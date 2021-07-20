@@ -18,7 +18,7 @@ export class TodoEntity {
   public static create(todoDto: TodoDto, clock: Clock) {
     const hour = clock.getNow().getHours();
     if (hour < 8 || hour >= 12)
-      throw new Error("You can only add todos between 08h00 and 12h00");
+      throw new Error("You can only add todos between 08h00 and 12h00. Was: " + hour);
 
     const trimmedDescription = todoDto.description.trim();
 
