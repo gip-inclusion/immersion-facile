@@ -9,7 +9,8 @@
     "test:e2e": "REPOSITORIES=JSON jest --runInBand --watchAll --testRegex=.e2e.test.ts --verbose",
     "test:integration": "jest --runInBand --testRegex=.integration.test.ts --watchAll --verbose",
     "test:all": "REPOSITORIES=JSON jest --runInBand --verbose",
-    "lint": "eslint '*/**/*.{js,ts,tsx}' --fix"
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --fix",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",

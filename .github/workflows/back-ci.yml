@@ -17,5 +17,5 @@ jobs:
         run: cd back && npm ci
       - name: Run tests
         run: cd back && npm run test:all
-      - name: Typecheck and Build
-        run: cd back && npm run build
+      - name: Typecheck
+        run: cd back && npm run typecheck
