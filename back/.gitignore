@@ -1,3 +1,4 @@
 node_modules
 coverage
 .idea
+data-test.json
