@@ -1,0 +1,23 @@
+name: Front CI
+on: [push]
+jobs:
+  Front-CI:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Copy shared folder from backend
+        run: cp -r back/src/shared front/src
+      - name: Install npm dependencies
+        run: cd front && npm ci
+      - name: Run tests
+        run: cd front && npm run test
+      - name: Typecheck and Build
+        run: cd front && npm run build
