@@ -1,0 +1,33 @@
+{
+  "version": "0.0.0",
+  "scripts": {
+    "test": "jest",
+    "dev": "npm run copy-shared && vite",
+    "build": "npm run copy-shared && tsc && vite build",
+    "serve": "vite preview",
+    "copy-shared": "cp -r ../back/src/shared ./src/"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.6.0",
+    "axios": "^0.21.1",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
+    "react-redux": "^7.2.4",
+    "uuid": "^8.3.2",
+    "yup": "^0.32.9"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.24",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/uuid": "^8.3.1",
+    "@vitejs/plugin-react-refresh": "^1.3.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "jest": "^27.0.6",
+    "prettier": "^2.3.2",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.3.2",
+    "vite": "^2.4.2"
+  }
+}
