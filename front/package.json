@@ -1,11 +1,11 @@
 {
   "version": "0.0.0",
   "scripts": {
-    "test": "jest",
-    "dev": "npm run copy-shared && vite",
-    "build": "npm run copy-shared && tsc && vite build",
+    "test": "npm run symlink-shared && jest",
+    "dev": "npm run symlink-shared && vite",
+    "build": "npm run symlink-shared && tsc && vite build",
     "serve": "vite preview",
-    "copy-shared": "cp -r ../back/src/shared ./src/"
+    "symlink-shared": "ln -fs ../../back/src/shared ./src/"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.6.0",
