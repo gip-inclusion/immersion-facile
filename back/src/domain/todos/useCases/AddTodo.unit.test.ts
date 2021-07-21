@@ -69,7 +69,7 @@ describe("Add Todo", () => {
       });
       await expectPromiseToFailWith(
         useCasePromise,
-        "You can only add todos between 08h00 and 12h00"
+        "You can only add todos between 08h00 and 12h00. Was: 7"
       );
     });
 
@@ -81,7 +81,7 @@ describe("Add Todo", () => {
       });
       await expectPromiseToFailWith(
         useCasePromise,
-        "You can only add todos between 08h00 and 12h00"
+        "You can only add todos between 08h00 and 12h00. Was: 12"
       );
     });
   });

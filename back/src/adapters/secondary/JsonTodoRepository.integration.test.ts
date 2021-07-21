@@ -3,6 +3,7 @@ import { JsonTodoRepository } from "./JsonTodoRepository";
 import * as fs from "fs";
 import * as util from "util";
 import { TodoRepository } from "../../domain/todos/ports/TodoRepository";
+import { CustomClock } from "../../domain/todos/ports/Clock";
 import { expectPromiseToFailWith } from "../../utils/test.helpers";
 
 const readFile = util.promisify(fs.readFile);
@@ -10,18 +11,20 @@ const readFile = util.promisify(fs.readFile);
 describe("JsonTodoRepository", () => {
   const dataPath = `${__dirname}/data-test.json`;
   let csvTodoRepository: TodoRepository;
+  let clock: CustomClock;
 
   beforeEach(() => {
     fs.writeFileSync(dataPath, "[]");
     csvTodoRepository = new JsonTodoRepository(dataPath);
+    clock = new CustomClock();
   });
 
   describe("save", () => {
     it("adds the Todo to the json file when empty", async () => {
-      const todoEntity = new TodoEntity({
+      const todoEntity = TodoEntity.create({
         uuid: "someUuid",
         description: "my csv description",
-      });
+      }, clock);
       await csvTodoRepository.save(todoEntity);
       await expectDataToBe([todoEntity]);
     });
@@ -31,10 +34,10 @@ describe("JsonTodoRepository", () => {
         { uuid: "alreadyThereUuid", description: "Already there description" },
       ]);
 
-      const todoEntity = new TodoEntity({
+      const todoEntity = TodoEntity.create({
         uuid: "newlyAddedUuid",
         description: "Newly added description",
-      });
+      }, clock);
 
       await csvTodoRepository.save(todoEntity);
       await expectDataToBe([
@@ -47,10 +50,10 @@ describe("JsonTodoRepository", () => {
       fillJsonWith([
         { uuid: "existingUuid", description: "Already there description" },
       ]);
-      const todoEntity = new TodoEntity({
+      const todoEntity = TodoEntity.create({
         uuid: "existingUuid",
         description: "Newly added description",
-      });
+      }, clock);
 
       await expectPromiseToFailWith(
         csvTodoRepository.save(todoEntity),
