@@ -1,0 +1,25 @@
+stages:
+  - install
+  - test
+  - build
+
+image: node:16.5
+
+cache:
+  paths:
+    - node_modules/
+
+front:
+  script:
+    - cd front
+    - npm ci
+    - npm run test
+    - npm run build
+
+back:
+  script:
+    - cd back
+    - npm install
+    - npm ci
+    - npm run test:all
+    - npm run typecheck
