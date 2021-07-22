@@ -2,6 +2,8 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 
+const backendUrl = process.env.BACKEND_URL || "http://localhost:8080/";
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [reactRefresh()],
@@ -13,7 +15,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:8080/",
+        target: backendUrl,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

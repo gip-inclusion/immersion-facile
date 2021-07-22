@@ -1,1 +1,6 @@
 FROM node:16.5
+COPY package.json package-lock.json /app/
+WORKDIR /app
+RUN npm ci 
+COPY . /app
+CMD npm start
