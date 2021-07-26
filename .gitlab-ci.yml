@@ -24,3 +24,15 @@ back:
     - npm ci
     - npm run test:all
     - npm run typecheck
+
+build_docker_image:
+  stage: build-docker-image
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+     # build de l'image docker contenant l'API et le back end  et push de celles-ci dans le container registry
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR/back --dockerfile $CI_PROJECT_DIR/back/Dockerfile --destination $CI_REGISTRY_IMAGE
+  only:
+    - branches
