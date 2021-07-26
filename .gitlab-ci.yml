@@ -46,9 +46,9 @@ build_docker_image_back_job:
   only:
     - branches
 
-deploy:
+deploy_back:
   image: alpine:latest
-  stage: deploy
+  stage: publish
   script:
     - chmod og= $DEPLOYER_ID_RSA_DEV
     - apk update && apk add openssh-client
