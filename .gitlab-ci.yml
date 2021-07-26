@@ -2,6 +2,7 @@ stages:
   - install
   - test
   - build
+  - deploy
 
 image: node:16.5
 
@@ -11,6 +12,7 @@ cache:
     - back/node_modules/
 
 front:
+  stage: test
   script:
     - cd front
     - npm ci
@@ -18,6 +20,7 @@ front:
     - npm run build
 
 back:
+  stage: test
   script:
     - cd back
     - npm install
@@ -25,8 +28,8 @@ back:
     - npm run test:all
     - npm run typecheck
 
-build_docker_image:
-  stage: build-docker-image
+build_docker_image_back_job:
+  stage: deploy
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
