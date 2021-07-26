@@ -1,5 +1,7 @@
 variables:
   SERVER_USER: deployer
+  TAG_COMMIT: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
+
 
 stages:
   - install
@@ -40,7 +42,7 @@ build_docker_image_back_job:
   script:
      # build de l'image docker contenant l'API et le back end  et push de celles-ci dans le container registry
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR/back --dockerfile $CI_PROJECT_DIR/back/Dockerfile --destination $CI_REGISTRY_IMAGE
+    - /kaniko/executor --context $CI_PROJECT_DIR/back --dockerfile $CI_PROJECT_DIR/back/Dockerfile --destination $CI_REGISTRY_IMAGE:$TAG_COMMIT
   only:
     - branches
 
@@ -52,4 +54,4 @@ deploy:
     - apk update && apk add openssh-client
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker container rm -f back || true"
-    - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker run -d -p 80:1234 --pull always --name back  $CI_REGISTRY_IMAGE"
+    - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker run -d -p 80:1234 --pull always --name back  $CI_REGISTRY_IMAGE:$TAG_COMMIT"
