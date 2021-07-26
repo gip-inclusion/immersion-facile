@@ -32,6 +32,25 @@ back:
     - npm run test:all
     - npm run typecheck
 
+sonarqube-check:
+  stage: test
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+  variables:
+    SONAR_TOKEN: "${SONAR_TOKEN}"
+    SONAR_HOST_URL: "https://sonarqube.beta.pole-emploi.fr"
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
+    GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: ${CI_JOB_NAME}
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=immersion-facile
+  allow_failure: true
+  only:
+    - dev
+
 build_docker_image_back_job:
   stage: deploy
   image:
