@@ -3,11 +3,11 @@ services:
     back:
         build: "./back"
         ports: 
-            - "8080:8080"
+            - "5555:1234"
     front:
         build: "."
         ports:
             - "3000:5000"
         environment: 
-            BACKEND_URL: "http://back:8080/"
+            BACKEND_URL: "http://back:5555/"
     
