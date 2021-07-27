@@ -86,7 +86,7 @@ deploy_back:
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker run -d -p 80:1234 --pull always --name back  $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
 
 deploy_front:
-  image; alpine:latest
+  image: alpine:latest
   stage: publish
   script:
       - chmod og= $DEPLOYER_ID_RSA_DEV
