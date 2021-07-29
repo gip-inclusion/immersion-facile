@@ -86,7 +86,6 @@ deploy_back:
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker run -d -p 8080:1234 --pull always --name back  ${CI_REGISTRY_IMAGE}/back:$CI_COMMIT_SHORT_SHA"
   only:
     - dev
-    - cicd-experiments
 
 deploy_front:
   image: alpine:latest
@@ -99,4 +98,3 @@ deploy_front:
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker run -d -p 80:5000 --pull always --name front  ${CI_REGISTRY_IMAGE}/front:$CI_COMMIT_SHORT_SHA"
   only:
     - dev
-    - cicd-experiments
