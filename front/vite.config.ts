@@ -12,6 +12,14 @@ export default defineConfig({
       src: resolve(__dirname, "src"),
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        formulaire: resolve(__dirname, 'formulaire.html'),
+      },
+    }
+  },
   server: {
     proxy: {
       "/api": {
