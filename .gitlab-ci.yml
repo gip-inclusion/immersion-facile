@@ -47,7 +47,7 @@ sonarqube-check:
       - .sonar/cache
   script:
     - npm install typescript
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=immersion-facile
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=immersion-facile -Dsonar.scm.provider=git
   allow_failure: true
   only:
     - dev
