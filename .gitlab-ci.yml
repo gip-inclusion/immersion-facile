@@ -84,7 +84,20 @@ deploy_back:
     - apk update && apk add openssh-client
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker container rm -f back || true"
-    - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "docker run -d -p 8080:1234 --pull always --name back  ${CI_REGISTRY_IMAGE}/back:$CI_COMMIT_SHORT_SHA"
+    - ssh
+        -i $DEPLOYER_ID_RSA_DEV
+        -o StrictHostKeyChecking=no
+        $SERVER_USER@$DEPLOYER_SERVER_IP_DEV
+        "docker run
+          -d
+          -p 8080:1234
+          --env REPOSITORIES=AIRTABLE
+          --env AIRTABLE_API_KEY
+          --env AIRTABLE_BASE_ID
+          --env AIRTABLE_TABLE_NAME
+          --pull always
+          --name back
+          ${CI_REGISTRY_IMAGE}/back:$CI_COMMIT_SHORT_SHA"
   only:
     - dev
 

@@ -3,6 +3,7 @@ import { AddFormulaire } from "../../domain/formulaires/useCases/AddFormulaire";
 import { ListFormulaires } from "../../domain/formulaires/useCases/ListFormulaires";
 import { AddTodo } from "../../domain/todos/useCases/AddTodo";
 import { ListTodos } from "../../domain/todos/useCases/ListTodos";
+import { AirtableFormulaireRepository } from "../secondary/AirtableFormulaireRepository";
 import { InMemoryFormulaireRepository } from "../secondary/InMemoryFormulaireRepository";
 import { InMemoryTodoRepository } from "../secondary/InMemoryTodoRepository";
 import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
@@ -10,17 +11,23 @@ import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
 export const getRepositories = () => {
   console.log("Repositories : ", process.env.REPOSITORIES ?? "IN_MEMORY");
 
-  if (process.env.REPOSITORIES === "JSON") {
-    console.log("JSON repository for formulaires isn't implemented yet!!");
-  }
-
   return {
     todo:
       process.env.REPOSITORIES === "JSON"
         ? new JsonTodoRepository(`${__dirname}/../secondary/app-data.json`)
         : new InMemoryTodoRepository(),
 
-    formulaires: new InMemoryFormulaireRepository(),
+    formulaires:
+      process.env.REPOSITORIES === "AIRTABLE"
+        ? AirtableFormulaireRepository.create(
+            process.env.AIRTABLE_API_KEY ||
+              fail("Missing environment variable: AIRTABLE_API_KEY"),
+            process.env.AIRTABLE_BASE_ID ||
+              fail("Missing environment variable: AIRTABLE_BASE_ID"),
+            process.env.AIRTABLE_TABLE_NAME ||
+              fail("Missing environment variable: AIRTABLE_TABLE_NAME")
+          )
+        : new InMemoryFormulaireRepository(),
   };
 };
 
