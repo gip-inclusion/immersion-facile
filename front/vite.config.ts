@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 
-const backendUrl = process.env.BACKEND_URL || "http://localhost:8080/";
+const backendUrl = process.env.BACKEND_URL || "http://localhost:1234/";
 
 // https://vitejs.dev/config/
 export default defineConfig({
