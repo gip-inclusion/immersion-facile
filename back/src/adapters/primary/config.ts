@@ -31,6 +31,10 @@ export const getRepositories = () => {
   };
 };
 
+ const fail = (message: string) => {
+   throw new Error(message);
+ };
+
 const getClock = (): Clock => {
   console.log("NODE_ENV : ", process.env.NODE_ENV);
 

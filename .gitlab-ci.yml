@@ -92,9 +92,9 @@ deploy_back:
           -d
           -p 8080:1234
           --env REPOSITORIES=AIRTABLE
-          --env AIRTABLE_API_KEY
-          --env AIRTABLE_BASE_ID
-          --env AIRTABLE_TABLE_NAME
+          --env AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+          --env AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
+          --env AIRTABLE_TABLE_NAME=${AIRTABLE_TABLE_NAME}
           --pull always
           --name back
           ${CI_REGISTRY_IMAGE}/back:$CI_COMMIT_SHORT_SHA"
