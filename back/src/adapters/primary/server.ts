@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+import PinoHttp from "pino-http";
 import { todosRoute, formulairesRoute } from "../../shared/routes";
 import { getUsecases } from "./config";
 import bodyParser from "body-parser";
@@ -6,11 +7,13 @@ import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { todoDtoSchema } from "../../shared/TodoDto";
 import { formulaireDtoSchema } from "../../shared/FormulaireDto";
+import { logger } from "../../utils/logger";
 
 const app = express();
 const router = Router();
 
 app.use(bodyParser.json());
+app.use(PinoHttp({ logger }));
 
 router.route("/").get((req, res) => {
   return res.json({ message: "Hello World !" });

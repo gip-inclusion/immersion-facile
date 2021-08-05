@@ -7,9 +7,10 @@ import { AirtableFormulaireRepository } from "../secondary/AirtableFormulaireRep
 import { InMemoryFormulaireRepository } from "../secondary/InMemoryFormulaireRepository";
 import { InMemoryTodoRepository } from "../secondary/InMemoryTodoRepository";
 import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
+import { logger } from "../../utils/logger";
 
 export const getRepositories = () => {
-  console.log("Repositories : ", process.env.REPOSITORIES ?? "IN_MEMORY");
+  logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
 
   return {
     todo:
@@ -36,7 +37,7 @@ export const getRepositories = () => {
  };
 
 const getClock = (): Clock => {
-  console.log("NODE_ENV : ", process.env.NODE_ENV);
+  logger.info(`NODE_ENV : ${process.env.NODE_ENV}`);
 
   if (process.env.NODE_ENV === "test") {
     const clock = new CustomClock();
