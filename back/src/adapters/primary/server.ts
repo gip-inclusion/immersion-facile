@@ -13,7 +13,10 @@ const app = express();
 const router = Router();
 
 app.use(bodyParser.json());
-app.use(PinoHttp({ logger }));
+
+if (process.env.NODE_ENV !== 'test') {
+  app.use(PinoHttp({ logger }));
+}
 
 router.route("/").get((req, res) => {
   return res.json({ message: "Hello World !" });
