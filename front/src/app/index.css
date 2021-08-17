@@ -8,8 +8,3 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
-
-#form-body {
-  padding: 50px;
-  max-width: 500px;
-}

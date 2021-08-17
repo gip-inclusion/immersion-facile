@@ -1,11 +1,9 @@
 import { InMemoryFormulaireRepository } from "../../../adapters/secondary/InMemoryFormulaireRepository";
 import { ListFormulaires } from "./ListFormulaires";
+import { validFormulaire } from "../entities/FormulaireEntityTestData";
+import { FormulaireEntity } from "../entities/FormulaireEntity";
 
 describe("List Formulaires", () => {
-  const EMAIL = "some@email.fr";
-  const DATE_START = new Date(1000);
-  const DATE_END = new Date(1001);
-
   let repository: InMemoryFormulaireRepository;
   let listFormulaires: ListFormulaires;
 
@@ -23,16 +21,11 @@ describe("List Formulaires", () => {
 
   describe("When a formulaire is stored", () => {
     test("returns the formulaire", async () => {
-      repository.setFormulaires([{
-        email: EMAIL,
-        dateStart: DATE_START,
-        dateEnd: DATE_END,
-      }]);
+      const form = FormulaireEntity.create(validFormulaire);
+      repository.setFormulaires([form]);
 
       const formulaires = await listFormulaires.execute();
-      expect(formulaires).toEqual([
-        { email: EMAIL, dateStart: DATE_START, dateEnd: DATE_END },
-      ]);
+      expect(formulaires).toEqual([form]);
     });
   });
 });

@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import { Provider } from "react-redux";
 import { configureReduxStore } from "src/core-logic/store/initilizeStore";
 import { Formulaire } from "./formulaire";
 import { HttpTodoGateway } from "src/core-logic/adapters/HttpTodoGateway";
@@ -18,9 +17,7 @@ const store = configureReduxStore({ todoGateway });
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <Formulaire />
-    </Provider>
+    <Formulaire />
   </React.StrictMode>,
   document.getElementById("root")
 );
