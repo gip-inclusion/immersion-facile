@@ -18,20 +18,19 @@ describe("/formulaires route", () => {
       .expect(200, [])
 
       // POSTing a valid formulaire succeeds.
-      .then(() => {
+      .end((err, res) => {
+        if (err) return done(err);
         supertest(app)
           .post("/formulaires")
           .send(validFormulaire)
-          .expect("Content-Type", /json/)
           .expect(200)
-          .then((response) => {
-            expect(typeof response.body.id).toEqual("string");
-            expect(response.body.id).not.toEqual("");
-            done();
-          })
+          .expect("Content-Type", /json/)
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(typeof res.body.id).toEqual("string");
+            expect(res.body.id).not.toEqual("");
 
-          // GET /formulaires returns the recorded formulaire.
-          .then(() => {
+            // GET /formulaires returns the recorded formulaire.
             supertest(app)
               .get("/formulaires")
               .expect("Content-Type", /json/)
