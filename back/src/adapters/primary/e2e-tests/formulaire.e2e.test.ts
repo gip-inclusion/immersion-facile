@@ -23,7 +23,12 @@ describe("/formulaires route", () => {
           .post("/formulaires")
           .send(validFormulaire)
           .expect("Content-Type", /json/)
-          .expect(200, { success: true })
+          .expect(200)
+          .then((response) => {
+            expect(typeof response.body.id).toEqual("string");
+            expect(response.body.id).not.toEqual("");
+            done();
+          })
 
           // GET /formulaires returns the recorded formulaire.
           .then(() => {

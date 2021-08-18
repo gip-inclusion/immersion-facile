@@ -2,6 +2,7 @@ import Airtable, { Table, FieldSet } from "airtable";
 import moment from "moment";
 import { FormulaireRepository } from "../../domain/formulaires/ports/FormulaireRepository";
 import { FormulaireEntity } from "../../domain/formulaires/entities/FormulaireEntity";
+import { FormulaireIdEntity } from "../../domain/formulaires/entities/FormulaireIdEntity";
 
 export class AirtableFormulaireRepository implements FormulaireRepository {
   private readonly table: Table<FieldSet>;
@@ -16,8 +17,8 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
     );
   }
 
-  public async save(entity: FormulaireEntity): Promise<void> {
-    await this.table.create([
+  public async save(entity: FormulaireEntity): Promise<FormulaireIdEntity> {
+    return this.table.create([
       {
         fields: {
           email: entity.email,
@@ -44,8 +45,15 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
           beneficiaryAccepted: entity.beneficiaryAccepted,
           enterpriseAccepted: entity.enterpriseAccepted,
         },
-      },
-    ]);
+      }
+    ]).then((response) => {
+        if (response.length < 1) {
+          throw new Error(
+            `Unexpected response length during creation of Airtable record: ${response}`
+          );
+        }
+        return FormulaireIdEntity.create(response[0].id);
+      });
   }
 
   private isArrayOfStrings(value: any): boolean {

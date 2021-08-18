@@ -1,19 +1,26 @@
 import { UseCase } from "../../core/UseCase";
 import { FormulaireEntity } from "../entities/FormulaireEntity";
 import { FormulaireRepository } from "../ports/FormulaireRepository";
-import { FormulaireDto } from "../../../shared/FormulaireDto";
+import {
+  AddFormulaireResponseDto,
+  FormulaireDto,
+} from "../../../shared/FormulaireDto";
 
-type AddFormulaireDependencies = { formulaireRepository: FormulaireRepository; };
+type AddFormulaireDependencies = { formulaireRepository: FormulaireRepository };
 
-export class AddFormulaire implements UseCase<FormulaireDto> {
-    private readonly formulaireRepository: FormulaireRepository;
+export class AddFormulaire
+  implements UseCase<FormulaireDto, AddFormulaireResponseDto>
+{
+  private readonly formulaireRepository: FormulaireRepository;
 
-    constructor({ formulaireRepository }: AddFormulaireDependencies) {
-        this.formulaireRepository = formulaireRepository;
-    }
+  constructor({ formulaireRepository }: AddFormulaireDependencies) {
+    this.formulaireRepository = formulaireRepository;
+  }
 
-    public async execute(params: FormulaireDto) {
-        const formulaire = FormulaireEntity.create(params);
-        await this.formulaireRepository.save(formulaire);
-    }
+  public async execute(
+    params: FormulaireDto
+  ): Promise<AddFormulaireResponseDto> {
+    const formulaire = FormulaireEntity.create(params);
+    return this.formulaireRepository.save(formulaire);
+  }
 }
