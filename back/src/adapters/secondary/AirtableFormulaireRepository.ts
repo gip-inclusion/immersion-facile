@@ -1,5 +1,5 @@
 import Airtable, { Table, FieldSet } from "airtable";
-import moment from "moment";
+import { format } from "date-fns";
 import { FormulaireRepository } from "../../domain/formulaires/ports/FormulaireRepository";
 import { FormulaireEntity } from "../../domain/formulaires/entities/FormulaireEntity";
 import { FormulaireIdEntity } from "../../domain/formulaires/entities/FormulaireIdEntity";
@@ -25,8 +25,8 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
           phone: entity.phone,
           firstName: entity.firstName,
           lastName: entity.lastName,
-          dateStart: moment(entity.dateStart).format("YYYY-MM-DD"),
-          dateEnd: moment(entity.dateEnd).format("YYYY-MM-DD"),
+          dateStart: format(entity.dateStart, "YYYY-MM-DD"),
+          dateEnd: format(entity.dateEnd, "YYYY-MM-DD"),
           businessName: entity.businessName,
           siret: entity.siret,
           mentor: entity.mentor,
@@ -47,13 +47,13 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
         },
       }
     ]).then((response) => {
-        if (response.length < 1) {
-          throw new Error(
-            `Unexpected response length during creation of Airtable record: ${response}`
-          );
-        }
-        return FormulaireIdEntity.create(response[0].id);
-      });
+      if (response.length < 1) {
+        throw new Error(
+          `Unexpected response length during creation of Airtable record: ${response}`
+        );
+      }
+      return FormulaireIdEntity.create(response[0].id);
+    });
   }
 
   private isArrayOfStrings(value: any): boolean {
