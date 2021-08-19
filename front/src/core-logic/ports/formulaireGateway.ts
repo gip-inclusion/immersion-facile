@@ -1,5 +1,5 @@
-import { FormulaireDto } from "src/shared/FormulaireDto";
+import { FormulaireDto, AddFormulaireResponseDto } from "src/shared/FormulaireDto";
 
 export interface FormulaireGateway {
-  add: (todo: FormulaireDto) => Promise<void>;
+  add: (todo: FormulaireDto) => Promise<AddFormulaireResponseDto>;
 }
