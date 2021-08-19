@@ -4,3 +4,10 @@ export const expectPromiseToFailWith = async (
 ) => {
   await expect(promise).rejects.toThrowError(new Error(errorMessage));
 };
+
+export const expectPromiseToFailWithError = async (
+  promise: Promise<unknown>,
+  error: Error
+) => {
+  await expect(promise).rejects.toThrowError(error);
+};

@@ -70,3 +70,11 @@ const addFormulaireResponseDtoSchema = Yup.object({
 export type AddFormulaireResponseDto = Yup.InferType<
   typeof addFormulaireResponseDtoSchema
 >;
+
+export const getFormulaireRequestDtoSchema = Yup.object({
+  id: Yup.string().required(),
+}).required();
+
+export type getFormulaireRequestDto = Yup.InferType<
+  typeof getFormulaireRequestDtoSchema
+>;

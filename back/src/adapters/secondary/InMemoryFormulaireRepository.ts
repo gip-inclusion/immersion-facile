@@ -21,9 +21,13 @@ export class FakeIdGenerator implements InMemoryFormulaireIdGenerator {
   }
 }
 
+type Formulaires = {
+  [id: string]: FormulaireEntity;
+};
+
 export class InMemoryFormulaireRepository implements FormulaireRepository {
   private readonly idGenerator: InMemoryFormulaireIdGenerator;
-  private _formulaires: FormulaireEntity[] = [];
+  private _formulaires: Formulaires = {};
 
   public constructor(
     idGenerator: InMemoryFormulaireIdGenerator = new DefaultIdGenerator()
@@ -34,15 +38,24 @@ export class InMemoryFormulaireRepository implements FormulaireRepository {
   public async save(
     formulaireEntity: FormulaireEntity
   ): Promise<FormulaireIdEntity> {
-    this._formulaires.push(formulaireEntity);
-    return FormulaireIdEntity.create(this.idGenerator.nextId());
+    const id = this.idGenerator.nextId();
+    this._formulaires[id] = formulaireEntity;
+    return FormulaireIdEntity.create(id);
   }
 
   public async getAllFormulaires() {
-    return this._formulaires;
+    const formulaires = [];
+    for (let id in this._formulaires) {
+      formulaires.push(this._formulaires[id]);
+    }
+    return formulaires;
   }
 
-  setFormulaires(formulaireEntites: FormulaireEntity[]) {
+  public async getFormulaire(id: FormulaireIdEntity) {
+    return this._formulaires[id.id];
+  }
+
+  setFormulaires(formulaireEntites: Formulaires) {
     this._formulaires = formulaireEntites;
   }
 }

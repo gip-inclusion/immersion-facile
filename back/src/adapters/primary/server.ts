@@ -6,7 +6,10 @@ import bodyParser from "body-parser";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { todoDtoSchema } from "../../shared/TodoDto";
-import { formulaireDtoSchema } from "../../shared/FormulaireDto";
+import {
+  formulaireDtoSchema,
+  getFormulaireRequestDtoSchema
+} from "../../shared/FormulaireDto";
 import { logger } from "../../utils/logger";
 
 const app = express();
@@ -14,7 +17,7 @@ const router = Router();
 
 app.use(bodyParser.json());
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== "test") {
   app.use(PinoHttp({ logger }));
 }
 
@@ -31,7 +34,7 @@ router
       callUseCase({
         useCase: useCases.addTodo,
         validationSchema: todoDtoSchema,
-        useCaseParams: req.body,
+        useCaseParams: req.body
       })
     )
   )
@@ -46,12 +49,25 @@ router
       callUseCase({
         useCase: useCases.addFormulaire,
         validationSchema: formulaireDtoSchema,
-        useCaseParams: req.body,
+        useCaseParams: req.body
       })
     )
   )
   .get(async (req, res) =>
     sendHttpResponse(res, () => useCases.listFormulaires.execute())
+  );
+
+  const uniqueFormulaireRouter = Router({mergeParams: true});
+  router.use(`/${formulairesRoute}`, uniqueFormulaireRouter);
+
+  uniqueFormulaireRouter.route(`/:id`).get(async (req, res) =>
+    sendHttpResponse(res, () =>
+      callUseCase({
+        useCase: useCases.getFormulaire,
+        validationSchema: getFormulaireRequestDtoSchema,
+        useCaseParams: req.params,
+      })
+    )
   );
 
 app.use(router);

@@ -22,7 +22,7 @@ describe("List Formulaires", () => {
   describe("When a formulaire is stored", () => {
     test("returns the formulaire", async () => {
       const form = FormulaireEntity.create(validFormulaire);
-      repository.setFormulaires([form]);
+      repository.setFormulaires({"form_id": form});
 
       const formulaires = await listFormulaires.execute();
       expect(formulaires).toEqual([form]);

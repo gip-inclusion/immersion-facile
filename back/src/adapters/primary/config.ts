@@ -8,6 +8,7 @@ import { InMemoryFormulaireRepository } from "../secondary/InMemoryFormulaireRep
 import { InMemoryTodoRepository } from "../secondary/InMemoryTodoRepository";
 import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
 import { logger } from "../../utils/logger";
+import { GetFormulaire } from "../../domain/formulaires/useCases/GetFormulaire";
 
 export const getRepositories = () => {
   logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
@@ -57,6 +58,9 @@ export const getUsecases = () => {
     }),
     listTodos: new ListTodos(repositories.todo),
     addFormulaire: new AddFormulaire({
+      formulaireRepository: repositories.formulaires,
+    }),
+    getFormulaire: new GetFormulaire({
       formulaireRepository: repositories.formulaires,
     }),
     listFormulaires: new ListFormulaires({
