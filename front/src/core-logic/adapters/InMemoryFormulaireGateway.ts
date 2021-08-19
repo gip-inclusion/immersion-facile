@@ -10,6 +10,10 @@ export class InMemoryFormulaireGateway implements FormulaireGateway {
     return {id: 'fake-test-id'};
   }
 
+  public async get(id: string): Promise<FormulaireDto> {
+    return this._formulaires[0]
+  }
+
   // for test purpose:
   public getFormulaires() {
     return this._formulaires;

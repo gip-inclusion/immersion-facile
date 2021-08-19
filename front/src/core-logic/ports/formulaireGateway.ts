@@ -2,4 +2,5 @@ import { FormulaireDto, AddFormulaireResponseDto } from "src/shared/FormulaireDt
 
 export interface FormulaireGateway {
   add: (todo: FormulaireDto) => Promise<AddFormulaireResponseDto>;
+  get: (id: string) => Promise<FormulaireDto>;
 }

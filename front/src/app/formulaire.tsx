@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { Component, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Formik, Form, useField, FormikState, FieldHookConfig, Field, FormikHelpers, FormikValues } from "formik";
 import * as Yup from "yup";
 import { formulaireGateway } from "src/app/main";
 import { FormulaireDto, formulaireDtoSchema } from "src/shared/FormulaireDto"
+import { current } from "@reduxjs/toolkit";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
 
@@ -179,311 +180,355 @@ const MyRadioGroup = (props: MyCheckboxGroupProps) => {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 let submitError: Error | null = null
 
-export const Formulaire = () => {
-  return (
-    <>
-      <header role="banner" className="fr-header">
-        <div className="fr-header__body">
-          <div className="fr-container">
-            <div className="fr-header__body-row">
-              <div className="fr-header__brand fr-enlarge-link">
-                <div className="fr-header__brand-top">
-                  <div className="fr-header__logo">
-                    <p className="fr-logo">
-                      République
-                      <br />Française
-                    </p>
+
+interface FormulaireProps { }
+interface FormulaireState {
+  initialValues: FormulaireDto
+}
+export class Formulaire extends Component<FormulaireProps, FormulaireState> {
+
+  createInitialValues(): FormulaireDto {
+    return {
+      // Participant
+      email: "jeffmac@google.com",
+      firstName: "JF",
+      lastName: "Macresy",
+      phone: "0664404708",
+      dateStart: new Date("2020-01-01"),
+      dateEnd: new Date("2020-02-01"),
+
+      // Enterprise
+      siret: "12345678912345",
+      businessName: "Ma petite entreprise ne connait pas la crise", //< raison sociale
+      mentor: "The Mentor",
+      mentorPhone: "0687010101",
+      mentorEmail: "mentor@supermentor.fr",
+      workdays: ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+      workHours: "9h00-12h00, 14h00-18h00",
+      immersionAddress: "Quelque Part",
+
+      // Covid
+      individualProtection: false,
+      sanitaryPrevention: false,
+      sanitaryPreventionDescription: "Aucunes",
+
+      // Immersion
+      immersionObjective: "Valider coaching d'équipe",
+      immersionProfession: "Chef d'atelier", //< intitulé du poste
+      immersionActivities: "Superviser",
+      immersionSkills: "Attention au détail",
+
+      // Signatures
+      beneficiaryAccepted: false,
+      enterpriseAccepted: false,
+    }
+  }
+
+  async loadValuesForCurrentID() {
+    const queryParams = new URLSearchParams(window.location.search);
+    let id = queryParams.get("id");
+    if (!id) {
+      return;
+    }
+    try {
+      let response = await formulaireGateway.get(id);
+      this.setState({ initialValues: response })
+    } catch (e) {
+      console.log(e)
+      submitError = e;
+    }
+  }
+
+  componentDidMount() {
+    this.loadValuesForCurrentID();
+  }
+
+  constructor(props: any) {
+    super(props);
+    this.state = { initialValues: this.createInitialValues() };
+  }
+
+  render() {
+
+    return (
+      <>
+        <header role="banner" className="fr-header">
+          <div className="fr-header__body">
+            <div className="fr-container">
+              <div className="fr-header__body-row">
+                <div className="fr-header__brand fr-enlarge-link">
+                  <div className="fr-header__brand-top">
+                    <div className="fr-header__logo">
+                      <p className="fr-logo">
+                        République
+                        <br />Française
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="fr-header__service">
-                  <p className="fr-header__service-title">Immersion Facile</p>
-                  <p className="fr-header__service-tagline">Faciliter la réalisation des immersion professionnelles</p>
+                  <div className="fr-header__service">
+                    <p className="fr-header__service-title">Immersion Facile</p>
+                    <p className="fr-header__service-tagline">Faciliter la réalisation des immersion professionnelles</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
-        <div className="fr-col-lg-8 fr-p-2w">
+        <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+          <div className="fr-col-lg-8 fr-p-2w">
 
 
-          <h2>Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)</h2>
-          <div className="fr-text">
-            Bravo ! <br />
-            Vous avez trouvé une entreprise pour vous accueillir en immersion. <br />
-            Avant tout, vous devez faire établir une convention pour cette immersion et c'est ici que ça se passe. <br />
-            En quelques minutes, complétez ce formulaire avec l'entreprise qui vous accueillera. <br />
-            <p className="fr-text--xs">
-              Ce formulaire vaut équivalence de la signature du CERFA 13912 * 03
-            </p>
-          </div>
-
+            <h2>Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)</h2>
+            <div className="fr-text">
+              Bravo ! <br />
+              Vous avez trouvé une entreprise pour vous accueillir en immersion. <br />
+              Avant tout, vous devez faire établir une convention pour cette immersion et c'est ici que ça se passe. <br />
+              En quelques minutes, complétez ce formulaire avec l'entreprise qui vous accueillera. <br />
+              <p className="fr-text--xs">
+                Ce formulaire vaut équivalence de la signature du CERFA 13912 * 03
+              </p>
+            </div>
 
 
 
-          <Formik
-            initialValues={{
-              // Participant
-              email: "jeffmac@google.com",
-              firstName: "JF",
-              lastName: "Macresy",
-              phone: "0664404708",
-              dateStart: Date(),
-              dateEnd: Date(),
 
-              // Enterprise
-              siret: "12345678912345",
-              businessName: "Ma petite entreprise ne connait pas la crise", //< raison sociale
-              mentor: "The Mentor",
-              mentorPhone: "0687010101",
-              mentorEmail: "mentor@supermentor.fr",
-              workdays: ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
-              workHours: "9h00-12h00, 14h00-18h00",
-              immersionAddress: "Quelque Part",
+            <Formik
+              enableReinitialize={true}
+              initialValues={this.state.initialValues}
+              validationSchema={formulaireDtoSchema}
+              onSubmit={async (values, { setSubmitting }) => {
+                console.log(values);
+                const formulaire = formulaireDtoSchema.validate(values);
+                try {
+                  const response = await formulaireGateway.add(await formulaire);
+                  var queryParams = new URLSearchParams(window.location.search);
+                  queryParams.set("id", response.id);
+                  history.replaceState(null, document.title, "?" + queryParams.toString());
+                } catch (e) {
+                  console.log(e)
+                  submitError = e;
+                }
+                setSubmitting(false);
+              }}
+            >
+              {props => (
+                <div>
+                  <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
+                    <MyTextInput
+                      label="Email *"
+                      name="email"
+                      type="email"
+                      placeholder="nom@exemple.com"
+                      description="cela nous permet de vous transmettre la validation de la convention"
+                    />
 
-              // Covid
-              individualProtection: false,
-              sanitaryPrevention: false,
-              sanitaryPreventionDescription: "Aucunes",
+                    <MyTextInput
+                      label="Votre nom *"
+                      name="firstName"
+                      type="text"
+                      placeholder=""
+                      description=""
+                    />
 
-              // Immersion
-              immersionObjective: "Valider coaching d'équipe",
-              immersionProfession: "Chef d'atelier", //< intitulé du poste
-              immersionActivities: "Superviser",
-              immersionSkills: "Attention au détail",
+                    <MyTextInput
+                      label="Votre prénom *"
+                      name="lastName"
+                      type="text"
+                      placeholder=""
+                      description=""
+                    />
 
-              // Signatures
-              beneficiaryAccepted: false,
-              enterpriseAccepted: false,
-            }}
-            validationSchema={formulaireDtoSchema}
-            onSubmit={async (values, { setSubmitting }) => {
-              console.log(values);
-              const formulaire = formulaireDtoSchema.validate(values);
-              try { 
-                const response = await formulaireGateway.add(await formulaire);
-                alert(response.id); 
-              } catch (e) {
-                console.log(e)
-                submitError = e;
-              }
-              setSubmitting(false);
-            }}
-          >
-            {props => (
-              <div>
-                <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-                  <MyTextInput
-                    label="Email *"
-                    name="email"
-                    type="email"
-                    placeholder="nom@exemple.com"
-                    description="cela nous permet de vous transmettre la validation de la convention"
-                  />
+                    <MyTextInput
+                      label="Votre numéro de téléphone"
+                      name="phone"
+                      type="tel"
+                      placeholder="0606060607"
+                      description="pour qu’on puisse vous contacter à propos de l’immersion"
+                    />
 
-                  <MyTextInput
-                    label="Votre nom *"
-                    name="firstName"
-                    type="text"
-                    placeholder=""
-                    description=""
-                  />
+                    <MyDateInput
+                      label="Date de debut de l'immersion *"
+                      name="dateStart"
+                      type="date"
+                    />
 
-                  <MyTextInput
-                    label="Votre prénom *"
-                    name="lastName"
-                    type="text"
-                    placeholder=""
-                    description=""
-                  />
+                    <MyDateInput
+                      label="Date de fin de l'immersion *"
+                      name="dateEnd"
+                      type="date"
+                    />
 
-                  <MyTextInput
-                    label="Votre numéro de téléphone"
-                    name="phone"
-                    type="tel"
-                    placeholder="0606060607"
-                    description="pour qu’on puisse vous contacter à propos de l’immersion"
-                  />
+                    <h4><br />Les questions suivantes doivent être complétées avec la personne qui vous accueillera pendant votre immersion</h4>
 
-                  <MyDateInput
-                    label="Date de debut de l'immersion *"
-                    name="dateStart"
-                    type="date"
-                  />
+                    <MyTextInput
+                      label="Indiquez le SIRET de la structure d'accueil *"
+                      name="siret"
+                      type="number"
+                      placeholder="362 521 879 00034"
+                      description="la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
+                    />
 
-                  <MyDateInput
-                    label="Date de fin de l'immersion *"
-                    name="dateEnd"
-                    type="date"
-                  />
+                    <MyTextInput
+                      label="Indiquez le nom (raison sociale) de l'établissement d'accueil *"
+                      name="businessName"
+                      type="text"
+                      placeholder=""
+                      description=""
+                    />
 
-                  <h4><br />Les questions suivantes doivent être complétées avec la personne qui vous accueillera pendant votre immersion</h4>
+                    <MyTextInput
+                      label="Indiquez le prénom, nom et fonction du tuteur *"
+                      name="mentor"
+                      type="text"
+                      placeholder=""
+                      description="Ex : Alain Prost, pilote automobile"
+                    />
 
-                  <MyTextInput
-                    label="Indiquez le SIRET de la structure d'accueil *"
-                    name="siret"
-                    type="number"
-                    placeholder="362 521 879 00034"
-                    description="la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
-                  />
+                    <MyTextInput
+                      label="Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil *"
+                      name="mentorPhone"
+                      type="tel"
+                      placeholder="0606060707"
+                      description="pour qu’on puisse le contacter à propos de l’immersion"
+                    />
 
-                  <MyTextInput
-                    label="Indiquez le nom (raison sociale) de l'établissement d'accueil *"
-                    name="businessName"
-                    type="text"
-                    placeholder=""
-                    description=""
-                  />
+                    <MyTextInput
+                      label="Indiquez l'e-mail du tuteur *"
+                      name="mentorEmail"
+                      type="email"
+                      placeholder="alain.prost@exemple.com"
+                      description="pour envoyer la validation de la convention"
+                    />
 
-                  <MyTextInput
-                    label="Indiquez le prénom, nom et fonction du tuteur *"
-                    name="mentor"
-                    type="text"
-                    placeholder=""
-                    description="Ex : Alain Prost, pilote automobile"
-                  />
+                    <MyCheckboxGroup
+                      name="workdays"
+                      label="Journées pendant lesquelles l'immersion va se dérouler *"
+                      values={["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]}
+                    />
 
-                  <MyTextInput
-                    label="Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil *"
-                    name="mentorPhone"
-                    type="tel"
-                    placeholder="0606060707"
-                    description="pour qu’on puisse le contacter à propos de l’immersion"
-                  />
-
-                  <MyTextInput
-                    label="Indiquez l'e-mail du tuteur *"
-                    name="mentorEmail"
-                    type="email"
-                    placeholder="alain.prost@exemple.com"
-                    description="pour envoyer la validation de la convention"
-                  />
-
-                  <MyCheckboxGroup
-                    name="workdays"
-                    label="Journées pendant lesquelles l'immersion va se dérouler *"
-                    values={["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]}
-                  />
-
-                  <MyTextInput
-                    label="Indiquez les horaires de l'immersion *"
-                    name="workHours"
-                    type="text"
-                    placeholder=""
-                    description="Par ex, de 8h30 à 12h et de 13h à 16h.
+                    <MyTextInput
+                      label="Indiquez les horaires de l'immersion *"
+                      name="workHours"
+                      type="text"
+                      placeholder=""
+                      description="Par ex, de 8h30 à 12h et de 13h à 16h.
                   Si les horaires sont différents en fonction des journée, précisez-le bien.
                   Par ex,  lundi, de 10h à 12h et de 13h30 à 17h,  les autres jours de la semaine,  de 8h30 à 12h00 et de 13h00 à 16h00.
                   Si il y a un jour férié ou non travaillé pendant l'immersion, le préciser aussi.  Par ex :  en dehors du  8 mai, jour férié."
-                  />
+                    />
 
-                  <MyTextInput
-                    label="Adresse du lieu où se fera l'immersion (si différent de l’adresse de la structure d’accueil)"
-                    name="immersionAddress"
-                    type="text"
-                    placeholder=""
-                    description=""
-                  />
+                    <MyTextInput
+                      label="Adresse du lieu où se fera l'immersion (si différent de l’adresse de la structure d’accueil)"
+                      name="immersionAddress"
+                      type="text"
+                      placeholder=""
+                      description=""
+                    />
 
-                  <MyBoolRadioGroup
-                    name="individualProtection"
-                    label="Un équipement de protection individuelle est-il fourni pour l’immersion ?"
-                    formikHelpers={props}
-                    hideNoOption={false}
-                    description=""
-                    descriptionLink=""
-                  />
+                    <MyBoolRadioGroup
+                      name="individualProtection"
+                      label="Un équipement de protection individuelle est-il fourni pour l’immersion ?"
+                      formikHelpers={props}
+                      hideNoOption={false}
+                      description=""
+                      descriptionLink=""
+                    />
 
-                  <MyBoolRadioGroup
-                    name="sanitaryPrevention"
-                    label="Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ? *"
-                    formikHelpers={props}
-                    hideNoOption={false}
-                    description=""
-                    descriptionLink=""
-                  />
+                    <MyBoolRadioGroup
+                      name="sanitaryPrevention"
+                      label="Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ? *"
+                      formikHelpers={props}
+                      hideNoOption={false}
+                      description=""
+                      descriptionLink=""
+                    />
 
-                  <MyTextInput
-                    label="Si oui, précisez-les"
-                    name="sanitaryPreventionDescription"
-                    type="text"
-                    placeholder=""
-                    description="Ex : fourniture de gel, de masques"
-                  />
+                    <MyTextInput
+                      label="Si oui, précisez-les"
+                      name="sanitaryPreventionDescription"
+                      type="text"
+                      placeholder=""
+                      description="Ex : fourniture de gel, de masques"
+                    />
 
-                  <MyRadioGroup
-                    name="immersionObjective"
-                    label="Objectif  de la période de mise en situation en milieu professionnel"
-                    values={["Confirmer un projet professionnel",
-                      "Découvrir un métier ou un secteur d'activité",
-                      "Initier une démarche de recrutement"
-                    ]}
-                  />
+                    <MyRadioGroup
+                      name="immersionObjective"
+                      label="Objectif  de la période de mise en situation en milieu professionnel"
+                      values={["Confirmer un projet professionnel",
+                        "Découvrir un métier ou un secteur d'activité",
+                        "Initier une démarche de recrutement"
+                      ]}
+                    />
 
-                  <MyTextInput
-                    label="Intitulé du poste / métier observé pendant l'immersion *"
-                    name="immersionProfession"
-                    type="text"
-                    placeholder=""
-                    description="Ex : employé libre service, web développeur, boulanger …"
-                  />
+                    <MyTextInput
+                      label="Intitulé du poste / métier observé pendant l'immersion *"
+                      name="immersionProfession"
+                      type="text"
+                      placeholder=""
+                      description="Ex : employé libre service, web développeur, boulanger …"
+                    />
 
-                  <MyTextInput
-                    label="Activités observées / pratiquées pendant l'immersion *"
-                    name="immersionActivities"
-                    type="text"
-                    placeholder=""
-                    description="Ex : mise en rayon, accueil et aide à la clientèle"
-                  />
+                    <MyTextInput
+                      label="Activités observées / pratiquées pendant l'immersion *"
+                      name="immersionActivities"
+                      type="text"
+                      placeholder=""
+                      description="Ex : mise en rayon, accueil et aide à la clientèle"
+                    />
 
-                  <MyTextInput
-                    label="Compétences/aptitudes observées / évaluées pendant l'immersion"
-                    name="immersionSkills"
-                    type="text"
-                    placeholder=""
-                    description="Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe"
-                  />
+                    <MyTextInput
+                      label="Compétences/aptitudes observées / évaluées pendant l'immersion"
+                      name="immersionSkills"
+                      type="text"
+                      placeholder=""
+                      description="Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe"
+                    />
 
-                  <p />
+                    <p />
 
-                  <MyBoolRadioGroup
-                    name="beneficiaryAccepted"
-                    label={"Je (bénéficiaire de l'immersion) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"}
-                    formikHelpers={props}
-                    hideNoOption={true}
-                    description="Avant de répondre, consultez ces dispositions ici"
-                    descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-                  />
+                    <MyBoolRadioGroup
+                      name="beneficiaryAccepted"
+                      label={"Je (bénéficiaire de l'immersion) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"}
+                      formikHelpers={props}
+                      hideNoOption={true}
+                      description="Avant de répondre, consultez ces dispositions ici"
+                      descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+                    />
 
-                  <MyBoolRadioGroup
-                    name="enterpriseAccepted"
-                    label={"Je (représentant de la structure d'accueil ) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"}
-                    formikHelpers={props}
-                    hideNoOption={true}
-                    description="Avant de répondre, consultez ces dispositions ici"
-                    descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-                  />
+                    <MyBoolRadioGroup
+                      name="enterpriseAccepted"
+                      label={"Je (représentant de la structure d'accueil ) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"}
+                      formikHelpers={props}
+                      hideNoOption={true}
+                      description="Avant de répondre, consultez ces dispositions ici"
+                      descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+                    />
 
-                  <p />
+                    <p />
 
-                  <button className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-                    type="submit"
-                    disabled={props.isSubmitting}
-                  >
-                    {props.isSubmitting ? "Éxecution" : "Valider ce formulaire"}
-                  </button>
-                </form>
+                    <button className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+                      type="submit"
+                      disabled={props.isSubmitting}
+                    >
+                      {props.isSubmitting ? "Éxecution" : "Valider ce formulaire"}
+                    </button>
+                  </form>
 
-                {!!submitError && <div role="alert" className="fr-alert fr-alert--error">
-                  <p className="fr-alert__title">Erreur de serveur</p>
-                  <p>{submitError?.message}</p>
-                </div>}
-              </div>
-            )}
-          </Formik>
+                  {!!submitError && <div role="alert" className="fr-alert fr-alert--error">
+                    <p className="fr-alert__title">Erreur de serveur</p>
+                    <p>{submitError?.message}</p>
+                  </div>}
+                </div>
+              )}
+            </Formik>
+          </div>
         </div>
-      </div>
-    </>
-  );
-};
+      </>
+    );
+  }
+
+}
+
+
+
