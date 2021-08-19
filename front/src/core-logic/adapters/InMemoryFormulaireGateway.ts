@@ -1,13 +1,12 @@
 import { FormulaireGateway } from "src/core-logic/ports/formulaireGateway";
-import type { FormulaireDto, AddFormulaireResponseDto } from "src/shared/FormulaireDto";
+import type { FormulaireDto } from "src/shared/FormulaireDto";
 
 export class InMemoryFormulaireGateway implements FormulaireGateway {
   constructor(private _formulaires: FormulaireDto[] = []) { }
 
-  public async add(formulaire: FormulaireDto): Promise<AddFormulaireResponseDto> {
+  public async add(formulaire: FormulaireDto): Promise<void> {
     console.log(formulaire)
     this._formulaires.push(formulaire);
-    return {id: 'fake-test-id'};
   }
 
   // for test purpose:

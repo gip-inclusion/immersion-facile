@@ -3,7 +3,6 @@
   "scripts": {
     "test": "npm run symlink-shared && jest",
     "dev": "npm run symlink-shared && VITE_GATEWAY=IN_MEMORY vite",
-    "dev-http": "npm run symlink-shared && VITE_GATEWAY=HTTP vite",
     "build": "npm run symlink-shared && tsc && vite build",
     "serve": "vite preview",
     "symlink-shared": "ln -fs ../../back/src/shared ./src/"

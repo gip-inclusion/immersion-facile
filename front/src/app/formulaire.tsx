@@ -226,33 +226,33 @@ export const Formulaire = () => {
           <Formik
             initialValues={{
               // Participant
-              email: "jeffmac@google.com",
-              firstName: "JF",
-              lastName: "Macresy",
-              phone: "0664404708",
+              email: "",
+              firstName: "",
+              lastName: "",
+              phone: "",
               dateStart: Date(),
               dateEnd: Date(),
 
               // Enterprise
-              siret: "12345678912345",
-              businessName: "Ma petite entreprise ne connait pas la crise", //< raison sociale
-              mentor: "The Mentor",
-              mentorPhone: "0687010101",
-              mentorEmail: "mentor@supermentor.fr",
+              siret: "",
+              businessName: "", //< raison sociale
+              mentor: "",
+              mentorPhone: "",
+              mentorEmail: "",
               workdays: ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
               workHours: "9h00-12h00, 14h00-18h00",
-              immersionAddress: "Quelque Part",
+              immersionAddress: "",
 
               // Covid
               individualProtection: false,
               sanitaryPrevention: false,
-              sanitaryPreventionDescription: "Aucunes",
+              sanitaryPreventionDescription: "",
 
               // Immersion
-              immersionObjective: "Valider coaching d'équipe",
-              immersionProfession: "Chef d'atelier", //< intitulé du poste
-              immersionActivities: "Superviser",
-              immersionSkills: "Attention au détail",
+              immersionObjective: "",
+              immersionProfession: "", //< intitulé du poste
+              immersionActivities: "",
+              immersionSkills: "",
 
               // Signatures
               beneficiaryAccepted: false,
@@ -262,10 +262,7 @@ export const Formulaire = () => {
             onSubmit={async (values, { setSubmitting }) => {
               console.log(values);
               const formulaire = formulaireDtoSchema.validate(values);
-              try { 
-                const response = await formulaireGateway.add(await formulaire);
-                alert(response.id); 
-              } catch (e) {
+              try { await formulaireGateway.add(await formulaire) } catch (e) {
                 console.log(e)
                 submitError = e;
               }
