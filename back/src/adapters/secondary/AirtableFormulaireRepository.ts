@@ -92,149 +92,156 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
   private static verifyRecordAndConvertToEntity(
     record: Airtable.Record<FieldSet>
   ): FormulaireEntity {
-    record.fields.email ||= "";
+    record.fields.email = record.fields.email || "";
     if (typeof record.fields.email !== "string") {
       throw new Error(`Invalid field 'email' in Airtable record: ${record}`);
     }
 
-    record.fields.phone ||= "";
+    record.fields.phone = record.fields.phone || "";
     if (typeof record.fields.phone !== "string") {
       throw new Error(`Invalid field 'phone' in Airtable record: ${record}`);
     }
 
-    record.fields.firstName ||= "";
+    record.fields.firstName = record.fields.firstName || "";
     if (typeof record.fields.firstName !== "string") {
       throw new Error(
         `Invalid field 'firstName' in Airtable record: ${record}`
       );
     }
 
-    record.fields.lastName ||= "";
+    record.fields.lastName = record.fields.lastName || "";
     if (typeof record.fields.lastName !== "string") {
       throw new Error(`Invalid field 'lastName' in Airtable record: ${record}`);
     }
 
-    record.fields.businessName ||= "";
+    record.fields.businessName = record.fields.businessName || "";
     if (typeof record.fields.businessName !== "string") {
       throw new Error(
         `Invalid field 'businessName' in Airtable record: ${record}`
       );
     }
 
-    record.fields.siret ||= "";
+    record.fields.siret = record.fields.siret || "";
     if (typeof record.fields.siret !== "string") {
       throw new Error(`Invalid field 'siret' in Airtable record: ${record}`);
     }
 
-    record.fields.dateStart ||= "";
+    record.fields.dateStart = record.fields.dateStart || "";
     if (typeof record.fields.dateStart !== "string") {
       throw new Error(
         `Invalid field 'dateStart' in Airtable record: ${record}`
       );
     }
 
-    record.fields.dateEnd ||= "";
+    record.fields.dateEnd = record.fields.dateEnd || "";
     if (typeof record.fields.dateEnd !== "string") {
       throw new Error(
         `Invalid field 'dateStart' in Airtable record: ${record}`
       );
     }
 
-    record.fields.mentor ||= "";
+    record.fields.mentor = record.fields.mentor || "";
     if (typeof record.fields.mentor !== "string") {
       throw new Error(`Invalid field 'mentor' in Airtable record: ${record}`);
     }
 
-    record.fields.mentorPhone ||= "";
+    record.fields.mentorPhone = record.fields.mentorPhone || "";
     if (typeof record.fields.mentorPhone !== "string") {
       throw new Error(
         `Invalid field 'mentorPhone' in Airtable record: ${record}`
       );
     }
 
-    record.fields.mentorEmail ||= "";
+    record.fields.mentorEmail = record.fields.mentorEmail || "";
     if (typeof record.fields.mentorEmail !== "string") {
       throw new Error(
         `Invalid field 'mentorEmail' in Airtable record: ${record}`
       );
     }
 
-    record.fields.workdays ||= [];
-    if (!AirtableFormulaireRepository.isArrayOfStrings(record.fields.workdays)) {
+    record.fields.workdays = record.fields.workdays || [];
+    if (
+      !AirtableFormulaireRepository.isArrayOfStrings(record.fields.workdays)
+    ) {
       throw new Error(`Invalid field 'workdays' in Airtable record: ${record}`);
     }
 
-    record.fields.workHours ||= "";
+    record.fields.workHours = record.fields.workHours || "";
     if (typeof record.fields.workHours !== "string") {
       throw new Error(
         `Invalid field 'workHours' in Airtable record: ${record}`
       );
     }
 
-    record.fields.immersionAddress ||= "";
+    record.fields.immersionAddress = record.fields.immersionAddress || "";
     if (typeof record.fields.immersionAddress !== "string") {
       throw new Error(
         `Invalid field 'immersionAddress in Airtable record: ${record}`
       );
     }
 
-    record.fields.individualProtection ||= false;
+    record.fields.individualProtection =
+      record.fields.individualProtection || false;
     if (typeof record.fields.individualProtection !== "boolean") {
       throw new Error(
         `Invalid field 'individualProtection in Airtable record: ${record}`
       );
     }
 
-    record.fields.sanitaryPrevention ||= false;
+    record.fields.sanitaryPrevention =
+      record.fields.sanitaryPrevention || false;
     if (typeof record.fields.sanitaryPrevention !== "boolean") {
       throw new Error(
         `Invalid field 'sanitaryPrevention in Airtable record: ${record}`
       );
     }
 
-    record.fields.sanitaryPreventionDescription ||= "";
+    record.fields.sanitaryPreventionDescription =
+      record.fields.sanitaryPreventionDescription || "";
     if (typeof record.fields.sanitaryPreventionDescription !== "string") {
       throw new Error(
         `Invalid field 'siret' in sanitaryPreventionDescription record: ${record}`
       );
     }
 
-    record.fields.immersionObjective ||= "";
+    record.fields.immersionObjective = record.fields.immersionObjective || "";
     if (typeof record.fields.immersionObjective !== "string") {
       throw new Error(
         `Invalid field 'immersionObjective in Airtable record: ${record}`
       );
     }
 
-    record.fields.immersionProfession ||= "";
+    record.fields.immersionProfession = record.fields.immersionProfession || "";
     if (typeof record.fields.immersionProfession !== "string") {
       throw new Error(
         `Invalid field 'immersionProfession in Airtable record: ${record}`
       );
     }
 
-    record.fields.immersionActivities ||= "";
+    record.fields.immersionActivities = record.fields.immersionActivities || "";
     if (typeof record.fields.immersionActivities !== "string") {
       throw new Error(
         `Invalid field 'immersionActivities in Airtable record: ${record}`
       );
     }
 
-    record.fields.immersionSkills ||= "";
+    record.fields.immersionSkills = record.fields.immersionSkills || "";
     if (typeof record.fields.immersionSkills !== "string") {
       throw new Error(
         `Invalid field 'immersionSkills in Airtable record: ${record}`
       );
     }
 
-    record.fields.beneficiaryAccepted ||= false;
+    record.fields.beneficiaryAccepted =
+      record.fields.beneficiaryAccepted || false;
     if (typeof record.fields.beneficiaryAccepted !== "boolean") {
       throw new Error(
         `Invalid field 'beneficiaryAccepted in Airtable record: ${record}`
       );
     }
 
-    record.fields.enterpriseAccepted ||= false;
+    record.fields.enterpriseAccepted =
+      record.fields.enterpriseAccepted || false;
     if (typeof record.fields.enterpriseAccepted !== "boolean") {
       throw new Error(
         `Invalid field 'enterpriseAccepted in Airtable record: ${record}`
