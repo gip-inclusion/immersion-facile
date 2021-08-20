@@ -1,15 +1,14 @@
-import React, { Component, useEffect } from "react";
-import ReactDOM from "react-dom";
-import { Formik, Form, useField, FormikState, FieldHookConfig, Field, FormikHelpers, FormikValues } from "formik";
-import * as Yup from "yup";
+import React, { Component, useDebugValue, useEffect } from "react";
+import { Formik, Form, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
 import { formulaireGateway } from "src/app/main";
 import { FormulaireDto, formulaireDtoSchema } from "src/shared/FormulaireDto"
-import { current } from "@reduxjs/toolkit";
+import { format } from "date-fns";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
 
 const MyDateInput = (props: MyDateInputProps) => {
   const [field, meta] = useField(props);
+  const value = (field.value as unknown) as Date;
   return (
     <>
       <div className="fr-input-group${meta.touched && meta.error ? ' fr-input-group--error' : ''}">
@@ -19,6 +18,7 @@ const MyDateInput = (props: MyDateInputProps) => {
         <div className="fr-input-wrap fr-fi-calendar-line">
           <input className={`fr-input${meta.touched && meta.error ? ' fr-input--error' : ''}`}
             {...field}
+            value={format(value, "yyyy-MM-dd")}
             type="date"
           />
         </div>
@@ -28,7 +28,6 @@ const MyDateInput = (props: MyDateInputProps) => {
       </div>
     </>
   )
-
 }
 
 type MyTextInputProps = { label: string, placeholder: string | null, description: string | null } & FieldHookConfig<string>;
@@ -178,12 +177,50 @@ const MyRadioGroup = (props: MyCheckboxGroupProps) => {
 
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-let submitError: Error | null = null
+
+interface SuccessMessageProps { link: string }
+export class SuccessMessage extends Component<SuccessMessageProps> {
+  constructor(props: SuccessMessageProps) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <>
+        <div role="alert" className="fr-alert fr-alert--success">
+          <p className="fr-alert__title">Succès de l&#39;envoi</p>
+          <p>Vous avez enregistré votre formulaire et vous pouvez le modifier avec le lien suivant:&nbsp;<a href={this.props.link}>{this.props.link}</a>
+          </p>
+        </div>
+      </>
+    );
+  }
+}
+
+interface ErrorMessageProps { message: string, title: string }
+export class ErrorMessage extends Component<ErrorMessageProps> {
+  constructor(props: ErrorMessageProps) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <>
+        <div role="alert" className="fr-alert fr-alert--error">
+          <p className="fr-alert__title">{this.props.title}</p>
+          <p>{this.props.message}</p>
+        </div>
+      </>
+    );
+  }
+}
 
 
 interface FormulaireProps { }
 interface FormulaireState {
-  initialValues: FormulaireDto
+  initialValues: FormulaireDto;
+  formLink: string | null;
+  submitError: Error | null;
 }
 export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
@@ -232,10 +269,10 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
     }
     try {
       let response = await formulaireGateway.get(id);
-      this.setState({ initialValues: response })
+      this.setState({ initialValues: response });
     } catch (e) {
       console.log(e)
-      submitError = e;
+      this.state = { ...this.state, submitError: e, formLink: null };
     }
   }
 
@@ -245,7 +282,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
   constructor(props: any) {
     super(props);
-    this.state = { initialValues: this.createInitialValues() };
+    this.state = { initialValues: this.createInitialValues(), formLink: null, submitError: null };
   }
 
   render() {
@@ -290,9 +327,6 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
               </p>
             </div>
 
-
-
-
             <Formik
               enableReinitialize={true}
               initialValues={this.state.initialValues}
@@ -302,12 +336,14 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                 const formulaire = formulaireDtoSchema.validate(values);
                 try {
                   const response = await formulaireGateway.add(await formulaire);
-                  var queryParams = new URLSearchParams(window.location.search);
+                  const queryParams = new URLSearchParams(window.location.search);
                   queryParams.set("id", response.id);
                   history.replaceState(null, document.title, "?" + queryParams.toString());
+                  const newURL = window.location.href;
+                  this.state = { ...this.state, submitError: null, formLink: newURL }
                 } catch (e) {
                   console.log(e)
-                  submitError = e;
+                  this.state = { ...this.state, submitError: e, formLink: null };
                 }
                 setSubmitting(false);
               }}
@@ -507,6 +543,14 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
                     <p />
 
+
+
+                    {!!this.state.submitError && <ErrorMessage title="Erreur de serveur" message={this.state.submitError.message} />}
+
+                    {!!this.state.formLink && <SuccessMessage link={this.state.formLink} />}
+
+                    <p></p>
+
                     <button className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
                       type="submit"
                       disabled={props.isSubmitting}
@@ -515,10 +559,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                     </button>
                   </form>
 
-                  {!!submitError && <div role="alert" className="fr-alert fr-alert--error">
-                    <p className="fr-alert__title">Erreur de serveur</p>
-                    <p>{submitError?.message}</p>
-                  </div>}
+
                 </div>
               )}
             </Formik>
