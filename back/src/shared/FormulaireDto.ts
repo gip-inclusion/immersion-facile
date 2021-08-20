@@ -75,6 +75,6 @@ export const getFormulaireRequestDtoSchema = Yup.object({
   id: Yup.string().required(),
 }).required();
 
-export type getFormulaireRequestDto = Yup.InferType<
+export type GetFormulaireRequestDto = Yup.InferType<
   typeof getFormulaireRequestDtoSchema
 >;
