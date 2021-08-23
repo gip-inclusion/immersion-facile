@@ -2,13 +2,20 @@ import React, { Component, useDebugValue, useEffect } from "react";
 import { Formik, Form, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
 import { formulaireGateway } from "src/app/main";
 import { FormulaireDto, formulaireDtoSchema } from "src/shared/FormulaireDto"
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
 
+const formatDateInput = (value: Date | string): string => {
+  if (typeof value === "string") {
+    value = parseISO(value);
+  }
+  return format(value, "yyyy-MM-dd");
+};
+
 const MyDateInput = (props: MyDateInputProps) => {
   const [field, meta] = useField(props);
-  const value = (field.value as unknown) as Date;
+  const value: Date = (field.value as unknown) as Date;
   return (
     <>
       <div className="fr-input-group${meta.touched && meta.error ? ' fr-input-group--error' : ''}">
@@ -18,7 +25,7 @@ const MyDateInput = (props: MyDateInputProps) => {
         <div className="fr-input-wrap fr-fi-calendar-line">
           <input className={`fr-input${meta.touched && meta.error ? ' fr-input--error' : ''}`}
             {...field}
-            value={format(value, "yyyy-MM-dd")}
+            value={formatDateInput(value)}
             type="date"
           />
         </div>
@@ -88,7 +95,7 @@ const MyCheckboxGroup = (props: MyCheckboxGroupProps) => {
 
 type MyBoolRadioProps = { label: string, formikHelpers: FormikHelpers<any> & FormikState<any>, hideNoOption: boolean, description: string, descriptionLink: string } & FieldHookConfig<string>;
 
-// Like MyRadioGroup, but backs a boolean value. 
+// Like MyRadioGroup, but backs a boolean value.
 // Has default "oui/non" options.
 const MyBoolRadioGroup = (props: MyBoolRadioProps) => {
   const [field, meta, helper] = useField(props);
@@ -227,18 +234,18 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
   createInitialValues(): FormulaireDto {
     return {
       // Participant
-      email: "jeffmac@google.com",
-      firstName: "JF",
-      lastName: "Macresy",
-      phone: "0664404708",
-      dateStart: new Date("2020-01-01"),
-      dateEnd: new Date("2020-02-01"),
+      email: "sylvanie@monemail.fr",
+      firstName: "Sylanie",
+      lastName: "Durand",
+      phone: "0612345678",
+      dateStart: new Date(),
+      dateEnd: new Date(),
 
       // Enterprise
       siret: "12345678912345",
       businessName: "Ma petite entreprise ne connait pas la crise", //< raison sociale
       mentor: "The Mentor",
-      mentorPhone: "0687010101",
+      mentorPhone: "0687654321",
       mentorEmail: "mentor@supermentor.fr",
       workdays: ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
       workHours: "9h00-12h00, 14h00-18h00",
