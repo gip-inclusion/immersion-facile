@@ -19,35 +19,10 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
   }
 
   public async save(entity: FormulaireEntity): Promise<FormulaireIdEntity> {
-
     return this.table
       .create([
         {
-          fields: {
-            email: entity.email,
-            phone: entity.phone,
-            firstName: entity.firstName,
-            lastName: entity.lastName,
-            dateStart: format(entity.dateStart, "yyyy-MM-dd"),
-            dateEnd: format(entity.dateEnd, "yyyy-MM-dd"),
-            businessName: entity.businessName,
-            siret: entity.siret,
-            mentor: entity.mentor,
-            mentorPhone: entity.mentorPhone,
-            mentorEmail: entity.mentorEmail,
-            workdays: entity.workdays,
-            workHours: entity.workHours,
-            immersionAddress: entity.immersionAddress,
-            individualProtection: entity.individualProtection,
-            sanitaryPrevention: entity.sanitaryPrevention,
-            sanitaryPreventionDescription: entity.sanitaryPreventionDescription,
-            immersionObjective: entity.immersionObjective,
-            immersionProfession: entity.immersionProfession,
-            immersionActivities: entity.immersionActivities,
-            immersionSkills: entity.immersionSkills,
-            beneficiaryAccepted: entity.beneficiaryAccepted,
-            enterpriseAccepted: entity.enterpriseAccepted,
-          },
+          fields: AirtableFormulaireRepository.convertEntityToFieldSet(entity),
         },
       ])
       .then((response) => {
@@ -63,12 +38,13 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
   public async getFormulaire(
     id: FormulaireIdEntity
   ): Promise<FormulaireEntity | undefined> {
-    return this.table.find(id.id)
-    .then(AirtableFormulaireRepository.verifyRecordAndConvertToEntity)
-    .catch((e) => {
-      logger.error(e);
-      return undefined;
-    });
+    return this.table
+      .find(id.id)
+      .then(AirtableFormulaireRepository.verifyRecordAndConvertToEntity)
+      .catch((e) => {
+        logger.error(e);
+        return undefined;
+      });
   }
 
   public async getAllFormulaires(): Promise<FormulaireEntity[]> {
@@ -81,6 +57,22 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
     return allRecords.map(
       AirtableFormulaireRepository.verifyRecordAndConvertToEntity
     );
+  }
+
+  public async updateFormulaire(
+    id: FormulaireIdEntity,
+    formulaire: FormulaireEntity
+  ): Promise<FormulaireIdEntity | undefined> {
+    return this.table
+      .update(
+        id.id,
+        AirtableFormulaireRepository.convertEntityToFieldSet(formulaire)
+      )
+      .then((response) => FormulaireIdEntity.create(response.id))
+      .catch((e) => {
+        logger.error(e);
+        return undefined;
+      });
   }
 
   private static isArrayOfStrings(value: any): boolean {
@@ -274,5 +266,33 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
       beneficiaryAccepted: record.fields.beneficiaryAccepted,
       enterpriseAccepted: record.fields.enterpriseAccepted,
     });
+  }
+
+  private static convertEntityToFieldSet(entity: FormulaireEntity): FieldSet {
+    return {
+      email: entity.email,
+      phone: entity.phone,
+      firstName: entity.firstName,
+      lastName: entity.lastName,
+      dateStart: format(entity.dateStart, "yyyy-MM-dd"),
+      dateEnd: format(entity.dateEnd, "yyyy-MM-dd"),
+      businessName: entity.businessName,
+      siret: entity.siret,
+      mentor: entity.mentor,
+      mentorPhone: entity.mentorPhone,
+      mentorEmail: entity.mentorEmail,
+      workdays: entity.workdays,
+      workHours: entity.workHours,
+      immersionAddress: entity.immersionAddress,
+      individualProtection: entity.individualProtection,
+      sanitaryPrevention: entity.sanitaryPrevention,
+      sanitaryPreventionDescription: entity.sanitaryPreventionDescription,
+      immersionObjective: entity.immersionObjective,
+      immersionProfession: entity.immersionProfession,
+      immersionActivities: entity.immersionActivities,
+      immersionSkills: entity.immersionSkills,
+      beneficiaryAccepted: entity.beneficiaryAccepted,
+      enterpriseAccepted: entity.enterpriseAccepted,
+    };
   }
 }

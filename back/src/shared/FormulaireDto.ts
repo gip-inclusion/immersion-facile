@@ -78,3 +78,20 @@ export const getFormulaireRequestDtoSchema = Yup.object({
 export type GetFormulaireRequestDto = Yup.InferType<
   typeof getFormulaireRequestDtoSchema
 >;
+
+export const updateFormulaireRequestDtoSchema = Yup.object({
+  id: Yup.string().required(),
+  formulaire: formulaireDtoSchema.required(),
+}).required();
+
+export type UpdateFormulaireRequestDto = Yup.InferType<
+  typeof updateFormulaireRequestDtoSchema
+>;
+
+const updateFormulaireResponseDtoSchema = Yup.object({
+  id: Yup.string().required(),
+}).required();
+
+export type UpdateFormulaireResponseDto = Yup.InferType<
+  typeof updateFormulaireResponseDtoSchema
+>;

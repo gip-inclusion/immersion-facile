@@ -9,6 +9,7 @@ import { InMemoryTodoRepository } from "../secondary/InMemoryTodoRepository";
 import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
 import { logger } from "../../utils/logger";
 import { GetFormulaire } from "../../domain/formulaires/useCases/GetFormulaire";
+import { UpdateFormulaire } from "../../domain/formulaires/useCases/UpdateFormulaire";
 
 export const getRepositories = () => {
   logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
@@ -33,9 +34,9 @@ export const getRepositories = () => {
   };
 };
 
- const fail = (message: string) => {
-   throw new Error(message);
- };
+const fail = (message: string) => {
+  throw new Error(message);
+};
 
 const getClock = (): Clock => {
   logger.info(`NODE_ENV : ${process.env.NODE_ENV}`);
@@ -64,6 +65,9 @@ export const getUsecases = () => {
       formulaireRepository: repositories.formulaires,
     }),
     listFormulaires: new ListFormulaires({
+      formulaireRepository: repositories.formulaires,
+    }),
+    updateFormulaire: new UpdateFormulaire({
       formulaireRepository: repositories.formulaires,
     }),
   };

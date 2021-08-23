@@ -8,9 +8,11 @@ import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { todoDtoSchema } from "../../shared/TodoDto";
 import {
   formulaireDtoSchema,
-  getFormulaireRequestDtoSchema
+  getFormulaireRequestDtoSchema,
+  updateFormulaireRequestDtoSchema,
 } from "../../shared/FormulaireDto";
 import { logger } from "../../utils/logger";
+import { UpdateFormulaire } from "../../domain/formulaires/useCases/UpdateFormulaire";
 
 const app = express();
 const router = Router();
@@ -34,7 +36,7 @@ router
       callUseCase({
         useCase: useCases.addTodo,
         validationSchema: todoDtoSchema,
-        useCaseParams: req.body
+        useCaseParams: req.body,
       })
     )
   )
@@ -49,7 +51,7 @@ router
       callUseCase({
         useCase: useCases.addFormulaire,
         validationSchema: formulaireDtoSchema,
-        useCaseParams: req.body
+        useCaseParams: req.body,
       })
     )
   )
@@ -57,15 +59,26 @@ router
     sendHttpResponse(res, () => useCases.listFormulaires.execute())
   );
 
-  const uniqueFormulaireRouter = Router({mergeParams: true});
-  router.use(`/${formulairesRoute}`, uniqueFormulaireRouter);
+const uniqueFormulaireRouter = Router({ mergeParams: true });
+router.use(`/${formulairesRoute}`, uniqueFormulaireRouter);
 
-  uniqueFormulaireRouter.route(`/:id`).get(async (req, res) =>
+uniqueFormulaireRouter
+  .route(`/:id`)
+  .get(async (req, res) =>
     sendHttpResponse(res, () =>
       callUseCase({
         useCase: useCases.getFormulaire,
         validationSchema: getFormulaireRequestDtoSchema,
         useCaseParams: req.params,
+      })
+    )
+  )
+  .post(async (req, res) =>
+    sendHttpResponse(res, () =>
+      callUseCase({
+        useCase: useCases.updateFormulaire,
+        validationSchema: updateFormulaireRequestDtoSchema,
+        useCaseParams: { id: req.params.id, formulaire: req.body },
       })
     )
   );
