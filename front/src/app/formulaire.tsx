@@ -268,9 +268,14 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
     }
   }
 
+  getCurrentFormulaireId(): string | null {
+    const queryParams = new URLSearchParams(window.location.search);
+    return queryParams.get("id");
+  }
+
   async loadValuesForCurrentID() {
     const queryParams = new URLSearchParams(window.location.search);
-    let id = queryParams.get("id");
+     const id = this.getCurrentFormulaireId();
     if (!id) {
       return;
     }
@@ -340,12 +345,18 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
               validationSchema={formulaireDtoSchema}
               onSubmit={async (values, { setSubmitting }) => {
                 console.log(values);
-                const formulaire = formulaireDtoSchema.validate(values);
                 try {
-                  const response = await formulaireGateway.add(await formulaire);
+                  const formulaire = await formulaireDtoSchema.validate(values);
+
+                  const currentId = this.getCurrentFormulaireId();
+                  const upsertedId = currentId
+                    ? await formulaireGateway.update(currentId, formulaire)
+                    : await formulaireGateway.add(formulaire);
+
                   const queryParams = new URLSearchParams(window.location.search);
-                  queryParams.set("id", response.id);
+                  queryParams.set("id", upsertedId);
                   history.replaceState(null, document.title, "?" + queryParams.toString());
+
                   const newURL = window.location.href;
                   this.state = { ...this.state, submitError: null, formLink: newURL }
                 } catch (e) {
@@ -562,7 +573,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="submit"
                       disabled={props.isSubmitting}
                     >
-                      {props.isSubmitting ? "Éxecution" : "Valider ce formulaire"}
+                      {props.isSubmitting ? "Éxecution" : "Sauvegarder"}
                     </button>
                   </form>
 

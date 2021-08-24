@@ -88,7 +88,7 @@ export type UpdateFormulaireRequestDto = Yup.InferType<
   typeof updateFormulaireRequestDtoSchema
 >;
 
-const updateFormulaireResponseDtoSchema = Yup.object({
+export const updateFormulaireResponseDtoSchema = Yup.object({
   id: Yup.string().required(),
 }).required();
 
