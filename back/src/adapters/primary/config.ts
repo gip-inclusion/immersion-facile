@@ -10,9 +10,15 @@ import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
 import { logger } from "../../utils/logger";
 import { GetFormulaire } from "../../domain/formulaires/useCases/GetFormulaire";
 import { UpdateFormulaire } from "../../domain/formulaires/useCases/UpdateFormulaire";
+import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
+import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 
 export const getRepositories = () => {
   logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
+  logger.info(
+    "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY"
+  );
 
   return {
     todo:
@@ -31,6 +37,16 @@ export const getRepositories = () => {
               fail("Missing environment variable: AIRTABLE_TABLE_NAME")
           )
         : new InMemoryFormulaireRepository(),
+
+    sirene:
+      process.env.SIRENE_REPOSITORY === "HTTPS"
+        ? HttpsSireneRepository.create(
+            process.env.SIRENE_ENDPOINT ||
+              fail("Missing environment variable: SIRENE_ENDPOINT"),
+            process.env.SIRENE_BEARER_TOKEN ||
+              fail("Missing environment variable: SIRENE_BEARER_TOKEN")
+          )
+        : new InMemorySireneRepository(),
   };
 };
 
@@ -53,11 +69,14 @@ export const getUsecases = () => {
   const repositories = getRepositories();
 
   return {
+    // todo
     addTodo: new AddTodo({
       todoRepository: repositories.todo,
       clock: getClock(),
     }),
     listTodos: new ListTodos(repositories.todo),
+
+    // formulaire
     addFormulaire: new AddFormulaire({
       formulaireRepository: repositories.formulaires,
     }),
@@ -69,6 +88,11 @@ export const getUsecases = () => {
     }),
     updateFormulaire: new UpdateFormulaire({
       formulaireRepository: repositories.formulaires,
+    }),
+
+    // siret
+    getSiret: new GetSiret({
+      sireneRepository: repositories.sirene,
     }),
   };
 };

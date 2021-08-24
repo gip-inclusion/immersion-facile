@@ -97,6 +97,9 @@ deploy_back:
           --env AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
           --env AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
           --env AIRTABLE_TABLE_NAME=${AIRTABLE_TABLE_NAME}
+          --env SIRENE_REPOSITORY=HTTPS
+          --env SIRENE_ENDPOINT="https://api.insee.fr/entreprises/sirene/V3"
+          --env SIRENE_BEARER_TOKEN=${SIRENE_BEARER_TOKEN}
           --pull always
           --name back
           ${CI_REGISTRY_IMAGE}/back:$CI_COMMIT_SHORT_SHA"

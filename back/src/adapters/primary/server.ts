@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import PinoHttp from "pino-http";
-import { todosRoute, formulairesRoute } from "../../shared/routes";
+import { todosRoute, formulairesRoute, siretRoute } from "../../shared/routes";
 import { getUsecases } from "./config";
 import bodyParser from "body-parser";
 import { callUseCase } from "./helpers/callUseCase";
@@ -12,7 +12,6 @@ import {
   updateFormulaireRequestDtoSchema,
 } from "../../shared/FormulaireDto";
 import { logger } from "../../utils/logger";
-import { UpdateFormulaire } from "../../domain/formulaires/useCases/UpdateFormulaire";
 
 const app = express();
 const router = Router();
@@ -82,6 +81,13 @@ uniqueFormulaireRouter
       })
     )
   );
+
+router.route(`/${siretRoute}/:siret`).get(async (req, res) =>
+  sendHttpResponse(res, async () => {
+    logger.info(req);
+    return useCases.getSiret.execute(req.params.siret);
+  })
+);
 
 app.use(router);
 
