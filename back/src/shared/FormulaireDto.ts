@@ -1,4 +1,5 @@
 import * as Yup from "../../node_modules/yup";
+import { differenceInCalendarDays } from 'date-fns'
 
 // TODO: find the standard for gouv.fr phone verification
 const phoneRegExp = /\+?[0-9]*/;
@@ -18,7 +19,20 @@ export const formulaireDtoSchema = Yup.object({
     .required("Obligatoire"),
   dateEnd: Yup.date()
     .required("Obligatoire")
-    .min(Yup.ref('dateStart'), "Date de fin doit être après la date de début"),
+    .min(Yup.ref('dateStart'), "Date de fin doit être après la date de début")
+    .test(
+      "moins-28j",
+      "La durée maximale d\'immersion est de 28 jours",
+      (value, context) => {
+        const startDate = context.parent.dateStart;
+        if (!value || !startDate || !(startDate instanceof Date)) {
+          return false;
+        }
+        return differenceInCalendarDays(value, startDate) <= 28;
+      }
+    ),
+
+
 
   siret: Yup.string()
     .required("Obligatoire")
