@@ -1,4 +1,4 @@
-import { FormulaireDto, formulaireDtoSchema } from "../../../shared/FormulaireDto";
+import { FormulaireDto, formulaireDtoSchema, FormulaireStatus, FormulaireStatusUtil } from "../../../shared/FormulaireDto";
 import { validFormulaire, VALID_EMAILS, DATE_START, DATE_END } from "./FormulaireEntityTestData";
 import { it } from "date-fns/locale";
 import { expectPromiseToFailWith } from "../../../utils/test.helpers";
@@ -34,5 +34,17 @@ describe("formulaireDtoSchema", () => {
 
     expect(() => formulaireDtoSchema.validateSync(validRequest)).not.toThrow();
     expect(formulaireDtoSchema.validateSync(validRequest)).toBeTruthy();
+  });
+});
+
+describe("FormulaireStateUtil", () => {
+  test('fromString() accepts valid enum values', () => {
+    expect(FormulaireStatusUtil.fromString("DRAFT")).toEqual(FormulaireStatus.DRAFT);
+    expect(FormulaireStatusUtil.fromString("FINALIZED")).toEqual(FormulaireStatus.FINALIZED);
+  });
+
+  test('fromString() converts invalid enum values to UNKNOWN', () => {
+    expect(FormulaireStatusUtil.fromString("")).toEqual(FormulaireStatus.UNKNOWN);
+    expect(FormulaireStatusUtil.fromString("UNKNOWN_VALUE")).toEqual(FormulaireStatus.UNKNOWN);
   });
 });

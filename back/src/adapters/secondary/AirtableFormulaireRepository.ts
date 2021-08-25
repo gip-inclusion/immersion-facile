@@ -4,6 +4,7 @@ import { FormulaireRepository } from "../../domain/formulaires/ports/FormulaireR
 import { FormulaireEntity } from "../../domain/formulaires/entities/FormulaireEntity";
 import { FormulaireIdEntity } from "../../domain/formulaires/entities/FormulaireIdEntity";
 import { logger } from "../../utils/logger";
+import { FormulaireStatusUtil } from "../../shared/FormulaireDto";
 
 export class AirtableFormulaireRepository implements FormulaireRepository {
   private readonly table: Table<FieldSet>;
@@ -84,6 +85,11 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
   private static verifyRecordAndConvertToEntity(
     record: Airtable.Record<FieldSet>
   ): FormulaireEntity {
+    record.fields.status = record.fields.status || "";
+    if (typeof record.fields.status !== "string") {
+      throw new Error(`Invalid field 'email' in Airtable record: ${record}`);
+    }
+
     record.fields.email = record.fields.email || "";
     if (typeof record.fields.email !== "string") {
       throw new Error(`Invalid field 'email' in Airtable record: ${record}`);
@@ -241,6 +247,7 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
     }
 
     return FormulaireEntity.create({
+      status: FormulaireStatusUtil.fromString(record.fields.status),
       email: record.fields.email,
       phone: record.fields.phone,
       firstName: record.fields.firstName,
@@ -270,6 +277,7 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
 
   private static convertEntityToFieldSet(entity: FormulaireEntity): FieldSet {
     return {
+      status: entity.status,
       email: entity.email,
       phone: entity.phone,
       firstName: entity.firstName,

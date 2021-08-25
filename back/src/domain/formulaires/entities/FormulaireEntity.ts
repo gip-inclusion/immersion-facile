@@ -1,6 +1,7 @@
-import { FormulaireDto } from "../../../shared/FormulaireDto";
+import { FormulaireDto, FormulaireStatusUtil } from "../../../shared/FormulaireDto";
 
 type FormulaireProps = {
+  status: string;
   email: string;
   phone: string | undefined;
   firstName: string;
@@ -24,10 +25,10 @@ type FormulaireProps = {
   immersionSkills: string | undefined;
   beneficiaryAccepted: boolean;
   enterpriseAccepted: boolean;
-
 };
 
 export class FormulaireEntity {
+  public readonly status: string;
   public readonly email: string;
   public readonly firstName: string;
   public readonly lastName: string;
@@ -52,11 +53,33 @@ export class FormulaireEntity {
   public readonly beneficiaryAccepted: boolean;
   public readonly enterpriseAccepted: boolean;
 
-  private constructor({ email, phone, firstName, lastName, dateStart, dateEnd, businessName, siret,
-    mentor, mentorPhone, mentorEmail, workdays, workHours, immersionAddress,
-    individualProtection, sanitaryPrevention, sanitaryPreventionDescription,
-    immersionObjective, immersionProfession, immersionActivities, immersionSkills,
-    beneficiaryAccepted, enterpriseAccepted }: FormulaireProps) {
+  private constructor({
+    status,
+    email,
+    phone,
+    firstName,
+    lastName,
+    dateStart,
+    dateEnd,
+    businessName,
+    siret,
+    mentor,
+    mentorPhone,
+    mentorEmail,
+    workdays,
+    workHours,
+    immersionAddress,
+    individualProtection,
+    sanitaryPrevention,
+    sanitaryPreventionDescription,
+    immersionObjective,
+    immersionProfession,
+    immersionActivities,
+    immersionSkills,
+    beneficiaryAccepted,
+    enterpriseAccepted,
+  }: FormulaireProps) {
+    this.status = status;
     this.email = email;
     this.phone = phone;
     this.firstName = firstName;
@@ -80,12 +103,11 @@ export class FormulaireEntity {
     this.immersionSkills = immersionSkills;
     this.beneficiaryAccepted = beneficiaryAccepted;
     this.enterpriseAccepted = enterpriseAccepted;
-
   }
 
   public static create(dto: FormulaireDto) {
-    // TODO: Find a more precise email validation method. This is a simplified regex that 
-    // accepts some invalid email addresses. 
+    // TODO: Find a more precise email validation method. This is a simplified regex that
+    // accepts some invalid email addresses.
     // For details see https://stackoverflow.com/questions/201323
     const emailRegex = /\S+@\S+\.\S+/;
     if (!emailRegex.test(dto.email)) {
@@ -97,6 +119,7 @@ export class FormulaireEntity {
     }
 
     return new FormulaireEntity({
+      status: dto.status,
       email: dto.email,
       phone: dto.phone ?? undefined,
       firstName: dto.firstName,
@@ -113,7 +136,8 @@ export class FormulaireEntity {
       immersionAddress: dto.immersionAddress ?? undefined,
       individualProtection: dto.individualProtection,
       sanitaryPrevention: dto.sanitaryPrevention,
-      sanitaryPreventionDescription: dto.sanitaryPreventionDescription ?? undefined,
+      sanitaryPreventionDescription:
+        dto.sanitaryPreventionDescription ?? undefined,
       immersionObjective: dto.immersionObjective ?? "",
       immersionProfession: dto.immersionProfession,
       immersionActivities: dto.immersionActivities,
@@ -124,28 +148,33 @@ export class FormulaireEntity {
   }
 }
 
-export const formulaireEntityToDto = (entity: FormulaireEntity): FormulaireDto => ({
-  email: entity.email,
-  phone: entity.phone,
-  firstName: entity.firstName,
-  lastName: entity.lastName,
-  dateStart: entity.dateStart,
-  dateEnd: entity.dateEnd,
-  businessName: entity.businessName,
-  siret: entity.siret,
-  mentor: entity.mentor,
-  mentorPhone: entity.mentorPhone,
-  mentorEmail: entity.mentorEmail,
-  workdays: entity.workdays,
-  workHours: entity.workHours,
-  immersionAddress: entity.immersionAddress,
-  individualProtection: entity.individualProtection,
-  sanitaryPrevention: entity.sanitaryPrevention,
-  sanitaryPreventionDescription: entity.sanitaryPreventionDescription,
-  immersionObjective: entity.immersionObjective,
-  immersionProfession: entity.immersionProfession,
-  immersionActivities: entity.immersionActivities,
-  immersionSkills: entity.immersionSkills,
-  beneficiaryAccepted: entity.beneficiaryAccepted,
-  enterpriseAccepted: entity.enterpriseAccepted,
-});
+export const formulaireEntityToDto = (
+  entity: FormulaireEntity
+): FormulaireDto => {
+  return {
+    status: FormulaireStatusUtil.fromString(entity.status),
+    email: entity.email,
+    phone: entity.phone,
+    firstName: entity.firstName,
+    lastName: entity.lastName,
+    dateStart: entity.dateStart,
+    dateEnd: entity.dateEnd,
+    businessName: entity.businessName,
+    siret: entity.siret,
+    mentor: entity.mentor,
+    mentorPhone: entity.mentorPhone,
+    mentorEmail: entity.mentorEmail,
+    workdays: entity.workdays,
+    workHours: entity.workHours,
+    immersionAddress: entity.immersionAddress,
+    individualProtection: entity.individualProtection,
+    sanitaryPrevention: entity.sanitaryPrevention,
+    sanitaryPreventionDescription: entity.sanitaryPreventionDescription,
+    immersionObjective: entity.immersionObjective,
+    immersionProfession: entity.immersionProfession,
+    immersionActivities: entity.immersionActivities,
+    immersionSkills: entity.immersionSkills,
+    beneficiaryAccepted: entity.beneficiaryAccepted,
+    enterpriseAccepted: entity.enterpriseAccepted,
+  } as FormulaireDto;
+};

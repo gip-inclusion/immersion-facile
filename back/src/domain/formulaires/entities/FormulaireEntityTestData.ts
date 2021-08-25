@@ -1,11 +1,12 @@
-import { FormulaireDto } from "../../../shared/FormulaireDto";
+import { FormulaireDto, FormulaireStatus } from "../../../shared/FormulaireDto";
 
 export const VALID_EMAILS = ["valid@email.fr", "name@example.com"];
 export const DATE_START = new Date("2021-01-01");
 export const DATE_END = new Date("2021-01-15");
 export const VALID_PHONES = ["+33012345678", "0601010101", "+18001231234", "+41800001853"];
 
-export const validFormulaire = {
+export const validFormulaire: FormulaireDto = {
+    status: FormulaireStatus.DRAFT,
     email: VALID_EMAILS[0],
     phone: VALID_PHONES[0],
     firstName: "Esteban",

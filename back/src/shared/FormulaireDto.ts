@@ -3,7 +3,26 @@ import * as Yup from "../../node_modules/yup";
 // TODO: find the standard for gouv.fr phone verification
 const phoneRegExp = /\+?[0-9]*/;
 
+export enum FormulaireStatus {
+  UNKNOWN = "UNKNOWN",
+  DRAFT = "DRAFT",
+  FINALIZED = "FINALIZED",
+}
+export class FormulaireStatusUtil {
+  static fromString(s: string): FormulaireStatus {
+    if (
+      Object.values(FormulaireStatus).some((status: string) => status === s)
+    ) {
+      return <FormulaireStatus>s;
+    }
+    return FormulaireStatus.UNKNOWN;
+  }
+}
+
 export const formulaireDtoSchema = Yup.object({
+  status: Yup.mixed<FormulaireStatus>()
+    .oneOf(Object.values(FormulaireStatus))
+    .required("Obligatoire"),
   email: Yup.string()
     .required("Obligatoire")
     .email("Veuillez saisir une adresse e-mail valide"),
@@ -32,10 +51,7 @@ export const formulaireDtoSchema = Yup.object({
         return value <= maxEndDate;
       }
     ),
-
-
-
-  siret: Yup.string()
+    siret: Yup.string()
     .required("Obligatoire")
     .length(14, "SIRET doit étre composé de 14 chiffres"),
   businessName: Yup.string()

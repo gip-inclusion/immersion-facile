@@ -1,6 +1,7 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { FormulaireDto } from "../../../shared/FormulaireDto";
 import { UseCase } from "../../core/UseCase";
+import { formulaireEntityToDto } from "../entities/FormulaireEntity";
 import { FormulaireIdEntity } from "../entities/FormulaireIdEntity";
 import { FormulaireRepository } from "../ports/FormulaireRepository";
 
@@ -16,11 +17,10 @@ export class GetFormulaire
   }
 
   public async execute(id: FormulaireIdEntity): Promise<FormulaireDto> {
-    return this.formulaireRepository.getFormulaire(id).then((formulaire) => {
-      if (formulaire === undefined) {
-        throw new NotFoundError(id.id);
-      }
-      return formulaire;
-    });
+    const formulaireEntity = await this.formulaireRepository.getFormulaire(id);
+    if (!formulaireEntity) {
+      throw new NotFoundError(id.id);
+    }
+    return formulaireEntityToDto(formulaireEntity);
   }
 }

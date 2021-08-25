@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Formik, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
 import { formulaireGateway } from "src/app/main";
-import { FormulaireDto, formulaireDtoSchema } from "src/shared/FormulaireDto"
+import { FormulaireDto, formulaireDtoSchema, FormulaireStatus} from "src/shared/FormulaireDto"
 import { addDays, format, parseISO } from "date-fns";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
@@ -233,6 +233,8 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
   createInitialValues(): FormulaireDto {
     return {
+      status: FormulaireStatus.DRAFT,
+
       // Participant
       email: "sylvanie@monemail.fr",
       firstName: "Sylanie",
