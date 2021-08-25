@@ -9,6 +9,10 @@ export class HttpsSireneRepository implements SireneRepository {
     sireneEndpoint: string,
     bearerToken: string
   ): SireneRepository {
+    if (new URL(sireneEndpoint).protocol !== "https:") {
+      throw new Error(`Not an HTTPS endpoint: ${sireneEndpoint}`);
+    }
+
     const axiosInstance = axios.create({
       baseURL: sireneEndpoint,
       headers: {
@@ -24,11 +28,7 @@ export class HttpsSireneRepository implements SireneRepository {
       (response) => {
         logger.debug(response);
         return response;
-      },
-      (error) => {
-        logger.error(error);
-      }
-    );
+      });
 
     return new HttpsSireneRepository(axiosInstance);
   }
@@ -44,6 +44,7 @@ export class HttpsSireneRepository implements SireneRepository {
       });
       return response.data;
     } catch (error) {
+      logger.error(error);
       if (error.response.status == 404) {
         return undefined;
       }
