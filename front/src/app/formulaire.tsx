@@ -1,8 +1,8 @@
-import React, { Component, useDebugValue, useEffect } from "react";
-import { Formik, Form, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
+import React, { Component } from "react";
+import { Formik, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
 import { formulaireGateway } from "src/app/main";
 import { FormulaireDto, formulaireDtoSchema } from "src/shared/FormulaireDto"
-import { format, parseISO } from "date-fns";
+import { addDays, format, parseISO } from "date-fns";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
 
@@ -238,8 +238,8 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
       firstName: "Sylanie",
       lastName: "Durand",
       phone: "0612345678",
-      dateStart: new Date(),
-      dateEnd: new Date(),
+      dateStart: addDays(new Date(), 2),
+      dateEnd: addDays(new Date(), 3),
 
       // Enterprise
       siret: "12345678912345",
