@@ -1,5 +1,4 @@
 import * as Yup from "../../node_modules/yup";
-import { differenceInCalendarDays } from 'date-fns'
 
 // TODO: find the standard for gouv.fr phone verification
 const phoneRegExp = /\+?[0-9]*/;
@@ -28,7 +27,9 @@ export const formulaireDtoSchema = Yup.object({
         if (!value || !startDate || !(startDate instanceof Date)) {
           return false;
         }
-        return differenceInCalendarDays(value, startDate) <= 28;
+        let maxEndDate = new Date(startDate)
+        maxEndDate.setDate(maxEndDate.getDate() + 28)
+        return value <= maxEndDate;
       }
     ),
 
