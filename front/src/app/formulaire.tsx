@@ -1,8 +1,9 @@
-import React, { Component } from "react";
-import { Formik, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
+import React, { Component, useDebugValue, useEffect } from "react";
+import { Formik, useFormikContext, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
 import { formulaireGateway } from "src/app/main";
-import { FormulaireDto, formulaireDtoSchema, FormulaireStatus} from "src/shared/FormulaireDto"
+import { FormulaireDto, formulaireDtoSchema, FormulaireStatus } from "src/shared/FormulaireDto"
 import { addDays, format, parseISO, startOfToday } from "date-fns";
+import { AxiosError } from "axios";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
 
@@ -226,6 +227,83 @@ const MyRadioGroup = (props: MyCheckboxGroupProps) => {
 }
 
 
+const fetchCompanyInfoBySiret = async (siret: string) => {
+  const addressDictToString = (addressDict: any): string => {
+
+    const addressOrder = [
+      "numeroVoieEtablissement",
+      "typeVoieEtablissement",
+      "libelleVoieEtablissement",
+      "codePostalEtablissement",
+      "libelleCommuneEtablissement"
+    ]
+
+    let addressString = ""
+    for (const field of addressOrder) {
+      addressString += (addressDict[field] ?? "") + " ";
+    }
+    return addressString.trim();
+  }
+
+  return formulaireGateway.getSiretInfo(siret).then((info: any) => {
+    const establishment = info["etablissements"][0];
+    const nom = establishment["uniteLegale"]["denominationUniteLegale"];
+    const address = addressDictToString(establishment["adresseEtablissement"]);
+
+    return { nom, address }
+  });
+}
+
+interface SiretFields {
+  siret: string
+}
+
+const SiretAutocompletedField = (props: FieldHookConfig<string>) => {
+  const {
+    values: { siret },
+    setFieldValue,
+    setFieldError,
+  } = useFormikContext<SiretFields>();
+  const [field, meta] = useField(props);
+
+  React.useEffect(() => {
+    let isCurrent = true;
+    let sanitizedSiret = siret.replace(/\s/g, "")
+    if (sanitizedSiret.length == 14) {
+
+      fetchCompanyInfoBySiret(sanitizedSiret).then((info: any) => {
+        if (!!isCurrent) {
+          setFieldValue(props.name, sanitizedSiret);
+          setFieldValue("businessName", info.nom);
+          setFieldValue("immersionAddress", info.address);
+        }
+      }).catch((err: AxiosError) => {
+        if (err.isAxiosError && err.code === "404") {
+          setFieldError(props.name, "SIRET inconnu ou inactif");
+        } else {
+          setFieldError(props.name, err.message);
+        }
+      })
+    }
+    return () => {
+      isCurrent = false;
+    };
+  }, [siret, setFieldValue, setFieldError, props.name]);
+
+  return (
+    <>
+      <MyTextInput
+        label="Indiquez le SIRET de la structure d'accueil *"
+        name="siret"
+        type="number"
+        placeholder="362 521 879 00034"
+        description="la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
+      /></>
+  );
+};
+
+
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface SuccessMessageProps { link: string }
@@ -321,7 +399,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
   async loadValuesForCurrentID() {
     const queryParams = new URLSearchParams(window.location.search);
-     const id = this.getCurrentFormulaireId();
+    const id = this.getCurrentFormulaireId();
     if (!id) {
       return;
     }
@@ -467,13 +545,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
                     <h4><br />Les questions suivantes doivent être complétées avec la personne qui vous accueillera pendant votre immersion</h4>
 
-                    <MyTextInput
-                      label="Indiquez le SIRET de la structure d'accueil *"
-                      name="siret"
-                      type="number"
-                      placeholder="362 521 879 00034"
-                      description="la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
-                    />
+                    <SiretAutocompletedField name="siret" />
 
                     <MyTextInput
                       label="Indiquez le nom (raison sociale) de l'établissement d'accueil *"
@@ -525,7 +597,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                     />
 
                     <MyTextInput
-                      label="Adresse du lieu où se fera l'immersion (si différent de l’adresse de la structure d’accueil)"
+                      label="Adresse du lieu où se fera l'immersion"
                       name="immersionAddress"
                       type="text"
                       placeholder=""
@@ -636,8 +708,4 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
       </>
     );
   }
-
 }
-
-
-

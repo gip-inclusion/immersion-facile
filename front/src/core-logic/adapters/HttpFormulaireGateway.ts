@@ -1,6 +1,6 @@
 import axios from "axios";
 import { FormulaireGateway } from "src/core-logic/ports/formulaireGateway";
-import { formulairesRoute } from "src/shared/routes";
+import { formulairesRoute, siretRoute } from "src/shared/routes";
 import { FormulaireDto, addFormulaireResponseDtoSchema, AddFormulaireResponseDto, formulaireDtoSchema, UpdateFormulaireResponseDto, updateFormulaireResponseDtoSchema } from "src/shared/FormulaireDto";
 
 const prefix = "api";
@@ -32,5 +32,10 @@ export class HttpFormulaireGateway implements FormulaireGateway {
     const updateFormulaireResponse: UpdateFormulaireResponseDto = httpResponse.data;
     await updateFormulaireResponseDtoSchema.validate(updateFormulaireResponse);
     return updateFormulaireResponse.id;
+  }
+
+  public async getSiretInfo(siret: string): Promise<Object> {
+    const httpResponse = await axios.get(`/${prefix}/${siretRoute}/${siret}`);
+    return httpResponse.data;
   }
 }
