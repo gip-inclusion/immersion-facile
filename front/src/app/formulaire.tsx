@@ -61,6 +61,49 @@ const MyTextInput = (props: MyTextInputProps) => {
   );
 };
 
+
+type MyBoolCheckboxGroupProps = { label: string, formikHelpers: FormikHelpers<any> & FormikState<any>, description: string, descriptionLink: string } & FieldHookConfig<string>;
+const MyBoolCheckboxGroup = (props: MyBoolCheckboxGroupProps) => {
+  const [field, meta] = useField(props);
+  const isError = meta.touched && meta.error;
+  const htmlName = isError ? "checkBox-error" : "checkbox";
+
+  return (
+    <>
+
+      <div className="fr-form-group">
+        <fieldset className={isError ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
+          aria-labelledby={"checkboxes-error-legend" + isError ? " checkboxes-error-desc-error" : ""}
+          role="group">
+          <legend className="fr-fieldset__legend fr-text--regular" id='checkboxes-error-legend'>
+            {props.label}
+          </legend>
+          {props.description && <span className="fr-hint-text" id="select-hint-desc-hint"><a href={props.descriptionLink} target="_blank">{props.description}</a></span>}
+          <div className="fr-fieldset__content">
+            <div className="fr-checkbox-group" key={htmlName + props.name + "_oui"}>
+              <input {...field} type="checkbox" id={htmlName} {...field}
+                checked={props.formikHelpers.values[props.name]}
+              />
+              <label className="fr-label" htmlFor={htmlName + "oui"}
+                onClick={() => { 
+                  if (field.value) 
+                    props.formikHelpers.setFieldValue(props.name, false, true);
+                    else 
+                        props.formikHelpers.setFieldValue(props.name, true, true);
+                    }
+              }
+              >oui</label>
+            </div>
+          </div>
+          {isError && <p id="checkboxes-error-desc-error" className="fr-error-text">
+            {meta.error}
+          </p>}
+        </fieldset>
+      </div>
+    </>
+  );
+}
+
 type MyCheckboxGroupProps = { label: string, values: Array<string> } & FieldHookConfig<string>;
 
 const MyCheckboxGroup = (props: MyCheckboxGroupProps) => {
@@ -353,6 +396,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
               validationSchema={formulaireDtoSchema}
               onSubmit={async (values, { setSubmitting }) => {
                 console.log(values);
+
                 try {
                   const formulaire = await formulaireDtoSchema.validate(values);
 
@@ -549,26 +593,24 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
                     <p />
 
-                    <MyBoolRadioGroup
-                      name="beneficiaryAccepted"
-                      label={"Je (bénéficiaire de l'immersion) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"}
-                      formikHelpers={props}
-                      hideNoOption={true}
-                      description="Avant de répondre, consultez ces dispositions ici"
-                      descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-                    />
+                   
+            <MyBoolCheckboxGroup
+                    name="beneficiaryAccepted"
+                    label={"Je (bénéficiaire de l'immersion) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"}
+                    formikHelpers={props}
+                    description="Avant de répondre, consultez ces dispositions ici"
+                    descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+                  />
 
-                    <MyBoolRadioGroup
-                      name="enterpriseAccepted"
-                      label={"Je (représentant de la structure d'accueil ) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"}
-                      formikHelpers={props}
-                      hideNoOption={true}
-                      description="Avant de répondre, consultez ces dispositions ici"
-                      descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-                    />
+                  <MyBoolCheckboxGroup
+                    name="enterpriseAccepted"
+                    label={"Je (représentant de la structure d'accueil ) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"}
+                    formikHelpers={props}
+                    description="Avant de répondre, consultez ces dispositions ici"
+                    descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+                  />
 
                     <p />
-
 
 
                     {!!this.state.submitError && <ErrorMessage title="Erreur de serveur" message={this.state.submitError.message} />}
