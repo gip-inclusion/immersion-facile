@@ -1,22 +1,29 @@
-import React, { Component, useDebugValue, useEffect } from "react";
+import React, { Component } from "react";
 import { Formik, useFormikContext, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
 import { formulaireGateway } from "src/app/main";
 import { FormulaireDto, formulaireDtoSchema, FormulaireStatus } from "src/shared/FormulaireDto"
-import { addDays, format, parseISO, startOfToday } from "date-fns";
+import { addDays, format, parse, startOfToday } from "date-fns";
 import { AxiosError } from "axios";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
 
 const formatDateInput = (value: Date | string): string => {
+  let date: Date;
   if (typeof value === "string") {
-    value = parseISO(value);
+    date = parse(value, "yyyy-MM-dd", new Date(0));
+  } else {
+    date = value;
   }
-  return format(value, "yyyy-MM-dd");
+  try {
+    return format(date, "yyyy-MM-dd");
+  } catch (e) {
+    // Date is invalid and can't be properly formatted. Use fallback.
+    return value as string;
+  }
 };
 
 const MyDateInput = (props: MyDateInputProps) => {
   const [field, meta] = useField(props);
-  const value: Date = (field.value as unknown) as Date;
   return (
     <>
       <div className="fr-input-group${meta.touched && meta.error ? ' fr-input-group--error' : ''}">
@@ -26,7 +33,7 @@ const MyDateInput = (props: MyDateInputProps) => {
         <div className="fr-input-wrap fr-fi-calendar-line">
           <input className={`fr-input${meta.touched && meta.error ? ' fr-input--error' : ''}`}
             {...field}
-            value={formatDateInput(value)}
+            value={formatDateInput(field.value)}
             type="date"
           />
         </div>
@@ -86,10 +93,10 @@ const MyBoolCheckboxGroup = (props: MyBoolCheckboxGroupProps) => {
                 checked={props.formikHelpers.values[props.name]}
               />
               <label className="fr-label" htmlFor={htmlName + "oui"}
-                onClick={() => { 
-                  if (field.value) 
+                onClick={() => {
+                  if (field.value)
                     props.formikHelpers.setFieldValue(props.name, false, true);
-                    else 
+                    else
                         props.formikHelpers.setFieldValue(props.name, true, true);
                     }
               }
@@ -665,7 +672,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
                     <p />
 
-                   
+
             <MyBoolCheckboxGroup
                     name="beneficiaryAccepted"
                     label={"Je (bénéficiaire de l'immersion) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"}
