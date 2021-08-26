@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Formik, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
 import { formulaireGateway } from "src/app/main";
 import { FormulaireDto, formulaireDtoSchema, FormulaireStatus} from "src/shared/FormulaireDto"
-import { addDays, format, parseISO } from "date-fns";
+import { addDays, format, parseISO, startOfToday } from "date-fns";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
 
@@ -240,8 +240,9 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
       firstName: "Sylanie",
       lastName: "Durand",
       phone: "0612345678",
-      dateStart: addDays(new Date(), 2),
-      dateEnd: addDays(new Date(), 3),
+      dateSubmission: startOfToday(),
+      dateStart: addDays(startOfToday(), 2),
+      dateEnd: addDays(startOfToday(), 3),
 
       // Enterprise
       siret: "12345678912345",
@@ -283,6 +284,11 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
     }
     try {
       let response = await formulaireGateway.get(id);
+
+      if (response.status === FormulaireStatus.DRAFT) {
+        response.dateSubmission = startOfToday();
+      }
+
       this.setState({ initialValues: response });
     } catch (e) {
       console.log(e)

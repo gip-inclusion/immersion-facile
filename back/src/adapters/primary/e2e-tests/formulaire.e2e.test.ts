@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import { app } from "../server";
 import { validFormulaire } from "../../../domain/formulaires/entities/FormulaireEntityTestData";
+import { FormulaireEntity } from "../../../domain/formulaires/entities/FormulaireEntity";
 
 describe("/formulaires route", () => {
   it("rejects invalid requests", (done) => {
@@ -40,6 +41,7 @@ describe("/formulaires route", () => {
               .end((err, res) => {
                 if (err) return done(err);
 
+                res.body.dateSubmission = new Date(res.body.dateSubmission);
                 res.body.dateStart = new Date(res.body.dateStart);
                 res.body.dateEnd = new Date(res.body.dateEnd);
                 expect(res.body).toEqual(validFormulaire);
@@ -86,6 +88,7 @@ describe("/formulaires route", () => {
               .end((err, res) => {
                 if (err) return done(err);
 
+                res.body.dateSubmission = new Date(res.body.dateSubmission);
                 res.body.dateStart = new Date(res.body.dateStart);
                 res.body.dateEnd = new Date(res.body.dateEnd);
                 expect(res.body).toEqual(updatedFormulaire);

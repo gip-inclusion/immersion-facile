@@ -124,6 +124,13 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
       throw new Error(`Invalid field 'siret' in Airtable record: ${record}`);
     }
 
+    record.fields.dateSubmission = record.fields.dateSubmission || "";
+    if (typeof record.fields.dateSubmission !== "string") {
+      throw new Error(
+        `Invalid field 'dateSubmission' in Airtable record: ${record}`
+      );
+    }
+
     record.fields.dateStart = record.fields.dateStart || "";
     if (typeof record.fields.dateStart !== "string") {
       throw new Error(
@@ -252,6 +259,7 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
       phone: record.fields.phone,
       firstName: record.fields.firstName,
       lastName: record.fields.lastName,
+      dateSubmission: new Date(record.fields.dateSubmission),
       dateStart: new Date(record.fields.dateStart),
       dateEnd: new Date(record.fields.dateEnd),
       businessName: record.fields.businessName,
@@ -282,6 +290,7 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
       phone: entity.phone,
       firstName: entity.firstName,
       lastName: entity.lastName,
+      dateSubmission: format(entity.dateSubmission, "yyyy-MM-dd"),
       dateStart: format(entity.dateStart, "yyyy-MM-dd"),
       dateEnd: format(entity.dateEnd, "yyyy-MM-dd"),
       businessName: entity.businessName,

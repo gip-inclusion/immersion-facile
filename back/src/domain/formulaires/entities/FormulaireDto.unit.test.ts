@@ -1,7 +1,6 @@
-import { FormulaireDto, formulaireDtoSchema, FormulaireStatus, FormulaireStatusUtil } from "../../../shared/FormulaireDto";
-import { validFormulaire, VALID_EMAILS, DATE_START, DATE_END } from "./FormulaireEntityTestData";
-import { it } from "date-fns/locale";
-import { expectPromiseToFailWith } from "../../../utils/test.helpers";
+import { formulaireDtoSchema, FormulaireStatus, FormulaireStatusUtil } from "../../../shared/FormulaireDto";
+import { validFormulaire, DATE_START, DATE_END, DATE_SUBMISSION } from "./FormulaireEntityTestData";
+import { addDays } from "date-fns";
 
 describe("formulaireDtoSchema", () => {
 
@@ -16,10 +15,7 @@ describe("formulaireDtoSchema", () => {
   test("rejects end dates that are more than 28 days after the start date", () => {
     const invalidRequest = { ...validFormulaire };
     invalidRequest.dateStart = DATE_START;
-
-    let invalidEndDate = new Date(DATE_START);
-    invalidEndDate.setDate(invalidEndDate.getDate() + 290 /* days */);
-    invalidRequest.dateEnd = invalidEndDate;
+    invalidRequest.dateEnd = addDays(DATE_START, 29);
 
     expect(() => formulaireDtoSchema.validateSync(invalidRequest)).toThrow();
   });
@@ -27,13 +23,28 @@ describe("formulaireDtoSchema", () => {
   test("accepts end dates that are <= 28 days after the start date", () => {
     const validRequest = { ...validFormulaire };
     validRequest.dateStart = DATE_START;
-
-    let validEndDate = new Date(DATE_START);
-    validEndDate.setDate(validEndDate.getDate() + 28 /* days */);
-    validRequest.dateEnd = validEndDate;
+    validRequest.dateEnd = addDays(DATE_START, 28);
 
     expect(() => formulaireDtoSchema.validateSync(validRequest)).not.toThrow();
     expect(formulaireDtoSchema.validateSync(validRequest)).toBeTruthy();
+  });
+
+  test('accepts start dates that are >= 2 days after the submission date', () => {
+    const invalidRequest = {
+      ...validFormulaire,
+      dateSubmission: DATE_SUBMISSION,
+      dateStart: addDays(DATE_SUBMISSION, 2),
+    };
+    expect(() => formulaireDtoSchema.validateSync(invalidRequest)).not.toThrow();
+  });
+
+  test('rejects start dates that are < 2 days after the submission date', () => {
+    const invalidRequest = {
+      ...validFormulaire,
+      dateSubmission: DATE_SUBMISSION,
+      dateStart: addDays(DATE_SUBMISSION, 1),
+    };
+    expect(() => formulaireDtoSchema.validateSync(invalidRequest)).toThrow();
   });
 });
 

@@ -33,8 +33,23 @@ export const formulaireDtoSchema = Yup.object({
   phone: Yup.string()
     .matches(phoneRegExp, 'Numero de téléphone incorrect')
     .nullable(true),
-  dateStart: Yup.date()
+  dateSubmission: Yup.date()
     .required("Obligatoire"),
+  dateStart: Yup.date()
+    .required("Obligatoire")
+    .test(
+      "dateStart-afterSubmission",
+      "La date de démarrage doit étre au moins 2 jours après la saisie.",
+      (value, context) => {
+        const submissionDate = context.parent.dateSubmission;
+        if (!value || !submissionDate || !(submissionDate instanceof Date)) {
+          return false;
+        }
+        let minStartDate = new Date(submissionDate);
+        minStartDate.setDate(minStartDate.getDate() + 2);
+        return value >= minStartDate;
+      }
+    ),
   dateEnd: Yup.date()
     .required("Obligatoire")
     .min(Yup.ref('dateStart'), "Date de fin doit être après la date de début")

@@ -6,6 +6,7 @@ type FormulaireProps = {
   phone: string | undefined;
   firstName: string;
   lastName: string;
+  dateSubmission: Date;
   dateStart: Date;
   dateEnd: Date;
   businessName: string;
@@ -33,6 +34,7 @@ export class FormulaireEntity {
   public readonly firstName: string;
   public readonly lastName: string;
   public readonly phone: string | undefined;
+  public readonly dateSubmission: Date;
   public readonly dateStart: Date;
   public readonly dateEnd: Date;
   public readonly businessName: string;
@@ -59,6 +61,7 @@ export class FormulaireEntity {
     phone,
     firstName,
     lastName,
+    dateSubmission,
     dateStart,
     dateEnd,
     businessName,
@@ -84,6 +87,7 @@ export class FormulaireEntity {
     this.phone = phone;
     this.firstName = firstName;
     this.lastName = lastName;
+    this.dateSubmission = dateSubmission;
     this.dateStart = dateStart;
     this.dateEnd = dateEnd;
     this.businessName = businessName;
@@ -124,6 +128,7 @@ export class FormulaireEntity {
       phone: dto.phone ?? undefined,
       firstName: dto.firstName,
       lastName: dto.lastName,
+      dateSubmission: dto.dateSubmission,
       dateStart: dto.dateStart,
       dateEnd: dto.dateEnd,
       businessName: dto.businessName,
@@ -157,6 +162,7 @@ export const formulaireEntityToDto = (
     phone: entity.phone,
     firstName: entity.firstName,
     lastName: entity.lastName,
+    dateSubmission: entity.dateSubmission,
     dateStart: entity.dateStart,
     dateEnd: entity.dateEnd,
     businessName: entity.businessName,
