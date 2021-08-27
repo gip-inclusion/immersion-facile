@@ -2,25 +2,10 @@ import React, { Component } from "react";
 import { Formik, useFormikContext, useField, FormikState, FieldHookConfig, Field, FormikHelpers } from "formik";
 import { formulaireGateway } from "src/app/main";
 import { FormulaireDto, formulaireDtoSchema, FormulaireStatus } from "src/shared/FormulaireDto"
-import { addDays, format, parse, startOfToday } from "date-fns";
+import { addDays, format, startOfToday } from "date-fns";
 import { AxiosError } from "axios";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
-
-const formatDateInput = (value: Date | string): string => {
-  let date: Date;
-  if (typeof value === "string") {
-    date = parse(value, "yyyy-MM-dd", new Date(0));
-  } else {
-    date = value;
-  }
-  try {
-    return format(date, "yyyy-MM-dd");
-  } catch (e) {
-    // Date is invalid and can't be properly formatted. Use fallback.
-    return value as string;
-  }
-};
 
 const MyDateInput = (props: MyDateInputProps) => {
   const [field, meta] = useField(props);
@@ -33,7 +18,7 @@ const MyDateInput = (props: MyDateInputProps) => {
         <div className="fr-input-wrap fr-fi-calendar-line">
           <input className={`fr-input${meta.touched && meta.error ? ' fr-input--error' : ''}`}
             {...field}
-            value={formatDateInput(field.value)}
+            value={field.value}
             type="date"
           />
         </div>
@@ -368,9 +353,9 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
       firstName: "Sylanie",
       lastName: "Durand",
       phone: "0612345678",
-      dateSubmission: startOfToday(),
-      dateStart: addDays(startOfToday(), 2),
-      dateEnd: addDays(startOfToday(), 3),
+      dateSubmission: Formulaire.toDateString(startOfToday()),
+      dateStart: Formulaire.toDateString(addDays(startOfToday(), 2)),
+      dateEnd: Formulaire.toDateString(addDays(startOfToday(), 3)),
 
       // Enterprise
       siret: "12345678912345",
@@ -414,7 +399,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
       let response = await formulaireGateway.get(id);
 
       if (response.status === FormulaireStatus.DRAFT) {
-        response.dateSubmission = startOfToday();
+        response.dateSubmission = Formulaire.toDateString(startOfToday());
       }
 
       this.setState({ initialValues: response });
@@ -422,6 +407,10 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
       console.log(e)
       this.state = { ...this.state, submitError: e, formLink: null };
     }
+  }
+
+  private static toDateString(date: Date):string {
+    return format(date, "yyyy-MM-dd");
   }
 
   componentDidMount() {

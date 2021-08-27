@@ -40,12 +40,7 @@ describe("/formulaires route", () => {
               .expect("Content-Type", /json/)
               .end((err, res) => {
                 if (err) return done(err);
-
-                res.body.dateSubmission = new Date(res.body.dateSubmission);
-                res.body.dateStart = new Date(res.body.dateStart);
-                res.body.dateEnd = new Date(res.body.dateEnd);
                 expect(res.body).toEqual(validFormulaire);
-
                 done();
               });
           });
@@ -87,12 +82,7 @@ describe("/formulaires route", () => {
               .expect("Content-Type", /json/)
               .end((err, res) => {
                 if (err) return done(err);
-
-                res.body.dateSubmission = new Date(res.body.dateSubmission);
-                res.body.dateStart = new Date(res.body.dateStart);
-                res.body.dateEnd = new Date(res.body.dateEnd);
                 expect(res.body).toEqual(updatedFormulaire);
-
                 done();
               });
           });

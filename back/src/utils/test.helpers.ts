@@ -1,3 +1,5 @@
+import { addDays as dateFnsAddDays, format } from "date-fns";
+
 export const expectPromiseToFailWith = async (
   promise: Promise<unknown>,
   errorMessage: string
@@ -10,4 +12,9 @@ export const expectPromiseToFailWithError = async (
   error: Error
 ) => {
   await expect(promise).rejects.toThrowError(error);
+};
+
+export const addDays = (dateStr: string, amount: number) => {
+  const newDate = dateFnsAddDays(new Date(dateStr), amount);
+  return format(newDate, "yyyy-MM-dd");
 };

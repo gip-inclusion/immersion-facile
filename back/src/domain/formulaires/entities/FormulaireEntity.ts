@@ -1,4 +1,4 @@
-import { FormulaireDto, FormulaireStatusUtil } from "../../../shared/FormulaireDto";
+import { FormulaireDto, formulaireDtoSchema, FormulaireStatusUtil } from "../../../shared/FormulaireDto";
 
 type FormulaireProps = {
   status: string;
@@ -6,9 +6,9 @@ type FormulaireProps = {
   phone: string | undefined;
   firstName: string;
   lastName: string;
-  dateSubmission: Date;
-  dateStart: Date;
-  dateEnd: Date;
+  dateSubmission: string;
+  dateStart: string;
+  dateEnd: string;
   businessName: string;
   siret: string;
   mentor: string;
@@ -34,9 +34,9 @@ export class FormulaireEntity {
   public readonly firstName: string;
   public readonly lastName: string;
   public readonly phone: string | undefined;
-  public readonly dateSubmission: Date;
-  public readonly dateStart: Date;
-  public readonly dateEnd: Date;
+  public readonly dateSubmission: string;
+  public readonly dateStart: string;
+  public readonly dateEnd: string;
   public readonly businessName: string;
   public readonly siret: string;
   public readonly mentor: string;
@@ -110,18 +110,7 @@ export class FormulaireEntity {
   }
 
   public static create(dto: FormulaireDto) {
-    // TODO: Find a more precise email validation method. This is a simplified regex that
-    // accepts some invalid email addresses.
-    // For details see https://stackoverflow.com/questions/201323
-    const emailRegex = /\S+@\S+\.\S+/;
-    if (!emailRegex.test(dto.email)) {
-      throw new Error(`Email must match the RFC standard: ${dto.email}`);
-    }
-
-    if (dto.dateEnd <= dto.dateStart) {
-      throw new Error(`The start date must be before the end date.`);
-    }
-
+    formulaireDtoSchema.validateSync(dto);
     return new FormulaireEntity({
       status: dto.status,
       email: dto.email,

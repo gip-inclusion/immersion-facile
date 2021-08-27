@@ -3,6 +3,9 @@ import * as Yup from "../../node_modules/yup";
 // TODO: find the standard for gouv.fr phone verification
 const phoneRegExp = /\+?[0-9]*/;
 
+// Matches valid dates of the format 'yyyy-mm-dd'.
+const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
+
 export enum FormulaireStatus {
   UNKNOWN = "UNKNOWN",
   DRAFT = "DRAFT",
@@ -33,39 +36,58 @@ export const formulaireDtoSchema = Yup.object({
   phone: Yup.string()
     .matches(phoneRegExp, 'Numero de téléphone incorrect')
     .nullable(true),
-  dateSubmission: Yup.date()
+  dateSubmission: Yup.string()
+    .matches(dateRegExp, "La date de saisie est invalide.")
     .required("Obligatoire"),
-  dateStart: Yup.date()
-    .required("Obligatoire")
+  dateStart: Yup.string()
+    .matches(dateRegExp, "La date de démarrage est invalide.")
     .test(
-      "dateStart-afterSubmission",
+      "dateStart-min",
       "La date de démarrage doit étre au moins 2 jours après la saisie.",
       (value, context) => {
-        const submissionDate = context.parent.dateSubmission;
-        if (!value || !submissionDate || !(submissionDate instanceof Date)) {
+        if (!value || !context.parent.dateSubmission) {
           return false;
         }
+        const startDate = new Date(value);
+        const submissionDate = new Date(context.parent.dateSubmission);
+
         let minStartDate = new Date(submissionDate);
         minStartDate.setDate(minStartDate.getDate() + 2);
-        return value >= minStartDate;
+        return startDate >= minStartDate;
       }
-    ),
-  dateEnd: Yup.date()
-    .required("Obligatoire")
-    .min(Yup.ref('dateStart'), "Date de fin doit être après la date de début")
+    )
+    .required("Obligatoire"),
+  dateEnd: Yup.string()
+    .matches(dateRegExp, "La date de fin invalide.")
     .test(
-      "moins-28j",
-      "La durée maximale d\'immersion est de 28 jours",
+      "dateEnd-min",
+      "La date de fin doit être après la date de début.",
       (value, context) => {
-        const startDate = context.parent.dateStart;
-        if (!value || !startDate || !(startDate instanceof Date)) {
+        if (!value || !context.parent.dateStart) {
           return false;
         }
-        let maxEndDate = new Date(startDate)
-        maxEndDate.setDate(maxEndDate.getDate() + 28)
-        return value <= maxEndDate;
+        const startDate = new Date(context.parent.dateStart);
+        const endDate = new Date(value);
+
+        return endDate > startDate;
       }
-    ),
+    )
+    .test(
+      "dateEnd-max",
+      "La durée maximale d'immersion est de 28 jours.",
+      (value, context) => {
+        if (!value || !context.parent.dateStart) {
+          return false;
+        }
+        const startDate = new Date(context.parent.dateStart);
+        const endDate = new Date(value);
+
+        let maxEndDate = new Date(startDate);
+        maxEndDate.setDate(maxEndDate.getDate() + 28);
+        return endDate <= maxEndDate;
+      }
+    )
+    .required("Obligatoire"),
     siret: Yup.string()
     .required("Obligatoire")
     .length(14, "SIRET doit étre composé de 14 chiffres"),

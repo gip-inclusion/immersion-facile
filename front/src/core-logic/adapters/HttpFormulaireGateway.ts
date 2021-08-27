@@ -16,14 +16,9 @@ export class HttpFormulaireGateway implements FormulaireGateway {
 
   public async get(id: string): Promise<FormulaireDto> {
     const response = await axios.get(`/${prefix}/${formulairesRoute}/${id}`);
-    const dto = {
-      ...response.data,
-      dateStart: new Date(response.data.dateStart),
-      dateEnd: new Date(response.data.dateEnd)
-    } as FormulaireDto;
-    console.log(dto);
-    await formulaireDtoSchema.validate(dto);
-    return dto;
+    console.log(response.data);
+    await formulaireDtoSchema.validate(response.data);
+    return response.data;
   }
 
   public async update(id: string, formulaireDto: FormulaireDto): Promise<string> {
