@@ -129,6 +129,8 @@ export const formulaireDtoSchema = Yup.object({
   enterpriseAccepted: Yup.boolean().equals([true], "L'engagement est obligatoire"),
 }).required();
 
+export const formulaireDtoArraySchema = Yup.array().of(formulaireDtoSchema);
+
 export type FormulaireDto = Yup.InferType<typeof formulaireDtoSchema>;
 
 export const addFormulaireResponseDtoSchema = Yup.object({

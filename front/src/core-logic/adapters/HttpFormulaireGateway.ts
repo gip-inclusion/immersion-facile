@@ -1,7 +1,7 @@
 import axios from "axios";
 import { FormulaireGateway } from "src/core-logic/ports/formulaireGateway";
 import { formulairesRoute, siretRoute } from "src/shared/routes";
-import { FormulaireDto, addFormulaireResponseDtoSchema, AddFormulaireResponseDto, formulaireDtoSchema, UpdateFormulaireResponseDto, updateFormulaireResponseDtoSchema } from "src/shared/FormulaireDto";
+import { FormulaireDto, addFormulaireResponseDtoSchema, AddFormulaireResponseDto, formulaireDtoSchema, UpdateFormulaireResponseDto, updateFormulaireResponseDtoSchema, formulaireDtoArraySchema } from "src/shared/FormulaireDto";
 
 const prefix = "api";
 
@@ -19,6 +19,21 @@ export class HttpFormulaireGateway implements FormulaireGateway {
     console.log(response.data);
     await formulaireDtoSchema.validate(response.data);
     return response.data;
+  }
+
+  public async getAll(): Promise<Array<FormulaireDto>> {
+    const response = await axios.get(`/${prefix}/${formulairesRoute}`);
+
+    const formulaires = response.data.map(function (data: any) {
+      return {
+        ...data,
+        dateStart: new Date(data.dateStart),
+        dateEnd: new Date(data.dateEnd)
+      } as FormulaireDto;
+    });
+
+    await formulaireDtoArraySchema.validate(formulaires);
+    return formulaires;
   }
 
   public async update(id: string, formulaireDto: FormulaireDto): Promise<string> {

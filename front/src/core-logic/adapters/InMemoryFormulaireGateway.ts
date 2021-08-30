@@ -33,6 +33,11 @@ export class InMemoryFormulaireGateway implements FormulaireGateway {
     return this._formulaires[0];
   }
 
+  public async getAll(): Promise<Array<FormulaireDto>> {
+    console.log("InMemoryFormulaireGateway.getAll");
+    return this._formulaires;
+  }
+
   public async update(id: string, formulaire: FormulaireDto): Promise<string> {
     console.log("InMemoryFormulaireGateway.update: ", formulaire);
     this._formulaires[0] = formulaire;

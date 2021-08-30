@@ -100,6 +100,8 @@ deploy_back:
           --env SIRENE_REPOSITORY=HTTPS
           --env SIRENE_ENDPOINT="https://api.insee.fr/entreprises/sirene/V3"
           --env SIRENE_BEARER_TOKEN=${SIRENE_BEARER_TOKEN}
+          --env BACKOFFICE_USERNAME=${BACKOFFICE_USERNAME}
+          --env BACKOFFICE_PASSWORD=${BACKOFFICE_PASSWORD}
           --pull always
           --name back
           ${CI_REGISTRY_IMAGE}/back:$CI_COMMIT_SHORT_SHA"

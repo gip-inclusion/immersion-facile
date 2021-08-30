@@ -15,6 +15,7 @@ describe("/formulaires route", () => {
     // GET /formulaires returns an empty list.
     supertest(app)
       .get("/formulaires")
+      .auth("e2e_tests", "e2e")
       .expect("Content-Type", /json/)
       .expect(200)
 
@@ -98,5 +99,25 @@ describe("/formulaires route", () => {
       .post("/formulaires/unknown-formulaire-id")
       .send(validFormulaire)
       .expect(404, done);
+  });
+
+  it("Fails to fetch formulaires without credentials", (done) => {
+    supertest(app).get("/formulaires").expect(401, done);
+  });
+
+  it("Fails to fetch formulaires with invalid credentials", (done) => {
+    supertest(app)
+      .get("/formulaires")
+      .auth("not real user", "not real password")
+      .expect(401, done);
+  });
+
+  it("Fetches formulaires with valid credentials", (done) => {
+    // GET /formulaires succeeds with login/pass.
+    supertest(app)
+      .get("/formulaires")
+      .auth("e2e_tests", "e2e")
+      .expect("Content-Type", /json/)
+      .expect(200, done);
   });
 });

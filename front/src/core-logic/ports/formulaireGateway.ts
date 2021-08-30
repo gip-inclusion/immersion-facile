@@ -6,4 +6,5 @@ export interface FormulaireGateway {
   update: (id: string, formulaire: FormulaireDto) => Promise<string>;
 
   getSiretInfo: (siret: string) => Promise<Object>;
+  getAll: () => Promise<Array<FormulaireDto>>;
 }

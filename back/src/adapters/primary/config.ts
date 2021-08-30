@@ -1,3 +1,4 @@
+import { ALWAYS_REJECT } from "./../../domain/auth/AuthChecker";
 import { Clock, CustomClock, RealClock } from "../../domain/todos/ports/Clock";
 import { AddFormulaire } from "../../domain/formulaires/useCases/AddFormulaire";
 import { ListFormulaires } from "../../domain/formulaires/useCases/ListFormulaires";
@@ -8,6 +9,7 @@ import { InMemoryFormulaireRepository } from "../secondary/InMemoryFormulaireRep
 import { InMemoryTodoRepository } from "../secondary/InMemoryTodoRepository";
 import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
 import { logger } from "../../utils/logger";
+import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GetFormulaire } from "../../domain/formulaires/useCases/GetFormulaire";
 import { UpdateFormulaire } from "../../domain/formulaires/useCases/UpdateFormulaire";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
@@ -48,6 +50,32 @@ export const getRepositories = () => {
           )
         : new InMemorySireneRepository(),
   };
+};
+
+export const getAuthChecker = () => {
+  let username: string;
+  let password: string;
+
+  if (process.env.NODE_ENV === "test") {
+    // Prevent failure when the username/password env variables are not set in tests
+    username = "e2e_tests";
+    password = "e2e";
+  } else if (
+    !process.env.BACKOFFICE_USERNAME ||
+    !process.env.BACKOFFICE_PASSWORD
+  ) {
+    logger.warn("Missing backoffice credentials. Disabling backoffice access.");
+    return ALWAYS_REJECT;
+  } else {
+    username =
+      process.env.BACKOFFICE_USERNAME ||
+      fail("Missing environment variable: BACKOFFICE_USERNAME");
+    password =
+      process.env.BACKOFFICE_PASSWORD ||
+      fail("Missing environment variable: BACKOFFICE_PASSWORD");
+  }
+
+  return InMemoryAuthChecker.create(username, password);
 };
 
 const fail = (message: string) => {
