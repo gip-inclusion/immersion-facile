@@ -1,14 +1,10 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
 import { formulaireGateway } from "src/app/main";
+import { routes } from "src/app/routes";
 import { FormulaireDto } from "src/shared/FormulaireDto";
-import { format } from "date-fns";
 import { MarianneHeader } from "src/app/Components/Header";
+import { Route } from "type-route";
 
-interface FormulaireDetailsProps {
-  data: FormulaireDto;
-}
-interface FormulaireDetailsState {}
 class FormulaireDetails extends Component<
   FormulaireAccordeonProps,
   FormulaireAccordeonState
@@ -99,9 +95,11 @@ class FormulaireAccordeon extends Component<
 interface AdminState {
   formulaires: Array<FormulaireDto>;
 }
-interface AdminProps {}
+interface AdminProps {
+  route: Route<typeof routes.admin>;
+}
 
-class Admin extends Component<AdminProps, AdminState> {
+export class Admin extends Component<AdminProps, AdminState> {
   async fetchData() {
     this.setState({ formulaires: await formulaireGateway.getAll() });
   }
@@ -143,10 +141,3 @@ class Admin extends Component<AdminProps, AdminState> {
     );
   }
 }
-
-ReactDOM.render(
-  <React.StrictMode>
-    <Admin />
-  </React.StrictMode>,
-  document.getElementById("root")
-);

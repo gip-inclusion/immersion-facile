@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Formik, useFormikContext, useField, FieldHookConfig } from "formik";
 import { formulaireGateway } from "src/app/main";
+import { BoolRadioGroup, RadioGroup } from "src/app/radioGroup";
+import { routes } from "src/app/routes";
 import { DateInput } from "src/components/DateInput";
 import { ErrorMessage } from "src/components/ErrorMessage";
 import { SuccessMessage } from "src/components/SuccessMessage";
@@ -12,6 +14,7 @@ import {
 } from "src/shared/FormulaireDto";
 import { addDays, format, startOfToday } from "date-fns";
 import { AxiosError } from "axios";
+import { Route } from "type-route";
 import { MarianneHeader } from "./Components/Header";
 import { v4 as uuidV4 } from "uuid";
 
@@ -108,13 +111,17 @@ const FrozenMessage = () => (
   </>
 );
 
-interface FormulaireProps {}
+interface FormulaireProps {
+  route: Route<typeof routes.demandeImmersion>;
+}
+
 interface FormulaireState {
   initialValues: FormulaireDto;
   formLink: string | null;
   submitError: Error | null;
   isFrozen: boolean;
 }
+
 export class Formulaire extends Component<FormulaireProps, FormulaireState> {
   createInitialValues(): FormulaireDto {
     return {
@@ -175,7 +182,10 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
         response.dateSubmission = Formulaire.toDateString(startOfToday());
       }
 
-      this.setState({ initialValues: response });
+      this.setState({
+        initialValues: response,
+        isFrozen: Formulaire.isFrozen(response),
+      });
     } catch (e) {
       console.log(e);
       this.state = { ...this.state, submitError: e, formLink: null };
