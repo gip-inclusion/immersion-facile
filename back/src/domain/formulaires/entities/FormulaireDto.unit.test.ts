@@ -1,7 +1,7 @@
 import {
   formulaireDtoSchema,
   FormulaireStatus,
-  FormulaireStatusUtil,
+  formulaireStatusFromString,
 } from "../../../shared/FormulaireDto";
 import { addDays } from "../../../utils/test.helpers";
 import { updateFormulaireRequestDtoSchema } from "./../../../shared/FormulaireDto";
@@ -111,21 +111,24 @@ describe("updateFormulaireRequestDtoSchema", () => {
 });
 
 describe("FormulaireStateUtil", () => {
-  test("fromString() accepts valid enum values", () => {
-    expect(FormulaireStatusUtil.fromString("DRAFT")).toEqual(
-      FormulaireStatus.DRAFT
-    );
-    expect(FormulaireStatusUtil.fromString("FINALIZED")).toEqual(
-      FormulaireStatus.FINALIZED
+  test("formulaireStatusFromString() accepts valid enum values", () => {
+    expectFormulaireStatusToBe(formulaireStatusFromString("DRAFT"), "DRAFT");
+    expectFormulaireStatusToBe(
+      formulaireStatusFromString("FINALIZED"),
+      "FINALIZED"
     );
   });
 
-  test("fromString() converts invalid enum values to UNKNOWN", () => {
-    expect(FormulaireStatusUtil.fromString("")).toEqual(
-      FormulaireStatus.UNKNOWN
-    );
-    expect(FormulaireStatusUtil.fromString("UNKNOWN_VALUE")).toEqual(
-      FormulaireStatus.UNKNOWN
+  test("formulaireStatusFromString() converts invalid enum values to UNKNOWN", () => {
+    expectFormulaireStatusToBe(formulaireStatusFromString(""), "UNKNOWN");
+    expectFormulaireStatusToBe(
+      formulaireStatusFromString("UNKNOWN_VALUE"),
+      "UNKNOWN"
     );
   });
 });
+
+const expectFormulaireStatusToBe = (
+  status: FormulaireStatus,
+  expectedStatus: FormulaireStatus
+) => expect(status).toBe(expectedStatus);

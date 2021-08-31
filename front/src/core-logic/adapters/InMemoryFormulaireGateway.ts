@@ -1,6 +1,5 @@
 import { FormulaireGateway } from "src/core-logic/ports/formulaireGateway";
-import type { FormulaireDto } from "src/shared/FormulaireDto";
-import { DemandeImmersionId } from "./../../../../back/src/shared/FormulaireDto";
+import type { FormulaireDto, DemandeImmersionId } from "src/shared/FormulaireDto";
 
 const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
 const TEST_ESTABLISHMENT1 = {

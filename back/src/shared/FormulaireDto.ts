@@ -7,28 +7,21 @@ const phoneRegExp = /\+?[0-9]*/;
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
 
-export enum FormulaireStatus {
-  UNKNOWN = "UNKNOWN",
-  DRAFT = "DRAFT",
-  FINALIZED = "FINALIZED",
-}
-export class FormulaireStatusUtil {
-  static fromString(s: string): FormulaireStatus {
-    if (
-      Object.values(FormulaireStatus).some((status: string) => status === s)
-    ) {
-      return <FormulaireStatus>s;
-    }
-    return FormulaireStatus.UNKNOWN;
-  }
-}
+export type FormulaireStatus = "UNKNOWN" | "DRAFT" | "FINALIZED";
+const formulaireStatusOptions: FormulaireStatus[] = ["DRAFT", "FINALIZED"];
+
+export const formulaireStatusFromString = (s: string): FormulaireStatus => {
+  const status = s as FormulaireStatus;
+  if (formulaireStatusOptions.includes(status)) return status;
+  return "UNKNOWN";
+};
 
 export type DemandeImmersionId = Flavor<string, "DemandeImmersionId">;
 
 export const formulaireDtoSchema = Yup.object({
   id: Yup.mixed<DemandeImmersionId>().required("Obligatoire"),
   status: Yup.mixed<FormulaireStatus>()
-    .oneOf(Object.values(FormulaireStatus))
+    .oneOf(formulaireStatusOptions)
     .required("Obligatoire"),
   email: Yup.string()
     .required("Obligatoire")

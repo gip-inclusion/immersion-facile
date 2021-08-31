@@ -2,7 +2,7 @@ import {
   DemandeImmersionId,
   FormulaireDto,
   formulaireDtoSchema,
-  FormulaireStatusUtil
+  formulaireStatusFromString,
 } from "../../../shared/FormulaireDto";
 
 type FormulaireProps = {
@@ -157,7 +157,7 @@ export const formulaireEntityToDto = (
 ): FormulaireDto => {
   return {
     id: entity.id,
-    status: FormulaireStatusUtil.fromString(entity.status),
+    status: formulaireStatusFromString(entity.status),
     email: entity.email,
     phone: entity.phone,
     firstName: entity.firstName,
@@ -182,5 +182,5 @@ export const formulaireEntityToDto = (
     immersionSkills: entity.immersionSkills,
     beneficiaryAccepted: entity.beneficiaryAccepted,
     enterpriseAccepted: entity.enterpriseAccepted,
-  } as FormulaireDto;
+  };
 };

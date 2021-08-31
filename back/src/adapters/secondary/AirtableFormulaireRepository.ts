@@ -2,8 +2,10 @@ import Airtable, { FieldSet, Table } from "airtable";
 import { QueryParams } from "airtable/lib/query_params";
 import { FormulaireEntity } from "../../domain/formulaires/entities/FormulaireEntity";
 import { FormulaireRepository } from "../../domain/formulaires/ports/FormulaireRepository";
-import { FormulaireStatusUtil } from "../../shared/FormulaireDto";
+import { FormulaireEntity } from "../../domain/formulaires/entities/FormulaireEntity";
+import { FormulaireIdEntity } from "../../domain/formulaires/entities/FormulaireIdEntity";
 import { logger } from "../../utils/logger";
+import { formulaireStatusFromString } from "../../shared/FormulaireDto";
 import { DemandeImmersionId } from "./../../shared/FormulaireDto";
 
 export class AirtableFormulaireRepository implements FormulaireRepository {
@@ -68,6 +70,7 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
       records.forEach((record) => allRecords.push(record));
       fetchNextPage();
     });
+
     return allRecords.map(
       AirtableFormulaireRepository.verifyRecordAndConvertToEntity
     );
@@ -272,7 +275,7 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
 
     return FormulaireEntity.create({
       id: record.fields.id,
-      status: FormulaireStatusUtil.fromString(record.fields.status),
+      status: formulaireStatusFromString(record.fields.status),
       email: record.fields.email,
       phone: record.fields.phone,
       firstName: record.fields.firstName,

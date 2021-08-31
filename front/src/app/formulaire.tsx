@@ -17,6 +17,8 @@ import { AxiosError } from "axios";
 import { Route } from "type-route";
 import { MarianneHeader } from "./Components/Header";
 import { v4 as uuidV4 } from "uuid";
+import { BoolCheckboxGroup, CheckboxGroup } from "src/components/CheckboxGroup";
+
 
 const fetchCompanyInfoBySiret = async (siret: string) => {
   const addressDictToString = (addressDict: any): string => {
@@ -60,12 +62,12 @@ const SiretAutocompletedField = (props: SiretAutocompletedFieldProps) => {
   const [field, meta] = useField(props);
 
   React.useEffect(() => {
-    let isCurrent = true;
+    let isCurrent: boolean = true;
     let sanitizedSiret = siret.replace(/\s/g, "");
     if (sanitizedSiret.length == 14) {
       fetchCompanyInfoBySiret(sanitizedSiret)
         .then((info: any) => {
-          if (!!isCurrent) {
+          if (isCurrent) {
             setFieldValue(props.name, sanitizedSiret);
             setFieldValue("businessName", info.nom);
             setFieldValue("immersionAddress", info.address);
@@ -126,7 +128,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
   createInitialValues(): FormulaireDto {
     return {
       id: uuidV4(),
-      status: FormulaireStatus.DRAFT,
+      status: "DRAFT",
 
       // Participant
       email: "sylvanie@monemail.fr",
@@ -178,7 +180,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
     try {
       let response = await formulaireGateway.get(id);
 
-      if (response.status === FormulaireStatus.DRAFT) {
+      if (response.status === "DRAFT") {
         response.dateSubmission = Formulaire.toDateString(startOfToday());
       }
 
@@ -193,7 +195,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
   }
 
   private static isFrozen(formulaire: FormulaireDto): boolean {
-    return formulaire.status !== FormulaireStatus.DRAFT;
+    return formulaire.status !== "DRAFT";
   }
 
   private static toDateString(date: Date): string {

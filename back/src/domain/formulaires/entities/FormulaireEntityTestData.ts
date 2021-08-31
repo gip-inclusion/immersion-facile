@@ -1,4 +1,4 @@
-import { FormulaireDto, FormulaireStatus } from "../../../shared/FormulaireDto";
+import { FormulaireDto } from "../../../shared/FormulaireDto";
 
 export const DEMANDE_IMMERSION_ID = "test_demande_immersion_id";
 export const VALID_EMAILS = ["valid@email.fr", "name@example.com"];
@@ -14,7 +14,7 @@ export const VALID_PHONES = [
 
 export const validFormulaire: FormulaireDto = {
   id: DEMANDE_IMMERSION_ID,
-  status: FormulaireStatus.DRAFT,
+  status: "DRAFT",
   email: VALID_EMAILS[0],
   phone: VALID_PHONES[0],
   firstName: "Esteban",
@@ -39,4 +39,4 @@ export const validFormulaire: FormulaireDto = {
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
   beneficiaryAccepted: true,
   enterpriseAccepted: true,
-} as FormulaireDto;
+};
