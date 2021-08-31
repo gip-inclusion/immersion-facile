@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { formulaireGateway } from "src/app/main";
 import { routes } from "src/app/routes";
 import { FormulaireDto } from "src/shared/FormulaireDto";
-import { MarianneHeader } from "src/app/Components/Header";
+import { MarianneHeader } from "src/components/MarianneHeader";
 import { Route } from "type-route";
 
 class FormulaireDetails extends Component<

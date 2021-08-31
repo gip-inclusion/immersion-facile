@@ -1,6 +1,6 @@
 import { FieldHookConfig, FormikHelpers, FormikState, useField } from "formik";
 import React from "react";
-import { CheckboxGroupProps } from "src/components/CheckboxGroup";
+import { CheckboxGroupProps } from "src/components/form/CheckboxGroup";
 
 type BoolRadioProps = {
   label: string;

@@ -3,10 +3,10 @@ import { Formik, useFormikContext, useField, FieldHookConfig } from "formik";
 import { formulaireGateway } from "src/app/main";
 import { BoolRadioGroup, RadioGroup } from "src/app/radioGroup";
 import { routes } from "src/app/routes";
-import { DateInput } from "src/components/DateInput";
-import { ErrorMessage } from "src/components/ErrorMessage";
-import { SuccessMessage } from "src/components/SuccessMessage";
-import { TextInput } from "src/components/TextInput";
+import { DateInput } from "src/components/form/DateInput";
+import { ErrorMessage } from "src/components/form/ErrorMessage";
+import { SuccessMessage } from "src/components/form/SuccessMessage";
+import { TextInput } from "src/components/form/TextInput";
 import {
   FormulaireDto,
   formulaireDtoSchema,
@@ -15,9 +15,12 @@ import {
 import { addDays, format, startOfToday } from "date-fns";
 import { AxiosError } from "axios";
 import { Route } from "type-route";
-import { MarianneHeader } from "./Components/Header";
-import { v4 as uuidV4 } from "uuid";
-import { BoolCheckboxGroup, CheckboxGroup } from "src/components/CheckboxGroup";
+import { MarianneHeader } from "src/components/MarianneHeader";
+import {
+ v4 as uuidV4 } from "uuid";
+import { BoolCheckboxGroup,
+  CheckboxGroup,
+} from "src/components/form/CheckboxGroup";
 
 
 const fetchCompanyInfoBySiret = async (siret: string) => {
