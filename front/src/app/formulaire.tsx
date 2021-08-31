@@ -18,7 +18,10 @@ import { addDays, format, startOfToday } from "date-fns";
 import { AxiosError } from "axios";
 import { MarianneHeader } from "./Components/Header";
 
-type MyDateInputProps = { label: string } & FieldHookConfig<string>;
+type MyDateInputProps = {
+  label: string;
+  disabled: boolean;
+} & FieldHookConfig<string>;
 
 const MyDateInput = (props: MyDateInputProps) => {
   const [field, meta] = useField(props);
@@ -36,6 +39,7 @@ const MyDateInput = (props: MyDateInputProps) => {
             {...field}
             value={field.value}
             type="date"
+            disabled={props.disabled}
           />
         </div>
         {meta.touched && meta.error && (
@@ -52,6 +56,7 @@ type MyTextInputProps = {
   label: string;
   placeholder: string | null;
   description: string | null;
+  disabled: boolean;
 } & FieldHookConfig<string>;
 
 const MyTextInput = (props: MyTextInputProps) => {
@@ -78,6 +83,7 @@ const MyTextInput = (props: MyTextInputProps) => {
           }`}
           placeholder={props.placeholder || ""}
           aria-describedby="text-input-error-desc-error"
+          disabled={props.disabled}
         />
         {meta.touched && meta.error && (
           <p id="text-input-email-error-desc-error" className="fr-error-text">
@@ -94,6 +100,7 @@ type MyBoolCheckboxGroupProps = {
   formikHelpers: FormikHelpers<any> & FormikState<any>;
   description: string;
   descriptionLink: string;
+  disabled: boolean;
 } & FieldHookConfig<string>;
 const MyBoolCheckboxGroup = (props: MyBoolCheckboxGroupProps) => {
   const [field, meta] = useField(props);
@@ -134,8 +141,8 @@ const MyBoolCheckboxGroup = (props: MyBoolCheckboxGroupProps) => {
                 {...field}
                 type="checkbox"
                 id={htmlName}
-                {...field}
                 checked={props.formikHelpers.values[props.name]}
+                disabled={props.disabled}
               />
               <label
                 className="fr-label"
@@ -165,6 +172,7 @@ const MyBoolCheckboxGroup = (props: MyBoolCheckboxGroupProps) => {
 type MyCheckboxGroupProps = {
   label: string;
   values: Array<string>;
+  disabled: boolean;
 } & FieldHookConfig<string>;
 
 const MyCheckboxGroup = (props: MyCheckboxGroupProps) => {
@@ -197,6 +205,7 @@ const MyCheckboxGroup = (props: MyCheckboxGroupProps) => {
                   name={props.name}
                   value={value}
                   id={value}
+                  disabled={props.disabled}
                 />
                 <label className="fr-label" htmlFor={value}>
                   {value}
@@ -221,6 +230,7 @@ type MyBoolRadioProps = {
   hideNoOption: boolean;
   description: string;
   descriptionLink: string;
+  disabled: boolean;
 } & FieldHookConfig<string>;
 
 // Like MyRadioGroup, but backs a boolean value.
@@ -264,6 +274,7 @@ const MyBoolRadioGroup = (props: MyBoolRadioProps) => {
                 id={htmlName}
                 {...field}
                 checked={props.formikHelpers.values[props.name]}
+                disabled={props.disabled}
               />
               <label
                 className="fr-label"
@@ -286,6 +297,7 @@ const MyBoolRadioGroup = (props: MyBoolRadioProps) => {
                   id={htmlName}
                   {...field}
                   checked={!props.formikHelpers.values[props.name]}
+                  disabled={props.disabled}
                 />
                 <label
                   className="fr-label"
@@ -313,7 +325,6 @@ const MyBoolRadioGroup = (props: MyBoolRadioProps) => {
 const MyRadioGroup = (props: MyCheckboxGroupProps) => {
   const [field, meta] = useField(props);
   const isError = meta.touched && meta.error;
-
   return (
     <>
       <div className="fr-form-group">
@@ -323,6 +334,7 @@ const MyRadioGroup = (props: MyCheckboxGroupProps) => {
             isError ? "radio-error-legend radio-error-desc-error" : ""
           }
           role="group"
+          disabled={props.disabled}
         >
           <legend
             className="fr-fieldset__legend fr-text--regular"
@@ -338,7 +350,11 @@ const MyRadioGroup = (props: MyCheckboxGroupProps) => {
                   className="fr-radio-group"
                   key={htmlName + props.name + value}
                 >
-                  <input {...field} type="radio" id={htmlName + value} />
+                  <input
+                  {...field}
+                  type="radio"
+                  id={htmlName + value}
+                  disabled={props.disabled} />
                   <label className="fr-label" htmlFor={htmlName + value}>
                     {value}
                   </label>
@@ -387,7 +403,10 @@ interface SiretFields {
   siret: string;
 }
 
-const SiretAutocompletedField = (props: FieldHookConfig<string>) => {
+type SiretAutocompletedFieldProps = {
+  disabled: boolean;
+} & FieldHookConfig<string>;
+const SiretAutocompletedField = (props: SiretAutocompletedFieldProps) => {
   const {
     values: { siret },
     setFieldValue,
@@ -428,6 +447,7 @@ const SiretAutocompletedField = (props: FieldHookConfig<string>) => {
         type="number"
         placeholder="362 521 879 00034"
         description="la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
+        disabled={props.disabled}
       />
     </>
   );
@@ -480,11 +500,25 @@ export class ErrorMessage extends Component<ErrorMessageProps> {
   }
 }
 
+const FrozenMessage = () => (
+  <>
+    <div role="alert" className="fr-alert fr-alert--info">
+      <p className="fr-alert__title">Ce formulaire n'est pas modifiable.</p>
+      <p>
+        Ce formulaire a été validé par vôtre conseiller et il n'est plus
+        possible de le modifier.
+      </p>
+    </div>
+    <br />
+  </>
+);
+
 interface FormulaireProps {}
 interface FormulaireState {
   initialValues: FormulaireDto;
   formLink: string | null;
   submitError: Error | null;
+  isFrozen: boolean;
 }
 export class Formulaire extends Component<FormulaireProps, FormulaireState> {
   createInitialValues(): FormulaireDto {
@@ -545,11 +579,18 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
         response.dateSubmission = Formulaire.toDateString(startOfToday());
       }
 
-      this.setState({ initialValues: response });
+      this.setState({
+        initialValues: response,
+        isFrozen: Formulaire.isFrozen(response),
+      });
     } catch (e) {
       console.log(e);
       this.state = { ...this.state, submitError: e, formLink: null };
     }
+  }
+
+  private static isFrozen(formulaire: FormulaireDto): boolean {
+    return formulaire.status !== FormulaireStatus.DRAFT;
   }
 
   private static toDateString(date: Date): string {
@@ -562,10 +603,12 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
   constructor(props: any) {
     super(props);
+    const initialValues = this.createInitialValues();
     this.state = {
-      initialValues: this.createInitialValues(),
+      initialValues,
       formLink: null,
       submitError: null,
+      isFrozen: Formulaire.isFrozen(initialValues),
     };
   }
 
@@ -642,12 +685,15 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                     onReset={props.handleReset}
                     onSubmit={props.handleSubmit}
                   >
+                    {this.state.isFrozen && <FrozenMessage />}
+
                     <MyTextInput
                       label="Email *"
                       name="email"
                       type="email"
                       placeholder="nom@exemple.com"
                       description="cela nous permet de vous transmettre la validation de la convention"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -656,6 +702,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="text"
                       placeholder=""
                       description=""
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -664,6 +711,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="text"
                       placeholder=""
                       description=""
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -672,18 +720,21 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="tel"
                       placeholder="0606060607"
                       description="pour qu’on puisse vous contacter à propos de l’immersion"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyDateInput
                       label="Date de debut de l'immersion *"
                       name="dateStart"
                       type="date"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyDateInput
                       label="Date de fin de l'immersion *"
                       name="dateEnd"
                       type="date"
+                      disabled={this.state.isFrozen}
                     />
 
                     <h4>
@@ -692,7 +743,10 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       personne qui vous accueillera pendant votre immersion
                     </h4>
 
-                    <SiretAutocompletedField name="siret" />
+                    <SiretAutocompletedField
+                      name="siret"
+                      disabled={this.state.isFrozen}
+                    />
 
                     <MyTextInput
                       label="Indiquez le nom (raison sociale) de l'établissement d'accueil *"
@@ -700,6 +754,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="text"
                       placeholder=""
                       description=""
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -708,6 +763,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="text"
                       placeholder=""
                       description="Ex : Alain Prost, pilote automobile"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -716,6 +772,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="tel"
                       placeholder="0606060707"
                       description="pour qu’on puisse le contacter à propos de l’immersion"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -724,6 +781,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="email"
                       placeholder="alain.prost@exemple.com"
                       description="pour envoyer la validation de la convention"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyCheckboxGroup
@@ -738,6 +796,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                         "samedi",
                         "dimanche",
                       ]}
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -749,6 +808,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                   Si les horaires sont différents en fonction des journée, précisez-le bien.
                   Par ex,  lundi, de 10h à 12h et de 13h30 à 17h,  les autres jours de la semaine,  de 8h30 à 12h00 et de 13h00 à 16h00.
                   Si il y a un jour férié ou non travaillé pendant l'immersion, le préciser aussi.  Par ex :  en dehors du  8 mai, jour férié."
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -757,6 +817,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="text"
                       placeholder=""
                       description=""
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyBoolRadioGroup
@@ -766,6 +827,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       hideNoOption={false}
                       description=""
                       descriptionLink=""
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyBoolRadioGroup
@@ -775,6 +837,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       hideNoOption={false}
                       description=""
                       descriptionLink=""
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -783,6 +846,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="text"
                       placeholder=""
                       description="Ex : fourniture de gel, de masques"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyRadioGroup
@@ -793,6 +857,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                         "Découvrir un métier ou un secteur d'activité",
                         "Initier une démarche de recrutement",
                       ]}
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -801,6 +866,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="text"
                       placeholder=""
                       description="Ex : employé libre service, web développeur, boulanger …"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -809,6 +875,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="text"
                       placeholder=""
                       description="Ex : mise en rayon, accueil et aide à la clientèle"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyTextInput
@@ -817,6 +884,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       type="text"
                       placeholder=""
                       description="Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe"
+                      disabled={this.state.isFrozen}
                     />
 
                     <p />
@@ -829,6 +897,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       formikHelpers={props}
                       description="Avant de répondre, consultez ces dispositions ici"
                       descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+                      disabled={this.state.isFrozen}
                     />
 
                     <MyBoolCheckboxGroup
@@ -839,6 +908,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                       formikHelpers={props}
                       description="Avant de répondre, consultez ces dispositions ici"
                       descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+                      disabled={this.state.isFrozen}
                     />
 
                     <p />
@@ -859,7 +929,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
                     <button
                       className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
                       type="submit"
-                      disabled={props.isSubmitting}
+                      disabled={props.isSubmitting || this.state.isFrozen}
                     >
                       {props.isSubmitting ? "Éxecution" : "Sauvegarder"}
                     </button>
