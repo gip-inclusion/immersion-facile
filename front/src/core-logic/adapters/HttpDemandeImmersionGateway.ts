@@ -53,12 +53,11 @@ export class HttpDemandeImmersionGateway implements DemandeImmersionGateway {
   }
 
   public async update(
-    id: string,
     demandeImmersionDto: DemandeImmersionDto
   ): Promise<string> {
     await demandeImmersionDtoSchema.validate(demandeImmersionDto);
     const httpResponse = await axios.post(
-      `/${prefix}/${demandesImmersionRoute}/${id}`,
+      `/${prefix}/${demandesImmersionRoute}/${demandeImmersionDto.id}`,
       demandeImmersionDto
     );
     const updateDemandeImmersionResponse: UpdateDemandeImmersionResponseDto =
