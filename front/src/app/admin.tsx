@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { formulaireGateway } from "src/app/main";
+import { demandeImmersionGateway } from "src/app/main";
 import { routes } from "src/app/routes";
-import { FormulaireDto } from "src/shared/FormulaireDto";
+import { DemandeImmersionDto } from "../../../back/src/shared/DemandeImmersionDto";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { Route } from "type-route";
 
@@ -20,7 +20,7 @@ class FormulaireDetails extends Component<
 }
 
 interface FormulaireAccordeonProps {
-  data: FormulaireDto;
+  data: DemandeImmersionDto;
 }
 interface FormulaireAccordeonState {
   expanded: boolean;
@@ -93,7 +93,7 @@ class FormulaireAccordeon extends Component<
 }
 
 interface AdminState {
-  formulaires: Array<FormulaireDto>;
+  demandeImmersion: Array<DemandeImmersionDto>;
 }
 interface AdminProps {
   route: Route<typeof routes.admin>;
@@ -101,12 +101,12 @@ interface AdminProps {
 
 export class Admin extends Component<AdminProps, AdminState> {
   async fetchData() {
-    this.setState({ formulaires: await formulaireGateway.getAll() });
+    this.setState({ demandeImmersion: await demandeImmersionGateway.getAll() });
   }
 
   constructor(props: any) {
     super(props);
-    this.state = { formulaires: [] };
+    this.state = { demandeImmersion: [] };
   }
 
   componentDidMount() {
@@ -127,7 +127,7 @@ export class Admin extends Component<AdminProps, AdminState> {
             </div>
 
             <ul className="fr-accordions-group">
-              {this.state.formulaires.map(function (item) {
+              {this.state.demandeImmersion.map(function (item) {
                 return (
                   <li key={item.firstName}>
                     <FormulaireAccordeon data={item} />

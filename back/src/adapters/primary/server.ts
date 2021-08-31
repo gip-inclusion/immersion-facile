@@ -1,16 +1,20 @@
 import express, { Router } from "express";
 import PinoHttp from "pino-http";
-import { todosRoute, formulairesRoute, siretRoute } from "../../shared/routes";
+import {
+  todosRoute,
+  demandesImmersionRoute,
+  siretRoute,
+} from "../../shared/routes";
 import { getUsecases, getAuthChecker } from "./config";
 import bodyParser from "body-parser";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { todoDtoSchema } from "../../shared/TodoDto";
 import {
-  formulaireDtoSchema,
-  getFormulaireRequestDtoSchema,
-  updateFormulaireRequestDtoSchema,
-} from "../../shared/FormulaireDto";
+  demandeImmersionDtoSchema,
+  getDemandeImmersionRequestDtoSchema,
+  updateDemandeImmersionRequestDtoSchema,
+} from "../../shared/DemandeImmersionDto";
 import { logger } from "../../utils/logger";
 import { resolveProjectReferencePath } from "typescript";
 
@@ -46,12 +50,12 @@ router
   );
 
 router
-  .route(`/${formulairesRoute}`)
+  .route(`/${demandesImmersionRoute}`)
   .post(async (req, res) =>
     sendHttpResponse(req, res, () =>
       callUseCase({
-        useCase: useCases.addFormulaire,
-        validationSchema: formulaireDtoSchema,
+        useCase: useCases.addDemandeImmersion,
+        validationSchema: demandeImmersionDtoSchema,
         useCaseParams: req.body,
       })
     )
@@ -60,21 +64,21 @@ router
     sendHttpResponse(
       req,
       res,
-      () => useCases.listFormulaires.execute(),
+      () => useCases.listDemandeImmersion.execute(),
       authChecker
-      );
-    });
+    );
+  });
 
-const uniqueFormulaireRouter = Router({ mergeParams: true });
-router.use(`/${formulairesRoute}`, uniqueFormulaireRouter);
+const uniqueDemandeImmersionRouter = Router({ mergeParams: true });
+router.use(`/${demandesImmersionRoute}`, uniqueDemandeImmersionRouter);
 
-uniqueFormulaireRouter
+uniqueDemandeImmersionRouter
   .route(`/:id`)
   .get(async (req, res) =>
     sendHttpResponse(req, res, () =>
       callUseCase({
-        useCase: useCases.getFormulaire,
-        validationSchema: getFormulaireRequestDtoSchema,
+        useCase: useCases.getDemandeImmersion,
+        validationSchema: getDemandeImmersionRequestDtoSchema,
         useCaseParams: req.params,
       })
     )
@@ -82,9 +86,9 @@ uniqueFormulaireRouter
   .post(async (req, res) =>
     sendHttpResponse(req, res, () =>
       callUseCase({
-        useCase: useCases.updateFormulaire,
-        validationSchema: updateFormulaireRequestDtoSchema,
-        useCaseParams: { id: req.params.id, formulaire: req.body },
+        useCase: useCases.updateDemandeImmersion,
+        validationSchema: updateDemandeImmersionRequestDtoSchema,
+        useCaseParams: { id: req.params.id, demandeImmersion: req.body },
       })
     )
   );

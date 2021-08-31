@@ -1,17 +1,17 @@
 import { ALWAYS_REJECT } from "./../../domain/auth/AuthChecker";
 import { Clock, CustomClock, RealClock } from "../../domain/todos/ports/Clock";
-import { AddFormulaire } from "../../domain/formulaires/useCases/AddFormulaire";
-import { ListFormulaires } from "../../domain/formulaires/useCases/ListFormulaires";
+import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
+import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
 import { AddTodo } from "../../domain/todos/useCases/AddTodo";
 import { ListTodos } from "../../domain/todos/useCases/ListTodos";
-import { AirtableFormulaireRepository } from "../secondary/AirtableFormulaireRepository";
-import { InMemoryFormulaireRepository } from "../secondary/InMemoryFormulaireRepository";
+import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
+import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryTodoRepository } from "../secondary/InMemoryTodoRepository";
 import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
 import { logger } from "../../utils/logger";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
-import { GetFormulaire } from "../../domain/formulaires/useCases/GetFormulaire";
-import { UpdateFormulaire } from "../../domain/formulaires/useCases/UpdateFormulaire";
+import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
+import { UpdateDemandeImmersion } from "../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
@@ -28,9 +28,9 @@ export const getRepositories = () => {
         ? new JsonTodoRepository(`${__dirname}/../secondary/app-data.json`)
         : new InMemoryTodoRepository(),
 
-    formulaires:
+    demandeImmersion:
       process.env.REPOSITORIES === "AIRTABLE"
-        ? AirtableFormulaireRepository.create(
+        ? AirtableDemandeImmersionRepository.create(
             process.env.AIRTABLE_API_KEY ||
               fail("Missing environment variable: AIRTABLE_API_KEY"),
             process.env.AIRTABLE_BASE_ID ||
@@ -38,7 +38,7 @@ export const getRepositories = () => {
             process.env.AIRTABLE_TABLE_NAME ||
               fail("Missing environment variable: AIRTABLE_TABLE_NAME")
           )
-        : new InMemoryFormulaireRepository(),
+        : new InMemoryDemandeImmersionRepository(),
 
     sirene:
       process.env.SIRENE_REPOSITORY === "HTTPS"
@@ -105,17 +105,17 @@ export const getUsecases = () => {
     listTodos: new ListTodos(repositories.todo),
 
     // formulaire
-    addFormulaire: new AddFormulaire({
-      formulaireRepository: repositories.formulaires,
+    addDemandeImmersion: new AddDemandeImmersion({
+      demandeImmersionRepository: repositories.demandeImmersion,
     }),
-    getFormulaire: new GetFormulaire({
-      formulaireRepository: repositories.formulaires,
+    getDemandeImmersion: new GetDemandeImmersion({
+      demandeImmersionRepository: repositories.demandeImmersion,
     }),
-    listFormulaires: new ListFormulaires({
-      formulaireRepository: repositories.formulaires,
+    listDemandeImmersion: new ListDemandeImmersion({
+      demandeImmersionRepository: repositories.demandeImmersion,
     }),
-    updateFormulaire: new UpdateFormulaire({
-      formulaireRepository: repositories.formulaires,
+    updateDemandeImmersion: new UpdateDemandeImmersion({
+      demandeImmersionRepository: repositories.demandeImmersion,
     }),
 
     // siret

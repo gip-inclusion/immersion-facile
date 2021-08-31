@@ -1,14 +1,13 @@
-import Airtable, { FieldSet, Table } from "airtable";
+import Airtable, { Table, FieldSet } from "airtable";
 import { QueryParams } from "airtable/lib/query_params";
-import { FormulaireEntity } from "../../domain/formulaires/entities/FormulaireEntity";
-import { FormulaireRepository } from "../../domain/formulaires/ports/FormulaireRepository";
-import { FormulaireEntity } from "../../domain/formulaires/entities/FormulaireEntity";
-import { FormulaireIdEntity } from "../../domain/formulaires/entities/FormulaireIdEntity";
+import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
+import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import { logger } from "../../utils/logger";
-import { formulaireStatusFromString } from "../../shared/FormulaireDto";
-import { DemandeImmersionId } from "./../../shared/FormulaireDto";
+import { DemandeImmersionId, demandeImmersionStatusFromString } from "../../shared/DemandeImmersionDto";
 
-export class AirtableFormulaireRepository implements FormulaireRepository {
+export class AirtableDemandeImmersionRepository
+  implements DemandeImmersionRepository
+{
   private readonly table: Table<FieldSet>;
 
   constructor(table: Table<FieldSet>) {
@@ -16,20 +15,20 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
   }
 
   public static create(apiKey: string, baseId: string, tableName: string) {
-    return new AirtableFormulaireRepository(
+    return new AirtableDemandeImmersionRepository(
       new Airtable({ apiKey }).base(baseId)(tableName)
     );
   }
 
   public async save(
-    entity: FormulaireEntity
+    entity: DemandeImmersionEntity
   ): Promise<DemandeImmersionId | undefined> {
-    if (await this.getFormulaire(entity.id)) {
+    if (await this.getById(entity.id)) {
       return undefined;
     }
     const response = await this.table.create([
       {
-        fields: AirtableFormulaireRepository.convertEntityToFieldSet(entity),
+        fields: AirtableDemandeImmersionRepository.convertEntityToFieldSet(entity),
       },
     ]);
     if (response.length < 1) {
@@ -40,9 +39,9 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
     return entity.id;
   }
 
-  public async getFormulaire(
+  public async getById(
     id: DemandeImmersionId
-  ): Promise<FormulaireEntity | undefined> {
+  ): Promise<DemandeImmersionEntity | undefined> {
     try {
       const demandesImmersion = await this.query({
         maxRecords: 1,
@@ -58,13 +57,13 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
     }
   }
 
-  public async getAllFormulaires(): Promise<FormulaireEntity[]> {
+  public async getAll(): Promise<DemandeImmersionEntity[]> {
     return this.query({});
   }
 
   private async query(
     params: QueryParams<FieldSet>
-  ): Promise<FormulaireEntity[]> {
+  ): Promise<DemandeImmersionEntity[]> {
     const allRecords: Airtable.Record<Airtable.FieldSet>[] = [];
     await this.table.select(params).eachPage((records, fetchNextPage) => {
       records.forEach((record) => allRecords.push(record));
@@ -72,17 +71,17 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
     });
 
     return allRecords.map(
-      AirtableFormulaireRepository.verifyRecordAndConvertToEntity
+      AirtableDemandeImmersionRepository.verifyRecordAndConvertToEntity
     );
   }
 
-  public async updateFormulaire(
-    formulaire: FormulaireEntity
+  public async updateDemandeImmersion(
+    demandeImmersion: DemandeImmersionEntity
   ): Promise<DemandeImmersionId | undefined> {
     return this.table
       .update(
-        formulaire.id,
-        AirtableFormulaireRepository.convertEntityToFieldSet(formulaire)
+        demandeImmersion.id,
+        AirtableDemandeImmersionRepository.convertEntityToFieldSet(demandeImmersion)
       )
       .then((response) => response.id)
       .catch((e) => {
@@ -99,12 +98,11 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
 
   private static verifyRecordAndConvertToEntity(
     record: Airtable.Record<FieldSet>
-  ): FormulaireEntity {
+  ): DemandeImmersionEntity {
     record.fields.id = record.fields.id || "";
     if (typeof record.fields.id !== "string") {
       throw new Error(`Invalid field 'id' in Airtable record: ${record}`);
     }
-
     record.fields.status = record.fields.status || "";
     if (typeof record.fields.status !== "string") {
       throw new Error(`Invalid field 'email' in Airtable record: ${record}`);
@@ -186,7 +184,9 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
 
     record.fields.workdays = record.fields.workdays || [];
     if (
-      !AirtableFormulaireRepository.isArrayOfStrings(record.fields.workdays)
+      !AirtableDemandeImmersionRepository.isArrayOfStrings(
+        record.fields.workdays
+      )
     ) {
       throw new Error(`Invalid field 'workdays' in Airtable record: ${record}`);
     }
@@ -273,9 +273,9 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
       );
     }
 
-    return FormulaireEntity.create({
+    return DemandeImmersionEntity.create({
       id: record.fields.id,
-      status: formulaireStatusFromString(record.fields.status),
+      status: demandeImmersionStatusFromString(record.fields.status),
       email: record.fields.email,
       phone: record.fields.phone,
       firstName: record.fields.firstName,
@@ -304,34 +304,9 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
     });
   }
 
-  private static convertEntityToFieldSet(entity: FormulaireEntity): FieldSet {
-    return {
-      id: entity.id,
-      status: entity.status,
-      email: entity.email,
-      phone: entity.phone,
-      firstName: entity.firstName,
-      lastName: entity.lastName,
-      dateSubmission: entity.dateSubmission,
-      dateStart: entity.dateStart,
-      dateEnd: entity.dateEnd,
-      businessName: entity.businessName,
-      siret: entity.siret,
-      mentor: entity.mentor,
-      mentorPhone: entity.mentorPhone,
-      mentorEmail: entity.mentorEmail,
-      workdays: entity.workdays,
-      workHours: entity.workHours,
-      immersionAddress: entity.immersionAddress,
-      individualProtection: entity.individualProtection,
-      sanitaryPrevention: entity.sanitaryPrevention,
-      sanitaryPreventionDescription: entity.sanitaryPreventionDescription,
-      immersionObjective: entity.immersionObjective,
-      immersionProfession: entity.immersionProfession,
-      immersionActivities: entity.immersionActivities,
-      immersionSkills: entity.immersionSkills,
-      beneficiaryAccepted: entity.beneficiaryAccepted,
-      enterpriseAccepted: entity.enterpriseAccepted,
-    };
+  private static convertEntityToFieldSet(
+    entity: DemandeImmersionEntity
+  ): FieldSet {
+    return entity.toDto() as FieldSet;
   }
 }

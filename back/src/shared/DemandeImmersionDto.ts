@@ -7,21 +7,26 @@ const phoneRegExp = /\+?[0-9]*/;
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
 
-export type FormulaireStatus = "UNKNOWN" | "DRAFT" | "FINALIZED";
-const formulaireStatusOptions: FormulaireStatus[] = ["DRAFT", "FINALIZED"];
+export type DemandeImmersionStatus = "UNKNOWN" | "DRAFT" | "FINALIZED";
+const demandeImmersionStatusOptions: DemandeImmersionStatus[] = [
+  "DRAFT",
+  "FINALIZED",
+];
 
-export const formulaireStatusFromString = (s: string): FormulaireStatus => {
-  const status = s as FormulaireStatus;
-  if (formulaireStatusOptions.includes(status)) return status;
+export const demandeImmersionStatusFromString = (
+  s: string
+): DemandeImmersionStatus => {
+  const status = s as DemandeImmersionStatus;
+  if (demandeImmersionStatusOptions.includes(status)) return status;
   return "UNKNOWN";
 };
 
 export type DemandeImmersionId = Flavor<string, "DemandeImmersionId">;
 
-export const formulaireDtoSchema = Yup.object({
+export const demandeImmersionDtoSchema = Yup.object({
   id: Yup.mixed<DemandeImmersionId>().required("Obligatoire"),
-  status: Yup.mixed<FormulaireStatus>()
-    .oneOf(formulaireStatusOptions)
+  status: Yup.mixed<DemandeImmersionStatus>()
+    .oneOf(demandeImmersionStatusOptions)
     .required("Obligatoire"),
   email: Yup.string()
     .required("Obligatoire")
@@ -118,27 +123,31 @@ export const formulaireDtoSchema = Yup.object({
   ),
 }).required();
 
-export const formulaireDtoArraySchema = Yup.array().of(formulaireDtoSchema);
+export const demandeImmersionDtoArraySchema = Yup.array().of(
+  demandeImmersionDtoSchema
+);
 
-export type FormulaireDto = Yup.InferType<typeof formulaireDtoSchema>;
+export type DemandeImmersionDto = Yup.InferType<
+  typeof demandeImmersionDtoSchema
+>;
 
-export const addFormulaireResponseDtoSchema = Yup.object({
+export const addDemandeImmersionResponseDtoSchema = Yup.object({
   id: Yup.mixed<DemandeImmersionId>().required(),
 }).required();
 
-export type AddFormulaireResponseDto = Yup.InferType<
-  typeof addFormulaireResponseDtoSchema
+export type AddDemandeImmersionResponseDto = Yup.InferType<
+  typeof addDemandeImmersionResponseDtoSchema
 >;
 
-export const getFormulaireRequestDtoSchema = Yup.object({
+export const getDemandeImmersionRequestDtoSchema = Yup.object({
   id: Yup.mixed<DemandeImmersionId>().required(),
 }).required();
 
-export type GetFormulaireRequestDto = Yup.InferType<
-  typeof getFormulaireRequestDtoSchema
+export type GetDemandeImmersionRequestDto = Yup.InferType<
+  typeof getDemandeImmersionRequestDtoSchema
 >;
 
-export const updateFormulaireRequestDtoSchema = Yup.object({
+export const updateDemandeImmersionRequestDtoSchema = Yup.object({
   id: Yup.mixed<DemandeImmersionId>()
     .required()
     .test(
@@ -149,17 +158,17 @@ export const updateFormulaireRequestDtoSchema = Yup.object({
         context.parent.formulaire &&
         value === context.parent.formulaire.id
     ),
-  formulaire: formulaireDtoSchema.required(),
+  demandeImmersion: demandeImmersionDtoSchema.required(),
 }).required();
 
-export type UpdateFormulaireRequestDto = Yup.InferType<
-  typeof updateFormulaireRequestDtoSchema
+export type UpdateDemandeImmersionRequestDto = Yup.InferType<
+  typeof updateDemandeImmersionRequestDtoSchema
 >;
 
-export const updateFormulaireResponseDtoSchema = Yup.object({
+export const updateDemandeImmersionResponseDtoSchema = Yup.object({
   id: Yup.mixed<DemandeImmersionId>().required(),
 }).required();
 
-export type UpdateFormulaireResponseDto = Yup.InferType<
-  typeof updateFormulaireResponseDtoSchema
+export type UpdateDemandeImmersionResponseDto = Yup.InferType<
+  typeof updateDemandeImmersionResponseDtoSchema
 >;

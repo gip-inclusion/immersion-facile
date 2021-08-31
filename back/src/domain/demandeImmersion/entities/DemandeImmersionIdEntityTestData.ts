@@ -1,4 +1,4 @@
-import { FormulaireDto } from "../../../shared/FormulaireDto";
+import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
 
 export const DEMANDE_IMMERSION_ID = "test_demande_immersion_id";
 export const VALID_EMAILS = ["valid@email.fr", "name@example.com"];
@@ -12,7 +12,7 @@ export const VALID_PHONES = [
   "+41800001853",
 ];
 
-export const validFormulaire: FormulaireDto = {
+export const validDemandeImmersion: DemandeImmersionDto = {
   id: DEMANDE_IMMERSION_ID,
   status: "DRAFT",
   email: VALID_EMAILS[0],

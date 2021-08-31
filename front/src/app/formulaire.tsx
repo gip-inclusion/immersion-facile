@@ -1,13 +1,16 @@
 import React, { Component } from "react";
 import { Formik, useFormikContext, useField, FieldHookConfig } from "formik";
-import { formulaireGateway } from "src/app/main";
+import { demandeImmersionGateway } from "src/app/main";
 import { BoolRadioGroup, RadioGroup } from "src/app/radioGroup";
 import { routes } from "src/app/routes";
 import { DateInput } from "src/components/form/DateInput";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
-import { FormulaireDto, formulaireDtoSchema } from "src/shared/FormulaireDto";
+import {
+  DemandeImmersionDto,
+  demandeImmersionDtoSchema,
+} from "../../../back/src/shared/DemandeImmersionDto";
 import { addDays, format, startOfToday } from "date-fns";
 import { AxiosError } from "axios";
 import { Route } from "type-route";
@@ -36,7 +39,7 @@ const fetchCompanyInfoBySiret = async (siret: string) => {
     return addressString.trim();
   };
 
-  return formulaireGateway.getSiretInfo(siret).then((info: any) => {
+  return demandeImmersionGateway.getSiretInfo(siret).then((info: any) => {
     const establishment = info["etablissements"][0];
     const nom = establishment["uniteLegale"]["denominationUniteLegale"];
     const address = addressDictToString(establishment["adresseEtablissement"]);
@@ -102,10 +105,12 @@ const SiretAutocompletedField = (props: SiretAutocompletedFieldProps) => {
 const FrozenMessage = () => (
   <>
     <div role="alert" className="fr-alert fr-alert--info">
-      <p className="fr-alert__title">Ce formulaire n'est pas modifiable.</p>
+      <p className="fr-alert__title">
+        Cette demande d'immersion n'est pas modifiable.
+      </p>
       <p>
-        Ce formulaire a été validé par vôtre conseiller et il n'est plus
-        possible de le modifier.
+        Cette demande d'immersion a été validé par vôtre conseiller et il n'est
+        plus possible de la modifier.
       </p>
     </div>
     <br />
@@ -117,14 +122,14 @@ interface FormulaireProps {
 }
 
 interface FormulaireState {
-  initialValues: FormulaireDto;
+  initialValues: DemandeImmersionDto;
   formLink: string | null;
   submitError: Error | null;
   isFrozen: boolean;
 }
 
 export class Formulaire extends Component<FormulaireProps, FormulaireState> {
-  createInitialValues(): FormulaireDto {
+  createInitialValues(): DemandeImmersionDto {
     return {
       id: uuidV4(),
       status: "DRAFT",
@@ -177,7 +182,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
       return;
     }
     try {
-      let response = await formulaireGateway.get(id);
+      let response = await demandeImmersionGateway.get(id);
 
       if (response.status === "DRAFT") {
         response.dateSubmission = Formulaire.toDateString(startOfToday());
@@ -193,8 +198,8 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
     }
   }
 
-  private static isFrozen(formulaire: FormulaireDto): boolean {
-    return formulaire.status !== "DRAFT";
+  private static isFrozen(demandeImmersion: DemandeImmersionDto): boolean {
+    return demandeImmersion.status !== "DRAFT";
   }
 
   private static toDateString(date: Date): string {
@@ -244,17 +249,22 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
             <Formik
               enableReinitialize={true}
               initialValues={this.state.initialValues}
-              validationSchema={formulaireDtoSchema}
+              validationSchema={demandeImmersionDtoSchema}
               onSubmit={async (values, { setSubmitting }) => {
                 console.log(values);
 
                 try {
-                  const formulaire = await formulaireDtoSchema.validate(values);
+                  const formulaire = await demandeImmersionDtoSchema.validate(
+                    values
+                  );
 
                   const currentId = this.getCurrentFormulaireId();
                   const upsertedId = currentId
-                    ? await formulaireGateway.update(formulaire)
-                    : await formulaireGateway.add(formulaire);
+                    ? await demandeImmersionGateway.update(
+
+                        formulaire
+                      )
+                    : await demandeImmersionGateway.add(formulaire);
 
                   const queryParams = new URLSearchParams(
                     window.location.search

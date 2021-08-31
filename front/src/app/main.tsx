@@ -7,8 +7,8 @@ import { Router } from "src/app/Router";
 import { HttpTodoGateway } from "src/core-logic/adapters/HttpTodoGateway";
 import { InMemoryTodoGateway } from "src/core-logic/adapters/InMemoryTodoGateway";
 import { configureReduxStore } from "src/core-logic/store/initilizeStore";
-import { InMemoryFormulaireGateway } from "src/core-logic/adapters/InMemoryFormulaireGateway";
-import { HttpFormulaireGateway } from "src/core-logic/adapters/HttpFormulaireGateway";
+import { InMemoryDemandeImmersionGateway } from "src/core-logic/adapters/InMemoryDemandeImmersionGateway";
+import { HttpDemandeImmersionGateway } from "src/core-logic/adapters/HttpDemandeImmersionGateway";
 import { RouteProvider } from "./routes";
 
 const gateway = import.meta.env.VITE_GATEWAY;
@@ -19,10 +19,10 @@ const todoGateway =
   gateway === "HTTP" ? new HttpTodoGateway() : new InMemoryTodoGateway();
 
 // TODO: don't export the gateway, maybe?
-export const formulaireGateway =
+export const demandeImmersionGateway =
   gateway === "HTTP"
-    ? new HttpFormulaireGateway()
-    : new InMemoryFormulaireGateway();
+    ? new HttpDemandeImmersionGateway()
+    : new InMemoryDemandeImmersionGateway();
 
 const store = configureReduxStore({ todoGateway });
 

@@ -1,27 +1,29 @@
 import supertest from "supertest";
+import { demandesImmersionRoute } from "../../../shared/routes";
+import { validDemandeImmersion } from "../../../domain/demandeImmersion/entities/DemandeImmersionIdEntityTestData";
 import { validFormulaire } from "../../../domain/formulaires/entities/FormulaireEntityTestData";
 import { app } from "../server";
 
 // TODO: Find a way to clear the repository between tests so that we can reuse the same ID.
 
-describe("/formulaires route", () => {
+describe("/demandes-immersion route", () => {
   it("rejects invalid requests", (done) => {
     supertest(app)
-      .post("/formulaires")
+      .post(`/${demandesImmersionRoute}`)
       .send({ invalid_params: true })
       .expect(400, done);
   });
 
-  it("records a valid formulaire and returns it", (done) => {
+  it("records a valid demandeImmersion and returns it", (done) => {
     const demandeImmersionId = "test_id_1";
     const demandeImmersion = {
-      ...validFormulaire,
+      ...validDemandeImmersion,
       id: demandeImmersionId
     };
 
-    // GET /formulaires returns an empty list.
+    // GET /demandes-immersion returns an empty list.
     supertest(app)
-      .get("/formulaires")
+      .get(`/${demandesImmersionRoute}`)
       .auth("e2e_tests", "e2e")
       .expect("Content-Type", /json/)
       .expect(200)
@@ -32,7 +34,7 @@ describe("/formulaires route", () => {
 
         // POSTing a valid demande d'immersion succeeds.
         supertest(app)
-          .post("/formulaires")
+          .post(`/${demandesImmersionRoute}`)
           .send(demandeImmersion)
           .expect(200)
           .expect("Content-Type", /json/)
@@ -42,7 +44,7 @@ describe("/formulaires route", () => {
 
             // GETting the new demande d'immersion succeeds.
             supertest(app)
-              .get(`/formulaires/${demandeImmersionId}`)
+              .get(`/${demandesImmersionRoute}/${demandeImmersionId}`)
               .expect(200)
               .expect("Content-Type", /json/)
               .end((err, res) => {
@@ -54,7 +56,7 @@ describe("/formulaires route", () => {
       });
   });
 
-  it("updates an existing formulaire and returns it", (done) => {
+  it("updates an existing demandeImmersion and returns it", (done) => {
     const demandeImmersionId = "test_id_2";
     const demandeImmersion = {
       ...validFormulaire,
@@ -63,12 +65,13 @@ describe("/formulaires route", () => {
 
     // POSTing a valid demande d'immersion succeeds.
     supertest(app)
-      .post("/formulaires")
+      .post(`/${demandesImmersionRoute}`)
       .send(demandeImmersion)
       .expect(200)
       .expect("Content-Type", /json/)
       .end((err, res) => {
         if (err) return done(err);
+
         expect(res.body.id).toEqual(demandeImmersionId);
 
         // POSTing an updated demande d'immersion to the same id succeeds.
@@ -77,7 +80,7 @@ describe("/formulaires route", () => {
           email: "new@email.fr",
         };
         supertest(app)
-          .post(`/formulaires/${demandeImmersionId}`)
+          .post(`/${demandesImmersionRoute}/${demandeImmersionId}`)
           .send(updatedDemandeImmersion)
           .expect(200)
           .expect("Content-Type", /json/)
@@ -85,9 +88,9 @@ describe("/formulaires route", () => {
             if (err) return done(err);
             expect(res.body.id).toEqual(demandeImmersionId);
 
-            // GETting the updated formulaire succeeds.
+            // GETting the updated demandeImmersion succeeds.
             supertest(app)
-              .get(`/formulaires/${demandeImmersionId}`)
+              .get(`/${demandesImmersionRoute}/${demandeImmersionId}`)
               .expect(200)
               .expect("Content-Type", /json/)
               .end((err, res) => {
@@ -99,17 +102,19 @@ describe("/formulaires route", () => {
       });
   });
 
-  it("fetching unknown formulaire IDs reports 404 Not Found", (done) => {
-    supertest(app).get("/formulaires/unknown-formulaire-id").expect(404, done);
+  it("fetching unknown demandeImmersion IDs reports 404 Not Found", (done) => {
+    supertest(app)
+      .get(`/${demandesImmersionRoute}/unknown-demande-immersion-id`)
+      .expect(404, done);
   });
 
-  it("posting to unknown formulaire IDs reports 404 Not Found", (done) => {
+  it("posting to unknown demandeImmersion IDs reports 404 Not Found", (done) => {
     const demandeImmersionWithUnknownId = {
       ...validFormulaire,
       id: "unknown-formulaire-id",
     }
     supertest(app)
-      .post("/formulaires/unknown-formulaire-id")
+      .post(`/${demandesImmersionRoute}/unknown-demande-immersion-id`)
       .send(demandeImmersionWithUnknownId)
       .expect(404, done);
   });
@@ -142,21 +147,21 @@ describe("/formulaires route", () => {
       });
   });
 
-  it("Fails to fetch formulaires without credentials", (done) => {
-    supertest(app).get("/formulaires").expect(401, done);
+  it("Fails to fetch demandesImmersion without credentials", (done) => {
+    supertest(app).get(`/${demandesImmersionRoute}`).expect(401, done);
   });
 
-  it("Fails to fetch formulaires with invalid credentials", (done) => {
+  it("Fails to fetch demandesImmersion with invalid credentials", (done) => {
     supertest(app)
-      .get("/formulaires")
+      .get(`/${demandesImmersionRoute}`)
       .auth("not real user", "not real password")
       .expect(401, done);
   });
 
-  it("Fetches formulaires with valid credentials", (done) => {
-    // GET /formulaires succeeds with login/pass.
+  it("Fetches demandesImmersion with valid credentials", (done) => {
+    // GET /demandes-immersion succeeds with login/pass.
     supertest(app)
-      .get("/formulaires")
+      .get(`/${demandesImmersionRoute}`)
       .auth("e2e_tests", "e2e")
       .expect("Content-Type", /json/)
       .expect(200, done);
