@@ -6,6 +6,7 @@
     "dev-http": "npm run symlink-shared && VITE_GATEWAY=HTTP vite",
     "build": "npm run symlink-shared && tsc && vite build",
     "serve": "vite preview",
+    "typecheck": "tsc --noEmit",
     "symlink-shared": "ln -fs ../../back/src/shared ./src/"
   },
   "dependencies": {

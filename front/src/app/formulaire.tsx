@@ -7,11 +7,7 @@ import { DateInput } from "src/components/form/DateInput";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
-import {
-  FormulaireDto,
-  formulaireDtoSchema,
-  FormulaireStatus,
-} from "src/shared/FormulaireDto";
+import { FormulaireDto, formulaireDtoSchema } from "src/shared/FormulaireDto";
 import { addDays, format, startOfToday } from "date-fns";
 import { AxiosError } from "axios";
 import { Route } from "type-route";

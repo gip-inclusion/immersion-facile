@@ -15,10 +15,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        formulaire: resolve(__dirname, 'formulaire.html'),
+        main: resolve(__dirname, "index.html"),
       },
-    }
+    },
   },
   server: {
     proxy: {
