@@ -1,10 +1,10 @@
-import { format } from "date-fns";
-import Airtable, { Table, FieldSet, Record } from "airtable";
-import { FormulaireRepository } from "../../domain/formulaires/ports/FormulaireRepository";
+import Airtable, { FieldSet, Table } from "airtable";
+import { QueryParams } from "airtable/lib/query_params";
 import { FormulaireEntity } from "../../domain/formulaires/entities/FormulaireEntity";
-import { FormulaireIdEntity } from "../../domain/formulaires/entities/FormulaireIdEntity";
-import { logger } from "../../utils/logger";
+import { FormulaireRepository } from "../../domain/formulaires/ports/FormulaireRepository";
 import { FormulaireStatusUtil } from "../../shared/FormulaireDto";
+import { logger } from "../../utils/logger";
+import { DemandeImmersionId } from "./../../shared/FormulaireDto";
 
 export class AirtableFormulaireRepository implements FormulaireRepository {
   private readonly table: Table<FieldSet>;
@@ -19,57 +19,69 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
     );
   }
 
-  public async save(entity: FormulaireEntity): Promise<FormulaireIdEntity> {
-    return this.table
-      .create([
-        {
-          fields: AirtableFormulaireRepository.convertEntityToFieldSet(entity),
-        },
-      ])
-      .then((response) => {
-        if (response.length < 1) {
-          throw new Error(
-            `Unexpected response length during creation of Airtable record: ${response}`
-          );
-        }
-        return FormulaireIdEntity.create(response[0].id);
-      });
+  public async save(
+    entity: FormulaireEntity
+  ): Promise<DemandeImmersionId | undefined> {
+    if (await this.getFormulaire(entity.id)) {
+      return undefined;
+    }
+    const response = await this.table.create([
+      {
+        fields: AirtableFormulaireRepository.convertEntityToFieldSet(entity),
+      },
+    ]);
+    if (response.length < 1) {
+      throw new Error(
+        `Unexpected response length during creation of Airtable record: ${response}`
+      );
+    }
+    return entity.id;
   }
 
   public async getFormulaire(
-    id: FormulaireIdEntity
+    id: DemandeImmersionId
   ): Promise<FormulaireEntity | undefined> {
-    return this.table
-      .find(id.id)
-      .then(AirtableFormulaireRepository.verifyRecordAndConvertToEntity)
-      .catch((e) => {
-        logger.error(e);
-        return undefined;
+    try {
+      const demandesImmersion = await this.query({
+        maxRecords: 1,
+        filterByFormula: `id="${id}"`,
       });
+      if (demandesImmersion.length < 1) {
+        return undefined;
+      }
+      return demandesImmersion[0];
+    } catch (e) {
+      logger.error(e);
+      return undefined;
+    }
   }
 
   public async getAllFormulaires(): Promise<FormulaireEntity[]> {
+    return this.query({});
+  }
+
+  private async query(
+    params: QueryParams<FieldSet>
+  ): Promise<FormulaireEntity[]> {
     const allRecords: Airtable.Record<Airtable.FieldSet>[] = [];
-    await this.table.select().eachPage((records, fetchNextPage) => {
+    await this.table.select(params).eachPage((records, fetchNextPage) => {
       records.forEach((record) => allRecords.push(record));
       fetchNextPage();
     });
-
     return allRecords.map(
       AirtableFormulaireRepository.verifyRecordAndConvertToEntity
     );
   }
 
   public async updateFormulaire(
-    id: FormulaireIdEntity,
     formulaire: FormulaireEntity
-  ): Promise<FormulaireIdEntity | undefined> {
+  ): Promise<DemandeImmersionId | undefined> {
     return this.table
       .update(
-        id.id,
+        formulaire.id,
         AirtableFormulaireRepository.convertEntityToFieldSet(formulaire)
       )
-      .then((response) => FormulaireIdEntity.create(response.id))
+      .then((response) => response.id)
       .catch((e) => {
         logger.error(e);
         return undefined;
@@ -85,6 +97,11 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
   private static verifyRecordAndConvertToEntity(
     record: Airtable.Record<FieldSet>
   ): FormulaireEntity {
+    record.fields.id = record.fields.id || "";
+    if (typeof record.fields.id !== "string") {
+      throw new Error(`Invalid field 'id' in Airtable record: ${record}`);
+    }
+
     record.fields.status = record.fields.status || "";
     if (typeof record.fields.status !== "string") {
       throw new Error(`Invalid field 'email' in Airtable record: ${record}`);
@@ -254,6 +271,7 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
     }
 
     return FormulaireEntity.create({
+      id: record.fields.id,
       status: FormulaireStatusUtil.fromString(record.fields.status),
       email: record.fields.email,
       phone: record.fields.phone,
@@ -285,6 +303,7 @@ export class AirtableFormulaireRepository implements FormulaireRepository {
 
   private static convertEntityToFieldSet(entity: FormulaireEntity): FieldSet {
     return {
+      id: entity.id,
       status: entity.status,
       email: entity.email,
       phone: entity.phone,

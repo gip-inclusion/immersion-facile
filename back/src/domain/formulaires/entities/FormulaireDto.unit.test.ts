@@ -1,11 +1,22 @@
-import { formulaireDtoSchema, FormulaireStatus, FormulaireStatusUtil } from "../../../shared/FormulaireDto";
+import {
+  formulaireDtoSchema,
+  FormulaireStatus,
+  FormulaireStatusUtil,
+} from "../../../shared/FormulaireDto";
 import { addDays } from "../../../utils/test.helpers";
-import { validFormulaire, DATE_START, DATE_END, DATE_SUBMISSION } from "./FormulaireEntityTestData";
+import { updateFormulaireRequestDtoSchema } from "./../../../shared/FormulaireDto";
+import {
+  DATE_END,
+  DATE_START,
+  DATE_SUBMISSION,
+  validFormulaire,
+} from "./FormulaireEntityTestData";
 
 describe("formulaireDtoSchema", () => {
-
   test("accepts valid formulaire", () => {
-    expect(() => formulaireDtoSchema.validateSync(validFormulaire)).not.toThrow();
+    expect(() =>
+      formulaireDtoSchema.validateSync(validFormulaire)
+    ).not.toThrow();
   });
 
   test("rejects misformatted submission dates", () => {
@@ -32,7 +43,7 @@ describe("formulaireDtoSchema", () => {
     expect(() => formulaireDtoSchema.validateSync(invalidFormulaire)).toThrow();
   });
 
-  test('rejects start dates that are after the end date', () => {
+  test("rejects start dates that are after the end date", () => {
     const invalidFormulaire = { ...validFormulaire };
     invalidFormulaire.dateEnd = DATE_START;
     invalidFormulaire.dateStart = DATE_END;
@@ -57,16 +68,18 @@ describe("formulaireDtoSchema", () => {
     expect(formulaireDtoSchema.validateSync(validRequest)).toBeTruthy();
   });
 
-  test('accepts start dates that are >= 2 days after the submission date', () => {
+  test("accepts start dates that are >= 2 days after the submission date", () => {
     const invalidFormulaire = {
       ...validFormulaire,
       dateSubmission: DATE_SUBMISSION,
       dateStart: addDays(DATE_SUBMISSION, 2),
     };
-    expect(() => formulaireDtoSchema.validateSync(invalidFormulaire)).not.toThrow();
+    expect(() =>
+      formulaireDtoSchema.validateSync(invalidFormulaire)
+    ).not.toThrow();
   });
 
-  test('rejects start dates that are < 2 days after the submission date', () => {
+  test("rejects start dates that are < 2 days after the submission date", () => {
     const invalidFormulaire = {
       ...validFormulaire,
       dateSubmission: DATE_SUBMISSION,
@@ -76,14 +89,43 @@ describe("formulaireDtoSchema", () => {
   });
 });
 
+describe("updateFormulaireRequestDtoSchema", () => {
+  test("accepts requests with an ID match", () => {
+    const invalidRequest = {
+      id: validFormulaire.id,
+      formulaire: validFormulaire,
+    };
+    expect(() =>
+      updateFormulaireRequestDtoSchema.validateSync(invalidRequest)
+    ).not.toThrow();
+  });
+  test("rejects requests with an ID mismatch", () => {
+    const invalidRequest = {
+      id: "not" + validFormulaire.id,
+      formulaire: validFormulaire,
+    };
+    expect(() =>
+      updateFormulaireRequestDtoSchema.validateSync(invalidRequest)
+    ).toThrow();
+  });
+});
+
 describe("FormulaireStateUtil", () => {
-  test('fromString() accepts valid enum values', () => {
-    expect(FormulaireStatusUtil.fromString("DRAFT")).toEqual(FormulaireStatus.DRAFT);
-    expect(FormulaireStatusUtil.fromString("FINALIZED")).toEqual(FormulaireStatus.FINALIZED);
+  test("fromString() accepts valid enum values", () => {
+    expect(FormulaireStatusUtil.fromString("DRAFT")).toEqual(
+      FormulaireStatus.DRAFT
+    );
+    expect(FormulaireStatusUtil.fromString("FINALIZED")).toEqual(
+      FormulaireStatus.FINALIZED
+    );
   });
 
-  test('fromString() converts invalid enum values to UNKNOWN', () => {
-    expect(FormulaireStatusUtil.fromString("")).toEqual(FormulaireStatus.UNKNOWN);
-    expect(FormulaireStatusUtil.fromString("UNKNOWN_VALUE")).toEqual(FormulaireStatus.UNKNOWN);
+  test("fromString() converts invalid enum values to UNKNOWN", () => {
+    expect(FormulaireStatusUtil.fromString("")).toEqual(
+      FormulaireStatus.UNKNOWN
+    );
+    expect(FormulaireStatusUtil.fromString("UNKNOWN_VALUE")).toEqual(
+      FormulaireStatus.UNKNOWN
+    );
   });
 });

@@ -1,17 +1,14 @@
-import { UpdateFormulaire } from "./UpdateFormulaire";
+import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   Formulaires,
   InMemoryFormulaireRepository,
 } from "../../../adapters/secondary/InMemoryFormulaireRepository";
-import { validFormulaire } from "../entities/FormulaireEntityTestData";
-import { FormulaireEntity } from "../entities/FormulaireEntity";
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
-import { FormulaireIdEntity } from "../entities/FormulaireIdEntity";
+import { FormulaireEntity } from "../entities/FormulaireEntity";
+import { validFormulaire } from "../entities/FormulaireEntityTestData";
+import { UpdateFormulaire } from "./UpdateFormulaire";
 
 describe("Update Formulaire", () => {
-  const FORMULAIRE_ID = "some_id";
-
   let repository: InMemoryFormulaireRepository;
   let updateFormulaire: UpdateFormulaire;
 
@@ -25,7 +22,8 @@ describe("Update Formulaire", () => {
   describe("When the formulaire is valid", () => {
     test("updates the formulaire in the repository", async () => {
       const formulaires: Formulaires = {};
-      formulaires[FORMULAIRE_ID] = FormulaireEntity.create(validFormulaire);
+      formulaires[validFormulaire.id] =
+        FormulaireEntity.create(validFormulaire);
       repository.setFormulaires(formulaires);
 
       const updatedFormulaire = {
@@ -33,10 +31,10 @@ describe("Update Formulaire", () => {
         email: "new@email.fr",
       };
       const id = await updateFormulaire.execute({
-        id: FORMULAIRE_ID,
+        id: updatedFormulaire.id,
         formulaire: updatedFormulaire,
       });
-      expect(id).toEqual(FormulaireIdEntity.create(FORMULAIRE_ID));
+      expect(id).toEqual({ id: validFormulaire.id });
 
       expect(await repository.getAllFormulaires()).toEqual([updatedFormulaire]);
     });
@@ -44,12 +42,16 @@ describe("Update Formulaire", () => {
 
   describe("When no formulaire with id exists", () => {
     it("throws NotFoundError", async () => {
+      const demandeImmersionWithUnknownId = {
+        ...validFormulaire,
+        id: "unknown_demande_immersion_id",
+      };
       expectPromiseToFailWithError(
         updateFormulaire.execute({
-          id: "unknown_formulaire_id",
-          formulaire: validFormulaire,
+          id: demandeImmersionWithUnknownId.id,
+          formulaire: demandeImmersionWithUnknownId,
         }),
-        new NotFoundError("unknown_formulaire_id")
+        new NotFoundError("unknown_demande_immersion_id")
       );
     });
   });

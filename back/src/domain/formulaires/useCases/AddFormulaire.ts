@@ -1,10 +1,11 @@
+import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import {
+  AddFormulaireResponseDto,
+  FormulaireDto
+} from "../../../shared/FormulaireDto";
 import { UseCase } from "../../core/UseCase";
 import { FormulaireEntity } from "../entities/FormulaireEntity";
 import { FormulaireRepository } from "../ports/FormulaireRepository";
-import {
-  AddFormulaireResponseDto,
-  FormulaireDto,
-} from "../../../shared/FormulaireDto";
 
 type AddFormulaireDependencies = { formulaireRepository: FormulaireRepository };
 
@@ -21,6 +22,10 @@ export class AddFormulaire
     params: FormulaireDto
   ): Promise<AddFormulaireResponseDto> {
     const formulaire = FormulaireEntity.create(params);
-    return this.formulaireRepository.save(formulaire);
+    const id = await this.formulaireRepository.save(formulaire);
+    if (!id) {
+      throw new ConflictError(formulaire.id);
+    }
+    return { id };
   }
 }

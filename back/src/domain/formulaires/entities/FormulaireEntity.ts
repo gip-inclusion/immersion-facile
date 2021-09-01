@@ -1,6 +1,12 @@
-import { FormulaireDto, formulaireDtoSchema, FormulaireStatusUtil } from "../../../shared/FormulaireDto";
+import {
+  DemandeImmersionId,
+  FormulaireDto,
+  formulaireDtoSchema,
+  FormulaireStatusUtil
+} from "../../../shared/FormulaireDto";
 
 type FormulaireProps = {
+  id: DemandeImmersionId;
   status: string;
   email: string;
   phone: string | undefined;
@@ -29,6 +35,7 @@ type FormulaireProps = {
 };
 
 export class FormulaireEntity {
+  public readonly id: DemandeImmersionId;
   public readonly status: string;
   public readonly email: string;
   public readonly firstName: string;
@@ -56,6 +63,7 @@ export class FormulaireEntity {
   public readonly enterpriseAccepted: boolean;
 
   private constructor({
+    id,
     status,
     email,
     phone,
@@ -82,6 +90,7 @@ export class FormulaireEntity {
     beneficiaryAccepted,
     enterpriseAccepted,
   }: FormulaireProps) {
+    this.id = id;
     this.status = status;
     this.email = email;
     this.phone = phone;
@@ -112,6 +121,7 @@ export class FormulaireEntity {
   public static create(dto: FormulaireDto) {
     formulaireDtoSchema.validateSync(dto);
     return new FormulaireEntity({
+      id: dto.id,
       status: dto.status,
       email: dto.email,
       phone: dto.phone ?? undefined,
@@ -146,6 +156,7 @@ export const formulaireEntityToDto = (
   entity: FormulaireEntity
 ): FormulaireDto => {
   return {
+    id: entity.id,
     status: FormulaireStatusUtil.fromString(entity.status),
     email: entity.email,
     phone: entity.phone,

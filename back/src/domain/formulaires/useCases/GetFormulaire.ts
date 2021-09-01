@@ -2,13 +2,13 @@ import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpRespons
 import { FormulaireDto } from "../../../shared/FormulaireDto";
 import { UseCase } from "../../core/UseCase";
 import { formulaireEntityToDto } from "../entities/FormulaireEntity";
-import { FormulaireIdEntity } from "../entities/FormulaireIdEntity";
 import { FormulaireRepository } from "../ports/FormulaireRepository";
+import { DemandeImmersionId, GetFormulaireRequestDto } from './../../../shared/FormulaireDto';
 
 type GetFormulaireDependencies = { formulaireRepository: FormulaireRepository };
 
 export class GetFormulaire
-  implements UseCase<FormulaireIdEntity, FormulaireDto>
+  implements UseCase<GetFormulaireRequestDto, FormulaireDto>
 {
   private readonly formulaireRepository: FormulaireRepository;
 
@@ -16,8 +16,8 @@ export class GetFormulaire
     this.formulaireRepository = formulaireRepository;
   }
 
-  public async execute(id: FormulaireIdEntity): Promise<FormulaireDto> {
-    const formulaireEntity = await this.formulaireRepository.getFormulaire(id);
+  public async execute(id: GetFormulaireRequestDto): Promise<FormulaireDto> {
+    const formulaireEntity = await this.formulaireRepository.getFormulaire(id.id);
     if (!formulaireEntity) {
       throw new NotFoundError(id.id);
     }

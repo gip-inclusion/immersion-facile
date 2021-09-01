@@ -1,7 +1,7 @@
 import { FormulaireGateway } from "src/core-logic/ports/formulaireGateway";
-import type { FormulaireDto, AddFormulaireResponseDto, UpdateFormulaireResponseDto } from "src/shared/FormulaireDto";
+import type { FormulaireDto } from "src/shared/FormulaireDto";
+import { DemandeImmersionId } from "./../../../../back/src/shared/FormulaireDto";
 
-const FORMULAIRE_ID = "fake-test-id";
 const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
 const TEST_ESTABLISHMENT1 = {
   siren: "123456789",
@@ -20,15 +20,15 @@ const TEST_ESTABLISHMENT1 = {
 };
 
 export class InMemoryFormulaireGateway implements FormulaireGateway {
-  constructor(private _formulaires: FormulaireDto[] = []) { }
+  constructor(private _formulaires: FormulaireDto[] = []) {}
 
-  public async add(formulaire: FormulaireDto): Promise<string> {
+  public async add(formulaire: FormulaireDto): Promise<DemandeImmersionId> {
     console.log("InMemoryFormulaireGateway.add: ", formulaire);
     this._formulaires.push(formulaire);
-    return FORMULAIRE_ID;
+    return formulaire.id;
   }
 
-  public async get(id: string): Promise<FormulaireDto> {
+  public async get(id: DemandeImmersionId): Promise<FormulaireDto> {
     console.log("InMemoryFormulaireGateway.get: ", id);
     return this._formulaires[0];
   }
@@ -38,17 +38,17 @@ export class InMemoryFormulaireGateway implements FormulaireGateway {
     return this._formulaires;
   }
 
-  public async update(id: string, formulaire: FormulaireDto): Promise<string> {
+  public async update(formulaire: FormulaireDto): Promise<DemandeImmersionId> {
     console.log("InMemoryFormulaireGateway.update: ", formulaire);
     this._formulaires[0] = formulaire;
-    return FORMULAIRE_ID;
+    return formulaire.id;
   }
 
   public async getSiretInfo(siret: string): Promise<Object> {
     console.log("InMemoryFormulaireGateway.getSiretInfo: " + siret);
 
     if (siret !== TEST_ESTABLISHMENT1_SIRET) {
-      throw new Error("404 Not found")
+      throw new Error("404 Not found");
     }
 
     return {
@@ -62,5 +62,4 @@ export class InMemoryFormulaireGateway implements FormulaireGateway {
       etablissements: [TEST_ESTABLISHMENT1],
     };
   }
-
 }

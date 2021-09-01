@@ -1,14 +1,13 @@
 import { FormulaireEntity } from "../entities/FormulaireEntity";
-import { FormulaireIdEntity } from "../entities/FormulaireIdEntity";
+import { DemandeImmersionId } from './../../../shared/FormulaireDto';
 
 export interface FormulaireRepository {
-  save: (formulaireEntity: FormulaireEntity) => Promise<FormulaireIdEntity>;
+  save: (formulaireEntity: FormulaireEntity) => Promise<DemandeImmersionId | undefined>;
   getAllFormulaires: () => Promise<FormulaireEntity[]>;
   getFormulaire: (
-    id: FormulaireIdEntity
+    id: DemandeImmersionId
   ) => Promise<FormulaireEntity | undefined>;
   updateFormulaire: (
-    id: FormulaireIdEntity,
     formulaire: FormulaireEntity
-  ) => Promise<FormulaireIdEntity | undefined>;
+  ) => Promise<DemandeImmersionId | undefined>;
 }

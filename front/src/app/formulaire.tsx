@@ -17,6 +17,7 @@ import {
 import { addDays, format, startOfToday } from "date-fns";
 import { AxiosError } from "axios";
 import { MarianneHeader } from "./Components/Header";
+import { v4 as uuidV4 } from "uuid";
 
 type MyDateInputProps = { label: string } & FieldHookConfig<string>;
 
@@ -489,6 +490,7 @@ interface FormulaireState {
 export class Formulaire extends Component<FormulaireProps, FormulaireState> {
   createInitialValues(): FormulaireDto {
     return {
+      id: uuidV4(),
       status: FormulaireStatus.DRAFT,
 
       // Participant
@@ -606,7 +608,7 @@ export class Formulaire extends Component<FormulaireProps, FormulaireState> {
 
                   const currentId = this.getCurrentFormulaireId();
                   const upsertedId = currentId
-                    ? await formulaireGateway.update(currentId, formulaire)
+                    ? await formulaireGateway.update(formulaire)
                     : await formulaireGateway.add(formulaire);
 
                   const queryParams = new URLSearchParams(

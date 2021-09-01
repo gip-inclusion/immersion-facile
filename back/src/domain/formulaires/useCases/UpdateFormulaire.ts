@@ -1,12 +1,11 @@
+import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import {
+  UpdateFormulaireRequestDto,
+  UpdateFormulaireResponseDto
+} from "../../../shared/FormulaireDto";
 import { UseCase } from "../../core/UseCase";
 import { FormulaireEntity } from "../entities/FormulaireEntity";
 import { FormulaireRepository } from "../ports/FormulaireRepository";
-import {
-  UpdateFormulaireRequestDto,
-  UpdateFormulaireResponseDto,
-} from "../../../shared/FormulaireDto";
-import { FormulaireIdEntity } from "../entities/FormulaireIdEntity";
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 
 type UpdateFormulaireDependencies = {
   formulaireRepository: FormulaireRepository;
@@ -24,15 +23,13 @@ export class UpdateFormulaire
   public async execute(
     params: UpdateFormulaireRequestDto
   ): Promise<UpdateFormulaireResponseDto> {
-    const idEntity = FormulaireIdEntity.create(params.id);
     const formulaireEntity = FormulaireEntity.create(params.formulaire);
-    return this.formulaireRepository
-      .updateFormulaire(idEntity, formulaireEntity)
-      .then((id) => {
-        if (!id) {
-          throw new NotFoundError(params.id);
-        }
-        return id;
-      });
+    const id = await this.formulaireRepository.updateFormulaire(
+      formulaireEntity
+    );
+    if (!id) {
+      throw new NotFoundError(params.formulaire.id);
+    }
+    return { id };
   }
 }

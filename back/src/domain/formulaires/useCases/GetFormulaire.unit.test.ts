@@ -17,19 +17,18 @@ describe("Get Formulaire", () => {
   describe("When the formulaire does not exist", () => {
     it("throws NotFoundError", async () => {
       expectPromiseToFailWithError(
-        getFormulaire.execute({ id: "unknown_formulaire_id" }),
-        new NotFoundError("unknown_formulaire_id")
+        getFormulaire.execute({ id: "unknown_demande_immersion_id" }),
+        new NotFoundError("unknown_demande_immersion_id")
       );
     });
   });
 
   describe("When a formulaire is stored", () => {
     it("returns the formulaire", async () => {
-      repository.setFormulaires({
-        test_id: FormulaireEntity.create(validFormulaire),
+      repository.save(FormulaireEntity.create(validFormulaire));
+      const formulaire = await getFormulaire.execute({
+        id: validFormulaire.id,
       });
-
-      const formulaire = await getFormulaire.execute({ id: "test_id" });
       expect(formulaire).toEqual(validFormulaire);
     });
   });
