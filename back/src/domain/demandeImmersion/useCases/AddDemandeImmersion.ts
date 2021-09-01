@@ -1,3 +1,4 @@
+import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
@@ -26,7 +27,9 @@ export class AddDemandeImmersion
     const id = await this.demandeImmersionRepository.save(
       demandeImmersionEntity
     );
-    // TODO: how to handle save error case ?
-    return { id: id ?? "400" };
+
+    if (!id) throw new ConflictError(demandeImmersionEntity.id);
+
+    return { id };
   }
 }

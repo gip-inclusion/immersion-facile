@@ -155,8 +155,8 @@ export const updateDemandeImmersionRequestDtoSchema = Yup.object({
       "The ID in the URL path must match the ID in the request body.",
       (value, context) =>
         value &&
-        context.parent.formulaire &&
-        value === context.parent.formulaire.id
+        context.parent.demandeImmersion &&
+        value === context.parent.demandeImmersion.id
     ),
   demandeImmersion: demandeImmersionDtoSchema.required(),
 }).required();

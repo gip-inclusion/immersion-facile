@@ -29,7 +29,6 @@ export class UpdateDemandeImmersion
   public async execute(
     params: UpdateDemandeImmersionRequestDto
   ): Promise<UpdateDemandeImmersionResponseDto> {
-    const idEntity = params.id;
     const demandeImmersionEntity = DemandeImmersionEntity.create(
       params.demandeImmersion
     );

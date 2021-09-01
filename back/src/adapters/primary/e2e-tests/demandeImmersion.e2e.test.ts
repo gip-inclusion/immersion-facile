@@ -78,6 +78,7 @@ describe("/demandes-immersion route", () => {
           ...demandeImmersion,
           email: "new@email.fr",
         };
+
         supertest(app)
           .post(`/${demandesImmersionRoute}/${demandeImmersionId}`)
           .send(updatedDemandeImmersion)
@@ -110,7 +111,7 @@ describe("/demandes-immersion route", () => {
   it("posting to unknown demandeImmersion IDs reports 404 Not Found", (done) => {
     const demandeImmersionWithUnknownId = {
       ...validDemandeImmersion,
-      id: "unknown-formulaire-id",
+      id: "unknown-demande-immersion-id",
     };
     supertest(app)
       .post(`/${demandesImmersionRoute}/unknown-demande-immersion-id`)
@@ -125,9 +126,9 @@ describe("/demandes-immersion route", () => {
       id: demandeImmersionId,
     };
 
-    // POSTing a valid formulaire succeeds.
+    // POSTing a valid demande immersion succeeds.
     supertest(app)
-      .post("/formulaires")
+      .post(`/${demandesImmersionRoute}`)
       .send(demandeImmersion)
       .expect(200)
       .expect("Content-Type", /json/)
@@ -140,7 +141,7 @@ describe("/demandes-immersion route", () => {
           email: "another@email.fr",
         };
         supertest(app)
-          .post("/formulaires")
+          .post(`/${demandesImmersionRoute}`)
           .send(demandeImmersionWithExistingId)
           .expect(409, done);
       });

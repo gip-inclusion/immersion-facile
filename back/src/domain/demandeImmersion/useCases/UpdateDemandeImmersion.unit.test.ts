@@ -10,8 +10,6 @@ import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpRespons
 import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
 
 describe("Update demandeImmersion", () => {
-  const DEMANDE_IMMERSION_ID: DemandeImmersionId = "some_id";
-
   let repository: InMemoryDemandeImmersionRepository;
   let updateDemandeImmersion: UpdateDemandeImmersion;
 
@@ -25,20 +23,19 @@ describe("Update demandeImmersion", () => {
   describe("When the demandeImmersion is valid", () => {
     test("updates the demandeImmersion in the repository", async () => {
       const demandesImmersion: DemandesImmersion = {};
-      demandesImmersion[DEMANDE_IMMERSION_ID] = DemandeImmersionEntity.create(
-        validDemandeImmersion
-      );
+      demandesImmersion[validDemandeImmersion.id] =
+        DemandeImmersionEntity.create(validDemandeImmersion);
       repository.setDemandesImmersion(demandesImmersion);
 
       const updatedDemandeImmersion = {
         ...validDemandeImmersion,
         email: "new@email.fr",
       };
-      const id = await updateDemandeImmersion.execute({
-        id: DEMANDE_IMMERSION_ID,
+      const { id } = await updateDemandeImmersion.execute({
+        id: updatedDemandeImmersion.id,
         demandeImmersion: updatedDemandeImmersion,
       });
-      expect(id).toEqual(DEMANDE_IMMERSION_ID);
+      expect(id).toEqual(updatedDemandeImmersion.id);
 
       const storedInRepo = await repository.getAll();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
