@@ -23,6 +23,10 @@ export class AddDemandeImmersion
     params: DemandeImmersionDto
   ): Promise<AddDemandeImmersionResponseDto> {
     const demandeImmersionEntity = DemandeImmersionEntity.create(params);
-    return this.demandeImmersionRepository.save(demandeImmersionEntity);
+    const id = await this.demandeImmersionRepository.save(
+      demandeImmersionEntity
+    );
+    // TODO: how to handle save error case ?
+    return { id: id ?? "400" };
   }
 }

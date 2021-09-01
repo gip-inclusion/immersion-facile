@@ -1,7 +1,9 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
+import {
+  DemandeImmersionDto,
+  GetDemandeImmersionRequestDto,
+} from "../../../shared/DemandeImmersionDto";
 import { UseCase } from "../../core/UseCase";
-import { DemandeImmersionIdEntity } from "../entities/DemandeImmersionIdEntity";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
 
 type GetDemandeImmersionDependencies = {
@@ -9,7 +11,7 @@ type GetDemandeImmersionDependencies = {
 };
 
 export class GetDemandeImmersion
-  implements UseCase<DemandeImmersionIdEntity, DemandeImmersionDto>
+  implements UseCase<GetDemandeImmersionRequestDto, DemandeImmersionDto>
 {
   private readonly demandeImmersionRepository: DemandeImmersionRepository;
 
@@ -17,13 +19,13 @@ export class GetDemandeImmersion
     this.demandeImmersionRepository = demandeImmersionRepository;
   }
 
-  public async execute(
-    id: DemandeImmersionIdEntity
-  ): Promise<DemandeImmersionDto> {
+  public async execute({
+    id,
+  }: GetDemandeImmersionRequestDto): Promise<DemandeImmersionDto> {
     const demandeImmersionEntity =
       await this.demandeImmersionRepository.getById(id);
     if (!demandeImmersionEntity) {
-      throw new NotFoundError(id.id);
+      throw new NotFoundError(id);
     }
     return demandeImmersionEntity.toDto();
   }

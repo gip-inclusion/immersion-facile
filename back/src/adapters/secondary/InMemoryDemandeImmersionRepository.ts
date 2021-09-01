@@ -1,7 +1,7 @@
 import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
 import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { DemandeImmersionIdEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionIdEntity";
 import { v4 as uuidV4 } from "uuid";
+import { DemandeImmersionId } from "../../shared/DemandeImmersionDto";
 
 export interface InMemoryDemandeImmersionIdGenerator {
   nextId: () => string;
@@ -39,10 +39,9 @@ export class InMemoryDemandeImmersionRepository
 
   public async save(
     demandeImmersionEntity: DemandeImmersionEntity
-  ): Promise<DemandeImmersionIdEntity> {
-    const id = this.idGenerator.nextId();
-    this._demandesImmersion[id] = demandeImmersionEntity;
-    return DemandeImmersionIdEntity.create(id);
+  ): Promise<DemandeImmersionId> {
+    this._demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
+    return demandeImmersionEntity.id;
   }
 
   public async getAll() {
@@ -53,18 +52,18 @@ export class InMemoryDemandeImmersionRepository
     return demandesImmersion;
   }
 
-  public async getById(id: DemandeImmersionIdEntity) {
-    return this._demandesImmersion[id.id];
+  public async getById(id: DemandeImmersionId) {
+    return this._demandesImmersion[id];
   }
 
   public async updateDemandeImmersion(
-    id: DemandeImmersionIdEntity,
     demandeImmersion: DemandeImmersionEntity
   ) {
-    if (!this._demandesImmersion[id.id]) {
+    const id = demandeImmersion.id;
+    if (!this._demandesImmersion[id]) {
       return undefined;
     }
-    this._demandesImmersion[id.id] = demandeImmersion;
+    this._demandesImmersion[id] = demandeImmersion;
     return id;
   }
 

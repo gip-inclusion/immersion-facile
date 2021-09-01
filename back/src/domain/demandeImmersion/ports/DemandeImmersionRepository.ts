@@ -1,16 +1,15 @@
+import { DemandeImmersionId } from "../../../shared/DemandeImmersionDto";
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
-import { DemandeImmersionIdEntity } from "../entities/DemandeImmersionIdEntity";
 
 export interface DemandeImmersionRepository {
   save: (
     demandeImmersionEntity: DemandeImmersionEntity
-  ) => Promise<DemandeImmersionIdEntity>;
+  ) => Promise<DemandeImmersionId | undefined>;
   getAll: () => Promise<DemandeImmersionEntity[]>;
   getById: (
-    id: DemandeImmersionIdEntity
+    id: DemandeImmersionId
   ) => Promise<DemandeImmersionEntity | undefined>;
   updateDemandeImmersion: (
-    id: DemandeImmersionIdEntity,
     demandeImmersion: DemandeImmersionEntity
-  ) => Promise<DemandeImmersionIdEntity | undefined>;
+  ) => Promise<DemandeImmersionId | undefined>;
 }

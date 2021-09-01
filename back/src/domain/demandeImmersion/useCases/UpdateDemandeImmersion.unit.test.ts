@@ -1,3 +1,4 @@
+import { DemandeImmersionId } from "../../../shared/DemandeImmersionDto";
 import { UpdateDemandeImmersion } from "./UpdateDemandeImmersion";
 import {
   DemandesImmersion,
@@ -7,10 +8,9 @@ import { validDemandeImmersion } from "../entities/DemandeImmersionIdEntityTestD
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
-import { DemandeImmersionIdEntity } from "../entities/DemandeImmersionIdEntity";
 
 describe("Update demandeImmersion", () => {
-  const DEMANDE_IMMERSION_ID = "some_id";
+  const DEMANDE_IMMERSION_ID: DemandeImmersionId = "some_id";
 
   let repository: InMemoryDemandeImmersionRepository;
   let updateDemandeImmersion: UpdateDemandeImmersion;
@@ -38,7 +38,7 @@ describe("Update demandeImmersion", () => {
         id: DEMANDE_IMMERSION_ID,
         demandeImmersion: updatedDemandeImmersion,
       });
-      expect(id).toEqual(DemandeImmersionIdEntity.create(DEMANDE_IMMERSION_ID));
+      expect(id).toEqual(DEMANDE_IMMERSION_ID);
 
       const storedInRepo = await repository.getAll();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([

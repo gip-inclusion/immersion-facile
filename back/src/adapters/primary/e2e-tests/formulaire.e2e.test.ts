@@ -1,7 +1,6 @@
 import supertest from "supertest";
 import { demandesImmersionRoute } from "../../../shared/routes";
 import { validDemandeImmersion } from "../../../domain/demandeImmersion/entities/DemandeImmersionIdEntityTestData";
-import { validFormulaire } from "../../../domain/formulaires/entities/FormulaireEntityTestData";
 import { app } from "../server";
 
 // TODO: Find a way to clear the repository between tests so that we can reuse the same ID.
@@ -18,7 +17,7 @@ describe("/demandes-immersion route", () => {
     const demandeImmersionId = "test_id_1";
     const demandeImmersion = {
       ...validDemandeImmersion,
-      id: demandeImmersionId
+      id: demandeImmersionId,
     };
 
     // GET /demandes-immersion returns an empty list.
@@ -59,8 +58,8 @@ describe("/demandes-immersion route", () => {
   it("updates an existing demandeImmersion and returns it", (done) => {
     const demandeImmersionId = "test_id_2";
     const demandeImmersion = {
-      ...validFormulaire,
-      id: demandeImmersionId
+      ...validDemandeImmersion,
+      id: demandeImmersionId,
     };
 
     // POSTing a valid demande d'immersion succeeds.
@@ -110,9 +109,9 @@ describe("/demandes-immersion route", () => {
 
   it("posting to unknown demandeImmersion IDs reports 404 Not Found", (done) => {
     const demandeImmersionWithUnknownId = {
-      ...validFormulaire,
+      ...validDemandeImmersion,
       id: "unknown-formulaire-id",
-    }
+    };
     supertest(app)
       .post(`/${demandesImmersionRoute}/unknown-demande-immersion-id`)
       .send(demandeImmersionWithUnknownId)
@@ -122,8 +121,8 @@ describe("/demandes-immersion route", () => {
   it("creating a demande d'immersion with an existing ID reports 409 Conflict", (done) => {
     const demandeImmersionId = "test_id_3";
     const demandeImmersion = {
-      ...validFormulaire,
-      id: demandeImmersionId
+      ...validDemandeImmersion,
+      id: demandeImmersionId,
     };
 
     // POSTing a valid formulaire succeeds.
@@ -139,7 +138,7 @@ describe("/demandes-immersion route", () => {
         const demandeImmersionWithExistingId = {
           ...demandeImmersion,
           email: "another@email.fr",
-        }
+        };
         supertest(app)
           .post("/formulaires")
           .send(demandeImmersionWithExistingId)

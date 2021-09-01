@@ -5,7 +5,6 @@ import {
   UpdateDemandeImmersionRequestDto,
   UpdateDemandeImmersionResponseDto,
 } from "../../../shared/DemandeImmersionDto";
-import { DemandeImmersionIdEntity } from "../entities/DemandeImmersionIdEntity";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 
 type UpdateDemandeImmersionDependencies = {
@@ -30,17 +29,17 @@ export class UpdateDemandeImmersion
   public async execute(
     params: UpdateDemandeImmersionRequestDto
   ): Promise<UpdateDemandeImmersionResponseDto> {
-    const idEntity = DemandeImmersionIdEntity.create(params.id);
+    const idEntity = params.id;
     const demandeImmersionEntity = DemandeImmersionEntity.create(
       params.demandeImmersion
     );
     return this.demandeImmersionRepository
-      .updateDemandeImmersion(idEntity, demandeImmersionEntity)
+      .updateDemandeImmersion(demandeImmersionEntity)
       .then((id) => {
         if (!id) {
           throw new NotFoundError(params.id);
         }
-        return id;
+        return params.demandeImmersion;
       });
   }
 }

@@ -15,7 +15,7 @@ export class DemandeImmersionEntity {
     return this.properties;
   }
 
-  public id() {
+  public get id() {
     return this.properties.id;
   }
 }
