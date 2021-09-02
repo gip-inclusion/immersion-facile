@@ -119,6 +119,7 @@ export const CheckboxGroup = (props: CheckboxGroupProps) => {
                   name={props.name}
                   value={value}
                   id={value}
+                  disabled={props.disabled}
                 />
                 <label className="fr-label" htmlFor={value}>
                   {value}
