@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { demandeImmersionGateway } from "src/app/main";
 import { routes } from "src/app/routes";
-import { DemandeImmersionDto } from "../../../back/src/shared/DemandeImmersionDto";
+import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { Route } from "type-route";
 

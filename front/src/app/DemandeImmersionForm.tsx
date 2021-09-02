@@ -10,11 +10,11 @@ import { TextInput } from "src/components/form/TextInput";
 import {
   DemandeImmersionDto,
   demandeImmersionDtoSchema,
-} from "../../../back/src/shared/DemandeImmersionDto";
+} from "src/shared/DemandeImmersionDto";
 import { addDays, format, startOfToday } from "date-fns";
 import { AxiosError } from "axios";
 import { Route } from "type-route";
-import { MarianneHeader } from "../components/MarianneHeader";
+import { MarianneHeader } from "src/components/MarianneHeader";
 import { v4 as uuidV4 } from "uuid";
 import {
   BoolCheckboxGroup,
