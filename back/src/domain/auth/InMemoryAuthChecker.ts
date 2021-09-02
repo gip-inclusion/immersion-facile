@@ -1,5 +1,5 @@
-import { AuthChecker } from "./AuthChecker";
-import { UnauthorizedError } from "../../adapters/primary/helpers/sendHttpResponse";
+import { AuthChecker } from "src/domain/auth/AuthChecker";
+import { UnauthorizedError } from "src/adapters/primary/helpers/sendHttpResponse";
 import express from "express";
 
 export class InMemoryAuthChecker implements AuthChecker {

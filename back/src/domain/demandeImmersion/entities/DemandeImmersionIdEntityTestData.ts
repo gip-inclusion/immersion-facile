@@ -1,5 +1,5 @@
-import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
-import { reasonableSchedule, ScheduleDto } from "../../../shared/ScheduleSchema";
+import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
+import { reasonableSchedule } from "src/shared/ScheduleSchema";
 
 export const DEMANDE_IMMERSION_ID = "test_demande_immersion_id";
 export const VALID_EMAILS = ["valid@email.fr", "name@example.com"];

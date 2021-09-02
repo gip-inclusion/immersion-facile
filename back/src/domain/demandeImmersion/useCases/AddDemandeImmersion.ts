@@ -1,12 +1,15 @@
-import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { UseCase } from "../../core/UseCase";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
-import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
-import { Email, EmailGateway } from "./../ports/EmailGateway";
+import { ConflictError } from "src/adapters/primary/helpers/sendHttpResponse";
+import { UseCase } from "src/domain/core/UseCase";
+import { DemandeImmersionEntity } from "src/domain/demandeImmersion/entities/DemandeImmersionEntity";
+import { DemandeImmersionRepository } from "src/domain/demandeImmersion/ports/DemandeImmersionRepository";
+import {
+  Email,
+  EmailGateway,
+} from "src/domain/demandeImmersion/ports/EmailGateway";
 import {
   AddDemandeImmersionResponseDto,
   DemandeImmersionDto,
-} from "../../../shared/DemandeImmersionDto";
+} from "src/shared/DemandeImmersionDto";
 
 type AddDemandeImmersionDependencies = {
   demandeImmersionRepository: DemandeImmersionRepository;

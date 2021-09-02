@@ -1,12 +1,11 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
+import { NotFoundError } from "src/adapters/primary/helpers/sendHttpResponse";
 import {
   InMemorySireneRepository,
   TEST_ESTABLISHMENT1,
   TEST_ESTABLISHMENT1_SIRET,
-} from "../../../adapters/secondary/InMemorySireneRepository";
-import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
-import { GetSiret } from "./GetSiret";
+} from "src/adapters/secondary/InMemorySireneRepository";
+import { expectPromiseToFailWithError } from "src/utils/test.helpers";
+import { GetSiret } from "src/domain/sirene/useCases/GetSiret";
 
 describe("Get SIRET", () => {
   let repository: InMemorySireneRepository;

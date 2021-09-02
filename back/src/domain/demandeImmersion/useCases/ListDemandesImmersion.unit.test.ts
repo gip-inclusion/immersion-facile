@@ -1,7 +1,7 @@
-import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { ListDemandeImmersion } from "./ListDemandeImmersion";
-import { validDemandeImmersion } from "../entities/DemandeImmersionIdEntityTestData";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
+import { InMemoryDemandeImmersionRepository } from "src/adapters/secondary/InMemoryDemandeImmersionRepository";
+import { ListDemandeImmersion } from "src/domain/demandeImmersion/useCases/ListDemandeImmersion";
+import { validDemandeImmersion } from "src/domain/demandeImmersion/entities/DemandeImmersionIdEntityTestData";
+import { DemandeImmersionEntity } from "src/domain/demandeImmersion/entities/DemandeImmersionEntity";
 
 describe("List DemandeImmersion", () => {
   let repository: InMemoryDemandeImmersionRepository;

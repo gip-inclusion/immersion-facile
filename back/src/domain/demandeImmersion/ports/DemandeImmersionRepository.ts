@@ -1,5 +1,5 @@
-import { DemandeImmersionId } from "../../../shared/DemandeImmersionDto";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
+import { DemandeImmersionId } from "src/shared/DemandeImmersionDto";
+import { DemandeImmersionEntity } from "src/domain/demandeImmersion/entities/DemandeImmersionEntity";
 
 export interface DemandeImmersionRepository {
   save: (

@@ -1,6 +1,6 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { UseCase } from "../../core/UseCase";
-import { SireneRepository } from "../ports/SireneRepository";
+import { NotFoundError } from "src/adapters/primary/helpers/sendHttpResponse";
+import { UseCase } from "src/domain/core/UseCase";
+import { SireneRepository } from "src/domain/sirene/ports/SireneRepository";
 
 type GetSiretDependencies = { sireneRepository: SireneRepository };
 

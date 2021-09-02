@@ -1,11 +1,11 @@
-import { UseCase } from "../../core/UseCase";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
-import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
+import { NotFoundError } from "src/adapters/primary/helpers/sendHttpResponse";
+import { UseCase } from "src/domain/core/UseCase";
+import { DemandeImmersionEntity } from "src/domain/demandeImmersion/entities/DemandeImmersionEntity";
+import { DemandeImmersionRepository } from "src/domain/demandeImmersion/ports/DemandeImmersionRepository";
 import {
   UpdateDemandeImmersionRequestDto,
   UpdateDemandeImmersionResponseDto,
-} from "../../../shared/DemandeImmersionDto";
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+} from "src/shared/DemandeImmersionDto";
 
 type UpdateDemandeImmersionDependencies = {
   demandeImmersionRepository: DemandeImmersionRepository;

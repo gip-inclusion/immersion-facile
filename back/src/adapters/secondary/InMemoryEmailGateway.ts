@@ -1,4 +1,7 @@
-import { Email, EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
+import {
+  Email,
+  EmailGateway,
+} from "../../domain/demandeImmersion/ports/EmailGateway";
 import { logger } from "../../utils/logger";
 
 export class InMemoryEmailGateway implements EmailGateway {

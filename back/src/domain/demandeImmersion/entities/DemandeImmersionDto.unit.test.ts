@@ -2,8 +2,8 @@ import {
   demandeImmersionDtoSchema,
   DemandeImmersionStatus,
   demandeImmersionStatusFromString,
-} from "../../../shared/DemandeImmersionDto";
-import { addDays } from "../../../utils/test.helpers";
+} from "src/shared/DemandeImmersionDto";
+import { addDays } from "src/utils/test.helpers";
 import {
   validDemandeImmersion,
   DATE_START,

@@ -10,7 +10,8 @@
     "test:integration": "jest --runInBand --testRegex=.integration.test.ts --watchAll --verbose",
     "test:all": "REPOSITORIES=JSON jest --runInBand --verbose",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write src"
   },
   "keywords": [],
   "author": "",

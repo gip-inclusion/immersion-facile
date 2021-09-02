@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { app } from "../server";
+import { app } from "src/adapters/primary/server";
 import * as fs from "fs";
 
 const request = supertest(app);

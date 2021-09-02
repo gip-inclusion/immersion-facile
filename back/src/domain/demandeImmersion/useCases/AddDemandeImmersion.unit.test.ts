@@ -1,10 +1,10 @@
-import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
-import { validDemandeImmersion } from "../entities/DemandeImmersionIdEntityTestData";
-import { AddDemandeImmersion } from "./AddDemandeImmersion";
+import { ConflictError } from "src/adapters/primary/helpers/sendHttpResponse";
+import { InMemoryDemandeImmersionRepository } from "src/adapters/secondary/InMemoryDemandeImmersionRepository";
+import { InMemoryEmailGateway } from "src/adapters/secondary/InMemoryEmailGateway";
+import { expectPromiseToFailWithError } from "src/utils/test.helpers";
+import { DemandeImmersionEntity } from "src/domain/demandeImmersion/entities/DemandeImmersionEntity";
+import { validDemandeImmersion } from "src/domain/demandeImmersion/entities/DemandeImmersionIdEntityTestData";
+import { AddDemandeImmersion } from "src/domain/demandeImmersion/useCases/AddDemandeImmersion";
 
 describe("Add demandeImmersion", () => {
   let repository: InMemoryDemandeImmersionRepository;
@@ -90,7 +90,9 @@ describe("Add demandeImmersion", () => {
       expect(sentEmails).toHaveLength(1);
 
       expect(sentEmails[0].recipient).toEqual("bénéficiaire@email.fr");
-      expect(sentEmails[0].subject).toEqual("Votre demande d'immersion a été enregistrée");
+      expect(sentEmails[0].subject).toEqual(
+        "Votre demande d'immersion a été enregistrée"
+      );
       expect(sentEmails[0].textContent).toEqual(
         "Merci d'avoir enregistré votre demande. Vous pouvez la modifier avec le lien suivant: " +
           `https://immersion.beta.pole-emploi.fr/demande-immersion` +

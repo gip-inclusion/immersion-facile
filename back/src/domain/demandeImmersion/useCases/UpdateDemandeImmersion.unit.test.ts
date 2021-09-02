@@ -1,13 +1,12 @@
-import { DemandeImmersionId } from "../../../shared/DemandeImmersionDto";
-import { UpdateDemandeImmersion } from "./UpdateDemandeImmersion";
+import { UpdateDemandeImmersion } from "src/domain/demandeImmersion/useCases/UpdateDemandeImmersion";
 import {
   DemandesImmersion,
   InMemoryDemandeImmersionRepository,
-} from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { validDemandeImmersion } from "../entities/DemandeImmersionIdEntityTestData";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
+} from "src/adapters/secondary/InMemoryDemandeImmersionRepository";
+import { validDemandeImmersion } from "src/domain/demandeImmersion/entities/DemandeImmersionIdEntityTestData";
+import { DemandeImmersionEntity } from "src/domain/demandeImmersion/entities/DemandeImmersionEntity";
+import { NotFoundError } from "src/adapters/primary/helpers/sendHttpResponse";
+import { expectPromiseToFailWithError } from "src/utils/test.helpers";
 
 describe("Update demandeImmersion", () => {
   let repository: InMemoryDemandeImmersionRepository;
@@ -46,7 +45,7 @@ describe("Update demandeImmersion", () => {
 
   describe("When no demandeImmersion with id exists", () => {
     it("throws NotFoundError", async () => {
-      expectPromiseToFailWithError(
+      await expectPromiseToFailWithError(
         updateDemandeImmersion.execute({
           id: "unknown_demande_immersion_id",
           demandeImmersion: validDemandeImmersion,
