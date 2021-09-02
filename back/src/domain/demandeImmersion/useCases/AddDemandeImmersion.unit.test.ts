@@ -90,7 +90,7 @@ describe("Add demandeImmersion", () => {
       expect(sentEmails).toHaveLength(1);
 
       expect(sentEmails[0].recipient).toEqual("bénéficiaire@email.fr");
-      expect(sentEmails[0].subject).toEqual("Votre demande d'immersion a été enregistré");
+      expect(sentEmails[0].subject).toEqual("Votre demande d'immersion a été enregistrée");
       expect(sentEmails[0].textContent).toEqual(
         "Merci d'avoir enregistré votre demande. Vous pouvez la modifier avec le lien suivant: " +
           `https://immersion.beta.pole-emploi.fr/demande-immersion` +
