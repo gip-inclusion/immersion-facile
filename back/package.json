@@ -20,6 +20,7 @@
     "@types/jest": "^26.0.24",
     "@types/pino": "^6.3.11",
     "@types/pino-http": "^5.4.2",
+    "@types/request": "^2.48.7",
     "@types/supertest": "^2.0.11",
     "@types/uuid": "^8.3.1",
     "@types/yup": "^0.29.13",
@@ -42,6 +43,7 @@
     "pino": "^6.13.0",
     "pino-http": "^5.6.0",
     "pino-pretty": "^5.1.2",
+    "sib-api-v3-typescript": "^2.2.2",
     "ts-node": "^10.1.0",
     "uuid": "^8.3.2",
     "yup": "^0.32.9"

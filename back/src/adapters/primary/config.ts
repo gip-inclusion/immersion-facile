@@ -13,7 +13,9 @@ import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
 import { UpdateDemandeImmersion } from "../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
+import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 
 export const getRepositories = () => {
@@ -21,6 +23,7 @@ export const getRepositories = () => {
   logger.info(
     "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY"
   );
+  logger.info("EMAIL_GATEWAY: " + process.env.EMAIL_GATEWAY ?? "IN_MEMORY");
 
   return {
     todo:
@@ -31,24 +34,24 @@ export const getRepositories = () => {
     demandeImmersion:
       process.env.REPOSITORIES === "AIRTABLE"
         ? AirtableDemandeImmersionRepository.create(
-            process.env.AIRTABLE_API_KEY ||
-              fail("Missing environment variable: AIRTABLE_API_KEY"),
-            process.env.AIRTABLE_BASE_ID ||
-              fail("Missing environment variable: AIRTABLE_BASE_ID"),
-            process.env.AIRTABLE_TABLE_NAME ||
-              fail("Missing environment variable: AIRTABLE_TABLE_NAME")
+            getEnvVarOrDie("AIRTABLE_API_KEY"),
+            getEnvVarOrDie("AIRTABLE_BASE_ID"),
+            getEnvVarOrDie("AIRTABLE_TABLE_NAME")
           )
         : new InMemoryDemandeImmersionRepository(),
 
     sirene:
       process.env.SIRENE_REPOSITORY === "HTTPS"
         ? HttpsSireneRepository.create(
-            process.env.SIRENE_ENDPOINT ||
-              fail("Missing environment variable: SIRENE_ENDPOINT"),
-            process.env.SIRENE_BEARER_TOKEN ||
-              fail("Missing environment variable: SIRENE_BEARER_TOKEN")
+            getEnvVarOrDie("SIRENE_ENDPOINT"),
+            getEnvVarOrDie("SIRENE_BEARER_TOKEN")
           )
         : new InMemorySireneRepository(),
+
+    email:
+      process.env.EMAIL_GATEWAY === "SENDINBLUE"
+        ? SendinblueEmailGateway.create(getEnvVarOrDie("SENDINBLUE_API_KEY"))
+        : new InMemoryEmailGateway(),
   };
 };
 
@@ -67,16 +70,15 @@ export const getAuthChecker = () => {
     logger.warn("Missing backoffice credentials. Disabling backoffice access.");
     return ALWAYS_REJECT;
   } else {
-    username =
-      process.env.BACKOFFICE_USERNAME ||
-      fail("Missing environment variable: BACKOFFICE_USERNAME");
-    password =
-      process.env.BACKOFFICE_PASSWORD ||
-      fail("Missing environment variable: BACKOFFICE_PASSWORD");
+    username = getEnvVarOrDie("BACKOFFICE_USERNAME");
+    password = getEnvVarOrDie("BACKOFFICE_PASSWORD");
   }
 
   return InMemoryAuthChecker.create(username, password);
 };
+
+const getEnvVarOrDie = (envVar: string) =>
+  process.env[envVar] || fail(`Missing environment variable: ${envVar}`)
 
 const fail = (message: string) => {
   throw new Error(message);
@@ -95,6 +97,15 @@ const getClock = (): Clock => {
 
 export const getUsecases = () => {
   const repositories = getRepositories();
+  const supervisorEmail = process.env.SUPERVISOR_EMAIL;
+  if (!supervisorEmail) {
+    logger.warn("No SUPERVISOR_EMAIL specified. Disabling the sending of supervisor emails.");
+  }
+
+  const emailAllowlist = (process.env.EMAIL_ALLOWLIST || "").split(",").filter(el => !!el);
+  if (!emailAllowlist) {
+    logger.warn("Empty EMAIL_ALLOWLIST. Disabling the sending of non-supervisor emails.");
+  }
 
   return {
     // todo
@@ -107,6 +118,9 @@ export const getUsecases = () => {
     // formulaire
     addDemandeImmersion: new AddDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,
+      emailGateway: repositories.email,
+      supervisorEmail: supervisorEmail,
+      emailAllowlist: emailAllowlist,
     }),
     getDemandeImmersion: new GetDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,
