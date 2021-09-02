@@ -231,7 +231,7 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
                   : await demandeImmersionGateway.add(demandeImmersion);
 
                 const queryParams = new URLSearchParams(window.location.search);
-                queryParams.set("id", upsertedId);
+                queryParams.set("demandeId", upsertedId);
                 history.replaceState(
                   null,
                   document.title,
