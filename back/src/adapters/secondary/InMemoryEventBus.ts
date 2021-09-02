@@ -1,8 +1,8 @@
 import { EventCallback, EventBus } from "../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../domain/core/eventBus/events";
 
-class InMemoryEventBus implements EventBus {
-  private subscriptions: Partial<
+export class InMemoryEventBus implements EventBus {
+  public subscriptions: Partial<
     Record<DomainTopic, EventCallback<DomainTopic>[]>
   >;
 

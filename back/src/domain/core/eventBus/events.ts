@@ -1,13 +1,20 @@
-type GenericEvent<T extends string, P> = {
+type GenericEvent<T extends string, P> = Readonly<{
   id: string;
+  occuredAt: string;
   topic: T;
   payload: P;
-  time: string;
-};
+  // wasPublished: boolean;
+}>;
 
 export type DomainEvent =
-  | GenericEvent<"SomethingHappended", { happended: string }>
-  | GenericEvent<"SomethingElseHappended", { notHappended: number }>
-  | GenericEvent<"NothingHappened", { nothingNess: Date }>;
+  | GenericEvent<
+      "ImmersionApplicationSubmittedByBeneficiary",
+      { submittedByBeneficiary: string }
+    >
+  | GenericEvent<
+      "ImmersionApplicationSubmittedByHostingCompany",
+      { submittedByHostingCompany: number }
+    >
+  | GenericEvent<"DemandeImmersionCancelled", { canceled: Date }>;
 
 export type DomainTopic = DomainEvent["topic"];
