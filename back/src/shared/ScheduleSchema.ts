@@ -1,4 +1,4 @@
-import * as Yup from "yup";
+import * as Yup from "../../node_modules/yup";
 
 const reasonableHours = {
   start: "09:00",
