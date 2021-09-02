@@ -61,7 +61,7 @@ export class AddDemandeImmersion
     if (this.emailAllowlist.has(params.email)) {
       const email: Email = {
         recipient: params.email,
-        subject: "Votre demande d'immersion a été enregistré",
+        subject: "Votre demande d'immersion a été enregistrée",
         textContent:
           `Merci d'avoir enregistré votre demande. Vous pouvez la modifier avec le ` +
           `lien suivant: https://immersion.beta.pole-emploi.fr/demande-immersion?demandeId=${id}`,
