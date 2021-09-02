@@ -1,0 +1,65 @@
+.numberCircle {
+  border-radius: 50%;
+  width: 10px;
+  height: 8px;
+  padding: 10px;
+  margin-right: 5px;
+
+  background: #f0f0f0;
+  color: #666;
+  text-align: center;
+
+  font: 14px Arial, sans-serif;
+
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.numberCircle:hover {
+  background: #aeaeca;
+}
+
+.numberCircle.filled {
+  background: #e5e5f4;
+}
+
+.numberCircle.selected:hover {
+  background: #996cdd;
+}
+
+.numberCircle.selected {
+  background: #9a9aff;
+  color: #00006d;
+  font-weight: bold;
+}
+
+.time-picker-container {
+  display: flex;
+}
+
+.day-picker {
+  display: flex;
+  margin: auto 10px;
+}
+
+.time-wrapper {
+  display: flex;
+  padding: 5px;
+}
+
+.date-or-time-block {
+  min-width: 135px;
+  margin: auto 10px;
+}
+
+.schedule-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 330px;
+}

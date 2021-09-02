@@ -16,7 +16,6 @@ export const BoolRadioGroup = (props: BoolRadioProps) => {
   const [field, meta, helper] = useField(props);
   const isError = meta.touched && meta.error;
   const htmlName = isError ? "radio" : "radio-error";
-
   return (
     <>
       <div className="fr-form-group">

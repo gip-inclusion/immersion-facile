@@ -1,4 +1,5 @@
 import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
+import { reasonableSchedule, ScheduleDto } from "../../../shared/ScheduleSchema";
 
 export const DEMANDE_IMMERSION_ID = "test_demande_immersion_id";
 export const VALID_EMAILS = ["valid@email.fr", "name@example.com"];
@@ -27,8 +28,7 @@ export const validDemandeImmersion: DemandeImmersionDto = {
   mentor: "Alain Prost",
   mentorPhone: VALID_PHONES[1],
   mentorEmail: VALID_EMAILS[1],
-  workdays: ["jeudi", "vendredi", "samedi", "dimanche"],
-  workHours: "9h00-17h00",
+  schedule: reasonableSchedule,
   immersionAddress: "",
   individualProtection: true,
   sanitaryPrevention: true,

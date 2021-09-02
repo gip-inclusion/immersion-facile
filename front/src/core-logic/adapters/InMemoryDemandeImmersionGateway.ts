@@ -1,8 +1,9 @@
-import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
 import {
   DemandeImmersionDto,
   DemandeImmersionId,
 } from "src/shared/DemandeImmersionDto";
+import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
+import { reasonableSchedule } from "src/shared/ScheduleSchema";
 
 const DEMANDE_IMMERSION_TEMPLATE: DemandeImmersionDto = {
   id: "fake-test-id",
@@ -19,8 +20,7 @@ const DEMANDE_IMMERSION_TEMPLATE: DemandeImmersionDto = {
   mentor: "Alain Prost",
   mentorPhone: "0601010101",
   mentorEmail: "alain@prost.fr",
-  workdays: ["jeudi", "vendredi", "samedi", "dimanche"],
-  workHours: "9h00-17h00",
+  schedule: reasonableSchedule,
   immersionAddress: "",
   individualProtection: true,
   sanitaryPrevention: true,

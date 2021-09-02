@@ -1,3 +1,4 @@
+import { scheduleSchema } from "./ScheduleSchema";
 import * as Yup from "../../node_modules/yup";
 import { Flavor } from "./typeFlavours";
 
@@ -101,8 +102,7 @@ export const demandeImmersionDtoSchema = Yup.object({
     .required("Obligatoire")
     .email("Veuillez saisir un adresse mail correct"),
 
-  workdays: Yup.array(Yup.string().required()).required("Obligatoire"),
-  workHours: Yup.string().required("Obligatoire"),
+  schedule: scheduleSchema.required(),
 
   individualProtection: Yup.boolean().required("Obligatoire"),
   sanitaryPrevention: Yup.boolean().required("Obligatoire"),

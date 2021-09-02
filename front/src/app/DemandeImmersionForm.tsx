@@ -20,6 +20,8 @@ import {
   BoolCheckboxGroup,
   CheckboxGroup,
 } from "src/components/form/CheckboxGroup";
+import { SchedulePicker } from "src/components/form/SchedulePicker/SchedulePicker";
+import { reasonableSchedule, ScheduleDto } from "src/shared/ScheduleSchema";
 
 const fetchCompanyInfoBySiret = async (siret: string) => {
   const addressDictToString = (addressDict: any): string => {
@@ -46,7 +48,6 @@ const fetchCompanyInfoBySiret = async (siret: string) => {
     return { nom, address };
   });
 };
-
 interface SiretFields {
   siret: string;
 }
@@ -127,46 +128,49 @@ const isDemandeImmersionFrozen = (
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
-const createInitialValues = (): DemandeImmersionDto => ({
-  id: uuidV4(),
-  status: "DRAFT",
-  // Participant
-  email: "sylvanie@monemail.fr",
-  firstName: "Sylanie",
-  lastName: "Durand",
-  phone: "0612345678",
-  dateSubmission: toDateString(startOfToday()),
-  dateStart: toDateString(addDays(startOfToday(), 2)),
-  dateEnd: toDateString(addDays(startOfToday(), 3)),
+const createInitialDemandeImmersion = (): DemandeImmersionDto => {
+  return {
+    id: uuidV4(),
+    status: "DRAFT",
+    // Participant
+    email: "sylvanie@monemail.fr",
+    firstName: "Sylanie",
+    lastName: "Durand",
+    phone: "0612345678",
+    dateSubmission: toDateString(startOfToday()),
+    dateStart: toDateString(addDays(startOfToday(), 2)),
+    dateEnd: toDateString(addDays(startOfToday(), 3)),
 
-  // Enterprise
-  siret: "12345678912345",
-  businessName: "Ma petite entreprise ne connait pas la crise", //< raison sociale
-  mentor: "The Mentor",
-  mentorPhone: "0687654321",
-  mentorEmail: "mentor@supermentor.fr",
-  workdays: ["lundi", "mardi", "mercredi", "jeudi", "vendredi"],
-  workHours: "9h00-12h00, 14h00-18h00",
-  immersionAddress: "Quelque Part",
+    // Enterprise
+    siret: "12345678912345",
+    businessName: "Ma petite entreprise ne connait pas la crise",
+    mentor: "The Mentor",
+    mentorPhone: "0687654321",
+    mentorEmail: "mentor@supermentor.fr",
+    schedule: reasonableSchedule,
+    immersionAddress: "Quelque Part",
 
-  // Covid
-  individualProtection: false,
-  sanitaryPrevention: false,
-  sanitaryPreventionDescription: "Aucunes",
+    // Covid
+    individualProtection: false,
+    sanitaryPrevention: false,
+    sanitaryPreventionDescription: "Aucunes",
 
-  // Immersion
-  immersionObjective: "Valider coaching d'équipe",
-  immersionProfession: "Chef d'atelier", //< intitulé du poste
-  immersionActivities: "Superviser",
-  immersionSkills: "Attention au détail",
+    // Immersion
+    immersionObjective: "Valider coaching d'équipe",
+    immersionProfession: "Chef d'atelier",
+    immersionActivities: "Superviser",
+    immersionSkills: "Attention au détail",
 
-  // Signatures
-  beneficiaryAccepted: false,
-  enterpriseAccepted: false,
-});
+    // Signatures
+    beneficiaryAccepted: false,
+    enterpriseAccepted: false,
+  };
+};
 
 export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
-  const [initialValues, setInitialValues] = useState(createInitialValues());
+  const [initialValues, setInitialValues] = useState(
+    createInitialDemandeImmersion()
+  );
   const [submitError, setSubmitError] = useState<Error | null>(null);
   const [formLink, setFormLink] = useState<string | null>(null);
 
@@ -349,31 +353,11 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
                     disabled={isFrozen}
                   />
 
-                  <CheckboxGroup
-                    name="workdays"
-                    label="Journées pendant lesquelles l'immersion va se dérouler *"
-                    values={[
-                      "lundi",
-                      "mardi",
-                      "mercredi",
-                      "jeudi",
-                      "vendredi",
-                      "samedi",
-                      "dimanche",
-                    ]}
-                    disabled={isFrozen}
-                  />
-
-                  <TextInput
-                    label="Indiquez les horaires de l'immersion *"
-                    name="workHours"
-                    type="text"
-                    placeholder=""
-                    description="Par ex, de 8h30 à 12h et de 13h à 16h.
-                  Si les horaires sont différents en fonction des journée, précisez-le bien.
-                  Par ex,  lundi, de 10h à 12h et de 13h30 à 17h,  les autres jours de la semaine,  de 8h30 à 12h00 et de 13h00 à 16h00.
-                  Si il y a un jour férié ou non travaillé pendant l'immersion, le préciser aussi.  Par ex :  en dehors du  8 mai, jour férié."
-                    disabled={isFrozen}
+                  <SchedulePicker
+                    name="schedule"
+                    setFieldValue={(x) => {
+                      props.setFieldValue("schedule", x);
+                    }}
                   />
 
                   <TextInput
