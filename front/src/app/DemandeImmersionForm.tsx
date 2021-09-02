@@ -21,7 +21,7 @@ import {
   CheckboxGroup,
 } from "src/components/form/CheckboxGroup";
 import { SchedulePicker } from "src/components/form/SchedulePicker/SchedulePicker";
-import { reasonableSchedule, ScheduleDto } from "src/shared/ScheduleSchema";
+import { reasonableSchedule } from "src/shared/ScheduleSchema";
 
 const fetchCompanyInfoBySiret = async (siret: string) => {
   const addressDictToString = (addressDict: any): string => {

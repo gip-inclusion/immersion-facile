@@ -28,7 +28,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
               <input
                 id={props.name + "radio_yes"}
                 type="radio"
-                checked={props.checked}
+                defaultChecked={props.checked}
               />
               <label
                 className="fr-label"
@@ -42,7 +42,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
               <input
                 id={props.name + "radio_no"}
                 type="radio"
-                checked={!props.checked}
+                defaultChecked={!props.checked}
               />
               <label
                 className="fr-label"

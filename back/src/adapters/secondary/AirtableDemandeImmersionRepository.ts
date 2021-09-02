@@ -3,7 +3,10 @@ import { QueryParams } from "airtable/lib/query_params";
 import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
 import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import { logger } from "../../utils/logger";
-import { DemandeImmersionId, demandeImmersionStatusFromString } from "../../shared/DemandeImmersionDto";
+import {
+  DemandeImmersionId,
+  demandeImmersionStatusFromString,
+} from "../../shared/DemandeImmersionDto";
 
 export class AirtableDemandeImmersionRepository
   implements DemandeImmersionRepository
@@ -28,7 +31,8 @@ export class AirtableDemandeImmersionRepository
     }
     const response = await this.table.create([
       {
-        fields: AirtableDemandeImmersionRepository.convertEntityToFieldSet(entity),
+        fields:
+          AirtableDemandeImmersionRepository.convertEntityToFieldSet(entity),
       },
     ]);
     if (response.length < 1) {
@@ -81,7 +85,9 @@ export class AirtableDemandeImmersionRepository
     return this.table
       .update(
         demandeImmersion.id,
-        AirtableDemandeImmersionRepository.convertEntityToFieldSet(demandeImmersion)
+        AirtableDemandeImmersionRepository.convertEntityToFieldSet(
+          demandeImmersion
+        )
       )
       .then((response) => response.id)
       .catch((e) => {
@@ -182,20 +188,9 @@ export class AirtableDemandeImmersionRepository
       );
     }
 
-    record.fields.workdays = record.fields.workdays || [];
-    if (
-      !AirtableDemandeImmersionRepository.isArrayOfStrings(
-        record.fields.workdays
-      )
-    ) {
-      throw new Error(`Invalid field 'workdays' in Airtable record: ${record}`);
-    }
-
-    record.fields.workHours = record.fields.workHours || "";
-    if (typeof record.fields.workHours !== "string") {
-      throw new Error(
-        `Invalid field 'workHours' in Airtable record: ${record}`
-      );
+    record.fields.schedule = record.fields.schedule || "";
+    if (typeof record.fields.schedule !== "string") {
+      throw new Error(`Invalid field 'schedule' in Airtable record: ${record}`);
     }
 
     record.fields.immersionAddress = record.fields.immersionAddress || "";
@@ -288,8 +283,7 @@ export class AirtableDemandeImmersionRepository
       mentor: record.fields.mentor,
       mentorPhone: record.fields.mentorPhone,
       mentorEmail: record.fields.mentorEmail,
-      workdays: record.fields.workdays as string[],
-      workHours: record.fields.workHours,
+      schedule: JSON.parse(record.fields.schedule),
       immersionAddress: record.fields.immersionAddress,
       individualProtection: record.fields.individualProtection,
       sanitaryPrevention: record.fields.sanitaryPrevention,
@@ -307,6 +301,11 @@ export class AirtableDemandeImmersionRepository
   private static convertEntityToFieldSet(
     entity: DemandeImmersionEntity
   ): FieldSet {
-    return entity.toDto() as FieldSet;
+    const demandeImmersionDto = entity.toDto();
+
+    return {
+      ...demandeImmersionDto,
+      schedule: JSON.stringify(demandeImmersionDto.schedule),
+    } as FieldSet;
   }
 }
