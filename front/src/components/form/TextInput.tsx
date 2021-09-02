@@ -5,6 +5,7 @@ type TextInputProps = {
   label: string;
   placeholder: string | null;
   description: string | null;
+  disabled: boolean;
 } & FieldHookConfig<string>;
 
 export const TextInput = (props: TextInputProps) => {
@@ -31,6 +32,7 @@ export const TextInput = (props: TextInputProps) => {
           }`}
           placeholder={props.placeholder || ""}
           aria-describedby="text-input-error-desc-error"
+          disabled={props.disabled}
         />
         {meta.touched && meta.error && (
           <p id="text-input-email-error-desc-error" className="fr-error-text">

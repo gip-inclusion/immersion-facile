@@ -1,5 +1,37 @@
-import { DemandeImmersionDto, DemandeImmersionId } from "src/shared/DemandeImmersionDto";
 import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
+import {
+  DemandeImmersionDto,
+  DemandeImmersionId,
+} from "src/shared/DemandeImmersionDto";
+
+const DEMANDE_IMMERSION_TEMPLATE: DemandeImmersionDto = {
+  id: "fake-test-id",
+  status: "DRAFT",
+  email: "esteban@ocon.fr",
+  phone: "+33012345678",
+  firstName: "Esteban",
+  lastName: "Ocon",
+  dateSubmission: "2021-07-01",
+  dateStart: "2021-08-01",
+  dateEnd: "2021-08-31",
+  businessName: "Beta.gouv.fr",
+  siret: "12345678901234",
+  mentor: "Alain Prost",
+  mentorPhone: "0601010101",
+  mentorEmail: "alain@prost.fr",
+  workdays: ["jeudi", "vendredi", "samedi", "dimanche"],
+  workHours: "9h00-17h00",
+  immersionAddress: "",
+  individualProtection: true,
+  sanitaryPrevention: true,
+  sanitaryPreventionDescription: "fourniture de gel",
+  immersionObjective: "Confirmer un projet professionnel",
+  immersionProfession: "Pilote d'automobile",
+  immersionActivities: "Piloter un automobile",
+  immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
+  beneficiaryAccepted: true,
+  enterpriseAccepted: true,
+};
 
 const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
 const TEST_ESTABLISHMENT1 = {
@@ -21,27 +53,46 @@ const TEST_ESTABLISHMENT1 = {
 export class InMemoryDemandeImmersionGateway
   implements DemandeImmersionGateway
 {
-  private _demandesImmersion: DemandeImmersionDto[] = [];
+  private _demandesImmersion: { [id: string]: DemandeImmersionDto } = {};
 
-  public async add(demandeImmersion: DemandeImmersionDto): Promise<DemandeImmersionId> {
+  public constructor() {
+    this.add({
+      ...DEMANDE_IMMERSION_TEMPLATE,
+      id: "valid_draft",
+      status: "DRAFT",
+      email: "DRAFT.esteban@ocon.fr",
+    });
+    this.add({
+      ...DEMANDE_IMMERSION_TEMPLATE,
+      id: "valid_finalized",
+      status: "FINALIZED",
+      email: "FINALIZED.esteban@ocon.fr",
+    });
+  }
+
+  public async add(
+    demandeImmersion: DemandeImmersionDto
+  ): Promise<DemandeImmersionId> {
     console.log("InMemoryDemandeImmersionGateway.add: ", demandeImmersion);
-    this._demandesImmersion.push(demandeImmersion);
+    this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
     return demandeImmersion.id;
   }
 
   public async get(id: DemandeImmersionId): Promise<DemandeImmersionDto> {
     console.log("InMemoryDemandeImmersionGateway.get: ", id);
-    return this._demandesImmersion[0];
+    return this._demandesImmersion[id];
   }
 
   public async getAll(): Promise<Array<DemandeImmersionDto>> {
     console.log("InMemoryFormulaireGateway.getAll");
-    return this._demandesImmersion;
+    return Object.values(this._demandesImmersion);
   }
 
-  public async update(demandeImmersion: DemandeImmersionDto): Promise<DemandeImmersionId> {
+  public async update(
+    demandeImmersion: DemandeImmersionDto
+  ): Promise<DemandeImmersionId> {
     console.log("InMemoryDemandeImmersionGateway.update: ", demandeImmersion);
-    this._demandesImmersion[0] = demandeImmersion;
+    this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
     return demandeImmersion.id;
   }
 

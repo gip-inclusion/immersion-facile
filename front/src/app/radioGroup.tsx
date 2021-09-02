@@ -8,6 +8,7 @@ type BoolRadioProps = {
   hideNoOption: boolean;
   description: string;
   descriptionLink: string;
+  disabled: boolean;
 } & FieldHookConfig<string>;
 // Like MyRadioGroup, but backs a boolean value.
 // Has default "oui/non" options.
@@ -48,8 +49,8 @@ export const BoolRadioGroup = (props: BoolRadioProps) => {
                 {...field}
                 type="radio"
                 id={htmlName}
-                {...field}
                 checked={props.formikHelpers.values[props.name]}
+                disabled={props.disabled}
               />
               <label
                 className="fr-label"
@@ -70,8 +71,8 @@ export const BoolRadioGroup = (props: BoolRadioProps) => {
                   {...field}
                   type="radio"
                   id={htmlName}
-                  {...field}
                   checked={!props.formikHelpers.values[props.name]}
+                  disabled={props.disabled}
                 />
                 <label
                   className="fr-label"
@@ -123,7 +124,12 @@ export const RadioGroup = (props: CheckboxGroupProps) => {
                   className="fr-radio-group"
                   key={htmlName + props.name + value}
                 >
-                  <input {...field} type="radio" id={htmlName + value} />
+                  <input
+                    {...field}
+                    type="radio"
+                    id={htmlName + value}
+                    disabled={props.disabled}
+                  />
                   <label className="fr-label" htmlFor={htmlName + value}>
                     {value}
                   </label>

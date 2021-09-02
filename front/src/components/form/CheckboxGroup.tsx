@@ -12,6 +12,7 @@ type BoolCheckboxGroupProps = {
   formikHelpers: FormikHelpers<any> & FormikState<any>;
   description: string;
   descriptionLink: string;
+  disabled: boolean;
 } & FieldHookConfig<string>;
 
 export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
@@ -53,8 +54,8 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
                 {...field}
                 type="checkbox"
                 id={htmlName}
-                {...field}
                 checked={props.formikHelpers.values[props.name]}
+                disabled={props.disabled}
               />
               <label
                 className="fr-label"
@@ -84,6 +85,7 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
 export type CheckboxGroupProps = {
   label: string;
   values: Array<string>;
+  disabled: boolean;
 } & FieldHookConfig<string>;
 
 export const CheckboxGroup = (props: CheckboxGroupProps) => {

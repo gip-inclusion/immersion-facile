@@ -1,7 +1,10 @@
 import { FieldHookConfig, useField } from "formik";
 import React from "react";
 
-type DateInputProps = { label: string } & FieldHookConfig<string>;
+type DateInputProps = {
+  label: string;
+  disabled: boolean;
+} & FieldHookConfig<string>;
 
 export const DateInput = (props: DateInputProps) => {
   const [field, meta] = useField(props);
@@ -20,6 +23,7 @@ export const DateInput = (props: DateInputProps) => {
             {...field}
             value={field.value}
             type="date"
+            disabled={props.disabled}
           />
         </div>
         {meta.touched && meta.error && (
