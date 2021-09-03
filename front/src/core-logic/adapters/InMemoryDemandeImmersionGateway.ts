@@ -4,6 +4,7 @@ import {
 } from "src/shared/DemandeImmersionDto";
 import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
+import { sleep } from 'src/shared/utils';
 
 const DEMANDE_IMMERSION_TEMPLATE: DemandeImmersionDto = {
   id: "fake-test-id",
@@ -50,6 +51,8 @@ const TEST_ESTABLISHMENT1 = {
   },
 };
 
+const SIMULATED_LATENCY_MS = 2000;
+
 export class InMemoryDemandeImmersionGateway
   implements DemandeImmersionGateway
 {
@@ -74,17 +77,20 @@ export class InMemoryDemandeImmersionGateway
     demandeImmersion: DemandeImmersionDto
   ): Promise<DemandeImmersionId> {
     console.log("InMemoryDemandeImmersionGateway.add: ", demandeImmersion);
+    await sleep(SIMULATED_LATENCY_MS);
     this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
     return demandeImmersion.id;
   }
 
   public async get(id: DemandeImmersionId): Promise<DemandeImmersionDto> {
     console.log("InMemoryDemandeImmersionGateway.get: ", id);
+    await sleep(SIMULATED_LATENCY_MS);
     return this._demandesImmersion[id];
   }
 
   public async getAll(): Promise<Array<DemandeImmersionDto>> {
     console.log("InMemoryFormulaireGateway.getAll");
+    await sleep(SIMULATED_LATENCY_MS);
     return Object.values(this._demandesImmersion);
   }
 
@@ -92,12 +98,14 @@ export class InMemoryDemandeImmersionGateway
     demandeImmersion: DemandeImmersionDto
   ): Promise<DemandeImmersionId> {
     console.log("InMemoryDemandeImmersionGateway.update: ", demandeImmersion);
+    await sleep(SIMULATED_LATENCY_MS);
     this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
     return demandeImmersion.id;
   }
 
   public async getSiretInfo(siret: string): Promise<Object> {
     console.log("InMemoryDemandeImmersionGateway.getSiretInfo: " + siret);
+    await sleep(SIMULATED_LATENCY_MS);
 
     if (siret !== TEST_ESTABLISHMENT1_SIRET) {
       throw new Error("404 Not found");

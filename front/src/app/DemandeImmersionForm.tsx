@@ -54,6 +54,7 @@ interface SiretFields {
 
 type SiretAutocompletedFieldProps = {
   disabled: boolean;
+  setIsFetchingSiret: (state: boolean) => void;
 } & FieldHookConfig<string>;
 
 const SiretAutocompletedField = (props: SiretAutocompletedFieldProps) => {
@@ -66,24 +67,27 @@ const SiretAutocompletedField = (props: SiretAutocompletedFieldProps) => {
 
   React.useEffect(() => {
     let isCurrent: boolean = true;
-    let sanitizedSiret = siret.replace(/\s/g, "");
-    if (sanitizedSiret.length == 14) {
-      fetchCompanyInfoBySiret(sanitizedSiret)
-        .then((info: any) => {
-          if (isCurrent) {
-            setFieldValue(props.name, sanitizedSiret);
-            setFieldValue("businessName", info.nom);
-            setFieldValue("immersionAddress", info.address);
-          }
-        })
-        .catch((err: AxiosError) => {
-          if (err.isAxiosError && err.code === "404") {
-            setFieldError(props.name, "SIRET inconnu ou inactif");
-          } else {
-            setFieldError(props.name, err.message);
-          }
-        });
+    const sanitizedSiret = siret.replace(/\s/g, "");
+    if (sanitizedSiret.length != 14) {
+      return;
     }
+    props.setIsFetchingSiret(true);
+    fetchCompanyInfoBySiret(sanitizedSiret)
+      .then((info: any) => {
+        if (isCurrent) {
+          setFieldValue(props.name, sanitizedSiret);
+          setFieldValue("businessName", info.nom);
+          setFieldValue("immersionAddress", info.address);
+        }
+      })
+      .catch((err: AxiosError) => {
+        if (err.isAxiosError && err.code === "404") {
+          setFieldError(props.name, "SIRET inconnu ou inactif");
+        } else {
+          setFieldError(props.name, err.message);
+        }
+      })
+      .finally(() => props.setIsFetchingSiret(false));
     return () => {
       isCurrent = false;
     };
@@ -173,6 +177,7 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
   );
   const [submitError, setSubmitError] = useState<Error | null>(null);
   const [formLink, setFormLink] = useState<string | null>(null);
+  const [isFetchingSiret, setIsFetchingSiret] = useState<boolean>(false);
 
   useEffect(() => {
     const { demandeId } = route.params;
@@ -315,7 +320,11 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
                     personne qui vous accueillera pendant votre immersion
                   </h4>
 
-                  <SiretAutocompletedField name="siret" disabled={isFrozen} />
+                  <SiretAutocompletedField
+                    name="siret"
+                    disabled={isFrozen}
+                    setIsFetchingSiret={setIsFetchingSiret}
+                  />
 
                   <TextInput
                     label="Indiquez le nom (raison sociale) de l'établissement d'accueil *"
@@ -323,7 +332,7 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
                     type="text"
                     placeholder=""
                     description=""
-                    disabled={isFrozen}
+                    disabled={isFrozen || isFetchingSiret}
                   />
 
                   <TextInput
@@ -332,7 +341,7 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
                     type="text"
                     placeholder=""
                     description="Ex : Alain Prost, pilote automobile"
-                    disabled={isFrozen}
+                    disabled={isFrozen || isFetchingSiret}
                   />
 
                   <TextInput
@@ -366,7 +375,7 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
                     type="text"
                     placeholder=""
                     description=""
-                    disabled={isFrozen}
+                    disabled={isFrozen || isFetchingSiret}
                   />
 
                   <BoolRadioGroup
