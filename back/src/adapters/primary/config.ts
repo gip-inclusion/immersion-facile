@@ -1,22 +1,22 @@
-import { AirtableDemandeImmersionRepository } from "src/adapters/secondary/AirtableDemandeImmersionRepository";
-import { HttpsSireneRepository } from "src/adapters/secondary/HttpsSireneRepository";
-import { InMemoryDemandeImmersionRepository } from "src/adapters/secondary/InMemoryDemandeImmersionRepository";
-import { InMemoryEmailGateway } from "src/adapters/secondary/InMemoryEmailGateway";
-import { InMemorySireneRepository } from "src/adapters/secondary/InMemorySireneRepository";
-import { InMemoryTodoRepository } from "src/adapters/secondary/InMemoryTodoRepository";
-import { JsonTodoRepository } from "src/adapters/secondary/JsonTodoRepository";
-import { SendinblueEmailGateway } from "src/adapters/secondary/SendinblueEmailGateway";
-import { ALWAYS_REJECT } from "src/domain/auth/AuthChecker";
-import { InMemoryAuthChecker } from "src/domain/auth/InMemoryAuthChecker";
-import { AddDemandeImmersion } from "src/domain/demandeImmersion/useCases/AddDemandeImmersion";
-import { GetDemandeImmersion } from "src/domain/demandeImmersion/useCases/GetDemandeImmersion";
-import { ListDemandeImmersion } from "src/domain/demandeImmersion/useCases/ListDemandeImmersion";
-import { UpdateDemandeImmersion } from "src/domain/demandeImmersion/useCases/UpdateDemandeImmersion";
-import { GetSiret } from "src/domain/sirene/useCases/GetSiret";
-import { Clock, CustomClock, RealClock } from "src/domain/todos/ports/Clock";
-import { AddTodo } from "src/domain/todos/useCases/AddTodo";
-import { ListTodos } from "src/domain/todos/useCases/ListTodos";
-import { logger } from "src/utils/logger";
+import { ALWAYS_REJECT } from "./../../domain/auth/AuthChecker";
+import { Clock, CustomClock, RealClock } from "../../domain/todos/ports/Clock";
+import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
+import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
+import { AddTodo } from "../../domain/todos/useCases/AddTodo";
+import { ListTodos } from "../../domain/todos/useCases/ListTodos";
+import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
+import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
+import { InMemoryTodoRepository } from "../secondary/InMemoryTodoRepository";
+import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
+import { logger } from "../../utils/logger";
+import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
+import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
+import { UpdateDemandeImmersion } from "../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
+import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
+import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
+import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 
 export const getRepositories = () => {
   logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
@@ -78,7 +78,7 @@ export const getAuthChecker = () => {
 };
 
 const getEnvVarOrDie = (envVar: string) =>
-  process.env[envVar] || fail(`Missing environment variable: ${envVar}`);
+  process.env[envVar] || fail(`Missing environment variable: ${envVar}`)
 
 const fail = (message: string) => {
   throw new Error(message);
@@ -99,18 +99,12 @@ export const getUsecases = () => {
   const repositories = getRepositories();
   const supervisorEmail = process.env.SUPERVISOR_EMAIL;
   if (!supervisorEmail) {
-    logger.warn(
-      "No SUPERVISOR_EMAIL specified. Disabling the sending of supervisor emails."
-    );
+    logger.warn("No SUPERVISOR_EMAIL specified. Disabling the sending of supervisor emails.");
   }
 
-  const emailAllowlist = (process.env.EMAIL_ALLOWLIST || "")
-    .split(",")
-    .filter((el) => !!el);
+  const emailAllowlist = (process.env.EMAIL_ALLOWLIST || "").split(",").filter(el => !!el);
   if (!emailAllowlist) {
-    logger.warn(
-      "Empty EMAIL_ALLOWLIST. Disabling the sending of non-supervisor emails."
-    );
+    logger.warn("Empty EMAIL_ALLOWLIST. Disabling the sending of non-supervisor emails.");
   }
 
   return {

@@ -1,6 +1,6 @@
-import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
-import { UseCase } from "src/domain/core/UseCase";
-import { DemandeImmersionRepository } from "src/domain/demandeImmersion/ports/DemandeImmersionRepository";
+import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
+import { UseCase } from "../../core/UseCase";
+import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
 
 type ListDemandeImmersionDependencies = {
   demandeImmersionRepository: DemandeImmersionRepository;

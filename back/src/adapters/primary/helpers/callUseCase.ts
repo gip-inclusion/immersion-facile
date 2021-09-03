@@ -1,4 +1,4 @@
-import type { UseCase } from "src/domain/core/UseCase";
+import type { UseCase } from "../../../domain/core/UseCase";
 import * as yup from "yup";
 
 export const callUseCase = async <T extends Record<string, unknown>, R = void>({

@@ -4,18 +4,19 @@ import {
   todosRoute,
   demandesImmersionRoute,
   siretRoute,
-} from "src/shared/routes";
+} from "../../shared/routes";
 import { getUsecases, getAuthChecker } from "./config";
 import bodyParser from "body-parser";
-import { callUseCase } from "src/adapters/primary/helpers/callUseCase";
-import { sendHttpResponse } from "src/adapters/primary/helpers/sendHttpResponse";
-import { todoDtoSchema } from "src/shared/TodoDto";
+import { callUseCase } from "./helpers/callUseCase";
+import { sendHttpResponse } from "./helpers/sendHttpResponse";
+import { todoDtoSchema } from "../../shared/TodoDto";
 import {
   demandeImmersionDtoSchema,
   getDemandeImmersionRequestDtoSchema,
   updateDemandeImmersionRequestDtoSchema,
-} from "src/shared/DemandeImmersionDto";
-import { logger } from "src/utils/logger";
+} from "../../shared/DemandeImmersionDto";
+import { logger } from "../../utils/logger";
+import { resolveProjectReferencePath } from "typescript";
 
 const app = express();
 const router = Router();

@@ -1,10 +1,10 @@
-import { NotFoundError } from "src/adapters/primary/helpers/sendHttpResponse";
+import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   DemandeImmersionDto,
   GetDemandeImmersionRequestDto,
-} from "src/shared/DemandeImmersionDto";
-import { UseCase } from "src/domain/core/UseCase";
-import { DemandeImmersionRepository } from "src/domain/demandeImmersion/ports/DemandeImmersionRepository";
+} from "../../../shared/DemandeImmersionDto";
+import { UseCase } from "../../core/UseCase";
+import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
 
 type GetDemandeImmersionDependencies = {
   demandeImmersionRepository: DemandeImmersionRepository;

@@ -1,7 +1,7 @@
 import {
   DemandeImmersionDto,
   demandeImmersionDtoSchema,
-} from "src/shared/DemandeImmersionDto";
+} from "../../../shared/DemandeImmersionDto";
 
 export class DemandeImmersionEntity {
   private constructor(private readonly properties: DemandeImmersionDto) {}

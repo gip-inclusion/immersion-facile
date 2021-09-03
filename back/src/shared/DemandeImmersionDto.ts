@@ -1,6 +1,6 @@
 import { ScheduleDto } from "./ScheduleSchema";
 import * as Yup from "../../node_modules/yup";
-import { Flavor } from "./typeFlavors";
+import { Flavor } from "./typeFlavours";
 
 // TODO: find the standard for gouv.fr phone verification
 const phoneRegExp = /\+?[0-9]*/;

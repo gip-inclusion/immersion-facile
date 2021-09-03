@@ -1,12 +1,12 @@
-import Airtable, { FieldSet, Table } from "airtable";
+import Airtable, { Table, FieldSet } from "airtable";
 import { QueryParams } from "airtable/lib/query_params";
-import { DemandeImmersionEntity } from "src/domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { DemandeImmersionRepository } from "src/domain/demandeImmersion/ports/DemandeImmersionRepository";
+import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
+import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
+import { logger } from "../../utils/logger";
 import {
   DemandeImmersionId,
   demandeImmersionStatusFromString,
-} from "src/shared/DemandeImmersionDto";
-import { logger } from "src/utils/logger";
+} from "../../shared/DemandeImmersionDto";
 
 export class AirtableDemandeImmersionRepository
   implements DemandeImmersionRepository

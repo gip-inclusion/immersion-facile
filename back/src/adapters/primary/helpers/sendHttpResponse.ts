@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AuthChecker } from "src/domain/auth/AuthChecker";
+import { AuthChecker } from "../../../domain/auth/AuthChecker";
 
 export class UnauthorizedError extends Error {
   constructor() {

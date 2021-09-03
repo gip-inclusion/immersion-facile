@@ -24,10 +24,11 @@ export class HttpsSireneRepository implements SireneRepository {
       logger.info(request);
       return request;
     });
-    axiosInstance.interceptors.response.use((response) => {
-      logger.debug(response);
-      return response;
-    });
+    axiosInstance.interceptors.response.use(
+      (response) => {
+        logger.debug(response);
+        return response;
+      });
 
     return new HttpsSireneRepository(axiosInstance);
   }
