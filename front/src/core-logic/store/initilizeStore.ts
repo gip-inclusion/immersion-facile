@@ -1,8 +1,8 @@
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
+import { TodoGateway } from "src/core-logic/ports/todoGateway";
 import { rootReducer } from "src/core-logic/store/rootReducer";
 import type { RootState } from "src/core-logic/store/rootReducer";
-import type { TodoGateway } from "src/core-logic/ports/todoGateway";
 
 export type Dependencies = {
   todoGateway: TodoGateway;

@@ -1,13 +1,8 @@
-import { ALWAYS_REJECT } from "./../../domain/auth/AuthChecker";
-import { Clock, CustomClock, RealClock } from "../../domain/todos/ports/Clock";
+import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
 import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
-import { AddTodo } from "../../domain/todos/useCases/AddTodo";
-import { ListTodos } from "../../domain/todos/useCases/ListTodos";
 import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
 import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
-import { InMemoryTodoRepository } from "../secondary/InMemoryTodoRepository";
-import { JsonTodoRepository } from "../secondary/JsonTodoRepository";
 import { logger } from "../../utils/logger";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
@@ -26,11 +21,6 @@ export const getRepositories = () => {
   logger.info("EMAIL_GATEWAY: " + process.env.EMAIL_GATEWAY ?? "IN_MEMORY");
 
   return {
-    todo:
-      process.env.REPOSITORIES === "JSON"
-        ? new JsonTodoRepository(`${__dirname}/../secondary/app-data.json`)
-        : new InMemoryTodoRepository(),
-
     demandeImmersion:
       process.env.REPOSITORIES === "AIRTABLE"
         ? AirtableDemandeImmersionRepository.create(
@@ -78,43 +68,31 @@ export const getAuthChecker = () => {
 };
 
 const getEnvVarOrDie = (envVar: string) =>
-  process.env[envVar] || fail(`Missing environment variable: ${envVar}`)
+  process.env[envVar] || fail(`Missing environment variable: ${envVar}`);
 
 const fail = (message: string) => {
   throw new Error(message);
-};
-
-const getClock = (): Clock => {
-  logger.info(`NODE_ENV : ${process.env.NODE_ENV}`);
-
-  if (process.env.NODE_ENV === "test") {
-    const clock = new CustomClock();
-    clock.setNextDate(new Date("2020-11-02T10:00"));
-    return clock;
-  }
-  return new RealClock();
 };
 
 export const getUsecases = () => {
   const repositories = getRepositories();
   const supervisorEmail = process.env.SUPERVISOR_EMAIL;
   if (!supervisorEmail) {
-    logger.warn("No SUPERVISOR_EMAIL specified. Disabling the sending of supervisor emails.");
+    logger.warn(
+      "No SUPERVISOR_EMAIL specified. Disabling the sending of supervisor emails."
+    );
   }
 
-  const emailAllowlist = (process.env.EMAIL_ALLOWLIST || "").split(",").filter(el => !!el);
+  const emailAllowlist = (process.env.EMAIL_ALLOWLIST || "")
+    .split(",")
+    .filter((el) => !!el);
   if (!emailAllowlist) {
-    logger.warn("Empty EMAIL_ALLOWLIST. Disabling the sending of non-supervisor emails.");
+    logger.warn(
+      "Empty EMAIL_ALLOWLIST. Disabling the sending of non-supervisor emails."
+    );
   }
 
   return {
-    // todo
-    addTodo: new AddTodo({
-      todoRepository: repositories.todo,
-      clock: getClock(),
-    }),
-    listTodos: new ListTodos(repositories.todo),
-
     // formulaire
     addDemandeImmersion: new AddDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,

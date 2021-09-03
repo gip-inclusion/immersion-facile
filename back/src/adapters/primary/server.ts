@@ -16,7 +16,6 @@ import {
   updateDemandeImmersionRequestDtoSchema,
 } from "../../shared/DemandeImmersionDto";
 import { logger } from "../../utils/logger";
-import { resolveProjectReferencePath } from "typescript";
 
 const app = express();
 const router = Router();
@@ -33,21 +32,6 @@ router.route("/").get((req, res) => {
 
 const authChecker = getAuthChecker();
 const useCases = getUsecases();
-
-router
-  .route(`/${todosRoute}`)
-  .post(async (req, res) =>
-    sendHttpResponse(req, res, () =>
-      callUseCase({
-        useCase: useCases.addTodo,
-        validationSchema: todoDtoSchema,
-        useCaseParams: req.body,
-      })
-    )
-  )
-  .get(async (req, res) =>
-    sendHttpResponse(req, res, () => useCases.listTodos.execute())
-  );
 
 router
   .route(`/${demandesImmersionRoute}`)
