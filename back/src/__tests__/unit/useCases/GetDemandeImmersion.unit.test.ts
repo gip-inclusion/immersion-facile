@@ -1,9 +1,9 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
 import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
-import { validDemandeImmersion } from "../entities/DemandeImmersionIdEntityTestData";
-import { GetDemandeImmersion } from "./GetDemandeImmersion";
+import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
+import { validDemandeImmersion } from "../../../_testBuilders/DemandeImmersionIdEntityTestData";
+import { GetDemandeImmersion } from "../../../domain/demandeImmersion/useCases/GetDemandeImmersion";
 
 describe("Get DemandeImmersion", () => {
   let repository: InMemoryDemandeImmersionRepository;

@@ -1,11 +1,11 @@
-import { demandeImmersionDtoSchema } from "../../../shared/DemandeImmersionDto";
-import { DemandeImmersionEntity } from "./DemandeImmersionEntity";
+import { demandeImmersionDtoSchema } from "../../shared/DemandeImmersionDto";
+import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import {
   validDemandeImmersion,
   VALID_EMAILS,
   DATE_START,
   DATE_END,
-} from "./DemandeImmersionIdEntityTestData";
+} from "../../_testBuilders/DemandeImmersionIdEntityTestData";
 
 describe("DemandeImmersionIdEntity", () => {
   describe("DemandeImmersionIdEntity.create()", () => {

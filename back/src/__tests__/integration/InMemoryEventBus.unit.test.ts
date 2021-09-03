@@ -3,7 +3,7 @@ import type {
   DomainEvent,
   DomainTopic,
 } from "../../domain/core/eventBus/events";
-import { InMemoryEventBus } from "./InMemoryEventBus";
+import { InMemoryEventBus } from "../../adapters/secondary/InMemoryEventBus";
 
 const domainEvt: DomainEvent = {
   id: "anId",

@@ -1,11 +1,10 @@
-import { DemandeImmersionId } from "../../../shared/DemandeImmersionDto";
-import { UpdateDemandeImmersion } from "./UpdateDemandeImmersion";
+import { UpdateDemandeImmersion } from "../../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
 import {
   DemandesImmersion,
   InMemoryDemandeImmersionRepository,
 } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { validDemandeImmersion } from "../entities/DemandeImmersionIdEntityTestData";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
+import { validDemandeImmersion } from "../../../_testBuilders/DemandeImmersionIdEntityTestData";
+import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
 
@@ -46,7 +45,7 @@ describe("Update demandeImmersion", () => {
 
   describe("When no demandeImmersion with id exists", () => {
     it("throws NotFoundError", async () => {
-      expectPromiseToFailWithError(
+      await expectPromiseToFailWithError(
         updateDemandeImmersion.execute({
           id: "unknown_demande_immersion_id",
           demandeImmersion: validDemandeImmersion,

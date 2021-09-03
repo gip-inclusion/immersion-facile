@@ -2,8 +2,8 @@ import supertest from "supertest";
 import {
   TEST_ESTABLISHMENT1,
   TEST_ESTABLISHMENT1_SIRET,
-} from "../../secondary/InMemorySireneRepository";
-import { app } from "../server";
+} from "../../adapters/secondary/InMemorySireneRepository";
+import { app } from "../../adapters/primary/server";
 
 describe("/siret route", () => {
   it("forwards valid requests", (done) => {
@@ -26,8 +26,6 @@ describe("/siret route", () => {
   });
 
   it("returns 404 Not Found for unknown siret", (done) => {
-    supertest(app)
-    .get("/siret/unknown-siret")
-    .expect(404, done);
+    supertest(app).get("/siret/unknown-siret").expect(404, done);
   });
 });

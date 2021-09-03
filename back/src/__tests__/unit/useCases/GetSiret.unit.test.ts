@@ -6,7 +6,7 @@ import {
   TEST_ESTABLISHMENT1_SIRET,
 } from "../../../adapters/secondary/InMemorySireneRepository";
 import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
-import { GetSiret } from "./GetSiret";
+import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 
 describe("Get SIRET", () => {
   let repository: InMemorySireneRepository;

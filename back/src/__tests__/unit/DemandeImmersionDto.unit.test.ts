@@ -2,14 +2,14 @@ import {
   demandeImmersionDtoSchema,
   DemandeImmersionStatus,
   demandeImmersionStatusFromString,
-} from "../../../shared/DemandeImmersionDto";
-import { addDays } from "../../../utils/test.helpers";
+} from "../../shared/DemandeImmersionDto";
+import { addDays } from "../../utils/test.helpers";
 import {
   validDemandeImmersion,
   DATE_START,
   DATE_END,
   DATE_SUBMISSION,
-} from "./DemandeImmersionIdEntityTestData";
+} from "../../_testBuilders/DemandeImmersionIdEntityTestData";
 
 describe("demandeImmersionDtoSchema", () => {
   test("accepts valid demandeImmersion", () => {

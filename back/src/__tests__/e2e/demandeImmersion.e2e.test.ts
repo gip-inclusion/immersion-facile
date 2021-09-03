@@ -1,7 +1,7 @@
 import supertest from "supertest";
-import { demandesImmersionRoute } from "../../../shared/routes";
-import { validDemandeImmersion } from "../../../domain/demandeImmersion/entities/DemandeImmersionIdEntityTestData";
-import { app } from "../server";
+import { demandesImmersionRoute } from "../../shared/routes";
+import { validDemandeImmersion } from "../../_testBuilders/DemandeImmersionIdEntityTestData";
+import { app } from "../../adapters/primary/server";
 
 // TODO: Find a way to clear the repository between tests so that we can reuse the same ID.
 

@@ -2,9 +2,9 @@ import { ConflictError } from "../../../adapters/primary/helpers/sendHttpRespons
 import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
-import { validDemandeImmersion } from "../entities/DemandeImmersionIdEntityTestData";
-import { AddDemandeImmersion } from "./AddDemandeImmersion";
+import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
+import { validDemandeImmersion } from "../../../_testBuilders/DemandeImmersionIdEntityTestData";
+import { AddDemandeImmersion } from "../../../domain/demandeImmersion/useCases/AddDemandeImmersion";
 
 describe("Add demandeImmersion", () => {
   let repository: InMemoryDemandeImmersionRepository;
