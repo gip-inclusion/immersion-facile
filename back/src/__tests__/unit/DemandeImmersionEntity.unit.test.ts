@@ -1,16 +1,17 @@
-import { demandeImmersionDtoSchema } from "../../shared/DemandeImmersionDto";
+import { DemandeImmersionEntityBuilder } from "../../_testBuilders/DemandeImmersionEntityBuilder";
 import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import {
-  validDemandeImmersion,
   VALID_EMAILS,
   DATE_START,
   DATE_END,
-} from "../../_testBuilders/DemandeImmersionIdEntityTestData";
+  DemandeImmersionDtoBuilder,
+} from "../../_testBuilders/DemandeImmersionDtoBuilder";
+import { DemandeImmersionDto } from "../../shared/DemandeImmersionDto";
 
 describe("DemandeImmersionIdEntity", () => {
   describe("DemandeImmersionIdEntity.create()", () => {
     it("creates a DemandeImmersionIdEntity for valid parameters", () => {
-      const entity = DemandeImmersionEntity.create(validDemandeImmersion);
+      const entity = new DemandeImmersionEntityBuilder().build();
       const dto = entity.toDto();
       expect(dto.email).toEqual(VALID_EMAILS[0]);
       expect(dto.dateStart).toEqual(DATE_START);
@@ -18,20 +19,25 @@ describe("DemandeImmersionIdEntity", () => {
     });
 
     it("rejects invalid parameters", () => {
-      const invalidDemandeImmersion = {
-        ...validDemandeImmersion,
-        email: "not_a_valid_email",
-      };
-      expect(() =>
-        DemandeImmersionEntity.create(invalidDemandeImmersion)
-      ).toThrow();
+      const invalidDemandeImmersion = new DemandeImmersionDtoBuilder()
+        .withEmail("not_a_valid_email")
+        .build();
+
+      expectDemandeImmersionEntityToBeInvalidWithParams(
+        invalidDemandeImmersion
+      );
     });
   });
 
   describe("DemandeImmersionEntity.toDto()", () => {
     it("converts entities to DTOs", () => {
-      const entity = DemandeImmersionEntity.create(validDemandeImmersion);
-      expect(entity.toDto()).toEqual(validDemandeImmersion);
+      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+      const entity = DemandeImmersionEntity.create(demandeImmersion);
+      expect(entity.toDto()).toEqual(demandeImmersion);
     });
   });
 });
+
+const expectDemandeImmersionEntityToBeInvalidWithParams = (
+  demandeImmersionDto: DemandeImmersionDto
+) => expect(() => DemandeImmersionEntity.create(demandeImmersionDto)).toThrow();

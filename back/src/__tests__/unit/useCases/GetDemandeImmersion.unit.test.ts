@@ -1,8 +1,7 @@
+import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
-import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { validDemandeImmersion } from "../../../_testBuilders/DemandeImmersionIdEntityTestData";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { GetDemandeImmersion } from "../../../domain/demandeImmersion/useCases/GetDemandeImmersion";
 
 describe("Get DemandeImmersion", () => {
@@ -27,14 +26,13 @@ describe("Get DemandeImmersion", () => {
 
   describe("When a DemandeImmersion is stored", () => {
     it("returns the DemandeImmersion", async () => {
-      repository.setDemandesImmersion({
-        test_id: DemandeImmersionEntity.create(validDemandeImmersion),
-      });
+      const entity = new DemandeImmersionEntityBuilder().build();
+      repository.setDemandesImmersion({ [entity.id]: entity });
 
       const demandeImmersion = await getDemandeImmersion.execute({
-        id: "test_id",
+        id: entity.id,
       });
-      expect(demandeImmersion).toEqual(validDemandeImmersion);
+      expect(demandeImmersion).toEqual(entity.toDto());
     });
   });
 });

@@ -1,9 +1,9 @@
+import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { validDemandeImmersion } from "../../../_testBuilders/DemandeImmersionIdEntityTestData";
 import { AddDemandeImmersion } from "../../../domain/demandeImmersion/useCases/AddDemandeImmersion";
 
 describe("Add demandeImmersion", () => {
@@ -11,7 +11,8 @@ describe("Add demandeImmersion", () => {
   let emailGateway: InMemoryEmailGateway;
   let addDemandeImmersion: AddDemandeImmersion;
   let supervisorEmail: string;
-  let emailAllowlist: string[];
+  let emailAllowList: string[];
+  const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
 
   beforeEach(() => {
     repository = new InMemoryDemandeImmersionRepository();
@@ -20,7 +21,7 @@ describe("Add demandeImmersion", () => {
       demandeImmersionRepository: repository,
       emailGateway,
       supervisorEmail,
-      emailAllowlist,
+      emailAllowList,
     });
   });
 
@@ -36,7 +37,7 @@ describe("Add demandeImmersion", () => {
     });
   });
 
-  describe("Noticiation emails", () => {
+  describe("Notification emails", () => {
     test("Sends no emails when supervisor and allowlist are not set", async () => {
       expect(
         await addDemandeImmersion.execute(validDemandeImmersion)
@@ -49,7 +50,7 @@ describe("Add demandeImmersion", () => {
         demandeImmersionRepository: repository,
         emailGateway,
         supervisorEmail: "supervisor@email.fr",
-        emailAllowlist,
+        emailAllowList,
       });
 
       expect(
@@ -76,13 +77,13 @@ describe("Add demandeImmersion", () => {
         demandeImmersionRepository: repository,
         emailGateway,
         supervisorEmail,
-        emailAllowlist: ["bénéficiaire@email.fr"],
+        emailAllowList: ["beneficiaire@email.fr"],
       });
 
       expect(
         await addDemandeImmersion.execute({
           ...validDemandeImmersion,
-          email: "bénéficiaire@email.fr",
+          email: "beneficiaire@email.fr",
         })
       ).not.toBeUndefined();
 
@@ -92,7 +93,7 @@ describe("Add demandeImmersion", () => {
       expect(sentEmails[0].type).toEqual(
         "NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION"
       );
-      expect(sentEmails[0].recipients).toContain("bénéficiaire@email.fr");
+      expect(sentEmails[0].recipients).toContain("beneficiaire@email.fr");
       expect(sentEmails[0].params).toEqual({
         demandeId: validDemandeImmersion.id,
         firstName: validDemandeImmersion.firstName,
@@ -107,7 +108,7 @@ describe("Add demandeImmersion", () => {
         DemandeImmersionEntity.create(validDemandeImmersion)
       );
 
-      expectPromiseToFailWithError(
+      await expectPromiseToFailWithError(
         addDemandeImmersion.execute(validDemandeImmersion),
         new ConflictError(validDemandeImmersion.id)
       );

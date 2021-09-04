@@ -1,12 +1,13 @@
+import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
+import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
 import { UpdateDemandeImmersion } from "../../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
 import {
   DemandesImmersion,
   InMemoryDemandeImmersionRepository,
 } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { validDemandeImmersion } from "../../../_testBuilders/DemandeImmersionIdEntityTestData";
 import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 describe("Update demandeImmersion", () => {
   let repository: InMemoryDemandeImmersionRepository;
@@ -22,14 +23,15 @@ describe("Update demandeImmersion", () => {
   describe("When the demandeImmersion is valid", () => {
     test("updates the demandeImmersion in the repository", async () => {
       const demandesImmersion: DemandesImmersion = {};
-      demandesImmersion[validDemandeImmersion.id] =
-        DemandeImmersionEntity.create(validDemandeImmersion);
+      const demandeImmersionEntity =
+        new DemandeImmersionEntityBuilder().build();
+      demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
       repository.setDemandesImmersion(demandesImmersion);
 
-      const updatedDemandeImmersion = {
-        ...validDemandeImmersion,
-        email: "new@email.fr",
-      };
+      const updatedDemandeImmersion = new DemandeImmersionDtoBuilder()
+        .withEmail("new@email.fr")
+        .build();
+
       const { id } = await updateDemandeImmersion.execute({
         id: updatedDemandeImmersion.id,
         demandeImmersion: updatedDemandeImmersion,
@@ -45,6 +47,8 @@ describe("Update demandeImmersion", () => {
 
   describe("When no demandeImmersion with id exists", () => {
     it("throws NotFoundError", async () => {
+      const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
+
       await expectPromiseToFailWithError(
         updateDemandeImmersion.execute({
           id: "unknown_demande_immersion_id",

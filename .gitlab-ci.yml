@@ -105,7 +105,7 @@ deploy_back:
           --env EMAIL_GATEWAY=SENDINBLUE
           --env SENDINBLUE_API_KEY=${SENDINBLUE_API_KEY}
           --env SUPERVISOR_EMAIL=${SUPERVISOR_EMAIL}
-          --env EMAIL_ALLOWLIST=${EMAIL_ALLOWLIST}
+          --env EMAIL_ALLOW_LIST=${EMAIL_ALLOWLIST}
           --pull always
           --name back
           ${CI_REGISTRY_IMAGE}/back:$CI_COMMIT_SHORT_SHA"

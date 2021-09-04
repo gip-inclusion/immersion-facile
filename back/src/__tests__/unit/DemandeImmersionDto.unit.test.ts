@@ -1,104 +1,91 @@
 import {
+  DemandeImmersionDto,
   demandeImmersionDtoSchema,
   DemandeImmersionStatus,
   demandeImmersionStatusFromString,
 } from "../../shared/DemandeImmersionDto";
-import { addDays } from "../../utils/test.helpers";
+import { addDays } from "../../_testBuilders/test.helpers";
 import {
-  validDemandeImmersion,
   DATE_START,
-  DATE_END,
   DATE_SUBMISSION,
-} from "../../_testBuilders/DemandeImmersionIdEntityTestData";
+  DemandeImmersionDtoBuilder,
+} from "../../_testBuilders/DemandeImmersionDtoBuilder";
 
 describe("demandeImmersionDtoSchema", () => {
   test("accepts valid demandeImmersion", () => {
-    expect(() =>
-      demandeImmersionDtoSchema.validateSync(validDemandeImmersion)
-    ).not.toThrow();
+    const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+    expectDemandeImmersionDtoToBeValid(demandeImmersion);
   });
 
   test("rejects misformatted submission dates", () => {
-    const invalidDemandeImmersion = {
-      ...validDemandeImmersion,
-      dateSubmission: "not-a-date",
-    };
-    expect(() =>
-      demandeImmersionDtoSchema.validateSync(invalidDemandeImmersion)
-    ).toThrow();
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withDateSubmission("not-a-date")
+      .build();
+
+    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
   });
 
   test("rejects misformatted start dates", () => {
-    const invalidDemandeImmersion = {
-      ...validDemandeImmersion,
-      dateStart: "not-a-date",
-    };
-    expect(() =>
-      demandeImmersionDtoSchema.validateSync(invalidDemandeImmersion)
-    ).toThrow();
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withDateStart("not-a-date")
+      .build();
+
+    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
   });
 
   test("rejects misformatted end dates", () => {
-    const invalidDemandeImmersion = {
-      ...validDemandeImmersion,
-      dateEnd: "not-a-date",
-    };
-    expect(() =>
-      demandeImmersionDtoSchema.validateSync(invalidDemandeImmersion)
-    ).toThrow();
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withDateEnd("not-a-date")
+      .build();
+
+    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
   });
 
   test("rejects start dates that are after the end date", () => {
-    const invalidDemandeImmersion = { ...validDemandeImmersion };
-    invalidDemandeImmersion.dateEnd = DATE_START;
-    invalidDemandeImmersion.dateStart = DATE_END;
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withDateStart("2021-01-10")
+      .withDateEnd("2021-01-03")
+      .build();
 
-    expect(() =>
-      demandeImmersionDtoSchema.validateSync(invalidDemandeImmersion)
-    ).toThrow();
+    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
   });
 
   test("rejects end dates that are more than 28 days after the start date", () => {
-    const invalidDemandeImmersion = { ...validDemandeImmersion };
-    invalidDemandeImmersion.dateStart = DATE_START;
-    invalidDemandeImmersion.dateEnd = addDays(DATE_START, 29);
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withDateStart(DATE_START)
+      .withDateEnd(addDays(DATE_START, 29))
+      .build();
 
-    expect(() =>
-      demandeImmersionDtoSchema.validateSync(invalidDemandeImmersion)
-    ).toThrow();
+    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
   });
 
   test("accepts end dates that are <= 28 days after the start date", () => {
-    const validRequest = { ...validDemandeImmersion };
-    validRequest.dateStart = DATE_START;
-    validRequest.dateEnd = addDays(DATE_START, 28);
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withDateStart(DATE_START)
+      .withDateEnd(addDays(DATE_START, 28))
+      .build();
 
-    expect(() =>
-      demandeImmersionDtoSchema.validateSync(validRequest)
-    ).not.toThrow();
-    expect(demandeImmersionDtoSchema.validateSync(validRequest)).toBeTruthy();
+    console.log(demandeImmersion);
+
+    expectDemandeImmersionDtoToBeValid(demandeImmersion);
   });
 
   test("accepts start dates that are >= 2 days after the submission date", () => {
-    const invalidDemandeImmersion = {
-      ...validDemandeImmersion,
-      dateSubmission: DATE_SUBMISSION,
-      dateStart: addDays(DATE_SUBMISSION, 2),
-    };
-    expect(() =>
-      demandeImmersionDtoSchema.validateSync(invalidDemandeImmersion)
-    ).not.toThrow();
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withDateSubmission(DATE_SUBMISSION)
+      .withDateStart(addDays(DATE_SUBMISSION, 2))
+      .build();
+
+    expectDemandeImmersionDtoToBeValid(demandeImmersion);
   });
 
   test("rejects start dates that are < 2 days after the submission date", () => {
-    const invalidDemandeImmersion = {
-      ...validDemandeImmersion,
-      dateSubmission: DATE_SUBMISSION,
-      dateStart: addDays(DATE_SUBMISSION, 1),
-    };
-    expect(() =>
-      demandeImmersionDtoSchema.validateSync(invalidDemandeImmersion)
-    ).toThrow();
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withDateSubmission(DATE_SUBMISSION)
+      .withDateStart(addDays(DATE_SUBMISSION, 1))
+      .build();
+
+    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
   });
 });
 
@@ -130,3 +117,22 @@ const expectDemandeImmersionStatusToBe = (
   status: DemandeImmersionStatus,
   expectedStatus: DemandeImmersionStatus
 ) => expect(status).toBe(expectedStatus);
+
+const expectDemandeImmersionDtoToBeValid = (
+  validDemandeImmersionDto: DemandeImmersionDto
+) => {
+  expect(() =>
+    demandeImmersionDtoSchema.validateSync(validDemandeImmersionDto)
+  ).not.toThrow();
+
+  expect(
+    demandeImmersionDtoSchema.validateSync(validDemandeImmersionDto)
+  ).toBeTruthy();
+};
+
+const expectDemandeImmersionDtoToBeInvalid = (
+  demandeImmersionDto: DemandeImmersionDto
+) =>
+  expect(() =>
+    demandeImmersionDtoSchema.validateSync(demandeImmersionDto)
+  ).toThrow();

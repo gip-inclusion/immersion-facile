@@ -5,7 +5,7 @@ import {
   TEST_ESTABLISHMENT1,
   TEST_ESTABLISHMENT1_SIRET,
 } from "../../../adapters/secondary/InMemorySireneRepository";
-import { expectPromiseToFailWithError } from "../../../utils/test.helpers";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 
 describe("Get SIRET", () => {

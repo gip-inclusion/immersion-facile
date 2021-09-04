@@ -1,6 +1,6 @@
 import supertest from "supertest";
 import { demandesImmersionRoute } from "../../shared/routes";
-import { validDemandeImmersion } from "../../_testBuilders/DemandeImmersionIdEntityTestData";
+import { DemandeImmersionDtoBuilder } from "../../_testBuilders/DemandeImmersionDtoBuilder";
 import { app } from "../../adapters/primary/server";
 
 // TODO: Find a way to clear the repository between tests so that we can reuse the same ID.
@@ -15,10 +15,9 @@ describe("/demandes-immersion route", () => {
 
   it("records a valid demandeImmersion and returns it", (done) => {
     const demandeImmersionId = "test_id_1";
-    const demandeImmersion = {
-      ...validDemandeImmersion,
-      id: demandeImmersionId,
-    };
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withId(demandeImmersionId)
+      .build();
 
     // GET /demandes-immersion returns an empty list.
     supertest(app)
@@ -57,10 +56,9 @@ describe("/demandes-immersion route", () => {
 
   it("updates an existing demandeImmersion and returns it", (done) => {
     const demandeImmersionId = "test_id_2";
-    const demandeImmersion = {
-      ...validDemandeImmersion,
-      id: demandeImmersionId,
-    };
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withId(demandeImmersionId)
+      .build();
 
     // POSTing a valid demande d'immersion succeeds.
     supertest(app)
@@ -109,22 +107,22 @@ describe("/demandes-immersion route", () => {
   });
 
   it("posting to unknown demandeImmersion IDs reports 404 Not Found", (done) => {
-    const demandeImmersionWithUnknownId = {
-      ...validDemandeImmersion,
-      id: "unknown-demande-immersion-id",
-    };
+    const unknownId = "unknown-demande-immersion-id";
+    const demandeImmersionWithUnknownId = new DemandeImmersionDtoBuilder()
+      .withId(unknownId)
+      .build();
+
     supertest(app)
-      .post(`/${demandesImmersionRoute}/unknown-demande-immersion-id`)
+      .post(`/${demandesImmersionRoute}/${unknownId}`)
       .send(demandeImmersionWithUnknownId)
       .expect(404, done);
   });
 
   it("creating a demande d'immersion with an existing ID reports 409 Conflict", (done) => {
     const demandeImmersionId = "test_id_3";
-    const demandeImmersion = {
-      ...validDemandeImmersion,
-      id: demandeImmersionId,
-    };
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withId(demandeImmersionId)
+      .build();
 
     // POSTing a valid demande immersion succeeds.
     supertest(app)

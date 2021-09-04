@@ -13,7 +13,7 @@ type AddDemandeImmersionDependencies = {
   demandeImmersionRepository: DemandeImmersionRepository;
   emailGateway: EmailGateway;
   supervisorEmail: string | undefined;
-  emailAllowlist: string[];
+  emailAllowList: string[];
 };
 
 export class AddDemandeImmersion
@@ -23,18 +23,18 @@ export class AddDemandeImmersion
   private readonly demandeImmersionRepository: DemandeImmersionRepository;
   private readonly emailGateway: EmailGateway;
   private readonly supervisorEmail: string | undefined;
-  private readonly emailAllowlist: Set<string>;
+  private readonly emailAllowList: Set<string>;
 
   constructor({
     demandeImmersionRepository,
     emailGateway,
     supervisorEmail,
-    emailAllowlist,
+    emailAllowList,
   }: AddDemandeImmersionDependencies) {
     this.demandeImmersionRepository = demandeImmersionRepository;
     this.emailGateway = emailGateway;
     this.supervisorEmail = supervisorEmail;
-    this.emailAllowlist = new Set(emailAllowlist);
+    this.emailAllowList = new Set(emailAllowList);
   }
 
   public async execute(
@@ -61,7 +61,7 @@ export class AddDemandeImmersion
       );
     }
 
-    if (this.emailAllowlist.has(params.email)) {
+    if (this.emailAllowList.has(params.email)) {
       this.emailGateway.sendNewDemandeBeneficiaireConfirmation(params.email, {
         demandeId: params.id,
         firstName: params.firstName,

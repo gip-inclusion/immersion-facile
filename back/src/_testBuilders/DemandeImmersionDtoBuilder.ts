@@ -1,5 +1,9 @@
-import { DemandeImmersionDto } from "../shared/DemandeImmersionDto";
+import {
+  DemandeImmersionDto,
+  DemandeImmersionId,
+} from "../shared/DemandeImmersionDto";
 import { reasonableSchedule } from "../shared/ScheduleSchema";
+import { Builder } from "./Builder";
 
 export const DEMANDE_IMMERSION_ID = "test_demande_immersion_id";
 export const VALID_EMAILS = ["valid@email.fr", "name@example.com"];
@@ -13,7 +17,7 @@ export const VALID_PHONES = [
   "+41800001853",
 ];
 
-export const validDemandeImmersion: DemandeImmersionDto = {
+const validDemandeImmersion: DemandeImmersionDto = {
   id: DEMANDE_IMMERSION_ID,
   status: "DRAFT",
   email: VALID_EMAILS[0],
@@ -40,3 +44,35 @@ export const validDemandeImmersion: DemandeImmersionDto = {
   beneficiaryAccepted: true,
   enterpriseAccepted: true,
 };
+
+export class DemandeImmersionDtoBuilder
+  implements Builder<DemandeImmersionDto>
+{
+  constructor(private dto: DemandeImmersionDto = validDemandeImmersion) {}
+
+  public withEmail(email: string): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, email });
+  }
+
+  public withDateSubmission(
+    dateSubmission: string
+  ): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, dateSubmission });
+  }
+
+  public withDateStart(dateStart: string): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, dateStart });
+  }
+
+  public withDateEnd(dateEnd: string): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, dateEnd });
+  }
+
+  public withId(id: DemandeImmersionId): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, id });
+  }
+
+  public build() {
+    return this.dto;
+  }
+}

@@ -1,7 +1,6 @@
+import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
 import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
 import { ListDemandeImmersion } from "../../../domain/demandeImmersion/useCases/ListDemandeImmersion";
-import { validDemandeImmersion } from "../../../_testBuilders/DemandeImmersionIdEntityTestData";
-import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 
 describe("List DemandeImmersion", () => {
   let repository: InMemoryDemandeImmersionRepository;
@@ -23,13 +22,11 @@ describe("List DemandeImmersion", () => {
 
   describe("When a demandeImmersion is stored", () => {
     test("returns the demandeImmersion", async () => {
-      const demandeImmersionEntity = DemandeImmersionEntity.create(
-        validDemandeImmersion
-      );
-      repository.setDemandesImmersion({ form_id: demandeImmersionEntity });
+      const entity = new DemandeImmersionEntityBuilder().build();
+      repository.setDemandesImmersion({ form_id: entity });
 
       const demandesImmersion = await listDemandeImmersion.execute();
-      expect(demandesImmersion).toEqual([demandeImmersionEntity.toDto()]);
+      expect(demandesImmersion).toEqual([entity.toDto()]);
     });
   });
 });

@@ -83,12 +83,12 @@ export const getUsecases = () => {
     );
   }
 
-  const emailAllowlist = (process.env.EMAIL_ALLOWLIST || "")
+  const emailAllowList = (process.env.EMAIL_ALLOW_LIST || "")
     .split(",")
     .filter((el) => !!el);
-  if (!emailAllowlist) {
+  if (!emailAllowList) {
     logger.warn(
-      "Empty EMAIL_ALLOWLIST. Disabling the sending of non-supervisor emails."
+      "Empty EMAIL_ALLOW_LIST. Disabling the sending of non-supervisor emails."
     );
   }
 
@@ -98,7 +98,7 @@ export const getUsecases = () => {
       demandeImmersionRepository: repositories.demandeImmersion,
       emailGateway: repositories.email,
       supervisorEmail: supervisorEmail,
-      emailAllowlist: emailAllowlist,
+      emailAllowList,
     }),
     getDemandeImmersion: new GetDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,

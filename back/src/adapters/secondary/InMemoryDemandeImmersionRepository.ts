@@ -22,11 +22,7 @@ export class InMemoryDemandeImmersionRepository
   }
 
   public async getAll() {
-    const demandesImmersion = [];
-    for (let id in this._demandesImmersion) {
-      demandesImmersion.push(this._demandesImmersion[id]);
-    }
-    return demandesImmersion;
+    return Object.values(this._demandesImmersion);
   }
 
   public async getById(id: DemandeImmersionId) {
