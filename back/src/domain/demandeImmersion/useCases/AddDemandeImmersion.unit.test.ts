@@ -44,7 +44,7 @@ describe("Add demandeImmersion", () => {
       expect(emailGateway.getSentEmails()).toHaveLength(0);
     });
 
-    test("Sends supervisor email when supervisor set", async () => {
+    test("Sends admin notification email when supervisor set", async () => {
       addDemandeImmersion = new AddDemandeImmersion({
         demandeImmersionRepository: repository,
         emailGateway,
@@ -59,19 +59,19 @@ describe("Add demandeImmersion", () => {
       const sentEmails = emailGateway.getSentEmails();
       expect(sentEmails).toHaveLength(1);
 
-      expect(sentEmails[0].recipient).toEqual("supervisor@email.fr");
-      expect(sentEmails[0].subject).toEqual(
-        "Nouvelle demande d'immersion: " +
-          `${validDemandeImmersion.lastName}, ${validDemandeImmersion.firstName}` +
-          ` - ${validDemandeImmersion.businessName}`
-      );
-      expect(sentEmails[0].textContent).toEqual(
-        `Détails sur: https://immersion.beta.pole-emploi.fr/demande-immersion` +
-          `?demandeId=${validDemandeImmersion.id}`
-      );
+      expect(sentEmails[0].type).toEqual("NEW_DEMANDE_ADMIN_NOTIFICATION");
+      expect(sentEmails[0].recipients).toContain("supervisor@email.fr");
+      expect(sentEmails[0].params).toEqual({
+        demandeId: validDemandeImmersion.id,
+        firstName: validDemandeImmersion.firstName,
+        lastName: validDemandeImmersion.lastName,
+        dateStart: validDemandeImmersion.dateStart,
+        dateEnd: validDemandeImmersion.dateEnd,
+        businessName: validDemandeImmersion.businessName,
+      });
     });
 
-    test("Sends bénéficiaire email when on allowlist", async () => {
+    test("Sends bénéficiaire confirmation email when on allowlist", async () => {
       addDemandeImmersion = new AddDemandeImmersion({
         demandeImmersionRepository: repository,
         emailGateway,
@@ -89,13 +89,15 @@ describe("Add demandeImmersion", () => {
       const sentEmails = emailGateway.getSentEmails();
       expect(sentEmails).toHaveLength(1);
 
-      expect(sentEmails[0].recipient).toEqual("bénéficiaire@email.fr");
-      expect(sentEmails[0].subject).toEqual("Votre demande d'immersion a été enregistrée");
-      expect(sentEmails[0].textContent).toEqual(
-        "Merci d'avoir enregistré votre demande. Vous pouvez la modifier avec le lien suivant: " +
-          `https://immersion.beta.pole-emploi.fr/demande-immersion` +
-          `?demandeId=${validDemandeImmersion.id}`
+      expect(sentEmails[0].type).toEqual(
+        "NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION"
       );
+      expect(sentEmails[0].recipients).toContain("bénéficiaire@email.fr");
+      expect(sentEmails[0].params).toEqual({
+        demandeId: validDemandeImmersion.id,
+        firstName: validDemandeImmersion.firstName,
+        lastName: validDemandeImmersion.lastName,
+      });
     });
   });
 

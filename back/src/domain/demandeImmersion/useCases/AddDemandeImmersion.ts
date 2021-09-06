@@ -1,12 +1,13 @@
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import {
+  AddDemandeImmersionResponseDto,
+  DemandeImmersionDto
+} from "../../../shared/DemandeImmersionDto";
+import { logger } from "../../../utils/logger";
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
-import { Email, EmailGateway } from "./../ports/EmailGateway";
-import {
-  AddDemandeImmersionResponseDto,
-  DemandeImmersionDto,
-} from "../../../shared/DemandeImmersionDto";
+import { EmailGateway } from "./../ports/EmailGateway";
 
 type AddDemandeImmersionDependencies = {
   demandeImmersionRepository: DemandeImmersionRepository;
@@ -18,6 +19,7 @@ type AddDemandeImmersionDependencies = {
 export class AddDemandeImmersion
   implements UseCase<DemandeImmersionDto, AddDemandeImmersionResponseDto>
 {
+  private readonly logger = logger.child({ logsource: "AddDemandeImmersion" });
   private readonly demandeImmersionRepository: DemandeImmersionRepository;
   private readonly emailGateway: EmailGateway;
   private readonly supervisorEmail: string | undefined;
@@ -46,27 +48,30 @@ export class AddDemandeImmersion
     if (!id) throw new ConflictError(demandeImmersionEntity.id);
 
     if (this.supervisorEmail) {
-      const email: Email = {
-        recipient: this.supervisorEmail,
-        subject:
-          `Nouvelle demande d'immersion: ${params.lastName}, ${params.firstName} - ` +
-          `${params.businessName}`,
-        textContent:
-          `Détails sur: ` +
-          `https://immersion.beta.pole-emploi.fr/demande-immersion?demandeId=${id}`,
-      };
-      this.emailGateway.send(email);
+      this.emailGateway.sendNewDemandeAdminNotification(
+        [this.supervisorEmail],
+        {
+          demandeId: params.id,
+          firstName: params.firstName,
+          lastName: params.lastName,
+          dateStart: params.dateStart,
+          dateEnd: params.dateEnd,
+          businessName: params.businessName,
+        }
+      );
     }
 
     if (this.emailAllowlist.has(params.email)) {
-      const email: Email = {
-        recipient: params.email,
-        subject: "Votre demande d'immersion a été enregistrée",
-        textContent:
-          `Merci d'avoir enregistré votre demande. Vous pouvez la modifier avec le ` +
-          `lien suivant: https://immersion.beta.pole-emploi.fr/demande-immersion?demandeId=${id}`,
-      };
-      this.emailGateway.send(email);
+      this.emailGateway.sendNewDemandeBeneficiaireConfirmation(params.email, {
+        demandeId: params.id,
+        firstName: params.firstName,
+        lastName: params.lastName,
+      });
+    } else {
+      this.logger.info(
+        { demandeId: params.id, email: params.email },
+        "Bénéficiaire confirmation email not sent because recipient not on allowlist."
+      );
     }
 
     return { id };
