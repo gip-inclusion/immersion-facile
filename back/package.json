@@ -10,6 +10,7 @@
     "test:integration": "jest --runInBand --testRegex=.integration.test.ts --watchAll --verbose",
     "test:all": "REPOSITORIES=JSON jest --runInBand --verbose",
     "format": "prettier --write src",
+    "format:check": "prettier --check src",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
