@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { AuthChecker } from "../../../domain/auth/AuthChecker";
+import { FeatureDisabledError } from "../../../shared/featureFlags";
 
 export class UnauthorizedError extends Error {
   constructor() {
@@ -33,9 +34,11 @@ export const sendHttpResponse = async (
     const response = await callback();
     res.status(200);
     return res.json(response || { success: true });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof UnauthorizedError) {
       res.status(401);
+    } else if (error instanceof FeatureDisabledError) {
+      res.status(404);
     } else if (error instanceof NotFoundError) {
       res.status(404);
     } else if (error instanceof ConflictError) {

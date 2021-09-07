@@ -65,8 +65,6 @@ describe("demandeImmersionDtoSchema", () => {
       .withDateEnd(addDays(DATE_START, 28))
       .build();
 
-    console.log(demandeImmersion);
-
     expectDemandeImmersionDtoToBeValid(demandeImmersion);
   });
 

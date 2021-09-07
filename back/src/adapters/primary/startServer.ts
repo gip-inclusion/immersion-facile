@@ -1,8 +1,13 @@
-import { app } from "./server";
+import { getFeatureFlagsFromEnvVariables } from "./../../shared/featureFlags";
 import { logger } from "../../utils/logger";
+import { AppConfig, createApp } from "./server";
 
 const port = 1234;
 
-app.listen(port, () => {
+const appConfig: AppConfig = {
+  featureFlags: getFeatureFlagsFromEnvVariables(),
+};
+
+createApp(appConfig).listen(port, () => {
   logger.info(`server started at http://localhost:${port}`);
 });

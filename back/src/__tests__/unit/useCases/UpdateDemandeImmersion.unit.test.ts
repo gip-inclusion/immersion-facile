@@ -1,22 +1,30 @@
-import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
-import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
-import { UpdateDemandeImmersion } from "../../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
+import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   DemandesImmersion,
-  InMemoryDemandeImmersionRepository,
+  InMemoryDemandeImmersionRepository
 } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { UpdateDemandeImmersion } from "../../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
+import {
+  FeatureDisabledError,
+  FeatureFlags
+} from "../../../shared/featureFlags";
+import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
+import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 describe("Update demandeImmersion", () => {
   let repository: InMemoryDemandeImmersionRepository;
   let updateDemandeImmersion: UpdateDemandeImmersion;
+  let featureFlags: FeatureFlags;
 
   beforeEach(() => {
     repository = new InMemoryDemandeImmersionRepository();
+    featureFlags = {
+      enableViewableApplications: true,
+    };
     updateDemandeImmersion = new UpdateDemandeImmersion({
       demandeImmersionRepository: repository,
+      featureFlags,
     });
   });
 
@@ -55,6 +63,27 @@ describe("Update demandeImmersion", () => {
           demandeImmersion: validDemandeImmersion,
         }),
         new NotFoundError("unknown_demande_immersion_id")
+      );
+    });
+  });
+
+  describe("When enableViewableApplications is off", () => {
+    beforeEach(() => {
+      featureFlags = { enableViewableApplications: false };
+      updateDemandeImmersion = new UpdateDemandeImmersion({
+        demandeImmersionRepository: repository,
+        featureFlags,
+      });
+    });
+
+    it("throws FeatureDisabledError", async () => {
+      const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
+      expectPromiseToFailWithError(
+        updateDemandeImmersion.execute({
+          id: "demande_id",
+          demandeImmersion: validDemandeImmersion,
+        }),
+        new FeatureDisabledError()
       );
     });
   });

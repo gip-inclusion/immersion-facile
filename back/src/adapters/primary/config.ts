@@ -1,17 +1,18 @@
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
-import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
-import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
-import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
-import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
-import { logger } from "../../utils/logger";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
+import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
 import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
+import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
 import { UpdateDemandeImmersion } from "../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
+import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
+import { FeatureFlags } from "../../shared/featureFlags";
+import { logger } from "../../utils/logger";
+import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 
 export const getRepositories = () => {
   logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
@@ -74,7 +75,7 @@ const fail = (message: string) => {
   throw new Error(message);
 };
 
-export const getUsecases = () => {
+export const getUsecases = (featureFlags: FeatureFlags) => {
   const repositories = getRepositories();
   const supervisorEmail = process.env.SUPERVISOR_EMAIL;
   if (!supervisorEmail) {
@@ -102,12 +103,15 @@ export const getUsecases = () => {
     }),
     getDemandeImmersion: new GetDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,
+      featureFlags,
     }),
     listDemandeImmersion: new ListDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,
+      featureFlags,
     }),
     updateDemandeImmersion: new UpdateDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,
+      featureFlags,
     }),
 
     // siret

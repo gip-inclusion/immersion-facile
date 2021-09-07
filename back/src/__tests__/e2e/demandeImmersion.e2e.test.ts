@@ -1,167 +1,189 @@
-import supertest from "supertest";
+import supertest, { SuperTest, Test } from "supertest";
+import { createApp } from "../../adapters/primary/server";
 import { demandesImmersionRoute } from "../../shared/routes";
 import { DemandeImmersionDtoBuilder } from "../../_testBuilders/DemandeImmersionDtoBuilder";
-import { app } from "../../adapters/primary/server";
-
-// TODO: Find a way to clear the repository between tests so that we can reuse the same ID.
 
 describe("/demandes-immersion route", () => {
-  it("rejects invalid requests", (done) => {
-    supertest(app)
-      .post(`/${demandesImmersionRoute}`)
-      .send({ invalid_params: true })
-      .expect(400, done);
-  });
+  let request: SuperTest<Test>;
 
-  it("records a valid demandeImmersion and returns it", (done) => {
-    const demandeImmersionId = "test_id_1";
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
-      .withId(demandeImmersionId)
-      .build();
+  describe("When the ENABLE_VIEWABLE_APPLICATIONS feature flag is on", () => {
+    beforeEach(() => {
+      request = supertest(
+        createApp({
+          featureFlags: {
+            enableViewableApplications: true,
+          },
+        })
+      );
+    });
 
-    // GET /demandes-immersion returns an empty list.
-    supertest(app)
-      .get(`/${demandesImmersionRoute}`)
-      .auth("e2e_tests", "e2e")
-      .expect("Content-Type", /json/)
-      .expect(200)
+    it("Creating an invalid application fails", async () => {
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send({ invalid_params: true })
+        .expect(400);
+    });
 
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body).toEqual([]);
+    it("Creating a valid application succeeds", async () => {
+      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
 
-        // POSTing a valid demande d'immersion succeeds.
-        supertest(app)
-          .post(`/${demandesImmersionRoute}`)
-          .send(demandeImmersion)
-          .expect(200)
-          .expect("Content-Type", /json/)
-          .end((err, res) => {
-            if (err) return done(err);
-            expect(res.body.id).toEqual(demandeImmersionId);
+      // GET /demandes-immersion returns an empty list.
+      await request
+        .get(`/${demandesImmersionRoute}`)
+        .auth("e2e_tests", "e2e")
+        .expect("Content-Type", /json/)
+        .expect(200, []);
 
-            // GETting the new demande d'immersion succeeds.
-            supertest(app)
-              .get(`/${demandesImmersionRoute}/${demandeImmersionId}`)
-              .expect(200)
-              .expect("Content-Type", /json/)
-              .end((err, res) => {
-                if (err) return done(err);
-                expect(res.body).toEqual(demandeImmersion);
-                done();
-              });
-          });
-      });
-  });
+      // POSTing a valid application succeeds.
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(demandeImmersion)
+        .expect("Content-Type", /json/)
+        .expect(200, { id: demandeImmersion.id });
 
-  it("updates an existing demandeImmersion and returns it", (done) => {
-    const demandeImmersionId = "test_id_2";
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
-      .withId(demandeImmersionId)
-      .build();
+      // GETting the created application succeeds.
+      await request
+        .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .expect("Content-Type", /json/)
+        .expect(200, demandeImmersion);
+    });
 
-    // POSTing a valid demande d'immersion succeeds.
-    supertest(app)
-      .post(`/${demandesImmersionRoute}`)
-      .send(demandeImmersion)
-      .expect(200)
-      .expect("Content-Type", /json/)
-      .end((err, res) => {
-        if (err) return done(err);
+    it("Updating an existing application succeeds", async () => {
+      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
 
-        expect(res.body.id).toEqual(demandeImmersionId);
+      // POSTing a valid application succeeds.
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(demandeImmersion)
+        .expect("Content-Type", /json/)
+        .expect(200, { id: demandeImmersion.id });
 
-        // POSTing an updated demande d'immersion to the same id succeeds.
-        const updatedDemandeImmersion = {
-          ...demandeImmersion,
-          email: "new@email.fr",
-        };
+      // POSTing an updated application to the same id succeeds.
+      const updatedDemandeImmersion = {
+        ...demandeImmersion,
+        email: "new@email.fr",
+      };
+      await request
+        .post(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .send(updatedDemandeImmersion)
+        .expect("Content-Type", /json/)
+        .expect(200, { id: demandeImmersion.id });
 
-        supertest(app)
-          .post(`/${demandesImmersionRoute}/${demandeImmersionId}`)
-          .send(updatedDemandeImmersion)
-          .expect(200)
-          .expect("Content-Type", /json/)
-          .end((err, res) => {
-            if (err) return done(err);
-            expect(res.body.id).toEqual(demandeImmersionId);
+      // GETting the updated application succeeds.
+      await request
+        .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .expect("Content-Type", /json/)
+        .expect(200, updatedDemandeImmersion);
+    });
 
-            // GETting the updated demandeImmersion succeeds.
-            supertest(app)
-              .get(`/${demandesImmersionRoute}/${demandeImmersionId}`)
-              .expect(200)
-              .expect("Content-Type", /json/)
-              .end((err, res) => {
-                if (err) return done(err);
-                expect(res.body).toEqual(updatedDemandeImmersion);
-                done();
-              });
-          });
-      });
-  });
+    it("Fetching unknown application IDs fails with 404 Not Found", async () => {
+      await request
+        .get(`/${demandesImmersionRoute}/unknown-demande-immersion-id`)
+        .expect(404);
+    });
 
-  it("fetching unknown demandeImmersion IDs reports 404 Not Found", (done) => {
-    supertest(app)
-      .get(`/${demandesImmersionRoute}/unknown-demande-immersion-id`)
-      .expect(404, done);
-  });
+    it("Updating an unknown application IDs fails with 404 Not Found", async () => {
+      const unknownId = "unknown-demande-immersion-id";
+      const demandeImmersionWithUnknownId = new DemandeImmersionDtoBuilder()
+        .withId(unknownId)
+        .build();
+      await request
+        .post(`/${demandesImmersionRoute}/${unknownId}`)
+        .send(demandeImmersionWithUnknownId)
+        .expect(404);
+    });
 
-  it("posting to unknown demandeImmersion IDs reports 404 Not Found", (done) => {
-    const unknownId = "unknown-demande-immersion-id";
-    const demandeImmersionWithUnknownId = new DemandeImmersionDtoBuilder()
-      .withId(unknownId)
-      .build();
+    it("Creating an application with an existing ID fails with 409 Conflict", async () => {
+      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
 
-    supertest(app)
-      .post(`/${demandesImmersionRoute}/${unknownId}`)
-      .send(demandeImmersionWithUnknownId)
-      .expect(404, done);
-  });
+      // POSTing a valid application succeeds.
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(demandeImmersion)
+        .expect("Content-Type", /json/)
+        .expect(200, { id: demandeImmersion.id });
 
-  it("creating a demande d'immersion with an existing ID reports 409 Conflict", (done) => {
-    const demandeImmersionId = "test_id_3";
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
-      .withId(demandeImmersionId)
-      .build();
-
-    // POSTing a valid demande immersion succeeds.
-    supertest(app)
-      .post(`/${demandesImmersionRoute}`)
-      .send(demandeImmersion)
-      .expect(200)
-      .expect("Content-Type", /json/)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body.id).toEqual(demandeImmersionId);
-
-        const demandeImmersionWithExistingId = {
+      // POSTing a another valid application with the same ID fails.
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send({
           ...demandeImmersion,
           email: "another@email.fr",
-        };
-        supertest(app)
-          .post(`/${demandesImmersionRoute}`)
-          .send(demandeImmersionWithExistingId)
-          .expect(409, done);
-      });
+        })
+        .expect(409);
+    });
+
+    it("Listing applications without credentials fails with 401 Unauthorized", async () => {
+      await request.get(`/${demandesImmersionRoute}`).expect(401);
+    });
+
+    it("Listing applications with invalid credentials fails with 401 Unauthorized", async () => {
+      await request
+        .get(`/${demandesImmersionRoute}`)
+        .auth("not real user", "not real password")
+        .expect(401);
+    });
+
+    it("Listing applications with valid credentials succeeds", async () => {
+      // GET /demandes-immersion succeeds with login/pass.
+      await request
+        .get(`/${demandesImmersionRoute}`)
+        .auth("e2e_tests", "e2e")
+        .expect("Content-Type", /json/)
+        .expect(200);
+    });
   });
 
-  it("Fails to fetch demandesImmersion without credentials", (done) => {
-    supertest(app).get(`/${demandesImmersionRoute}`).expect(401, done);
-  });
+  describe("When the ENABLE_VIEWABLE_APPLICATIONS feature flag is off", () => {
+    beforeEach(() => {
+      request = supertest(
+        createApp({
+          featureFlags: {
+            enableViewableApplications: false,
+          },
+        })
+      );
+    });
 
-  it("Fails to fetch demandesImmersion with invalid credentials", (done) => {
-    supertest(app)
-      .get(`/${demandesImmersionRoute}`)
-      .auth("not real user", "not real password")
-      .expect(401, done);
-  });
+    it("Listing applications fails with 404 Not Found despite valid credentials", async () => {
+      await request
+        .get(`/${demandesImmersionRoute}`)
+        .auth("e2e_tests", "e2e")
+        .expect(404);
+    });
 
-  it("Fetches demandesImmersion with valid credentials", (done) => {
-    // GET /demandes-immersion succeeds with login/pass.
-    supertest(app)
-      .get(`/${demandesImmersionRoute}`)
-      .auth("e2e_tests", "e2e")
-      .expect("Content-Type", /json/)
-      .expect(200, done);
+    it("Geting an existing application fails with 404 Not Found", async () => {
+      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+
+      // POSTing a valid application succeeds.
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(demandeImmersion)
+        .expect(200);
+
+      // GETting the created application returns 404 Not Found.
+      await request
+        .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .expect(404);
+    });
+
+    it("Updating an existing application fails with 404 Not Found", async () => {
+      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+
+      // POSTing a valid application succeeds.
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(demandeImmersion)
+        .expect(200);
+
+      // POSTing a valid application returns 404 Not Found.
+      await request
+        .post(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .send({
+          ...demandeImmersion,
+          email: "another@email.fr",
+        })
+        .expect(404);
+    });
   });
 });
