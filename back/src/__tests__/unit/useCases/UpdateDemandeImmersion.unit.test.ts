@@ -1,12 +1,12 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   DemandesImmersion,
-  InMemoryDemandeImmersionRepository
+  InMemoryDemandeImmersionRepository,
 } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
 import { UpdateDemandeImmersion } from "../../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
 import {
   FeatureDisabledError,
-  FeatureFlags
+  FeatureFlags,
 } from "../../../shared/featureFlags";
 import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
 import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";

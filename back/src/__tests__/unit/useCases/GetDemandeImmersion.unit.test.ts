@@ -3,7 +3,7 @@ import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/
 import { GetDemandeImmersion } from "../../../domain/demandeImmersion/useCases/GetDemandeImmersion";
 import {
   FeatureDisabledError,
-  FeatureFlags
+  FeatureFlags,
 } from "../../../shared/featureFlags";
 import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";

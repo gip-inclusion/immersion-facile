@@ -4,14 +4,14 @@
   "description": "",
   "scripts": {
     "start": "ts-node src/adapters/primary/startServer.ts",
-    "start:json": "REPOSITORIES=JSON npm start",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts --verbose",
     "test:e2e": "REPOSITORIES=JSON jest --runInBand --watchAll --testRegex=.e2e.test.ts --verbose",
     "test:integration": "jest --runInBand --testRegex=.integration.test.ts --watchAll --verbose",
     "test:all": "REPOSITORIES=JSON jest --runInBand --verbose",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "fullcheck": "npm run test:all && npm run typecheck && npm run format:check"
   },
   "keywords": [],
   "author": "",

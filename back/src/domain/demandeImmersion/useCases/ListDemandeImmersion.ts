@@ -1,7 +1,7 @@
 import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
 import {
   FeatureDisabledError,
-  FeatureFlags
+  FeatureFlags,
 } from "../../../shared/featureFlags";
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";

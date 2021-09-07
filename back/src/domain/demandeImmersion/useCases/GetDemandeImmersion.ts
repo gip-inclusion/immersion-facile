@@ -1,11 +1,11 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   DemandeImmersionDto,
-  GetDemandeImmersionRequestDto
+  GetDemandeImmersionRequestDto,
 } from "../../../shared/DemandeImmersionDto";
 import {
   FeatureDisabledError,
-  FeatureFlags
+  FeatureFlags,
 } from "../../../shared/featureFlags";
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";

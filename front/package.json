@@ -1,13 +1,15 @@
 {
   "version": "0.0.0",
   "scripts": {
-    "test": "npm run symlink-shared && jest",
+    "test": "npm run symlink-shared && npm run typecheck && jest",
     "dev": "npm run symlink-shared && VITE_GATEWAY=IN_MEMORY vite",
     "dev-http": "npm run symlink-shared && VITE_GATEWAY=HTTP vite",
     "build": "npm run symlink-shared && tsc && vite build",
     "serve": "vite preview",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write src",
+    "format:check": "prettier --check src",
+    "fullcheck": "npm run test && npm run typecheck && npm run format:check",
     "symlink-shared": "ln -fs ../../back/src/shared ./src/"
   },
   "dependencies": {

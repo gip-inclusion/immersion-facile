@@ -4,7 +4,7 @@ import {
 } from "src/shared/DemandeImmersionDto";
 import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
-import { sleep } from 'src/shared/utils';
+import { sleep } from "src/shared/utils";
 
 const DEMANDE_IMMERSION_TEMPLATE: DemandeImmersionDto = {
   id: "fake-test-id",
