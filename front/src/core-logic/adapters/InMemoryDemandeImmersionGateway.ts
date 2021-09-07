@@ -1,8 +1,9 @@
+import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
 import {
   DemandeImmersionDto,
-  DemandeImmersionId,
+  DemandeImmersionId
 } from "src/shared/DemandeImmersionDto";
-import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
+import { FeatureFlags } from "src/shared/featureFlags";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { sleep } from "src/shared/utils";
 
@@ -58,7 +59,7 @@ export class InMemoryDemandeImmersionGateway
 {
   private _demandesImmersion: { [id: string]: DemandeImmersionDto } = {};
 
-  public constructor() {
+  public constructor(readonly featureFlags: FeatureFlags) {
     this.add({
       ...DEMANDE_IMMERSION_TEMPLATE,
       id: "valid_draft",
@@ -85,12 +86,16 @@ export class InMemoryDemandeImmersionGateway
   public async get(id: DemandeImmersionId): Promise<DemandeImmersionDto> {
     console.log("InMemoryDemandeImmersionGateway.get: ", id);
     await sleep(SIMULATED_LATENCY_MS);
+    if (!this.featureFlags.enableViewableApplications)
+      throw new Error("404 Not found");
     return this._demandesImmersion[id];
   }
 
   public async getAll(): Promise<Array<DemandeImmersionDto>> {
     console.log("InMemoryFormulaireGateway.getAll");
     await sleep(SIMULATED_LATENCY_MS);
+    if (!this.featureFlags.enableViewableApplications)
+      throw new Error("404 Not found");
     return Object.values(this._demandesImmersion);
   }
 
@@ -99,6 +104,8 @@ export class InMemoryDemandeImmersionGateway
   ): Promise<DemandeImmersionId> {
     console.log("InMemoryDemandeImmersionGateway.update: ", demandeImmersion);
     await sleep(SIMULATED_LATENCY_MS);
+    if (!this.featureFlags.enableViewableApplications)
+      throw new Error("404 Not found");
     this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
     return demandeImmersion.id;
   }

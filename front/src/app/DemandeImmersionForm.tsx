@@ -1,27 +1,24 @@
+import { AxiosError } from "axios";
+import { addDays, format, startOfToday } from "date-fns";
+import { FieldHookConfig, Formik, useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
-import { Formik, useFormikContext, useField, FieldHookConfig } from "formik";
-import { demandeImmersionGateway } from "src/app/main";
+import { demandeImmersionGateway, featureFlags } from "src/app/main";
 import { BoolRadioGroup, RadioGroup } from "src/app/radioGroup";
 import { routes } from "src/app/routes";
+import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { DateInput } from "src/components/form/DateInput";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
+import { SchedulePicker } from "src/components/form/SchedulePicker/SchedulePicker";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
+import { MarianneHeader } from "src/components/MarianneHeader";
 import {
   DemandeImmersionDto,
   demandeImmersionDtoSchema,
 } from "src/shared/DemandeImmersionDto";
-import { addDays, format, startOfToday } from "date-fns";
-import { AxiosError } from "axios";
-import { Route } from "type-route";
-import { MarianneHeader } from "src/components/MarianneHeader";
-import { v4 as uuidV4 } from "uuid";
-import {
-  BoolCheckboxGroup,
-  CheckboxGroup,
-} from "src/components/form/CheckboxGroup";
-import { SchedulePicker } from "src/components/form/SchedulePicker/SchedulePicker";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
+import { Route } from "type-route";
+import { v4 as uuidV4 } from "uuid";
 
 const fetchCompanyInfoBySiret = async (siret: string) => {
   const addressDictToString = (addressDict: any): string => {
@@ -171,17 +168,39 @@ const createInitialDemandeImmersion = (): DemandeImmersionDto => {
   };
 };
 
+interface SuccessProps {
+  message: string;
+  link: string | undefined;
+}
+
+const createSuccessProps = (link: string | undefined): SuccessProps => ({
+  message: link
+    ? "Succès d'envoi. Vous pouvez acceder votre demande grâce un lien suivante :"
+    : `Merci d'avoir complété ce formulaire. Il va être transmis à votre conseiller
+      référent. Il vous informera par mail de la validation ou non de l'immersion.
+      Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.
+      Attention, ne démarrez jamais une immersion tant que vous n'avez pas reçu de
+      validation ! Bonne journée !`,
+  link,
+});
+
 export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
   const [initialValues, setInitialValues] = useState(
     createInitialDemandeImmersion()
   );
   const [submitError, setSubmitError] = useState<Error | null>(null);
-  const [formLink, setFormLink] = useState<string | null>(null);
+  const [successProps, setSuccessProps] = useState<SuccessProps | null>(null);
   const [isFetchingSiret, setIsFetchingSiret] = useState<boolean>(false);
 
   useEffect(() => {
     const { demandeId } = route.params;
     if (!demandeId) return;
+
+    if (!featureFlags.enableViewableApplications) {
+      const newLocation = "//" + location.host + location.pathname;
+      history.replaceState(null, document.title, newLocation);
+      return;
+    }
 
     demandeImmersionGateway
       .get(demandeId)
@@ -194,7 +213,7 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
       .catch((e) => {
         console.log(e);
         setSubmitError(e);
-        setFormLink(e);
+        setSuccessProps(null);
       });
   }, []);
 
@@ -228,33 +247,44 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
             initialValues={initialValues}
             validationSchema={demandeImmersionDtoSchema}
             onSubmit={async (values, { setSubmitting }) => {
-              console.log(values);
+              let currentId = route.params.demandeId;
 
               try {
-                const demandeImmersion =
-                  await demandeImmersionDtoSchema.validate(values);
+                let demandeImmersion = await demandeImmersionDtoSchema.validate(
+                  values
+                );
 
-                const currentId = route.params.demandeId;
+                if (!featureFlags.enableViewableApplications) {
+                  demandeImmersion = {
+                    ...demandeImmersion,
+                    status: "FINALIZED",
+                  };
+                  currentId = undefined;
+                }
+
                 const upsertedId = currentId
                   ? await demandeImmersionGateway.update(demandeImmersion)
                   : await demandeImmersionGateway.add(demandeImmersion);
 
-                const queryParams = new URLSearchParams(window.location.search);
-                queryParams.set("demandeId", upsertedId);
-                history.replaceState(
-                  null,
-                  document.title,
-                  "?" + queryParams.toString()
-                );
-
-                const newURL = window.location.href;
-
+                let newUrl: string | undefined = undefined;
+                if (featureFlags.enableViewableApplications) {
+                  const queryParams = new URLSearchParams(
+                    window.location.search
+                  );
+                  queryParams.set("demandeId", upsertedId);
+                  history.replaceState(
+                    null,
+                    document.title,
+                    "?" + queryParams.toString()
+                  );
+                  newUrl = window.location.href;
+                }
+                setSuccessProps(createSuccessProps(newUrl));
                 setSubmitError(null);
-                setFormLink(newURL);
-              } catch (e) {
+              } catch (e: any) {
                 console.log(e);
                 setSubmitError(e);
-                setFormLink(null);
+                setSuccessProps(null);
               }
               setSubmitting(false);
             }}
@@ -478,11 +508,11 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
                     />
                   )}
 
-                  {formLink && (
+                  {successProps && (
                     <SuccessMessage
-                      link={formLink}
+                      link={successProps.link}
                       title="Succès de l'envoi"
-                      text="Vous avez enregistré votre formulaire et vous pouvez le modifier avec le lien suivant:"
+                      text={successProps.message}
                     />
                   )}
 
@@ -493,7 +523,11 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
                     type="submit"
                     disabled={props.isSubmitting || isFrozen}
                   >
-                    {props.isSubmitting ? "Éxecution" : "Sauvegarder"}
+                    {props.isSubmitting
+                      ? "Éxecution"
+                      : featureFlags.enableViewableApplications
+                      ? "Sauvegarder"
+                      : "Envoyer la demande"}
                   </button>
                 </form>
               </div>

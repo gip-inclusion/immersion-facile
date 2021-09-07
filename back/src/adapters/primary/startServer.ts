@@ -5,7 +5,7 @@ import { AppConfig, createApp } from "./server";
 const port = 1234;
 
 const appConfig: AppConfig = {
-  featureFlags: getFeatureFlagsFromEnvVariables(),
+  featureFlags: getFeatureFlagsFromEnvVariables((name) => process.env[name]),
 };
 
 createApp(appConfig).listen(port, () => {

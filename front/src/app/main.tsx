@@ -1,25 +1,30 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
 import { Provider } from "react-redux";
 import { App } from "src/app/App";
+import { HttpDemandeImmersionGateway } from "src/core-logic/adapters/HttpDemandeImmersionGateway";
+import { InMemoryDemandeImmersionGateway } from "src/core-logic/adapters/InMemoryDemandeImmersionGateway";
 import { InMemoryTodoGateway } from "src/core-logic/adapters/InMemoryTodoGateway";
 import { configureReduxStore } from "src/core-logic/store/initilizeStore";
-import { InMemoryDemandeImmersionGateway } from "src/core-logic/adapters/InMemoryDemandeImmersionGateway";
-import { HttpDemandeImmersionGateway } from "src/core-logic/adapters/HttpDemandeImmersionGateway";
+import { FeatureFlags, getFeatureFlagsFromEnvVariables } from "src/shared/featureFlags";
+import "./index.css";
 import { RouteProvider } from "./routes";
 
-const gateway = import.meta.env.VITE_GATEWAY;
+const env = import.meta.env;
+const gateway = env.VITE_GATEWAY;
 
 console.log("GATEWAY : ", gateway);
 
 const todoGateway = new InMemoryTodoGateway();
 
-// TODO: don't export the gateway, maybe?
+export const featureFlags: FeatureFlags = getFeatureFlagsFromEnvVariables(
+  (name) => env["VITE_" + name]
+);
+
 export const demandeImmersionGateway =
   gateway === "HTTP"
     ? new HttpDemandeImmersionGateway()
-    : new InMemoryDemandeImmersionGateway();
+    : new InMemoryDemandeImmersionGateway(featureFlags);
 
 const store = configureReduxStore({ todoGateway });
 
