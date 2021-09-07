@@ -1,7 +1,7 @@
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   AddDemandeImmersionResponseDto,
-  DemandeImmersionDto
+  DemandeImmersionDto,
 } from "../../../shared/DemandeImmersionDto";
 import { logger } from "../../../utils/logger";
 import { UseCase } from "../../core/UseCase";

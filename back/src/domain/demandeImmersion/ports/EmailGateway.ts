@@ -17,7 +17,6 @@ export type EmailType =
   | "NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION"
   | "NEW_DEMANDE_ADMIN_NOTIFICATION";
 
-
 export interface EmailGateway {
   sendNewDemandeBeneficiaireConfirmation: (
     recipient: string,

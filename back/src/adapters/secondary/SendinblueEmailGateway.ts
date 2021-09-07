@@ -1,8 +1,9 @@
 import { Logger } from "pino";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import type {
-  EmailType, NewDemandeAdminNotificationParams,
-  NewDemandeBeneficiaireConfirmationParams
+  EmailType,
+  NewDemandeAdminNotificationParams,
+  NewDemandeBeneficiaireConfirmationParams,
 } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { logger } from "../../utils/logger";

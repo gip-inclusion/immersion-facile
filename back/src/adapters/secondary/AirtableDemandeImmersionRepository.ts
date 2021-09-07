@@ -2,7 +2,10 @@ import Airtable, { FieldSet, Record, Table } from "airtable";
 import { QueryParams } from "airtable/lib/query_params";
 import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
-import { DemandeImmersionId, demandeImmersionStatusFromString } from "../../shared/DemandeImmersionDto";
+import {
+  DemandeImmersionId,
+  demandeImmersionStatusFromString,
+} from "../../shared/DemandeImmersionDto";
 import { logger } from "../../utils/logger";
 
 export class AirtableDemandeImmersionRepository
