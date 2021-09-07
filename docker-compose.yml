@@ -1,13 +1,23 @@
 version: "3"
 services: 
-    back:
-        build: "./back"
-        ports: 
-            - "5555:1234"
-    front:
-        build: "."
-        ports:
-            - "3000:5000"
-        environment: 
-            BACKEND_URL: "http://back:5555/"
-    
+  back:
+    build: "./back"
+    ports:
+      - "5555:1234"
+    env_file:
+      - .env.back
+
+  front:
+    build: "."
+    env_file:
+      - .env.front
+
+  nginx:
+    restart: unless-stopped
+    depends_on:
+      - front
+      - back
+    build:
+      context: ./nginx
+    ports:
+      - 80:80

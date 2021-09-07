@@ -1,4 +1,6 @@
 .DS_Store
 .env
+.env.back
+.env.front
 .idea
 node_modules
