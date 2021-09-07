@@ -1,7 +1,7 @@
 import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
 import {
   DemandeImmersionDto,
-  DemandeImmersionId
+  DemandeImmersionId,
 } from "src/shared/DemandeImmersionDto";
 import { FeatureFlags } from "src/shared/featureFlags";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";

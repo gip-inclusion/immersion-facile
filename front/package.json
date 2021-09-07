@@ -1,15 +1,17 @@
 {
   "version": "0.0.0",
   "scripts": {
-    "test": "npm run symlink-shared && npm run typecheck && jest",
-    "dev": "npm run symlink-shared && VITE_GATEWAY=IN_MEMORY vite",
+    "test": "npm run symlink-shared && jest",
+    "dev": "npm run symlink-shared && npm run gen-env-config && vite",
     "dev-http": "npm run symlink-shared && VITE_GATEWAY=HTTP vite",
     "build": "npm run symlink-shared && tsc && vite build",
-    "serve": "vite preview",
+    "serve": "npm run prod-env-config && vite preview",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write src",
+    "gen-env-config": "chmod +x ./env.sh && ./env.sh",
+    "prod-env-config": "npm run gen-env-config && cp env-config.js dist/env-config.js",
     "format:check": "prettier --check src",
-    "fullcheck": "npm run test && npm run typecheck && npm run format:check",
+    "fullcheck": "npm run format && npm run test && npm run typecheck",
     "symlink-shared": "ln -fs ../../back/src/shared ./src/"
   },
   "dependencies": {

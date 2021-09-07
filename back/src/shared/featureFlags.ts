@@ -1,33 +1,4 @@
-type EnvVarReaderFn = (name: string) => string | boolean | undefined;
-
-const getFeatureFlagOrDie = (
-  envVarReaderFn: EnvVarReaderFn,
-  name: string
-): boolean => {
-  const value = envVarReaderFn(name);
-  if (value === "TRUE") return true;
-  if (!value) return false;
-  throw new Error(
-    `Unexpected value for environment variable ${name}: ${value}. ` +
-      `Must be "TRUE" or falsy.`
-  );
-};
-
-export type FeatureFlags = {
-  // Enables getting and updating applications.
-  enableViewableApplications: boolean;
-};
-
-export const getFeatureFlagsFromEnvVariables = (
-  envVarReader: EnvVarReaderFn
-): FeatureFlags => {
-  return {
-    enableViewableApplications: getFeatureFlagOrDie(
-      envVarReader,
-      "ENABLE_VIEWABLE_APPLICATIONS"
-    ),
-  };
-};
+import { makeGetBooleanVariable, ProcessEnv } from "./envHelpers";
 
 export class FeatureDisabledError extends Error {
   constructor() {
@@ -35,3 +6,16 @@ export class FeatureDisabledError extends Error {
     Object.setPrototypeOf(this, FeatureDisabledError.prototype);
   }
 }
+
+export const getFeatureFlags = (processEnv: ProcessEnv) => {
+  const getBooleanVariable = makeGetBooleanVariable(processEnv);
+
+  return {
+    // Enables getting and updating applications.
+    enableViewableApplications: getBooleanVariable(
+      "ENABLE_VIEWABLE_APPLICATIONS"
+    ),
+  };
+};
+
+export type FeatureFlags = ReturnType<typeof getFeatureFlags>;

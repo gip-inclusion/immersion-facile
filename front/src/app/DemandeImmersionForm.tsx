@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import { addDays, format, startOfToday } from "date-fns";
 import { FieldHookConfig, Formik, useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
-import { demandeImmersionGateway, featureFlags } from "src/app/main";
+import { demandeImmersionGateway } from "src/app/main";
 import { BoolRadioGroup, RadioGroup } from "src/app/radioGroup";
 import { routes } from "src/app/routes";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
@@ -12,6 +12,7 @@ import { SchedulePicker } from "src/components/form/SchedulePicker/SchedulePicke
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { MarianneHeader } from "src/components/MarianneHeader";
+import { ENV } from "src/environmentVariables";
 import {
   DemandeImmersionDto,
   demandeImmersionDtoSchema,
@@ -183,6 +184,8 @@ const createSuccessProps = (link: string | undefined): SuccessProps => ({
       validation ! Bonne journée !`,
   link,
 });
+
+const { featureFlags } = ENV;
 
 export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
   const [initialValues, setInitialValues] = useState(

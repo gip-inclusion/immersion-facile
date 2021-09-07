@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Admin } from "src/app/admin";
 import { DemandeImmersionForm } from "src/app/DemandeImmersionForm";
-import { TodoApp } from "src/app/TodoApp";
+import { Home } from "src/app/Home";
 import { useRoute } from "src/app/routes";
-
-const Home = () => <div>Welcome to the app !</div>;
+import { TodoApp } from "src/app/TodoApp";
 
 export const Router = () => {
   const route = useRoute();
