@@ -98,6 +98,7 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
     addDemandeImmersion: new AddDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,
       emailGateway: repositories.email,
+      featureFlags,
       supervisorEmail: supervisorEmail,
       emailAllowList,
     }),

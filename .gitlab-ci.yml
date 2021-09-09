@@ -107,6 +107,9 @@ deploy_back:
           --env SUPERVISOR_EMAIL=${SUPERVISOR_EMAIL}
           --env EMAIL_ALLOW_LIST=${EMAIL_ALLOWLIST}
           --env ENABLE_VIEWABLE_APPLICATIONS=TRUE
+          --env ENABLE_GENERIC_APPLICATION_FORM=TRUE
+          --env ENABLE_BOULOGNE_SUR_MER_APPLICATION_FORM=TRUE
+          --env ENABLE_NARBONNE_APPLICATION_FORM=TRUE
           --pull always
           --name back
           ${CI_REGISTRY_IMAGE}/back:$CI_COMMIT_SHORT_SHA"
@@ -129,6 +132,10 @@ deploy_front:
         -d
         -p ${FRONTEND_PORT_DEV}:5000
         --env BACKEND_URL=http://${DEPLOYER_SERVER_IP_DEV}:${BACKEND_PORT_DEV}
+        --env ENABLE_VIEWABLE_APPLICATIONS=TRUE
+        --env ENABLE_GENERIC_APPLICATION_FORM=TRUE
+        --env ENABLE_BOULOGNE_SUR_MER_APPLICATION_FORM=TRUE
+        --env ENABLE_NARBONNE_APPLICATION_FORM=TRUE
         --pull always
         --name front
         ${CI_REGISTRY_IMAGE}/front:$CI_COMMIT_SHORT_SHA"

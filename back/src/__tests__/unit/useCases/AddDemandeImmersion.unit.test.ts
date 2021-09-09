@@ -1,32 +1,52 @@
-import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import { AddDemandeImmersion } from "../../../domain/demandeImmersion/useCases/AddDemandeImmersion";
+import {
+  FeatureDisabledError,
+  FeatureFlags,
+} from "../../../shared/featureFlags";
+import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
+import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 describe("Add demandeImmersion", () => {
+  let addDemandeImmersion: AddDemandeImmersion;
   let repository: InMemoryDemandeImmersionRepository;
   let emailGateway: InMemoryEmailGateway;
-  let addDemandeImmersion: AddDemandeImmersion;
-  let supervisorEmail: string;
+  let featureFlags: FeatureFlags;
+  let supervisorEmail: string | undefined;
   let emailAllowList: string[];
   const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
 
   beforeEach(() => {
     repository = new InMemoryDemandeImmersionRepository();
     emailGateway = new InMemoryEmailGateway();
-    addDemandeImmersion = new AddDemandeImmersion({
+    featureFlags = new FeatureFlagsBuilder().build();
+    supervisorEmail = undefined;
+    emailAllowList = [];
+  });
+
+  const createAddDemandeImmersionUseCase = () => {
+    return new AddDemandeImmersion({
       demandeImmersionRepository: repository,
       emailGateway,
+      featureFlags,
       supervisorEmail,
       emailAllowList,
     });
-  });
+  };
 
-  describe("When the demandeImmersion is valid", () => {
-    test("saves the demandeImmersion in the repository", async () => {
+  describe("When enableGenericApplications is on", () => {
+    beforeEach(() => {
+      featureFlags = new FeatureFlagsBuilder()
+        .enableGenericApplicationForm()
+        .build();
+      addDemandeImmersion = createAddDemandeImmersionUseCase();
+    });
+
+    test("saves valid applications in the repository", async () => {
       expect(await addDemandeImmersion.execute(validDemandeImmersion)).toEqual({
         id: validDemandeImmersion.id,
       });
@@ -35,75 +55,71 @@ describe("Add demandeImmersion", () => {
       expect(storedInRepo.length).toBe(1);
       expect(storedInRepo[0].toDto()).toEqual(validDemandeImmersion);
     });
-  });
 
-  describe("Notification emails", () => {
-    test("Sends no emails when supervisor and allowlist are not set", async () => {
+    test("sends no emails when supervisor and allowlist are not set", async () => {
       expect(
         await addDemandeImmersion.execute(validDemandeImmersion)
       ).not.toBeUndefined();
       expect(emailGateway.getSentEmails()).toHaveLength(0);
     });
 
-    test("Sends admin notification email when supervisor set", async () => {
-      addDemandeImmersion = new AddDemandeImmersion({
-        demandeImmersionRepository: repository,
-        emailGateway,
-        supervisorEmail: "supervisor@email.fr",
-        emailAllowList,
+    describe("When supervisor email is set", () => {
+      beforeEach(() => {
+        supervisorEmail = "supervisor@email.fr";
+        addDemandeImmersion = createAddDemandeImmersionUseCase();
       });
 
-      expect(
-        await addDemandeImmersion.execute(validDemandeImmersion)
-      ).not.toBeUndefined();
+      test("sends admin notification email when supervisor set", async () => {
+        expect(
+          await addDemandeImmersion.execute(validDemandeImmersion)
+        ).not.toBeUndefined();
 
-      const sentEmails = emailGateway.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
+        const sentEmails = emailGateway.getSentEmails();
+        expect(sentEmails).toHaveLength(1);
 
-      expect(sentEmails[0].type).toEqual("NEW_DEMANDE_ADMIN_NOTIFICATION");
-      expect(sentEmails[0].recipients).toContain("supervisor@email.fr");
-      expect(sentEmails[0].params).toEqual({
-        demandeId: validDemandeImmersion.id,
-        firstName: validDemandeImmersion.firstName,
-        lastName: validDemandeImmersion.lastName,
-        dateStart: validDemandeImmersion.dateStart,
-        dateEnd: validDemandeImmersion.dateEnd,
-        businessName: validDemandeImmersion.businessName,
+        expect(sentEmails[0].type).toEqual("NEW_DEMANDE_ADMIN_NOTIFICATION");
+        expect(sentEmails[0].recipients).toContain("supervisor@email.fr");
+        expect(sentEmails[0].params).toEqual({
+          demandeId: validDemandeImmersion.id,
+          firstName: validDemandeImmersion.firstName,
+          lastName: validDemandeImmersion.lastName,
+          dateStart: validDemandeImmersion.dateStart,
+          dateEnd: validDemandeImmersion.dateEnd,
+          businessName: validDemandeImmersion.businessName,
+        });
+      });
+    });
+
+    describe("When beneficiary email address is on allowlist", () => {
+      beforeEach(() => {
+        emailAllowList = ["beneficiaire@email.fr"];
+        addDemandeImmersion = createAddDemandeImmersionUseCase();
+      });
+
+      test("sends beneficiary confirmation email", async () => {
+        expect(
+          await addDemandeImmersion.execute({
+            ...validDemandeImmersion,
+            email: "beneficiaire@email.fr",
+          })
+        ).not.toBeUndefined();
+
+        const sentEmails = emailGateway.getSentEmails();
+        expect(sentEmails).toHaveLength(1);
+
+        expect(sentEmails[0].type).toEqual(
+          "NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION"
+        );
+        expect(sentEmails[0].recipients).toContain("beneficiaire@email.fr");
+        expect(sentEmails[0].params).toEqual({
+          demandeId: validDemandeImmersion.id,
+          firstName: validDemandeImmersion.firstName,
+          lastName: validDemandeImmersion.lastName,
+        });
       });
     });
 
-    test("Sends bénéficiaire confirmation email when on allowlist", async () => {
-      addDemandeImmersion = new AddDemandeImmersion({
-        demandeImmersionRepository: repository,
-        emailGateway,
-        supervisorEmail,
-        emailAllowList: ["beneficiaire@email.fr"],
-      });
-
-      expect(
-        await addDemandeImmersion.execute({
-          ...validDemandeImmersion,
-          email: "beneficiaire@email.fr",
-        })
-      ).not.toBeUndefined();
-
-      const sentEmails = emailGateway.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
-
-      expect(sentEmails[0].type).toEqual(
-        "NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION"
-      );
-      expect(sentEmails[0].recipients).toContain("beneficiaire@email.fr");
-      expect(sentEmails[0].params).toEqual({
-        demandeId: validDemandeImmersion.id,
-        firstName: validDemandeImmersion.firstName,
-        lastName: validDemandeImmersion.lastName,
-      });
-    });
-  });
-
-  describe("When a demande d'immersion with the given ID already exists", () => {
-    test("throws a ConflictError", async () => {
+    test("rejects applications where the ID is already in use", async () => {
       await repository.save(
         DemandeImmersionEntity.create(validDemandeImmersion)
       );
@@ -111,6 +127,79 @@ describe("Add demandeImmersion", () => {
       await expectPromiseToFailWithError(
         addDemandeImmersion.execute(validDemandeImmersion),
         new ConflictError(validDemandeImmersion.id)
+      );
+    });
+
+    test("rejects applications with source != GENERIC", async () => {
+      const application = new DemandeImmersionDtoBuilder()
+        .withSource("NARBONNE")
+        .build();
+
+      await expectPromiseToFailWithError(
+        addDemandeImmersion.execute(application),
+        new FeatureDisabledError()
+      );
+    });
+  });
+
+  describe("When enableBoulogneSurMerApplicationForm is on", () => {
+    beforeEach(() => {
+      featureFlags = new FeatureFlagsBuilder()
+        .enableBoulogneSurMerApplicationForm()
+        .build();
+      supervisorEmail = "supervisor@email.fr";
+      emailAllowList = ["beneficiary@email.fr"];
+      addDemandeImmersion = createAddDemandeImmersionUseCase();
+    });
+
+    test("accepts applications with source BOULOGNE_SUR_MER", async () => {
+      const application = new DemandeImmersionDtoBuilder()
+        .withSource("BOULOGNE_SUR_MER")
+        .build();
+
+      expect(() => addDemandeImmersion.execute(application)).not.toThrowError();
+      expect(emailGateway.getSentEmails).toHaveLength(0);
+    });
+
+    test("rejects applications with source != BOULOGNE_SUR_MER", async () => {
+      const application = new DemandeImmersionDtoBuilder()
+        .withSource("GENERIC")
+        .build();
+
+      await expectPromiseToFailWithError(
+        addDemandeImmersion.execute(application),
+        new FeatureDisabledError()
+      );
+    });
+  });
+
+  describe("When enableNarbonneApplicationForm is on", () => {
+    beforeEach(() => {
+      featureFlags = new FeatureFlagsBuilder()
+        .enableNarbonneApplicationForm()
+        .build();
+      supervisorEmail = "supervisor@email.fr";
+      emailAllowList = ["beneficiary@email.fr"];
+      addDemandeImmersion = createAddDemandeImmersionUseCase();
+    });
+
+    test("accepts applications with source NARBONNE", async () => {
+      const application = new DemandeImmersionDtoBuilder()
+        .withSource("NARBONNE")
+        .build();
+
+      expect(() => addDemandeImmersion.execute(application)).not.toThrowError();
+      expect(emailGateway.getSentEmails).toHaveLength(0);
+    });
+
+    test("rejects applications with source != NARBONNE", async () => {
+      const application = new DemandeImmersionDtoBuilder()
+        .withSource("BOULOGNE_SUR_MER")
+        .build();
+
+      await expectPromiseToFailWithError(
+        addDemandeImmersion.execute(application),
+        new FeatureDisabledError()
       );
     });
   });

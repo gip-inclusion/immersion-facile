@@ -1,5 +1,5 @@
-import { ScheduleDto } from "./ScheduleSchema";
 import * as Yup from "../../node_modules/yup";
+import { ScheduleDto } from "./ScheduleSchema";
 import { Flavor } from "./typeFlavors";
 
 // TODO: find the standard for gouv.fr phone verification
@@ -8,17 +8,27 @@ const phoneRegExp = /\+?[0-9]*/;
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
 
-export type DemandeImmersionStatus = "UNKNOWN" | "DRAFT" | "FINALIZED";
-const demandeImmersionStatusOptions: DemandeImmersionStatus[] = [
-  "DRAFT",
-  "FINALIZED",
-];
+export type ApplicationStatus = "UNKNOWN" | "DRAFT" | "FINALIZED";
+const validApplicationStatus: ApplicationStatus[] = ["DRAFT", "FINALIZED"];
+export const applicationStatusFromString = (s: string): ApplicationStatus => {
+  const status = s as ApplicationStatus;
+  if (validApplicationStatus.includes(status)) return status;
+  return "UNKNOWN";
+};
 
-export const demandeImmersionStatusFromString = (
-  s: string
-): DemandeImmersionStatus => {
-  const status = s as DemandeImmersionStatus;
-  if (demandeImmersionStatusOptions.includes(status)) return status;
+export type ApplicationSource =
+  | "UNKNOWN"
+  | "GENERIC"
+  | "BOULOGNE_SUR_MER"
+  | "NARBONNE";
+const validApplicationSources: ApplicationSource[] = [
+  "GENERIC",
+  "BOULOGNE_SUR_MER",
+  "NARBONNE",
+];
+export const applicationSourceFromString = (s: string): ApplicationSource => {
+  const source = s as ApplicationSource;
+  if (validApplicationSources.includes(source)) return source;
   return "UNKNOWN";
 };
 
@@ -26,9 +36,12 @@ export type DemandeImmersionId = Flavor<string, "DemandeImmersionId">;
 
 export const demandeImmersionDtoSchema = Yup.object({
   id: Yup.mixed<DemandeImmersionId>().required("Obligatoire"),
-  status: Yup.mixed<DemandeImmersionStatus>()
-    .oneOf(demandeImmersionStatusOptions)
+  status: Yup.mixed<ApplicationStatus>()
+    .oneOf(validApplicationStatus)
     .required("Obligatoire"),
+  source: Yup.mixed<ApplicationSource>()
+    .oneOf(validApplicationSources)
+    .required(),
   email: Yup.string()
     .required("Obligatoire")
     .email("Veuillez saisir une adresse e-mail valide"),

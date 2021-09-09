@@ -15,6 +15,15 @@ export const getFeatureFlags = (processEnv: ProcessEnv) => {
     enableViewableApplications: getBooleanVariable(
       "ENABLE_VIEWABLE_APPLICATIONS"
     ),
+    enableGenericApplicationForm: getBooleanVariable(
+      "ENABLE_GENERIC_APPLICATION_FORM"
+    ),
+    enableBoulogneSurMerApplicationForm: getBooleanVariable(
+      "ENABLE_BOULOGNE_SUR_MER_APPLICATION_FORM"
+    ),
+    enableNarbonneApplicationForm: getBooleanVariable(
+      "ENABLE_NARBONNE_APPLICATION_FORM"
+    ),
   };
 };
 

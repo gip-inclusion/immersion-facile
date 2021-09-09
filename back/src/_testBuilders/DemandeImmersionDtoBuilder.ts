@@ -1,4 +1,5 @@
 import {
+  ApplicationSource,
   DemandeImmersionDto,
   DemandeImmersionId,
 } from "../shared/DemandeImmersionDto";
@@ -20,6 +21,7 @@ export const VALID_PHONES = [
 const validDemandeImmersion: DemandeImmersionDto = {
   id: DEMANDE_IMMERSION_ID,
   status: "DRAFT",
+  source: "GENERIC",
   email: VALID_EMAILS[0],
   phone: VALID_PHONES[0],
   firstName: "Esteban",
@@ -70,6 +72,10 @@ export class DemandeImmersionDtoBuilder
 
   public withId(id: DemandeImmersionId): DemandeImmersionDtoBuilder {
     return new DemandeImmersionDtoBuilder({ ...this.dto, id });
+  }
+
+  public withSource(source: ApplicationSource): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, source });
   }
 
   public build() {

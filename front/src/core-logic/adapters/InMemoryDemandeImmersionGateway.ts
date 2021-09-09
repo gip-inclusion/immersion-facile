@@ -10,6 +10,7 @@ import { sleep } from "src/shared/utils";
 const DEMANDE_IMMERSION_TEMPLATE: DemandeImmersionDto = {
   id: "fake-test-id",
   status: "DRAFT",
+  source: "GENERIC",
   email: "esteban@ocon.fr",
   phone: "+33012345678",
   firstName: "Esteban",

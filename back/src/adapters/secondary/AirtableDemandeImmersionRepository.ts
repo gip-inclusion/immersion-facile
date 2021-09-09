@@ -4,7 +4,8 @@ import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/D
 import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
 import {
   DemandeImmersionId,
-  demandeImmersionStatusFromString,
+  applicationStatusFromString,
+  applicationSourceFromString,
 } from "../../shared/DemandeImmersionDto";
 import { logger } from "../../utils/logger";
 
@@ -129,9 +130,15 @@ const verifyRecordAndConvertToEntity = (
   if (typeof record.fields.id !== "string") {
     throw new Error(`Invalid field 'id' in Airtable record: ${record}`);
   }
+
   record.fields.status = record.fields.status || "";
   if (typeof record.fields.status !== "string") {
-    throw new Error(`Invalid field 'email' in Airtable record: ${record}`);
+    throw new Error(`Invalid field 'status' in Airtable record: ${record}`);
+  }
+
+  record.fields.source = record.fields.source || "";
+  if (typeof record.fields.source !== "string") {
+    throw new Error(`Invalid field 'source' in Airtable record: ${record}`);
   }
 
   record.fields.email = record.fields.email || "";
@@ -282,7 +289,8 @@ const verifyRecordAndConvertToEntity = (
 
   return DemandeImmersionEntity.create({
     id: record.fields.id,
-    status: demandeImmersionStatusFromString(record.fields.status),
+    status: applicationStatusFromString(record.fields.status),
+    source: applicationSourceFromString(record.fields.source),
     email: record.fields.email,
     phone: record.fields.phone,
     firstName: record.fields.firstName,

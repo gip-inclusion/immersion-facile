@@ -3,7 +3,7 @@
   "scripts": {
     "test": "npm run symlink-shared && jest",
     "dev": "npm run symlink-shared && npm run gen-env-config && vite",
-    "dev-http": "npm run symlink-shared && VITE_GATEWAY=HTTP vite",
+    "dev-http": "npm run symlink-shared && GATEWAY=HTTP npm run gen-env-config && vite",
     "build": "npm run symlink-shared && tsc && vite build",
     "serve": "npm run prod-env-config && vite preview",
     "typecheck": "tsc --noEmit",

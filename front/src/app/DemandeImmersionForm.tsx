@@ -120,8 +120,12 @@ const FrozenMessage = () => (
   </>
 );
 
-interface FormulaireProps {
-  route: Route<typeof routes.demandeImmersion>;
+interface ApplicationFormProps {
+  route: Route<
+    | typeof routes.demandeImmersion
+    | typeof routes.boulogneSurMer
+    | typeof routes.narbonne
+  >;
 }
 
 const isDemandeImmersionFrozen = (
@@ -130,10 +134,11 @@ const isDemandeImmersionFrozen = (
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
-const createInitialDemandeImmersion = (): DemandeImmersionDto => {
+const createInitialApplication = (): DemandeImmersionDto => {
   return {
     id: uuidV4(),
     status: "DRAFT",
+    source: "GENERIC",
     // Participant
     email: "sylvanie@monemail.fr",
     firstName: "Sylanie",
@@ -187,9 +192,9 @@ const createSuccessProps = (link: string | undefined): SuccessProps => ({
 
 const { featureFlags } = ENV;
 
-export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
+export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const [initialValues, setInitialValues] = useState(
-    createInitialDemandeImmersion()
+    createInitialApplication()
   );
   const [submitError, setSubmitError] = useState<Error | null>(null);
   const [successProps, setSuccessProps] = useState<SuccessProps | null>(null);
@@ -250,24 +255,42 @@ export const DemandeImmersionForm = ({ route }: FormulaireProps) => {
             initialValues={initialValues}
             validationSchema={demandeImmersionDtoSchema}
             onSubmit={async (values, { setSubmitting }) => {
-              let currentId = route.params.demandeId;
-
               try {
-                let demandeImmersion = await demandeImmersionDtoSchema.validate(
+                let application = await demandeImmersionDtoSchema.validate(
                   values
                 );
 
+                let currentId = route.params.demandeId;
                 if (!featureFlags.enableViewableApplications) {
-                  demandeImmersion = {
-                    ...demandeImmersion,
+                  application = {
+                    ...application,
                     status: "FINALIZED",
                   };
-                  currentId = undefined;
+                }
+
+                if (
+                  route.name === "boulogneSurMer" &&
+                  featureFlags.enableBoulogneSurMerApplicationForm
+                ) {
+                  application = {
+                    ...application,
+                    source: "BOULOGNE_SUR_MER",
+                  };
+                }
+
+                if (
+                  route.name === "narbonne" &&
+                  featureFlags.enableNarbonneApplicationForm
+                ) {
+                  application = {
+                    ...application,
+                    source: "NARBONNE",
+                  };
                 }
 
                 const upsertedId = currentId
-                  ? await demandeImmersionGateway.update(demandeImmersion)
-                  : await demandeImmersionGateway.add(demandeImmersion);
+                  ? await demandeImmersionGateway.update(application)
+                  : await demandeImmersionGateway.add(application);
 
                 let newUrl: string | undefined = undefined;
                 if (featureFlags.enableViewableApplications) {

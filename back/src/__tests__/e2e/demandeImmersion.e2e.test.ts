@@ -2,17 +2,19 @@ import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
 import { demandesImmersionRoute } from "../../shared/routes";
 import { DemandeImmersionDtoBuilder } from "../../_testBuilders/DemandeImmersionDtoBuilder";
+import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
 
 describe("/demandes-immersion route", () => {
   let request: SuperTest<Test>;
 
-  describe("When the ENABLE_VIEWABLE_APPLICATIONS feature flag is on", () => {
+  describe("DEV environment", () => {
     beforeEach(() => {
       request = supertest(
         createApp({
-          featureFlags: {
-            enableViewableApplications: true,
-          },
+          featureFlags: new FeatureFlagsBuilder()
+            .enableViewableApplications()
+            .enableGenericApplicationForm()
+            .build(),
         })
       );
     });
@@ -46,6 +48,24 @@ describe("/demandes-immersion route", () => {
         .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
         .expect("Content-Type", /json/)
         .expect(200, demandeImmersion);
+    });
+
+    it("Creating an application with invalid sources fails with 404 Not Found", async () => {
+      const application1 = new DemandeImmersionDtoBuilder()
+        .withSource("BOULOGNE_SUR_MER")
+        .build();
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(application1)
+        .expect(404);
+
+      const application2 = new DemandeImmersionDtoBuilder()
+        .withSource("NARBONNE")
+        .build();
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(application2)
+        .expect(404);
     });
 
     it("Updating an existing application succeeds", async () => {
@@ -134,15 +154,46 @@ describe("/demandes-immersion route", () => {
     });
   });
 
-  describe("When the ENABLE_VIEWABLE_APPLICATIONS feature flag is off", () => {
+  describe("BETA environment", () => {
     beforeEach(() => {
       request = supertest(
         createApp({
-          featureFlags: {
-            enableViewableApplications: false,
-          },
+          featureFlags: new FeatureFlagsBuilder()
+            .enableBoulogneSurMerApplicationForm()
+            .enableNarbonneApplicationForm()
+            .build(),
         })
       );
+    });
+
+    it("Creating an application with valid sources succeeds", async () => {
+      const application1 = new DemandeImmersionDtoBuilder()
+        .withId("id1")
+        .withSource("BOULOGNE_SUR_MER")
+        .build();
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(application1)
+        .expect(200, { id: "id1" });
+
+      const application2 = new DemandeImmersionDtoBuilder()
+        .withId("id2")
+        .withSource("NARBONNE")
+        .build();
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(application2)
+        .expect(200, { id: "id2" });
+    });
+
+    it("Creating an application with invalid sources fails with 404 Not Found", async () => {
+      const demandeImmersion = new DemandeImmersionDtoBuilder()
+        .withSource("GENERIC")
+        .build();
+      await request
+        .post(`/${demandesImmersionRoute}`)
+        .send(demandeImmersion)
+        .expect(404);
     });
 
     it("Listing applications fails with 404 Not Found despite valid credentials", async () => {
@@ -153,7 +204,9 @@ describe("/demandes-immersion route", () => {
     });
 
     it("Geting an existing application fails with 404 Not Found", async () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+      const demandeImmersion = new DemandeImmersionDtoBuilder()
+        .withSource("BOULOGNE_SUR_MER")
+        .build();
 
       // POSTing a valid application succeeds.
       await request
@@ -168,7 +221,9 @@ describe("/demandes-immersion route", () => {
     });
 
     it("Updating an existing application fails with 404 Not Found", async () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+      const demandeImmersion = new DemandeImmersionDtoBuilder()
+        .withSource("NARBONNE")
+        .build();
 
       // POSTing a valid application succeeds.
       await request

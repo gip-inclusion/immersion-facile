@@ -4,6 +4,7 @@ import {
   TEST_ESTABLISHMENT1,
   TEST_ESTABLISHMENT1_SIRET,
 } from "../../adapters/secondary/InMemorySireneRepository";
+import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
 
 describe("/siret route", () => {
   let request: SuperTest<Test>;
@@ -11,9 +12,7 @@ describe("/siret route", () => {
   beforeEach(() => {
     request = supertest(
       createApp({
-        featureFlags: {
-          enableViewableApplications: true,
-        },
+        featureFlags: new FeatureFlagsBuilder().build(),
       })
     );
   });

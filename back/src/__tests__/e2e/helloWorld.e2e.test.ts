@@ -1,5 +1,6 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
+import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
 
 describe("Hello world route", () => {
   let request: SuperTest<Test>;
@@ -7,9 +8,7 @@ describe("Hello world route", () => {
   beforeEach(() => {
     request = supertest(
       createApp({
-        featureFlags: {
-          enableViewableApplications: true,
-        },
+        featureFlags: new FeatureFlagsBuilder().build(),
       })
     );
   });

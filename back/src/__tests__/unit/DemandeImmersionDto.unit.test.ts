@@ -1,15 +1,17 @@
 import {
+  ApplicationSource,
+  applicationSourceFromString,
+  ApplicationStatus,
+  applicationStatusFromString,
   DemandeImmersionDto,
   demandeImmersionDtoSchema,
-  DemandeImmersionStatus,
-  demandeImmersionStatusFromString,
 } from "../../shared/DemandeImmersionDto";
-import { addDays } from "../../_testBuilders/test.helpers";
 import {
   DATE_START,
   DATE_SUBMISSION,
   DemandeImmersionDtoBuilder,
 } from "../../_testBuilders/DemandeImmersionDtoBuilder";
+import { addDays } from "../../_testBuilders/test.helpers";
 
 describe("demandeImmersionDtoSchema", () => {
   test("accepts valid demandeImmersion", () => {
@@ -87,34 +89,54 @@ describe("demandeImmersionDtoSchema", () => {
   });
 });
 
-describe("demandeImmersionStatusFromString", () => {
-  test("demandeImmersionStatusFromString() accepts valid enum values", () => {
-    expectDemandeImmersionStatusToBe(
-      demandeImmersionStatusFromString("DRAFT"),
-      "DRAFT"
-    );
-    expectDemandeImmersionStatusToBe(
-      demandeImmersionStatusFromString("FINALIZED"),
+describe("applicationStatusFromString", () => {
+  test("accepts valid enum values", () => {
+    expectApplicationStatusToBe(applicationStatusFromString("DRAFT"), "DRAFT");
+    expectApplicationStatusToBe(
+      applicationStatusFromString("FINALIZED"),
       "FINALIZED"
     );
   });
 
-  test("demandeImmersionStatusFromString() converts invalid enum values to UNKNOWN", () => {
-    expectDemandeImmersionStatusToBe(
-      demandeImmersionStatusFromString(""),
-      "UNKNOWN"
-    );
-    expectDemandeImmersionStatusToBe(
-      demandeImmersionStatusFromString("UNKNOWN_VALUE"),
+  test("converts invalid enum values to UNKNOWN", () => {
+    expectApplicationStatusToBe(applicationStatusFromString(""), "UNKNOWN");
+    expectApplicationStatusToBe(
+      applicationStatusFromString("UNKNOWN_VALUE"),
       "UNKNOWN"
     );
   });
 });
 
-const expectDemandeImmersionStatusToBe = (
-  status: DemandeImmersionStatus,
-  expectedStatus: DemandeImmersionStatus
-) => expect(status).toBe(expectedStatus);
+const expectApplicationStatusToBe = (
+  actual: ApplicationStatus,
+  expected: ApplicationStatus
+) => expect(actual).toBe(expected);
+
+describe("applicationSourceFromString", () => {
+  test("accepts valid enum values", () => {
+    expectApplicationSourceToBe(
+      applicationSourceFromString("GENERIC"),
+      "GENERIC"
+    );
+    expectApplicationSourceToBe(
+      applicationSourceFromString("BOULOGNE_SUR_MER"),
+      "BOULOGNE_SUR_MER"
+    );
+  });
+
+  test("converts invalid enum values to UNKNOWN", () => {
+    expectApplicationSourceToBe(applicationSourceFromString(""), "UNKNOWN");
+    expectApplicationSourceToBe(
+      applicationSourceFromString("UNKNOWN_VALUE"),
+      "UNKNOWN"
+    );
+  });
+});
+
+const expectApplicationSourceToBe = (
+  actual: ApplicationSource,
+  expected: ApplicationSource
+) => expect(actual).toBe(expected);
 
 const expectDemandeImmersionDtoToBeValid = (
   validDemandeImmersionDto: DemandeImmersionDto
