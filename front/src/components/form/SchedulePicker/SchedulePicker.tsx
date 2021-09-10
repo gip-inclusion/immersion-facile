@@ -6,39 +6,31 @@ import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import { BoolRadioPicker } from "./BoolRadioPicker";
 import { TotalHoursIndicator } from "./TotalHoursIndicator";
 import { ScheduleDto } from "src/shared/ScheduleSchema";
+import {
+  calculateHours,
+  checkSchedule,
+  maxPermittedHoursPerWeek,
+} from "src/shared/ScheduleUtils";
 
-export const calculateHours = (schedule: ScheduleDto) => {
-  if (schedule.isSimple) {
-    let numberOfDays = 0;
-    for (const period of schedule.simpleSchedule.dayPeriods) {
-      numberOfDays += period[1] - period[0] + 1;
-    }
-    let numberOfHours = 0;
-    for (const period of schedule.simpleSchedule.hours) {
-      let [startHour, startMinute] = period.start.split(":").map(Number);
-      let [endHour, endMinute] = period.end.split(":").map(Number);
-      numberOfHours += (endHour - startHour) * 60 + endMinute - startMinute;
-    }
+// Function that can be used as `validate` in Formik.
+export function scheduleValidator(value: ScheduleDto): string | void {
+  let totalHours = calculateHours(value);
 
-    return (numberOfDays * numberOfHours) / 60;
-  } else {
-    let total = 0;
-    for (const day of schedule.complexSchedule) {
-      for (const period of day) {
-        let [startHour, startMinute] = period.start.split(":").map(Number);
-        let [endHour, endMinute] = period.end.split(":").map(Number);
-        total += (endHour - startHour) * 60 + endMinute - startMinute;
-      }
-    }
-    return total / 60;
+  if (totalHours > maxPermittedHoursPerWeek) {
+    return "Veuillez saisir moins de 35h par semaine.";
+  } else if (totalHours === 0) {
+    return "Veuillez remplir les horaires!";
   }
-};
+
+  return checkSchedule(value);
+}
 
 type SchedulePickerProps = {
   setFieldValue: (schedule: ScheduleDto) => void;
 } & FieldHookConfig<ScheduleDto>;
 export const SchedulePicker = (props: SchedulePickerProps) => {
-  const [field] = useField(props);
+  const [field, meta] = useField(props);
+
   return (
     <>
       <BoolRadioPicker
@@ -61,6 +53,11 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
           : "Sélectionnez les horaires de travail jour par jour"}
       </h4>
 
+      {meta.error && (
+        <div id={props.name + "-error-description"} className="fr-error-text">
+          {meta.error}
+        </div>
+      )}
       <TotalHoursIndicator totalHours={calculateHours(field.value)} />
 
       {!field.value.isSimple && (

@@ -8,7 +8,10 @@ import { routes } from "src/app/routes";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { DateInput } from "src/components/form/DateInput";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
-import { SchedulePicker } from "src/components/form/SchedulePicker/SchedulePicker";
+import {
+  SchedulePicker,
+  scheduleValidator,
+} from "src/components/form/SchedulePicker/SchedulePicker";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { MarianneHeader } from "src/components/MarianneHeader";
@@ -420,6 +423,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
 
                   <SchedulePicker
                     name="schedule"
+                    validate={scheduleValidator}
                     setFieldValue={(x) => {
                       props.setFieldValue("schedule", x);
                     }}

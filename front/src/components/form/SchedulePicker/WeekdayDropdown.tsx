@@ -1,14 +1,5 @@
 import React, { ChangeEvent } from "react";
-
-const weekdays = [
-  "lundi",
-  "mardi",
-  "mercredi",
-  "jeudi",
-  "vendredi",
-  "samedi",
-  "dimanche",
-];
+import { weekdays } from "src/shared/ScheduleUtils";
 
 type WeekdayDropdownProps = {
   name: string;
