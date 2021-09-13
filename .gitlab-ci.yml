@@ -63,37 +63,24 @@ deploy_on_dev:
     - echo $SERVER_USER
     - apk update && apk add openssh-client
     - scp -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SECRETS $SERVER_USER@$DEPLOYER_SERVER_IP_DEV:/home/docker/immersion-facile-dev/.env.secrets
+    - scp -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $VARIABLES $SERVER_USER@$DEPLOYER_SERVER_IP_DEV:/home/docker/immersion-facile-dev/.env.variables
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "cd /home/docker/immersion-facile-dev &&
       chmod 600 .env.secrets;
-      git checkout dev &&
-      git pull &&
-      rm -f .env;
+      chmod 600 .env.variables;
 
-      echo \"EXPOSED_PORT=${EXPOSED_PORT}\" >> .env;
-      echo \"ENABLE_VIEWABLE_APPLICATIONS=${ENABLE_VIEWABLE_APPLICATIONS}\" >> .env;
-      echo \"ENABLE_GENERIC_APPLICATION_FORM=${ENABLE_GENERIC_APPLICATION_FORM}\" >> .env;
-      echo \"ENABLE_BOULOGNE_SUR_MER_APPLICATION_FORM=${ENABLE_BOULOGNE_SUR_MER_APPLICATION_FORM}\" >> .env;
-      echo \"ENABLE_NARBONNE_APPLICATION_FORM=${ENABLE_NARBONNE_APPLICATION_FORM}\" >> .env;
-      echo \"GATEWAY=${GATEWAY}\" >> .env;
-      echo \"REPOSITORIES=${REPOSITORIES}\" >> .env;
-      echo \"EMAIL_GATEWAY=${EMAIL_GATEWAY}\" >> .env;
-      echo \"SIRENE_REPOSITORY=${SIRENE_REPOSITORY}\" >> .env;
-      echo \"AIRTABLE_API_KEY=${AIRTABLE_API_KEY}\" >> .env;
-      echo \"AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}\" >> .env;
-      echo \"AIRTABLE_TABLE_NAME=${AIRTABLE_TABLE_NAME}\" >> .env;
-      echo \"SIRENE_ENDPOINT="https://api.insee.fr/entreprises/sirene/V3"\" >> .env;
-      echo \"SIRENE_BEARER_TOKEN=${SIRENE_BEARER_TOKEN}\" >> .env;
-      echo \"BACKOFFICE_USERNAME=${BACKOFFICE_USERNAME}\" >> .env;
-      echo \"BACKOFFICE_PASSWORD=${BACKOFFICE_PASSWORD}\" >> .env;
-      echo \"SENDINBLUE_API_KEY=${SENDINBLUE_API_KEY}\" >> .env;
-      echo \"SUPERVISOR_EMAIL=${SUPERVISOR_EMAIL}\" >> .env;
-      echo \"EMAIL_ALLOW_LIST=${EMAIL_ALLOWLIST}\" >> .env;
+      git checkout env-variable-files &&
+      git fetch &&
+      git reset --hard origin/env-variable-files &&
 
-      cat .env;
+      touch .env;
+      chmod 600 .env;
+
+      cat .env.variables <(echo) .env.secrets <(echo) > .env;
+      rm -f .env.variables .env.secrets;
+
       docker-compose --env-file .env build;
       docker-compose down;
-      docker-compose up -d &&
-      rm -f .env;"
+      docker-compose up -d"
 
 deploy_on_beta:
   cache: []
@@ -108,35 +95,19 @@ deploy_on_beta:
     - echo $SERVER_USER
     - apk update && apk add openssh-client
     - scp -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SECRETS $SERVER_USER@$DEPLOYER_SERVER_IP_DEV:/home/docker/immersion-facile/.env.secrets
+    - scp -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $VARIABLES $SERVER_USER@$DEPLOYER_SERVER_IP_DEV:/home/docker/immersion-facile/.env.variables
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "cd /home/docker/immersion-facile &&
         chmod 600 .env.secrets;
+        chmod 600 .env.variables;
         git checkout beta &&
         git fetch &&
         git reset --hard origin/beta &&
 
-        rm -f .env;
+        touch .env;
+        chmod 600 .env;
+        cat .env.variables <(echo) .env.secrets <(echo) > .env;
+        rm -f .env.variables .env.secrets;
 
-        echo \"EXPOSED_PORT=${EXPOSED_PORT}\" >> .env;
-        echo \"ENABLE_VIEWABLE_APPLICATIONS=${ENABLE_VIEWABLE_APPLICATIONS}\" >> .env;
-        echo \"ENABLE_GENERIC_APPLICATION_FORM=${ENABLE_GENERIC_APPLICATION_FORM}\" >> .env;
-        echo \"ENABLE_BOULOGNE_SUR_MER_APPLICATION_FORM=${ENABLE_BOULOGNE_SUR_MER_APPLICATION_FORM}\" >> .env;
-        echo \"ENABLE_NARBONNE_APPLICATION_FORM=${ENABLE_NARBONNE_APPLICATION_FORM}\" >> .env;
-        echo \"GATEWAY=${GATEWAY}\" >> .env;
-        echo \"REPOSITORIES=${REPOSITORIES}\" >> .env;
-        echo \"EMAIL_GATEWAY=${EMAIL_GATEWAY}\" >> .env;
-        echo \"SIRENE_REPOSITORY=${SIRENE_REPOSITORY}\" >> .env;
-        echo \"AIRTABLE_API_KEY=${AIRTABLE_API_KEY}\" >> .env;
-        echo \"AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}\" >> .env;
-        echo \"AIRTABLE_TABLE_NAME=${AIRTABLE_TABLE_NAME}\" >> .env;
-        echo \"SIRENE_ENDPOINT="https://api.insee.fr/entreprises/sirene/V3"\" >> .env;
-        echo \"SIRENE_BEARER_TOKEN=${SIRENE_BEARER_TOKEN}\" >> .env;
-        echo \"BACKOFFICE_USERNAME=${BACKOFFICE_USERNAME}\" >> .env;
-        echo \"BACKOFFICE_PASSWORD=${BACKOFFICE_PASSWORD}\" >> .env;
-        echo \"SENDINBLUE_API_KEY=${SENDINBLUE_API_KEY}\" >> .env;
-        echo \"SUPERVISOR_EMAIL=${SUPERVISOR_EMAIL}\" >> .env;
-        echo \"EMAIL_ALLOW_LIST=${EMAIL_ALLOWLIST}\" >> .env;
-
-        cat .env;
         docker-compose --env-file .env build;
         docker-compose down;
         docker-compose up -d &&

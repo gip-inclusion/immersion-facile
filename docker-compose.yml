@@ -2,8 +2,6 @@ version: "3"
 services:
   back:
     build: "./back"
-    ports:
-      - "5555:1234"
     env_file:
       - .env
 

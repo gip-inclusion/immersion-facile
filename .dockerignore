@@ -7,3 +7,6 @@ back/node_modules
 front/env-config.js
 front/dist
 front/dist-ssr
+.env
+.env.sample
+.gitlab-ci.yml
