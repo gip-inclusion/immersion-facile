@@ -62,7 +62,7 @@ deploy_on_dev:
     - chmod og= $DEPLOYER_ID_RSA_DEV
     - echo $SERVER_USER
     - apk update && apk add openssh-client
-    - scp -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SECRETS $SERVER_USER@$DEPLOYER_SERVER_IP_DEV:/home/docker/immersion-facile/.env.secrets
+    - scp -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SECRETS $SERVER_USER@$DEPLOYER_SERVER_IP_DEV:/home/docker/immersion-facile-dev/.env.secrets
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "cd /home/docker/immersion-facile-dev &&
       chmod 600 .env.secrets;
       git checkout dev &&
