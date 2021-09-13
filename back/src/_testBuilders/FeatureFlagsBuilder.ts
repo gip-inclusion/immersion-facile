@@ -2,14 +2,8 @@ import { FeatureFlags } from "../shared/featureFlags";
 import { Builder } from "./Builder";
 
 export class FeatureFlagsBuilder implements Builder<FeatureFlags> {
-  constructor(
-    private featureFlags: FeatureFlags = {
-      enableViewableApplications: false,
-      enableGenericApplicationForm: false,
-      enableBoulogneSurMerApplicationForm: false,
-      enableNarbonneApplicationForm: false,
-    }
-  ) {}
+  // Initializes all feature flags to be off.
+  constructor(readonly featureFlags: FeatureFlags = {}) {}
 
   public enableViewableApplications(): FeatureFlagsBuilder {
     return new FeatureFlagsBuilder({

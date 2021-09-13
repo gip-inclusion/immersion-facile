@@ -24,7 +24,10 @@ export const getFeatureFlags = (processEnv: ProcessEnv) => {
     enableNarbonneApplicationForm: getBooleanVariable(
       "ENABLE_NARBONNE_APPLICATION_FORM"
     ),
+    enableAdminUi: getBooleanVariable(
+      "ENABLE_ADMIN_UI"
+    )
   };
 };
 
-export type FeatureFlags = ReturnType<typeof getFeatureFlags>;
+export type FeatureFlags = Partial<ReturnType<typeof getFeatureFlags>>;

@@ -1,10 +1,10 @@
 import React from "react";
 import { ENV } from "src/environmentVariables";
 
-export const Home = () => (
+const DebugInfo = () => (
   <div>
-    Welcome to the app ! Env variables are:
     <br />
+    Env variables are:
     <br />
     {Object.entries(ENV).map(([envName, envValue]) => (
       <div key={envName} style={{ width: "400px" }}>
@@ -12,4 +12,12 @@ export const Home = () => (
       </div>
     ))}
   </div>
+);
+
+type HomeProps = {
+  showDebugInfo: boolean;
+};
+
+export const Home = ({ showDebugInfo }: HomeProps) => (
+  <div>Welcome to the app !{showDebugInfo && <DebugInfo />}</div>
 );
