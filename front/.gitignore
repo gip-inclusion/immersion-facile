@@ -6,3 +6,4 @@ dist-ssr
 .idea
 src/shared
 env-config.js
+!.env

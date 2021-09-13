@@ -1,4 +1,9 @@
 .git
+.DS_Store
 docker-compose.yml
 front/node_modules
 back/node_modules
+
+front/env-config.js
+front/dist
+front/dist-ssr

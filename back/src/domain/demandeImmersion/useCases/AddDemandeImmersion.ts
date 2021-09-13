@@ -11,7 +11,7 @@ import { logger } from "../../../utils/logger";
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
-import { EmailGateway } from "./../ports/EmailGateway";
+import { EmailGateway } from "../ports/EmailGateway";
 
 type AddDemandeImmersionDependencies = {
   demandeImmersionRepository: DemandeImmersionRepository;
