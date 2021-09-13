@@ -68,9 +68,9 @@ deploy_on_dev:
       chmod 600 .env.secrets;
       chmod 600 .env.variables;
 
-      git checkout env-variable-files &&
+      git checkout dev &&
       git fetch &&
-      git reset --hard origin/env-variable-files &&
+      git reset --hard origin/dev &&
 
       touch .env;
       chmod 600 .env;
