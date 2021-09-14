@@ -69,6 +69,29 @@ export const checkTimePeriodPositive = (period: TimePeriodDto) => {
   return duration > 0;
 };
 
+export const periodStringToMinutesFromMidnight = (s: string) => {
+  let [hr, min] = periodStringToHoursMinutes(s);
+  return hr * 60 + min;
+};
+
+// Returns true if the two periods overlap (for at least one minute).
+export const checkTimePeriodsOverlap = (
+  period1: TimePeriodDto,
+  period2: TimePeriodDto
+): boolean => {
+  let period1Start = periodStringToMinutesFromMidnight(period1.start);
+  let period1End = periodStringToMinutesFromMidnight(period1.end);
+  let period2Start = periodStringToMinutesFromMidnight(period2.start);
+  let period2End = periodStringToMinutesFromMidnight(period2.end);
+
+  // Force ordering
+  if (period1Start > period2Start) {
+    return checkTimePeriodsOverlap(period2, period1);
+  }
+
+  return period2Start < period1End;
+};
+
 export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
   if (schedule.dayPeriods.length === 0) {
     return "Selectionnez au moins un jour !";
@@ -82,23 +105,42 @@ export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
     let period = schedule.hours[periodIndex];
     if (!checkTimePeriodPositive(period)) {
       return (
-        "Sous-periode " +
+        "La plage horaire " +
         (periodIndex + 1) +
-        " (" +
-        period.start +
-        " — " +
-        period.end +
-        ")" +
+        periodToHumanReadableString(period) +
         " incorrect. Le début doit être avant la fin. "
       );
     }
   }
 
+  // Check if all periods are positive.
   schedule.hours.forEach((period: TimePeriodDto, index: Number) => {
     if (!checkTimePeriodPositive(period)) {
-      return "Sous-periode " + index.toString() + " incorrect!";
+      return "La plage horaire " + index.toString() + " incorrect !";
     }
   });
+
+  // Check if any periods overlap.
+  for (let i = 0; i < schedule.hours.length; i++) {
+    for (let j = i + 1; j < schedule.hours.length; j++) {
+      let period1 = schedule.hours[i];
+      let period2 = schedule.hours[j];
+      if (checkTimePeriodsOverlap(schedule.hours[i], schedule.hours[j])) {
+        return (
+          "Les plages horaires " +
+          periodToHumanReadableString(period1) +
+          " et " +
+          periodToHumanReadableString(period2) +
+          " se chevauchent !"
+        );
+      }
+    }
+  }
+};
+
+// Generates a string in format: "(09:00 - 13:00)"
+export const periodToHumanReadableString = (period: TimePeriodDto): string => {
+  return "(" + period.start + " - " + period.end + ")";
 };
 
 export const checkComplexSchedule = (schedule: ComplexScheduleDto) => {
@@ -106,19 +148,32 @@ export const checkComplexSchedule = (schedule: ComplexScheduleDto) => {
     const day = schedule[dayIndex];
     for (let periodIndex = 0; periodIndex < day.length; periodIndex++) {
       let period = day[periodIndex];
+      // Check if all periods are positive.
       if (!checkTimePeriodPositive(period)) {
         return (
-          "Sous-periode " +
+          "La plage horaire " +
           (periodIndex + 1) +
-          " (" +
-          period.start +
-          " — " +
-          period.end +
-          ")" +
+          periodToHumanReadableString(period) +
           " de " +
           weekdays[dayIndex] +
           " incorrect. Le début doit être avant la fin. "
         );
+      }
+
+      // Check for overlap with other periods
+      for (let j = periodIndex + 1; j < day.length; j++) {
+        let otherPeriod = day[j];
+        if (checkTimePeriodsOverlap(period, otherPeriod)) {
+          return (
+            "Les plages horaires " +
+            periodToHumanReadableString(period) +
+            " et " +
+            periodToHumanReadableString(otherPeriod) +
+            " de " +
+            weekdays[dayIndex] +
+            " se chevauchent !"
+          );
+        }
       }
     }
   }

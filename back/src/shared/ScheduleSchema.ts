@@ -1,19 +1,25 @@
 import * as Yup from "../../node_modules/yup";
 
-const reasonableHours = {
-  start: "09:00",
-  end: "16:00",
-};
+const reasonableHours = [
+  {
+    start: "08:00",
+    end: "12:00",
+  },
+  {
+    start: "13:00",
+    end: "16:00",
+  },
+];
 
 export const reasonableSchedule: ScheduleDto = {
-  isSimple: false,
+  isSimple: true,
   selectedIndex: 0,
   complexSchedule: Array.from({ length: 5 }, (e) => [
-    { ...reasonableHours },
+    ...reasonableHours,
   ]).concat([[], []]),
   simpleSchedule: {
     dayPeriods: [[0, 4]],
-    hours: [{ ...reasonableHours }],
+    hours: [...reasonableHours],
   },
 };
 
