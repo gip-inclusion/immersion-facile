@@ -78,7 +78,6 @@ export const HourPicker = ({
                   <input
                     className="fr-input"
                     value={hours.end}
-                    min="09:30"
                     onChange={(evt) =>
                       onEndChange(index, evt.currentTarget.value)
                     }
