@@ -55,6 +55,7 @@ export const BoolRadioGroup = (props: BoolRadioProps) => {
                 className="fr-label"
                 htmlFor={htmlName + "oui"}
                 onClick={() =>
+                  !props.disabled &&
                   props.formikHelpers.setFieldValue(props.name, true)
                 }
               >
@@ -77,6 +78,7 @@ export const BoolRadioGroup = (props: BoolRadioProps) => {
                   className="fr-label"
                   htmlFor={htmlName + "non"}
                   onClick={() =>
+                    !props.disabled &&
                     props.formikHelpers.setFieldValue(props.name, false)
                   }
                 >

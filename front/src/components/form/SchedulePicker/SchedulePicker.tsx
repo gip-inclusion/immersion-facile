@@ -1,16 +1,16 @@
+import { FieldHookConfig, useField } from "formik";
 import React from "react";
-import { useField, FieldHookConfig, FormikHelpers, FormikState } from "formik";
-import "./SchedulePicker.css";
-import { SimpleSchedulePicker } from "./SimpleSchedulePicker";
-import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
-import { BoolRadioPicker } from "./BoolRadioPicker";
-import { TotalHoursIndicator } from "./TotalHoursIndicator";
 import { ScheduleDto } from "src/shared/ScheduleSchema";
 import {
   calculateHours,
   checkSchedule,
   maxPermittedHoursPerWeek,
 } from "src/shared/ScheduleUtils";
+import { BoolRadioPicker } from "./BoolRadioPicker";
+import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
+import "./SchedulePicker.css";
+import { SimpleSchedulePicker } from "./SimpleSchedulePicker";
+import { TotalHoursIndicator } from "./TotalHoursIndicator";
 
 // Function that can be used as `validate` in Formik.
 export function scheduleValidator(value: ScheduleDto): string | void {
@@ -27,6 +27,7 @@ export function scheduleValidator(value: ScheduleDto): string | void {
 
 type SchedulePickerProps = {
   setFieldValue: (schedule: ScheduleDto) => void;
+  disabled?: boolean;
 } & FieldHookConfig<ScheduleDto>;
 export const SchedulePicker = (props: SchedulePickerProps) => {
   const [field, meta] = useField(props);
@@ -35,7 +36,7 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
     <>
       <BoolRadioPicker
         name="schedule.isSimple"
-        label="Les horaires quotidiens sont-ils réguliers ?"
+        label="Les horaires quotidiens sont-ils réguliers ? *"
         description="Ex : (Non) chaque jour a des horaires bien spécifiques, (Oui) “Du lundi au vendredi de 8h00 à 17h00”"
         yesLabel="Oui"
         noLabel="Non, irrégulieres"
@@ -45,12 +46,13 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
           schedule.isSimple = newValue;
           props.setFieldValue(schedule);
         }}
+        disabled={props.disabled}
       />
 
       <h4>
         {field.value.isSimple
-          ? "Sélectionnez la période des jours"
-          : "Sélectionnez les horaires de travail jour par jour"}
+          ? "Sélectionnez la période des jours *"
+          : "Sélectionnez les horaires de travail jour par jour *"}
       </h4>
 
       {meta.error && (

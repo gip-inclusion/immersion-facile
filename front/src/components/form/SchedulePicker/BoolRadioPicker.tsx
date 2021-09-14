@@ -8,17 +8,22 @@ type BoolRadioPickerProps = {
   noLabel: string;
   checked: boolean;
   setFieldValue: (isSimple: boolean) => void;
+  disabled?: boolean;
 } & FieldHookConfig<boolean>;
 export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
   const [field] = useField(props);
 
-  const setFieldAsTrue = () => props.setFieldValue(true);
-  const setFieldAsFalse = () => props.setFieldValue(false);
+  const setFieldAsTrue = () => !props.disabled && props.setFieldValue(true);
+  const setFieldAsFalse = () => !props.disabled && props.setFieldValue(false);
 
   return (
     <>
       <div className="fr-form-group">
-        <fieldset className="fr-fieldset" role="group">
+        <fieldset
+          className="fr-fieldset"
+          role="group"
+          disabled={props.disabled}
+        >
           <legend className="fr-fieldset__legend fr-text--regular">
             {props.label}
           </legend>
@@ -34,6 +39,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
                 type="radio"
                 checked={props.checked}
                 onChange={setFieldAsTrue}
+                disabled={props.disabled}
               />
               <label
                 className="fr-label"
@@ -49,6 +55,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
                 type="radio"
                 checked={!props.checked}
                 onChange={setFieldAsFalse}
+                disabled={props.disabled}
               />
               <label
                 className="fr-label"

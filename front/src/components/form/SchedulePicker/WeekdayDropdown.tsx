@@ -7,6 +7,7 @@ type WeekdayDropdownProps = {
   maxDay: number;
   selected: number;
   onValueChange: (pickedDay: number) => void;
+  disabled?: boolean;
 };
 export const WeekdayDropdown = ({
   name,
@@ -14,6 +15,7 @@ export const WeekdayDropdown = ({
   maxDay,
   selected,
   onValueChange,
+  disabled,
 }: WeekdayDropdownProps) => {
   const onChangeHandler = (evt: ChangeEvent) => {
     const target = evt.currentTarget as HTMLSelectElement;
@@ -27,6 +29,7 @@ export const WeekdayDropdown = ({
       name={name}
       value={selected}
       onChange={onChangeHandler}
+      disabled={disabled}
     >
       {weekdays
         .filter((_, index) => index >= minDay && index <= maxDay)

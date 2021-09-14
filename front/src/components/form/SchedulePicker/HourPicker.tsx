@@ -7,11 +7,13 @@ type HourPickerProps = {
   name: string;
   schedule: Array<TimePeriodDto>;
   onValueChange: (schedule: Array<TimePeriodDto>) => void;
+  disabled?: boolean;
 };
 export const HourPicker = ({
   name,
   schedule,
   onValueChange,
+  disabled,
 }: HourPickerProps) => {
   const add = () => {
     let start = "9:00";
@@ -62,6 +64,7 @@ export const HourPicker = ({
                     onChange={(evt) =>
                       onStartChange(index, evt.currentTarget.value)
                     }
+                    disabled={disabled}
                   />
                   <ErrorMessage
                     name={`hours.${index}.start`}
@@ -80,6 +83,7 @@ export const HourPicker = ({
                       onEndChange(index, evt.currentTarget.value)
                     }
                     type="time"
+                    disabled={disabled}
                   />
                   <ErrorMessage
                     name={`hours.${index}.end`}
@@ -88,21 +92,23 @@ export const HourPicker = ({
                   />
                 </div>
 
-                <DeleteButton onClick={() => remove(index)} />
+                {!disabled && <DeleteButton onClick={() => remove(index)} />}
               </div>
             </div>
           );
         })}
-      <button
-        type="button"
-        style={{
-          marginTop: "10px",
-        }}
-        className="fr-btn fr-fi-add-line fr-btn--icon-left fr-btn--secondary"
-        onClick={() => add()}
-      >
-        Ajouter des horaires
-      </button>
+      {!disabled && (
+        <button
+          type="button"
+          style={{
+            marginTop: "10px",
+          }}
+          className="fr-btn fr-fi-add-line fr-btn--icon-left fr-btn--secondary"
+          onClick={() => add()}
+        >
+          Ajouter des horaires
+        </button>
+      )}
     </>
   );
 };

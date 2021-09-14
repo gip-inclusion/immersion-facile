@@ -6,6 +6,7 @@ import { ScheduleDto } from "src/shared/ScheduleSchema";
 
 export type SimpleSchedulePickerProps = {
   setFieldValue: (updatedSchedule: ScheduleDto) => void;
+  disabled?: boolean;
 } & FieldHookConfig<ScheduleDto>;
 
 export const SimpleSchedulePicker = (props: SimpleSchedulePickerProps) => {
@@ -21,6 +22,7 @@ export const SimpleSchedulePicker = (props: SimpleSchedulePickerProps) => {
           schedule.simpleSchedule.dayPeriods = updatedWeekdays;
           props.setFieldValue(schedule);
         }}
+        disabled={props.disabled}
       />
 
       <h4>Sélectionnez les horaires</h4>
@@ -33,6 +35,7 @@ export const SimpleSchedulePicker = (props: SimpleSchedulePickerProps) => {
           schedule.simpleSchedule.hours = newHours;
           props.setFieldValue(schedule);
         }}
+        disabled={props.disabled}
       />
     </div>
   );

@@ -7,6 +7,7 @@ import { ScheduleDto } from "src/shared/ScheduleSchema";
 type ComplexSchedulePickerProps = {
   selectedIndex: number;
   setFieldValue: (updatedSchedule: ScheduleDto) => void;
+  disabled?: boolean;
 } & FieldHookConfig<ScheduleDto>;
 
 export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
@@ -31,6 +32,7 @@ export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
           schedule.complexSchedule[schedule.selectedIndex] = newHours;
           props.setFieldValue(schedule);
         }}
+        disabled={props.disabled}
       />
     </div>
   );

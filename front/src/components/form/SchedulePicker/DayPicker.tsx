@@ -5,12 +5,14 @@ type DayPickerProps = {
   complexSchedule: ComplexScheduleDto;
   selectedIndex: number;
   onChange: (index: number) => void;
+  disabled?: boolean;
 };
 
 export const DayPicker = ({
   complexSchedule,
   selectedIndex,
   onChange,
+  disabled,
 }: DayPickerProps) => {
   const weekDays = ["L", "M", "M", "J", "V", "S", "D"];
 
@@ -33,6 +35,7 @@ export const DayPicker = ({
               className={className}
               onClick={() => onChange(index)}
               key={"weekdaybtn" + index}
+              disabled={disabled}
             >
               <div>{name}</div>
             </button>

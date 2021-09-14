@@ -7,12 +7,14 @@ import { DeleteButton } from "../../DeleteButton";
 type WeekdayPickerProps = {
   schedule: number[][];
   onValueChange: (updatedWeekdays: number[][]) => void;
+  disabled?: boolean;
 } & FieldHookConfig<ScheduleDto>;
 
 export const WeekdayPicker = ({
   name,
   schedule,
   onValueChange,
+  disabled,
 }: WeekdayPickerProps) => {
   const add = () => {
     let start = 0;
@@ -63,6 +65,7 @@ export const WeekdayPicker = ({
                     maxDay={dayRange[1]}
                     selected={dayRange[0]}
                     onValueChange={(x) => onStartChange(x)}
+                    disabled={disabled}
                   />
                 </div>
 
@@ -74,24 +77,29 @@ export const WeekdayPicker = ({
                     maxDay={6}
                     selected={dayRange[1]}
                     onValueChange={(x) => onEndChange(x)}
+                    disabled={disabled}
                   />
                 </div>
-                <DeleteButton
-                  isHidden={!isRemovable}
-                  disabled={!isRemovable}
-                  onClick={() => remove(index)}
-                />
+                {!disabled && (
+                  <DeleteButton
+                    isHidden={!isRemovable}
+                    disabled={!isRemovable}
+                    onClick={() => remove(index)}
+                  />
+                )}
               </div>
             </div>
           );
         })}
-      <button
-        type="button"
-        className="fr-btn fr-fi-add-line fr-btn--icon-left fr-btn--secondary"
-        onClick={() => add()}
-      >
-        Ajouter une période
-      </button>
+      {!disabled && (
+        <button
+          type="button"
+          className="fr-btn fr-fi-add-line fr-btn--icon-left fr-btn--secondary"
+          onClick={() => add()}
+        >
+          Ajouter une période
+        </button>
+      )}
     </>
   );
 };

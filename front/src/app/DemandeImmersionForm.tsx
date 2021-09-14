@@ -17,6 +17,7 @@ import { TextInput } from "src/components/form/TextInput";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { ENV } from "src/environmentVariables";
 import {
+  ApplicationSource,
   DemandeImmersionDto,
   demandeImmersionDtoSchema,
 } from "src/shared/DemandeImmersionDto";
@@ -123,33 +124,87 @@ const FrozenMessage = () => (
   </>
 );
 
+type ApplicationFormRoute = Route<
+  | typeof routes.demandeImmersion
+  | typeof routes.boulogneSurMer
+  | typeof routes.narbonne
+>;
 interface ApplicationFormProps {
-  route: Route<
-    | typeof routes.demandeImmersion
-    | typeof routes.boulogneSurMer
-    | typeof routes.narbonne
-  >;
+  route: ApplicationFormRoute;
 }
 
 const isDemandeImmersionFrozen = (
   demandeImmersion: DemandeImmersionDto
-): boolean => demandeImmersion.status !== "DRAFT";
+): boolean => !demandeImmersion.status || demandeImmersion.status !== "DRAFT";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
-const createInitialApplication = (): DemandeImmersionDto => {
-  return {
+const { featureFlags, dev } = ENV;
+
+const getApplicationSourceForRoute = (
+  route: ApplicationFormRoute
+): ApplicationSource => {
+  switch (route.name) {
+    case "boulogneSurMer":
+      return "BOULOGNE_SUR_MER";
+    case "narbonne":
+      return "NARBONNE";
+    default:
+      return "GENERIC";
+  }
+};
+
+const createInitialApplication = (
+  route: ApplicationFormRoute
+): DemandeImmersionDto => {
+  const emptyForm: DemandeImmersionDto = {
     id: uuidV4(),
     status: "DRAFT",
-    source: "GENERIC",
+    source: getApplicationSourceForRoute(route),
+    dateSubmission: toDateString(startOfToday()),
+
+    // Participant
+    email: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    dateStart: toDateString(addDays(startOfToday(), 2)),
+    dateEnd: toDateString(addDays(startOfToday(), 3)),
+
+    // Enterprise
+    siret: "",
+    businessName: "",
+    mentor: "",
+    mentorPhone: "",
+    mentorEmail: "",
+    schedule: reasonableSchedule,
+    immersionAddress: "",
+
+    // Covid
+    individualProtection: false,
+    sanitaryPrevention: false,
+    sanitaryPreventionDescription: "",
+
+    // Immersion
+    immersionObjective: "",
+    immersionProfession: "",
+    immersionActivities: "",
+    immersionSkills: "",
+
+    // Signatures
+    beneficiaryAccepted: false,
+    enterpriseAccepted: false,
+  };
+  if (!dev) return emptyForm;
+
+  return {
+    ...emptyForm,
+
     // Participant
     email: "sylvanie@monemail.fr",
     firstName: "Sylanie",
     lastName: "Durand",
     phone: "0612345678",
-    dateSubmission: toDateString(startOfToday()),
-    dateStart: toDateString(addDays(startOfToday(), 2)),
-    dateEnd: toDateString(addDays(startOfToday(), 3)),
 
     // Enterprise
     siret: "12345678912345",
@@ -157,12 +212,9 @@ const createInitialApplication = (): DemandeImmersionDto => {
     mentor: "The Mentor",
     mentorPhone: "0687654321",
     mentorEmail: "mentor@supermentor.fr",
-    schedule: reasonableSchedule,
     immersionAddress: "Quelque Part",
 
     // Covid
-    individualProtection: false,
-    sanitaryPrevention: false,
     sanitaryPreventionDescription: "Aucunes",
 
     // Immersion
@@ -172,8 +224,8 @@ const createInitialApplication = (): DemandeImmersionDto => {
     immersionSkills: "Attention au détail",
 
     // Signatures
-    beneficiaryAccepted: false,
-    enterpriseAccepted: false,
+    beneficiaryAccepted: true,
+    enterpriseAccepted: true,
   };
 };
 
@@ -193,11 +245,9 @@ const createSuccessProps = (link: string | undefined): SuccessProps => ({
   link,
 });
 
-const { featureFlags } = ENV;
-
 export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const [initialValues, setInitialValues] = useState(
-    createInitialApplication()
+    createInitialApplication(route)
   );
   const [submitError, setSubmitError] = useState<Error | null>(null);
   const [successProps, setSuccessProps] = useState<SuccessProps | null>(null);
@@ -271,29 +321,11 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                   };
                 }
 
-                if (
-                  route.name === "boulogneSurMer" &&
-                  featureFlags.enableBoulogneSurMerApplicationForm
-                ) {
-                  application = {
-                    ...application,
-                    source: "BOULOGNE_SUR_MER",
-                  };
-                }
-
-                if (
-                  route.name === "narbonne" &&
-                  featureFlags.enableNarbonneApplicationForm
-                ) {
-                  application = {
-                    ...application,
-                    source: "NARBONNE",
-                  };
-                }
-
                 const upsertedId = currentId
                   ? await demandeImmersionGateway.update(application)
                   : await demandeImmersionGateway.add(application);
+
+                setInitialValues(application);
 
                 let newUrl: string | undefined = undefined;
                 if (featureFlags.enableViewableApplications) {
@@ -321,7 +353,9 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             {(props) => (
               <div>
                 <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-                  {isFrozen && <FrozenMessage />}
+                  {isFrozen && featureFlags.enableViewableApplications && (
+                    <FrozenMessage />
+                  )}
 
                   <TextInput
                     label="Email *"
@@ -416,7 +450,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                     label="Indiquez l'e-mail du tuteur *"
                     name="mentorEmail"
                     type="email"
-                    placeholder="alain.prost@exemple.com"
+                    placeholder="nom@exemple.com"
                     description="pour envoyer la validation de la convention"
                     disabled={isFrozen}
                   />
@@ -427,6 +461,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                     setFieldValue={(x) => {
                       props.setFieldValue("schedule", x);
                     }}
+                    disabled={isFrozen}
                   />
 
                   <TextInput
@@ -548,17 +583,19 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
 
                   <p />
 
-                  <button
-                    className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-                    type="submit"
-                    disabled={props.isSubmitting || isFrozen}
-                  >
-                    {props.isSubmitting
-                      ? "Éxecution"
-                      : featureFlags.enableViewableApplications
-                      ? "Sauvegarder"
-                      : "Envoyer la demande"}
-                  </button>
+                  {!isFrozen && (
+                    <button
+                      className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+                      type="submit"
+                      disabled={props.isSubmitting || isFrozen}
+                    >
+                      {props.isSubmitting
+                        ? "Éxecution"
+                        : featureFlags.enableViewableApplications
+                        ? "Sauvegarder"
+                        : "Envoyer la demande"}
+                    </button>
+                  )}
                 </form>
               </div>
             )}
