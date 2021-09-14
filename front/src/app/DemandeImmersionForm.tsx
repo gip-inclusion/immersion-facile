@@ -166,7 +166,7 @@ const createInitialApplication = (): DemandeImmersionDto => {
     sanitaryPreventionDescription: "Aucunes",
 
     // Immersion
-    immersionObjective: "Valider coaching d'équipe",
+    immersionObjective: "",
     immersionProfession: "Chef d'atelier",
     immersionActivities: "Superviser",
     immersionSkills: "Attention au détail",

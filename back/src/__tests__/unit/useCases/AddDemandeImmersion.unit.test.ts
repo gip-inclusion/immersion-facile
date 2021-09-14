@@ -13,7 +13,9 @@ import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helper
 
 describe("Add demandeImmersion", () => {
   let addDemandeImmersion: AddDemandeImmersion;
-  let repository: InMemoryDemandeImmersionRepository;
+  let genericRepository: InMemoryDemandeImmersionRepository;
+  let boulogneSurMerRepository: InMemoryDemandeImmersionRepository;
+  let narbonneRepository: InMemoryDemandeImmersionRepository;
   let emailGateway: InMemoryEmailGateway;
   let featureFlags: FeatureFlags;
   let supervisorEmail: string | undefined;
@@ -21,7 +23,9 @@ describe("Add demandeImmersion", () => {
   const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
 
   beforeEach(() => {
-    repository = new InMemoryDemandeImmersionRepository();
+    genericRepository = new InMemoryDemandeImmersionRepository();
+    boulogneSurMerRepository = new InMemoryDemandeImmersionRepository();
+    narbonneRepository = new InMemoryDemandeImmersionRepository();
     emailGateway = new InMemoryEmailGateway();
     featureFlags = new FeatureFlagsBuilder().build();
     supervisorEmail = undefined;
@@ -30,7 +34,9 @@ describe("Add demandeImmersion", () => {
 
   const createAddDemandeImmersionUseCase = () => {
     return new AddDemandeImmersion({
-      demandeImmersionRepository: repository,
+      genericRepository: genericRepository,
+      boulogneSurMerRepository,
+      narbonneRepository,
       emailGateway,
       featureFlags,
       supervisorEmail,
@@ -51,7 +57,7 @@ describe("Add demandeImmersion", () => {
         id: validDemandeImmersion.id,
       });
 
-      const storedInRepo = await repository.getAll();
+      const storedInRepo = await genericRepository.getAll();
       expect(storedInRepo.length).toBe(1);
       expect(storedInRepo[0].toDto()).toEqual(validDemandeImmersion);
     });
@@ -120,7 +126,7 @@ describe("Add demandeImmersion", () => {
     });
 
     test("rejects applications where the ID is already in use", async () => {
-      await repository.save(
+      await genericRepository.save(
         DemandeImmersionEntity.create(validDemandeImmersion)
       );
 
@@ -189,6 +195,8 @@ describe("Add demandeImmersion", () => {
         .build();
 
       expect(() => addDemandeImmersion.execute(application)).not.toThrowError();
+      expect(await genericRepository.getAll()).toHaveLength(0);
+      expect(await narbonneRepository.getAll()).toHaveLength(1);
       expect(emailGateway.getSentEmails).toHaveLength(0);
     });
 

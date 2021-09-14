@@ -8,6 +8,7 @@ import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { FeatureFlags } from "../../shared/featureFlags";
 import { logger } from "../../utils/logger";
 import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
+import { AirtableOriginalBetaDemandeImmersionRepository } from "../secondary/AirtableOriginalBetaDemandeImmersionRepository";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
@@ -22,12 +23,28 @@ export const getRepositories = () => {
   logger.info("EMAIL_GATEWAY: " + process.env.EMAIL_GATEWAY ?? "IN_MEMORY");
 
   return {
-    demandeImmersion:
+    demandeImmersionGeneric:
       process.env.REPOSITORIES === "AIRTABLE"
         ? AirtableDemandeImmersionRepository.create(
             getEnvVarOrDie("AIRTABLE_API_KEY"),
-            getEnvVarOrDie("AIRTABLE_BASE_ID"),
-            getEnvVarOrDie("AIRTABLE_TABLE_NAME")
+            getEnvVarOrDie("AIRTABLE_BASE_ID_GENERIC"),
+            getEnvVarOrDie("AIRTABLE_TABLE_NAME_GENERIC")
+          )
+        : new InMemoryDemandeImmersionRepository(),
+    demandeImmersionBoulogneSurMer:
+      process.env.REPOSITORIES === "AIRTABLE"
+        ? AirtableOriginalBetaDemandeImmersionRepository.create(
+            getEnvVarOrDie("AIRTABLE_API_KEY"),
+            getEnvVarOrDie("AIRTABLE_BASE_ID_BOULOGNE_SUR_MER"),
+            getEnvVarOrDie("AIRTABLE_TABLE_NAME_BOULOGNE_SUR_MER")
+          )
+        : new InMemoryDemandeImmersionRepository(),
+    demandeImmersionNarbonne:
+      process.env.REPOSITORIES === "AIRTABLE"
+        ? AirtableOriginalBetaDemandeImmersionRepository.create(
+            getEnvVarOrDie("AIRTABLE_API_KEY"),
+            getEnvVarOrDie("AIRTABLE_BASE_ID_NARBONNE"),
+            getEnvVarOrDie("AIRTABLE_TABLE_NAME_NARBONNE")
           )
         : new InMemoryDemandeImmersionRepository(),
 
@@ -96,22 +113,24 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
   return {
     // formulaire
     addDemandeImmersion: new AddDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersion,
+      genericRepository: repositories.demandeImmersionGeneric,
+      boulogneSurMerRepository: repositories.demandeImmersionBoulogneSurMer,
+      narbonneRepository: repositories.demandeImmersionNarbonne,
       emailGateway: repositories.email,
       featureFlags,
       supervisorEmail: supervisorEmail,
       emailAllowList,
     }),
     getDemandeImmersion: new GetDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersion,
+      demandeImmersionRepository: repositories.demandeImmersionGeneric,
       featureFlags,
     }),
     listDemandeImmersion: new ListDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersion,
+      demandeImmersionRepository: repositories.demandeImmersionGeneric,
       featureFlags,
     }),
     updateDemandeImmersion: new UpdateDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersion,
+      demandeImmersionRepository: repositories.demandeImmersionGeneric,
       featureFlags,
     }),
 
