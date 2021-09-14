@@ -1,95 +1,83 @@
-import { FieldHookConfig, FormikHelpers, FormikState, useField } from "formik";
+import { useField } from "formik";
 import React from "react";
 import { CheckboxGroupProps } from "src/components/form/CheckboxGroup";
 
 type BoolRadioProps = {
+  name: string;
   label: string;
-  formikHelpers: FormikHelpers<any> & FormikState<any>;
   hideNoOption: boolean;
-  description: string;
-  descriptionLink: string;
   disabled: boolean;
-} & FieldHookConfig<string>;
+};
+
 // Like MyRadioGroup, but backs a boolean value.
 // Has default "oui/non" options.
-export const BoolRadioGroup = (props: BoolRadioProps) => {
-  const [field, meta, helper] = useField(props);
-  const isError = meta.touched && meta.error;
-  const htmlName = isError ? "radio" : "radio-error";
+export const BoolRadioGroup = ({
+  name,
+  label,
+  hideNoOption,
+  disabled,
+}: BoolRadioProps) => {
+  const [field, meta, { setValue }] = useField<boolean>({ name });
+  const error = meta.touched && meta.error;
+  const htmlName = error ? "radio" : "radio-error";
+
   return (
     <>
       <div className="fr-form-group">
         <fieldset
-          className={isError ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
+          className={error ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
           aria-labelledby={
-            isError ? "radio-error-legend radio-error-desc-error" : ""
+            error ? "radio-error-legend radio-error-desc-error" : ""
           }
           role="group"
         >
           <legend
             className="fr-fieldset__legend fr-text--regular"
-            id={isError ? "radio-error-legend" : "radio-legend"}
+            id={error ? "radio-error-legend" : "radio-legend"}
           >
-            {props.label}
+            {label}
           </legend>
-          {props.description && (
-            <span className="fr-hint-text" id="select-hint-desc-hint">
-              <a href={props.descriptionLink} target="_blank">
-                {props.description}
-              </a>
-            </span>
-          )}
           <div className="fr-fieldset__content">
-            <div
-              className="fr-radio-group"
-              key={htmlName + props.name + "_oui"}
-            >
+            <div className="fr-radio-group" key={htmlName + name + "_oui"}>
               <input
                 {...field}
+                checked={field.value}
+                value={field.value.toString()}
                 type="radio"
                 id={htmlName}
-                checked={props.formikHelpers.values[props.name]}
-                disabled={props.disabled}
+                disabled={disabled}
               />
               <label
                 className="fr-label"
                 htmlFor={htmlName + "oui"}
-                onClick={() =>
-                  !props.disabled &&
-                  props.formikHelpers.setFieldValue(props.name, true)
-                }
+                onClick={() => !disabled && setValue(true)}
               >
                 oui{" "}
               </label>
             </div>
-            {!props.hideNoOption && (
-              <div
-                className="fr-radio-group"
-                key={htmlName + props.name + "_non"}
-              >
+            {!hideNoOption && (
+              <div className="fr-radio-group" key={htmlName + name + "_non"}>
                 <input
                   {...field}
                   type="radio"
                   id={htmlName}
-                  checked={!props.formikHelpers.values[props.name]}
-                  disabled={props.disabled}
+                  value={field.value.toString()}
+                  checked={!field.value}
+                  disabled={disabled}
                 />
                 <label
                   className="fr-label"
                   htmlFor={htmlName + "non"}
-                  onClick={() =>
-                    !props.disabled &&
-                    props.formikHelpers.setFieldValue(props.name, false)
-                  }
+                  onClick={() => !disabled && setValue(false)}
                 >
                   non
                 </label>
               </div>
             )}
           </div>
-          {isError && (
+          {error && (
             <p id="radio-error-desc-error" className="fr-error-text">
-              {meta.error}
+              {error}
             </p>
           )}
         </fieldset>
@@ -97,6 +85,7 @@ export const BoolRadioGroup = (props: BoolRadioProps) => {
     </>
   );
 };
+
 export const RadioGroup = (props: CheckboxGroupProps) => {
   const [field, meta] = useField(props);
   const isError = meta.touched && meta.error;

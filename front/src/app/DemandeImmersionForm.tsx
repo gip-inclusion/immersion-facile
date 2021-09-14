@@ -479,8 +479,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
 
                   <BoolRadioGroup
                     name="individualProtection"
-                    label="Un équipement de protection individuelle est-il fourni pour l’immersion ?"
-                    formikHelpers={props}
+                    label="Un équipement de protection individuelle est-il fourni pour l’immersion ? *"
                     hideNoOption={false}
                     description=""
                     descriptionLink=""
@@ -490,7 +489,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                   <BoolRadioGroup
                     name="sanitaryPrevention"
                     label="Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ? *"
-                    formikHelpers={props}
                     hideNoOption={false}
                     description=""
                     descriptionLink=""
