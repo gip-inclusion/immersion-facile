@@ -52,6 +52,7 @@ const fetchCompanyInfoBySiret = async (siret: string) => {
 };
 interface SiretFields {
   siret: string;
+  immersionAddress: string;
 }
 
 type SiretAutocompletedFieldProps = {
@@ -64,6 +65,7 @@ const SiretAutocompletedField = (props: SiretAutocompletedFieldProps) => {
     values: { siret },
     setFieldValue,
     setFieldError,
+    touched,
   } = useFormikContext<SiretFields>();
   const [field, meta] = useField(props);
 
@@ -79,7 +81,9 @@ const SiretAutocompletedField = (props: SiretAutocompletedFieldProps) => {
         if (isCurrent) {
           setFieldValue(props.name, sanitizedSiret);
           setFieldValue("businessName", info.nom);
-          setFieldValue("immersionAddress", info.address);
+          if (!touched.immersionAddress) {
+            setFieldValue("immersionAddress", info.address);
+          }
         }
       })
       .catch((err: AxiosError) => {
