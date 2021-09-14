@@ -106,9 +106,9 @@ export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
     if (!checkTimePeriodPositive(period)) {
       return (
         "La plage horaire " +
-        (periodIndex + 1) +
+        (periodIndex + 1) + " " +
         periodToHumanReadableString(period) +
-        " incorrect. Le début doit être avant la fin. "
+        " est incorrecte. L'heure de début doit précéder l'heure de fin. "
       );
     }
   }
@@ -116,7 +116,7 @@ export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
   // Check if all periods are positive.
   schedule.hours.forEach((period: TimePeriodDto, index: Number) => {
     if (!checkTimePeriodPositive(period)) {
-      return "La plage horaire " + index.toString() + " incorrect !";
+      return "La plage horaire " + index.toString() + " est incorrecte !";
     }
   });
 
@@ -152,11 +152,11 @@ export const checkComplexSchedule = (schedule: ComplexScheduleDto) => {
       if (!checkTimePeriodPositive(period)) {
         return (
           "La plage horaire " +
-          (periodIndex + 1) +
+          (periodIndex + 1) + " " +
           periodToHumanReadableString(period) +
           " de " +
           weekdays[dayIndex] +
-          " incorrect. Le début doit être avant la fin. "
+          " incorrecte. L'heure de début doit précéder l'heure de fin. "
         );
       }
 
