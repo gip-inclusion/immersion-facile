@@ -50,6 +50,7 @@ const fetchCompanyInfoBySiret = async (siret: string) => {
     return { nom, address };
   });
 };
+
 interface SiretFields {
   siret: string;
   immersionAddress: string;
@@ -133,6 +134,7 @@ type ApplicationFormRoute = Route<
   | typeof routes.boulogneSurMer
   | typeof routes.narbonne
 >;
+
 interface ApplicationFormProps {
   route: ApplicationFormRoute;
 }
@@ -563,6 +565,12 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                   />
 
                   <p />
+
+                  {props.submitCount !== 0 && props.errors && (
+                    <div style={{ color: "red" }}>
+                      Veuillez corriger les champs erronés
+                    </div>
+                  )}
 
                   {submitError && (
                     <ErrorMessage
