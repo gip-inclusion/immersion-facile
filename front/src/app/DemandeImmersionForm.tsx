@@ -3,7 +3,7 @@ import { addDays, format, startOfToday } from "date-fns";
 import { FieldHookConfig, Formik, useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
 import { demandeImmersionGateway } from "src/app/main";
-import { BoolRadioGroup, RadioGroup } from "src/app/radioGroup";
+import { BoolRadioGroup, RadioGroup } from "src/app/RadioGroup";
 import { routes } from "src/app/routes";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { DateInput } from "src/components/form/DateInput";
@@ -481,8 +481,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                     name="individualProtection"
                     label="Un équipement de protection individuelle est-il fourni pour l’immersion ? *"
                     hideNoOption={false}
-                    description=""
-                    descriptionLink=""
                     disabled={isFrozen}
                   />
 
@@ -490,8 +488,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                     name="sanitaryPrevention"
                     label="Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ? *"
                     hideNoOption={false}
-                    description=""
-                    descriptionLink=""
                     disabled={isFrozen}
                   />
 

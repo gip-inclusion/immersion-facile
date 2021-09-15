@@ -83,22 +83,28 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
 };
 
 export type CheckboxGroupProps = {
+  name: string;
   label: string;
   values: Array<string>;
   disabled: boolean;
-} & FieldHookConfig<string>;
+};
 
-export const CheckboxGroup = (props: CheckboxGroupProps) => {
-  const [field, meta] = useField(props);
-  const isError = meta.touched && meta.error;
+export const CheckboxGroup = ({
+  name,
+  label,
+  values,
+  disabled,
+}: CheckboxGroupProps) => {
+  const [field, meta] = useField({ name });
+  const error = meta.touched && meta.error;
 
   return (
     <>
       <div className="fr-form-group">
         <fieldset
-          className={isError ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
+          className={error ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
           aria-labelledby={
-            "checkboxes-error-legend" + isError
+            "checkboxes-error-legend" + error
               ? " checkboxes-error-desc-error"
               : ""
           }
@@ -108,18 +114,18 @@ export const CheckboxGroup = (props: CheckboxGroupProps) => {
             className="fr-fieldset__legend fr-text--regular"
             id="checkboxes-error-legend"
           >
-            {props.label}
+            {label}
           </legend>
           <div className="fr-fieldset__content">
-            {props.values.map((value) => (
+            {values.map((value) => (
               <div className="fr-checkbox-group" key={value}>
                 <Field
                   type="checkbox"
                   {...field}
-                  name={props.name}
+                  name={name}
                   value={value}
                   id={value}
-                  disabled={props.disabled}
+                  disabled={disabled}
                 />
                 <label className="fr-label" htmlFor={value}>
                   {value}
@@ -127,7 +133,7 @@ export const CheckboxGroup = (props: CheckboxGroupProps) => {
               </div>
             ))}
           </div>
-          {isError && (
+          {error && (
             <p id="checkboxes-error-desc-error" className="fr-error-text">
               {meta.error}
             </p>

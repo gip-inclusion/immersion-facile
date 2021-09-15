@@ -86,39 +86,43 @@ export const BoolRadioGroup = ({
   );
 };
 
-export const RadioGroup = (props: CheckboxGroupProps) => {
-  const [field, meta] = useField(props);
-  const isError = meta.touched && meta.error;
+export const RadioGroup = ({
+  name,
+  label,
+  values,
+  disabled,
+}: CheckboxGroupProps) => {
+  const [field, meta, { setValue }] = useField({ name });
+  const error = meta.touched && meta.error;
 
   return (
     <>
       <div className="fr-form-group">
         <fieldset
-          className={isError ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
+          className={error ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
           aria-labelledby={
-            isError ? "radio-error-legend radio-error-desc-error" : ""
+            error ? "radio-error-legend radio-error-desc-error" : ""
           }
           role="group"
         >
           <legend
             className="fr-fieldset__legend fr-text--regular"
-            id={isError ? "radio-error-legend" : "radio-legend"}
+            id={error ? "radio-error-legend" : "radio-legend"}
           >
-            {props.label}
+            {label}
           </legend>
           <div className="fr-fieldset__content">
-            {props.values.map((value) => {
-              const htmlName = isError ? "radio" : "radio-error";
+            {values.map((value) => {
+              const htmlName = error ? "radio" : "radio-error";
               return (
-                <div
-                  className="fr-radio-group"
-                  key={htmlName + props.name + value}
-                >
+                <div className="fr-radio-group" key={value}>
                   <input
-                    {...field}
                     type="radio"
                     id={htmlName + value}
-                    disabled={props.disabled}
+                    disabled={disabled}
+                    value={value}
+                    checked={value === field.value}
+                    onChange={() => !disabled && setValue(value)}
                   />
                   <label className="fr-label" htmlFor={htmlName + value}>
                     {value}
@@ -127,7 +131,7 @@ export const RadioGroup = (props: CheckboxGroupProps) => {
               );
             })}
           </div>
-          {isError && (
+          {error && (
             <p id="radio-error-desc-error" className="fr-error-text">
               {meta.error}
             </p>
