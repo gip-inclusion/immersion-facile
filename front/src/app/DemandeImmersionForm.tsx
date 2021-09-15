@@ -173,8 +173,8 @@ const getApplicationSourceForRoute = (
 
 const createInitialApplication = (
   route: ApplicationFormRoute
-): DemandeImmersionDto => {
-  const emptyForm: DemandeImmersionDto = {
+): Partial<DemandeImmersionDto> => {
+  const emptyForm: Partial<DemandeImmersionDto> = {
     id: uuidV4(),
     status: "DRAFT",
     source: getApplicationSourceForRoute(route),
@@ -198,8 +198,8 @@ const createInitialApplication = (
     immersionAddress: "",
 
     // Covid
-    individualProtection: false,
-    sanitaryPrevention: false,
+    individualProtection: undefined,
+    sanitaryPrevention: undefined,
     sanitaryPreventionDescription: "",
 
     // Immersion
@@ -232,6 +232,8 @@ const createInitialApplication = (
     immersionAddress: "",
 
     // Covid
+    individualProtection: true,
+    sanitaryPrevention: true,
     sanitaryPreventionDescription: "Aucunes",
 
     // Immersion

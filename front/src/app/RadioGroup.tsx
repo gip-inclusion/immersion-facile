@@ -41,8 +41,8 @@ export const BoolRadioGroup = ({
             <div className="fr-radio-group" key={htmlName + name + "_oui"}>
               <input
                 {...field}
-                checked={field.value}
-                value={field.value.toString()}
+                checked={field.value === undefined ? false : field.value}
+                value={field.value?.toString()}
                 type="radio"
                 id={htmlName}
                 disabled={disabled}
@@ -61,8 +61,8 @@ export const BoolRadioGroup = ({
                   {...field}
                   type="radio"
                   id={htmlName}
-                  value={field.value.toString()}
-                  checked={!field.value}
+                  value={field.value?.toString()}
+                  checked={field.value === undefined ? false : !field.value}
                   disabled={disabled}
                 />
                 <label
