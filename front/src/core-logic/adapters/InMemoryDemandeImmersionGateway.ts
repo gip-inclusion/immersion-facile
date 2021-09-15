@@ -53,12 +53,32 @@ const TEST_ESTABLISHMENT1 = {
   },
 };
 
+const TEST_ESTABLISHMENT2_SIRET = "11111111111111";
+const TEST_ESTABLISHMENT2 = {
+  siren: "111111111",
+  nic: "11111",
+  siret: TEST_ESTABLISHMENT2_SIRET,
+  uniteLegale: {
+    denominationUniteLegale: null,
+    "nomUniteLegale": "PROST",
+    "prenomUsuelUniteLegale": "ALAIN",
+  },
+  adresseEtablissement: {
+    numeroVoieEtablissement: null,
+    typeVoieEtablissement: "CHALET",
+    libelleVoieEtablissement: "SECRET",
+    codePostalEtablissement: "73550",
+    libelleCommuneEtablissement: "MERIBEL",
+  },
+};
+
 const SIMULATED_LATENCY_MS = 2000;
 
 export class InMemoryDemandeImmersionGateway
   implements DemandeImmersionGateway
 {
   private _demandesImmersion: { [id: string]: DemandeImmersionDto } = {};
+  private _establishments: { [siret: string]: Object } = {};
 
   public constructor(readonly featureFlags: FeatureFlags) {
     this.add({
@@ -73,6 +93,9 @@ export class InMemoryDemandeImmersionGateway
       status: "FINALIZED",
       email: "FINALIZED.esteban@ocon.fr",
     });
+
+    this._establishments[TEST_ESTABLISHMENT1_SIRET] = TEST_ESTABLISHMENT1;
+    this._establishments[TEST_ESTABLISHMENT2_SIRET] = TEST_ESTABLISHMENT2;
   }
 
   public async add(
@@ -115,7 +138,10 @@ export class InMemoryDemandeImmersionGateway
     console.log("InMemoryDemandeImmersionGateway.getSiretInfo: " + siret);
     await sleep(SIMULATED_LATENCY_MS);
 
-    if (siret !== TEST_ESTABLISHMENT1_SIRET) {
+    const establishment = this._establishments[siret];
+    console.log("InMemoryDemandeImmersionGateway.getSiretInfo: ", establishment);
+
+    if (!establishment) {
       throw new Error("404 Not found");
     }
 
@@ -127,7 +153,7 @@ export class InMemoryDemandeImmersionGateway
         debut: 0,
         nombre: 1,
       },
-      etablissements: [TEST_ESTABLISHMENT1],
+      etablissements: [establishment],
     };
   }
 }

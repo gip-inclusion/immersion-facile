@@ -44,10 +44,21 @@ const fetchCompanyInfoBySiret = async (siret: string) => {
 
   return demandeImmersionGateway.getSiretInfo(siret).then((info: any) => {
     const establishment = info["etablissements"][0];
-    const nom = establishment["uniteLegale"]["denominationUniteLegale"];
+
+
+    let businessName;
+
+    const uniteLegale = establishment["uniteLegale"]["denominationUniteLegale"];
+    if (uniteLegale) {
+      businessName = uniteLegale;
+    } else {
+      const prenomUsuelUniteLegale = establishment["uniteLegale"]["prenomUsuelUniteLegale"];
+      const nomUniteLegale = establishment["uniteLegale"]["nomUniteLegale"];
+      businessName = [prenomUsuelUniteLegale, nomUniteLegale].filter((s) => !!s).join(" ");
+    }
     const address = addressDictToString(establishment["adresseEtablissement"]);
 
-    return { nom, address };
+    return { nom: businessName, address };
   });
 };
 
@@ -213,12 +224,12 @@ const createInitialApplication = (
     phone: "0612345678",
 
     // Enterprise
-    siret: "12345678912345",
-    businessName: "Ma petite entreprise ne connait pas la crise",
+    siret: "12345678901234",
+    businessName: "",
     mentor: "The Mentor",
     mentorPhone: "0687654321",
     mentorEmail: "mentor@supermentor.fr",
-    immersionAddress: "Quelque Part",
+    immersionAddress: "",
 
     // Covid
     sanitaryPreventionDescription: "Aucunes",
