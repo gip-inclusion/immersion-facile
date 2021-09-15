@@ -20,6 +20,7 @@ front:
     - cd front
     - npm ci
     - npm run test
+    - npm run typecheck
     - npm run build
 
 back:

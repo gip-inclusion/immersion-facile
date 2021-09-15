@@ -60,8 +60,8 @@ const TEST_ESTABLISHMENT2 = {
   siret: TEST_ESTABLISHMENT2_SIRET,
   uniteLegale: {
     denominationUniteLegale: null,
-    "nomUniteLegale": "PROST",
-    "prenomUsuelUniteLegale": "ALAIN",
+    nomUniteLegale: "PROST",
+    prenomUsuelUniteLegale: "ALAIN",
   },
   adresseEtablissement: {
     numeroVoieEtablissement: null,
@@ -139,7 +139,10 @@ export class InMemoryDemandeImmersionGateway
     await sleep(SIMULATED_LATENCY_MS);
 
     const establishment = this._establishments[siret];
-    console.log("InMemoryDemandeImmersionGateway.getSiretInfo: ", establishment);
+    console.log(
+      "InMemoryDemandeImmersionGateway.getSiretInfo: ",
+      establishment
+    );
 
     if (!establishment) {
       throw new Error("404 Not found");

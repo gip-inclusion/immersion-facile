@@ -45,16 +45,18 @@ const fetchCompanyInfoBySiret = async (siret: string) => {
   return demandeImmersionGateway.getSiretInfo(siret).then((info: any) => {
     const establishment = info["etablissements"][0];
 
-
     let businessName;
 
     const uniteLegale = establishment["uniteLegale"]["denominationUniteLegale"];
     if (uniteLegale) {
       businessName = uniteLegale;
     } else {
-      const prenomUsuelUniteLegale = establishment["uniteLegale"]["prenomUsuelUniteLegale"];
+      const prenomUsuelUniteLegale =
+        establishment["uniteLegale"]["prenomUsuelUniteLegale"];
       const nomUniteLegale = establishment["uniteLegale"]["nomUniteLegale"];
-      businessName = [prenomUsuelUniteLegale, nomUniteLegale].filter((s) => !!s).join(" ");
+      businessName = [prenomUsuelUniteLegale, nomUniteLegale]
+        .filter((s) => !!s)
+        .join(" ");
     }
     const address = addressDictToString(establishment["adresseEtablissement"]);
 
@@ -151,7 +153,7 @@ interface ApplicationFormProps {
 }
 
 const isDemandeImmersionFrozen = (
-  demandeImmersion: DemandeImmersionDto
+  demandeImmersion: Partial<DemandeImmersionDto>
 ): boolean => !demandeImmersion.status || demandeImmersion.status !== "DRAFT";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
