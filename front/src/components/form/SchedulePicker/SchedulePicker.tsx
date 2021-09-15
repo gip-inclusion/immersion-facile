@@ -39,7 +39,7 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
         label="Les horaires quotidiens sont-ils réguliers ? *"
         description="Ex : (Non) chaque jour a des horaires bien spécifiques, (Oui) “Du lundi au vendredi de 8h00 à 17h00”"
         yesLabel="Oui"
-        noLabel="Non, irrégulieres"
+        noLabel="Non, irréguliers"
         checked={field.value.isSimple}
         setFieldValue={(newValue) => {
           let schedule = field.value;
