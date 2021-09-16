@@ -1,4 +1,4 @@
-export type NewDemandeAdminNotificationParams = {
+export type NewApplicationAdminNotificationParams = {
   demandeId: string;
   firstName: string;
   lastName: string;
@@ -7,23 +7,35 @@ export type NewDemandeAdminNotificationParams = {
   businessName: string;
 };
 
-export type NewDemandeBeneficiaireConfirmationParams = {
+export type NewApplicationBeneficiaryConfirmationParams = {
   demandeId: string;
   firstName: string;
   lastName: string;
 };
 
+export type NewApplicationMentorConfirmationParams = {
+  demandeId: string;
+  mentorName: string;
+  beneficiaryFirstName: string;
+  beneficiaryLastName: string;
+};
+
 export type EmailType =
-  | "NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION"
-  | "NEW_DEMANDE_ADMIN_NOTIFICATION";
+  | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
+  | "NEW_APPLICATION_MENTOR_CONFIRMATION"
+  | "NEW_APPLICATION_ADMIN_NOTIFICATION";
 
 export interface EmailGateway {
-  sendNewDemandeBeneficiaireConfirmation: (
+  sendNewApplicationBeneficiaryConfirmation: (
     recipient: string,
-    params: NewDemandeBeneficiaireConfirmationParams
+    params: NewApplicationBeneficiaryConfirmationParams
   ) => Promise<void>;
-  sendNewDemandeAdminNotification: (
+  sendNewApplicationMentorConfirmation: (
+    recipient: string,
+    params: NewApplicationMentorConfirmationParams
+  ) => Promise<void>;
+  sendNewApplicationAdminNotification: (
     recipients: string[],
-    params: NewDemandeAdminNotificationParams
+    params: NewApplicationAdminNotificationParams
   ) => Promise<void>;
 }

@@ -106,7 +106,8 @@ export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
     if (!checkTimePeriodPositive(period)) {
       return (
         "La plage horaire " +
-        (periodIndex + 1) + " " +
+        (periodIndex + 1) +
+        " " +
         periodToHumanReadableString(period) +
         " est incorrecte. L'heure de début doit précéder l'heure de fin. "
       );
@@ -152,7 +153,8 @@ export const checkComplexSchedule = (schedule: ComplexScheduleDto) => {
       if (!checkTimePeriodPositive(period)) {
         return (
           "La plage horaire " +
-          (periodIndex + 1) + " " +
+          (periodIndex + 1) +
+          " " +
           periodToHumanReadableString(period) +
           " de " +
           weekdays[dayIndex] +

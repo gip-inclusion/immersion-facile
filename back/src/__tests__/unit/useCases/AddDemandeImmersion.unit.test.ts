@@ -10,6 +10,7 @@ import {
 import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
 import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { ApplicationSource } from "./../../../shared/DemandeImmersionDto";
 
 describe("Add demandeImmersion", () => {
   let addDemandeImmersion: AddDemandeImmersion;
@@ -19,7 +20,8 @@ describe("Add demandeImmersion", () => {
   let emailGateway: InMemoryEmailGateway;
   let featureFlags: FeatureFlags;
   let supervisorEmail: string | undefined;
-  let emailAllowList: string[];
+  let unrestrictedEmailSendingSources: Set<ApplicationSource>;
+  let emailAllowList: Set<string>;
   const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
 
   beforeEach(() => {
@@ -29,7 +31,8 @@ describe("Add demandeImmersion", () => {
     emailGateway = new InMemoryEmailGateway();
     featureFlags = new FeatureFlagsBuilder().build();
     supervisorEmail = undefined;
-    emailAllowList = [];
+    unrestrictedEmailSendingSources = new Set<ApplicationSource>();
+    emailAllowList = new Set<string>();
   });
 
   const createAddDemandeImmersionUseCase = () => {
@@ -40,6 +43,7 @@ describe("Add demandeImmersion", () => {
       emailGateway,
       featureFlags,
       supervisorEmail,
+      unrestrictedEmailSendingSources,
       emailAllowList,
     });
   };
@@ -83,7 +87,9 @@ describe("Add demandeImmersion", () => {
         const sentEmails = emailGateway.getSentEmails();
         expect(sentEmails).toHaveLength(1);
 
-        expect(sentEmails[0].type).toEqual("NEW_DEMANDE_ADMIN_NOTIFICATION");
+        expect(sentEmails[0].type).toEqual(
+          "NEW_APPLICATION_ADMIN_NOTIFICATION"
+        );
         expect(sentEmails[0].recipients).toContain("supervisor@email.fr");
         expect(sentEmails[0].params).toEqual({
           demandeId: validDemandeImmersion.id,
@@ -96,17 +102,17 @@ describe("Add demandeImmersion", () => {
       });
     });
 
-    describe("When beneficiary email address is on allowlist", () => {
+    describe("When beneficiary email address is on the allowlist", () => {
       beforeEach(() => {
-        emailAllowList = ["beneficiaire@email.fr"];
+        emailAllowList.add("beneficiary@email.fr");
         addDemandeImmersion = createAddDemandeImmersionUseCase();
       });
 
-      test("sends beneficiary confirmation email", async () => {
+      test("sends the beneficiary confirmation email", async () => {
         expect(
           await addDemandeImmersion.execute({
             ...validDemandeImmersion,
-            email: "beneficiaire@email.fr",
+            email: "beneficiary@email.fr",
           })
         ).not.toBeUndefined();
 
@@ -114,14 +120,67 @@ describe("Add demandeImmersion", () => {
         expect(sentEmails).toHaveLength(1);
 
         expect(sentEmails[0].type).toEqual(
-          "NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION"
+          "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
         );
-        expect(sentEmails[0].recipients).toContain("beneficiaire@email.fr");
+        expect(sentEmails[0].recipients).toContain("beneficiary@email.fr");
         expect(sentEmails[0].params).toEqual({
           demandeId: validDemandeImmersion.id,
           firstName: validDemandeImmersion.firstName,
           lastName: validDemandeImmersion.lastName,
         });
+      });
+    });
+
+    describe("When mentor email address is on the allowlist", () => {
+      beforeEach(() => {
+        emailAllowList.add("mentor@email.fr");
+        addDemandeImmersion = createAddDemandeImmersionUseCase();
+      });
+
+      test("sends the mentor confirmation email", async () => {
+        expect(
+          await addDemandeImmersion.execute({
+            ...validDemandeImmersion,
+            mentorEmail: "mentor@email.fr",
+          })
+        ).not.toBeUndefined();
+
+        const sentEmails = emailGateway.getSentEmails();
+        expect(sentEmails).toHaveLength(1);
+
+        expect(sentEmails[0].type).toEqual(
+          "NEW_APPLICATION_MENTOR_CONFIRMATION"
+        );
+        expect(sentEmails[0].recipients).toContain("mentor@email.fr");
+        expect(sentEmails[0].params).toEqual({
+          demandeId: validDemandeImmersion.id,
+          mentorName: validDemandeImmersion.mentor,
+          beneficiaryFirstName: validDemandeImmersion.firstName,
+          beneficiaryLastName: validDemandeImmersion.lastName,
+        });
+      });
+    });
+
+    describe("When unrestricted email sending is enabled", () => {
+      beforeEach(() => {
+        unrestrictedEmailSendingSources.add("GENERIC");
+        addDemandeImmersion = createAddDemandeImmersionUseCase();
+      });
+
+      test("sends the beneficiary and mentor confirmation emails", async () => {
+        expect(
+          await addDemandeImmersion.execute({
+            ...validDemandeImmersion,
+            email: "beneficiary@email.fr",
+            mentorEmail: "mentor@email.fr",
+          })
+        ).not.toBeUndefined();
+
+        const sentEmails = emailGateway.getSentEmails();
+        expect(sentEmails.map((email) => email.type)).toEqual([
+          "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
+          "NEW_APPLICATION_MENTOR_CONFIRMATION",
+        ]);
       });
     });
 
@@ -154,7 +213,7 @@ describe("Add demandeImmersion", () => {
         .enableBoulogneSurMerApplicationForm()
         .build();
       supervisorEmail = "supervisor@email.fr";
-      emailAllowList = ["beneficiary@email.fr"];
+      unrestrictedEmailSendingSources.add("BOULOGNE_SUR_MER");
       addDemandeImmersion = createAddDemandeImmersionUseCase();
     });
 
@@ -163,8 +222,15 @@ describe("Add demandeImmersion", () => {
         .withSource("BOULOGNE_SUR_MER")
         .build();
 
-      expect(() => addDemandeImmersion.execute(application)).not.toThrowError();
-      expect(emailGateway.getSentEmails).toHaveLength(0);
+      await expect(() =>
+        addDemandeImmersion.execute(application)
+      ).not.toThrowError();
+      expect(await genericRepository.getAll()).toHaveLength(0);
+      expect(await boulogneSurMerRepository.getAll()).toHaveLength(1);
+      expect(emailGateway.getSentEmails().map((email) => email.type)).toEqual([
+        "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
+        "NEW_APPLICATION_MENTOR_CONFIRMATION",
+      ]);
     });
 
     test("rejects applications with source != BOULOGNE_SUR_MER", async () => {
@@ -185,7 +251,7 @@ describe("Add demandeImmersion", () => {
         .enableNarbonneApplicationForm()
         .build();
       supervisorEmail = "supervisor@email.fr";
-      emailAllowList = ["beneficiary@email.fr"];
+      unrestrictedEmailSendingSources.add("NARBONNE");
       addDemandeImmersion = createAddDemandeImmersionUseCase();
     });
 
@@ -194,10 +260,15 @@ describe("Add demandeImmersion", () => {
         .withSource("NARBONNE")
         .build();
 
-      expect(() => addDemandeImmersion.execute(application)).not.toThrowError();
+      await expect(() =>
+        addDemandeImmersion.execute(application)
+      ).not.toThrowError();
       expect(await genericRepository.getAll()).toHaveLength(0);
       expect(await narbonneRepository.getAll()).toHaveLength(1);
-      expect(emailGateway.getSentEmails).toHaveLength(0);
+      expect(emailGateway.getSentEmails().map((email) => email.type)).toEqual([
+        "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
+        "NEW_APPLICATION_MENTOR_CONFIRMATION",
+      ]);
     });
 
     test("rejects applications with source != NARBONNE", async () => {

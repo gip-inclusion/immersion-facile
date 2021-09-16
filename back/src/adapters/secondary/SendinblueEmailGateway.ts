@@ -2,18 +2,22 @@ import { Logger } from "pino";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import type {
   EmailType,
-  NewDemandeAdminNotificationParams,
-  NewDemandeBeneficiaireConfirmationParams,
+  NewApplicationAdminNotificationParams,
+  NewApplicationBeneficiaryConfirmationParams,
+  NewApplicationMentorConfirmationParams,
 } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { logger } from "../../utils/logger";
 
 const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/3/message-setup
-  NEW_DEMANDE_ADMIN_NOTIFICATION: 3,
+  NEW_APPLICATION_ADMIN_NOTIFICATION: 3,
 
   // https://my.sendinblue.com/camp/template/4/message-setup
-  NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION: 4,
+  NEW_APPLICATION_BENEFICIARY_CONFIRMATION: 4,
+
+  // https://my.sendinblue.com/camp/template/5/message-setup
+  NEW_APPLICATION_MENTOR_CONFIRMATION: 5,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -34,13 +38,13 @@ export class SendinblueEmailGateway implements EmailGateway {
     return new SendinblueEmailGateway(apiInstance);
   }
 
-  public async sendNewDemandeBeneficiaireConfirmation(
+  public async sendNewApplicationBeneficiaryConfirmation(
     recipient: string,
-    params: NewDemandeBeneficiaireConfirmationParams
+    params: NewApplicationBeneficiaryConfirmationParams
   ): Promise<void> {
     const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
     sibEmail.templateId =
-      emailTypeToTemplateId.NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION;
+      emailTypeToTemplateId.NEW_APPLICATION_BENEFICIARY_CONFIRMATION;
     sibEmail.to = [{ email: recipient }];
     sibEmail.params = {
       DEMANDE_ID: params.demandeId,
@@ -50,12 +54,30 @@ export class SendinblueEmailGateway implements EmailGateway {
     this.sendTransacEmail(sibEmail);
   }
 
-  public async sendNewDemandeAdminNotification(
+  public async sendNewApplicationMentorConfirmation(
+    recipient: string,
+    params: NewApplicationMentorConfirmationParams
+  ): Promise<void> {
+    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sibEmail.templateId =
+      emailTypeToTemplateId.NEW_APPLICATION_MENTOR_CONFIRMATION;
+    sibEmail.to = [{ email: recipient }];
+    sibEmail.params = {
+      DEMANDE_ID: params.demandeId,
+      MENTOR_NAME: params.mentorName,
+      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+    };
+    this.sendTransacEmail(sibEmail);
+  }
+
+  public async sendNewApplicationAdminNotification(
     recipients: string[],
-    params: NewDemandeAdminNotificationParams
+    params: NewApplicationAdminNotificationParams
   ) {
     const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sibEmail.templateId = emailTypeToTemplateId.NEW_DEMANDE_ADMIN_NOTIFICATION;
+    sibEmail.templateId =
+      emailTypeToTemplateId.NEW_APPLICATION_ADMIN_NOTIFICATION;
     sibEmail.to = recipients.map((email) => ({ email }));
     sibEmail.params = {
       DEMANDE_ID: params.demandeId,

@@ -21,7 +21,8 @@ type AddDemandeImmersionDependencies = {
   emailGateway: EmailGateway;
   featureFlags: FeatureFlags;
   supervisorEmail: string | undefined;
-  emailAllowList: string[];
+  unrestrictedEmailSendingSources: Readonly<Set<ApplicationSource>>;
+  emailAllowList: Readonly<Set<string>>;
 };
 
 export class AddDemandeImmersion
@@ -34,7 +35,10 @@ export class AddDemandeImmersion
   private readonly emailGateway: EmailGateway;
   private readonly featureFlags: FeatureFlags;
   private readonly supervisorEmail: string | undefined;
-  private readonly emailAllowList: Set<string>;
+  private readonly unrestrictedEmailSendingSources: Readonly<
+    Set<ApplicationSource>
+  >;
+  private readonly emailAllowList: Readonly<Set<string>>;
 
   constructor({
     genericRepository,
@@ -43,6 +47,7 @@ export class AddDemandeImmersion
     emailGateway,
     featureFlags,
     supervisorEmail,
+    unrestrictedEmailSendingSources,
     emailAllowList,
   }: AddDemandeImmersionDependencies) {
     this.genericRepository = genericRepository;
@@ -51,20 +56,21 @@ export class AddDemandeImmersion
     this.emailGateway = emailGateway;
     this.featureFlags = featureFlags;
     this.supervisorEmail = supervisorEmail;
-    this.emailAllowList = new Set(emailAllowList);
+    this.unrestrictedEmailSendingSources = unrestrictedEmailSendingSources;
+    this.emailAllowList = emailAllowList;
   }
 
   public async execute(
     params: DemandeImmersionDto
   ): Promise<AddDemandeImmersionResponseDto> {
     const repository = this.selectRepository(params.source);
-    const demandeImmersionEntity = DemandeImmersionEntity.create(params);
-    const id = await repository.save(demandeImmersionEntity);
+    const applicationEntity = DemandeImmersionEntity.create(params);
+    const id = await repository.save(applicationEntity);
 
-    if (!id) throw new ConflictError(demandeImmersionEntity.id);
+    if (!id) throw new ConflictError(applicationEntity.id);
 
     if (params.source === "GENERIC" && this.supervisorEmail) {
-      this.emailGateway.sendNewDemandeAdminNotification(
+      this.emailGateway.sendNewApplicationAdminNotification(
         [this.supervisorEmail],
         {
           demandeId: params.id,
@@ -77,16 +83,42 @@ export class AddDemandeImmersion
       );
     }
 
-    if (params.source === "GENERIC" && this.emailAllowList.has(params.email)) {
-      this.emailGateway.sendNewDemandeBeneficiaireConfirmation(params.email, {
-        demandeId: params.id,
-        firstName: params.firstName,
-        lastName: params.lastName,
-      });
+    if (
+      this.unrestrictedEmailSendingSources.has(params.source) ||
+      this.emailAllowList.has(params.email)
+    ) {
+      this.emailGateway.sendNewApplicationBeneficiaryConfirmation(
+        params.email,
+        {
+          demandeId: params.id,
+          firstName: params.firstName,
+          lastName: params.lastName,
+        }
+      );
     } else {
       this.logger.info(
-        { demandeId: params.id, email: params.email },
-        "Bénéficiaire confirmation email not sent because recipient not on allowlist."
+        { demandeId: params.id, email: params.email, source: params.source },
+        "Sending beneficiary confirmation email skipped."
+      );
+    }
+
+    if (
+      this.unrestrictedEmailSendingSources.has(params.source) ||
+      this.emailAllowList.has(params.mentorEmail)
+    ) {
+      this.emailGateway.sendNewApplicationMentorConfirmation(
+        params.mentorEmail,
+        {
+          demandeId: params.id,
+          mentorName: params.mentor,
+          beneficiaryFirstName: params.firstName,
+          beneficiaryLastName: params.lastName,
+        }
+      );
+    } else {
+      this.logger.info(
+        { demandeId: params.id, email: params.email, source: params.source },
+        "Sending mentor confirmation email skipped."
       );
     }
 

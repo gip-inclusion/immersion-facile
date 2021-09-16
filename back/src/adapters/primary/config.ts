@@ -5,6 +5,10 @@ import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetD
 import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
 import { UpdateDemandeImmersion } from "../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
+import {
+  ApplicationSource,
+  applicationSourceFromString,
+} from "../../shared/DemandeImmersionDto";
 import { FeatureFlags } from "../../shared/featureFlags";
 import { logger } from "../../utils/logger";
 import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
@@ -101,12 +105,22 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
     );
   }
 
-  const emailAllowList = (process.env.EMAIL_ALLOW_LIST || "")
-    .split(",")
-    .filter((el) => !!el);
+  const unrestrictedEmailSendingSources: Readonly<Set<ApplicationSource>> =
+    new Set(
+      (process.env.UNRESTRICTED_EMAIL_SENDING_SOURCES || "")
+        .split(",")
+        .filter((el) => !!el)
+        .map(applicationSourceFromString)
+        .filter((source) => source !== "UNKNOWN")
+    );
+
+  const emailAllowList: Readonly<Set<string>> = new Set(
+    (process.env.EMAIL_ALLOW_LIST || "").split(",").filter((el) => !!el)
+  );
   if (!emailAllowList) {
     logger.warn(
-      "Empty EMAIL_ALLOW_LIST. Disabling the sending of non-supervisor emails."
+      "Empty EMAIL_ALLOW_LIST. Disabling the sending of non-supervisor emails for sources with ",
+      "restricted email sending."
     );
   }
 
@@ -119,6 +133,7 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
       emailGateway: repositories.email,
       featureFlags,
       supervisorEmail: supervisorEmail,
+      unrestrictedEmailSendingSources,
       emailAllowList,
     }),
     getDemandeImmersion: new GetDemandeImmersion({

@@ -1,7 +1,8 @@
 import type {
   EmailType,
-  NewDemandeAdminNotificationParams,
-  NewDemandeBeneficiaireConfirmationParams,
+  NewApplicationAdminNotificationParams,
+  NewApplicationBeneficiaryConfirmationParams,
+  NewApplicationMentorConfirmationParams,
 } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { logger } from "../../utils/logger";
@@ -16,28 +17,46 @@ export class InMemoryEmailGateway implements EmailGateway {
   private readonly logger = logger.child({ logsource: "InMemoryEmailGateway" });
   private readonly sentEmails: TemplatedEmail[] = [];
 
-  public async sendNewDemandeBeneficiaireConfirmation(
+  public async sendNewApplicationBeneficiaryConfirmation(
     recipient: string,
-    params: NewDemandeBeneficiaireConfirmationParams
+    params: NewApplicationBeneficiaryConfirmationParams
   ): Promise<void> {
     this.logger.info(
       { recipient, params },
-      "sendNewDemandeBeneficiaireConfirmation"
+      "sendNewApplicationBeneficiaryConfirmation"
     );
     this.sentEmails.push({
-      type: "NEW_DEMANDE_BENEFICIAIRE_CONFIRMATION",
+      type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
       recipients: [recipient],
       params,
     });
   }
 
-  public async sendNewDemandeAdminNotification(
-    recipients: string[],
-    params: NewDemandeAdminNotificationParams
+  public async sendNewApplicationMentorConfirmation(
+    recipient: string,
+    params: NewApplicationMentorConfirmationParams
   ): Promise<void> {
-    this.logger.info({ recipients, params }, "sendNewDemandeAdminNotification");
+    this.logger.info(
+      { recipient, params },
+      "sendNewApplicationMentorConfirmation"
+    );
     this.sentEmails.push({
-      type: "NEW_DEMANDE_ADMIN_NOTIFICATION",
+      type: "NEW_APPLICATION_MENTOR_CONFIRMATION",
+      recipients: [recipient],
+      params,
+    });
+  }
+
+  public async sendNewApplicationAdminNotification(
+    recipients: string[],
+    params: NewApplicationAdminNotificationParams
+  ): Promise<void> {
+    this.logger.info(
+      { recipients, params },
+      "sendNewApplicationAdminNotification"
+    );
+    this.sentEmails.push({
+      type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
       recipients: recipients,
       params,
     });
