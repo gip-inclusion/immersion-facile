@@ -389,7 +389,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
 
                   <TextInput
                     label="Votre nom *"
-                    name="firstName"
+                    name="lastName"
                     type="text"
                     placeholder=""
                     description=""
@@ -398,7 +398,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
 
                   <TextInput
                     label="Votre prénom *"
-                    name="lastName"
+                    name="firstName"
                     type="text"
                     placeholder=""
                     description=""
