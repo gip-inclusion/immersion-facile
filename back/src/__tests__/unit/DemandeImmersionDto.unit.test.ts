@@ -19,6 +19,15 @@ describe("demandeImmersionDtoSchema", () => {
     expectDemandeImmersionDtoToBeValid(demandeImmersion);
   });
 
+  test("rejects equal applicant and mentor emails", () => {
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withEmail("demandeur@mail.fr")
+      .withMentorEmail("demandeur@mail.fr")
+      .build();
+
+    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
+  });
+
   test("rejects misformatted submission dates", () => {
     const demandeImmersion = new DemandeImmersionDtoBuilder()
       .withDateSubmission("not-a-date")

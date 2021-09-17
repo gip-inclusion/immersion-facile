@@ -56,6 +56,10 @@ export class DemandeImmersionDtoBuilder
     return new DemandeImmersionDtoBuilder({ ...this.dto, email });
   }
 
+  public withMentorEmail(mentorEmail: string): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, mentorEmail });
+  }
+
   public withDateSubmission(
     dateSubmission: string
   ): DemandeImmersionDtoBuilder {

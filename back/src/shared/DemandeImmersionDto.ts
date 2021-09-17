@@ -113,7 +113,18 @@ export const demandeImmersionDtoSchema = Yup.object({
     .matches(phoneRegExp, "Numero de téléphone de tuteur incorrect"),
   mentorEmail: Yup.string()
     .required("Obligatoire")
-    .email("Veuillez saisir un adresse mail correct"),
+    .email("Veuillez saisir une adresse mail correcte")
+    .test(
+      "notEqualToOtherEmail",
+      "Votre adresse e-mail doit être différente de celle du tuteur",
+      (value, context) => {
+        if (!value || !context.parent.email) {
+          return false;
+        }
+
+        return context.parent.email !== value;
+      }
+    ),
 
   // TODO: investigate how to use correct schema (problem on submiting form, nothing happens)
   schedule: Yup.mixed<ScheduleDto>().required(),
