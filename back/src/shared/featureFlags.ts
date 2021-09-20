@@ -1,8 +1,8 @@
 import { makeGetBooleanVariable, ProcessEnv } from "./envHelpers";
 
 export class FeatureDisabledError extends Error {
-  constructor() {
-    super();
+  constructor(msg?: string) {
+    super(msg);
     Object.setPrototypeOf(this, FeatureDisabledError.prototype);
   }
 }

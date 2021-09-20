@@ -1,4 +1,7 @@
-import { DemandeImmersionId } from "../../../shared/DemandeImmersionDto";
+import {
+  ApplicationSource,
+  DemandeImmersionId,
+} from "../../../shared/DemandeImmersionDto";
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
 
 export interface DemandeImmersionRepository {

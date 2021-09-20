@@ -1,5 +1,7 @@
+import { weekdays } from "../../shared/ScheduleSchema";
 import {
   convertToFrenchNamedDays,
+  isArrayOfWeekdays,
   prettyPrintSchedule,
 } from "../../shared/ScheduleUtils";
 import { ScheduleDtoBuilder } from "../../_testBuilders/ScheduleDtoBuilder";
@@ -120,6 +122,22 @@ describe("ScheduleUtils", () => {
         "jeudi",
         "dimanche",
       ]);
+    });
+  });
+
+  describe("isArrayOfWeekdays", () => {
+    test("accepts valid arrays", () => {
+      expect(isArrayOfWeekdays([])).toEqual(true);
+      expect(isArrayOfWeekdays(["lundi", "jeudi", "samedi"])).toEqual(true);
+      expect(isArrayOfWeekdays(weekdays)).toEqual(true);
+    });
+    test("rejects invalid arrays", () => {
+      expect(isArrayOfWeekdays(undefined)).toEqual(false);
+      expect(isArrayOfWeekdays("hello world")).toEqual(false);
+      expect(isArrayOfWeekdays(12345)).toEqual(false);
+      expect(isArrayOfWeekdays([1, 2, 3])).toEqual(false);
+      expect(isArrayOfWeekdays(["Lundi"])).toEqual(false);
+      expect(isArrayOfWeekdays(["lundi", "MARDI"])).toEqual(false);
     });
   });
 });

@@ -24,6 +24,7 @@ const DEMANDE_IMMERSION_TEMPLATE: DemandeImmersionDto = {
   mentorPhone: "0601010101",
   mentorEmail: "alain@prost.fr",
   schedule: reasonableSchedule,
+  legacySchedule: undefined,
   immersionAddress: "",
   individualProtection: true,
   sanitaryPrevention: true,

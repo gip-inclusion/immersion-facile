@@ -1,5 +1,5 @@
 import * as Yup from "../../node_modules/yup";
-import { ScheduleDto } from "./ScheduleSchema";
+import { LegacyScheduleDto, ScheduleDto } from "./ScheduleSchema";
 import { Flavor } from "./typeFlavors";
 
 // TODO: find the standard for gouv.fr phone verification
@@ -130,8 +130,8 @@ export const demandeImmersionDtoSchema = Yup.object({
       }
     ),
 
-  // TODO: investigate how to use correct schema (problem on submiting form, nothing happens)
   schedule: Yup.mixed<ScheduleDto>().required(),
+  legacySchedule: Yup.mixed<LegacyScheduleDto>(),
 
   individualProtection: Yup.boolean().required("Obligatoire"),
   sanitaryPrevention: Yup.boolean().required("Obligatoire"),

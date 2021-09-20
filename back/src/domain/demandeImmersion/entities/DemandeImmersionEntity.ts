@@ -18,4 +18,14 @@ export class DemandeImmersionEntity {
   public get id() {
     return this.properties.id;
   }
+
+  public get source() {
+    return this.properties.source;
+  }
 }
+
+export const isDemandeImmersionEntity = (
+  entity: DemandeImmersionEntity | undefined
+): entity is DemandeImmersionEntity => {
+  return !!entity;
+};

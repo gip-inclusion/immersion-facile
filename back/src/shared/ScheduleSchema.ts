@@ -1,5 +1,31 @@
 import * as Yup from "../../node_modules/yup";
 
+export type Weekday =
+  | "lundi"
+  | "mardi"
+  | "mercredi"
+  | "jeudi"
+  | "vendredi"
+  | "samedi"
+  | "dimanche";
+
+export const weekdays: Weekday[] = [
+  "lundi",
+  "mardi",
+  "mercredi",
+  "jeudi",
+  "vendredi",
+  "samedi",
+  "dimanche",
+];
+
+export const emptySchedule: Readonly<ScheduleDto> = {
+  isSimple: false,
+  selectedIndex: 0,
+  complexSchedule: [[], [], [], [], [], [], []],
+  simpleSchedule: { dayPeriods: [], hours: [] },
+};
+
 const reasonableHours = [
   {
     start: "08:00",
@@ -53,7 +79,13 @@ export const scheduleSchema = Yup.object({
   simpleSchedule: simpleScheduleSchema,
 }).required();
 
+export const legacyScheduleSchema = Yup.object({
+  workdays: Yup.array(Yup.mixed<Weekday>().required()).required(),
+  description: Yup.string().required(),
+}).required();
+
 export type SimpleScheduleDto = Yup.InferType<typeof simpleScheduleSchema>;
 export type ScheduleDto = Yup.InferType<typeof scheduleSchema>;
 export type TimePeriodDto = Yup.InferType<typeof timePeriodSchema>;
 export type ComplexScheduleDto = Yup.InferType<typeof complexScheduleSchema>;
+export type LegacyScheduleDto = Yup.InferType<typeof legacyScheduleSchema>;

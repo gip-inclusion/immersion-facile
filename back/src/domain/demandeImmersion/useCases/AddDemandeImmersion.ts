@@ -4,22 +4,15 @@ import {
   ApplicationSource,
   DemandeImmersionDto,
 } from "../../../shared/DemandeImmersionDto";
-import {
-  FeatureDisabledError,
-  FeatureFlags,
-} from "../../../shared/featureFlags";
 import { logger } from "../../../utils/logger";
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
-import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
 import { EmailGateway } from "../ports/EmailGateway";
+import { DemandeImmersionRepository } from "./../ports/DemandeImmersionRepository";
 
 type AddDemandeImmersionDependencies = {
-  genericRepository: DemandeImmersionRepository;
-  boulogneSurMerRepository: DemandeImmersionRepository;
-  narbonneRepository: DemandeImmersionRepository;
+  applicationRepository: DemandeImmersionRepository;
   emailGateway: EmailGateway;
-  featureFlags: FeatureFlags;
   supervisorEmail: string | undefined;
   unrestrictedEmailSendingSources: Readonly<Set<ApplicationSource>>;
   emailAllowList: Readonly<Set<string>>;
@@ -29,11 +22,8 @@ export class AddDemandeImmersion
   implements UseCase<DemandeImmersionDto, AddDemandeImmersionResponseDto>
 {
   private readonly logger = logger.child({ logsource: "AddDemandeImmersion" });
-  private readonly genericRepository: DemandeImmersionRepository;
-  private readonly boulogneSurMerRepository: DemandeImmersionRepository;
-  private readonly narbonneRepository: DemandeImmersionRepository;
+  private readonly applicationRepository: DemandeImmersionRepository;
   private readonly emailGateway: EmailGateway;
-  private readonly featureFlags: FeatureFlags;
   private readonly supervisorEmail: string | undefined;
   private readonly unrestrictedEmailSendingSources: Readonly<
     Set<ApplicationSource>
@@ -41,20 +31,14 @@ export class AddDemandeImmersion
   private readonly emailAllowList: Readonly<Set<string>>;
 
   constructor({
-    genericRepository,
-    boulogneSurMerRepository,
-    narbonneRepository,
+    applicationRepository,
     emailGateway,
-    featureFlags,
     supervisorEmail,
     unrestrictedEmailSendingSources,
     emailAllowList,
   }: AddDemandeImmersionDependencies) {
-    this.genericRepository = genericRepository;
-    this.boulogneSurMerRepository = boulogneSurMerRepository;
-    this.narbonneRepository = narbonneRepository;
+    this.applicationRepository = applicationRepository;
     this.emailGateway = emailGateway;
-    this.featureFlags = featureFlags;
     this.supervisorEmail = supervisorEmail;
     this.unrestrictedEmailSendingSources = unrestrictedEmailSendingSources;
     this.emailAllowList = emailAllowList;
@@ -63,10 +47,8 @@ export class AddDemandeImmersion
   public async execute(
     params: DemandeImmersionDto
   ): Promise<AddDemandeImmersionResponseDto> {
-    const repository = this.selectRepository(params.source);
     const applicationEntity = DemandeImmersionEntity.create(params);
-    const id = await repository.save(applicationEntity);
-
+    const id = await this.applicationRepository.save(applicationEntity);
     if (!id) throw new ConflictError(applicationEntity.id);
 
     if (params.source === "GENERIC" && this.supervisorEmail) {
@@ -123,33 +105,5 @@ export class AddDemandeImmersion
     }
 
     return { id };
-  }
-
-  private selectRepository(
-    source: ApplicationSource
-  ): DemandeImmersionRepository {
-    const {
-      enableGenericApplicationForm,
-      enableBoulogneSurMerApplicationForm,
-      enableNarbonneApplicationForm,
-    } = this.featureFlags;
-
-    switch (source) {
-      case "GENERIC": {
-        if (!enableGenericApplicationForm) throw new FeatureDisabledError();
-        return this.genericRepository;
-      }
-      case "BOULOGNE_SUR_MER": {
-        if (!enableBoulogneSurMerApplicationForm)
-          throw new FeatureDisabledError();
-        return this.boulogneSurMerRepository;
-      }
-      case "NARBONNE": {
-        if (!enableNarbonneApplicationForm) throw new FeatureDisabledError();
-        return this.narbonneRepository;
-      }
-      default:
-        throw new Error(`Unknown source in request: ${source}`);
-    }
   }
 }

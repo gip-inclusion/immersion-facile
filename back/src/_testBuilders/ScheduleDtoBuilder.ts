@@ -3,24 +3,13 @@ import {
   ScheduleDto,
   SimpleScheduleDto,
 } from "../shared/ScheduleSchema";
+import { emptySchedule } from "./../shared/ScheduleSchema";
 import { Builder } from "./Builder";
-
-const emptySimpleSchedule: SimpleScheduleDto = { dayPeriods: [], hours: [] };
-
-const emptyComplexSchedule: ComplexScheduleDto = [[], [], [], [], [], [], []];
-
-const emptySchedule: ScheduleDto = {
-  isSimple: false,
-  selectedIndex: 0,
-  complexSchedule: emptyComplexSchedule,
-  simpleSchedule: emptySimpleSchedule,
-};
-
 export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
   constructor(private dto: ScheduleDto = emptySchedule) {}
 
   public withEmptySimpleSchedule(): ScheduleDtoBuilder {
-    return this.withSimpleSchedule(emptySimpleSchedule);
+    return this.withSimpleSchedule(emptySchedule.simpleSchedule);
   }
 
   public withSimpleSchedule(
@@ -34,7 +23,7 @@ export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
   }
 
   public withEmptyComplexSchedule(): ScheduleDtoBuilder {
-    return this.withComplexSchedule(emptyComplexSchedule);
+    return this.withComplexSchedule(emptySchedule.complexSchedule);
   }
 
   public withComplexSchedule(

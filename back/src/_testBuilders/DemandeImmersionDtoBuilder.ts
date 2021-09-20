@@ -36,6 +36,7 @@ const validDemandeImmersion: DemandeImmersionDto = {
   mentorPhone: VALID_PHONES[1],
   mentorEmail: VALID_EMAILS[1],
   schedule: reasonableSchedule,
+  legacySchedule: { workdays: [], description: "" },
   immersionAddress: "",
   individualProtection: true,
   sanitaryPrevention: true,

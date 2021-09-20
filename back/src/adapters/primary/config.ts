@@ -8,19 +8,65 @@ import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import {
   ApplicationSource,
-  applicationSourceFromString,
+  applicationSourceFromString
 } from "../../shared/DemandeImmersionDto";
 import { FeatureFlags } from "../../shared/featureFlags";
 import { logger } from "../../utils/logger";
-import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
-import { AirtableOriginalBetaDemandeImmersionRepository } from "../secondary/AirtableOriginalBetaDemandeImmersionRepository";
+import {
+  genericApplicationDataConverter,
+  legacyApplicationDataConverter
+} from "../secondary/AirtableApplicationDataConverters";
+import {
+  ApplicationRepositoryMap,
+  ApplicationRepositorySwitcher
+} from "../secondary/ApplicationRepositorySwitcher";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { DemandeImmersionRepository } from "./../../domain/demandeImmersion/ports/DemandeImmersionRepository";
+import { AirtableDemandeImmersionRepository } from "./../secondary/AirtableDemandeImmersionRepository";
 
-export const getRepositories = () => {
+const getApplicationRepository = (
+  featureFlags: FeatureFlags
+): DemandeImmersionRepository => {
+  const useAirtable = process.env.REPOSITORIES === "AIRTABLE";
+  const repositoriesBySource: ApplicationRepositoryMap = {};
+  if (featureFlags.enableGenericApplicationForm) {
+    repositoriesBySource["GENERIC"] = useAirtable
+      ? AirtableDemandeImmersionRepository.create(
+          getEnvVarOrDie("AIRTABLE_API_KEY"),
+          getEnvVarOrDie("AIRTABLE_BASE_ID_GENERIC"),
+          getEnvVarOrDie("AIRTABLE_TABLE_NAME_GENERIC"),
+          genericApplicationDataConverter
+        )
+      : new InMemoryDemandeImmersionRepository();
+  }
+  if (featureFlags.enableBoulogneSurMerApplicationForm) {
+    repositoriesBySource["BOULOGNE_SUR_MER"] = useAirtable
+      ? AirtableDemandeImmersionRepository.create(
+          getEnvVarOrDie("AIRTABLE_API_KEY"),
+          getEnvVarOrDie("AIRTABLE_BASE_ID_BOULOGNE_SUR_MER"),
+          getEnvVarOrDie("AIRTABLE_TABLE_NAME_BOULOGNE_SUR_MER"),
+          legacyApplicationDataConverter
+        )
+      : new InMemoryDemandeImmersionRepository();
+  }
+  if (featureFlags.enableNarbonneApplicationForm) {
+    repositoriesBySource["NARBONNE"] = useAirtable
+      ? AirtableDemandeImmersionRepository.create(
+          getEnvVarOrDie("AIRTABLE_API_KEY"),
+          getEnvVarOrDie("AIRTABLE_BASE_ID_NARBONNE"),
+          getEnvVarOrDie("AIRTABLE_TABLE_NAME_NARBONNE"),
+          legacyApplicationDataConverter
+        )
+      : new InMemoryDemandeImmersionRepository();
+  }
+  return new ApplicationRepositorySwitcher(repositoriesBySource);
+};
+
+export const getRepositories = (featureFlags: FeatureFlags) => {
   logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
   logger.info(
     "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY"
@@ -28,31 +74,7 @@ export const getRepositories = () => {
   logger.info("EMAIL_GATEWAY: " + process.env.EMAIL_GATEWAY ?? "IN_MEMORY");
 
   return {
-    demandeImmersionGeneric:
-      process.env.REPOSITORIES === "AIRTABLE"
-        ? AirtableDemandeImmersionRepository.create(
-            getEnvVarOrDie("AIRTABLE_API_KEY"),
-            getEnvVarOrDie("AIRTABLE_BASE_ID_GENERIC"),
-            getEnvVarOrDie("AIRTABLE_TABLE_NAME_GENERIC")
-          )
-        : new InMemoryDemandeImmersionRepository(),
-    demandeImmersionBoulogneSurMer:
-      process.env.REPOSITORIES === "AIRTABLE"
-        ? AirtableOriginalBetaDemandeImmersionRepository.create(
-            getEnvVarOrDie("AIRTABLE_API_KEY"),
-            getEnvVarOrDie("AIRTABLE_BASE_ID_BOULOGNE_SUR_MER"),
-            getEnvVarOrDie("AIRTABLE_TABLE_NAME_BOULOGNE_SUR_MER")
-          )
-        : new InMemoryDemandeImmersionRepository(),
-    demandeImmersionNarbonne:
-      process.env.REPOSITORIES === "AIRTABLE"
-        ? AirtableOriginalBetaDemandeImmersionRepository.create(
-            getEnvVarOrDie("AIRTABLE_API_KEY"),
-            getEnvVarOrDie("AIRTABLE_BASE_ID_NARBONNE"),
-            getEnvVarOrDie("AIRTABLE_TABLE_NAME_NARBONNE")
-          )
-        : new InMemoryDemandeImmersionRepository(),
-
+    demandeImmersion: getApplicationRepository(featureFlags),
     sirene:
       process.env.SIRENE_REPOSITORY === "HTTPS"
         ? HttpsSireneRepository.create(
@@ -98,7 +120,7 @@ const fail = (message: string) => {
 };
 
 export const getUsecases = (featureFlags: FeatureFlags) => {
-  const repositories = getRepositories();
+  const repositories = getRepositories(featureFlags);
   const supervisorEmail = process.env.SUPERVISOR_EMAIL;
   if (!supervisorEmail) {
     logger.warn(
@@ -128,29 +150,26 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
   return {
     // formulaire
     addDemandeImmersion: new AddDemandeImmersion({
-      genericRepository: repositories.demandeImmersionGeneric,
-      boulogneSurMerRepository: repositories.demandeImmersionBoulogneSurMer,
-      narbonneRepository: repositories.demandeImmersionNarbonne,
+      applicationRepository: repositories.demandeImmersion,
       emailGateway: repositories.email,
-      featureFlags,
       supervisorEmail: supervisorEmail,
       unrestrictedEmailSendingSources,
       emailAllowList,
     }),
     getDemandeImmersion: new GetDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersionGeneric,
+      demandeImmersionRepository: repositories.demandeImmersion,
       featureFlags,
     }),
     listDemandeImmersion: new ListDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersionGeneric,
+      demandeImmersionRepository: repositories.demandeImmersion,
       featureFlags,
     }),
     updateDemandeImmersion: new UpdateDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersionGeneric,
+      demandeImmersionRepository: repositories.demandeImmersion,
       featureFlags,
     }),
     validateDemandeImmersion: new ValidateDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersionGeneric,
+      demandeImmersionRepository: repositories.demandeImmersion,
     }),
 
     // siret

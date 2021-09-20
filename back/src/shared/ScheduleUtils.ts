@@ -3,17 +3,8 @@ import {
   ScheduleDto,
   SimpleScheduleDto,
   TimePeriodDto,
+  weekdays,
 } from "./ScheduleSchema";
-
-export const weekdays = [
-  "lundi",
-  "mardi",
-  "mercredi",
-  "jeudi",
-  "vendredi",
-  "samedi",
-  "dimanche",
-];
 
 const minutesInDay = (timePeriods: TimePeriodDto[]): number => {
   return timePeriods.reduce(
@@ -254,3 +245,6 @@ export const convertToFrenchNamedDays = (aSchedule: ScheduleDto) => {
     (_dayLabel, dayIndex) => complexSchedule[dayIndex].length > 0
   );
 };
+
+export const isArrayOfWeekdays = (value: any): boolean =>
+  Array.isArray(value) && value.every((el) => weekdays.includes(el));
