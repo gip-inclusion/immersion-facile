@@ -1,0 +1,14 @@
+.static-application-container {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: space-around;
+  max-width: 400px;
+}
+
+.static-info-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

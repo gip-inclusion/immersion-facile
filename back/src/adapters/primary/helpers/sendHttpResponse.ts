@@ -42,6 +42,7 @@ export const sendHttpResponse = async (
     return res.json(response || { success: true });
   } catch (error: any) {
     if (error instanceof UnauthorizedError) {
+      res.setHeader("WWW-Authenticate", "Basic");
       res.status(401);
     } else if (error instanceof FeatureDisabledError) {
       res.status(404);

@@ -33,23 +33,13 @@ export class HttpDemandeImmersionGateway implements DemandeImmersionGateway {
       `/${prefix}/${demandesImmersionRoute}/${id}`
     );
     console.log(response.data);
-    await demandeImmersionDtoSchema.validate(response.data);
     return response.data;
   }
 
   public async getAll(): Promise<Array<DemandeImmersionDto>> {
     const response = await axios.get(`/${prefix}/${demandesImmersionRoute}`);
 
-    const demandesImmersion = response.data.map(function (data: any) {
-      return {
-        ...data,
-        dateStart: new Date(data.dateStart),
-        dateEnd: new Date(data.dateEnd),
-      } as DemandeImmersionDto;
-    });
-
-    await demandeImmersionDtoArraySchema.validate(demandesImmersion);
-    return demandesImmersion;
+    return response.data;
   }
 
   public async update(
