@@ -102,8 +102,8 @@ describe("applicationStatusFromString", () => {
   test("accepts valid enum values", () => {
     expectApplicationStatusToBe(applicationStatusFromString("DRAFT"), "DRAFT");
     expectApplicationStatusToBe(
-      applicationStatusFromString("FINALIZED"),
-      "FINALIZED"
+      applicationStatusFromString("IN_REVIEW"),
+      "IN_REVIEW"
     );
   });
 

@@ -5,9 +5,14 @@ import {
   demandeImmersionDtoSchema,
   getDemandeImmersionRequestDtoSchema,
   updateDemandeImmersionRequestDtoSchema,
+  validateDemandeImmersionRequestDtoSchema,
 } from "../../shared/DemandeImmersionDto";
 import { FeatureFlags } from "../../shared/featureFlags";
-import { demandesImmersionRoute, siretRoute } from "../../shared/routes";
+import {
+  demandesImmersionRoute,
+  siretRoute,
+  validateDemandeRoute,
+} from "../../shared/routes";
 import { logger } from "../../utils/logger";
 import { getAuthChecker, getUsecases } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
@@ -53,6 +58,19 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
         authChecker
       );
     });
+  router.route(`/${validateDemandeRoute}/:id`).get(async (req, res) => {
+    sendHttpResponse(
+      req,
+      res,
+      () =>
+        callUseCase({
+          useCase: useCases.validateDemandeImmersion,
+          validationSchema: validateDemandeImmersionRequestDtoSchema,
+          useCaseParams: req.params,
+        }),
+      authChecker
+    );
+  });
 
   const uniqueDemandeImmersionRouter = Router({ mergeParams: true });
   router.use(`/${demandesImmersionRoute}`, uniqueDemandeImmersionRouter);

@@ -1,3 +1,4 @@
+import { validateDemandeRoute } from "./../../shared/routes";
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
 import { demandesImmersionRoute } from "../../shared/routes";
@@ -6,6 +7,90 @@ import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
 
 describe("/demandes-immersion route", () => {
   let request: SuperTest<Test>;
+
+  describe("Backoffice", () => {
+    beforeEach(() => {
+      request = supertest(
+        createApp({
+          featureFlags: new FeatureFlagsBuilder()
+            .enableViewableApplications()
+            .enableGenericApplicationForm()
+            .build(),
+        })
+      );
+    });
+    
+    describe("Application validation", () => {
+      const demandeImmersion = new DemandeImmersionDtoBuilder().withStatus("IN_REVIEW").build();
+
+      beforeEach(async () => {
+        // POST a valid application.
+        await request
+          .post(`/${demandesImmersionRoute}`)
+          .send(demandeImmersion)
+          .expect("Content-Type", /json/)
+          .expect(200, { id: demandeImmersion.id });
+      });
+
+      it("Validating an existing application succeeds, with auth", async () => {
+        // Validating an application with existing id succeeds (with auth).
+        await request
+          .get(`/${validateDemandeRoute}/${demandeImmersion.id}`)
+          .auth("e2e_tests", "e2e")
+          .expect("Content-Type", /json/)
+          .expect(200, { id: demandeImmersion.id });
+
+        const validatedDemandeImmersion = {
+          ...demandeImmersion,
+          status: "VALIDATED",
+        };
+
+        // Getting the application succeeds and shows that it's validated.
+        await request
+          .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+          .expect("Content-Type", /json/)
+          .expect(200, validatedDemandeImmersion);
+      });
+
+      it("Validating applications without credentials fails with 401 Unauthorized", async () => {
+        await request
+          .get(`/${validateDemandeRoute}/${demandeImmersion.id}`)
+          .expect(401);
+
+        // Getting the application succeeds and shows that it's NOT validated.
+        await request
+          .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+          .expect("Content-Type", /json/)
+          .expect(200, demandeImmersion);
+      });
+
+      it("Validating applications with invalid credentials fails with 401 Unauthorized", async () => {
+        await request
+          .get(`/${validateDemandeRoute}/${demandeImmersion.id}`)
+          .auth("not real user", "not real password")
+          .expect(401);
+
+        // Getting the application succeeds and shows that it's NOT validated.
+        await request
+          .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+          .expect("Content-Type", /json/)
+          .expect(200, demandeImmersion);
+      });
+
+      it("Validating non-existent application with valid credentials fails with 404", async () => {
+        await request
+          .get(`/${validateDemandeRoute}/unknown-demande-immersion-id`)
+          .auth("e2e_tests", "e2e")
+          .expect(404);
+
+        // Getting the existing application succeeds and shows that it's NOT validated.
+        await request
+          .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+          .expect("Content-Type", /json/)
+          .expect(200, demandeImmersion);
+      });
+    });
+  });
 
   describe("DEV environment", () => {
     beforeEach(() => {

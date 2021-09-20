@@ -89,9 +89,9 @@ export class InMemoryDemandeImmersionGateway
     });
     this.add({
       ...DEMANDE_IMMERSION_TEMPLATE,
-      id: "valid_finalized",
-      status: "FINALIZED",
-      email: "FINALIZED.esteban@ocon.fr",
+      id: "valid_in_review",
+      status: "IN_REVIEW",
+      email: "IN_REVIEW.esteban@ocon.fr",
     });
 
     this._establishments[TEST_ESTABLISHMENT1_SIRET] = TEST_ESTABLISHMENT1;

@@ -338,7 +338,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                 if (!featureFlags.enableViewableApplications) {
                   application = {
                     ...application,
-                    status: "FINALIZED",
+                    status: "IN_REVIEW",
                   };
                 }
 

@@ -1,5 +1,6 @@
 import {
   ApplicationSource,
+  ApplicationStatus,
   DemandeImmersionDto,
   DemandeImmersionId,
 } from "../shared/DemandeImmersionDto";
@@ -80,6 +81,10 @@ export class DemandeImmersionDtoBuilder
 
   public withSource(source: ApplicationSource): DemandeImmersionDtoBuilder {
     return new DemandeImmersionDtoBuilder({ ...this.dto, source });
+  }
+
+  public withStatus(status: ApplicationStatus): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, status });
   }
 
   public build() {

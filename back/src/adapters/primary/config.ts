@@ -4,6 +4,7 @@ import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddD
 import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
 import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
 import { UpdateDemandeImmersion } from "../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
+import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases/ValidateDemandeImmersion";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import {
   ApplicationSource,
@@ -147,6 +148,9 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
     updateDemandeImmersion: new UpdateDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersionGeneric,
       featureFlags,
+    }),
+    validateDemandeImmersion: new ValidateDemandeImmersion({
+      demandeImmersionRepository: repositories.demandeImmersionGeneric,
     }),
 
     // siret

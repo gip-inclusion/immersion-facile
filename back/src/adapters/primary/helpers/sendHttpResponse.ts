@@ -14,6 +14,12 @@ export class NotFoundError extends Error {
     Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 }
+export class BadRequestError extends Error {
+  constructor(msg: any) {
+    super(msg);
+    Object.setPrototypeOf(this, BadRequestError.prototype);
+  }
+}
 export class ConflictError extends Error {
   constructor(msg: any) {
     super(msg);
@@ -43,6 +49,8 @@ export const sendHttpResponse = async (
       res.status(404);
     } else if (error instanceof ConflictError) {
       res.status(409);
+    } else if (error instanceof BadRequestError) {
+      res.status(400);
     } else {
       res.status(400);
     }

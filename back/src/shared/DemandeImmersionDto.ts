@@ -8,8 +8,12 @@ const phoneRegExp = /\+?[0-9]*/;
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
 
-export type ApplicationStatus = "UNKNOWN" | "DRAFT" | "FINALIZED";
-const validApplicationStatus: ApplicationStatus[] = ["DRAFT", "FINALIZED"];
+export type ApplicationStatus = "UNKNOWN" | "DRAFT" | "IN_REVIEW" | "VALIDATED";
+const validApplicationStatus: ApplicationStatus[] = [
+  "DRAFT",
+  "IN_REVIEW",
+  "VALIDATED",
+];
 export const applicationStatusFromString = (s: string): ApplicationStatus => {
   const status = s as ApplicationStatus;
   if (validApplicationStatus.includes(status)) return status;
@@ -196,4 +200,20 @@ export const updateDemandeImmersionResponseDtoSchema = Yup.object({
 
 export type UpdateDemandeImmersionResponseDto = Yup.InferType<
   typeof updateDemandeImmersionResponseDtoSchema
+>;
+
+export const validateDemandeImmersionRequestDtoSchema = Yup.object({
+  id: Yup.mixed<DemandeImmersionId>().required(),
+}).required();
+
+export type ValidateDemandeImmersionRequestDto = Yup.InferType<
+  typeof validateDemandeImmersionRequestDtoSchema
+>;
+
+export const validateDemandeImmersionResponseDtoSchema = Yup.object({
+  id: Yup.mixed<DemandeImmersionId>().required(),
+}).required();
+
+export type ValidateDemandeImmersionResponseDto = Yup.InferType<
+  typeof validateDemandeImmersionResponseDtoSchema
 >;
