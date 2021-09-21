@@ -1,21 +1,13 @@
-import { EventBus } from "../../domain/core/eventBus/EventBus";
-import type {
-  DomainEvent,
-  DomainTopic,
-} from "../../domain/core/eventBus/events";
+import { spyOnTopic } from "../../_testBuilders/test.helpers";
+import type { DomainEvent } from "../../domain/core/eventBus/events";
 import { InMemoryEventBus } from "../../adapters/secondary/InMemoryEventBus";
+import { DemandeImmersionDtoBuilder } from "../../_testBuilders/DemandeImmersionDtoBuilder";
 
 const domainEvt: DomainEvent = {
   id: "anId",
   topic: "ImmersionApplicationSubmittedByBeneficiary",
-  payload: { submittedByBeneficiary: "my Payload" },
-  occuredAt: "a date",
-};
-
-const spyOnTopic = (eventBus: EventBus, topic: DomainTopic): DomainEvent[] => {
-  const publishedEvents: DomainEvent[] = [];
-  eventBus.subscribe(topic, (event) => publishedEvents.push(event));
-  return publishedEvents;
+  payload: new DemandeImmersionDtoBuilder().build(),
+  occurredAt: "a date",
 };
 
 describe("InMemoryEventBus", () => {

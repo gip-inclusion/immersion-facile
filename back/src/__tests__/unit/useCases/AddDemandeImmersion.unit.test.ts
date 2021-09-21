@@ -1,41 +1,51 @@
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../../domain/core/eventBus/EventBus";
+import { DomainEvent } from "../../../domain/core/eventBus/events";
+import { DateStr } from "../../../domain/core/ports/Clock";
+import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import { AddDemandeImmersion } from "../../../domain/demandeImmersion/useCases/AddDemandeImmersion";
 import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { DemandeImmersionEntity } from "./../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { ApplicationSource } from "./../../../shared/DemandeImmersionDto";
 
 describe("Add demandeImmersion", () => {
   let addDemandeImmersion: AddDemandeImmersion;
   let applicationRepository: InMemoryDemandeImmersionRepository;
-  let emailGateway: InMemoryEmailGateway;
-  let supervisorEmail: string | undefined;
-  let unrestrictedEmailSendingSources: Set<ApplicationSource>;
-  let emailAllowList: Set<string>;
+  let clock: CustomClock;
+  let uuidGenerator: TestUuidGenerator;
+  let createNewEvent: CreateNewEvent;
+  let outboxRepository: InMemoryOutboxRepository;
   const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
 
   beforeEach(() => {
     applicationRepository = new InMemoryDemandeImmersionRepository();
-    emailGateway = new InMemoryEmailGateway();
-    supervisorEmail = undefined;
-    unrestrictedEmailSendingSources = new Set<ApplicationSource>();
-    emailAllowList = new Set<string>();
+    outboxRepository = new InMemoryOutboxRepository();
+    clock = new CustomClock();
+    uuidGenerator = new TestUuidGenerator();
+    createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     addDemandeImmersion = createAddDemandeImmersionUseCase();
   });
 
   const createAddDemandeImmersionUseCase = () => {
-    return new AddDemandeImmersion({
+    return new AddDemandeImmersion(
       applicationRepository,
-      emailGateway,
-      supervisorEmail,
-      unrestrictedEmailSendingSources,
-      emailAllowList,
-    });
+      createNewEvent,
+      outboxRepository
+    );
   };
 
   test("saves valid applications in the repository", async () => {
+    const occurredAt: DateStr = new Date("2021-10-15T15:00").toISOString();
+    const id = "eventId";
+    clock.setNextDate(occurredAt);
+    uuidGenerator.setNextUuid(id);
+
     expect(await addDemandeImmersion.execute(validDemandeImmersion)).toEqual({
       id: validDemandeImmersion.id,
     });
@@ -43,130 +53,15 @@ describe("Add demandeImmersion", () => {
     const storedInRepo = await applicationRepository.getAll();
     expect(storedInRepo.length).toBe(1);
     expect(storedInRepo[0].toDto()).toEqual(validDemandeImmersion);
-  });
-
-  test("sends no emails when supervisor and allowlist are not set", async () => {
-    expect(
-      await addDemandeImmersion.execute(validDemandeImmersion)
-    ).not.toBeUndefined();
-    expect(emailGateway.getSentEmails()).toHaveLength(0);
-  });
-
-  describe("When supervisor email is set", () => {
-    beforeEach(() => {
-      supervisorEmail = "supervisor@email.fr";
-      addDemandeImmersion = createAddDemandeImmersionUseCase();
-    });
-
-    test("sends admin notification email when source == GENERIC", async () => {
-      expect(
-        await addDemandeImmersion.execute(validDemandeImmersion)
-      ).not.toBeUndefined();
-
-      const sentEmails = emailGateway.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
-
-      expect(sentEmails[0].type).toEqual("NEW_APPLICATION_ADMIN_NOTIFICATION");
-      expect(sentEmails[0].recipients).toContain("supervisor@email.fr");
-      expect(sentEmails[0].params).toEqual({
-        demandeId: validDemandeImmersion.id,
-        firstName: validDemandeImmersion.firstName,
-        lastName: validDemandeImmersion.lastName,
-        dateStart: validDemandeImmersion.dateStart,
-        dateEnd: validDemandeImmersion.dateEnd,
-        businessName: validDemandeImmersion.businessName,
-      });
-    });
-    test("sends no admin notification email when source != GENERIC", async () => {
-      const application = new DemandeImmersionDtoBuilder()
-        .withSource("NARBONNE")
-        .build();
-
-      expect(
-        await addDemandeImmersion.execute(application)
-      ).not.toBeUndefined();
-      expect(emailGateway.getSentEmails()).toHaveLength(0);
-    });
-  });
-
-  describe("When beneficiary email address is on the allowlist", () => {
-    beforeEach(() => {
-      emailAllowList.add("beneficiary@email.fr");
-      addDemandeImmersion = createAddDemandeImmersionUseCase();
-    });
-
-    test("sends the beneficiary confirmation email", async () => {
-      expect(
-        await addDemandeImmersion.execute({
-          ...validDemandeImmersion,
-          email: "beneficiary@email.fr",
-        })
-      ).not.toBeUndefined();
-
-      const sentEmails = emailGateway.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
-
-      expect(sentEmails[0].type).toEqual(
-        "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
-      );
-      expect(sentEmails[0].recipients).toContain("beneficiary@email.fr");
-      expect(sentEmails[0].params).toEqual({
-        demandeId: validDemandeImmersion.id,
-        firstName: validDemandeImmersion.firstName,
-        lastName: validDemandeImmersion.lastName,
-      });
-    });
-  });
-
-  describe("When mentor email address is on the allowlist", () => {
-    beforeEach(() => {
-      emailAllowList.add("mentor@email.fr");
-      addDemandeImmersion = createAddDemandeImmersionUseCase();
-    });
-
-    test("sends the mentor confirmation email", async () => {
-      expect(
-        await addDemandeImmersion.execute({
-          ...validDemandeImmersion,
-          mentorEmail: "mentor@email.fr",
-        })
-      ).not.toBeUndefined();
-
-      const sentEmails = emailGateway.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
-
-      expect(sentEmails[0].type).toEqual("NEW_APPLICATION_MENTOR_CONFIRMATION");
-      expect(sentEmails[0].recipients).toContain("mentor@email.fr");
-      expect(sentEmails[0].params).toEqual({
-        demandeId: validDemandeImmersion.id,
-        mentorName: validDemandeImmersion.mentor,
-        beneficiaryFirstName: validDemandeImmersion.firstName,
-        beneficiaryLastName: validDemandeImmersion.lastName,
-      });
-    });
-  });
-
-  describe("When unrestricted email sending is enabled", () => {
-    beforeEach(() => {
-      unrestrictedEmailSendingSources.add("GENERIC");
-      addDemandeImmersion = createAddDemandeImmersionUseCase();
-    });
-
-    test("sends the beneficiary and mentor confirmation emails", async () => {
-      expect(
-        await addDemandeImmersion.execute({
-          ...validDemandeImmersion,
-          email: "beneficiary@email.fr",
-          mentorEmail: "mentor@email.fr",
-        })
-      ).not.toBeUndefined();
-
-      const sentEmails = emailGateway.getSentEmails();
-      expect(sentEmails.map((email) => email.type)).toEqual([
-        "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
-        "NEW_APPLICATION_MENTOR_CONFIRMATION",
-      ]);
-    });
+    expectDomainEventsToBeInOutbox([
+      {
+        id,
+        occurredAt,
+        topic: "ImmersionApplicationSubmittedByBeneficiary",
+        payload: validDemandeImmersion,
+        wasPublished: false,
+      },
+    ]);
   });
 
   test("rejects applications where the ID is already in use", async () => {
@@ -179,4 +74,8 @@ describe("Add demandeImmersion", () => {
       new ConflictError(validDemandeImmersion.id)
     );
   });
+
+  const expectDomainEventsToBeInOutbox = (expected: DomainEvent[]) => {
+    expect(outboxRepository.events).toEqual(expected);
+  };
 });

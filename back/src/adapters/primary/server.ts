@@ -14,7 +14,7 @@ import {
   validateDemandeRoute,
 } from "../../shared/routes";
 import { logger } from "../../utils/logger";
-import { getAuthChecker, getUsecases } from "./config";
+import { getAuthChecker, getEventCrawler, getUsecases } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 
@@ -104,6 +104,8 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   );
 
   app.use(router);
+
+  getEventCrawler(featureFlags).startCrawler();
 
   return app;
 };

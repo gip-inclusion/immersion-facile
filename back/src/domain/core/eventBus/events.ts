@@ -1,20 +1,23 @@
-type GenericEvent<T extends string, P> = Readonly<{
+import type { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
+import type { DateStr } from "../ports/Clock";
+
+type GenericEvent<T extends string, P> = {
   id: string;
-  occuredAt: string;
+  occurredAt: DateStr;
   topic: T;
   payload: P;
-  // wasPublished: boolean;
-}>;
+  wasPublished?: boolean;
+};
 
 export type DomainEvent =
   | GenericEvent<
       "ImmersionApplicationSubmittedByBeneficiary",
-      { submittedByBeneficiary: string }
+      DemandeImmersionDto
     >
   | GenericEvent<
       "ImmersionApplicationSubmittedByHostingCompany",
-      { submittedByHostingCompany: number }
+      DemandeImmersionDto
     >
-  | GenericEvent<"DemandeImmersionCancelled", { canceled: Date }>;
+  | GenericEvent<"DemandeImmersionCancelled", DemandeImmersionDto>;
 
 export type DomainTopic = DomainEvent["topic"];

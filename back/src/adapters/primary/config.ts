@@ -1,5 +1,7 @@
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
+import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
+import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
 import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
 import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
@@ -8,25 +10,38 @@ import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import {
   ApplicationSource,
-  applicationSourceFromString
+  applicationSourceFromString,
 } from "../../shared/DemandeImmersionDto";
 import { FeatureFlags } from "../../shared/featureFlags";
 import { logger } from "../../utils/logger";
 import {
   genericApplicationDataConverter,
-  legacyApplicationDataConverter
+  legacyApplicationDataConverter,
 } from "../secondary/AirtableApplicationDataConverters";
+import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
 import {
   ApplicationRepositoryMap,
-  ApplicationRepositorySwitcher
+  ApplicationRepositorySwitcher,
 } from "../secondary/ApplicationRepositorySwitcher";
+import { RealClock } from "../secondary/core/ClockImplementations";
+import {
+  BasicEventCrawler,
+  RealEventCrawler,
+} from "../secondary/core/EventCrawlerImplementations";
+import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
+import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
+import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { DemandeImmersionRepository } from "./../../domain/demandeImmersion/ports/DemandeImmersionRepository";
-import { AirtableDemandeImmersionRepository } from "./../secondary/AirtableDemandeImmersionRepository";
+
+const clock = new RealClock();
+const uuidGenerator = new UuidV4Generator();
+
+const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
 const getApplicationRepository = (
   featureFlags: FeatureFlags
@@ -71,7 +86,6 @@ export const getRepositories = (featureFlags: FeatureFlags) => {
   logger.info(
     "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY"
   );
-  logger.info("EMAIL_GATEWAY: " + process.env.EMAIL_GATEWAY ?? "IN_MEMORY");
 
   return {
     demandeImmersion: getApplicationRepository(featureFlags),
@@ -87,6 +101,8 @@ export const getRepositories = (featureFlags: FeatureFlags) => {
       process.env.EMAIL_GATEWAY === "SENDINBLUE"
         ? SendinblueEmailGateway.create(getEnvVarOrDie("SENDINBLUE_API_KEY"))
         : new InMemoryEmailGateway(),
+
+    outbox: new InMemoryOutboxRepository(),
   };
 };
 
@@ -148,14 +164,11 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
   }
 
   return {
-    // formulaire
-    addDemandeImmersion: new AddDemandeImmersion({
-      applicationRepository: repositories.demandeImmersion,
-      emailGateway: repositories.email,
-      supervisorEmail: supervisorEmail,
-      unrestrictedEmailSendingSources,
-      emailAllowList,
-    }),
+    addDemandeImmersion: new AddDemandeImmersion(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox
+    ),
     getDemandeImmersion: new GetDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,
       featureFlags,
@@ -178,3 +191,10 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
     }),
   };
 };
+
+const eventBus = new InMemoryEventBus();
+
+export const getEventCrawler = (featureFlags: FeatureFlags): EventCrawler =>
+  process.env.NODE_ENV === "test"
+    ? new BasicEventCrawler(eventBus, getRepositories(featureFlags).outbox)
+    : new RealEventCrawler(eventBus, getRepositories(featureFlags).outbox);

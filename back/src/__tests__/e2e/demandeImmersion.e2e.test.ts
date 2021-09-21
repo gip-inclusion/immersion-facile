@@ -19,9 +19,11 @@ describe("/demandes-immersion route", () => {
         })
       );
     });
-    
+
     describe("Application validation", () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder().withStatus("IN_REVIEW").build();
+      const demandeImmersion = new DemandeImmersionDtoBuilder()
+        .withStatus("IN_REVIEW")
+        .build();
 
       beforeEach(async () => {
         // POST a valid application.

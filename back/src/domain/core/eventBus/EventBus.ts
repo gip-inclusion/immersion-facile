@@ -1,3 +1,5 @@
+import { Clock } from "../ports/Clock";
+import { UuidGenerator } from "../ports/UuidGenerator";
 import type { DomainEvent, DomainTopic } from "./events";
 
 type NarrowEvent<
@@ -14,3 +16,23 @@ export interface EventBus {
     callBack: EventCallback<T>
   ) => void;
 }
+
+type CreateEventDependencies = {
+  clock: Clock;
+  uuidGenerator: UuidGenerator;
+};
+
+export type CreateNewEvent = (
+  params: Pick<DomainEvent, "topic" | "payload">
+) => DomainEvent;
+
+type MakeCreateEvent = (deps: CreateEventDependencies) => CreateNewEvent;
+
+export const makeCreateNewEvent: MakeCreateEvent =
+  ({ uuidGenerator, clock }) =>
+  (params) => ({
+    id: uuidGenerator.new(),
+    occurredAt: clock.now(),
+    wasPublished: false,
+    ...params,
+  });

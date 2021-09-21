@@ -45,7 +45,7 @@ npm start
 npm run start:json
 ```
 
-If you want to fake that it is the morning (time during when the app is suppose to work), you can add `NODE_ENV=test`, to use the CustomClock. For exemple :
+If you want to fake that it is the morning (time during when the app is suppose to work), you can add `NODE_ENV=test`, to use the ClockImplementations. For exemple :
 
 ```
 NODE_ENV=test npm run start:json
