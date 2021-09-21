@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Accordeon } from "./Accordeon";
 import { TextCell } from "./TextCell";
-import { FormAccordeonProps } from "./FormAccordeon";
+import { FormAccordeonProps as FormAccordeonProps } from "./FormAccordeon";
 import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
 
 type FieldForFormDetails = { title: string; key: keyof DemandeImmersionDto };

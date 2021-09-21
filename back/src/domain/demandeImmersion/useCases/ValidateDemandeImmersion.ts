@@ -30,24 +30,26 @@ export class ValidateDemandeImmersion
   }
 
   public async execute(
-    params: ValidateDemandeImmersionRequestDto
+    id: ValidateDemandeImmersionRequestDto
   ): Promise<ValidateDemandeImmersionResponseDto> {
     const demandeImmersionEntity =
-      await this.demandeImmersionRepository.getById(params.id);
-    if (!demandeImmersionEntity) throw new NotFoundError(params.id);
+      await this.demandeImmersionRepository.getById(id);
+    if (!demandeImmersionEntity) throw new NotFoundError(id);
+
     if (demandeImmersionEntity.toDto().status !== "IN_REVIEW")
-      throw new BadRequestError(params.id);
+      throw new BadRequestError(id);
 
     const validatedEntity = DemandeImmersionEntity.create({
       ...demandeImmersionEntity.toDto(),
       status: "VALIDATED",
     });
 
-    const id = await this.demandeImmersionRepository.updateDemandeImmersion(
-      validatedEntity
-    );
-    if (!id) throw new NotFoundError(id);
+    const updatedId =
+      await this.demandeImmersionRepository.updateDemandeImmersion(
+        validatedEntity
+      );
+    if (!updatedId) throw new NotFoundError(updatedId);
 
-    return { id };
+    return { id: updatedId };
   }
 }

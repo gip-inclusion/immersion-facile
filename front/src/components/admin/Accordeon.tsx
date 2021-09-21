@@ -7,7 +7,7 @@ interface AccordeonProps {
 
 export const Accordeon = ({ title, children }: AccordeonProps) => {
   const id = title + "-accordion";
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const divClass = expanded
     ? "fr-collapse fr-collapse--expanded"

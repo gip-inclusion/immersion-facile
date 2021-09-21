@@ -202,9 +202,8 @@ export type UpdateDemandeImmersionResponseDto = Yup.InferType<
   typeof updateDemandeImmersionResponseDtoSchema
 >;
 
-export const validateDemandeImmersionRequestDtoSchema = Yup.object({
-  id: Yup.mixed<DemandeImmersionId>().required(),
-}).required();
+export const validateDemandeImmersionRequestDtoSchema =
+  Yup.mixed<DemandeImmersionId>().required();
 
 export type ValidateDemandeImmersionRequestDto = Yup.InferType<
   typeof validateDemandeImmersionRequestDtoSchema

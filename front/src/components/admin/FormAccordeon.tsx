@@ -1,5 +1,8 @@
 import React, { Component } from "react";
-import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
+import {
+  DemandeImmersionDto,
+  ApplicationStatus,
+} from "src/shared/DemandeImmersionDto";
 import { formatDistance, formatDuration, intervalToDuration } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Accordeon } from "./Accordeon";
@@ -28,15 +31,30 @@ export interface FormAccordeonProps {
   data: DemandeImmersionDto;
 }
 
+const getPrefix = (status: ApplicationStatus) => {
+  switch (status) {
+    case "DRAFT":
+      return "📕 BROUILLON";
+    case "IN_REVIEW":
+      return "📙";
+    case "VALIDATED":
+      return "✅";
+  }
+};
+
 export const FormAccordeon = ({ data }: FormAccordeonProps) => {
-  const title = () =>
-    `${data.lastName.toUpperCase()} ${data.firstName} chez ${
-      data.businessName
-    } ` +
-    `${beforeAfterString(data.dateStart)} (pendant ${durationDays(
-      data.dateStart,
-      data.dateEnd
-    )})`;
+  const title = () => {
+    return (
+      `${getPrefix(data.status)} ` +
+      `${data.lastName.toUpperCase()} ${data.firstName} chez ${
+        data.businessName
+      } ` +
+      `${beforeAfterString(data.dateStart)} (pendant ${durationDays(
+        data.dateStart,
+        data.dateEnd
+      )})`
+    );
+  };
 
   return (
     <Accordeon title={title()} key={data.id}>

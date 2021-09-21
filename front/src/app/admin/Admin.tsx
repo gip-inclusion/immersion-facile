@@ -5,7 +5,7 @@ import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { Route } from "type-route";
 import "./Admin.css";
-import { FormAccordeon } from "../components/admin/FormAccordeon";
+import { FormAccordeon } from "src/components/admin/FormAccordeon";
 
 interface AdminState {
   demandeImmersion: Array<DemandeImmersionDto>;
@@ -22,7 +22,6 @@ export const Admin = ({ route }: AdminProps) => {
   useEffect(() => {
     demandeImmersionGateway.getAll().then(setDemandesImmersion);
   }, []);
-
 
   return (
     <>

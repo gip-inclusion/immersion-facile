@@ -221,7 +221,7 @@ const createInitialApplication = (
 
     // Participant
     email: "sylvanie@monemail.fr",
-    firstName: "Sylanie",
+    firstName: "Sylvanie",
     lastName: "Durand",
     phone: "0612345678",
 

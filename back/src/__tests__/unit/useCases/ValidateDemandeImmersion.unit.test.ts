@@ -37,9 +37,9 @@ describe("Validate demandeImmersion", () => {
       demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
       repository.setDemandesImmersion(demandesImmersion);
 
-      const { id } = await validateDemandeImmersion.execute({
-        id: demandeImmersionEntity.id,
-      });
+      const { id } = await validateDemandeImmersion.execute(
+        demandeImmersionEntity.id
+      );
 
       expect(id).toEqual(demandeImmersionEntity.id);
 
@@ -59,9 +59,7 @@ describe("Validate demandeImmersion", () => {
       repository.setDemandesImmersion(demandesImmersion);
 
       await expectPromiseToFailWithError(
-        validateDemandeImmersion.execute({
-          id: demandeImmersionEntity.id,
-        }),
+        validateDemandeImmersion.execute(demandeImmersionEntity.id),
         new BadRequestError(demandeImmersionEntity.id)
       );
 
@@ -76,9 +74,7 @@ describe("Validate demandeImmersion", () => {
   describe("When no demandeImmersion with id exists", () => {
     it("throws NotFoundError", async () => {
       await expectPromiseToFailWithError(
-        validateDemandeImmersion.execute({
-          id: "unknown_demande_immersion_id",
-        }),
+        validateDemandeImmersion.execute("unknown_demande_immersion_id"),
         new NotFoundError("unknown_demande_immersion_id")
       );
     });

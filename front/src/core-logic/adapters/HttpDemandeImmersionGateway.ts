@@ -1,6 +1,10 @@
 import axios from "axios";
 import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
-import { demandesImmersionRoute, siretRoute } from "src/shared/routes";
+import {
+  demandesImmersionRoute,
+  siretRoute,
+  validateDemandeRoute,
+} from "src/shared/routes";
 import {
   DemandeImmersionDto,
   addDemandeImmersionResponseDtoSchema,
@@ -9,6 +13,7 @@ import {
   UpdateDemandeImmersionResponseDto,
   updateDemandeImmersionResponseDtoSchema,
   demandeImmersionDtoArraySchema,
+  DemandeImmersionId,
 } from "src/shared/DemandeImmersionDto";
 
 const prefix = "api";
@@ -56,6 +61,13 @@ export class HttpDemandeImmersionGateway implements DemandeImmersionGateway {
       updateDemandeImmersionResponse
     );
     return updateDemandeImmersionResponse.id;
+  }
+
+  public async validate(id: DemandeImmersionId): Promise<string> {
+    const { data } = await axios.get(
+      `/${prefix}/${validateDemandeRoute}/${id}`
+    );
+    return data.id;
   }
 
   public async getSiretInfo(siret: string): Promise<Object> {

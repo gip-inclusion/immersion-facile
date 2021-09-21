@@ -66,7 +66,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
         callUseCase({
           useCase: useCases.validateDemandeImmersion,
           validationSchema: validateDemandeImmersionRequestDtoSchema,
-          useCaseParams: req.params,
+          useCaseParams: req.params.id,
         }),
       authChecker
     );

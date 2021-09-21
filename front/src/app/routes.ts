@@ -16,4 +16,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => "/demande-immersion/narbonne"
   ),
   admin: defineRoute("/admin"),
+  adminVerification: defineRoute(
+    { demandeId: param.path.string },
+    (p) => `/admin-verification/${p.demandeId}`
+  ),
 });

@@ -1,10 +1,11 @@
 import React from "react";
-import { Admin } from "src/app/admin";
+import { Admin } from "src/app/admin/Admin";
 import { ApplicationForm } from "src/app/DemandeImmersionForm";
 import { Home } from "src/app/Home";
 import { useRoute } from "src/app/routes";
 import { TodoApp } from "src/app/TodoApp";
 import { ENV } from "src/environmentVariables";
+import { AdminVerification } from "./admin/AdminVerification";
 
 const { dev, featureFlags } = ENV;
 
@@ -39,6 +40,12 @@ export const Router = () => {
       {route.name === "admin" &&
         (featureFlags.enableAdminUi ? (
           <Admin route={route} />
+        ) : (
+          <NotAvailable />
+        ))}
+      {route.name === "adminVerification" &&
+        (featureFlags.enableAdminUi ? (
+          <AdminVerification route={route} />
         ) : (
           <NotAvailable />
         ))}
