@@ -5,12 +5,13 @@ import type {
   NewApplicationMentorConfirmationParams,
 } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
+import { DemandeImmersionDto } from "../../shared/DemandeImmersionDto";
 import { logger } from "../../utils/logger";
 
 export type TemplatedEmail = {
   type: EmailType;
   recipients: string[];
-  params: Object;
+  params: Record<string, unknown>;
 };
 
 export class InMemoryEmailGateway implements EmailGateway {
@@ -59,6 +60,21 @@ export class InMemoryEmailGateway implements EmailGateway {
       type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
       recipients: recipients,
       params,
+    });
+  }
+
+  public async sendValidatedApplicationFinalConfirmation(
+    recipients: string[],
+    dto: DemandeImmersionDto
+  ): Promise<void> {
+    this.logger.info(
+      { recipients, dto },
+      "sendValidatedApplicationFinalConfirmation"
+    );
+    this.sentEmails.push({
+      type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
+      recipients: recipients,
+      params: dto,
     });
   }
 

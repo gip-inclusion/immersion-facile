@@ -1,3 +1,5 @@
+import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
+
 export type NewApplicationAdminNotificationParams = {
   demandeId: string;
   firstName: string;
@@ -23,7 +25,8 @@ export type NewApplicationMentorConfirmationParams = {
 export type EmailType =
   | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
   | "NEW_APPLICATION_MENTOR_CONFIRMATION"
-  | "NEW_APPLICATION_ADMIN_NOTIFICATION";
+  | "NEW_APPLICATION_ADMIN_NOTIFICATION"
+  | "VALIDATED_APPLICATION_FINAL_CONFIRMATION";
 
 export interface EmailGateway {
   sendNewApplicationBeneficiaryConfirmation: (
@@ -37,5 +40,9 @@ export interface EmailGateway {
   sendNewApplicationAdminNotification: (
     recipients: string[],
     params: NewApplicationAdminNotificationParams
+  ) => Promise<void>;
+  sendValidatedApplicationFinalConfirmation: (
+    recipient: string[],
+    dto: DemandeImmersionDto
   ) => Promise<void>;
 }

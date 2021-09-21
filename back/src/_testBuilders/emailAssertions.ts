@@ -60,3 +60,16 @@ export const expectEmailMentorConfirmationMatchingImmersionApplication = (
     },
   });
 };
+
+export const expectEmailFinalValidationConfirmationMatchingImmersionApplication =
+  (
+    recipients: string[],
+    templatedEmail: TemplatedEmail,
+    immersionApplication: DemandeImmersionDto
+  ) => {
+    expect(templatedEmail).toEqual({
+      type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
+      recipients,
+      params: immersionApplication,
+    });
+  };

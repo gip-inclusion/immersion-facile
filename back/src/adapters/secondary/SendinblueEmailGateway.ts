@@ -7,6 +7,7 @@ import type {
   NewApplicationMentorConfirmationParams,
 } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
+import { DemandeImmersionDto } from "../../shared/DemandeImmersionDto";
 import { logger } from "../../utils/logger";
 
 const emailTypeToTemplateId: Record<EmailType, number> = {
@@ -18,6 +19,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/5/message-setup
   NEW_APPLICATION_MENTOR_CONFIRMATION: 5,
+
+  // https://my.sendinblue.com/camp/template/6/message-setup
+  VALIDATED_APPLICATION_FINAL_CONFIRMATION: 6,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -87,6 +91,18 @@ export class SendinblueEmailGateway implements EmailGateway {
       DATE_END: params.dateEnd,
       BUSINESS_NAME: params.businessName,
     };
+    this.sendTransacEmail(sibEmail);
+  }
+
+  public async sendValidatedApplicationFinalConfirmation(
+    recipients: string[],
+    dto: DemandeImmersionDto
+  ): Promise<void> {
+    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sibEmail.templateId =
+      emailTypeToTemplateId.VALIDATED_APPLICATION_FINAL_CONFIRMATION;
+    sibEmail.to = recipients.map((email) => ({ email }));
+    sibEmail.params = {}; // TODO: add params.
     this.sendTransacEmail(sibEmail);
   }
 
