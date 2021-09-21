@@ -50,6 +50,8 @@ export class ValidateDemandeImmersion
       );
     if (!updatedId) throw new NotFoundError(updatedId);
 
+    // TODO: Add FinalImmersionApplicationValidationByAdmin event to outbox.
+
     return { id: updatedId };
   }
 }

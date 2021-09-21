@@ -15,9 +15,8 @@ export type DomainEvent =
       DemandeImmersionDto
     >
   | GenericEvent<
-      "ImmersionApplicationSubmittedByHostingCompany",
+      "FinalImmersionApplicationValidationByAdmin",
       DemandeImmersionDto
-    >
-  | GenericEvent<"DemandeImmersionCancelled", DemandeImmersionDto>;
+    >;
 
 export type DomainTopic = DomainEvent["topic"];

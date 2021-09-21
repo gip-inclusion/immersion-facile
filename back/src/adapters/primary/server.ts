@@ -14,7 +14,12 @@ import {
   validateDemandeRoute,
 } from "../../shared/routes";
 import { logger } from "../../utils/logger";
-import { getAuthChecker, getEventCrawler, getUsecases } from "./config";
+import {
+  eventBus,
+  getAuthChecker,
+  getEventCrawler,
+  getUsecases,
+} from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 
@@ -104,6 +109,28 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   );
 
   app.use(router);
+
+  eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
+    useCases.confirmToBeneficiaryThatApplicationCorrectlySubmitted.execute(
+      event.payload
+    )
+  );
+
+  eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
+    useCases.confirmToMentorThatApplicationCorrectlySubmitted.execute(
+      event.payload
+    )
+  );
+
+  eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
+    useCases.notifyToTeamApplicationSubmittedByBeneficiary.execute(
+      event.payload
+    )
+  );
+
+  eventBus.subscribe("FinalImmersionApplicationValidationByAdmin", (event) =>
+    useCases.notifyAllActorsOfFinalApplicationValidation.execute(event.payload)
+  );
 
   getEventCrawler(featureFlags).startCrawler();
 

@@ -5,6 +5,10 @@ import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
 import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
 import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
+import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
+import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/demandeImmersion/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { UpdateDemandeImmersion } from "../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
 import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases/ValidateDemandeImmersion";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
@@ -189,10 +193,35 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
     getSiret: new GetSiret({
       sireneRepository: repositories.sirene,
     }),
+
+    // notifications
+    confirmToBeneficiaryThatApplicationCorrectlySubmitted:
+      new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
+        repositories.email,
+        emailAllowList,
+        unrestrictedEmailSendingSources
+      ),
+    confirmToMentorThatApplicationCorrectlySubmitted:
+      new ConfirmToMentorThatApplicationCorrectlySubmitted(
+        repositories.email,
+        emailAllowList,
+        unrestrictedEmailSendingSources
+      ),
+    notifyAllActorsOfFinalApplicationValidation:
+      new NotifyAllActorsOfFinalApplicationValidation(
+        repositories.email,
+        emailAllowList,
+        unrestrictedEmailSendingSources
+      ),
+    notifyToTeamApplicationSubmittedByBeneficiary:
+      new NotifyToTeamApplicationSubmittedByBeneficiary(
+        repositories.email,
+        supervisorEmail
+      ),
   };
 };
 
-const eventBus = new InMemoryEventBus();
+export const eventBus = new InMemoryEventBus();
 
 export const getEventCrawler = (featureFlags: FeatureFlags): EventCrawler =>
   process.env.NODE_ENV === "test"
