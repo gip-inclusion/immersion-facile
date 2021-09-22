@@ -26,7 +26,7 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
 
   async getCompanies(searchParams: SearchParams): Promise<CompanyEntity[]> {
     const accessToken = await this.poleEmploiAPIGateway.getAccessToken(
-      "application_PAR_limmersionfacile_61f728ccbab3458cb64ffab4d5a86f44171253d4f3d0e78bf63e01cdd438d844 api_labonneboitev1"
+      "application_PAR_limmersionfacile_61f728ccbab3458cb64ffab4d5a86f44171253d4f3d0e78bf63e01cdd438d844 api_labonneboitev1",
     );
     const headers = {
       Authorization: "Bearer " + accessToken.access_token,
@@ -44,13 +44,13 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
             latitude: searchParams.lat,
             rome_codes: searchParams.ROME,
           },
-        }
+        },
       )
       .then((response: any) => {
         const companies: CompanyFromLaBonneBoite[] = response.data.companies;
         return companies
           .filter((company) =>
-            this.keepRelevantCompanies(searchParams.ROME, company)
+            this.keepRelevantCompanies(searchParams.ROME, company),
           )
           .map(
             (company) =>
@@ -64,8 +64,8 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
                 company.naf,
                 company.name,
                 company.siret,
-                company.stars
-              )
+                company.stars,
+              ),
           );
       })
       .catch(function (error: any) {
@@ -77,7 +77,7 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
 
   keepRelevantCompanies(
     romeSearched: string,
-    company: CompanyFromLaBonneBoite
+    company: CompanyFromLaBonneBoite,
   ): boolean {
     if (
       (company.naf.startsWith("9609") && romeSearched == "A1408") ||

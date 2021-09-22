@@ -70,7 +70,7 @@ export const demandeImmersionDtoSchema = Yup.object({
         let minStartDate = new Date(submissionDate);
         minStartDate.setDate(minStartDate.getDate() + 2);
         return startDate >= minStartDate;
-      }
+      },
     )
     .required("Obligatoire"),
   dateEnd: Yup.string()
@@ -86,7 +86,7 @@ export const demandeImmersionDtoSchema = Yup.object({
         const endDate = new Date(value);
 
         return endDate > startDate;
-      }
+      },
     )
     .test(
       "dateEnd-max",
@@ -101,7 +101,7 @@ export const demandeImmersionDtoSchema = Yup.object({
         let maxEndDate = new Date(startDate);
         maxEndDate.setDate(maxEndDate.getDate() + 28);
         return endDate <= maxEndDate;
-      }
+      },
     )
     .required("Obligatoire"),
   siret: Yup.string()
@@ -125,7 +125,7 @@ export const demandeImmersionDtoSchema = Yup.object({
         }
 
         return context.parent.email !== value;
-      }
+      },
     ),
 
   schedule: Yup.mixed<ScheduleDto>().required(),
@@ -142,16 +142,16 @@ export const demandeImmersionDtoSchema = Yup.object({
   immersionSkills: Yup.string().nullable(true),
   beneficiaryAccepted: Yup.boolean().equals(
     [true],
-    "L'engagement est obligatoire"
+    "L'engagement est obligatoire",
   ),
   enterpriseAccepted: Yup.boolean().equals(
     [true],
-    "L'engagement est obligatoire"
+    "L'engagement est obligatoire",
   ),
 }).required();
 
 export const demandeImmersionDtoArraySchema = Yup.array().of(
-  demandeImmersionDtoSchema
+  demandeImmersionDtoSchema,
 );
 
 export type DemandeImmersionDto = Yup.InferType<
@@ -183,7 +183,7 @@ export const updateDemandeImmersionRequestDtoSchema = Yup.object({
       (value, context) =>
         value &&
         context.parent.demandeImmersion &&
-        value === context.parent.demandeImmersion.id
+        value === context.parent.demandeImmersion.id,
     ),
   demandeImmersion: demandeImmersionDtoSchema.required(),
 }).required();

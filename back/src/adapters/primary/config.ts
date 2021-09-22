@@ -50,7 +50,7 @@ const uuidGenerator = new UuidV4Generator();
 const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
 const getApplicationRepository = (
-  featureFlags: FeatureFlags
+  featureFlags: FeatureFlags,
 ): DemandeImmersionRepository => {
   const useAirtable = process.env.REPOSITORIES === "AIRTABLE";
   const repositoriesBySource: ApplicationRepositoryMap = {};
@@ -60,7 +60,7 @@ const getApplicationRepository = (
           getEnvVarOrDie("AIRTABLE_API_KEY"),
           getEnvVarOrDie("AIRTABLE_BASE_ID_GENERIC"),
           getEnvVarOrDie("AIRTABLE_TABLE_NAME_GENERIC"),
-          genericApplicationDataConverter
+          genericApplicationDataConverter,
         )
       : new InMemoryDemandeImmersionRepository();
   }
@@ -70,7 +70,7 @@ const getApplicationRepository = (
           getEnvVarOrDie("AIRTABLE_API_KEY"),
           getEnvVarOrDie("AIRTABLE_BASE_ID_BOULOGNE_SUR_MER"),
           getEnvVarOrDie("AIRTABLE_TABLE_NAME_BOULOGNE_SUR_MER"),
-          legacyApplicationDataConverter
+          legacyApplicationDataConverter,
         )
       : new InMemoryDemandeImmersionRepository();
   }
@@ -80,7 +80,7 @@ const getApplicationRepository = (
           getEnvVarOrDie("AIRTABLE_API_KEY"),
           getEnvVarOrDie("AIRTABLE_BASE_ID_NARBONNE"),
           getEnvVarOrDie("AIRTABLE_TABLE_NAME_NARBONNE"),
-          legacyApplicationDataConverter
+          legacyApplicationDataConverter,
         )
       : new InMemoryDemandeImmersionRepository();
   }
@@ -90,7 +90,7 @@ const getApplicationRepository = (
 export const getRepositories = (featureFlags: FeatureFlags) => {
   logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
   logger.info(
-    "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY"
+    "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY",
   );
 
   return {
@@ -99,7 +99,7 @@ export const getRepositories = (featureFlags: FeatureFlags) => {
       process.env.SIRENE_REPOSITORY === "HTTPS"
         ? HttpsSireneRepository.create(
             getEnvVarOrDie("SIRENE_ENDPOINT"),
-            getEnvVarOrDie("SIRENE_BEARER_TOKEN")
+            getEnvVarOrDie("SIRENE_BEARER_TOKEN"),
           )
         : new InMemorySireneRepository(),
 
@@ -146,7 +146,7 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
   const supervisorEmail = process.env.SUPERVISOR_EMAIL;
   if (!supervisorEmail) {
     logger.warn(
-      "No SUPERVISOR_EMAIL specified. Disabling the sending of supervisor emails."
+      "No SUPERVISOR_EMAIL specified. Disabling the sending of supervisor emails.",
     );
   }
 
@@ -156,16 +156,16 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
         .split(",")
         .filter((el) => !!el)
         .map(applicationSourceFromString)
-        .filter((source) => source !== "UNKNOWN")
+        .filter((source) => source !== "UNKNOWN"),
     );
 
   const emailAllowList: Readonly<Set<string>> = new Set(
-    (process.env.EMAIL_ALLOW_LIST || "").split(",").filter((el) => !!el)
+    (process.env.EMAIL_ALLOW_LIST || "").split(",").filter((el) => !!el),
   );
   if (!emailAllowList) {
     logger.warn(
       "Empty EMAIL_ALLOW_LIST. Disabling the sending of non-supervisor emails for sources with ",
-      "restricted email sending."
+      "restricted email sending.",
     );
   }
 
@@ -173,7 +173,7 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
     addDemandeImmersion: new AddDemandeImmersion(
       repositories.demandeImmersion,
       createNewEvent,
-      repositories.outbox
+      repositories.outbox,
     ),
     getDemandeImmersion: new GetDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,
@@ -190,7 +190,7 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
     validateDemandeImmersion: new ValidateDemandeImmersion(
       repositories.demandeImmersion,
       createNewEvent,
-      repositories.outbox
+      repositories.outbox,
     ),
 
     // immersionOffer
@@ -209,24 +209,24 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
         repositories.email,
         emailAllowList,
-        unrestrictedEmailSendingSources
+        unrestrictedEmailSendingSources,
       ),
     confirmToMentorThatApplicationCorrectlySubmitted:
       new ConfirmToMentorThatApplicationCorrectlySubmitted(
         repositories.email,
         emailAllowList,
-        unrestrictedEmailSendingSources
+        unrestrictedEmailSendingSources,
       ),
     notifyAllActorsOfFinalApplicationValidation:
       new NotifyAllActorsOfFinalApplicationValidation(
         repositories.email,
         emailAllowList,
-        unrestrictedEmailSendingSources
+        unrestrictedEmailSendingSources,
       ),
     notifyToTeamApplicationSubmittedByBeneficiary:
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         repositories.email,
-        supervisorEmail
+        supervisorEmail,
       ),
   };
 };

@@ -18,11 +18,11 @@ export class AddDemandeImmersion
   constructor(
     private readonly applicationRepository: DemandeImmersionRepository,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly outboxRepository: OutboxRepository
+    private readonly outboxRepository: OutboxRepository,
   ) {}
 
   public async execute(
-    demandeImmersionDto: DemandeImmersionDto
+    demandeImmersionDto: DemandeImmersionDto,
   ): Promise<AddDemandeImmersionResponseDto> {
     const applicationEntity =
       DemandeImmersionEntity.create(demandeImmersionDto);

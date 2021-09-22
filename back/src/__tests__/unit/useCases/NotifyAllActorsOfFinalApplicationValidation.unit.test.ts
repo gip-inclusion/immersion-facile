@@ -23,7 +23,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     sendConventionToAllActors = new NotifyAllActorsOfFinalApplicationValidation(
       emailGw,
       allowList,
-      unrestrictedEmailSendingSources
+      unrestrictedEmailSendingSources,
     );
   });
 
@@ -43,7 +43,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [validDemandeImmersion.email],
       sentEmails[0],
-      validDemandeImmersion
+      validDemandeImmersion,
     );
   });
 
@@ -58,7 +58,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [validDemandeImmersion.mentorEmail],
       sentEmails[0],
-      validDemandeImmersion
+      validDemandeImmersion,
     );
   });
 
@@ -74,7 +74,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [validDemandeImmersion.email, validDemandeImmersion.mentorEmail],
       sentEmails[0],
-      validDemandeImmersion
+      validDemandeImmersion,
     );
   });
 
@@ -89,7 +89,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [validDemandeImmersion.email, validDemandeImmersion.mentorEmail],
       sentEmails[0],
-      validDemandeImmersion
+      validDemandeImmersion,
     );
   });
 });

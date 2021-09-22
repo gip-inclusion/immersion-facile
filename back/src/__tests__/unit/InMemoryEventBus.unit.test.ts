@@ -21,7 +21,7 @@ describe("InMemoryEventBus", () => {
     test("Publishes to a new topic and check we have only one spyed", () => {
       const publishedEvents = spyOnTopic(
         anEventBus,
-        "ImmersionApplicationSubmittedByBeneficiary"
+        "ImmersionApplicationSubmittedByBeneficiary",
       );
       anEventBus.publish(domainEvt);
       expect(publishedEvents).toHaveLength(1);
@@ -31,12 +31,12 @@ describe("InMemoryEventBus", () => {
   test("Publish to the same topic and check that 2 subscribers get the message", () => {
     const eventsOnFirstHandler = spyOnTopic(
       anEventBus,
-      "ImmersionApplicationSubmittedByBeneficiary"
+      "ImmersionApplicationSubmittedByBeneficiary",
     );
 
     const eventsOnSecondHandler = spyOnTopic(
       anEventBus,
-      "ImmersionApplicationSubmittedByBeneficiary"
+      "ImmersionApplicationSubmittedByBeneficiary",
     );
 
     anEventBus.publish(domainEvt);

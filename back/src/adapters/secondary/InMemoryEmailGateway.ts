@@ -20,11 +20,11 @@ export class InMemoryEmailGateway implements EmailGateway {
 
   public async sendNewApplicationBeneficiaryConfirmation(
     recipient: string,
-    params: NewApplicationBeneficiaryConfirmationParams
+    params: NewApplicationBeneficiaryConfirmationParams,
   ): Promise<void> {
     this.logger.info(
       { recipient, params },
-      "sendNewApplicationBeneficiaryConfirmation"
+      "sendNewApplicationBeneficiaryConfirmation",
     );
     this.sentEmails.push({
       type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
@@ -35,11 +35,11 @@ export class InMemoryEmailGateway implements EmailGateway {
 
   public async sendNewApplicationMentorConfirmation(
     recipient: string,
-    params: NewApplicationMentorConfirmationParams
+    params: NewApplicationMentorConfirmationParams,
   ): Promise<void> {
     this.logger.info(
       { recipient, params },
-      "sendNewApplicationMentorConfirmation"
+      "sendNewApplicationMentorConfirmation",
     );
     this.sentEmails.push({
       type: "NEW_APPLICATION_MENTOR_CONFIRMATION",
@@ -50,11 +50,11 @@ export class InMemoryEmailGateway implements EmailGateway {
 
   public async sendNewApplicationAdminNotification(
     recipients: string[],
-    params: NewApplicationAdminNotificationParams
+    params: NewApplicationAdminNotificationParams,
   ): Promise<void> {
     this.logger.info(
       { recipients, params },
-      "sendNewApplicationAdminNotification"
+      "sendNewApplicationAdminNotification",
     );
     this.sentEmails.push({
       type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
@@ -65,11 +65,11 @@ export class InMemoryEmailGateway implements EmailGateway {
 
   public async sendValidatedApplicationFinalConfirmation(
     recipients: string[],
-    dto: DemandeImmersionDto
+    dto: DemandeImmersionDto,
   ): Promise<void> {
     this.logger.info(
       { recipients, dto },
-      "sendValidatedApplicationFinalConfirmation"
+      "sendValidatedApplicationFinalConfirmation",
     );
     this.sentEmails.push({
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",

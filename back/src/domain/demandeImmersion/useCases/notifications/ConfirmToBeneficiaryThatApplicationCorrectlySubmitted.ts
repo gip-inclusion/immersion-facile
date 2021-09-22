@@ -18,7 +18,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
     private readonly emailAllowList: Readonly<Set<string>>,
     private readonly unrestrictedEmailSendingSources: Readonly<
       Set<ApplicationSource>
-    >
+    >,
   ) {}
 
   public async execute({
@@ -30,7 +30,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
   }: DemandeImmersionDto): Promise<void> {
     this.logger.info(
       { demandeImmersionid: id },
-      `------------- Entering execute`
+      `------------- Entering execute`,
     );
 
     if (
@@ -45,7 +45,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
     } else {
       this.logger.info(
         { id, email, source },
-        "Sending beneficiary confirmation email skipped."
+        "Sending beneficiary confirmation email skipped.",
       );
     }
   }

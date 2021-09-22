@@ -71,7 +71,7 @@ describe("Update demandeImmersion", () => {
             id: "unknown_demande_immersion_id",
             demandeImmersion: validDemandeImmersion,
           }),
-          new NotFoundError("unknown_demande_immersion_id")
+          new NotFoundError("unknown_demande_immersion_id"),
         );
       });
     });
@@ -90,7 +90,7 @@ describe("Update demandeImmersion", () => {
           id: "demande_id",
           demandeImmersion: validDemandeImmersion,
         }),
-        new FeatureDisabledError()
+        new FeatureDisabledError(),
       );
     });
   });

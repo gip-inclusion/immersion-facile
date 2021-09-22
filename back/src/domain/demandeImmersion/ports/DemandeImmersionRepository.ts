@@ -6,13 +6,13 @@ import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
 
 export interface DemandeImmersionRepository {
   save: (
-    demandeImmersionEntity: DemandeImmersionEntity
+    demandeImmersionEntity: DemandeImmersionEntity,
   ) => Promise<DemandeImmersionId | undefined>;
   getAll: () => Promise<DemandeImmersionEntity[]>;
   getById: (
-    id: DemandeImmersionId
+    id: DemandeImmersionId,
   ) => Promise<DemandeImmersionEntity | undefined>;
   updateDemandeImmersion: (
-    demandeImmersion: DemandeImmersionEntity
+    demandeImmersion: DemandeImmersionEntity,
   ) => Promise<DemandeImmersionId | undefined>;
 }

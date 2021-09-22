@@ -8,7 +8,7 @@ export type ImmersionOfferId = Flavor<string, "ImmersionOfferId">;
 const businessContactDtoSchema = Yup.object({
   lastName: Yup.string().required("Obligatoire"),
   firstName: Yup.string().required("Obligatoire"),
-  function: Yup.string().required("Obligatoire"),
+  job: Yup.string().required("Obligatoire"),
   phone: Yup.string()
     .matches(phoneRegExp, "Numero de téléphone incorrect")
     .required("Obligatoire"),

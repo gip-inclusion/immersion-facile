@@ -16,7 +16,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   test("Sends no mail when contact Email is not set", async () => {
     const notifyToTeam = new NotifyToTeamApplicationSubmittedByBeneficiary(
       emailGw,
-      undefined
+      undefined,
     );
     await notifyToTeam.execute(validDemandeImmersion);
     const sentEmails = emailGw.getSentEmails();
@@ -26,7 +26,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   test("Sends admin notification email to immersion facile team when contact Email is set", async () => {
     const notifyToTeam = new NotifyToTeamApplicationSubmittedByBeneficiary(
       emailGw,
-      immersionFacileContactEmail
+      immersionFacileContactEmail,
     );
     await notifyToTeam.execute(validDemandeImmersion);
 

@@ -100,7 +100,7 @@ export class InMemoryDemandeImmersionGateway
   }
 
   public async add(
-    demandeImmersion: DemandeImmersionDto
+    demandeImmersion: DemandeImmersionDto,
   ): Promise<DemandeImmersionId> {
     console.log("InMemoryDemandeImmersionGateway.add: ", demandeImmersion);
     await sleep(SIMULATED_LATENCY_MS);
@@ -125,7 +125,7 @@ export class InMemoryDemandeImmersionGateway
   }
 
   public async update(
-    demandeImmersion: DemandeImmersionDto
+    demandeImmersion: DemandeImmersionDto,
   ): Promise<DemandeImmersionId> {
     console.log("InMemoryDemandeImmersionGateway.update: ", demandeImmersion);
     await sleep(SIMULATED_LATENCY_MS);
@@ -157,7 +157,7 @@ export class InMemoryDemandeImmersionGateway
     const establishment = this._establishments[siret];
     console.log(
       "InMemoryDemandeImmersionGateway.getSiretInfo: ",
-      establishment
+      establishment,
     );
 
     if (!establishment) {

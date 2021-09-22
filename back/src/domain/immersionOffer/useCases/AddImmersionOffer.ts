@@ -8,7 +8,7 @@ export class AddImmersionOffer
   implements UseCase<ImmersionOfferDto, AddImmersionOfferResponseDto>
 {
   public async execute(
-    dto: ImmersionOfferDto
+    dto: ImmersionOfferDto,
   ): Promise<AddImmersionOfferResponseDto> {
     throw new Error("implement"); // TODO
   }

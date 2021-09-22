@@ -24,7 +24,7 @@ export class InMemoryAuthChecker implements AuthChecker {
 
     const [receivedUsername, receivedPassword] = Buffer.from(
       authorization.replace("Basic ", ""),
-      "base64"
+      "base64",
     )
       .toString()
       .split(":");

@@ -30,21 +30,21 @@ export class SendinblueEmailGateway implements EmailGateway {
   });
 
   private constructor(
-    private readonly apiInstance: SibApiV3Sdk.TransactionalEmailsApi
+    private readonly apiInstance: SibApiV3Sdk.TransactionalEmailsApi,
   ) {}
 
   public static create(apiKey: string): SendinblueEmailGateway {
     const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     apiInstance.setApiKey(
       SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
-      apiKey
+      apiKey,
     );
     return new SendinblueEmailGateway(apiInstance);
   }
 
   public async sendNewApplicationBeneficiaryConfirmation(
     recipient: string,
-    params: NewApplicationBeneficiaryConfirmationParams
+    params: NewApplicationBeneficiaryConfirmationParams,
   ): Promise<void> {
     const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
     sibEmail.templateId =
@@ -60,7 +60,7 @@ export class SendinblueEmailGateway implements EmailGateway {
 
   public async sendNewApplicationMentorConfirmation(
     recipient: string,
-    params: NewApplicationMentorConfirmationParams
+    params: NewApplicationMentorConfirmationParams,
   ): Promise<void> {
     const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
     sibEmail.templateId =
@@ -77,7 +77,7 @@ export class SendinblueEmailGateway implements EmailGateway {
 
   public async sendNewApplicationAdminNotification(
     recipients: string[],
-    params: NewApplicationAdminNotificationParams
+    params: NewApplicationAdminNotificationParams,
   ) {
     const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
     sibEmail.templateId =
@@ -96,7 +96,7 @@ export class SendinblueEmailGateway implements EmailGateway {
 
   public async sendValidatedApplicationFinalConfirmation(
     recipients: string[],
-    dto: DemandeImmersionDto
+    dto: DemandeImmersionDto,
   ): Promise<void> {
     const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
     sibEmail.templateId =

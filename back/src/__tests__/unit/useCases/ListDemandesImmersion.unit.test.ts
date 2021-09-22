@@ -60,7 +60,7 @@ describe("List DemandeImmersion", () => {
     it("throws FeatureDisabledError", async () => {
       expectPromiseToFailWithError(
         listDemandeImmersion.execute(),
-        new FeatureDisabledError()
+        new FeatureDisabledError(),
       );
     });
   });

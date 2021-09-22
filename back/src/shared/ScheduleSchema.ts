@@ -57,7 +57,7 @@ export const timePeriodSchema = Yup.object({
 
 // Each element represents one weekday, starting with Monday.
 export const complexScheduleSchema = Yup.array(
-  Yup.array(timePeriodSchema).required()
+  Yup.array(timePeriodSchema).required(),
 ).required();
 
 // Represents a schedule where each day is worked on the same
@@ -67,7 +67,7 @@ export const simpleScheduleSchema = Yup.object({
   // [0, 4] means "Monday to Friday, inclusive"
   // [0, 0] means "Monday"
   dayPeriods: Yup.array(
-    Yup.array(Yup.number().required()).length(2).required()
+    Yup.array(Yup.number().required()).length(2).required(),
   ).required(),
   hours: Yup.array(timePeriodSchema).required(),
 }).required();

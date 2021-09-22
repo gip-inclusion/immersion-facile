@@ -38,7 +38,7 @@ describe("Get DemandeImmersion", () => {
       it("throws NotFoundError", async () => {
         expectPromiseToFailWithError(
           getDemandeImmersion.execute({ id: "unknown_demande_immersion_id" }),
-          new NotFoundError("unknown_demande_immersion_id")
+          new NotFoundError("unknown_demande_immersion_id"),
         );
       });
     });
@@ -64,7 +64,7 @@ describe("Get DemandeImmersion", () => {
     it("throws FeatureDisabledError", async () => {
       expectPromiseToFailWithError(
         getDemandeImmersion.execute({ id: "demande_id" }),
-        new FeatureDisabledError()
+        new FeatureDisabledError(),
       );
     });
   });

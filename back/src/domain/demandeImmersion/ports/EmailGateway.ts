@@ -31,18 +31,18 @@ export type EmailType =
 export interface EmailGateway {
   sendNewApplicationBeneficiaryConfirmation: (
     recipient: string,
-    params: NewApplicationBeneficiaryConfirmationParams
+    params: NewApplicationBeneficiaryConfirmationParams,
   ) => Promise<void>;
   sendNewApplicationMentorConfirmation: (
     recipient: string,
-    params: NewApplicationMentorConfirmationParams
+    params: NewApplicationMentorConfirmationParams,
   ) => Promise<void>;
   sendNewApplicationAdminNotification: (
     recipients: string[],
-    params: NewApplicationAdminNotificationParams
+    params: NewApplicationAdminNotificationParams,
   ) => Promise<void>;
   sendValidatedApplicationFinalConfirmation: (
     recipient: string[],
-    dto: DemandeImmersionDto
+    dto: DemandeImmersionDto,
   ) => Promise<void>;
 }

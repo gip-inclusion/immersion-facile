@@ -25,7 +25,7 @@ export class DemandeImmersionEntity {
 }
 
 export const isDemandeImmersionEntity = (
-  entity: DemandeImmersionEntity | undefined
+  entity: DemandeImmersionEntity | undefined,
 ): entity is DemandeImmersionEntity => {
   return !!entity;
 };

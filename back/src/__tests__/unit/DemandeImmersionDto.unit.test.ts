@@ -103,7 +103,7 @@ describe("applicationStatusFromString", () => {
     expectApplicationStatusToBe(applicationStatusFromString("DRAFT"), "DRAFT");
     expectApplicationStatusToBe(
       applicationStatusFromString("IN_REVIEW"),
-      "IN_REVIEW"
+      "IN_REVIEW",
     );
   });
 
@@ -111,25 +111,25 @@ describe("applicationStatusFromString", () => {
     expectApplicationStatusToBe(applicationStatusFromString(""), "UNKNOWN");
     expectApplicationStatusToBe(
       applicationStatusFromString("UNKNOWN_VALUE"),
-      "UNKNOWN"
+      "UNKNOWN",
     );
   });
 });
 
 const expectApplicationStatusToBe = (
   actual: ApplicationStatus,
-  expected: ApplicationStatus
+  expected: ApplicationStatus,
 ) => expect(actual).toBe(expected);
 
 describe("applicationSourceFromString", () => {
   test("accepts valid enum values", () => {
     expectApplicationSourceToBe(
       applicationSourceFromString("GENERIC"),
-      "GENERIC"
+      "GENERIC",
     );
     expectApplicationSourceToBe(
       applicationSourceFromString("BOULOGNE_SUR_MER"),
-      "BOULOGNE_SUR_MER"
+      "BOULOGNE_SUR_MER",
     );
   });
 
@@ -137,31 +137,31 @@ describe("applicationSourceFromString", () => {
     expectApplicationSourceToBe(applicationSourceFromString(""), "UNKNOWN");
     expectApplicationSourceToBe(
       applicationSourceFromString("UNKNOWN_VALUE"),
-      "UNKNOWN"
+      "UNKNOWN",
     );
   });
 });
 
 const expectApplicationSourceToBe = (
   actual: ApplicationSource,
-  expected: ApplicationSource
+  expected: ApplicationSource,
 ) => expect(actual).toBe(expected);
 
 const expectDemandeImmersionDtoToBeValid = (
-  validDemandeImmersionDto: DemandeImmersionDto
+  validDemandeImmersionDto: DemandeImmersionDto,
 ) => {
   expect(() =>
-    demandeImmersionDtoSchema.validateSync(validDemandeImmersionDto)
+    demandeImmersionDtoSchema.validateSync(validDemandeImmersionDto),
   ).not.toThrow();
 
   expect(
-    demandeImmersionDtoSchema.validateSync(validDemandeImmersionDto)
+    demandeImmersionDtoSchema.validateSync(validDemandeImmersionDto),
   ).toBeTruthy();
 };
 
 const expectDemandeImmersionDtoToBeInvalid = (
-  demandeImmersionDto: DemandeImmersionDto
+  demandeImmersionDto: DemandeImmersionDto,
 ) =>
   expect(() =>
-    demandeImmersionDtoSchema.validateSync(demandeImmersionDto)
+    demandeImmersionDtoSchema.validateSync(demandeImmersionDto),
   ).toThrow();

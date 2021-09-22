@@ -28,7 +28,7 @@ export class FakeLaBonneBoiteGateway implements CompaniesGateway {
   async getCompanies(searchParams: SearchParams): Promise<CompanyEntity[]> {
     return fakeCompanies
       .filter((company) =>
-        this.keepRelevantCompanies(searchParams.ROME, company)
+        this.keepRelevantCompanies(searchParams.ROME, company),
       )
       .map(
         (company) =>
@@ -42,14 +42,14 @@ export class FakeLaBonneBoiteGateway implements CompaniesGateway {
             company.naf,
             company.name,
             company.siret,
-            company.stars
-          )
+            company.stars,
+          ),
       );
   }
 
   keepRelevantCompanies(
     romeSearched: string,
-    company: CompanyFromLaBonneBoite
+    company: CompanyFromLaBonneBoite,
   ): boolean {
     if (
       (company.naf.startsWith("9609") && romeSearched == "A1408") ||

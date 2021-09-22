@@ -12,7 +12,7 @@ export class InMemoryDemandeImmersionRepository
   private _demandesImmersion: DemandesImmersion = {};
 
   public async save(
-    demandeImmersionEntity: DemandeImmersionEntity
+    demandeImmersionEntity: DemandeImmersionEntity,
   ): Promise<DemandeImmersionId | undefined> {
     if (this._demandesImmersion[demandeImmersionEntity.id]) {
       return undefined;
@@ -30,7 +30,7 @@ export class InMemoryDemandeImmersionRepository
   }
 
   public async updateDemandeImmersion(
-    demandeImmersion: DemandeImmersionEntity
+    demandeImmersion: DemandeImmersionEntity,
   ) {
     const id = demandeImmersion.id;
     if (!this._demandesImmersion[id]) {

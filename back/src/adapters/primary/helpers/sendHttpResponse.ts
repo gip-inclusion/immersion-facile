@@ -31,7 +31,7 @@ export const sendHttpResponse = async (
   req: Request,
   res: Response,
   callback: () => Promise<unknown>,
-  authChecker?: AuthChecker
+  authChecker?: AuthChecker,
 ) => {
   try {
     if (authChecker) {

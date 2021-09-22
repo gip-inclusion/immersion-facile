@@ -23,19 +23,19 @@ export class HttpDemandeImmersionGateway implements DemandeImmersionGateway {
     await demandeImmersionDtoSchema.validate(demandeImmersionDto);
     const httpResponse = await axios.post(
       `/${prefix}/${demandesImmersionRoute}`,
-      demandeImmersionDto
+      demandeImmersionDto,
     );
     const addDemandeImmersionResponse: AddDemandeImmersionResponseDto =
       httpResponse.data;
     await addDemandeImmersionResponseDtoSchema.validate(
-      addDemandeImmersionResponse
+      addDemandeImmersionResponse,
     );
     return addDemandeImmersionResponse.id;
   }
 
   public async get(id: string): Promise<DemandeImmersionDto> {
     const response = await axios.get(
-      `/${prefix}/${demandesImmersionRoute}/${id}`
+      `/${prefix}/${demandesImmersionRoute}/${id}`,
     );
     console.log(response.data);
     return response.data;
@@ -48,24 +48,24 @@ export class HttpDemandeImmersionGateway implements DemandeImmersionGateway {
   }
 
   public async update(
-    demandeImmersionDto: DemandeImmersionDto
+    demandeImmersionDto: DemandeImmersionDto,
   ): Promise<string> {
     await demandeImmersionDtoSchema.validate(demandeImmersionDto);
     const httpResponse = await axios.post(
       `/${prefix}/${demandesImmersionRoute}/${demandeImmersionDto.id}`,
-      demandeImmersionDto
+      demandeImmersionDto,
     );
     const updateDemandeImmersionResponse: UpdateDemandeImmersionResponseDto =
       httpResponse.data;
     await updateDemandeImmersionResponseDtoSchema.validate(
-      updateDemandeImmersionResponse
+      updateDemandeImmersionResponse,
     );
     return updateDemandeImmersionResponse.id;
   }
 
   public async validate(id: DemandeImmersionId): Promise<string> {
     const { data } = await axios.get(
-      `/${prefix}/${validateDemandeRoute}/${id}`
+      `/${prefix}/${validateDemandeRoute}/${id}`,
     );
     return data.id;
   }

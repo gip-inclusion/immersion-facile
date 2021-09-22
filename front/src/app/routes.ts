@@ -5,19 +5,19 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   todos: defineRoute("/todos"),
   demandeImmersion: defineRoute(
     { demandeId: param.query.optional.string },
-    () => "/demande-immersion"
+    () => "/demande-immersion",
   ),
   boulogneSurMer: defineRoute(
     { demandeId: param.query.optional.string },
-    () => "/demande-immersion/boulogne-sur-mer"
+    () => "/demande-immersion/boulogne-sur-mer",
   ),
   narbonne: defineRoute(
     { demandeId: param.query.optional.string },
-    () => "/demande-immersion/narbonne"
+    () => "/demande-immersion/narbonne",
   ),
   admin: defineRoute("/admin"),
   adminVerification: defineRoute(
     { demandeId: param.path.string },
-    (p) => `/admin-verification/${p.demandeId}`
+    (p) => `/admin-verification/${p.demandeId}`,
   ),
 });

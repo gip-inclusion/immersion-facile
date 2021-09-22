@@ -8,7 +8,7 @@ export class RomeSearch
   implements UseCase<RomeSearchRequestDto, RomeSearchResponseDto>
 {
   public async execute(
-    searchText: RomeSearchRequestDto
+    searchText: RomeSearchRequestDto,
   ): Promise<RomeSearchResponseDto> {
     throw new Error("implement"); // TODO
   }

@@ -18,7 +18,7 @@ export class NotifyAllActorsOfFinalApplicationValidation
     private readonly emailAllowList: Readonly<Set<string>>,
     private readonly unrestrictedEmailSendingSources: Readonly<
       Set<ApplicationSource>
-    >
+    >,
   ) {}
 
   public async execute(dto: DemandeImmersionDto): Promise<void> {
@@ -26,7 +26,7 @@ export class NotifyAllActorsOfFinalApplicationValidation
       {
         demandeImmersionid: dto.id,
       },
-      "------------- Entering execute."
+      "------------- Entering execute.",
     );
 
     let recipients = [dto.email, dto.mentorEmail];
@@ -37,7 +37,7 @@ export class NotifyAllActorsOfFinalApplicationValidation
     if (recipients.length > 0) {
       await this.emailGateway.sendValidatedApplicationFinalConfirmation(
         recipients,
-        dto
+        dto,
       );
     } else {
       this.logger.info(
@@ -46,7 +46,7 @@ export class NotifyAllActorsOfFinalApplicationValidation
           recipients,
           source: dto.source,
         },
-        "Sending validation confirmation email skipped."
+        "Sending validation confirmation email skipped.",
       );
     }
   }

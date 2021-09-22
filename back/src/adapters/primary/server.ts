@@ -5,21 +5,24 @@ import {
   demandeImmersionDtoSchema,
   getDemandeImmersionRequestDtoSchema,
   updateDemandeImmersionRequestDtoSchema,
-  validateDemandeImmersionRequestDtoSchema
+  validateDemandeImmersionRequestDtoSchema,
 } from "../../shared/DemandeImmersionDto";
 import { FeatureFlags } from "../../shared/featureFlags";
 import { immersionOfferDtoSchema } from "../../shared/ImmersionOfferDto";
 import { romeSearchRequestDtoSchema } from "../../shared/rome";
 import {
-  demandesImmersionRoute, immersionOffersRoute, romeRoute, siretRoute,
-  validateDemandeRoute
+  demandesImmersionRoute,
+  immersionOffersRoute,
+  romeRoute,
+  siretRoute,
+  validateDemandeRoute,
 } from "../../shared/routes";
 import { logger } from "../../utils/logger";
 import {
   eventBus,
   getAuthChecker,
   getEventCrawler,
-  getUsecases
+  getUsecases,
 } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
@@ -53,15 +56,15 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
           useCase: useCases.addDemandeImmersion,
           validationSchema: demandeImmersionDtoSchema,
           useCaseParams: req.body,
-        })
-      )
+        }),
+      ),
     )
     .get(async (req, res) => {
       sendHttpResponse(
         req,
         res,
         () => useCases.listDemandeImmersion.execute(),
-        authChecker
+        authChecker,
       );
     });
   router.route(`/${validateDemandeRoute}/:id`).get(async (req, res) => {
@@ -74,7 +77,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
           validationSchema: validateDemandeImmersionRequestDtoSchema,
           useCaseParams: req.params.id,
         }),
-      authChecker
+      authChecker,
     );
   });
 
@@ -89,8 +92,8 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
           useCase: useCases.getDemandeImmersion,
           validationSchema: getDemandeImmersionRequestDtoSchema,
           useCaseParams: req.params,
-        })
-      )
+        }),
+      ),
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
@@ -98,8 +101,8 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
           useCase: useCases.updateDemandeImmersion,
           validationSchema: updateDemandeImmersionRequestDtoSchema,
           useCaseParams: { id: req.params.id, demandeImmersion: req.body },
-        })
-      )
+        }),
+      ),
     );
 
   router.route(`/${immersionOffersRoute}`).post(async (req, res) =>
@@ -108,8 +111,8 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
         useCase: useCases.addImmersionOffer,
         validationSchema: immersionOfferDtoSchema,
         useCaseParams: req.body,
-      })
-    )
+      }),
+    ),
   );
 
   router.route(`/${romeRoute}`).get(async (req, res) => {
@@ -127,31 +130,31 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     sendHttpResponse(req, res, async () => {
       logger.info(req);
       return useCases.getSiret.execute(req.params.siret);
-    })
+    }),
   );
 
   app.use(router);
 
   eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
     useCases.confirmToBeneficiaryThatApplicationCorrectlySubmitted.execute(
-      event.payload
-    )
+      event.payload,
+    ),
   );
 
   eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
     useCases.confirmToMentorThatApplicationCorrectlySubmitted.execute(
-      event.payload
-    )
+      event.payload,
+    ),
   );
 
   eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
     useCases.notifyToTeamApplicationSubmittedByBeneficiary.execute(
-      event.payload
-    )
+      event.payload,
+    ),
   );
 
   eventBus.subscribe("FinalImmersionApplicationValidationByAdmin", (event) =>
-    useCases.notifyAllActorsOfFinalApplicationValidation.execute(event.payload)
+    useCases.notifyAllActorsOfFinalApplicationValidation.execute(event.payload),
   );
 
   getEventCrawler(featureFlags).startCrawler();

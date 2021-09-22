@@ -13,7 +13,7 @@ describe("/siret route", () => {
     request = supertest(
       createApp({
         featureFlags: new FeatureFlagsBuilder().build(),
-      })
+      }),
     );
   });
 

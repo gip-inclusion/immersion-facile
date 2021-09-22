@@ -7,7 +7,7 @@ export class HttpsSireneRepository implements SireneRepository {
 
   public static create(
     sireneEndpoint: string,
-    bearerToken: string
+    bearerToken: string,
   ): SireneRepository {
     if (new URL(sireneEndpoint).protocol !== "https:") {
       throw new Error(`Not an HTTPS endpoint: ${sireneEndpoint}`);

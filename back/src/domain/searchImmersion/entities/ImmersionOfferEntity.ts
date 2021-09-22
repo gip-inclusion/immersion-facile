@@ -8,7 +8,7 @@ export class ImmersionOfferEntity {
     private naf: string,
     private rome: string,
     private siret: string,
-    private name: string
+    private name: string,
   ) {}
 
   public getName() {

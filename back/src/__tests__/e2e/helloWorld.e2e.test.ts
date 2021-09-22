@@ -9,7 +9,7 @@ describe("Hello world route", () => {
     request = supertest(
       createApp({
         featureFlags: new FeatureFlagsBuilder().build(),
-      })
+      }),
     );
   });
 

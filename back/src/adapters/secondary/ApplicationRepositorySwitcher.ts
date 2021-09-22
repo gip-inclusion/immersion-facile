@@ -19,13 +19,13 @@ export class ApplicationRepositorySwitcher
   }
 
   public async save(
-    entity: DemandeImmersionEntity
+    entity: DemandeImmersionEntity,
   ): Promise<DemandeImmersionId | undefined> {
     return await this.getRepositoryBySource(entity.source).save(entity);
   }
 
   public async getById(
-    id: DemandeImmersionId
+    id: DemandeImmersionId,
   ): Promise<DemandeImmersionEntity | undefined> {
     const entities = await this.demux((repository) => repository.getById(id));
     if (entities.length == 0) return undefined;
@@ -38,20 +38,20 @@ export class ApplicationRepositorySwitcher
     const entityLists = await this.demux((repository) => repository.getAll());
     return entityLists.reduce(
       (response, entityList) => response.concat(entityList),
-      []
+      [],
     );
   }
 
   public async updateDemandeImmersion(
-    entity: DemandeImmersionEntity
+    entity: DemandeImmersionEntity,
   ): Promise<DemandeImmersionId | undefined> {
     return this.getRepositoryBySource(entity.source).updateDemandeImmersion(
-      entity
+      entity,
     );
   }
 
   private async demux<Type>(
-    fn: (repo: DemandeImmersionRepository) => Promise<Type>
+    fn: (repo: DemandeImmersionRepository) => Promise<Type>,
   ): Promise<Type[]> {
     if (this.applicationRepositories.length == 0)
       throw new FeatureDisabledError();
@@ -60,7 +60,7 @@ export class ApplicationRepositorySwitcher
   }
 
   private getRepositoryBySource(
-    source: ApplicationSource
+    source: ApplicationSource,
   ): DemandeImmersionRepository {
     const repository = this.applicationRepositoryMap[source];
     if (!repository) throw new FeatureDisabledError(source);

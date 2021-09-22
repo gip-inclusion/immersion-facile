@@ -21,7 +21,7 @@ describe("Get SIRET", () => {
     it("throws NotFoundError", async () => {
       expectPromiseToFailWithError(
         getSiret.execute("unknown_siret"),
-        new NotFoundError("unknown_siret")
+        new NotFoundError("unknown_siret"),
       );
     });
   });

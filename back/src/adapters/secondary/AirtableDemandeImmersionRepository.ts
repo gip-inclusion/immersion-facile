@@ -19,23 +19,23 @@ export class AirtableDemandeImmersionRepository
 
   constructor(
     readonly table: Table<FieldSet>,
-    readonly converter: AirtableApplicationDataConverter
+    readonly converter: AirtableApplicationDataConverter,
   ) {}
 
   public static create(
     apiKey: string,
     baseId: string,
     tableName: string,
-    converter: AirtableApplicationDataConverter
+    converter: AirtableApplicationDataConverter,
   ) {
     return new AirtableDemandeImmersionRepository(
       new Airtable({ apiKey }).base(baseId)(tableName),
-      converter
+      converter,
     );
   }
 
   public async save(
-    entity: DemandeImmersionEntity
+    entity: DemandeImmersionEntity,
   ): Promise<DemandeImmersionId | undefined> {
     if (await this.getById(entity.id)) {
       return undefined;
@@ -58,7 +58,7 @@ export class AirtableDemandeImmersionRepository
   }
 
   public async getById(
-    id: DemandeImmersionId
+    id: DemandeImmersionId,
   ): Promise<DemandeImmersionEntity | undefined> {
     const record = await this.queryRecordById(id);
     if (!record) {
@@ -71,7 +71,7 @@ export class AirtableDemandeImmersionRepository
     try {
       const records = await this.queryRecords({});
       return records.map((record) =>
-        this.converter.fieldSetToEntity(record.fields)
+        this.converter.fieldSetToEntity(record.fields),
       );
     } catch (e: any) {
       this.logger.error(e, "Error fetching all airtable records.");
@@ -80,7 +80,7 @@ export class AirtableDemandeImmersionRepository
   }
 
   private async queryRecordById(
-    id: DemandeImmersionId
+    id: DemandeImmersionId,
   ): Promise<Record<FieldSet> | undefined> {
     try {
       const demandesImmersion = await this.queryRecords({
@@ -98,7 +98,7 @@ export class AirtableDemandeImmersionRepository
   }
 
   private async queryRecords(
-    params: QueryParams<FieldSet>
+    params: QueryParams<FieldSet>,
   ): Promise<Record<FieldSet>[]> {
     const allRecords: Record<FieldSet>[] = [];
     await this.table.select(params).eachPage((records, fetchNextPage) => {
@@ -109,7 +109,7 @@ export class AirtableDemandeImmersionRepository
   }
 
   public async updateDemandeImmersion(
-    demandeImmersion: DemandeImmersionEntity
+    demandeImmersion: DemandeImmersionEntity,
   ): Promise<DemandeImmersionId | undefined> {
     const currentRecord = await this.queryRecordById(demandeImmersion.id);
     if (!currentRecord) {
@@ -119,13 +119,13 @@ export class AirtableDemandeImmersionRepository
     try {
       await this.table.update(
         currentRecord.id,
-        this.converter.entityToFieldSet(demandeImmersion)
+        this.converter.entityToFieldSet(demandeImmersion),
       );
       return demandeImmersion.id;
     } catch (e: any) {
       this.logger.error(
         e,
-        `Error updating Airtable record: ${currentRecord.id}`
+        `Error updating Airtable record: ${currentRecord.id}`,
       );
       throw e;
     }

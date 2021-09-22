@@ -13,7 +13,7 @@ export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
   }
 
   public withSimpleSchedule(
-    simpleSchedule: SimpleScheduleDto
+    simpleSchedule: SimpleScheduleDto,
   ): ScheduleDtoBuilder {
     return new ScheduleDtoBuilder({
       ...this.dto,
@@ -27,7 +27,7 @@ export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
   }
 
   public withComplexSchedule(
-    complexSchedule: ComplexScheduleDto
+    complexSchedule: ComplexScheduleDto,
   ): ScheduleDtoBuilder {
     return new ScheduleDtoBuilder({
       ...this.dto,

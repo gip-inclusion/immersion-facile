@@ -4,14 +4,14 @@ import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
 
 export const expectPromiseToFailWith = async (
   promise: Promise<unknown>,
-  errorMessage: string
+  errorMessage: string,
 ) => {
   await expect(promise).rejects.toThrowError(new Error(errorMessage));
 };
 
 export const expectPromiseToFailWithError = async (
   promise: Promise<unknown>,
-  error: Error
+  error: Error,
 ) => {
   await expect(promise).rejects.toThrowError(error);
 };
@@ -23,7 +23,7 @@ export const addDays = (dateStr: string, amount: number) => {
 
 export const spyOnTopic = (
   eventBus: EventBus,
-  topic: DomainTopic
+  topic: DomainTopic,
 ): DomainEvent[] => {
   const publishedEvents: DomainEvent[] = [];
   eventBus.subscribe(topic, (event) => {

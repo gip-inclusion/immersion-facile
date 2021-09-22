@@ -9,19 +9,19 @@ describe("ApplicationRepositorySwitcher", () => {
     new DemandeImmersionDtoBuilder()
       .withId("generic_id")
       .withSource("GENERIC")
-      .build()
+      .build(),
   );
   const narbonneApplication = DemandeImmersionEntity.create(
     new DemandeImmersionDtoBuilder()
       .withId("narbonne_id")
       .withSource("NARBONNE")
-      .build()
+      .build(),
   );
   const boulogneSurMerApplication = DemandeImmersionEntity.create(
     new DemandeImmersionDtoBuilder()
       .withId("boulogne_sur_mer_id")
       .withSource("BOULOGNE_SUR_MER")
-      .build()
+      .build(),
   );
 
   let genericRepository: InMemoryDemandeImmersionRepository;
@@ -41,16 +41,16 @@ describe("ApplicationRepositorySwitcher", () => {
     test("saves application to correct repository", async () => {
       // GENERIC repository
       expect(await demux.save(genericApplication)).toEqual(
-        genericApplication.id
+        genericApplication.id,
       );
       expect((await genericRepository.getAll())[0]).toEqual(genericApplication);
 
       // NARBONNE repository
       expect(await demux.save(narbonneApplication)).toEqual(
-        narbonneApplication.id
+        narbonneApplication.id,
       );
       expect((await narbonneRepository.getAll())[0]).toEqual(
-        narbonneApplication
+        narbonneApplication,
       );
     });
 
@@ -71,7 +71,7 @@ describe("ApplicationRepositorySwitcher", () => {
     test("rejects applications from unsupported sources", async () => {
       await expectPromiseToFailWithError(
         demux.save(boulogneSurMerApplication),
-        new FeatureDisabledError(boulogneSurMerApplication.source)
+        new FeatureDisabledError(boulogneSurMerApplication.source),
       );
     });
   });
@@ -86,10 +86,10 @@ describe("ApplicationRepositorySwitcher", () => {
       });
 
       expect(await demux.getById(genericApplication.id)).toEqual(
-        genericApplication
+        genericApplication,
       );
       expect(await demux.getById(narbonneApplication.id)).toEqual(
-        narbonneApplication
+        narbonneApplication,
       );
     });
 
@@ -107,7 +107,7 @@ describe("ApplicationRepositorySwitcher", () => {
 
       await expectPromiseToFailWithError(
         demux.getById("duplicate_id"),
-        new Error("More results than expected: duplicate_id")
+        new Error("More results than expected: duplicate_id"),
       );
     });
 
@@ -118,7 +118,7 @@ describe("ApplicationRepositorySwitcher", () => {
       test("throws FeatureDisabledError", async () => {
         await expectPromiseToFailWithError(
           demux.getById("id"),
-          new FeatureDisabledError()
+          new FeatureDisabledError(),
         );
       });
     });
@@ -135,18 +135,18 @@ describe("ApplicationRepositorySwitcher", () => {
         [narbonneApplication.id]: narbonneApplication,
       });
       expect(new Set(await demux.getAll())).toEqual(
-        new Set([genericApplication, narbonneApplication])
+        new Set([genericApplication, narbonneApplication]),
       );
 
       const genericApplication2 = DemandeImmersionEntity.create(
-        new DemandeImmersionDtoBuilder().withId("generic_id2").build()
+        new DemandeImmersionDtoBuilder().withId("generic_id2").build(),
       );
       genericRepository.setDemandesImmersion({
         [genericApplication.id]: genericApplication,
         [genericApplication2.id]: genericApplication2,
       });
       expect(new Set(await demux.getAll())).toEqual(
-        new Set([genericApplication, genericApplication2, narbonneApplication])
+        new Set([genericApplication, genericApplication2, narbonneApplication]),
       );
     });
 
@@ -161,7 +161,7 @@ describe("ApplicationRepositorySwitcher", () => {
       test("throws FeatureDisabledError", async () => {
         await expectPromiseToFailWithError(
           demux.getAll(),
-          new FeatureDisabledError()
+          new FeatureDisabledError(),
         );
       });
     });
@@ -178,10 +178,10 @@ describe("ApplicationRepositorySwitcher", () => {
         email: "new@generic.email.fr",
       });
       expect(
-        await demux.updateDemandeImmersion(updatedGenericApplication)
+        await demux.updateDemandeImmersion(updatedGenericApplication),
       ).toEqual(updatedGenericApplication.id);
       expect((await genericRepository.getAll())[0]).toEqual(
-        updatedGenericApplication
+        updatedGenericApplication,
       );
 
       // NARBONNE repository
@@ -193,21 +193,21 @@ describe("ApplicationRepositorySwitcher", () => {
         email: "new@narbonne.email.fr",
       });
       expect(
-        await demux.updateDemandeImmersion(updatedNarbonneApplication)
+        await demux.updateDemandeImmersion(updatedNarbonneApplication),
       ).toEqual(updatedNarbonneApplication.id);
       expect((await narbonneRepository.getAll())[0]).toEqual(
-        updatedNarbonneApplication
+        updatedNarbonneApplication,
       );
     });
 
     test("returns undefined if application doesn't exist", async () => {
       expect(
-        await demux.updateDemandeImmersion(genericApplication)
+        await demux.updateDemandeImmersion(genericApplication),
       ).toBeUndefined();
       expect(await genericRepository.getAll()).toEqual([]);
 
       expect(
-        await demux.updateDemandeImmersion(narbonneApplication)
+        await demux.updateDemandeImmersion(narbonneApplication),
       ).toBeUndefined();
       expect(await narbonneRepository.getAll()).toEqual([]);
     });
@@ -215,7 +215,7 @@ describe("ApplicationRepositorySwitcher", () => {
     test("rejects application updates in unsupported sources", async () => {
       await expectPromiseToFailWithError(
         demux.updateDemandeImmersion(boulogneSurMerApplication),
-        new FeatureDisabledError(boulogneSurMerApplication.source)
+        new FeatureDisabledError(boulogneSurMerApplication.source),
       );
     });
   });

@@ -12,7 +12,7 @@ export class SearchImmersionByCandidate {
   constructor(private laBonneBoiteGateway: CompaniesGateway) {}
 
   public async execute(
-    searchParams: SearchParams
+    searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
     return this.getImmersionLaBonneBoite(searchParams);
   }
@@ -20,22 +20,22 @@ export class SearchImmersionByCandidate {
   //TODO : en faire une classe à part
   async getImmersionLaBonneBoite(searchParams: SearchParams) {
     const laBonneBoiteCompanies = await this.laBonneBoiteGateway.getCompanies(
-      searchParams
+      searchParams,
     );
     return laBonneBoiteCompanies.map((laBonneBoitecompany: CompanyEntity) =>
-      this.transformCompanyInImmersion(laBonneBoitecompany)
+      this.transformCompanyInImmersion(laBonneBoitecompany),
     );
   }
 
   private transformCompanyInImmersion(
-    company: CompanyEntity
+    company: CompanyEntity,
   ): ImmersionOfferEntity {
     return new ImmersionOfferEntity(
       uuidV4(),
       company.getName(),
       company.getNaf(),
       company.getMatched_rome_code(),
-      company.getSiret()
+      company.getSiret(),
     );
   }
 }

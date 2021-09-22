@@ -63,7 +63,7 @@ export class DemandeImmersionDtoBuilder
   }
 
   public withDateSubmission(
-    dateSubmission: string
+    dateSubmission: string,
   ): DemandeImmersionDtoBuilder {
     return new DemandeImmersionDtoBuilder({ ...this.dto, dateSubmission });
   }

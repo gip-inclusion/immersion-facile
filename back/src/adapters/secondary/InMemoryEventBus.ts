@@ -26,14 +26,14 @@ export class InMemoryEventBus implements EventBus {
       cb(event);
       logger.info(
         { demandeImmersionId: event.payload.id, eventId: event.id },
-        `XXXXXXXXXXXXXXXX  Sending an event`
+        `XXXXXXXXXXXXXXXX  Sending an event`,
       );
     });
   }
 
   public subscribe<T extends DomainTopic>(
     domainTopic: T,
-    callback: EventCallback<T>
+    callback: EventCallback<T>,
   ) {
     if (!this.subscriptions[domainTopic]) {
       this.subscriptions[domainTopic] = [];

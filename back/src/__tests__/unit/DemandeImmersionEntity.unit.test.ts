@@ -24,7 +24,7 @@ describe("DemandeImmersionIdEntity", () => {
         .build();
 
       expectDemandeImmersionEntityToBeInvalidWithParams(
-        invalidDemandeImmersion
+        invalidDemandeImmersion,
       );
     });
   });
@@ -39,5 +39,5 @@ describe("DemandeImmersionIdEntity", () => {
 });
 
 const expectDemandeImmersionEntityToBeInvalidWithParams = (
-  demandeImmersionDto: DemandeImmersionDto
+  demandeImmersionDto: DemandeImmersionDto,
 ) => expect(() => DemandeImmersionEntity.create(demandeImmersionDto)).toThrow();

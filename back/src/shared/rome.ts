@@ -23,7 +23,7 @@ export type RomeSearchRequestDto = Yup.InferType<
 >;
 
 export const romeSearchResponseDtoSchema = Yup.array(
-  romeProfessionDtoSchema
+  romeProfessionDtoSchema,
 ).required();
 
 export type RomeSearchResponseDto = Yup.InferType<

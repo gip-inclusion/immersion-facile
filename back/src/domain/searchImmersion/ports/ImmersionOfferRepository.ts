@@ -4,6 +4,6 @@ export interface ImmersionOfferRepository {
   getAll(): Promise<ImmersionOfferEntity[]>;
   getFromSearch(
     rome: string,
-    localisation: [number, number]
+    localisation: [number, number],
   ): Promise<ImmersionOfferEntity[]>;
 }

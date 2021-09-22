@@ -38,7 +38,7 @@ describe("Validate demandeImmersion", () => {
     validateDemandeImmersion = new ValidateDemandeImmersion(
       repository,
       createNewEvent,
-      outboxRepository
+      outboxRepository,
     );
   });
 
@@ -46,13 +46,13 @@ describe("Validate demandeImmersion", () => {
     test("validates the demandeImmersion in the repository", async () => {
       const demandesImmersion: DemandesImmersion = {};
       const demandeImmersionEntity = DemandeImmersionEntity.create(
-        new DemandeImmersionDtoBuilder().withStatus("IN_REVIEW").build()
+        new DemandeImmersionDtoBuilder().withStatus("IN_REVIEW").build(),
       );
       demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
       repository.setDemandesImmersion(demandesImmersion);
 
       const { id } = await validateDemandeImmersion.execute(
-        demandeImmersionEntity.id
+        demandeImmersionEntity.id,
       );
       const expectedDemandeImmersion: DemandeImmersionDto = {
         ...demandeImmersionEntity.toDto(),
@@ -82,7 +82,7 @@ describe("Validate demandeImmersion", () => {
 
       await expectPromiseToFailWithError(
         validateDemandeImmersion.execute(demandeImmersionEntity.id),
-        new BadRequestError(demandeImmersionEntity.id)
+        new BadRequestError(demandeImmersionEntity.id),
       );
 
       // And the demande is still DRAFT
@@ -97,7 +97,7 @@ describe("Validate demandeImmersion", () => {
     it("throws NotFoundError", async () => {
       await expectPromiseToFailWithError(
         validateDemandeImmersion.execute("unknown_demande_immersion_id"),
-        new NotFoundError("unknown_demande_immersion_id")
+        new NotFoundError("unknown_demande_immersion_id"),
       );
     });
   });
@@ -105,7 +105,7 @@ describe("Validate demandeImmersion", () => {
 
 const expectEventSavedInOutbox = async (
   outboxRepository: OutboxRepository,
-  event: Partial<DomainEvent>
+  event: Partial<DomainEvent>,
 ) => {
   const publishedEvents = await outboxRepository.getAllUnpublishedEvents();
   expect(publishedEvents[publishedEvents.length - 1]).toMatchObject(event);

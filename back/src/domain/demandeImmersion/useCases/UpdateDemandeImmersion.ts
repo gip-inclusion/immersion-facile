@@ -35,16 +35,16 @@ export class UpdateDemandeImmersion
   }
 
   public async execute(
-    params: UpdateDemandeImmersionRequestDto
+    params: UpdateDemandeImmersionRequestDto,
   ): Promise<UpdateDemandeImmersionResponseDto> {
     if (!this.featureFlags.enableViewableApplications)
       throw new FeatureDisabledError();
 
     const demandeImmersionEntity = DemandeImmersionEntity.create(
-      params.demandeImmersion
+      params.demandeImmersion,
     );
     const id = await this.demandeImmersionRepository.updateDemandeImmersion(
-      demandeImmersionEntity
+      demandeImmersionEntity,
     );
     if (!id) throw new NotFoundError(params.id);
     return { id };

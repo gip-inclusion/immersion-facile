@@ -24,7 +24,7 @@ export class PoleEmploiAPIGateway {
       .post(
         "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Fpartenaire",
         dataAcessToken,
-        { headers }
+        { headers },
       )
       .then(function (response: any) {
         return response.data;

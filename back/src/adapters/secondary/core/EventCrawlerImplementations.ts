@@ -8,12 +8,12 @@ export class BasicEventCrawler {
 
   constructor(
     private readonly eventBus: EventBus,
-    private readonly outboxRepository: OutboxRepository
+    private readonly outboxRepository: OutboxRepository,
   ) {}
 
   startCrawler() {
     logger.info(
-      "Crawler is in Basic mode and will not process events until explicitly told to"
+      "Crawler is in Basic mode and will not process events until explicitly told to",
     );
   }
 
@@ -33,7 +33,7 @@ export class RealEventCrawler
   constructor(
     eventBus: EventBus,
     outboxRepository: OutboxRepository,
-    private readonly crawlingPeriod: number = 10_000
+    private readonly crawlingPeriod: number = 10_000,
   ) {
     super(eventBus, outboxRepository);
   }

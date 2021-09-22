@@ -7,8 +7,8 @@ export class DemandeImmersionEntityBuilder
 {
   constructor(
     private entity: DemandeImmersionEntity = DemandeImmersionEntity.create(
-      new DemandeImmersionDtoBuilder().build()
-    )
+      new DemandeImmersionDtoBuilder().build(),
+    ),
   ) {}
 
   public build() {

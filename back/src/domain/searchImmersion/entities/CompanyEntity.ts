@@ -13,7 +13,7 @@ export class CompanyEntity {
     private naf: string,
     private name: string,
     private siret: string,
-    private stars: number //The ratin of the company. Set to -1 if unknown
+    private stars: number, //The ratin of the company. Set to -1 if unknown
   ) {}
 
   public getMatched_rome_code() {

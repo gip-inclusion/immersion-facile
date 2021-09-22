@@ -16,7 +16,7 @@ describe("/demandes-immersion route", () => {
             .enableViewableApplications()
             .enableGenericApplicationForm()
             .build(),
-        })
+        }),
       );
     });
 
@@ -102,7 +102,7 @@ describe("/demandes-immersion route", () => {
             .enableViewableApplications()
             .enableGenericApplicationForm()
             .build(),
-        })
+        }),
       );
     });
 
@@ -249,7 +249,7 @@ describe("/demandes-immersion route", () => {
             .enableBoulogneSurMerApplicationForm()
             .enableNarbonneApplicationForm()
             .build(),
-        })
+        }),
       );
     });
 

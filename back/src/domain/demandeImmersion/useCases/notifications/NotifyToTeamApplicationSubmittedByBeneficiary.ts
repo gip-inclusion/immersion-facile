@@ -12,7 +12,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
 
   constructor(
     private readonly emailGateway: EmailGateway,
-    private readonly immersionFacileContactEmail: string | undefined
+    private readonly immersionFacileContactEmail: string | undefined,
   ) {}
 
   public async execute({
@@ -29,12 +29,12 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
         demandeImmersionId: id,
         immersionFacileContactEmail: this.immersionFacileContactEmail,
       },
-      "------------- Entering execute."
+      "------------- Entering execute.",
     );
     if (!this.immersionFacileContactEmail) {
       this.logger.info(
         { demandeId: id, email },
-        "No immersionFacileContactEmail"
+        "No immersionFacileContactEmail",
       );
       return;
     }
@@ -48,7 +48,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
         dateStart,
         dateEnd,
         businessName,
-      }
+      },
     );
   }
 }

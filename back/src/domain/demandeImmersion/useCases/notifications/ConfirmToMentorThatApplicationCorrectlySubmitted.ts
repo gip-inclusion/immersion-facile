@@ -18,7 +18,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
     private readonly emailAllowList: Readonly<Set<string>>,
     private readonly unrestrictedEmailSendingSources: Readonly<
       Set<ApplicationSource>
-    >
+    >,
   ) {}
 
   public async execute({
@@ -33,7 +33,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
       {
         demandeImmersionid: id,
       },
-      "------------- Entering execute."
+      "------------- Entering execute.",
     );
 
     if (
@@ -47,12 +47,12 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
           mentorName: mentor,
           beneficiaryFirstName: firstName,
           beneficiaryLastName: lastName,
-        }
+        },
       );
     } else {
       this.logger.info(
         { id, mentorEmail, source },
-        "Sending mentor confirmation email skipped."
+        "Sending mentor confirmation email skipped.",
       );
     }
   }

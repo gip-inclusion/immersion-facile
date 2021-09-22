@@ -51,7 +51,7 @@ export const FormAccordeon = ({ data }: FormAccordeonProps) => {
       } ` +
       `${beforeAfterString(data.dateStart)} (pendant ${durationDays(
         data.dateStart,
-        data.dateEnd
+        data.dateEnd,
       )})`
     );
   };

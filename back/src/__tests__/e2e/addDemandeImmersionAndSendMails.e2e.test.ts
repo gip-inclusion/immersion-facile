@@ -66,12 +66,12 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
     addDemandeImmersion = new AddDemandeImmersion(
       applicationRepository,
       createNewEvent,
-      outboxRepository
+      outboxRepository,
     );
     validateDemandeImmersion = new ValidateDemandeImmersion(
       applicationRepository,
       createNewEvent,
-      outboxRepository
+      outboxRepository,
     );
 
     aSupervisorEmail = "supervisor@email.fr";
@@ -85,18 +85,18 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
         emailGw,
         emailAllowList,
-        unrestrictedEmailSendingSources
+        unrestrictedEmailSendingSources,
       );
 
     confirmToMentor = new ConfirmToMentorThatApplicationCorrectlySubmitted(
       emailGw,
       emailAllowList,
-      unrestrictedEmailSendingSources
+      unrestrictedEmailSendingSources,
     );
 
     notifyToTeam = new NotifyToTeamApplicationSubmittedByBeneficiary(
       emailGw,
-      aSupervisorEmail
+      aSupervisorEmail,
     );
   });
 
@@ -106,19 +106,19 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
     addDemandeImmersion = new AddDemandeImmersion(
       applicationRepository,
       createNewEvent,
-      outboxRepository
+      outboxRepository,
     );
 
     eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
-      confirmToBeneficiary.execute(event.payload)
+      confirmToBeneficiary.execute(event.payload),
     );
 
     eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
-      confirmToMentor.execute(event.payload)
+      confirmToMentor.execute(event.payload),
     );
 
     eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
-      notifyToTeam.execute(event.payload)
+      notifyToTeam.execute(event.payload),
     );
 
     // We expect this execute to trigger an event on ImmersionApplicationSubmittedByBeneficiary topic
@@ -133,12 +133,12 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
 
     expectEmailBeneficiaryConfirmationMatchingImmersionApplication(
       sentEmails[0],
-      validDemandeImmersion
+      validDemandeImmersion,
     );
 
     expectEmailMentorConfirmationMatchingImmersionApplication(
       sentEmails[1],
-      validDemandeImmersion
+      validDemandeImmersion,
     );
 
     expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[2], {
@@ -159,11 +159,11 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
       new NotifyAllActorsOfFinalApplicationValidation(
         emailGw,
         emailAllowList,
-        unrestrictedEmailSendingSources
+        unrestrictedEmailSendingSources,
       );
 
     eventBus.subscribe("FinalImmersionApplicationValidationByAdmin", (event) =>
-      sendConventionToAllActors.execute(event.payload)
+      sendConventionToAllActors.execute(event.payload),
     );
 
     // We expect this execute to trigger an event on ImmersionApplicationSubmittedByBeneficiary topic
@@ -185,7 +185,7 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [demandeImmersionInReview.email, demandeImmersionInReview.mentorEmail],
       sentEmails[1],
-      demandeImmersionInReview
+      demandeImmersionInReview,
     );
   });
 });

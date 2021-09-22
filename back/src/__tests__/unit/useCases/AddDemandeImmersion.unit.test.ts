@@ -36,7 +36,7 @@ describe("Add demandeImmersion", () => {
     return new AddDemandeImmersion(
       applicationRepository,
       createNewEvent,
-      outboxRepository
+      outboxRepository,
     );
   };
 
@@ -66,12 +66,12 @@ describe("Add demandeImmersion", () => {
 
   test("rejects applications where the ID is already in use", async () => {
     await applicationRepository.save(
-      DemandeImmersionEntity.create(validDemandeImmersion)
+      DemandeImmersionEntity.create(validDemandeImmersion),
     );
 
     await expectPromiseToFailWithError(
       addDemandeImmersion.execute(validDemandeImmersion),
-      new ConflictError(validDemandeImmersion.id)
+      new ConflictError(validDemandeImmersion.id),
     );
   });
 

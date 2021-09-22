@@ -44,8 +44,8 @@ describe("ScheduleUtils", () => {
     test("prints complex schedules", () => {
       expect(
         prettyPrintSchedule(
-          new ScheduleDtoBuilder().withEmptySimpleSchedule().build()
-        ).split("\n")
+          new ScheduleDtoBuilder().withEmptySimpleSchedule().build(),
+        ).split("\n"),
       ).toEqual([
         "Heures de travail hebdomadaires: 0",
         "lundi: libre",
@@ -71,8 +71,8 @@ describe("ScheduleUtils", () => {
     test("prints simple schedules", () => {
       expect(
         prettyPrintSchedule(
-          new ScheduleDtoBuilder().withEmptySimpleSchedule().build()
-        ).split("\n")
+          new ScheduleDtoBuilder().withEmptySimpleSchedule().build(),
+        ).split("\n"),
       ).toEqual([
         "Heures de travail hebdomadaires: 0",
         "lundi: libre",
@@ -100,8 +100,8 @@ describe("ScheduleUtils", () => {
     test("converts complex schedule", () => {
       expect(
         convertToFrenchNamedDays(
-          new ScheduleDtoBuilder().withEmptyComplexSchedule().build()
-        )
+          new ScheduleDtoBuilder().withEmptyComplexSchedule().build(),
+        ),
       ).toEqual([]);
       expect(convertToFrenchNamedDays(complexSchedule)).toEqual([
         "lundi",
@@ -113,8 +113,8 @@ describe("ScheduleUtils", () => {
     test("converts simple schedule", () => {
       expect(
         convertToFrenchNamedDays(
-          new ScheduleDtoBuilder().withEmptySimpleSchedule().build()
-        )
+          new ScheduleDtoBuilder().withEmptySimpleSchedule().build(),
+        ),
       ).toEqual([]);
       expect(convertToFrenchNamedDays(simpleSchedule)).toEqual([
         "lundi",

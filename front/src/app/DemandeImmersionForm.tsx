@@ -153,7 +153,7 @@ interface ApplicationFormProps {
 }
 
 const isDemandeImmersionFrozen = (
-  demandeImmersion: Partial<DemandeImmersionDto>
+  demandeImmersion: Partial<DemandeImmersionDto>,
 ): boolean => !demandeImmersion.status || demandeImmersion.status !== "DRAFT";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
@@ -161,7 +161,7 @@ const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 const { featureFlags, dev } = ENV;
 
 const getApplicationSourceForRoute = (
-  route: ApplicationFormRoute
+  route: ApplicationFormRoute,
 ): ApplicationSource => {
   switch (route.name) {
     case "boulogneSurMer":
@@ -174,7 +174,7 @@ const getApplicationSourceForRoute = (
 };
 
 const createInitialApplication = (
-  route: ApplicationFormRoute
+  route: ApplicationFormRoute,
 ): Partial<DemandeImmersionDto> => {
   const emptyForm: Partial<DemandeImmersionDto> = {
     id: uuidV4(),
@@ -268,7 +268,7 @@ const createSuccessProps = (link: string | undefined): SuccessProps => ({
 
 export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const [initialValues, setInitialValues] = useState(
-    createInitialApplication(route)
+    createInitialApplication(route),
   );
   const [submitError, setSubmitError] = useState<Error | null>(null);
   const [successProps, setSuccessProps] = useState<SuccessProps | null>(null);
@@ -331,7 +331,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             onSubmit={async (values, { setSubmitting }) => {
               try {
                 let application = await demandeImmersionDtoSchema.validate(
-                  values
+                  values,
                 );
 
                 let currentId = route.params.demandeId;
@@ -351,13 +351,13 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                 let newUrl: string | undefined = undefined;
                 if (featureFlags.enableViewableApplications) {
                   const queryParams = new URLSearchParams(
-                    window.location.search
+                    window.location.search,
                   );
                   queryParams.set("demandeId", upsertedId);
                   history.replaceState(
                     null,
                     document.title,
-                    "?" + queryParams.toString()
+                    "?" + queryParams.toString(),
                   );
                   newUrl = window.location.href;
                 }

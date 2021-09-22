@@ -6,7 +6,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
   params: {
     recipient: string;
     immersionApplication: DemandeImmersionDto;
-  }
+  },
 ) => {
   const { recipient, immersionApplication } = params;
   const { id, firstName, lastName, dateStart, dateEnd, businessName } =
@@ -28,7 +28,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
 
 export const expectEmailBeneficiaryConfirmationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
-  immersionApplication: DemandeImmersionDto
+  immersionApplication: DemandeImmersionDto,
 ) => {
   const { email, id, firstName, lastName } = immersionApplication;
 
@@ -45,7 +45,7 @@ export const expectEmailBeneficiaryConfirmationMatchingImmersionApplication = (
 
 export const expectEmailMentorConfirmationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
-  immersionApplication: DemandeImmersionDto
+  immersionApplication: DemandeImmersionDto,
 ) => {
   const { id, mentor, mentorEmail, firstName, lastName } = immersionApplication;
 
@@ -65,7 +65,7 @@ export const expectEmailFinalValidationConfirmationMatchingImmersionApplication 
   (
     recipients: string[],
     templatedEmail: TemplatedEmail,
-    immersionApplication: DemandeImmersionDto
+    immersionApplication: DemandeImmersionDto,
   ) => {
     expect(templatedEmail).toEqual({
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",

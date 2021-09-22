@@ -9,16 +9,16 @@ import {
 const minutesInDay = (timePeriods: TimePeriodDto[]): number => {
   return timePeriods.reduce(
     (totalMinutes, period) => totalMinutes + timePeriodDuration(period),
-    0
+    0,
   );
 };
 
 export const calculateHoursOfComplexSchedule = (
-  complexSchedule: ComplexScheduleDto
+  complexSchedule: ComplexScheduleDto,
 ): number =>
   complexSchedule.reduce(
     (minutesInWeek, day) => minutesInWeek + minutesInDay(day),
-    0
+    0,
   ) / 60;
 
 // Calculate total hours per week for a given schedule.
@@ -68,7 +68,7 @@ export const periodStringToMinutesFromMidnight = (s: string) => {
 // Returns true if the two periods overlap (for at least one minute).
 export const checkTimePeriodsOverlap = (
   period1: TimePeriodDto,
-  period2: TimePeriodDto
+  period2: TimePeriodDto,
 ): boolean => {
   let period1Start = periodStringToMinutesFromMidnight(period1.start);
   let period1End = periodStringToMinutesFromMidnight(period1.end);
@@ -182,16 +182,16 @@ export const checkSchedule = (schedule: ScheduleDto) => {
 
 // Converts a SimpleScheduleDto to its corresponding ComplexSchduleDto representation.
 const convertSimpleToComplexSchedule = (
-  simpleSchedule: SimpleScheduleDto
+  simpleSchedule: SimpleScheduleDto,
 ): ComplexScheduleDto => {
   const complexSchedule: ComplexScheduleDto = Array.from(
     { length: 7 },
-    () => []
+    () => [],
   );
   simpleSchedule.dayPeriods.forEach((dayPeriod) => {
     for (let dayIndex = dayPeriod[0]; dayIndex <= dayPeriod[1]; dayIndex++) {
       complexSchedule[dayIndex] = complexSchedule[dayIndex].concat(
-        simpleSchedule.hours
+        simpleSchedule.hours,
       );
     }
   });
@@ -201,7 +201,7 @@ const convertSimpleToComplexSchedule = (
 // Converts an array of TimePeriodDto to a readable schedule, e.g.
 // "08:00-12:00, 14:00-17:00". Empty arrays get converted to "libre".
 export const prettyPrintDaySchedule = (
-  timePeriods: TimePeriodDto[]
+  timePeriods: TimePeriodDto[],
 ): string => {
   if (timePeriods.length == 0) {
     return "libre";
@@ -215,11 +215,11 @@ export const prettyPrintDaySchedule = (
 // mardi: 08:00-12:00, 14:00-17:00
 // ...
 const prettyPrintComplexSchedule = (
-  complexSchedule: ComplexScheduleDto
+  complexSchedule: ComplexScheduleDto,
 ): string => {
   const lines: string[] = weekdays.map(
     (dayLabel: string, dayIndex: number) =>
-      dayLabel + ": " + prettyPrintDaySchedule(complexSchedule[dayIndex])
+      dayLabel + ": " + prettyPrintDaySchedule(complexSchedule[dayIndex]),
   );
 
   const hours = calculateHoursOfComplexSchedule(complexSchedule);
@@ -242,7 +242,7 @@ export const convertToFrenchNamedDays = (aSchedule: ScheduleDto) => {
     : aSchedule.complexSchedule;
 
   return weekdays.filter(
-    (_dayLabel, dayIndex) => complexSchedule[dayIndex].length > 0
+    (_dayLabel, dayIndex) => complexSchedule[dayIndex].length > 0,
   );
 };
 

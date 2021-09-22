@@ -29,7 +29,7 @@ const readString = (fields: FieldSet, fieldName: string): string => {
 
 export const readArrayOfWeekdays = (
   fields: FieldSet,
-  fieldName: string
+  fieldName: string,
 ): Weekday[] => {
   const value = fields[fieldName] || [];
   if (!isArrayOfWeekdays(value))
@@ -53,13 +53,13 @@ const readBoolean = (fields: FieldSet, fieldName: string): boolean => {
 
 const readApplicationStatus = (
   fields: FieldSet,
-  fieldName: string
+  fieldName: string,
 ): ApplicationStatus =>
   applicationStatusFromString(readString(fields, fieldName));
 
 const readApplicationSource = (
   fields: FieldSet,
-  fieldName: string
+  fieldName: string,
 ): ApplicationSource =>
   applicationSourceFromString(readString(fields, fieldName));
 
@@ -70,7 +70,7 @@ const scheduleDtoToString = JSON.stringify;
 const readLegacyScheduleDto = (
   fields: FieldSet,
   workdaysFieldName: string,
-  descriptionFieldName: string
+  descriptionFieldName: string,
 ): LegacyScheduleDto | undefined => {
   const workdays = readArrayOfWeekdays(fields, workdaysFieldName);
   const description = readString(fields, descriptionFieldName);
@@ -127,7 +127,7 @@ export const genericApplicationDataConverter: AirtableApplicationDataConverter =
         sanitaryPrevention: readBoolean(fields, "sanitaryPrevention"),
         sanitaryPreventionDescription: readString(
           fields,
-          "sanitaryPreventionDescription"
+          "sanitaryPreventionDescription",
         ),
         immersionObjective: readString(fields, "immersionObjective"),
         immersionProfession: readString(fields, "immersionProfession"),
@@ -204,18 +204,18 @@ export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
           dto.legacySchedule.description;
       } else {
         fields[legacyLabels.legacyScheduleWorkdays] = convertToFrenchNamedDays(
-          dto.schedule
+          dto.schedule,
         );
         fields[legacyLabels.legacyScheduleDescription] = prettyPrintSchedule(
-          dto.schedule
+          dto.schedule,
         );
       }
 
       fields[legacyLabels.individualProtection] = booleanToOuiNon(
-        dto.individualProtection
+        dto.individualProtection,
       );
       fields[legacyLabels.sanitaryPrevention] = booleanToOuiNon(
-        dto.sanitaryPrevention
+        dto.sanitaryPrevention,
       );
       fields[legacyLabels.sanitaryPreventionDescription] =
         dto.sanitaryPreventionDescription || "";
@@ -226,10 +226,10 @@ export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
       fields[legacyLabels.immersionSkills] = dto.immersionSkills || "";
       fields[legacyLabels.immersionActivities] = dto.immersionActivities;
       fields[legacyLabels.beneficiaryAccepted] = booleanToOuiNon(
-        dto.beneficiaryAccepted
+        dto.beneficiaryAccepted,
       );
       fields[legacyLabels.enterpriseAccepted] = booleanToOuiNon(
-        dto.enterpriseAccepted
+        dto.enterpriseAccepted,
       );
 
       // internals
@@ -258,31 +258,31 @@ export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
         legacySchedule: readLegacyScheduleDto(
           fields,
           legacyLabels.legacyScheduleWorkdays,
-          legacyLabels.legacyScheduleDescription
+          legacyLabels.legacyScheduleDescription,
         ),
         individualProtection: readOuiNon(
           fields,
-          legacyLabels.individualProtection
+          legacyLabels.individualProtection,
         ),
         sanitaryPrevention: readOuiNon(fields, legacyLabels.sanitaryPrevention),
         sanitaryPreventionDescription: readString(
           fields,
-          legacyLabels.sanitaryPreventionDescription
+          legacyLabels.sanitaryPreventionDescription,
         ),
         immersionAddress: readString(fields, legacyLabels.immersionAddress),
         immersionObjective: readString(fields, legacyLabels.immersionObjective),
         immersionProfession: readString(
           fields,
-          legacyLabels.immersionProfession
+          legacyLabels.immersionProfession,
         ),
         immersionSkills: readString(fields, legacyLabels.immersionSkills),
         immersionActivities: readString(
           fields,
-          legacyLabels.immersionActivities
+          legacyLabels.immersionActivities,
         ),
         beneficiaryAccepted: readOuiNon(
           fields,
-          legacyLabels.beneficiaryAccepted
+          legacyLabels.beneficiaryAccepted,
         ),
         enterpriseAccepted: readOuiNon(fields, legacyLabels.enterpriseAccepted),
 

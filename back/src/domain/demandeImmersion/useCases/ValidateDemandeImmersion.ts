@@ -28,11 +28,11 @@ export class ValidateDemandeImmersion
   constructor(
     private readonly demandeImmersionRepository: DemandeImmersionRepository,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly outboxRepository: OutboxRepository
+    private readonly outboxRepository: OutboxRepository,
   ) {}
 
   public async execute(
-    id: DemandeImmersionId
+    id: DemandeImmersionId,
   ): Promise<ValidateDemandeImmersionResponseDto> {
     const demandeImmersionEntity =
       await this.demandeImmersionRepository.getById(id);
@@ -48,7 +48,7 @@ export class ValidateDemandeImmersion
 
     const updatedId =
       await this.demandeImmersionRepository.updateDemandeImmersion(
-        validatedEntity
+        validatedEntity,
       );
     if (!updatedId) throw new NotFoundError(updatedId);
 

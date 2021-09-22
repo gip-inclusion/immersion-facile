@@ -15,7 +15,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
   public async markEventsAsPublished(events: DomainEvent[]) {
     events.forEach((event) => {
       const eventToUpdate = this._events.find(
-        (storedEvent) => storedEvent.id === event.id
+        (storedEvent) => storedEvent.id === event.id,
       );
       if (eventToUpdate) eventToUpdate.wasPublished = true;
     });

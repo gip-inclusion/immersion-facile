@@ -26,17 +26,17 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   }
 
   async insertImmersions(
-    immersionOffers: ImmersionOfferEntity[]
+    immersionOffers: ImmersionOfferEntity[],
   ): Promise<QueryResult<any>> {
     const arrayOfImmersionsOffers = immersionOffers.map((immersion) =>
-      immersion.toArrayOfProps()
+      immersion.toArrayOfProps(),
     );
     return this.client
       .query(
         format(
           "INSERT INTO immersion_proposals (uuid, name, naf, rome, siret) VALUES %L",
-          arrayOfImmersionsOffers
-        )
+          arrayOfImmersionsOffers,
+        ),
       )
       .then((res) => {
         return res;
@@ -48,7 +48,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
   async getFromSearch(
     rome: string,
-    localisation: [number, number]
+    localisation: [number, number],
   ): Promise<ImmersionOfferEntity[]> {
     return [];
   }

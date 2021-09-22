@@ -15,7 +15,7 @@ export const throwIfNotInArray = <T extends string | undefined>({
     throw new Error(
       `Expected ${variableName} to be one of : ` +
         `${authorizedValues.join(" | ")},` +
-        `got : ${processEnv[variableName]}`
+        `got : ${processEnv[variableName]}`,
     );
   return processEnv[variableName] as T;
 };

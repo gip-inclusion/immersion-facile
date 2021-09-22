@@ -19,7 +19,7 @@ describe("Add demandeImmersion Notifications", () => {
     new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
       emailGw,
       allowList,
-      unrestrictedEmailSendingSources
+      unrestrictedEmailSendingSources,
     );
 
   beforeEach(() => {
@@ -43,7 +43,7 @@ describe("Add demandeImmersion Notifications", () => {
     expect(sentEmails).toHaveLength(1);
     expectEmailBeneficiaryConfirmationMatchingImmersionApplication(
       sentEmails[0],
-      validDemandeImmersion
+      validDemandeImmersion,
     );
   });
 
@@ -57,7 +57,7 @@ describe("Add demandeImmersion Notifications", () => {
     expect(sentEmails).toHaveLength(1);
     expectEmailBeneficiaryConfirmationMatchingImmersionApplication(
       sentEmails[0],
-      validDemandeImmersion
+      validDemandeImmersion,
     );
   });
 });
