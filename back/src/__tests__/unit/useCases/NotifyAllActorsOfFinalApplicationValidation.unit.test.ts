@@ -11,32 +11,31 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   let emailGw: InMemoryEmailGateway;
   let allowList: Set<string>;
   let unrestrictedEmailSendingSources: Set<ApplicationSource>;
+  let sendConventionToAllActors: NotifyAllActorsOfFinalApplicationValidation;
 
   const validDemandeImmersion: DemandeImmersionDto =
     new DemandeImmersionEntityBuilder().build().toDto();
-
-  const createUseCase = () =>
-    new NotifyAllActorsOfFinalApplicationValidation(
-      emailGw,
-      allowList,
-      unrestrictedEmailSendingSources
-    );
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
     allowList = new Set();
     unrestrictedEmailSendingSources = new Set();
+    sendConventionToAllActors = new NotifyAllActorsOfFinalApplicationValidation(
+      emailGw,
+      allowList,
+      unrestrictedEmailSendingSources
+    );
   });
 
   test("Sends no emails when allowList and unrestrictedEmailSendingSources is empty", async () => {
-    await createUseCase().execute(validDemandeImmersion);
+    await sendConventionToAllActors.execute(validDemandeImmersion);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
 
   test("Sends confirmation email to beneficiary when on allowList", async () => {
     allowList.add(validDemandeImmersion.email);
 
-    await createUseCase().execute(validDemandeImmersion);
+    await sendConventionToAllActors.execute(validDemandeImmersion);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -51,7 +50,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   test("Sends confirmation email to mentor when on allowList", async () => {
     allowList.add(validDemandeImmersion.mentorEmail);
 
-    await createUseCase().execute(validDemandeImmersion);
+    await sendConventionToAllActors.execute(validDemandeImmersion);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -67,7 +66,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     allowList.add(validDemandeImmersion.email);
     allowList.add(validDemandeImmersion.mentorEmail);
 
-    await createUseCase().execute(validDemandeImmersion);
+    await sendConventionToAllActors.execute(validDemandeImmersion);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -82,7 +81,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   test("Sends confirmation email to beneficiary and mentor for unrestrictedEmailSendingSources", async () => {
     unrestrictedEmailSendingSources.add(validDemandeImmersion.source);
 
-    await createUseCase().execute(validDemandeImmersion);
+    await sendConventionToAllActors.execute(validDemandeImmersion);
 
     const sentEmails = emailGw.getSentEmails();
 

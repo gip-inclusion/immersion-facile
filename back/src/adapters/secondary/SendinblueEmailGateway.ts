@@ -102,7 +102,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     sibEmail.templateId =
       emailTypeToTemplateId.VALIDATED_APPLICATION_FINAL_CONFIRMATION;
     sibEmail.to = recipients.map((email) => ({ email }));
-    sibEmail.params = {}; // TODO: add params.
+    sibEmail.params = {}; // TODO(jfmac): add params.
     this.sendTransacEmail(sibEmail);
   }
 

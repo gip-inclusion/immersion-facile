@@ -187,9 +187,11 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
       demandeImmersionRepository: repositories.demandeImmersion,
       featureFlags,
     }),
-    validateDemandeImmersion: new ValidateDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersion,
-    }),
+    validateDemandeImmersion: new ValidateDemandeImmersion(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox
+    ),
 
     // immersionOffer
     addImmersionOffer: new AddImmersionOffer(),

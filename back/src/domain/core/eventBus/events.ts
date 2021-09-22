@@ -1,4 +1,7 @@
-import type { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
+import type {
+  DemandeImmersionDto,
+  DemandeImmersionId,
+} from "../../../shared/DemandeImmersionDto";
 import type { DateStr } from "../ports/Clock";
 
 type GenericEvent<T extends string, P> = {

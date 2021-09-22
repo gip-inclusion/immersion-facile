@@ -9,23 +9,37 @@ import { ValidateDemandeImmersion } from "../../../domain/demandeImmersion/useCa
 import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
 import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../../domain/core/eventBus/EventBus";
+import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { DomainEvent } from "../../../domain/core/eventBus/events";
+import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
 
 describe("Validate demandeImmersion", () => {
   let validateDemandeImmersion: ValidateDemandeImmersion;
+  let outboxRepository: OutboxRepository;
   let repository: InMemoryDemandeImmersionRepository;
+  let createNewEvent: CreateNewEvent;
+  let clock: CustomClock;
+  let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
     repository = new InMemoryDemandeImmersionRepository();
-  });
+    outboxRepository = new InMemoryOutboxRepository();
+    clock = new CustomClock();
+    uuidGenerator = new TestUuidGenerator();
+    createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-  const createValidateDemandeImmersionUseCase = () => {
-    return new ValidateDemandeImmersion({
-      demandeImmersionRepository: repository,
-    });
-  };
-
-  beforeEach(() => {
-    validateDemandeImmersion = createValidateDemandeImmersionUseCase();
+    validateDemandeImmersion = new ValidateDemandeImmersion(
+      repository,
+      createNewEvent,
+      outboxRepository
+    );
   });
 
   describe("When the demandeImmersion is valid", () => {
@@ -40,12 +54,20 @@ describe("Validate demandeImmersion", () => {
       const { id } = await validateDemandeImmersion.execute(
         demandeImmersionEntity.id
       );
+      const expectedDemandeImmersion: DemandeImmersionDto = {
+        ...demandeImmersionEntity.toDto(),
+        status: "VALIDATED",
+      };
 
+      expectEventSavedInOutbox(outboxRepository, {
+        topic: "FinalImmersionApplicationValidationByAdmin",
+        payload: expectedDemandeImmersion,
+      });
       expect(id).toEqual(demandeImmersionEntity.id);
 
       const storedInRepo = await repository.getAll();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        { ...demandeImmersionEntity.toDto(), status: "VALIDATED" },
+        expectedDemandeImmersion,
       ]);
     });
   });
@@ -80,3 +102,11 @@ describe("Validate demandeImmersion", () => {
     });
   });
 });
+
+const expectEventSavedInOutbox = async (
+  outboxRepository: OutboxRepository,
+  event: Partial<DomainEvent>
+) => {
+  const publishedEvents = await outboxRepository.getAllUnpublishedEvents();
+  expect(publishedEvents[publishedEvents.length - 1]).toMatchObject(event);
+};

@@ -3,7 +3,10 @@ import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImp
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryDemandeImmersionRepository } from "../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { InMemoryEmailGateway } from "../../adapters/secondary/InMemoryEmailGateway";
+import {
+  InMemoryEmailGateway,
+  TemplatedEmail,
+} from "../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryEventBus } from "../../adapters/secondary/InMemoryEventBus";
 import {
   CreateNewEvent,
@@ -12,6 +15,7 @@ import {
 } from "../../domain/core/eventBus/EventBus";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
+import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases/ValidateDemandeImmersion";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
 import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/demandeImmersion/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
@@ -25,9 +29,12 @@ import {
   expectEmailBeneficiaryConfirmationMatchingImmersionApplication,
   expectEmailMentorConfirmationMatchingImmersionApplication,
 } from "../../_testBuilders/emailAssertions";
+import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } from "../../_testBuilders/emailAssertions";
 
 describe("Add demandeImmersion Notifications, then checks the mails are sent (trigerred by events)", () => {
   let addDemandeImmersion: AddDemandeImmersion;
+  let validateDemandeImmersion: ValidateDemandeImmersion;
   let applicationRepository: InMemoryDemandeImmersionRepository;
   let outboxRepository: OutboxRepository;
   let clock: CustomClock;
@@ -43,6 +50,7 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
   let aSupervisorEmail: string;
   let emailAllowList: Set<string>;
   let unrestrictedEmailSendingSources: Set<ApplicationSource>;
+  let sentEmails: TemplatedEmail[];
 
   beforeEach(() => {
     applicationRepository = new InMemoryDemandeImmersionRepository();
@@ -60,6 +68,12 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
       createNewEvent,
       outboxRepository
     );
+    validateDemandeImmersion = new ValidateDemandeImmersion(
+      applicationRepository,
+      createNewEvent,
+      outboxRepository
+    );
+
     aSupervisorEmail = "supervisor@email.fr";
     emailAllowList = new Set([
       validDemandeImmersion.email,
@@ -86,8 +100,15 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
     );
   });
 
-  //Creates a DemandeImmersion, check it is saved proberly and that event had been triggered (thanks to subscription), then check mails have been sent trough the inmemory mail gateway
+  //Creates a DemandeImmersion, check it is saved properly and that event had been triggered (thanks to subscription),
+  // t hen check mails have been sent trough the inmemory mail gateway
   test("saves valid applications in the repository", async () => {
+    addDemandeImmersion = new AddDemandeImmersion(
+      applicationRepository,
+      createNewEvent,
+      outboxRepository
+    );
+
     eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
       confirmToBeneficiary.execute(event.payload)
     );
@@ -107,7 +128,7 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
     // the following line triggers the eventCrawler (in prod it would be triggered every 10sec or so)
     await eventCrawler.processEvents();
 
-    const sentEmails = emailGw.getSentEmails();
+    sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(3);
 
     expectEmailBeneficiaryConfirmationMatchingImmersionApplication(
@@ -126,5 +147,45 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
     });
   });
 
-  // TODO: Add test for ValidateDemandeImmersion => NotifyAllActorsOfFinalApplicationValidation
+  // TODO(jfmac): Add test for ValidateDemandeImmersion => NotifyAllActorsOfFinalApplicationValidation
+  test("Checks than when a conselor updates an Immersion Application to confirm it, the proper emails are sent to Beneficiary, mentor & team", async () => {
+    const demandeImmersionInReview = new DemandeImmersionDtoBuilder()
+      .withStatus("IN_REVIEW")
+      .build();
+
+    const result = await addDemandeImmersion.execute(demandeImmersionInReview);
+
+    const sendConventionToAllActors =
+      new NotifyAllActorsOfFinalApplicationValidation(
+        emailGw,
+        emailAllowList,
+        unrestrictedEmailSendingSources
+      );
+
+    eventBus.subscribe("FinalImmersionApplicationValidationByAdmin", (event) =>
+      sendConventionToAllActors.execute(event.payload)
+    );
+
+    // We expect this execute to trigger an event on ImmersionApplicationSubmittedByBeneficiary topic
+    const resultValidate = await validateDemandeImmersion.execute(result.id);
+    expect(resultValidate).toEqual({ id: demandeImmersionInReview.id });
+
+    // the following line triggers the eventCrawler (in prod it would be triggered every 10sec or so)
+    await eventCrawler.processEvents();
+
+    sentEmails = emailGw.getSentEmails();
+    expect(sentEmails).toHaveLength(1);
+
+    unrestrictedEmailSendingSources.add(demandeImmersionInReview.source);
+
+    await sendConventionToAllActors.execute(demandeImmersionInReview);
+
+    // Expecting 2 emails as we got one when we initially created the application
+    expect(sentEmails).toHaveLength(2);
+    expectEmailFinalValidationConfirmationMatchingImmersionApplication(
+      [demandeImmersionInReview.email, demandeImmersionInReview.mentorEmail],
+      sentEmails[1],
+      demandeImmersionInReview
+    );
+  });
 });

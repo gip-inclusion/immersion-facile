@@ -10,10 +10,9 @@ import {
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
-
-type ValidateDemandeImmersionDependencies = {
-  demandeImmersionRepository: DemandeImmersionRepository;
-};
+import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { OutboxRepository } from "../../core/ports/OutboxRepository";
+import { logger } from "../../../utils/logger";
 
 export class ValidateDemandeImmersion
   implements
@@ -22,13 +21,15 @@ export class ValidateDemandeImmersion
       ValidateDemandeImmersionResponseDto
     >
 {
-  private readonly demandeImmersionRepository: DemandeImmersionRepository;
+  private readonly logger = logger.child({
+    logsource: "ValidateDemandeImmersion",
+  });
 
-  constructor({
-    demandeImmersionRepository,
-  }: ValidateDemandeImmersionDependencies) {
-    this.demandeImmersionRepository = demandeImmersionRepository;
-  }
+  constructor(
+    private readonly demandeImmersionRepository: DemandeImmersionRepository,
+    private readonly createNewEvent: CreateNewEvent,
+    private readonly outboxRepository: OutboxRepository
+  ) {}
 
   public async execute(
     id: DemandeImmersionId
@@ -51,7 +52,12 @@ export class ValidateDemandeImmersion
       );
     if (!updatedId) throw new NotFoundError(updatedId);
 
-    // TODO: Add FinalImmersionApplicationValidationByAdmin event to outbox.
+    const event = this.createNewEvent({
+      topic: "FinalImmersionApplicationValidationByAdmin",
+      payload: validatedEntity.toDto(),
+    });
+
+    await this.outboxRepository.save(event);
 
     return { id: updatedId };
   }
