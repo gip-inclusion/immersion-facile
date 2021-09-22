@@ -1,9 +1,7 @@
 import * as Yup from "../../node_modules/yup";
 import { LegacyScheduleDto, ScheduleDto } from "./ScheduleSchema";
 import { Flavor } from "./typeFlavors";
-
-// TODO: find the standard for gouv.fr phone verification
-const phoneRegExp = /\+?[0-9]*/;
+import { phoneRegExp } from "./utils";
 
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;

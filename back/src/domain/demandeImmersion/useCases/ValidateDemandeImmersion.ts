@@ -3,6 +3,7 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
+  DemandeImmersionId,
   ValidateDemandeImmersionRequestDto,
   ValidateDemandeImmersionResponseDto,
 } from "../../../shared/DemandeImmersionDto";
@@ -30,7 +31,7 @@ export class ValidateDemandeImmersion
   }
 
   public async execute(
-    id: ValidateDemandeImmersionRequestDto
+    id: DemandeImmersionId
   ): Promise<ValidateDemandeImmersionResponseDto> {
     const demandeImmersionEntity =
       await this.demandeImmersionRepository.getById(id);

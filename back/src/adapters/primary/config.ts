@@ -1,3 +1,5 @@
+import { RomeSearch } from "./../../domain/rome/useCases/RomeSearch";
+import { AddImmersionOffer } from "./../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
@@ -189,10 +191,16 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
       demandeImmersionRepository: repositories.demandeImmersion,
     }),
 
+    // immersionOffer
+    addImmersionOffer: new AddImmersionOffer(),
+
     // siret
     getSiret: new GetSiret({
       sireneRepository: repositories.sirene,
     }),
+
+    // rome
+    romeSearch: new RomeSearch(),
 
     // notifications
     confirmToBeneficiaryThatApplicationCorrectlySubmitted:

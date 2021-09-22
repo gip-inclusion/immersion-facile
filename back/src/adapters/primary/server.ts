@@ -5,20 +5,21 @@ import {
   demandeImmersionDtoSchema,
   getDemandeImmersionRequestDtoSchema,
   updateDemandeImmersionRequestDtoSchema,
-  validateDemandeImmersionRequestDtoSchema,
+  validateDemandeImmersionRequestDtoSchema
 } from "../../shared/DemandeImmersionDto";
 import { FeatureFlags } from "../../shared/featureFlags";
+import { immersionOfferDtoSchema } from "../../shared/ImmersionOfferDto";
+import { romeSearchRequestDtoSchema } from "../../shared/rome";
 import {
-  demandesImmersionRoute,
-  siretRoute,
-  validateDemandeRoute,
+  demandesImmersionRoute, immersionOffersRoute, romeRoute, siretRoute,
+  validateDemandeRoute
 } from "../../shared/routes";
 import { logger } from "../../utils/logger";
 import {
   eventBus,
   getAuthChecker,
   getEventCrawler,
-  getUsecases,
+  getUsecases
 } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
@@ -77,10 +78,10 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     );
   });
 
-  const uniqueDemandeImmersionRouter = Router({ mergeParams: true });
-  router.use(`/${demandesImmersionRoute}`, uniqueDemandeImmersionRouter);
+  const demandeImmersionRouter = Router({ mergeParams: true });
+  router.use(`/${demandesImmersionRoute}`, demandeImmersionRouter);
 
-  uniqueDemandeImmersionRouter
+  demandeImmersionRouter
     .route(`/:id`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
@@ -100,6 +101,27 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
         })
       )
     );
+
+  router.route(`/${immersionOffersRoute}`).post(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      callUseCase({
+        useCase: useCases.addImmersionOffer,
+        validationSchema: immersionOfferDtoSchema,
+        useCaseParams: req.body,
+      })
+    )
+  );
+
+  router.route(`/${romeRoute}`).get(async (req, res) => {
+    sendHttpResponse(req, res, async () => {
+      logger.info(req);
+      callUseCase({
+        useCase: useCases.romeSearch,
+        validationSchema: romeSearchRequestDtoSchema,
+        useCaseParams: req.query.searchText,
+      });
+    });
+  });
 
   router.route(`/${siretRoute}/:siret`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
