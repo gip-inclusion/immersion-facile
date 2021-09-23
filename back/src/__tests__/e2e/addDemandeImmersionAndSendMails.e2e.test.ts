@@ -15,10 +15,11 @@ import {
 } from "../../domain/core/eventBus/EventBus";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
-import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases/ValidateDemandeImmersion";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
 import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
+import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/demandeImmersion/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
+import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases/ValidateDemandeImmersion";
 import {
   ApplicationSource,
   DemandeImmersionDto,
@@ -27,10 +28,9 @@ import { DemandeImmersionDtoBuilder } from "../../_testBuilders/DemandeImmersion
 import {
   expectEmailAdminNotificationMatchingImmersionApplication,
   expectEmailBeneficiaryConfirmationMatchingImmersionApplication,
+  expectEmailFinalValidationConfirmationMatchingImmersionApplication,
   expectEmailMentorConfirmationMatchingImmersionApplication,
 } from "../../_testBuilders/emailAssertions";
-import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } from "../../_testBuilders/emailAssertions";
 
 describe("Add demandeImmersion Notifications, then checks the mails are sent (trigerred by events)", () => {
   let addDemandeImmersion: AddDemandeImmersion;
@@ -147,7 +147,6 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
     });
   });
 
-  // TODO(jfmac): Add test for ValidateDemandeImmersion => NotifyAllActorsOfFinalApplicationValidation
   test("Checks than when a conselor updates an Immersion Application to confirm it, the proper emails are sent to Beneficiary, mentor & team", async () => {
     const demandeImmersionInReview = new DemandeImmersionDtoBuilder()
       .withStatus("IN_REVIEW")
@@ -155,11 +154,16 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
 
     const result = await addDemandeImmersion.execute(demandeImmersionInReview);
 
+    const counsellorEmail = "counsellor@email.fr";
+    const counsellorEmails = {
+      [demandeImmersionInReview.source]: [counsellorEmail],
+    } as Record<ApplicationSource, string[]>;
     const sendConventionToAllActors =
       new NotifyAllActorsOfFinalApplicationValidation(
         emailGw,
         emailAllowList,
         unrestrictedEmailSendingSources,
+        counsellorEmails,
       );
 
     eventBus.subscribe("FinalImmersionApplicationValidationByAdmin", (event) =>
@@ -183,7 +187,11 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
     // Expecting 2 emails as we got one when we initially created the application
     expect(sentEmails).toHaveLength(2);
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
-      [demandeImmersionInReview.email, demandeImmersionInReview.mentorEmail],
+      [
+        demandeImmersionInReview.email,
+        demandeImmersionInReview.mentorEmail,
+        counsellorEmail,
+      ],
       sentEmails[1],
       demandeImmersionInReview,
     );

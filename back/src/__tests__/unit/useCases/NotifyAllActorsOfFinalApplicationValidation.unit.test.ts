@@ -21,20 +21,25 @@ import { DemandeImmersionDtoBuilder } from "./../../../_testBuilders/DemandeImme
 const validDemandeImmersion: DemandeImmersionDto =
   new DemandeImmersionEntityBuilder().build().toDto();
 
+const counsellorEmail = "counsellor@email.fr";
+
 describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   let emailGw: InMemoryEmailGateway;
   let allowList: Set<string>;
   let unrestrictedEmailSendingSources: Set<ApplicationSource>;
+  let counsellorEmails: Record<ApplicationSource, string[]>;
   let sendConventionToAllActors: NotifyAllActorsOfFinalApplicationValidation;
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
     allowList = new Set();
     unrestrictedEmailSendingSources = new Set();
+    counsellorEmails = {} as Record<ApplicationSource, string[]>;
     sendConventionToAllActors = new NotifyAllActorsOfFinalApplicationValidation(
       emailGw,
       allowList,
       unrestrictedEmailSendingSources,
+      counsellorEmails,
     );
   });
 
@@ -73,7 +78,25 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     );
   });
 
-  test("Sends confirmation email to beneficiary and mentor when on allowList", async () => {
+  test("Sends confirmation email to counsellor when on allowList", async () => {
+    counsellorEmails[validDemandeImmersion.source] = [counsellorEmail];
+    allowList.add(counsellorEmail);
+
+    await sendConventionToAllActors.execute(validDemandeImmersion);
+
+    const sentEmails = emailGw.getSentEmails();
+
+    expect(sentEmails).toHaveLength(1);
+    expectEmailFinalValidationConfirmationMatchingImmersionApplication(
+      [counsellorEmail],
+      sentEmails[0],
+      validDemandeImmersion,
+    );
+  });
+
+  test("Sends confirmation email to beneficiary, mentor, and counsellor when on allowList", async () => {
+    counsellorEmails[validDemandeImmersion.source] = [counsellorEmail];
+    allowList.add(counsellorEmail);
     allowList.add(validDemandeImmersion.email);
     allowList.add(validDemandeImmersion.mentorEmail);
 
@@ -83,13 +106,18 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
     expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
-      [validDemandeImmersion.email, validDemandeImmersion.mentorEmail],
+      [
+        validDemandeImmersion.email,
+        validDemandeImmersion.mentorEmail,
+        counsellorEmail,
+      ],
       sentEmails[0],
       validDemandeImmersion,
     );
   });
 
-  test("Sends confirmation email to beneficiary and mentor for unrestrictedEmailSendingSources", async () => {
+  test("Sends confirmation email to beneficiary, mentor, and counsellor for unrestrictedEmailSendingSources", async () => {
+    counsellorEmails[validDemandeImmersion.source] = [counsellorEmail];
     unrestrictedEmailSendingSources.add(validDemandeImmersion.source);
 
     await sendConventionToAllActors.execute(validDemandeImmersion);
@@ -98,7 +126,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
     expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
-      [validDemandeImmersion.email, validDemandeImmersion.mentorEmail],
+      [
+        validDemandeImmersion.email,
+        validDemandeImmersion.mentorEmail,
+        counsellorEmail,
+      ],
       sentEmails[0],
       validDemandeImmersion,
     );

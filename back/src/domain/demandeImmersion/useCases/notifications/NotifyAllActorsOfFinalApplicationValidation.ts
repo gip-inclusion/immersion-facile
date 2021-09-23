@@ -26,6 +26,9 @@ export class NotifyAllActorsOfFinalApplicationValidation
     private readonly unrestrictedEmailSendingSources: Readonly<
       Set<ApplicationSource>
     >,
+    private readonly counsellorEmails: Readonly<
+      Record<ApplicationSource, string[]>
+    >,
   ) {}
 
   public async execute(dto: DemandeImmersionDto): Promise<void> {
@@ -36,10 +39,19 @@ export class NotifyAllActorsOfFinalApplicationValidation
       "------------- Entering execute.",
     );
 
-    // TODO: Add advisor to the list of recipients.
-    let recipients = [dto.email, dto.mentorEmail];
+    let recipients = [
+      dto.email,
+      dto.mentorEmail,
+      ...(this.counsellorEmails[dto.source] || []),
+    ];
     if (!this.unrestrictedEmailSendingSources.has(dto.source)) {
-      recipients = recipients.filter((email) => this.emailAllowList.has(email));
+      recipients = recipients.filter((email) => {
+        if (!this.emailAllowList.has(email)) {
+          this.logger.info(`Skipped sending email to: ${email}`);
+          return false;
+        }
+        return true;
+      });
     }
 
     if (recipients.length > 0) {

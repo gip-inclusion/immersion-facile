@@ -195,6 +195,22 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
     );
   }
 
+  // Format: COUNSELLOR_EMAILS=<source>:<email>,<source>:<email>,...
+  const counsellorEmails: Record<ApplicationSource, string[]> = (
+    process.env.COUNSELLOR_EMAILS || ""
+  )
+    .split(",")
+    .filter((el) => !!el)
+    .reduce((acc, el) => {
+      const [sourceStr, email] = el.split(":", 2);
+      const source = applicationSourceFromString(sourceStr);
+      return {
+        ...acc,
+        [source]: [...(acc[source] || []), email],
+      };
+    }, {} as Record<ApplicationSource, string[]>);
+  logger.debug({ counsellorEmails: counsellorEmails }, "COUNSELLOR_EMAILS");
+
   return {
     addDemandeImmersion: new AddDemandeImmersion(
       repositories.demandeImmersion,
@@ -245,6 +261,7 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
         repositories.email,
         emailAllowList,
         unrestrictedEmailSendingSources,
+        counsellorEmails,
       ),
     notifyToTeamApplicationSubmittedByBeneficiary:
       new NotifyToTeamApplicationSubmittedByBeneficiary(
