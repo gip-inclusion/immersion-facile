@@ -290,7 +290,7 @@ describe("/demandes-immersion route", () => {
         .expect(404);
     });
 
-    it("Geting an existing application fails with 404 Not Found", async () => {
+    it("Geting an existing application succeeds", async () => {
       const demandeImmersion = new DemandeImmersionDtoBuilder()
         .withSource("BOULOGNE_SUR_MER")
         .build();
@@ -301,10 +301,10 @@ describe("/demandes-immersion route", () => {
         .send(demandeImmersion)
         .expect(200);
 
-      // GETting the created application returns 404 Not Found.
+      // GETting the created application succeeds.
       await request
         .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
-        .expect(404);
+        .expect(200, demandeImmersion);
     });
 
     it("Updating an existing application fails with 404 Not Found", async () => {

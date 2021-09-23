@@ -2,7 +2,7 @@ import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import {
   EventBus,
-  makeCreateNewEvent,
+  makeCreateNewEvent
 } from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
@@ -20,23 +20,23 @@ import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import {
   ApplicationSource,
-  applicationSourceFromString,
+  applicationSourceFromString
 } from "../../shared/DemandeImmersionDto";
 import { FeatureFlags } from "../../shared/featureFlags";
 import { logger } from "../../utils/logger";
 import {
   genericApplicationDataConverter,
-  legacyApplicationDataConverter,
+  legacyApplicationDataConverter
 } from "../secondary/AirtableApplicationDataConverters";
 import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
 import {
   ApplicationRepositoryMap,
-  ApplicationRepositorySwitcher,
+  ApplicationRepositorySwitcher
 } from "../secondary/ApplicationRepositorySwitcher";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
   BasicEventCrawler,
-  RealEventCrawler,
+  RealEventCrawler
 } from "../secondary/core/EventCrawlerImplementations";
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
@@ -201,10 +201,7 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
       createNewEvent,
       repositories.outbox,
     ),
-    getDemandeImmersion: new GetDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersion,
-      featureFlags,
-    }),
+    getDemandeImmersion: new GetDemandeImmersion(repositories.demandeImmersion),
     listDemandeImmersion: new ListDemandeImmersion({
       demandeImmersionRepository: repositories.demandeImmersion,
       featureFlags,
