@@ -19,7 +19,7 @@ describe("Postgres implementation of immersion proposal repository", () => {
     expect(immersions[0]).toBeInstanceOf(ImmersionOfferEntity);
   });
 
-  test("GetAll immersion works", async () => {
+  test.skip("GetAll immersion works", async () => {
     const pgImmersionProposalRepository = new PgImmersionOfferRepository();
     pgImmersionProposalRepository.connect();
     const results = await pgImmersionProposalRepository.getAll();
