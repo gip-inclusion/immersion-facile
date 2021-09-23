@@ -1,4 +1,5 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
+import { getValidatedApplicationFinalConfirmationParams } from "../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { DemandeImmersionDto } from "../shared/DemandeImmersionDto";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
@@ -70,6 +71,7 @@ export const expectEmailFinalValidationConfirmationMatchingImmersionApplication 
     expect(templatedEmail).toEqual({
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
       recipients,
-      params: immersionApplication,
+      params:
+        getValidatedApplicationFinalConfirmationParams(immersionApplication),
     });
   };

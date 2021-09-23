@@ -4,7 +4,10 @@ import {
   DemandeImmersionDto,
   DemandeImmersionId,
 } from "../shared/DemandeImmersionDto";
-import { reasonableSchedule } from "../shared/ScheduleSchema";
+import {
+  LegacyScheduleDto,
+  reasonableSchedule,
+} from "../shared/ScheduleSchema";
 import { Builder } from "./Builder";
 
 export const DEMANDE_IMMERSION_ID = "test_demande_immersion_id";
@@ -86,6 +89,43 @@ export class DemandeImmersionDtoBuilder
 
   public withStatus(status: ApplicationStatus): DemandeImmersionDtoBuilder {
     return new DemandeImmersionDtoBuilder({ ...this.dto, status });
+  }
+
+  public withImmersionAddress(
+    immersionAddress: string,
+  ): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, immersionAddress });
+  }
+
+  public withSanitaryPrevention(
+    sanitaryPrevention: boolean,
+  ): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({ ...this.dto, sanitaryPrevention });
+  }
+
+  public withSanitaryPreventionDescription(
+    sanitaryPreventionDescription: string,
+  ): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({
+      ...this.dto,
+      sanitaryPreventionDescription,
+    });
+  }
+
+  public withIndividualProtection(
+    individualProtection: boolean,
+  ): DemandeImmersionDtoBuilder {
+    return new DemandeImmersionDtoBuilder({
+      ...this.dto,
+      individualProtection,
+    });
+  }
+
+  public withLegacySchedule(legacySchedule: LegacyScheduleDto) {
+    return new DemandeImmersionDtoBuilder({
+      ...this.dto,
+      legacySchedule,
+    });
   }
 
   public build() {

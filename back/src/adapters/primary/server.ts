@@ -18,12 +18,7 @@ import {
   validateDemandeRoute,
 } from "../../shared/routes";
 import { logger } from "../../utils/logger";
-import {
-  eventBus,
-  getAuthChecker,
-  getEventCrawler,
-  getUsecases,
-} from "./config";
+import { createConfig } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 
@@ -45,15 +40,14 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     return res.json({ message: "Hello World !" });
   });
 
-  const authChecker = getAuthChecker();
-  const useCases = getUsecases(featureFlags);
+  const config = createConfig(featureFlags);
 
   router
     .route(`/${demandesImmersionRoute}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         callUseCase({
-          useCase: useCases.addDemandeImmersion,
+          useCase: config.useCases.addDemandeImmersion,
           validationSchema: demandeImmersionDtoSchema,
           useCaseParams: req.body,
         }),
@@ -63,8 +57,8 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
       sendHttpResponse(
         req,
         res,
-        () => useCases.listDemandeImmersion.execute(),
-        authChecker,
+        () => config.useCases.listDemandeImmersion.execute(),
+        config.authChecker,
       );
     });
   router.route(`/${validateDemandeRoute}/:id`).get(async (req, res) => {
@@ -73,11 +67,11 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
       res,
       () =>
         callUseCase({
-          useCase: useCases.validateDemandeImmersion,
+          useCase: config.useCases.validateDemandeImmersion,
           validationSchema: validateDemandeImmersionRequestDtoSchema,
           useCaseParams: req.params.id,
         }),
-      authChecker,
+      config.authChecker,
     );
   });
 
@@ -89,7 +83,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
         callUseCase({
-          useCase: useCases.getDemandeImmersion,
+          useCase: config.useCases.getDemandeImmersion,
           validationSchema: getDemandeImmersionRequestDtoSchema,
           useCaseParams: req.params,
         }),
@@ -98,7 +92,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         callUseCase({
-          useCase: useCases.updateDemandeImmersion,
+          useCase: config.useCases.updateDemandeImmersion,
           validationSchema: updateDemandeImmersionRequestDtoSchema,
           useCaseParams: { id: req.params.id, demandeImmersion: req.body },
         }),
@@ -108,7 +102,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   router.route(`/${immersionOffersRoute}`).post(async (req, res) =>
     sendHttpResponse(req, res, () =>
       callUseCase({
-        useCase: useCases.addImmersionOffer,
+        useCase: config.useCases.addImmersionOffer,
         validationSchema: immersionOfferDtoSchema,
         useCaseParams: req.body,
       }),
@@ -119,7 +113,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     sendHttpResponse(req, res, async () => {
       logger.info(req);
       callUseCase({
-        useCase: useCases.romeSearch,
+        useCase: config.useCases.romeSearch,
         validationSchema: romeSearchRequestDtoSchema,
         useCaseParams: req.query.searchText,
       });
@@ -129,35 +123,45 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   router.route(`/${siretRoute}/:siret`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
       logger.info(req);
-      return useCases.getSiret.execute(req.params.siret);
+      return config.useCases.getSiret.execute(req.params.siret);
     }),
   );
 
   app.use(router);
 
-  eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
-    useCases.confirmToBeneficiaryThatApplicationCorrectlySubmitted.execute(
-      event.payload,
-    ),
+  config.eventBus.subscribe(
+    "ImmersionApplicationSubmittedByBeneficiary",
+    (event) =>
+      config.useCases.confirmToBeneficiaryThatApplicationCorrectlySubmitted.execute(
+        event.payload,
+      ),
   );
 
-  eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
-    useCases.confirmToMentorThatApplicationCorrectlySubmitted.execute(
-      event.payload,
-    ),
+  config.eventBus.subscribe(
+    "ImmersionApplicationSubmittedByBeneficiary",
+    (event) =>
+      config.useCases.confirmToMentorThatApplicationCorrectlySubmitted.execute(
+        event.payload,
+      ),
   );
 
-  eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
-    useCases.notifyToTeamApplicationSubmittedByBeneficiary.execute(
-      event.payload,
-    ),
+  config.eventBus.subscribe(
+    "ImmersionApplicationSubmittedByBeneficiary",
+    (event) =>
+      config.useCases.notifyToTeamApplicationSubmittedByBeneficiary.execute(
+        event.payload,
+      ),
   );
 
-  eventBus.subscribe("FinalImmersionApplicationValidationByAdmin", (event) =>
-    useCases.notifyAllActorsOfFinalApplicationValidation.execute(event.payload),
+  config.eventBus.subscribe(
+    "FinalImmersionApplicationValidationByAdmin",
+    (event) =>
+      config.useCases.notifyAllActorsOfFinalApplicationValidation.execute(
+        event.payload,
+      ),
   );
 
-  getEventCrawler(featureFlags).startCrawler();
+  config.eventCrawler.startCrawler();
 
   return app;
 };

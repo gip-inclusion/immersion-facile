@@ -1,9 +1,11 @@
-import { RomeSearch } from "./../../domain/rome/useCases/RomeSearch";
-import { AddImmersionOffer } from "./../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
-import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
+import {
+  EventBus,
+  makeCreateNewEvent,
+} from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
+import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
 import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
 import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
 import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
@@ -13,6 +15,8 @@ import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/demand
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/demandeImmersion/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { UpdateDemandeImmersion } from "../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
 import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases/ValidateDemandeImmersion";
+import { AddImmersionOffer } from "../../domain/immersionOffer/useCases/AddImmersionOffer";
+import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import {
   ApplicationSource,
@@ -42,10 +46,20 @@ import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import { DemandeImmersionRepository } from "./../../domain/demandeImmersion/ports/DemandeImmersionRepository";
 
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
+
+export const createConfig = (featureFlags: FeatureFlags) => {
+  const repositories = createRepositories(featureFlags);
+  const eventBus = createEventBus();
+  return {
+    useCases: createUsecases(featureFlags, repositories),
+    authChecker: createAuthChecker(),
+    eventBus: eventBus,
+    eventCrawler: createEventCrawler(repositories, eventBus),
+  };
+};
 
 const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
@@ -87,11 +101,12 @@ const getApplicationRepository = (
   return new ApplicationRepositorySwitcher(repositoriesBySource);
 };
 
-export const getRepositories = (featureFlags: FeatureFlags) => {
+const createRepositories = (featureFlags: FeatureFlags) => {
   logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
   logger.info(
     "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY",
   );
+  logger.info("EMAIL_GATEWAY: " + process.env.EMAIL_GATEWAY ?? "IN_MEMORY");
 
   return {
     demandeImmersion: getApplicationRepository(featureFlags),
@@ -112,7 +127,7 @@ export const getRepositories = (featureFlags: FeatureFlags) => {
   };
 };
 
-export const getAuthChecker = () => {
+export const createAuthChecker = () => {
   let username: string;
   let password: string;
 
@@ -141,8 +156,7 @@ const fail = (message: string) => {
   throw new Error(message);
 };
 
-export const getUsecases = (featureFlags: FeatureFlags) => {
-  const repositories = getRepositories(featureFlags);
+const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
   const supervisorEmail = process.env.SUPERVISOR_EMAIL;
   if (!supervisorEmail) {
     logger.warn(
@@ -158,11 +172,23 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
         .map(applicationSourceFromString)
         .filter((source) => source !== "UNKNOWN"),
     );
+  logger.debug(
+    {
+      unrestrictedEmailSendingSources: Array.from(
+        unrestrictedEmailSendingSources,
+      ),
+    },
+    "UNRESTRICTED_EMAIL_SENDING_SOURCES",
+  );
 
   const emailAllowList: Readonly<Set<string>> = new Set(
     (process.env.EMAIL_ALLOW_LIST || "").split(",").filter((el) => !!el),
   );
-  if (!emailAllowList) {
+  logger.debug(
+    { emailAllowList: Array.from(emailAllowList) },
+    "EMAIL_ALLOW_LIST",
+  );
+  if (emailAllowList.size == 0) {
     logger.warn(
       "Empty EMAIL_ALLOW_LIST. Disabling the sending of non-supervisor emails for sources with ",
       "restricted email sending.",
@@ -231,9 +257,16 @@ export const getUsecases = (featureFlags: FeatureFlags) => {
   };
 };
 
-export const eventBus = new InMemoryEventBus();
+const createEventBus = () => new InMemoryEventBus();
 
-export const getEventCrawler = (featureFlags: FeatureFlags): EventCrawler =>
-  process.env.NODE_ENV === "test"
-    ? new BasicEventCrawler(eventBus, getRepositories(featureFlags).outbox)
-    : new RealEventCrawler(eventBus, getRepositories(featureFlags).outbox);
+const createEventCrawler = (
+  repositories: any,
+  eventBus: EventBus,
+): EventCrawler => {
+  const eventCrawlerPeriodMs: number = process.env.EVENT_CRAWLER_PERIOD_MS
+    ? parseInt(process.env.EVENT_CRAWLER_PERIOD_MS)
+    : 0;
+  return eventCrawlerPeriodMs > 0
+    ? new RealEventCrawler(eventBus, repositories.outbox, eventCrawlerPeriodMs)
+    : new BasicEventCrawler(eventBus, repositories.outbox);
+};

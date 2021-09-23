@@ -5,9 +5,9 @@ import type {
   NewApplicationAdminNotificationParams,
   NewApplicationBeneficiaryConfirmationParams,
   NewApplicationMentorConfirmationParams,
+  ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
-import { DemandeImmersionDto } from "../../shared/DemandeImmersionDto";
 import { logger } from "../../utils/logger";
 
 const emailTypeToTemplateId: Record<EmailType, number> = {
@@ -96,13 +96,28 @@ export class SendinblueEmailGateway implements EmailGateway {
 
   public async sendValidatedApplicationFinalConfirmation(
     recipients: string[],
-    dto: DemandeImmersionDto,
+    params: ValidatedApplicationFinalConfirmationParams,
   ): Promise<void> {
     const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
     sibEmail.templateId =
       emailTypeToTemplateId.VALIDATED_APPLICATION_FINAL_CONFIRMATION;
     sibEmail.to = recipients.map((email) => ({ email }));
-    sibEmail.params = {}; // TODO(jfmac): add params.
+    sibEmail.params = {
+      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+      DATE_START: params.dateStart,
+      DATE_END: params.dateEnd,
+      MENTOR_NAME: params.mentorName,
+      SCHEDULE: params.scheduleText,
+      BUSINESS_NAME: params.businessName,
+      IMMERSION_ADDRESS: params.immersionAddress,
+      IMMERSION_PROFESSION: params.immersionProfession,
+      IMMERSION_ACTIVITIES: params.immersionActivities,
+      SANITARY_PREVENTION_DESCRIPTION: params.sanitaryPrevention,
+      INDIVIDUAL_PROTECTION: params.individualProtection,
+      QUESTIONNAIRE_URL: params.questionnaireUrl,
+      SIGNATURE: params.signature,
+    };
     this.sendTransacEmail(sibEmail);
   }
 

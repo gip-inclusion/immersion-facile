@@ -1,3 +1,4 @@
+import { LegacyScheduleDto } from "../shared/ScheduleSchema";
 import {
   ComplexScheduleDto,
   ScheduleDto,
@@ -234,6 +235,14 @@ export const prettyPrintSchedule = (schedule: ScheduleDto): string =>
   schedule.isSimple
     ? prettyPrintSimpleSchedule(schedule.simpleSchedule)
     : prettyPrintComplexSchedule(schedule.complexSchedule);
+
+export const prettyPrintLegacySchedule = (
+  schedule: LegacyScheduleDto,
+): string =>
+  [
+    "Les jours de l'immersion seront " + schedule.workdays.join(", "),
+    schedule.description,
+  ].join("\n");
 
 // Extract all weekday names for which there is at least one
 export const convertToFrenchNamedDays = (aSchedule: ScheduleDto) => {

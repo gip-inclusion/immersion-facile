@@ -3,6 +3,7 @@ import type {
   NewApplicationAdminNotificationParams,
   NewApplicationBeneficiaryConfirmationParams,
   NewApplicationMentorConfirmationParams,
+  ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { DemandeImmersionDto } from "../../shared/DemandeImmersionDto";
@@ -65,16 +66,16 @@ export class InMemoryEmailGateway implements EmailGateway {
 
   public async sendValidatedApplicationFinalConfirmation(
     recipients: string[],
-    dto: DemandeImmersionDto,
+    params: ValidatedApplicationFinalConfirmationParams,
   ): Promise<void> {
     this.logger.info(
-      { recipients, dto },
+      { recipients, params },
       "sendValidatedApplicationFinalConfirmation",
     );
     this.sentEmails.push({
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
       recipients: recipients,
-      params: dto,
+      params: params,
     });
   }
 

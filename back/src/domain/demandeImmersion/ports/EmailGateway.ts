@@ -1,5 +1,3 @@
-import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
-
 export type NewApplicationAdminNotificationParams = {
   demandeId: string;
   firstName: string;
@@ -20,6 +18,23 @@ export type NewApplicationMentorConfirmationParams = {
   mentorName: string;
   beneficiaryFirstName: string;
   beneficiaryLastName: string;
+};
+
+export type ValidatedApplicationFinalConfirmationParams = {
+  beneficiaryFirstName: string;
+  beneficiaryLastName: string;
+  dateStart: string;
+  dateEnd: string;
+  mentorName: string;
+  scheduleText: string;
+  businessName: string;
+  immersionAddress: string;
+  immersionProfession: string;
+  immersionActivities: string;
+  sanitaryPrevention: string;
+  individualProtection: string;
+  questionnaireUrl: string;
+  signature: string;
 };
 
 export type EmailType =
@@ -43,6 +58,6 @@ export interface EmailGateway {
   ) => Promise<void>;
   sendValidatedApplicationFinalConfirmation: (
     recipient: string[],
-    dto: DemandeImmersionDto,
+    params: ValidatedApplicationFinalConfirmationParams,
   ) => Promise<void>;
 }
