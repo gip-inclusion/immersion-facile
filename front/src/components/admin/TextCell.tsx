@@ -9,7 +9,7 @@ export const TextCell = ({ title, contents }: TextCellProps) => {
   return (
     <div className="static-info-container">
       <p style={{ fontWeight: "bold" }}>{title}</p>
-      <p>{contents}</p>
+      <p style={{ whiteSpace: "pre" }}>{contents}</p>
     </div>
   );
 };
