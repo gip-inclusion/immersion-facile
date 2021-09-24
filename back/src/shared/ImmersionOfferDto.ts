@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { professionDtoSchema, romeProfessionDtoSchema } from "./rome";
+import { professionDtoSchema } from "./rome";
 import { Flavor } from "./typeFlavors";
 import { phoneRegExp } from "./utils";
 
@@ -15,7 +15,7 @@ const businessContactDtoSchema = Yup.object({
   email: Yup.string()
     .email("Veuillez saisir une adresse e-mail valide")
     .required("Obligatoire"),
-  professions: Yup.array().of(romeProfessionDtoSchema).required("Obligatoire"),
+  professions: Yup.array().of(professionDtoSchema).required("Obligatoire"),
 }).required();
 
 type ContactMethod = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
