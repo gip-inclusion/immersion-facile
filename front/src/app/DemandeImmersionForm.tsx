@@ -301,6 +301,40 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
 
   const isFrozen = isDemandeImmersionFrozen(initialValues);
 
+  const SaveButton = () => {
+    const { isSubmitting, submitForm } = useFormikContext();
+
+    return (
+      <button
+        className="fr-btn fr-fi-save-line fr-btn--icon-left"
+        type="button"
+        onClick={submitForm}
+        disabled={isSubmitting || isFrozen}
+      >
+        {isSubmitting ? "Éxecution" : "Sauvegarder"}
+      </button>
+    );
+  };
+
+  const SubmitButton = () => {
+    const { setFieldValue, isSubmitting, submitForm } = useFormikContext();
+
+    const makeDraftAndSubmit = () => {
+      setFieldValue("status", "IN_REVIEW");
+      submitForm();
+    };
+
+    return (
+      <button
+        className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+        type="button"
+        onClick={makeDraftAndSubmit}
+      >
+        {isSubmitting ? "Éxecution" : "Envoyer la demande"}
+      </button>
+    );
+  };
+
   return (
     <>
       <MarianneHeader />
@@ -335,12 +369,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                 );
 
                 let currentId = route.params.demandeId;
-                if (!featureFlags.enableViewableApplications) {
-                  application = {
-                    ...application,
-                    status: "IN_REVIEW",
-                  };
-                }
 
                 const upsertedId = currentId
                   ? await demandeImmersionGateway.update(application)
@@ -597,26 +625,18 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                   {successProps && (
                     <SuccessMessage
                       link={successProps.link}
-                      title="Succès de l'envoi"
+                      title="Succès"
                       text={successProps.message}
                     />
                   )}
 
                   <p />
 
-                  {!isFrozen && (
-                    <button
-                      className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-                      type="submit"
-                      disabled={props.isSubmitting || isFrozen}
-                    >
-                      {props.isSubmitting
-                        ? "Éxecution"
-                        : featureFlags.enableViewableApplications
-                        ? "Sauvegarder"
-                        : "Envoyer la demande"}
-                    </button>
+                  {featureFlags.enableViewableApplications && !isFrozen && (
+                    <SaveButton />
                   )}
+                  <p />
+                  {!isFrozen && <SubmitButton />}
                 </form>
               </div>
             )}
