@@ -108,7 +108,7 @@ export class SendinblueEmailGateway implements EmailGateway {
       DATE_START: params.dateStart,
       DATE_END: params.dateEnd,
       MENTOR_NAME: params.mentorName,
-      SCHEDULE: params.scheduleText,
+      SCHEDULE_LINES: params.scheduleText.split("\n"),
       BUSINESS_NAME: params.businessName,
       IMMERSION_ADDRESS: params.immersionAddress,
       IMMERSION_PROFESSION: params.immersionProfession,
