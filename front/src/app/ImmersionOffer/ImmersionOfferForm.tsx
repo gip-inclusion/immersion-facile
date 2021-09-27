@@ -1,6 +1,7 @@
 import { Form, Formik } from "formik";
 import React from "react";
 import { BusinessContactList } from "src/app/ImmersionOffer/BusinessContactList";
+import { BusinessSectorInput } from "src/app/ImmersionOffer/BusinessSectorInput";
 import { ProfessionList } from "src/app/ImmersionOffer/ProfessionList";
 import { routes } from "src/app/routes";
 import {
@@ -115,10 +116,7 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
             <Form>
               Votre établissement
               <SiretRelatedInputs />
-              <TextInput
-                label="Vérifiez votre secteur d'activité"
-                name="businessSector"
-              />
+              <BusinessSectorInput />
               <ProfessionList name="professions" />
               <BusinessContactList />
               <CheckboxGroup

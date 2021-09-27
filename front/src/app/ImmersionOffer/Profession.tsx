@@ -1,6 +1,7 @@
 import { useField } from "formik";
 import React from "react";
 import { DropDown } from "src/app/ImmersionOffer/DropDown";
+import { immersionOfferGateway } from "src/app/main";
 import { TextInput } from "src/components/form/TextInput";
 import { ProfessionDto } from "src/shared/rome";
 
@@ -14,7 +15,24 @@ export const Profession = ({ name, onDelete }: ProfessionProps) => {
 
   return (
     <div style={{ display: "flex" }}>
-      <DropDown title="Rechercher un métier " onSelection={setValue} />
+      <DropDown
+        title="Rechercher un métier "
+        onSelection={setValue}
+        onTermChange={async (newTerm) => {
+          if (!newTerm) return [];
+          const romeOptions = await immersionOfferGateway.searchProfession(
+            newTerm,
+          );
+
+          return romeOptions.map(
+            ({ romeCodeMetier, description, matchRanges }) => ({
+              value: romeCodeMetier,
+              description,
+              matchRanges,
+            }),
+          );
+        }}
+      />
       <TextInput label="Code métier" name={name} disabled />
       <button onClick={onDelete}>Supprimer ce métier</button>
     </div>

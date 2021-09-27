@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import type { RomeSearchMatchDto } from "src/shared/rome";
+import type { Proposal } from "src/app/ImmersionOffer/DropDown";
 
 type SliceOfString = {
   startIndexInclusive: number;
@@ -10,7 +10,7 @@ type SliceOfString = {
 export const StringWithHighlights = ({
   description,
   matchRanges,
-}: RomeSearchMatchDto) => {
+}: Proposal) => {
   const slices: SliceOfString[] =
     matchRanges.length === 0
       ? [

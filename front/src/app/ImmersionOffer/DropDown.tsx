@@ -1,28 +1,29 @@
 import React, { useEffect, useReducer } from "react";
 import { StringWithHighlights } from "src/app/ImmersionOffer/StringWithHighlights";
-import { immersionOfferGateway } from "src/app/main";
 import { useDebounce } from "src/app/useDebounce";
-import type {
-  RomeSearchMatchDto,
-  RomeSearchResponseDto,
-} from "src/shared/rome";
 import "./dropdown.css";
 
-type DropDownProps = {
-  title: string;
-  onSelection: (param: string) => void;
+type MatchRange = {
+  startIndexInclusive: number;
+  endIndexExclusive: number;
+};
+
+export type Proposal = {
+  description: string;
+  value: string;
+  matchRanges: MatchRange[];
 };
 
 type DropDownState = {
   searchTerm: string;
-  proposals: RomeSearchResponseDto;
+  proposals: Proposal[];
   isOpen: boolean;
 };
 
 type DropDownAction =
   | { type: "SEARCH_TERM_CHANGED"; payload: string }
-  | { type: "PROPOSALS_UPDATED"; payload: RomeSearchResponseDto }
-  | { type: "PROPOSAL_SELECTED"; payload: RomeSearchMatchDto };
+  | { type: "PROPOSALS_UPDATED"; payload: Proposal[] }
+  | { type: "PROPOSAL_SELECTED"; payload: Proposal };
 
 const reducer = (state: DropDownState, action: DropDownAction) => {
   switch (action.type) {
@@ -47,18 +48,27 @@ const initialState: DropDownState = {
   isOpen: false,
 };
 
-export const DropDown = ({ title, onSelection }: DropDownProps) => {
+type DropDownProps = {
+  title: string;
+  initialValue?: string;
+  onSelection: (param: string) => void;
+  onTermChange: (newTerm: string) => Promise<Proposal[]>;
+};
+
+export const DropDown = ({
+  title,
+  initialValue,
+  onSelection,
+  onTermChange,
+}: DropDownProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { proposals, searchTerm, isOpen } = state;
   const debounceSearchTerm = useDebounce(searchTerm, 1200);
 
   useEffect(() => {
-    if (!debounceSearchTerm) return;
-    immersionOfferGateway
-      .searchProfession(debounceSearchTerm)
-      .then((proposals) =>
-        dispatch({ type: "PROPOSALS_UPDATED", payload: proposals }),
-      );
+    onTermChange(debounceSearchTerm).then((proposals) =>
+      dispatch({ type: "PROPOSALS_UPDATED", payload: proposals }),
+    );
   }, [debounceSearchTerm]);
 
   return (
@@ -69,7 +79,8 @@ export const DropDown = ({ title, onSelection }: DropDownProps) => {
       <input
         id="search"
         type="text"
-        value={searchTerm}
+        className="fr-input"
+        value={searchTerm === "" && !isOpen ? initialValue : searchTerm}
         onChange={(e) =>
           dispatch({ type: "SEARCH_TERM_CHANGED", payload: e.target.value })
         }
@@ -78,14 +89,14 @@ export const DropDown = ({ title, onSelection }: DropDownProps) => {
         <div className="dropdown-proposals">
           {proposals.map((proposal) => (
             <div
-              key={proposal.romeCodeMetier}
+              key={proposal.value}
               className="dropdown-proposal"
               onClick={() => {
                 dispatch({ type: "PROPOSAL_SELECTED", payload: proposal });
-                onSelection(proposal.romeCodeMetier);
+                onSelection(proposal.value);
               }}
             >
-              {proposal.romeCodeMetier} : <StringWithHighlights {...proposal} />
+              {proposal.value} : <StringWithHighlights {...proposal} />
             </div>
           ))}
         </div>

@@ -1,4 +1,4 @@
-import { FieldHookConfig, useField } from "formik";
+import { useField } from "formik";
 import React from "react";
 
 type TextInputProps = {

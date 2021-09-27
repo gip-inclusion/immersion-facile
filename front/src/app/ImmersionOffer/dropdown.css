@@ -5,6 +5,7 @@
 .dropdown-proposals {
   position: absolute;
   background-color: white;
+  z-index: 1;
 }
 
 .dropdown-proposal:hover {
