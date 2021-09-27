@@ -1,4 +1,5 @@
 import * as Yup from "../../node_modules/yup";
+import { NafSectorCode, validNafSectorCodes } from "./naf";
 import { professionDtoSchema } from "./rome";
 import { Flavor } from "./typeFlavors";
 import { phoneRegExp } from "./utils";
@@ -30,7 +31,9 @@ export const immersionOfferDtoSchema = Yup.object({
     .length(14, "SIRET doit étre composé de 14 chiffres"),
   businessName: Yup.string().required("Obligatoire"),
   businessAddress: Yup.string().required("Obligatoire"),
-  businessSector: Yup.string().required("Obligatoire"),
+  businessSectorCode: Yup.mixed<NafSectorCode>()
+    .oneOf(validNafSectorCodes)
+    .required("Obligatoire"),
   professions: Yup.array()
     .of(professionDtoSchema)
     .min(1, "Spécifiez au moins 1 métier")

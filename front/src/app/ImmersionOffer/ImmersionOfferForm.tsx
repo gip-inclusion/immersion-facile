@@ -29,7 +29,7 @@ const initialValues: ImmersionOfferDto = ENV.dev
       siret: "1234567890123",
       businessName: "My buisiness name",
       businessAddress: "My businessAddress:",
-      businessSector: "My businessSector",
+      businessSectorCode: "F",
       professions: [{ romeCodeMetier: "A10000" }],
       businessContacts: [
         {
@@ -48,7 +48,7 @@ const initialValues: ImmersionOfferDto = ENV.dev
       siret: "",
       businessName: "",
       businessAddress: "",
-      businessSector: "",
+      businessSectorCode: "0",
       professions: [],
       businessContacts: [],
       preferredContactMethods: [],
