@@ -12,7 +12,7 @@ describe("/demandes-immersion route", () => {
     beforeEach(() => {
       request = supertest(
         createApp({
-          featureFlags: new FeatureFlagsBuilder()
+          featureFlags: FeatureFlagsBuilder.allOff()
             .enableViewableApplications()
             .enableGenericApplicationForm()
             .build(),
@@ -98,7 +98,7 @@ describe("/demandes-immersion route", () => {
     beforeEach(() => {
       request = supertest(
         createApp({
-          featureFlags: new FeatureFlagsBuilder()
+          featureFlags: FeatureFlagsBuilder.allOff()
             .enableViewableApplications()
             .enableGenericApplicationForm()
             .build(),
@@ -245,7 +245,7 @@ describe("/demandes-immersion route", () => {
     beforeEach(() => {
       request = supertest(
         createApp({
-          featureFlags: new FeatureFlagsBuilder()
+          featureFlags: FeatureFlagsBuilder.allOff()
             .enableBoulogneSurMerApplicationForm()
             .enableNarbonneApplicationForm()
             .build(),

@@ -3,7 +3,11 @@ import { Builder } from "./Builder";
 
 export class FeatureFlagsBuilder implements Builder<FeatureFlags> {
   // Initializes all feature flags to be off.
-  constructor(readonly featureFlags: FeatureFlags = {}) {}
+  private constructor(readonly featureFlags: FeatureFlags = {}) {}
+
+  public static allOff() {
+    return new FeatureFlagsBuilder();
+  }
 
   public enableViewableApplications(): FeatureFlagsBuilder {
     return new FeatureFlagsBuilder({

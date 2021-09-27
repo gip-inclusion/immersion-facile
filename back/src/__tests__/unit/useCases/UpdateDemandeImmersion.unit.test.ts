@@ -31,7 +31,7 @@ describe("Update demandeImmersion", () => {
 
   describe("When enableViewableApplication in on", () => {
     beforeEach(() => {
-      featureFlags = new FeatureFlagsBuilder()
+      featureFlags = FeatureFlagsBuilder.allOff()
         .enableViewableApplications()
         .build();
       updateDemandeImmersion = createUpdateDemandeImmersionUseCase();
@@ -79,7 +79,7 @@ describe("Update demandeImmersion", () => {
 
   describe("When enableViewableApplications is off", () => {
     beforeEach(() => {
-      featureFlags = new FeatureFlagsBuilder().build();
+      featureFlags = FeatureFlagsBuilder.allOff().build();
       updateDemandeImmersion = createUpdateDemandeImmersionUseCase();
     });
 

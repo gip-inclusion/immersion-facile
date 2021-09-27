@@ -15,7 +15,7 @@ describe("List DemandeImmersion", () => {
 
   beforeEach(() => {
     repository = new InMemoryDemandeImmersionRepository();
-    featureFlags = new FeatureFlagsBuilder().build();
+    featureFlags = FeatureFlagsBuilder.allOff().build();
   });
 
   const createListDemandeImmersionUseCase = () => {
@@ -27,7 +27,7 @@ describe("List DemandeImmersion", () => {
 
   describe("When enableViewableApplication in on", () => {
     beforeEach(() => {
-      featureFlags = new FeatureFlagsBuilder()
+      featureFlags = FeatureFlagsBuilder.allOff()
         .enableViewableApplications()
         .build();
       listDemandeImmersion = createListDemandeImmersionUseCase();
@@ -53,7 +53,7 @@ describe("List DemandeImmersion", () => {
 
   describe("When demandeImmersionRepository is off", () => {
     beforeEach(() => {
-      featureFlags = new FeatureFlagsBuilder().build();
+      featureFlags = FeatureFlagsBuilder.allOff().build();
       listDemandeImmersion = createListDemandeImmersionUseCase();
     });
 

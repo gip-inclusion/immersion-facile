@@ -13,7 +13,7 @@ describe("Get DemandeImmersion", () => {
 
   beforeEach(() => {
     repository = new InMemoryDemandeImmersionRepository();
-    featureFlags = new FeatureFlagsBuilder().build();
+    featureFlags = FeatureFlagsBuilder.allOff().build();
   });
 
   const createGetDemandeImmersionUseCase = () => {
@@ -22,7 +22,7 @@ describe("Get DemandeImmersion", () => {
 
   describe("When enableViewableApplication in on", () => {
     beforeEach(() => {
-      featureFlags = new FeatureFlagsBuilder()
+      featureFlags = FeatureFlagsBuilder.allOff()
         .enableViewableApplications()
         .build();
       getDemandeImmersion = createGetDemandeImmersionUseCase();
