@@ -44,6 +44,7 @@ import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
+import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 
@@ -122,6 +123,8 @@ const createRepositories = (featureFlags: FeatureFlags) => {
       process.env.EMAIL_GATEWAY === "SENDINBLUE"
         ? SendinblueEmailGateway.create(getEnvVarOrDie("SENDINBLUE_API_KEY"))
         : new InMemoryEmailGateway(),
+
+    rome: new InMemoryRomeGateway(),
 
     outbox: new InMemoryOutboxRepository(),
   };
@@ -241,7 +244,7 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
     }),
 
     // rome
-    romeSearch: new RomeSearch(),
+    romeSearch: new RomeSearch(repositories.rome),
 
     // notifications
     confirmToBeneficiaryThatApplicationCorrectlySubmitted:

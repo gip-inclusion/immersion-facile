@@ -7,6 +7,10 @@ export const romeCodeMetierDtoSchema = Yup.string()
   .matches(romeCodeMetierRegex, "Code ROME incorrect")
   .required("Obligatoire");
 
+export type RomeCodeMetierDto = Yup.InferType<
+  typeof romeSearchResponseDtoSchema
+>;
+
 export const professionDtoSchema = Yup.object({
   romeCodeMetier: romeCodeMetierDtoSchema.required("Obligatoire"),
 });

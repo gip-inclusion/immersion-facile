@@ -1,7 +1,7 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   DemandeImmersionDto,
-  GetDemandeImmersionRequestDto
+  GetDemandeImmersionRequestDto,
 } from "../../../shared/DemandeImmersionDto";
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";

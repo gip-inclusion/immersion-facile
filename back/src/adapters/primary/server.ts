@@ -112,7 +112,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   router.route(`/${romeRoute}`).get(async (req, res) => {
     sendHttpResponse(req, res, async () => {
       logger.info(req);
-      callUseCase({
+      return callUseCase({
         useCase: config.useCases.romeSearch,
         validationSchema: romeSearchRequestDtoSchema,
         useCaseParams: req.query.searchText,
