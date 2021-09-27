@@ -1,0 +1,14 @@
+.dropdown-container {
+    position: relative;
+}
+
+.dropdown-proposals {
+    position: absolute;
+    background-color: white;
+}
+
+.dropdown-proposal:hover {
+    cursor: pointer;
+    opacity: 0.8;
+    background-color: lightgray;
+}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { CompanyInfoFromSiretApi } from "src/core-logic/ports/CompanyInfoFromSiretApi";
 import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
 import {
   demandesImmersionRoute,
@@ -70,7 +71,7 @@ export class HttpDemandeImmersionGateway implements DemandeImmersionGateway {
     return data.id;
   }
 
-  public async getSiretInfo(siret: string): Promise<Object> {
+  public async getSiretInfo(siret: string): Promise<CompanyInfoFromSiretApi> {
     const httpResponse = await axios.get(`/${prefix}/${siretRoute}/${siret}`);
     return httpResponse.data;
   }

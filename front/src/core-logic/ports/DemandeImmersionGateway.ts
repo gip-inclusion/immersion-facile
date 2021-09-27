@@ -1,3 +1,4 @@
+import { CompanyInfoFromSiretApi } from "src/core-logic/ports/CompanyInfoFromSiretApi";
 import {
   DemandeImmersionDto,
   DemandeImmersionId,
@@ -10,6 +11,6 @@ export interface DemandeImmersionGateway {
   // Calls validate-demande on backend.
   validate: (id: DemandeImmersionId) => Promise<string>;
 
-  getSiretInfo: (siret: string) => Promise<Object>;
+  getSiretInfo: (siret: string) => Promise<CompanyInfoFromSiretApi>;
   getAll: () => Promise<Array<DemandeImmersionDto>>;
 }

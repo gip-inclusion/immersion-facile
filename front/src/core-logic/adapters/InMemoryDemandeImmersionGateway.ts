@@ -1,3 +1,7 @@
+import {
+  CompanyInfoFromSiretApi,
+  Establishment,
+} from "src/core-logic/ports/CompanyInfoFromSiretApi";
 import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
 import {
   DemandeImmersionDto,
@@ -42,8 +46,11 @@ const TEST_ESTABLISHMENT1 = {
   siren: "123456789",
   nic: "01234",
   siret: TEST_ESTABLISHMENT1_SIRET,
+  etablissementSiege: true,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE",
+    nomUniteLegale: "PROST",
+    prenomUsuelUniteLegale: "ALAIN",
   },
   adresseEtablissement: {
     numeroVoieEtablissement: "20",
@@ -59,6 +66,7 @@ const TEST_ESTABLISHMENT2 = {
   siren: "111111111",
   nic: "11111",
   siret: TEST_ESTABLISHMENT2_SIRET,
+  etablissementSiege: true,
   uniteLegale: {
     denominationUniteLegale: null,
     nomUniteLegale: "PROST",
@@ -79,7 +87,7 @@ export class InMemoryDemandeImmersionGateway
   implements DemandeImmersionGateway
 {
   private _demandesImmersion: { [id: string]: DemandeImmersionDto } = {};
-  private _establishments: { [siret: string]: Object } = {};
+  private _establishments: { [siret: string]: Establishment } = {};
 
   public constructor(readonly featureFlags: FeatureFlags) {
     this.add({
@@ -150,7 +158,7 @@ export class InMemoryDemandeImmersionGateway
     return id;
   }
 
-  public async getSiretInfo(siret: string): Promise<Object> {
+  public async getSiretInfo(siret: string): Promise<CompanyInfoFromSiretApi> {
     console.log("InMemoryDemandeImmersionGateway.getSiretInfo: " + siret);
     await sleep(SIMULATED_LATENCY_MS);
 

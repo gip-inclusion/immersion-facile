@@ -1,4 +1,4 @@
-import * as Yup from "yup";
+import * as Yup from "../../node_modules/yup";
 import { professionDtoSchema } from "./rome";
 import { Flavor } from "./typeFlavors";
 import { phoneRegExp } from "./utils";
@@ -18,7 +18,9 @@ const businessContactDtoSchema = Yup.object({
   professions: Yup.array().of(professionDtoSchema).required("Obligatoire"),
 }).required();
 
-type ContactMethod = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
+export type BusinessContactDto = Yup.InferType<typeof businessContactDtoSchema>;
+
+export type ContactMethod = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
 const validContactMethods: ContactMethod[] = ["EMAIL", "PHONE", "IN_PERSON"];
 
 export const immersionOfferDtoSchema = Yup.object({

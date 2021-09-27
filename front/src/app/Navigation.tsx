@@ -27,6 +27,8 @@ export const Navigation = () => (
     {featureFlags.enableAdminUi && <a {...routes.admin().link}>Backoffice</a>}
     {featureFlags.enableAdminUi && " - "}
 
+    <a {...routes.immersionOffer().link}>Formulaire Entreprise {" - "}</a>
+
     <a {...routes.todos().link}>Todo list</a>
   </nav>
 );

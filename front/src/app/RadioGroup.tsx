@@ -6,7 +6,7 @@ type BoolRadioProps = {
   name: string;
   label: string;
   hideNoOption: boolean;
-  disabled: boolean;
+  disabled?: boolean;
 };
 
 // Like MyRadioGroup, but backs a boolean value.
@@ -89,7 +89,7 @@ export const BoolRadioGroup = ({
 export const RadioGroup = ({
   name,
   label,
-  values,
+  options,
   disabled,
 }: CheckboxGroupProps) => {
   const [field, meta, { setValue }] = useField({ name });
@@ -112,7 +112,7 @@ export const RadioGroup = ({
             {label}
           </legend>
           <div className="fr-fieldset__content">
-            {values.map((value) => {
+            {options.map(({ value, label }) => {
               const htmlName = error ? "radio" : "radio-error";
               return (
                 <div className="fr-radio-group" key={value}>
@@ -125,7 +125,7 @@ export const RadioGroup = ({
                     onChange={() => !disabled && setValue(value)}
                   />
                   <label className="fr-label" htmlFor={htmlName + value}>
-                    {value}
+                    {label ?? value}
                   </label>
                 </div>
               );

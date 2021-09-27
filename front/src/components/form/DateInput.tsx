@@ -3,7 +3,7 @@ import React from "react";
 
 type DateInputProps = {
   label: string;
-  disabled: boolean;
+  disabled?: boolean;
 } & FieldHookConfig<string>;
 
 export const DateInput = (props: DateInputProps) => {

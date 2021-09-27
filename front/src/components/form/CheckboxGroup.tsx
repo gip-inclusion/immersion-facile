@@ -9,14 +9,14 @@ import React from "react";
 
 type BoolCheckboxGroupProps = {
   label: string;
-  formikHelpers: FormikHelpers<any> & FormikState<any>;
   description: string;
   descriptionLink: string;
-  disabled: boolean;
-} & FieldHookConfig<string>;
+  disabled?: boolean;
+  name: string;
+};
 
 export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
-  const [field, meta] = useField(props);
+  const [field, meta, { setValue }] = useField<boolean>({ name: props.name });
   const isError = meta.touched && meta.error;
   const htmlName = isError ? "checkBox-error" : "checkbox";
 
@@ -52,20 +52,16 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
             >
               <input
                 {...field}
+                value={""}
                 type="checkbox"
                 id={htmlName}
-                checked={props.formikHelpers.values[props.name]}
+                checked={field.value}
                 disabled={props.disabled}
               />
               <label
                 className="fr-label"
                 htmlFor={htmlName + "oui"}
-                onClick={() => {
-                  if (field.value)
-                    props.formikHelpers.setFieldValue(props.name, false, true);
-                  else
-                    props.formikHelpers.setFieldValue(props.name, true, true);
-                }}
+                onClick={() => setValue(!field.value)}
               >
                 oui
               </label>
@@ -85,14 +81,14 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
 export type CheckboxGroupProps = {
   name: string;
   label: string;
-  values: Array<string>;
-  disabled: boolean;
+  options: Array<{ value: string; label?: string }>;
+  disabled?: boolean;
 };
 
 export const CheckboxGroup = ({
   name,
   label,
-  values,
+  options,
   disabled,
 }: CheckboxGroupProps) => {
   const [field, meta] = useField({ name });
@@ -117,7 +113,7 @@ export const CheckboxGroup = ({
             {label}
           </legend>
           <div className="fr-fieldset__content">
-            {values.map((value) => (
+            {options.map(({ value, label }) => (
               <div className="fr-checkbox-group" key={value}>
                 <Field
                   type="checkbox"
@@ -128,7 +124,7 @@ export const CheckboxGroup = ({
                   disabled={disabled}
                 />
                 <label className="fr-label" htmlFor={value}>
-                  {value}
+                  {label ?? value}
                 </label>
               </div>
             ))}

@@ -1,11 +1,12 @@
 import React from "react";
 import { Admin } from "src/app/admin/Admin";
-import { ApplicationForm } from "src/app/DemandeImmersionForm";
+import { ApplicationForm } from "src/app/ApplicationForm/ApplicationForm";
 import { Home } from "src/app/Home";
 import { useRoute } from "src/app/routes";
 import { TodoApp } from "src/app/TodoApp";
 import { ENV } from "src/environmentVariables";
 import { AdminVerification } from "./admin/AdminVerification";
+import { ImmersionOfferForm } from "./ImmersionOffer/ImmersionOfferForm";
 
 const { dev, featureFlags } = ENV;
 
@@ -17,6 +18,8 @@ export const Router = () => {
   return (
     <>
       {route.name === "home" && <Home showDebugInfo={dev} />}
+      {route.name === "immersionOffer" && <ImmersionOfferForm route={route} />}
+
       {route.name === "todos" &&
         (dev ? <TodoApp route={route} /> : <NotAvailable />)}
       {route.name === "demandeImmersion" &&

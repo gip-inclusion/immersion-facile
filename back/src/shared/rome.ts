@@ -1,4 +1,4 @@
-import * as Yup from "yup";
+import * as Yup from "../../node_modules/yup";
 
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 const romeCodeMetierRegex = /[A-N]\d{4}/;
@@ -21,6 +21,10 @@ export const romeSearchMatchSchema = Yup.object({
   description: Yup.string().required("Obligatoire"),
   matchRanges: Yup.array().of(matchRangeSchema).required("Obligatoire"),
 });
+
+export type RomeSearchMatchDto = Yup.InferType<typeof romeSearchMatchSchema>;
+
+export type ProfessionDto = Yup.InferType<typeof professionDtoSchema>;
 
 export const romeSearchRequestDtoSchema = Yup.string().required("Obligatoire");
 
