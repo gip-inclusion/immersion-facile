@@ -1,5 +1,6 @@
 import React from "react";
 import { FieldHookConfig } from "formik";
+import { ButtonAdd } from "src/components/ButtonAdd";
 import { ScheduleDto } from "src/shared/ScheduleSchema";
 import { WeekdayDropdown } from "./WeekdayDropdown";
 import { DeleteButton } from "../../DeleteButton";
@@ -92,13 +93,7 @@ export const WeekdayPicker = ({
           );
         })}
       {!disabled && (
-        <button
-          type="button"
-          className="fr-btn fr-fi-add-line fr-btn--icon-left fr-btn--secondary"
-          onClick={() => add()}
-        >
-          Ajouter une période
-        </button>
+        <ButtonAdd onClick={() => add()}>Ajouter une période</ButtonAdd>
       )}
     </>
   );

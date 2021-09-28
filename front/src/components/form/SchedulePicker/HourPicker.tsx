@@ -1,5 +1,6 @@
 import React from "react";
 import { ErrorMessage } from "formik";
+import { ButtonAdd } from "src/components/ButtonAdd";
 import { TimePeriodDto } from "src/shared/ScheduleSchema";
 import { DeleteButton } from "src/components/DeleteButton";
 
@@ -97,16 +98,14 @@ export const HourPicker = ({
           );
         })}
       {!disabled && (
-        <button
-          type="button"
+        <ButtonAdd
           style={{
             marginTop: "10px",
           }}
-          className="fr-btn fr-fi-add-line fr-btn--icon-left fr-btn--secondary"
           onClick={() => add()}
         >
           Ajouter des horaires
-        </button>
+        </ButtonAdd>
       )}
     </>
   );

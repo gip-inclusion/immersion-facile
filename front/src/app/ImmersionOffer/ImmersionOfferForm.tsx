@@ -103,43 +103,51 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
   return (
     <>
       <MarianneHeader />
-      <Formik
-        enableReinitialize={true}
-        initialValues={initialValues}
-        validationSchema={immersionOfferDtoSchema}
-        onSubmit={(data) => {
-          console.log("submitted: ", data);
-        }}
+      <div
+        className="fr-grid-row fr-grid-row--center fr-grid-row--gutters"
+        style={{ marginTop: "25px" }}
       >
-        {({ isSubmitting, submitCount, errors, values }) => (
-          <div style={{ margin: "5px", maxWidth: "600px" }}>
-            <Form>
-              Votre établissement
-              <SiretRelatedInputs />
-              <BusinessSectorInput />
-              <ProfessionList name="professions" />
-              <BusinessContactList />
-              <CheckboxGroup
-                name="preferredContactMethods"
-                label="Comment souhaitez-vous que les candidats vous contactent ?"
-                options={preferredContactMethodOptions}
-              />
-              {submitCount !== 0 && Object.values(errors).length > 0 && (
-                <div style={{ color: "red" }}>
-                  Veuillez corriger les champs erronés
-                </div>
-              )}
-              <button
-                className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-                type="submit"
-                disabled={isSubmitting}
-              >
-                Enregistrer mes informations
-              </button>
-            </Form>
-          </div>
-        )}
-      </Formik>
+        <Formik
+          enableReinitialize={true}
+          initialValues={initialValues}
+          validationSchema={immersionOfferDtoSchema}
+          onSubmit={(data) => {
+            console.log("submitted: ", data);
+          }}
+        >
+          {({ isSubmitting, submitCount, errors, values }) => (
+            <div style={{ margin: "5px", maxWidth: "600px" }}>
+              <Form>
+                Votre établissement
+                <SiretRelatedInputs />
+                <BusinessSectorInput />
+                <ProfessionList
+                  name="professions"
+                  title="Métiers de l'entreprise"
+                />
+                <BusinessContactList />
+                <CheckboxGroup
+                  name="preferredContactMethods"
+                  label="Comment souhaitez-vous que les candidats vous contactent ?"
+                  options={preferredContactMethodOptions}
+                />
+                {submitCount !== 0 && Object.values(errors).length > 0 && (
+                  <div style={{ color: "red" }}>
+                    Veuillez corriger les champs erronés
+                  </div>
+                )}
+                <button
+                  className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  Enregistrer mes informations
+                </button>
+              </Form>
+            </div>
+          )}
+        </Formik>
+      </div>
     </>
   );
 };

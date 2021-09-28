@@ -1,6 +1,7 @@
 import { useField } from "formik";
 import React from "react";
 import { ProfessionList } from "src/app/ImmersionOffer/ProfessionList";
+import { ButtonAdd } from "src/components/ButtonAdd";
 import { TextInput } from "src/components/form/TextInput";
 import {
   BusinessContactDto,
@@ -21,17 +22,17 @@ export const BusinessContactList = () => {
   const [field, _, { setValue }] = useField<BusinessContactDto[]>({ name });
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column" }}>
       {field.value.map((_, index) => (
         <BusinessContact index={index} key={index} />
       ))}
-      <button
-        type="button"
+      <ButtonAdd
+        style={{ alignSelf: "center", margin: "30px auto" }}
         onClick={() => setValue([...field.value, emptyContact])}
       >
         Ajouter un référent
-      </button>
-    </>
+      </ButtonAdd>
+    </div>
   );
 };
 
@@ -46,7 +47,7 @@ const BusinessContact = ({ index }: BusinessContactProps) => {
 
   return (
     <div>
-      <h4>Référent :</h4>
+      <h4>Détails du référent :</h4>
       <TextInput label="Nom du référent" name={makeName("lastName")} />
       <TextInput label="Prénom du référent" name={makeName("firstName")} />
       <TextInput label="Fonction du référent" name={makeName("job")} />
@@ -55,10 +56,8 @@ const BusinessContact = ({ index }: BusinessContactProps) => {
         name={makeName("phone")}
       />
       <TextInput label="Son email" name={makeName("email")} />
-      <ProfessionList
-        title="Responsable des métiers suivants :"
-        name={makeName("professions")}
-      />
+      <label>Responsable des métiers suivants :</label>
+      <ProfessionList name={makeName("professions")} />
     </div>
   );
 };
