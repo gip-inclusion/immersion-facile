@@ -6,7 +6,7 @@ export class InMemoryImmersionOfferGateway implements ImmersionOfferGateway {
   public async searchProfession(
     searchTerm: string,
   ): Promise<RomeSearchResponseDto> {
-    await sleep(1000);
+    await sleep(700);
     return [
       {
         romeCodeMetier: "A1111",

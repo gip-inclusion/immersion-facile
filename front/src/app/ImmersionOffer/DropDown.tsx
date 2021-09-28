@@ -1,6 +1,7 @@
 import React, { useEffect, useReducer } from "react";
 import { StringWithHighlights } from "src/app/ImmersionOffer/StringWithHighlights";
 import { immersionOfferGateway } from "src/app/main";
+import { useDebounce } from "src/app/useDebounce";
 import type {
   RomeSearchMatchDto,
   RomeSearchResponseDto,
@@ -49,15 +50,16 @@ const initialState: DropDownState = {
 export const DropDown = ({ title, onSelection }: DropDownProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { proposals, searchTerm, isOpen } = state;
+  const debounceSearchTerm = useDebounce(searchTerm, 1200);
 
   useEffect(() => {
-    if (!searchTerm) return;
+    if (!debounceSearchTerm) return;
     immersionOfferGateway
-      .searchProfession(searchTerm)
+      .searchProfession(debounceSearchTerm)
       .then((proposals) =>
         dispatch({ type: "PROPOSALS_UPDATED", payload: proposals }),
       );
-  }, [searchTerm]);
+  }, [debounceSearchTerm]);
 
   return (
     <div className="dropdown-container">
@@ -76,6 +78,7 @@ export const DropDown = ({ title, onSelection }: DropDownProps) => {
         <div className="dropdown-proposals">
           {proposals.map((proposal) => (
             <div
+              key={proposal.romeCodeMetier}
               className="dropdown-proposal"
               onClick={() => {
                 dispatch({ type: "PROPOSAL_SELECTED", payload: proposal });

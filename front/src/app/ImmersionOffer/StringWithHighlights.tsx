@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import type { RomeSearchMatchDto } from "src/shared/rome";
 
 type SliceOfString = {
@@ -60,11 +60,16 @@ export const StringWithHighlights = ({
 
   return (
     <>
-      {slices.map(({ startIndexInclusive, endIndexExclusive, bolded }) => {
-        const text = description.slice(startIndexInclusive, endIndexExclusive);
-        if (bolded) return <strong>{text}</strong>;
-        return <>{text}</>;
-      })}
+      {slices.map(
+        ({ startIndexInclusive, endIndexExclusive, bolded }, index) => {
+          const text = description.slice(
+            startIndexInclusive,
+            endIndexExclusive,
+          );
+          if (bolded) return <strong key={index}>{text}</strong>;
+          return <Fragment key={index}>{text}</Fragment>;
+        },
+      )}
     </>
   );
 };
