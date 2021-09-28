@@ -262,7 +262,7 @@ export const ApplicationFormFields = ({
 
       <p />
 
-      {submitCount !== 0 && errors && (
+      {submitCount !== 0 && Object.values(errors).length > 0 && (
         <div style={{ color: "red" }}>Veuillez corriger les champs erronés</div>
       )}
 
