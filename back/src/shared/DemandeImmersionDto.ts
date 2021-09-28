@@ -45,17 +45,21 @@ export const demandeImmersionDtoSchema = Yup.object({
     .oneOf(validApplicationSources)
     .required(),
   email: Yup.string()
+    .trim()
     .required("Obligatoire")
     .email("Veuillez saisir une adresse e-mail valide"),
-  firstName: Yup.string().required("Obligatoire"),
-  lastName: Yup.string().required("Obligatoire"),
+  firstName: Yup.string().trim().required("Obligatoire"),
+  lastName: Yup.string().trim().required("Obligatoire"),
   phone: Yup.string()
+    .trim()
     .matches(phoneRegExp, "Numero de téléphone incorrect")
     .nullable(true),
   dateSubmission: Yup.string()
+    .trim()
     .matches(dateRegExp, "La date de saisie est invalide.")
     .required("Obligatoire"),
   dateStart: Yup.string()
+    .trim()
     .matches(dateRegExp, "La date de démarrage est invalide.")
     .test(
       "dateStart-min",
@@ -67,13 +71,14 @@ export const demandeImmersionDtoSchema = Yup.object({
         const startDate = new Date(value);
         const submissionDate = new Date(context.parent.dateSubmission);
 
-        let minStartDate = new Date(submissionDate);
+        const minStartDate = new Date(submissionDate);
         minStartDate.setDate(minStartDate.getDate() + 2);
         return startDate >= minStartDate;
       },
     )
     .required("Obligatoire"),
   dateEnd: Yup.string()
+    .trim()
     .matches(dateRegExp, "La date de fin invalide.")
     .test(
       "dateEnd-min",
@@ -98,22 +103,25 @@ export const demandeImmersionDtoSchema = Yup.object({
         const startDate = new Date(context.parent.dateStart);
         const endDate = new Date(value);
 
-        let maxEndDate = new Date(startDate);
+        const maxEndDate = new Date(startDate);
         maxEndDate.setDate(maxEndDate.getDate() + 28);
         return endDate <= maxEndDate;
       },
     )
     .required("Obligatoire"),
   siret: Yup.string()
+    .trim()
     .required("Obligatoire")
     .length(14, "SIRET doit étre composé de 14 chiffres"),
-  businessName: Yup.string().required("Obligatoire"),
+  businessName: Yup.string().trim().required("Obligatoire"),
 
-  mentor: Yup.string().required("Obligatoire"),
+  mentor: Yup.string().trim().required("Obligatoire"),
   mentorPhone: Yup.string()
+    .trim()
     .required("Obligatoire")
     .matches(phoneRegExp, "Numero de téléphone de tuteur incorrect"),
   mentorEmail: Yup.string()
+    .trim()
     .required("Obligatoire")
     .email("Veuillez saisir une adresse mail correcte")
     .test(
@@ -133,13 +141,13 @@ export const demandeImmersionDtoSchema = Yup.object({
 
   individualProtection: Yup.boolean().required("Obligatoire"),
   sanitaryPrevention: Yup.boolean().required("Obligatoire"),
-  sanitaryPreventionDescription: Yup.string().nullable(true),
+  sanitaryPreventionDescription: Yup.string().trim().nullable(true),
 
-  immersionAddress: Yup.string().nullable(true),
-  immersionObjective: Yup.string().nullable(true),
-  immersionProfession: Yup.string().required("Obligatoire"),
-  immersionActivities: Yup.string().required("Obligatoire"),
-  immersionSkills: Yup.string().nullable(true),
+  immersionAddress: Yup.string().trim().nullable(true),
+  immersionObjective: Yup.string().trim().nullable(true),
+  immersionProfession: Yup.string().trim().required("Obligatoire"),
+  immersionActivities: Yup.string().trim().required("Obligatoire"),
+  immersionSkills: Yup.string().trim().nullable(true),
   beneficiaryAccepted: Yup.boolean().equals(
     [true],
     "L'engagement est obligatoire",
