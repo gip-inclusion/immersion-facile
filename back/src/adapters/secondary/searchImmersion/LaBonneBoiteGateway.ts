@@ -62,11 +62,12 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
                 company.city,
                 company.lat,
                 company.lon,
-                company.matched_rome_code,
                 company.naf,
                 company.name,
                 company.siret,
                 company.stars,
+                [company.matched_rome_code],
+                "LaBonneBoite",
               ),
           );
       })

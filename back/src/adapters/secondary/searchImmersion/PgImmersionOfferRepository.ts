@@ -31,10 +31,11 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     const arrayOfImmersionsOffers = immersionOffers.map((immersion) =>
       immersion.toArrayOfProps(),
     );
+
     return this.client
       .query(
         format(
-          "INSERT INTO immersion_proposals (uuid, name, naf, rome, siret) VALUES %L",
+          "INSERT INTO immersion_proposals (uuid, rome, naf,siret, name) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_proposals DO UPDATE SET name=EXCLUDED.name",
           arrayOfImmersionsOffers,
         ),
       )

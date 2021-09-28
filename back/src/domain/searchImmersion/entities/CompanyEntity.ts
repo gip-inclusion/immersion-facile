@@ -9,19 +9,36 @@ export class CompanyEntity {
     private city: string,
     private lat: number,
     private lon: number,
-    private matched_rome_code: string,
     private naf: string,
     private name: string,
     private siret: string,
     private stars: number, //The ratin of the company. Set to -1 if unknown
+    private romes: string[],
+    private source: string,
   ) {}
 
-  public getMatched_rome_code() {
-    return this.matched_rome_code;
+  public getRomeCodesArray() {
+    return this.romes;
   }
 
   public getName() {
     return this.name;
+  }
+
+  public getAddress(): string {
+    return this.address;
+  }
+
+  public getLongitude() {
+    return this.lon;
+  }
+
+  public setLatitude(lat: number) {
+    this.lat = lat;
+  }
+
+  public setLongitude(lon: number) {
+    this.lon = lon;
   }
 
   public getSiret() {

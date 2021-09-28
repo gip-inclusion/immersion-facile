@@ -21,20 +21,32 @@ export class SearchImmersionByCandidate {
     const laBonneBoiteCompanies = await this.laBonneBoiteGateway.getCompanies(
       searchParams,
     );
-    return laBonneBoiteCompanies.map((laBonneBoitecompany: CompanyEntity) =>
-      this.transformCompanyInImmersion(laBonneBoitecompany),
+    var companies = laBonneBoiteCompanies.map(
+      (laBonneBoitecompany: CompanyEntity) =>
+        this.transformCompanyInImmersions(laBonneBoitecompany),
     );
+
+    //A trick to make flatmap in nodejs
+    var emptyArray: ImmersionOfferEntity[] = [];
+    return emptyArray.concat.apply([], companies);
   }
 
-  private transformCompanyInImmersion(
+  private transformCompanyInImmersions(
     company: CompanyEntity,
-  ): ImmersionOfferEntity {
-    return new ImmersionOfferEntity(
-      uuidV4(),
-      company.getName(),
-      company.getNaf(),
-      company.getMatched_rome_code(),
-      company.getSiret(),
-    );
+  ): ImmersionOfferEntity[] {
+    const immersionOffers: ImmersionOfferEntity[] = [];
+    const romeArray = company.getRomeCodesArray();
+    for (const romeIndex in romeArray) {
+      immersionOffers.push(
+        new ImmersionOfferEntity(
+          uuidV4(),
+          romeArray[romeIndex],
+          company.getNaf(),
+          company.getSiret(),
+          company.getName(),
+        ),
+      );
+    }
+    return immersionOffers;
   }
 }

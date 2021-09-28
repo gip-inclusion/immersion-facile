@@ -6,6 +6,8 @@ import querystring from "querystring";
 import { v4 as uuidV4 } from "uuid";
 import { fakeCompanies } from "./fakeCompanies";
 import { createLogger } from "../../../utils/logger";
+import { PoleEmploiAPIGateway } from "./PoleEmploiAPIGateway";
+import { fakeCompaniesLaBonneBoite } from "./fakeCompaniesLaBonneBoite";
 
 const logger = createLogger(__filename);
 
@@ -23,7 +25,7 @@ type CompanyFromLaBonneBoite = {
 
 export class FakeLaBonneBoiteGateway implements CompaniesGateway {
   async getCompanies(searchParams: SearchParams): Promise<CompanyEntity[]> {
-    return fakeCompanies
+    return fakeCompaniesLaBonneBoite
       .filter((company) =>
         this.keepRelevantCompanies(searchParams.ROME, company),
       )
@@ -35,11 +37,12 @@ export class FakeLaBonneBoiteGateway implements CompaniesGateway {
             company.city,
             company.lat,
             company.lon,
-            company.matched_rome_code,
             company.naf,
             company.name,
             company.siret,
             company.stars,
+            [company.matched_rome_code],
+            "LaBonneBoite",
           ),
       );
   }
