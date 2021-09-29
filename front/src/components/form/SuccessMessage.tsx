@@ -1,8 +1,8 @@
 import React from "react";
 
 interface SuccessMessageProps {
-  link: string | undefined;
-  text: string;
+  link?: string;
+  text?: string;
   title: string;
 }
 

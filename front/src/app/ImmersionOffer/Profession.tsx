@@ -4,7 +4,6 @@ import { DropDown } from "src/app/ImmersionOffer/DropDown";
 import { immersionOfferGateway } from "src/app/main";
 import { DeleteButton } from "src/components/DeleteButton";
 import { TextInput } from "src/components/form/TextInput";
-import { ProfessionDto } from "src/shared/rome";
 
 type ProfessionProps = {
   name: string;
@@ -23,7 +22,7 @@ export const Profession = ({ name, onDelete }: ProfessionProps) => {
       }}
     >
       <DropDown
-        title="Rechercher un métier "
+        title="Rechercher un métier *"
         onSelection={setValue}
         onTermChange={async (newTerm) => {
           if (!newTerm) return [];

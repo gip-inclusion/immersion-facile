@@ -1,5 +1,5 @@
 import { Form, Formik } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import { BusinessContactList } from "src/app/ImmersionOffer/BusinessContactList";
 import { BusinessSectorInput } from "src/app/ImmersionOffer/BusinessSectorInput";
 import { ProfessionList } from "src/app/ImmersionOffer/ProfessionList";
@@ -9,6 +9,7 @@ import {
   useSiretRelatedField,
 } from "src/app/Siret/fetchCompanyInfoBySiret";
 import { CheckboxGroup } from "src/components/form/CheckboxGroup";
+import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { ENV } from "src/environmentVariables";
@@ -24,7 +25,7 @@ type ImmersionOfferFormProps = {
   route: Route<typeof routes.immersionOffer>;
 };
 
-const initialValues: ImmersionOfferDto = ENV.dev
+const initialValues: ImmersionOfferDto = !ENV.dev
   ? {
       id: uuidV4(),
       siret: "1234567890123",
@@ -88,7 +89,7 @@ const SiretRelatedInputs = () => {
         placeholder="362 521 879 00034"
       />
       <TextInput
-        label="Vérifiez le nom (raison sociale) de votre établissement"
+        label="Vérifiez le nom (raison sociale) de votre établissement *"
         name="businessName"
       />
       <TextInput
@@ -100,6 +101,8 @@ const SiretRelatedInputs = () => {
 };
 
 export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
+  const [isSuccess, setIsSuccess] = useState(false);
+
   return (
     <>
       <MarianneHeader />
@@ -111,7 +114,10 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
           enableReinitialize={true}
           initialValues={initialValues}
           validationSchema={immersionOfferDtoSchema}
-          onSubmit={(data) => {
+          onSubmit={async (data) => {
+            // TODO: post data: something like :
+            // await immersionOfferGateway.addImmersionOffer(data)
+            setIsSuccess(true);
             console.log("submitted: ", data);
           }}
         >
@@ -123,26 +129,36 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
                 <BusinessSectorInput />
                 <ProfessionList
                   name="professions"
-                  title="Métiers de l'entreprise"
+                  title="Métiers de l'entreprise *"
                 />
                 <BusinessContactList />
                 <CheckboxGroup
                   name="preferredContactMethods"
-                  label="Comment souhaitez-vous que les candidats vous contactent ?"
+                  label="Comment souhaitez-vous que les candidats vous contactent ? *"
                   options={preferredContactMethodOptions}
                 />
                 {submitCount !== 0 && Object.values(errors).length > 0 && (
                   <div style={{ color: "red" }}>
-                    Veuillez corriger les champs erronés
+                    Veuillez corriger les champs erronés :
+                    <ul>
+                      {Object.values(errors).map((err) =>
+                        typeof err === "string" && err !== "Obligatoire" ? (
+                          <li key={err}>{err}</li>
+                        ) : null,
+                      )}
+                    </ul>
                   </div>
                 )}
                 <button
                   className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isSuccess}
                 >
                   Enregistrer mes informations
                 </button>
+                <br />
+                <br />
+                {isSuccess && <SuccessMessage title="Succès de l'envoi" />}
               </Form>
             </div>
           )}

@@ -48,14 +48,14 @@ const BusinessContact = ({ index }: BusinessContactProps) => {
   return (
     <div>
       <h4>Détails du référent :</h4>
-      <TextInput label="Nom du référent" name={makeName("lastName")} />
-      <TextInput label="Prénom du référent" name={makeName("firstName")} />
-      <TextInput label="Fonction du référent" name={makeName("job")} />
+      <TextInput label="Nom du référent *" name={makeName("lastName")} />
+      <TextInput label="Prénom du référent *" name={makeName("firstName")} />
+      <TextInput label="Fonction du référent *" name={makeName("job")} />
       <TextInput
-        label="Son numéro de téléphone (ne sera pas communiqué directement)"
+        label="Son numéro de téléphone (ne sera pas communiqué directement) *"
         name={makeName("phone")}
       />
-      <TextInput label="Son email" name={makeName("email")} />
+      <TextInput label="Son email *" name={makeName("email")} />
       <label>Responsable des métiers suivants :</label>
       <ProfessionList name={makeName("professions")} />
     </div>
