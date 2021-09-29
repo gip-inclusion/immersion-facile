@@ -33,6 +33,7 @@ import {
   ApplicationRepositoryMap,
   ApplicationRepositorySwitcher,
 } from "../secondary/ApplicationRepositorySwitcher";
+import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
   BasicEventCrawler,
@@ -47,6 +48,8 @@ import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { PoleEmploiAccessTokenGateway } from "./../secondary/PoleEmploiAccessTokenGateway";
+import { PoleEmploiRomeGateway } from "./../secondary/PoleEmploiRomeGateway";
 
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
@@ -108,6 +111,7 @@ const createRepositories = (featureFlags: FeatureFlags) => {
     "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY",
   );
   logger.info("EMAIL_GATEWAY: " + process.env.EMAIL_GATEWAY ?? "IN_MEMORY");
+  logger.info("ROME_GATEWAY: " + process.env.ROME_GATEWAY ?? "IN_MEMORY");
 
   return {
     demandeImmersion: getApplicationRepository(featureFlags),
@@ -124,7 +128,18 @@ const createRepositories = (featureFlags: FeatureFlags) => {
         ? SendinblueEmailGateway.create(getEnvVarOrDie("SENDINBLUE_API_KEY"))
         : new InMemoryEmailGateway(),
 
-    rome: new InMemoryRomeGateway(),
+    rome:
+      process.env.ROME_GATEWAY === "POLE_EMPLOI"
+        ? new PoleEmploiRomeGateway(
+            new CachingAccessTokenGateway(
+              new PoleEmploiAccessTokenGateway(
+                getEnvVarOrDie("POLE_EMPLOI_CLIENT_ID"),
+                getEnvVarOrDie("POLE_EMPLOI_CLIENT_SECRET"),
+              ),
+            ),
+            getEnvVarOrDie("POLE_EMPLOI_CLIENT_ID"),
+          )
+        : new InMemoryRomeGateway(),
 
     outbox: new InMemoryOutboxRepository(),
   };

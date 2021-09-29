@@ -22,7 +22,11 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
       return request;
     });
     this.axiosInstance.interceptors.response.use((response) => {
-      this.logger.debug(response);
+      this.logger.debug({
+        status: response.status,
+        headers: response.headers,
+        data: response.data,
+      });
       return response;
     });
   }
