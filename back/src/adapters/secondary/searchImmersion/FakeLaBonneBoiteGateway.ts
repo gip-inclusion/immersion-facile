@@ -34,6 +34,7 @@ export class FakeLaBonneBoiteGateway implements CompaniesGateway {
           new CompanyEntity(
             uuidV4(),
             company.address,
+            -1,
             company.city,
             company.lat,
             company.lon,

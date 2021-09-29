@@ -9,6 +9,8 @@ export class ImmersionOfferEntity {
     private naf: string,
     private siret: string,
     private name: string,
+    private dataSource: string,
+    private score: number,
   ) {}
 
   public getName() {
@@ -16,6 +18,14 @@ export class ImmersionOfferEntity {
   }
 
   public toArrayOfProps() {
-    return [this.id, this.rome, this.naf, this.siret, this.name];
+    return [
+      this.id,
+      this.rome,
+      this.naf,
+      this.siret,
+      this.name,
+      this.dataSource,
+      this.score,
+    ];
   }
 }

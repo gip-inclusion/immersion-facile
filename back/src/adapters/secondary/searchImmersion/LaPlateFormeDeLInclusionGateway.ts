@@ -162,6 +162,7 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
         company.code_postal +
         " " +
         company.ville,
+      -1,
       company.ville,
       -1,
       -1,
@@ -172,7 +173,7 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
       company.postes.map((poste) =>
         poste.rome.substring(poste.rome.length - 6, poste.rome.length - 1),
       ),
-      "LaPlateFormeDeLInclusion",
+      "api_laplateformedelinclusion",
     );
   }
 

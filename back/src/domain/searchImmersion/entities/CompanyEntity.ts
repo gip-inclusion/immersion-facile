@@ -6,15 +6,16 @@ export class CompanyEntity {
   constructor(
     private id: CompanyId,
     private address: string,
+    private number_employees: number,
     private city: string,
     private lat: number,
     private lon: number,
     private naf: string,
     private name: string,
     private siret: string,
-    private stars: number, //The ratin of the company. Set to -1 if unknown
+    private score: number,
     private romes: string[],
-    private source: string,
+    private dataSource: string,
   ) {}
 
   public getRomeCodesArray() {
@@ -23,6 +24,14 @@ export class CompanyEntity {
 
   public getName() {
     return this.name;
+  }
+
+  public getScore() {
+    return this.score;
+  }
+
+  public getDataSource() {
+    return this.dataSource;
   }
 
   public getAddress(): string {

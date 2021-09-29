@@ -44,6 +44,8 @@ export class SearchImmersionByCandidate {
           company.getNaf(),
           company.getSiret(),
           company.getName(),
+          company.getDataSource(),
+          company.getScore(),
         ),
       );
     }

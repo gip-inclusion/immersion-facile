@@ -35,7 +35,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     return this.client
       .query(
         format(
-          "INSERT INTO immersion_proposals (uuid, rome, naf,siret, name) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_proposals DO UPDATE SET name=EXCLUDED.name",
+          "INSERT INTO immersion_proposals (uuid, rome, naf,siret, name, data_source, score) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_proposals DO UPDATE SET name=EXCLUDED.name",
           arrayOfImmersionsOffers,
         ),
       )

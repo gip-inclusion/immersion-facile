@@ -59,6 +59,7 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
               new CompanyEntity(
                 uuidV4(),
                 company.address,
+                -1,
                 company.city,
                 company.lat,
                 company.lon,
@@ -67,7 +68,7 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
                 company.siret,
                 company.stars,
                 [company.matched_rome_code],
-                "LaBonneBoite",
+                "api_labonneboite",
               ),
           );
       })

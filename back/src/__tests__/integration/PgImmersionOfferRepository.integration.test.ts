@@ -5,6 +5,7 @@ import { ImmersionOfferEntity } from "../../domain/searchImmersion/entities/Imme
 import { FakeLaBonneBoiteGateway } from "../../adapters/secondary/searchImmersion/FakeLaBonneBoiteGateway";
 import { LaPlateFormeDeLInclusionGateway } from "../../adapters/secondary/searchImmersion/LaPlateFormeDeLInclusionGateway";
 import { CompanyEntity } from "../../domain/searchImmersion/entities/CompanyEntity";
+import { FakeLaPlateFormeDeLInclusionGateway } from "../../adapters/secondary/searchImmersion/FakeLaPlateFormeDeLInclusionGateway";
 
 describe("Postgres implementation of immersion proposal repository", () => {
   test("Search immersion works", async () => {
@@ -20,19 +21,18 @@ describe("Postgres implementation of immersion proposal repository", () => {
     expect(immersions[0]).toBeInstanceOf(ImmersionOfferEntity);
   });
 
-  test.skip("Search La Plateforme de l'inclusion works", async () => {
+  test("Search La Plateforme de l'inclusion works", async () => {
     jest.setTimeout(30000);
-    const laPlateFormeDeLInclusionGateway =
-      new LaPlateFormeDeLInclusionGateway();
-    const companies = await laPlateFormeDeLInclusionGateway.getCompanies({
+    const fakeLaPlateFormeDeLInclusionGateway =
+      new FakeLaPlateFormeDeLInclusionGateway();
+    const companies = await fakeLaPlateFormeDeLInclusionGateway.getCompanies({
       ROME: "M1607",
       distance: 30,
       lat: 49.119146,
       long: 6.17602,
     });
-    console.log(companies.length);
     const cleanedCompanies =
-      await laPlateFormeDeLInclusionGateway.cleanCompanyData(companies);
+      await fakeLaPlateFormeDeLInclusionGateway.cleanCompanyData(companies);
     expect(cleanedCompanies[0]).toBeInstanceOf(CompanyEntity);
   }, 30000);
 
