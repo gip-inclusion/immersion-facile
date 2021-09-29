@@ -5,11 +5,9 @@ import axios from "axios";
 import querystring from "querystring";
 import { v4 as uuidV4 } from "uuid";
 import { fakeCompanies } from "./fakeCompanies";
-import { createLogger } from "../../../utils/logger";
 import { PoleEmploiAPIGateway } from "./PoleEmploiAPIGateway";
 import { fakeCompaniesLaBonneBoite } from "./fakeCompaniesLaBonneBoite";
-
-const logger = createLogger(__filename);
+import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
 
 type CompanyFromLaBonneBoite = {
   address: string;
@@ -24,27 +22,27 @@ type CompanyFromLaBonneBoite = {
 };
 
 export class FakeLaBonneBoiteGateway implements CompaniesGateway {
-  async getCompanies(searchParams: SearchParams): Promise<CompanyEntity[]> {
+  async getCompanies(
+    searchParams: SearchParams,
+  ): Promise<UncompleteCompanyEntity[]> {
     return fakeCompaniesLaBonneBoite
       .filter((company) =>
         this.keepRelevantCompanies(searchParams.ROME, company),
       )
       .map(
         (company) =>
-          new CompanyEntity(
-            uuidV4(),
-            company.address,
-            -1,
-            company.city,
-            company.lat,
-            company.lon,
-            company.naf,
-            company.name,
-            company.siret,
-            company.stars,
-            [company.matched_rome_code],
-            "LaBonneBoite",
-          ),
+          new UncompleteCompanyEntity({
+            id: uuidV4(),
+            address: company.address,
+            city: company.city,
+            position: { lat: company.lat, lon: company.lon },
+            naf: company.naf,
+            name: company.name,
+            siret: company.siret,
+            score: company.stars,
+            romes: [company.matched_rome_code],
+            dataSource: "api_labonneboite",
+          }),
       );
   }
 

@@ -2,59 +2,66 @@ import { Flavor } from "../../../shared/typeFlavors";
 
 export type CompanyId = Flavor<string, "CompanyId">;
 
+export type Position = {
+  lat: number;
+  lon: number;
+};
+
+export type MandatoryCompanyFields = {
+  id: CompanyId;
+  address: string;
+  city: string;
+  score: number;
+  romes: string[];
+  siret: string;
+  dataSource:
+    | "api_labonneboite"
+    | "api_laplateformedelinclusion"
+    | "form"
+    | "api_sirene";
+  name: string;
+};
+
+export type CompanyFieldsToRetrieve = {
+  number_employees: number;
+  position: Position;
+  naf: string;
+};
+
+type CompanyProps = MandatoryCompanyFields & CompanyFieldsToRetrieve;
+
 export class CompanyEntity {
-  constructor(
-    private id: CompanyId,
-    private address: string,
-    private number_employees: number,
-    private city: string,
-    private lat: number,
-    private lon: number,
-    private naf: string,
-    private name: string,
-    private siret: string,
-    private score: number,
-    private romes: string[],
-    private dataSource: string,
-  ) {}
+  constructor(private props: CompanyProps) {}
 
   public getRomeCodesArray() {
-    return this.romes;
+    return this.props.romes;
   }
 
   public getName() {
-    return this.name;
+    return this.props.name;
   }
 
   public getScore() {
-    return this.score;
+    return this.props.score;
   }
 
   public getDataSource() {
-    return this.dataSource;
+    return this.props.dataSource;
   }
 
   public getAddress(): string {
-    return this.address;
+    return this.props.address;
   }
 
-  public getLongitude() {
-    return this.lon;
-  }
-
-  public setLatitude(lat: number) {
-    this.lat = lat;
-  }
-
-  public setLongitude(lon: number) {
-    this.lon = lon;
+  public getPosition() {
+    return this.props.position;
   }
 
   public getSiret() {
-    return this.siret;
+    return this.props.siret;
   }
 
   public getNaf() {
-    return this.naf;
+    return this.props.naf;
   }
 }

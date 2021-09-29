@@ -5,6 +5,8 @@ import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyE
 import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
 import type { SearchParams } from "../../../domain/searchImmersion/ports/SearchParams";
 import { createLogger } from "../../../utils/logger";
+import { PoleEmploiAPIGateway } from "./PoleEmploiAPIGateway";
+import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
 
 const logger = createLogger(__filename);
 
@@ -56,20 +58,18 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
           )
           .map(
             (company) =>
-              new CompanyEntity(
-                uuidV4(),
-                company.address,
-                -1,
-                company.city,
-                company.lat,
-                company.lon,
-                company.naf,
-                company.name,
-                company.siret,
-                company.stars,
-                [company.matched_rome_code],
-                "api_labonneboite",
-              ),
+              new UncompleteCompanyEntity({
+                id: uuidV4(),
+                address: company.address,
+                city: company.city,
+                position: { lat: company.lat, lon: company.lon },
+                naf: company.naf,
+                name: company.name,
+                siret: company.siret,
+                score: company.stars,
+                romes: [company.matched_rome_code],
+                dataSource: "api_labonneboite",
+              }),
           );
       })
       .catch(function (error: any) {

@@ -6,6 +6,7 @@ import { logger } from "../../../utils/logger";
 import { v4 as uuidV4 } from "uuid";
 import { string } from "yup/lib/locale";
 import { fakeCompaniesLaPlateFormeDeLInclusion } from "./fakeCompaniesLaPlateFormeDeLInclusion";
+import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
 
 export type CompanyFromLaPlateFormeDeLInclusion = {
   cree_le: string;
@@ -40,7 +41,9 @@ export class FakeLaPlateFormeDeLInclusionGateway implements CompaniesGateway {
     logsource: "LaPlateFormeDeLInclusionGateway",
   });
 
-  async getCompanies(searchParams: SearchParams): Promise<CompanyEntity[]> {
+  async getCompanies(
+    searchParams: SearchParams,
+  ): Promise<UncompleteCompanyEntity[]> {
     var companies: CompanyFromLaPlateFormeDeLInclusion[] =
       fakeCompaniesLaPlateFormeDeLInclusion;
     return fakeCompaniesLaPlateFormeDeLInclusion.map((company) =>
@@ -51,35 +54,34 @@ export class FakeLaPlateFormeDeLInclusionGateway implements CompaniesGateway {
   /*
   Clean company data before insertion into the database with external APIs
   */
-  async cleanCompanyData(companies: CompanyEntity[]): Promise<CompanyEntity[]> {
+  async enrichCompanyData(
+    companies: CompanyEntity[],
+  ): Promise<CompanyEntity[]> {
     return companies;
   }
 
   mapCompanyFromLaPlateFormeDeLInclusionToCompanyEntity(
     company: CompanyFromLaPlateFormeDeLInclusion,
-  ): CompanyEntity {
-    return new CompanyEntity(
-      uuidV4(),
-      company.addresse_ligne_1 +
+  ): UncompleteCompanyEntity {
+    return new UncompleteCompanyEntity({
+      id: uuidV4(),
+      address:
+        company.addresse_ligne_1 +
         " " +
         company.addresse_ligne_2 +
         " " +
         company.code_postal +
         " " +
         company.ville,
-      -1,
-      company.ville,
-      -1,
-      -1,
-      "",
-      company.enseigne,
-      company.siret,
-      5,
-      company.postes.map((poste) =>
+      city: company.ville,
+      score: 6,
+      romes: company.postes.map((poste) =>
         poste.rome.substring(poste.rome.length - 6, poste.rome.length - 1),
       ),
-      "api_laplateformedelinclusion",
-    );
+      siret: company.siret,
+      dataSource: "api_laplateformedelinclusion",
+      name: company.enseigne,
+    });
   }
 
   async getGPSFromAddressAPIAdresse(address: string) {

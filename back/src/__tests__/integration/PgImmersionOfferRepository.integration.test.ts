@@ -1,17 +1,18 @@
 import { PgImmersionOfferRepository } from "../../adapters/secondary/searchImmersion/PgImmersionOfferRepository";
-import { SearchImmersionByCandidate } from "../../domain/searchImmersion/useCases/SearchImmersionByCandidate";
+import { SearchImmersion } from "../../domain/searchImmersion/useCases/SearchImmersion";
 import { LaBonneBoiteGateway } from "../../adapters/secondary/searchImmersion/LaBonneBoiteGateway";
 import { ImmersionOfferEntity } from "../../domain/searchImmersion/entities/ImmersionOfferEntity";
 import { FakeLaBonneBoiteGateway } from "../../adapters/secondary/searchImmersion/FakeLaBonneBoiteGateway";
 import { LaPlateFormeDeLInclusionGateway } from "../../adapters/secondary/searchImmersion/LaPlateFormeDeLInclusionGateway";
 import { CompanyEntity } from "../../domain/searchImmersion/entities/CompanyEntity";
 import { FakeLaPlateFormeDeLInclusionGateway } from "../../adapters/secondary/searchImmersion/FakeLaPlateFormeDeLInclusionGateway";
+import { UncompleteCompanyEntity } from "../../domain/searchImmersion/entities/UncompleteCompanyEntity";
 
 describe("Postgres implementation of immersion proposal repository", () => {
   test("Search immersion works", async () => {
     const laBonneBoiteGateway = new FakeLaBonneBoiteGateway();
 
-    const searchImmersion = new SearchImmersionByCandidate(laBonneBoiteGateway);
+    const searchImmersion = new SearchImmersion(laBonneBoiteGateway);
     const immersions = await searchImmersion.execute({
       ROME: "M1607",
       distance: 30,
@@ -22,19 +23,18 @@ describe("Postgres implementation of immersion proposal repository", () => {
   });
 
   test("Search La Plateforme de l'inclusion works", async () => {
-    jest.setTimeout(30000);
     const fakeLaPlateFormeDeLInclusionGateway =
       new FakeLaPlateFormeDeLInclusionGateway();
-    const companies = await fakeLaPlateFormeDeLInclusionGateway.getCompanies({
-      ROME: "M1607",
-      distance: 30,
-      lat: 49.119146,
-      long: 6.17602,
-    });
-    const cleanedCompanies =
-      await fakeLaPlateFormeDeLInclusionGateway.cleanCompanyData(companies);
-    expect(cleanedCompanies[0]).toBeInstanceOf(CompanyEntity);
-  }, 30000);
+    const uncompleteCompanies =
+      await fakeLaPlateFormeDeLInclusionGateway.getCompanies({
+        ROME: "M1607",
+        distance: 30,
+        lat: 49.119146,
+        long: 6.17602,
+      });
+
+    expect(uncompleteCompanies[0]).toBeInstanceOf(UncompleteCompanyEntity);
+  });
 
   test.skip("GetAll immersion works", async () => {
     const pgImmersionOfferRepository = new PgImmersionOfferRepository();
@@ -51,7 +51,7 @@ describe("Postgres implementation of immersion proposal repository", () => {
       new PoleEmploiAPIGateway(),
     );
 
-    const searchImmersion = new SearchImmersionByCandidate(laBonneBoiteGateway);
+    const searchImmersion = new SearchImmersion(laBonneBoiteGateway);
     const immersions = await searchImmersion.execute({
       ROME: "M1607",
       distance: 30,
@@ -60,7 +60,9 @@ describe("Postgres implementation of immersion proposal repository", () => {
     });
     pgImmersionOfferRepository.connect();
 
-    var result = await pgImmersionOfferRepository.insertImmersions(immersions);
+    const result = await pgImmersionOfferRepository.insertImmersions(
+      immersions,
+    );
     console.log(result);
     //We inserted all the immersions
     expect(result.command).toEqual("INSERT");
