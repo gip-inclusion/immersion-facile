@@ -2,25 +2,24 @@ import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
 import { eventsToDebugInfo } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
-import { logger } from "../../../utils/logger";
+import { createLogger } from "../../../utils/logger";
 
+const logger = createLogger(__filename);
 export class BasicEventCrawler {
-  protected readonly logger = logger.child({ logsource: "BasicEventCrawler" });
-
   constructor(
     private readonly eventBus: EventBus,
     private readonly outboxRepository: OutboxRepository,
   ) {}
 
   startCrawler() {
-    this.logger.warn(
+    logger.warn(
       "BasicEventCrawler.startCrawler: NO AUTOMATIC EVENT PROCESSING!",
     );
   }
 
   public async processEvents() {
     const events = await this.outboxRepository.getAllUnpublishedEvents();
-    this.logger.debug({ events: eventsToDebugInfo(events) }, "processEvents");
+    logger.debug({ events: eventsToDebugInfo(events) }, "processEvents");
     events.forEach((event) => {
       this.eventBus.publish(event);
     });
@@ -41,7 +40,7 @@ export class RealEventCrawler
   }
 
   public override startCrawler() {
-    this.logger.info(
+    logger.info(
       { crawlingPeriodMs: this.crawlingPeriodMs },
       "RealEventCrawler.startCrawler: processing events at regular intervals",
     );

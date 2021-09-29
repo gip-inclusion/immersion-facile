@@ -23,7 +23,6 @@ import {
   applicationSourceFromString,
 } from "../../shared/DemandeImmersionDto";
 import { FeatureFlags } from "../../shared/featureFlags";
-import { logger } from "../../utils/logger";
 import {
   genericApplicationDataConverter,
   legacyApplicationDataConverter,
@@ -48,8 +47,11 @@ import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { createLogger } from "./../../utils/logger";
 import { PoleEmploiAccessTokenGateway } from "./../secondary/PoleEmploiAccessTokenGateway";
 import { PoleEmploiRomeGateway } from "./../secondary/PoleEmploiRomeGateway";
+
+const logger = createLogger(__filename);
 
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();

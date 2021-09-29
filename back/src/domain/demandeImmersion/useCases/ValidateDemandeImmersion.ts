@@ -7,12 +7,14 @@ import {
   ValidateDemandeImmersionRequestDto,
   ValidateDemandeImmersionResponseDto,
 } from "../../../shared/DemandeImmersionDto";
+import { createLogger } from "../../../utils/logger";
+import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { logger } from "../../../utils/logger";
+
+const logger = createLogger(__filename);
 
 export class ValidateDemandeImmersion
   implements
@@ -21,10 +23,6 @@ export class ValidateDemandeImmersion
       ValidateDemandeImmersionResponseDto
     >
 {
-  private readonly logger = logger.child({
-    logsource: "ValidateDemandeImmersion",
-  });
-
   constructor(
     private readonly demandeImmersionRepository: DemandeImmersionRepository,
     private readonly createNewEvent: CreateNewEvent,

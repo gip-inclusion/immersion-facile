@@ -6,8 +6,9 @@ import type {
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
-import { DemandeImmersionDto } from "../../shared/DemandeImmersionDto";
-import { logger } from "../../utils/logger";
+import { createLogger } from "../../utils/logger";
+
+const logger = createLogger(__filename);
 
 export type TemplatedEmail = {
   type: EmailType;
@@ -16,14 +17,13 @@ export type TemplatedEmail = {
 };
 
 export class InMemoryEmailGateway implements EmailGateway {
-  private readonly logger = logger.child({ logsource: "InMemoryEmailGateway" });
   private readonly sentEmails: TemplatedEmail[] = [];
 
   public async sendNewApplicationBeneficiaryConfirmation(
     recipient: string,
     params: NewApplicationBeneficiaryConfirmationParams,
   ): Promise<void> {
-    this.logger.info(
+    logger.info(
       { recipient, params },
       "sendNewApplicationBeneficiaryConfirmation",
     );
@@ -38,10 +38,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     recipient: string,
     params: NewApplicationMentorConfirmationParams,
   ): Promise<void> {
-    this.logger.info(
-      { recipient, params },
-      "sendNewApplicationMentorConfirmation",
-    );
+    logger.info({ recipient, params }, "sendNewApplicationMentorConfirmation");
     this.sentEmails.push({
       type: "NEW_APPLICATION_MENTOR_CONFIRMATION",
       recipients: [recipient],
@@ -53,10 +50,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     recipients: string[],
     params: NewApplicationAdminNotificationParams,
   ): Promise<void> {
-    this.logger.info(
-      { recipients, params },
-      "sendNewApplicationAdminNotification",
-    );
+    logger.info({ recipients, params }, "sendNewApplicationAdminNotification");
     this.sentEmails.push({
       type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
       recipients: recipients,
@@ -68,7 +62,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     recipients: string[],
     params: ValidatedApplicationFinalConfirmationParams,
   ): Promise<void> {
-    this.logger.info(
+    logger.info(
       { recipients, params },
       "sendValidatedApplicationFinalConfirmation",
     );

@@ -4,12 +4,10 @@ import {
   AccessTokenGateway,
   GetAccessTokenResponse,
 } from "../../domain/core/ports/AccessTokenGateway";
-import { logger as rootLogger } from "../../utils/logger";
+import { createLogger } from "../../utils/logger";
 
+const logger = createLogger(__filename);
 export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
-  private readonly logger = rootLogger.child({
-    logsource: "PoleEmploiAccessTokenGateway",
-  });
   private readonly axiosInstance: AxiosInstance;
 
   public constructor(
@@ -18,11 +16,11 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
   ) {
     this.axiosInstance = axios.create();
     this.axiosInstance.interceptors.request.use((request) => {
-      this.logger.info(request);
+      logger.info(request);
       return request;
     });
     this.axiosInstance.interceptors.response.use((response) => {
-      this.logger.debug({
+      logger.debug({
         status: response.status,
         headers: response.headers,
         data: response.data,
@@ -50,7 +48,7 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
       );
       return response.data;
     } catch (error: any) {
-      this.logger.error(error);
+      logger.error(error);
       throw error;
     }
   }

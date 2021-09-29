@@ -3,18 +3,18 @@ import {
   AddDemandeImmersionResponseDto,
   DemandeImmersionDto,
 } from "../../../shared/DemandeImmersionDto";
-import { logger } from "../../../utils/logger";
+import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
 import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
 
+const logger = createLogger(__filename);
+
 export class AddDemandeImmersion
   implements UseCase<DemandeImmersionDto, AddDemandeImmersionResponseDto>
 {
-  private readonly logger = logger.child({ logsource: "AddDemandeImmersion" });
-
   constructor(
     private readonly applicationRepository: DemandeImmersionRepository,
     private readonly createNewEvent: CreateNewEvent,

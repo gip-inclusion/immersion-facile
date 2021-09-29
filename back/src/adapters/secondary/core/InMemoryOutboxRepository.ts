@@ -1,28 +1,26 @@
-import { eventToDebugInfo } from "./../../../domain/core/eventBus/events";
 import {
   DomainEvent,
   eventsToDebugInfo,
 } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
-import { logger } from "../../../utils/logger";
+import { createLogger } from "../../../utils/logger";
+import { eventToDebugInfo } from "./../../../domain/core/eventBus/events";
+
+const logger = createLogger(__filename);
 
 export class InMemoryOutboxRepository implements OutboxRepository {
-  private readonly logger = logger.child({
-    logsource: "InMemoryOutboxRepository",
-  });
-
   constructor(private readonly _events: DomainEvent[] = []) {}
 
   public async save(event: DomainEvent): Promise<void> {
     this._events.push(event);
-    this.logger.info(
+    logger.info(
       { newEvent: event, newOutboxSize: this._events.length },
       "save",
     );
   }
 
   public async getAllUnpublishedEvents() {
-    this.logger.debug(
+    logger.debug(
       { allEvents: eventsToDebugInfo(this._events) },
       "getAllUnpublishedEvents",
     );
@@ -31,7 +29,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     );
 
     if (unpublishedEvents.length > 0) {
-      this.logger.info(
+      logger.info(
         { events: eventsToDebugInfo(unpublishedEvents) },
         "getAllUnpublishedEvents: found unpublished events",
       );
@@ -40,7 +38,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
   }
 
   public async markEventsAsPublished(events: DomainEvent[]) {
-    this.logger.debug(
+    logger.debug(
       { events: eventsToDebugInfo(events) },
       "markEventsAsPublished",
     );
@@ -50,7 +48,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
       );
       if (eventToUpdate) {
         eventToUpdate.wasPublished = true;
-        this.logger.info(
+        logger.info(
           { event: eventToDebugInfo(eventToUpdate) },
           "event marked as published",
         );

@@ -4,8 +4,10 @@ import type { SearchParams } from "../../../domain/searchImmersion/ports/SearchP
 import axios from "axios";
 import querystring from "querystring";
 import { v4 as uuidV4 } from "uuid";
-import { logger } from "../../../utils/logger";
 import { fakeCompanies } from "./fakeCompanies";
+import { createLogger } from "../../../utils/logger";
+
+const logger = createLogger(__filename);
 
 type CompanyFromLaBonneBoite = {
   address: string;
@@ -20,10 +22,6 @@ type CompanyFromLaBonneBoite = {
 };
 
 export class FakeLaBonneBoiteGateway implements CompaniesGateway {
-  private readonly logger = logger.child({
-    logsource: "FakeLaBonneBoiteGateway",
-  });
-
   async getCompanies(searchParams: SearchParams): Promise<CompanyEntity[]> {
     return fakeCompanies
       .filter((company) =>

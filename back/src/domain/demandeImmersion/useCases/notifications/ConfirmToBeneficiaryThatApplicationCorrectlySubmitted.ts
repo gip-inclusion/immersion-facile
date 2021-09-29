@@ -2,17 +2,15 @@ import {
   ApplicationSource,
   DemandeImmersionDto,
 } from "../../../../shared/DemandeImmersionDto";
-import { logger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
+import { createLogger } from "./../../../../utils/logger";
+
+const logger = createLogger(__filename);
 
 export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
   implements UseCase<DemandeImmersionDto>
 {
-  private readonly logger = logger.child({
-    logsource: "ConfirmToBeneficiaryThatApplicationCorrectlySubmitted",
-  });
-
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
@@ -28,10 +26,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
     firstName,
     lastName,
   }: DemandeImmersionDto): Promise<void> {
-    this.logger.info(
-      { demandeImmersionid: id },
-      `------------- Entering execute`,
-    );
+    logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
 
     if (
       this.unrestrictedEmailSendingSources.has(source) ||
@@ -43,7 +38,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
         lastName,
       });
     } else {
-      this.logger.info(
+      logger.info(
         { id, email, source },
         "Sending beneficiary confirmation email skipped.",
       );

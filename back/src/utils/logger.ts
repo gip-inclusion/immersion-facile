@@ -1,4 +1,6 @@
-import pino from "pino";
+import path = require("path");
+import pino, { Logger } from "pino";
+import { PrettyOptions } from "pino-pretty";
 
 const getLogLevel = () => {
   // Allow command-line overrides of the log level.
@@ -9,19 +11,28 @@ const getLogLevel = () => {
   return "info";
 };
 
-const getPrettyPrintOptions = () => {
-  // Don't pretty-print in prod.
-  if (process.env.NODE_ENV === "production") {
-    return undefined;
-  }
-  return {
-    colorize: true,
+const getPrettyPrintOptions = (): PrettyOptions => {
+  const defaultOptions: PrettyOptions = {
     translateTime: "yyyy-mm-dd HH:MM:ss.l",
+  };
+
+  if (process.env.NODE_ENV === "production") {
+    return defaultOptions;
+  }
+
+  return {
+    ...defaultOptions,
+    colorize: true,
     ignore: "pid,hostname",
   };
 };
 
-export const logger = pino({
+const rootLogger = pino({
   level: getLogLevel(),
   prettyPrint: getPrettyPrintOptions(),
 });
+
+// Example use: const logger = createLogger(__filename);
+export const createLogger = (filename: string): Logger => {
+  return rootLogger.child({ name: path.basename(filename) });
+};

@@ -17,10 +17,12 @@ import {
   siretRoute,
   validateDemandeRoute,
 } from "../../shared/routes";
-import { logger } from "../../utils/logger";
+import { createLogger } from "../../utils/logger";
 import { createConfig } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
+
+const logger = createLogger(__filename);
 
 export type AppConfig = {
   featureFlags: FeatureFlags;

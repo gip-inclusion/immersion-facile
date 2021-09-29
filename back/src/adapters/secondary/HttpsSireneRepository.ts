@@ -1,6 +1,8 @@
-import { SireneRepository } from "../../domain/sirene/ports/SireneRepository";
 import axios, { AxiosInstance } from "axios";
-import { logger } from "../../utils/logger";
+import { SireneRepository } from "../../domain/sirene/ports/SireneRepository";
+import { createLogger } from "../../utils/logger";
+
+const logger = createLogger(__filename);
 
 export class HttpsSireneRepository implements SireneRepository {
   private readonly axiosInstance: AxiosInstance;
@@ -42,7 +44,7 @@ export class HttpsSireneRepository implements SireneRepository {
         params: { q: `siret:${siret}` },
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       logger.error(error);
       if (error.response.status == 404) {
         return undefined;

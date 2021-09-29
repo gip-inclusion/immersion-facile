@@ -1,5 +1,7 @@
 import { RomeGateway, RomeMetier } from "../../domain/rome/ports/RomeGateway";
-import { logger } from "../../utils/logger";
+import { createLogger } from "../../utils/logger";
+
+const logger = createLogger(__filename);
 
 const metiers: RomeMetier[] = [
   { code: "A1203", libelle: "Aménagement et entretien des espaces verts" },
@@ -17,8 +19,6 @@ const metiers: RomeMetier[] = [
 const normalize = (s: string) => s.toLowerCase();
 
 export class InMemoryRomeGateway implements RomeGateway {
-  private readonly logger = logger.child({ logsource: "InMemoryRomeGateway" });
-
   public async searchMetier(query: string): Promise<RomeMetier[]> {
     logger.info({ query }, "searchMetier");
     const normalizedQuery = normalize(query);

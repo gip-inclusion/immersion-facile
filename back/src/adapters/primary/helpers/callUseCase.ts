@@ -1,8 +1,8 @@
-import type { UseCase } from "../../../domain/core/UseCase";
 import * as yup from "yup";
-import { logger as rootLogger } from "../../../utils/logger";
+import type { UseCase } from "../../../domain/core/UseCase";
+import { createLogger } from "../../../utils/logger";
 
-const logger = rootLogger.child({ logsource: "callUseCase" });
+const logger = createLogger(__filename);
 
 export const callUseCase = async <Input, Output = void>({
   useCase,

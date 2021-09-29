@@ -2,14 +2,14 @@ import {
   RomeSearchRequestDto,
   RomeSearchResponseDto,
 } from "../../../shared/rome";
-import { logger } from "../../../utils/logger";
+import { createLogger } from "../../../utils/logger";
 import { UseCase } from "../../core/UseCase";
 import { RomeGateway } from "../ports/RomeGateway";
 
+const logger = createLogger(__filename);
 export class RomeSearch
   implements UseCase<RomeSearchRequestDto, RomeSearchResponseDto>
 {
-  private readonly logger = logger.child({ logsource: "RomeSearch" });
   public constructor(readonly romeGateway: RomeGateway) {}
 
   public async execute(

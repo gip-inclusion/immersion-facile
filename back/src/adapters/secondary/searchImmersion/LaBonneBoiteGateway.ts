@@ -4,7 +4,9 @@ import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGatewa
 import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyEntity";
 import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
 import type { SearchParams } from "../../../domain/searchImmersion/ports/SearchParams";
-import { logger } from "../../../utils/logger";
+import { createLogger } from "../../../utils/logger";
+
+const logger = createLogger(__filename);
 
 type CompanyFromLaBonneBoite = {
   address: string;
@@ -19,8 +21,6 @@ type CompanyFromLaBonneBoite = {
 };
 
 export class LaBonneBoiteGateway implements CompaniesGateway {
-  private readonly logger = logger.child({ logsource: "LaBonneBoiteGateway" });
-
   constructor(
     private readonly accessTokenGateway: AccessTokenGateway,
     private readonly poleEmploiClientId: string,

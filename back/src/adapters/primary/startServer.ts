@@ -1,7 +1,9 @@
-import { getFeatureFlags } from "../../shared/featureFlags";
-import { logger } from "../../utils/logger";
-import { AppConfig, createApp } from "./server";
 import * as dotenv from "dotenv";
+import { getFeatureFlags } from "../../shared/featureFlags";
+import { createLogger } from "../../utils/logger";
+import { AppConfig, createApp } from "./server";
+
+const logger = createLogger(__filename);
 
 const port = 1234;
 

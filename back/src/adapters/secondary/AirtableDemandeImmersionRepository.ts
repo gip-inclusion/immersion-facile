@@ -3,7 +3,9 @@ import { QueryParams } from "airtable/lib/query_params";
 import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
 import { DemandeImmersionId } from "../../shared/DemandeImmersionDto";
-import { logger } from "../../utils/logger";
+import { createLogger } from "../../utils/logger";
+
+const logger = createLogger(__filename);
 
 export type AirtableApplicationDataConverter = {
   entityToFieldSet: (entity: DemandeImmersionEntity) => FieldSet;
@@ -13,10 +15,6 @@ export type AirtableApplicationDataConverter = {
 export class AirtableDemandeImmersionRepository
   implements DemandeImmersionRepository
 {
-  private readonly logger = logger.child({
-    logsource: "AirtableApplicationRepository",
-  });
-
   constructor(
     readonly table: Table<FieldSet>,
     readonly converter: AirtableApplicationDataConverter,
@@ -52,7 +50,7 @@ export class AirtableDemandeImmersionRepository
       }
       return entity.id;
     } catch (e: any) {
-      this.logger.error(e, `Error creating Airtable record: ${entity.id}`);
+      logger.error(e, `Error creating Airtable record: ${entity.id}`);
       throw e;
     }
   }
@@ -74,7 +72,7 @@ export class AirtableDemandeImmersionRepository
         this.converter.fieldSetToEntity(record.fields),
       );
     } catch (e: any) {
-      this.logger.error(e, "Error fetching all airtable records.");
+      logger.error(e, "Error fetching all airtable records.");
       throw e;
     }
   }
@@ -92,7 +90,7 @@ export class AirtableDemandeImmersionRepository
       }
       return demandesImmersion[0];
     } catch (e: any) {
-      this.logger.error(e, `Error fetching Airtable record: ${id}`);
+      logger.error(e, `Error fetching Airtable record: ${id}`);
       throw e;
     }
   }
@@ -123,10 +121,7 @@ export class AirtableDemandeImmersionRepository
       );
       return demandeImmersion.id;
     } catch (e: any) {
-      this.logger.error(
-        e,
-        `Error updating Airtable record: ${currentRecord.id}`,
-      );
+      logger.error(e, `Error updating Airtable record: ${currentRecord.id}`);
       throw e;
     }
   }

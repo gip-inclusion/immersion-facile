@@ -3,11 +3,13 @@ import isAfter from "date-fns/isAfter";
 import parseISO from "date-fns/parseISO";
 import {
   AccessTokenGateway,
-  GetAccessTokenResponse
+  GetAccessTokenResponse,
 } from "../../../domain/core/ports/AccessTokenGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
-import { logger } from "../../../utils/logger";
+import { createLogger } from "../../../utils/logger";
 import { RealClock } from "./ClockImplementations";
+
+const logger = createLogger(__filename);
 
 type Scope = string;
 type CacheEntry = {
@@ -26,9 +28,6 @@ const minTtlSec = 30;
 //
 // Expired tokens are refreshed lazily.
 export class CachingAccessTokenGateway implements AccessTokenGateway {
-  private readonly logger = logger.child({
-    logsource: "CachingAccessTokenGateway",
-  });
   private readonly cache: Record<Scope, CacheEntry> = {};
 
   public constructor(
@@ -50,7 +49,7 @@ export class CachingAccessTokenGateway implements AccessTokenGateway {
       response,
       expirationTime,
     };
-    this.logger.debug({ response, expirationTime }, "caching entry");
+    logger.debug({ response, expirationTime }, "caching entry");
 
     return response;
   }

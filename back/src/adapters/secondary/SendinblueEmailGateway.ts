@@ -1,4 +1,3 @@
-import { Logger } from "pino";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import type {
   EmailType,
@@ -8,7 +7,9 @@ import type {
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/demandeImmersion/ports/EmailGateway";
 import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
-import { logger } from "../../utils/logger";
+import { createLogger } from "./../../utils/logger";
+
+const logger = createLogger(__filename);
 
 const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/3/message-setup
@@ -25,10 +26,6 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
-  private readonly logger: Logger = logger.child({
-    logsource: "SendinblueEmailGateway",
-  });
-
   private constructor(
     private readonly apiInstance: SibApiV3Sdk.TransactionalEmailsApi,
   ) {}
@@ -122,12 +119,12 @@ export class SendinblueEmailGateway implements EmailGateway {
   }
 
   private async sendTransacEmail(sibEmail: SibApiV3Sdk.SendSmtpEmail) {
-    this.logger.info(sibEmail, "Sending email");
+    logger.info(sibEmail, "Sending email");
     try {
       const data = await this.apiInstance.sendTransacEmail(sibEmail);
-      this.logger.info(data, "Email sending succeeded");
+      logger.info(data, "Email sending succeeded");
     } catch (e: any) {
-      this.logger.error(e, "Email sending failed");
+      logger.error(e, "Email sending failed");
     }
   }
 }

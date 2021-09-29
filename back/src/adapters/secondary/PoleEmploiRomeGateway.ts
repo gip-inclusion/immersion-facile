@@ -1,12 +1,10 @@
 import axios, { AxiosInstance } from "axios";
 import { RomeGateway, RomeMetier } from "../../domain/rome/ports/RomeGateway";
-import { logger } from "../../utils/logger";
+import { createLogger } from "../../utils/logger";
 import { AccessTokenGateway } from "./../../domain/core/ports/AccessTokenGateway";
 
+const logger = createLogger(__filename);
 export class PoleEmploiRomeGateway implements RomeGateway {
-  private readonly logger = logger.child({
-    logsource: "PoleEmploiRomeGateway",
-  });
   private readonly axiosInstance: AxiosInstance;
   private readonly scope: string;
 
@@ -21,11 +19,11 @@ export class PoleEmploiRomeGateway implements RomeGateway {
       },
     });
     this.axiosInstance.interceptors.request.use((request) => {
-      this.logger.info(request);
+      logger.info(request);
       return request;
     });
     this.axiosInstance.interceptors.response.use((response) => {
-      this.logger.debug({
+      logger.debug({
         status: response.status,
         headers: response.headers,
         data: response.data,

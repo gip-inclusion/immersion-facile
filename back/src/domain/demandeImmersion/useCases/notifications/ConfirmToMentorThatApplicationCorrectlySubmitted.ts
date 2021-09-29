@@ -2,17 +2,14 @@ import {
   ApplicationSource,
   DemandeImmersionDto,
 } from "../../../../shared/DemandeImmersionDto";
-import { logger } from "../../../../utils/logger";
+import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
+const logger = createLogger(__filename);
 export class ConfirmToMentorThatApplicationCorrectlySubmitted
   implements UseCase<DemandeImmersionDto>
 {
-  private readonly logger = logger.child({
-    logsource: "ConfirmToMentorThatApplicationCorrectlySubmitted",
-  });
-
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
@@ -29,7 +26,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
     firstName,
     lastName,
   }: DemandeImmersionDto): Promise<void> {
-    this.logger.info(
+    logger.info(
       {
         demandeImmersionid: id,
       },
@@ -50,7 +47,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
         },
       );
     } else {
-      this.logger.info(
+      logger.info(
         { id, mentorEmail, source },
         "Sending mentor confirmation email skipped.",
       );

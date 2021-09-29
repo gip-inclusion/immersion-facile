@@ -6,20 +6,17 @@ import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "../../../../shared/ScheduleUtils";
-import { logger } from "../../../../utils/logger";
+import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import {
   EmailGateway,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../ports/EmailGateway";
 
+const logger = createLogger(__filename);
 export class NotifyAllActorsOfFinalApplicationValidation
   implements UseCase<DemandeImmersionDto>
 {
-  private readonly logger = logger.child({
-    logsource: "NotifyAllActorsOfFinalApplicationValidation",
-  });
-
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
@@ -32,7 +29,7 @@ export class NotifyAllActorsOfFinalApplicationValidation
   ) {}
 
   public async execute(dto: DemandeImmersionDto): Promise<void> {
-    this.logger.info(
+    logger.info(
       {
         demandeImmersionid: dto.id,
       },
@@ -47,7 +44,7 @@ export class NotifyAllActorsOfFinalApplicationValidation
     if (!this.unrestrictedEmailSendingSources.has(dto.source)) {
       recipients = recipients.filter((email) => {
         if (!this.emailAllowList.has(email)) {
-          this.logger.info(`Skipped sending email to: ${email}`);
+          logger.info(`Skipped sending email to: ${email}`);
           return false;
         }
         return true;
@@ -60,7 +57,7 @@ export class NotifyAllActorsOfFinalApplicationValidation
         getValidatedApplicationFinalConfirmationParams(dto),
       );
     } else {
-      this.logger.info(
+      logger.info(
         {
           id: dto.id,
           recipients,

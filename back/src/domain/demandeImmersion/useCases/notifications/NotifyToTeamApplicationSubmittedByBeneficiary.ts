@@ -1,15 +1,12 @@
 import { DemandeImmersionDto } from "../../../../shared/DemandeImmersionDto";
-import { logger } from "../../../../utils/logger";
+import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
+const logger = createLogger(__filename);
 export class NotifyToTeamApplicationSubmittedByBeneficiary
   implements UseCase<DemandeImmersionDto>
 {
-  private readonly logger = logger.child({
-    logsource: "NotifyToTeamApplicationSubmittedByBeneficiary",
-  });
-
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly immersionFacileContactEmail: string | undefined,
@@ -24,7 +21,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
     dateEnd,
     businessName,
   }: DemandeImmersionDto): Promise<void> {
-    this.logger.info(
+    logger.info(
       {
         demandeImmersionId: id,
         immersionFacileContactEmail: this.immersionFacileContactEmail,
@@ -32,10 +29,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
       "------------- Entering execute.",
     );
     if (!this.immersionFacileContactEmail) {
-      this.logger.info(
-        { demandeId: id, email },
-        "No immersionFacileContactEmail",
-      );
+      logger.info({ demandeId: id, email }, "No immersionFacileContactEmail");
       return;
     }
 
