@@ -18,7 +18,6 @@ import {
   isArrayOfWeekdays,
   prettyPrintSchedule,
 } from "../../shared/ScheduleUtils";
-import { AirtableApplicationDataConverter } from "./AirtableDemandeImmersionRepository";
 
 const readString = (fields: FieldSet, fieldName: string): string => {
   const value = fields[fieldName] || "";
@@ -91,6 +90,11 @@ const numberToSiret = (value: number): string => {
     minimumIntegerDigits: 14,
     useGrouping: false,
   });
+};
+
+export type AirtableApplicationDataConverter = {
+  entityToFieldSet: (entity: DemandeImmersionEntity) => FieldSet;
+  fieldSetToEntity: (fields: FieldSet) => DemandeImmersionEntity;
 };
 
 export const genericApplicationDataConverter: AirtableApplicationDataConverter =

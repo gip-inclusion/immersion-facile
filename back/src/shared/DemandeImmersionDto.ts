@@ -37,7 +37,12 @@ export const applicationSourceFromString = (s: string): ApplicationSource => {
 export type DemandeImmersionId = Flavor<string, "DemandeImmersionId">;
 
 export const demandeImmersionDtoSchema = Yup.object({
-  id: Yup.mixed<DemandeImmersionId>().required("Obligatoire"),
+  id: Yup.mixed<DemandeImmersionId>()
+    .required("Obligatoire")
+    .test("no-empty-id", "L'ID est obligatoire", (value) => {
+      if (typeof value !== "string") return false;
+      return value.trim() !== "";
+    }),
   status: Yup.mixed<ApplicationStatus>()
     .oneOf(validApplicationStatus)
     .required("Obligatoire"),

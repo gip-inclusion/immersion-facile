@@ -6,7 +6,7 @@ import { phoneRegExp } from "./utils";
 
 export type ImmersionOfferId = Flavor<string, "ImmersionOfferId">;
 
-const businessContactDtoSchema = Yup.object({
+export const businessContactDtoSchema = Yup.object({
   lastName: Yup.string().required("Obligatoire"),
   firstName: Yup.string().required("Obligatoire"),
   job: Yup.string().required("Obligatoire"),
@@ -25,7 +25,12 @@ export type ContactMethod = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
 const validContactMethods: ContactMethod[] = ["EMAIL", "PHONE", "IN_PERSON"];
 
 export const immersionOfferDtoSchema = Yup.object({
-  id: Yup.mixed<ImmersionOfferId>().required("Obligatoire"),
+  id: Yup.mixed<ImmersionOfferId>()
+    .required("Obligatoire")
+    .test("no-empty-id", "L'ID est obligatoire", (value) => {
+      if (typeof value !== "string") return false;
+      return value.trim() !== "";
+    }),
   siret: Yup.string()
     .required("Obligatoire")
     .length(14, "SIRET doit étre composé de 14 chiffres"),

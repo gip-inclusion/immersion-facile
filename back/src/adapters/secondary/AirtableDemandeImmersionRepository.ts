@@ -3,6 +3,7 @@ import { QueryParams } from "airtable/lib/query_params";
 import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
 import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
 import { DemandeImmersionId } from "../../shared/DemandeImmersionDto";
+import { ConflictError } from "../primary/helpers/sendHttpResponse";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -36,7 +37,7 @@ export class AirtableDemandeImmersionRepository
     entity: DemandeImmersionEntity,
   ): Promise<DemandeImmersionId | undefined> {
     if (await this.getById(entity.id)) {
-      return undefined;
+      throw new ConflictError(`ID already exists: ${entity.id}`);
     }
 
     try {

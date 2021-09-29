@@ -44,6 +44,7 @@ import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
+import { InMemoryImmersionOfferRepository } from "../secondary/InMemoryImmersionOfferRepository";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
@@ -144,6 +145,7 @@ const createRepositories = (featureFlags: FeatureFlags) => {
         : new InMemoryRomeGateway(),
 
     outbox: new InMemoryOutboxRepository(),
+    ImmersionOffer: new InMemoryImmersionOfferRepository(),
   };
 };
 
@@ -253,7 +255,7 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
     ),
 
     // immersionOffer
-    addImmersionOffer: new AddImmersionOffer(),
+    addImmersionOffer: new AddImmersionOffer(repositories.ImmersionOffer),
 
     // siret
     getSiret: new GetSiret({
