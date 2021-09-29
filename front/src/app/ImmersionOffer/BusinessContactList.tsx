@@ -8,7 +8,7 @@ import {
   BusinessContactDto,
   ImmersionOfferDto,
 } from "src/shared/ImmersionOfferDto";
-import { removeAtIndex } from "../../../../back/src/shared/utils";
+import { removeAtIndex } from "src/shared/utils";
 
 const emptyContact: BusinessContactDto = {
   email: "",
@@ -23,18 +23,20 @@ export const BusinessContactList = () => {
   const name: keyof ImmersionOfferDto = "businessContacts";
   const [field, _, { setValue }] = useField<BusinessContactDto[]>({ name });
 
+  const businessContacts = field.value;
+
   const onDelete = (index: number) => {
-    setValue(removeAtIndex(field.value, index));
+    setValue(removeAtIndex(businessContacts, index));
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      {field.value.map((_, index) => (
+      {businessContacts.map((_, index) => (
         <BusinessContact index={index} key={index} onDelete={onDelete} />
       ))}
       <ButtonAdd
         style={{ alignSelf: "center", margin: "30px auto" }}
-        onClick={() => setValue([...field.value, emptyContact])}
+        onClick={() => setValue([...businessContacts, emptyContact])}
       >
         Ajouter un référent
       </ButtonAdd>

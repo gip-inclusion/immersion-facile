@@ -3,7 +3,7 @@ import React from "react";
 import { Profession } from "src/app/ImmersionOffer/Profession";
 import { ButtonAdd } from "src/components/ButtonAdd";
 import { ProfessionDto } from "src/shared/rome";
-import { removeAtIndex } from "../../../../back/src/shared/utils";
+import { removeAtIndex } from "src/shared/utils";
 
 type ProfessionListProps = {
   name: string;

@@ -10,7 +10,7 @@ const valideImmersionOffer: ImmersionOfferDto = {
       firstName: "Esteban",
       lastName: "Ocon",
       phone: "+33012345678",
-      professions: [{ romeCodeMetier: "C3333" }],
+      professions: [{ romeCodeMetier: "C3333", label: "Menuisier" }],
       job: "a job",
     },
     {
@@ -18,7 +18,7 @@ const valideImmersionOffer: ImmersionOfferDto = {
       firstName: "Sarah",
       lastName: "Connor",
       phone: "+3301",
-      professions: [{ romeCodeMetier: "D4444" }],
+      professions: [{ romeCodeMetier: "D4444", label: "Vendeur" }],
       job: "XYZ - Terminator's terminator",
     },
   ],
@@ -26,7 +26,10 @@ const valideImmersionOffer: ImmersionOfferDto = {
   businessSectorCode: "A",
   preferredContactMethods: ["IN_PERSON", "EMAIL"],
   siret: "01234567890123",
-  professions: [{ romeCodeMetier: "A1111" }, { romeCodeMetier: "B2222" }],
+  professions: [
+    { romeCodeMetier: "A1111", label: "Boulanger" },
+    { romeCodeMetier: "B2222", label: "Boucher" },
+  ],
 };
 
 const emptyImmersionOffer: ImmersionOfferDto = {
