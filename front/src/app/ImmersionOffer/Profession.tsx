@@ -4,14 +4,18 @@ import { DropDown } from "src/app/ImmersionOffer/DropDown";
 import { immersionOfferGateway } from "src/app/main";
 import { DeleteButton } from "src/components/DeleteButton";
 import { TextInput } from "src/components/form/TextInput";
+import { ProfessionDto } from "../../../../back/src/shared/rome";
 
 type ProfessionProps = {
   name: string;
+  label: string;
   onDelete: () => void;
 };
 
-export const Profession = ({ name, onDelete }: ProfessionProps) => {
-  const [_, __, { setValue }] = useField<string>(name);
+const romeCodeField: keyof ProfessionDto = "romeCodeMetier";
+
+export const Profession = ({ name, label, onDelete }: ProfessionProps) => {
+  const [__, _, { setValue }] = useField<ProfessionDto>(name);
 
   return (
     <div
@@ -24,6 +28,7 @@ export const Profession = ({ name, onDelete }: ProfessionProps) => {
       <DropDown
         title="Rechercher un métier *"
         onSelection={setValue}
+        initialTerm={label}
         onTermChange={async (newTerm) => {
           if (!newTerm) return [];
           const romeOptions = await immersionOfferGateway.searchProfession(
@@ -32,14 +37,18 @@ export const Profession = ({ name, onDelete }: ProfessionProps) => {
 
           return romeOptions.map(
             ({ romeCodeMetier, description, matchRanges }) => ({
-              value: romeCodeMetier,
+              value: { romeCodeMetier, label: description },
               description,
               matchRanges,
             }),
           );
         }}
       />
-      <TextInput label="Code métier" name={name} disabled />
+      <TextInput
+        label="Code métier"
+        name={`${name}.${romeCodeField}`}
+        disabled
+      />
       <DeleteButton onClick={onDelete} />
     </div>
   );

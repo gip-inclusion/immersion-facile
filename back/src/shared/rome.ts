@@ -13,6 +13,7 @@ export type RomeCodeMetierDto = Yup.InferType<
 
 export const professionDtoSchema = Yup.object({
   romeCodeMetier: romeCodeMetierDtoSchema.required("Obligatoire"),
+  label: Yup.string().required("Obligatoire"),
 });
 
 const matchRangeSchema = Yup.object({

@@ -8,27 +8,33 @@ type MatchRange = {
   endIndexExclusive: number;
 };
 
-export type Proposal = {
+export type Proposal<T> = {
   description: string;
-  value: string;
+  value: T;
   matchRanges: MatchRange[];
 };
 
-type DropDownState = {
+type DropDownState<T> = {
   searchTerm: string;
-  proposals: Proposal[];
+  proposals: Proposal<T>[];
   isOpen: boolean;
 };
 
-type DropDownAction =
+type DropDownAction<T> =
   | { type: "SEARCH_TERM_CHANGED"; payload: string }
-  | { type: "PROPOSALS_UPDATED"; payload: Proposal[] }
-  | { type: "PROPOSAL_SELECTED"; payload: Proposal };
+  | { type: "SEARCH_TERM_CHANGED_FROM_OUTSIDE"; payload: string }
+  | { type: "PROPOSALS_UPDATED"; payload: Proposal<T>[] }
+  | { type: "PROPOSAL_SELECTED"; payload: Proposal<T> };
 
-const reducer = (state: DropDownState, action: DropDownAction) => {
+const reducer = <T extends unknown>(
+  state: DropDownState<T>,
+  action: DropDownAction<T>,
+) => {
   switch (action.type) {
     case "SEARCH_TERM_CHANGED":
       return { ...state, searchTerm: action.payload, isOpen: true };
+    case "SEARCH_TERM_CHANGED_FROM_OUTSIDE":
+      return { ...state, searchTerm: action.payload };
     case "PROPOSALS_UPDATED":
       return { ...state, proposals: action.payload };
     case "PROPOSAL_SELECTED":
@@ -42,25 +48,25 @@ const reducer = (state: DropDownState, action: DropDownAction) => {
   }
 };
 
-const initialState: DropDownState = {
+const initialState: DropDownState<unknown> = {
   searchTerm: "",
   proposals: [],
   isOpen: false,
 };
 
-type DropDownProps = {
+type DropDownProps<T> = {
   title: string;
-  initialValue?: string;
-  onSelection: (param: string) => void;
-  onTermChange: (newTerm: string) => Promise<Proposal[]>;
+  initialTerm?: string;
+  onSelection: (value: T) => void;
+  onTermChange: (newTerm: string) => Promise<Proposal<T>[]>;
 };
 
-export const DropDown = ({
+export const DropDown = <T extends unknown>({
   title,
-  initialValue,
+  initialTerm = "",
   onSelection,
   onTermChange,
-}: DropDownProps) => {
+}: DropDownProps<T>) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { proposals, searchTerm, isOpen } = state;
   const debounceSearchTerm = useDebounce(searchTerm, 1200);
@@ -71,6 +77,13 @@ export const DropDown = ({
     );
   }, [debounceSearchTerm]);
 
+  useEffect(() => {
+    dispatch({
+      type: "SEARCH_TERM_CHANGED_FROM_OUTSIDE",
+      payload: initialTerm,
+    });
+  }, [initialTerm]);
+
   return (
     <div className="dropdown-container">
       <label className="fr-label" htmlFor={"search"}>
@@ -80,7 +93,7 @@ export const DropDown = ({
         id="search"
         type="text"
         className="fr-input"
-        value={searchTerm === "" && !isOpen ? initialValue : searchTerm}
+        value={searchTerm}
         onChange={(e) =>
           dispatch({ type: "SEARCH_TERM_CHANGED", payload: e.target.value })
         }
@@ -89,14 +102,14 @@ export const DropDown = ({
         <div className="dropdown-proposals">
           {proposals.map((proposal) => (
             <div
-              key={proposal.value}
+              key={proposal.description}
               className="dropdown-proposal"
               onClick={() => {
                 dispatch({ type: "PROPOSAL_SELECTED", payload: proposal });
-                onSelection(proposal.value);
+                onSelection(proposal.value as T);
               }}
             >
-              {proposal.value} : <StringWithHighlights {...proposal} />
+              <StringWithHighlights {...proposal} />
             </div>
           ))}
         </div>

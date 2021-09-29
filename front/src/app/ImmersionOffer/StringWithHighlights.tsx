@@ -10,7 +10,7 @@ type SliceOfString = {
 export const StringWithHighlights = ({
   description,
   matchRanges,
-}: Proposal) => {
+}: Pick<Proposal<unknown>, "description" | "matchRanges">) => {
   const slices: SliceOfString[] =
     matchRanges.length === 0
       ? [

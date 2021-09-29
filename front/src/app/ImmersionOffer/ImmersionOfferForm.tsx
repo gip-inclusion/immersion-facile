@@ -25,14 +25,17 @@ type ImmersionOfferFormProps = {
   route: Route<typeof routes.immersionOffer>;
 };
 
-const initialValues: ImmersionOfferDto = !ENV.dev
+const initialValues: ImmersionOfferDto = ENV.dev
   ? {
       id: uuidV4(),
       siret: "1234567890123",
       businessName: "My buisiness name",
       businessAddress: "My businessAddress:",
       businessSectorCode: "F",
-      professions: [{ romeCodeMetier: "A10000" }],
+      professions: [
+        { romeCodeMetier: "A1000", label: "Boulanger" },
+        { romeCodeMetier: "B2000", label: "Boucher" },
+      ],
       businessContacts: [
         {
           firstName: "John",

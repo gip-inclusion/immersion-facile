@@ -7,3 +7,8 @@ export const sleep = (ms: number) => {
   }
   return new Promise((r) => setTimeout(r, ms));
 };
+
+export const removeAtIndex = <T>(array: T[], indexToRemove: number): T[] => [
+  ...array.slice(0, indexToRemove),
+  ...array.slice(indexToRemove + 1),
+];

@@ -16,7 +16,9 @@ export const BusinessSectorInput = () => {
   return (
     <DropDown
       title="Secteur d'activité"
-      initialValue={nafSectorLabels[businessSectorCode]}
+      initialTerm={
+        businessSectorCode === "0" ? "" : nafSectorLabels[businessSectorCode]
+      }
       onSelection={(v) => setValue(v as NafSectorCode)}
       onTermChange={async (newTerm) => {
         return nafSectorsInArray
