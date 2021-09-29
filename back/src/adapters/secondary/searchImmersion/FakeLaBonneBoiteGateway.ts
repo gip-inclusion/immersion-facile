@@ -4,7 +4,6 @@ import type { SearchParams } from "../../../domain/searchImmersion/ports/SearchP
 import axios from "axios";
 import querystring from "querystring";
 import { v4 as uuidV4 } from "uuid";
-import { PoleEmploiAPIGateway } from "./PoleEmploiAPIGateway";
 import { logger } from "../../../utils/logger";
 import { fakeCompanies } from "./fakeCompanies";
 

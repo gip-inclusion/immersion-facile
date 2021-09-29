@@ -1,10 +1,9 @@
-import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
-import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyEntity";
-import type { SearchParams } from "../../../domain/searchImmersion/ports/SearchParams";
 import axios from "axios";
-import querystring from "querystring";
 import { v4 as uuidV4 } from "uuid";
-import { PoleEmploiAPIGateway } from "./PoleEmploiAPIGateway";
+import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
+import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyEntity";
+import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
+import type { SearchParams } from "../../../domain/searchImmersion/ports/SearchParams";
 import { logger } from "../../../utils/logger";
 
 type CompanyFromLaBonneBoite = {
@@ -22,14 +21,17 @@ type CompanyFromLaBonneBoite = {
 export class LaBonneBoiteGateway implements CompaniesGateway {
   private readonly logger = logger.child({ logsource: "LaBonneBoiteGateway" });
 
-  constructor(private poleEmploiAPIGateway: PoleEmploiAPIGateway) {}
+  constructor(
+    private readonly accessTokenGateway: AccessTokenGateway,
+    private readonly poleEmploiClientId: string,
+  ) {}
 
   async getCompanies(searchParams: SearchParams): Promise<CompanyEntity[]> {
-    const accessToken = await this.poleEmploiAPIGateway.getAccessToken(
-      "application_PAR_limmersionfacile_61f728ccbab3458cb64ffab4d5a86f44171253d4f3d0e78bf63e01cdd438d844 api_labonneboitev1",
+    const response = await this.accessTokenGateway.getAccessToken(
+      `application_${this.poleEmploiClientId} api_labonneboitev1`,
     );
     const headers = {
-      Authorization: "Bearer " + accessToken.access_token,
+      Authorization: "Bearer " + response.access_token,
     };
     console.log("Above to fetch");
     return axios

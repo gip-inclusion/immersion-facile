@@ -2,7 +2,6 @@ import { PgImmersionOfferRepository } from "../../adapters/secondary/searchImmer
 import { SearchImmersionByCandidate } from "../../domain/searchImmersion/useCases/SearchImmersionByCandidate";
 import { LaBonneBoiteGateway } from "../../adapters/secondary/searchImmersion/LaBonneBoiteGateway";
 import { ImmersionOfferEntity } from "../../domain/searchImmersion/entities/ImmersionOfferEntity";
-import { PoleEmploiAPIGateway } from "../../adapters/secondary/searchImmersion/PoleEmploiAPIGateway";
 import { FakeLaBonneBoiteGateway } from "../../adapters/secondary/searchImmersion/FakeLaBonneBoiteGateway";
 
 describe("Postgres implementation of immersion proposal repository", () => {

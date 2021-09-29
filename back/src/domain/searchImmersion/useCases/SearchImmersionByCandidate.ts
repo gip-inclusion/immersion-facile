@@ -3,7 +3,6 @@ import type { SearchParams } from "../ports/SearchParams";
 import { CompanyEntity } from "../entities/CompanyEntity";
 
 import { v4 as uuidV4 } from "uuid";
-import { LaBonneBoiteGateway } from "../../../adapters/secondary/searchImmersion/LaBonneBoiteGateway";
 import { CompaniesGateway } from "../ports/CompaniesGateway";
 
 //A mettre dans ports
