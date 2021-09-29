@@ -3,6 +3,7 @@ import {
   RomeSearchResponseDto,
 } from "../../../shared/rome";
 import { createLogger } from "../../../utils/logger";
+import { findMatchRanges } from "../../../utils/textSearch";
 import { UseCase } from "../../core/UseCase";
 import { RomeGateway } from "../ports/RomeGateway";
 
@@ -20,7 +21,7 @@ export class RomeSearch
     return results.map((result) => ({
       romeCodeMetier: result.code,
       description: result.libelle,
-      matchRanges: [], // TODO
+      matchRanges: findMatchRanges(searchText, result.libelle),
     }));
   }
 }

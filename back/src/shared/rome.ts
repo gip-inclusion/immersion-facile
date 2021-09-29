@@ -43,3 +43,5 @@ export const romeSearchResponseDtoSchema = Yup.array(
 export type RomeSearchResponseDto = Yup.InferType<
   typeof romeSearchResponseDtoSchema
 >;
+
+export type MatchRangeDto = Yup.InferType<typeof matchRangeSchema>;

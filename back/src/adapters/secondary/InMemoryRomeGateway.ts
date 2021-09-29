@@ -1,5 +1,6 @@
 import { RomeGateway, RomeMetier } from "../../domain/rome/ports/RomeGateway";
 import { createLogger } from "../../utils/logger";
+import { normalize } from "../../utils/textSearch";
 
 const logger = createLogger(__filename);
 
@@ -9,14 +10,15 @@ const metiers: RomeMetier[] = [
   { code: "D1102", libelle: "Boulangerie - viennoiserie" },
   { code: "D1103", libelle: "Charcuterie - traiteur" },
   { code: "D1106", libelle: "Vente en alimentation" },
+  {
+    code: "D1201",
+    libelle: "Achat vente d'objets d'art, anciens ou d'occasion",
+  },
   { code: "D1202", libelle: "Coiffure" },
-  { code: "D1211", libelle: "Vente en articles de sport et loisirs" },
   { code: "D1505", libelle: "Personnel de caisse" },
   { code: "D1507", libelle: "Mise en rayon libre-service" },
   { code: "N4301", libelle: "Conduite sur rails" },
 ];
-
-const normalize = (s: string) => s.toLowerCase();
 
 export class InMemoryRomeGateway implements RomeGateway {
   public async searchMetier(query: string): Promise<RomeMetier[]> {

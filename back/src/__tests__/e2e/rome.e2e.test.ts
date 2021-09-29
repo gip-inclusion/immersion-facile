@@ -18,7 +18,12 @@ describe("/rome route", () => {
       {
         romeCodeMetier: "N4301",
         description: "Conduite sur rails",
-        matchRanges: [],
+        matchRanges: [
+          {
+            startIndexInclusive: 13,
+            endIndexExclusive: 18,
+          },
+        ],
       },
     ]);
   });
