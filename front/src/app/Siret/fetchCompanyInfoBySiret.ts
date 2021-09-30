@@ -32,7 +32,7 @@ const getBusinessName = (establishment: Establishment) => {
 
 type CompanyInfo = {
   businessName: string;
-  address: string;
+  businessAddress: string;
 };
 
 export const fetchCompanyInfoBySiret = async (
@@ -40,8 +40,10 @@ export const fetchCompanyInfoBySiret = async (
 ): Promise<CompanyInfo> => {
   const info = await demandeImmersionGateway.getSiretInfo(siret);
   const establishment = info.etablissements[0];
-  const address = addressDictToString(establishment.adresseEtablissement);
-  return { businessName: getBusinessName(establishment), address };
+  const businessAddress = addressDictToString(
+    establishment.adresseEtablissement,
+  );
+  return { businessName: getBusinessName(establishment), businessAddress };
 };
 
 export const useSiretRelatedField = (

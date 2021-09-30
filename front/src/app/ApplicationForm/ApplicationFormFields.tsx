@@ -53,7 +53,7 @@ export const ApplicationFormFields = ({
     useFormikContext<DemandeImmersionDto>();
   const { companyInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", companyInfo);
-  useSiretRelatedField("address", companyInfo, "immersionAddress");
+  useSiretRelatedField("businessAddress", companyInfo, "immersionAddress");
 
   return (
     <>

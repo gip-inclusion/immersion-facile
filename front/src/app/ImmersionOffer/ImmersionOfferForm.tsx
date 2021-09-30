@@ -84,7 +84,7 @@ const preferredContactMethodOptions: Array<{
 const SiretRelatedInputs = () => {
   const { companyInfo } = useSiretFetcher();
   useSiretRelatedField("businessName", companyInfo);
-  useSiretRelatedField("address", companyInfo);
+  useSiretRelatedField("businessAddress", companyInfo);
 
   return (
     <>
@@ -99,7 +99,7 @@ const SiretRelatedInputs = () => {
       />
       <TextInput
         label="Vérifiez l'adresse de votre établissement"
-        name="address"
+        name="businessAddress"
       />
     </>
   );
