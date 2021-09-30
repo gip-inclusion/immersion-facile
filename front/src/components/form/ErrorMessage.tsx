@@ -1,15 +1,15 @@
 import React from "react";
 
 interface ErrorMessageProps {
-  message: string;
   title: string;
+  children: React.ReactNode;
 }
 
-export const ErrorMessage = ({ message, title }: ErrorMessageProps) => (
+export const ErrorMessage = ({ title, children }: ErrorMessageProps) => (
   <>
     <div role="alert" className="fr-alert fr-alert--error">
       <p className="fr-alert__title">{title}</p>
-      <p>{message}</p>
+      <p>{children}</p>
     </div>
   </>
 );

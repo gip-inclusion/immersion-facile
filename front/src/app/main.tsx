@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { App } from "src/app/App";
 import { HttpDemandeImmersionGateway } from "src/core-logic/adapters/HttpDemandeImmersionGateway";
+import { HttpImmersionOfferGateway } from "src/core-logic/adapters/HttpImmersionOfferGateway";
 import { InMemoryDemandeImmersionGateway } from "src/core-logic/adapters/InMemoryDemandeImmersionGateway";
 import { InMemoryImmersionOfferGateway } from "src/core-logic/adapters/InMemoryImmersionOfferGateway";
 import { InMemoryTodoGateway } from "src/core-logic/adapters/InMemoryTodoGateway";
@@ -13,7 +14,10 @@ import { RouteProvider } from "./routes";
 
 const todoGateway = new InMemoryTodoGateway();
 
-export const immersionOfferGateway = new InMemoryImmersionOfferGateway();
+export const immersionOfferGateway =
+  ENV.gateway === "HTTP"
+    ? new HttpImmersionOfferGateway()
+    : new InMemoryImmersionOfferGateway();
 
 export const demandeImmersionGateway =
   ENV.gateway === "HTTP"

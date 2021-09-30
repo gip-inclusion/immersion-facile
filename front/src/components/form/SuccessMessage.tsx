@@ -1,20 +1,16 @@
 import React from "react";
 
 interface SuccessMessageProps {
-  link?: string;
-  text?: string;
   title: string;
+  children: React.ReactNode;
 }
 
-export const SuccessMessage = ({ link, text, title }: SuccessMessageProps) => {
+export const SuccessMessage = ({ title, children }: SuccessMessageProps) => {
   return (
     <>
       <div role="alert" className="fr-alert fr-alert--success">
         <p className="fr-alert__title">{title}</p>
-        <p>
-          {text}
-          {link && <a href={link}>{link}</a>}
-        </p>
+        <p>{children}</p>
       </div>
     </>
   );

@@ -17,8 +17,8 @@ export const professionDtoSchema = Yup.object({
 });
 
 const matchRangeSchema = Yup.object({
-  startIndexInclusive: Yup.number().positive().required("Obligatoire"),
-  endIndexExclusive: Yup.number().positive().required("Obligatoire"),
+  startIndexInclusive: Yup.number().min(0).integer().required("Obligatoire"),
+  endIndexExclusive: Yup.number().min(0).integer().required("Obligatoire"),
 });
 
 export const romeSearchMatchSchema = Yup.object({

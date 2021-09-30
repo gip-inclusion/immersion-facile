@@ -267,15 +267,18 @@ export const ApplicationFormFields = ({
       )}
 
       {submitError && (
-        <ErrorMessage title="Erreur de serveur" message={submitError.message} />
+        <ErrorMessage title="Erreur de serveur">
+          {submitError.message}
+        </ErrorMessage>
       )}
 
       {successInfos && (
-        <SuccessMessage
-          link={successInfos.link}
-          title="Succès de l'envoi"
-          text={successInfos.message}
-        />
+        <SuccessMessage title="Succès de l'envoi">
+          {successInfos.message}
+          {successInfos.link && (
+            <a href={successInfos.link}>{successInfos.link}</a>
+          )}
+        </SuccessMessage>
       )}
 
       <p />

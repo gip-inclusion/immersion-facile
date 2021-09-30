@@ -90,16 +90,12 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
             </button>
           )}
           {successMessage && (
-            <SuccessMessage
-              link={undefined}
-              title="Succès"
-              text={successMessage}
-            />
+            <SuccessMessage title="Succès">{successMessage}</SuccessMessage>
           )}
         </>
       )}
       {error && (
-        <ErrorMessage title="Erreur de serveur" message={error.message} />
+        <ErrorMessage title="Erreur de serveur">{error.message}</ErrorMessage>
       )}
     </>
   );

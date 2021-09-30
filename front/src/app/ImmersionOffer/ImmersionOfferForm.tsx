@@ -9,6 +9,7 @@ import {
   useSiretRelatedField,
 } from "src/app/Siret/fetchCompanyInfoBySiret";
 import { CheckboxGroup } from "src/components/form/CheckboxGroup";
+import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { MarianneHeader } from "src/components/MarianneHeader";
@@ -20,6 +21,7 @@ import {
 } from "src/shared/ImmersionOfferDto";
 import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
+import { immersionOfferGateway } from "../main";
 
 type ImmersionOfferFormProps = {
   route: Route<typeof routes.immersionOffer>;
@@ -105,6 +107,7 @@ const SiretRelatedInputs = () => {
 
 export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<Error | null>(null);
 
   return (
     <>
@@ -117,14 +120,26 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
           enableReinitialize={true}
           initialValues={initialValues}
           validationSchema={immersionOfferDtoSchema}
-          onSubmit={async (data) => {
-            // TODO: post data: something like :
-            // await immersionOfferGateway.addImmersionOffer(data)
-            setIsSuccess(true);
-            console.log("submitted: ", data);
+          onSubmit={async (data, { setSubmitting }) => {
+            try {
+              setIsSuccess(false);
+              setSubmitError(null);
+
+              await immersionOfferDtoSchema.validate(data);
+              await immersionOfferGateway.addImmersionOffer(data);
+
+              setIsSuccess(true);
+              setSubmitError(null);
+            } catch (e: any) {
+              console.log(e);
+              setIsSuccess(false);
+              setSubmitError(e);
+            } finally {
+              setSubmitting(false);
+            }
           }}
         >
-          {({ isSubmitting, submitCount, errors, values }) => (
+          {({ isSubmitting, submitCount, errors }) => (
             <div style={{ margin: "5px", maxWidth: "600px" }}>
               <Form>
                 Votre établissement
@@ -152,17 +167,37 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
                     </ul>
                   </div>
                 )}
-                <button
-                  className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-                  type="submit"
-                  disabled={isSubmitting || isSuccess}
-                >
-                  Enregistrer mes informations
-                </button>
                 <br />
-                <br />
-                {isSuccess && <SuccessMessage title="Succès de l'envoi" />}
+                {submitError && (
+                  <>
+                    <ErrorMessage title="Erreur de serveur">
+                      {submitError.message}
+                    </ErrorMessage>
+                    <br />
+                  </>
+                )}
+                {isSuccess && (
+                  <SuccessMessage title="Succès de l'envoi">
+                    Merci ! Nous avons bien enregistré vos informations. Vous
+                    pourrez y accéder à tout moment pour les modifier ou les
+                    supprimer en nous contactant à :&nbsp;
+                    <a href="mailto:immersionfacile@beta.gouv.fr">
+                      immersionfacile@beta.gouv.fr
+                    </a>
+                  </SuccessMessage>
+                )}
+                {!isSuccess && (
+                  <button
+                    className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    Enregistrer mes informations
+                  </button>
+                )}
               </Form>
+              <br />
+              <br />
             </div>
           )}
         </Formik>
