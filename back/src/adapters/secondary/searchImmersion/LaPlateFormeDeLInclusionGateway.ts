@@ -10,7 +10,7 @@ import {
   UncompleteCompanyProps,
 } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
 
-type CompanyFromLaPlateFormeDeLInclusion = {
+export type CompanyFromLaPlateFormeDeLInclusion = {
   cree_le: Date;
   mis_a_jour_le: Date;
 
@@ -28,7 +28,8 @@ type CompanyFromLaPlateFormeDeLInclusion = {
   departement: string;
   postes: JobFromLaPlateFormeDeLInclusion[];
 };
-type JobFromLaPlateFormeDeLInclusion = {
+
+export type JobFromLaPlateFormeDeLInclusion = {
   id: number;
   rome: string;
   cree_le: Date;
@@ -38,7 +39,32 @@ type JobFromLaPlateFormeDeLInclusion = {
   appellation_modifiee: string;
 };
 
+export const convertLaPlateFormeDeLInclusionToUncompletCompany = (
+  company: CompanyFromLaPlateFormeDeLInclusion,
+): UncompleteCompanyEntity => {
+  const { addresse_ligne_1, addresse_ligne_2, code_postal, ville } = company;
+
+  return new UncompleteCompanyEntity({
+    id: uuidV4(),
+    address: `${addresse_ligne_1} ${addresse_ligne_2} ${code_postal} ${ville}`,
+    city: ville,
+    score: 6,
+    romes: company.postes.map((poste) =>
+      poste.rome.substring(poste.rome.length - 6, poste.rome.length - 1),
+    ),
+    siret: company.siret,
+    dataSource: "api_laplateformedelinclusion",
+    name: company.enseigne,
+  });
+};
+
+// type HttpCallsToLaPlateFormeDeLInclusion = {
+//   getCompanies: (searchParams: SearchParams) => Promise<CompanyFromLaPlateFormeDeLInclusion[]>
+// }
+
 export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
+  // constructor(private httpCalls: HttpCallsToLaPlateFormeDeLInclusion) {}
+
   private readonly logger = logger.child({
     logsource: "LaPlateFormeDeLInclusionGateway",
   });
@@ -46,7 +72,7 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
   async getCompanies(
     searchParams: SearchParams,
   ): Promise<UncompleteCompanyEntity[]> {
-    var cityCode = await this.getCityCodeFromLatLongAPIAdresse(
+    const cityCode = await this.getCityCodeFromLatLongAPIAdresse(
       searchParams.lat,
       searchParams.long,
     );
@@ -64,19 +90,13 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
         .then(async (response: any) => {
           const companies: CompanyFromLaPlateFormeDeLInclusion[] =
             response.data.results;
-          var nextPageURL = response.data.next;
+          const nextPageURL = response.data.next;
           return this.getNextCompanies(nextPageURL)
-            .then((nextCompanies) => {
-              return companies
+            .then((nextCompanies) =>
+              companies
                 .concat(nextCompanies)
-                .map((company: CompanyFromLaPlateFormeDeLInclusion) => {
-                  const uncompleteCompanyEntity =
-                    this.mapCompanyFromLaPlateFormeDeLInclusionToCompanyEntity(
-                      company,
-                    );
-                  return uncompleteCompanyEntity;
-                });
-            })
+                .map(convertLaPlateFormeDeLInclusionToUncompletCompany),
+            )
             .catch(function (error: any) {
               // handle error
               logger.error(
@@ -100,9 +120,8 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
   async getNextCompanies(
     url: string,
   ): Promise<CompanyFromLaPlateFormeDeLInclusion[]> {
-    var nextPageURL = url;
     return axios
-      .get(nextPageURL)
+      .get(url)
       .then(async (response: any) => {
         if (response.data.next != null) {
           return this.getNextCompanies(response.data.next)
@@ -115,7 +134,6 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
                 error,
                 "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
               );
-              nextPageURL = "null";
               return [];
             });
         } else {
@@ -128,7 +146,6 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
           error,
           "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
         );
-        nextPageURL = "null";
         return [];
       });
   }
@@ -154,30 +171,6 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
     }
     return cleanedCompanies;
   }*/
-
-  mapCompanyFromLaPlateFormeDeLInclusionToCompanyEntity(
-    company: CompanyFromLaPlateFormeDeLInclusion,
-  ): UncompleteCompanyEntity {
-    return new UncompleteCompanyEntity({
-      id: uuidV4(),
-      address:
-        company.addresse_ligne_1 +
-        " " +
-        company.addresse_ligne_2 +
-        " " +
-        company.code_postal +
-        " " +
-        company.ville,
-      city: company.ville,
-      score: 6,
-      romes: company.postes.map((poste) =>
-        poste.rome.substring(poste.rome.length - 6, poste.rome.length - 1),
-      ),
-      siret: company.siret,
-      dataSource: "api_laplateformedelinclusion",
-      name: company.enseigne,
-    });
-  }
 
   async getGPSFromAddressAPIAdresse(address: string) {
     return axios

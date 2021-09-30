@@ -7,34 +7,10 @@ import { v4 as uuidV4 } from "uuid";
 import { string } from "yup/lib/locale";
 import { fakeCompaniesLaPlateFormeDeLInclusion } from "./fakeCompaniesLaPlateFormeDeLInclusion";
 import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
-
-export type CompanyFromLaPlateFormeDeLInclusion = {
-  cree_le: string;
-  mis_a_jour_le: string;
-
-  siret: string;
-  type: string;
-  raison_sociale: string;
-  enseigne: string;
-  site_web: string;
-  description: string;
-  bloque_candidatures: boolean;
-  addresse_ligne_1: string;
-  addresse_ligne_2: string;
-  code_postal: string;
-  ville: string;
-  departement: string;
-  postes: JobFromLaPlateFormeDeLInclusion[];
-};
-type JobFromLaPlateFormeDeLInclusion = {
-  id: number;
-  rome: string;
-  cree_le: string;
-  mis_a_jour_le: string;
-  recrutement_ouvert: string;
-  description: string;
-  appellation_modifiee: string;
-};
+import {
+  convertLaPlateFormeDeLInclusionToUncompletCompany,
+  CompanyFromLaPlateFormeDeLInclusion,
+} from "./LaPlateFormeDeLInclusionGateway";
 
 export class FakeLaPlateFormeDeLInclusionGateway implements CompaniesGateway {
   private readonly logger = logger.child({
@@ -44,82 +20,10 @@ export class FakeLaPlateFormeDeLInclusionGateway implements CompaniesGateway {
   async getCompanies(
     searchParams: SearchParams,
   ): Promise<UncompleteCompanyEntity[]> {
-    var companies: CompanyFromLaPlateFormeDeLInclusion[] =
+    const companies: CompanyFromLaPlateFormeDeLInclusion[] =
       fakeCompaniesLaPlateFormeDeLInclusion;
-    return fakeCompaniesLaPlateFormeDeLInclusion.map((company) =>
-      this.mapCompanyFromLaPlateFormeDeLInclusionToCompanyEntity(company),
+    return fakeCompaniesLaPlateFormeDeLInclusion.map(
+      convertLaPlateFormeDeLInclusionToUncompletCompany,
     );
-  }
-
-  /*
-  Clean company data before insertion into the database with external APIs
-  */
-  async enrichCompanyData(
-    companies: CompanyEntity[],
-  ): Promise<CompanyEntity[]> {
-    return companies;
-  }
-
-  mapCompanyFromLaPlateFormeDeLInclusionToCompanyEntity(
-    company: CompanyFromLaPlateFormeDeLInclusion,
-  ): UncompleteCompanyEntity {
-    return new UncompleteCompanyEntity({
-      id: uuidV4(),
-      address:
-        company.addresse_ligne_1 +
-        " " +
-        company.addresse_ligne_2 +
-        " " +
-        company.code_postal +
-        " " +
-        company.ville,
-      city: company.ville,
-      score: 6,
-      romes: company.postes.map((poste) =>
-        poste.rome.substring(poste.rome.length - 6, poste.rome.length - 1),
-      ),
-      siret: company.siret,
-      dataSource: "api_laplateformedelinclusion",
-      name: company.enseigne,
-    });
-  }
-
-  async getGPSFromAddressAPIAdresse(address: string) {
-    return axios
-      .get("https://api-adresse.data.gouv.fr/search/", {
-        params: {
-          q: address,
-        },
-      })
-      .then((response: any) => {
-        return response.data.features[0].geometry.coordinates;
-      })
-      .catch(function (error: any) {
-        return [-1, -1];
-      });
-  }
-  /*
-    Returns city code from latitude and longitude parameters using the api-adresse API from data.gouv
-    Returns -1 if did not find
-    */
-  async getCityCodeFromLatLongAPIAdresse(
-    lat: number,
-    lon: number,
-  ): Promise<number> {
-    return axios
-      .get("https://api-adresse.data.gouv.fr/reverse/", {
-        params: {
-          lon: lon,
-          lat: lat,
-        },
-      })
-      .then((response: any) => {
-        if (response.data.features.length != 0)
-          return response.data.features[0].properties.citycode;
-        else return -1;
-      })
-      .catch(function (error: any) {
-        return -1;
-      });
   }
 }
