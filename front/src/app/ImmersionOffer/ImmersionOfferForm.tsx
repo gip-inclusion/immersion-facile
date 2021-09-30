@@ -157,6 +157,7 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
                 />
                 {submitCount !== 0 && Object.values(errors).length > 0 && (
                   <div style={{ color: "red" }}>
+                    {console.log(errors)}
                     Veuillez corriger les champs erronés :
                     <ul>
                       {Object.values(errors).map((err) =>
