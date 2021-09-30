@@ -137,6 +137,8 @@ export class AirtableImmersionOfferRepository
     }
 
     try {
+      logger.debug(this.table.name, "Table Name");
+      logger.debug(this.converter.dtoToFieldSet(dto), "Coverted Dto");
       const response = await this.table.create([
         {
           fields: this.converter.dtoToFieldSet(dto),

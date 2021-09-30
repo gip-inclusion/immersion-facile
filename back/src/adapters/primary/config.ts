@@ -29,6 +29,10 @@ import {
 } from "../secondary/AirtableApplicationDataConverters";
 import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
 import {
+  AirtableImmersionOfferRepository,
+  immersionOfferDataConverter,
+} from "../secondary/AirtableImmersionOfferRepositroy";
+import {
   ApplicationRepositoryMap,
   ApplicationRepositorySwitcher,
 } from "../secondary/ApplicationRepositorySwitcher";
@@ -53,6 +57,9 @@ import { PoleEmploiAccessTokenGateway } from "./../secondary/PoleEmploiAccessTok
 import { PoleEmploiRomeGateway } from "./../secondary/PoleEmploiRomeGateway";
 
 const logger = createLogger(__filename);
+const useAirtable = (): boolean => {
+  return process.env.REPOSITORIES === "AIRTABLE";
+};
 
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
@@ -73,10 +80,9 @@ const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 const getApplicationRepository = (
   featureFlags: FeatureFlags,
 ): DemandeImmersionRepository => {
-  const useAirtable = process.env.REPOSITORIES === "AIRTABLE";
   const repositoriesBySource: ApplicationRepositoryMap = {};
   if (featureFlags.enableGenericApplicationForm) {
-    repositoriesBySource["GENERIC"] = useAirtable
+    repositoriesBySource["GENERIC"] = useAirtable()
       ? AirtableDemandeImmersionRepository.create(
           getEnvVarOrDie("AIRTABLE_API_KEY"),
           getEnvVarOrDie("AIRTABLE_BASE_ID_GENERIC"),
@@ -86,7 +92,7 @@ const getApplicationRepository = (
       : new InMemoryDemandeImmersionRepository();
   }
   if (featureFlags.enableBoulogneSurMerApplicationForm) {
-    repositoriesBySource["BOULOGNE_SUR_MER"] = useAirtable
+    repositoriesBySource["BOULOGNE_SUR_MER"] = useAirtable()
       ? AirtableDemandeImmersionRepository.create(
           getEnvVarOrDie("AIRTABLE_API_KEY"),
           getEnvVarOrDie("AIRTABLE_BASE_ID_BOULOGNE_SUR_MER"),
@@ -96,7 +102,7 @@ const getApplicationRepository = (
       : new InMemoryDemandeImmersionRepository();
   }
   if (featureFlags.enableNarbonneApplicationForm) {
-    repositoriesBySource["NARBONNE"] = useAirtable
+    repositoriesBySource["NARBONNE"] = useAirtable()
       ? AirtableDemandeImmersionRepository.create(
           getEnvVarOrDie("AIRTABLE_API_KEY"),
           getEnvVarOrDie("AIRTABLE_BASE_ID_NARBONNE"),
@@ -109,7 +115,7 @@ const getApplicationRepository = (
 };
 
 const createRepositories = (featureFlags: FeatureFlags) => {
-  logger.info("Repositories : " + process.env.REPOSITORIES ?? "IN_MEMORY");
+  logger.info("REPOSITORIES : " + process.env.REPOSITORIES ?? "IN_MEMORY");
   logger.info(
     "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY",
   );
@@ -118,6 +124,15 @@ const createRepositories = (featureFlags: FeatureFlags) => {
 
   return {
     demandeImmersion: getApplicationRepository(featureFlags),
+    immersionOffer: useAirtable()
+      ? AirtableImmersionOfferRepository.create(
+          getEnvVarOrDie("AIRTABLE_API_KEY"),
+          getEnvVarOrDie("AIRTABLE_BASE_ID_IMMERSION_OFFER"),
+          getEnvVarOrDie("AIRTABLE_TABLE_NAME_IMMERSION_OFFER"),
+          immersionOfferDataConverter,
+        )
+      : new InMemoryImmersionOfferRepository(),
+
     sirene:
       process.env.SIRENE_REPOSITORY === "HTTPS"
         ? HttpsSireneRepository.create(
@@ -145,7 +160,6 @@ const createRepositories = (featureFlags: FeatureFlags) => {
         : new InMemoryRomeGateway(),
 
     outbox: new InMemoryOutboxRepository(),
-    ImmersionOffer: new InMemoryImmersionOfferRepository(),
   };
 };
 
@@ -255,7 +269,7 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
     ),
 
     // immersionOffer
-    addImmersionOffer: new AddImmersionOffer(repositories.ImmersionOffer),
+    addImmersionOffer: new AddImmersionOffer(repositories.immersionOffer),
 
     // siret
     getSiret: new GetSiret({
