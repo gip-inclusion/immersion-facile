@@ -20,13 +20,13 @@ services:
     ports:
       - "${EXPOSED_PORT:-80}:80"
 
-  postgres:
-    image: postgres:13
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_DB: immersion-db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pg-password
-    volumes:
-      - ./docker-data/postgresql:/var/lib/postgresql/data
+#  postgres:
+#    image: postgres:13
+#    ports:
+#      - 5432:5432
+#    environment:
+#      POSTGRES_DB: immersion-db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: pg-password
+#    volumes:
+#      - ./docker-data/postgresql:/var/lib/postgresql/data
