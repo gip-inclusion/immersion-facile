@@ -85,7 +85,7 @@ deploy_on_dev:
       cat .env.variables <(echo) .env.secrets <(echo) > .env;
       rm -f .env.variables .env.secrets;
 
-      docker-compose --env-file .env build;
+      docker-compose --env-file .env build &&
       docker-compose down;
       docker-compose up -d &&
       rm -f .env;"
@@ -116,7 +116,7 @@ deploy_on_beta:
       cat .env.variables <(echo) .env.secrets <(echo) > .env;
       rm -f .env.variables .env.secrets;
 
-      docker-compose --env-file .env build;
+      docker-compose --env-file .env build &&
       docker-compose down;
       docker-compose up -d &&
       rm -f .env;"
