@@ -47,9 +47,7 @@ describe("Postgres implementation of immersion proposal repository", () => {
 
   test.skip("Insert immersion works", async () => {
     const pgImmersionOfferRepository = new PgImmersionOfferRepository();
-    const laBonneBoiteGateway = new LaBonneBoiteGateway(
-      new PoleEmploiAPIGateway(),
-    );
+    const laBonneBoiteGateway = new FakeLaBonneBoiteGateway();
 
     const searchImmersion = new SearchImmersion(laBonneBoiteGateway);
     const immersions = await searchImmersion.execute({

@@ -1,14 +1,11 @@
 import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
 import { SearchParams } from "../../../domain/searchImmersion/ports/SearchParams";
-import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyEntity";
 import axios from "axios";
-import { logger } from "../../../utils/logger";
+import { createLogger } from "../../../utils/logger";
 import { v4 as uuidV4 } from "uuid";
-import { string } from "yup/lib/locale";
-import {
-  UncompleteCompanyEntity,
-  UncompleteCompanyProps,
-} from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
+import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
+
+const logger = createLogger(__filename);
 
 export type CompanyFromLaPlateFormeDeLInclusion = {
   cree_le: Date;
@@ -64,10 +61,6 @@ export const convertLaPlateFormeDeLInclusionToUncompletCompany = (
 
 export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
   // constructor(private httpCalls: HttpCallsToLaPlateFormeDeLInclusion) {}
-
-  private readonly logger = logger.child({
-    logsource: "LaPlateFormeDeLInclusionGateway",
-  });
 
   async getCompanies(
     searchParams: SearchParams,

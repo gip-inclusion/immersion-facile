@@ -5,7 +5,6 @@ import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyE
 import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
 import type { SearchParams } from "../../../domain/searchImmersion/ports/SearchParams";
 import { createLogger } from "../../../utils/logger";
-import { PoleEmploiAPIGateway } from "./PoleEmploiAPIGateway";
 import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
 
 const logger = createLogger(__filename);
@@ -28,14 +27,15 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
     private readonly poleEmploiClientId: string,
   ) {}
 
-  async getCompanies(searchParams: SearchParams): Promise<CompanyEntity[]> {
+  async getCompanies(
+    searchParams: SearchParams,
+  ): Promise<UncompleteCompanyEntity[]> {
     const response = await this.accessTokenGateway.getAccessToken(
       `application_${this.poleEmploiClientId} api_labonneboitev1`,
     );
     const headers = {
       Authorization: "Bearer " + response.access_token,
     };
-    console.log("Above to fetch");
     return axios
       .get(
         "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",

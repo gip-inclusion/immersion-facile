@@ -1,11 +1,6 @@
 import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
-import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyEntity";
 import type { SearchParams } from "../../../domain/searchImmersion/ports/SearchParams";
-import axios from "axios";
-import querystring from "querystring";
 import { v4 as uuidV4 } from "uuid";
-import { fakeCompanies } from "./fakeCompanies";
-import { PoleEmploiAPIGateway } from "./PoleEmploiAPIGateway";
 import { fakeCompaniesLaBonneBoite } from "./fakeCompaniesLaBonneBoite";
 import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
 
