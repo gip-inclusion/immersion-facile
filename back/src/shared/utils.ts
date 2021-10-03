@@ -12,3 +12,5 @@ export const removeAtIndex = <T>(array: T[], indexToRemove: number): T[] => [
   ...array.slice(0, indexToRemove),
   ...array.slice(indexToRemove + 1),
 ];
+
+export type NotEmptyArray<T> = [T, ...T[]];

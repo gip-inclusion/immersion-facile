@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from "react";
 import { demandeImmersionGateway } from "src/app/main";
 import { routes } from "src/app/routes";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../../../back/src/shared/ImmersionApplicationDto";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { Route } from "type-route";
 import "./Admin.css";

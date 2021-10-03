@@ -19,7 +19,7 @@ import { ENV } from "src/environmentVariables";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
-} from "src/shared/ImmersionApplicationDto";
+} from "../../../../back/src/shared/ImmersionApplicationDto";
 
 const { featureFlags } = ENV;
 

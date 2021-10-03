@@ -16,7 +16,7 @@ import {
   ApplicationSource,
   ImmersionApplicationDto,
   immersionApplicationSchema,
-} from "src/shared/ImmersionApplicationDto";
+} from "../../../../back/src/shared/ImmersionApplicationDto";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 
 type ApplicationFormRoute = Route<
