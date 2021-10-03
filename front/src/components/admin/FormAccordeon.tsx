@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import {
+import type {
   ImmersionApplicationDto,
   ApplicationStatus,
-} from "../../../../back/src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplicationDto";
 import { formatDistance, formatDuration, intervalToDuration } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Accordeon } from "./Accordeon";

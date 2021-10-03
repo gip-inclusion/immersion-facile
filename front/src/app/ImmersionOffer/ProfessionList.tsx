@@ -37,10 +37,7 @@ export const ProfessionList = ({ name, title }: ProfessionListProps) => {
       </div>
       <ButtonAdd
         onClick={() =>
-          setValue([
-            ...field.value,
-            { romeCodeMetier: "", description: "" } as ProfessionDto,
-          ])
+          setValue([...field.value, { romeCodeMetier: "", description: "" }])
         }
       >
         Ajouter un métier

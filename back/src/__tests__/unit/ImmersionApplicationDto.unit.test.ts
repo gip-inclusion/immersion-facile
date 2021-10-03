@@ -151,17 +151,15 @@ const expectDemandeImmersionDtoToBeValid = (
   validDemandeImmersionDto: ImmersionApplicationDto,
 ) => {
   expect(() =>
-    immersionApplicationSchema.validateSync(validDemandeImmersionDto),
+    immersionApplicationSchema.parse(validDemandeImmersionDto),
   ).not.toThrow();
 
   expect(
-    immersionApplicationSchema.validateSync(validDemandeImmersionDto),
+    immersionApplicationSchema.parse(validDemandeImmersionDto),
   ).toBeTruthy();
 };
 
 const expectDemandeImmersionDtoToBeInvalid = (
   demandeImmersionDto: ImmersionApplicationDto,
 ) =>
-  expect(() =>
-    immersionApplicationSchema.validateSync(demandeImmersionDto),
-  ).toThrow();
+  expect(() => immersionApplicationSchema.parse(demandeImmersionDto)).toThrow();

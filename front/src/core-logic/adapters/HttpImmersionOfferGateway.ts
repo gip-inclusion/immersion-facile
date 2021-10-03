@@ -23,7 +23,7 @@ export class HttpImmersionOfferGateway implements ImmersionOfferGateway {
       immersionOffer,
     );
     const responseDto: AddImmersionOfferResponseDto = httpResponse.data;
-    await addImmersionOfferResponseSchema.validate(responseDto);
+    addImmersionOfferResponseSchema.parse(responseDto);
     return responseDto;
   }
 
@@ -34,7 +34,7 @@ export class HttpImmersionOfferGateway implements ImmersionOfferGateway {
       params: { searchText },
     });
     const responseDto: RomeSearchResponseDto = httpResponse.data;
-    await romeSearchResponseSchema.validate(responseDto);
+    romeSearchResponseSchema.parse(responseDto);
     return responseDto;
   }
 }

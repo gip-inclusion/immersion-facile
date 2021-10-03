@@ -3,7 +3,7 @@ import { professionSchema } from "../../shared/rome";
 describe("professionSchema", () => {
   test("must include exactly one code", () => {
     expect(() =>
-      professionSchema.validateSync({
+      professionSchema.parse({
         romeCodeMetier: "A0000",
         romeCodeAppellation: undefined,
         description: "description",
@@ -11,7 +11,7 @@ describe("professionSchema", () => {
     ).not.toThrowError();
 
     expect(() =>
-      professionSchema.validateSync({
+      professionSchema.parse({
         romeCodeMetier: undefined,
         romeCodeAppellation: "00000",
         description: "description",
@@ -19,7 +19,7 @@ describe("professionSchema", () => {
     ).not.toThrowError();
 
     expect(() =>
-      professionSchema.validateSync({
+      professionSchema.parse({
         romeCodeMetier: "A0000",
         romeCodeAppellation: "00000",
         description: "description",
@@ -27,7 +27,7 @@ describe("professionSchema", () => {
     ).toThrowError();
 
     expect(() =>
-      professionSchema.validateSync({
+      professionSchema.parse({
         romeCodeMetier: undefined,
         romeCodeAppellation: undefined,
         description: "description",

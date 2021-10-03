@@ -23,7 +23,7 @@ export class AddImmersionOffer
   ): Promise<AddImmersionOfferResponseDto> {
     logger.debug({ dto: dto }, "Execute AddImmersionOffer Use case, with DTO");
 
-    immersionOfferSchema.validateSync(dto, { abortEarly: false });
+    immersionOfferSchema.parse(dto);
 
     const id = await this.immersionOfferRepository.save(dto);
 

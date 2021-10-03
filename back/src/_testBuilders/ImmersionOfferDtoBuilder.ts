@@ -22,11 +22,11 @@ const valideImmersionOffer: ImmersionOfferDto = {
     {
       romeCodeMetier: "A1111",
       description: "Boulangerie",
-    } as ProfessionDto,
+    },
     {
       romeCodeAppellation: "22222",
       description: "Boucher / Bouchère",
-    } as ProfessionDto,
+    },
   ],
 };
 

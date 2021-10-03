@@ -6,7 +6,7 @@ import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionAppli
 import {
   ImmersionApplicationDto,
   ImmersionApplicationId,
-} from "../../../../back/src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplicationDto";
 import { FeatureFlags } from "src/shared/featureFlags";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { sleep } from "src/shared/utils";

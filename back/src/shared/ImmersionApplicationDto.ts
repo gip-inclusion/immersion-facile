@@ -1,7 +1,14 @@
-import * as Yup from "../../node_modules/yup";
+import { z } from "../../node_modules/zod";
+import {
+  emailAndMentorEmailAreDifferent,
+  startDateIsBeforeEndDate,
+  submissionAndStartDatesConstraints,
+  underMaxDuration,
+} from "./immersionApplicationRefinement";
 import { LegacyScheduleDto, ScheduleDto } from "./ScheduleSchema";
 import { Flavor } from "./typeFlavors";
-import { phoneRegExp } from "./utils";
+import { NotEmptyArray, phoneRegExp } from "./utils";
+import { zBoolean, zEmail, zRequiredString, zTrue } from "./zodUtils";
 
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
@@ -11,6 +18,10 @@ const validApplicationStatus: ApplicationStatus[] = [
   "DRAFT",
   "IN_REVIEW",
   "VALIDATED",
+];
+const allApplicationStatuses: NotEmptyArray<ApplicationStatus> = [
+  "UNKNOWN",
+  ...validApplicationStatus,
 ];
 export const applicationStatusFromString = (s: string): ApplicationStatus => {
   const status = s as ApplicationStatus;
@@ -23,7 +34,7 @@ export type ApplicationSource =
   | "GENERIC"
   | "BOULOGNE_SUR_MER"
   | "NARBONNE";
-const validApplicationSources: ApplicationSource[] = [
+const validApplicationSources: NotEmptyArray<ApplicationSource> = [
   "GENERIC",
   "BOULOGNE_SUR_MER",
   "NARBONNE",
@@ -34,196 +45,110 @@ export const applicationSourceFromString = (s: string): ApplicationSource => {
   return "UNKNOWN";
 };
 
-export type ImmersionApplicationId = Flavor<string, "ImmersionApplicationId">;
+const scheduleSchema: z.ZodSchema<ScheduleDto> = z.any();
+const legacyScheduleSchema: z.ZodSchema<LegacyScheduleDto> = z.any();
 
-export const immersionApplicationSchema = Yup.object({
-  id: Yup.mixed<ImmersionApplicationId>()
-    .required("Obligatoire")
-    .test("no-empty-id", "L'ID est obligatoire", (value) => {
-      if (typeof value !== "string") return false;
-      return value.trim() !== "";
-    }),
-  status: Yup.mixed<ApplicationStatus>()
-    .oneOf(validApplicationStatus)
-    .required("Obligatoire"),
-  source: Yup.mixed<ApplicationSource>()
-    .oneOf(validApplicationSources)
-    .required(),
-  email: Yup.string()
-    .trim()
-    .required("Obligatoire")
-    .email("Veuillez saisir une adresse e-mail valide"),
-  firstName: Yup.string().trim().required("Obligatoire"),
-  lastName: Yup.string().trim().required("Obligatoire"),
-  phone: Yup.string()
-    .trim()
-    .matches(phoneRegExp, "Numero de téléphone incorrect")
-    .nullable(true),
-  dateSubmission: Yup.string()
-    .trim()
-    .matches(dateRegExp, "La date de saisie est invalide.")
-    .required("Obligatoire"),
-  dateStart: Yup.string()
-    .trim()
-    .matches(dateRegExp, "La date de démarrage est invalide.")
-    .test(
-      "dateStart-min",
-      "La date de démarrage doit étre au moins 2 jours après la saisie.",
-      (value, context) => {
-        if (!value || !context.parent.dateSubmission) {
-          return false;
-        }
-        const startDate = new Date(value);
-        const submissionDate = new Date(context.parent.dateSubmission);
+export type ImmersionApplicationId = Flavor<string, "DemandeImmersionId">;
+const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
+  zRequiredString;
 
-        const minStartDate = new Date(submissionDate);
-        minStartDate.setDate(minStartDate.getDate() + 2);
-        return startDate >= minStartDate;
-      },
-    )
-    .required("Obligatoire"),
-  dateEnd: Yup.string()
-    .trim()
-    .matches(dateRegExp, "La date de fin invalide.")
-    .test(
-      "dateEnd-min",
-      "La date de fin doit être après la date de début.",
-      (value, context) => {
-        if (!value || !context.parent.dateStart) {
-          return false;
-        }
-        const startDate = new Date(context.parent.dateStart);
-        const endDate = new Date(value);
-
-        return endDate > startDate;
-      },
-    )
-    .test(
-      "dateEnd-max",
-      "La durée maximale d'immersion est de 28 jours.",
-      (value, context) => {
-        if (!value || !context.parent.dateStart) {
-          return false;
-        }
-        const startDate = new Date(context.parent.dateStart);
-        const endDate = new Date(value);
-
-        const maxEndDate = new Date(startDate);
-        maxEndDate.setDate(maxEndDate.getDate() + 28);
-        return endDate <= maxEndDate;
-      },
-    )
-    .required("Obligatoire"),
-  siret: Yup.string()
-    .trim()
-    .required("Obligatoire")
-    .length(14, "SIRET doit étre composé de 14 chiffres"),
-  businessName: Yup.string().trim().required("Obligatoire"),
-
-  mentor: Yup.string().trim().required("Obligatoire"),
-  mentorPhone: Yup.string()
-    .trim()
-    .required("Obligatoire")
-    .matches(phoneRegExp, "Numero de téléphone de tuteur incorrect"),
-  mentorEmail: Yup.string()
-    .trim()
-    .required("Obligatoire")
-    .email("Veuillez saisir une adresse mail correcte")
-    .test(
-      "notEqualToOtherEmail",
-      "Votre adresse e-mail doit être différente de celle du tuteur",
-      (value, context) => {
-        if (!value || !context.parent.email) {
-          return false;
-        }
-
-        return context.parent.email !== value;
-      },
+// prettier-ignore
+export type ImmersionApplicationDto = z.infer<typeof immersionApplicationSchema>;
+export const immersionApplicationSchema = z
+  .object({
+    id: immersionApplicationIdSchema,
+    status: z.enum(allApplicationStatuses),
+    source: z.enum(validApplicationSources),
+    email: zEmail,
+    firstName: zRequiredString,
+    lastName: zRequiredString,
+    phone: zRequiredString
+      .regex(phoneRegExp, "Numero de téléphone incorrect")
+      .optional(),
+    dateSubmission: zRequiredString.regex(
+      dateRegExp,
+      "La date de saisie est invalide.",
     ),
+    dateStart: zRequiredString.regex(
+      dateRegExp,
+      "La date de démarrage est invalide.",
+    ),
+    dateEnd: zRequiredString.regex(dateRegExp, "La date de fin invalide."),
 
-  schedule: Yup.mixed<ScheduleDto>().required(),
-  legacySchedule: Yup.mixed<LegacyScheduleDto>(),
+    siret: zRequiredString.length(14, "SIRET doit étre composé de 14 chiffres"),
+    businessName: zRequiredString,
+    mentor: zRequiredString,
+    mentorPhone: zRequiredString.regex(
+      phoneRegExp,
+      "Numero de téléphone de tuteur incorrect",
+    ),
+    mentorEmail: zEmail,
+    //
+    schedule: scheduleSchema,
+    legacySchedule: legacyScheduleSchema.optional(),
+    individualProtection: zBoolean,
+    sanitaryPrevention: zBoolean,
+    sanitaryPreventionDescription: z.string().optional(),
 
-  individualProtection: Yup.boolean().required("Obligatoire"),
-  sanitaryPrevention: Yup.boolean().required("Obligatoire"),
-  sanitaryPreventionDescription: Yup.string().trim().nullable(true),
+    immersionAddress: z.string().optional(),
+    immersionObjective: z.string().optional(),
+    immersionProfession: zRequiredString,
+    immersionActivities: zRequiredString,
+    immersionSkills: z.string().optional(),
+    beneficiaryAccepted: zTrue,
+    enterpriseAccepted: zTrue,
+  })
+  .refine(
+    submissionAndStartDatesConstraints,
+    "La date de démarrage doit étre au moins 2 jours après la saisie.",
+  )
+  .refine(
+    startDateIsBeforeEndDate,
+    "La date de fin doit être après la date de début.",
+  )
+  .refine(underMaxDuration, "La durée maximale d'immersion est de 28 jours.")
+  .refine(
+    emailAndMentorEmailAreDifferent,
+    "Votre adresse e-mail doit être différente de celle du tuteur",
+  );
 
-  immersionAddress: Yup.string().trim().nullable(true),
-  immersionObjective: Yup.string().trim().nullable(true),
-  immersionProfession: Yup.string().trim().required("Obligatoire"),
-  immersionActivities: Yup.string().trim().required("Obligatoire"),
-  immersionSkills: Yup.string().trim().nullable(true),
-  beneficiaryAccepted: Yup.boolean().equals(
-    [true],
-    "L'engagement est obligatoire",
-  ),
-  enterpriseAccepted: Yup.boolean().equals(
-    [true],
-    "L'engagement est obligatoire",
-  ),
-}).required();
-
-export const immersionApplicationArraySchema = Yup.array().of(
+export const immersionApplicationArraySchema = z.array(
   immersionApplicationSchema,
 );
 
-export type ImmersionApplicationDto = Yup.InferType<
-  typeof immersionApplicationSchema
->;
+const idInObject = z.object({
+  id: immersionApplicationIdSchema,
+});
 
-export const addImmersionApplicationResponseDtoSchema = Yup.object({
-  id: Yup.mixed<ImmersionApplicationId>().required(),
-}).required();
+// prettier-ignore
+export type AddImmersionApplicationResponseDto = z.infer<typeof addImmersionApplicationResponseDtoSchema>;
+export const addImmersionApplicationResponseDtoSchema = idInObject;
 
-export type AddImmersionApplicationResponseDto = Yup.InferType<
-  typeof addImmersionApplicationResponseDtoSchema
->;
+// prettier-ignore
+export type GetImmersionApplicationRequestDto = z.infer<typeof getImmersionApplicationRequestDtoSchema>;
+export const getImmersionApplicationRequestDtoSchema = idInObject;
 
-export const getImmersionApplicationRequestDtoSchema = Yup.object({
-  id: Yup.mixed<ImmersionApplicationId>().required(),
-}).required();
+// prettier-ignore
+export type UpdateImmersionApplicationRequestDto = z.infer<typeof updateImmersionApplicationRequestDtoSchema>;
+export const updateImmersionApplicationRequestDtoSchema = z
+  .object({
+    demandeImmersion: immersionApplicationSchema,
+    id: immersionApplicationIdSchema,
+  })
+  .refine(
+    ({ demandeImmersion, id }) => id === demandeImmersion.id,
+    "The ID in the URL path must match the ID in the request body.",
+  );
 
-export type GetImmersionApplicationRequestDto = Yup.InferType<
-  typeof getImmersionApplicationRequestDtoSchema
->;
+// prettier-ignore
+export type UpdateImmersionApplicationResponseDto = z.infer<typeof updateImmersionApplicationResponseDtoSchema>;
+export const updateImmersionApplicationResponseDtoSchema = idInObject;
 
-export const updateImmersionApplicationRequestDtoSchema = Yup.object({
-  id: Yup.mixed<ImmersionApplicationId>()
-    .required()
-    .test(
-      "id-match",
-      "The ID in the URL path must match the ID in the request body.",
-      (value, context) =>
-        value &&
-        context.parent.demandeImmersion &&
-        value === context.parent.demandeImmersion.id,
-    ),
-  demandeImmersion: immersionApplicationSchema.required(),
-}).required();
-
-export type UpdateImmersionApplicationRequestDto = Yup.InferType<
-  typeof updateImmersionApplicationRequestDtoSchema
->;
-
-export const updateImmersionApplicationResponseDtoSchema = Yup.object({
-  id: Yup.mixed<ImmersionApplicationId>().required(),
-}).required();
-
-export type UpdateImmersionApplicationResponseDto = Yup.InferType<
-  typeof updateImmersionApplicationResponseDtoSchema
->;
-
+// prettier-ignore
+export type ValidateImmersionApplicationRequestDto = z.infer<typeof validateImmersionApplicationRequestDtoSchema>;
 export const validateImmersionApplicationRequestDtoSchema =
-  Yup.mixed<ImmersionApplicationId>().required();
+  immersionApplicationIdSchema;
 
-export type ValidateImmersionApplicationRequestDto = Yup.InferType<
-  typeof validateImmersionApplicationRequestDtoSchema
->;
-
-export const validateImmersionApplicationResponseDtoSchema = Yup.object({
-  id: Yup.mixed<ImmersionApplicationId>().required(),
-}).required();
-
-export type ValidateImmersionApplicationResponseDto = Yup.InferType<
-  typeof validateImmersionApplicationResponseDtoSchema
->;
+// prettier-ignore
+export type ValidateImmersionApplicationResponseDto = z.infer<typeof validateImmersionApplicationResponseDtoSchema>;
+export const validateImmersionApplicationResponseDtoSchema = idInObject;

@@ -16,10 +16,10 @@ import {
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { ENV } from "src/environmentVariables";
-import {
+import type {
   ApplicationStatus,
   ImmersionApplicationDto,
-} from "../../../../back/src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplicationDto";
 
 const { featureFlags } = ENV;
 

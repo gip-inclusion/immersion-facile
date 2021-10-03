@@ -5,8 +5,7 @@ import {
 import { InMemoryTodoGateway } from "src/core-logic/adapters/InMemoryTodoGateway";
 import { actions } from "src/core-logic/store/rootActions";
 import type { RootState } from "src/core-logic/store/rootReducer";
-import { todoSlice } from "src/core-logic/useCases/todoSlice";
-import type { TodoDto } from "src/shared/TodoDto";
+import { todoSlice, TodoDto } from "src/core-logic/useCases/todoSlice";
 
 const makeExpectStateToEqual =
   (store: ReduxStore) => (expectedState: RootState) =>

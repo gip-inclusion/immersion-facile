@@ -1,4 +1,4 @@
-import { TodoDto } from "src/shared/TodoDto";
+import type { TodoDto } from "src/core-logic/useCases/todoSlice";
 
 export interface TodoGateway {
   retrieveAll: () => Promise<TodoDto[]>;

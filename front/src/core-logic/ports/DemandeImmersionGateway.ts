@@ -1,8 +1,8 @@
 import { CompanyInfoFromSiretApi } from "src/core-logic/ports/CompanyInfoFromSiretApi";
-import {
+import type {
   ImmersionApplicationDto,
   ImmersionApplicationId,
-} from "../../../../back/src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplicationDto";
 
 export interface DemandeImmersionGateway {
   add: (demandeImmersionDto: ImmersionApplicationDto) => Promise<string>;

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Accordeon } from "./Accordeon";
 import { TextCell } from "./TextCell";
 import { FormAccordeonProps as FormAccordeonProps } from "./FormAccordeon";
-import { ImmersionApplicationDto } from "../../../../back/src/shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 
 type FieldForFormDetails = {
   title: string;
@@ -50,7 +50,13 @@ export const FormDetails = ({ data }: FormAccordeonProps) => (
       return (
         <Accordeon title={listTitle} key={listTitle}>
           {fields.map(({ title, key }) => {
-            return <TextCell title={title} contents={data[key]} key={key} />;
+            return (
+              <TextCell
+                title={title}
+                contents={JSON.stringify(data[key])}
+                key={key}
+              />
+            );
           })}
         </Accordeon>
       );

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Accordeon } from "./Accordeon";
 import { TextCell } from "./TextCell";
 import { FormAccordeonProps } from "./FormAccordeon";
-import { ImmersionApplicationDto } from "../../../../back/src/shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { prettyPrintSchedule } from "src/shared/ScheduleUtils";
 
 type KeyedFormData = { title: string; key: keyof ImmersionApplicationDto };
@@ -72,7 +72,7 @@ export const FormDetails = ({ data }: FormAccordeonProps) => {
                 return (
                   <TextCell
                     title={formData.title}
-                    contents={data[formData.key]}
+                    contents={JSON.stringify(data[formData.key])}
                     key={formData.title}
                   />
                 );

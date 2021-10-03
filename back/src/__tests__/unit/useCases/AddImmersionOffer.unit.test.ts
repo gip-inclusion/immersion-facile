@@ -1,11 +1,8 @@
-import * as yup from "yup";
+import { z } from "zod";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/InMemoryImmersionOfferRepository";
 import { AddImmersionOffer } from "../../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { ImmersionOfferDtoBuilder } from "../../../_testBuilders/ImmersionOfferDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { createLogger } from "../../../utils/logger";
-
-const logger = createLogger(__filename);
 
 describe("Add ImmersionOffer", () => {
   let addImmersionOffer: AddImmersionOffer;
@@ -33,13 +30,9 @@ describe("Add ImmersionOffer", () => {
     const emptyImmersionOffer =
       ImmersionOfferDtoBuilder.allEmptyFields().build();
 
-    // We expect 8 errors as it exactly corresponds to missing fields
-    const expectedError = new yup.ValidationError("8 errors occurred");
-
-    await expectPromiseToFailWithError(
+    await expect(
       addImmersionOffer.execute(emptyImmersionOffer),
-      expectedError,
-    );
+    ).rejects.toThrow();
   });
 
   test("reject when tryingsaving Immersion offer in the repository with null ID", async () => {
@@ -47,9 +40,14 @@ describe("Add ImmersionOffer", () => {
       .withId("")
       .build();
 
-    await expectPromiseToFailWithError(
+    await expect(
       addImmersionOffer.execute(emptyImmersionOffer),
-      new yup.ValidationError("L'ID est obligatoire"),
-    );
+    ).rejects.toThrow();
+
+    await addImmersionOffer
+      .execute(emptyImmersionOffer)
+      .catch((e: z.ZodError) =>
+        expect(e.issues[0].message).toBe("Obligatoire"),
+      );
   });
 });

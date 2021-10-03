@@ -1,58 +1,51 @@
-import * as Yup from "../../node_modules/yup";
+import { z } from "../../node_modules/zod";
+import { zRequiredString } from "./zodUtils";
 
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 const romeCodeMetierRegex = /[A-N]\d{4}/;
 
-export const romeCodeMetierSchema = Yup.string().matches(
-  romeCodeMetierRegex,
-  "Code ROME incorrect",
-);
-
-export type RomeCodeMetierDto = Yup.InferType<typeof romeSearchResponseSchema>;
+export type RomeCodeMetierDto = z.infer<typeof romeSearchResponseSchema>;
+const romeCodeMetierSchema = z
+  .string()
+  .regex(romeCodeMetierRegex, "Code ROME incorrect");
 
 const romeCodeAppellationRegex = /\d{5}/;
+const romeCodeAppellationSchema = z
+  .string()
+  .regex(romeCodeAppellationRegex, "Code ROME incorrect");
 
-const romeCodeAppellationSchema = Yup.string().matches(
-  romeCodeAppellationRegex,
-  "Code ROME incorrect",
+export type ProfessionDto = z.infer<typeof professionSchema>;
+export const professionSchema = z
+  .object({
+    romeCodeMetier: romeCodeMetierSchema.optional(),
+    romeCodeAppellation: romeCodeAppellationSchema.optional(),
+    description: zRequiredString,
+  })
+  .refine(
+    ({ romeCodeMetier, romeCodeAppellation }) =>
+      !!romeCodeMetier !== !!romeCodeAppellation,
+    { message: "Obligatoire: 'romeCodeMetier' ou 'romeCodeAppellation'" },
+  );
+
+export type MatchRangeDto = z.infer<typeof matchRangeSchema>;
+const matchRangeSchema = z.object({
+  startIndexInclusive: z.number({ required_error: "Obligatoire" }).min(0).int(),
+  endIndexExclusive: z.number({ required_error: "Obligatoire" }).min(0).int(),
+});
+
+export type RomeSearchMatchDto = z.infer<typeof romeSearchMatchSchema>;
+export const romeSearchMatchSchema = z.object(
+  {
+    profession: professionSchema,
+    matchRanges: z.array(matchRangeSchema),
+  },
+  { required_error: "Obligatoire" },
 );
 
-export const professionSchema = Yup.object({
-  romeCodeMetier: romeCodeMetierSchema.test(
-    "romeCodeMetier-exactlyOneCode",
-    "Obligatoire: 'romeCodeMetier' ou 'romeCodeAppellation'",
-    (value, context) => !!value !== !!context.parent.romeCodeAppellation,
-  ),
-  romeCodeAppellation: romeCodeAppellationSchema,
-  description: Yup.string().required("Obligatoire"),
+export type RomeSearchRequestDto = z.infer<typeof romeSearchRequestSchema>;
+export const romeSearchRequestSchema = zRequiredString;
+
+export type RomeSearchResponseDto = z.infer<typeof romeSearchResponseSchema>;
+export const romeSearchResponseSchema = z.array(romeSearchMatchSchema, {
+  required_error: "Obligatoire",
 });
-
-export type ProfessionDto = Yup.InferType<typeof professionSchema>;
-
-const matchRangeSchema = Yup.object({
-  startIndexInclusive: Yup.number().min(0).integer().required("Obligatoire"),
-  endIndexExclusive: Yup.number().min(0).integer().required("Obligatoire"),
-});
-
-export type MatchRangeDto = Yup.InferType<typeof matchRangeSchema>;
-
-export const romeSearchMatchSchema = Yup.object({
-  profession: professionSchema.required("Obligatoire"),
-  matchRanges: Yup.array().of(matchRangeSchema).required("Obligatoire"),
-});
-
-export type RomeSearchMatchDto = Yup.InferType<typeof romeSearchMatchSchema>;
-
-export const romeSearchRequestSchema = Yup.string().required("Obligatoire");
-
-export type RomeSearchRequestDto = Yup.InferType<
-  typeof romeSearchRequestSchema
->;
-
-export const romeSearchResponseSchema = Yup.array(
-  romeSearchMatchSchema,
-).required("Obligatoire");
-
-export type RomeSearchResponseDto = Yup.InferType<
-  typeof romeSearchResponseSchema
->;

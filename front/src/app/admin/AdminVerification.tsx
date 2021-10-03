@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FormAccordeon } from "src/components/admin/FormAccordeon";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
-import { ImmersionApplicationDto } from "../../../../back/src/shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { Route } from "type-route";
 import { demandeImmersionGateway } from "../main";
 import { routes } from "../routes";

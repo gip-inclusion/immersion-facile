@@ -1,5 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { TodoDto } from "src/shared/TodoDto";
+import { z } from "zod";
+
+export const todoDtoSchema = z.object({
+  uuid: z.string(),
+  description: z.string(),
+});
+
+export type TodoDto = z.infer<typeof todoDtoSchema>;
 
 interface TodoState {
   items: TodoDto[];

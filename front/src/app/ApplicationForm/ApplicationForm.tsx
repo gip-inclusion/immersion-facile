@@ -16,8 +16,9 @@ import {
   ApplicationSource,
   ImmersionApplicationDto,
   immersionApplicationSchema,
-} from "../../../../back/src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplicationDto";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
+import { toFormikValidationSchema } from "src/components/form/zodValidate";
 
 type ApplicationFormRoute = Route<
   | typeof routes.demandeImmersion
@@ -187,12 +188,12 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
           <Formik
             enableReinitialize={true}
             initialValues={initialValues}
-            validationSchema={immersionApplicationSchema}
+            validationSchema={toFormikValidationSchema(
+              immersionApplicationSchema,
+            )}
             onSubmit={async (values, { setSubmitting }) => {
               try {
-                let application = await immersionApplicationSchema.validate(
-                  values,
-                );
+                let application = immersionApplicationSchema.parse(values);
 
                 let currentId = route.params.demandeId;
                 if (!featureFlags.enableViewableApplications) {

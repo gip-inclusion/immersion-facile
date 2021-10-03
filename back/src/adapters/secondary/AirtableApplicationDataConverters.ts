@@ -104,6 +104,7 @@ export const genericApplicationDataConverter: AirtableApplicationDataConverter =
       return {
         ...dto,
         schedule: scheduleDtoToString(dto.schedule),
+        legacySchedule: undefined, // I had to add this line to fix a strange type error. Not sure if it is Ok ...
       } as FieldSet;
     },
 

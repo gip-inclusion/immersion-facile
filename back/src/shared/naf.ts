@@ -1,5 +1,6 @@
-import * as Yup from "../../node_modules/yup";
+import { z } from "../../node_modules/zod";
 
+export type NafSectorCode = keyof typeof nafSectorLabels;
 export const nafSectorLabels = {
   "0": "Unknown",
   A: "Agriculture, sylviculture et pêche",
@@ -29,11 +30,10 @@ export const validNafSectorCodes = Object.keys(nafSectorLabels).filter(
   (val) => val !== "0",
 ) as NafSectorCode[];
 
-export type NafSectorCode = keyof typeof nafSectorLabels;
-
-export type NafDto = Yup.InferType<typeof nafSchema>;
-
-export const nafSchema = Yup.object({
-  code: Yup.string().trim(),
-  nomenclature: Yup.string().trim(),
-});
+export type NafDto = z.infer<typeof nafSchema>;
+export const nafSchema = z
+  .object({
+    code: z.string(),
+    nomenclature: z.string(),
+  })
+  .optional();

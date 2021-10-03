@@ -15,6 +15,7 @@ import {
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
+import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { ENV } from "src/environmentVariables";
 import {
@@ -22,8 +23,6 @@ import {
   ImmersionOfferDto,
   immersionOfferSchema,
 } from "src/shared/ImmersionOfferDto";
-import { NafDto } from "src/shared/naf";
-import { ProfessionDto } from "src/shared/rome";
 import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import { immersionOfferGateway } from "../main";
@@ -38,16 +37,15 @@ const initialValues: ImmersionOfferDto = ENV.dev
       siret: "1234567890123",
       businessName: "My business name",
       businessAddress: "My businessAddress:",
-      naf: undefined as unknown as Required<NafDto>, // ugly fix, but yup doesn't like optional for typings
       professions: [
         {
           romeCodeMetier: "A1000",
           description: "Boulanger",
-        } as unknown as Required<ProfessionDto>, // ugly fix, but yup doesn't like optional for typings
+        },
         {
           romeCodeMetier: "B2000",
           description: "Boucher",
-        } as unknown as Required<ProfessionDto>, // ugly fix, but yup doesn't like optional for typings
+        },
       ],
       businessContacts: [
         {
@@ -65,7 +63,6 @@ const initialValues: ImmersionOfferDto = ENV.dev
       siret: "",
       businessName: "",
       businessAddress: "",
-      naf: undefined as unknown as Required<NafDto>, // ugly fix, but yup doesn't like optional for typings
       professions: [],
       businessContacts: [
         {
@@ -136,13 +133,13 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
         <Formik
           enableReinitialize={true}
           initialValues={initialValues}
-          validationSchema={immersionOfferSchema}
+          validationSchema={toFormikValidationSchema(immersionOfferSchema)}
           onSubmit={async (data, { setSubmitting }) => {
             try {
               setIsSuccess(false);
               setSubmitError(null);
 
-              await immersionOfferSchema.validate(data);
+              immersionOfferSchema.parse(data);
               await immersionOfferGateway.addImmersionOffer(data);
 
               setIsSuccess(true);
@@ -188,7 +185,7 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
                           const err = errors[field];
                           return typeof err === "string" ? (
                             <li key={field}>
-                              {fieldsToLabel[field]}: {err}
+                              {fieldsToLabel[field] || field}: {err}
                             </li>
                           ) : null;
                         },

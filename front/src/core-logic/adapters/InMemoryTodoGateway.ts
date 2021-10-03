@@ -1,5 +1,5 @@
 import { TodoGateway } from "src/core-logic/ports/todoGateway";
-import type { TodoDto } from "src/shared/TodoDto";
+import type { TodoDto } from "src/core-logic/useCases/todoSlice";
 
 export class InMemoryTodoGateway implements TodoGateway {
   constructor(private _todos: TodoDto[] = []) {}

@@ -34,7 +34,7 @@ const getBusinessName = (establishment: Establishment) => {
 type CompanyInfo = {
   businessName: string;
   businessAddress: string;
-  naf: NafDto;
+  naf?: NafDto;
 };
 
 export const fetchCompanyInfoBySiret = async (
@@ -45,15 +45,21 @@ export const fetchCompanyInfoBySiret = async (
   const businessAddress = addressDictToString(
     establishment.adresseEtablissement,
   );
+  const withNaf =
+    establishment.uniteLegale.activitePrincipaleUniteLegale &&
+    establishment.uniteLegale.activitePrincipaleUniteLegale;
   return {
     businessName: getBusinessName(establishment),
     businessAddress,
-    naf: {
-      code:
-        establishment.uniteLegale.activitePrincipaleUniteLegale ?? undefined,
-      nomenclature:
-        establishment.uniteLegale.activitePrincipaleUniteLegale ?? undefined,
-    },
+    ...(withNaf
+      ? {
+          naf: {
+            code: establishment.uniteLegale.activitePrincipaleUniteLegale!,
+            nomenclature:
+              establishment.uniteLegale.activitePrincipaleUniteLegale!,
+          },
+        }
+      : {}),
   };
 };
 

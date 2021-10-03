@@ -1,4 +1,6 @@
-import * as Yup from "../../node_modules/yup";
+import { z } from "../../node_modules/zod";
+import { NotEmptyArray } from "./utils";
+import { zRequiredString } from "./zodUtils";
 
 export type Weekday =
   | "lundi"
@@ -9,7 +11,7 @@ export type Weekday =
   | "samedi"
   | "dimanche";
 
-export const weekdays: Weekday[] = [
+export const weekdays: NotEmptyArray<Weekday> = [
   "lundi",
   "mardi",
   "mercredi",
@@ -50,42 +52,38 @@ export const reasonableSchedule: ScheduleDto = {
 };
 
 // Time period within a day.
-export const timePeriodSchema = Yup.object({
-  start: Yup.string().required(),
-  end: Yup.string().required(),
+export const timePeriodSchema = z.object({
+  start: zRequiredString,
+  end: zRequiredString,
 });
 
 // Each element represents one weekday, starting with Monday.
-export const complexScheduleSchema = Yup.array(
-  Yup.array(timePeriodSchema).required(),
-).required();
+export const complexScheduleSchema = z.array(z.array(timePeriodSchema));
 
 // Represents a schedule where each day is worked on the same
 // schedule, with any combinations of workdays.
-export const simpleScheduleSchema = Yup.object({
+export const simpleScheduleSchema = z.object({
   // Each tuple represents a weekday range, e.g.:
   // [0, 4] means "Monday to Friday, inclusive"
   // [0, 0] means "Monday"
-  dayPeriods: Yup.array(
-    Yup.array(Yup.number().required()).length(2).required(),
-  ).required(),
-  hours: Yup.array(timePeriodSchema).required(),
-}).required();
+  dayPeriods: z.array(z.array(z.number()).length(2)),
+  hours: z.array(timePeriodSchema),
+});
 
-export const scheduleSchema = Yup.object({
-  isSimple: Yup.boolean().required("Obligatoire"),
-  selectedIndex: Yup.number().default(0),
+export const scheduleSchema = z.object({
+  isSimple: z.boolean(),
+  selectedIndex: z.number().default(0),
   complexSchedule: complexScheduleSchema,
   simpleSchedule: simpleScheduleSchema,
-}).required();
+});
 
-export const legacyScheduleSchema = Yup.object({
-  workdays: Yup.array(Yup.mixed<Weekday>().required()).required(),
-  description: Yup.string().required(),
-}).required();
+export const legacyScheduleSchema = z.object({
+  workdays: z.array(z.enum(weekdays)),
+  description: zRequiredString,
+});
 
-export type SimpleScheduleDto = Yup.InferType<typeof simpleScheduleSchema>;
-export type ScheduleDto = Yup.InferType<typeof scheduleSchema>;
-export type TimePeriodDto = Yup.InferType<typeof timePeriodSchema>;
-export type ComplexScheduleDto = Yup.InferType<typeof complexScheduleSchema>;
-export type LegacyScheduleDto = Yup.InferType<typeof legacyScheduleSchema>;
+export type SimpleScheduleDto = z.infer<typeof simpleScheduleSchema>;
+export type ScheduleDto = z.infer<typeof scheduleSchema>;
+export type TimePeriodDto = z.infer<typeof timePeriodSchema>;
+export type ComplexScheduleDto = z.infer<typeof complexScheduleSchema>;
+export type LegacyScheduleDto = z.infer<typeof legacyScheduleSchema>;
