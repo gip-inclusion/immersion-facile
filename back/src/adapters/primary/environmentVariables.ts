@@ -1,8 +1,10 @@
+import * as dotenv from "dotenv";
 import {
   makeGetBooleanVariable,
   makeThrowIfNotDefined,
 } from "../../shared/envHelpers";
 
+dotenv.config({ path: `${__dirname}/../../../.env` });
 const getBooleanVariable = makeGetBooleanVariable(process.env);
 const throwIfNotDefined = makeThrowIfNotDefined(process.env);
 
