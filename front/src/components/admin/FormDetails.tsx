@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { Accordeon } from "./Accordeon";
+import { Accordion } from "./Accordion";
 import { TextCell } from "./TextCell";
-import { FormAccordeonProps } from "./FormAccordeon";
+import { FormAccordionProps } from "./FormAccordion";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { prettyPrintSchedule } from "src/shared/ScheduleUtils";
 
@@ -9,7 +9,7 @@ type KeyedFormData = { title: string; key: keyof ImmersionApplicationDto };
 type TextFormData = { title: string; text: string };
 type BoolFormData = { title: string; value: boolean };
 
-export const FormDetails = ({ data }: FormAccordeonProps) => {
+export const FormDetails = ({ data }: FormAccordionProps) => {
   const candidateFields: Array<BoolFormData | KeyedFormData> = [
     { title: "Mail de démandeur", key: "email" },
     { title: "Nom", key: "lastName" },
@@ -66,7 +66,7 @@ export const FormDetails = ({ data }: FormAccordeonProps) => {
     <div className="static-application-container">
       {allFields.map(({ listTitle, fields }, index) => {
         return (
-          <Accordeon title={listTitle} key={listTitle}>
+          <Accordion title={listTitle} key={listTitle}>
             {fields.map((formData) => {
               if ("key" in formData) {
                 return (
@@ -94,7 +94,7 @@ export const FormDetails = ({ data }: FormAccordeonProps) => {
                 );
               }
             })}
-          </Accordeon>
+          </Accordion>
         );
       })}
     </div>

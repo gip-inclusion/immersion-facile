@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { Accordeon } from "./Accordeon";
+import { Accordion } from "./Accordion";
 import { TextCell } from "./TextCell";
-import { FormAccordeonProps as FormAccordeonProps } from "./FormAccordeon";
+import { FormAccordionProps as FormAccordeonProps } from "./FormAccordion";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 
 type FieldForFormDetails = {
@@ -48,7 +48,7 @@ export const FormDetails = ({ data }: FormAccordeonProps) => (
   <div className="static-application-container">
     {allFields.map(({ listTitle, fields }, index) => {
       return (
-        <Accordeon title={listTitle} key={listTitle}>
+        <Accordion title={listTitle} key={listTitle}>
           {fields.map(({ title, key }) => {
             return (
               <TextCell
@@ -58,7 +58,7 @@ export const FormDetails = ({ data }: FormAccordeonProps) => (
               />
             );
           })}
-        </Accordeon>
+        </Accordion>
       );
     })}
   </div>

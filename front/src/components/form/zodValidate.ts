@@ -1,4 +1,6 @@
 // taken from : https://github.com/robertLichtnow/zod-formik-adapter/blob/master/index.ts
+// MIT License
+// Copyright (c) 2021 zod-formik-adapter
 
 import { z } from "zod";
 

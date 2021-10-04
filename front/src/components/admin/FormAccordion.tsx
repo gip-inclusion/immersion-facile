@@ -5,7 +5,7 @@ import type {
 } from "src/shared/ImmersionApplicationDto";
 import { formatDistance, formatDuration, intervalToDuration } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Accordeon } from "./Accordeon";
+import { Accordion } from "./Accordion";
 import { FormDetails } from "./FormDetails";
 
 const beforeAfterString = (date: string) => {
@@ -27,7 +27,7 @@ const durationDays = (dateStart: string, dateEnd: string) => {
   return formatDuration(d, { locale: fr });
 };
 
-export interface FormAccordeonProps {
+export interface FormAccordionProps {
   data: ImmersionApplicationDto;
 }
 
@@ -42,7 +42,7 @@ const getPrefix = (status: ApplicationStatus) => {
   }
 };
 
-export const FormAccordeon = ({ data }: FormAccordeonProps) => {
+export const FormAccordion = ({ data }: FormAccordionProps) => {
   const title = () => {
     return (
       `${getPrefix(data.status)} ` +
@@ -57,8 +57,8 @@ export const FormAccordeon = ({ data }: FormAccordeonProps) => {
   };
 
   return (
-    <Accordeon title={title()} key={data.id}>
+    <Accordion title={title()} key={data.id}>
       <FormDetails data={data} />
-    </Accordeon>
+    </Accordion>
   );
 };

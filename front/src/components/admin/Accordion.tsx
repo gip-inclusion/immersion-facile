@@ -1,11 +1,11 @@
-import React, { Component, ReactChildren, useState } from "react";
+import React, { useState } from "react";
 
-interface AccordeonProps {
+interface AccordionProps {
   title: string;
   children: React.ReactNode;
 }
 
-export const Accordeon = ({ title, children }: AccordeonProps) => {
+export const Accordion = ({ title, children }: AccordionProps) => {
   const id = title + "-accordion";
   const [expanded, setExpanded] = useState(true);
 

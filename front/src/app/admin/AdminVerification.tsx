@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FormAccordeon } from "src/components/admin/FormAccordeon";
+import { FormAccordion } from "src/components/admin/FormAccordion";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
@@ -78,7 +78,7 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
       {form && (
         <>
           {infoMessage && <InfoMessage title="Attention" text={infoMessage} />}
-          <FormAccordeon data={form} />
+          <FormAccordion data={form} />
           {!validationDisabled() && (
             <button
               className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"

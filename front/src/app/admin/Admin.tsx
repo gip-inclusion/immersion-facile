@@ -5,7 +5,7 @@ import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { Route } from "type-route";
 import "./Admin.css";
-import { FormAccordeon } from "src/components/admin/FormAccordeon";
+import { FormAccordion } from "src/components/admin/FormAccordion";
 
 interface AdminState {
   demandeImmersion: Array<ImmersionApplicationDto>;
@@ -38,7 +38,7 @@ export const Admin = ({ route }: AdminProps) => {
           <ul className="fr-accordions-group">
             {demandesImmersion.map((item) => (
               <li key={item.id}>
-                <FormAccordeon data={item} />
+                <FormAccordion data={item} />
               </li>
             ))}
           </ul>
