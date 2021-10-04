@@ -284,10 +284,6 @@ export const ApplicationFormFields = ({
       <p />
 
       {featureFlags.enableViewableApplications && !isFrozen && (
-        <SaveButton isSubmitting={isSubmitting} onSubmit={submitForm} />
-      )}
-      <p />
-      {!isFrozen && (
         <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
       )}
     </>
