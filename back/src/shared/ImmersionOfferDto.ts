@@ -3,7 +3,7 @@ import { nafSchema } from "./naf";
 import { professionSchema } from "./rome";
 import { Flavor } from "./typeFlavors";
 import { NotEmptyArray, phoneRegExp } from "./utils";
-import { zEmail, zRequiredString } from "./zodUtils";
+import { zEmail, zRequiredString, zString } from "./zodUtils";
 
 export type ImmersionOfferId = Flavor<string, "ImmersionOfferId">;
 const immersionOfferIdSchema: z.ZodSchema<ImmersionOfferId> = zRequiredString;
@@ -13,7 +13,7 @@ export const businessContactSchema = z.object({
   lastName: zRequiredString,
   firstName: zRequiredString,
   job: zRequiredString,
-  phone: zRequiredString.regex(phoneRegExp, "Numero de téléphone incorrect"),
+  phone: zString.regex(phoneRegExp, "Numero de téléphone incorrect"),
   email: zEmail,
 });
 
@@ -28,7 +28,7 @@ export type ImmersionOfferDto = z.infer<typeof immersionOfferSchema>;
 export const immersionOfferSchema = z.object(
   {
     id: immersionOfferIdSchema,
-    siret: zRequiredString.length(14, "SIRET doit étre composé de 14 chiffres"),
+    siret: zString.length(14, "SIRET doit étre composé de 14 chiffres"),
     businessName: zRequiredString,
     businessAddress: zRequiredString,
     naf: nafSchema,

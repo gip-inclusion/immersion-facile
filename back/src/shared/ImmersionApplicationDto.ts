@@ -8,7 +8,7 @@ import {
 import { LegacyScheduleDto, ScheduleDto } from "./ScheduleSchema";
 import { Flavor } from "./typeFlavors";
 import { NotEmptyArray, phoneRegExp } from "./utils";
-import { zBoolean, zEmail, zRequiredString, zTrue } from "./zodUtils";
+import { zBoolean, zEmail, zRequiredString, zString, zTrue } from "./zodUtils";
 
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
@@ -62,23 +62,20 @@ export const immersionApplicationSchema = z
     email: zEmail,
     firstName: zRequiredString,
     lastName: zRequiredString,
-    phone: zRequiredString
+    phone: zString
       .regex(phoneRegExp, "Numero de téléphone incorrect")
       .optional(),
-    dateSubmission: zRequiredString.regex(
+    dateSubmission: zString.regex(
       dateRegExp,
       "La date de saisie est invalide.",
     ),
-    dateStart: zRequiredString.regex(
-      dateRegExp,
-      "La date de démarrage est invalide.",
-    ),
-    dateEnd: zRequiredString.regex(dateRegExp, "La date de fin invalide."),
+    dateStart: zString.regex(dateRegExp, "La date de démarrage est invalide."),
+    dateEnd: zString.regex(dateRegExp, "La date de fin invalide."),
 
-    siret: zRequiredString.length(14, "SIRET doit étre composé de 14 chiffres"),
+    siret: zString.length(14, "SIRET doit étre composé de 14 chiffres"),
     businessName: zRequiredString,
     mentor: zRequiredString,
-    mentorPhone: zRequiredString.regex(
+    mentorPhone: zString.regex(
       phoneRegExp,
       "Numero de téléphone de tuteur incorrect",
     ),

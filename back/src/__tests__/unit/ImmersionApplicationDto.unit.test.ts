@@ -12,6 +12,7 @@ import {
   ImmersionApplicationDtoBuilder,
 } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { addDays } from "../../_testBuilders/test.helpers";
+import { zRequiredString } from "../../shared/zodUtils";
 
 describe("demandeImmersionDtoSchema", () => {
   test("accepts valid immersionApplication", () => {
@@ -25,7 +26,15 @@ describe("demandeImmersionDtoSchema", () => {
       .withMentorEmail("demandeur@mail.fr")
       .build();
 
-    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
+  });
+
+  test("rejects when string with spaces are provided", () => {
+    const demandeImmersion = new DemandeImmersionDtoBuilder()
+      .withId("  ")
+      .build();
+
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
   });
 
   test("rejects misformatted submission dates", () => {
@@ -33,7 +42,7 @@ describe("demandeImmersionDtoSchema", () => {
       .withDateSubmission("not-a-date")
       .build();
 
-    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
   });
 
   test("rejects misformatted start dates", () => {
@@ -41,7 +50,7 @@ describe("demandeImmersionDtoSchema", () => {
       .withDateStart("not-a-date")
       .build();
 
-    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
   });
 
   test("rejects misformatted end dates", () => {
@@ -49,7 +58,7 @@ describe("demandeImmersionDtoSchema", () => {
       .withDateEnd("not-a-date")
       .build();
 
-    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
   });
 
   test("rejects start dates that are after the end date", () => {
@@ -58,7 +67,7 @@ describe("demandeImmersionDtoSchema", () => {
       .withDateEnd("2021-01-03")
       .build();
 
-    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
   });
 
   test("rejects end dates that are more than 28 days after the start date", () => {
@@ -67,7 +76,7 @@ describe("demandeImmersionDtoSchema", () => {
       .withDateEnd(addDays(DATE_START, 29))
       .build();
 
-    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
   });
 
   test("accepts end dates that are <= 28 days after the start date", () => {
@@ -94,7 +103,7 @@ describe("demandeImmersionDtoSchema", () => {
       .withDateStart(addDays(DATE_SUBMISSION, 1))
       .build();
 
-    expectDemandeImmersionDtoToBeInvalid(demandeImmersion);
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
   });
 });
 
@@ -159,7 +168,7 @@ const expectDemandeImmersionDtoToBeValid = (
   ).toBeTruthy();
 };
 
-const expectDemandeImmersionDtoToBeInvalid = (
+const expectImmersionApplicationDtoToBeInvalid = (
   demandeImmersionDto: ImmersionApplicationDto,
 ) =>
   expect(() => immersionApplicationSchema.parse(demandeImmersionDto)).toThrow();
