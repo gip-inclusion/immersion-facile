@@ -81,7 +81,7 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
 export type CheckboxGroupProps = {
   name: string;
   label: string;
-  options: Array<{ value: string; label?: string }>;
+  options: Array<{ value: string | string[]; label?: string }>;
   disabled?: boolean;
 };
 
@@ -113,21 +113,25 @@ export const CheckboxGroup = ({
             {label}
           </legend>
           <div className="fr-fieldset__content">
-            {options.map(({ value, label }) => (
-              <div className="fr-checkbox-group" key={value}>
-                <Field
-                  type="checkbox"
-                  {...field}
-                  name={name}
-                  value={value}
-                  id={value}
-                  disabled={disabled}
-                />
-                <label className="fr-label" htmlFor={value}>
-                  {label ?? value}
-                </label>
-              </div>
-            ))}
+            {options.map(({ value, label }) => {
+              const strValue = typeof value === "string" ? value : value[0];
+
+              return (
+                <div className="fr-checkbox-group" key={strValue}>
+                  <Field
+                    type="checkbox"
+                    {...field}
+                    name={name}
+                    value={value}
+                    id={strValue}
+                    disabled={disabled}
+                  />
+                  <label className="fr-label" htmlFor={strValue}>
+                    {label ?? strValue}
+                  </label>
+                </div>
+              );
+            })}
           </div>
           {error && (
             <p id="checkboxes-error-desc-error" className="fr-error-text">

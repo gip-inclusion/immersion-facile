@@ -2,7 +2,7 @@ import { ConflictError } from "../../../adapters/primary/helpers/sendHttpRespons
 import {
   AddImmersionOfferResponseDto,
   ImmersionOfferDto,
-  immersionOfferDtoSchema,
+  immersionOfferSchema,
 } from "../../../shared/ImmersionOfferDto";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
@@ -23,7 +23,7 @@ export class AddImmersionOffer
   ): Promise<AddImmersionOfferResponseDto> {
     logger.debug({ dto: dto }, "Execute AddImmersionOffer Use case, with DTO");
 
-    immersionOfferDtoSchema.validateSync(dto, { abortEarly: false });
+    immersionOfferSchema.validateSync(dto, { abortEarly: false });
 
     const id = await this.immersionOfferRepository.save(dto);
 

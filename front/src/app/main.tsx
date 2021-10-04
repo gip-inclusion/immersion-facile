@@ -7,6 +7,8 @@ import { HttpImmersionOfferGateway } from "src/core-logic/adapters/HttpImmersion
 import { InMemoryDemandeImmersionGateway } from "src/core-logic/adapters/InMemoryDemandeImmersionGateway";
 import { InMemoryImmersionOfferGateway } from "src/core-logic/adapters/InMemoryImmersionOfferGateway";
 import { InMemoryTodoGateway } from "src/core-logic/adapters/InMemoryTodoGateway";
+import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
+import { ImmersionOfferGateway } from "src/core-logic/ports/ImmersionOfferGateway";
 import { configureReduxStore } from "src/core-logic/store/initilizeStore";
 import { ENV } from "src/environmentVariables";
 import "./index.css";
@@ -14,12 +16,12 @@ import { RouteProvider } from "./routes";
 
 const todoGateway = new InMemoryTodoGateway();
 
-export const immersionOfferGateway =
+export const immersionOfferGateway: ImmersionOfferGateway =
   ENV.gateway === "HTTP"
     ? new HttpImmersionOfferGateway()
     : new InMemoryImmersionOfferGateway();
 
-export const demandeImmersionGateway =
+export const demandeImmersionGateway: DemandeImmersionGateway =
   ENV.gateway === "HTTP"
     ? new HttpDemandeImmersionGateway()
     : new InMemoryDemandeImmersionGateway(ENV.featureFlags);

@@ -7,10 +7,10 @@ import {
 } from "src/shared/ImmersionOfferDto";
 import {
   RomeSearchResponseDto,
-  romeSearchResponseDtoSchema,
+  romeSearchResponseSchema,
 } from "src/shared/rome";
 import { immersionOffersRoute, romeRoute } from "src/shared/routes";
-import { addImmersionOfferResponseDtoSchema } from "./../../shared/ImmersionOfferDto";
+import { addImmersionOfferResponseSchema } from "./../../shared/ImmersionOfferDto";
 
 const prefix = "api";
 
@@ -23,7 +23,7 @@ export class HttpImmersionOfferGateway implements ImmersionOfferGateway {
       immersionOffer,
     );
     const responseDto: AddImmersionOfferResponseDto = httpResponse.data;
-    await addImmersionOfferResponseDtoSchema.validate(responseDto);
+    await addImmersionOfferResponseSchema.validate(responseDto);
     return responseDto;
   }
 
@@ -34,7 +34,7 @@ export class HttpImmersionOfferGateway implements ImmersionOfferGateway {
       params: { searchText },
     });
     const responseDto: RomeSearchResponseDto = httpResponse.data;
-    await romeSearchResponseDtoSchema.validate(responseDto);
+    await romeSearchResponseSchema.validate(responseDto);
     return responseDto;
   }
 }

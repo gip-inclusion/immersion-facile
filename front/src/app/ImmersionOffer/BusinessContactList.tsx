@@ -1,7 +1,5 @@
 import { useField } from "formik";
 import React from "react";
-import { ProfessionList } from "src/app/ImmersionOffer/ProfessionList";
-import { ButtonAdd } from "src/components/ButtonAdd";
 import { DeleteButton } from "src/components/DeleteButton";
 import { TextInput } from "src/components/form/TextInput";
 import {
@@ -16,7 +14,6 @@ const emptyContact: BusinessContactDto = {
   lastName: "",
   phone: "",
   job: "",
-  professions: [],
 };
 
 export const BusinessContactList = () => {
@@ -25,28 +22,22 @@ export const BusinessContactList = () => {
 
   const businessContacts = field.value;
 
-  const onDelete = (index: number) => {
-    setValue(removeAtIndex(businessContacts, index));
-  };
+  // const onDelete = (index: number) => {
+  //   setValue(removeAtIndex(businessContacts, index));
+  // };
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       {businessContacts.map((_, index) => (
-        <BusinessContact index={index} key={index} onDelete={onDelete} />
+        <BusinessContact index={index} key={index} /* onDelete={onDelete} */ />
       ))}
-      <ButtonAdd
-        style={{ alignSelf: "center", margin: "30px auto" }}
-        onClick={() => setValue([...businessContacts, emptyContact])}
-      >
-        Ajouter un référent
-      </ButtonAdd>
     </div>
   );
 };
 
 type BusinessContactProps = {
   index: number;
-  onDelete: (indexToDelete: number) => void;
+  onDelete?: (indexToDelete: number) => void;
 };
 
 const BusinessContact = ({ index, onDelete }: BusinessContactProps) => {
@@ -57,19 +48,20 @@ const BusinessContact = ({ index, onDelete }: BusinessContactProps) => {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", padding: "10px" }}>
-        <DeleteButton onClick={() => onDelete(index)} />
-        <h4 style={{ margin: 0 }}>Détails du référent :</h4>
+        {typeof onDelete !== "undefined" && (
+          <DeleteButton onClick={() => onDelete(index)} />
+        )}
+        <h4 style={{ margin: 0 }}>Détails du correspondant immersion :</h4>
+        <p>Le correspondant reçoit les demandes et les traite</p>
       </div>
       <TextInput label="Nom du référent *" name={makeName("lastName")} />
       <TextInput label="Prénom du référent *" name={makeName("firstName")} />
       <TextInput label="Fonction du référent *" name={makeName("job")} />
       <TextInput
-        label="Son numéro de téléphone (ne sera pas communiqué directement) *"
+        label="Numéro de téléphone (ne sera pas communiqué directement) *"
         name={makeName("phone")}
       />
-      <TextInput label="Son email *" name={makeName("email")} />
-      <label>Responsable des métiers suivants :</label>
-      <ProfessionList name={makeName("professions")} />
+      <TextInput label="Email *" name={makeName("email")} />
     </div>
   );
 };

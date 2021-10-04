@@ -1,5 +1,9 @@
 import axios, { AxiosInstance } from "axios";
-import { RomeGateway, RomeMetier } from "../../domain/rome/ports/RomeGateway";
+import {
+  RomeAppellation,
+  RomeGateway,
+  RomeMetier,
+} from "../../domain/rome/ports/RomeGateway";
 import { createLogger } from "../../utils/logger";
 import { AccessTokenGateway } from "./../../domain/core/ports/AccessTokenGateway";
 
@@ -52,6 +56,29 @@ export class PoleEmploiRomeGateway implements RomeGateway {
       },
     });
 
-    return response.data;
+    return response.data.map((metier: any) => ({
+      codeMetier: metier.code,
+      libelle: metier.libelle,
+    }));
+  }
+
+  public async searchAppellation(query: string): Promise<RomeAppellation[]> {
+    const accessToken = await this.accessTokenGateway.getAccessToken(
+      this.scope,
+    );
+
+    const response = await this.axiosInstance.get("/appellation", {
+      headers: {
+        Authorization: `Bearer ${accessToken.access_token}`,
+      },
+      params: {
+        q: query,
+      },
+    });
+
+    return response.data.map((appellation: any) => ({
+      codeAppellation: appellation.code,
+      libelle: appellation.libelle,
+    }));
   }
 }

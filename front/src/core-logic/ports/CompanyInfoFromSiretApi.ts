@@ -7,6 +7,8 @@ export type Establishment = {
     denominationUniteLegale: string | null;
     nomUniteLegale: string | null;
     prenomUsuelUniteLegale: string | null;
+    activitePrincipaleUniteLegale: string | null;
+    nomenclatureActivitePrincipaleUniteLegale: string | null;
   }>;
   adresseEtablissement: Partial<{
     numeroVoieEtablissement: string | null;

@@ -1,12 +1,12 @@
 import * as Yup from "../../node_modules/yup";
-import { NafSectorCode, validNafSectorCodes } from "./naf";
-import { professionDtoSchema } from "./rome";
+import { nafSchema } from "./naf";
+import { professionSchema } from "./rome";
 import { Flavor } from "./typeFlavors";
 import { phoneRegExp } from "./utils";
 
 export type ImmersionOfferId = Flavor<string, "ImmersionOfferId">;
 
-export const businessContactDtoSchema = Yup.object({
+export const businessContactSchema = Yup.object({
   lastName: Yup.string().required("Obligatoire"),
   firstName: Yup.string().required("Obligatoire"),
   job: Yup.string().required("Obligatoire"),
@@ -16,15 +16,16 @@ export const businessContactDtoSchema = Yup.object({
   email: Yup.string()
     .email("Veuillez saisir une adresse e-mail valide")
     .required("Obligatoire"),
-  professions: Yup.array().of(professionDtoSchema).required("Obligatoire"),
-}).required();
+}).required("Obligatoire");
 
-export type BusinessContactDto = Yup.InferType<typeof businessContactDtoSchema>;
+export type BusinessContactDto = Yup.InferType<typeof businessContactSchema>;
 
 export type ContactMethod = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
 const validContactMethods: ContactMethod[] = ["EMAIL", "PHONE", "IN_PERSON"];
 
-export const immersionOfferDtoSchema = Yup.object({
+export type ImmersionOfferDto = Yup.InferType<typeof immersionOfferSchema>;
+
+export const immersionOfferSchema = Yup.object({
   id: Yup.mixed<ImmersionOfferId>()
     .required("Obligatoire")
     .test("no-empty-id", "L'ID est obligatoire", (value) => {
@@ -36,28 +37,26 @@ export const immersionOfferDtoSchema = Yup.object({
     .length(14, "SIRET doit étre composé de 14 chiffres"),
   businessName: Yup.string().required("Obligatoire"),
   businessAddress: Yup.string().required("Obligatoire"),
-  businessSectorCode: Yup.mixed<NafSectorCode>()
-    .oneOf(validNafSectorCodes)
-    .required("Obligatoire"),
+  naf: nafSchema,
   professions: Yup.array()
-    .of(professionDtoSchema)
+    .of(professionSchema)
     .min(1, "Spécifiez au moins 1 métier")
-    .required(),
+    .required("Obligatoire"),
   businessContacts: Yup.array()
-    .of(businessContactDtoSchema)
+    .of(businessContactSchema)
     .min(1, "Spécifiez au moins 1 référent")
-    .required(),
+    .max(1, "Pas plus de 1 référent")
+    .required("Obligatoire"),
   preferredContactMethods: Yup.array()
     .of(Yup.mixed<ContactMethod>().oneOf(validContactMethods))
     .min(1, "Spécifiez au moins 1 mode de contact")
-    .required(),
-}).required();
+    .max(1, "Spécifiez au plus 1 mode de contact")
+    .required("Obligatoire"),
+}).required("Obligatoire");
 
-export type ImmersionOfferDto = Yup.InferType<typeof immersionOfferDtoSchema>;
-
-export const addImmersionOfferResponseDtoSchema =
-  Yup.mixed<ImmersionOfferId>().required();
+export const addImmersionOfferResponseSchema =
+  Yup.mixed<ImmersionOfferId>().required("Obligatoire");
 
 export type AddImmersionOfferResponseDto = Yup.InferType<
-  typeof addImmersionOfferResponseDtoSchema
+  typeof addImmersionOfferResponseSchema
 >;

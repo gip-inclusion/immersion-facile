@@ -8,8 +8,8 @@ import {
   validateDemandeImmersionRequestDtoSchema,
 } from "../../shared/DemandeImmersionDto";
 import { FeatureFlags } from "../../shared/featureFlags";
-import { immersionOfferDtoSchema } from "../../shared/ImmersionOfferDto";
-import { romeSearchRequestDtoSchema } from "../../shared/rome";
+import { immersionOfferSchema } from "../../shared/ImmersionOfferDto";
+import { romeSearchRequestSchema } from "../../shared/rome";
 import {
   demandesImmersionRoute,
   immersionOffersRoute,
@@ -105,7 +105,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     sendHttpResponse(req, res, () =>
       callUseCase({
         useCase: config.useCases.addImmersionOffer,
-        validationSchema: immersionOfferDtoSchema,
+        validationSchema: immersionOfferSchema,
         useCaseParams: req.body,
       }),
     ),
@@ -116,7 +116,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
       logger.info(req);
       return callUseCase({
         useCase: config.useCases.romeSearch,
-        validationSchema: romeSearchRequestDtoSchema,
+        validationSchema: romeSearchRequestSchema,
         useCaseParams: req.query.searchText,
       });
     });

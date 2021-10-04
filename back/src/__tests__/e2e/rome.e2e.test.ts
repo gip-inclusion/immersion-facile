@@ -14,14 +14,28 @@ describe("/rome route", () => {
   });
 
   it("forwards valid requests", async () => {
-    await request.get(`/rome?searchText=rails`).expect(200, [
+    await request.get(`/rome?searchText=rail`).expect(200, [
       {
-        romeCodeMetier: "N4301",
-        description: "Conduite sur rails",
+        profession: {
+          romeCodeAppellation: "20714",
+          description: "Vitrailliste",
+        },
+        matchRanges: [
+          {
+            startIndexInclusive: 3,
+            endIndexExclusive: 7,
+          },
+        ],
+      },
+      {
+        profession: {
+          romeCodeMetier: "N4301",
+          description: "Conduite sur rails",
+        },
         matchRanges: [
           {
             startIndexInclusive: 13,
-            endIndexExclusive: 18,
+            endIndexExclusive: 17,
           },
         ],
       },

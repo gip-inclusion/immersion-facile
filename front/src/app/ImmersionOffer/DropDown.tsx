@@ -18,13 +18,16 @@ type DropDownState<T> = {
   searchTerm: string;
   proposals: Proposal<T>[];
   isOpen: boolean;
+  showSpinner: boolean;
+  isSearchTermFromDropDown: boolean;
 };
 
 type DropDownAction<T> =
   | { type: "SEARCH_TERM_CHANGED"; payload: string }
   | { type: "SEARCH_TERM_CHANGED_FROM_OUTSIDE"; payload: string }
   | { type: "PROPOSALS_UPDATED"; payload: Proposal<T>[] }
-  | { type: "PROPOSAL_SELECTED"; payload: Proposal<T> };
+  | { type: "PROPOSAL_SELECTED"; payload: Proposal<T> }
+  | { type: "FOCUS_LOST" };
 
 const reducer = <T extends unknown>(
   state: DropDownState<T>,
@@ -32,16 +35,32 @@ const reducer = <T extends unknown>(
 ) => {
   switch (action.type) {
     case "SEARCH_TERM_CHANGED":
-      return { ...state, searchTerm: action.payload, isOpen: true };
+      return {
+        ...state,
+        searchTerm: action.payload,
+        proposals: [],
+        isOpen: !!action.payload,
+        showSpinner: !!action.payload,
+        isSearchTermFromDropDown: false,
+      };
     case "SEARCH_TERM_CHANGED_FROM_OUTSIDE":
       return { ...state, searchTerm: action.payload };
     case "PROPOSALS_UPDATED":
-      return { ...state, proposals: action.payload };
+      return { ...state, proposals: action.payload, showSpinner: false };
     case "PROPOSAL_SELECTED":
       return {
         ...state,
         isOpen: false,
         searchTerm: action.payload.description,
+        isSearchTermFromDropDown: true,
+      };
+    case "FOCUS_LOST":
+      return {
+        ...state,
+        isOpen: false,
+        searchTerm: state.isSearchTermFromDropDown
+          ? state.searchTerm
+          : initialState.searchTerm,
       };
     default:
       return state;
@@ -52,6 +71,8 @@ const initialState: DropDownState<unknown> = {
   searchTerm: "",
   proposals: [],
   isOpen: false,
+  showSpinner: false,
+  isSearchTermFromDropDown: false,
 };
 
 type DropDownProps<T> = {
@@ -68,7 +89,7 @@ export const DropDown = <T extends unknown>({
   onTermChange,
 }: DropDownProps<T>) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { proposals, searchTerm, isOpen } = state;
+  const { proposals, searchTerm, isOpen, showSpinner } = state;
   const debounceSearchTerm = useDebounce(searchTerm, 1200);
 
   useEffect(() => {
@@ -85,7 +106,13 @@ export const DropDown = <T extends unknown>({
   }, [initialTerm]);
 
   return (
-    <div className="dropdown-container">
+    <div
+      className="dropdown-container"
+      onBlur={() => {
+        // Delay so that any onClick event on the dropdown-proposal has a chance to be registered.
+        setTimeout(() => dispatch({ type: "FOCUS_LOST" }), 100);
+      }}
+    >
       <label className="fr-label" htmlFor={"search"}>
         {title}
       </label>
@@ -93,6 +120,7 @@ export const DropDown = <T extends unknown>({
         id="search"
         type="text"
         className="fr-input"
+        autoComplete="off"
         value={searchTerm}
         onChange={(e) =>
           dispatch({ type: "SEARCH_TERM_CHANGED", payload: e.target.value })
@@ -100,6 +128,10 @@ export const DropDown = <T extends unknown>({
       />
       {isOpen && (
         <div className="dropdown-proposals">
+          {showSpinner && <div className="dropdown-spinner">...</div>}
+          {searchTerm && proposals.length == 0 && !showSpinner && (
+            <div className="dropdown-nomatch">(pas de résultats)</div>
+          )}
           {proposals.map((proposal) => (
             <div
               key={proposal.description}

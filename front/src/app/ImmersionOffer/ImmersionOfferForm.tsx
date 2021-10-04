@@ -1,14 +1,17 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { BusinessContactList } from "src/app/ImmersionOffer/BusinessContactList";
-import { BusinessSectorInput } from "src/app/ImmersionOffer/BusinessSectorInput";
+import {
+  fieldsToLabel,
+  FieldsWithLabel,
+} from "src/app/ImmersionOffer/fieldsToLabels";
 import { ProfessionList } from "src/app/ImmersionOffer/ProfessionList";
+import { RadioGroup } from "src/app/RadioGroup";
 import { routes } from "src/app/routes";
 import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/Siret/fetchCompanyInfoBySiret";
-import { CheckboxGroup } from "src/components/form/CheckboxGroup";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
@@ -17,8 +20,10 @@ import { ENV } from "src/environmentVariables";
 import {
   ContactMethod,
   ImmersionOfferDto,
-  immersionOfferDtoSchema,
+  immersionOfferSchema,
 } from "src/shared/ImmersionOfferDto";
+import { NafDto } from "src/shared/naf";
+import { ProfessionDto } from "src/shared/rome";
 import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import { immersionOfferGateway } from "../main";
@@ -27,16 +32,22 @@ type ImmersionOfferFormProps = {
   route: Route<typeof routes.immersionOffer>;
 };
 
-const initialValues: ImmersionOfferDto = ENV.dev
+const initialValues: ImmersionOfferDto = !ENV.dev
   ? {
       id: uuidV4(),
       siret: "1234567890123",
-      businessName: "My buisiness name",
+      businessName: "My business name",
       businessAddress: "My businessAddress:",
-      businessSectorCode: "F",
+      naf: undefined as unknown as Required<NafDto>, // ugly fix, but yup doesn't like optional for typings
       professions: [
-        { romeCodeMetier: "A1000", label: "Boulanger" },
-        { romeCodeMetier: "B2000", label: "Boucher" },
+        {
+          romeCodeMetier: "A1000",
+          description: "Boulanger",
+        } as unknown as Required<ProfessionDto>, // ugly fix, but yup doesn't like optional for typings
+        {
+          romeCodeMetier: "B2000",
+          description: "Boucher",
+        } as unknown as Required<ProfessionDto>, // ugly fix, but yup doesn't like optional for typings
       ],
       businessContacts: [
         {
@@ -45,7 +56,6 @@ const initialValues: ImmersionOfferDto = ENV.dev
           job: "super job",
           phone: "0D2837",
           email: "joe@mail.com",
-          professions: [],
         },
       ],
       preferredContactMethods: ["EMAIL"],
@@ -55,52 +65,59 @@ const initialValues: ImmersionOfferDto = ENV.dev
       siret: "",
       businessName: "",
       businessAddress: "",
-      businessSectorCode: "0",
+      naf: undefined as unknown as Required<NafDto>, // ugly fix, but yup doesn't like optional for typings
       professions: [],
-      businessContacts: [],
+      businessContacts: [
+        {
+          firstName: "",
+          lastName: "",
+          job: "",
+          phone: "",
+          email: "",
+        },
+      ],
       preferredContactMethods: [],
     };
 
 const preferredContactMethodOptions: Array<{
   label?: string;
-  value: ContactMethod;
+  value: ContactMethod[];
 }> = [
   {
-    value: "EMAIL",
+    value: ["EMAIL"],
     label:
       "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
   },
   {
-    value: "PHONE",
+    value: ["PHONE"],
     label:
-      "Par téléphone (seuls les candidats idetifiés auront accès au numéro de téléphone)",
+      "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
   },
   {
-    value: "IN_PERSON",
+    value: ["IN_PERSON"],
     label: "Se présenter en personne à votre établissement",
   },
 ];
+
+const getLabelAndName = (field: FieldsWithLabel) => ({
+  label: fieldsToLabel[field] + " *",
+  name: field,
+});
 
 const SiretRelatedInputs = () => {
   const { companyInfo } = useSiretFetcher();
   useSiretRelatedField("businessName", companyInfo);
   useSiretRelatedField("businessAddress", companyInfo);
+  useSiretRelatedField("naf", companyInfo);
 
   return (
     <>
       <TextInput
-        label="Indiquez le SIRET de la structure d'accueil *"
-        name="siret"
+        {...getLabelAndName("siret")}
         placeholder="362 521 879 00034"
       />
-      <TextInput
-        label="Vérifiez le nom (raison sociale) de votre établissement *"
-        name="businessName"
-      />
-      <TextInput
-        label="Vérifiez l'adresse de votre établissement"
-        name="businessAddress"
-      />
+      <TextInput {...getLabelAndName("businessName")} />
+      <TextInput {...getLabelAndName("businessAddress")} />
     </>
   );
 };
@@ -119,13 +136,13 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
         <Formik
           enableReinitialize={true}
           initialValues={initialValues}
-          validationSchema={immersionOfferDtoSchema}
+          validationSchema={immersionOfferSchema}
           onSubmit={async (data, { setSubmitting }) => {
             try {
               setIsSuccess(false);
               setSubmitError(null);
 
-              await immersionOfferDtoSchema.validate(data);
+              await immersionOfferSchema.validate(data);
               await immersionOfferGateway.addImmersionOffer(data);
 
               setIsSuccess(true);
@@ -141,18 +158,24 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
         >
           {({ isSubmitting, submitCount, errors }) => (
             <div style={{ margin: "5px", maxWidth: "600px" }}>
+              <p>
+                Bienvenue sur l'espace de référencement des entreprises
+                volontaires pour l'accueil des immersions professionnelles. Ce
+                formulaire vous permet d'indiquer les métiers de votre
+                établissement ouverts aux immersions. Si votre entreprise
+                comprend plusieurs établissements, il convient de renseigner un
+                formulaire pour chaque établissement (Siret différent).
+              </p>
               <Form>
                 Votre établissement
                 <SiretRelatedInputs />
-                <BusinessSectorInput />
                 <ProfessionList
                   name="professions"
-                  title="Métiers de l'entreprise *"
+                  title={`${fieldsToLabel["professions"]} *`}
                 />
                 <BusinessContactList />
-                <CheckboxGroup
-                  name="preferredContactMethods"
-                  label="Comment souhaitez-vous que les candidats vous contactent ? *"
+                <RadioGroup
+                  {...getLabelAndName("preferredContactMethods")}
                   options={preferredContactMethodOptions}
                 />
                 {submitCount !== 0 && Object.values(errors).length > 0 && (
@@ -160,10 +183,15 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
                     {console.log(errors)}
                     Veuillez corriger les champs erronés :
                     <ul>
-                      {Object.values(errors).map((err) =>
-                        typeof err === "string" && err !== "Obligatoire" ? (
-                          <li key={err}>{err}</li>
-                        ) : null,
+                      {(Object.keys(errors) as FieldsWithLabel[]).map(
+                        (field) => {
+                          const err = errors[field];
+                          return typeof err === "string" ? (
+                            <li key={field}>
+                              {fieldsToLabel[field]}: {err}
+                            </li>
+                          ) : null;
+                        },
                       )}
                     </ul>
                   </div>

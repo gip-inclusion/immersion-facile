@@ -3,13 +3,14 @@ import {
   ImmersionOfferDto,
   ImmersionOfferId,
 } from "src/shared/ImmersionOfferDto";
-import { RomeSearchResponseDto } from "src/shared/rome";
+import { ProfessionDto, RomeSearchResponseDto } from "src/shared/rome";
 import { sleep } from "src/shared/utils";
 
 export class InMemoryImmersionOfferGateway implements ImmersionOfferGateway {
   public async addImmersionOffer(
     immersionOffer: ImmersionOfferDto,
   ): Promise<ImmersionOfferId> {
+    console.log(immersionOffer);
     await sleep(2000);
     if (immersionOffer.businessName === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
@@ -20,28 +21,37 @@ export class InMemoryImmersionOfferGateway implements ImmersionOfferGateway {
     searchText: string,
   ): Promise<RomeSearchResponseDto> {
     await sleep(700);
+    if (searchText === "emptylistplease") return [];
     return [
       {
-        romeCodeMetier: "A1111",
-        description: "Boulanger",
+        profession: {
+          description: "Boulanger",
+          romeCodeMetier: "A1111",
+        } as ProfessionDto,
         matchRanges: [
           { startIndexInclusive: 0, endIndexExclusive: 3 },
           { startIndexInclusive: 5, endIndexExclusive: 8 },
         ],
       },
       {
-        romeCodeMetier: "B2222",
-        description: "Boucher",
+        profession: {
+          description: "Boucher",
+          romeCodeMetier: "B2222",
+        } as ProfessionDto,
         matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 3 }],
       },
       {
-        romeCodeMetier: "C3333",
-        description: "Menuisier",
+        profession: {
+          romeCodeMetier: "C3333",
+          description: "Menuisier",
+        } as ProfessionDto,
         matchRanges: [],
       },
       {
-        romeCodeMetier: "D4444",
-        description: "Vendeur",
+        profession: {
+          romeCodeMetier: "D4444",
+          description: "Vendeur",
+        } as ProfessionDto,
         matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 7 }],
       },
     ];

@@ -7,6 +7,8 @@ export const TEST_ESTABLISHMENT1 = {
   siret: TEST_ESTABLISHMENT1_SIRET,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE",
+    activitePrincipaleUniteLegale: "78.3Z",
+    nomenclatureActivitePrincipaleUniteLegale: "Ref2",
   },
   adresseEtablissement: {
     numeroVoieEtablissement: "20",

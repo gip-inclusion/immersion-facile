@@ -42,7 +42,7 @@ const DEMANDE_IMMERSION_TEMPLATE: DemandeImmersionDto = {
 };
 
 const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
-const TEST_ESTABLISHMENT1 = {
+const TEST_ESTABLISHMENT1: Establishment = {
   siren: "123456789",
   nic: "01234",
   siret: TEST_ESTABLISHMENT1_SIRET,
@@ -51,6 +51,8 @@ const TEST_ESTABLISHMENT1 = {
     denominationUniteLegale: "MA P'TITE BOITE",
     nomUniteLegale: "PROST",
     prenomUsuelUniteLegale: "ALAIN",
+    activitePrincipaleUniteLegale: "78.3Z",
+    nomenclatureActivitePrincipaleUniteLegale: "Ref2",
   },
   adresseEtablissement: {
     numeroVoieEtablissement: "20",

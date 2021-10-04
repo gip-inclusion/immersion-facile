@@ -1,3 +1,5 @@
+import * as Yup from "../../node_modules/yup";
+
 export const nafSectorLabels = {
   "0": "Unknown",
   A: "Agriculture, sylviculture et pêche",
@@ -28,3 +30,10 @@ export const validNafSectorCodes = Object.keys(nafSectorLabels).filter(
 ) as NafSectorCode[];
 
 export type NafSectorCode = keyof typeof nafSectorLabels;
+
+export type NafDto = Yup.InferType<typeof nafSchema>;
+
+export const nafSchema = Yup.object({
+  code: Yup.string().trim(),
+  nomenclature: Yup.string().trim(),
+});

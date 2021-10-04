@@ -1,8 +1,9 @@
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 import { useField } from "formik";
 import { useEffect, useState } from "react";
 import { demandeImmersionGateway } from "src/app/main";
-import { Establishment } from "src/core-logic/ports/CompanyInfoFromSiretApi";
+import type { Establishment } from "src/core-logic/ports/CompanyInfoFromSiretApi";
+import type { NafDto } from "src/shared/naf";
 
 const addressDictToString = (addressDict: any): string => {
   const addressOrder = [
@@ -33,6 +34,7 @@ const getBusinessName = (establishment: Establishment) => {
 type CompanyInfo = {
   businessName: string;
   businessAddress: string;
+  naf: NafDto;
 };
 
 export const fetchCompanyInfoBySiret = async (
@@ -43,15 +45,24 @@ export const fetchCompanyInfoBySiret = async (
   const businessAddress = addressDictToString(
     establishment.adresseEtablissement,
   );
-  return { businessName: getBusinessName(establishment), businessAddress };
+  return {
+    businessName: getBusinessName(establishment),
+    businessAddress,
+    naf: {
+      code:
+        establishment.uniteLegale.activitePrincipaleUniteLegale ?? undefined,
+      nomenclature:
+        establishment.uniteLegale.activitePrincipaleUniteLegale ?? undefined,
+    },
+  };
 };
 
-export const useSiretRelatedField = (
-  fieldFromInfo: keyof CompanyInfo,
+export const useSiretRelatedField = <K extends keyof CompanyInfo>(
+  fieldFromInfo: K,
   companyInfos: CompanyInfo | undefined,
   fieldToUpdate?: string,
 ) => {
-  const [_, { touched }, { setValue }] = useField<string>({
+  const [_, { touched }, { setValue }] = useField<CompanyInfo[K]>({
     name: fieldToUpdate ?? fieldFromInfo,
   });
 

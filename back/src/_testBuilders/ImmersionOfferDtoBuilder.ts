@@ -1,4 +1,5 @@
 import { ImmersionOfferDto } from "../shared/ImmersionOfferDto";
+import { ProfessionDto } from "../shared/rome";
 import { Builder } from "./Builder";
 
 const valideImmersionOffer: ImmersionOfferDto = {
@@ -10,34 +11,31 @@ const valideImmersionOffer: ImmersionOfferDto = {
       firstName: "Esteban",
       lastName: "Ocon",
       phone: "+33012345678",
-      professions: [{ romeCodeMetier: "C3333", label: "Menuisier" }],
       job: "a job",
     },
-    {
-      email: "sarah@mail.com",
-      firstName: "Sarah",
-      lastName: "Connor",
-      phone: "+3301",
-      professions: [{ romeCodeMetier: "D4444", label: "Vendeur" }],
-      job: "XYZ - Terminator's terminator",
-    },
   ],
+  naf: { code: "A", nomenclature: "nomenclature code A" },
   businessName: "Ma super entreprise",
-  businessSectorCode: "A",
-  preferredContactMethods: ["IN_PERSON", "EMAIL"],
+  preferredContactMethods: ["EMAIL"],
   siret: "01234567890123",
   professions: [
-    { romeCodeMetier: "A1111", label: "Boulanger" },
-    { romeCodeMetier: "B2222", label: "Boucher" },
+    {
+      romeCodeMetier: "A1111",
+      description: "Boulangerie",
+    } as ProfessionDto,
+    {
+      romeCodeAppellation: "22222",
+      description: "Boucher / Bouchère",
+    } as ProfessionDto,
   ],
 };
 
 const emptyImmersionOffer: ImmersionOfferDto = {
   id: "",
   businessAddress: "",
+  naf: { code: "", nomenclature: "" },
   preferredContactMethods: [],
   businessContacts: [],
-  businessSectorCode: "0",
   businessName: "",
   siret: "",
   professions: [],

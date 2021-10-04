@@ -114,18 +114,22 @@ export const RadioGroup = ({
           <div className="fr-fieldset__content">
             {options.map(({ value, label }) => {
               const htmlName = error ? "radio" : "radio-error";
+              const strValue = typeof value === "string" ? value : value[0];
+              const currentFieldStrValue =
+                typeof field.value === "string" ? field.value : field.value[0];
+
               return (
-                <div className="fr-radio-group" key={value}>
+                <div className="fr-radio-group" key={strValue}>
                   <input
                     type="radio"
-                    id={htmlName + value}
+                    id={htmlName + strValue}
                     disabled={disabled}
                     value={value}
-                    checked={value === field.value}
+                    checked={strValue === currentFieldStrValue}
                     onChange={() => !disabled && setValue(value)}
                   />
-                  <label className="fr-label" htmlFor={htmlName + value}>
-                    {label ?? value}
+                  <label className="fr-label" htmlFor={htmlName + strValue}>
+                    {label ?? strValue}
                   </label>
                 </div>
               );

@@ -19,7 +19,7 @@ export const MarianneHeader = () => (
               <div className="fr-header__service">
                 <p className="fr-header__service-title">Immersion Facile</p>
                 <p className="fr-header__service-tagline">
-                  Faciliter la réalisation des immersion professionnelles
+                  Faciliter la réalisations des immersions professionnelles
                 </p>
               </div>
             </div>
