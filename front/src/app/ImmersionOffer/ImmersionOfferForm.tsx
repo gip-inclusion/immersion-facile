@@ -32,7 +32,7 @@ type ImmersionOfferFormProps = {
   route: Route<typeof routes.immersionOffer>;
 };
 
-const initialValues: ImmersionOfferDto = !ENV.dev
+const initialValues: ImmersionOfferDto = ENV.dev
   ? {
       id: uuidV4(),
       siret: "1234567890123",
