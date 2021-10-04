@@ -20,6 +20,13 @@ export const throwIfNotInArray = <T extends string | undefined>({
   return processEnv[variableName] as T;
 };
 
+export const makeThrowIfNotDefined =
+  (processEnv: ProcessEnv) => (variableName: string) => {
+    const value = processEnv[variableName];
+    if (!value) throw new Error(`Expected ${variableName} to be Defined`);
+    return value;
+  };
+
 /*
  * Value should can only be a string,
  * so any string containing "TRUE" or "True" (case insensitive) will be considered true,

@@ -18,6 +18,7 @@ import {
   validateDemandeRoute,
 } from "../../shared/routes";
 import { createLogger } from "../../utils/logger";
+import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { createConfig } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
@@ -63,6 +64,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
         config.authChecker,
       );
     });
+
   router.route(`/${validateDemandeRoute}/:id`).get(async (req, res) => {
     sendHttpResponse(
       req,
@@ -130,6 +132,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   );
 
   app.use(router);
+  app.use("/auth", createMagicLinkRouter(config));
 
   config.eventBus.subscribe(
     "ImmersionApplicationSubmittedByBeneficiary",

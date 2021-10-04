@@ -75,6 +75,8 @@ export const createConfig = (featureFlags: FeatureFlags) => {
   };
 };
 
+export type AppConfig = ReturnType<typeof createConfig>;
+
 const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
 const getApplicationRepository = (
