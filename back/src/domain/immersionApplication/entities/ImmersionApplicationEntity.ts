@@ -7,7 +7,7 @@ export class ImmersionApplicationEntity {
   private constructor(private readonly properties: ImmersionApplicationDto) {}
 
   public static create(dto: ImmersionApplicationDto) {
-    immersionApplicationSchema.validateSync(dto);
+    immersionApplicationSchema.parse(dto);
     return new ImmersionApplicationEntity(dto);
   }
 

@@ -25,16 +25,14 @@ export class HttpImmersionApplicationGateway
   public async add(
     demandeImmersionDto: ImmersionApplicationDto,
   ): Promise<string> {
-    await immersionApplicationSchema.validate(demandeImmersionDto);
+    immersionApplicationSchema.parse(demandeImmersionDto);
     const httpResponse = await axios.post(
       `/${prefix}/${immersionApplicationsRoute}`,
       demandeImmersionDto,
     );
     const addDemandeImmersionResponse: AddImmersionApplicationResponseDto =
       httpResponse.data;
-    await addImmersionApplicationResponseDtoSchema.validate(
-      addDemandeImmersionResponse,
-    );
+    addImmersionApplicationResponseDtoSchema.parse(addDemandeImmersionResponse);
     return addDemandeImmersionResponse.id;
   }
 
@@ -57,14 +55,14 @@ export class HttpImmersionApplicationGateway
   public async update(
     demandeImmersionDto: ImmersionApplicationDto,
   ): Promise<string> {
-    await immersionApplicationSchema.validate(demandeImmersionDto);
+    immersionApplicationSchema.parse(demandeImmersionDto);
     const httpResponse = await axios.post(
       `/${prefix}/${immersionApplicationsRoute}/${demandeImmersionDto.id}`,
       demandeImmersionDto,
     );
     const updateDemandeImmersionResponse: UpdateImmersionApplicationResponseDto =
       httpResponse.data;
-    await updateImmersionApplicationResponseDtoSchema.validate(
+    updateImmersionApplicationResponseDtoSchema.parse(
       updateDemandeImmersionResponse,
     );
     return updateDemandeImmersionResponse.id;

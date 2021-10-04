@@ -12,7 +12,6 @@ import {
   ImmersionApplicationDtoBuilder,
 } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { addDays } from "../../_testBuilders/test.helpers";
-import { zRequiredString } from "../../shared/zodUtils";
 
 describe("demandeImmersionDtoSchema", () => {
   test("accepts valid immersionApplication", () => {
@@ -30,7 +29,7 @@ describe("demandeImmersionDtoSchema", () => {
   });
 
   test("rejects when string with spaces are provided", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withId("  ")
       .build();
 
