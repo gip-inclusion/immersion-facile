@@ -1,7 +1,7 @@
 import {
   ApplicationSource,
-  DemandeImmersionDto,
-} from "../../../../shared/DemandeImmersionDto";
+  ImmersionApplicationDto,
+} from "../../../../shared/ImmersionApplicationDto";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 import { createLogger } from "./../../../../utils/logger";
@@ -9,7 +9,7 @@ import { createLogger } from "./../../../../utils/logger";
 const logger = createLogger(__filename);
 
 export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
-  implements UseCase<DemandeImmersionDto>
+  implements UseCase<ImmersionApplicationDto>
 {
   constructor(
     private readonly emailGateway: EmailGateway,
@@ -25,7 +25,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
     email,
     firstName,
     lastName,
-  }: DemandeImmersionDto): Promise<void> {
+  }: ImmersionApplicationDto): Promise<void> {
     logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
 
     if (

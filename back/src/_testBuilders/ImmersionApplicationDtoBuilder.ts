@@ -1,9 +1,9 @@
 import {
   ApplicationSource,
   ApplicationStatus,
-  DemandeImmersionDto,
-  DemandeImmersionId,
-} from "../shared/DemandeImmersionDto";
+  ImmersionApplicationDto,
+  ImmersionApplicationId,
+} from "../shared/ImmersionApplicationDto";
 import {
   LegacyScheduleDto,
   reasonableSchedule,
@@ -22,7 +22,7 @@ export const VALID_PHONES = [
   "+41800001853",
 ];
 
-const validDemandeImmersion: DemandeImmersionDto = {
+const validDemandeImmersion: ImmersionApplicationDto = {
   id: DEMANDE_IMMERSION_ID,
   status: "DRAFT",
   source: "GENERIC",
@@ -52,61 +52,67 @@ const validDemandeImmersion: DemandeImmersionDto = {
   enterpriseAccepted: true,
 };
 
-export class DemandeImmersionDtoBuilder
-  implements Builder<DemandeImmersionDto>
+export class ImmersionApplicationDtoBuilder
+  implements Builder<ImmersionApplicationDto>
 {
-  constructor(private dto: DemandeImmersionDto = validDemandeImmersion) {}
+  constructor(private dto: ImmersionApplicationDto = validDemandeImmersion) {}
 
-  public withEmail(email: string): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, email });
+  public withEmail(email: string): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, email });
   }
 
-  public withMentorEmail(mentorEmail: string): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, mentorEmail });
+  public withMentorEmail(mentorEmail: string): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, mentorEmail });
   }
 
   public withDateSubmission(
     dateSubmission: string,
-  ): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, dateSubmission });
+  ): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, dateSubmission });
   }
 
-  public withDateStart(dateStart: string): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, dateStart });
+  public withDateStart(dateStart: string): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, dateStart });
   }
 
-  public withDateEnd(dateEnd: string): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, dateEnd });
+  public withDateEnd(dateEnd: string): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, dateEnd });
   }
 
-  public withId(id: DemandeImmersionId): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, id });
+  public withId(id: ImmersionApplicationId): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, id });
   }
 
-  public withSource(source: ApplicationSource): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, source });
+  public withSource(source: ApplicationSource): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, source });
   }
 
-  public withStatus(status: ApplicationStatus): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, status });
+  public withStatus(status: ApplicationStatus): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, status });
   }
 
   public withImmersionAddress(
     immersionAddress: string,
-  ): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, immersionAddress });
+  ): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      immersionAddress,
+    });
   }
 
   public withSanitaryPrevention(
     sanitaryPrevention: boolean,
-  ): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({ ...this.dto, sanitaryPrevention });
+  ): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      sanitaryPrevention,
+    });
   }
 
   public withSanitaryPreventionDescription(
     sanitaryPreventionDescription: string,
-  ): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({
+  ): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({
       ...this.dto,
       sanitaryPreventionDescription,
     });
@@ -114,15 +120,15 @@ export class DemandeImmersionDtoBuilder
 
   public withIndividualProtection(
     individualProtection: boolean,
-  ): DemandeImmersionDtoBuilder {
-    return new DemandeImmersionDtoBuilder({
+  ): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({
       ...this.dto,
       individualProtection,
     });
   }
 
   public withLegacySchedule(legacySchedule: LegacyScheduleDto) {
-    return new DemandeImmersionDtoBuilder({
+    return new ImmersionApplicationDtoBuilder({
       ...this.dto,
       legacySchedule,
     });

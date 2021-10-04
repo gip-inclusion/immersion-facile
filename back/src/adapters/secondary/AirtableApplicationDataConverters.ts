@@ -1,12 +1,12 @@
 import { FieldSet } from "airtable";
-import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
+import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import {
   ApplicationSource,
   applicationSourceFromString,
   ApplicationStatus,
   applicationStatusFromString,
-  DemandeImmersionDto,
-} from "../../shared/DemandeImmersionDto";
+  ImmersionApplicationDto,
+} from "../../shared/ImmersionApplicationDto";
 import {
   emptySchedule,
   LegacyScheduleDto,
@@ -93,13 +93,13 @@ const numberToSiret = (value: number): string => {
 };
 
 export type AirtableApplicationDataConverter = {
-  entityToFieldSet: (entity: DemandeImmersionEntity) => FieldSet;
-  fieldSetToEntity: (fields: FieldSet) => DemandeImmersionEntity;
+  entityToFieldSet: (entity: ImmersionApplicationEntity) => FieldSet;
+  fieldSetToEntity: (fields: FieldSet) => ImmersionApplicationEntity;
 };
 
 export const genericApplicationDataConverter: AirtableApplicationDataConverter =
   {
-    entityToFieldSet: (entity: DemandeImmersionEntity): FieldSet => {
+    entityToFieldSet: (entity: ImmersionApplicationEntity): FieldSet => {
       const dto = entity.toDto();
       return {
         ...dto,
@@ -107,8 +107,8 @@ export const genericApplicationDataConverter: AirtableApplicationDataConverter =
       } as FieldSet;
     },
 
-    fieldSetToEntity: (fields: FieldSet): DemandeImmersionEntity => {
-      return DemandeImmersionEntity.create({
+    fieldSetToEntity: (fields: FieldSet): ImmersionApplicationEntity => {
+      return ImmersionApplicationEntity.create({
         id: readString(fields, "id"),
         status: readApplicationStatus(fields, "status"),
         source: readApplicationSource(fields, "source"),
@@ -185,7 +185,7 @@ const legacyLabels = {
 
 export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
   {
-    entityToFieldSet: (entity: DemandeImmersionEntity): FieldSet => {
+    entityToFieldSet: (entity: ImmersionApplicationEntity): FieldSet => {
       const dto = entity.toDto();
 
       const fields: Record<string, any> = {};
@@ -246,8 +246,8 @@ export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
       return fields;
     },
 
-    fieldSetToEntity: (fields: FieldSet): DemandeImmersionEntity => {
-      const dto: DemandeImmersionDto = {
+    fieldSetToEntity: (fields: FieldSet): ImmersionApplicationEntity => {
+      const dto: ImmersionApplicationDto = {
         firstName: readString(fields, legacyLabels.firstName),
         lastName: readString(fields, legacyLabels.lastName),
         email: readString(fields, legacyLabels.email),
@@ -298,6 +298,6 @@ export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
         schedule:
           readScheduleDto(fields, legacyLabels.schedule) || emptySchedule,
       };
-      return DemandeImmersionEntity.create(dto);
+      return ImmersionApplicationEntity.create(dto);
     },
   };

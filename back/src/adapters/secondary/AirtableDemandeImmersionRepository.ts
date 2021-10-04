@@ -1,20 +1,20 @@
 import Airtable, { FieldSet, Record, Table } from "airtable";
 import { QueryParams } from "airtable/lib/query_params";
-import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
-import { DemandeImmersionId } from "../../shared/DemandeImmersionDto";
+import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+import { ImmersionApplicationRepository } from "../../domain/immersionApplication/ports/ImmersionApplicationRepository";
+import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { ConflictError } from "../primary/helpers/sendHttpResponse";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 
 export type AirtableApplicationDataConverter = {
-  entityToFieldSet: (entity: DemandeImmersionEntity) => FieldSet;
-  fieldSetToEntity: (fields: FieldSet) => DemandeImmersionEntity;
+  entityToFieldSet: (entity: ImmersionApplicationEntity) => FieldSet;
+  fieldSetToEntity: (fields: FieldSet) => ImmersionApplicationEntity;
 };
 
 export class AirtableDemandeImmersionRepository
-  implements DemandeImmersionRepository
+  implements ImmersionApplicationRepository
 {
   constructor(
     readonly table: Table<FieldSet>,
@@ -34,8 +34,8 @@ export class AirtableDemandeImmersionRepository
   }
 
   public async save(
-    entity: DemandeImmersionEntity,
-  ): Promise<DemandeImmersionId | undefined> {
+    entity: ImmersionApplicationEntity,
+  ): Promise<ImmersionApplicationId | undefined> {
     if (await this.getById(entity.id)) {
       throw new ConflictError(`ID already exists: ${entity.id}`);
     }
@@ -57,8 +57,8 @@ export class AirtableDemandeImmersionRepository
   }
 
   public async getById(
-    id: DemandeImmersionId,
-  ): Promise<DemandeImmersionEntity | undefined> {
+    id: ImmersionApplicationId,
+  ): Promise<ImmersionApplicationEntity | undefined> {
     const record = await this.queryRecordById(id);
     if (!record) {
       return undefined;
@@ -66,7 +66,7 @@ export class AirtableDemandeImmersionRepository
     return this.converter.fieldSetToEntity(record.fields);
   }
 
-  public async getAll(): Promise<DemandeImmersionEntity[]> {
+  public async getAll(): Promise<ImmersionApplicationEntity[]> {
     try {
       const records = await this.queryRecords({});
       return records.map((record) =>
@@ -79,7 +79,7 @@ export class AirtableDemandeImmersionRepository
   }
 
   private async queryRecordById(
-    id: DemandeImmersionId,
+    id: ImmersionApplicationId,
   ): Promise<Record<FieldSet> | undefined> {
     try {
       const demandesImmersion = await this.queryRecords({
@@ -107,9 +107,9 @@ export class AirtableDemandeImmersionRepository
     return allRecords;
   }
 
-  public async updateDemandeImmersion(
-    demandeImmersion: DemandeImmersionEntity,
-  ): Promise<DemandeImmersionId | undefined> {
+  public async updateImmersionApplication(
+    demandeImmersion: ImmersionApplicationEntity,
+  ): Promise<ImmersionApplicationId | undefined> {
     const currentRecord = await this.queryRecordById(demandeImmersion.id);
     if (!currentRecord) {
       return undefined;

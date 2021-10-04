@@ -1,14 +1,14 @@
 import React, { Component, useEffect, useState } from "react";
 import { demandeImmersionGateway } from "src/app/main";
 import { routes } from "src/app/routes";
-import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { Route } from "type-route";
 import "./Admin.css";
 import { FormAccordeon } from "src/components/admin/FormAccordeon";
 
 interface AdminState {
-  demandeImmersion: Array<DemandeImmersionDto>;
+  demandeImmersion: Array<ImmersionApplicationDto>;
 }
 interface AdminProps {
   route: Route<typeof routes.admin>;
@@ -16,7 +16,7 @@ interface AdminProps {
 
 export const Admin = ({ route }: AdminProps) => {
   const [demandesImmersion, setDemandesImmersion] = useState<
-    DemandeImmersionDto[]
+    ImmersionApplicationDto[]
   >([]);
 
   useEffect(() => {

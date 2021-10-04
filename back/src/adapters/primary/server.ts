@@ -2,16 +2,16 @@ import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import PinoHttp from "pino-http";
 import {
-  demandeImmersionDtoSchema,
-  getDemandeImmersionRequestDtoSchema,
-  updateDemandeImmersionRequestDtoSchema,
-  validateDemandeImmersionRequestDtoSchema,
-} from "../../shared/DemandeImmersionDto";
+  immersionApplicationSchema,
+  getImmersionApplicationRequestDtoSchema,
+  updateImmersionApplicationRequestDtoSchema,
+  validateImmersionApplicationRequestDtoSchema,
+} from "../../shared/ImmersionApplicationDto";
 import { FeatureFlags } from "../../shared/featureFlags";
 import { immersionOfferSchema } from "../../shared/ImmersionOfferDto";
 import { romeSearchRequestSchema } from "../../shared/rome";
 import {
-  demandesImmersionRoute,
+  immersionApplicationsRoute,
   immersionOffersRoute,
   romeRoute,
   siretRoute,
@@ -46,12 +46,12 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   const config = createConfig(featureFlags);
 
   router
-    .route(`/${demandesImmersionRoute}`)
+    .route(`/${immersionApplicationsRoute}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         callUseCase({
           useCase: config.useCases.addDemandeImmersion,
-          validationSchema: demandeImmersionDtoSchema,
+          validationSchema: immersionApplicationSchema,
           useCaseParams: req.body,
         }),
       ),
@@ -72,7 +72,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
       () =>
         callUseCase({
           useCase: config.useCases.validateDemandeImmersion,
-          validationSchema: validateDemandeImmersionRequestDtoSchema,
+          validationSchema: validateImmersionApplicationRequestDtoSchema,
           useCaseParams: req.params.id,
         }),
       config.authChecker,
@@ -80,7 +80,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   });
 
   const demandeImmersionRouter = Router({ mergeParams: true });
-  router.use(`/${demandesImmersionRoute}`, demandeImmersionRouter);
+  router.use(`/${immersionApplicationsRoute}`, demandeImmersionRouter);
 
   demandeImmersionRouter
     .route(`/:id`)
@@ -88,7 +88,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
       sendHttpResponse(req, res, () =>
         callUseCase({
           useCase: config.useCases.getDemandeImmersion,
-          validationSchema: getDemandeImmersionRequestDtoSchema,
+          validationSchema: getImmersionApplicationRequestDtoSchema,
           useCaseParams: req.params,
         }),
       ),
@@ -97,7 +97,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
       sendHttpResponse(req, res, () =>
         callUseCase({
           useCase: config.useCases.updateDemandeImmersion,
-          validationSchema: updateDemandeImmersionRequestDtoSchema,
+          validationSchema: updateImmersionApplicationRequestDtoSchema,
           useCaseParams: { id: req.params.id, demandeImmersion: req.body },
         }),
       ),

@@ -1,7 +1,7 @@
 import {
   ApplicationSource,
-  DemandeImmersionDto,
-} from "../../../../shared/DemandeImmersionDto";
+  ImmersionApplicationDto,
+} from "../../../../shared/ImmersionApplicationDto";
 import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
@@ -15,7 +15,7 @@ import {
 
 const logger = createLogger(__filename);
 export class NotifyAllActorsOfFinalApplicationValidation
-  implements UseCase<DemandeImmersionDto>
+  implements UseCase<ImmersionApplicationDto>
 {
   constructor(
     private readonly emailGateway: EmailGateway,
@@ -28,7 +28,7 @@ export class NotifyAllActorsOfFinalApplicationValidation
     >,
   ) {}
 
-  public async execute(dto: DemandeImmersionDto): Promise<void> {
+  public async execute(dto: ImmersionApplicationDto): Promise<void> {
     logger.info(
       {
         demandeImmersionid: dto.id,
@@ -94,7 +94,7 @@ export const getQuestionnaireUrl = (source: ApplicationSource): string => {
 
 // Visible for testing.
 export const getValidatedApplicationFinalConfirmationParams = (
-  dto: DemandeImmersionDto,
+  dto: ImmersionApplicationDto,
 ): ValidatedApplicationFinalConfirmationParams => {
   return {
     beneficiaryFirstName: dto.firstName,

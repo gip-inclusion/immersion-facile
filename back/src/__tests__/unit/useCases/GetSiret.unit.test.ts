@@ -1,5 +1,5 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
+import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   InMemorySireneRepository,
   TEST_ESTABLISHMENT1,
@@ -26,8 +26,8 @@ describe("Get SIRET", () => {
     });
   });
 
-  describe("When a demandeImmersion is stored", () => {
-    it("returns the demandeImmersion", async () => {
+  describe("When a immersionApplication is stored", () => {
+    it("returns the immersionApplication", async () => {
       const response = await getSiret.execute(TEST_ESTABLISHMENT1_SIRET);
       expect(response).toEqual({
         header: {

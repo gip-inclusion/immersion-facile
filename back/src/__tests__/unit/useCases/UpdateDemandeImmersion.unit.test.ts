@@ -1,30 +1,30 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
-  DemandesImmersion,
-  InMemoryDemandeImmersionRepository,
-} from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { UpdateDemandeImmersion } from "../../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
+  ImmersionApplications,
+  InMemoryImmersionApplicationRepository,
+} from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { UpdateImmersionApplication } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import {
   FeatureDisabledError,
   FeatureFlags,
 } from "../../../shared/featureFlags";
-import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
-import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { FeatureFlagsBuilder } from "./../../../_testBuilders/FeatureFlagsBuilder";
 
-describe("Update demandeImmersion", () => {
-  let updateDemandeImmersion: UpdateDemandeImmersion;
-  let repository: InMemoryDemandeImmersionRepository;
+describe("Update immersionApplication", () => {
+  let updateDemandeImmersion: UpdateImmersionApplication;
+  let repository: InMemoryImmersionApplicationRepository;
   let featureFlags: FeatureFlags;
 
   beforeEach(() => {
-    repository = new InMemoryDemandeImmersionRepository();
+    repository = new InMemoryImmersionApplicationRepository();
   });
 
   const createUpdateDemandeImmersionUseCase = () => {
-    return new UpdateDemandeImmersion({
-      demandeImmersionRepository: repository,
+    return new UpdateImmersionApplication({
+      immersionApplicationRepository: repository,
       featureFlags,
     });
   };
@@ -37,15 +37,15 @@ describe("Update demandeImmersion", () => {
       updateDemandeImmersion = createUpdateDemandeImmersionUseCase();
     });
 
-    describe("When the demandeImmersion is valid", () => {
-      test("updates the demandeImmersion in the repository", async () => {
-        const demandesImmersion: DemandesImmersion = {};
+    describe("When the immersionApplication is valid", () => {
+      test("updates the immersionApplication in the repository", async () => {
+        const demandesImmersion: ImmersionApplications = {};
         const demandeImmersionEntity =
-          new DemandeImmersionEntityBuilder().build();
+          new ImmersionApplicationEntityBuilder().build();
         demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
         repository.setDemandesImmersion(demandesImmersion);
 
-        const updatedDemandeImmersion = new DemandeImmersionDtoBuilder()
+        const updatedDemandeImmersion = new ImmersionApplicationDtoBuilder()
           .withEmail("new@email.fr")
           .build();
 
@@ -62,9 +62,10 @@ describe("Update demandeImmersion", () => {
       });
     });
 
-    describe("When no demandeImmersion with id exists", () => {
+    describe("When no immersionApplication with id exists", () => {
       it("throws NotFoundError", async () => {
-        const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
+        const validDemandeImmersion =
+          new ImmersionApplicationDtoBuilder().build();
 
         await expectPromiseToFailWithError(
           updateDemandeImmersion.execute({
@@ -84,7 +85,8 @@ describe("Update demandeImmersion", () => {
     });
 
     it("throws FeatureDisabledError", async () => {
-      const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
+      const validDemandeImmersion =
+        new ImmersionApplicationDtoBuilder().build();
       expectPromiseToFailWithError(
         updateDemandeImmersion.execute({
           id: "demande_id",

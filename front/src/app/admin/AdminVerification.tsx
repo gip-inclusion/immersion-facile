@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FormAccordeon } from "src/components/admin/FormAccordeon";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
-import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { Route } from "type-route";
 import { demandeImmersionGateway } from "../main";
 import { routes } from "../routes";
@@ -15,7 +15,7 @@ interface AdminVerificationProps {
 }
 
 export const AdminVerification = ({ route }: AdminVerificationProps) => {
-  const [form, setForm] = useState<DemandeImmersionDto | null>(null);
+  const [form, setForm] = useState<ImmersionApplicationDto | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);

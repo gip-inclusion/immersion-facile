@@ -1,12 +1,12 @@
-import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { expectEmailAdminNotificationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../../domain/demandeImmersion/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
+import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 
 describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   let emailGw: InMemoryEmailGateway;
   let immersionFacileContactEmail: string;
-  const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
+  const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
 
   beforeEach(() => {
     immersionFacileContactEmail = "supervisor@email.fr";

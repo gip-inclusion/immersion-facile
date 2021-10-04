@@ -3,24 +3,24 @@ import {
   applicationSourceFromString,
   ApplicationStatus,
   applicationStatusFromString,
-  DemandeImmersionDto,
-  demandeImmersionDtoSchema,
-} from "../../shared/DemandeImmersionDto";
+  ImmersionApplicationDto,
+  immersionApplicationSchema,
+} from "../../shared/ImmersionApplicationDto";
 import {
   DATE_START,
   DATE_SUBMISSION,
-  DemandeImmersionDtoBuilder,
-} from "../../_testBuilders/DemandeImmersionDtoBuilder";
+  ImmersionApplicationDtoBuilder,
+} from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { addDays } from "../../_testBuilders/test.helpers";
 
 describe("demandeImmersionDtoSchema", () => {
-  test("accepts valid demandeImmersion", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+  test("accepts valid immersionApplication", () => {
+    const demandeImmersion = new ImmersionApplicationDtoBuilder().build();
     expectDemandeImmersionDtoToBeValid(demandeImmersion);
   });
 
   test("rejects equal applicant and mentor emails", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withEmail("demandeur@mail.fr")
       .withMentorEmail("demandeur@mail.fr")
       .build();
@@ -29,7 +29,7 @@ describe("demandeImmersionDtoSchema", () => {
   });
 
   test("rejects misformatted submission dates", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withDateSubmission("not-a-date")
       .build();
 
@@ -37,7 +37,7 @@ describe("demandeImmersionDtoSchema", () => {
   });
 
   test("rejects misformatted start dates", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withDateStart("not-a-date")
       .build();
 
@@ -45,7 +45,7 @@ describe("demandeImmersionDtoSchema", () => {
   });
 
   test("rejects misformatted end dates", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withDateEnd("not-a-date")
       .build();
 
@@ -53,7 +53,7 @@ describe("demandeImmersionDtoSchema", () => {
   });
 
   test("rejects start dates that are after the end date", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withDateStart("2021-01-10")
       .withDateEnd("2021-01-03")
       .build();
@@ -62,7 +62,7 @@ describe("demandeImmersionDtoSchema", () => {
   });
 
   test("rejects end dates that are more than 28 days after the start date", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withDateStart(DATE_START)
       .withDateEnd(addDays(DATE_START, 29))
       .build();
@@ -71,7 +71,7 @@ describe("demandeImmersionDtoSchema", () => {
   });
 
   test("accepts end dates that are <= 28 days after the start date", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withDateStart(DATE_START)
       .withDateEnd(addDays(DATE_START, 28))
       .build();
@@ -80,7 +80,7 @@ describe("demandeImmersionDtoSchema", () => {
   });
 
   test("accepts start dates that are >= 2 days after the submission date", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withDateSubmission(DATE_SUBMISSION)
       .withDateStart(addDays(DATE_SUBMISSION, 2))
       .build();
@@ -89,7 +89,7 @@ describe("demandeImmersionDtoSchema", () => {
   });
 
   test("rejects start dates that are < 2 days after the submission date", () => {
-    const demandeImmersion = new DemandeImmersionDtoBuilder()
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withDateSubmission(DATE_SUBMISSION)
       .withDateStart(addDays(DATE_SUBMISSION, 1))
       .build();
@@ -148,20 +148,20 @@ const expectApplicationSourceToBe = (
 ) => expect(actual).toBe(expected);
 
 const expectDemandeImmersionDtoToBeValid = (
-  validDemandeImmersionDto: DemandeImmersionDto,
+  validDemandeImmersionDto: ImmersionApplicationDto,
 ) => {
   expect(() =>
-    demandeImmersionDtoSchema.validateSync(validDemandeImmersionDto),
+    immersionApplicationSchema.validateSync(validDemandeImmersionDto),
   ).not.toThrow();
 
   expect(
-    demandeImmersionDtoSchema.validateSync(validDemandeImmersionDto),
+    immersionApplicationSchema.validateSync(validDemandeImmersionDto),
   ).toBeTruthy();
 };
 
 const expectDemandeImmersionDtoToBeInvalid = (
-  demandeImmersionDto: DemandeImmersionDto,
+  demandeImmersionDto: ImmersionApplicationDto,
 ) =>
   expect(() =>
-    demandeImmersionDtoSchema.validateSync(demandeImmersionDto),
+    immersionApplicationSchema.validateSync(demandeImmersionDto),
   ).toThrow();

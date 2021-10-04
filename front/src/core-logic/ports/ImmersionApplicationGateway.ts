@@ -4,10 +4,10 @@ import {
   ImmersionApplicationId,
 } from "src/shared/ImmersionApplicationDto";
 
-export interface DemandeImmersionGateway {
-  add: (demandeImmersionDto: ImmersionApplicationDto) => Promise<string>;
+export interface ImmersionApplicationGateway {
+  add: (immersionApplicationDto: ImmersionApplicationDto) => Promise<string>;
   get: (id: ImmersionApplicationId) => Promise<ImmersionApplicationDto>;
-  update: (demandeImmersionDto: ImmersionApplicationDto) => Promise<string>;
+  update: (immersionApplicationDto: ImmersionApplicationDto) => Promise<string>;
   // Calls validate-demande on backend.
   validate: (id: ImmersionApplicationId) => Promise<string>;
 

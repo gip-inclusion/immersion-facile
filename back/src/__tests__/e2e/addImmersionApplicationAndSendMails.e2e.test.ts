@@ -2,7 +2,7 @@ import { CustomClock } from "../../adapters/secondary/core/ClockImplementations"
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryDemandeImmersionRepository } from "../../adapters/secondary/InMemoryDemandeImmersionRepository";
+import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   InMemoryEmailGateway,
   TemplatedEmail,
@@ -14,17 +14,17 @@ import {
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
-import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
-import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
-import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
-import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/demandeImmersion/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
-import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases/ValidateDemandeImmersion";
+import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
+import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
+import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
+import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import {
   ApplicationSource,
-  DemandeImmersionDto,
-} from "../../shared/DemandeImmersionDto";
-import { DemandeImmersionDtoBuilder } from "../../_testBuilders/DemandeImmersionDtoBuilder";
+  ImmersionApplicationDto,
+} from "../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import {
   expectEmailAdminNotificationMatchingImmersionApplication,
   expectEmailBeneficiaryConfirmationMatchingImmersionApplication,
@@ -32,10 +32,10 @@ import {
   expectEmailMentorConfirmationMatchingImmersionApplication,
 } from "../../_testBuilders/emailAssertions";
 
-describe("Add demandeImmersion Notifications, then checks the mails are sent (trigerred by events)", () => {
-  let addDemandeImmersion: AddDemandeImmersion;
-  let validateDemandeImmersion: ValidateDemandeImmersion;
-  let applicationRepository: InMemoryDemandeImmersionRepository;
+describe("Add immersionApplication Notifications, then checks the mails are sent (trigerred by events)", () => {
+  let addDemandeImmersion: AddImmersionApplication;
+  let validateDemandeImmersion: ValidateImmersionApplication;
+  let applicationRepository: InMemoryImmersionApplicationRepository;
   let outboxRepository: OutboxRepository;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
@@ -44,7 +44,7 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
   let confirmToBeneficiary: ConfirmToBeneficiaryThatApplicationCorrectlySubmitted;
   let confirmToMentor: ConfirmToMentorThatApplicationCorrectlySubmitted;
   let notifyToTeam: NotifyToTeamApplicationSubmittedByBeneficiary;
-  let validDemandeImmersion: DemandeImmersionDto;
+  let validDemandeImmersion: ImmersionApplicationDto;
   let eventBus: EventBus;
   let eventCrawler: BasicEventCrawler;
   let aSupervisorEmail: string;
@@ -53,22 +53,22 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
   let sentEmails: TemplatedEmail[];
 
   beforeEach(() => {
-    applicationRepository = new InMemoryDemandeImmersionRepository();
+    applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     emailGw = new InMemoryEmailGateway();
-    validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
+    validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
     eventBus = new InMemoryEventBus();
     eventCrawler = new BasicEventCrawler(eventBus, outboxRepository);
 
-    addDemandeImmersion = new AddDemandeImmersion(
+    addDemandeImmersion = new AddImmersionApplication(
       applicationRepository,
       createNewEvent,
       outboxRepository,
     );
-    validateDemandeImmersion = new ValidateDemandeImmersion(
+    validateDemandeImmersion = new ValidateImmersionApplication(
       applicationRepository,
       createNewEvent,
       outboxRepository,
@@ -103,7 +103,7 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
   //Creates a DemandeImmersion, check it is saved properly and that event had been triggered (thanks to subscription),
   // t hen check mails have been sent trough the inmemory mail gateway
   test("saves valid applications in the repository", async () => {
-    addDemandeImmersion = new AddDemandeImmersion(
+    addDemandeImmersion = new AddImmersionApplication(
       applicationRepository,
       createNewEvent,
       outboxRepository,
@@ -148,7 +148,7 @@ describe("Add demandeImmersion Notifications, then checks the mails are sent (tr
   });
 
   test("Checks than when a conselor updates an Immersion Application to confirm it, the proper emails are sent to Beneficiary, mentor & team", async () => {
-    const demandeImmersionInReview = new DemandeImmersionDtoBuilder()
+    const demandeImmersionInReview = new ImmersionApplicationDtoBuilder()
       .withStatus("IN_REVIEW")
       .build();
 

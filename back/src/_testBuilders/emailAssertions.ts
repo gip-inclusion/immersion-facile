@@ -1,12 +1,12 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
-import { getValidatedApplicationFinalConfirmationParams } from "../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { DemandeImmersionDto } from "../shared/DemandeImmersionDto";
+import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
   email: TemplatedEmail,
   params: {
     recipient: string;
-    immersionApplication: DemandeImmersionDto;
+    immersionApplication: ImmersionApplicationDto;
   },
 ) => {
   const { recipient, immersionApplication } = params;
@@ -29,7 +29,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
 
 export const expectEmailBeneficiaryConfirmationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
-  immersionApplication: DemandeImmersionDto,
+  immersionApplication: ImmersionApplicationDto,
 ) => {
   const { email, id, firstName, lastName } = immersionApplication;
 
@@ -46,7 +46,7 @@ export const expectEmailBeneficiaryConfirmationMatchingImmersionApplication = (
 
 export const expectEmailMentorConfirmationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
-  immersionApplication: DemandeImmersionDto,
+  immersionApplication: ImmersionApplicationDto,
 ) => {
   const { id, mentor, mentorEmail, firstName, lastName } = immersionApplication;
 
@@ -66,7 +66,7 @@ export const expectEmailFinalValidationConfirmationMatchingImmersionApplication 
   (
     recipients: string[],
     templatedEmail: TemplatedEmail,
-    immersionApplication: DemandeImmersionDto,
+    immersionApplication: ImmersionApplicationDto,
   ) => {
     expect(templatedEmail).toEqual({
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",

@@ -11,7 +11,7 @@ import { FeatureFlags } from "src/shared/featureFlags";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { sleep } from "src/shared/utils";
 
-const DEMANDE_IMMERSION_TEMPLATE: ImmersionApplicationDto = {
+const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   id: "fake-test-id",
   status: "DRAFT",
   source: "GENERIC",
@@ -85,7 +85,7 @@ const TEST_ESTABLISHMENT2 = {
 
 const SIMULATED_LATENCY_MS = 2000;
 
-export class InMemoryDemandeImmersionGateway
+export class InMemoryImmersionApplicationGateway
   implements ImmersionApplicationGateway
 {
   private _demandesImmersion: { [id: string]: ImmersionApplicationDto } = {};
@@ -93,13 +93,13 @@ export class InMemoryDemandeImmersionGateway
 
   public constructor(readonly featureFlags: FeatureFlags) {
     this.add({
-      ...DEMANDE_IMMERSION_TEMPLATE,
+      ...IMMERSION_APPLICATION_TEMPLATE,
       id: "valid_draft",
       status: "DRAFT",
       email: "DRAFT.esteban@ocon.fr",
     });
     this.add({
-      ...DEMANDE_IMMERSION_TEMPLATE,
+      ...IMMERSION_APPLICATION_TEMPLATE,
       id: "valid_in_review",
       status: "IN_REVIEW",
       email: "IN_REVIEW.esteban@ocon.fr",

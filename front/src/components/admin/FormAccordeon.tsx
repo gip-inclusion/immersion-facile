@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import {
-  DemandeImmersionDto,
+  ImmersionApplicationDto,
   ApplicationStatus,
-} from "src/shared/DemandeImmersionDto";
+} from "src/shared/ImmersionApplicationDto";
 import { formatDistance, formatDuration, intervalToDuration } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Accordeon } from "./Accordeon";
@@ -28,7 +28,7 @@ const durationDays = (dateStart: string, dateEnd: string) => {
 };
 
 export interface FormAccordeonProps {
-  data: DemandeImmersionDto;
+  data: ImmersionApplicationDto;
 }
 
 const getPrefix = (status: ApplicationStatus) => {

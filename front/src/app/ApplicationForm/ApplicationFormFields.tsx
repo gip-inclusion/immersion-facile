@@ -18,8 +18,8 @@ import { TextInput } from "src/components/form/TextInput";
 import { ENV } from "src/environmentVariables";
 import {
   ApplicationStatus,
-  DemandeImmersionDto,
-} from "src/shared/DemandeImmersionDto";
+  ImmersionApplicationDto,
+} from "src/shared/ImmersionApplicationDto";
 
 const { featureFlags } = ENV;
 
@@ -50,7 +50,7 @@ export const ApplicationFormFields = ({
   successInfos,
 }: ApplicationFieldsProps) => {
   const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
-    useFormikContext<DemandeImmersionDto>();
+    useFormikContext<ImmersionApplicationDto>();
   const { companyInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", companyInfo);
   useSiretRelatedField("businessAddress", companyInfo, "immersionAddress");

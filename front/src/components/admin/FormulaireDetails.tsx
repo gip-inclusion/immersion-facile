@@ -2,9 +2,12 @@ import React, { Component } from "react";
 import { Accordeon } from "./Accordeon";
 import { TextCell } from "./TextCell";
 import { FormAccordeonProps as FormAccordeonProps } from "./FormAccordeon";
-import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 
-type FieldForFormDetails = { title: string; key: keyof DemandeImmersionDto };
+type FieldForFormDetails = {
+  title: string;
+  key: keyof ImmersionApplicationDto;
+};
 
 // TODO(stk): show schedule, individual protection, signature status, upload date
 const candidateFields: FieldForFormDetails[] = [

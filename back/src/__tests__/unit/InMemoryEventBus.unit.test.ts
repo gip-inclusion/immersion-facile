@@ -1,12 +1,12 @@
 import { spyOnTopic } from "../../_testBuilders/test.helpers";
 import type { DomainEvent } from "../../domain/core/eventBus/events";
 import { InMemoryEventBus } from "../../adapters/secondary/InMemoryEventBus";
-import { DemandeImmersionDtoBuilder } from "../../_testBuilders/DemandeImmersionDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 
 const domainEvt: DomainEvent = {
   id: "anId",
   topic: "ImmersionApplicationSubmittedByBeneficiary",
-  payload: new DemandeImmersionDtoBuilder().build(),
+  payload: new ImmersionApplicationDtoBuilder().build(),
   occurredAt: "a date",
 };
 

@@ -1,36 +1,36 @@
 import { FeatureDisabledError } from "../../shared/featureFlags";
 import { expectPromiseToFailWithError } from "../../_testBuilders/test.helpers";
 import { ApplicationRepositorySwitcher } from "../../adapters/secondary/ApplicationRepositorySwitcher";
-import { InMemoryDemandeImmersionRepository } from "../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { DemandeImmersionEntity } from "../../domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { DemandeImmersionDtoBuilder } from "../../_testBuilders/DemandeImmersionDtoBuilder";
+import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 describe("ApplicationRepositorySwitcher", () => {
-  const genericApplication = DemandeImmersionEntity.create(
-    new DemandeImmersionDtoBuilder()
+  const genericApplication = ImmersionApplicationEntity.create(
+    new ImmersionApplicationDtoBuilder()
       .withId("generic_id")
       .withSource("GENERIC")
       .build(),
   );
-  const narbonneApplication = DemandeImmersionEntity.create(
-    new DemandeImmersionDtoBuilder()
+  const narbonneApplication = ImmersionApplicationEntity.create(
+    new ImmersionApplicationDtoBuilder()
       .withId("narbonne_id")
       .withSource("NARBONNE")
       .build(),
   );
-  const boulogneSurMerApplication = DemandeImmersionEntity.create(
-    new DemandeImmersionDtoBuilder()
+  const boulogneSurMerApplication = ImmersionApplicationEntity.create(
+    new ImmersionApplicationDtoBuilder()
       .withId("boulogne_sur_mer_id")
       .withSource("BOULOGNE_SUR_MER")
       .build(),
   );
 
-  let genericRepository: InMemoryDemandeImmersionRepository;
-  let narbonneRepository: InMemoryDemandeImmersionRepository;
+  let genericRepository: InMemoryImmersionApplicationRepository;
+  let narbonneRepository: InMemoryImmersionApplicationRepository;
   let demux: ApplicationRepositorySwitcher;
 
   beforeEach(() => {
-    genericRepository = new InMemoryDemandeImmersionRepository();
-    narbonneRepository = new InMemoryDemandeImmersionRepository();
+    genericRepository = new InMemoryImmersionApplicationRepository();
+    narbonneRepository = new InMemoryImmersionApplicationRepository();
     demux = new ApplicationRepositorySwitcher({
       GENERIC: genericRepository,
       NARBONNE: narbonneRepository,
@@ -138,8 +138,8 @@ describe("ApplicationRepositorySwitcher", () => {
         new Set([genericApplication, narbonneApplication]),
       );
 
-      const genericApplication2 = DemandeImmersionEntity.create(
-        new DemandeImmersionDtoBuilder().withId("generic_id2").build(),
+      const genericApplication2 = ImmersionApplicationEntity.create(
+        new ImmersionApplicationDtoBuilder().withId("generic_id2").build(),
       );
       genericRepository.setDemandesImmersion({
         [genericApplication.id]: genericApplication,
@@ -173,12 +173,12 @@ describe("ApplicationRepositorySwitcher", () => {
       genericRepository.setDemandesImmersion({
         [genericApplication.id]: genericApplication,
       });
-      const updatedGenericApplication = DemandeImmersionEntity.create({
+      const updatedGenericApplication = ImmersionApplicationEntity.create({
         ...genericApplication.toDto(),
         email: "new@generic.email.fr",
       });
       expect(
-        await demux.updateDemandeImmersion(updatedGenericApplication),
+        await demux.updateImmersionApplication(updatedGenericApplication),
       ).toEqual(updatedGenericApplication.id);
       expect((await genericRepository.getAll())[0]).toEqual(
         updatedGenericApplication,
@@ -188,12 +188,12 @@ describe("ApplicationRepositorySwitcher", () => {
       narbonneRepository.setDemandesImmersion({
         [narbonneApplication.id]: narbonneApplication,
       });
-      const updatedNarbonneApplication = DemandeImmersionEntity.create({
+      const updatedNarbonneApplication = ImmersionApplicationEntity.create({
         ...narbonneApplication.toDto(),
         email: "new@narbonne.email.fr",
       });
       expect(
-        await demux.updateDemandeImmersion(updatedNarbonneApplication),
+        await demux.updateImmersionApplication(updatedNarbonneApplication),
       ).toEqual(updatedNarbonneApplication.id);
       expect((await narbonneRepository.getAll())[0]).toEqual(
         updatedNarbonneApplication,
@@ -202,19 +202,19 @@ describe("ApplicationRepositorySwitcher", () => {
 
     test("returns undefined if application doesn't exist", async () => {
       expect(
-        await demux.updateDemandeImmersion(genericApplication),
+        await demux.updateImmersionApplication(genericApplication),
       ).toBeUndefined();
       expect(await genericRepository.getAll()).toEqual([]);
 
       expect(
-        await demux.updateDemandeImmersion(narbonneApplication),
+        await demux.updateImmersionApplication(narbonneApplication),
       ).toBeUndefined();
       expect(await narbonneRepository.getAll()).toEqual([]);
     });
 
     test("rejects application updates in unsupported sources", async () => {
       await expectPromiseToFailWithError(
-        demux.updateDemandeImmersion(boulogneSurMerApplication),
+        demux.updateImmersionApplication(boulogneSurMerApplication),
         new FeatureDisabledError(boulogneSurMerApplication.source),
       );
     });

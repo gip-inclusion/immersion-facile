@@ -2,12 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { App } from "src/app/App";
-import { HttpDemandeImmersionGateway } from "src/core-logic/adapters/HttpDemandeImmersionGateway";
+import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
 import { HttpImmersionOfferGateway } from "src/core-logic/adapters/HttpImmersionOfferGateway";
-import { InMemoryDemandeImmersionGateway } from "src/core-logic/adapters/InMemoryDemandeImmersionGateway";
+import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
 import { InMemoryImmersionOfferGateway } from "src/core-logic/adapters/InMemoryImmersionOfferGateway";
 import { InMemoryTodoGateway } from "src/core-logic/adapters/InMemoryTodoGateway";
-import { DemandeImmersionGateway } from "src/core-logic/ports/DemandeImmersionGateway";
+import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { ImmersionOfferGateway } from "src/core-logic/ports/ImmersionOfferGateway";
 import { configureReduxStore } from "src/core-logic/store/initilizeStore";
 import { ENV } from "src/environmentVariables";
@@ -21,10 +21,10 @@ export const immersionOfferGateway: ImmersionOfferGateway =
     ? new HttpImmersionOfferGateway()
     : new InMemoryImmersionOfferGateway();
 
-export const demandeImmersionGateway: DemandeImmersionGateway =
+export const demandeImmersionGateway: ImmersionApplicationGateway =
   ENV.gateway === "HTTP"
-    ? new HttpDemandeImmersionGateway()
-    : new InMemoryDemandeImmersionGateway(ENV.featureFlags);
+    ? new HttpImmersionApplicationGateway()
+    : new InMemoryImmersionApplicationGateway(ENV.featureFlags);
 
 const store = configureReduxStore({ todoGateway });
 

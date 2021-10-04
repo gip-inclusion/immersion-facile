@@ -34,10 +34,10 @@ export const applicationSourceFromString = (s: string): ApplicationSource => {
   return "UNKNOWN";
 };
 
-export type DemandeImmersionId = Flavor<string, "DemandeImmersionId">;
+export type ImmersionApplicationId = Flavor<string, "ImmersionApplicationId">;
 
-export const demandeImmersionDtoSchema = Yup.object({
-  id: Yup.mixed<DemandeImmersionId>()
+export const immersionApplicationSchema = Yup.object({
+  id: Yup.mixed<ImmersionApplicationId>()
     .required("Obligatoire")
     .test("no-empty-id", "L'ID est obligatoire", (value) => {
       if (typeof value !== "string") return false;
@@ -163,32 +163,32 @@ export const demandeImmersionDtoSchema = Yup.object({
   ),
 }).required();
 
-export const demandeImmersionDtoArraySchema = Yup.array().of(
-  demandeImmersionDtoSchema,
+export const immersionApplicationArraySchema = Yup.array().of(
+  immersionApplicationSchema,
 );
 
-export type DemandeImmersionDto = Yup.InferType<
-  typeof demandeImmersionDtoSchema
+export type ImmersionApplicationDto = Yup.InferType<
+  typeof immersionApplicationSchema
 >;
 
-export const addDemandeImmersionResponseDtoSchema = Yup.object({
-  id: Yup.mixed<DemandeImmersionId>().required(),
+export const addImmersionApplicationResponseDtoSchema = Yup.object({
+  id: Yup.mixed<ImmersionApplicationId>().required(),
 }).required();
 
-export type AddDemandeImmersionResponseDto = Yup.InferType<
-  typeof addDemandeImmersionResponseDtoSchema
+export type AddImmersionApplicationResponseDto = Yup.InferType<
+  typeof addImmersionApplicationResponseDtoSchema
 >;
 
-export const getDemandeImmersionRequestDtoSchema = Yup.object({
-  id: Yup.mixed<DemandeImmersionId>().required(),
+export const getImmersionApplicationRequestDtoSchema = Yup.object({
+  id: Yup.mixed<ImmersionApplicationId>().required(),
 }).required();
 
-export type GetDemandeImmersionRequestDto = Yup.InferType<
-  typeof getDemandeImmersionRequestDtoSchema
+export type GetImmersionApplicationRequestDto = Yup.InferType<
+  typeof getImmersionApplicationRequestDtoSchema
 >;
 
-export const updateDemandeImmersionRequestDtoSchema = Yup.object({
-  id: Yup.mixed<DemandeImmersionId>()
+export const updateImmersionApplicationRequestDtoSchema = Yup.object({
+  id: Yup.mixed<ImmersionApplicationId>()
     .required()
     .test(
       "id-match",
@@ -198,32 +198,32 @@ export const updateDemandeImmersionRequestDtoSchema = Yup.object({
         context.parent.demandeImmersion &&
         value === context.parent.demandeImmersion.id,
     ),
-  demandeImmersion: demandeImmersionDtoSchema.required(),
+  demandeImmersion: immersionApplicationSchema.required(),
 }).required();
 
-export type UpdateDemandeImmersionRequestDto = Yup.InferType<
-  typeof updateDemandeImmersionRequestDtoSchema
+export type UpdateImmersionApplicationRequestDto = Yup.InferType<
+  typeof updateImmersionApplicationRequestDtoSchema
 >;
 
-export const updateDemandeImmersionResponseDtoSchema = Yup.object({
-  id: Yup.mixed<DemandeImmersionId>().required(),
+export const updateImmersionApplicationResponseDtoSchema = Yup.object({
+  id: Yup.mixed<ImmersionApplicationId>().required(),
 }).required();
 
-export type UpdateDemandeImmersionResponseDto = Yup.InferType<
-  typeof updateDemandeImmersionResponseDtoSchema
+export type UpdateImmersionApplicationResponseDto = Yup.InferType<
+  typeof updateImmersionApplicationResponseDtoSchema
 >;
 
-export const validateDemandeImmersionRequestDtoSchema =
-  Yup.mixed<DemandeImmersionId>().required();
+export const validateImmersionApplicationRequestDtoSchema =
+  Yup.mixed<ImmersionApplicationId>().required();
 
-export type ValidateDemandeImmersionRequestDto = Yup.InferType<
-  typeof validateDemandeImmersionRequestDtoSchema
+export type ValidateImmersionApplicationRequestDto = Yup.InferType<
+  typeof validateImmersionApplicationRequestDtoSchema
 >;
 
-export const validateDemandeImmersionResponseDtoSchema = Yup.object({
-  id: Yup.mixed<DemandeImmersionId>().required(),
+export const validateImmersionApplicationResponseDtoSchema = Yup.object({
+  id: Yup.mixed<ImmersionApplicationId>().required(),
 }).required();
 
-export type ValidateDemandeImmersionResponseDto = Yup.InferType<
-  typeof validateDemandeImmersionResponseDtoSchema
+export type ValidateImmersionApplicationResponseDto = Yup.InferType<
+  typeof validateImmersionApplicationResponseDtoSchema
 >;

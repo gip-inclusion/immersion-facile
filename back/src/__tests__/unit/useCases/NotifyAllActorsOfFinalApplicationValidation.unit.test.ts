@@ -1,25 +1,25 @@
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { ValidatedApplicationFinalConfirmationParams } from "../../../domain/demandeImmersion/ports/EmailGateway";
-import { NotifyAllActorsOfFinalApplicationValidation } from "../../../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { ValidatedApplicationFinalConfirmationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
+import { NotifyAllActorsOfFinalApplicationValidation } from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import {
   ApplicationSource,
-  DemandeImmersionDto,
-} from "../../../shared/DemandeImmersionDto";
+  ImmersionApplicationDto,
+} from "../../../shared/ImmersionApplicationDto";
 import { LegacyScheduleDto } from "../../../shared/ScheduleSchema";
 import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "../../../shared/ScheduleUtils";
-import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
+import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import {
   getQuestionnaireUrl,
   getValidatedApplicationFinalConfirmationParams,
-} from "./../../../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { DemandeImmersionDtoBuilder } from "./../../../_testBuilders/DemandeImmersionDtoBuilder";
+} from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 
-const validDemandeImmersion: DemandeImmersionDto =
-  new DemandeImmersionEntityBuilder().build().toDto();
+const validDemandeImmersion: ImmersionApplicationDto =
+  new ImmersionApplicationEntityBuilder().build().toDto();
 
 const counsellorEmail = "counsellor@email.fr";
 
@@ -139,7 +139,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
 describe("getValidatedApplicationFinalConfirmationParams", () => {
   test("simple application", () => {
-    const application = new DemandeImmersionDtoBuilder()
+    const application = new ImmersionApplicationDtoBuilder()
       .withImmersionAddress("immersionAddress")
       .withSanitaryPrevention(true)
       .withSanitaryPreventionDescription("sanitaryPreventionDescription")
@@ -169,7 +169,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
   });
 
   test("BOULOGNE_SUR_MER application", () => {
-    const application = new DemandeImmersionDtoBuilder()
+    const application = new ImmersionApplicationDtoBuilder()
       .withSource("BOULOGNE_SUR_MER")
       .build();
 
@@ -183,7 +183,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
   });
 
   test("NARBONNE application", () => {
-    const application = new DemandeImmersionDtoBuilder()
+    const application = new ImmersionApplicationDtoBuilder()
       .withSource("NARBONNE")
       .build();
 
@@ -203,7 +203,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       workdays: ["lundi"],
       description: "legacyScheduleDescription",
     };
-    const application = new DemandeImmersionDtoBuilder()
+    const application = new ImmersionApplicationDtoBuilder()
       .withLegacySchedule(legacySchedule)
       .build();
 
@@ -216,7 +216,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
   });
 
   test("prints correct sanitaryPreventionMessage when missing", () => {
-    const application = new DemandeImmersionDtoBuilder()
+    const application = new ImmersionApplicationDtoBuilder()
       .withSanitaryPrevention(false)
       .build();
 
@@ -227,7 +227,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
   });
 
   test("prints correct individualProtection when missing", () => {
-    const application = new DemandeImmersionDtoBuilder()
+    const application = new ImmersionApplicationDtoBuilder()
       .withIndividualProtection(false)
       .build();
 

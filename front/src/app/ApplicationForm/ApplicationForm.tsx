@@ -14,9 +14,9 @@ import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import {
   ApplicationSource,
-  DemandeImmersionDto,
-  demandeImmersionDtoSchema,
-} from "src/shared/DemandeImmersionDto";
+  ImmersionApplicationDto,
+  immersionApplicationSchema,
+} from "src/shared/ImmersionApplicationDto";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 
 type ApplicationFormRoute = Route<
@@ -30,7 +30,7 @@ interface ApplicationFormProps {
 }
 
 const isDemandeImmersionFrozen = (
-  demandeImmersion: Partial<DemandeImmersionDto>,
+  demandeImmersion: Partial<ImmersionApplicationDto>,
 ): boolean => !demandeImmersion.status || demandeImmersion.status !== "DRAFT";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
@@ -52,8 +52,8 @@ const getApplicationSourceForRoute = (
 
 const createInitialApplication = (
   route: ApplicationFormRoute,
-): Partial<DemandeImmersionDto> => {
-  const emptyForm: Partial<DemandeImmersionDto> = {
+): Partial<ImmersionApplicationDto> => {
+  const emptyForm: Partial<ImmersionApplicationDto> = {
     id: uuidV4(),
     status: "DRAFT",
     source: getApplicationSourceForRoute(route),
@@ -187,10 +187,10 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
           <Formik
             enableReinitialize={true}
             initialValues={initialValues}
-            validationSchema={demandeImmersionDtoSchema}
+            validationSchema={immersionApplicationSchema}
             onSubmit={async (values, { setSubmitting }) => {
               try {
-                let application = await demandeImmersionDtoSchema.validate(
+                let application = await immersionApplicationSchema.validate(
                   values,
                 );
 

@@ -1,14 +1,14 @@
 import {
   ApplicationSource,
-  DemandeImmersionDto,
-} from "../../../../shared/DemandeImmersionDto";
+  ImmersionApplicationDto,
+} from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
 const logger = createLogger(__filename);
 export class ConfirmToMentorThatApplicationCorrectlySubmitted
-  implements UseCase<DemandeImmersionDto>
+  implements UseCase<ImmersionApplicationDto>
 {
   constructor(
     private readonly emailGateway: EmailGateway,
@@ -25,7 +25,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
     mentorEmail,
     firstName,
     lastName,
-  }: DemandeImmersionDto): Promise<void> {
+  }: ImmersionApplicationDto): Promise<void> {
     logger.info(
       {
         demandeImmersionid: id,

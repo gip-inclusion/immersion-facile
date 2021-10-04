@@ -3,35 +3,35 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
-  DemandeImmersionId,
-  ValidateDemandeImmersionRequestDto,
-  ValidateDemandeImmersionResponseDto,
-} from "../../../shared/DemandeImmersionDto";
+  ImmersionApplicationId,
+  ValidateImmersionApplicationRequestDto,
+  ValidateImmersionApplicationResponseDto,
+} from "../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
-import { DemandeImmersionEntity } from "../entities/DemandeImmersionEntity";
-import { DemandeImmersionRepository } from "../ports/DemandeImmersionRepository";
+import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
+import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
 
 const logger = createLogger(__filename);
 
-export class ValidateDemandeImmersion
+export class ValidateImmersionApplication
   implements
     UseCase<
-      ValidateDemandeImmersionRequestDto,
-      ValidateDemandeImmersionResponseDto
+      ValidateImmersionApplicationRequestDto,
+      ValidateImmersionApplicationResponseDto
     >
 {
   constructor(
-    private readonly demandeImmersionRepository: DemandeImmersionRepository,
+    private readonly demandeImmersionRepository: ImmersionApplicationRepository,
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
   ) {}
 
   public async execute(
-    id: DemandeImmersionId,
-  ): Promise<ValidateDemandeImmersionResponseDto> {
+    id: ImmersionApplicationId,
+  ): Promise<ValidateImmersionApplicationResponseDto> {
     const demandeImmersionEntity =
       await this.demandeImmersionRepository.getById(id);
     if (!demandeImmersionEntity) throw new NotFoundError(id);
@@ -39,13 +39,13 @@ export class ValidateDemandeImmersion
     if (demandeImmersionEntity.toDto().status !== "IN_REVIEW")
       throw new BadRequestError(id);
 
-    const validatedEntity = DemandeImmersionEntity.create({
+    const validatedEntity = ImmersionApplicationEntity.create({
       ...demandeImmersionEntity.toDto(),
       status: "VALIDATED",
     });
 
     const updatedId =
-      await this.demandeImmersionRepository.updateDemandeImmersion(
+      await this.demandeImmersionRepository.updateImmersionApplication(
         validatedEntity,
       );
     if (!updatedId) throw new NotFoundError(updatedId);

@@ -1,4 +1,4 @@
-import type { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
+import type { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import type { DateStr } from "../ports/Clock";
 
 type GenericEvent<T extends string, P> = {
@@ -12,11 +12,11 @@ type GenericEvent<T extends string, P> = {
 export type DomainEvent =
   | GenericEvent<
       "ImmersionApplicationSubmittedByBeneficiary",
-      DemandeImmersionDto
+      ImmersionApplicationDto
     >
   | GenericEvent<
       "FinalImmersionApplicationValidationByAdmin",
-      DemandeImmersionDto
+      ImmersionApplicationDto
     >;
 
 export type DomainTopic = DomainEvent["topic"];

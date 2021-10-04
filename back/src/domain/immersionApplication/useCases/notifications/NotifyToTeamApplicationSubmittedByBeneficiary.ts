@@ -1,11 +1,11 @@
-import { DemandeImmersionDto } from "../../../../shared/DemandeImmersionDto";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
 const logger = createLogger(__filename);
 export class NotifyToTeamApplicationSubmittedByBeneficiary
-  implements UseCase<DemandeImmersionDto>
+  implements UseCase<ImmersionApplicationDto>
 {
   constructor(
     private readonly emailGateway: EmailGateway,
@@ -20,7 +20,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
     dateStart,
     dateEnd,
     businessName,
-  }: DemandeImmersionDto): Promise<void> {
+  }: ImmersionApplicationDto): Promise<void> {
     logger.info(
       {
         demandeImmersionId: id,

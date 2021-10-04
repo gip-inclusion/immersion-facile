@@ -5,8 +5,8 @@ import type {
   NewApplicationBeneficiaryConfirmationParams,
   NewApplicationMentorConfirmationParams,
   ValidatedApplicationFinalConfirmationParams,
-} from "../../domain/demandeImmersion/ports/EmailGateway";
-import { EmailGateway } from "../../domain/demandeImmersion/ports/EmailGateway";
+} from "../../domain/immersionApplication/ports/EmailGateway";
+import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
 import { createLogger } from "./../../utils/logger";
 
 const logger = createLogger(__filename);

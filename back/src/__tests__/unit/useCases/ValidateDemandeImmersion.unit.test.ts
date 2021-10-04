@@ -1,13 +1,13 @@
 import { BadRequestError } from "./../../../adapters/primary/helpers/sendHttpResponse";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
-  DemandesImmersion,
-  InMemoryDemandeImmersionRepository,
-} from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { ValidateDemandeImmersion } from "../../../domain/demandeImmersion/useCases/ValidateDemandeImmersion";
-import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
-import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
+  ImmersionApplications,
+  InMemoryImmersionApplicationRepository,
+} from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+import { ValidateImmersionApplication } from "../../../domain/immersionApplication/useCases/ValidateImmersionApplication";
+import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import {
@@ -18,35 +18,35 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
-import { DemandeImmersionDto } from "../../../shared/DemandeImmersionDto";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 
-describe("Validate demandeImmersion", () => {
-  let validateDemandeImmersion: ValidateDemandeImmersion;
+describe("Validate immersionApplication", () => {
+  let validateDemandeImmersion: ValidateImmersionApplication;
   let outboxRepository: OutboxRepository;
-  let repository: InMemoryDemandeImmersionRepository;
+  let repository: InMemoryImmersionApplicationRepository;
   let createNewEvent: CreateNewEvent;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    repository = new InMemoryDemandeImmersionRepository();
+    repository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-    validateDemandeImmersion = new ValidateDemandeImmersion(
+    validateDemandeImmersion = new ValidateImmersionApplication(
       repository,
       createNewEvent,
       outboxRepository,
     );
   });
 
-  describe("When the demandeImmersion is valid", () => {
-    test("validates the demandeImmersion in the repository", async () => {
-      const demandesImmersion: DemandesImmersion = {};
-      const demandeImmersionEntity = DemandeImmersionEntity.create(
-        new DemandeImmersionDtoBuilder().withStatus("IN_REVIEW").build(),
+  describe("When the immersionApplication is valid", () => {
+    test("validates the immersionApplication in the repository", async () => {
+      const demandesImmersion: ImmersionApplications = {};
+      const demandeImmersionEntity = ImmersionApplicationEntity.create(
+        new ImmersionApplicationDtoBuilder().withStatus("IN_REVIEW").build(),
       );
       demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
       repository.setDemandesImmersion(demandesImmersion);
@@ -54,7 +54,7 @@ describe("Validate demandeImmersion", () => {
       const { id } = await validateDemandeImmersion.execute(
         demandeImmersionEntity.id,
       );
-      const expectedDemandeImmersion: DemandeImmersionDto = {
+      const expectedDemandeImmersion: ImmersionApplicationDto = {
         ...demandeImmersionEntity.toDto(),
         status: "VALIDATED",
       };
@@ -72,11 +72,11 @@ describe("Validate demandeImmersion", () => {
     });
   });
 
-  describe("When the demandeImmersion is still draft", () => {
+  describe("When the immersionApplication is still draft", () => {
     test("throws bad request error", async () => {
-      const demandesImmersion: DemandesImmersion = {};
+      const demandesImmersion: ImmersionApplications = {};
       const demandeImmersionEntity =
-        new DemandeImmersionEntityBuilder().build();
+        new ImmersionApplicationEntityBuilder().build();
       demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
       repository.setDemandesImmersion(demandesImmersion);
 
@@ -93,7 +93,7 @@ describe("Validate demandeImmersion", () => {
     });
   });
 
-  describe("When no demandeImmersion with id exists", () => {
+  describe("When no immersionApplication with id exists", () => {
     it("throws NotFoundError", async () => {
       await expectPromiseToFailWithError(
         validateDemandeImmersion.execute("unknown_demande_immersion_id"),

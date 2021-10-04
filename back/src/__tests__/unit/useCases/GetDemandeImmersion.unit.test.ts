@@ -1,23 +1,23 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
-import { GetDemandeImmersion } from "../../../domain/demandeImmersion/useCases/GetDemandeImmersion";
+import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { GetImmersionApplication } from "../../../domain/immersionApplication/useCases/GetImmersionApplication";
 import { FeatureFlags } from "../../../shared/featureFlags";
-import { DemandeImmersionEntityBuilder } from "../../../_testBuilders/DemandeImmersionEntityBuilder";
+import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 describe("Get DemandeImmersion", () => {
-  let getDemandeImmersion: GetDemandeImmersion;
-  let repository: InMemoryDemandeImmersionRepository;
+  let getDemandeImmersion: GetImmersionApplication;
+  let repository: InMemoryImmersionApplicationRepository;
   let featureFlags: FeatureFlags;
 
   beforeEach(() => {
-    repository = new InMemoryDemandeImmersionRepository();
+    repository = new InMemoryImmersionApplicationRepository();
     featureFlags = FeatureFlagsBuilder.allOff().build();
   });
 
   const createGetDemandeImmersionUseCase = () => {
-    return new GetDemandeImmersion(repository);
+    return new GetImmersionApplication(repository);
   };
 
   describe("When enableViewableApplication in on", () => {
@@ -39,7 +39,7 @@ describe("Get DemandeImmersion", () => {
 
     describe("When a DemandeImmersion is stored", () => {
       it("returns the DemandeImmersion", async () => {
-        const entity = new DemandeImmersionEntityBuilder().build();
+        const entity = new ImmersionApplicationEntityBuilder().build();
         repository.setDemandesImmersion({ [entity.id]: entity });
 
         const demandeImmersion = await getDemandeImmersion.execute({

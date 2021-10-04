@@ -5,23 +5,23 @@ import {
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
-import { DemandeImmersionRepository } from "../../domain/demandeImmersion/ports/DemandeImmersionRepository";
-import { AddDemandeImmersion } from "../../domain/demandeImmersion/useCases/AddDemandeImmersion";
-import { GetDemandeImmersion } from "../../domain/demandeImmersion/useCases/GetDemandeImmersion";
-import { ListDemandeImmersion } from "../../domain/demandeImmersion/useCases/ListDemandeImmersion";
-import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
-import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/demandeImmersion/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
-import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/demandeImmersion/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/demandeImmersion/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
-import { UpdateDemandeImmersion } from "../../domain/demandeImmersion/useCases/UpdateDemandeImmersion";
-import { ValidateDemandeImmersion } from "../../domain/demandeImmersion/useCases/ValidateDemandeImmersion";
+import { ImmersionApplicationRepository } from "../../domain/immersionApplication/ports/ImmersionApplicationRepository";
+import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
+import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
+import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
+import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
+import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
+import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
+import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddImmersionOffer } from "../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import {
   ApplicationSource,
   applicationSourceFromString,
-} from "../../shared/DemandeImmersionDto";
+} from "../../shared/ImmersionApplicationDto";
 import { FeatureFlags } from "../../shared/featureFlags";
 import {
   genericApplicationDataConverter,
@@ -45,7 +45,7 @@ import {
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
-import { InMemoryDemandeImmersionRepository } from "../secondary/InMemoryDemandeImmersionRepository";
+import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
 import { InMemoryImmersionOfferRepository } from "../secondary/InMemoryImmersionOfferRepository";
@@ -81,7 +81,7 @@ const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
 const getApplicationRepository = (
   featureFlags: FeatureFlags,
-): DemandeImmersionRepository => {
+): ImmersionApplicationRepository => {
   const repositoriesBySource: ApplicationRepositoryMap = {};
   if (featureFlags.enableGenericApplicationForm) {
     repositoriesBySource["GENERIC"] = useAirtable()
@@ -91,7 +91,7 @@ const getApplicationRepository = (
           getEnvVarOrDie("AIRTABLE_TABLE_NAME_GENERIC"),
           genericApplicationDataConverter,
         )
-      : new InMemoryDemandeImmersionRepository();
+      : new InMemoryImmersionApplicationRepository();
   }
   if (featureFlags.enableBoulogneSurMerApplicationForm) {
     repositoriesBySource["BOULOGNE_SUR_MER"] = useAirtable()
@@ -101,7 +101,7 @@ const getApplicationRepository = (
           getEnvVarOrDie("AIRTABLE_TABLE_NAME_BOULOGNE_SUR_MER"),
           legacyApplicationDataConverter,
         )
-      : new InMemoryDemandeImmersionRepository();
+      : new InMemoryImmersionApplicationRepository();
   }
   if (featureFlags.enableNarbonneApplicationForm) {
     repositoriesBySource["NARBONNE"] = useAirtable()
@@ -111,7 +111,7 @@ const getApplicationRepository = (
           getEnvVarOrDie("AIRTABLE_TABLE_NAME_NARBONNE"),
           legacyApplicationDataConverter,
         )
-      : new InMemoryDemandeImmersionRepository();
+      : new InMemoryImmersionApplicationRepository();
   }
   return new ApplicationRepositorySwitcher(repositoriesBySource);
 };
@@ -250,21 +250,23 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
   logger.debug({ counsellorEmails: counsellorEmails }, "COUNSELLOR_EMAILS");
 
   return {
-    addDemandeImmersion: new AddDemandeImmersion(
+    addDemandeImmersion: new AddImmersionApplication(
       repositories.demandeImmersion,
       createNewEvent,
       repositories.outbox,
     ),
-    getDemandeImmersion: new GetDemandeImmersion(repositories.demandeImmersion),
-    listDemandeImmersion: new ListDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersion,
+    getDemandeImmersion: new GetImmersionApplication(
+      repositories.demandeImmersion,
+    ),
+    listDemandeImmersion: new ListImmersionApplication({
+      immersionApplicationRepository: repositories.demandeImmersion,
       featureFlags,
     }),
-    updateDemandeImmersion: new UpdateDemandeImmersion({
-      demandeImmersionRepository: repositories.demandeImmersion,
+    updateDemandeImmersion: new UpdateImmersionApplication({
+      immersionApplicationRepository: repositories.demandeImmersion,
       featureFlags,
     }),
-    validateDemandeImmersion: new ValidateDemandeImmersion(
+    validateDemandeImmersion: new ValidateImmersionApplication(
       repositories.demandeImmersion,
       createNewEvent,
       repositories.outbox,

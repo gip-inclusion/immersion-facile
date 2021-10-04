@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "./authMiddleware";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
-import { demandesImmersionRoute } from "../../shared/routes";
+import { immersionApplicationsRoute } from "../../shared/routes";
 import { AppConfig } from "./config";
 
 export const createMagicLinkRouter = (config: AppConfig) => {
@@ -17,12 +17,10 @@ export const createMagicLinkRouter = (config: AppConfig) => {
     });
 
   authenticatedRouter
-    .route(`/${demandesImmersionRoute}`)
+    .route(`/${immersionApplicationsRoute}`)
     .get(async (req, res) => {
-      sendHttpResponse(
-        req,
-        res,
-        () => config.useCases.listDemandeImmersion.execute(),
+      sendHttpResponse(req, res, () =>
+        config.useCases.listDemandeImmersion.execute(),
       );
     });
 

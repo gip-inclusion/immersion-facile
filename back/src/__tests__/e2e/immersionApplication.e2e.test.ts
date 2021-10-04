@@ -1,8 +1,8 @@
 import { validateDemandeRoute } from "./../../shared/routes";
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
-import { demandesImmersionRoute } from "../../shared/routes";
-import { DemandeImmersionDtoBuilder } from "../../_testBuilders/DemandeImmersionDtoBuilder";
+import { immersionApplicationsRoute } from "../../shared/routes";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
 
 describe("/demandes-immersion route", () => {
@@ -21,14 +21,14 @@ describe("/demandes-immersion route", () => {
     });
 
     describe("Application validation", () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder()
+      const demandeImmersion = new ImmersionApplicationDtoBuilder()
         .withStatus("IN_REVIEW")
         .build();
 
       beforeEach(async () => {
         // POST a valid application.
         await request
-          .post(`/${demandesImmersionRoute}`)
+          .post(`/${immersionApplicationsRoute}`)
           .send(demandeImmersion)
           .expect("Content-Type", /json/)
           .expect(200, { id: demandeImmersion.id });
@@ -49,7 +49,7 @@ describe("/demandes-immersion route", () => {
 
         // Getting the application succeeds and shows that it's validated.
         await request
-          .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+          .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
           .expect("Content-Type", /json/)
           .expect(200, validatedDemandeImmersion);
       });
@@ -61,7 +61,7 @@ describe("/demandes-immersion route", () => {
 
         // Getting the application succeeds and shows that it's NOT validated.
         await request
-          .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+          .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
           .expect("Content-Type", /json/)
           .expect(200, demandeImmersion);
       });
@@ -74,7 +74,7 @@ describe("/demandes-immersion route", () => {
 
         // Getting the application succeeds and shows that it's NOT validated.
         await request
-          .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+          .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
           .expect("Content-Type", /json/)
           .expect(200, demandeImmersion);
       });
@@ -87,7 +87,7 @@ describe("/demandes-immersion route", () => {
 
         // Getting the existing application succeeds and shows that it's NOT validated.
         await request
-          .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+          .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
           .expect("Content-Type", /json/)
           .expect(200, demandeImmersion);
       });
@@ -108,59 +108,59 @@ describe("/demandes-immersion route", () => {
 
     it("Creating an invalid application fails", async () => {
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send({ invalid_params: true })
         .expect(400);
     });
 
     it("Creating a valid application succeeds", async () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+      const demandeImmersion = new ImmersionApplicationDtoBuilder().build();
 
       // GET /demandes-immersion returns an empty list.
       await request
-        .get(`/${demandesImmersionRoute}`)
+        .get(`/${immersionApplicationsRoute}`)
         .auth("e2e_tests", "e2e")
         .expect("Content-Type", /json/)
         .expect(200, []);
 
       // POSTing a valid application succeeds.
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(demandeImmersion)
         .expect("Content-Type", /json/)
         .expect(200, { id: demandeImmersion.id });
 
       // GETting the created application succeeds.
       await request
-        .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .expect("Content-Type", /json/)
         .expect(200, demandeImmersion);
     });
 
     it("Creating an application with invalid sources fails with 404 Not Found", async () => {
-      const application1 = new DemandeImmersionDtoBuilder()
+      const application1 = new ImmersionApplicationDtoBuilder()
         .withSource("BOULOGNE_SUR_MER")
         .build();
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(application1)
         .expect(404);
 
-      const application2 = new DemandeImmersionDtoBuilder()
+      const application2 = new ImmersionApplicationDtoBuilder()
         .withSource("NARBONNE")
         .build();
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(application2)
         .expect(404);
     });
 
     it("Updating an existing application succeeds", async () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+      const demandeImmersion = new ImmersionApplicationDtoBuilder().build();
 
       // POSTing a valid application succeeds.
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(demandeImmersion)
         .expect("Content-Type", /json/)
         .expect(200, { id: demandeImmersion.id });
@@ -171,48 +171,48 @@ describe("/demandes-immersion route", () => {
         email: "new@email.fr",
       };
       await request
-        .post(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .post(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .send(updatedDemandeImmersion)
         .expect("Content-Type", /json/)
         .expect(200, { id: demandeImmersion.id });
 
       // GETting the updated application succeeds.
       await request
-        .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .expect("Content-Type", /json/)
         .expect(200, updatedDemandeImmersion);
     });
 
     it("Fetching unknown application IDs fails with 404 Not Found", async () => {
       await request
-        .get(`/${demandesImmersionRoute}/unknown-demande-immersion-id`)
+        .get(`/${immersionApplicationsRoute}/unknown-demande-immersion-id`)
         .expect(404);
     });
 
     it("Updating an unknown application IDs fails with 404 Not Found", async () => {
       const unknownId = "unknown-demande-immersion-id";
-      const demandeImmersionWithUnknownId = new DemandeImmersionDtoBuilder()
+      const demandeImmersionWithUnknownId = new ImmersionApplicationDtoBuilder()
         .withId(unknownId)
         .build();
       await request
-        .post(`/${demandesImmersionRoute}/${unknownId}`)
+        .post(`/${immersionApplicationsRoute}/${unknownId}`)
         .send(demandeImmersionWithUnknownId)
         .expect(404);
     });
 
     it("Creating an application with an existing ID fails with 409 Conflict", async () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder().build();
+      const demandeImmersion = new ImmersionApplicationDtoBuilder().build();
 
       // POSTing a valid application succeeds.
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(demandeImmersion)
         .expect("Content-Type", /json/)
         .expect(200, { id: demandeImmersion.id });
 
       // POSTing a another valid application with the same ID fails.
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send({
           ...demandeImmersion,
           email: "another@email.fr",
@@ -221,12 +221,12 @@ describe("/demandes-immersion route", () => {
     });
 
     it("Listing applications without credentials fails with 401 Unauthorized", async () => {
-      await request.get(`/${demandesImmersionRoute}`).expect(401);
+      await request.get(`/${immersionApplicationsRoute}`).expect(401);
     });
 
     it("Listing applications with invalid credentials fails with 401 Unauthorized", async () => {
       await request
-        .get(`/${demandesImmersionRoute}`)
+        .get(`/${immersionApplicationsRoute}`)
         .auth("not real user", "not real password")
         .expect(401);
     });
@@ -234,7 +234,7 @@ describe("/demandes-immersion route", () => {
     it("Listing applications with valid credentials succeeds", async () => {
       // GET /demandes-immersion succeeds with login/pass.
       await request
-        .get(`/${demandesImmersionRoute}`)
+        .get(`/${immersionApplicationsRoute}`)
         .auth("e2e_tests", "e2e")
         .expect("Content-Type", /json/)
         .expect(200);
@@ -254,73 +254,73 @@ describe("/demandes-immersion route", () => {
     });
 
     it("Creating an application with valid sources succeeds", async () => {
-      const application1 = new DemandeImmersionDtoBuilder()
+      const application1 = new ImmersionApplicationDtoBuilder()
         .withId("id1")
         .withSource("BOULOGNE_SUR_MER")
         .build();
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(application1)
         .expect(200, { id: "id1" });
 
-      const application2 = new DemandeImmersionDtoBuilder()
+      const application2 = new ImmersionApplicationDtoBuilder()
         .withId("id2")
         .withSource("NARBONNE")
         .build();
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(application2)
         .expect(200, { id: "id2" });
     });
 
     it("Creating an application with invalid sources fails with 404 Not Found", async () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder()
+      const demandeImmersion = new ImmersionApplicationDtoBuilder()
         .withSource("GENERIC")
         .build();
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(demandeImmersion)
         .expect(404);
     });
 
     it("Listing applications fails with 404 Not Found despite valid credentials", async () => {
       await request
-        .get(`/${demandesImmersionRoute}`)
+        .get(`/${immersionApplicationsRoute}`)
         .auth("e2e_tests", "e2e")
         .expect(404);
     });
 
     it("Geting an existing application succeeds", async () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder()
+      const demandeImmersion = new ImmersionApplicationDtoBuilder()
         .withSource("BOULOGNE_SUR_MER")
         .build();
 
       // POSTing a valid application succeeds.
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(demandeImmersion)
         .expect(200);
 
       // GETting the created application succeeds.
       await request
-        .get(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .expect(200, demandeImmersion);
     });
 
     it("Updating an existing application fails with 404 Not Found", async () => {
-      const demandeImmersion = new DemandeImmersionDtoBuilder()
+      const demandeImmersion = new ImmersionApplicationDtoBuilder()
         .withSource("NARBONNE")
         .build();
 
       // POSTing a valid application succeeds.
       await request
-        .post(`/${demandesImmersionRoute}`)
+        .post(`/${immersionApplicationsRoute}`)
         .send(demandeImmersion)
         .expect(200);
 
       // POSTing a valid application returns 404 Not Found.
       await request
-        .post(`/${demandesImmersionRoute}/${demandeImmersion.id}`)
+        .post(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .send({
           ...demandeImmersion,
           email: "another@email.fr",

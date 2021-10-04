@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { Accordeon } from "./Accordeon";
 import { TextCell } from "./TextCell";
 import { FormAccordeonProps } from "./FormAccordeon";
-import { DemandeImmersionDto } from "src/shared/DemandeImmersionDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { prettyPrintSchedule } from "src/shared/ScheduleUtils";
 
-type KeyedFormData = { title: string; key: keyof DemandeImmersionDto };
+type KeyedFormData = { title: string; key: keyof ImmersionApplicationDto };
 type TextFormData = { title: string; text: string };
 type BoolFormData = { title: string; value: boolean };
 

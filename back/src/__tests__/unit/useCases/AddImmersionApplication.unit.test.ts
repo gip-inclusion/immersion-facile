@@ -2,38 +2,39 @@ import { ConflictError } from "../../../adapters/primary/helpers/sendHttpRespons
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryDemandeImmersionRepository } from "../../../adapters/secondary/InMemoryDemandeImmersionRepository";
+import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { DateStr } from "../../../domain/core/ports/Clock";
-import { DemandeImmersionEntity } from "../../../domain/demandeImmersion/entities/DemandeImmersionEntity";
-import { AddDemandeImmersion } from "../../../domain/demandeImmersion/useCases/AddDemandeImmersion";
-import { DemandeImmersionDtoBuilder } from "../../../_testBuilders/DemandeImmersionDtoBuilder";
+import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
+import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
-describe("Add demandeImmersion", () => {
-  let addDemandeImmersion: AddDemandeImmersion;
-  let applicationRepository: InMemoryDemandeImmersionRepository;
+describe("Add immersionApplication", () => {
+  let addImmersionApplication: AddImmersionApplication;
+  let applicationRepository: InMemoryImmersionApplicationRepository;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
   let outboxRepository: InMemoryOutboxRepository;
-  const validDemandeImmersion = new DemandeImmersionDtoBuilder().build();
+  const validImmersionApplication =
+    new ImmersionApplicationDtoBuilder().build();
 
   beforeEach(() => {
-    applicationRepository = new InMemoryDemandeImmersionRepository();
+    applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
-    addDemandeImmersion = createAddDemandeImmersionUseCase();
+    addImmersionApplication = createAddDemandeImmersionUseCase();
   });
 
   const createAddDemandeImmersionUseCase = () => {
-    return new AddDemandeImmersion(
+    return new AddImmersionApplication(
       applicationRepository,
       createNewEvent,
       outboxRepository,
@@ -46,19 +47,21 @@ describe("Add demandeImmersion", () => {
     clock.setNextDate(occurredAt);
     uuidGenerator.setNextUuid(id);
 
-    expect(await addDemandeImmersion.execute(validDemandeImmersion)).toEqual({
-      id: validDemandeImmersion.id,
+    expect(
+      await addImmersionApplication.execute(validImmersionApplication),
+    ).toEqual({
+      id: validImmersionApplication.id,
     });
 
     const storedInRepo = await applicationRepository.getAll();
     expect(storedInRepo.length).toBe(1);
-    expect(storedInRepo[0].toDto()).toEqual(validDemandeImmersion);
+    expect(storedInRepo[0].toDto()).toEqual(validImmersionApplication);
     expectDomainEventsToBeInOutbox([
       {
         id,
         occurredAt,
         topic: "ImmersionApplicationSubmittedByBeneficiary",
-        payload: validDemandeImmersion,
+        payload: validImmersionApplication,
         wasPublished: false,
       },
     ]);
@@ -66,12 +69,12 @@ describe("Add demandeImmersion", () => {
 
   test("rejects applications where the ID is already in use", async () => {
     await applicationRepository.save(
-      DemandeImmersionEntity.create(validDemandeImmersion),
+      ImmersionApplicationEntity.create(validImmersionApplication),
     );
 
     await expectPromiseToFailWithError(
-      addDemandeImmersion.execute(validDemandeImmersion),
-      new ConflictError(validDemandeImmersion.id),
+      addImmersionApplication.execute(validImmersionApplication),
+      new ConflictError(validImmersionApplication.id),
     );
   });
 
