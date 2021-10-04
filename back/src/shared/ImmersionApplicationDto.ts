@@ -95,19 +95,22 @@ export const immersionApplicationSchema = z
     beneficiaryAccepted: zTrue,
     enterpriseAccepted: zTrue,
   })
-  .refine(
-    submissionAndStartDatesConstraints,
-    "La date de démarrage doit étre au moins 2 jours après la saisie.",
-  )
-  .refine(
-    startDateIsBeforeEndDate,
-    "La date de fin doit être après la date de début.",
-  )
-  .refine(underMaxDuration, "La durée maximale d'immersion est de 28 jours.")
-  .refine(
-    emailAndMentorEmailAreDifferent,
-    "Votre adresse e-mail doit être différente de celle du tuteur",
-  );
+  .refine(submissionAndStartDatesConstraints, {
+    message: "La date de démarrage doit étre au moins 2 jours après la saisie.",
+    path: ["dateStart"],
+  })
+  .refine(startDateIsBeforeEndDate, {
+    message: "La date de fin doit être après la date de début.",
+    path: ["dateEnd"],
+  })
+  .refine(underMaxDuration, {
+    message: "La durée maximale d'immersion est de 28 jours.",
+    path: ["dateEnd"],
+  })
+  .refine(emailAndMentorEmailAreDifferent, {
+    message: "Votre adresse e-mail doit être différente de celle du tuteur",
+    path: ["mentorEmail"],
+  });
 
 export const immersionApplicationArraySchema = z.array(
   immersionApplicationSchema,
