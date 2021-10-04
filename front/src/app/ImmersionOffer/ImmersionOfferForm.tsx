@@ -157,7 +157,7 @@ export const ImmersionOfferForm = ({ route }: ImmersionOfferFormProps) => {
           }}
         >
           {({ isSubmitting, submitCount, errors }) => (
-            <div style={{ margin: "5px", maxWidth: "600px" }}>
+            <div style={{ margin: "5px 12px", maxWidth: "600px" }}>
               <p>
                 Bienvenue sur l'espace de référencement des entreprises
                 volontaires pour l'accueil des immersions professionnelles. Ce
