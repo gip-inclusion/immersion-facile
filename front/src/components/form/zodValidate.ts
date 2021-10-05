@@ -27,7 +27,7 @@ export const toFormikValidationSchema = <T>(
 ): { validate: (obj: T) => Promise<void> } => ({
   async validate(obj: T) {
     try {
-      await schema.parseAsync(obj);
+      schema.parse(obj);
     } catch (err: unknown) {
       throw createValidationError(err as z.ZodError<T>);
     }

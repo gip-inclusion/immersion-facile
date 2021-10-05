@@ -1,14 +1,16 @@
 import { z } from "../../node_modules/zod";
 
-export const zString = z.string({
-  required_error: "Obligatoire",
-  invalid_type_error: "Une chaine de caractères est attendue",
-});
+export const zString = z
+  .string({
+    required_error: "Obligatoire",
+    invalid_type_error: "Une chaine de caractères est attendue",
+  })
+  .nonempty("Obligatoire");
 
-export const zRequiredString = zString
-  .nonempty("Obligatoire")
-
-  .refine((s) => s.trim() === s, "Obligatoire");
+export const zTrimmedString = zString.refine(
+  (s) => s.trim() === s,
+  "Obligatoire",
+);
 
 export const zEmail = zString
   .nonempty("Obligatoire")

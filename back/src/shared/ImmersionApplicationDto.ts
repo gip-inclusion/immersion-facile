@@ -8,21 +8,23 @@ import {
 import { LegacyScheduleDto, ScheduleDto } from "./ScheduleSchema";
 import { Flavor } from "./typeFlavors";
 import { NotEmptyArray, phoneRegExp } from "./utils";
-import { zBoolean, zEmail, zRequiredString, zString, zTrue } from "./zodUtils";
+import { zBoolean, zEmail, zTrimmedString, zString, zTrue } from "./zodUtils";
 
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
 
 export type ApplicationStatus = "UNKNOWN" | "DRAFT" | "IN_REVIEW" | "VALIDATED";
-const validApplicationStatus: ApplicationStatus[] = [
+const validApplicationStatus: NotEmptyArray<ApplicationStatus> = [
   "DRAFT",
   "IN_REVIEW",
   "VALIDATED",
 ];
+
 const allApplicationStatuses: NotEmptyArray<ApplicationStatus> = [
   "UNKNOWN",
   ...validApplicationStatus,
 ];
+
 export const applicationStatusFromString = (s: string): ApplicationStatus => {
   const status = s as ApplicationStatus;
   if (validApplicationStatus.includes(status)) return status;
@@ -50,18 +52,18 @@ const legacyScheduleSchema: z.ZodSchema<LegacyScheduleDto> = z.any();
 
 export type ImmersionApplicationId = Flavor<string, "DemandeImmersionId">;
 const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
-  zRequiredString;
+  zTrimmedString;
 
 // prettier-ignore
 export type ImmersionApplicationDto = z.infer<typeof immersionApplicationSchema>;
 export const immersionApplicationSchema = z
   .object({
     id: immersionApplicationIdSchema,
-    status: z.enum(allApplicationStatuses),
+    status: z.enum(validApplicationStatus),
     source: z.enum(validApplicationSources),
     email: zEmail,
-    firstName: zRequiredString,
-    lastName: zRequiredString,
+    firstName: zTrimmedString,
+    lastName: zTrimmedString,
     phone: zString
       .regex(phoneRegExp, "Numero de téléphone incorrect")
       .optional(),
@@ -73,8 +75,8 @@ export const immersionApplicationSchema = z
     dateEnd: zString.regex(dateRegExp, "La date de fin invalide."),
 
     siret: zString.length(14, "SIRET doit étre composé de 14 chiffres"),
-    businessName: zRequiredString,
-    mentor: zRequiredString,
+    businessName: zTrimmedString,
+    mentor: zTrimmedString,
     mentorPhone: zString.regex(
       phoneRegExp,
       "Numero de téléphone de tuteur incorrect",
@@ -89,8 +91,8 @@ export const immersionApplicationSchema = z
 
     immersionAddress: z.string().optional(),
     immersionObjective: z.string().optional(),
-    immersionProfession: zRequiredString,
-    immersionActivities: zRequiredString,
+    immersionProfession: zTrimmedString,
+    immersionActivities: zTrimmedString,
     immersionSkills: z.string().optional(),
     beneficiaryAccepted: zTrue,
     enterpriseAccepted: zTrue,

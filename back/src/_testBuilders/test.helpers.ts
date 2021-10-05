@@ -16,6 +16,14 @@ export const expectPromiseToFailWithError = async (
   await expect(promise).rejects.toThrowError(error);
 };
 
+export const expectPromiseToFailWithErrorMatching = async (
+  promise: Promise<unknown>,
+  expectedErrorMatch: Record<string, unknown>,
+) => {
+  await expect(promise).rejects.toThrow();
+  await promise.catch((e) => expect(e).toMatchObject(expectedErrorMatch));
+};
+
 export const addDays = (dateStr: string, amount: number) => {
   const newDate = dateFnsAddDays(new Date(dateStr), amount);
   return format(newDate, "yyyy-MM-dd");

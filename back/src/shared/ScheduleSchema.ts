@@ -1,6 +1,6 @@
 import { z } from "../../node_modules/zod";
 import { NotEmptyArray } from "./utils";
-import { zRequiredString } from "./zodUtils";
+import { zTrimmedString } from "./zodUtils";
 
 export type Weekday =
   | "lundi"
@@ -53,8 +53,8 @@ export const reasonableSchedule: ScheduleDto = {
 
 // Time period within a day.
 export const timePeriodSchema = z.object({
-  start: zRequiredString,
-  end: zRequiredString,
+  start: zTrimmedString,
+  end: zTrimmedString,
 });
 
 // Each element represents one weekday, starting with Monday.
@@ -79,7 +79,7 @@ export const scheduleSchema = z.object({
 
 export const legacyScheduleSchema = z.object({
   workdays: z.array(z.enum(weekdays)),
-  description: zRequiredString,
+  description: zTrimmedString,
 });
 
 export type SimpleScheduleDto = z.infer<typeof simpleScheduleSchema>;

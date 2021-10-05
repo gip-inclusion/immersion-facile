@@ -1,8 +1,7 @@
-import { z } from "zod";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/InMemoryImmersionOfferRepository";
 import { AddImmersionOffer } from "../../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { ImmersionOfferDtoBuilder } from "../../../_testBuilders/ImmersionOfferDtoBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { expectPromiseToFailWithErrorMatching } from "../../../_testBuilders/test.helpers";
 
 describe("Add ImmersionOffer", () => {
   let addImmersionOffer: AddImmersionOffer;
@@ -40,14 +39,9 @@ describe("Add ImmersionOffer", () => {
       .withId("")
       .build();
 
-    await expect(
+    await expectPromiseToFailWithErrorMatching(
       addImmersionOffer.execute(emptyImmersionOffer),
-    ).rejects.toThrow();
-
-    await addImmersionOffer
-      .execute(emptyImmersionOffer)
-      .catch((e: z.ZodError) =>
-        expect(e.issues[0].message).toBe("Obligatoire"),
-      );
+      { issues: [{ message: "Obligatoire" }] },
+    );
   });
 });
