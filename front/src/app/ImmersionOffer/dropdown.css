@@ -2,6 +2,10 @@
   position: relative;
 }
 
+.dropdown-error {
+  color: red
+}
+
 .dropdown-proposals {
   position: absolute;
   background-color: white;

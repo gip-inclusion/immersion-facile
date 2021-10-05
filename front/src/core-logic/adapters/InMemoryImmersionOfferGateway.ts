@@ -21,7 +21,8 @@ export class InMemoryImmersionOfferGateway implements ImmersionOfferGateway {
     searchText: string,
   ): Promise<RomeSearchResponseDto> {
     await sleep(700);
-    if (searchText === "emptylistplease") return [];
+    if (searchText === "givemeanemptylistplease") return [];
+    if (searchText === "givemeanerrorplease") throw new Error("418 I'm a teapot");
     return [
       {
         profession: {
