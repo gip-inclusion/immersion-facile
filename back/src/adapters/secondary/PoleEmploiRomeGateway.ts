@@ -47,19 +47,25 @@ export class PoleEmploiRomeGateway implements RomeGateway {
       this.scope,
     );
 
-    const response = await this.axiosInstance.get("/metier", {
-      headers: {
-        Authorization: `Bearer ${accessToken.access_token}`,
-      },
-      params: {
-        q: query,
-      },
-    });
-
-    return response.data.map((metier: any) => ({
-      codeMetier: metier.code,
-      libelle: metier.libelle,
-    }));
+    try {
+      const response = await this.axiosInstance.get("/metier", {
+        headers: {
+          Authorization: `Bearer ${accessToken.access_token}`,
+        },
+        params: {
+          q: query,
+        },
+      });
+      return response.data.map((metier: any) => ({
+        codeMetier: metier.code,
+        libelle: metier.libelle,
+      }));
+    } catch (error: any) {
+      logger.warn(
+        `Status was ${error.response.status} when calling Rome API from Pole Emploi / SearchMetier`,
+      );
+      return [];
+    }
   }
 
   public async searchAppellation(query: string): Promise<RomeAppellation[]> {
@@ -67,18 +73,25 @@ export class PoleEmploiRomeGateway implements RomeGateway {
       this.scope,
     );
 
-    const response = await this.axiosInstance.get("/appellation", {
-      headers: {
-        Authorization: `Bearer ${accessToken.access_token}`,
-      },
-      params: {
-        q: query,
-      },
-    });
+    try {
+      const response = await this.axiosInstance.get("/appellation", {
+        headers: {
+          Authorization: `Bearer ${accessToken.access_token}`,
+        },
+        params: {
+          q: query,
+        },
+      });
 
-    return response.data.map((appellation: any) => ({
-      codeAppellation: appellation.code,
-      libelle: appellation.libelle,
-    }));
+      return response.data.map((appellation: any) => ({
+        codeAppellation: appellation.code,
+        libelle: appellation.libelle,
+      }));
+    } catch (error: any) {
+      logger.warn(
+        `Status was ${error.response.status} when calling Rome API from Pole Emploi / SearchAppelation`,
+      );
+      return [];
+    }
   }
 }
