@@ -120,3 +120,35 @@ deploy_on_beta:
       docker-compose down;
       docker-compose up -d &&
       rm -f .env;"
+
+deploy_on_prod:
+  cache: [ ]
+  only:
+    - main
+  image: alpine:latest
+  stage: deploy
+  environment:
+    name: prod
+  script:
+    - chmod og= $DEPLOYER_PRIVATE_KEY
+    - echo $SERVER_USER
+    - apk update && apk add openssh-client
+    - scp -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $SECRETS $SERVER_USER@$DEPLOYER_SERVER_IP:/home/docker/immersion-facile/.env.secrets
+    - scp -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $VARIABLES $SERVER_USER@$DEPLOYER_SERVER_IP:/home/docker/immersion-facile/.env.variables
+    - ssh -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP "cd /home/docker/immersion-facile &&
+      chmod 600 .env.secrets;
+      chmod 600 .env.variables;
+      git checkout main &&
+      git fetch &&
+      git reset --hard origin/main &&
+
+      touch .env;
+      chmod 600 .env;
+      cat .env.variables <(echo) .env.secrets <(echo) > .env;
+      rm -f .env.variables .env.secrets;
+
+      docker-compose --env-file .env build &&
+      docker-compose down;
+      docker-compose up -d &&
+      rm -f .env;"
+
