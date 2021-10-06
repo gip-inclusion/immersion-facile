@@ -1,13 +1,13 @@
 import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import PinoHttp from "pino-http";
+import { FeatureFlags } from "../../shared/featureFlags";
 import {
-  immersionApplicationSchema,
   getImmersionApplicationRequestDtoSchema,
+  immersionApplicationSchema,
   updateImmersionApplicationRequestDtoSchema,
   validateImmersionApplicationRequestDtoSchema,
 } from "../../shared/ImmersionApplicationDto";
-import { FeatureFlags } from "../../shared/featureFlags";
 import { immersionOfferSchema } from "../../shared/ImmersionOfferDto";
 import { romeSearchRequestSchema } from "../../shared/rome";
 import {
@@ -18,10 +18,11 @@ import {
   validateDemandeRoute,
 } from "../../shared/routes";
 import { createLogger } from "../../utils/logger";
-import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { createConfig } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
+import { createMagicLinkRouter } from "./MagicLinkRouter";
+import expressPrometheusMiddleware = require("express-prometheus-middleware");
 
 const logger = createLogger(__filename);
 
@@ -29,15 +30,22 @@ export type AppConfig = {
   featureFlags: FeatureFlags;
 };
 
+const metrics = expressPrometheusMiddleware({
+  metricsPath: "/__metrics",
+  collectDefaultMetrics: true,
+});
+
 export const createApp = ({ featureFlags }: AppConfig): Express => {
   const app = express();
   const router = Router();
 
-  app.use(bodyParser.json());
-
   if (process.env.NODE_ENV !== "test") {
     app.use(PinoHttp({ logger }));
   }
+
+  app.use(metrics);
+
+  app.use(bodyParser.json());
 
   router.route("/").get((req, res) => {
     return res.json({ message: "Hello World !" });
