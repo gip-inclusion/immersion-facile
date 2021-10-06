@@ -3,8 +3,6 @@ services:
 
 variables:
   SERVER_USER: deployer
-  FRONTEND_PORT_DEV: 80
-  BACKEND_PORT_DEV: 8080
   POSTGRES_DB: immersion-db
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: pg-password
@@ -77,18 +75,21 @@ deploy_on_dev:
 
       git checkout dev &&
       git fetch &&
-      git reset --hard origin/dev &&
+      git reset --hard origin/dev;
 
       touch .env;
       chmod 600 .env;
-
       cat .env.variables <(echo) .env.secrets <(echo) > .env;
       rm -f .env.variables .env.secrets;
 
       docker-compose --env-file .env build &&
-      docker-compose down;
-      docker-compose up -d &&
-      rm -f .env;"
+      docker-compose down &&
+      docker-compose up -d;
+      rm -f .env;
+
+      sleep 60;
+      echo \"Checking server health...\";
+      curl --silent --fail --output /dev/null http://localhost:80/api/"
 
 deploy_on_beta:
   cache: []
@@ -107,9 +108,10 @@ deploy_on_beta:
     - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "cd /home/docker/immersion-facile &&
       chmod 600 .env.secrets;
       chmod 600 .env.variables;
+
       git checkout beta &&
       git fetch &&
-      git reset --hard origin/beta &&
+      git reset --hard origin/beta;
 
       touch .env;
       chmod 600 .env;
@@ -117,12 +119,16 @@ deploy_on_beta:
       rm -f .env.variables .env.secrets;
 
       docker-compose --env-file .env build &&
-      docker-compose down;
-      docker-compose up -d &&
-      rm -f .env;"
+      docker-compose down &&
+      docker-compose up -d;
+      rm -f .env;
+
+      sleep 60;
+      echo \"Checking server health...\";
+      curl --silent --fail --output /dev/null http://localhost:3100/api/"
 
 deploy_on_prod:
-  cache: [ ]
+  cache: []
   only:
     - main
   image: alpine:latest
@@ -148,7 +154,10 @@ deploy_on_prod:
       rm -f .env.variables .env.secrets;
 
       docker-compose --env-file .env build &&
-      docker-compose down;
-      docker-compose up -d &&
-      rm -f .env;"
+      docker-compose down &&
+      docker-compose up -d;
+      rm -f .env;
 
+      sleep 60;
+      echo \"Checking server health...\";
+      curl --silent --fail --output /dev/null http://localhost:80/api/"
