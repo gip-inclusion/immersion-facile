@@ -98,7 +98,7 @@ export const ApplicationFormFields = ({
       />
 
       <DateInput
-        label="Date de debut de l'immersion *"
+        label="Date de début de l'immersion *"
         name="dateStart"
         type="date"
         disabled={isFrozen}
@@ -148,7 +148,7 @@ export const ApplicationFormFields = ({
         name="mentorPhone"
         type="tel"
         placeholder="0606060707"
-        description="pour qu’on puisse le contacter à propos de l’immersion"
+        description="pour que l'on puisse le contacter à propos de l’immersion"
         disabled={isFrozen}
       />
 
@@ -269,7 +269,7 @@ export const ApplicationFormFields = ({
       )}
 
       {submitError && (
-        <ErrorMessage title="Erreur de serveur">
+        <ErrorMessage title="Désolé: Erreur de traitement sur la plateforme, veuillez réessayer ultérieurement">
           {submitError.message}
         </ErrorMessage>
       )}
