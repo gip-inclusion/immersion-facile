@@ -4,12 +4,14 @@ import {
 } from "src/core-logic/ports/CompanyInfoFromSiretApi";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import {
+  AddImmersionApplicationMLResponseDto,
   ImmersionApplicationDto,
   ImmersionApplicationId,
 } from "src/shared/ImmersionApplicationDto";
 import { FeatureFlags } from "src/shared/featureFlags";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { sleep } from "src/shared/utils";
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 
 const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   id: "fake-test-id",
@@ -118,6 +120,19 @@ export class InMemoryImmersionApplicationGateway
     return demandeImmersion.id;
   }
 
+  public async addML(
+    demandeImmersionDto: ImmersionApplicationDto,
+  ): Promise<AddImmersionApplicationMLResponseDto> {
+    console.log("InMemoryDemandeImmersionGateway.addML: ", demandeImmersionDto);
+    await sleep(SIMULATED_LATENCY_MS);
+    if (!this.featureFlags.enableMagicLinks) throw new Error("404 Not found");
+
+    this._demandesImmersion[demandeImmersionDto.id] = demandeImmersionDto;
+
+    // TODO: generate actual JWTs here
+    return { magicLinkApplicant: "", magicLinkEnterprise: "" };
+  }
+
   public async get(
     id: ImmersionApplicationId,
   ): Promise<ImmersionApplicationDto> {
@@ -126,6 +141,15 @@ export class InMemoryImmersionApplicationGateway
     if (!this.featureFlags.enableViewableApplications)
       throw new Error("404 Not found");
     return this._demandesImmersion[id];
+  }
+
+  // Same as GET above, but using a magic link
+  public async getML(jwt: string): Promise<ImmersionApplicationDto> {
+    await sleep(SIMULATED_LATENCY_MS);
+    if (!this.featureFlags.enableMagicLinks) throw new Error("404 Not found");
+
+    const payload = decodeJwt(jwt);
+    return this._demandesImmersion[payload.applicationId];
   }
 
   public async getAll(): Promise<Array<ImmersionApplicationDto>> {
@@ -144,6 +168,19 @@ export class InMemoryImmersionApplicationGateway
     if (!this.featureFlags.enableViewableApplications)
       throw new Error("404 Not found");
     this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
+    return demandeImmersion.id;
+  }
+
+  public async updateML(
+    demandeImmersion: ImmersionApplicationDto,
+    jwt: string,
+  ): Promise<string> {
+    console.log("InMemoryDemandeImmersionGateway.updateML: ", demandeImmersion);
+    const payload = decodeJwt(jwt);
+
+    await sleep(SIMULATED_LATENCY_MS);
+    if (!this.featureFlags.enableMagicLinks) throw new Error("404 Not found");
+    this._demandesImmersion[payload.applicationId] = demandeImmersion;
     return demandeImmersion.id;
   }
 

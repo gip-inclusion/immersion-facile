@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { verifyJwt } from "../../domain/auth/jwt";
-import { MagicLinkPayload } from "../../domain/auth/MagicLinkPayload";
+import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);

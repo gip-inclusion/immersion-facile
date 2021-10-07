@@ -28,6 +28,12 @@ export const Router = () => {
         ) : (
           <NotAvailable />
         ))}
+      {route.name === "magicLink" &&
+        (featureFlags.enableMagicLinks ? (
+          <ApplicationForm route={route} />
+        ) : (
+          <NotAvailable />
+        ))}
       {route.name === "boulogneSurMer" &&
         (featureFlags.enableBoulogneSurMerApplicationForm ? (
           <ApplicationForm route={route} />

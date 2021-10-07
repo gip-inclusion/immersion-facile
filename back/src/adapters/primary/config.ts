@@ -6,7 +6,10 @@ import {
 } from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { ImmersionApplicationRepository } from "../../domain/immersionApplication/ports/ImmersionApplicationRepository";
-import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
+import {
+  AddImmersionApplication,
+  AddImmersionApplicationML,
+} from "../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
@@ -83,7 +86,10 @@ const getApplicationRepository = (
   featureFlags: FeatureFlags,
 ): ImmersionApplicationRepository => {
   const repositoriesBySource: ApplicationRepositoryMap = {};
-  if (featureFlags.enableGenericApplicationForm) {
+  if (
+    featureFlags.enableGenericApplicationForm ||
+    featureFlags.enableMagicLinks
+  ) {
     repositoriesBySource["GENERIC"] = useAirtable()
       ? AirtableDemandeImmersionRepository.create(
           getEnvVarOrDie("AIRTABLE_API_KEY"),
@@ -251,6 +257,11 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
 
   return {
     addDemandeImmersion: new AddImmersionApplication(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox,
+    ),
+    addDemandeImmersionML: new AddImmersionApplicationML(
       repositories.demandeImmersion,
       createNewEvent,
       repositories.outbox,

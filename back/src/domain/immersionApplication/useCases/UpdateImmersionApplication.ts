@@ -37,9 +37,11 @@ export class UpdateImmersionApplication
   public async execute(
     params: UpdateImmersionApplicationRequestDto,
   ): Promise<UpdateImmersionApplicationResponseDto> {
-    if (!this.featureFlags.enableViewableApplications)
+    if (
+      !this.featureFlags.enableViewableApplications &&
+      !this.featureFlags.enableMagicLinks
+    )
       throw new FeatureDisabledError();
-
     const immersionApplicationEntity = ImmersionApplicationEntity.create(
       params.demandeImmersion,
     );

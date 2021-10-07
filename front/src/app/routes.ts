@@ -15,6 +15,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { demandeId: param.query.optional.string },
     () => "/demande-immersion/narbonne",
   ),
+  magicLink: defineRoute(
+    { jwt: param.query.optional.string },
+    () => "/demande-immersionml",
+  ),
   admin: defineRoute("/admin"),
   adminVerification: defineRoute(
     { demandeId: param.path.string },

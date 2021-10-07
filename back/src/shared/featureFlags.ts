@@ -25,6 +25,7 @@ export const getFeatureFlags = (processEnv: ProcessEnv) => {
       "ENABLE_NARBONNE_APPLICATION_FORM",
     ),
     enableAdminUi: getBooleanVariable("ENABLE_ADMIN_UI"),
+    enableMagicLinks: getBooleanVariable("ENABLE_MAGIC_LINKS"),
   };
 };
 

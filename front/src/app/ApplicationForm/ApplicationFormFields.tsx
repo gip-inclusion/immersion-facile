@@ -57,7 +57,9 @@ export const ApplicationFormFields = ({
 
   return (
     <>
-      {isFrozen && featureFlags.enableViewableApplications && <FrozenMessage />}
+      {isFrozen &&
+        (featureFlags.enableViewableApplications ||
+          featureFlags.enableMagicLinks) && <FrozenMessage />}
 
       <TextInput
         label="Email *"
@@ -285,6 +287,12 @@ export const ApplicationFormFields = ({
 
       {!isFrozen && (
         <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
+      )}
+
+      {featureFlags.enableMagicLinks && !isFrozen && (
+        <>
+          <SaveButton isSubmitting={isSubmitting} onSubmit={submitForm} />
+        </>
       )}
     </>
   );

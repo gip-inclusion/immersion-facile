@@ -1,4 +1,9 @@
-type Role = "beneficiary" | "company" | "advisor" | "validator" | "admin";
+export type Role =
+  | "beneficiary"
+  | "company"
+  | "advisor"
+  | "validator"
+  | "admin";
 
 export type MagicLinkPayload = {
   applicationId: string;

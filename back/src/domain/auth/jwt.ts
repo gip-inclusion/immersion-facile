@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { ENV } from "../../adapters/primary/environmentVariables";
-import { MagicLinkPayload } from "./MagicLinkPayload";
+import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 
 const algo = "ES256";
 

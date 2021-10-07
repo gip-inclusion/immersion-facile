@@ -24,6 +24,7 @@ type ApplicationFormRoute = Route<
   | typeof routes.demandeImmersion
   | typeof routes.boulogneSurMer
   | typeof routes.narbonne
+  | typeof routes.magicLink
 >;
 
 interface ApplicationFormProps {
@@ -105,11 +106,11 @@ const createInitialApplication = (
 
     // Enterprise
     siret: "12345678901234",
-    businessName: "",
+    businessName: "business",
     mentor: "The Mentor",
     mentorPhone: "0687654321",
     mentorEmail: "mentor@supermentor.fr",
-    immersionAddress: "",
+    immersionAddress: "1 rue Karl Marx",
 
     // Covid
     individualProtection: true,
@@ -128,6 +129,28 @@ const createInitialApplication = (
   };
 };
 
+const currentJWT = (route: ApplicationFormRoute) => {
+  if (!("jwt" in route.params)) {
+    return "";
+  }
+  return route.params.jwt ?? "";
+};
+
+const hasExistingId = (route: ApplicationFormRoute) => {
+  if (featureFlags.enableMagicLinks) {
+    if (!("jwt" in route.params)) {
+      return false;
+    }
+    return route.params.jwt !== undefined;
+  } else {
+    if ("demandeId" in route.params) {
+      return route.params.demandeId !== undefined;
+    } else {
+      return false;
+    }
+  }
+};
+
 export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const [initialValues, setInitialValues] = useState(
     createInitialApplication(route),
@@ -136,28 +159,57 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const [successInfos, setSuccessInfos] = useState<SuccessInfos | null>(null);
 
   useEffect(() => {
-    const { demandeId } = route.params;
-    if (!demandeId) return;
+    if (!("demandeId" in route.params) && !("jwt" in route.params)) return;
 
-    if (!featureFlags.enableViewableApplications) {
+    if (
+      !featureFlags.enableViewableApplications &&
+      !featureFlags.enableMagicLinks
+    ) {
       const newLocation = "//" + location.host + location.pathname;
       history.replaceState(null, document.title, newLocation);
       return;
     }
 
-    demandeImmersionGateway
-      .get(demandeId)
-      .then((response) => {
-        if (response.status === "DRAFT") {
-          response.dateSubmission = toDateString(startOfToday());
-        }
-        setInitialValues(response);
-      })
-      .catch((e) => {
-        console.log(e);
-        setSubmitError(e);
-        setSuccessInfos(null);
-      });
+    if (featureFlags.enableMagicLinks) {
+      if (!("jwt" in route.params) || route.params.jwt === undefined) {
+        return;
+      }
+      demandeImmersionGateway
+        .getML(route.params.jwt)
+        .then((response) => {
+          if (response.status === "DRAFT") {
+            response.dateSubmission = toDateString(startOfToday());
+          }
+          setInitialValues(response);
+        })
+        .catch((e) => {
+          console.log(e);
+          setSubmitError(e);
+          setSuccessInfos(null);
+        });
+    } else {
+      if (
+        !("demandeId" in route.params) ||
+        route.params.demandeId === undefined
+      ) {
+        return;
+      }
+      const demandeId = route.params.demandeId;
+
+      demandeImmersionGateway
+        .get(demandeId)
+        .then((response) => {
+          if (response.status === "DRAFT") {
+            response.dateSubmission = toDateString(startOfToday());
+          }
+          setInitialValues(response);
+        })
+        .catch((e) => {
+          console.log(e);
+          setSubmitError(e);
+          setSuccessInfos(null);
+        });
+    }
   }, []);
 
   const isFrozen = isDemandeImmersionFrozen(initialValues);
@@ -195,35 +247,67 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
               try {
                 let application = immersionApplicationSchema.parse(values);
 
-                let currentId = route.params.demandeId;
-                if (!featureFlags.enableViewableApplications) {
+                if (
+                  !featureFlags.enableViewableApplications &&
+                  !featureFlags.enableMagicLinks
+                ) {
                   application = {
                     ...application,
                     status: "IN_REVIEW",
                   };
                 }
 
-                const upsertedId = currentId
-                  ? await demandeImmersionGateway.update(application)
-                  : await demandeImmersionGateway.add(application);
+                if (featureFlags.enableMagicLinks) {
+                  const updateExisting = hasExistingId(route);
+                  if (updateExisting) {
+                    await demandeImmersionGateway.updateML(
+                      application,
+                      currentJWT(route),
+                    );
+                  } else {
+                    const magicLinks = await demandeImmersionGateway.addML(
+                      application,
+                    );
 
-                setInitialValues(application);
+                    let newUrl: string | undefined = undefined;
+                    const queryParams = new URLSearchParams(
+                      window.location.search,
+                    );
+                    queryParams.set("jwt", magicLinks.magicLinkApplicant);
+                    history.replaceState(
+                      null,
+                      document.title,
+                      "?" + queryParams.toString(),
+                    );
+                    newUrl = window.location.href;
+                  }
+                  setInitialValues(application);
 
-                let newUrl: string | undefined = undefined;
-                if (featureFlags.enableViewableApplications) {
-                  const queryParams = new URLSearchParams(
-                    window.location.search,
-                  );
-                  queryParams.set("demandeId", upsertedId);
-                  history.replaceState(
-                    null,
-                    document.title,
-                    "?" + queryParams.toString(),
-                  );
-                  newUrl = window.location.href;
+                  // TODO: change success message to show both new links
+                  setSuccessInfos(createSuccessInfos(undefined));
+                  setSubmitError(null);
+                } else {
+                  const upsertedId = hasExistingId(route)
+                    ? await demandeImmersionGateway.update(application)
+                    : await demandeImmersionGateway.add(application);
+                  setInitialValues(application);
+
+                  let newUrl: string | undefined = undefined;
+                  if (featureFlags.enableViewableApplications) {
+                    const queryParams = new URLSearchParams(
+                      window.location.search,
+                    );
+                    queryParams.set("demandeId", upsertedId);
+                    history.replaceState(
+                      null,
+                      document.title,
+                      "?" + queryParams.toString(),
+                    );
+                    newUrl = window.location.href;
+                  }
+                  setSuccessInfos(createSuccessInfos(newUrl));
+                  setSubmitError(null);
                 }
-                setSuccessInfos(createSuccessInfos(newUrl));
-                setSubmitError(null);
               } catch (e: any) {
                 console.log(e);
                 setSubmitError(e);
