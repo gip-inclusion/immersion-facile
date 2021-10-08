@@ -1,4 +1,5 @@
 import { z } from "../../node_modules/zod";
+import { keys } from "./utils";
 
 export type NafSectorCode = keyof typeof nafSectorLabels;
 export const nafSectorLabels = {
@@ -26,9 +27,9 @@ export const nafSectorLabels = {
   U: "Activités extra-territoriales",
 };
 
-export const validNafSectorCodes = Object.keys(nafSectorLabels).filter(
+export const validNafSectorCodes = keys(nafSectorLabels).filter(
   (val) => val !== "0",
-) as NafSectorCode[];
+);
 
 export type NafDto = z.infer<typeof nafSchema>;
 export const nafSchema = z

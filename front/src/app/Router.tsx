@@ -1,5 +1,6 @@
 import React from "react";
 import { Admin } from "src/app/admin/Admin";
+import { VerificationPage } from "src/app/Verification/VerificationPage";
 import { ApplicationForm } from "src/app/ApplicationForm/ApplicationForm";
 import { Home } from "src/app/Home";
 import { useRoute } from "src/app/routes";
@@ -19,7 +20,7 @@ export const Router = () => {
     <>
       {route.name === "home" && <Home showDebugInfo={dev} />}
       {route.name === "immersionOffer" && <ImmersionOfferForm route={route} />}
-
+      {route.name === "verification" && <VerificationPage route={route} />}
       {route.name === "todos" &&
         (dev ? <TodoApp route={route} /> : <NotAvailable />)}
       {route.name === "immersionApplication" &&

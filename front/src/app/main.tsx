@@ -21,7 +21,7 @@ export const immersionOfferGateway: ImmersionOfferGateway =
     ? new HttpImmersionOfferGateway()
     : new InMemoryImmersionOfferGateway();
 
-export const demandeImmersionGateway: ImmersionApplicationGateway =
+export const immersionApplicationGateway: ImmersionApplicationGateway =
   ENV.gateway === "HTTP"
     ? new HttpImmersionApplicationGateway()
     : new InMemoryImmersionApplicationGateway(ENV.featureFlags);

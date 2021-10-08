@@ -1,7 +1,7 @@
 import type { AxiosError } from "axios";
 import { useField } from "formik";
 import { useEffect, useState } from "react";
-import { demandeImmersionGateway } from "src/app/main";
+import { immersionApplicationGateway } from "src/app/main";
 import type { Establishment } from "src/core-logic/ports/CompanyInfoFromSiretApi";
 import type { NafDto } from "src/shared/naf";
 
@@ -40,7 +40,7 @@ type CompanyInfo = {
 export const fetchCompanyInfoBySiret = async (
   siret: string,
 ): Promise<CompanyInfo> => {
-  const info = await demandeImmersionGateway.getSiretInfo(siret);
+  const info = await immersionApplicationGateway.getSiretInfo(siret);
   const establishment = info.etablissements[0];
   const businessAddress = addressDictToString(
     establishment.adresseEtablissement,

@@ -20,5 +20,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { demandeId: param.path.string },
     (p) => `/admin-verification/${p.demandeId}`,
   ),
+  verification: defineRoute({ jwt: param.query.string }, () => `/verification`),
   immersionOffer: defineRoute("/immersion-offer"),
 });

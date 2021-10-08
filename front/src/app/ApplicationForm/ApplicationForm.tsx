@@ -6,7 +6,7 @@ import {
   createSuccessInfos,
   SuccessInfos,
 } from "src/app/ApplicationForm/createSuccessInfos";
-import { demandeImmersionGateway } from "src/app/main";
+import { immersionApplicationGateway } from "src/app/main";
 import { routes } from "src/app/routes";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { MarianneHeader } from "src/components/MarianneHeader";
@@ -172,7 +172,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
       if (!("jwt" in route.params) || route.params.jwt === undefined) {
         return;
       }
-      demandeImmersionGateway
+      immersionApplicationGateway
         .getML(route.params.jwt)
         .then((response) => {
           if (response.status === "DRAFT") {
@@ -194,7 +194,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
       }
       const demandeId = route.params.demandeId;
 
-      demandeImmersionGateway
+      immersionApplicationGateway
         .get(demandeId)
         .then((response) => {
           if (response.status === "DRAFT") {
@@ -255,12 +255,12 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                 if (featureFlags.enableMagicLinks) {
                   const updateExisting = currentJWT(route).length > 0;
                   if (updateExisting) {
-                    await demandeImmersionGateway.updateML(
+                    await immersionApplicationGateway.updateML(
                       application,
                       currentJWT(route),
                     );
                   } else {
-                    const magicLinks = await demandeImmersionGateway.addML(
+                    const magicLinks = await immersionApplicationGateway.addML(
                       application,
                     );
 

@@ -1,9 +1,7 @@
 .static-application-container {
   display: flex;
-  flex-direction: column;
-  align-items: left;
-  justify-content: space-around;
-  max-width: 400px;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
 }
 
 .static-info-container {

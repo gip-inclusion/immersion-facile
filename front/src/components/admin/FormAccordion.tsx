@@ -28,7 +28,7 @@ const durationDays = (dateStart: string, dateEnd: string) => {
 };
 
 export interface FormAccordionProps {
-  data: ImmersionApplicationDto;
+  immersionApplication: ImmersionApplicationDto;
 }
 
 const getPrefix = (status: ApplicationStatus) => {
@@ -42,23 +42,22 @@ const getPrefix = (status: ApplicationStatus) => {
   }
 };
 
-export const FormAccordion = ({ data }: FormAccordionProps) => {
-  const title = () => {
-    return (
-      `${getPrefix(data.status)} ` +
-      `${data.lastName.toUpperCase()} ${data.firstName} chez ${
-        data.businessName
-      } ` +
-      `${beforeAfterString(data.dateStart)} (pendant ${durationDays(
-        data.dateStart,
-        data.dateEnd,
-      )})`
-    );
-  };
+export const FormAccordion = ({ immersionApplication }: FormAccordionProps) => {
+  const { status, lastName, firstName, businessName, dateStart, dateEnd } =
+    immersionApplication;
+
+  const title =
+    `${getPrefix(status)} ` +
+    `${lastName.toUpperCase()} ${firstName} chez ${businessName} ` +
+    `${beforeAfterString(dateStart)} (pendant ${durationDays(
+      dateStart,
+      dateEnd,
+    )})`;
 
   return (
-    <Accordion title={title()} key={data.id}>
-      <FormDetails data={data} />
-    </Accordion>
+    <div style={{ padding: "0.5rem" }}>
+      <h5 style={{ margin: "2rem 4rem" }}>{title}</h5>
+      <FormDetails immersionApplication={immersionApplication} />
+    </div>
   );
 };

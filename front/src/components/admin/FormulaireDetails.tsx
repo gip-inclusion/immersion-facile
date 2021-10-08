@@ -44,7 +44,7 @@ const allFields = [
   { listTitle: "Tuteur", fields: mentorFields },
 ];
 
-export const FormDetails = ({ data }: FormAccordeonProps) => (
+export const FormDetails = ({ immersionApplication }: FormAccordeonProps) => (
   <div className="static-application-container">
     {allFields.map(({ listTitle, fields }, index) => {
       return (
@@ -53,7 +53,7 @@ export const FormDetails = ({ data }: FormAccordeonProps) => (
             return (
               <TextCell
                 title={title}
-                contents={JSON.stringify(data[key])}
+                contents={JSON.stringify(immersionApplication[key])}
                 key={key}
               />
             );

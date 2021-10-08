@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from "react";
-import { demandeImmersionGateway } from "src/app/main";
+import { immersionApplicationGateway } from "src/app/main";
 import { routes } from "src/app/routes";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { MarianneHeader } from "src/components/MarianneHeader";
@@ -20,7 +20,7 @@ export const Admin = ({ route }: AdminProps) => {
   >([]);
 
   useEffect(() => {
-    demandeImmersionGateway.getAll().then(setDemandesImmersion);
+    immersionApplicationGateway.getAll().then(setDemandesImmersion);
   }, []);
 
   return (
@@ -38,7 +38,7 @@ export const Admin = ({ route }: AdminProps) => {
           <ul className="fr-accordions-group">
             {demandesImmersion.map((item) => (
               <li key={item.id}>
-                <FormAccordion data={item} />
+                <FormAccordion immersionApplication={item} />
               </li>
             ))}
           </ul>

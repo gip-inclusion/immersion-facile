@@ -317,7 +317,7 @@ type SubmitButtonProps = {
 
 const SaveButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => (
   <button
-    className="fr-btn fr-fi-save-line fr-btn--icon-left"
+    className="fr-fi-save-line fr-btn--icon-left"
     type="button"
     onClick={onSubmit}
     disabled={isSubmitting}

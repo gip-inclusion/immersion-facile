@@ -1,102 +1,88 @@
-import React, { Component } from "react";
+import React, { Component, ReactNode } from "react";
+import { keys } from "src/shared/utils";
 import { Accordion } from "./Accordion";
 import { TextCell } from "./TextCell";
 import { FormAccordionProps } from "./FormAccordion";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { prettyPrintSchedule } from "src/shared/ScheduleUtils";
 
-type KeyedFormData = { title: string; key: keyof ImmersionApplicationDto };
-type TextFormData = { title: string; text: string };
-type BoolFormData = { title: string; value: boolean };
+type ImmersionField = keyof ImmersionApplicationDto;
+type FieldsToLabel = Partial<Record<ImmersionField, string>>;
 
-export const FormDetails = ({ data }: FormAccordionProps) => {
-  const candidateFields: Array<BoolFormData | KeyedFormData> = [
-    { title: "Mail de démandeur", key: "email" },
-    { title: "Nom", key: "lastName" },
-    { title: "Prénom", key: "firstName" },
-    { title: "Numero de téléphone", key: "phone" },
-    { title: "Signé", value: data.beneficiaryAccepted },
-  ];
+const enterpriseFields: FieldsToLabel = {
+  businessName: "Entreprise",
+  siret: "Siret",
+};
 
-  let scheduleText = data.legacySchedule
-    ? data.legacySchedule.description
-    : prettyPrintSchedule(data.schedule);
+const mentorFields: FieldsToLabel = {
+  mentor: "Tuteur",
+  mentorPhone: "Numéro de téléphone du tuteur",
+  mentorEmail: "Mail du tuteur",
+  enterpriseAccepted: "Signé",
+};
 
-  const immersionFields: Array<KeyedFormData | TextFormData | BoolFormData> = [
-    { title: "Date de soumission", key: "dateSubmission" },
-    { title: "Début", key: "dateStart" },
-    { title: "Fin", key: "dateEnd" },
-    { title: "Adresse d'immersion", key: "immersionAddress" },
-    { title: "Metier observé", key: "immersionProfession" },
-    { title: "Activités", key: "immersionActivities" },
-    { title: "Objectif", key: "immersionObjective" },
-    { title: "Horaires", text: scheduleText },
-    { title: "Protection individuelle", value: data.individualProtection },
-    data.sanitaryPrevention
-      ? {
-          title: "Mesures de prévention sanitaire",
-          key: "sanitaryPreventionDescription",
-        }
-      : {
-          title: "Mesures de prévention sanitaire",
-          value: data.sanitaryPrevention,
-        },
-  ];
+const candidateFields: FieldsToLabel = {
+  email: "Mail de démandeur",
+  lastName: "Nom",
+  firstName: "Prénom",
+  phone: "Numero de téléphone",
+  beneficiaryAccepted: "Signé",
+};
 
-  const enterpriseFields: KeyedFormData[] = [
-    { title: "Entreprise", key: "businessName" },
-    { title: "Siret", key: "siret" },
-  ];
+const immersionFields: FieldsToLabel = {
+  dateSubmission: "Date de soumission",
+  dateStart: "Début",
+  dateEnd: "Fin",
+  immersionAddress: "Adresse d'immersion",
+  immersionProfession: "Metier observé",
+  immersionActivities: "Activités",
+  immersionObjective: "Objectif",
+  schedule: "Horaires",
+  individualProtection: "Protection individuelle",
+  sanitaryPrevention: "Mesures de prévention sanitaire",
+};
 
-  const mentorFields: Array<BoolFormData | KeyedFormData> = [
-    { title: "Tuteur", key: "mentor" },
-    { title: "Numero de téléphone du tuteur", key: "mentorPhone" },
-    { title: "Mail de tuteur", key: "mentorEmail" },
-    { title: "Signé", value: data.enterpriseAccepted },
-  ];
+type FieldsAndTitle = { listTitle: string; fields: FieldsToLabel };
 
-  const allFields = [
-    { listTitle: "Candidate", fields: candidateFields },
-    { listTitle: "Immersion", fields: immersionFields },
-    { listTitle: "Entreprise", fields: enterpriseFields },
-    { listTitle: "Tuteur", fields: mentorFields },
-  ];
+const allFields: FieldsAndTitle[] = [
+  { listTitle: "Immersion", fields: immersionFields },
+  { listTitle: "Candidate", fields: candidateFields },
+  { listTitle: "Entreprise", fields: enterpriseFields },
+  { listTitle: "Tuteur", fields: mentorFields },
+];
+
+export const FormDetails = ({ immersionApplication }: FormAccordionProps) => {
+  const scheduleText = immersionApplication.legacySchedule
+    ? immersionApplication.legacySchedule.description
+    : prettyPrintSchedule(immersionApplication.schedule);
+
+  const buildContent = (field: ImmersionField): ReactNode => {
+    const value = immersionApplication[field];
+    if (field === "schedule")
+      return <div style={{ whiteSpace: "pre" }}>{scheduleText}</div>;
+    if (field === "sanitaryPrevention") {
+      return value
+        ? immersionApplication.sanitaryPreventionDescription ?? "✅"
+        : "❌";
+    }
+    if (typeof value === "string") return value;
+    if (typeof value === "boolean") return value ? "✅" : "❌";
+    return JSON.stringify(value);
+  };
 
   return (
     <div className="static-application-container">
-      {allFields.map(({ listTitle, fields }, index) => {
-        return (
-          <Accordion title={listTitle} key={listTitle}>
-            {fields.map((formData) => {
-              if ("key" in formData) {
-                return (
-                  <TextCell
-                    title={formData.title}
-                    contents={JSON.stringify(data[formData.key])}
-                    key={formData.title}
-                  />
-                );
-              } else if ("value" in formData) {
-                return (
-                  <TextCell
-                    title={formData.title}
-                    contents={formData.value ? "✅" : "❌"}
-                    key={formData.title}
-                  />
-                );
-              } else {
-                return (
-                  <TextCell
-                    title={formData.title}
-                    contents={formData.text}
-                    key={formData.title}
-                  />
-                );
-              }
-            })}
-          </Accordion>
-        );
-      })}
+      {allFields.map(({ listTitle, fields }, index) => (
+        <Accordion title={listTitle} key={listTitle}>
+          {keys(fields).map((field) => (
+            <TextCell
+              title={fields[field]!}
+              contents={buildContent(field)}
+              key={field}
+            />
+          ))}
+        </Accordion>
+      ))}
     </div>
   );
 };

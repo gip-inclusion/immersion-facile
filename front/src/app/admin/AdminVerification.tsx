@@ -4,7 +4,7 @@ import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { Route } from "type-route";
-import { demandeImmersionGateway } from "../main";
+import { immersionApplicationGateway } from "../main";
 import { routes } from "../routes";
 import { InfoMessage } from "src/components/form/InfoMessage";
 
@@ -28,7 +28,7 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
   };
 
   useEffect(() => {
-    demandeImmersionGateway
+    immersionApplicationGateway
       .get(id)
       .then((data) => {
         setForm(data);
@@ -56,7 +56,7 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
   const sendValidationRequest = () => {
     if (!form) return;
     setSubmitting(true);
-    demandeImmersionGateway
+    immersionApplicationGateway
       .validate(form.id)
       .then(() => {
         setSuccessMessage(
@@ -78,7 +78,7 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
       {form && (
         <>
           {infoMessage && <InfoMessage title="Attention" text={infoMessage} />}
-          <FormAccordion data={form} />
+          <FormAccordion immersionApplication={form} />
           {!validationDisabled() && (
             <button
               className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
