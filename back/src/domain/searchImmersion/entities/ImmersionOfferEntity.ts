@@ -1,9 +1,9 @@
 import { Flavor } from "../../../shared/typeFlavors";
 
 export type ImmersionOfferId = Flavor<string, "ImmersionProposalId">;
-export type ImmersionContactInCompanyId = Flavor<
+export type ImmersionContactInEstablishmentId = Flavor<
   string,
-  "ImmersionContactInCompanyId"
+  "ImmersionContactInEstablishmentId"
 >;
 
 export type ImmersionOfferProps = {
@@ -14,12 +14,12 @@ export type ImmersionOfferProps = {
   name: string;
   voluntary_to_immersion: boolean;
   data_source: string;
-  contact_in_company?: ImmersionCompanyContact;
+  contact_in_establishment?: ImmersionEstablishmentContact;
   score: number;
 };
 
-export type ImmersionCompanyContact = {
-  id: ImmersionContactInCompanyId;
+export type ImmersionEstablishmentContact = {
+  id: ImmersionContactInEstablishmentId;
   name: string;
   fistname: string;
   email: string;

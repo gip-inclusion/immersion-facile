@@ -1,4 +1,4 @@
-export const fakeCompaniesLaBonneBoite = [
+export const fakeEstablishmentsLaBonneBoite = [
   {
     address: "3 PLACE EDOUARD BRANLY, 57070 METZ",
     alternance: false,

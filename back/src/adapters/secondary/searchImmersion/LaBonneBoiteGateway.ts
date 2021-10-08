@@ -1,15 +1,15 @@
 import axios from "axios";
 import { v4 as uuidV4 } from "uuid";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
-import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyEntity";
-import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
+import { EstablishmentEntity } from "../../../domain/searchImmersion/entities/EstablishmentEntity";
+import { EstablishmentsGateway } from "../../../domain/searchImmersion/ports/EstablishmentsGateway";
 import type { SearchParams } from "../../../domain/searchImmersion/ports/ImmersionOfferRepository";
 import { createLogger } from "../../../utils/logger";
-import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
+import { UncompleteEstablishmentEntity } from "../../../domain/searchImmersion/entities/UncompleteEstablishmentEntity";
 
 const logger = createLogger(__filename);
 
-export type CompanyFromLaBonneBoite = {
+export type EstablishmentFromLaBonneBoite = {
   address: string;
   city: string;
   lat: number;
@@ -22,21 +22,21 @@ export type CompanyFromLaBonneBoite = {
 };
 
 export type HttpCallsToLaBonneBoite = {
-  getCompanies: (
+  getEstablishments: (
     searchParams: SearchParams,
     accessToken: String,
-  ) => Promise<CompanyFromLaBonneBoite[]>;
+  ) => Promise<EstablishmentFromLaBonneBoite[]>;
 };
 
 export const httpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
-  getCompanies: (searchParams: SearchParams, accessToken: String) => {
+  getEstablishments: (searchParams: SearchParams, accessToken: String) => {
     const headers = {
       Authorization: "Bearer " + accessToken,
     };
 
     return axios
       .get(
-        "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
+        "https://api.emploi-store.fr/partenaire/labonneboite/v1/establishment/",
 
         {
           headers: headers,
@@ -49,46 +49,47 @@ export const httpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
         },
       )
       .then((response: any) => {
-        const companies: CompanyFromLaBonneBoite[] = response.data.companies;
-        return companies;
+        const establishments: EstablishmentFromLaBonneBoite[] =
+          response.data.establishments;
+        return establishments;
       });
   },
 };
 
-export class LaBonneBoiteGateway implements CompaniesGateway {
+export class LaBonneBoiteGateway implements EstablishmentsGateway {
   constructor(
     private readonly accessTokenGateway: AccessTokenGateway,
     private readonly poleEmploiClientId: string,
     private readonly httpCallToLaBonneBoite: HttpCallsToLaBonneBoite,
   ) {}
 
-  async getCompanies(
+  async getEstablishments(
     searchParams: SearchParams,
-  ): Promise<UncompleteCompanyEntity[]> {
+  ): Promise<UncompleteEstablishmentEntity[]> {
     const response = await this.accessTokenGateway.getAccessToken(
       `application_${this.poleEmploiClientId} api_labonneboitev1`,
     );
 
     return this.httpCallToLaBonneBoite
-      .getCompanies(searchParams, response.access_token)
+      .getEstablishments(searchParams, response.access_token)
       .then((response: any) => {
-        const companies: CompanyFromLaBonneBoite[] = response;
-        return companies
-          .filter((company) =>
-            this.keepRelevantCompanies(searchParams.ROME, company),
+        const establishments: EstablishmentFromLaBonneBoite[] = response;
+        return establishments
+          .filter((establishment) =>
+            this.keepRelevantEstablishments(searchParams.ROME, establishment),
           )
           .map(
-            (company) =>
-              new UncompleteCompanyEntity({
+            (establishment) =>
+              new UncompleteEstablishmentEntity({
                 id: uuidV4(),
-                address: company.address,
-                city: company.city,
-                position: { lat: company.lat, lon: company.lon },
-                naf: company.naf,
-                name: company.name,
-                siret: company.siret,
-                score: company.stars,
-                romes: [company.matched_rome_code],
+                address: establishment.address,
+                city: establishment.city,
+                position: { lat: establishment.lat, lon: establishment.lon },
+                naf: establishment.naf,
+                name: establishment.name,
+                siret: establishment.siret,
+                score: establishment.stars,
+                romes: [establishment.matched_rome_code],
                 dataSource: "api_labonneboite",
               }),
           );
@@ -100,16 +101,16 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
       });
   }
 
-  keepRelevantCompanies(
+  keepRelevantEstablishments(
     romeSearched: string,
-    company: CompanyFromLaBonneBoite,
+    establishment: EstablishmentFromLaBonneBoite,
   ): boolean {
     if (
-      (company.naf.startsWith("9609") && romeSearched == "A1408") ||
-      (company.naf == "XXXXX" && romeSearched == "A1503") ||
-      (company.naf == "5610C" && romeSearched == "D1102") ||
-      (company.naf.startsWith("8411") && romeSearched == "D1202") ||
-      (company.naf.startsWith("8411") &&
+      (establishment.naf.startsWith("9609") && romeSearched == "A1408") ||
+      (establishment.naf == "XXXXX" && romeSearched == "A1503") ||
+      (establishment.naf == "5610C" && romeSearched == "D1102") ||
+      (establishment.naf.startsWith("8411") && romeSearched == "D1202") ||
+      (establishment.naf.startsWith("8411") &&
         [
           "D1202",
           "G1404",

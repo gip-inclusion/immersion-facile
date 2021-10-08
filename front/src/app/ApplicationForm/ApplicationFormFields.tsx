@@ -5,7 +5,7 @@ import { BoolRadioGroup, RadioGroup } from "src/app/RadioGroup";
 import {
   useSiretFetcher,
   useSiretRelatedField,
-} from "src/app/Siret/fetchCompanyInfoBySiret";
+} from "src/app/Siret/fetchEstablishmentInfoBySiret";
 import { AgencyCodeDropdown } from "src/components/form/AgencyCodeDropdown";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { DateInput } from "src/components/form/DateInput";
@@ -52,11 +52,20 @@ export const ApplicationFormFields = ({
   successInfos,
   enableAgencySelection,
 }: ApplicationFieldsProps) => {
-  const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
-    useFormikContext<ImmersionApplicationDto>();
-  const { companyInfo, isFetchingSiret } = useSiretFetcher();
-  useSiretRelatedField("businessName", companyInfo);
-  useSiretRelatedField("businessAddress", companyInfo, "immersionAddress");
+  const {
+    errors,
+    submitCount,
+    setFieldValue,
+    isSubmitting,
+    submitForm,
+  } = useFormikContext<ImmersionApplicationDto>();
+  const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
+  useSiretRelatedField("businessName", establishmentInfo);
+  useSiretRelatedField(
+    "businessAddress",
+    establishmentInfo,
+    "immersionAddress",
+  );
 
   return (
     <>

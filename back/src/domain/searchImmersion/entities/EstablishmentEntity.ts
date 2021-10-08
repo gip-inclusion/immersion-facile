@@ -1,14 +1,14 @@
 import { Flavor } from "../../../shared/typeFlavors";
 
-export type CompanyId = Flavor<string, "CompanyId">;
+export type EstablishmentId = Flavor<string, "EstablishmentId">;
 
 export type Position = {
   lat: number;
   lon: number;
 };
 
-export type MandatoryCompanyFields = {
-  id: CompanyId;
+export type MandatoryEstablishmentFields = {
+  id: EstablishmentId;
   address: string;
   city: string;
   score: number;
@@ -40,16 +40,17 @@ export type TefenCode =
   | 52
   | 53;
 
-export type CompanyFieldsToRetrieve = {
+export type EstablishmentFieldsToRetrieve = {
   numberEmployeesRange: TefenCode;
   position: Position;
   naf: string;
 };
 
-type CompanyProps = MandatoryCompanyFields & CompanyFieldsToRetrieve;
+type EstablishmentProps = MandatoryEstablishmentFields &
+  EstablishmentFieldsToRetrieve;
 
-export class CompanyEntity {
-  constructor(private props: CompanyProps) {}
+export class EstablishmentEntity {
+  constructor(private props: EstablishmentProps) {}
 
   public getRomeCodesArray() {
     return this.props.romes;

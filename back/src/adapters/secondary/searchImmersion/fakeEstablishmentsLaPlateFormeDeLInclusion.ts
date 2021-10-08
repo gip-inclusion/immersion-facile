@@ -1,6 +1,6 @@
-import { CompanyFromLaPlateFormeDeLInclusion } from "./LaPlateFormeDeLInclusionGateway";
+import { EstablishmentFromLaPlateFormeDeLInclusion } from "./LaPlateFormeDeLInclusionGateway";
 
-export const fakeCompaniesLaPlateFormeDeLInclusion: CompanyFromLaPlateFormeDeLInclusion[] =
+export const fakeEstablishmentsLaPlateFormeDeLInclusion: EstablishmentFromLaPlateFormeDeLInclusion[] =
   [
     {
       cree_le: new Date("2019-12-05T15:37:56.609000+01:00"),

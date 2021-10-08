@@ -4,25 +4,13 @@ import { Client, QueryResult } from "pg";
 import format from "pg-format";
 import { SearchParams } from "../../../domain/searchImmersion/ports/ImmersionOfferRepository";
 import { createLogger } from "../../../utils/logger";
-import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyEntity";
+import { EstablishmentEntity } from "../../../domain/searchImmersion/entities/EstablishmentEntity";
 import { ENV } from "../../primary/environmentVariables";
 
 const logger = createLogger(__filename);
 
 export class PgImmersionOfferRepository implements ImmersionOfferRepository {
-  private client: Client;
-
-  constructor(connectionString: string) {
-    this.client = new Client({ connectionString });
-  }
-
-  async connect() {
-    await this.client.connect();
-  }
-  //todo connection hors client
-  async disconnect() {
-    await this.client.end();
-  }
+  constructor(private client: Client) {}
 
   //TODO
   async getAll(): Promise<ImmersionOfferEntity[]> {
@@ -69,7 +57,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   }
   /*
   async insertEstablishments(
-    establishments: CompanyEntity[],
+    establishments: EstablishmentEntity[],
   ): Promise<QueryResult<any>> {
     const arrayOfEstablishments = establishments.map((establishment) =>
       establishment.toArrayOfProps(),
@@ -92,24 +80,17 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
   async insertImmersions(
     immersionOffers: ImmersionOfferEntity[],
-  ): Promise<QueryResult<any>> {
+  ): Promise<void> {
     const arrayOfImmersionsOffers = immersionOffers.map((immersion) =>
       immersion.toArrayOfProps(),
     );
 
-    return this.client
-      .query(
-        format(
-          "INSERT INTO immersion_proposals (uuid, rome, naf,siret, name, data_source, score) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_proposals DO UPDATE SET name=EXCLUDED.name, update_date=NOW()",
-          arrayOfImmersionsOffers,
-        ),
-      )
-      .then((res) => {
-        return res;
-      })
-      .catch((e) => {
-        return e;
-      });
+    await this.client.query(
+      format(
+        "INSERT INTO immersion_proposals (uuid, rome, naf,siret, name, data_source, score) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_proposals DO UPDATE SET name=EXCLUDED.name, update_date=NOW()",
+        arrayOfImmersionsOffers,
+      ),
+    );
   }
 
   async getFromSearch(

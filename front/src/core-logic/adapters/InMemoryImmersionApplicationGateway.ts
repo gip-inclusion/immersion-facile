@@ -1,7 +1,7 @@
 import {
-  CompanyInfoFromSiretApi,
+  EstablishmentInfoFromSiretApi,
   Establishment,
-} from "src/core-logic/ports/CompanyInfoFromSiretApi";
+} from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { FeatureFlags } from "src/shared/featureFlags";
 import {
@@ -89,8 +89,7 @@ const TEST_ESTABLISHMENT2 = {
 const SIMULATED_LATENCY_MS = 2000;
 
 export class InMemoryImmersionApplicationGateway
-  implements ImmersionApplicationGateway
-{
+  implements ImmersionApplicationGateway {
   private _demandesImmersion: { [id: string]: ImmersionApplicationDto } = {};
   private _establishments: { [siret: string]: Establishment } = {};
 
@@ -200,7 +199,9 @@ export class InMemoryImmersionApplicationGateway
     return id;
   }
 
-  public async getSiretInfo(siret: string): Promise<CompanyInfoFromSiretApi> {
+  public async getSiretInfo(
+    siret: string,
+  ): Promise<EstablishmentInfoFromSiretApi> {
     console.log("InMemoryDemandeImmersionGateway.getSiretInfo: " + siret);
     await sleep(SIMULATED_LATENCY_MS);
 

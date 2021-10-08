@@ -1,6 +1,6 @@
 export type Role =
   | "beneficiary"
-  | "company"
+  | "establishment"
   | "advisor"
   | "validator"
   | "admin";

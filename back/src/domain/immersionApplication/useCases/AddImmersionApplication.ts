@@ -83,15 +83,15 @@ export class AddImmersionApplicationML
         immersionApplicationDto.lastName,
     };
 
-    const companyPayload = {
+    const establishmentPayload = {
       ...applicantPayload,
       name: immersionApplicationDto.mentor,
-      roles: ["company" as Role],
+      roles: ["establishment" as Role],
     };
 
     return {
       magicLinkApplicant: generateJwt(applicantPayload),
-      magicLinkEnterprise: generateJwt(companyPayload),
+      magicLinkEnterprise: generateJwt(establishmentPayload),
     };
   }
 }

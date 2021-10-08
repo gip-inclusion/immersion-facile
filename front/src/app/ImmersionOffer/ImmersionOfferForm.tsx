@@ -11,7 +11,7 @@ import { routes } from "src/app/routes";
 import {
   useSiretFetcher,
   useSiretRelatedField,
-} from "src/app/Siret/fetchCompanyInfoBySiret";
+} from "src/app/Siret/fetchEstablishmentInfoBySiret";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
@@ -102,10 +102,10 @@ const getLabelAndName = (field: FieldsWithLabel) => ({
 });
 
 const SiretRelatedInputs = () => {
-  const { companyInfo } = useSiretFetcher();
-  useSiretRelatedField("businessName", companyInfo);
-  useSiretRelatedField("businessAddress", companyInfo);
-  useSiretRelatedField("naf", companyInfo);
+  const { establishmentInfo } = useSiretFetcher();
+  useSiretRelatedField("businessName", establishmentInfo);
+  useSiretRelatedField("businessAddress", establishmentInfo);
+  useSiretRelatedField("naf", establishmentInfo);
 
   return (
     <>

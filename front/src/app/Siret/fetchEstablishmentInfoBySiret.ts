@@ -2,7 +2,7 @@ import type { AxiosError } from "axios";
 import { useField } from "formik";
 import { useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/main";
-import type { Establishment } from "src/core-logic/ports/CompanyInfoFromSiretApi";
+import type { Establishment } from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import type { NafDto } from "src/shared/naf";
 
 const addressDictToString = (addressDict: any): string => {
@@ -31,15 +31,15 @@ const getBusinessName = (establishment: Establishment) => {
     .join(" ");
 };
 
-type CompanyInfo = {
+type EstablishmentInfo = {
   businessName: string;
   businessAddress: string;
   naf?: NafDto;
 };
 
-export const fetchCompanyInfoBySiret = async (
+export const fetchEstablishmentInfoBySiret = async (
   siret: string,
-): Promise<CompanyInfo> => {
+): Promise<EstablishmentInfo> => {
   const info = await immersionApplicationGateway.getSiretInfo(siret);
   const establishment = info.etablissements[0];
   const businessAddress = addressDictToString(
@@ -63,24 +63,26 @@ export const fetchCompanyInfoBySiret = async (
   };
 };
 
-export const useSiretRelatedField = <K extends keyof CompanyInfo>(
+export const useSiretRelatedField = <K extends keyof EstablishmentInfo>(
   fieldFromInfo: K,
-  companyInfos: CompanyInfo | undefined,
+  establishmentInfos: EstablishmentInfo | undefined,
   fieldToUpdate?: string,
 ) => {
-  const [_, { touched }, { setValue }] = useField<CompanyInfo[K]>({
+  const [_, { touched }, { setValue }] = useField<EstablishmentInfo[K]>({
     name: fieldToUpdate ?? fieldFromInfo,
   });
 
   useEffect(() => {
-    if (!companyInfos) return;
-    if (!touched) setValue(companyInfos[fieldFromInfo]);
-  }, [companyInfos]);
+    if (!establishmentInfos) return;
+    if (!touched) setValue(establishmentInfos[fieldFromInfo]);
+  }, [establishmentInfos]);
 };
 
 export const useSiretFetcher = () => {
   const [isFetchingSiret, setIsFetchingSiret] = useState(false);
-  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | undefined>();
+  const [establishmentInfo, setEstablishmentInfo] = useState<
+    EstablishmentInfo | undefined
+  >();
 
   const [field, _, { setValue, setError }] = useField<string>({
     name: "siret",
@@ -91,10 +93,10 @@ export const useSiretFetcher = () => {
     if (sanitizedSiret.length !== 14) return;
 
     setIsFetchingSiret(true);
-    fetchCompanyInfoBySiret(sanitizedSiret)
+    fetchEstablishmentInfoBySiret(sanitizedSiret)
       .then((info) => {
         setValue(sanitizedSiret);
-        setCompanyInfo(info);
+        setEstablishmentInfo(info);
       })
       .catch((err: AxiosError) => {
         if (err.isAxiosError && err.code === "404") {
@@ -106,5 +108,5 @@ export const useSiretFetcher = () => {
       .finally(() => setIsFetchingSiret(false));
   }, [field.value]);
 
-  return { companyInfo, isFetchingSiret };
+  return { establishmentInfo, isFetchingSiret };
 };

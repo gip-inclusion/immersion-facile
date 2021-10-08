@@ -1,22 +1,22 @@
-import { CompanyEntity, TefenCode } from "./CompanyEntity";
+import { EstablishmentEntity, TefenCode } from "./EstablishmentEntity";
 import type {
-  MandatoryCompanyFields,
-  CompanyFieldsToRetrieve,
+  MandatoryEstablishmentFields,
+  EstablishmentFieldsToRetrieve,
   Position,
-} from "./CompanyEntity";
+} from "./EstablishmentEntity";
 
 export type GetPosition = (address: string) => Promise<Position>;
 
-type ExtraCompanyInfos = { naf: string; numberEmployeesRange: TefenCode };
-export type GetExtraCompanyInfos = (
+type ExtraEstablishmentInfos = { naf: string; numberEmployeesRange: TefenCode };
+export type GetExtraEstablishmentInfos = (
   siret: string,
-) => Promise<ExtraCompanyInfos>;
+) => Promise<ExtraEstablishmentInfos>;
 
-export type UncompleteCompanyProps = MandatoryCompanyFields &
-  Partial<CompanyFieldsToRetrieve>;
+export type UncompleteEstablishmentProps = MandatoryEstablishmentFields &
+  Partial<EstablishmentFieldsToRetrieve>;
 
-export class UncompleteCompanyEntity {
-  constructor(private props: UncompleteCompanyProps) {}
+export class UncompleteEstablishmentEntity {
+  constructor(private props: UncompleteEstablishmentProps) {}
 
   getRomeCodesArray() {
     return this.props.romes;
@@ -46,22 +46,24 @@ export class UncompleteCompanyEntity {
     return position;
   }
 
-  public async updateExtraCompanyInfos(
-    getExtraCompanyInfos: GetExtraCompanyInfos,
+  public async updateExtraEstablishmentInfos(
+    getExtraEstablishmentInfos: GetExtraEstablishmentInfos,
   ) {
-    const extraCompanyInfo = await getExtraCompanyInfos(this.props.siret);
-
-    this.props.naf = extraCompanyInfo.naf;
-    this.props.numberEmployeesRange = <TefenCode>(
-      +extraCompanyInfo.numberEmployeesRange
+    const extraEstablishmentInfo = await getExtraEstablishmentInfos(
+      this.props.siret,
     );
-    return extraCompanyInfo;
+
+    this.props.naf = extraEstablishmentInfo.naf;
+    this.props.numberEmployeesRange = <TefenCode>(
+      +extraEstablishmentInfo.numberEmployeesRange
+    );
+    return extraEstablishmentInfo;
   }
 
   public async searchForMissingFields(
     getPosition: GetPosition,
-    getExtraCompanyInfos: GetExtraCompanyInfos,
-  ): Promise<CompanyEntity> {
+    getExtraEstablishmentInfos: GetExtraEstablishmentInfos,
+  ): Promise<EstablishmentEntity> {
     let position: Position;
     if (!this.props.position) {
       position = await this.updatePosition(getPosition);
@@ -72,8 +74,8 @@ export class UncompleteCompanyEntity {
     let naf: string;
     let numberEmployeesRange: TefenCode;
     if (!this.props.naf || !this.props.numberEmployeesRange) {
-      const otherProperties = await this.updateExtraCompanyInfos(
-        getExtraCompanyInfos,
+      const otherProperties = await this.updateExtraEstablishmentInfos(
+        getExtraEstablishmentInfos,
       );
       numberEmployeesRange = otherProperties.numberEmployeesRange;
       naf = otherProperties.naf;
@@ -82,7 +84,7 @@ export class UncompleteCompanyEntity {
       numberEmployeesRange = this.props.numberEmployeesRange;
     }
 
-    return new CompanyEntity({
+    return new EstablishmentEntity({
       id: this.props.id,
       address: this.props.address,
       city: this.props.city,

@@ -1,78 +1,74 @@
-import { PgImmersionOfferRepository } from "../../../adapters/secondary/searchImmersion/PgImmersionOfferRepository";
 import { SearchParams } from "../ports/ImmersionOfferRepository";
-import { LaBonneBoiteGateway } from "../../../adapters/secondary/searchImmersion/LaBonneBoiteGateway";
-import { LaPlateFormeDeLInclusionGateway } from "../../../adapters/secondary/searchImmersion/LaPlateFormeDeLInclusionGateway";
-import { APIAdresseGateway } from "../../../adapters/secondary/searchImmersion/APIAdresseGateway";
-import { CompaniesGateway } from "../ports/CompaniesGateway";
+import { EstablishmentsGateway } from "../ports/EstablishmentsGateway";
 import {
   GetPosition,
-  GetExtraCompanyInfos,
-} from "../entities/UncompleteCompanyEntity";
-import { CompanyEntity } from "../entities/CompanyEntity";
+  GetExtraEstablishmentInfos,
+} from "../entities/UncompleteEstablishmentEntity";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
 import { v4 as uuidV4 } from "uuid";
+import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 
 export class InsertSearchedImmersionsInOfferRepository {
   constructor(
-    private laBonneBoiteGateway: CompaniesGateway,
-    private laPlateFormeDeLinclusionGateway: CompaniesGateway,
+    private laBonneBoiteGateway: EstablishmentsGateway,
+    private laPlateFormeDeLinclusionGateway: EstablishmentsGateway,
     private getPosition: GetPosition,
-    private getExtraCompanyInfos: GetExtraCompanyInfos,
-    private pgImmersionOfferRepository: PgImmersionOfferRepository,
+    private getExtraEstablishmentInfos: GetExtraEstablishmentInfos,
+    private immersionOfferRepository: ImmersionOfferRepository,
   ) {}
 
   public async execute(searchParams: SearchParams) {
-    this.pgImmersionOfferRepository.connect();
-
     //We first take all searches made in the past
     const searchesMade =
-      await this.pgImmersionOfferRepository.getSearchesMadeAndNotInserted();
+      await this.immersionOfferRepository.getSearchesMadeAndNotInserted();
 
     //For all these searches, we go to check if we have potential immersions in our available databases
     for (const searchMade in searchesMade) {
-      const companiesLaPlateFormeDeLinclusion =
-        await this.laPlateFormeDeLinclusionGateway.getCompanies(
+      const establishmentsLaPlateFormeDeLinclusion =
+        await this.laPlateFormeDeLinclusionGateway.getEstablishments(
           searchesMade[searchMade],
         );
-      const companiesLaBonneBoite = await this.laBonneBoiteGateway.getCompanies(
-        searchesMade[searchMade],
-      );
-      const allCompanies: CompanyEntity[] = await Promise.all(
-        companiesLaPlateFormeDeLinclusion
-          .concat(companiesLaBonneBoite)
+      const establishmentsLaBonneBoite =
+        await this.laBonneBoiteGateway.getEstablishments(
+          searchesMade[searchMade],
+        );
+      const allEstablishments: EstablishmentEntity[] = await Promise.all(
+        establishmentsLaPlateFormeDeLinclusion
+          .concat(establishmentsLaBonneBoite)
           .map(
-            async (uncompleteCompanyEntity) =>
-              await uncompleteCompanyEntity.searchForMissingFields(
+            async (uncompleteEstablishmentEntity) =>
+              await uncompleteEstablishmentEntity.searchForMissingFields(
                 this.getPosition,
-                this.getExtraCompanyInfos,
+                this.getExtraEstablishmentInfos,
               ),
           ),
       );
 
       //We then transform  dfffdthem into immersions and add them to our database
-      const allImmersions = allCompanies.flatMap((company) =>
-        this.extractImmersionsFromCompany(company),
+      const allImmersions = allEstablishments.flatMap((establishment) =>
+        this.extractImmersionsFromEstablishment(establishment),
       );
-      this.pgImmersionOfferRepository.insertImmersions(allImmersions);
+      this.immersionOfferRepository.insertImmersions(allImmersions);
     }
   }
 
-  private extractImmersionsFromCompany(
-    company: CompanyEntity,
+  private extractImmersionsFromEstablishment(
+    establishment: EstablishmentEntity,
   ): ImmersionOfferEntity[] {
-    const romeArray = company.getRomeCodesArray();
+    const romeArray = establishment.getRomeCodesArray();
     return romeArray.map(
       (rome) =>
         new ImmersionOfferEntity({
           id: uuidV4(),
           rome: rome,
-          naf: company.getNaf(),
-          siret: company.getSiret(),
-          name: company.getName(),
+          naf: establishment.getNaf(),
+          siret: establishment.getSiret(),
+          name: establishment.getName(),
           voluntary_to_immersion: false,
-          data_source: company.getDataSource(),
-          contact_in_company: undefined,
-          score: company.getScore(),
+          data_source: establishment.getDataSource(),
+          contact_in_establishment: undefined,
+          score: establishment.getScore(),
         }),
     );
   }

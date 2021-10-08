@@ -19,7 +19,7 @@ export type Establishment = {
   }>;
 };
 
-export type CompanyInfoFromSiretApi = {
+export type EstablishmentInfoFromSiretApi = {
   header: {
     statut: number;
     message: string;

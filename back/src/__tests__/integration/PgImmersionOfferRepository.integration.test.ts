@@ -6,7 +6,7 @@ import {
 } from "../../domain/core/ports/AccessTokenGateway";
 import {
   LaBonneBoiteGateway,
-  CompanyFromLaBonneBoite,
+  EstablishmentFromLaBonneBoite,
   HttpCallsToLaBonneBoite,
   httpCallToLaBonneBoite,
 } from "../../adapters/secondary/searchImmersion/LaBonneBoiteGateway";
@@ -16,25 +16,30 @@ import {} from "../../adapters/secondary/searchImmersion/LaBonneBoiteGateway";
 import {
   httpCallToLaPlateFormeDeLInclusion,
   LaPlateFormeDeLInclusionGateway,
-  CompanyFromLaPlateFormeDeLInclusion,
+  EstablishmentFromLaPlateFormeDeLInclusion,
   HttpCallsToLaPlateFormeDeLInclusion,
 } from "../../adapters/secondary/searchImmersion/LaPlateFormeDeLInclusionGateway";
-import { CompanyEntity } from "../../domain/searchImmersion/entities/CompanyEntity";
-import { UncompleteCompanyEntity } from "../../domain/searchImmersion/entities/UncompleteCompanyEntity";
+import { EstablishmentEntity } from "../../domain/searchImmersion/entities/EstablishmentEntity";
+import { UncompleteEstablishmentEntity } from "../../domain/searchImmersion/entities/UncompleteEstablishmentEntity";
 import { SearchParams } from "../../domain/searchImmersion/ports/ImmersionOfferRepository";
-import { fakeCompaniesLaPlateFormeDeLInclusion } from "../../adapters/secondary/searchImmersion/fakeCompaniesLaPlateFormeDeLInclusion";
-import { fakeCompaniesLaBonneBoite } from "../../adapters/secondary/searchImmersion/fakeCompaniesLaBonneBoite";
+import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../../adapters/secondary/searchImmersion/fakeEstablishmentsLaPlateFormeDeLInclusion";
+import { fakeEstablishmentsLaBonneBoite } from "../../adapters/secondary/searchImmersion/fakeEstablishmentsLaBonneBoite";
 import { PoleEmploiAccessTokenGateway } from "../../adapters/secondary/PoleEmploiAccessTokenGateway";
 import { ENV } from "../../adapters/primary/environmentVariables";
+import { Client } from "pg";
 
 const host = ENV.ci ? "postgres" : "localhost";
 const testPgUrl = `postgresql://postgres:pg-password@${host}:5432/immersion-db`;
+const client = new Client(testPgUrl);
 
 const fakeHttpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
-  getCompanies: async (searchParams: SearchParams, accessToken: String) => {
-    var returnedCompanies: CompanyFromLaBonneBoite[] =
-      fakeCompaniesLaBonneBoite;
-    return returnedCompanies;
+  getEstablishments: async (
+    searchParams: SearchParams,
+    accessToken: String,
+  ) => {
+    const returnedEstablishments: EstablishmentFromLaBonneBoite[] =
+      fakeEstablishmentsLaBonneBoite;
+    return returnedEstablishments;
   },
 };
 
@@ -49,10 +54,16 @@ const fakeAccessTokenGateway: AccessTokenGateway = {
 };
 
 describe("Postgres implementation of immersion proposal repository", () => {
+  beforeAll(async () => {
+    await client.connect();
+  });
+
+  afterAll(async () => {
+    await client.end();
+  });
+
   test("Search immersion works", async () => {
-    const pgImmersionOfferRepository = new PgImmersionOfferRepository(
-      testPgUrl,
-    );
+    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
     const fakeLaBonneBoiteGateway = new LaBonneBoiteGateway(
       fakeAccessTokenGateway,
       "",
@@ -70,45 +81,42 @@ describe("Postgres implementation of immersion proposal repository", () => {
       lon: 6.17602,
     });
     expect(immersions[0]).toBeInstanceOf(ImmersionOfferEntity);
-    await pgImmersionOfferRepository.disconnect();
   });
 
   test("Search La Plateforme de l'inclusion works", async () => {
     const fakeHttpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclusion =
       {
-        getCompanies: async (searchParams: SearchParams) => {
-          const returnedCompanies: [
-            CompanyFromLaPlateFormeDeLInclusion[],
+        getEstablishments: async (searchParams: SearchParams) => {
+          const returnedEstablishments: [
+            EstablishmentFromLaPlateFormeDeLInclusion[],
             String,
-          ] = [fakeCompaniesLaPlateFormeDeLInclusion, ""];
-          return returnedCompanies;
+          ] = [fakeEstablishmentsLaPlateFormeDeLInclusion, ""];
+          return returnedEstablishments;
         },
-        getNextCompanies: async (url: string) => [],
+        getNextEstablishments: async (url: string) => [],
       };
     const laPlateFormeDeLInclusionGateway = new LaPlateFormeDeLInclusionGateway(
       fakeHttpCallToLaPlateFormeDeLInclusion,
     );
-    const uncompleteCompanies =
-      await laPlateFormeDeLInclusionGateway.getCompanies({
+    const uncompleteEstablishments =
+      await laPlateFormeDeLInclusionGateway.getEstablishments({
         ROME: "M1607",
         distance: 30,
         lat: 49.119146,
         lon: 6.17602,
       });
-    //console.log(uncompleteCompanies);
-    expect(uncompleteCompanies[0]).toBeInstanceOf(UncompleteCompanyEntity);
+    //console.log(uncompleteEstablishments);
+    expect(uncompleteEstablishments[0]).toBeInstanceOf(
+      UncompleteEstablishmentEntity,
+    );
   });
 
   //TODO LIMIT 10
 
   test("GetAll immersion works", async () => {
-    const pgImmersionOfferRepository = new PgImmersionOfferRepository(
-      testPgUrl,
-    );
-    pgImmersionOfferRepository.connect();
+    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
     const results = await pgImmersionOfferRepository.getAll();
     expect(results).toBeInstanceOf(Array);
-    await pgImmersionOfferRepository.disconnect();
   });
 
   //TODO fake
@@ -122,9 +130,7 @@ describe("Postgres implementation of immersion proposal repository", () => {
         sireneRepository: repositories.sirene,
       })*/
 
-    const pgImmersionOfferRepository = new PgImmersionOfferRepository(
-      testPgUrl,
-    );
+    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
     const laBonneBoiteGateway = new LaBonneBoiteGateway(
       fakeAccessTokenGateway,
       "",
@@ -141,14 +147,13 @@ describe("Postgres implementation of immersion proposal repository", () => {
       lat: 49.119146,
       lon: 6.17602,
     });
-    pgImmersionOfferRepository.connect();
 
-    const result = await pgImmersionOfferRepository.insertImmersions(
-      immersions,
+    await pgImmersionOfferRepository.insertImmersions(immersions);
+
+    const savedImmersionOffers = await client.query(
+      `SELECT * FROM immersion_proposals`,
     );
-    console.log(result);
-    //We inserted all the immersions
-    expect(result.command).toEqual("INSERT");
-    await pgImmersionOfferRepository.disconnect();
+    console.log(savedImmersionOffers);
+    expect(savedImmersionOffers).toEqual(immersions);
   });
 });

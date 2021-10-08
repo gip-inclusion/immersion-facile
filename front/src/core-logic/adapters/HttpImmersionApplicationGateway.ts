@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CompanyInfoFromSiretApi } from "src/core-logic/ports/CompanyInfoFromSiretApi";
+import { EstablishmentInfoFromSiretApi } from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import {
   immersionApplicationsRoute,
@@ -22,8 +22,7 @@ import {
 const prefix = "api";
 
 export class HttpImmersionApplicationGateway
-  implements ImmersionApplicationGateway
-{
+  implements ImmersionApplicationGateway {
   public async add(
     demandeImmersionDto: ImmersionApplicationDto,
   ): Promise<string> {
@@ -119,7 +118,9 @@ export class HttpImmersionApplicationGateway
     return data.id;
   }
 
-  public async getSiretInfo(siret: string): Promise<CompanyInfoFromSiretApi> {
+  public async getSiretInfo(
+    siret: string,
+  ): Promise<EstablishmentInfoFromSiretApi> {
     const httpResponse = await axios.get(`/${prefix}/${siretRoute}/${siret}`);
     return httpResponse.data;
   }

@@ -1,14 +1,14 @@
-import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
+import { EstablishmentsGateway } from "../../../domain/searchImmersion/ports/EstablishmentsGateway";
 import { SearchParams } from "../../../domain/searchImmersion/ports/ImmersionOfferRepository";
 import axios from "axios";
 import { createLogger } from "../../../utils/logger";
 import { v4 as uuidV4 } from "uuid";
-import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
+import { UncompleteEstablishmentEntity } from "../../../domain/searchImmersion/entities/UncompleteEstablishmentEntity";
 import { APIAdresseGateway } from "./APIAdresseGateway";
 
 const logger = createLogger(__filename);
 
-export type CompanyFromLaPlateFormeDeLInclusion = {
+export type EstablishmentFromLaPlateFormeDeLInclusion = {
   cree_le: Date;
   mis_a_jour_le: Date;
 
@@ -37,37 +37,38 @@ export type JobFromLaPlateFormeDeLInclusion = {
   appellation_modifiee: string;
 };
 
-export const convertLaPlateFormeDeLInclusionToUncompletCompany = (
-  company: CompanyFromLaPlateFormeDeLInclusion,
-): UncompleteCompanyEntity => {
-  const { addresse_ligne_1, addresse_ligne_2, code_postal, ville } = company;
+export const convertLaPlateFormeDeLInclusionToUncompletEstablishment = (
+  establishment: EstablishmentFromLaPlateFormeDeLInclusion,
+): UncompleteEstablishmentEntity => {
+  const { addresse_ligne_1, addresse_ligne_2, code_postal, ville } =
+    establishment;
 
-  return new UncompleteCompanyEntity({
+  return new UncompleteEstablishmentEntity({
     id: uuidV4(),
     address: `${addresse_ligne_1} ${addresse_ligne_2} ${code_postal} ${ville}`,
     city: ville,
     score: 6,
-    romes: company.postes.map((poste) =>
+    romes: establishment.postes.map((poste) =>
       poste.rome.substring(poste.rome.length - 6, poste.rome.length - 1),
     ),
-    siret: company.siret,
+    siret: establishment.siret,
     dataSource: "api_laplateformedelinclusion",
-    name: company.enseigne,
+    name: establishment.enseigne,
   });
 };
 
 export type HttpCallsToLaPlateFormeDeLInclusion = {
-  getCompanies: (
+  getEstablishments: (
     searchParams: SearchParams,
-  ) => Promise<[CompanyFromLaPlateFormeDeLInclusion[], String]>;
-  getNextCompanies: (
+  ) => Promise<[EstablishmentFromLaPlateFormeDeLInclusion[], String]>;
+  getNextEstablishments: (
     url: string,
-  ) => Promise<CompanyFromLaPlateFormeDeLInclusion[]>;
+  ) => Promise<EstablishmentFromLaPlateFormeDeLInclusion[]>;
 };
 
 export const httpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclusion =
   {
-    getCompanies: async (searchParams: SearchParams) => {
+    getEstablishments: async (searchParams: SearchParams) => {
       const apiAdresseGateway = new APIAdresseGateway();
       const cityCode = await apiAdresseGateway.getCityCodeFromLatLongAPIAdresse(
         searchParams.lat,
@@ -85,11 +86,11 @@ export const httpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclu
             },
           })
           .then(async (response: any) => {
-            const companies: [CompanyFromLaPlateFormeDeLInclusion[], String] = [
-              response.data.results,
-              response.data.next,
-            ];
-            return companies;
+            const establishments: [
+              EstablishmentFromLaPlateFormeDeLInclusion[],
+              String,
+            ] = [response.data.results, response.data.next];
+            return establishments;
           })
           .catch(function (error: any) {
             // handle error
@@ -101,15 +102,15 @@ export const httpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclu
           });
       }
     },
-    getNextCompanies: async (url: string) => {
+    getNextEstablishments: async (url: string) => {
       return axios
         .get(url)
         .then(async (response: any) => {
           if (response.data.next != null) {
             return httpCallToLaPlateFormeDeLInclusion
-              .getNextCompanies(response.data.next)
-              .then((nextCompanies) => {
-                return response.data.results.concat(nextCompanies);
+              .getNextEstablishments(response.data.next)
+              .then((nextEstablishments) => {
+                return response.data.results.concat(nextEstablishments);
               })
               .catch(function (error: any) {
                 // handle error
@@ -120,7 +121,7 @@ export const httpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclu
                 return [];
               });
           } else {
-            var results: CompanyFromLaPlateFormeDeLInclusion[] =
+            const results: EstablishmentFromLaPlateFormeDeLInclusion[] =
               response.data.results;
             return results;
           }
@@ -136,23 +137,24 @@ export const httpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclu
     },
   };
 
-export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
+export class LaPlateFormeDeLInclusionGateway implements EstablishmentsGateway {
   constructor(private httpCalls: HttpCallsToLaPlateFormeDeLInclusion) {}
 
-  async getCompanies(
+  async getEstablishments(
     searchParams: SearchParams,
-  ): Promise<UncompleteCompanyEntity[]> {
+  ): Promise<UncompleteEstablishmentEntity[]> {
     return this.httpCalls
-      .getCompanies(searchParams)
+      .getEstablishments(searchParams)
       .then(async (response: any) => {
-        const companies: CompanyFromLaPlateFormeDeLInclusion[] = response[0];
+        const establishments: EstablishmentFromLaPlateFormeDeLInclusion[] =
+          response[0];
         const nextPageURL = response[1];
         return this.httpCalls
-          .getNextCompanies(nextPageURL)
-          .then((nextCompanies) =>
-            companies
-              .concat(nextCompanies)
-              .map(convertLaPlateFormeDeLInclusionToUncompletCompany),
+          .getNextEstablishments(nextPageURL)
+          .then((nextEstablishments) =>
+            establishments
+              .concat(nextEstablishments)
+              .map(convertLaPlateFormeDeLInclusionToUncompletEstablishment),
           )
           .catch(function (error: any) {
             // handle error
@@ -175,23 +177,23 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
 }
 
 /*
-  Clean company data before insertion into the database with external APIs
+  Clean establishment data before insertion into the database with external APIs
   */
 /*
-  async enrichCompanyData(companies: UncompleteCompanyEntity[]): Promise<CompanyEntity[]> {
-    const cleanedCompanies = [];
-    for (const companyIndex in companies) {
+  async enrichEstablishmentData(establishments: UncompleteEstablishmentEntity[]): Promise<EstablishmentEntity[]> {
+    const cleanedEstablishments = [];
+    for (const establishmentIndex in establishments) {
       //Adjust GPS coordinates
-      const company = companies[companyIndex];
+      const establishment = establishments[establishmentIndex];
       const gps = await this.getGPSFromAddressAPIAdresse(
-        companies[companyIndex].getAddress(),
+        establishments[establishmentIndex].getAddress(),
       );
-      company.setLatitude(Number(gps[0]));
-      company.setLongitude(Number(gps[1]));
+      establishment.setLatitude(Number(gps[0]));
+      establishment.setLongitude(Number(gps[1]));
 
-      //Get NAF from company
+      //Get NAF from establishment
 
-      cleanedCompanies.push(company);
+      cleanedEstablishments.push(establishment);
     }
-    return cleanedCompanies;
+    return cleanedEstablishments;
   }*/

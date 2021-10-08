@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Position } from "../../../domain/searchImmersion/entities/CompanyEntity";
+import { Position } from "../../../domain/searchImmersion/entities/EstablishmentEntity";
 
 export class APIAdresseGateway {
   async getGPSFromAddressAPIAdresse(address: string): Promise<Position> {

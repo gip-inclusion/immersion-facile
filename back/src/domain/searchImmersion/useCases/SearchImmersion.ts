@@ -1,10 +1,10 @@
 import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
-import { CompanyEntity } from "../entities/CompanyEntity";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 
 import { v4 as uuidV4 } from "uuid";
 import { LaBonneBoiteGateway } from "../../../adapters/secondary/searchImmersion/LaBonneBoiteGateway";
-import { CompaniesGateway } from "../ports/CompaniesGateway";
-import { UncompleteCompanyEntity } from "../entities/UncompleteCompanyEntity";
+import { EstablishmentsGateway } from "../ports/EstablishmentsGateway";
+import { UncompleteEstablishmentEntity } from "../entities/UncompleteEstablishmentEntity";
 import type {
   ImmersionOfferRepository,
   SearchParams,
@@ -14,7 +14,7 @@ import type {
 
 export class SearchImmersion {
   constructor(
-    private laBonneBoiteGateway: CompaniesGateway,
+    private laBonneBoiteGateway: EstablishmentsGateway,
     private immersionOfferRepository: ImmersionOfferRepository,
   ) {}
 
@@ -27,13 +27,12 @@ export class SearchImmersion {
 
   //TODO : en faire une classe à part
   async getImmersionLaBonneBoite(searchParams: SearchParams) {
-    const laBonneBoiteCompanies = await this.laBonneBoiteGateway.getCompanies(
-      searchParams,
-    );
+    const laBonneBoiteEstablishments =
+      await this.laBonneBoiteGateway.getEstablishments(searchParams);
 
-    const immersionOffers = laBonneBoiteCompanies.flatMap(
-      (laBonneBoitecompany) =>
-        this.extractImmersionsFromCompany(laBonneBoitecompany),
+    const immersionOffers = laBonneBoiteEstablishments.flatMap(
+      (laBonneBoiteestablishment) =>
+        this.extractImmersionsFromEstablishment(laBonneBoiteestablishment),
     );
 
     return immersionOffers;
@@ -47,26 +46,26 @@ export type ImmersionOfferProps = {
   name: string;
   voluntary_to_immersion: boolean;
   data_source: string;
-  contact_in_company_uuid?: ImmersionCompanyContact;
+  contact_in_establishment_uuid?: ImmersionEstablishmentContact;
   score: number;
 };
 */
-  private extractImmersionsFromCompany(
-    company: UncompleteCompanyEntity,
+  private extractImmersionsFromEstablishment(
+    establishment: UncompleteEstablishmentEntity,
   ): ImmersionOfferEntity[] {
-    const romeArray = company.getRomeCodesArray();
+    const romeArray = establishment.getRomeCodesArray();
     return romeArray.map(
       (rome) =>
         new ImmersionOfferEntity({
           id: uuidV4(),
           rome: rome,
-          naf: company.getNaf(),
-          siret: company.getSiret(),
-          name: company.getName(),
+          naf: establishment.getNaf(),
+          siret: establishment.getSiret(),
+          name: establishment.getName(),
           voluntary_to_immersion: false,
-          data_source: company.getDataSource(),
-          contact_in_company: undefined,
-          score: company.getScore(),
+          data_source: establishment.getDataSource(),
+          contact_in_establishment: undefined,
+          score: establishment.getScore(),
         }),
     );
   }

@@ -1,4 +1,4 @@
-import { CompanyInfoFromSiretApi } from "src/core-logic/ports/CompanyInfoFromSiretApi";
+import { EstablishmentInfoFromSiretApi } from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import {
   AddImmersionApplicationMLResponseDto,
   ImmersionApplicationDto,
@@ -21,6 +21,6 @@ export interface ImmersionApplicationGateway {
   // Calls validate-demande on backend.
   validate: (id: ImmersionApplicationId) => Promise<string>;
 
-  getSiretInfo: (siret: string) => Promise<CompanyInfoFromSiretApi>;
+  getSiretInfo: (siret: string) => Promise<EstablishmentInfoFromSiretApi>;
   getAll: () => Promise<Array<ImmersionApplicationDto>>;
 }

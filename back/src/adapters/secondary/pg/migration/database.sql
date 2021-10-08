@@ -84,7 +84,7 @@ CREATE TABLE public.immersion_proposals (
     number_immersions integer DEFAULT 0,
     voluntary_to_immersion boolean DEFAULT false,
     data_source public.data_source,
-    contact_in_company_uuid uuid,
+    contact_in_establishment_uuid uuid,
     creation_date timestamp without time zone DEFAULT now(),
     update_date timestamp without time zone DEFAULT now(),
     score real DEFAULT 0
@@ -138,11 +138,11 @@ ALTER TABLE public.searches_made OWNER TO postgres;
 
 --
 -- TOC entry 2842 (class 2606 OID 16466)
--- Name: immersion_contacts pk_company_contact; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: immersion_contacts pk_establishment_contact; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.immersion_contacts
-    ADD CONSTRAINT pk_company_contact PRIMARY KEY (uuid);
+    ADD CONSTRAINT pk_establishment_contact PRIMARY KEY (uuid);
 
 
 --
@@ -174,10 +174,10 @@ ALTER TABLE ONLY public.searches_made
 
 --
 -- TOC entry 2833 (class 1259 OID 16472)
--- Name: fki_fk_company_contact; Type: INDEX; Schema: public; Owner: postgres
+-- Name: fki_fk_establishment_contact; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX fki_fk_company_contact ON public.immersion_proposals USING btree (contact_in_company_uuid);
+CREATE INDEX fki_fk_establishment_contact ON public.immersion_proposals USING btree (contact_in_establishment_uuid);
 
 
 --
@@ -214,11 +214,11 @@ CREATE INDEX index_number_displays ON public.immersion_proposals USING btree (nu
 
 --
 -- TOC entry 2846 (class 2606 OID 16467)
--- Name: immersion_proposals fk_company_contact; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: immersion_proposals fk_establishment_contact; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.immersion_proposals
-    ADD CONSTRAINT fk_company_contact FOREIGN KEY (contact_in_company_uuid) REFERENCES public.immersion_contacts(uuid) NOT VALID;
+    ADD CONSTRAINT fk_establishment_contact FOREIGN KEY (contact_in_establishment_uuid) REFERENCES public.immersion_contacts(uuid) NOT VALID;
 
 
 --
