@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "build-initial-db": "ts-node src/adapters/secondary/pg/migration/buildDb.ts",
     "start": "ts-node src/adapters/primary/startServer.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts --verbose",
     "test:e2e": "SIRENE_REPOSITORY=IN_MEMORY REPOSITORIES=IN_MEMORY EMAIL_GATEWAY=IN_MEMORY jest --runInBand --watchAll --testRegex=.e2e.test.ts --verbose",

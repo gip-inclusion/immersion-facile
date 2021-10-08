@@ -22,8 +22,26 @@ export type MandatoryCompanyFields = {
   name: string;
 };
 
+// Code Tefen : Tranche Effectif Entreprise
+export type TefenCode =
+  | 0
+  | 1
+  | 2
+  | 3
+  | 11
+  | 12
+  | 21
+  | 22
+  | 31
+  | 32
+  | 41
+  | 42
+  | 51
+  | 52
+  | 53;
+
 export type CompanyFieldsToRetrieve = {
-  number_employees: number;
+  numberEmployeesRange: TefenCode;
   position: Position;
   naf: string;
 };

@@ -1,11 +1,10 @@
-services:
-  - postgres:13.4-alpine
-
 variables:
   SERVER_USER: deployer
   POSTGRES_DB: immersion-db
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: pg-password
+  POSTGRES_PORT: 5432
+  POSTGRES_HOST_AUTH_METHOD: trust
 
 stages:
   - test
@@ -29,9 +28,12 @@ front:
 
 back:
   stage: test
+  services:
+    - postgres:13.4-alpine
   script:
     - cd back
     - npm ci
+    - npm run build-initial-db "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB"
     - npm run test:all
     - npm run typecheck
 

@@ -3,13 +3,13 @@ import { v4 as uuidV4 } from "uuid";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
 import { CompanyEntity } from "../../../domain/searchImmersion/entities/CompanyEntity";
 import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
-import type { SearchParams } from "../../../domain/searchImmersion/ports/SearchParams";
+import type { SearchParams } from "../../../domain/searchImmersion/ports/ImmersionOfferRepository";
 import { createLogger } from "../../../utils/logger";
 import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
 
 const logger = createLogger(__filename);
 
-type CompanyFromLaBonneBoite = {
+export type CompanyFromLaBonneBoite = {
   address: string;
   city: string;
   lat: number;
@@ -21,21 +21,19 @@ type CompanyFromLaBonneBoite = {
   stars: number;
 };
 
-export class LaBonneBoiteGateway implements CompaniesGateway {
-  constructor(
-    private readonly accessTokenGateway: AccessTokenGateway,
-    private readonly poleEmploiClientId: string,
-  ) {}
-
-  async getCompanies(
+export type HttpCallsToLaBonneBoite = {
+  getCompanies: (
     searchParams: SearchParams,
-  ): Promise<UncompleteCompanyEntity[]> {
-    const response = await this.accessTokenGateway.getAccessToken(
-      `application_${this.poleEmploiClientId} api_labonneboitev1`,
-    );
+    accessToken: String,
+  ) => Promise<CompanyFromLaBonneBoite[]>;
+};
+
+export const httpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
+  getCompanies: (searchParams: SearchParams, accessToken: String) => {
     const headers = {
-      Authorization: "Bearer " + response.access_token,
+      Authorization: "Bearer " + accessToken,
     };
+
     return axios
       .get(
         "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
@@ -44,7 +42,7 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
           headers: headers,
           params: {
             distance: searchParams.distance,
-            longitude: searchParams.long,
+            longitude: searchParams.lon,
             latitude: searchParams.lat,
             rome_codes: searchParams.ROME,
           },
@@ -52,6 +50,29 @@ export class LaBonneBoiteGateway implements CompaniesGateway {
       )
       .then((response: any) => {
         const companies: CompanyFromLaBonneBoite[] = response.data.companies;
+        return companies;
+      });
+  },
+};
+
+export class LaBonneBoiteGateway implements CompaniesGateway {
+  constructor(
+    private readonly accessTokenGateway: AccessTokenGateway,
+    private readonly poleEmploiClientId: string,
+    private readonly httpCallToLaBonneBoite: HttpCallsToLaBonneBoite,
+  ) {}
+
+  async getCompanies(
+    searchParams: SearchParams,
+  ): Promise<UncompleteCompanyEntity[]> {
+    const response = await this.accessTokenGateway.getAccessToken(
+      `application_${this.poleEmploiClientId} api_labonneboitev1`,
+    );
+
+    return this.httpCallToLaBonneBoite
+      .getCompanies(searchParams, response.access_token)
+      .then((response: any) => {
+        const companies: CompanyFromLaBonneBoite[] = response;
         return companies
           .filter((company) =>
             this.keepRelevantCompanies(searchParams.ROME, company),

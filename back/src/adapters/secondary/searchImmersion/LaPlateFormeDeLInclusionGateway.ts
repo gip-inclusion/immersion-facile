@@ -1,9 +1,10 @@
 import { CompaniesGateway } from "../../../domain/searchImmersion/ports/CompaniesGateway";
-import { SearchParams } from "../../../domain/searchImmersion/ports/SearchParams";
+import { SearchParams } from "../../../domain/searchImmersion/ports/ImmersionOfferRepository";
 import axios from "axios";
 import { createLogger } from "../../../utils/logger";
 import { v4 as uuidV4 } from "uuid";
 import { UncompleteCompanyEntity } from "../../../domain/searchImmersion/entities/UncompleteCompanyEntity";
+import { APIAdresseGateway } from "./APIAdresseGateway";
 
 const logger = createLogger(__filename);
 
@@ -55,98 +56,128 @@ export const convertLaPlateFormeDeLInclusionToUncompletCompany = (
   });
 };
 
-// type HttpCallsToLaPlateFormeDeLInclusion = {
-//   getCompanies: (searchParams: SearchParams) => Promise<CompanyFromLaPlateFormeDeLInclusion[]>
-// }
-
-export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
-  // constructor(private httpCalls: HttpCallsToLaPlateFormeDeLInclusion) {}
-
-  async getCompanies(
+export type HttpCallsToLaPlateFormeDeLInclusion = {
+  getCompanies: (
     searchParams: SearchParams,
-  ): Promise<UncompleteCompanyEntity[]> {
-    const cityCode = await this.getCityCodeFromLatLongAPIAdresse(
-      searchParams.lat,
-      searchParams.long,
-    );
-    if (cityCode == -1) {
-      return [];
-    } else {
+  ) => Promise<[CompanyFromLaPlateFormeDeLInclusion[], String]>;
+  getNextCompanies: (
+    url: string,
+  ) => Promise<CompanyFromLaPlateFormeDeLInclusion[]>;
+};
+
+export const httpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclusion =
+  {
+    getCompanies: async (searchParams: SearchParams) => {
+      const apiAdresseGateway = new APIAdresseGateway();
+      const cityCode = await apiAdresseGateway.getCityCodeFromLatLongAPIAdresse(
+        searchParams.lat,
+        searchParams.lon,
+      );
+      if (cityCode == -1) {
+        return [[], ""];
+      } else {
+        return axios
+          .get("https://emplois.inclusion.beta.gouv.fr/api/v1/siaes/", {
+            params: {
+              code_insee: cityCode,
+              distance_max_km: searchParams.distance,
+              format: "json",
+            },
+          })
+          .then(async (response: any) => {
+            const companies: [CompanyFromLaPlateFormeDeLInclusion[], String] = [
+              response.data.results,
+              response.data.next,
+            ];
+            return companies;
+          })
+          .catch(function (error: any) {
+            // handle error
+            logger.error(
+              error,
+              "Could not fetch La Plate Forme de L'Inclusion API results",
+            );
+            return [[], ""];
+          });
+      }
+    },
+    getNextCompanies: async (url: string) => {
       return axios
-        .get("https://emplois.inclusion.beta.gouv.fr/api/v1/siaes/", {
-          params: {
-            code_insee: cityCode,
-            distance_max_km: searchParams.distance,
-            format: "json",
-          },
-        })
+        .get(url)
         .then(async (response: any) => {
-          const companies: CompanyFromLaPlateFormeDeLInclusion[] =
-            response.data.results;
-          const nextPageURL = response.data.next;
-          return this.getNextCompanies(nextPageURL)
-            .then((nextCompanies) =>
-              companies
-                .concat(nextCompanies)
-                .map(convertLaPlateFormeDeLInclusionToUncompletCompany),
-            )
-            .catch(function (error: any) {
-              // handle error
-              logger.error(
-                error,
-                "Could not fetch La Plate Forme de L'Inclusion API results",
-              );
-              return [];
-            });
+          if (response.data.next != null) {
+            return httpCallToLaPlateFormeDeLInclusion
+              .getNextCompanies(response.data.next)
+              .then((nextCompanies) => {
+                return response.data.results.concat(nextCompanies);
+              })
+              .catch(function (error: any) {
+                // handle error
+                logger.error(
+                  error,
+                  "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
+                );
+                return [];
+              });
+          } else {
+            var results: CompanyFromLaPlateFormeDeLInclusion[] =
+              response.data.results;
+            return results;
+          }
         })
         .catch(function (error: any) {
           // handle error
           logger.error(
             error,
-            "Could not fetch La Plate Forme de L'Inclusion API results",
+            "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
           );
           return [];
         });
-    }
-  }
+    },
+  };
 
-  async getNextCompanies(
-    url: string,
-  ): Promise<CompanyFromLaPlateFormeDeLInclusion[]> {
-    return axios
-      .get(url)
+export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
+  constructor(private httpCalls: HttpCallsToLaPlateFormeDeLInclusion) {}
+
+  async getCompanies(
+    searchParams: SearchParams,
+  ): Promise<UncompleteCompanyEntity[]> {
+    return this.httpCalls
+      .getCompanies(searchParams)
       .then(async (response: any) => {
-        if (response.data.next != null) {
-          return this.getNextCompanies(response.data.next)
-            .then((nextCompanies) => {
-              return response.data.results.concat(nextCompanies);
-            })
-            .catch(function (error: any) {
-              // handle error
-              logger.error(
-                error,
-                "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
-              );
-              return [];
-            });
-        } else {
-          return response.data.results;
-        }
+        const companies: CompanyFromLaPlateFormeDeLInclusion[] = response[0];
+        const nextPageURL = response[1];
+        return this.httpCalls
+          .getNextCompanies(nextPageURL)
+          .then((nextCompanies) =>
+            companies
+              .concat(nextCompanies)
+              .map(convertLaPlateFormeDeLInclusionToUncompletCompany),
+          )
+          .catch(function (error: any) {
+            // handle error
+            logger.error(
+              error,
+              "Could not fetch La Plate Forme de L'Inclusion API results",
+            );
+            return [];
+          });
       })
       .catch(function (error: any) {
         // handle error
         logger.error(
           error,
-          "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
+          "Could not fetch La Plate Forme de L'Inclusion API results",
         );
         return [];
       });
   }
+}
 
-  /*
+/*
   Clean company data before insertion into the database with external APIs
   */
-  /*
+/*
   async enrichCompanyData(companies: UncompleteCompanyEntity[]): Promise<CompanyEntity[]> {
     const cleanedCompanies = [];
     for (const companyIndex in companies) {
@@ -164,43 +195,3 @@ export class LaPlateFormeDeLInclusionGateway implements CompaniesGateway {
     }
     return cleanedCompanies;
   }*/
-
-  async getGPSFromAddressAPIAdresse(address: string) {
-    return axios
-      .get("https://api-adresse.data.gouv.fr/search/", {
-        params: {
-          q: address,
-        },
-      })
-      .then((response: any) => {
-        return response.data.features[0].geometry.coordinates;
-      })
-      .catch(function (error: any) {
-        return [-1, -1];
-      });
-  }
-  /*
-    Returns city code from latitude and longitude parameters using the api-adresse API from data.gouv
-    Returns -1 if did not find
-    */
-  async getCityCodeFromLatLongAPIAdresse(
-    lat: number,
-    lon: number,
-  ): Promise<number> {
-    return axios
-      .get("https://api-adresse.data.gouv.fr/reverse/", {
-        params: {
-          lon: lon,
-          lat: lat,
-        },
-      })
-      .then((response: any) => {
-        if (response.data.features.length != 0)
-          return response.data.features[0].properties.citycode;
-        else return -1;
-      })
-      .catch(function (error: any) {
-        return -1;
-      });
-  }
-}
