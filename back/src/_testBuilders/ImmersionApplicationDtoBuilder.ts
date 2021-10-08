@@ -26,6 +26,7 @@ const validDemandeImmersion: ImmersionApplicationDto = {
   id: DEMANDE_IMMERSION_ID,
   status: "DRAFT",
   source: "GENERIC",
+  agencyCode: "AMIE_BOULONAIS",
   email: VALID_EMAILS[0],
   phone: VALID_PHONES[0],
   firstName: "Esteban",

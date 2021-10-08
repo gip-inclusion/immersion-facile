@@ -8,17 +8,18 @@ import {
 } from "src/app/ApplicationForm/createSuccessInfos";
 import { demandeImmersionGateway } from "src/app/main";
 import { routes } from "src/app/routes";
+import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { ENV } from "src/environmentVariables";
-import { Route } from "type-route";
-import { v4 as uuidV4 } from "uuid";
+import { AgencyCode } from "src/shared/agencies";
 import {
   ApplicationSource,
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "src/shared/ImmersionApplicationDto";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
-import { toFormikValidationSchema } from "src/components/form/zodValidate";
+import { Route } from "type-route";
+import { v4 as uuidV4 } from "uuid";
 
 type ApplicationFormRoute = Route<
   | typeof routes.demandeImmersion
@@ -52,6 +53,17 @@ const getApplicationSourceForRoute = (
   }
 };
 
+const getAgencyCodeForRoute = (route: ApplicationFormRoute): AgencyCode => {
+  switch (route.name) {
+    case "boulogneSurMer":
+      return "AMIE_BOULONAIS";
+    case "narbonne":
+      return "MLJ_GRAND_NARBONNE";
+    default:
+      return "_UNKNOWN";
+  }
+};
+
 const createInitialApplication = (
   route: ApplicationFormRoute,
 ): Partial<ImmersionApplicationDto> => {
@@ -66,6 +78,7 @@ const createInitialApplication = (
     firstName: "",
     lastName: "",
     phone: "",
+    agencyCode: getAgencyCodeForRoute(route),
     dateStart: toDateString(addDays(startOfToday(), 2)),
     dateEnd: toDateString(addDays(startOfToday(), 3)),
 
@@ -103,6 +116,10 @@ const createInitialApplication = (
     firstName: "Sylvanie",
     lastName: "Durand",
     phone: "0612345678",
+    agencyCode:
+      emptyForm.agencyCode !== "_UNKNOWN"
+        ? emptyForm.agencyCode
+        : "AMIE_BOULONAIS",
 
     // Enterprise
     siret: "12345678901234",
@@ -323,6 +340,9 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                     isFrozen={isFrozen}
                     submitError={submitError}
                     successInfos={successInfos}
+                    enableAgencySelection={
+                      getAgencyCodeForRoute(route) === "_UNKNOWN"
+                    }
                   />
                 </form>
               </div>

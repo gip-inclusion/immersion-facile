@@ -6,6 +6,7 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/Siret/fetchCompanyInfoBySiret";
+import { AgencyCodeDropdown } from "src/components/form/AgencyCodeDropdown";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { DateInput } from "src/components/form/DateInput";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
@@ -42,12 +43,14 @@ type ApplicationFieldsProps = {
   isFrozen?: boolean;
   submitError: Error | null;
   successInfos: SuccessInfos | null;
+  enableAgencySelection?: boolean;
 };
 
 export const ApplicationFormFields = ({
   isFrozen,
   submitError,
   successInfos,
+  enableAgencySelection,
 }: ApplicationFieldsProps) => {
   const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
     useFormikContext<ImmersionApplicationDto>();
@@ -95,6 +98,17 @@ export const ApplicationFormFields = ({
         placeholder="0606060607"
         description="pour qu’on puisse vous contacter à propos de l’immersion"
         disabled={isFrozen}
+      />
+
+      <AgencyCodeDropdown
+        name="agencyCode"
+        label="Votre structure d'accompagnement *"
+        description={
+          enableAgencySelection
+            ? undefined
+            : "Ce formulaire ne peut être utilisé que pour la structure d'accompagnement ci-desous."
+        }
+        disabled={!enableAgencySelection || isFrozen}
       />
 
       <DateInput

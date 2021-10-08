@@ -1,4 +1,5 @@
 import { z } from "../../node_modules/zod";
+import { agencyCodeSchema } from "./agencies";
 import {
   emailAndMentorEmailAreDifferent,
   startDateIsBeforeEndDate,
@@ -8,7 +9,7 @@ import {
 import { LegacyScheduleDto, ScheduleDto } from "./ScheduleSchema";
 import { Flavor } from "./typeFlavors";
 import { NotEmptyArray, phoneRegExp } from "./utils";
-import { zBoolean, zEmail, zTrimmedString, zString, zTrue } from "./zodUtils";
+import { zBoolean, zEmail, zString, zTrimmedString, zTrue } from "./zodUtils";
 
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
@@ -67,6 +68,7 @@ export const immersionApplicationSchema = z
     phone: zString
       .regex(phoneRegExp, "Numero de téléphone incorrect")
       .optional(),
+    agencyCode: agencyCodeSchema,
     dateSubmission: zString.regex(
       dateRegExp,
       "La date de saisie est invalide.",
@@ -82,7 +84,6 @@ export const immersionApplicationSchema = z
       "Numero de téléphone de tuteur incorrect",
     ),
     mentorEmail: zEmail,
-    //
     schedule: scheduleSchema,
     legacySchedule: legacyScheduleSchema.optional(),
     individualProtection: zBoolean,

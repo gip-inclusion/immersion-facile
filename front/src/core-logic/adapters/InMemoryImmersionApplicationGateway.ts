@@ -3,12 +3,12 @@ import {
   Establishment,
 } from "src/core-logic/ports/CompanyInfoFromSiretApi";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { FeatureFlags } from "src/shared/featureFlags";
 import {
   AddImmersionApplicationMLResponseDto,
   ImmersionApplicationDto,
   ImmersionApplicationId,
 } from "src/shared/ImmersionApplicationDto";
-import { FeatureFlags } from "src/shared/featureFlags";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { sleep } from "src/shared/utils";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
@@ -17,6 +17,7 @@ const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   id: "fake-test-id",
   status: "DRAFT",
   source: "GENERIC",
+  agencyCode: "MLJ_GRAND_NARBONNE",
   email: "esteban@ocon.fr",
   phone: "+33012345678",
   firstName: "Esteban",

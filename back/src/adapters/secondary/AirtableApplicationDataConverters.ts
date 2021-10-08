@@ -1,5 +1,6 @@
 import { FieldSet } from "airtable";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+import { AgencyCode, agencyCodeFromString } from "../../shared/agencies";
 import {
   ApplicationSource,
   applicationSourceFromString,
@@ -62,6 +63,9 @@ const readApplicationSource = (
 ): ApplicationSource =>
   applicationSourceFromString(readString(fields, fieldName));
 
+const readAgencyCode = (fields: FieldSet, fieldName: string): AgencyCode =>
+  agencyCodeFromString(readString(fields, fieldName));
+
 const readScheduleDto = (fields: FieldSet, fieldName: string): ScheduleDto =>
   JSON.parse(readString(fields, fieldName));
 const scheduleDtoToString = JSON.stringify;
@@ -115,6 +119,7 @@ export const genericApplicationDataConverter: AirtableApplicationDataConverter =
         source: readApplicationSource(fields, "source"),
         email: readString(fields, "email"),
         phone: readString(fields, "phone"),
+        agencyCode: readAgencyCode(fields, "agencyCode"),
         firstName: readString(fields, "firstName"),
         lastName: readString(fields, "lastName"),
         dateSubmission: readString(fields, "dateSubmission"),
@@ -182,6 +187,7 @@ const legacyLabels = {
   source: "source",
   dateSubmission: "dateSubmission",
   schedule: "schedule",
+  agencyCode: "agencyCode",
 };
 
 export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
@@ -194,6 +200,7 @@ export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
       fields[legacyLabels.lastName] = dto.lastName;
       fields[legacyLabels.email] = dto.email;
       fields[legacyLabels.phone] = dto.phone || "";
+      fields[legacyLabels.agencyCode] = dto.agencyCode;
       fields[legacyLabels.siret] = siretToNumber(dto.siret);
       fields[legacyLabels.businessName] = dto.businessName;
       fields[legacyLabels.mentor] = dto.mentor;
@@ -253,6 +260,7 @@ export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
         lastName: readString(fields, legacyLabels.lastName),
         email: readString(fields, legacyLabels.email),
         phone: readString(fields, legacyLabels.phone),
+        agencyCode: readAgencyCode(fields, legacyLabels.agencyCode),
         siret: numberToSiret(readNumber(fields, legacyLabels.siret)),
         businessName: readString(fields, legacyLabels.businessName),
         mentor: readString(fields, legacyLabels.mentor),
