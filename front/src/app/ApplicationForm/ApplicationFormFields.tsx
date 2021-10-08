@@ -60,9 +60,7 @@ export const ApplicationFormFields = ({
 
   return (
     <>
-      {isFrozen &&
-        (featureFlags.enableViewableApplications ||
-          featureFlags.enableMagicLinks) && <FrozenMessage />}
+      {isFrozen && featureFlags.enableMagicLinks && <FrozenMessage />}
 
       <TextInput
         label="Email *"

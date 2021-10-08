@@ -3,10 +3,6 @@ import { createRouter, defineRoute, param } from "type-route";
 export const { RouteProvider, useRoute, routes } = createRouter({
   home: defineRoute("/"),
   todos: defineRoute("/todos"),
-  demandeImmersion: defineRoute(
-    { demandeId: param.query.optional.string },
-    () => "/demande-immersion",
-  ),
   boulogneSurMer: defineRoute(
     { demandeId: param.query.optional.string },
     () => "/demande-immersion/boulogne-sur-mer",
@@ -15,9 +11,9 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { demandeId: param.query.optional.string },
     () => "/demande-immersion/narbonne",
   ),
-  magicLink: defineRoute(
+  immersionApplication: defineRoute(
     { jwt: param.query.optional.string },
-    () => "/demande-immersionml",
+    () => "/demande-immersion",
   ),
   admin: defineRoute("/admin"),
   adminVerification: defineRoute(

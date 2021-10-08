@@ -22,13 +22,7 @@ export const Router = () => {
 
       {route.name === "todos" &&
         (dev ? <TodoApp route={route} /> : <NotAvailable />)}
-      {route.name === "demandeImmersion" &&
-        (featureFlags.enableGenericApplicationForm ? (
-          <ApplicationForm route={route} />
-        ) : (
-          <NotAvailable />
-        ))}
-      {route.name === "magicLink" &&
+      {route.name === "immersionApplication" &&
         (featureFlags.enableMagicLinks ? (
           <ApplicationForm route={route} />
         ) : (

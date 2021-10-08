@@ -10,7 +10,7 @@ export const Navigation = () => (
     {" - "}
 
     {featureFlags.enableGenericApplicationForm && (
-      <a {...routes.demandeImmersion().link}>Demande immersion</a>
+      <a {...routes.immersionApplication().link}>Demande immersion</a>
     )}
     {featureFlags.enableGenericApplicationForm && " - "}
 

@@ -22,10 +22,9 @@ import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
 type ApplicationFormRoute = Route<
-  | typeof routes.demandeImmersion
   | typeof routes.boulogneSurMer
   | typeof routes.narbonne
-  | typeof routes.magicLink
+  | typeof routes.immersionApplication
 >;
 
 interface ApplicationFormProps {
@@ -153,21 +152,6 @@ const currentJWT = (route: ApplicationFormRoute) => {
   return route.params.jwt ?? "";
 };
 
-const hasExistingId = (route: ApplicationFormRoute) => {
-  if (featureFlags.enableMagicLinks) {
-    if (!("jwt" in route.params)) {
-      return false;
-    }
-    return route.params.jwt !== undefined;
-  } else {
-    if ("demandeId" in route.params) {
-      return route.params.demandeId !== undefined;
-    } else {
-      return false;
-    }
-  }
-};
-
 export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const [initialValues, setInitialValues] = useState(
     createInitialApplication(route),
@@ -178,10 +162,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   useEffect(() => {
     if (!("demandeId" in route.params) && !("jwt" in route.params)) return;
 
-    if (
-      !featureFlags.enableViewableApplications &&
-      !featureFlags.enableMagicLinks
-    ) {
+    if (!featureFlags.enableMagicLinks) {
       const newLocation = "//" + location.host + location.pathname;
       history.replaceState(null, document.title, newLocation);
       return;
@@ -264,10 +245,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
               try {
                 let application = immersionApplicationSchema.parse(values);
 
-                if (
-                  !featureFlags.enableViewableApplications &&
-                  !featureFlags.enableMagicLinks
-                ) {
+                if (!featureFlags.enableMagicLinks) {
                   application = {
                     ...application,
                     status: "IN_REVIEW",
@@ -275,7 +253,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                 }
 
                 if (featureFlags.enableMagicLinks) {
-                  const updateExisting = hasExistingId(route);
+                  const updateExisting = currentJWT(route).length > 0;
                   if (updateExisting) {
                     await demandeImmersionGateway.updateML(
                       application,
@@ -302,27 +280,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
 
                   // TODO: change success message to show both new links
                   setSuccessInfos(createSuccessInfos(undefined));
-                  setSubmitError(null);
-                } else {
-                  const upsertedId = hasExistingId(route)
-                    ? await demandeImmersionGateway.update(application)
-                    : await demandeImmersionGateway.add(application);
-                  setInitialValues(application);
-
-                  let newUrl: string | undefined = undefined;
-                  if (featureFlags.enableViewableApplications) {
-                    const queryParams = new URLSearchParams(
-                      window.location.search,
-                    );
-                    queryParams.set("demandeId", upsertedId);
-                    history.replaceState(
-                      null,
-                      document.title,
-                      "?" + queryParams.toString(),
-                    );
-                    newUrl = window.location.href;
-                  }
-                  setSuccessInfos(createSuccessInfos(newUrl));
                   setSubmitError(null);
                 }
               } catch (e: any) {
