@@ -1,22 +1,21 @@
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { ValidatedApplicationFinalConfirmationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
-import { NotifyAllActorsOfFinalApplicationValidation } from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import {
-  ApplicationSource,
-  ImmersionApplicationDto,
-} from "../../../shared/ImmersionApplicationDto";
+  getQuestionnaireUrl,
+  getSignature,
+  getValidatedApplicationFinalConfirmationParams,
+  NotifyAllActorsOfFinalApplicationValidation,
+} from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { AgencyCode } from "../../../shared/agencies";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { LegacyScheduleDto } from "../../../shared/ScheduleSchema";
 import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "../../../shared/ScheduleUtils";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
-import {
-  getQuestionnaireUrl,
-  getValidatedApplicationFinalConfirmationParams,
-} from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 
 const validDemandeImmersion: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();
@@ -26,24 +25,24 @@ const counsellorEmail = "counsellor@email.fr";
 describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   let emailGw: InMemoryEmailGateway;
   let allowList: Set<string>;
-  let unrestrictedEmailSendingSources: Set<ApplicationSource>;
-  let counsellorEmails: Record<ApplicationSource, string[]>;
+  let unrestrictedEmailSendingAgencies: Set<AgencyCode>;
+  let counsellorEmails: Record<AgencyCode, string[]>;
   let sendConventionToAllActors: NotifyAllActorsOfFinalApplicationValidation;
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
     allowList = new Set();
-    unrestrictedEmailSendingSources = new Set();
-    counsellorEmails = {} as Record<ApplicationSource, string[]>;
+    unrestrictedEmailSendingAgencies = new Set();
+    counsellorEmails = {} as Record<AgencyCode, string[]>;
     sendConventionToAllActors = new NotifyAllActorsOfFinalApplicationValidation(
       emailGw,
       allowList,
-      unrestrictedEmailSendingSources,
+      unrestrictedEmailSendingAgencies,
       counsellorEmails,
     );
   });
 
-  test("Sends no emails when allowList and unrestrictedEmailSendingSources is empty", async () => {
+  test("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
     await sendConventionToAllActors.execute(validDemandeImmersion);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
@@ -79,7 +78,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   });
 
   test("Sends confirmation email to counsellor when on allowList", async () => {
-    counsellorEmails[validDemandeImmersion.source] = [counsellorEmail];
+    counsellorEmails[validDemandeImmersion.agencyCode] = [counsellorEmail];
     allowList.add(counsellorEmail);
 
     await sendConventionToAllActors.execute(validDemandeImmersion);
@@ -95,7 +94,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   });
 
   test("Sends confirmation email to beneficiary, mentor, and counsellor when on allowList", async () => {
-    counsellorEmails[validDemandeImmersion.source] = [counsellorEmail];
+    counsellorEmails[validDemandeImmersion.agencyCode] = [counsellorEmail];
     allowList.add(counsellorEmail);
     allowList.add(validDemandeImmersion.email);
     allowList.add(validDemandeImmersion.mentorEmail);
@@ -116,9 +115,9 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     );
   });
 
-  test("Sends confirmation email to beneficiary, mentor, and counsellor for unrestrictedEmailSendingSources", async () => {
-    counsellorEmails[validDemandeImmersion.source] = [counsellorEmail];
-    unrestrictedEmailSendingSources.add(validDemandeImmersion.source);
+  test("Sends confirmation email to beneficiary, mentor, and counsellor for unrestrictedEmailSendingAgencies", async () => {
+    counsellorEmails[validDemandeImmersion.agencyCode] = [counsellorEmail];
+    unrestrictedEmailSendingAgencies.add(validDemandeImmersion.agencyCode);
 
     await sendConventionToAllActors.execute(validDemandeImmersion);
 
@@ -159,8 +158,8 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       immersionActivities: application.immersionActivities,
       sanitaryPrevention: "sanitaryPreventionDescription",
       individualProtection: "oui",
-      questionnaireUrl: "",
-      signature: "L'immersion facile",
+      questionnaireUrl: getQuestionnaireUrl(application.agencyCode),
+      signature: getSignature(application.agencyCode),
     };
 
     expect(getValidatedApplicationFinalConfirmationParams(application)).toEqual(
@@ -168,30 +167,30 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     );
   });
 
-  test("BOULOGNE_SUR_MER application", () => {
+  test("AMIE_BOULONAIS application", () => {
     const application = new ImmersionApplicationDtoBuilder()
-      .withSource("BOULOGNE_SUR_MER")
+      .withAgencyCode("AMIE_BOULONAIS")
       .build();
 
     const actualParms =
       getValidatedApplicationFinalConfirmationParams(application);
 
     expect(actualParms.questionnaireUrl).toEqual(
-      getQuestionnaireUrl("BOULOGNE_SUR_MER"),
+      getQuestionnaireUrl("AMIE_BOULONAIS"),
     );
     expect(actualParms.signature).toEqual("L'équipe de l'AMIE du Boulonnais");
   });
 
-  test("NARBONNE application", () => {
+  test("MLJ_GRAND_NARBONNE application", () => {
     const application = new ImmersionApplicationDtoBuilder()
-      .withSource("NARBONNE")
+      .withAgencyCode("MLJ_GRAND_NARBONNE")
       .build();
 
     const actualParms =
       getValidatedApplicationFinalConfirmationParams(application);
 
     expect(actualParms.questionnaireUrl).toEqual(
-      getQuestionnaireUrl("NARBONNE"),
+      getQuestionnaireUrl("MLJ_GRAND_NARBONNE"),
     );
     expect(actualParms.signature).toEqual(
       "L'équipe de la Mission Locale de Narbonne",

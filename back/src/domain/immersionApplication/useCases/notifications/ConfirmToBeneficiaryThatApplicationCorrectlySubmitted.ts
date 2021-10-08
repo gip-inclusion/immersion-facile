@@ -1,7 +1,5 @@
-import {
-  ApplicationSource,
-  ImmersionApplicationDto,
-} from "../../../../shared/ImmersionApplicationDto";
+import { AgencyCode } from "../../../../shared/agencies";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 import { createLogger } from "./../../../../utils/logger";
@@ -14,14 +12,14 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
-    private readonly unrestrictedEmailSendingSources: Readonly<
-      Set<ApplicationSource>
+    private readonly unrestrictedEmailSendingAgencies: Readonly<
+      Set<AgencyCode>
     >,
   ) {}
 
   public async execute({
     id,
-    source,
+    agencyCode,
     email,
     firstName,
     lastName,
@@ -29,7 +27,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
     logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
 
     if (
-      this.unrestrictedEmailSendingSources.has(source) ||
+      this.unrestrictedEmailSendingAgencies.has(agencyCode) ||
       this.emailAllowList.has(email)
     ) {
       await this.emailGateway.sendNewApplicationBeneficiaryConfirmation(email, {
@@ -39,7 +37,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
       });
     } else {
       logger.info(
-        { id, email, source },
+        { id, email, agencyCode },
         "Sending beneficiary confirmation email skipped.",
       );
     }

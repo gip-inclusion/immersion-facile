@@ -1,3 +1,4 @@
+import { AgencyCode } from "../shared/agencies";
 import {
   ApplicationSource,
   ApplicationStatus,
@@ -86,6 +87,12 @@ export class ImmersionApplicationDtoBuilder
 
   public withSource(source: ApplicationSource): ImmersionApplicationDtoBuilder {
     return new ImmersionApplicationDtoBuilder({ ...this.dto, source });
+  }
+
+  public withAgencyCode(
+    agencyCode: AgencyCode,
+  ): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, agencyCode });
   }
 
   public withStatus(status: ApplicationStatus): ImmersionApplicationDtoBuilder {

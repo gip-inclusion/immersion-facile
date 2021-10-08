@@ -21,10 +21,7 @@ import { ValidateImmersionApplication } from "../../domain/immersionApplication/
 import { AddImmersionOffer } from "../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
-import {
-  ApplicationSource,
-  applicationSourceFromString,
-} from "../../shared/ImmersionApplicationDto";
+import { AgencyCode, agencyCodeFromString } from "../../shared/agencies";
 import { FeatureFlags } from "../../shared/featureFlags";
 import {
   genericApplicationDataConverter,
@@ -48,9 +45,9 @@ import {
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
-import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
+import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryImmersionOfferRepository } from "../secondary/InMemoryImmersionOfferRepository";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
@@ -208,21 +205,20 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
     );
   }
 
-  const unrestrictedEmailSendingSources: Readonly<Set<ApplicationSource>> =
-    new Set(
-      (process.env.UNRESTRICTED_EMAIL_SENDING_SOURCES || "")
-        .split(",")
-        .filter((el) => !!el)
-        .map(applicationSourceFromString)
-        .filter((source) => source !== "UNKNOWN"),
-    );
+  const unrestrictedEmailSendingAgencies: Readonly<Set<AgencyCode>> = new Set(
+    (process.env.UNRESTRICTED_EMAIL_SENDING_AGENCIES || "")
+      .split(",")
+      .filter((el) => !!el)
+      .map(agencyCodeFromString)
+      .filter((agencyCode) => agencyCode !== "_UNKNOWN"),
+  );
   logger.debug(
     {
-      unrestrictedEmailSendingSources: Array.from(
-        unrestrictedEmailSendingSources,
+      unrestrictedEmailSendingAgencies: Array.from(
+        unrestrictedEmailSendingAgencies,
       ),
     },
-    "UNRESTRICTED_EMAIL_SENDING_SOURCES",
+    "UNRESTRICTED_EMAIL_SENDING_AGENCIES",
   );
 
   const emailAllowList: Readonly<Set<string>> = new Set(
@@ -234,25 +230,25 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
   );
   if (emailAllowList.size == 0) {
     logger.warn(
-      "Empty EMAIL_ALLOW_LIST. Disabling the sending of non-supervisor emails for sources with ",
+      "Empty EMAIL_ALLOW_LIST. Disabling the sending of non-supervisor emails for agencies with ",
       "restricted email sending.",
     );
   }
 
-  // Format: COUNSELLOR_EMAILS=<source>:<email>,<source>:<email>,...
-  const counsellorEmails: Record<ApplicationSource, string[]> = (
+  // Format: COUNSELLOR_EMAILS=<agencyCode>:<email>,<agencyCode>:<email>,...
+  const counsellorEmails: Record<AgencyCode, string[]> = (
     process.env.COUNSELLOR_EMAILS || ""
   )
     .split(",")
     .filter((el) => !!el)
     .reduce((acc, el) => {
-      const [sourceStr, email] = el.split(":", 2);
-      const source = applicationSourceFromString(sourceStr);
+      const [str, email] = el.split(":", 2);
+      const agencyCode = agencyCodeFromString(str);
       return {
         ...acc,
-        [source]: [...(acc[source] || []), email],
+        [agencyCode]: [...(acc[agencyCode] || []), email],
       };
-    }, {} as Record<ApplicationSource, string[]>);
+    }, {} as Record<AgencyCode, string[]>);
   logger.debug({ counsellorEmails: counsellorEmails }, "COUNSELLOR_EMAILS");
 
   return {
@@ -299,19 +295,19 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
         repositories.email,
         emailAllowList,
-        unrestrictedEmailSendingSources,
+        unrestrictedEmailSendingAgencies,
       ),
     confirmToMentorThatApplicationCorrectlySubmitted:
       new ConfirmToMentorThatApplicationCorrectlySubmitted(
         repositories.email,
         emailAllowList,
-        unrestrictedEmailSendingSources,
+        unrestrictedEmailSendingAgencies,
       ),
     notifyAllActorsOfFinalApplicationValidation:
       new NotifyAllActorsOfFinalApplicationValidation(
         repositories.email,
         emailAllowList,
-        unrestrictedEmailSendingSources,
+        unrestrictedEmailSendingAgencies,
         counsellorEmails,
       ),
     notifyToTeamApplicationSubmittedByBeneficiary:

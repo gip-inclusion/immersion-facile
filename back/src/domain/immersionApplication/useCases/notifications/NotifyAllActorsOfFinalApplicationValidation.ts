@@ -1,7 +1,5 @@
-import {
-  ApplicationSource,
-  ImmersionApplicationDto,
-} from "../../../../shared/ImmersionApplicationDto";
+import { AgencyCode } from "../../../../shared/agencies";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
@@ -20,12 +18,10 @@ export class NotifyAllActorsOfFinalApplicationValidation
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
-    private readonly unrestrictedEmailSendingSources: Readonly<
-      Set<ApplicationSource>
+    private readonly unrestrictedEmailSendingAgencies: Readonly<
+      Set<AgencyCode>
     >,
-    private readonly counsellorEmails: Readonly<
-      Record<ApplicationSource, string[]>
-    >,
+    private readonly counsellorEmails: Readonly<Record<AgencyCode, string[]>>,
   ) {}
 
   public async execute(dto: ImmersionApplicationDto): Promise<void> {
@@ -39,9 +35,9 @@ export class NotifyAllActorsOfFinalApplicationValidation
     let recipients = [
       dto.email,
       dto.mentorEmail,
-      ...(this.counsellorEmails[dto.source] || []),
+      ...(this.counsellorEmails[dto.agencyCode] || []),
     ];
-    if (!this.unrestrictedEmailSendingSources.has(dto.source)) {
+    if (!this.unrestrictedEmailSendingAgencies.has(dto.agencyCode)) {
       recipients = recipients.filter((email) => {
         if (!this.emailAllowList.has(email)) {
           logger.info(`Skipped sending email to: ${email}`);
@@ -61,7 +57,7 @@ export class NotifyAllActorsOfFinalApplicationValidation
         {
           id: dto.id,
           recipients,
-          source: dto.source,
+          agencyCode: dto.agencyCode,
         },
         "Sending validation confirmation email skipped.",
       );
@@ -69,11 +65,12 @@ export class NotifyAllActorsOfFinalApplicationValidation
   }
 }
 
-const getSignature = (source: ApplicationSource): string => {
-  switch (source) {
-    case "BOULOGNE_SUR_MER":
+// Visible for testing.
+export const getSignature = (agencyCode: AgencyCode): string => {
+  switch (agencyCode) {
+    case "AMIE_BOULONAIS":
       return "L'équipe de l'AMIE du Boulonnais";
-    case "NARBONNE":
+    case "MLJ_GRAND_NARBONNE":
       return "L'équipe de la Mission Locale de Narbonne";
     default:
       return "L'immersion facile";
@@ -81,11 +78,11 @@ const getSignature = (source: ApplicationSource): string => {
 };
 
 // Visible for testing.
-export const getQuestionnaireUrl = (source: ApplicationSource): string => {
-  switch (source) {
-    case "BOULOGNE_SUR_MER":
+export const getQuestionnaireUrl = (agencyCode: AgencyCode): string => {
+  switch (agencyCode) {
+    case "AMIE_BOULONAIS":
       return "https://docs.google.com/document/d/1LLNoYByQzU6PXmOTN-MHbrhfOOglvTm1dBuzUzgesow/view";
-    case "NARBONNE":
+    case "MLJ_GRAND_NARBONNE":
       return "https://drive.google.com/file/d/1GP4JX21uF5RCBk8kbjWtgZjiBBHPYSFO/view";
     default:
       return "";
@@ -114,7 +111,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
         ? dto.sanitaryPreventionDescription
         : "non",
     individualProtection: dto.individualProtection ? "oui" : "non",
-    questionnaireUrl: getQuestionnaireUrl(dto.source),
-    signature: getSignature(dto.source),
+    questionnaireUrl: getQuestionnaireUrl(dto.agencyCode),
+    signature: getSignature(dto.agencyCode),
   };
 };

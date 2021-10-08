@@ -1,7 +1,5 @@
-import {
-  ApplicationSource,
-  ImmersionApplicationDto,
-} from "../../../../shared/ImmersionApplicationDto";
+import { AgencyCode } from "../../../../shared/agencies";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
@@ -13,14 +11,14 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
-    private readonly unrestrictedEmailSendingSources: Readonly<
-      Set<ApplicationSource>
+    private readonly unrestrictedEmailSendingAgencies: Readonly<
+      Set<AgencyCode>
     >,
   ) {}
 
   public async execute({
     id,
-    source,
+    agencyCode,
     mentor,
     mentorEmail,
     firstName,
@@ -34,7 +32,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
     );
 
     if (
-      this.unrestrictedEmailSendingSources.has(source) ||
+      this.unrestrictedEmailSendingAgencies.has(agencyCode) ||
       this.emailAllowList.has(mentorEmail)
     ) {
       await this.emailGateway.sendNewApplicationMentorConfirmation(
@@ -48,7 +46,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
       );
     } else {
       logger.info(
-        { id, mentorEmail, source },
+        { id, mentorEmail, agencyCode },
         "Sending mentor confirmation email skipped.",
       );
     }

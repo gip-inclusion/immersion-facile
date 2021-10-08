@@ -2,12 +2,12 @@ import { CustomClock } from "../../adapters/secondary/core/ClockImplementations"
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   InMemoryEmailGateway,
   TemplatedEmail,
 } from "../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryEventBus } from "../../adapters/secondary/InMemoryEventBus";
+import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   CreateNewEvent,
   EventBus,
@@ -20,17 +20,15 @@ import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/i
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
-import {
-  ApplicationSource,
-  ImmersionApplicationDto,
-} from "../../shared/ImmersionApplicationDto";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { AgencyCode } from "../../shared/agencies";
+import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
 import {
   expectEmailAdminNotificationMatchingImmersionApplication,
   expectEmailBeneficiaryConfirmationMatchingImmersionApplication,
   expectEmailFinalValidationConfirmationMatchingImmersionApplication,
   expectEmailMentorConfirmationMatchingImmersionApplication,
 } from "../../_testBuilders/emailAssertions";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 
 describe("Add immersionApplication Notifications, then checks the mails are sent (trigerred by events)", () => {
   let addDemandeImmersion: AddImmersionApplication;
@@ -49,7 +47,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
   let eventCrawler: BasicEventCrawler;
   let aSupervisorEmail: string;
   let emailAllowList: Set<string>;
-  let unrestrictedEmailSendingSources: Set<ApplicationSource>;
+  let unrestrictedEmailSendingAgencies: Set<AgencyCode>;
   let sentEmails: TemplatedEmail[];
 
   beforeEach(() => {
@@ -79,19 +77,19 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       validDemandeImmersion.email,
       validDemandeImmersion.mentorEmail,
     ]);
-    unrestrictedEmailSendingSources = new Set();
+    unrestrictedEmailSendingAgencies = new Set();
 
     confirmToBeneficiary =
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
         emailGw,
         emailAllowList,
-        unrestrictedEmailSendingSources,
+        unrestrictedEmailSendingAgencies,
       );
 
     confirmToMentor = new ConfirmToMentorThatApplicationCorrectlySubmitted(
       emailGw,
       emailAllowList,
-      unrestrictedEmailSendingSources,
+      unrestrictedEmailSendingAgencies,
     );
 
     notifyToTeam = new NotifyToTeamApplicationSubmittedByBeneficiary(
@@ -156,13 +154,14 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
     const counsellorEmail = "counsellor@email.fr";
     const counsellorEmails = {
-      [demandeImmersionInReview.source]: [counsellorEmail],
-    } as Record<ApplicationSource, string[]>;
+      [demandeImmersionInReview.agencyCode]: [counsellorEmail],
+    } as Record<AgencyCode, string[]>;
+
     const sendConventionToAllActors =
       new NotifyAllActorsOfFinalApplicationValidation(
         emailGw,
         emailAllowList,
-        unrestrictedEmailSendingSources,
+        unrestrictedEmailSendingAgencies,
         counsellorEmails,
       );
 
@@ -180,7 +179,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);
 
-    unrestrictedEmailSendingSources.add(demandeImmersionInReview.source);
+    unrestrictedEmailSendingAgencies.add(demandeImmersionInReview.agencyCode);
 
     await sendConventionToAllActors.execute(demandeImmersionInReview);
 

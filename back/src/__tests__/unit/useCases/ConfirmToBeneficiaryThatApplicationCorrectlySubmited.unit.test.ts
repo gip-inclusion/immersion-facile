@@ -1,16 +1,14 @@
-import { expectEmailBeneficiaryConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
-import {
-  ApplicationSource,
-  ImmersionApplicationDto,
-} from "../../../shared/ImmersionApplicationDto";
+import { AgencyCode } from "../../../shared/agencies";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
+import { expectEmailBeneficiaryConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
+import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 
 describe("Add immersionApplication Notifications", () => {
   let emailGw: InMemoryEmailGateway;
   let allowList: Set<string>;
-  let unrestrictedEmailSendingSources: Set<ApplicationSource>;
+  let unrestrictedEmailSendingAgencies: Set<AgencyCode>;
 
   const validImmersionApplication: ImmersionApplicationDto =
     new ImmersionApplicationEntityBuilder().build().toDto();
@@ -19,16 +17,16 @@ describe("Add immersionApplication Notifications", () => {
     new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
       emailGw,
       allowList,
-      unrestrictedEmailSendingSources,
+      unrestrictedEmailSendingAgencies,
     );
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
     allowList = new Set();
-    unrestrictedEmailSendingSources = new Set();
+    unrestrictedEmailSendingAgencies = new Set();
   });
 
-  test("Sends no emails when allowList and unrestrictedEmailSendingSources is empty", async () => {
+  test("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
     await createUseCase().execute(validImmersionApplication);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
@@ -47,8 +45,8 @@ describe("Add immersionApplication Notifications", () => {
     );
   });
 
-  test("Sends confirmation email when application source in unrestrictedEmailSendingSources", async () => {
-    unrestrictedEmailSendingSources.add(validImmersionApplication.source);
+  test("Sends confirmation email when agency code in unrestrictedEmailSendingAgencies", async () => {
+    unrestrictedEmailSendingAgencies.add(validImmersionApplication.agencyCode);
 
     await createUseCase().execute(validImmersionApplication);
 
