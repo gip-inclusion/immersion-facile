@@ -1,9 +1,14 @@
+import { generateJwt } from "./../../domain/auth/jwt";
 import { validateDemandeRoute } from "./../../shared/routes";
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
 import { immersionApplicationsRoute } from "../../shared/routes";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import {
+  createMagicLinkPayload,
+  Role,
+} from "../../shared/tokens/MagicLinkPayload";
 
 describe("/demandes-immersion route", () => {
   let request: SuperTest<Test>;
@@ -49,7 +54,8 @@ describe("/demandes-immersion route", () => {
 
         // Getting the application succeeds and shows that it's validated.
         await request
-          .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
+          .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+          .auth("e2e_tests", "e2e")
           .expect("Content-Type", /json/)
           .expect(200, validatedDemandeImmersion);
       });
@@ -61,7 +67,8 @@ describe("/demandes-immersion route", () => {
 
         // Getting the application succeeds and shows that it's NOT validated.
         await request
-          .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
+          .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+          .auth("e2e_tests", "e2e")
           .expect("Content-Type", /json/)
           .expect(200, demandeImmersion);
       });
@@ -74,7 +81,8 @@ describe("/demandes-immersion route", () => {
 
         // Getting the application succeeds and shows that it's NOT validated.
         await request
-          .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
+          .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+          .auth("e2e_tests", "e2e")
           .expect("Content-Type", /json/)
           .expect(200, demandeImmersion);
       });
@@ -87,7 +95,8 @@ describe("/demandes-immersion route", () => {
 
         // Getting the existing application succeeds and shows that it's NOT validated.
         await request
-          .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
+          .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+          .auth("e2e_tests", "e2e")
           .expect("Content-Type", /json/)
           .expect(200, demandeImmersion);
       });
@@ -132,7 +141,8 @@ describe("/demandes-immersion route", () => {
 
       // GETting the created application succeeds.
       await request
-        .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
+        .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+        .auth("e2e_tests", "e2e")
         .expect("Content-Type", /json/)
         .expect(200, demandeImmersion);
     });
@@ -155,6 +165,61 @@ describe("/demandes-immersion route", () => {
         .expect(404);
     });
 
+    describe("Getting an application", () => {
+      let demandeImmersion = new ImmersionApplicationDtoBuilder().build();
+
+      beforeEach(async () => {
+        // GET /demandes-immersion returns an empty list.
+        await request
+          .get(`/${immersionApplicationsRoute}`)
+          .auth("e2e_tests", "e2e")
+          .expect("Content-Type", /json/)
+          .expect(200, []);
+
+        // POSTing a valid application succeeds.
+        await request
+          .post(`/${immersionApplicationsRoute}`)
+          .send(demandeImmersion)
+          .expect("Content-Type", /json/)
+          .expect(200, { id: demandeImmersion.id });
+      });
+
+      it("succeeds with correct magic link", async () => {
+        const payload = {
+          applicationId: demandeImmersion.id,
+          roles: ["beneficiary" as Role],
+          iat: Math.round(Date.now() / 1000),
+          exp: Math.round(Date.now() / 1000) + 31 * 24 * 3600,
+          name: "Bobby",
+        };
+        const jwt = generateJwt(payload);
+
+        // GETting the created application succeeds.
+        await request
+          .get(`/${immersionApplicationsRoute}/${jwt}`)
+          .expect("Content-Type", /json/)
+          .expect(200, demandeImmersion);
+      });
+
+      it("fails with expired magic link", async () => {
+        const payload = createMagicLinkPayload(
+          demandeImmersion.id,
+          "beneficiary",
+          1,
+          undefined,
+          undefined,
+          Math.round(Date.now() / 1000) - 2 * 24 * 3600,
+        );
+        const jwt = generateJwt(payload);
+
+        // GETting the created application fails due to token being expired.
+        await request
+          .get(`/${immersionApplicationsRoute}/${jwt}`)
+          .expect("Content-Type", /json/)
+          .expect(403);
+      });
+    });
+
     it("Updating an existing application succeeds", async () => {
       const demandeImmersion = new ImmersionApplicationDtoBuilder().build();
 
@@ -170,22 +235,36 @@ describe("/demandes-immersion route", () => {
         ...demandeImmersion,
         email: "new@email.fr",
       };
+
+      const link = generateJwt(
+        createMagicLinkPayload(demandeImmersion.id, "beneficiary"),
+      );
+
       await request
-        .post(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
+        .post(`/${immersionApplicationsRoute}/${link}`)
         .send(updatedDemandeImmersion)
         .expect("Content-Type", /json/)
-        .expect(200, { id: demandeImmersion.id });
+        .expect(200);
 
       // GETting the updated application succeeds.
       await request
-        .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
+        .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+        .auth("e2e_tests", "e2e")
         .expect("Content-Type", /json/)
         .expect(200, updatedDemandeImmersion);
     });
 
     it("Fetching unknown application IDs fails with 404 Not Found", async () => {
+      const link = generateJwt(
+        createMagicLinkPayload("unknown-demande-immersion-id", "beneficiary"),
+      );
+      await request.get(`/${immersionApplicationsRoute}/${link}`).expect(404);
+
       await request
-        .get(`/${immersionApplicationsRoute}/unknown-demande-immersion-id`)
+        .get(
+          `/${immersionApplicationsRoute}/admin/unknown-demande-immersion-id`,
+        )
+        .auth("e2e_tests", "e2e")
         .expect(404);
     });
 
@@ -194,8 +273,13 @@ describe("/demandes-immersion route", () => {
       const demandeImmersionWithUnknownId = new ImmersionApplicationDtoBuilder()
         .withId(unknownId)
         .build();
+
+      const link = generateJwt(
+        createMagicLinkPayload(unknownId, "beneficiary"),
+      );
+
       await request
-        .post(`/${immersionApplicationsRoute}/${unknownId}`)
+        .post(`/${immersionApplicationsRoute}/${link}`)
         .send(demandeImmersionWithUnknownId)
         .expect(404);
     });
@@ -303,7 +387,8 @@ describe("/demandes-immersion route", () => {
 
       // GETting the created application succeeds.
       await request
-        .get(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
+        .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+        .auth("e2e_tests", "e2e")
         .expect(200, demandeImmersion);
     });
 
@@ -318,14 +403,14 @@ describe("/demandes-immersion route", () => {
         .send(demandeImmersion)
         .expect(200);
 
-      // POSTing a valid application returns 404 Not Found.
+      // POSTing a valid application returns 403 Not Authorized because id is not a jwt.
       await request
         .post(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .send({
           ...demandeImmersion,
           email: "another@email.fr",
         })
-        .expect(404);
+        .expect(403);
     });
   });
 });

@@ -29,22 +29,6 @@ export const createMagicLinkRouter = (config: AppConfig) => {
   authenticatedRouter.use("/:jwt", authMiddleware);
 
   authenticatedRouter
-    .use(`/:jwt`, authMiddleware)
-    .route(`/:jwt/auth-test`)
-    .get(async (req, res) => {
-      console.log("Payload : ", req.jwtPayload);
-      res.json({ yolo: "reached here  !" });
-    });
-
-  authenticatedRouter
-    .route(`/${immersionApplicationsRoute}`)
-    .get(async (req, res) => {
-      sendHttpResponse(req, res, () =>
-        config.useCases.listDemandeImmersion.execute(),
-      );
-    });
-
-  authenticatedRouter
     .route(`/${immersionApplicationsRoute}/:jwt`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
@@ -57,9 +41,6 @@ export const createMagicLinkRouter = (config: AppConfig) => {
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
-        console.log("XXXXXX11111");
-        console.log(req.jwtPayload);
-        console.log(req.body);
         return callUseCase({
           useCase: config.useCases.updateDemandeImmersion,
           validationSchema: updateImmersionApplicationRequestDtoSchema,
