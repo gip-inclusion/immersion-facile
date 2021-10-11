@@ -21,8 +21,8 @@ import { ValidateImmersionApplication } from "../../domain/immersionApplication/
 import { AddImmersionOffer } from "../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
-import { AgencyCode, agencyCodeFromString } from "../../shared/agencies";
 import { FeatureFlags } from "../../shared/featureFlags";
+import { createLogger } from "../../utils/logger";
 import {
   genericApplicationDataConverter,
   legacyApplicationDataConverter,
@@ -45,16 +45,19 @@ import {
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import {
+  createAgencyConfigsFromEnv,
+  InMemoryAgencyRepository,
+} from "../secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
 import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryImmersionOfferRepository } from "../secondary/InMemoryImmersionOfferRepository";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
+import { PoleEmploiAccessTokenGateway } from "../secondary/PoleEmploiAccessTokenGateway";
+import { PoleEmploiRomeGateway } from "../secondary/PoleEmploiRomeGateway";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import { createLogger } from "./../../utils/logger";
-import { PoleEmploiAccessTokenGateway } from "./../secondary/PoleEmploiAccessTokenGateway";
-import { PoleEmploiRomeGateway } from "./../secondary/PoleEmploiRomeGateway";
 
 const logger = createLogger(__filename);
 const useAirtable = (): boolean => {
@@ -137,6 +140,9 @@ const createRepositories = (featureFlags: FeatureFlags) => {
           immersionOfferDataConverter,
         )
       : new InMemoryImmersionOfferRepository(),
+    agency: new InMemoryAgencyRepository(
+      createAgencyConfigsFromEnv(process.env),
+    ),
 
     sirene:
       process.env.SIRENE_REPOSITORY === "HTTPS"
@@ -198,29 +204,6 @@ const fail = (message: string) => {
 };
 
 const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
-  const supervisorEmail = process.env.SUPERVISOR_EMAIL;
-  if (!supervisorEmail) {
-    logger.warn(
-      "No SUPERVISOR_EMAIL specified. Disabling the sending of supervisor emails.",
-    );
-  }
-
-  const unrestrictedEmailSendingAgencies: Readonly<Set<AgencyCode>> = new Set(
-    (process.env.UNRESTRICTED_EMAIL_SENDING_AGENCIES || "")
-      .split(",")
-      .filter((el) => !!el)
-      .map(agencyCodeFromString)
-      .filter((agencyCode) => agencyCode !== "_UNKNOWN"),
-  );
-  logger.debug(
-    {
-      unrestrictedEmailSendingAgencies: Array.from(
-        unrestrictedEmailSendingAgencies,
-      ),
-    },
-    "UNRESTRICTED_EMAIL_SENDING_AGENCIES",
-  );
-
   const emailAllowList: Readonly<Set<string>> = new Set(
     (process.env.EMAIL_ALLOW_LIST || "").split(",").filter((el) => !!el),
   );
@@ -234,22 +217,6 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
       "restricted email sending.",
     );
   }
-
-  // Format: COUNSELLOR_EMAILS=<agencyCode>:<email>,<agencyCode>:<email>,...
-  const counsellorEmails: Record<AgencyCode, string[]> = (
-    process.env.COUNSELLOR_EMAILS || ""
-  )
-    .split(",")
-    .filter((el) => !!el)
-    .reduce((acc, el) => {
-      const [str, email] = el.split(":", 2);
-      const agencyCode = agencyCodeFromString(str);
-      return {
-        ...acc,
-        [agencyCode]: [...(acc[agencyCode] || []), email],
-      };
-    }, {} as Record<AgencyCode, string[]>);
-  logger.debug({ counsellorEmails: counsellorEmails }, "COUNSELLOR_EMAILS");
 
   return {
     addDemandeImmersion: new AddImmersionApplication(
@@ -295,25 +262,24 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
         repositories.email,
         emailAllowList,
-        unrestrictedEmailSendingAgencies,
+        repositories.agency,
       ),
     confirmToMentorThatApplicationCorrectlySubmitted:
       new ConfirmToMentorThatApplicationCorrectlySubmitted(
         repositories.email,
         emailAllowList,
-        unrestrictedEmailSendingAgencies,
+        repositories.agency,
       ),
     notifyAllActorsOfFinalApplicationValidation:
       new NotifyAllActorsOfFinalApplicationValidation(
         repositories.email,
         emailAllowList,
-        unrestrictedEmailSendingAgencies,
-        counsellorEmails,
+        repositories.agency,
       ),
     notifyToTeamApplicationSubmittedByBeneficiary:
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         repositories.email,
-        supervisorEmail,
+        repositories.agency,
       ),
   };
 };

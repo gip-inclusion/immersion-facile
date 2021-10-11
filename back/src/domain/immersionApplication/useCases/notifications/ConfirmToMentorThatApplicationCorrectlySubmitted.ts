@@ -1,7 +1,7 @@
-import { AgencyCode } from "../../../../shared/agencies";
 import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
+import { AgencyRepository } from "../../ports/AgencyConfigRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
 
 const logger = createLogger(__filename);
@@ -11,9 +11,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
-    private readonly unrestrictedEmailSendingAgencies: Readonly<
-      Set<AgencyCode>
-    >,
+    private readonly agencyRepository: AgencyRepository,
   ) {}
 
   public async execute({
@@ -31,8 +29,15 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted
       "------------- Entering execute.",
     );
 
+    const agencyConfig = await this.agencyRepository.getConfig(agencyCode);
+    if (!agencyConfig) {
+      throw new Error(
+        `Unable to send mail. No agency config found for ${agencyCode}`,
+      );
+    }
+
     if (
-      this.unrestrictedEmailSendingAgencies.has(agencyCode) ||
+      agencyConfig.allowUnrestrictedEmailSending ||
       this.emailAllowList.has(mentorEmail)
     ) {
       await this.emailGateway.sendNewApplicationMentorConfirmation(

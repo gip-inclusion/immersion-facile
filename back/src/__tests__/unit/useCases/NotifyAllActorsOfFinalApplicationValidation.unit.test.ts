@@ -1,18 +1,20 @@
+import {
+  AgencyConfigs,
+  InMemoryAgencyRepository,
+} from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { ValidatedApplicationFinalConfirmationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
 import {
-  getQuestionnaireUrl,
-  getSignature,
   getValidatedApplicationFinalConfirmationParams,
   NotifyAllActorsOfFinalApplicationValidation,
 } from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { AgencyCode } from "../../../shared/agencies";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { LegacyScheduleDto } from "../../../shared/ScheduleSchema";
 import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "../../../shared/ScheduleUtils";
+import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
@@ -25,32 +27,33 @@ const counsellorEmail = "counsellor@email.fr";
 describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   let emailGw: InMemoryEmailGateway;
   let allowList: Set<string>;
-  let unrestrictedEmailSendingAgencies: Set<AgencyCode>;
-  let counsellorEmails: Record<AgencyCode, string[]>;
-  let sendConventionToAllActors: NotifyAllActorsOfFinalApplicationValidation;
+  let agencyConfigs: AgencyConfigs;
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
     allowList = new Set();
-    unrestrictedEmailSendingAgencies = new Set();
-    counsellorEmails = {} as Record<AgencyCode, string[]>;
-    sendConventionToAllActors = new NotifyAllActorsOfFinalApplicationValidation(
-      emailGw,
-      allowList,
-      unrestrictedEmailSendingAgencies,
-      counsellorEmails,
-    );
+    agencyConfigs = {
+      [validDemandeImmersion.agencyCode]: AgencyConfigBuilder.empty().build(),
+    };
   });
 
-  test("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
-    await sendConventionToAllActors.execute(validDemandeImmersion);
+  const createUseCase = () => {
+    return new NotifyAllActorsOfFinalApplicationValidation(
+      emailGw,
+      allowList,
+      new InMemoryAgencyRepository(agencyConfigs),
+    );
+  };
+
+  test("Sends no emails when allowList is empty unrestriced email sending is disabled", async () => {
+    await createUseCase().execute(validDemandeImmersion);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
 
   test("Sends confirmation email to beneficiary when on allowList", async () => {
     allowList.add(validDemandeImmersion.email);
 
-    await sendConventionToAllActors.execute(validDemandeImmersion);
+    await createUseCase().execute(validDemandeImmersion);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -58,6 +61,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [validDemandeImmersion.email],
       sentEmails[0],
+      agencyConfigs[validDemandeImmersion.agencyCode],
       validDemandeImmersion,
     );
   });
@@ -65,7 +69,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   test("Sends confirmation email to mentor when on allowList", async () => {
     allowList.add(validDemandeImmersion.mentorEmail);
 
-    await sendConventionToAllActors.execute(validDemandeImmersion);
+    await createUseCase().execute(validDemandeImmersion);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -73,15 +77,19 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [validDemandeImmersion.mentorEmail],
       sentEmails[0],
+      agencyConfigs[validDemandeImmersion.agencyCode],
       validDemandeImmersion,
     );
   });
 
   test("Sends confirmation email to counsellor when on allowList", async () => {
-    counsellorEmails[validDemandeImmersion.agencyCode] = [counsellorEmail];
+    agencyConfigs[validDemandeImmersion.agencyCode] =
+      AgencyConfigBuilder.empty()
+        .withCounsellorEmails([counsellorEmail])
+        .build();
     allowList.add(counsellorEmail);
 
-    await sendConventionToAllActors.execute(validDemandeImmersion);
+    await createUseCase().execute(validDemandeImmersion);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -89,17 +97,21 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [counsellorEmail],
       sentEmails[0],
+      agencyConfigs[validDemandeImmersion.agencyCode],
       validDemandeImmersion,
     );
   });
 
   test("Sends confirmation email to beneficiary, mentor, and counsellor when on allowList", async () => {
-    counsellorEmails[validDemandeImmersion.agencyCode] = [counsellorEmail];
+    agencyConfigs[validDemandeImmersion.agencyCode] =
+      AgencyConfigBuilder.empty()
+        .withCounsellorEmails([counsellorEmail])
+        .build();
     allowList.add(counsellorEmail);
     allowList.add(validDemandeImmersion.email);
     allowList.add(validDemandeImmersion.mentorEmail);
 
-    await sendConventionToAllActors.execute(validDemandeImmersion);
+    await createUseCase().execute(validDemandeImmersion);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -111,15 +123,18 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         counsellorEmail,
       ],
       sentEmails[0],
+      agencyConfigs[validDemandeImmersion.agencyCode],
       validDemandeImmersion,
     );
   });
 
-  test("Sends confirmation email to beneficiary, mentor, and counsellor for unrestrictedEmailSendingAgencies", async () => {
-    counsellorEmails[validDemandeImmersion.agencyCode] = [counsellorEmail];
-    unrestrictedEmailSendingAgencies.add(validDemandeImmersion.agencyCode);
-
-    await sendConventionToAllActors.execute(validDemandeImmersion);
+  test("Sends confirmation email to beneficiary, mentor, and counsellor when unrestricted email sending is allowed", async () => {
+    agencyConfigs[validDemandeImmersion.agencyCode] =
+      AgencyConfigBuilder.empty()
+        .withCounsellorEmails([counsellorEmail])
+        .allowUnrestrictedEmailSending()
+        .build();
+    await createUseCase().execute(validDemandeImmersion);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -131,12 +146,18 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         counsellorEmail,
       ],
       sentEmails[0],
+      agencyConfigs[validDemandeImmersion.agencyCode],
       validDemandeImmersion,
     );
   });
 });
 
 describe("getValidatedApplicationFinalConfirmationParams", () => {
+  const agencyConfig = AgencyConfigBuilder.empty()
+    .withQuestionnaireUrl("testQuestionnaireUrl")
+    .withSignature("testSignature")
+    .build();
+
   test("simple application", () => {
     const application = new ImmersionApplicationDtoBuilder()
       .withImmersionAddress("immersionAddress")
@@ -158,43 +179,13 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       immersionActivities: application.immersionActivities,
       sanitaryPrevention: "sanitaryPreventionDescription",
       individualProtection: "oui",
-      questionnaireUrl: getQuestionnaireUrl(application.agencyCode),
-      signature: getSignature(application.agencyCode),
+      questionnaireUrl: agencyConfig.questionnaireUrl,
+      signature: agencyConfig.signature,
     };
 
-    expect(getValidatedApplicationFinalConfirmationParams(application)).toEqual(
-      expectedParams,
-    );
-  });
-
-  test("AMIE_BOULONAIS application", () => {
-    const application = new ImmersionApplicationDtoBuilder()
-      .withAgencyCode("AMIE_BOULONAIS")
-      .build();
-
-    const actualParms =
-      getValidatedApplicationFinalConfirmationParams(application);
-
-    expect(actualParms.questionnaireUrl).toEqual(
-      getQuestionnaireUrl("AMIE_BOULONAIS"),
-    );
-    expect(actualParms.signature).toEqual("L'équipe de l'AMIE du Boulonnais");
-  });
-
-  test("MLJ_GRAND_NARBONNE application", () => {
-    const application = new ImmersionApplicationDtoBuilder()
-      .withAgencyCode("MLJ_GRAND_NARBONNE")
-      .build();
-
-    const actualParms =
-      getValidatedApplicationFinalConfirmationParams(application);
-
-    expect(actualParms.questionnaireUrl).toEqual(
-      getQuestionnaireUrl("MLJ_GRAND_NARBONNE"),
-    );
-    expect(actualParms.signature).toEqual(
-      "L'équipe de la Mission Locale de Narbonne",
-    );
+    expect(
+      getValidatedApplicationFinalConfirmationParams(agencyConfig, application),
+    ).toEqual(expectedParams);
   });
 
   test("prioritizes legacy schedule when available", () => {
@@ -206,8 +197,10 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .withLegacySchedule(legacySchedule)
       .build();
 
-    const actualParms =
-      getValidatedApplicationFinalConfirmationParams(application);
+    const actualParms = getValidatedApplicationFinalConfirmationParams(
+      agencyConfig,
+      application,
+    );
 
     expect(actualParms.scheduleText).toEqual(
       prettyPrintLegacySchedule(legacySchedule),
@@ -219,8 +212,10 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .withSanitaryPrevention(false)
       .build();
 
-    const actualParms =
-      getValidatedApplicationFinalConfirmationParams(application);
+    const actualParms = getValidatedApplicationFinalConfirmationParams(
+      agencyConfig,
+      application,
+    );
 
     expect(actualParms.sanitaryPrevention).toEqual("non");
   });
@@ -230,8 +225,10 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .withIndividualProtection(false)
       .build();
 
-    const actualParms =
-      getValidatedApplicationFinalConfirmationParams(application);
+    const actualParms = getValidatedApplicationFinalConfirmationParams(
+      agencyConfig,
+      application,
+    );
 
     expect(actualParms.individualProtection).toEqual("non");
   });

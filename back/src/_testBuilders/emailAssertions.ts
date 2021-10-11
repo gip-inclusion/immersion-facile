@@ -1,21 +1,22 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
+import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyConfigRepository";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
   email: TemplatedEmail,
   params: {
-    recipient: string;
+    recipients: string[];
     immersionApplication: ImmersionApplicationDto;
   },
 ) => {
-  const { recipient, immersionApplication } = params;
+  const { recipients, immersionApplication } = params;
   const { id, firstName, lastName, dateStart, dateEnd, businessName } =
     immersionApplication;
 
   expect(email).toEqual({
     type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
-    recipients: [recipient],
+    recipients: recipients,
     params: {
       demandeId: id,
       firstName,
@@ -66,12 +67,18 @@ export const expectEmailFinalValidationConfirmationMatchingImmersionApplication 
   (
     recipients: string[],
     templatedEmail: TemplatedEmail,
+    agencyConfig: AgencyConfig | undefined,
     immersionApplication: ImmersionApplicationDto,
   ) => {
+    if (!agencyConfig) {
+      fail("missing agency config");
+    }
     expect(templatedEmail).toEqual({
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
       recipients,
-      params:
-        getValidatedApplicationFinalConfirmationParams(immersionApplication),
+      params: getValidatedApplicationFinalConfirmationParams(
+        agencyConfig,
+        immersionApplication,
+      ),
     });
   };
