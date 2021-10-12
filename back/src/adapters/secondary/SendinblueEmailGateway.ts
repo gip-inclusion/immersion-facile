@@ -12,17 +12,17 @@ import { createLogger } from "./../../utils/logger";
 const logger = createLogger(__filename);
 
 const emailTypeToTemplateId: Record<EmailType, number> = {
-  // https://my.sendinblue.com/camp/template/3/message-setup
-  NEW_APPLICATION_ADMIN_NOTIFICATION: 3,
+  // https://my.sendinblue.com/camp/template/10/message-setup
+  NEW_APPLICATION_ADMIN_NOTIFICATION: 10, // v2
 
   // https://my.sendinblue.com/camp/template/4/message-setup
-  NEW_APPLICATION_BENEFICIARY_CONFIRMATION: 4,
+  NEW_APPLICATION_BENEFICIARY_CONFIRMATION: 4, // v1
 
   // https://my.sendinblue.com/camp/template/5/message-setup
-  NEW_APPLICATION_MENTOR_CONFIRMATION: 5,
+  NEW_APPLICATION_MENTOR_CONFIRMATION: 5, // v1
 
   // https://my.sendinblue.com/camp/template/6/message-setup
-  VALIDATED_APPLICATION_FINAL_CONFIRMATION: 6,
+  VALIDATED_APPLICATION_FINAL_CONFIRMATION: 6, // v1
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -87,6 +87,7 @@ export class SendinblueEmailGateway implements EmailGateway {
       DATE_START: params.dateStart,
       DATE_END: params.dateEnd,
       BUSINESS_NAME: params.businessName,
+      AGENCY_NAME: params.agencyName,
     };
     this.sendTransacEmail(sibEmail);
   }

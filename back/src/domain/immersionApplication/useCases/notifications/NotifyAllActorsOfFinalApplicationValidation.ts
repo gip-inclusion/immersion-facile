@@ -1,17 +1,17 @@
 import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import {
   prettyPrintLegacySchedule,
-  prettyPrintSchedule
+  prettyPrintSchedule,
 } from "../../../../shared/ScheduleUtils";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import {
   AgencyConfig,
-  AgencyRepository
+  AgencyRepository,
 } from "../../ports/AgencyConfigRepository";
 import {
   EmailGateway,
-  ValidatedApplicationFinalConfirmationParams
+  ValidatedApplicationFinalConfirmationParams,
 } from "../../ports/EmailGateway";
 
 const logger = createLogger(__filename);

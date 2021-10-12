@@ -6,6 +6,7 @@ export const agencyCodes = {
   _UNKNOWN: "Unknown",
   AMIE_BOULONAIS: "AMIE du Boulonnais",
   MLJ_GRAND_NARBONNE: "Mission Locale Jeunes du Grand Narbonne",
+  ML_PARIS_SOLEIL: "Site Soleil - Mission Locale de Paris",
 };
 
 export const validAgencyCodes = Object.keys(agencyCodes).filter(

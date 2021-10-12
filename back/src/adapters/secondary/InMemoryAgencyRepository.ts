@@ -38,15 +38,12 @@ export const createAgencyConfigsFromEnv = (env: ProcessEnv): AgencyConfigs => {
     (acc, agencyCode) => ({
       ...acc,
       [agencyCode]: {
-        adminEmails: adminEmails || [],
-        counsellorEmails: counsellorEmails
-          ? counsellorEmails[agencyCode] || []
-          : [],
+        adminEmails: adminEmails,
+        counsellorEmails: counsellorEmails[agencyCode] ?? [],
         allowUnrestrictedEmailSending:
-          unrestrictedEmailSendingAgencies &&
           unrestrictedEmailSendingAgencies.has(agencyCode),
-        questionnaireUrl: questionnaireUrls[agencyCode],
-        signature: signatures[agencyCode],
+        questionnaireUrl: questionnaireUrls[agencyCode] ?? "",
+        signature: signatures[agencyCode] ?? "",
       },
     }),
     {},
@@ -84,7 +81,7 @@ const parseEmailsByAgencyCode = (
   return parseStringList(str).reduce<EmailsByAgencyCode>((acc, el) => {
     const [str, email] = el.split(":", 2);
     const agencyCode = agencyCodeFromString(str);
-    if (agencyCode === "_UNKNOWN") return acc;
+    if (agencyCode === "_UNKNOWN" || !email) return acc;
     return {
       ...acc,
       [agencyCode]: [...(acc[agencyCode] || []), email],

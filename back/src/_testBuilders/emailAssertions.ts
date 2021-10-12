@@ -1,6 +1,7 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
 import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyConfigRepository";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { agencyCodes } from "../shared/agencies";
 import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
@@ -11,8 +12,15 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
   },
 ) => {
   const { recipients, immersionApplication } = params;
-  const { id, firstName, lastName, dateStart, dateEnd, businessName } =
-    immersionApplication;
+  const {
+    id,
+    firstName,
+    lastName,
+    dateStart,
+    dateEnd,
+    businessName,
+    agencyCode,
+  } = immersionApplication;
 
   expect(email).toEqual({
     type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
@@ -24,6 +32,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
       dateStart,
       dateEnd,
       businessName,
+      agencyName: agencyCodes[agencyCode],
     },
   });
 };
