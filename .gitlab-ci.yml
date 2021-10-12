@@ -78,7 +78,7 @@ deploy_on_dev:
       git checkout dev &&
       git fetch &&
       git reset --hard origin/dev;
-      retVal = $?;
+      retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Source code fetch failed. Aborting.\";
         exit $retVal;
@@ -97,7 +97,7 @@ deploy_on_dev:
       fi;
 
       docker-compose down && docker-compose up -d;
-      retVal = $?;
+      retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Server restart failed. Aborting.\";
         exit $retVal;
@@ -128,7 +128,7 @@ deploy_on_beta:
       git checkout beta &&
       git fetch &&
       git reset --hard origin/beta;
-      retVal = $?;
+      retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Source code fetch failed. Aborting.\";
         exit $retVal;
@@ -147,6 +147,7 @@ deploy_on_beta:
       fi;
 
       docker-compose down && docker-compose up -d;
+      retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Server restart failed. Aborting.\";
         exit $retVal;
@@ -177,7 +178,7 @@ deploy_on_prod:
       git checkout main &&
       git fetch &&
       git reset --hard origin/main;
-      retVal = $?;
+      retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Source code fetch failed. Aborting.\";
         exit $retVal;
@@ -191,11 +192,17 @@ deploy_on_prod:
       retVal=$?;
       rm -f .env;
       if [ $retVal -ne 0 ]; then;
-        echo \"FATAL:Server restart failed. Aborting.\";
+        echo \"FATAL:Docker image creation failed. Aborting.\";
         exit $retVal;
       fi;
 
       docker-compose down && docker-compose up -d;
+      retVal=$?;
+      if [ $retVal -ne 0 ]; then;
+        echo \"FATAL:Server restart failed. Aborting.\";
+        exit $retVal;
+      fi;
+
       sleep 60;
       echo \"Checking server health...\";
       curl --silent --fail --output /dev/null http://localhost:80/api/"
