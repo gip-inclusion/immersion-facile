@@ -22,7 +22,8 @@ import {
 const prefix = "api";
 
 export class HttpImmersionApplicationGateway
-  implements ImmersionApplicationGateway {
+  implements ImmersionApplicationGateway
+{
   public async add(
     demandeImmersionDto: ImmersionApplicationDto,
   ): Promise<string> {

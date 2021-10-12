@@ -89,7 +89,8 @@ const TEST_ESTABLISHMENT2 = {
 const SIMULATED_LATENCY_MS = 2000;
 
 export class InMemoryImmersionApplicationGateway
-  implements ImmersionApplicationGateway {
+  implements ImmersionApplicationGateway
+{
   private _demandesImmersion: { [id: string]: ImmersionApplicationDto } = {};
   private _establishments: { [siret: string]: Establishment } = {};
 

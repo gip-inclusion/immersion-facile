@@ -52,13 +52,8 @@ export const ApplicationFormFields = ({
   successInfos,
   enableAgencySelection,
 }: ApplicationFieldsProps) => {
-  const {
-    errors,
-    submitCount,
-    setFieldValue,
-    isSubmitting,
-    submitForm,
-  } = useFormikContext<ImmersionApplicationDto>();
+  const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
+    useFormikContext<ImmersionApplicationDto>();
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField(

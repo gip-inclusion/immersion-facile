@@ -35,7 +35,6 @@ describe("/demandes-immersion route", () => {
         await request
           .post(`/${immersionApplicationsRoute}`)
           .send(demandeImmersion)
-          .expect("Content-Type", /json/)
           .expect(200, { id: demandeImmersion.id });
       });
 
@@ -44,7 +43,6 @@ describe("/demandes-immersion route", () => {
         await request
           .get(`/${validateDemandeRoute}/${demandeImmersion.id}`)
           .auth("e2e_tests", "e2e")
-          .expect("Content-Type", /json/)
           .expect(200, { id: demandeImmersion.id });
 
         const validatedDemandeImmersion = {
@@ -54,9 +52,8 @@ describe("/demandes-immersion route", () => {
 
         // Getting the application succeeds and shows that it's validated.
         await request
-          .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+          .get(`/admin/${immersionApplicationsRoute}/${demandeImmersion.id}`)
           .auth("e2e_tests", "e2e")
-          .expect("Content-Type", /json/)
           .expect(200, validatedDemandeImmersion);
       });
 
@@ -67,9 +64,8 @@ describe("/demandes-immersion route", () => {
 
         // Getting the application succeeds and shows that it's NOT validated.
         await request
-          .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+          .get(`/admin/${immersionApplicationsRoute}/${demandeImmersion.id}`)
           .auth("e2e_tests", "e2e")
-          .expect("Content-Type", /json/)
           .expect(200, demandeImmersion);
       });
 
@@ -81,9 +77,8 @@ describe("/demandes-immersion route", () => {
 
         // Getting the application succeeds and shows that it's NOT validated.
         await request
-          .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+          .get(`/admin/${immersionApplicationsRoute}/${demandeImmersion.id}`)
           .auth("e2e_tests", "e2e")
-          .expect("Content-Type", /json/)
           .expect(200, demandeImmersion);
       });
 
@@ -95,9 +90,8 @@ describe("/demandes-immersion route", () => {
 
         // Getting the existing application succeeds and shows that it's NOT validated.
         await request
-          .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+          .get(`/admin/${immersionApplicationsRoute}/${demandeImmersion.id}`)
           .auth("e2e_tests", "e2e")
-          .expect("Content-Type", /json/)
           .expect(200, demandeImmersion);
       });
     });
@@ -129,21 +123,18 @@ describe("/demandes-immersion route", () => {
       await request
         .get(`/${immersionApplicationsRoute}`)
         .auth("e2e_tests", "e2e")
-        .expect("Content-Type", /json/)
         .expect(200, []);
 
       // POSTing a valid application succeeds.
       await request
         .post(`/${immersionApplicationsRoute}`)
         .send(demandeImmersion)
-        .expect("Content-Type", /json/)
         .expect(200, { id: demandeImmersion.id });
 
       // GETting the created application succeeds.
       await request
-        .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+        .get(`/admin/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .auth("e2e_tests", "e2e")
-        .expect("Content-Type", /json/)
         .expect(200, demandeImmersion);
     });
 
@@ -166,27 +157,25 @@ describe("/demandes-immersion route", () => {
     });
 
     describe("Getting an application", () => {
-      let demandeImmersion = new ImmersionApplicationDtoBuilder().build();
+      const immersionApplication = new ImmersionApplicationDtoBuilder().build();
 
       beforeEach(async () => {
         // GET /demandes-immersion returns an empty list.
         await request
           .get(`/${immersionApplicationsRoute}`)
           .auth("e2e_tests", "e2e")
-          .expect("Content-Type", /json/)
           .expect(200, []);
 
         // POSTing a valid application succeeds.
         await request
           .post(`/${immersionApplicationsRoute}`)
-          .send(demandeImmersion)
-          .expect("Content-Type", /json/)
-          .expect(200, { id: demandeImmersion.id });
+          .send(immersionApplication)
+          .expect(200, { id: immersionApplication.id });
       });
 
       it("succeeds with correct magic link", async () => {
         const payload = {
-          applicationId: demandeImmersion.id,
+          applicationId: immersionApplication.id,
           roles: ["beneficiary" as Role],
           iat: Math.round(Date.now() / 1000),
           exp: Math.round(Date.now() / 1000) + 31 * 24 * 3600,
@@ -196,14 +185,13 @@ describe("/demandes-immersion route", () => {
 
         // GETting the created application succeeds.
         await request
-          .get(`/${immersionApplicationsRoute}/${jwt}`)
-          .expect("Content-Type", /json/)
-          .expect(200, demandeImmersion);
+          .get(`/auth/${immersionApplicationsRoute}/${jwt}`)
+          .expect(200, immersionApplication);
       });
 
       it("fails with expired magic link", async () => {
         const payload = createMagicLinkPayload(
-          demandeImmersion.id,
+          immersionApplication.id,
           "beneficiary",
           1,
           undefined,
@@ -214,8 +202,7 @@ describe("/demandes-immersion route", () => {
 
         // GETting the created application fails due to token being expired.
         await request
-          .get(`/${immersionApplicationsRoute}/${jwt}`)
-          .expect("Content-Type", /json/)
+          .get(`/auth/${immersionApplicationsRoute}/${jwt}`)
           .expect(403);
       });
     });
@@ -227,7 +214,6 @@ describe("/demandes-immersion route", () => {
       await request
         .post(`/${immersionApplicationsRoute}`)
         .send(demandeImmersion)
-        .expect("Content-Type", /json/)
         .expect(200, { id: demandeImmersion.id });
 
       // POSTing an updated application to the same id succeeds.
@@ -241,16 +227,14 @@ describe("/demandes-immersion route", () => {
       );
 
       await request
-        .post(`/${immersionApplicationsRoute}/${link}`)
+        .post(`/auth/${immersionApplicationsRoute}/${link}`)
         .send(updatedDemandeImmersion)
-        .expect("Content-Type", /json/)
         .expect(200);
 
       // GETting the updated application succeeds.
       await request
-        .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+        .get(`/admin/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .auth("e2e_tests", "e2e")
-        .expect("Content-Type", /json/)
         .expect(200, updatedDemandeImmersion);
     });
 
@@ -262,7 +246,7 @@ describe("/demandes-immersion route", () => {
 
       await request
         .get(
-          `/${immersionApplicationsRoute}/admin/unknown-demande-immersion-id`,
+          `/admin/${immersionApplicationsRoute}/unknown-demande-immersion-id`,
         )
         .auth("e2e_tests", "e2e")
         .expect(404);
@@ -291,7 +275,6 @@ describe("/demandes-immersion route", () => {
       await request
         .post(`/${immersionApplicationsRoute}`)
         .send(demandeImmersion)
-        .expect("Content-Type", /json/)
         .expect(200, { id: demandeImmersion.id });
 
       // POSTing a another valid application with the same ID fails.
@@ -320,7 +303,6 @@ describe("/demandes-immersion route", () => {
       await request
         .get(`/${immersionApplicationsRoute}`)
         .auth("e2e_tests", "e2e")
-        .expect("Content-Type", /json/)
         .expect(200);
     });
   });
@@ -387,7 +369,7 @@ describe("/demandes-immersion route", () => {
 
       // GETting the created application succeeds.
       await request
-        .get(`/${immersionApplicationsRoute}/admin/${demandeImmersion.id}`)
+        .get(`/admin/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .auth("e2e_tests", "e2e")
         .expect(200, demandeImmersion);
     });
@@ -405,7 +387,7 @@ describe("/demandes-immersion route", () => {
 
       // POSTing a valid application returns 403 Not Authorized because id is not a jwt.
       await request
-        .post(`/${immersionApplicationsRoute}/${demandeImmersion.id}`)
+        .post(`/auth/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .send({
           ...demandeImmersion,
           email: "another@email.fr",

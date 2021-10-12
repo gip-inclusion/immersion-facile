@@ -243,40 +243,26 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             )}
             onSubmit={async (values, { setSubmitting }) => {
               try {
-                let application = immersionApplicationSchema.parse(values);
+                let immersionApplication = immersionApplicationSchema.parse(values);
 
                 if (!featureFlags.enableMagicLinks) {
-                  application = {
-                    ...application,
+                  immersionApplication = {
+                    ...immersionApplication,
                     status: "IN_REVIEW",
                   };
                 }
 
                 if (featureFlags.enableMagicLinks) {
-                  const updateExisting = currentJWT(route).length > 0;
-                  if (updateExisting) {
+                  const shouldUpdateExistingImmersionApplication = currentJWT(route).length > 0;
+                  if (shouldUpdateExistingImmersionApplication) {
                     await immersionApplicationGateway.updateML(
-                      application,
+                      immersionApplication,
                       currentJWT(route),
                     );
                   } else {
-                    const magicLinks = await immersionApplicationGateway.addML(
-                      application,
-                    );
-
-                    let newUrl: string | undefined = undefined;
-                    const queryParams = new URLSearchParams(
-                      window.location.search,
-                    );
-                    queryParams.set("jwt", magicLinks.magicLinkApplicant);
-                    history.replaceState(
-                      null,
-                      document.title,
-                      "?" + queryParams.toString(),
-                    );
-                    newUrl = window.location.href;
+                    await immersionApplicationGateway.add(immersionApplication)
                   }
-                  setInitialValues(application);
+                  setInitialValues(immersionApplication);
 
                   // TODO: change success message to show both new links
                   setSuccessInfos(createSuccessInfos(undefined));

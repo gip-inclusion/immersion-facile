@@ -87,21 +87,23 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   });
 
   const demandeImmersionRouter = Router({ mergeParams: true });
-  router.use(`/${immersionApplicationsRoute}`, demandeImmersionRouter);
+  router.use(`/admin`, demandeImmersionRouter);
 
-  demandeImmersionRouter.route(`/admin/:id`).get(async (req, res) =>
-    sendHttpResponse(
-      req,
-      res,
-      () =>
-        callUseCase({
-          useCase: config.useCases.getDemandeImmersion,
-          validationSchema: getImmersionApplicationRequestDtoSchema,
-          useCaseParams: req.params,
-        }),
-      config.authChecker,
-    ),
-  );
+  demandeImmersionRouter
+    .route(`/${immersionApplicationsRoute}/:id`)
+    .get(async (req, res) =>
+      sendHttpResponse(
+        req,
+        res,
+        () =>
+          callUseCase({
+            useCase: config.useCases.getDemandeImmersion,
+            validationSchema: getImmersionApplicationRequestDtoSchema,
+            useCaseParams: req.params,
+          }),
+        config.authChecker,
+      ),
+    );
 
   router.route(`/${immersionOffersRoute}`).post(async (req, res) =>
     sendHttpResponse(req, res, () =>
@@ -131,8 +133,18 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     }),
   );
 
+  router.route(`/${immersionApplicationsRoute}`).post(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      callUseCase({
+        useCase: config.useCases.addDemandeImmersionML,
+        validationSchema: immersionApplicationSchema,
+        useCaseParams: req.body,
+      }),
+    ),
+  );
+
   app.use(router);
-  app.use(createMagicLinkRouter(config));
+  app.use("/auth", createMagicLinkRouter(config));
 
   config.eventBus.subscribe(
     "ImmersionApplicationSubmittedByBeneficiary",

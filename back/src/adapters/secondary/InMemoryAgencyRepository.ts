@@ -1,11 +1,11 @@
 import {
   AgencyConfig,
-  AgencyRepository
+  AgencyRepository,
 } from "../../domain/immersionApplication/ports/AgencyConfigRepository";
 import {
   AgencyCode,
   agencyCodeFromString,
-  validAgencyCodes
+  validAgencyCodes,
 } from "../../shared/agencies";
 import { ProcessEnv } from "../../shared/envHelpers";
 import { createLogger } from "../../utils/logger";

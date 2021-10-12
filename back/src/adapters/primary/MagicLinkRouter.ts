@@ -13,19 +13,6 @@ import {
 export const createMagicLinkRouter = (config: AppConfig) => {
   const authenticatedRouter = Router({ mergeParams: true });
 
-  // Posting a new application doesn't require a JWT, so this is intentionally added before the auth middleware is plugged in
-  authenticatedRouter
-    .route(`/${immersionApplicationsRoute}`)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        callUseCase({
-          useCase: config.useCases.addDemandeImmersionML,
-          validationSchema: immersionApplicationSchema,
-          useCaseParams: req.body,
-        }),
-      ),
-    );
-
   authenticatedRouter.use("/:jwt", authMiddleware);
 
   authenticatedRouter
