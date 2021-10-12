@@ -80,7 +80,7 @@ deploy_on_dev:
       git reset --hard origin/dev;
       retVal = $?;
       if [ $retVal -ne 0 ]; then;
-        echo \"FATAL:Source code fetch failed. Aborting."\;
+        echo \"FATAL:Source code fetch failed. Aborting.\";
         exit $retVal;
       fi;
 
@@ -92,14 +92,14 @@ deploy_on_dev:
       retVal=$?;
       rm -f .env;
       if [ $retVal -ne 0 ]; then;
-        echo \"FATAL:Docker image creation failed. Aborting. \";
+        echo \"FATAL:Docker image creation failed. Aborting.\";
         exit $retVal;
       fi;
 
       docker-compose down && docker-compose up -d;
       retVal = $?;
       if [ $retVal -ne 0 ]; then;
-        echo \"FATAL:Server restart failed. Aborting."\;
+        echo \"FATAL:Server restart failed. Aborting.\";
         exit $retVal;
       fi;
 
@@ -130,7 +130,7 @@ deploy_on_beta:
       git reset --hard origin/beta;
       retVal = $?;
       if [ $retVal -ne 0 ]; then;
-        echo \"FATAL:Source code fetch failed. Aborting."\;
+        echo \"FATAL:Source code fetch failed. Aborting.\";
         exit $retVal;
       fi;
 
@@ -142,13 +142,13 @@ deploy_on_beta:
       retVal=$?;
       rm -f .env;
       if [ $retVal -ne 0 ]; then;
-        echo \"FATAL:Docker image creation failed. Aborting. \";
+        echo \"FATAL:Docker image creation failed. Aborting.\";
         exit $retVal;
       fi;
 
       docker-compose down && docker-compose up -d;
       if [ $retVal -ne 0 ]; then;
-        echo \"FATAL:Server restart failed. Aborting."\;
+        echo \"FATAL:Server restart failed. Aborting.\";
         exit $retVal;
       fi;
 
@@ -179,7 +179,7 @@ deploy_on_prod:
       git reset --hard origin/main;
       retVal = $?;
       if [ $retVal -ne 0 ]; then;
-        echo \"FATAL:Source code fetch failed. Aborting."\;
+        echo \"FATAL:Source code fetch failed. Aborting.\";
         exit $retVal;
       fi;
 
@@ -191,7 +191,7 @@ deploy_on_prod:
       retVal=$?;
       rm -f .env;
       if [ $retVal -ne 0 ]; then;
-        echo \"FATAL:Server restart failed. Aborting."\;
+        echo \"FATAL:Server restart failed. Aborting.\";
         exit $retVal;
       fi;
 
