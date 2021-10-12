@@ -78,7 +78,7 @@ deploy_on_dev:
       git checkout dev &&
       git fetch &&
       git reset --hard origin/dev;
-      retVal=$?;
+      export retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Source code fetch failed. Aborting.\";
         exit $retVal;
@@ -89,7 +89,7 @@ deploy_on_dev:
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
       rm -f .env.variables .env.secrets &&
       docker-compose --env-file .env build;
-      retVal=$?;
+      export retVal=$?;
       rm -f .env;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Docker image creation failed. Aborting.\";
@@ -97,7 +97,7 @@ deploy_on_dev:
       fi;
 
       docker-compose down && docker-compose up -d;
-      retVal=$?;
+      export retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Server restart failed. Aborting.\";
         exit $retVal;
@@ -128,7 +128,7 @@ deploy_on_beta:
       git checkout beta &&
       git fetch &&
       git reset --hard origin/beta;
-      retVal=$?;
+      export retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Source code fetch failed. Aborting.\";
         exit $retVal;
@@ -139,7 +139,7 @@ deploy_on_beta:
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
       rm -f .env.variables .env.secrets &&
       docker-compose --env-file .env build;
-      retVal=$?;
+      export retVal=$?;
       rm -f .env;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Docker image creation failed. Aborting.\";
@@ -147,7 +147,7 @@ deploy_on_beta:
       fi;
 
       docker-compose down && docker-compose up -d;
-      retVal=$?;
+      export retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Server restart failed. Aborting.\";
         exit $retVal;
@@ -178,8 +178,8 @@ deploy_on_prod:
       git checkout main &&
       git fetch &&
       git reset --hard origin/main;
-      retVal=$?;
-      if [ $retVal -ne 0 ]; then;
+      export retVal=$?;
+      if [ $? -ne 0 ]; then;
         echo \"FATAL:Source code fetch failed. Aborting.\";
         exit $retVal;
       fi;
@@ -189,7 +189,7 @@ deploy_on_prod:
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
       rm -f .env.variables .env.secrets &&
       docker-compose --env-file .env build;
-      retVal=$?;
+      export retVal=$?;
       rm -f .env;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Docker image creation failed. Aborting.\";
@@ -197,7 +197,7 @@ deploy_on_prod:
       fi;
 
       docker-compose down && docker-compose up -d;
-      retVal=$?;
+      export retVal=$?;
       if [ $retVal -ne 0 ]; then;
         echo \"FATAL:Server restart failed. Aborting.\";
         exit $retVal;
