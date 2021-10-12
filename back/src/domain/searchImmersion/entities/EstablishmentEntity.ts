@@ -1,4 +1,8 @@
 import { Flavor } from "../../../shared/typeFlavors";
+import {
+  ContactMethod,
+  BusinessContactDto,
+} from "../../../shared/ImmersionOfferDto";
 
 export type EstablishmentId = Flavor<string, "EstablishmentId">;
 
@@ -46,10 +50,27 @@ export type EstablishmentFieldsToRetrieve = {
   naf: string;
 };
 
+export type OptionalEstablishmentFields = {
+  contact_mode: ContactMethod;
+  contact_in_establishment: BusinessContactDto;
+};
+
 type EstablishmentProps = MandatoryEstablishmentFields &
-  EstablishmentFieldsToRetrieve;
+  EstablishmentFieldsToRetrieve &
+  Partial<OptionalEstablishmentFields>;
 
 export class EstablishmentEntity {
+  toArrayOfProps(): any {
+    return [
+      this.props.siret,
+      this.props.name,
+      this.props.address,
+      this.props.numberEmployeesRange,
+      this.props.naf,
+      this.props.contact_mode,
+      this.props.dataSource,
+    ];
+  }
   constructor(private props: EstablishmentProps) {}
 
   public getRomeCodesArray() {

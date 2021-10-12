@@ -60,7 +60,7 @@ export const convertLaPlateFormeDeLInclusionToUncompletEstablishment = (
 export type HttpCallsToLaPlateFormeDeLInclusion = {
   getEstablishments: (
     searchParams: SearchParams,
-  ) => Promise<[EstablishmentFromLaPlateFormeDeLInclusion[], String]>;
+  ) => Promise<[EstablishmentFromLaPlateFormeDeLInclusion[], string]>;
   getNextEstablishments: (
     url: string,
   ) => Promise<EstablishmentFromLaPlateFormeDeLInclusion[]>;
@@ -88,7 +88,7 @@ export const httpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclu
           .then(async (response: any) => {
             const establishments: [
               EstablishmentFromLaPlateFormeDeLInclusion[],
-              String,
+              string,
             ] = [response.data.results, response.data.next];
             return establishments;
           })

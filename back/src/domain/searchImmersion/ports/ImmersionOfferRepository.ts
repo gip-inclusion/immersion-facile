@@ -1,5 +1,6 @@
 import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
 import { QueryResult } from "pg";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 
 export type SearchParams = {
   ROME: string;
@@ -11,11 +12,12 @@ export type SearchParams = {
 export interface ImmersionOfferRepository {
   insertSearch: (searchParams: SearchParams) => Promise<void>;
   insertImmersions: (immersions: ImmersionOfferEntity[]) => Promise<void>;
+  insertEstablishments: (
+    establishments: EstablishmentEntity[],
+  ) => Promise<void>;
+  markPendingResearchesAsProcessedAndRetrieveThem(): Promise<SearchParams[]>;
 
-  getAll: () => Promise<ImmersionOfferEntity[]>;
-  getSearchesMadeAndNotInserted(): Promise<SearchParams[]>;
   getFromSearch: (
-    rome: string,
-    localisation: [number, number],
+    searchParams: SearchParams,
   ) => Promise<ImmersionOfferEntity[]>;
 }

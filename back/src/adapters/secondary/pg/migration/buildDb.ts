@@ -25,7 +25,7 @@ const checkIfSearchImmersionDbAlreadyBuilt = async (
   client: Client,
 ): Promise<boolean> => {
   try {
-    await client.query("SELECT * FROM immersion_proposals LIMIT 1");
+    await client.query("SELECT * FROM immersion_offers LIMIT 1");
     console.log("DB was already built");
     return true;
   } catch (e) {

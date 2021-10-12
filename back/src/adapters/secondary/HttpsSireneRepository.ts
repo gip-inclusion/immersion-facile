@@ -38,7 +38,7 @@ export class HttpsSireneRepository implements SireneRepository {
     this.axiosInstance = axiosInstance;
   }
 
-  public async get(siret: String): Promise<Object | undefined> {
+  public async get(siret: string): Promise<Object | undefined> {
     try {
       const response = await this.axiosInstance.get("/siret", {
         params: { q: `siret:${siret}` },

@@ -7,7 +7,10 @@ import type {
 
 export type GetPosition = (address: string) => Promise<Position>;
 
-type ExtraEstablishmentInfos = { naf: string; numberEmployeesRange: TefenCode };
+export type ExtraEstablishmentInfos = {
+  naf: string;
+  numberEmployeesRange: TefenCode;
+};
 export type GetExtraEstablishmentInfos = (
   siret: string,
 ) => Promise<ExtraEstablishmentInfos>;

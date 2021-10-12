@@ -12,13 +12,6 @@ const logger = createLogger(__filename);
 export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   constructor(private client: Client) {}
 
-  //TODO
-  async getAll(): Promise<ImmersionOfferEntity[]> {
-    const vary = await this.client.query("SELECT * FROM immersion_proposals");
-
-    return [];
-  }
-
   async insertSearch(searchParams: SearchParams) {
     return this.client
       .query(
@@ -39,7 +32,9 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       });
   }
 
-  async getSearchesMadeAndNotInserted(): Promise<SearchParams[]> {
+  async markPendingResearchesAsProcessedAndRetrieveThem(): Promise<
+    SearchParams[]
+  > {
     return this.client
       .query(
         "UPDATE searches_made SET needstobesearched=false WHERE needstobesearched=true RETURNING ROME, lat, lon ,distance",
@@ -51,32 +46,42 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         });
       })
       .catch((e) => {
-        logger.log(e);
+        logger.info(e);
         return [];
       });
   }
-  /*
-  async insertEstablishments(
+
+  public async insertEstablishments(
     establishments: EstablishmentEntity[],
-  ): Promise<QueryResult<any>> {
+  ): Promise<void> {
     const arrayOfEstablishments = establishments.map((establishment) =>
       establishment.toArrayOfProps(),
     );
 
-    return this.client
+    //We deduplicate establishments because postgres does not support duplicate rows
+    const deduplicatedArrayOfEstablishments = arrayOfEstablishments.reduce(
+      (acc, cur) => {
+        const alreadyExist = acc.some((item: any[]) => item[0] === cur[0]);
+        if (alreadyExist) return acc;
+        return [...acc, cur];
+      },
+      [],
+    );
+    await this.client
       .query(
         format(
-          "INSERT INTO establishments (siret, name, address,number_employees, naf, contact_mode, data_source, update_date, creation_date) VALUES %L ON CONFLICT ON CONSTRAINT pk_establishments DO UPDATE SET name=EXCLUDED.name, address=EXCLUDED.address, number_employees=EXCLUDED.number_employees, naf=EXCLUDED.naf, contact_mode=EXCLUDED.contact_mode, data_source=EXCLUDED.data_source, update_date=NOW()",
-          arrayOfEstablishments,
+          "INSERT INTO establishments (siret, name, address,number_employees, naf, contact_mode, data_source) VALUES %L ON CONFLICT ON CONSTRAINT pk_establishments DO UPDATE SET name=EXCLUDED.name, address=EXCLUDED.address, number_employees=EXCLUDED.number_employees, naf=EXCLUDED.naf, contact_mode=EXCLUDED.contact_mode, data_source=EXCLUDED.data_source, update_date=NOW()",
+          deduplicatedArrayOfEstablishments,
         ),
       )
       .then((res) => {
         return res;
       })
       .catch((e) => {
+        console.log(e);
         return e;
       });
-  }*/
+  }
 
   async insertImmersions(
     immersionOffers: ImmersionOfferEntity[],
@@ -84,18 +89,29 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     const arrayOfImmersionsOffers = immersionOffers.map((immersion) =>
       immersion.toArrayOfProps(),
     );
+    //We deduplicate establishments because postgres does not support duplicate rows
+    const deduplicatedArrayOfImmersionsOffers = arrayOfImmersionsOffers.reduce(
+      (acc: any[][], cur: any[]) => {
+        const alreadyExist = acc.some(
+          (item: any[]) =>
+            item[1] === cur[1] && item[2] === cur[2] && item[3] === cur[3],
+        );
+        if (alreadyExist) return acc;
+        return [...acc, cur];
+      },
+      [],
+    );
 
     await this.client.query(
       format(
-        "INSERT INTO immersion_proposals (uuid, rome, naf,siret, name, data_source, score) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_proposals DO UPDATE SET name=EXCLUDED.name, update_date=NOW()",
-        arrayOfImmersionsOffers,
+        "INSERT INTO immersion_offers (uuid, rome, division, siret, naf,  name,voluntary_to_immersion, data_source, score) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_offers DO UPDATE SET name=EXCLUDED.name, update_date=NOW()",
+        deduplicatedArrayOfImmersionsOffers,
       ),
     );
   }
 
   async getFromSearch(
-    rome: string,
-    localisation: [number, number],
+    searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
     return [];
   }

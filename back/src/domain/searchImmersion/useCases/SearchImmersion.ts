@@ -22,19 +22,23 @@ export class SearchImmersion {
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
     this.immersionOfferRepository.insertSearch(searchParams);
-    return this.getImmersionLaBonneBoite(searchParams);
+    return this.getImmersionFromEstablishmentsGateway(
+      this.laBonneBoiteGateway,
+      searchParams,
+    );
   }
 
   //TODO : en faire une classe à part
-  async getImmersionLaBonneBoite(searchParams: SearchParams) {
-    const laBonneBoiteEstablishments =
-      await this.laBonneBoiteGateway.getEstablishments(searchParams);
-
-    const immersionOffers = laBonneBoiteEstablishments.flatMap(
-      (laBonneBoiteestablishment) =>
-        this.extractImmersionsFromEstablishment(laBonneBoiteestablishment),
+  async getImmersionFromEstablishmentsGateway(
+    establishmentGateway: EstablishmentsGateway,
+    searchParams: SearchParams,
+  ) {
+    const establishments = await establishmentGateway.getEstablishments(
+      searchParams,
     );
-
+    const immersionOffers = establishments.flatMap((establishments) =>
+      this.extractImmersionsFromEstablishment(establishments),
+    );
     return immersionOffers;
   }
   /*

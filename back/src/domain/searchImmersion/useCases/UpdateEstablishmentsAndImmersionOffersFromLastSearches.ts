@@ -9,7 +9,7 @@ import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
 import { v4 as uuidV4 } from "uuid";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 
-export class InsertSearchedImmersionsInOfferRepository {
+export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   constructor(
     private laBonneBoiteGateway: EstablishmentsGateway,
     private laPlateFormeDeLinclusionGateway: EstablishmentsGateway,
@@ -18,39 +18,47 @@ export class InsertSearchedImmersionsInOfferRepository {
     private immersionOfferRepository: ImmersionOfferRepository,
   ) {}
 
-  public async execute(searchParams: SearchParams) {
+  public async execute() {
     //We first take all searches made in the past
     const searchesMade =
-      await this.immersionOfferRepository.getSearchesMadeAndNotInserted();
+      await this.immersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem();
 
     //For all these searches, we go to check if we have potential immersions in our available databases
-    for (const searchMade in searchesMade) {
-      const establishmentsLaPlateFormeDeLinclusion =
-        await this.laPlateFormeDeLinclusionGateway.getEstablishments(
-          searchesMade[searchMade],
-        );
-      const establishmentsLaBonneBoite =
-        await this.laBonneBoiteGateway.getEstablishments(
-          searchesMade[searchMade],
-        );
-      const allEstablishments: EstablishmentEntity[] = await Promise.all(
-        establishmentsLaPlateFormeDeLinclusion
-          .concat(establishmentsLaBonneBoite)
-          .map(
-            async (uncompleteEstablishmentEntity) =>
-              await uncompleteEstablishmentEntity.searchForMissingFields(
-                this.getPosition,
-                this.getExtraEstablishmentInfos,
-              ),
-          ),
-      );
 
-      //We then transform  dfffdthem into immersions and add them to our database
-      const allImmersions = allEstablishments.flatMap((establishment) =>
-        this.extractImmersionsFromEstablishment(establishment),
-      );
-      this.immersionOfferRepository.insertImmersions(allImmersions);
-    }
+    await Promise.all(
+      searchesMade.map(async (searchMade) => {
+        const establishmentsLaPlateFormeDeLinclusion =
+          await this.laPlateFormeDeLinclusionGateway.getEstablishments(
+            searchMade,
+          );
+
+        const establishmentsLaBonneBoite =
+          await this.laBonneBoiteGateway.getEstablishments(searchMade);
+
+        const allEstablishments: EstablishmentEntity[] = await Promise.all(
+          establishmentsLaPlateFormeDeLinclusion
+            .concat(establishmentsLaBonneBoite)
+            .map(
+              async (uncompleteEstablishmentEntity) =>
+                await uncompleteEstablishmentEntity.searchForMissingFields(
+                  this.getPosition,
+                  this.getExtraEstablishmentInfos,
+                ),
+            ),
+        );
+
+        //We insert the establishments in the database
+        await this.immersionOfferRepository.insertEstablishments(
+          allEstablishments,
+        );
+
+        //We then transform  dfffdthem into immersions and add them to our database
+        const allImmersions = allEstablishments.flatMap((establishment) =>
+          this.extractImmersionsFromEstablishment(establishment),
+        );
+        await this.immersionOfferRepository.insertImmersions(allImmersions);
+      }),
+    );
   }
 
   private extractImmersionsFromEstablishment(

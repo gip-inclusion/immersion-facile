@@ -24,12 +24,12 @@ export type EstablishmentFromLaBonneBoite = {
 export type HttpCallsToLaBonneBoite = {
   getEstablishments: (
     searchParams: SearchParams,
-    accessToken: String,
+    accessToken: string,
   ) => Promise<EstablishmentFromLaBonneBoite[]>;
 };
 
 export const httpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
-  getEstablishments: (searchParams: SearchParams, accessToken: String) => {
+  getEstablishments: (searchParams: SearchParams, accessToken: string) => {
     const headers = {
       Authorization: "Bearer " + accessToken,
     };
