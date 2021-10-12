@@ -78,16 +78,30 @@ deploy_on_dev:
       git checkout dev &&
       git fetch &&
       git reset --hard origin/dev;
+      retVal = $?;
+      if [ $retVal -ne 0 ]; then;
+        echo \"FATAL:Source code fetch failed. Aborting."\;
+        exit $retVal;
+      fi;
 
-      touch .env;
-      chmod 600 .env;
-      cat .env.variables <(echo) .env.secrets <(echo) > .env;
-      rm -f .env.variables .env.secrets;
-
-      docker-compose --env-file .env build &&
-      docker-compose down &&
-      docker-compose up -d;
+      touch .env &&
+      chmod 600 .env &&
+      cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+      rm -f .env.variables .env.secrets &&
+      docker-compose --env-file .env build;
+      retVal=$?;
       rm -f .env;
+      if [ $retVal -ne 0]; then;
+        echo \"FATAL:Docker image creation failed. Aborting. \";
+        exit $retVal;
+      fi;
+
+      docker-compose down && docker-compose up -d;
+      retVal = $?;
+      if [ $retVal -ne 0 ]; then;
+        echo \"FATAL:Server restart failed. Aborting."\;
+        exit $retVal;
+      fi;
 
       sleep 60;
       echo \"Checking server health...\";
@@ -114,16 +128,29 @@ deploy_on_beta:
       git checkout beta &&
       git fetch &&
       git reset --hard origin/beta;
+      retVal = $?;
+      if [ $retVal -ne 0 ]; then;
+        echo \"FATAL:Source code fetch failed. Aborting."\;
+        exit $retVal;
+      fi;
 
-      touch .env;
-      chmod 600 .env;
-      cat .env.variables <(echo) .env.secrets <(echo) > .env;
-      rm -f .env.variables .env.secrets;
-
-      docker-compose --env-file .env build &&
-      docker-compose down &&
-      docker-compose up -d;
+      touch .env &&
+      chmod 600 .env &&
+      cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+      rm -f .env.variables .env.secrets &&
+      docker-compose --env-file .env build;
+      retVal=$?;
       rm -f .env;
+      if [ $retVal -ne 0]; then;
+        echo \"FATAL:Docker image creation failed. Aborting. \";
+        exit $retVal;
+      fi;
+
+      docker-compose down && docker-compose up -d;
+      if [ $retVal -ne 0 ]; then;
+        echo \"FATAL:Server restart failed. Aborting."\;
+        exit $retVal;
+      fi;
 
       sleep 60;
       echo \"Checking server health...\";
@@ -146,20 +173,29 @@ deploy_on_prod:
     - ssh -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP "cd /home/docker/immersion-facile &&
       chmod 600 .env.secrets;
       chmod 600 .env.variables;
+
       git checkout main &&
       git fetch &&
-      git reset --hard origin/main &&
+      git reset --hard origin/main;
+      retVal = $?;
+      if [ $retVal -ne 0 ]; then;
+        echo \"FATAL:Source code fetch failed. Aborting."\;
+        exit $retVal;
+      fi;
 
-      touch .env;
-      chmod 600 .env;
-      cat .env.variables <(echo) .env.secrets <(echo) > .env;
-      rm -f .env.variables .env.secrets;
-
-      docker-compose --env-file .env build &&
-      docker-compose down &&
-      docker-compose up -d;
+      touch .env &&
+      chmod 600 .env &&
+      cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+      rm -f .env.variables .env.secrets &&
+      docker-compose --env-file .env build;
+      retVal=$?;
       rm -f .env;
+      if [ $retVal -ne 0]; then;
+        echo \"FATAL:Server restart failed. Aborting."\;
+        exit $retVal;
+      fi;
 
+      docker-compose down && docker-compose up -d;
       sleep 60;
       echo \"Checking server health...\";
       curl --silent --fail --output /dev/null http://localhost:80/api/"
