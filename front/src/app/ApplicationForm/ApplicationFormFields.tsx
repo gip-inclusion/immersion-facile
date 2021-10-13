@@ -304,14 +304,6 @@ export const ApplicationFormFields = ({
       {!isFrozen && (
         <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
       )}
-
-      {/* I am not sure when SaveButton should be better than Submit
-      so I just comment it for now so we don't have both button at the same time */}
-      {/* {featureFlags.enableMagicLinks && !isFrozen && (
-        <>
-          <SaveButton isSubmitting={isSubmitting} onSubmit={submitForm} />
-        </>
-      )} */}
     </>
   );
 };
