@@ -71,6 +71,7 @@ export const immersionApplicationSchema = z
   .object({
     id: immersionApplicationIdSchema,
     status: z.enum(validApplicationStatus),
+    rejectionJustification: zString.optional(),
     source: z.enum(validApplicationSources),
     email: zEmail,
     firstName: zTrimmedString,
