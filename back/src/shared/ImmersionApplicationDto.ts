@@ -89,7 +89,6 @@ export const immersionApplicationSchema = z
     individualProtection: zBoolean,
     sanitaryPrevention: zBoolean,
     sanitaryPreventionDescription: z.string().optional(),
-
     immersionAddress: z.string().optional(),
     immersionObjective: z.string().optional(),
     immersionProfession: zTrimmedString,

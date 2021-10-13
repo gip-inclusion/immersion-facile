@@ -43,7 +43,7 @@ const host = ENV.ci ? "postgres" : "localhost";
 const testPgUrl = `postgresql://postgres:pg-password@${host}:5432/immersion-db`;
 const client = new Client(testPgUrl);
 
-describe("Postgres implementation of immersion proposal repository", () => {
+describe("Postgres implementation of immersion offer repository", () => {
   beforeAll(async () => {
     await client.connect();
   });

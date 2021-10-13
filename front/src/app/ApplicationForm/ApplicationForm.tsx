@@ -21,6 +21,8 @@ import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
+const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
+
 type ApplicationFormRoute = Route<
   | typeof routes.boulogneSurMer
   | typeof routes.narbonne
@@ -34,8 +36,6 @@ interface ApplicationFormProps {
 const isDemandeImmersionFrozen = (
   demandeImmersion: Partial<ImmersionApplicationDto>,
 ): boolean => !demandeImmersion.status || demandeImmersion.status !== "DRAFT";
-
-const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
 const { featureFlags, dev } = ENV;
 
