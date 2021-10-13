@@ -1,7 +1,7 @@
 import {
   AgencyConfig,
   AgencyRepository,
-} from "../../domain/immersionApplication/ports/AgencyConfigRepository";
+} from "../../domain/immersionApplication/ports/AgencyRepository";
 import {
   AgencyCode,
   agencyCodeFromString,

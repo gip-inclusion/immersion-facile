@@ -8,7 +8,7 @@ import { UseCase } from "../../../core/UseCase";
 import {
   AgencyConfig,
   AgencyRepository,
-} from "../../ports/AgencyConfigRepository";
+} from "../../ports/AgencyRepository";
 import {
   EmailGateway,
   ValidatedApplicationFinalConfirmationParams,

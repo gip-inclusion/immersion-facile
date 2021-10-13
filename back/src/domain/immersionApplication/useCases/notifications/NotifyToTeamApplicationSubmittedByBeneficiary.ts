@@ -2,7 +2,7 @@ import { agencyCodes } from "../../../../shared/agencies";
 import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyConfigRepository";
+import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
 
 const logger = createLogger(__filename);

@@ -1,4 +1,4 @@
-import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyConfigRepository";
+import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyRepository";
 import { Builder } from "./Builder";
 
 const emptyConfig: AgencyConfig = {

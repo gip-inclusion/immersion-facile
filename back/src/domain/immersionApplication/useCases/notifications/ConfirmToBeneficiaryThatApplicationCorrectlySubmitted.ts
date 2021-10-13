@@ -1,6 +1,6 @@
 import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyConfigRepository";
+import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
 import { createLogger } from "./../../../../utils/logger";
 
