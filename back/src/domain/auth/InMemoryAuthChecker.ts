@@ -33,7 +33,7 @@ export class InMemoryAuthChecker implements AuthChecker {
         receivedUsername === this.username && receivedPassword === this.password
       )
     ) {
-      throw new UnauthorizedError();
+      throw new UnauthorizedError(); // TODO: Return a ForbiddenError.
     }
   }
 }

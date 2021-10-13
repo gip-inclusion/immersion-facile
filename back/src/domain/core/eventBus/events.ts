@@ -15,6 +15,14 @@ export type DomainEvent =
       ImmersionApplicationDto
     >
   | GenericEvent<
+      "ImmersionApplicationAcceptedByCounsellor",
+      ImmersionApplicationDto
+    >
+  | GenericEvent<
+      "ImmersionApplicationAcceptedByValidator",
+      ImmersionApplicationDto
+    >
+  | GenericEvent<
       "FinalImmersionApplicationValidationByAdmin",
       ImmersionApplicationDto
     >;

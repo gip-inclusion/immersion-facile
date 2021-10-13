@@ -1,9 +1,19 @@
+import { NotEmptyArray } from "../utils";
+
 export type Role =
   | "beneficiary"
   | "establishment"
-  | "advisor"
+  | "counsellor"
   | "validator"
   | "admin";
+
+export const allRoles: NotEmptyArray<Role> = [
+  "beneficiary",
+  "establishment",
+  "counsellor",
+  "validator",
+  "admin",
+];
 
 export type MagicLinkPayload = {
   applicationId: string;

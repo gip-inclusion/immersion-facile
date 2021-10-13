@@ -17,6 +17,7 @@ import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/i
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
+import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddImmersionOffer } from "../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
@@ -241,6 +242,11 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
       featureFlags,
     }),
     validateDemandeImmersion: new ValidateImmersionApplication(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox,
+    ),
+    updateImmersionApplicationStatus: new UpdateImmersionApplicationStatus(
       repositories.demandeImmersion,
       createNewEvent,
       repositories.outbox,

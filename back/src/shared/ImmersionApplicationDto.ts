@@ -14,11 +14,21 @@ import { zBoolean, zEmail, zString, zTrimmedString, zTrue } from "./zodUtils";
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
 
-export type ApplicationStatus = "UNKNOWN" | "DRAFT" | "IN_REVIEW" | "VALIDATED";
+export type ApplicationStatus =
+  | "UNKNOWN"
+  | "DRAFT"
+  | "IN_REVIEW"
+  | "ACCEPTED_BY_COUNSELLOR"
+  | "ACCEPTED_BY_VALIDATOR"
+  | "VALIDATED"
+  | "REJECTED";
 const validApplicationStatus: NotEmptyArray<ApplicationStatus> = [
   "DRAFT",
   "IN_REVIEW",
+  "ACCEPTED_BY_COUNSELLOR",
+  "ACCEPTED_BY_VALIDATOR",
   "VALIDATED",
+  "REJECTED",
 ];
 
 const allApplicationStatuses: NotEmptyArray<ApplicationStatus> = [
@@ -164,3 +174,14 @@ export const validateImmersionApplicationRequestDtoSchema =
 // prettier-ignore
 export type ValidateImmersionApplicationResponseDto = z.infer<typeof validateImmersionApplicationResponseDtoSchema>;
 export const validateImmersionApplicationResponseDtoSchema = idInObject;
+
+// prettier-ignore
+export type UpdateImmersionApplicationStatusRequestDto = z.infer<typeof updateImmersionApplicationStatusRequestSchema>;
+export const updateImmersionApplicationStatusRequestSchema = z.object({
+  status: z.enum(validApplicationStatus),
+  justification: z.string().optional(),
+});
+
+// prettier-ignore
+export type UpdateImmersionApplicationStatusResponseDto = z.infer<typeof updateImmersionApplicationStatusResponseSchema>;
+export const updateImmersionApplicationStatusResponseSchema = idInObject;

@@ -48,6 +48,8 @@ export class InMemoryImmersionApplicationRepository
     return id;
   }
 
+  // Visible for testing.
+  // TODO: Rename to setImmersionApplication.
   setDemandesImmersion(demandesImmersion: ImmersionApplications) {
     this._immersionApplications = demandesImmersion;
   }

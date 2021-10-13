@@ -11,7 +11,7 @@ const markImmersionApplicationAsLegit = async (
   );
 };
 
-export const AdvisorButton = ({
+export const CounsellorButton = ({
   immersionApplication,
 }: WithImmersionApplication) => (
   <Button

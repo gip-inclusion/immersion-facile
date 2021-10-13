@@ -1,18 +1,19 @@
-import { generateJwt } from "./../../domain/auth/jwt";
-import { validateDemandeRoute } from "./../../shared/routes";
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
-import { immersionApplicationsRoute } from "../../shared/routes";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import { generateJwt } from "../../domain/auth/jwt";
+import { Role } from "../../shared/tokens/MagicLinkPayload";
 import {
-  createMagicLinkPayload,
-  Role,
-} from "../../shared/tokens/MagicLinkPayload";
+  immersionApplicationsRoute,
+  updateApplicationStatusRoute,
+  validateDemandeRoute,
+} from "../../shared/routes";
+import { createMagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
+import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+
+let request: SuperTest<Test>;
 
 describe("/demandes-immersion route", () => {
-  let request: SuperTest<Test>;
-
   describe("Backoffice", () => {
     beforeEach(() => {
       request = supertest(
@@ -394,5 +395,105 @@ describe("/demandes-immersion route", () => {
         })
         .expect(403);
     });
+  });
+});
+
+describe("/update-application-status route", () => {
+  beforeEach(() => {
+    request = supertest(
+      createApp({
+        featureFlags: FeatureFlagsBuilder.allOff()
+          .enableGenericApplicationForm()
+          .build(),
+      }),
+    );
+  });
+
+  test("Succeeds for valid requests", async () => {
+    // A beneficiary creates a new application in state IN_REVIEW.
+    const application = new ImmersionApplicationDtoBuilder()
+      .withStatus("IN_REVIEW")
+      .build();
+    await request
+      .post(`/${immersionApplicationsRoute}`)
+      .send(application)
+      .expect(200);
+
+    // A counsellor accepts the application.
+    const counsellorJwt = generateJwt(
+      createMagicLinkPayload(application.id, "counsellor"),
+    );
+    await request
+      .post(`/auth/${updateApplicationStatusRoute}/${counsellorJwt}`)
+      .send({ status: "ACCEPTED_BY_COUNSELLOR" })
+      .expect(200);
+
+    // A validator accepts the application.
+    const validatorJwt = generateJwt(
+      createMagicLinkPayload(application.id, "validator"),
+    );
+    await request
+      .post(`/auth/${updateApplicationStatusRoute}/${validatorJwt}`)
+      .send({ status: "ACCEPTED_BY_VALIDATOR" })
+      .expect(200);
+
+    // An admin validates the application.
+    const adminJwt = generateJwt(
+      createMagicLinkPayload(application.id, "admin"),
+    );
+    await request
+      .post(`/auth/${updateApplicationStatusRoute}/${adminJwt}`)
+      .send({ status: "VALIDATED" })
+      .expect(200);
+  });
+
+  test("Returns error 400 for invalid requests", async () => {
+    // A beneficiary creates a new application in state IN_REVIEW.
+    const application = new ImmersionApplicationDtoBuilder()
+      .withStatus("IN_REVIEW")
+      .build();
+    await request
+      .post(`/${immersionApplicationsRoute}`)
+      .send(application)
+      .expect(200);
+
+    // An admin tries to change it to DRAFT but fails.
+    const establishmentJwt = generateJwt(
+      createMagicLinkPayload(application.id, "establishment"),
+    );
+    await request
+      .post(`/auth/${updateApplicationStatusRoute}/${establishmentJwt}`)
+      .send({ status: "DRAFT" })
+      .expect(400);
+  });
+
+  test("Returns error 403 for unauthorized requests", async () => {
+    // A beneficiary creates a new application in state IN_REVIEW.
+    const application = new ImmersionApplicationDtoBuilder()
+      .withStatus("IN_REVIEW")
+      .build();
+    await request
+      .post(`/${immersionApplicationsRoute}`)
+      .send(application)
+      .expect(200);
+
+    // An establishment tries to validate the application, but fails.
+    const establishmentJwt = generateJwt(
+      createMagicLinkPayload(application.id, "establishment"),
+    );
+    await request
+      .post(`/auth/${updateApplicationStatusRoute}/${establishmentJwt}`)
+      .send({ status: "VALIDATED" })
+      .expect(403);
+  });
+
+  test("Returns error 404 for unknown application ids", async () => {
+    const jwt = generateJwt(
+      createMagicLinkPayload("unknown_application_id", "counsellor"),
+    );
+    await request
+      .post(`/auth/${updateApplicationStatusRoute}/${jwt}`)
+      .send({ status: "ACCEPTED_BY_COUNSELLOR" })
+      .expect(404);
   });
 });

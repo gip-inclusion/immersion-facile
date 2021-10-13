@@ -19,6 +19,10 @@ export class ImmersionApplicationEntity {
     return this.properties.id;
   }
 
+  public get status() {
+    return this.properties.status;
+  }
+
   public get source() {
     return this.properties.source;
   }
