@@ -5,13 +5,9 @@ interface SuccessMessageProps {
   children: React.ReactNode;
 }
 
-export const SuccessMessage = ({ title, children }: SuccessMessageProps) => {
-  return (
-    <>
-      <div role="alert" className="fr-alert fr-alert--success">
-        <p className="fr-alert__title">{title}</p>
-        <p>{children}</p>
-      </div>
-    </>
-  );
-};
+export const SuccessMessage = ({ title, children }: SuccessMessageProps) => (
+  <div role="alert" className="fr-alert fr-alert--success">
+    <p className="fr-alert__title">{title}</p>
+    <p>{children}</p>
+  </div>
+);

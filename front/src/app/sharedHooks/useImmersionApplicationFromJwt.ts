@@ -3,18 +3,15 @@ import { immersionApplicationGateway } from "src/app/main";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 
-export const useImmersionApplicationFromJwt = (jwtToken: string) => {
-  const { applicationId, roles } = decodeJwt(jwtToken);
+export const useImmersionApplicationFromJwt = (jwt: string) => {
+  const { roles } = decodeJwt(jwt);
 
   const [immersionApplication, setImmersionApplication] =
     useState<ImmersionApplicationDto>();
 
   useEffect(() => {
-    // TODO: switch to calling get() with the token instead of the applicationId once supported by the backend.
-    immersionApplicationGateway
-      .get(applicationId)
-      .then(setImmersionApplication);
-  }, [applicationId]);
+    immersionApplicationGateway.getML(jwt).then(setImmersionApplication);
+  }, [jwt]);
 
-  return { immersionApplication, roles };
+  return { immersionApplication, roles, jwt };
 };

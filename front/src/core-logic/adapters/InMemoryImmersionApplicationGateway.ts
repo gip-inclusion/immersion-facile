@@ -8,6 +8,8 @@ import {
   AddImmersionApplicationMLResponseDto,
   ImmersionApplicationDto,
   ImmersionApplicationId,
+  UpdateImmersionApplicationStatusRequestDto,
+  UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { sleep } from "src/shared/utils";
@@ -183,6 +185,20 @@ export class InMemoryImmersionApplicationGateway
     if (!this.featureFlags.enableMagicLinks) throw new Error("404 Not found");
     this._demandesImmersion[payload.applicationId] = demandeImmersion;
     return demandeImmersion.id;
+  }
+
+  public async updateStatus(
+    { status, justification }: UpdateImmersionApplicationStatusRequestDto,
+    jwt: string,
+  ): Promise<UpdateImmersionApplicationStatusResponseDto> {
+    const payload = decodeJwt(jwt);
+    await sleep(SIMULATED_LATENCY_MS);
+    if (!this.featureFlags.enableMagicLinks) throw new Error("404 Not found");
+    this._demandesImmersion[payload.applicationId] = {
+      ...this._demandesImmersion[payload.applicationId],
+      status,
+    };
+    return { id: payload.applicationId };
   }
 
   public async validate(id: ImmersionApplicationId): Promise<string> {

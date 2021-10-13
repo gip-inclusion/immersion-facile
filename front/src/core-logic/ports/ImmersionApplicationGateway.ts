@@ -3,6 +3,8 @@ import {
   AddImmersionApplicationMLResponseDto,
   ImmersionApplicationDto,
   ImmersionApplicationId,
+  UpdateImmersionApplicationStatusRequestDto,
+  UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
 
 export interface ImmersionApplicationGateway {
@@ -20,6 +22,11 @@ export interface ImmersionApplicationGateway {
   ) => Promise<string>;
   // Calls validate-demande on backend.
   validate: (id: ImmersionApplicationId) => Promise<string>;
+
+  updateStatus: (
+    params: UpdateImmersionApplicationStatusRequestDto,
+    jwt: string,
+  ) => Promise<UpdateImmersionApplicationStatusResponseDto>;
 
   getSiretInfo: (siret: string) => Promise<EstablishmentInfoFromSiretApi>;
   getAll: () => Promise<Array<ImmersionApplicationDto>>;

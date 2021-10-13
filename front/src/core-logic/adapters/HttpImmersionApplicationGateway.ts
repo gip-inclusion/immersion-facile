@@ -2,22 +2,25 @@ import axios from "axios";
 import { EstablishmentInfoFromSiretApi } from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import {
-  immersionApplicationsRoute,
-  siretRoute,
-  validateDemandeRoute,
-} from "src/shared/routes";
-import {
-  ImmersionApplicationDto,
-  addImmersionApplicationResponseDtoSchema,
+  AddImmersionApplicationMLResponseDto,
+  addImmersionApplicationMLResponseDtoSchema,
   AddImmersionApplicationResponseDto,
+  addImmersionApplicationResponseDtoSchema,
+  ImmersionApplicationDto,
+  ImmersionApplicationId,
   immersionApplicationSchema,
   UpdateImmersionApplicationResponseDto,
   updateImmersionApplicationResponseDtoSchema,
-  immersionApplicationArraySchema,
-  ImmersionApplicationId,
-  AddImmersionApplicationMLResponseDto,
-  addImmersionApplicationMLResponseDtoSchema,
+  UpdateImmersionApplicationStatusRequestDto,
+  UpdateImmersionApplicationStatusResponseDto,
+  updateImmersionApplicationStatusResponseSchema,
 } from "src/shared/ImmersionApplicationDto";
+import {
+  immersionApplicationsRoute,
+  siretRoute,
+  updateApplicationStatusRoute,
+  validateDemandeRoute,
+} from "src/shared/routes";
 
 const prefix = "api";
 
@@ -110,6 +113,21 @@ export class HttpImmersionApplicationGateway
       updateDemandeImmersionResponse,
     );
     return updateDemandeImmersionResponse.id;
+  }
+
+  public async updateStatus(
+    params: UpdateImmersionApplicationStatusRequestDto,
+    jwt: string,
+  ): Promise<UpdateImmersionApplicationStatusResponseDto> {
+    const httpResponse = await axios.post(
+      `/${prefix}/auth/${updateApplicationStatusRoute}/${jwt}`,
+      params,
+    );
+
+    const response = updateImmersionApplicationStatusResponseSchema.parse(
+      httpResponse.data,
+    );
+    return response;
   }
 
   public async validate(id: ImmersionApplicationId): Promise<string> {
