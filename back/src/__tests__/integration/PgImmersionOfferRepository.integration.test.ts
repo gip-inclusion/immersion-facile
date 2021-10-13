@@ -19,7 +19,10 @@ import {
   EstablishmentFromLaPlateFormeDeLInclusion,
   HttpCallsToLaPlateFormeDeLInclusion,
 } from "../../adapters/secondary/searchImmersion/LaPlateFormeDeLInclusionGateway";
-import { Position } from "../../domain/searchImmersion/entities/EstablishmentEntity";
+import {
+  Position,
+  EstablishmentEntity,
+} from "../../domain/searchImmersion/entities/EstablishmentEntity";
 import {
   UncompleteEstablishmentEntity,
   GetPosition,
@@ -52,24 +55,6 @@ describe("Postgres implementation of immersion offer repository", () => {
     await client.end();
   });
 
-  test("Search immersion works", async () => {
-    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
-
-    const searchImmersion = new SearchImmersion(
-      fakeLaBonneBoiteGateway,
-      pgImmersionOfferRepository,
-    );
-
-    const immersions = await searchImmersion.execute({
-      ROME: "M1607",
-      distance: 30,
-      lat: 49.119146,
-      lon: 6.17602,
-    });
-
-    expect(immersions[0]).toBeInstanceOf(ImmersionOfferEntity);
-  });
-
   test("Insert search works", async () => {
     const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
 
@@ -79,6 +64,121 @@ describe("Postgres implementation of immersion offer repository", () => {
       lat: 49.119146,
       lon: 6.17602,
     });
-    //TODO assertion
+    expect(
+      (
+        await pgImmersionOfferRepository.getSearchInDatabase({
+          ROME: "M1607",
+          distance: 30,
+          lat: 49.119146,
+          lon: 6.17602,
+        })
+      )[0].rome,
+    ).toBe("M1607");
+  });
+
+  test("Insert establishments and retreives them back", async () => {
+    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
+
+    await pgImmersionOfferRepository.insertEstablishments([
+      new EstablishmentEntity({
+        id: "13df03a5-a2a5-430a-b558-ed3e2f035443",
+        address: "fake address",
+        name: "Fake Establishment from la plate forme de l'inclusion",
+        city: "Paris",
+        score: 5,
+        romes: ["M1607"],
+        siret: "78000403200019",
+        dataSource: "api_laplateformedelinclusion",
+        numberEmployeesRange: 1,
+        position: { lat: 10, lon: 10 },
+        naf: "8539A",
+      }),
+    ]);
+    await pgImmersionOfferRepository.insertEstablishments([
+      new EstablishmentEntity({
+        id: "13df03a5-a2a5-430a-b558-ed3e2f035443",
+        address: "fake address",
+        name: "Fake Establishment from form",
+        city: "Paris",
+        score: 5,
+        romes: ["M1607"],
+        siret: "78000403200019",
+        dataSource: "form",
+        numberEmployeesRange: 1,
+        position: { lat: 10, lon: 10 },
+        naf: "8539A",
+      }),
+    ]);
+    await pgImmersionOfferRepository.insertEstablishments([
+      new EstablishmentEntity({
+        id: "13df03a5-a2a5-430a-b558-ed3e2f035443",
+        address: "fake address",
+        name: "Fake Establishment from la bonne boite",
+        city: "Paris",
+        score: 5,
+        romes: ["M1607"],
+        siret: "78000403200019",
+        dataSource: "api_labonneboite",
+        numberEmployeesRange: 1,
+        position: { lat: 10, lon: 10 },
+        naf: "8539A",
+      }),
+    ]);
+
+    expect(
+      (
+        await pgImmersionOfferRepository.getEstablishmentFromSiret(
+          "78000403200019",
+        )
+      )[0].name,
+    ).toBe("Fake Establishment from form");
+
+    await pgImmersionOfferRepository.insertImmersions([
+      new ImmersionOfferEntity({
+        id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
+        rome: "M1607",
+        naf: "8539A",
+        siret: "78000403200019",
+        name: "Company from form",
+        voluntary_to_immersion: false,
+        data_source: "form",
+        contact_in_establishment: undefined,
+        score: 4.5,
+      }),
+    ]);
+    await pgImmersionOfferRepository.insertImmersions([
+      new ImmersionOfferEntity({
+        id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
+        rome: "M1607",
+        naf: "8539A",
+        siret: "78000403200019",
+        name: "Company from plateforme de l'inclusion",
+        voluntary_to_immersion: false,
+        data_source: "api_laplateformedelinclusion",
+        contact_in_establishment: undefined,
+        score: 4.5,
+      }),
+    ]);
+    await pgImmersionOfferRepository.insertImmersions([
+      new ImmersionOfferEntity({
+        id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
+        rome: "M1607",
+        naf: "8539A",
+        siret: "78000403200019",
+        name: "Company from la bonne boite",
+        voluntary_to_immersion: false,
+        data_source: "api_labonneboite",
+        contact_in_establishment: undefined,
+        score: 4.5,
+      }),
+    ]);
+
+    expect(
+      (
+        await pgImmersionOfferRepository.getImmersionsFromSiret(
+          "78000403200019",
+        )
+      )[0].name,
+    ).toBe("Company from form");
   });
 });

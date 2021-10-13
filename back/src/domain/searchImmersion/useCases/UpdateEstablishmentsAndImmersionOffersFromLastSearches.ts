@@ -46,7 +46,6 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
                 ),
             ),
         );
-
         //We insert the establishments in the database
         await this.immersionOfferRepository.insertEstablishments(
           allEstablishments,

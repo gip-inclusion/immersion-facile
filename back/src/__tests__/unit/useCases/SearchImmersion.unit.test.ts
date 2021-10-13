@@ -21,7 +21,6 @@ describe("SearchImmersion", () => {
       lat: 49.119146,
       lon: 6.17602,
     });
-
     expect(immersions[0]).toBeInstanceOf(ImmersionOfferEntity);
   });
 });

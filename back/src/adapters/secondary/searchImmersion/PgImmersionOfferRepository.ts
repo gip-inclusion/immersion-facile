@@ -70,7 +70,13 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     await this.client
       .query(
         format(
-          "INSERT INTO establishments (siret, name, address,number_employees, naf, contact_mode, data_source) VALUES %L ON CONFLICT ON CONSTRAINT pk_establishments DO UPDATE SET name=EXCLUDED.name, address=EXCLUDED.address, number_employees=EXCLUDED.number_employees, naf=EXCLUDED.naf, contact_mode=EXCLUDED.contact_mode, data_source=EXCLUDED.data_source, update_date=NOW()",
+          "INSERT INTO establishments (siret, name, address,number_employees, naf, contact_mode, \
+          data_source) VALUES %L ON CONFLICT ON CONSTRAINT pk_establishments DO UPDATE SET \
+          name=EXCLUDED.name, address=EXCLUDED.address, number_employees=EXCLUDED.number_employees, \
+          naf=EXCLUDED.naf, contact_mode=EXCLUDED.contact_mode, data_source=EXCLUDED.data_source, \
+          update_date=NOW() \
+          WHERE EXCLUDED.data_source='form' OR (establishments.data_source != 'form' AND \
+          (EXCLUDED.data_source = 'api_laplateformedelinclusion' AND establishments.data_source = 'api_labonneboite')) ",
           deduplicatedArrayOfEstablishments,
         ),
       )
@@ -104,15 +110,67 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
     await this.client.query(
       format(
-        "INSERT INTO immersion_offers (uuid, rome, division, siret, naf,  name,voluntary_to_immersion, data_source, score) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_offers DO UPDATE SET name=EXCLUDED.name, update_date=NOW()",
+        "INSERT INTO immersion_offers (uuid, rome, division, siret, naf,  name,voluntary_to_immersion, data_source, score) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_offers DO UPDATE SET naf=EXCLUDED.naf, name=EXCLUDED.name, voluntary_to_immersion=EXCLUDED.voluntary_to_immersion, \
+        data_source=EXCLUDED.data_source, score=EXCLUDED.score, update_date=NOW() \
+        WHERE EXCLUDED.data_source='form' OR (immersion_offers.data_source != 'form' AND \
+        (EXCLUDED.data_source = 'api_laplateformedelinclusion' AND immersion_offers.data_source = 'api_labonneboite')) ",
         deduplicatedArrayOfImmersionsOffers,
       ),
     );
   }
 
+  async getImmersionsFromSiret(siret: string) {
+    return this.client
+      .query("SELECT * FROM immersion_offers WHERE siret=$1", [siret])
+      .then((res) => {
+        return res.rows.map((x) => {
+          return x;
+        });
+      })
+      .catch((e) => {
+        logger.info(e);
+        return [];
+      });
+  }
+
+  async getEstablishmentFromSiret(siret: string) {
+    return this.client
+      .query("SELECT * FROM establishments WHERE siret=$1", [siret])
+      .then((res) => {
+        return res.rows.map((x) => {
+          return x;
+        });
+      })
+      .catch((e) => {
+        logger.info(e);
+        return [];
+      });
+  }
   async getFromSearch(
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
     return [];
+  }
+  async getSearchInDatabase(searchParams: SearchParams) {
+    return this.client
+      .query(
+        "SELECT * FROM searches_made WHERE rome=$1 AND lat=$2 AND lon=$3 AND distance=$4",
+        [
+          searchParams.ROME,
+          searchParams.lat,
+          searchParams.lon,
+          searchParams.distance,
+        ],
+      )
+      .then((res) => {
+        console.log;
+        return res.rows.map((x) => {
+          return x;
+        });
+      })
+      .catch((e) => {
+        logger.info(e);
+        return [];
+      });
   }
 }
