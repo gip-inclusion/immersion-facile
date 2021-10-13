@@ -10,3 +10,5 @@ front/dist-ssr
 .env
 .env.sample
 .gitlab-ci.yml
+
+docker-data
