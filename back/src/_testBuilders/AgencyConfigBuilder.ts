@@ -2,8 +2,9 @@ import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyReposit
 import { Builder } from "./Builder";
 
 const emptyConfig: AgencyConfig = {
-  adminEmails: [],
   counsellorEmails: [],
+  validatorEmails: [],
+  adminEmails: [],
   allowUnrestrictedEmailSending: false,
   questionnaireUrl: "",
   signature: "",
@@ -17,16 +18,22 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
     return new AgencyConfigBuilder(emptyConfig);
   }
 
-  public withAdminEmails(adminEmails: string[]) {
-    return new AgencyConfigBuilder({
-      ...this.config,
-      adminEmails,
-    });
-  }
   public withCounsellorEmails(counsellorEmails: string[]) {
     return new AgencyConfigBuilder({
       ...this.config,
       counsellorEmails,
+    });
+  }
+  public withValidatorEmails(validatorEmails: string[]) {
+    return new AgencyConfigBuilder({
+      ...this.config,
+      validatorEmails,
+    });
+  }
+  public withAdminEmails(adminEmails: string[]) {
+    return new AgencyConfigBuilder({
+      ...this.config,
+      adminEmails,
     });
   }
   public allowUnrestrictedEmailSending(

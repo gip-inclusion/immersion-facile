@@ -5,10 +5,7 @@ import {
 } from "../../../../shared/ScheduleUtils";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
-import {
-  AgencyConfig,
-  AgencyRepository,
-} from "../../ports/AgencyRepository";
+import { AgencyConfig, AgencyRepository } from "../../ports/AgencyRepository";
 import {
   EmailGateway,
   ValidatedApplicationFinalConfirmationParams,

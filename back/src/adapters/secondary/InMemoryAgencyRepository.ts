@@ -30,6 +30,7 @@ export const createAgencyConfigsFromEnv = (env: ProcessEnv): AgencyConfigs => {
   const counsellorEmails = parseEmailsByAgencyCode(
     process.env.COUNSELLOR_EMAILS,
   );
+  const validatorEmails = parseEmailsByAgencyCode(process.env.VALIDATOR_EMAILS);
   const unrestrictedEmailSendingAgencies = new Set(
     parseAgencyList(process.env.UNRESTRICTED_EMAIL_SENDING_AGENCIES),
   );
@@ -38,8 +39,9 @@ export const createAgencyConfigsFromEnv = (env: ProcessEnv): AgencyConfigs => {
     (acc, agencyCode) => ({
       ...acc,
       [agencyCode]: {
-        adminEmails: adminEmails,
         counsellorEmails: counsellorEmails[agencyCode] ?? [],
+        validatorEmails: validatorEmails[agencyCode] ?? [],
+        adminEmails: adminEmails,
         allowUnrestrictedEmailSending:
           unrestrictedEmailSendingAgencies.has(agencyCode),
         questionnaireUrl: questionnaireUrls[agencyCode] ?? "",
