@@ -25,7 +25,7 @@ const logger = createLogger(__filename);
 type StatusTransitionConfig = {
   validInitialStatuses: ApplicationStatus[];
   validRoles: Role[];
-  domainTopic?: DomainTopic;
+  domainTopic: DomainTopic;
 };
 
 // key: status transition target, value: status transition config
@@ -62,6 +62,7 @@ const statusTransitionConfigs: Partial<
       "ACCEPTED_BY_COUNSELLOR",
     ],
     validRoles: ["counsellor", "validator", "admin"],
+    domainTopic: "ImmersionApplicationRejected",
   },
 };
 
@@ -79,7 +80,7 @@ export class UpdateImmersionApplicationStatus
   ) {}
 
   public async execute(
-    { status }: UpdateImmersionApplicationStatusRequestDto,
+    { status, justification }: UpdateImmersionApplicationStatusRequestDto,
     { applicationId, roles }: MagicLinkPayload,
   ): Promise<UpdateImmersionApplicationStatusResponseDto> {
     logger.debug({ status, applicationId, roles });
@@ -103,6 +104,7 @@ export class UpdateImmersionApplicationStatus
     const updatedEntity = ImmersionApplicationEntity.create({
       ...immersionApplication.toDto(),
       status,
+      rejectionJustification: status === "REJECTED" ? justification : undefined,
     });
     const updatedId =
       await this.immersionApplicationRepository.updateImmersionApplication(

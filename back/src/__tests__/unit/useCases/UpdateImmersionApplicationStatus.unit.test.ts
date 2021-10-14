@@ -2,7 +2,7 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-  UnauthorizedError,
+  UnauthorizedError
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -10,7 +10,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   CreateNewEvent,
-  makeCreateNewEvent,
+  makeCreateNewEvent
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
@@ -18,11 +18,11 @@ import { ImmersionApplicationEntity } from "../../../domain/immersionApplication
 import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import {
   ApplicationStatus,
-  ImmersionApplicationDto,
+  ImmersionApplicationDto
 } from "../../../shared/ImmersionApplicationDto";
 import {
   createMagicLinkPayload,
-  Role,
+  Role
 } from "../../../shared/tokens/MagicLinkPayload";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
@@ -76,25 +76,19 @@ describe("UpdateImmersionApplicationStatus", () => {
 
   describe("IN_REVIEW -> REJECTED transition", () => {
     test("accepted from counsellor", () =>
-      testAcceptsStatusUpdate({
+      testAcceptsStatusUpdateToRejected({
         role: "counsellor",
         oldStatus: "IN_REVIEW",
-        newStatus: "REJECTED",
-        expectedDomainTopic: undefined, // No event expected.
       }));
     test("accepted from validator", () =>
-      testAcceptsStatusUpdate({
+      testAcceptsStatusUpdateToRejected({
         role: "validator",
         oldStatus: "IN_REVIEW",
-        newStatus: "REJECTED",
-        expectedDomainTopic: undefined, // No event expected.
       }));
     test("accepted from admin", () =>
-      testAcceptsStatusUpdate({
+      testAcceptsStatusUpdateToRejected({
         role: "admin",
         oldStatus: "IN_REVIEW",
-        newStatus: "REJECTED",
-        expectedDomainTopic: undefined, // No event expected.
       }));
   });
 
@@ -124,25 +118,19 @@ describe("UpdateImmersionApplicationStatus", () => {
 
   describe("ACCEPTED_BY_COUNSELLOR -> REJECTED transition", () => {
     test("accepted from counsellor", () =>
-      testAcceptsStatusUpdate({
+      testAcceptsStatusUpdateToRejected({
         role: "counsellor",
         oldStatus: "ACCEPTED_BY_COUNSELLOR",
-        newStatus: "REJECTED",
-        expectedDomainTopic: undefined, // No event expected.
       }));
     test("accepted from validator", () =>
-      testAcceptsStatusUpdate({
+      testAcceptsStatusUpdateToRejected({
         role: "validator",
         oldStatus: "ACCEPTED_BY_COUNSELLOR",
-        newStatus: "REJECTED",
-        expectedDomainTopic: undefined, // No event expected.
       }));
     test("accepted from admin", () =>
-      testAcceptsStatusUpdate({
+      testAcceptsStatusUpdateToRejected({
         role: "admin",
         oldStatus: "ACCEPTED_BY_COUNSELLOR",
-        newStatus: "REJECTED",
-        expectedDomainTopic: undefined, // No event expected.
       }));
   });
 
@@ -172,25 +160,19 @@ describe("UpdateImmersionApplicationStatus", () => {
 
   describe("ACCEPTED_BY_VALIDATOR -> REJECTED transition", () => {
     test("accepted from counsellor", () =>
-      testAcceptsStatusUpdate({
+      testAcceptsStatusUpdateToRejected({
         role: "counsellor",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
-        newStatus: "REJECTED",
-        expectedDomainTopic: undefined, // No event expected.
       }));
     test("accepted from validator", () =>
-      testAcceptsStatusUpdate({
+      testAcceptsStatusUpdateToRejected({
         role: "validator",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
-        newStatus: "REJECTED",
-        expectedDomainTopic: undefined, // No event expected.
       }));
     test("accepted from admin", () =>
-      testAcceptsStatusUpdate({
+      testAcceptsStatusUpdateToRejected({
         role: "admin",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
-        newStatus: "REJECTED",
-        expectedDomainTopic: undefined, // No event expected.
       }));
   });
 
@@ -239,14 +221,16 @@ describe("UpdateImmersionApplicationStatus", () => {
     applicationId: string;
     role: Role;
     newStatus: ApplicationStatus;
+    justification?: string;
   };
   const executeUseCase = async ({
     applicationId,
     role,
     newStatus,
+    justification,
   }: ExecuteUseCaseParams): Promise<ImmersionApplicationDto> => {
     const response = await updateImmersionApplicationStatus.execute(
-      { status: newStatus },
+      { status: newStatus, justification },
       createMagicLinkPayload(applicationId, role),
     );
     expect(response.id).toEqual(applicationId);
@@ -280,17 +264,39 @@ describe("UpdateImmersionApplicationStatus", () => {
     };
     expect(storedImmersionApplication).toEqual(expectedImmersionApplication);
 
-    const allEvents = await outboxRepository.getAllUnpublishedEvents();
-    if (expectedDomainTopic) {
-      const expectedEvent: Partial<DomainEvent> = {
-        topic: expectedDomainTopic,
-        payload: expectedImmersionApplication,
-      };
-      expect(allEvents).toHaveLength(1);
-      expect(allEvents[0]).toMatchObject(expectedEvent);
-    } else {
-      expect(allEvents).toHaveLength(0);
-    }
+    await expectNewEvent({
+      topic: expectedDomainTopic,
+      payload: expectedImmersionApplication,
+    });
+  };
+
+  type TestAcceptsStatusUpdateToRejectedParams = {
+    role: Role;
+    oldStatus: ApplicationStatus;
+  };
+  const testAcceptsStatusUpdateToRejected = async ({
+    role,
+    oldStatus,
+  }: TestAcceptsStatusUpdateToRejectedParams) => {
+    const originalImmersionApplication = await setupInitialState({ oldStatus });
+    const storedImmersionApplication = await executeUseCase({
+      applicationId: originalImmersionApplication.id,
+      role,
+      newStatus: "REJECTED",
+      justification: "test-rejection-justification",
+    });
+
+    const expectedImmersionApplication: ImmersionApplicationDto = {
+      ...originalImmersionApplication,
+      status: "REJECTED",
+      rejectionJustification: "test-rejection-justification",
+    };
+    expect(storedImmersionApplication).toEqual(expectedImmersionApplication);
+
+    await expectNewEvent({
+      topic: "ImmersionApplicationRejected",
+      payload: expectedImmersionApplication,
+    });
   };
 
   type TestRejectsNewStatusParams = {
@@ -314,5 +320,11 @@ describe("UpdateImmersionApplicationStatus", () => {
       }),
       expectedError,
     );
+  };
+
+  const expectNewEvent = async (expectedEvent: Partial<DomainEvent>) => {
+    const allEvents = await outboxRepository.getAllUnpublishedEvents();
+    expect(allEvents).toHaveLength(1);
+    expect(allEvents[0]).toMatchObject(expectedEvent);
   };
 });

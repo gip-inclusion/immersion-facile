@@ -25,7 +25,8 @@ export type DomainEvent =
   | GenericEvent<
       "FinalImmersionApplicationValidationByAdmin",
       ImmersionApplicationDto
-    >;
+    >
+  | GenericEvent<"ImmersionApplicationRejected", ImmersionApplicationDto>;
 
 export type DomainTopic = DomainEvent["topic"];
 
