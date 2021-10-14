@@ -34,12 +34,20 @@ export interface FormAccordionProps {
 const getPrefix = (status: ApplicationStatus) => {
   switch (status) {
     case "DRAFT":
-      return "📕 BROUILLON";
+      return "[📕 BROUILLON]";
     case "IN_REVIEW":
-      return "📙";
+      return "[📙 REVUE EN COURS]";
     case "VALIDATED":
-      return "✅";
+      return "[👩‍💼 DEMANDE CONFIRMÉE PAR ADMIN]";
+    case "ACCEPTED_BY_COUNSELLOR":
+      return "[📗 DEMANDE ÉLIGIBLE]";
+    case "ACCEPTED_BY_VALIDATOR":
+      return "[✅ DEMANDE VALIDÉE]";
+    case "REJECTED":
+      return "[❌ RÉJÉTÉ]";
   }
+
+  return "[⁉️ STATUS DE LA DEMANDE INDÉFINI]";
 };
 
 export const FormAccordion = ({ immersionApplication }: FormAccordionProps) => {
