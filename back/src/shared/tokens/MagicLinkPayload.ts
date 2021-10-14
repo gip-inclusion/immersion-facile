@@ -26,8 +26,8 @@ export type MagicLinkPayload = {
 export function createMagicLinkPayload(
   applicationId: string,
   role: Role,
-  durationDays: number = 31,
-  name: string = "",
+  durationDays = 31,
+  name = "",
   nowFn = Date.now,
   iat: number = Math.round(nowFn() / 1000),
   exp: number = iat + durationDays * 24 * 3600,

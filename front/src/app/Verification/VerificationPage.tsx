@@ -8,7 +8,7 @@ import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { Route } from "type-route";
 
 type VerificationPageProps = {
-  route: Route<typeof routes.verification>;
+  route: Route<typeof routes.immersionApplicationsToValidate>;
 };
 
 export const VerificationPage = ({ route }: VerificationPageProps) => {
@@ -25,7 +25,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
   if (!isCounsellor && !isValidator && !isAdmin)
     return <div>Vous n'êtes pas autorisé à accéder à cette page"</div>;
 
-  const disabled = !!successMessage
+  const disabled = !!successMessage;
 
   const buttonProps = {
     disabled,

@@ -1,6 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { verifyJwt } from "../../domain/auth/jwt";
-import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
+import { generateJwt, verifyJwt } from "../../domain/auth/jwt";
+import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
+import { frontRoutes } from "../../shared/routes";
+import {
+  createMagicLinkPayload,
+  MagicLinkPayload,
+  Role,
+} from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);

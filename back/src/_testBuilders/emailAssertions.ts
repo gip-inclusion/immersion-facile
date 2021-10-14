@@ -5,7 +5,7 @@ import { agencyCodes } from "../shared/agencies";
 import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
-  email: TemplatedEmail,
+  templatedEmail: TemplatedEmail,
   params: {
     recipients: string[];
     immersionApplication: ImmersionApplicationDto;
@@ -22,7 +22,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
     agencyCode,
   } = immersionApplication;
 
-  expect(email).toEqual({
+  expectTemplatedEmailToEqual(templatedEmail, {
     type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
     recipients: recipients,
     params: {
@@ -43,7 +43,7 @@ export const expectEmailBeneficiaryConfirmationMatchingImmersionApplication = (
 ) => {
   const { email, id, firstName, lastName } = immersionApplication;
 
-  expect(templatedEmail).toEqual({
+  expectTemplatedEmailToEqual(templatedEmail, {
     type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
     recipients: [email],
     params: {
@@ -60,7 +60,7 @@ export const expectEmailMentorConfirmationMatchingImmersionApplication = (
 ) => {
   const { id, mentor, mentorEmail, firstName, lastName } = immersionApplication;
 
-  expect(templatedEmail).toEqual({
+  expectTemplatedEmailToEqual(templatedEmail, {
     type: "NEW_APPLICATION_MENTOR_CONFIRMATION",
     recipients: [mentorEmail],
     params: {
@@ -82,7 +82,7 @@ export const expectEmailFinalValidationConfirmationMatchingImmersionApplication 
     if (!agencyConfig) {
       fail("missing agency config");
     }
-    expect(templatedEmail).toEqual({
+    expectTemplatedEmailToEqual(templatedEmail, {
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
       recipients,
       params: getValidatedApplicationFinalConfirmationParams(
@@ -91,3 +91,56 @@ export const expectEmailFinalValidationConfirmationMatchingImmersionApplication 
       ),
     });
   };
+
+export const expectedEmailImmersionApplicationReviewMatchingImmersionApplication =
+  (
+    templatedEmail: TemplatedEmail,
+    recipients: string[],
+    agencyConfig: AgencyConfig | undefined,
+    immersionApplication: ImmersionApplicationDto,
+    magicLink: string,
+    possibleRoleAction: string,
+  ) => {
+    if (!agencyConfig) {
+      fail("missing agency config");
+    }
+    expectTemplatedEmailToEqual(templatedEmail, {
+      type: "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+      recipients,
+      params: {
+        beneficiaryFirstName: immersionApplication.firstName,
+        beneficiaryLastName: immersionApplication.lastName,
+        businessName: immersionApplication.businessName,
+        magicLink,
+        possibleRoleAction,
+      },
+    });
+  };
+
+export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
+  templatedEmail: TemplatedEmail,
+  recipients: string[],
+  dto: ImmersionApplicationDto,
+  signature: string,
+) => {
+  expectTemplatedEmailToEqual(templatedEmail, {
+    type: "REJECTED_APPLICATION_NOTIFICATION",
+    recipients,
+    params: {
+      beneficiaryFirstName: dto.firstName,
+      beneficiaryLastName: dto.lastName,
+      businessName: dto.businessName,
+      rejectionReason: dto.rejectionJustification || "",
+      signature,
+      agency: agencyCodes[dto.agencyCode],
+      immersionProfession: dto.immersionProfession,
+    },
+  });
+};
+
+const expectTemplatedEmailToEqual = (
+  email: TemplatedEmail,
+  expected: TemplatedEmail,
+) => {
+  expect(email).toEqual(expected);
+};

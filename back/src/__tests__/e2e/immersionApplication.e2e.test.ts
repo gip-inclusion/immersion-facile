@@ -1,13 +1,15 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
 import { generateJwt } from "../../domain/auth/jwt";
-import { Role } from "../../shared/tokens/MagicLinkPayload";
 import {
   immersionApplicationsRoute,
   updateApplicationStatusRoute,
   validateDemandeRoute,
 } from "../../shared/routes";
-import { createMagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
+import {
+  createMagicLinkPayload,
+  Role,
+} from "../../shared/tokens/MagicLinkPayload";
 import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 

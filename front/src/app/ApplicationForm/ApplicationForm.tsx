@@ -243,7 +243,8 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             )}
             onSubmit={async (values, { setSubmitting }) => {
               try {
-                let immersionApplication = immersionApplicationSchema.parse(values);
+                let immersionApplication =
+                  immersionApplicationSchema.parse(values);
 
                 if (!featureFlags.enableMagicLinks) {
                   immersionApplication = {
@@ -253,14 +254,15 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                 }
 
                 if (featureFlags.enableMagicLinks) {
-                  const shouldUpdateExistingImmersionApplication = currentJWT(route).length > 0;
+                  const shouldUpdateExistingImmersionApplication =
+                    currentJWT(route).length > 0;
                   if (shouldUpdateExistingImmersionApplication) {
                     await immersionApplicationGateway.updateML(
                       immersionApplication,
                       currentJWT(route),
                     );
                   } else {
-                    await immersionApplicationGateway.add(immersionApplication)
+                    await immersionApplicationGateway.add(immersionApplication);
                   }
                   setInitialValues(immersionApplication);
 

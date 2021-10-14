@@ -5,6 +5,8 @@ import type {
   NewApplicationBeneficiaryConfirmationParams,
   NewApplicationMentorConfirmationParams,
   ValidatedApplicationFinalConfirmationParams,
+  RejectedApplicationNotificationParams,
+  NewImmersionApplicationReviewForEligibilityOrValidationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
 import { createLogger } from "./../../utils/logger";
@@ -22,7 +24,13 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   NEW_APPLICATION_MENTOR_CONFIRMATION: 5, // v1
 
   // https://my.sendinblue.com/camp/template/6/message-setup
-  VALIDATED_APPLICATION_FINAL_CONFIRMATION: 6, // v1
+  VALIDATED_APPLICATION_FINAL_CONFIRMATION: 6,
+
+  // https://my.sendinblue.com/camp/template/9/message-setup
+  REJECTED_APPLICATION_NOTIFICATION: 9,
+
+  // https://my.sendinblue.com/camp/template/11/message-setup
+  NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: 11,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -115,6 +123,53 @@ export class SendinblueEmailGateway implements EmailGateway {
       INDIVIDUAL_PROTECTION: params.individualProtection,
       QUESTIONNAIRE_URL: params.questionnaireUrl,
       SIGNATURE: params.signature,
+    };
+    this.sendTransacEmail(sibEmail);
+  }
+
+  public async sendRejectedApplicationNotification(
+    recipient: string[],
+    params: RejectedApplicationNotificationParams,
+  ): Promise<void> {
+    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sibEmail.templateId =
+      emailTypeToTemplateId.REJECTED_APPLICATION_NOTIFICATION;
+    if (recipient.length !== 3)
+      logger.error(
+        `Expecting 3 recipients to send Immersion Application rejection mail, got ${recipient.length}`,
+      );
+    else {
+      sibEmail.to = [
+        { email: recipient[0] },
+        { email: recipient[1] },
+        { email: recipient[2] },
+      ];
+      sibEmail.params = {
+        FIRST_NAME: params.beneficiaryFirstName,
+        LAST_NAME: params.beneficiaryLastName,
+        BUSINESS_NAME: params.businessName,
+        REASON: params.rejectionReason,
+        IMMERSION_PROFESSION: params.immersionProfession,
+        AGENCY: params.agency,
+      };
+      this.sendTransacEmail(sibEmail);
+    }
+  }
+
+  public async sendNewApplicationForReviewNotification(
+    recipients: string[],
+    params: NewImmersionApplicationReviewForEligibilityOrValidationParams,
+  ): Promise<void> {
+    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sibEmail.templateId =
+      emailTypeToTemplateId.NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION;
+    sibEmail.to = recipients.map((email) => ({ email }));
+    sibEmail.params = {
+      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+      BUSINESS_NAME: params.businessName,
+      MAGIC_LINK: params.magicLink,
+      POSSIBLE_ROLE_ACTION: params.possibleRoleAction,
     };
     this.sendTransacEmail(sibEmail);
   }

@@ -38,11 +38,31 @@ export type ValidatedApplicationFinalConfirmationParams = {
   signature: string;
 };
 
+export type RejectedApplicationNotificationParams = {
+  beneficiaryFirstName: string;
+  beneficiaryLastName: string;
+  rejectionReason: string;
+  businessName: string;
+  signature: string;
+  immersionProfession: string;
+  agency: string;
+};
+
+export type NewImmersionApplicationReviewForEligibilityOrValidationParams = {
+  beneficiaryFirstName: string;
+  beneficiaryLastName: string;
+  businessName: string;
+  magicLink: string;
+  possibleRoleAction: string;
+};
+
 export type EmailType =
   | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
   | "NEW_APPLICATION_MENTOR_CONFIRMATION"
   | "NEW_APPLICATION_ADMIN_NOTIFICATION"
-  | "VALIDATED_APPLICATION_FINAL_CONFIRMATION";
+  | "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION"
+  | "VALIDATED_APPLICATION_FINAL_CONFIRMATION"
+  | "REJECTED_APPLICATION_NOTIFICATION";
 
 export interface EmailGateway {
   sendNewApplicationBeneficiaryConfirmation: (
@@ -60,5 +80,13 @@ export interface EmailGateway {
   sendValidatedApplicationFinalConfirmation: (
     recipient: string[],
     params: ValidatedApplicationFinalConfirmationParams,
+  ) => Promise<void>;
+  sendRejectedApplicationNotification: (
+    recipient: string[],
+    params: RejectedApplicationNotificationParams,
+  ) => Promise<void>;
+  sendNewApplicationForReviewNotification: (
+    recipient: string[],
+    params: NewImmersionApplicationReviewForEligibilityOrValidationParams,
   ) => Promise<void>;
 }

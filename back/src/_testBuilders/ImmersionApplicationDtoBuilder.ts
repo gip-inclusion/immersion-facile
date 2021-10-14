@@ -140,6 +140,13 @@ export class ImmersionApplicationDtoBuilder
     });
   }
 
+  public withRejectionJustification(rejectionJustification: string) {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      rejectionJustification,
+    });
+  }
+
   public build() {
     return this.dto;
   }

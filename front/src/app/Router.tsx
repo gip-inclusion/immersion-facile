@@ -20,7 +20,9 @@ export const Router = () => {
     <>
       {route.name === "home" && <Home showDebugInfo={dev} />}
       {route.name === "immersionOffer" && <ImmersionOfferForm route={route} />}
-      {route.name === "verification" && <VerificationPage route={route} />}
+      {route.name === "immersionApplicationsToValidate" && (
+        <VerificationPage route={route} />
+      )}
       {route.name === "todos" &&
         (dev ? <TodoApp route={route} /> : <NotAvailable />)}
       {route.name === "immersionApplication" &&

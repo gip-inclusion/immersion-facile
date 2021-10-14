@@ -1,5 +1,6 @@
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
+import { generateJwt } from "../../domain/auth/jwt";
 import {
   EventBus,
   makeCreateNewEvent,
@@ -23,6 +24,12 @@ import { AddImmersionOffer } from "../../domain/immersionOffer/useCases/AddImmer
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { FeatureFlags } from "../../shared/featureFlags";
+import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
+import { frontRoutes } from "../../shared/routes";
+import {
+  createMagicLinkPayload,
+  Role,
+} from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
 import {
   genericApplicationDataConverter,
@@ -59,6 +66,10 @@ import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository"
 import { PoleEmploiAccessTokenGateway } from "../secondary/PoleEmploiAccessTokenGateway";
 import { PoleEmploiRomeGateway } from "../secondary/PoleEmploiRomeGateway";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import {
+  GenerateMagicLinkFn,
+  NotifyNewApplicationNeedsReview,
+} from "./../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 
 const logger = createLogger(__filename);
 const useAirtable = (): boolean => {
@@ -71,8 +82,9 @@ const uuidGenerator = new UuidV4Generator();
 export const createConfig = (featureFlags: FeatureFlags) => {
   const repositories = createRepositories(featureFlags);
   const eventBus = createEventBus();
+  const generateMagicLinkFn = createGenerateMagicLinkFn();
   return {
-    useCases: createUsecases(featureFlags, repositories),
+    useCases: createUsecases(featureFlags, repositories, generateMagicLinkFn),
     authChecker: createAuthChecker(),
     eventBus: eventBus,
     eventCrawler: createEventCrawler(repositories, eventBus),
@@ -197,6 +209,14 @@ export const createAuthChecker = () => {
   return InMemoryAuthChecker.create(username, password);
 };
 
+// Visible for testing.
+export const createGenerateMagicLinkFn =
+  () => (id: ImmersionApplicationId, role: Role) => {
+    const baseUrl = getEnvVarOrDie("IMMERSION_FACILE_BASE_URL");
+    const jwt = generateJwt(createMagicLinkPayload(id, role));
+    return `${baseUrl}/${frontRoutes.immersionApplicationsToValidate}?jwt=${jwt}`;
+  };
+
 const getEnvVarOrDie = (envVar: string) =>
   process.env[envVar] || fail(`Missing environment variable: ${envVar}`);
 
@@ -204,7 +224,11 @@ const fail = (message: string) => {
   throw new Error(message);
 };
 
-const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
+const createUsecases = (
+  featureFlags: FeatureFlags,
+  repositories: any,
+  generateMagicLinkFn: GenerateMagicLinkFn,
+) => {
   const emailAllowList: Readonly<Set<string>> = new Set(
     (process.env.EMAIL_ALLOW_LIST || "").split(",").filter((el) => !!el),
   );
@@ -282,6 +306,11 @@ const createUsecases = (featureFlags: FeatureFlags, repositories: any) => {
         emailAllowList,
         repositories.agency,
       ),
+    notifyNewApplicationNeedsReview: new NotifyNewApplicationNeedsReview(
+      repositories.email,
+      repositories.agency,
+      generateMagicLinkFn,
+    ),
     notifyToTeamApplicationSubmittedByBeneficiary:
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         repositories.email,

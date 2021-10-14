@@ -55,7 +55,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     await client.end();
   });
 
-  test("Insert search works", async () => {
+  test.skip("Insert search works", async () => {
     const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
 
     await pgImmersionOfferRepository.insertSearch({
@@ -76,7 +76,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     ).toBe("M1607");
   });
 
-  test("Insert establishments and retreives them back", async () => {
+  test.skip("Insert establishments and retreives them back", async () => {
     const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
 
     await pgImmersionOfferRepository.insertEstablishments([

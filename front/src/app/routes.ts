@@ -1,3 +1,4 @@
+import { frontRoutes } from "src/shared/routes";
 import { createRouter, defineRoute, param } from "type-route";
 
 export const { RouteProvider, useRoute, routes } = createRouter({
@@ -20,6 +21,9 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { demandeId: param.path.string },
     (p) => `/admin-verification/${p.demandeId}`,
   ),
-  verification: defineRoute({ jwt: param.query.string }, () => `/verification`),
+  immersionApplicationsToValidate: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.immersionApplicationsToValidate}`,
+  ),
   immersionOffer: defineRoute("/immersion-offer"),
 });

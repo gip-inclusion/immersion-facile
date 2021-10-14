@@ -3,6 +3,8 @@ import type {
   NewApplicationAdminNotificationParams,
   NewApplicationBeneficiaryConfirmationParams,
   NewApplicationMentorConfirmationParams,
+  NewImmersionApplicationReviewForEligibilityOrValidationParams,
+  RejectedApplicationNotificationParams,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
@@ -58,6 +60,21 @@ export class InMemoryEmailGateway implements EmailGateway {
     });
   }
 
+  public async sendNewApplicationForReviewNotification(
+    recipients: string[],
+    params: NewImmersionApplicationReviewForEligibilityOrValidationParams,
+  ): Promise<void> {
+    logger.info(
+      { recipients, params },
+      "sendNewApplicationForReviewNotification",
+    );
+    this.sentEmails.push({
+      type: "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+      recipients: recipients,
+      params,
+    });
+  }
+
   public async sendValidatedApplicationFinalConfirmation(
     recipients: string[],
     params: ValidatedApplicationFinalConfirmationParams,
@@ -68,6 +85,18 @@ export class InMemoryEmailGateway implements EmailGateway {
     );
     this.sentEmails.push({
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
+      recipients: recipients,
+      params: params,
+    });
+  }
+
+  public async sendRejectedApplicationNotification(
+    recipients: string[],
+    params: RejectedApplicationNotificationParams,
+  ): Promise<void> {
+    logger.info({ recipients, params }, "sendRejecteddApplicationNotification");
+    this.sentEmails.push({
+      type: "REJECTED_APPLICATION_NOTIFICATION",
       recipients: recipients,
       params: params,
     });

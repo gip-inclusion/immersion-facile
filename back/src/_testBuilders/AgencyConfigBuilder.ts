@@ -36,9 +36,7 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
       adminEmails,
     });
   }
-  public allowUnrestrictedEmailSending(
-    allowUnrestrictedEmailSending: boolean = true,
-  ) {
+  public allowUnrestrictedEmailSending(allowUnrestrictedEmailSending = true) {
     return new AgencyConfigBuilder({
       ...this.config,
       allowUnrestrictedEmailSending,
