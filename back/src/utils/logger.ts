@@ -11,25 +11,14 @@ const getLogLevel = () => {
   return "info";
 };
 
-const getPrettyPrintOptions = (): PrettyOptions => {
-  const defaultOptions: PrettyOptions = {
-    translateTime: "yyyy-mm-dd HH:MM:ss.l",
-  };
-
-  if (process.env.NODE_ENV === "production") {
-    return defaultOptions;
-  }
-
-  return {
-    ...defaultOptions,
-    colorize: true,
-    ignore: "pid,hostname",
-  };
-};
-
 const rootLogger = pino({
   level: getLogLevel(),
-  prettyPrint: getPrettyPrintOptions(),
+  prettyPrint: {
+    translateTime: "yyyy-mm-dd HH:MM:ss.l",
+    singleLine: !process.env.LOGGER_MULTI_LINE,
+    colorize: true,
+    ignore: "pid,hostname",
+  },
 });
 
 // Example use: const logger = createLogger(__filename);
