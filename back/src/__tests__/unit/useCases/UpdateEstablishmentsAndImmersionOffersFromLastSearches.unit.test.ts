@@ -1,5 +1,6 @@
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/searchImmersion/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
 import { EstablishmentsGateway } from "../../../domain/searchImmersion/ports/EstablishmentsGateway";
+import { Position } from "../../../domain/searchImmersion/entities/EstablishmentEntity";
 import {
   GetPosition,
   GetExtraEstablishmentInfos,
@@ -143,7 +144,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 
   it("when Immersion search have been made lately, their information gets persisted in our system", async () => {
     // prepare
-    const search = { ROME: "A1203", distance: 10, lat: 10, lon: 20 };
+    const search = { ROME: "A1203", distance: 10.0, lat: 10.0, lon: 20.0 };
     immersionOfferRepository.setSearches([search]);
 
     // act
@@ -160,6 +161,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
       data_source: "api_laplateformedelinclusion",
       contact_in_establishment: undefined,
       score: 6,
+      position: { lat: 43.8666, lon: 1.3333 },
     });
 
     expect(await immersionOfferRepository.getSearches()).toHaveLength(0);

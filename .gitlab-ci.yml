@@ -29,7 +29,8 @@ front:
 back:
   stage: test
   services:
-    - postgres:13.4-alpine
+    - name: postgis/postgis:13-master
+      alias: postgres
   script:
     - cd back
     - npm ci
@@ -80,8 +81,8 @@ deploy_on_dev:
       git reset --hard origin/dev;
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
-        echo \"FATAL:Source code fetch failed. Aborting.\";
-        exit \$retVal;
+      echo \"FATAL:Source code fetch failed. Aborting.\";
+      exit \$retVal;
       fi;
 
       touch .env &&
@@ -94,8 +95,8 @@ deploy_on_dev:
       retVal=\$?;
       rm -f .env;
       if [ \$retVal -ne 0 ]; then
-        echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
-        exit \$retVal;
+      echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
+      exit \$retVal;
       fi;
 
       sleep 60;
@@ -125,8 +126,8 @@ deploy_on_beta:
       git reset --hard origin/beta;
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
-        echo \"FATAL:Source code fetch failed. Aborting.\";
-        exit \$retVal;
+      echo \"FATAL:Source code fetch failed. Aborting.\";
+      exit \$retVal;
       fi;
 
       touch .env &&
@@ -139,8 +140,8 @@ deploy_on_beta:
       retVal=\$?;
       rm -f .env;
       if [ \$retVal -ne 0 ]; then
-        echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
-        exit \$retVal;
+      echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
+      exit \$retVal;
       fi;
 
       sleep 60;
@@ -170,8 +171,8 @@ deploy_on_prod:
       git reset --hard origin/main;
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
-        echo \"FATAL:Source code fetch failed. Aborting.\";
-        exit \$retVal;
+      echo \"FATAL:Source code fetch failed. Aborting.\";
+      exit \$retVal;
       fi;
 
       touch .env &&
@@ -184,8 +185,8 @@ deploy_on_prod:
       retVal=\$?;
       rm -f .env;
       if [ \$retVal -ne 0 ]; then
-        echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
-        exit \$retVal;
+      echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
+      exit \$retVal;
       fi;
 
       sleep 60;

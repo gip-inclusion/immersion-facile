@@ -64,6 +64,36 @@ describe("Postgres implementation of immersion offer repository", () => {
       lat: 49.119146,
       lon: 6.17602,
     });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1607",
+      distance: 30,
+      lat: 48.119146,
+      lon: 6.17602,
+    });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1607",
+      distance: 30,
+      lat: 48.119146,
+      lon: 5.17602,
+    });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1607",
+      distance: 30,
+      lat: 48.119146,
+      lon: 4.17602,
+    });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1607",
+      distance: 30,
+      lat: 48.129146,
+      lon: 4.17602,
+    });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1608",
+      distance: 30,
+      lat: 48.129146,
+      lon: 4.17602,
+    });
     expect(
       (
         await pgImmersionOfferRepository.getSearchInDatabase({
@@ -74,6 +104,66 @@ describe("Postgres implementation of immersion offer repository", () => {
         })
       )[0].rome,
     ).toBe("M1607");
+
+    //We empty the searches for the next tests
+    await pgImmersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem();
+  });
+
+  test("Grouping searches close geographically works", async () => {
+    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
+
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1607",
+      distance: 30,
+      lat: 49.119146,
+      lon: 6.17602,
+    });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1607",
+      distance: 30,
+      lat: 48.119146,
+      lon: 6.17602,
+    });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1607",
+      distance: 30,
+      lat: 48.119146,
+      lon: 5.17602,
+    });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1607",
+      distance: 30,
+      lat: 48.119146,
+      lon: 4.17602,
+    });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1607",
+      distance: 30,
+      lat: 48.129146,
+      lon: 4.17602,
+    });
+    await pgImmersionOfferRepository.insertSearch({
+      ROME: "M1608",
+      distance: 30,
+      lat: 48.129146,
+      lon: 4.17602,
+    });
+    //We expect that two of the 6 searches have been grouped by
+    expect(
+      await pgImmersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem(),
+    ).toHaveLength(5);
+
+    //We expect then that all searches have been retrieved
+    expect(
+      await pgImmersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem(),
+    ).toHaveLength(0);
+
+    //We expect that all searches are not to be searched anymore
+    const allSearches = (await pgImmersionOfferRepository.getAllSearches())
+      .rows;
+    allSearches.map((row) => {
+      expect(row.needstobesearched).toBe(false);
+    });
   });
 
   test.skip("Insert establishments and retreives them back", async () => {
@@ -90,7 +180,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: "78000403200019",
         dataSource: "api_laplateformedelinclusion",
         numberEmployeesRange: 1,
-        position: { lat: 10, lon: 10 },
+        position: { lat: 10.1, lon: 10.1 },
         naf: "8539A",
       }),
     ]);
@@ -105,7 +195,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: "78000403200019",
         dataSource: "form",
         numberEmployeesRange: 1,
-        position: { lat: 10, lon: 10 },
+        position: { lat: 10.1, lon: 10.2 },
         naf: "8539A",
       }),
     ]);
@@ -120,7 +210,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: "78000403200019",
         dataSource: "api_labonneboite",
         numberEmployeesRange: 1,
-        position: { lat: 10, lon: 10 },
+        position: { lat: 10.0, lon: 10.3 },
         naf: "8539A",
       }),
     ]);
@@ -144,6 +234,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         data_source: "form",
         contact_in_establishment: undefined,
         score: 4.5,
+        position: { lat: 48.8666, lon: 2.3333 },
       }),
     ]);
     await pgImmersionOfferRepository.insertImmersions([
@@ -157,6 +248,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         data_source: "api_laplateformedelinclusion",
         contact_in_establishment: undefined,
         score: 4.5,
+        position: { lat: 46.8666, lon: 3.3333 },
       }),
     ]);
     await pgImmersionOfferRepository.insertImmersions([
@@ -170,6 +262,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         data_source: "api_labonneboite",
         contact_in_establishment: undefined,
         score: 4.5,
+        position: { lat: 43.8666, lon: 8.3333 },
       }),
     ]);
 

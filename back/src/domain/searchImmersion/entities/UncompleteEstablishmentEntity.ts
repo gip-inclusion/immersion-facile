@@ -25,6 +25,10 @@ export class UncompleteEstablishmentEntity {
     return this.props.romes;
   }
 
+  getPosition() {
+    return this.props.position;
+  }
+
   public getSiret() {
     return this.props.siret;
   }

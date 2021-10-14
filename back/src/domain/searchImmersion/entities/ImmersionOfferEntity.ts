@@ -1,4 +1,5 @@
 import { Flavor } from "../../../shared/typeFlavors";
+import { Position } from "./EstablishmentEntity";
 
 export type ImmersionOfferId = Flavor<string, "ImmersionOfferId">;
 export type ImmersionContactInEstablishmentId = Flavor<
@@ -16,6 +17,7 @@ export type ImmersionOfferProps = {
   data_source: string;
   contact_in_establishment?: ImmersionEstablishmentContact;
   score: number;
+  position?: Position;
 };
 
 export type ImmersionEstablishmentContact = {
@@ -49,6 +51,7 @@ export class ImmersionOfferEntity {
       this.props.voluntary_to_immersion,
       this.props.data_source,
       this.props.score,
+      this.props.position,
     ];
   }
 

@@ -1,3 +1,5 @@
+
+
 --
 -- PostgreSQL database dump
 --
@@ -16,6 +18,7 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+CREATE EXTENSION IF NOT EXISTS postgis;
 --
 -- Name: contact_mode; Type: TYPE; Schema: public; Owner: postgres
 --
@@ -60,7 +63,8 @@ CREATE TABLE public.establishments (
     contact_mode public.contact_mode,
     data_source public.data_source,
     update_date timestamp without time zone DEFAULT now(),
-    creation_date timestamp without time zone DEFAULT now()
+    creation_date timestamp without time zone DEFAULT now(),
+    gps public.geography(Point,4326) DEFAULT public.st_geographyfromtext('POINT(2.19 48.5200)'::text)
 );
 
 
@@ -102,7 +106,8 @@ CREATE TABLE public.immersion_offers (
     contact_in_establishment_uuid uuid,
     creation_date timestamp without time zone DEFAULT now(),
     update_date timestamp without time zone DEFAULT now(),
-    score real DEFAULT 0
+    score real DEFAULT 0,
+    gps public.geography(Point,4326) DEFAULT public.st_geographyfromtext('POINT(2.19 48.5200)'::text)
 );
 
 
@@ -118,7 +123,8 @@ CREATE TABLE public.searches_made (
     lon double precision NOT NULL,
     distance double precision NOT NULL,
     needstobesearched boolean DEFAULT true,
-    update_date timestamp without time zone DEFAULT now()
+    update_date timestamp without time zone DEFAULT now(),
+    gps public.geography(Point,4326) DEFAULT public.st_geographyfromtext('POINT(2.19 48.5200)'::text)
 );
 
 

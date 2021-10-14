@@ -76,6 +76,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           data_source: establishment.getDataSource(),
           contact_in_establishment: undefined,
           score: establishment.getScore(),
+          position: establishment.getPosition(),
         }),
     );
   }

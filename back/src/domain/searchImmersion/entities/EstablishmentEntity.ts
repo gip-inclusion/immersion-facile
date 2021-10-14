@@ -69,6 +69,7 @@ export class EstablishmentEntity {
       this.props.naf,
       this.props.contact_mode,
       this.props.dataSource,
+      this.props.position,
     ];
   }
   constructor(private props: EstablishmentProps) {}
