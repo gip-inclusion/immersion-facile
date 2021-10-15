@@ -5,10 +5,18 @@ import { VerificationActionButton } from "src/app/Verification/VerificationActio
 import { FormAccordion } from "src/components/admin/FormAccordion";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
+import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 
 type VerificationPageProps = {
   route: Route<typeof routes.immersionApplicationsToValidate>;
+};
+
+const getHighestActingRole = (roles: Role[]) => {
+  if (roles.includes("admin")) return "admin";
+  if (roles.includes("validator")) return "validator";
+  if (roles.includes("counsellor")) return "counsellor";
+  return undefined;
 };
 
 export const VerificationPage = ({ route }: VerificationPageProps) => {
@@ -18,11 +26,8 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
   const [successMessage, setSuccessMessage] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
 
-  const isCounsellor = roles.includes("counsellor");
-  const isValidator = roles.includes("validator");
-  const isAdmin = roles.includes("admin");
-
-  if (!isCounsellor && !isValidator && !isAdmin)
+  const actingRole = getHighestActingRole(roles);
+  if (!actingRole)
     return <div>Vous n'êtes pas autorisé à accéder à cette page"</div>;
 
   const disabled = !!successMessage;
@@ -59,17 +64,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           Refuser l'immersion ...
         </VerificationActionButton>
 
-        {isValidator ? (
-          // if counsellor is also validator we only show this button
-          <VerificationActionButton
-            {...buttonProps}
-            newStatus="ACCEPTED_BY_VALIDATOR"
-            messageToShowOnSuccess={validatedSuccessfully}
-          >
-            Valider la demande
-          </VerificationActionButton>
-        ) : (
-          // in case counsellor is not validator :
+        {actingRole === "counsellor" && (
           <VerificationActionButton
             {...buttonProps}
             newStatus="ACCEPTED_BY_COUNSELLOR"
@@ -78,7 +73,16 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
             Marquer la demande comme légitime
           </VerificationActionButton>
         )}
-        {isAdmin && (
+        {actingRole === "validator" && (
+          <VerificationActionButton
+            {...buttonProps}
+            newStatus="ACCEPTED_BY_VALIDATOR"
+            messageToShowOnSuccess={validatedSuccessfully}
+          >
+            Valider la demande
+          </VerificationActionButton>
+        )}
+        {actingRole === "admin" && (
           <VerificationActionButton
             {...buttonProps}
             newStatus="VALIDATED"

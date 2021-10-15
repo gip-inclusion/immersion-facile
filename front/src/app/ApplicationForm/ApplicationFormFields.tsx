@@ -28,11 +28,10 @@ const FrozenMessage = () => (
   <>
     <div role="alert" className="fr-alert fr-alert--info">
       <p className="fr-alert__title">
-        Cette demande d'immersion n'est pas modifiable.
+        Cette demande d'immersion n'est plus modifiable.
       </p>
       <p>
-        Cette demande d'immersion a été validé par votre conseiller et il n'est
-        plus possible de la modifier.
+        Cette demande d'immersion a été soumise et il n'est plus possible de la modifier.
       </p>
     </div>
     <br />
