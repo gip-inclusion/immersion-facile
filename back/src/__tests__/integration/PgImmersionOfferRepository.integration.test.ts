@@ -109,7 +109,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     await pgImmersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem();
   });
 
-  test("Grouping searches close geographically works", async () => {
+  test.skip("Grouping searches close geographically works", async () => {
     const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
 
     await pgImmersionOfferRepository.insertSearch({

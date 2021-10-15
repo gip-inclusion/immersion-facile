@@ -31,7 +31,7 @@ const FrozenMessage = () => (
         Cette demande d'immersion n'est pas modifiable.
       </p>
       <p>
-        Cette demande d'immersion a été validé par vôtre conseiller et il n'est
+        Cette demande d'immersion a été validé par votre conseiller et il n'est
         plus possible de la modifier.
       </p>
     </div>

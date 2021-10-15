@@ -4,10 +4,8 @@ import {
   InMemoryAgencyRepository,
 } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
-import {
-  GenerateMagicLinkFn,
-  NotifyNewApplicationNeedsReview,
-} from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
+import { GenerateMagicLinkFn } from "../../domain/immersionApplication/useCases/notifications/NotificationsHelpers";
+import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "./../../_testBuilders/ImmersionApplicationDtoBuilder";

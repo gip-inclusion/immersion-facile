@@ -22,6 +22,7 @@ import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
+import { subscribeToEvents } from "./subscribeToEvents";
 
 const logger = createLogger(__filename);
 
@@ -146,37 +147,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   app.use(router);
   app.use("/auth", createMagicLinkRouter(config));
 
-  config.eventBus.subscribe(
-    "ImmersionApplicationSubmittedByBeneficiary",
-    (event) =>
-      config.useCases.confirmToBeneficiaryThatApplicationCorrectlySubmitted.execute(
-        event.payload,
-      ),
-  );
-
-  config.eventBus.subscribe(
-    "ImmersionApplicationSubmittedByBeneficiary",
-    (event) =>
-      config.useCases.confirmToMentorThatApplicationCorrectlySubmitted.execute(
-        event.payload,
-      ),
-  );
-
-  config.eventBus.subscribe(
-    "ImmersionApplicationSubmittedByBeneficiary",
-    (event) =>
-      config.useCases.notifyToTeamApplicationSubmittedByBeneficiary.execute(
-        event.payload,
-      ),
-  );
-
-  config.eventBus.subscribe(
-    "FinalImmersionApplicationValidationByAdmin",
-    (event) =>
-      config.useCases.notifyAllActorsOfFinalApplicationValidation.execute(
-        event.payload,
-      ),
-  );
+  subscribeToEvents(config);
 
   config.eventCrawler.startCrawler();
 

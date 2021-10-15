@@ -2,7 +2,7 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-  UnauthorizedError
+  UnauthorizedError,
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -10,7 +10,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   CreateNewEvent,
-  makeCreateNewEvent
+  makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
@@ -18,11 +18,11 @@ import { ImmersionApplicationEntity } from "../../../domain/immersionApplication
 import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import {
   ApplicationStatus,
-  ImmersionApplicationDto
+  ImmersionApplicationDto,
 } from "../../../shared/ImmersionApplicationDto";
 import {
   createMagicLinkPayload,
-  Role
+  Role,
 } from "../../../shared/tokens/MagicLinkPayload";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";

@@ -34,6 +34,7 @@ import {
   expectEmailMentorConfirmationMatchingImmersionApplication,
 } from "../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
 
 const adminEmail = "admin@email.fr";
 
@@ -110,11 +111,12 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     notifyToTeam = new NotifyToTeamApplicationSubmittedByBeneficiary(
       emailGw,
       agencyRepository,
+      fakeGenerateMagicLinkUrlFn,
     );
   });
 
-  //Creates a DemandeImmersion, check it is saved properly and that event had been triggered (thanks to subscription),
-  // t hen check mails have been sent trough the inmemory mail gateway
+  // Creates a DemandeImmersion, check it is saved properly and that event had been triggered (thanks to subscription),
+  // then check mails have been sent trough the inmemory mail gateway
   test("saves valid applications in the repository", async () => {
     addDemandeImmersion = new AddImmersionApplication(
       applicationRepository,
@@ -157,6 +159,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[2], {
       recipients: [adminEmail],
       immersionApplication: validDemandeImmersion,
+      magicLink: fakeGenerateMagicLinkUrlFn(validDemandeImmersion.id, "admin"),
     });
   });
 

@@ -7,6 +7,7 @@ import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../../domain/i
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { expectEmailAdminNotificationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 
 const adminEmail = "admin@email.fr";
 const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
@@ -26,6 +27,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
     return new NotifyToTeamApplicationSubmittedByBeneficiary(
       emailGw,
       new InMemoryAgencyRepository(agencyConfigs),
+      fakeGenerateMagicLinkUrlFn,
     );
   };
 
@@ -47,6 +49,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
     expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[0], {
       recipients: [adminEmail],
       immersionApplication: validDemandeImmersion,
+      magicLink: fakeGenerateMagicLinkUrlFn(validDemandeImmersion.id, "admin"),
     });
   });
 });

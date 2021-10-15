@@ -3,22 +3,13 @@ import {
   InMemoryAgencyRepository,
 } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import {
-  GenerateMagicLinkFn,
-  NotifyNewApplicationNeedsReview,
-} from "../../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
-import { ImmersionApplicationId } from "../../../shared/ImmersionApplicationDto";
-import { Role } from "../../../shared/tokens/MagicLinkPayload";
+import { NotifyNewApplicationNeedsReview } from "../../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { expectedEmailImmersionApplicationReviewMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 
 const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
-
-const fakeGenerateMagicLinkUrlFn: GenerateMagicLinkFn = (
-  applicationId: ImmersionApplicationId,
-  role: Role,
-) => `http://fake-magic-link/${applicationId}/${role}`;
 
 describe("NotifyImmersionApplicationNeedsReview", () => {
   let emailGw: InMemoryEmailGateway;

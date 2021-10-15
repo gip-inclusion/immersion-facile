@@ -6,6 +6,7 @@ export type NewApplicationAdminNotificationParams = {
   dateEnd: string;
   businessName: string;
   agencyName: string;
+  magicLink: string;
 };
 
 export type NewApplicationBeneficiaryConfirmationParams = {

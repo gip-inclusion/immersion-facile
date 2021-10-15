@@ -9,9 +9,10 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
   params: {
     recipients: string[];
     immersionApplication: ImmersionApplicationDto;
+    magicLink: string;
   },
 ) => {
-  const { recipients, immersionApplication } = params;
+  const { recipients, immersionApplication, magicLink } = params;
   const {
     id,
     firstName,
@@ -33,6 +34,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
       dateEnd,
       businessName,
       agencyName: agencyCodes[agencyCode],
+      magicLink,
     },
   });
 };

@@ -15,7 +15,9 @@ import { GetImmersionApplication } from "../../domain/immersionApplication/useCa
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
 import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
+import { GenerateMagicLinkFn } from "../../domain/immersionApplication/useCases/notifications/NotificationsHelpers";
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
@@ -66,10 +68,7 @@ import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository"
 import { PoleEmploiAccessTokenGateway } from "../secondary/PoleEmploiAccessTokenGateway";
 import { PoleEmploiRomeGateway } from "../secondary/PoleEmploiRomeGateway";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import {
-  GenerateMagicLinkFn,
-  NotifyNewApplicationNeedsReview,
-} from "./../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
+import { NotifyNewApplicationNeedsReview } from "./../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 
 const logger = createLogger(__filename);
 const useAirtable = (): boolean => {
@@ -314,6 +313,13 @@ const createUsecases = (
     notifyToTeamApplicationSubmittedByBeneficiary:
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         repositories.email,
+        repositories.agency,
+        generateMagicLinkFn,
+      ),
+    notifyBeneficiaryAndEnterpriseThatApplicationIsRejected:
+      new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+        repositories.email,
+        emailAllowList,
         repositories.agency,
       ),
   };

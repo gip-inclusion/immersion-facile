@@ -1,3 +1,4 @@
+import { createGenerateMagicLinkFn } from "../../adapters/primary/config";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
@@ -30,7 +31,11 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
     unrestrictedEmailSendingAgencies = new Set();
     counsellorEmails = {} as Record<AgencyCode, string[]>;
     notifyToTeamApplicationSubmittedByBeneficiary =
-      new NotifyToTeamApplicationSubmittedByBeneficiary(emailGw, agencyRepo);
+      new NotifyToTeamApplicationSubmittedByBeneficiary(
+        emailGw,
+        agencyRepo,
+        createGenerateMagicLinkFn(),
+      );
   });
 
   test.skip("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {

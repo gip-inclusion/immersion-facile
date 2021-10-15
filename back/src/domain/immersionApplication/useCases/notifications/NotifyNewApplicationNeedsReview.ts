@@ -1,19 +1,12 @@
-import {
-  ImmersionApplicationDto,
-  ImmersionApplicationId,
-} from "../../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import { Role } from "../../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
+import { GenerateMagicLinkFn } from "./NotificationsHelpers";
 
 const logger = createLogger(__filename);
-
-export type GenerateMagicLinkFn = (
-  applicationId: ImmersionApplicationId,
-  role: Role,
-) => string;
 
 export class NotifyNewApplicationNeedsReview
   implements UseCase<ImmersionApplicationDto>
@@ -56,9 +49,10 @@ export class NotifyNewApplicationNeedsReview
           agencyConfig.counsellorEmails.length < 1 &&
           agencyConfig.validatorEmails.length < 1
         ) {
-          logger.info(
+          logger.error(
             {
               immersionId: immersionApplicationDto.id,
+              agencyConf: agencyConfig,
             },
             "No Counsellor to review eligibility neither validator to validate this Immersion Application",
           );

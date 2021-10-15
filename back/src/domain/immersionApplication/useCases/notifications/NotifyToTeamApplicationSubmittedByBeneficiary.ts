@@ -4,6 +4,7 @@ import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
+import { GenerateMagicLinkFn } from "./NotificationsHelpers";
 
 const logger = createLogger(__filename);
 export class NotifyToTeamApplicationSubmittedByBeneficiary
@@ -12,6 +13,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly agencyRepository: AgencyRepository,
+    private readonly generateMagicLinkFn: GenerateMagicLinkFn,
   ) {}
 
   public async execute({
@@ -52,6 +54,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
         dateEnd,
         businessName,
         agencyName: agencyCodes[agencyCode],
+        magicLink: this.generateMagicLinkFn(id, "admin"),
       },
     );
   }
