@@ -1,4 +1,5 @@
 import { createGenerateMagicLinkFn } from "../../adapters/primary/config";
+import { AppConfig } from "../../adapters/primary/appConfig";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
@@ -21,12 +22,8 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   let agencyRepo: InMemoryAgencyRepository;
 
   beforeEach(() => {
-    if (!process.env.SENDINBLUE_API_KEY) {
-      throw new Error(
-        "Test requires a valid SENDINBLUE_API_KEY environment variable.",
-      );
-    }
-    emailGw = SendinblueEmailGateway.create(process.env.SENDINBLUE_API_KEY);
+    const config = AppConfig.createFromEnv();
+    emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
     allowList = new Set();
     unrestrictedEmailSendingAgencies = new Set();
     counsellorEmails = {} as Record<AgencyCode, string[]>;
@@ -34,7 +31,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         emailGw,
         agencyRepo,
-        createGenerateMagicLinkFn(),
+        createGenerateMagicLinkFn(config),
       );
   });
 

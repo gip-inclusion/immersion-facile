@@ -1,5 +1,3 @@
-import { Role } from "./../../../shared/tokens/MagicLinkPayload";
-import { generateJwt } from "./../../auth/jwt";
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   AddImmersionApplicationMLResponseDto,
@@ -7,11 +5,13 @@ import {
   ImmersionApplicationDto,
 } from "../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../utils/logger";
+import { GenerateJwtFn } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
+import { Role } from "./../../../shared/tokens/MagicLinkPayload";
 
 const logger = createLogger(__filename);
 
@@ -53,6 +53,7 @@ export class AddImmersionApplicationML
     private readonly applicationRepository: ImmersionApplicationRepository,
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
+    private readonly generateJwt: GenerateJwtFn,
   ) {}
 
   public async execute(
@@ -90,8 +91,8 @@ export class AddImmersionApplicationML
     };
 
     return {
-      magicLinkApplicant: generateJwt(applicantPayload),
-      magicLinkEnterprise: generateJwt(establishmentPayload),
+      magicLinkApplicant: this.generateJwt(applicantPayload),
+      magicLinkEnterprise: this.generateJwt(establishmentPayload),
     };
   }
 }

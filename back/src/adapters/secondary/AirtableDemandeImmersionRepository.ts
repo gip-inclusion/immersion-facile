@@ -3,8 +3,9 @@ import { QueryParams } from "airtable/lib/query_params";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../../domain/immersionApplication/ports/ImmersionApplicationRepository";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
-import { ConflictError } from "../primary/helpers/sendHttpResponse";
 import { createLogger } from "../../utils/logger";
+import { AirtableTableConfig } from "../primary/appConfig";
+import { ConflictError } from "../primary/helpers/sendHttpResponse";
 
 const logger = createLogger(__filename);
 
@@ -22,13 +23,13 @@ export class AirtableDemandeImmersionRepository
   ) {}
 
   public static create(
-    apiKey: string,
-    baseId: string,
-    tableName: string,
+    config: AirtableTableConfig,
     converter: AirtableApplicationDataConverter,
   ) {
     return new AirtableDemandeImmersionRepository(
-      new Airtable({ apiKey }).base(baseId)(tableName),
+      new Airtable({ apiKey: config.apiKey }).base(config.baseId)(
+        config.tableName,
+      ),
       converter,
     );
   }

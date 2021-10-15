@@ -1,22 +1,23 @@
 import axios, { AxiosInstance } from "axios";
 import { SireneRepository } from "../../domain/sirene/ports/SireneRepository";
 import { createLogger } from "../../utils/logger";
+import { AxiosConfig } from "../primary/appConfig";
 
 const logger = createLogger(__filename);
 
 export class HttpsSireneRepository implements SireneRepository {
   private readonly axiosInstance: AxiosInstance;
 
-  public static create(
-    sireneEndpoint: string,
-    bearerToken: string,
-  ): SireneRepository {
-    if (new URL(sireneEndpoint).protocol !== "https:") {
-      throw new Error(`Not an HTTPS endpoint: ${sireneEndpoint}`);
+  public static create({
+    endpoint,
+    bearerToken,
+  }: AxiosConfig): SireneRepository {
+    if (new URL(endpoint).protocol !== "https:") {
+      throw new Error(`Not an HTTPS endpoint: ${endpoint}`);
     }
 
     const axiosInstance = axios.create({
-      baseURL: sireneEndpoint,
+      baseURL: endpoint,
       headers: {
         Authorization: `Bearer ${bearerToken}`,
         Accept: "application/json",

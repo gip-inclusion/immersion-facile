@@ -1,3 +1,4 @@
+import { GenerateMagicLinkFn } from "../../../../adapters/primary/config";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -8,7 +9,6 @@ import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
 import { AgencyConfig } from "./../../ports/AgencyRepository";
-import { GenerateMagicLinkFn } from "./NotificationsHelpers";
 
 const logger = createLogger(__filename);
 

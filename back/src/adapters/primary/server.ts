@@ -1,7 +1,6 @@
 import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import PinoHttp from "pino-http";
-import { FeatureFlags } from "../../shared/featureFlags";
 import {
   getImmersionApplicationRequestDtoSchema,
   immersionApplicationSchema,
@@ -17,7 +16,8 @@ import {
   validateDemandeRoute,
 } from "../../shared/routes";
 import { createLogger } from "../../utils/logger";
-import { createConfig } from "./config";
+import { AppConfig } from "./appConfig";
+import { createAppDependencies } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
@@ -26,22 +26,15 @@ import { subscribeToEvents } from "./subscribeToEvents";
 
 const logger = createLogger(__filename);
 
-export type AppConfig = {
-  featureFlags: FeatureFlags;
-};
-
 const metrics = expressPrometheusMiddleware({
   metricsPath: "/__metrics",
   collectDefaultMetrics: true,
 });
 
-export const createApp = ({ featureFlags }: AppConfig): Express => {
+export const createApp = (config: AppConfig): Express => {
   const app = express();
   const router = Router();
-
-  if (process.env.NODE_ENV !== "test") {
-    app.use(PinoHttp({ logger }));
-  }
+  app.use(PinoHttp({ logger }));
 
   app.use(metrics);
 
@@ -51,14 +44,14 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     return res.json({ message: "Hello World !" });
   });
 
-  const config = createConfig(featureFlags);
+  const deps = createAppDependencies(config);
 
   router
     .route(`/${immersionApplicationsRoute}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         callUseCase({
-          useCase: config.useCases.addDemandeImmersion,
+          useCase: deps.useCases.addDemandeImmersion,
           validationSchema: immersionApplicationSchema,
           useCaseParams: req.body,
         }),
@@ -68,8 +61,8 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
       sendHttpResponse(
         req,
         res,
-        () => config.useCases.listDemandeImmersion.execute(),
-        config.authChecker,
+        () => deps.useCases.listDemandeImmersion.execute(),
+        deps.authChecker,
       );
     });
 
@@ -79,11 +72,11 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
       res,
       () =>
         callUseCase({
-          useCase: config.useCases.validateDemandeImmersion,
+          useCase: deps.useCases.validateDemandeImmersion,
           validationSchema: validateImmersionApplicationRequestDtoSchema,
           useCaseParams: req.params.id,
         }),
-      config.authChecker,
+      deps.authChecker,
     );
   });
 
@@ -98,18 +91,18 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
         res,
         () =>
           callUseCase({
-            useCase: config.useCases.getDemandeImmersion,
+            useCase: deps.useCases.getDemandeImmersion,
             validationSchema: getImmersionApplicationRequestDtoSchema,
             useCaseParams: req.params,
           }),
-        config.authChecker,
+        deps.authChecker,
       ),
     );
 
   router.route(`/${immersionOffersRoute}`).post(async (req, res) =>
     sendHttpResponse(req, res, () =>
       callUseCase({
-        useCase: config.useCases.addImmersionOffer,
+        useCase: deps.useCases.addImmersionOffer,
         validationSchema: immersionOfferSchema,
         useCaseParams: req.body,
       }),
@@ -120,7 +113,7 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
     sendHttpResponse(req, res, async () => {
       logger.info(req);
       return callUseCase({
-        useCase: config.useCases.romeSearch,
+        useCase: deps.useCases.romeSearch,
         validationSchema: romeSearchRequestSchema,
         useCaseParams: req.query.searchText,
       });
@@ -130,14 +123,14 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   router.route(`/${siretRoute}/:siret`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
       logger.info(req);
-      return config.useCases.getSiret.execute(req.params.siret);
+      return deps.useCases.getSiret.execute(req.params.siret);
     }),
   );
 
   router.route(`/${immersionApplicationsRoute}`).post(async (req, res) =>
     sendHttpResponse(req, res, () =>
       callUseCase({
-        useCase: config.useCases.addDemandeImmersionML,
+        useCase: deps.useCases.addDemandeImmersionML,
         validationSchema: immersionApplicationSchema,
         useCaseParams: req.body,
       }),
@@ -145,11 +138,11 @@ export const createApp = ({ featureFlags }: AppConfig): Express => {
   );
 
   app.use(router);
-  app.use("/auth", createMagicLinkRouter(config));
+  app.use("/auth", createMagicLinkRouter(deps));
 
-  subscribeToEvents(config);
+  subscribeToEvents(deps);
 
-  config.eventCrawler.startCrawler();
+  deps.eventCrawler.startCrawler();
 
   return app;
 };

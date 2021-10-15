@@ -5,7 +5,6 @@ import format from "pg-format";
 import { SearchParams } from "../../../domain/searchImmersion/ports/ImmersionOfferRepository";
 import { createLogger } from "../../../utils/logger";
 import { EstablishmentEntity } from "../../../domain/searchImmersion/entities/EstablishmentEntity";
-import { ENV } from "../../primary/environmentVariables";
 import { Position } from "../../../domain/searchImmersion/entities/EstablishmentEntity";
 
 const logger = createLogger(__filename);
@@ -39,9 +38,9 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     SearchParams[]
   > {
     /*
-    In order to lower the amount of request made to third-party services, 
+    In order to lower the amount of request made to third-party services,
     after grouping by ROME searched,
-    we make an aggregation of the searches made in a radius of 0.3 degrees (=29.97 kilometers) 
+    we make an aggregation of the searches made in a radius of 0.3 degrees (=29.97 kilometers)
     and take the max distance searched
     */
     return this.client

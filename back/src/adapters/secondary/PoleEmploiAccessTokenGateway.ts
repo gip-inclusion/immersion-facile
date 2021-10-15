@@ -5,15 +5,13 @@ import {
   GetAccessTokenResponse,
 } from "../../domain/core/ports/AccessTokenGateway";
 import { createLogger } from "../../utils/logger";
+import { AccessTokenConfig } from "../primary/appConfig";
 
 const logger = createLogger(__filename);
 export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
   private readonly axiosInstance: AxiosInstance;
 
-  public constructor(
-    private readonly clientId: string,
-    private readonly clientSecret: string,
-  ) {
+  public constructor(private readonly config: AccessTokenConfig) {
     this.axiosInstance = axios.create();
     this.axiosInstance.interceptors.request.use((request) => {
       logger.info(request);
@@ -32,8 +30,8 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
   public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
     const dataAcessToken = querystring.stringify({
       grant_type: "client_credentials",
-      client_id: this.clientId,
-      client_secret: this.clientSecret,
+      client_id: this.config.clientId,
+      client_secret: this.config.clientSecret,
       scope: scope,
     });
     const headers = {

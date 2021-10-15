@@ -10,6 +10,7 @@ import {
 import { NafDto } from "../../shared/naf";
 import { ProfessionDto } from "../../shared/rome";
 import { createLogger } from "../../utils/logger";
+import { AirtableTableConfig } from "../primary/appConfig";
 import { ConflictError } from "../primary/helpers/sendHttpResponse";
 
 const logger = createLogger(__filename);
@@ -127,13 +128,13 @@ export class AirtableImmersionOfferRepository
   ) {}
 
   public static create(
-    apiKey: string,
-    baseId: string,
-    tableName: string,
+    config: AirtableTableConfig,
     converter: AirtableImmersionOfferDataConverterWithDto,
   ) {
     return new AirtableImmersionOfferRepository(
-      new Airtable({ apiKey }).base(baseId)(tableName),
+      new Airtable({ apiKey: config.apiKey }).base(config.baseId)(
+        config.tableName,
+      ),
       converter,
     );
   }

@@ -1,11 +1,12 @@
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
-import { generateJwt } from "../../domain/auth/jwt";
+import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
 import {
   EventBus,
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
+import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import { ImmersionApplicationRepository } from "../../domain/immersionApplication/ports/ImmersionApplicationRepository";
 import {
   AddImmersionApplication,
@@ -15,9 +16,9 @@ import { GetImmersionApplication } from "../../domain/immersionApplication/useCa
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
 import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
-import { GenerateMagicLinkFn } from "../../domain/immersionApplication/useCases/notifications/NotificationsHelpers";
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
+import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
@@ -25,7 +26,6 @@ import { ValidateImmersionApplication } from "../../domain/immersionApplication/
 import { AddImmersionOffer } from "../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
-import { FeatureFlags } from "../../shared/featureFlags";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../shared/routes";
 import {
@@ -56,7 +56,7 @@ import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxReposi
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import {
-  createAgencyConfigsFromEnv,
+  createAgencyConfigsFromAppConfig,
   InMemoryAgencyRepository,
 } from "../secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
@@ -68,65 +68,65 @@ import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository"
 import { PoleEmploiAccessTokenGateway } from "../secondary/PoleEmploiAccessTokenGateway";
 import { PoleEmploiRomeGateway } from "../secondary/PoleEmploiRomeGateway";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import { NotifyNewApplicationNeedsReview } from "./../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
+import { AppConfig } from "./appConfig";
+import { createAuthMiddleware } from "./authMiddleware";
 
 const logger = createLogger(__filename);
-const useAirtable = (): boolean => {
-  return process.env.REPOSITORIES === "AIRTABLE";
-};
 
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
 
-export const createConfig = (featureFlags: FeatureFlags) => {
-  const repositories = createRepositories(featureFlags);
+export const createAppDependencies = (config: AppConfig) => {
+  const repositories = createRepositories(config);
   const eventBus = createEventBus();
-  const generateMagicLinkFn = createGenerateMagicLinkFn();
+  const generateJwtFn = createGenerateJwtFn(config);
+  const generateMagicLinkFn = createGenerateMagicLinkFn(config);
   return {
-    useCases: createUsecases(featureFlags, repositories, generateMagicLinkFn),
-    authChecker: createAuthChecker(),
-    eventBus: eventBus,
-    eventCrawler: createEventCrawler(repositories, eventBus),
+    useCases: createUseCases(
+      config,
+      repositories,
+      generateJwtFn,
+      generateMagicLinkFn,
+    ),
+    authChecker: createAuthChecker(config),
+    authMiddleware: createAuthMiddleware(config),
+    generateJwtFn,
+    eventBus,
+    eventCrawler: createEventCrawler(config, repositories.outbox, eventBus),
   };
 };
 
-export type AppConfig = ReturnType<typeof createConfig>;
+export type AppDependencies = ReturnType<typeof createAppDependencies>;
 
 const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-const getApplicationRepository = (
-  featureFlags: FeatureFlags,
+const createApplicationRepository = (
+  config: AppConfig,
 ): ImmersionApplicationRepository => {
   const repositoriesBySource: ApplicationRepositoryMap = {};
   if (
-    featureFlags.enableGenericApplicationForm ||
-    featureFlags.enableMagicLinks
+    config.featureFlags.enableGenericApplicationForm ||
+    config.featureFlags.enableMagicLinks
   ) {
-    repositoriesBySource["GENERIC"] = useAirtable()
+    repositoriesBySource["GENERIC"] = config.useAirtable()
       ? AirtableDemandeImmersionRepository.create(
-          getEnvVarOrDie("AIRTABLE_API_KEY"),
-          getEnvVarOrDie("AIRTABLE_BASE_ID_GENERIC"),
-          getEnvVarOrDie("AIRTABLE_TABLE_NAME_GENERIC"),
+          config.airtableGenericImmersionApplicationTableConfig,
           genericApplicationDataConverter,
         )
       : new InMemoryImmersionApplicationRepository();
   }
-  if (featureFlags.enableBoulogneSurMerApplicationForm) {
-    repositoriesBySource["BOULOGNE_SUR_MER"] = useAirtable()
+  if (config.featureFlags.enableBoulogneSurMerApplicationForm) {
+    repositoriesBySource["BOULOGNE_SUR_MER"] = config.useAirtable()
       ? AirtableDemandeImmersionRepository.create(
-          getEnvVarOrDie("AIRTABLE_API_KEY"),
-          getEnvVarOrDie("AIRTABLE_BASE_ID_BOULOGNE_SUR_MER"),
-          getEnvVarOrDie("AIRTABLE_TABLE_NAME_BOULOGNE_SUR_MER"),
+          config.airtableBoulogneSurMerImmersionApplicationTableConfig,
           legacyApplicationDataConverter,
         )
       : new InMemoryImmersionApplicationRepository();
   }
-  if (featureFlags.enableNarbonneApplicationForm) {
-    repositoriesBySource["NARBONNE"] = useAirtable()
+  if (config.featureFlags.enableNarbonneApplicationForm) {
+    repositoriesBySource["NARBONNE"] = config.useAirtable()
       ? AirtableDemandeImmersionRepository.create(
-          getEnvVarOrDie("AIRTABLE_API_KEY"),
-          getEnvVarOrDie("AIRTABLE_BASE_ID_NARBONNE"),
-          getEnvVarOrDie("AIRTABLE_TABLE_NAME_NARBONNE"),
+          config.airtableGenericImmersionApplicationTableConfig,
           legacyApplicationDataConverter,
         )
       : new InMemoryImmersionApplicationRepository();
@@ -134,51 +134,46 @@ const getApplicationRepository = (
   return new ApplicationRepositorySwitcher(repositoriesBySource);
 };
 
-const createRepositories = (featureFlags: FeatureFlags) => {
-  logger.info("REPOSITORIES : " + process.env.REPOSITORIES ?? "IN_MEMORY");
-  logger.info(
-    "SIRENE_REPOSITORY: " + process.env.SIRENE_REPOSITORY ?? "IN_MEMORY",
-  );
-  logger.info("EMAIL_GATEWAY: " + process.env.EMAIL_GATEWAY ?? "IN_MEMORY");
-  logger.info("ROME_GATEWAY: " + process.env.ROME_GATEWAY ?? "IN_MEMORY");
+type Repositories = ReturnType<typeof createRepositories>;
+const createRepositories = (config: AppConfig) => {
+  logger.info({
+    repositories: config.repositories,
+    sireneRepository: config.sireneRepository,
+    emailGateway: config.emailGateway,
+    romeGateway: config.romeGateway,
+  });
 
   return {
-    demandeImmersion: getApplicationRepository(featureFlags),
-    immersionOffer: useAirtable()
+    demandeImmersion: createApplicationRepository(config),
+    immersionOffer: config.useAirtable()
       ? AirtableImmersionOfferRepository.create(
-          getEnvVarOrDie("AIRTABLE_API_KEY"),
-          getEnvVarOrDie("AIRTABLE_BASE_ID_IMMERSION_OFFER"),
-          getEnvVarOrDie("AIRTABLE_TABLE_NAME_IMMERSION_OFFER"),
+          config.airtableApplicationTableConfig,
           immersionOfferDataConverter,
         )
       : new InMemoryImmersionOfferRepository(),
     agency: new InMemoryAgencyRepository(
-      createAgencyConfigsFromEnv(process.env),
+      createAgencyConfigsFromAppConfig(config),
     ),
 
     sirene:
-      process.env.SIRENE_REPOSITORY === "HTTPS"
-        ? HttpsSireneRepository.create(
-            getEnvVarOrDie("SIRENE_ENDPOINT"),
-            getEnvVarOrDie("SIRENE_BEARER_TOKEN"),
-          )
+      config.sireneRepository === "HTTPS"
+        ? HttpsSireneRepository.create(config.sireneHttpsConfig)
         : new InMemorySireneRepository(),
 
     email:
-      process.env.EMAIL_GATEWAY === "SENDINBLUE"
-        ? SendinblueEmailGateway.create(getEnvVarOrDie("SENDINBLUE_API_KEY"))
+      config.emailGateway === "SENDINBLUE"
+        ? SendinblueEmailGateway.create(config.sendinblueApiKey)
         : new InMemoryEmailGateway(),
 
     rome:
-      process.env.ROME_GATEWAY === "POLE_EMPLOI"
+      config.romeGateway === "POLE_EMPLOI"
         ? new PoleEmploiRomeGateway(
             new CachingAccessTokenGateway(
               new PoleEmploiAccessTokenGateway(
-                getEnvVarOrDie("POLE_EMPLOI_CLIENT_ID"),
-                getEnvVarOrDie("POLE_EMPLOI_CLIENT_SECRET"),
+                config.poleEmploiAccessTokenConfig,
               ),
             ),
-            getEnvVarOrDie("POLE_EMPLOI_CLIENT_ID"),
+            config.poleEmploiClientId,
           )
         : new InMemoryRomeGateway(),
 
@@ -186,155 +181,127 @@ const createRepositories = (featureFlags: FeatureFlags) => {
   };
 };
 
-export const createAuthChecker = () => {
-  let username: string;
-  let password: string;
-
-  if (process.env.NODE_ENV === "test") {
-    // Prevent failure when the username/password env variables are not set in tests
-    username = "e2e_tests";
-    password = "e2e";
-  } else if (
-    !process.env.BACKOFFICE_USERNAME ||
-    !process.env.BACKOFFICE_PASSWORD
-  ) {
+export const createAuthChecker = (config: AppConfig) => {
+  if (!config.backofficeUsername || !config.backofficePassword) {
     logger.warn("Missing backoffice credentials. Disabling backoffice access.");
     return ALWAYS_REJECT;
-  } else {
-    username = getEnvVarOrDie("BACKOFFICE_USERNAME");
-    password = getEnvVarOrDie("BACKOFFICE_PASSWORD");
   }
-
-  return InMemoryAuthChecker.create(username, password);
+  return InMemoryAuthChecker.create(
+    config.backofficeUsername,
+    config.backofficePassword,
+  );
 };
 
+export const createGenerateJwtFn = (config: AppConfig): GenerateJwtFn =>
+  makeGenerateJwt(config.jwtPrivateKey);
+
+export type GenerateMagicLinkFn = ReturnType<typeof createGenerateMagicLinkFn>;
+
 // Visible for testing.
-export const createGenerateMagicLinkFn =
-  () => (id: ImmersionApplicationId, role: Role) => {
-    const baseUrl = getEnvVarOrDie("IMMERSION_FACILE_BASE_URL");
+export const createGenerateMagicLinkFn = (config: AppConfig) => {
+  const generateJwt = createGenerateJwtFn(config);
+  return (id: ImmersionApplicationId, role: Role) => {
+    const baseUrl = config.immersionFacileBaseUrl;
     const jwt = generateJwt(createMagicLinkPayload(id, role));
     return `${baseUrl}/${frontRoutes.immersionApplicationsToValidate}?jwt=${jwt}`;
   };
-
-const getEnvVarOrDie = (envVar: string) =>
-  process.env[envVar] || fail(`Missing environment variable: ${envVar}`);
-
-const fail = (message: string) => {
-  throw new Error(message);
 };
 
-const createUsecases = (
-  featureFlags: FeatureFlags,
-  repositories: any,
+const createUseCases = (
+  config: AppConfig,
+  repositories: Repositories,
+  generateJwtFn: GenerateJwtFn,
   generateMagicLinkFn: GenerateMagicLinkFn,
-) => {
-  const emailAllowList: Readonly<Set<string>> = new Set(
-    (process.env.EMAIL_ALLOW_LIST || "").split(",").filter((el) => !!el),
-  );
-  logger.debug(
-    { emailAllowList: Array.from(emailAllowList) },
-    "EMAIL_ALLOW_LIST",
-  );
-  if (emailAllowList.size == 0) {
-    logger.warn(
-      "Empty EMAIL_ALLOW_LIST. Disabling the sending of non-supervisor emails for agencies with ",
-      "restricted email sending.",
-    );
-  }
+) => ({
+  addDemandeImmersion: new AddImmersionApplication(
+    repositories.demandeImmersion,
+    createNewEvent,
+    repositories.outbox,
+  ),
+  addDemandeImmersionML: new AddImmersionApplicationML(
+    repositories.demandeImmersion,
+    createNewEvent,
+    repositories.outbox,
+    generateJwtFn,
+  ),
+  getDemandeImmersion: new GetImmersionApplication(
+    repositories.demandeImmersion,
+  ),
+  listDemandeImmersion: new ListImmersionApplication({
+    immersionApplicationRepository: repositories.demandeImmersion,
+    featureFlags: config.featureFlags,
+  }),
+  updateDemandeImmersion: new UpdateImmersionApplication({
+    immersionApplicationRepository: repositories.demandeImmersion,
+    featureFlags: config.featureFlags,
+  }),
+  validateDemandeImmersion: new ValidateImmersionApplication(
+    repositories.demandeImmersion,
+    createNewEvent,
+    repositories.outbox,
+  ),
+  updateImmersionApplicationStatus: new UpdateImmersionApplicationStatus(
+    repositories.demandeImmersion,
+    createNewEvent,
+    repositories.outbox,
+  ),
 
-  return {
-    addDemandeImmersion: new AddImmersionApplication(
-      repositories.demandeImmersion,
-      createNewEvent,
-      repositories.outbox,
-    ),
-    addDemandeImmersionML: new AddImmersionApplicationML(
-      repositories.demandeImmersion,
-      createNewEvent,
-      repositories.outbox,
-    ),
-    getDemandeImmersion: new GetImmersionApplication(
-      repositories.demandeImmersion,
-    ),
-    listDemandeImmersion: new ListImmersionApplication({
-      immersionApplicationRepository: repositories.demandeImmersion,
-      featureFlags,
-    }),
-    updateDemandeImmersion: new UpdateImmersionApplication({
-      immersionApplicationRepository: repositories.demandeImmersion,
-      featureFlags,
-    }),
-    validateDemandeImmersion: new ValidateImmersionApplication(
-      repositories.demandeImmersion,
-      createNewEvent,
-      repositories.outbox,
-    ),
-    updateImmersionApplicationStatus: new UpdateImmersionApplicationStatus(
-      repositories.demandeImmersion,
-      createNewEvent,
-      repositories.outbox,
-    ),
+  // immersionOffer
+  addImmersionOffer: new AddImmersionOffer(repositories.immersionOffer),
 
-    // immersionOffer
-    addImmersionOffer: new AddImmersionOffer(repositories.immersionOffer),
+  // siret
+  getSiret: new GetSiret({
+    sireneRepository: repositories.sirene,
+  }),
 
-    // siret
-    getSiret: new GetSiret({
-      sireneRepository: repositories.sirene,
-    }),
+  // rome
+  romeSearch: new RomeSearch(repositories.rome),
 
-    // rome
-    romeSearch: new RomeSearch(repositories.rome),
-
-    // notifications
-    confirmToBeneficiaryThatApplicationCorrectlySubmitted:
-      new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
-        repositories.email,
-        emailAllowList,
-        repositories.agency,
-      ),
-    confirmToMentorThatApplicationCorrectlySubmitted:
-      new ConfirmToMentorThatApplicationCorrectlySubmitted(
-        repositories.email,
-        emailAllowList,
-        repositories.agency,
-      ),
-    notifyAllActorsOfFinalApplicationValidation:
-      new NotifyAllActorsOfFinalApplicationValidation(
-        repositories.email,
-        emailAllowList,
-        repositories.agency,
-      ),
-    notifyNewApplicationNeedsReview: new NotifyNewApplicationNeedsReview(
+  // notifications
+  confirmToBeneficiaryThatApplicationCorrectlySubmitted:
+    new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
+      repositories.email,
+      config.emailAllowList,
+      repositories.agency,
+    ),
+  confirmToMentorThatApplicationCorrectlySubmitted:
+    new ConfirmToMentorThatApplicationCorrectlySubmitted(
+      repositories.email,
+      config.emailAllowList,
+      repositories.agency,
+    ),
+  notifyAllActorsOfFinalApplicationValidation:
+    new NotifyAllActorsOfFinalApplicationValidation(
+      repositories.email,
+      config.emailAllowList,
+      repositories.agency,
+    ),
+  notifyNewApplicationNeedsReview: new NotifyNewApplicationNeedsReview(
+    repositories.email,
+    repositories.agency,
+    generateMagicLinkFn,
+  ),
+  notifyToTeamApplicationSubmittedByBeneficiary:
+    new NotifyToTeamApplicationSubmittedByBeneficiary(
       repositories.email,
       repositories.agency,
       generateMagicLinkFn,
     ),
-    notifyToTeamApplicationSubmittedByBeneficiary:
-      new NotifyToTeamApplicationSubmittedByBeneficiary(
-        repositories.email,
-        repositories.agency,
-        generateMagicLinkFn,
-      ),
-    notifyBeneficiaryAndEnterpriseThatApplicationIsRejected:
-      new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
-        repositories.email,
-        emailAllowList,
-        repositories.agency,
-      ),
-  };
-};
+  notifyBeneficiaryAndEnterpriseThatApplicationIsRejected:
+    new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+      repositories.email,
+      config.emailAllowList,
+      repositories.agency,
+    ),
+});
 
 const createEventBus = () => new InMemoryEventBus();
 
 const createEventCrawler = (
-  repositories: any,
+  config: AppConfig,
+  outbox: OutboxRepository,
   eventBus: EventBus,
-): EventCrawler => {
-  const eventCrawlerPeriodMs: number = process.env.EVENT_CRAWLER_PERIOD_MS
-    ? parseInt(process.env.EVENT_CRAWLER_PERIOD_MS)
-    : 0;
-  return eventCrawlerPeriodMs > 0
-    ? new RealEventCrawler(eventBus, repositories.outbox, eventCrawlerPeriodMs)
-    : new BasicEventCrawler(eventBus, repositories.outbox);
-};
+): EventCrawler =>
+  config.eventCrawlerPeriodMs > 0
+    ? new RealEventCrawler(eventBus, outbox, config.eventCrawlerPeriodMs)
+    : new BasicEventCrawler(eventBus, outbox);

@@ -4,20 +4,23 @@ type ThrowIfNotInArrayParams<T> = {
   processEnv: ProcessEnv;
   authorizedValues: T[];
   variableName: string;
+  defaultValue?: T;
 };
 
 export const throwIfNotInArray = <T extends string | undefined>({
   processEnv,
   authorizedValues,
   variableName,
+  defaultValue,
 }: ThrowIfNotInArrayParams<T>): T => {
-  if (!authorizedValues.includes(processEnv[variableName] as T))
+  const value = (processEnv[variableName] || defaultValue) as T;
+  if (!authorizedValues.includes(value))
     throw new Error(
       `Expected ${variableName} to be one of : ` +
         `${authorizedValues.join(" | ")},` +
         `got : ${processEnv[variableName]}`,
     );
-  return processEnv[variableName] as T;
+  return value;
 };
 
 export const makeThrowIfNotDefined =

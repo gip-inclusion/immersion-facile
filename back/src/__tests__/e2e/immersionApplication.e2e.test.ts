@@ -1,6 +1,7 @@
 import supertest, { SuperTest, Test } from "supertest";
+import { AppConfig } from "../../adapters/primary/appConfig";
 import { createApp } from "../../adapters/primary/server";
-import { generateJwt } from "../../domain/auth/jwt";
+import { makeGenerateJwt } from "../../domain/auth/jwt";
 import {
   immersionApplicationsRoute,
   updateApplicationStatusRoute,
@@ -10,21 +11,26 @@ import {
   createMagicLinkPayload,
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
-import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { GenerateJwtFn } from "./../../domain/auth/jwt";
 
 let request: SuperTest<Test>;
+let generateJwt: GenerateJwtFn;
+
+const initializeSystemUnderTest = (config: AppConfig) => {
+  request = supertest(createApp(config));
+  generateJwt = makeGenerateJwt(config.jwtPrivateKey);
+};
 
 describe("/demandes-immersion route", () => {
   describe("Backoffice", () => {
     beforeEach(() => {
-      request = supertest(
-        createApp({
-          featureFlags: FeatureFlagsBuilder.allOff()
-            .enableViewableApplications()
-            .enableGenericApplicationForm()
-            .build(),
-        }),
+      initializeSystemUnderTest(
+        new AppConfigBuilder()
+          .enableViewableApplications()
+          .enableGenericApplicationForm()
+          .build(),
       );
     });
 
@@ -102,13 +108,11 @@ describe("/demandes-immersion route", () => {
 
   describe("DEV environment", () => {
     beforeEach(() => {
-      request = supertest(
-        createApp({
-          featureFlags: FeatureFlagsBuilder.allOff()
-            .enableViewableApplications()
-            .enableGenericApplicationForm()
-            .build(),
-        }),
+      initializeSystemUnderTest(
+        new AppConfigBuilder()
+          .enableViewableApplications()
+          .enableGenericApplicationForm()
+          .build(),
       );
     });
 
@@ -312,13 +316,11 @@ describe("/demandes-immersion route", () => {
 
   describe("BETA environment", () => {
     beforeEach(() => {
-      request = supertest(
-        createApp({
-          featureFlags: FeatureFlagsBuilder.allOff()
-            .enableBoulogneSurMerApplicationForm()
-            .enableNarbonneApplicationForm()
-            .build(),
-        }),
+      initializeSystemUnderTest(
+        new AppConfigBuilder()
+          .enableBoulogneSurMerApplicationForm()
+          .enableNarbonneApplicationForm()
+          .build(),
       );
     });
 
@@ -402,12 +404,8 @@ describe("/demandes-immersion route", () => {
 
 describe("/update-application-status route", () => {
   beforeEach(() => {
-    request = supertest(
-      createApp({
-        featureFlags: FeatureFlagsBuilder.allOff()
-          .enableGenericApplicationForm()
-          .build(),
-      }),
+    initializeSystemUnderTest(
+      new AppConfigBuilder().enableGenericApplicationForm().build(),
     );
   });
 

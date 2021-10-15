@@ -1,16 +1,13 @@
-import { getFeatureFlags } from "../../shared/featureFlags";
 import { createLogger } from "../../utils/logger";
-import { AppConfig, createApp } from "./server";
+import { AppConfig } from "./appConfig";
+import { createApp } from "./server";
 
 const logger = createLogger(__filename);
 
 const port = 1234;
 
-const appConfig: AppConfig = {
-  featureFlags: getFeatureFlags(process.env),
-};
-
-logger.info(appConfig, "appConfig:");
+const appConfig = AppConfig.createFromEnv();
+logger.info({ featureFlags: appConfig.featureFlags });
 
 createApp(appConfig).listen(port, () => {
   logger.info(`server started at http://localhost:${port}`);

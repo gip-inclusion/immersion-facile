@@ -4,17 +4,13 @@ import {
   TEST_ESTABLISHMENT1,
   TEST_ESTABLISHMENT1_SIRET,
 } from "../../adapters/secondary/InMemorySireneRepository";
-import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 
 describe("/siret route", () => {
   let request: SuperTest<Test>;
 
   beforeEach(() => {
-    request = supertest(
-      createApp({
-        featureFlags: FeatureFlagsBuilder.allOff().build(),
-      }),
-    );
+    request = supertest(createApp(new AppConfigBuilder().build()));
   });
 
   it("forwards valid requests", async () => {

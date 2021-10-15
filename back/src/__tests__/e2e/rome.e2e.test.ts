@@ -1,16 +1,12 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
-import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 
 describe("/rome route", () => {
   let request: SuperTest<Test>;
 
   beforeEach(() => {
-    request = supertest(
-      createApp({
-        featureFlags: FeatureFlagsBuilder.allOff().build(),
-      }),
-    );
+    request = supertest(createApp(new AppConfigBuilder().build()));
   });
 
   it("forwards valid requests", async () => {

@@ -2,13 +2,9 @@ import {
   AgencyConfig,
   AgencyRepository,
 } from "../../domain/immersionApplication/ports/AgencyRepository";
-import {
-  AgencyCode,
-  agencyCodeFromString,
-  validAgencyCodes,
-} from "../../shared/agencies";
-import { ProcessEnv } from "../../shared/envHelpers";
+import { AgencyCode, validAgencyCodes } from "../../shared/agencies";
 import { createLogger } from "../../utils/logger";
+import { AppConfig } from "../primary/appConfig";
 
 const logger = createLogger(__filename);
 
@@ -25,32 +21,24 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   }
 }
 
-export const createAgencyConfigsFromEnv = (env: ProcessEnv): AgencyConfigs => {
-  const adminEmails = parseStringList(env.SUPERVISOR_EMAIL);
-  const counsellorEmails = parseEmailsByAgencyCode(
-    process.env.COUNSELLOR_EMAILS,
-  );
-  const validatorEmails = parseEmailsByAgencyCode(process.env.VALIDATOR_EMAILS);
-  const unrestrictedEmailSendingAgencies = new Set(
-    parseAgencyList(process.env.UNRESTRICTED_EMAIL_SENDING_AGENCIES),
-  );
-
-  return validAgencyCodes.reduce(
+export const createAgencyConfigsFromAppConfig = (
+  config: AppConfig,
+): AgencyConfigs =>
+  validAgencyCodes.reduce(
     (acc, agencyCode) => ({
       ...acc,
       [agencyCode]: {
-        counsellorEmails: counsellorEmails[agencyCode] ?? [],
-        validatorEmails: validatorEmails[agencyCode] ?? [],
-        adminEmails: adminEmails,
+        counsellorEmails: config.counsellorEmails[agencyCode] ?? [],
+        validatorEmails: config.validatorEmails[agencyCode] ?? [],
+        adminEmails: config.adminEmails,
         allowUnrestrictedEmailSending:
-          unrestrictedEmailSendingAgencies.has(agencyCode),
+          config.unrestrictedEmailSendingAgencies.has(agencyCode),
         questionnaireUrl: questionnaireUrls[agencyCode] ?? "",
         signature: signatures[agencyCode] ?? "",
       },
     }),
     {},
   );
-};
 
 const questionnaireUrls: Partial<Record<AgencyCode, string>> = {
   AMIE_BOULONAIS:
@@ -62,31 +50,4 @@ const questionnaireUrls: Partial<Record<AgencyCode, string>> = {
 const signatures: Partial<Record<AgencyCode, string>> = {
   AMIE_BOULONAIS: "L'équipe de l'AMIE du Boulonnais",
   MLJ_GRAND_NARBONNE: "L'équipe de la Mission Locale de Narbonne",
-};
-
-// Format: <string>,<string>,...
-const parseStringList = (str: string | undefined, separator = ","): string[] =>
-  (str || "").split(separator).filter((el) => !!el);
-
-// Format: <agencyCode>,<agencyCode>,...
-const parseAgencyList = (str: string | undefined): AgencyCode[] =>
-  parseStringList(str)
-    .map(agencyCodeFromString)
-    .filter((agencyCode) => agencyCode !== "_UNKNOWN");
-
-type EmailsByAgencyCode = Partial<Record<AgencyCode, string[]>>;
-
-// Format: <agencyCode>:<email>,<agencyCode>:<email>,...
-const parseEmailsByAgencyCode = (
-  str: string | undefined,
-): EmailsByAgencyCode => {
-  return parseStringList(str).reduce<EmailsByAgencyCode>((acc, el) => {
-    const [str, email] = el.split(":", 2);
-    const agencyCode = agencyCodeFromString(str);
-    if (agencyCode === "_UNKNOWN" || !email) return acc;
-    return {
-      ...acc,
-      [agencyCode]: [...(acc[agencyCode] || []), email],
-    };
-  }, {});
 };

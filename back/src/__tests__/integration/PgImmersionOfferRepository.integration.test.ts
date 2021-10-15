@@ -1,3 +1,4 @@
+import { AppConfig } from "./../../adapters/primary/appConfig";
 import { PgImmersionOfferRepository } from "../../adapters/secondary/searchImmersion/PgImmersionOfferRepository";
 import { SearchImmersion } from "../../domain/searchImmersion/useCases/SearchImmersion";
 import {
@@ -33,7 +34,6 @@ import { SearchParams } from "../../domain/searchImmersion/ports/ImmersionOfferR
 import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../../adapters/secondary/searchImmersion/fakeEstablishmentsLaPlateFormeDeLInclusion";
 import { fakeEstablishmentsLaBonneBoite } from "../../adapters/secondary/searchImmersion/fakeEstablishmentsLaBonneBoite";
 import { PoleEmploiAccessTokenGateway } from "../../adapters/secondary/PoleEmploiAccessTokenGateway";
-import { ENV } from "../../adapters/primary/environmentVariables";
 import { Client } from "pg";
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../domain/searchImmersion/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
 import {
@@ -42,12 +42,13 @@ import {
   fakeGetPosition,
   fakeGetExtraEstablishmentInfos,
 } from "../../_testBuilders/FakeHttpCalls";
-const host = ENV.ci ? "postgres" : "localhost";
-const testPgUrl = `postgresql://postgres:pg-password@${host}:5432/immersion-db`;
-const client = new Client(testPgUrl);
+
+let client: Client;
 
 describe("Postgres implementation of immersion offer repository", () => {
   beforeAll(async () => {
+    const config = AppConfig.createFromEnv();
+    const client = new Client(config.pgImmersionDbUrl);
     await client.connect();
   });
 

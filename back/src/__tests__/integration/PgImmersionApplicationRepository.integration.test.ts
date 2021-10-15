@@ -1,18 +1,21 @@
 import { Pool, PoolClient } from "pg";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { ENV } from "../../adapters/primary/environmentVariables";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { AppConfig } from "./../../adapters/primary/appConfig";
 
-const host = ENV.ci ? "postgres" : "localhost";
-const connectionString = `postgresql://postgres:pg-password@${host}:5432/immersion-db`;
-const pool = new Pool({ connectionString });
+let pool: Pool;
 
 describe("PgImmersionApplicationRepository", () => {
   let client: PoolClient;
   let immersionApplicationRepository: PgImmersionApplicationRepository;
+
+  beforeAll(async () => {
+    const config = AppConfig.createFromEnv();
+    pool = new Pool({ connectionString: config.pgImmersionDbUrl });
+  });
 
   beforeEach(async () => {
     client = await pool.connect();

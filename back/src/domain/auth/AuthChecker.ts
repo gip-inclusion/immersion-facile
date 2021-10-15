@@ -1,4 +1,5 @@
 import express from "express";
+import { UnauthorizedError } from "./../../adapters/primary/helpers/sendHttpResponse";
 
 export interface AuthChecker {
   checkAuth: (request: express.Request) => void;
@@ -6,6 +7,6 @@ export interface AuthChecker {
 
 export const ALWAYS_REJECT = new (class implements AuthChecker {
   public checkAuth(_req: express.Request) {
-    return false;
+    throw new UnauthorizedError();
   }
 })();

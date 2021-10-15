@@ -1,14 +1,17 @@
-import { createGenerateMagicLinkFn } from "../../adapters/primary/config";
+import { AppConfig } from "../../adapters/primary/appConfig";
+import {
+  createGenerateMagicLinkFn,
+  GenerateMagicLinkFn,
+} from "../../adapters/primary/config";
 import {
   AgencyConfigs,
   InMemoryAgencyRepository,
 } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
-import { GenerateMagicLinkFn } from "../../domain/immersionApplication/useCases/notifications/NotificationsHelpers";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
-import { ImmersionApplicationDtoBuilder } from "./../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 
 const validDemandeImmersion: ImmersionApplicationDto =
   new ImmersionApplicationDtoBuilder()
@@ -21,13 +24,9 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
   let generateMagicLinkFn: GenerateMagicLinkFn;
 
   beforeEach(() => {
-    if (!process.env.SENDINBLUE_API_KEY) {
-      throw new Error(
-        "Test requires a valid SENDINBLUE_API_KEY environment variable.",
-      );
-    }
-    emailGw = SendinblueEmailGateway.create(process.env.SENDINBLUE_API_KEY);
-    generateMagicLinkFn = createGenerateMagicLinkFn();
+    const config = AppConfig.createFromEnv();
+    emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
+    generateMagicLinkFn = createGenerateMagicLinkFn(config);
   });
 
   test.skip("Sends notification mails to check Immersion Application eligibility", async () => {
