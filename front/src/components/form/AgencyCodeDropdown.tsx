@@ -50,13 +50,15 @@ export const AgencyCodeDropdown = ({
         aria-describedby={`agency-code-{name}-error-desc-error`}
         disabled={disabled}
       >
-        {Object.entries(agencyCodes).map(([code, desc]) => (
-          <option
-            value={code}
-            key={code}
-            label={code === "_UNKNOWN" ? "" : desc}
-          />
-        ))}
+        {Object.entries(agencyCodes).map(([code, desc]) => {
+          const label = code === "_UNKNOWN" ? "" : desc;
+
+          return (
+            <option value={code} key={code} label={label}>
+              {label}
+            </option>
+          );
+        })}
       </select>
       {showError && (
         <p id={`agency-code-{name}-error-desc-error`} className="fr-error-text">
