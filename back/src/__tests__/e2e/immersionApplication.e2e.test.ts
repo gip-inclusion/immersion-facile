@@ -409,7 +409,7 @@ describe("/update-application-status route", () => {
     );
   });
 
-  test("Succeeds for valid requests", async () => {
+  test("Succeeds for fully validated applications", async () => {
     // A beneficiary creates a new application in state IN_REVIEW.
     const application = new ImmersionApplicationDtoBuilder()
       .withStatus("IN_REVIEW")
@@ -444,6 +444,26 @@ describe("/update-application-status route", () => {
     await request
       .post(`/auth/${updateApplicationStatusRoute}/${adminJwt}`)
       .send({ status: "VALIDATED" })
+      .expect(200);
+  });
+
+  test("Succeeds for rejected application", async () => {
+    // A beneficiary creates a new application in state IN_REVIEW.
+    const application = new ImmersionApplicationDtoBuilder()
+      .withStatus("IN_REVIEW")
+      .build();
+    await request
+      .post(`/${immersionApplicationsRoute}`)
+      .send(application)
+      .expect(200);
+
+    // A counsellor accepts the application.
+    const counsellorJwt = generateJwt(
+      createMagicLinkPayload(application.id, "counsellor"),
+    );
+    await request
+      .post(`/auth/${updateApplicationStatusRoute}/${counsellorJwt}`)
+      .send({ status: "REJECTED", justification: "test-justification"})
       .expect(200);
   });
 
