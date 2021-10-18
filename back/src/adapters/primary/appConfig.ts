@@ -76,7 +76,7 @@ export class AppConfig {
     return {
       apiKey: this.airtableApiKey,
       baseId: this.throwIfNotDefined("AIRTABLE_BASE_ID_GENERIC"),
-      tableName: this.throwIfNotDefined("AIRTABLE_TABLE_NAME_ID_GENERIC"),
+      tableName: this.throwIfNotDefined("AIRTABLE_TABLE_NAME_GENERIC"),
     };
   }
 
