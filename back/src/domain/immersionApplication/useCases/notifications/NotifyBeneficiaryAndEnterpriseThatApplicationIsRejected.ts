@@ -6,7 +6,6 @@ import {
   EmailGateway,
   RejectedApplicationNotificationParams,
 } from "../../ports/EmailGateway";
-import { agencyCodes } from "./../../../../shared/agencies";
 import { AgencyConfig } from "./../../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
@@ -71,7 +70,7 @@ const getRejectedApplicationNotificationParams = (
     businessName: dto.businessName,
     rejectionReason: dto.rejectionJustification || "",
     signature: agencyConfig.signature,
-    agency: agencyCodes[dto.agencyCode],
+    agency: agencyConfig.name,
     immersionProfession: dto.immersionProfession,
   };
 };

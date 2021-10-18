@@ -1,8 +1,6 @@
-import {
-  AgencyConfigs,
-  InMemoryAgencyRepository,
-} from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../_testBuilders/emailAssertions";
@@ -16,6 +14,8 @@ const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
 const signature = "test-signature";
 
 const defaultAgencyConfig = AgencyConfigBuilder.empty()
+  .withId(rejectedDemandeImmersion.agencyCode)
+  .withName("test-agency-name")
   .withCounsellorEmails(counsellorEmails)
   .withSignature(signature)
   .build();
@@ -23,9 +23,10 @@ const defaultAgencyConfig = AgencyConfigBuilder.empty()
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
   let emailGw: InMemoryEmailGateway;
   let allowList: string[];
-  let agencyConfigs: AgencyConfigs;
+  let agencyConfig: AgencyConfig;
 
   beforeEach(() => {
+    agencyConfig = defaultAgencyConfig;
     emailGw = new InMemoryEmailGateway();
   });
 
@@ -33,20 +34,16 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     return new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
       emailGw,
       new Set(allowList),
-      new InMemoryAgencyRepository(agencyConfigs),
+      new InMemoryAgencyRepository({ [agencyConfig.id]: agencyConfig }),
     );
   };
 
   describe("When email allowList is not enforced (i.e. allowUnrestrictedEmailSending is true)", () => {
-    beforeAll(() => {
+    beforeEach(() => {
       allowList = [];
-      agencyConfigs = {
-        [rejectedDemandeImmersion.agencyCode]: new AgencyConfigBuilder(
-          defaultAgencyConfig,
-        )
-          .allowUnrestrictedEmailSending()
-          .build(),
-      };
+      agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+        .allowUnrestrictedEmailSending()
+        .build();
     });
 
     test("Sends rejection email to beneficiary, mentor, and counsellor", async () => {
@@ -63,20 +60,16 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
           ...counsellorEmails,
         ],
         rejectedDemandeImmersion,
-        signature,
+        agencyConfig,
       );
     });
   });
 
   describe("When email allowList is enforced", () => {
-    beforeAll(() => {
-      agencyConfigs = {
-        [rejectedDemandeImmersion.agencyCode]: new AgencyConfigBuilder(
-          defaultAgencyConfig,
-        )
-          .allowUnrestrictedEmailSending(false)
-          .build(),
-      };
+    beforeEach(() => {
+      agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+        .allowUnrestrictedEmailSending(false)
+        .build();
     });
 
     test("Sends no emails when allowList is empty", async () => {
@@ -106,7 +99,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
           ...counsellorEmails,
         ],
         rejectedDemandeImmersion,
-        signature,
+        agencyConfig,
       );
     });
   });

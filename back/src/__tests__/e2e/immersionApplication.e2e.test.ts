@@ -463,7 +463,7 @@ describe("/update-application-status route", () => {
     );
     await request
       .post(`/auth/${updateApplicationStatusRoute}/${counsellorJwt}`)
-      .send({ status: "REJECTED", justification: "test-justification"})
+      .send({ status: "REJECTED", justification: "test-justification" })
       .expect(200);
   });
 

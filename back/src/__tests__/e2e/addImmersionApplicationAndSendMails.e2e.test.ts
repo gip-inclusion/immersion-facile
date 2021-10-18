@@ -85,6 +85,8 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     ]);
 
     agencyConfig = AgencyConfigBuilder.empty()
+      .withId(validDemandeImmersion.agencyCode)
+      .withName("TEST-name")
       .withAdminEmails([adminEmail])
       .withQuestionnaireUrl("TEST-questionnaireUrl")
       .withSignature("TEST-signature")
@@ -160,6 +162,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       recipients: [adminEmail],
       immersionApplication: validDemandeImmersion,
       magicLink: fakeGenerateMagicLinkUrlFn(validDemandeImmersion.id, "admin"),
+      agencyConfig,
     });
   });
 

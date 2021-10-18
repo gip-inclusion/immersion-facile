@@ -1,8 +1,7 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
-import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyRepository";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { agencyCodes } from "../shared/agencies";
 import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
+import { AgencyConfig } from "./../domain/immersionApplication/ports/AgencyRepository";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
@@ -10,18 +9,12 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
     recipients: string[];
     immersionApplication: ImmersionApplicationDto;
     magicLink: string;
+    agencyConfig: AgencyConfig;
   },
 ) => {
-  const { recipients, immersionApplication, magicLink } = params;
-  const {
-    id,
-    firstName,
-    lastName,
-    dateStart,
-    dateEnd,
-    businessName,
-    agencyCode,
-  } = immersionApplication;
+  const { recipients, immersionApplication, magicLink, agencyConfig } = params;
+  const { id, firstName, lastName, dateStart, dateEnd, businessName } =
+    immersionApplication;
 
   expectTemplatedEmailToEqual(templatedEmail, {
     type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
@@ -33,7 +26,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
       dateStart,
       dateEnd,
       businessName,
-      agencyName: agencyCodes[agencyCode],
+      agencyName: agencyConfig.name,
       magicLink,
     },
   });
@@ -123,7 +116,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
   dto: ImmersionApplicationDto,
-  signature: string,
+  agencyConfig: AgencyConfig,
 ) => {
   expectTemplatedEmailToEqual(templatedEmail, {
     type: "REJECTED_APPLICATION_NOTIFICATION",
@@ -133,8 +126,8 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
       beneficiaryLastName: dto.lastName,
       businessName: dto.businessName,
       rejectionReason: dto.rejectionJustification || "",
-      signature,
-      agency: agencyCodes[dto.agencyCode],
+      signature: agencyConfig.signature,
+      agency: agencyConfig.name,
       immersionProfession: dto.immersionProfession,
     },
   });

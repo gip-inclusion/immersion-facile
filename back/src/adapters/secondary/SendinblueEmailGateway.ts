@@ -3,7 +3,10 @@ import type {
   EmailType,
   NewApplicationAdminNotificationParams,
   NewApplicationBeneficiaryConfirmationParams,
-  NewApplicationMentorConfirmationParams, NewImmersionApplicationReviewForEligibilityOrValidationParams, RejectedApplicationNotificationParams, ValidatedApplicationFinalConfirmationParams
+  NewApplicationMentorConfirmationParams,
+  NewImmersionApplicationReviewForEligibilityOrValidationParams,
+  RejectedApplicationNotificationParams,
+  ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
 import { createLogger } from "./../../utils/logger";

@@ -2,7 +2,11 @@ import {
   AgencyConfig,
   AgencyRepository,
 } from "../../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyCode, validAgencyCodes } from "../../shared/agencies";
+import {
+  AgencyCode,
+  agencyCodes,
+  validAgencyCodes,
+} from "../../shared/agencies";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "../primary/appConfig";
 
@@ -28,6 +32,8 @@ export const createAgencyConfigsFromAppConfig = (
     (acc, agencyCode) => ({
       ...acc,
       [agencyCode]: {
+        id: agencyCode,
+        name: agencyCodes[agencyCode],
         counsellorEmails: config.counsellorEmails[agencyCode] ?? [],
         validatorEmails: config.validatorEmails[agencyCode] ?? [],
         adminEmails: config.adminEmails,

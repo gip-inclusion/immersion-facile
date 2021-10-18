@@ -1,32 +1,32 @@
-import {
-  AgencyConfigs,
-  InMemoryAgencyRepository,
-} from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { expectEmailAdminNotificationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
+import { AgencyConfig } from "./../../../domain/immersionApplication/ports/AgencyRepository";
 
 const adminEmail = "admin@email.fr";
 const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
+const defaultAgencyConfig = AgencyConfigBuilder.empty()
+  .withId(validDemandeImmersion.agencyCode)
+  .withName("test-agency-name")
+  .build();
 
 describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   let emailGw: InMemoryEmailGateway;
-  let agencyConfigs: AgencyConfigs;
+  let agencyConfig: AgencyConfig;
 
   beforeEach(() => {
-    agencyConfigs = {
-      [validDemandeImmersion.agencyCode]: AgencyConfigBuilder.empty().build(),
-    };
+    agencyConfig = defaultAgencyConfig;
     emailGw = new InMemoryEmailGateway();
   });
 
   const createUseCase = () => {
     return new NotifyToTeamApplicationSubmittedByBeneficiary(
       emailGw,
-      new InMemoryAgencyRepository(agencyConfigs),
+      new InMemoryAgencyRepository({ [agencyConfig.id]: agencyConfig }),
       fakeGenerateMagicLinkUrlFn,
     );
   };
@@ -38,8 +38,9 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   });
 
   test("Sends admin notification email to immersion facile team when contact Email is set", async () => {
-    agencyConfigs[validDemandeImmersion.agencyCode] =
-      AgencyConfigBuilder.empty().withAdminEmails([adminEmail]).build();
+    agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+      .withAdminEmails([adminEmail])
+      .build();
 
     await createUseCase().execute(validDemandeImmersion);
 
@@ -50,6 +51,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
       recipients: [adminEmail],
       immersionApplication: validDemandeImmersion,
       magicLink: fakeGenerateMagicLinkUrlFn(validDemandeImmersion.id, "admin"),
+      agencyConfig,
     });
   });
 });

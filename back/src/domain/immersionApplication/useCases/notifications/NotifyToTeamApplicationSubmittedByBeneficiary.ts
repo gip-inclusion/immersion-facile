@@ -1,4 +1,3 @@
-import { agencyCodes } from "../../../../shared/agencies";
 import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
@@ -53,7 +52,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
         dateStart,
         dateEnd,
         businessName,
-        agencyName: agencyCodes[agencyCode],
+        agencyName: agencyConfig.name,
         magicLink: this.generateMagicLinkFn(id, "admin"),
       },
     );
