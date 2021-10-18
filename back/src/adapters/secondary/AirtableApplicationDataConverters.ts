@@ -116,6 +116,7 @@ export const genericApplicationDataConverter: AirtableApplicationDataConverter =
       return ImmersionApplicationEntity.create({
         id: readString(fields, "id"),
         status: readApplicationStatus(fields, "status"),
+        rejectionJustification: readString(fields, "rejectionJustification"),
         source: readApplicationSource(fields, "source"),
         email: readString(fields, "email"),
         phone: readString(fields, "phone"),
@@ -188,6 +189,7 @@ const legacyLabels = {
   dateSubmission: "dateSubmission",
   schedule: "schedule",
   agencyCode: "agencyCode",
+  rejectionJustification: "rejectionJustification",
 };
 
 export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
@@ -250,6 +252,8 @@ export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
       fields[legacyLabels.source] = dto.source;
       fields[legacyLabels.dateSubmission] = dto.dateSubmission;
       fields[legacyLabels.schedule] = scheduleDtoToString(dto.schedule);
+      fields[legacyLabels.rejectionJustification] =
+        dto.rejectionJustification || "";
 
       return fields;
     },
@@ -306,6 +310,10 @@ export const legacyApplicationDataConverter: AirtableApplicationDataConverter =
         dateSubmission: readString(fields, legacyLabels.dateSubmission),
         schedule:
           readScheduleDto(fields, legacyLabels.schedule) || emptySchedule,
+        rejectionJustification: readString(
+          fields,
+          legacyLabels.rejectionJustification,
+        ),
       };
       return ImmersionApplicationEntity.create(dto);
     },
