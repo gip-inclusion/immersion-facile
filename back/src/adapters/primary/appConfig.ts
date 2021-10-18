@@ -59,7 +59,7 @@ export class AppConfig {
     return throwIfNotInArray({
       processEnv: this.env,
       variableName: "REPOSITORIES",
-      authorizedValues: ["IN_MEMORY", "AIRTABLE"],
+      authorizedValues: ["IN_MEMORY", "AIRTABLE", "PG"],
       defaultValue: "IN_MEMORY",
     });
   }

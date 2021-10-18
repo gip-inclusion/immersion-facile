@@ -103,11 +103,11 @@ An `AppConfig` instance must be provided to `createApp()` (in `server.ts`) in or
 
      Example usage:
      ```ts
-     beforeEach(() => {
+     beforeEach(async () => {
        const config = new AppConfigBuilder()
          .enableenableGenericApplicationForm()
          .build();
-       request = superTest(createApp(config));
+       request = superTest(await createApp(config));
      });
      ```
 
@@ -140,10 +140,10 @@ public withMyNewOptionalParameter(value: string): AppConfigBuilder {
 }
 
 // In the e2e test:
-beforeEach(() => {
+beforeEach(async () => {
  const config = new AppConfigBuilder()
    .withMyNewOptionalParameter("test-value")
    .build();
- request = superTest(createApp(config));
+ request = superTest(await createApp(config));
 });
 ```

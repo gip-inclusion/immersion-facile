@@ -31,7 +31,7 @@ const metrics = expressPrometheusMiddleware({
   collectDefaultMetrics: true,
 });
 
-export const createApp = (config: AppConfig): Express => {
+export const createApp = async (config: AppConfig): Promise<Express> => {
   const app = express();
   const router = Router();
   app.use(PinoHttp({ logger }));
@@ -44,7 +44,7 @@ export const createApp = (config: AppConfig): Express => {
     return res.json({ message: "Hello World !" });
   });
 
-  const deps = createAppDependencies(config);
+  const deps = await createAppDependencies(config);
 
   router
     .route(`/${immersionApplicationsRoute}`)

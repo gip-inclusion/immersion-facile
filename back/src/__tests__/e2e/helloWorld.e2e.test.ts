@@ -5,8 +5,8 @@ import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 describe("Hello world route", () => {
   let request: SuperTest<Test>;
 
-  beforeEach(() => {
-    request = supertest(createApp(new AppConfigBuilder().build()));
+  beforeEach(async () => {
+    request = supertest(await createApp(new AppConfigBuilder().build()));
   });
 
   it("says hello", async () => {

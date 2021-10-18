@@ -1,3 +1,4 @@
+import { Pool } from "pg";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
@@ -65,6 +66,7 @@ import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImm
 import { InMemoryImmersionOfferRepository } from "../secondary/InMemoryImmersionOfferRepository";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
+import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PoleEmploiAccessTokenGateway } from "../secondary/PoleEmploiAccessTokenGateway";
 import { PoleEmploiRomeGateway } from "../secondary/PoleEmploiRomeGateway";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
@@ -76,8 +78,8 @@ const logger = createLogger(__filename);
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
 
-export const createAppDependencies = (config: AppConfig) => {
-  const repositories = createRepositories(config);
+export const createAppDependencies = async (config: AppConfig) => {
+  const repositories = await createRepositories(config);
   const eventBus = createEventBus();
   const generateJwtFn = createGenerateJwtFn(config);
   const generateMagicLinkFn = createGenerateMagicLinkFn(config);
@@ -96,24 +98,41 @@ export const createAppDependencies = (config: AppConfig) => {
   };
 };
 
-export type AppDependencies = ReturnType<typeof createAppDependencies>;
+export type AppDependencies = ReturnType<
+  typeof createAppDependencies
+> extends Promise<infer T>
+  ? T
+  : never;
 
 const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-const createApplicationRepository = (
+const getGenericRepo = async (config: AppConfig) => {
+  switch (config.repositories) {
+    case "AIRTABLE":
+      config.airtableGenericImmersionApplicationTableConfig;
+      return AirtableDemandeImmersionRepository.create(
+        config.airtableGenericImmersionApplicationTableConfig,
+        genericApplicationDataConverter,
+      );
+    case "PG": {
+      const pool = new Pool({ connectionString: process.env.PG_URL });
+      const client = await pool.connect();
+      return new PgImmersionApplicationRepository(client);
+    }
+    default:
+      return new InMemoryImmersionApplicationRepository();
+  }
+};
+
+const createApplicationRepository = async (
   config: AppConfig,
-): ImmersionApplicationRepository => {
+): Promise<ImmersionApplicationRepository> => {
   const repositoriesBySource: ApplicationRepositoryMap = {};
   if (
     config.featureFlags.enableGenericApplicationForm ||
     config.featureFlags.enableMagicLinks
   ) {
-    repositoriesBySource["GENERIC"] = config.useAirtable()
-      ? AirtableDemandeImmersionRepository.create(
-          config.airtableGenericImmersionApplicationTableConfig,
-          genericApplicationDataConverter,
-        )
-      : new InMemoryImmersionApplicationRepository();
+    repositoriesBySource["GENERIC"] = await getGenericRepo(config);
   }
   if (config.featureFlags.enableBoulogneSurMerApplicationForm) {
     repositoriesBySource["BOULOGNE_SUR_MER"] = config.useAirtable()
@@ -134,8 +153,13 @@ const createApplicationRepository = (
   return new ApplicationRepositorySwitcher(repositoriesBySource);
 };
 
-type Repositories = ReturnType<typeof createRepositories>;
-const createRepositories = (config: AppConfig) => {
+type Repositories = ReturnType<typeof createRepositories> extends Promise<
+  infer T
+>
+  ? T
+  : never;
+
+const createRepositories = async (config: AppConfig) => {
   logger.info({
     repositories: config.repositories,
     sireneRepository: config.sireneRepository,
@@ -144,7 +168,7 @@ const createRepositories = (config: AppConfig) => {
   });
 
   return {
-    demandeImmersion: createApplicationRepository(config),
+    demandeImmersion: await createApplicationRepository(config),
     immersionOffer: config.useAirtable()
       ? AirtableImmersionOfferRepository.create(
           config.airtableApplicationTableConfig,

@@ -9,8 +9,8 @@ import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 describe("/siret route", () => {
   let request: SuperTest<Test>;
 
-  beforeEach(() => {
-    request = supertest(createApp(new AppConfigBuilder().build()));
+  beforeEach(async () => {
+    request = supertest(await createApp(new AppConfigBuilder().build()));
   });
 
   it("forwards valid requests", async () => {

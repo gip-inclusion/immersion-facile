@@ -13,20 +13,20 @@ import {
 } from "../../shared/tokens/MagicLinkPayload";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { GenerateJwtFn } from "./../../domain/auth/jwt";
+import { GenerateJwtFn } from "../../domain/auth/jwt";
 
 let request: SuperTest<Test>;
 let generateJwt: GenerateJwtFn;
 
-const initializeSystemUnderTest = (config: AppConfig) => {
-  request = supertest(createApp(config));
+const initializeSystemUnderTest = async (config: AppConfig) => {
+  request = supertest(await createApp(config));
   generateJwt = makeGenerateJwt(config.jwtPrivateKey);
 };
 
 describe("/demandes-immersion route", () => {
   describe("Backoffice", () => {
-    beforeEach(() => {
-      initializeSystemUnderTest(
+    beforeEach(async () => {
+      await initializeSystemUnderTest(
         new AppConfigBuilder()
           .enableViewableApplications()
           .enableGenericApplicationForm()
@@ -107,8 +107,8 @@ describe("/demandes-immersion route", () => {
   });
 
   describe("DEV environment", () => {
-    beforeEach(() => {
-      initializeSystemUnderTest(
+    beforeEach(async () => {
+      await initializeSystemUnderTest(
         new AppConfigBuilder()
           .enableViewableApplications()
           .enableGenericApplicationForm()
@@ -315,8 +315,8 @@ describe("/demandes-immersion route", () => {
   });
 
   describe("BETA environment", () => {
-    beforeEach(() => {
-      initializeSystemUnderTest(
+    beforeEach(async () => {
+      await initializeSystemUnderTest(
         new AppConfigBuilder()
           .enableBoulogneSurMerApplicationForm()
           .enableNarbonneApplicationForm()
@@ -361,7 +361,7 @@ describe("/demandes-immersion route", () => {
         .expect(404);
     });
 
-    it("Geting an existing application succeeds", async () => {
+    it("Getting an existing application succeeds", async () => {
       const demandeImmersion = new ImmersionApplicationDtoBuilder()
         .withSource("BOULOGNE_SUR_MER")
         .build();
@@ -403,8 +403,8 @@ describe("/demandes-immersion route", () => {
 });
 
 describe("/update-application-status route", () => {
-  beforeEach(() => {
-    initializeSystemUnderTest(
+  beforeEach(async () => {
+    await initializeSystemUnderTest(
       new AppConfigBuilder().enableGenericApplicationForm().build(),
     );
   });
