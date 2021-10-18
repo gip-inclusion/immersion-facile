@@ -126,7 +126,7 @@ const createApplicationRepository = (
   if (config.featureFlags.enableNarbonneApplicationForm) {
     repositoriesBySource["NARBONNE"] = config.useAirtable()
       ? AirtableDemandeImmersionRepository.create(
-          config.airtableGenericImmersionApplicationTableConfig,
+          config.airtableNarbonneImmersionApplicationTableConfig,
           legacyApplicationDataConverter,
         )
       : new InMemoryImmersionApplicationRepository();
