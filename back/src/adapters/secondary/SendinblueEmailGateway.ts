@@ -3,10 +3,7 @@ import type {
   EmailType,
   NewApplicationAdminNotificationParams,
   NewApplicationBeneficiaryConfirmationParams,
-  NewApplicationMentorConfirmationParams,
-  ValidatedApplicationFinalConfirmationParams,
-  RejectedApplicationNotificationParams,
-  NewImmersionApplicationReviewForEligibilityOrValidationParams,
+  NewApplicationMentorConfirmationParams, NewImmersionApplicationReviewForEligibilityOrValidationParams, RejectedApplicationNotificationParams, ValidatedApplicationFinalConfirmationParams
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
 import { createLogger } from "./../../utils/logger";
@@ -129,32 +126,22 @@ export class SendinblueEmailGateway implements EmailGateway {
   }
 
   public async sendRejectedApplicationNotification(
-    recipient: string[],
+    recipients: string[],
     params: RejectedApplicationNotificationParams,
   ): Promise<void> {
     const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
     sibEmail.templateId =
       emailTypeToTemplateId.REJECTED_APPLICATION_NOTIFICATION;
-    if (recipient.length !== 3)
-      logger.error(
-        `Expecting 3 recipients to send Immersion Application rejection mail, got ${recipient.length}`,
-      );
-    else {
-      sibEmail.to = [
-        { email: recipient[0] },
-        { email: recipient[1] },
-        { email: recipient[2] },
-      ];
-      sibEmail.params = {
-        FIRST_NAME: params.beneficiaryFirstName,
-        LAST_NAME: params.beneficiaryLastName,
-        BUSINESS_NAME: params.businessName,
-        REASON: params.rejectionReason,
-        IMMERSION_PROFESSION: params.immersionProfession,
-        AGENCY: params.agency,
-      };
-      this.sendTransacEmail(sibEmail);
-    }
+    sibEmail.to = recipients.map((email) => ({ email }));
+    sibEmail.params = {
+      FIRST_NAME: params.beneficiaryFirstName,
+      LAST_NAME: params.beneficiaryLastName,
+      BUSINESS_NAME: params.businessName,
+      REASON: params.rejectionReason,
+      IMMERSION_PROFESSION: params.immersionProfession,
+      AGENCY: params.agency,
+    };
+    this.sendTransacEmail(sibEmail);
   }
 
   public async sendNewApplicationForReviewNotification(
