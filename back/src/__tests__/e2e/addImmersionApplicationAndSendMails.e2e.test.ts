@@ -84,8 +84,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       validDemandeImmersion.mentorEmail,
     ]);
 
-    agencyConfig = AgencyConfigBuilder.empty()
-      .withId(validDemandeImmersion.agencyCode)
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
       .withName("TEST-name")
       .withAdminEmails([adminEmail])
       .withQuestionnaireUrl("TEST-questionnaireUrl")

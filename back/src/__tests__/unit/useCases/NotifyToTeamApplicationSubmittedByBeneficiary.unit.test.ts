@@ -9,8 +9,9 @@ import { AgencyConfig } from "./../../../domain/immersionApplication/ports/Agenc
 
 const adminEmail = "admin@email.fr";
 const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
-const defaultAgencyConfig = AgencyConfigBuilder.empty()
-  .withId(validDemandeImmersion.agencyCode)
+const defaultAgencyConfig = AgencyConfigBuilder.create(
+  validDemandeImmersion.agencyCode,
+)
   .withName("test-agency-name")
   .build();
 

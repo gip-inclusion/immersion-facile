@@ -3,10 +3,7 @@ import {
   createGenerateMagicLinkFn,
   GenerateMagicLinkFn,
 } from "../../adapters/primary/config";
-import {
-  AgencyConfigs,
-  InMemoryAgencyRepository,
-} from "../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
@@ -22,6 +19,7 @@ const validDemandeImmersion: ImmersionApplicationDto =
 describe("Notify To 2 Counsellors that an application is available ", () => {
   let emailGw: SendinblueEmailGateway;
   let generateMagicLinkFn: GenerateMagicLinkFn;
+  let agencyConfig;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
@@ -35,14 +33,12 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       "jeanfrancois.macresy+beneficiary@gmail.com",
     ];
 
-    const agencyConfigs: AgencyConfigs = {
-      [validDemandeImmersion.agencyCode]: AgencyConfigBuilder.empty()
-        .withCounsellorEmails(counsellorEmails)
-        .build(),
-    };
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository(
-      agencyConfigs,
-    );
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
+      .withCounsellorEmails(counsellorEmails)
+      .build();
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository({
+      [agencyConfig.id]: agencyConfig,
+    });
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,
@@ -57,15 +53,14 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       "jean-francois.macresy@beta.gouv.fr",
     ];
 
-    const agencyConfigs: AgencyConfigs = {
-      [validDemandeImmersion.agencyCode]: AgencyConfigBuilder.empty()
-        .withCounsellorEmails(counsellorEmails)
-        .build(),
-    };
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
+      .withCounsellorEmails(counsellorEmails)
+      .build();
+
     validDemandeImmersion.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository(
-      agencyConfigs,
-    );
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository({
+      [agencyConfig.id]: agencyConfig,
+    });
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,
@@ -80,15 +75,13 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       "jean-francois.macresy@beta.gouv.fr",
     ];
 
-    const agencyConfigs: AgencyConfigs = {
-      [validDemandeImmersion.agencyCode]: AgencyConfigBuilder.empty()
-        .withValidatorEmails(validationEmails)
-        .build(),
-    };
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
+      .withValidatorEmails(validationEmails)
+      .build();
     validDemandeImmersion.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository(
-      agencyConfigs,
-    );
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository({
+      [agencyConfig.id]: agencyConfig,
+    });
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,

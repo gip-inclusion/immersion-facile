@@ -13,8 +13,9 @@ const rejectedDemandeImmersion = new ImmersionApplicationDtoBuilder()
 const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
 const signature = "test-signature";
 
-const defaultAgencyConfig = AgencyConfigBuilder.empty()
-  .withId(rejectedDemandeImmersion.agencyCode)
+const defaultAgencyConfig = AgencyConfigBuilder.create(
+  rejectedDemandeImmersion.agencyCode,
+)
   .withName("test-agency-name")
   .withCounsellorEmails(counsellorEmails)
   .withSignature(signature)

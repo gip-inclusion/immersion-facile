@@ -1,8 +1,6 @@
-import {
-  AgencyConfigs,
-  InMemoryAgencyRepository,
-} from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
@@ -10,18 +8,27 @@ import { expectedEmailImmersionApplicationReviewMatchingImmersionApplication } f
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 
+const defaultImmersionApplication =
+  new ImmersionApplicationDtoBuilder().build();
+const defaultAgencyConfig = AgencyConfigBuilder.create(
+  defaultImmersionApplication.agencyCode,
+).build();
+
 describe("NotifyImmersionApplicationNeedsReview", () => {
   let validImmersionApplication: ImmersionApplicationDto;
   let emailGw: InMemoryEmailGateway;
+  let agencyConfig: AgencyConfig;
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
+    validImmersionApplication = defaultImmersionApplication;
+    agencyConfig = defaultAgencyConfig;
   });
 
-  const createUseCase = (agencyConfigs: AgencyConfigs) => {
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository(
-      agencyConfigs,
-    );
+  const createUseCase = () => {
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository({
+      [agencyConfig.id]: agencyConfig,
+    });
     return new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,
@@ -31,7 +38,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
   describe("When application status is IN_REVIEW", () => {
     beforeEach(() => {
-      validImmersionApplication = new ImmersionApplicationDtoBuilder()
+      validImmersionApplication = new ImmersionApplicationDtoBuilder(
+        defaultImmersionApplication,
+      )
         .withStatus("IN_REVIEW")
         .build();
     });
@@ -41,14 +50,10 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         "aCouncellor@unmail.com",
         "anotherCouncellor@unmail.com",
       ];
-
-      const agencyConfigs: AgencyConfigs = {
-        [validImmersionApplication.agencyCode]: AgencyConfigBuilder.empty()
-          .withCounsellorEmails(counsellorEmails)
-          .build(),
-      };
-
-      await createUseCase(agencyConfigs).execute(validImmersionApplication);
+      agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+        .withCounsellorEmails(counsellorEmails)
+        .build();
+      await createUseCase().execute(validImmersionApplication);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(1);
@@ -56,7 +61,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
         sentEmails[0],
         counsellorEmails,
-        agencyConfigs[validImmersionApplication.agencyCode],
+        agencyConfig,
         validImmersionApplication,
         fakeGenerateMagicLinkUrlFn(validImmersionApplication.id, "counsellor"),
         "en vérifier l'éligibilité",
@@ -68,13 +73,10 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         "aValidator@unmail.com",
         "anotherValidator@unmail.com",
       ];
-
-      const agencyConfigs: AgencyConfigs = {
-        [validImmersionApplication.agencyCode]: AgencyConfigBuilder.empty()
-          .withValidatorEmails(validatorEmails)
-          .build(),
-      };
-      await createUseCase(agencyConfigs).execute(validImmersionApplication);
+      agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+        .withValidatorEmails(validatorEmails)
+        .build();
+      await createUseCase().execute(validImmersionApplication);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(1);
@@ -82,7 +84,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
         sentEmails[0],
         validatorEmails,
-        agencyConfigs[validImmersionApplication.agencyCode],
+        agencyConfig,
         validImmersionApplication,
         fakeGenerateMagicLinkUrlFn(validImmersionApplication.id, "validator"),
         "en considérer la validation",
@@ -90,24 +92,17 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     test("No counsellors available, neither validators => ensure no mail is sent", async () => {
-      const agencyConfigs: AgencyConfigs = {
-        [validImmersionApplication.agencyCode]:
-          AgencyConfigBuilder.empty().build(),
-      };
-      await createUseCase(agencyConfigs).execute(validImmersionApplication);
-
+      await createUseCase().execute(validImmersionApplication);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
 
     test("No counsellors available, neither validators, still we got admins => ensure no mail is sent", async () => {
       const adminEmail = ["aValidator@unmail.com"];
-      const agencyConfigs: AgencyConfigs = {
-        [validImmersionApplication.agencyCode]: AgencyConfigBuilder.empty()
-          .withAdminEmails(adminEmail)
-          .build(),
-      };
-      await createUseCase(agencyConfigs).execute(validImmersionApplication);
+      agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+        .withAdminEmails(adminEmail)
+        .build();
+      await createUseCase().execute(validImmersionApplication);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
@@ -116,7 +111,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
   describe("When application status is ACCEPTED_BY_COUNSELLOR", () => {
     beforeEach(() => {
-      validImmersionApplication = new ImmersionApplicationDtoBuilder()
+      validImmersionApplication = new ImmersionApplicationDtoBuilder(
+        defaultImmersionApplication,
+      )
         .withStatus("ACCEPTED_BY_COUNSELLOR")
         .build();
     });
@@ -126,13 +123,10 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         "aValidator@unmail.com",
         "anotherValidator@unmail.com",
       ];
-
-      const agencyConfigs: AgencyConfigs = {
-        [validImmersionApplication.agencyCode]: AgencyConfigBuilder.empty()
-          .withValidatorEmails(validatorEmails)
-          .build(),
-      };
-      await createUseCase(agencyConfigs).execute(validImmersionApplication);
+      agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+        .withValidatorEmails(validatorEmails)
+        .build();
+      await createUseCase().execute(validImmersionApplication);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(1);
@@ -140,7 +134,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
         sentEmails[0],
         validatorEmails,
-        agencyConfigs[validImmersionApplication.agencyCode],
+        agencyConfig,
         validImmersionApplication,
         fakeGenerateMagicLinkUrlFn(validImmersionApplication.id, "validator"),
         "en considérer la validation",
@@ -148,24 +142,17 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     test("No validators available => ensure no mail is sent", async () => {
-      const agencyConfigs: AgencyConfigs = {
-        [validImmersionApplication.agencyCode]:
-          AgencyConfigBuilder.empty().build(),
-      };
-      await createUseCase(agencyConfigs).execute(validImmersionApplication);
-
+      await createUseCase().execute(validImmersionApplication);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
 
     test("No validators available, still we got admins => ensure no mail is sent", async () => {
       const adminEmail = ["anAdmin@unmail.com"];
-      const agencyConfigs: AgencyConfigs = {
-        [validImmersionApplication.agencyCode]: AgencyConfigBuilder.empty()
-          .withAdminEmails(adminEmail)
-          .build(),
-      };
-      await createUseCase(agencyConfigs).execute(validImmersionApplication);
+      agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+        .withAdminEmails(adminEmail)
+        .build();
+      await createUseCase().execute(validImmersionApplication);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
@@ -181,12 +168,10 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
     test("Nominal case: Sends notification email to admins", async () => {
       const adminEmail = ["anAdmin@unmail.com"];
-      const agencyConfigs: AgencyConfigs = {
-        [validImmersionApplication.agencyCode]: AgencyConfigBuilder.empty()
-          .withAdminEmails(adminEmail)
-          .build(),
-      };
-      await createUseCase(agencyConfigs).execute(validImmersionApplication);
+      agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+        .withAdminEmails(adminEmail)
+        .build();
+      await createUseCase().execute(validImmersionApplication);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(1);
@@ -194,7 +179,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
         sentEmails[0],
         adminEmail,
-        agencyConfigs[validImmersionApplication.agencyCode],
+        agencyConfig,
         validImmersionApplication,
         fakeGenerateMagicLinkUrlFn(validImmersionApplication.id, "admin"),
         "en considérer la validation",
@@ -202,12 +187,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     test("No admin available => ensure no mail is sent", async () => {
-      const agencyConfigs: AgencyConfigs = {
-        [validImmersionApplication.agencyCode]:
-          AgencyConfigBuilder.empty().build(),
-      };
-      await createUseCase(agencyConfigs).execute(validImmersionApplication);
-
+      await createUseCase().execute(validImmersionApplication);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });

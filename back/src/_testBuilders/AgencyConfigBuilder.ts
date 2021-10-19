@@ -3,27 +3,23 @@ import { AgencyCode } from "../shared/agencies";
 import { Builder } from "./Builder";
 
 const emptyConfig: AgencyConfig = {
-  id: "",
-  name: "",
+  id: "empty-id",
+  name: "empty-name",
   counsellorEmails: [],
   validatorEmails: [],
   adminEmails: [],
   allowUnrestrictedEmailSending: false,
-  questionnaireUrl: "",
-  signature: "",
+  questionnaireUrl: "empty-questionnaire-url",
+  signature: "empty-signature",
 };
 
 export class AgencyConfigBuilder implements Builder<AgencyConfig> {
   // Initializes all feature flags to be off.
   public constructor(readonly config: AgencyConfig) {}
 
-  public static empty() {
-    return new AgencyConfigBuilder(emptyConfig);
-  }
-
-  public withId(id: AgencyCode) {
+  public static create(id: AgencyCode) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...emptyConfig,
       id,
     });
   }
