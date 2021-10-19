@@ -12,7 +12,7 @@
     "prod-env-config": "npm run gen-env-config && cp env-config.js dist/env-config.js",
     "format:check": "prettier --check src",
     "fullcheck": "npm run format && npm run test && npm run typecheck",
-    "symlink-or-copy-shared": "if $CI; then cp -Rf ../back/src/shared ./src; else ln -fs ../../back/src/shared ./src/; fi;"
+    "symlink-or-copy-shared": "rm -rf ./src/shared; if $CI; then cp -Rf ../back/src/shared ./src; else ln -fs ../../back/src/shared ./src/; fi;"
   },
   "dependencies": {
     "@gouvfr/dsfr": "1.1.0",
