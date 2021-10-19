@@ -6,7 +6,11 @@ import {
   submissionAndStartDatesConstraints,
   underMaxDuration,
 } from "./immersionApplicationRefinement";
-import { LegacyScheduleDto, ScheduleDto } from "./ScheduleSchema";
+import {
+  LegacyScheduleDto,
+  ScheduleDto,
+  reasonableSchedule,
+} from "./ScheduleSchema";
 import { Flavor } from "./typeFlavors";
 import { NotEmptyArray, phoneRegExp } from "./utils";
 import { zBoolean, zEmail, zString, zTrimmedString, zTrue } from "./zodUtils";
@@ -22,7 +26,7 @@ export type ApplicationStatus =
   | "ACCEPTED_BY_VALIDATOR"
   | "VALIDATED"
   | "REJECTED";
-const validApplicationStatus: NotEmptyArray<ApplicationStatus> = [
+export const validApplicationStatus: NotEmptyArray<ApplicationStatus> = [
   "DRAFT",
   "IN_REVIEW",
   "ACCEPTED_BY_COUNSELLOR",
@@ -187,3 +191,34 @@ export const updateImmersionApplicationStatusRequestSchema = z.object({
 // prettier-ignore
 export type UpdateImmersionApplicationStatusResponseDto = z.infer<typeof updateImmersionApplicationStatusResponseSchema>;
 export const updateImmersionApplicationStatusResponseSchema = idInObject;
+
+export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
+  id: "fake-test-id",
+  status: "DRAFT",
+  source: "GENERIC",
+  agencyCode: "MLJ_GRAND_NARBONNE",
+  email: "esteban@ocon.fr",
+  phone: "+33012345678",
+  firstName: "Esteban",
+  lastName: "Ocon",
+  dateSubmission: "2021-07-01",
+  dateStart: "2021-08-01",
+  dateEnd: "2021-08-31",
+  businessName: "Beta.gouv.fr",
+  siret: "12345678901234",
+  mentor: "Alain Prost",
+  mentorPhone: "0601010101",
+  mentorEmail: "alain@prost.fr",
+  schedule: reasonableSchedule,
+  legacySchedule: undefined,
+  immersionAddress: "",
+  individualProtection: true,
+  sanitaryPrevention: true,
+  sanitaryPreventionDescription: "fourniture de gel",
+  immersionObjective: "Confirmer un projet professionnel",
+  immersionProfession: "Pilote d'automobile",
+  immersionActivities: "Piloter un automobile",
+  immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
+  beneficiaryAccepted: true,
+  enterpriseAccepted: true,
+};

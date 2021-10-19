@@ -26,4 +26,9 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.immersionApplicationsToValidate}`,
   ),
   immersionOffer: defineRoute("/immersion-offer"),
+
+  debugPopulateDB: defineRoute(
+    { count: param.path.number },
+    (p) => `/debug/populate/${p.count}`,
+  ),
 });

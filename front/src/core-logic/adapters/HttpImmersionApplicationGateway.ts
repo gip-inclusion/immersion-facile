@@ -1,6 +1,8 @@
 import axios from "axios";
+import { format, addDays } from "date-fns";
 import { EstablishmentInfoFromSiretApi } from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { frenchFirstNames } from "src/helpers/namesList";
 import {
   AddImmersionApplicationMLResponseDto,
   addImmersionApplicationMLResponseDtoSchema,
@@ -9,11 +11,13 @@ import {
   ImmersionApplicationDto,
   ImmersionApplicationId,
   immersionApplicationSchema,
+  IMMERSION_APPLICATION_TEMPLATE,
   UpdateImmersionApplicationResponseDto,
   updateImmersionApplicationResponseDtoSchema,
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
   updateImmersionApplicationStatusResponseSchema,
+  validApplicationStatus,
 } from "src/shared/ImmersionApplicationDto";
 import {
   immersionApplicationsRoute,
@@ -24,9 +28,8 @@ import {
 
 const prefix = "api";
 
-export class HttpImmersionApplicationGateway
-  implements ImmersionApplicationGateway
-{
+export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway {
+
   public async add(
     demandeImmersionDto: ImmersionApplicationDto,
   ): Promise<string> {

@@ -8,6 +8,7 @@ import { TodoApp } from "src/app/TodoApp";
 import { ENV } from "src/environmentVariables";
 import { AdminVerification } from "./admin/AdminVerification";
 import { ImmersionOfferForm } from "./ImmersionOffer/ImmersionOfferForm";
+import { PopulateDB } from "./Debug/PopulateDB";
 
 const { dev, featureFlags } = ENV;
 
@@ -55,6 +56,7 @@ export const Router = () => {
         ) : (
           <NotAvailable />
         ))}
+      {dev && route.name === "debugPopulateDB" && <PopulateDB route={route} />}
       {route.name === false && <NotAvailable />}
     </>
   );

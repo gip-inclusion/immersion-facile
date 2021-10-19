@@ -1,6 +1,7 @@
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
-  EstablishmentInfoFromSiretApi,
   Establishment,
+  EstablishmentInfoFromSiretApi,
 } from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { FeatureFlags } from "src/shared/featureFlags";
@@ -8,43 +9,11 @@ import {
   AddImmersionApplicationMLResponseDto,
   ImmersionApplicationDto,
   ImmersionApplicationId,
+  IMMERSION_APPLICATION_TEMPLATE,
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
-import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { sleep } from "src/shared/utils";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-
-const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
-  id: "fake-test-id",
-  status: "DRAFT",
-  source: "GENERIC",
-  agencyCode: "MLJ_GRAND_NARBONNE",
-  email: "esteban@ocon.fr",
-  phone: "+33012345678",
-  firstName: "Esteban",
-  lastName: "Ocon",
-  dateSubmission: "2021-07-01",
-  dateStart: "2021-08-01",
-  dateEnd: "2021-08-31",
-  businessName: "Beta.gouv.fr",
-  siret: "12345678901234",
-  mentor: "Alain Prost",
-  mentorPhone: "0601010101",
-  mentorEmail: "alain@prost.fr",
-  schedule: reasonableSchedule,
-  legacySchedule: undefined,
-  immersionAddress: "",
-  individualProtection: true,
-  sanitaryPrevention: true,
-  sanitaryPreventionDescription: "fourniture de gel",
-  immersionObjective: "Confirmer un projet professionnel",
-  immersionProfession: "Pilote d'automobile",
-  immersionActivities: "Piloter un automobile",
-  immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
-  beneficiaryAccepted: true,
-  enterpriseAccepted: true,
-};
 
 const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
 const TEST_ESTABLISHMENT1: Establishment = {
@@ -89,14 +58,12 @@ const TEST_ESTABLISHMENT2 = {
 };
 
 const SIMULATED_LATENCY_MS = 2000;
-
-export class InMemoryImmersionApplicationGateway
-  implements ImmersionApplicationGateway
-{
+export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGateway {
   private _demandesImmersion: { [id: string]: ImmersionApplicationDto } = {};
   private _establishments: { [siret: string]: Establishment } = {};
 
   public constructor(readonly featureFlags: FeatureFlags) {
+    super();
     this.add({
       ...IMMERSION_APPLICATION_TEMPLATE,
       id: "valid_draft",

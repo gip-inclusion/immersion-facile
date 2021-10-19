@@ -5,7 +5,7 @@
 import { z } from "zod";
 
 export class ValidationError extends Error {
-  public name = "ValidationError";
+  public override name = "ValidationError";
   public inner: Array<{ path: string; message: string }> = [];
   public constructor(message: string) {
     super(message);

@@ -6,28 +6,40 @@ import {
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
+import { generateApplication } from "src/helpers/generateImmersionApplication";
 
-export interface ImmersionApplicationGateway {
-  add: (immersionApplicationDto: ImmersionApplicationDto) => Promise<string>;
-  addML: (
+export abstract class ImmersionApplicationGateway {
+  abstract add(
     immersionApplicationDto: ImmersionApplicationDto,
-  ) => Promise<AddImmersionApplicationMLResponseDto>;
-  get: (id: ImmersionApplicationId) => Promise<ImmersionApplicationDto>;
-  getML: (jwt: string) => Promise<ImmersionApplicationDto>;
+  ): Promise<string>;
+  abstract addML(
+    immersionApplicationDto: ImmersionApplicationDto,
+  ): Promise<AddImmersionApplicationMLResponseDto>;
+  abstract get(id: ImmersionApplicationId): Promise<ImmersionApplicationDto>;
+  abstract getML(jwt: string): Promise<ImmersionApplicationDto>;
 
-  update: (immersionApplicationDto: ImmersionApplicationDto) => Promise<string>;
-  updateML: (
+  abstract update(
+    immersionApplicationDto: ImmersionApplicationDto,
+  ): Promise<string>;
+  abstract updateML(
     immersionApplicationDto: ImmersionApplicationDto,
     jwt: string,
-  ) => Promise<string>;
+  ): Promise<string>;
   // Calls validate-demande on backend.
-  validate: (id: ImmersionApplicationId) => Promise<string>;
+  abstract validate(id: ImmersionApplicationId): Promise<string>;
 
-  updateStatus: (
+  abstract updateStatus(
     params: UpdateImmersionApplicationStatusRequestDto,
     jwt: string,
-  ) => Promise<UpdateImmersionApplicationStatusResponseDto>;
+  ): Promise<UpdateImmersionApplicationStatusResponseDto>;
 
-  getSiretInfo: (siret: string) => Promise<EstablishmentInfoFromSiretApi>;
-  getAll: () => Promise<Array<ImmersionApplicationDto>>;
+  abstract getSiretInfo(siret: string): Promise<EstablishmentInfoFromSiretApi>;
+  abstract getAll(): Promise<Array<ImmersionApplicationDto>>;
+
+  public debugPopulateDB(count: number): Promise<Array<string>> {
+    const initialArray = Array(count).fill(null);
+    return Promise.all(
+      initialArray.map((_, i) => this.add(generateApplication(i))),
+    );
+  }
 }
