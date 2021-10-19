@@ -1,5 +1,5 @@
 import express from "express";
-import { UnauthorizedError } from "./../../adapters/primary/helpers/sendHttpResponse";
+import { ForbiddenError } from "./../../adapters/primary/helpers/sendHttpResponse";
 
 export interface AuthChecker {
   checkAuth: (request: express.Request) => void;
@@ -7,6 +7,6 @@ export interface AuthChecker {
 
 export const ALWAYS_REJECT = new (class implements AuthChecker {
   public checkAuth(_req: express.Request) {
-    throw new UnauthorizedError();
+    throw new ForbiddenError();
   }
 })();

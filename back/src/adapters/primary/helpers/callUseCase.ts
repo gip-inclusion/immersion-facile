@@ -1,3 +1,4 @@
+import { BadRequestError } from './sendHttpResponse';
 import { z } from "zod";
 import type { UseCase } from "../../../domain/core/UseCase";
 import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
@@ -17,7 +18,13 @@ export const callUseCase = async <Input, Output = void>({
   jwtPayload?: MagicLinkPayload;
 }) => {
   try {
-    const params = validationSchema.parse(useCaseParams) as Input;
+    let params: Input;
+    try {
+      params = validationSchema.parse(useCaseParams) as Input;
+    } catch (error) {
+      throw new BadRequestError(error);
+    }
+
     return useCase.execute(params, jwtPayload);
   } catch (error) {
     logger.error({ error }, "callUseCase failed");

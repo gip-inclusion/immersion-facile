@@ -78,11 +78,11 @@ describe("/demandes-immersion route", () => {
           .expect(200, demandeImmersion);
       });
 
-      it("Validating applications with invalid credentials fails with 401 Unauthorized", async () => {
+      it("Validating applications with invalid credentials fails with 403 Forbidden", async () => {
         await request
           .get(`/${validateDemandeRoute}/${demandeImmersion.id}`)
           .auth("not real user", "not real password")
-          .expect(401);
+          .expect(403);
 
         // Getting the application succeeds and shows that it's NOT validated.
         await request
@@ -298,11 +298,11 @@ describe("/demandes-immersion route", () => {
       await request.get(`/${immersionApplicationsRoute}`).expect(401);
     });
 
-    it("Listing applications with invalid credentials fails with 401 Unauthorized", async () => {
+    it("Listing applications with invalid credentials fails with 403 Forbidden", async () => {
       await request
         .get(`/${immersionApplicationsRoute}`)
         .auth("not real user", "not real password")
-        .expect(401);
+        .expect(403);
     });
 
     it("Listing applications with valid credentials succeeds", async () => {

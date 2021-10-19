@@ -1,5 +1,5 @@
 import { AuthChecker } from "./AuthChecker";
-import { UnauthorizedError } from "../../adapters/primary/helpers/sendHttpResponse";
+import { ForbiddenError, UnauthorizedError } from "../../adapters/primary/helpers/sendHttpResponse";
 import express from "express";
 
 export class InMemoryAuthChecker implements AuthChecker {
@@ -33,7 +33,7 @@ export class InMemoryAuthChecker implements AuthChecker {
         receivedUsername === this.username && receivedPassword === this.password
       )
     ) {
-      throw new UnauthorizedError(); // TODO: Return a ForbiddenError.
+      throw new ForbiddenError();
     }
   }
 }

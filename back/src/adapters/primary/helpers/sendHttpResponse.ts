@@ -61,7 +61,7 @@ export const sendHttpResponse = async (
     } else if (error instanceof BadRequestError) {
       res.status(400);
     } else {
-      res.status(400); // TODO: Change this to 500 Internal Server Error.
+      res.status(500);
     }
     return res.json({ errors: error.errors || [error.message] });
   }
