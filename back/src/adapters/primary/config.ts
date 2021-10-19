@@ -109,7 +109,6 @@ const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 const getGenericRepo = async (config: AppConfig) => {
   switch (config.repositories) {
     case "AIRTABLE":
-      config.airtableGenericImmersionApplicationTableConfig;
       return AirtableDemandeImmersionRepository.create(
         config.airtableGenericImmersionApplicationTableConfig,
         genericApplicationDataConverter,
