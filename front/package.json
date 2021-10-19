@@ -1,10 +1,10 @@
 {
   "version": "0.0.0",
   "scripts": {
-    "test": "npm run symlink-shared && jest",
-    "dev": "npm run symlink-shared && npm run gen-env-config && vite",
-    "dev-http": "npm run symlink-shared && GATEWAY=HTTP npm run gen-env-config && vite",
-    "build": "npm run symlink-shared && vite build",
+    "test": "npm run symlink-or-copy-shared && jest",
+    "dev": "npm run symlink-or-copy-shared && npm run gen-env-config && vite",
+    "dev-http": "npm run symlink-or-copy-shared && GATEWAY=HTTP npm run gen-env-config && vite",
+    "build": "npm run symlink-or-copy-shared && vite build",
     "serve": "npm run prod-env-config && vite preview",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write src",
@@ -12,7 +12,7 @@
     "prod-env-config": "npm run gen-env-config && cp env-config.js dist/env-config.js",
     "format:check": "prettier --check src",
     "fullcheck": "npm run format && npm run test && npm run typecheck",
-    "symlink-shared": "ln -fs ../../back/src/shared ./src/"
+    "symlink-or-copy-shared": "if $CI; then cp -Rf ../back/src/shared ./src; else ln -fs ../../back/src/shared ./src/; fi;"
   },
   "dependencies": {
     "@gouvfr/dsfr": "1.1.0",
