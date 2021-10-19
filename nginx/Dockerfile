@@ -1,18 +1,16 @@
 FROM nginx
 
-RUN apt-get update && \
-    apt-get -y install certbot cron python3-certbot-nginx procps
-
-RUN mkdir -p /certbot
-
 ARG ENV_TYPE
-
-RUN mkdir -p /etc/nginx/ssl
-
 ENV ENV_TYPE=$ENV_TYPE
 
-CMD echo $ENV_TYPE; \
-    [ "$ENV_TYPE" = "production" ] && cp /etc/nginx/conf.d/ssl/* /etc/nginx/ssl || rm -f /etc/nginx/ssl/*; \
-    service cron start && \
-    service nginx start && \
+ARG DOMAIN
+ENV DOMAIN=${DOMAIN:-domain.tld}
+
+ARG LETSENCRYPT_MAIL
+ENV LETSENCRYPT_MAIL=${LETSENCRYPT_MAIL:-not_provided@mail.com}
+
+ADD ./web/nginxautossl.tar.xz /
+
+RUN [ "$ENV_TYPE" = "production" ] && INIT="ssl"; /nginxautossl.sh "init$INIT";
+CMD [ "$ENV_TYPE" = "production" ] && INIT="ssl"; /nginxautossl.sh "run$INIT" $DOMAIN LETSENCRYPT_MAIL && \
     sleep infinity
