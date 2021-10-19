@@ -47,7 +47,7 @@ export const fetchEstablishmentInfoBySiret = async (
   );
   const withNaf =
     establishment.uniteLegale.activitePrincipaleUniteLegale &&
-    establishment.uniteLegale.activitePrincipaleUniteLegale;
+    establishment.uniteLegale.nomenclatureActivitePrincipaleUniteLegale;
   return {
     businessName: getBusinessName(establishment),
     businessAddress,
@@ -56,7 +56,7 @@ export const fetchEstablishmentInfoBySiret = async (
           naf: {
             code: establishment.uniteLegale.activitePrincipaleUniteLegale!,
             nomenclature:
-              establishment.uniteLegale.activitePrincipaleUniteLegale!,
+              establishment.uniteLegale.nomenclatureActivitePrincipaleUniteLegale!,
           },
         }
       : {}),
