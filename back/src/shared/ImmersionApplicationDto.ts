@@ -71,12 +71,13 @@ export const immersionApplicationSchema = z
   .object({
     id: immersionApplicationIdSchema,
     status: z.enum(validApplicationStatus),
-    rejectionJustification: zString.optional(),
+    rejectionJustification: z.string().optional(),
     source: z.enum(validApplicationSources),
     email: zEmail,
     firstName: zTrimmedString,
     lastName: zTrimmedString,
-    phone: zString
+    phone: z
+      .string()
       .regex(phoneRegExp, "Numero de téléphone incorrect")
       .optional(),
     agencyCode: agencyCodeSchema,

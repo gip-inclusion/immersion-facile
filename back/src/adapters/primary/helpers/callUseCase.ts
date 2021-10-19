@@ -1,4 +1,4 @@
-import { BadRequestError } from './sendHttpResponse';
+import { BadRequestError } from "./sendHttpResponse";
 import { z } from "zod";
 import type { UseCase } from "../../../domain/core/UseCase";
 import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";

@@ -138,11 +138,11 @@ export class SendinblueEmailGateway implements EmailGateway {
     sibEmail.to = recipients.map((email) => ({ email }));
     sibEmail.params = {
       FIRST_NAME: params.beneficiaryFirstName,
-      LAST_NAME: params.beneficiaryLastName,
+      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
       BUSINESS_NAME: params.businessName,
       REASON: params.rejectionReason,
-      IMMERSION_PROFESSION: params.immersionProfession,
       AGENCY: params.agency,
+      SIGNATURE: params.signature,
     };
     this.sendTransacEmail(sibEmail);
   }
