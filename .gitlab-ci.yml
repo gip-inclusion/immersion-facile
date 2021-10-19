@@ -177,13 +177,10 @@ deploy_on_prod:
 
       touch .env &&
       chmod 600 .env &&
-      cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+      cat .env.variables <(echo) .env.secrets <(echo) > .env;
       rm -f .env.variables .env.secrets &&
-      docker-compose --env-file .env build &&
-      docker-compose down &&
-      docker-compose up -d;
+      docker-compose --env-file .env up --build -d;
       retVal=\$?;
-      rm -f .env;
       if [ \$retVal -ne 0 ]; then
       echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
       exit \$retVal;

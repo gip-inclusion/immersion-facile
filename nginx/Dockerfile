@@ -12,5 +12,5 @@ ENV LETSENCRYPT_MAIL=${LETSENCRYPT_MAIL:-not_provided@mail.com}
 ADD ./web/nginxautossl.tar.xz /
 
 RUN [ "$ENV_TYPE" = "production" ] && INIT="ssl"; /nginxautossl.sh "init$INIT";
-CMD [ "$ENV_TYPE" = "production" ] && INIT="ssl"; /nginxautossl.sh "run$INIT" $DOMAIN LETSENCRYPT_MAIL && \
+CMD [ "$ENV_TYPE" = "production" ] && INIT="ssl"; /nginxautossl.sh "run$INIT" $DOMAIN $LETSENCRYPT_MAIL && \
     sleep infinity
