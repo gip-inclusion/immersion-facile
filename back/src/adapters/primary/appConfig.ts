@@ -63,10 +63,6 @@ export class AppConfig {
     });
   }
 
-  public useAirtable(): boolean {
-    return this.repositories === "AIRTABLE";
-  }
-
   private get airtableApiKey() {
     return this.throwIfNotDefined("AIRTABLE_API_KEY");
   }

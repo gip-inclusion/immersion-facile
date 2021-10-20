@@ -26,24 +26,9 @@ export const Router = () => {
       )}
       {route.name === "todos" &&
         (dev ? <TodoApp route={route} /> : <NotAvailable />)}
-      {route.name === "immersionApplication" &&
-        (featureFlags.enableMagicLinks ? (
-          <ApplicationForm route={route} />
-        ) : (
-          <NotAvailable />
-        ))}
-      {route.name === "boulogneSurMer" &&
-        (featureFlags.enableBoulogneSurMerApplicationForm ? (
-          <ApplicationForm route={route} />
-        ) : (
-          <NotAvailable />
-        ))}
-      {route.name === "narbonne" &&
-        (featureFlags.enableNarbonneApplicationForm ? (
-          <ApplicationForm route={route} />
-        ) : (
-          <NotAvailable />
-        ))}
+      {route.name === "immersionApplication" && (
+        <ApplicationForm route={route} />
+      )}
       {route.name === "admin" &&
         (featureFlags.enableAdminUi ? (
           <Admin route={route} />

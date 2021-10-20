@@ -19,34 +19,6 @@ const defaultConfigParams = {
 export class AppConfigBuilder implements Builder<AppConfig> {
   public constructor(readonly configParams: ProcessEnv = defaultConfigParams) {}
 
-  public enableViewableApplications(): AppConfigBuilder {
-    return new AppConfigBuilder({
-      ...this.configParams,
-      ENABLE_VIEWABLE_APPLICATIONS: "TRUE",
-    });
-  }
-
-  public enableGenericApplicationForm(): AppConfigBuilder {
-    return new AppConfigBuilder({
-      ...this.configParams,
-      ENABLE_GENERIC_APPLICATION_FORM: "TRUE",
-    });
-  }
-
-  public enableBoulogneSurMerApplicationForm(): AppConfigBuilder {
-    return new AppConfigBuilder({
-      ...this.configParams,
-      ENABLE_BOULOGNE_SUR_MER_APPLICATION_FORM: "TRUE",
-    });
-  }
-
-  public enableNarbonneApplicationForm(): AppConfigBuilder {
-    return new AppConfigBuilder({
-      ...this.configParams,
-      ENABLE_NARBONNE_APPLICATION_FORM: "TRUE",
-    });
-  }
-
   public build() {
     return AppConfig.createFromEnv(/* readDotEnv= */ false, this.configParams);
   }

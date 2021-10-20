@@ -43,14 +43,12 @@ type ApplicationFieldsProps = {
   isFrozen?: boolean;
   submitError: Error | null;
   successInfos: SuccessInfos | null;
-  enableAgencySelection?: boolean;
 };
 
 export const ApplicationFormFields = ({
   isFrozen,
   submitError,
   successInfos,
-  enableAgencySelection,
 }: ApplicationFieldsProps) => {
   const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
     useFormikContext<ImmersionApplicationDto>();
@@ -64,7 +62,7 @@ export const ApplicationFormFields = ({
 
   return (
     <>
-      {isFrozen && featureFlags.enableMagicLinks && <FrozenMessage />}
+      {isFrozen && <FrozenMessage />}
 
       <TextInput
         label="Email *"
@@ -105,12 +103,7 @@ export const ApplicationFormFields = ({
       <AgencyCodeDropdown
         name="agencyCode"
         label="Votre structure d'accompagnement *"
-        description={
-          enableAgencySelection
-            ? undefined
-            : "Ce formulaire ne peut être utilisé que pour la structure d'accompagnement ci-desous."
-        }
-        disabled={!enableAgencySelection || isFrozen}
+        disabled={isFrozen}
       />
 
       <DateInput

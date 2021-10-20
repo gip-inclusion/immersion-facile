@@ -3,7 +3,6 @@ import { AppConfig } from "../../adapters/primary/appConfig";
 import { createApp } from "../../adapters/primary/server";
 import { makeGenerateJwt } from "../../domain/auth/jwt";
 import {
-  generateMagicLinkRoute,
   immersionApplicationsRoute,
   updateApplicationStatusRoute,
   validateDemandeRoute,
@@ -27,12 +26,7 @@ const initializeSystemUnderTest = async (config: AppConfig) => {
 describe("/demandes-immersion route", () => {
   describe("Backoffice", () => {
     beforeEach(async () => {
-      await initializeSystemUnderTest(
-        new AppConfigBuilder()
-          .enableViewableApplications()
-          .enableGenericApplicationForm()
-          .build(),
-      );
+      await initializeSystemUnderTest(new AppConfigBuilder().build());
     });
 
     describe("Application validation", () => {
@@ -109,12 +103,7 @@ describe("/demandes-immersion route", () => {
 
   describe("DEV environment", () => {
     beforeEach(async () => {
-      await initializeSystemUnderTest(
-        new AppConfigBuilder()
-          .enableViewableApplications()
-          .enableGenericApplicationForm()
-          .build(),
-      );
+      await initializeSystemUnderTest(new AppConfigBuilder().build());
     });
 
     it("Creating an invalid application fails", async () => {
@@ -144,82 +133,6 @@ describe("/demandes-immersion route", () => {
         .get(`/admin/${immersionApplicationsRoute}/${demandeImmersion.id}`)
         .auth("e2e_tests", "e2e")
         .expect(200, demandeImmersion);
-    });
-
-    it("Creating an application with invalid sources fails with 404 Not Found", async () => {
-      const application1 = new ImmersionApplicationDtoBuilder()
-        .withSource("BOULOGNE_SUR_MER")
-        .build();
-      await request
-        .post(`/${immersionApplicationsRoute}`)
-        .send(application1)
-        .expect(404);
-
-      const application2 = new ImmersionApplicationDtoBuilder()
-        .withSource("NARBONNE")
-        .build();
-      await request
-        .post(`/${immersionApplicationsRoute}`)
-        .send(application2)
-        .expect(404);
-    });
-
-    describe("Magic Link Generator", () => {
-      const immersionApplication = new ImmersionApplicationDtoBuilder().build();
-
-      beforeEach(async () => {
-        // GET /demandes-immersion returns an empty list.
-        await request
-          .get(`/${immersionApplicationsRoute}`)
-          .auth("e2e_tests", "e2e")
-          .expect(200, []);
-
-        // POSTing a valid application succeeds.
-        await request
-          .post(`/${immersionApplicationsRoute}`)
-          .send(immersionApplication)
-          .expect(200, { id: immersionApplication.id });
-      });
-
-      it("Requires backoffice password to generate magic links", async () => {
-        const role = "beneficiary";
-        const generateMagicLinkUrl = `/admin/${generateMagicLinkRoute}?role=${role}&id=${immersionApplication.id}`;
-
-        await request
-          .get(generateMagicLinkUrl)
-          .auth("e2e_tests", "e2e")
-          .expect(200);
-
-        await request.get(generateMagicLinkUrl).expect(401);
-
-        await request
-          .get(generateMagicLinkUrl)
-          .auth("not_admin_login", "not_admin_password")
-          .expect(403);
-      });
-
-      it("Returns correctly scoped links", async () => {
-        const role: Role = "beneficiary";
-
-        let generateMLResponse = await request
-          .get(
-            `/admin/${generateMagicLinkRoute}?role=${role}&id=${immersionApplication.id}`,
-          )
-          .auth("e2e_tests", "e2e")
-          .expect(200);
-
-        // Getting with this magic link succeds.
-        await request
-          .get(
-            `/auth/${immersionApplicationsRoute}/${generateMLResponse.body.jwt}`,
-          )
-          .expect(200, immersionApplication);
-
-        // But beneficiary link doesn't permit to validate.
-        await request
-          .get(`/${validateDemandeRoute}/${generateMLResponse.body.jwt}`)
-          .expect(401);
-      });
     });
 
     describe("Getting an application", () => {
@@ -372,100 +285,11 @@ describe("/demandes-immersion route", () => {
         .expect(200);
     });
   });
-
-  describe("BETA environment", () => {
-    beforeEach(async () => {
-      await initializeSystemUnderTest(
-        new AppConfigBuilder()
-          .enableBoulogneSurMerApplicationForm()
-          .enableNarbonneApplicationForm()
-          .build(),
-      );
-    });
-
-    it("Creating an application with valid sources succeeds", async () => {
-      const application1 = new ImmersionApplicationDtoBuilder()
-        .withId("id1")
-        .withSource("BOULOGNE_SUR_MER")
-        .build();
-      await request
-        .post(`/${immersionApplicationsRoute}`)
-        .send(application1)
-        .expect(200, { id: "id1" });
-
-      const application2 = new ImmersionApplicationDtoBuilder()
-        .withId("id2")
-        .withSource("NARBONNE")
-        .build();
-      await request
-        .post(`/${immersionApplicationsRoute}`)
-        .send(application2)
-        .expect(200, { id: "id2" });
-    });
-
-    it("Creating an application with invalid sources fails with 404 Not Found", async () => {
-      const demandeImmersion = new ImmersionApplicationDtoBuilder()
-        .withSource("GENERIC")
-        .build();
-      await request
-        .post(`/${immersionApplicationsRoute}`)
-        .send(demandeImmersion)
-        .expect(404);
-    });
-
-    it("Listing applications fails with 404 Not Found despite valid credentials", async () => {
-      await request
-        .get(`/${immersionApplicationsRoute}`)
-        .auth("e2e_tests", "e2e")
-        .expect(404);
-    });
-
-    it("Getting an existing application succeeds", async () => {
-      const demandeImmersion = new ImmersionApplicationDtoBuilder()
-        .withSource("BOULOGNE_SUR_MER")
-        .build();
-
-      // POSTing a valid application succeeds.
-      await request
-        .post(`/${immersionApplicationsRoute}`)
-        .send(demandeImmersion)
-        .expect(200);
-
-      // GETting the created application succeeds.
-      await request
-        .get(`/admin/${immersionApplicationsRoute}/${demandeImmersion.id}`)
-        .auth("e2e_tests", "e2e")
-        .expect(200, demandeImmersion);
-    });
-
-    it("Updating an existing application fails with 404 Not Found", async () => {
-      const demandeImmersion = new ImmersionApplicationDtoBuilder()
-        .withSource("NARBONNE")
-        .build();
-
-      // POSTing a valid application succeeds.
-      await request
-        .post(`/${immersionApplicationsRoute}`)
-        .send(demandeImmersion)
-        .expect(200);
-
-      // POSTing a valid application returns 403 Not Authorized because id is not a jwt.
-      await request
-        .post(`/auth/${immersionApplicationsRoute}/${demandeImmersion.id}`)
-        .send({
-          ...demandeImmersion,
-          email: "another@email.fr",
-        })
-        .expect(403);
-    });
-  });
 });
 
 describe("/update-application-status route", () => {
   beforeEach(async () => {
-    await initializeSystemUnderTest(
-      new AppConfigBuilder().enableGenericApplicationForm().build(),
-    );
+    await initializeSystemUnderTest(new AppConfigBuilder().build());
   });
 
   test("Succeeds for fully validated applications", async () => {

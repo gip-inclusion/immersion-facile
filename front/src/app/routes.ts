@@ -4,14 +4,6 @@ import { createRouter, defineRoute, param } from "type-route";
 export const { RouteProvider, useRoute, routes } = createRouter({
   home: defineRoute("/"),
   todos: defineRoute("/todos"),
-  boulogneSurMer: defineRoute(
-    { demandeId: param.query.optional.string },
-    () => "/demande-immersion/boulogne-sur-mer",
-  ),
-  narbonne: defineRoute(
-    { demandeId: param.query.optional.string },
-    () => "/demande-immersion/narbonne",
-  ),
   immersionApplication: defineRoute(
     { jwt: param.query.optional.string },
     () => "/demande-immersion",

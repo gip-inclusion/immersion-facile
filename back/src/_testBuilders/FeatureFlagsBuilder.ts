@@ -9,34 +9,6 @@ export class FeatureFlagsBuilder implements Builder<FeatureFlags> {
     return new FeatureFlagsBuilder();
   }
 
-  public enableViewableApplications(): FeatureFlagsBuilder {
-    return new FeatureFlagsBuilder({
-      ...this.featureFlags,
-      enableViewableApplications: true,
-    });
-  }
-
-  public enableGenericApplicationForm(): FeatureFlagsBuilder {
-    return new FeatureFlagsBuilder({
-      ...this.featureFlags,
-      enableGenericApplicationForm: true,
-    });
-  }
-
-  public enableBoulogneSurMerApplicationForm(): FeatureFlagsBuilder {
-    return new FeatureFlagsBuilder({
-      ...this.featureFlags,
-      enableBoulogneSurMerApplicationForm: true,
-    });
-  }
-
-  public enableNarbonneApplicationForm(): FeatureFlagsBuilder {
-    return new FeatureFlagsBuilder({
-      ...this.featureFlags,
-      enableNarbonneApplicationForm: true,
-    });
-  }
-
   public build() {
     return this.featureFlags;
   }

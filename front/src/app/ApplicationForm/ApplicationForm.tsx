@@ -23,11 +23,7 @@ import { v4 as uuidV4 } from "uuid";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
-type ApplicationFormRoute = Route<
-  | typeof routes.boulogneSurMer
-  | typeof routes.narbonne
-  | typeof routes.immersionApplication
->;
+type ApplicationFormRoute = Route<typeof routes.immersionApplication>;
 
 interface ApplicationFormProps {
   route: ApplicationFormRoute;
@@ -43,10 +39,6 @@ const getApplicationSourceForRoute = (
   route: ApplicationFormRoute,
 ): ApplicationSource => {
   switch (route.name) {
-    case "boulogneSurMer":
-      return "BOULOGNE_SUR_MER";
-    case "narbonne":
-      return "NARBONNE";
     default:
       return "GENERIC";
   }
@@ -54,10 +46,6 @@ const getApplicationSourceForRoute = (
 
 const getAgencyCodeForRoute = (route: ApplicationFormRoute): AgencyCode => {
   switch (route.name) {
-    case "boulogneSurMer":
-      return "AMIE_BOULONAIS";
-    case "narbonne":
-      return "MLJ_GRAND_NARBONNE";
     default:
       return "_UNKNOWN";
   }
@@ -161,53 +149,23 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
 
   useEffect(() => {
     if (!("demandeId" in route.params) && !("jwt" in route.params)) return;
-
-    if (!featureFlags.enableMagicLinks) {
-      const newLocation = "//" + location.host + location.pathname;
-      history.replaceState(null, document.title, newLocation);
+    if (!("jwt" in route.params) || route.params.jwt === undefined) {
       return;
     }
 
-    if (featureFlags.enableMagicLinks) {
-      if (!("jwt" in route.params) || route.params.jwt === undefined) {
-        return;
-      }
-      immersionApplicationGateway
-        .getML(route.params.jwt)
-        .then((response) => {
-          if (response.status === "DRAFT") {
-            response.dateSubmission = toDateString(startOfToday());
-          }
-          setInitialValues(response);
-        })
-        .catch((e) => {
-          console.log(e);
-          setSubmitError(e);
-          setSuccessInfos(null);
-        });
-    } else {
-      if (
-        !("demandeId" in route.params) ||
-        route.params.demandeId === undefined
-      ) {
-        return;
-      }
-      const demandeId = route.params.demandeId;
-
-      immersionApplicationGateway
-        .get(demandeId)
-        .then((response) => {
-          if (response.status === "DRAFT") {
-            response.dateSubmission = toDateString(startOfToday());
-          }
-          setInitialValues(response);
-        })
-        .catch((e) => {
-          console.log(e);
-          setSubmitError(e);
-          setSuccessInfos(null);
-        });
-    }
+    immersionApplicationGateway
+      .getML(route.params.jwt)
+      .then((response) => {
+        if (response.status === "DRAFT") {
+          response.dateSubmission = toDateString(startOfToday());
+        }
+        setInitialValues(response);
+      })
+      .catch((e) => {
+        console.log(e);
+        setSubmitError(e);
+        setSuccessInfos(null);
+      });
   }, []);
 
   const isFrozen = isDemandeImmersionFrozen(initialValues);
@@ -243,33 +201,24 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             )}
             onSubmit={async (values, { setSubmitting }) => {
               try {
-                let immersionApplication =
+                const immersionApplication =
                   immersionApplicationSchema.parse(values);
 
-                if (!featureFlags.enableMagicLinks) {
-                  immersionApplication = {
-                    ...immersionApplication,
-                    status: "IN_REVIEW",
-                  };
+                const shouldUpdateExistingImmersionApplication =
+                  currentJWT(route).length > 0;
+                if (shouldUpdateExistingImmersionApplication) {
+                  await immersionApplicationGateway.updateML(
+                    immersionApplication,
+                    currentJWT(route),
+                  );
+                } else {
+                  await immersionApplicationGateway.add(immersionApplication);
                 }
+                setInitialValues(immersionApplication);
 
-                if (featureFlags.enableMagicLinks) {
-                  const shouldUpdateExistingImmersionApplication =
-                    currentJWT(route).length > 0;
-                  if (shouldUpdateExistingImmersionApplication) {
-                    await immersionApplicationGateway.updateML(
-                      immersionApplication,
-                      currentJWT(route),
-                    );
-                  } else {
-                    await immersionApplicationGateway.add(immersionApplication);
-                  }
-                  setInitialValues(immersionApplication);
-
-                  // TODO: change success message to show both new links
-                  setSuccessInfos(createSuccessInfos(undefined));
-                  setSubmitError(null);
-                }
+                // TODO: change success message to show both new links
+                setSuccessInfos(createSuccessInfos(undefined));
+                setSubmitError(null);
               } catch (e: any) {
                 console.log(e);
                 setSubmitError(e);
@@ -285,9 +234,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                     isFrozen={isFrozen}
                     submitError={submitError}
                     successInfos={successInfos}
-                    enableAgencySelection={
-                      getAgencyCodeForRoute(route) === "_UNKNOWN"
-                    }
                   />
                 </form>
               </div>

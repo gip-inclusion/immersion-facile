@@ -111,7 +111,7 @@ export type AppDependencies = ReturnType<
 
 const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-const getGenericRepo = async (config: AppConfig) => {
+const createApplicationRepository = async (config: AppConfig) => {
   switch (config.repositories) {
     case "AIRTABLE":
       return AirtableDemandeImmersionRepository.create(
@@ -128,37 +128,10 @@ const getGenericRepo = async (config: AppConfig) => {
   }
 };
 
-const createApplicationRepository = async (
-  config: AppConfig,
-): Promise<ImmersionApplicationRepository> => {
-  const repositoriesBySource: ApplicationRepositoryMap = {};
-  if (
-    config.featureFlags.enableGenericApplicationForm ||
-    config.featureFlags.enableMagicLinks
-  ) {
-    repositoriesBySource["GENERIC"] = await getGenericRepo(config);
-  }
-  if (config.featureFlags.enableBoulogneSurMerApplicationForm) {
-    repositoriesBySource["BOULOGNE_SUR_MER"] = config.useAirtable()
-      ? AirtableDemandeImmersionRepository.create(
-          config.airtableBoulogneSurMerImmersionApplicationTableConfig,
-          legacyApplicationDataConverter,
-        )
-      : new InMemoryImmersionApplicationRepository();
-  }
-  if (config.featureFlags.enableNarbonneApplicationForm) {
-    repositoriesBySource["NARBONNE"] = config.useAirtable()
-      ? AirtableDemandeImmersionRepository.create(
-          config.airtableNarbonneImmersionApplicationTableConfig,
-          legacyApplicationDataConverter,
-        )
-      : new InMemoryImmersionApplicationRepository();
-  }
-  return new ApplicationRepositorySwitcher(repositoriesBySource);
-};
-
 // prettier-ignore
-type Repositories = ReturnType<typeof createRepositories> extends Promise<infer T>
+type Repositories = ReturnType<typeof createRepositories> extends Promise<
+  infer T
+>
   ? T
   : never;
 
@@ -172,12 +145,13 @@ const createRepositories = async (config: AppConfig) => {
 
   return {
     demandeImmersion: await createApplicationRepository(config),
-    immersionOffer: config.useAirtable()
-      ? AirtableImmersionOfferRepository.create(
-          config.airtableApplicationTableConfig,
-          immersionOfferDataConverter,
-        )
-      : new InMemoryImmersionOfferRepository(),
+    immersionOffer:
+      config.repositories === "IN_MEMORY"
+        ? new InMemoryImmersionOfferRepository()
+        : AirtableImmersionOfferRepository.create(
+            config.airtableApplicationTableConfig,
+            immersionOfferDataConverter,
+          ),
 
     immersionOfferForSearch:
       config.repositories === "PG"

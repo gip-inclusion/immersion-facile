@@ -26,8 +26,6 @@ export class ListImmersionApplication
   }
 
   public async execute() {
-    if (!this.featureFlags.enableViewableApplications)
-      throw new FeatureDisabledError();
     const entities = await this.immersionApplicationRepository.getAll();
     return entities.map((entity) => entity.toDto());
   }

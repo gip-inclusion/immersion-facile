@@ -96,7 +96,6 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   ): Promise<AddImmersionApplicationMLResponseDto> {
     console.log("InMemoryDemandeImmersionGateway.addML: ", demandeImmersionDto);
     await sleep(SIMULATED_LATENCY_MS);
-    if (!this.featureFlags.enableMagicLinks) throw new Error("404 Not found");
 
     this._demandesImmersion[demandeImmersionDto.id] = demandeImmersionDto;
 
@@ -110,15 +109,12 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   ): Promise<ImmersionApplicationDto> {
     console.log("InMemoryDemandeImmersionGateway.get: ", id);
     await sleep(SIMULATED_LATENCY_MS);
-    if (!this.featureFlags.enableViewableApplications)
-      throw new Error("404 Not found");
     return this._demandesImmersion[id];
   }
 
   // Same as GET above, but using a magic link
   public async getML(jwt: string): Promise<ImmersionApplicationDto> {
     await sleep(SIMULATED_LATENCY_MS);
-    if (!this.featureFlags.enableMagicLinks) throw new Error("404 Not found");
 
     const payload = decodeJwt(jwt);
     return this._demandesImmersion[payload.applicationId];
@@ -127,8 +123,6 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   public async getAll(): Promise<Array<ImmersionApplicationDto>> {
     console.log("InMemoryFormulaireGateway.getAll");
     await sleep(SIMULATED_LATENCY_MS);
-    if (!this.featureFlags.enableViewableApplications)
-      throw new Error("404 Not found");
     return Object.values(this._demandesImmersion);
   }
 
@@ -137,8 +131,6 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   ): Promise<ImmersionApplicationId> {
     console.log("InMemoryDemandeImmersionGateway.update: ", demandeImmersion);
     await sleep(SIMULATED_LATENCY_MS);
-    if (!this.featureFlags.enableViewableApplications)
-      throw new Error("404 Not found");
     this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
     return demandeImmersion.id;
   }
@@ -151,7 +143,6 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     const payload = decodeJwt(jwt);
 
     await sleep(SIMULATED_LATENCY_MS);
-    if (!this.featureFlags.enableMagicLinks) throw new Error("404 Not found");
     this._demandesImmersion[payload.applicationId] = demandeImmersion;
     return demandeImmersion.id;
   }
@@ -162,7 +153,6 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   ): Promise<UpdateImmersionApplicationStatusResponseDto> {
     const payload = decodeJwt(jwt);
     await sleep(SIMULATED_LATENCY_MS);
-    if (!this.featureFlags.enableMagicLinks) throw new Error("404 Not found");
     this._demandesImmersion[payload.applicationId] = {
       ...this._demandesImmersion[payload.applicationId],
       status,
@@ -173,8 +163,6 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   public async validate(id: ImmersionApplicationId): Promise<string> {
     console.log("InMemoryDemandeImmersionGateway.validate: ", id);
     await sleep(SIMULATED_LATENCY_MS);
-    if (!this.featureFlags.enableViewableApplications)
-      throw new Error("404 Not found");
     let form = { ...this._demandesImmersion[id] };
     if (form.status === "IN_REVIEW") {
       form.status = "VALIDATED";
