@@ -36,6 +36,28 @@ describe("demandeImmersionDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
   });
 
+  test("rejects when phone is not a valid number", () => {
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
+      .withPhone("wrong")
+      .build();
+
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
+
+    const demandeImmersion2 = new ImmersionApplicationDtoBuilder()
+      .withPhone("0203stillWrong")
+      .build();
+
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion2);
+  });
+
+  test("rejects when mentorPhone is not a valid number", () => {
+    const demandeImmersion = new ImmersionApplicationDtoBuilder()
+      .withMentorPhone("wrong")
+      .build();
+
+    expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
+  });
+
   test("rejects misformatted submission dates", () => {
     const demandeImmersion = new ImmersionApplicationDtoBuilder()
       .withDateSubmission("not-a-date")

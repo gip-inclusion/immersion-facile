@@ -61,6 +61,14 @@ export class ImmersionApplicationDtoBuilder
     return new ImmersionApplicationDtoBuilder({ ...this.dto, email });
   }
 
+  public withPhone(phone: string): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, phone });
+  }
+
+  public withMentorPhone(mentorPhone: string): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, mentorPhone });
+  }
+
   public withMentorEmail(mentorEmail: string): ImmersionApplicationDtoBuilder {
     return new ImmersionApplicationDtoBuilder({ ...this.dto, mentorEmail });
   }
