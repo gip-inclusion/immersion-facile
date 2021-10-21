@@ -7,6 +7,7 @@ import {
   submissionAndStartDatesConstraints,
   underMaxDuration,
   mustBeSignedByEstablishmentBeforeReview,
+  enoughWorkedDaysToReviewFromSubmitDate,
 } from "./immersionApplicationRefinement";
 import {
   LegacyScheduleDto,
@@ -36,11 +37,6 @@ export const validApplicationStatus: NotEmptyArray<ApplicationStatus> = [
   "ACCEPTED_BY_VALIDATOR",
   "VALIDATED",
   "REJECTED",
-];
-
-const allApplicationStatuses: NotEmptyArray<ApplicationStatus> = [
-  "UNKNOWN",
-  ...validApplicationStatus,
 ];
 
 export const applicationStatusFromString = (s: string): ApplicationStatus => {
@@ -118,6 +114,11 @@ export const immersionApplicationSchema = z
   })
   .refine(submissionAndStartDatesConstraints, {
     message: "La date de démarrage doit étre au moins 2 jours après la saisie.",
+    path: ["dateStart"],
+  })
+  .refine(enoughWorkedDaysToReviewFromSubmitDate, {
+    message:
+      "Veuillez saisir une date de démarrage permettant au moins 24h pour sa validation par un conseiller",
     path: ["dateStart"],
   })
   .refine(startDateIsBeforeEndDate, {
