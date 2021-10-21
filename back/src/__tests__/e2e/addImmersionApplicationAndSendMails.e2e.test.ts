@@ -169,7 +169,11 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
           "fr",
         ),
       },
-      magicLink: fakeGenerateMagicLinkUrlFn(validDemandeImmersion.id, "admin"),
+      magicLink: fakeGenerateMagicLinkUrlFn(
+        validDemandeImmersion.id,
+        "admin",
+        "",
+      ),
       agencyConfig,
     });
   });

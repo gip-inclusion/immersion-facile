@@ -7,7 +7,8 @@ import {
   ModificationRequestApplicationNotificationParams,
 } from "../../ports/EmailGateway";
 import { AgencyConfig } from "../../ports/AgencyRepository";
-import type { GenerateMagicLinkFn } from "../../../../adapters/primary/config";
+import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
+import { frontRoutes } from "../../../../shared/routes";
 
 const logger = createLogger(__filename);
 
@@ -22,7 +23,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
     private readonly agencyRepository: AgencyRepository,
-    private readonly generateMagicLinkFn: GenerateMagicLinkFn,
+    private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
   ) {}
 
   public async execute({
@@ -59,7 +60,11 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification
           application,
           agencyConfig,
           reason,
-          this.generateMagicLinkFn(application.id, "beneficiary"),
+          this.generateMagicLinkFn(
+            application.id,
+            "beneficiary",
+            frontRoutes.immersionApplicationsRoute,
+          ),
         ),
       );
     } else {

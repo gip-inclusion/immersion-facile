@@ -8,4 +8,5 @@ export const searchImmersionRoute = "search-immersion";
 
 export const frontRoutes = {
   immersionApplicationsToValidate: "verification",
+  immersionApplicationsRoute: "demande-immersion",
 };

@@ -1,7 +1,7 @@
 import { addDays as dateFnsAddDays, format } from "date-fns";
 import { EventBus } from "../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
-import type { GenerateMagicLinkFn } from "../adapters/primary/config";
+import type { GenerateVerificationMagicLink } from "../adapters/primary/config";
 import { ImmersionApplicationId } from "../shared/ImmersionApplicationDto";
 import { Role } from "../shared/tokens/MagicLinkPayload";
 
@@ -42,8 +42,7 @@ export const spyOnTopic = (
   });
   return publishedEvents;
 };
-
-export const fakeGenerateMagicLinkUrlFn: GenerateMagicLinkFn = (
+export const fakeGenerateMagicLinkUrlFn: GenerateVerificationMagicLink = (
   applicationId: ImmersionApplicationId,
   role: Role,
 ) => `http://fake-magic-link/${applicationId}/${role}`;

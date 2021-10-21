@@ -1,4 +1,4 @@
-import { createGenerateMagicLinkFn } from "../../adapters/primary/config";
+import { createGenerateVerificationMagicLink } from "../../adapters/primary/config";
 import { AppConfig } from "../../adapters/primary/appConfig";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
@@ -31,7 +31,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         emailGw,
         agencyRepo,
-        createGenerateMagicLinkFn(config),
+        createGenerateVerificationMagicLink(config),
       );
   });
 

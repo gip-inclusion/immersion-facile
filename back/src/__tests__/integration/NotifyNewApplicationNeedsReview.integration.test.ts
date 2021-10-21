@@ -1,7 +1,7 @@
 import { AppConfig } from "../../adapters/primary/appConfig";
 import {
-  createGenerateMagicLinkFn,
-  GenerateMagicLinkFn,
+  createGenerateVerificationMagicLink,
+  GenerateVerificationMagicLink,
 } from "../../adapters/primary/config";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
@@ -18,13 +18,13 @@ const validDemandeImmersion: ImmersionApplicationDto =
 
 describe("Notify To 2 Counsellors that an application is available ", () => {
   let emailGw: SendinblueEmailGateway;
-  let generateMagicLinkFn: GenerateMagicLinkFn;
+  let generateMagicLinkFn: GenerateVerificationMagicLink;
   let agencyConfig;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
-    generateMagicLinkFn = createGenerateMagicLinkFn(config);
+    generateMagicLinkFn = createGenerateVerificationMagicLink(config);
   });
 
   test.skip("Sends notification mails to check Immersion Application eligibility", async () => {

@@ -1,4 +1,6 @@
-import type { GenerateMagicLinkFn } from "../../../../adapters/primary/config";
+import type { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
+import { frontRoutes } from "../../../../shared/routes";
+
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -18,7 +20,7 @@ export class NotifyNewApplicationNeedsReview
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly agencyRepository: AgencyRepository,
-    private readonly generateMagicLinkFn: GenerateMagicLinkFn,
+    private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
   ) {}
 
   public async execute(
@@ -67,6 +69,7 @@ export class NotifyNewApplicationNeedsReview
         magicLink: this.generateMagicLinkFn(
           immersionApplicationDto.id,
           recipients.role,
+          frontRoutes.immersionApplicationsToValidate,
         ),
         beneficiaryFirstName: immersionApplicationDto.firstName,
         beneficiaryLastName: immersionApplicationDto.lastName,

@@ -7,6 +7,7 @@ import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/Immersion
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 import { AgencyConfig } from "./../../../domain/immersionApplication/ports/AgencyRepository";
 import { parseISO } from "date-fns";
+import { frontRoutes } from "../../../shared/routes";
 
 const adminEmail = "admin@email.fr";
 const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
@@ -61,7 +62,11 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
           "fr",
         ),
       },
-      magicLink: fakeGenerateMagicLinkUrlFn(validDemandeImmersion.id, "admin"),
+      magicLink: fakeGenerateMagicLinkUrlFn(
+        validDemandeImmersion.id,
+        "admin",
+        frontRoutes.immersionApplicationsToValidate,
+      ),
       agencyConfig,
     });
   });
