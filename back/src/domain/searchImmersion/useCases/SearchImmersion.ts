@@ -13,19 +13,13 @@ import type {
 //A mettre dans ports
 
 export class SearchImmersion {
-  constructor(
-    private laBonneBoiteGateway: EstablishmentsGateway,
-    private immersionOfferRepository: ImmersionOfferRepository,
-  ) {}
+  constructor(private immersionOfferRepository: ImmersionOfferRepository) {}
 
   public async execute(
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
     this.immersionOfferRepository.insertSearch(searchParams);
-    return this.getImmersionFromEstablishmentsGateway(
-      this.laBonneBoiteGateway,
-      searchParams,
-    );
+    return this.immersionOfferRepository.getFromSearch(searchParams);
   }
 
   //TODO : en faire une classe à part
@@ -70,6 +64,7 @@ export type ImmersionOfferProps = {
           data_source: establishment.getDataSource(),
           contact_in_establishment: undefined,
           score: establishment.getScore(),
+          position: establishment.getPosition(),
         }),
     );
   }

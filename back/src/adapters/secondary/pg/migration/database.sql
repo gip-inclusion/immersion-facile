@@ -1,5 +1,4 @@
 
-
 --
 -- PostgreSQL database dump
 --
@@ -94,7 +93,7 @@ ALTER TABLE public.immersion_contacts OWNER TO postgres;
 CREATE TABLE public.immersion_offers (
     uuid uuid,
     rome character(5) NOT NULL,
-    division character(5) NOT NULL,
+    naf_division character(2) NOT NULL,
     siret bigint NOT NULL,
     naf character(5) NOT NULL,
     name text,
@@ -151,7 +150,7 @@ ALTER TABLE ONLY public.establishments
 --
 
 ALTER TABLE ONLY public.immersion_offers
-    ADD CONSTRAINT pk_immersion_offers PRIMARY KEY (rome, division, siret);
+    ADD CONSTRAINT pk_immersion_offers PRIMARY KEY (rome, naf_division, siret);
 
 
 --
@@ -196,6 +195,9 @@ CREATE INDEX index_needstobesearched ON public.searches_made USING btree (needst
 
 CREATE INDEX index_number_displays ON public.immersion_offers USING btree (number_displays);
 
+CREATE INDEX establishments_gps ON public.establishments USING GIST ( gps );
+CREATE INDEX immersion_offers_gps ON public.immersion_offers USING GIST ( gps );
+CREATE INDEX searches_made_gps ON public.searches_made USING GIST ( gps );
 
 --
 -- Name: immersion_offers fk_establishment_contact; Type: FK CONSTRAINT; Schema: public; Owner: postgres

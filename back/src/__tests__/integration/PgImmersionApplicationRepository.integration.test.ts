@@ -29,7 +29,7 @@ describe("PgImmersionApplicationRepository", () => {
     client.release();
   });
 
-  it.skip("Adds a new ImmersionApplicationEntity", async () => {
+  it("Adds a new ImmersionApplicationEntity", async () => {
     const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
       .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
       .build();
@@ -42,7 +42,7 @@ describe("PgImmersionApplicationRepository", () => {
     );
   });
 
-  it.skip("Gets saved immersion", async () => {
+  it("Gets saved immersion", async () => {
     const idA: ImmersionApplicationId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
     const immersionApplicationEntityA = new ImmersionApplicationEntityBuilder()
       .withId(idA)
@@ -66,7 +66,7 @@ describe("PgImmersionApplicationRepository", () => {
     ]);
   });
 
-  it.skip("Updates an already saved immersion", async () => {
+  it("Updates an already saved immersion", async () => {
     const idA: ImmersionApplicationId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
     const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
       .withId(idA)

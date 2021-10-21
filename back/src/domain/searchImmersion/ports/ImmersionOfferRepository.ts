@@ -7,6 +7,7 @@ export type SearchParams = {
   distance: number;
   lat: number;
   lon: number;
+  nafDivision?: string;
 };
 
 export interface ImmersionOfferRepository {

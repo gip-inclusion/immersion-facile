@@ -108,7 +108,7 @@ export class AppConfig {
     const pgHost = this.env.CI ? "postgres" : "localhost";
     // TODO: Should some of these come from environment variables?
     const pgPort = 5432;
-    const pgUser = "postgress";
+    const pgUser = "postgres";
     const pgPassword = "pg-password";
     return `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/immersion-db`;
   }
