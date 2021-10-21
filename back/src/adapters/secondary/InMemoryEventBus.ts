@@ -21,10 +21,7 @@ export class InMemoryEventBus implements EventBus {
 
     callbacks.forEach((cb) => {
       cb(event);
-      logger.info(
-        { demandeImmersionId: event.payload.id, eventId: event.id },
-        `XXXXXXXXXXXXXXXX  Sending an event`,
-      );
+      logger.info({ eventId: event.id }, `XXXXXXXXXXXXXXXX  Sending an event`);
     });
   }
 

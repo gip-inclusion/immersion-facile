@@ -1,4 +1,5 @@
 import { Client, Pool } from "pg";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
@@ -155,9 +156,8 @@ const createApplicationRepository = async (
   return new ApplicationRepositorySwitcher(repositoriesBySource);
 };
 
-type Repositories = ReturnType<typeof createRepositories> extends Promise<
-  infer T
->
+// prettier-ignore
+type Repositories = ReturnType<typeof createRepositories> extends Promise<infer T>
   ? T
   : never;
 
@@ -236,6 +236,7 @@ export type GenerateMagicLinkFn = ReturnType<typeof createGenerateMagicLinkFn>;
 // Visible for testing.
 export const createGenerateMagicLinkFn = (config: AppConfig) => {
   const generateJwt = createGenerateJwtFn(config);
+
   return (id: ImmersionApplicationId, role: Role) => {
     const baseUrl = config.immersionFacileBaseUrl;
     const jwt = generateJwt(createMagicLinkPayload(id, role));
@@ -267,10 +268,12 @@ const createUseCases = (
     immersionApplicationRepository: repositories.demandeImmersion,
     featureFlags: config.featureFlags,
   }),
-  updateDemandeImmersion: new UpdateImmersionApplication({
-    immersionApplicationRepository: repositories.demandeImmersion,
-    featureFlags: config.featureFlags,
-  }),
+  updateDemandeImmersion: new UpdateImmersionApplication(
+    createNewEvent,
+    repositories.outbox,
+    repositories.demandeImmersion,
+    config.featureFlags,
+  ),
   validateDemandeImmersion: new ValidateImmersionApplication(
     repositories.demandeImmersion,
     createNewEvent,
@@ -331,6 +334,13 @@ const createUseCases = (
       repositories.email,
       config.emailAllowList,
       repositories.agency,
+    ),
+  notifyBeneficiaryAndEnterpriseThatApplicationNeedsModifications:
+    new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
+      repositories.email,
+      config.emailAllowList,
+      repositories.agency,
+      generateMagicLinkFn,
     ),
 });
 

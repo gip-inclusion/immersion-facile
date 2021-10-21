@@ -1,7 +1,7 @@
 import { addDays as dateFnsAddDays, format } from "date-fns";
 import { EventBus } from "../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
-import { GenerateMagicLinkFn } from "../domain/immersionApplication/useCases/notifications/NotificationsHelpers";
+import type { GenerateMagicLinkFn } from "../adapters/primary/config";
 import { ImmersionApplicationId } from "../shared/ImmersionApplicationDto";
 import { Role } from "../shared/tokens/MagicLinkPayload";
 

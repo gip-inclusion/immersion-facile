@@ -1,3 +1,4 @@
+import { ModificationRequestApplicationNotificationParams } from "./../../domain/immersionApplication/ports/EmailGateway";
 import type {
   EmailType,
   NewApplicationAdminNotificationParams,
@@ -97,6 +98,21 @@ export class InMemoryEmailGateway implements EmailGateway {
     logger.info({ recipients, params }, "sendRejecteddApplicationNotification");
     this.sentEmails.push({
       type: "REJECTED_APPLICATION_NOTIFICATION",
+      recipients: recipients,
+      params: params,
+    });
+  }
+
+  public async sendModificationRequestApplicationNotification(
+    recipients: string[],
+    params: ModificationRequestApplicationNotificationParams,
+  ): Promise<void> {
+    logger.info(
+      { recipients, params },
+      "sendModificationRequestApplicationNotification",
+    );
+    this.sentEmails.push({
+      type: "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION",
       recipients: recipients,
       params: params,
     });

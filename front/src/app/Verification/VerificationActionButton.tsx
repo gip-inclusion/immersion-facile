@@ -27,10 +27,14 @@ const onSubmit = async ({
 }: VerificationActionButtonProps) => {
   if (!immersionApplication) return;
 
-  const justification =
-    newStatus === "REJECTED"
-      ? prompt("Pourquoi l'immersion est-elle refusée ?") ?? undefined
-      : undefined;
+  let justification: string | undefined = undefined;
+  if (newStatus === "REJECTED") {
+    justification =
+      prompt("Pourquoi l'immersion est-elle refusée ?") ?? undefined;
+  } else if (newStatus === "DRAFT") {
+    justification =
+      prompt("Precisez la raison et la modification necessaire") ?? "";
+  }
 
   return immersionApplicationGateway
     .updateStatus({ status: newStatus, justification }, jwt)
@@ -40,12 +44,31 @@ const onSubmit = async ({
 
 export const VerificationActionButton = (
   props: VerificationActionButtonProps,
-) => (
-  <Button
-    level={props.newStatus === "REJECTED" ? "secondary" : "primary"}
-    disable={!props.immersionApplication || props.disabled}
-    onSubmit={() => onSubmit(props)}
-  >
-    {props.children}
-  </Button>
-);
+) => {
+  let className = "fr-btn";
+  switch (props.newStatus) {
+    case "REJECTED":
+      // cross icon
+      className += " fr-fi-close-circle-line fr-btn--icon-left";
+      break;
+    case "DRAFT":
+      // pencil icon
+      className += " fr-fi-edit-fill fr-btn--icon-left";
+      break;
+    default:
+      // checkbox icon
+      className += " fr-fi-checkbox-circle-line fr-btn--icon-left";
+      break;
+  }
+
+  return (
+    <Button
+      level={props.newStatus === "REJECTED" ? "secondary" : "primary"}
+      disable={!props.immersionApplication || props.disabled}
+      onSubmit={() => onSubmit(props)}
+      className={className}
+    >
+      {props.children}
+    </Button>
+  );
+};

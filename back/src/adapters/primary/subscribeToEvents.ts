@@ -29,8 +29,9 @@ export const subscribeToEvents = (deps: AppDependencies) => {
   // Needs Review by a counsellor or validator
   deps.eventBus.subscribe(
     "ImmersionApplicationSubmittedByBeneficiary",
-    (event) =>
-      deps.useCases.notifyNewApplicationNeedsReview.execute(event.payload),
+    (event) => {
+      deps.useCases.notifyNewApplicationNeedsReview.execute(event.payload);
+    },
   );
 
   deps.eventBus.subscribe("ImmersionApplicationAcceptedByCounsellor", (event) =>
@@ -51,6 +52,12 @@ export const subscribeToEvents = (deps: AppDependencies) => {
 
   deps.eventBus.subscribe("ImmersionApplicationRejected", (event) =>
     deps.useCases.notifyBeneficiaryAndEnterpriseThatApplicationIsRejected.execute(
+      event.payload,
+    ),
+  );
+
+  deps.eventBus.subscribe("ImmersionApplicationRequiresModification", (event) =>
+    deps.useCases.notifyBeneficiaryAndEnterpriseThatApplicationNeedsModifications.execute(
       event.payload,
     ),
   );

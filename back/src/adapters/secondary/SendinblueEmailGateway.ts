@@ -1,3 +1,4 @@
+import { ModificationRequestApplicationNotificationParams } from "./../../domain/immersionApplication/ports/EmailGateway";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import type {
   EmailType,
@@ -28,6 +29,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/9/message-setup
   REJECTED_APPLICATION_NOTIFICATION: 9,
+
+  // https://my.sendinblue.com/camp/template/13/message-setup
+  MODIFICATION_REQUEST_APPLICATION_NOTIFICATION: 13,
 
   // https://my.sendinblue.com/camp/template/11/message-setup
   NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: 11,
@@ -143,6 +147,26 @@ export class SendinblueEmailGateway implements EmailGateway {
       REASON: params.rejectionReason,
       AGENCY: params.agency,
       SIGNATURE: params.signature,
+    };
+    this.sendTransacEmail(sibEmail);
+  }
+
+  public async sendModificationRequestApplicationNotification(
+    recipients: string[],
+    params: ModificationRequestApplicationNotificationParams,
+  ): Promise<void> {
+    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sibEmail.templateId =
+      emailTypeToTemplateId.MODIFICATION_REQUEST_APPLICATION_NOTIFICATION;
+    sibEmail.to = recipients.map((email) => ({ email }));
+    sibEmail.params = {
+      AGENCY: params.agency,
+      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+      BUSINESS_NAME: params.businessName,
+      REASON: params.reason,
+      SIGNATURE: params.signature,
+      URL: params.magicLink,
     };
     this.sendTransacEmail(sibEmail);
   }

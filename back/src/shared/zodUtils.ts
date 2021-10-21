@@ -20,7 +20,3 @@ export const zBoolean = z.boolean({
   required_error: "Obligatoire",
   invalid_type_error: "Un booléen est attendu",
 });
-
-export const zTrue = z
-  .boolean()
-  .refine((bool) => bool, "L'engagement est obligatoire");

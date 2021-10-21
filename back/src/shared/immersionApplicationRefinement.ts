@@ -1,3 +1,4 @@
+import { ApplicationStatus } from "./ImmersionApplicationDto";
 type DatesInApplication = {
   dateStart: string;
   dateEnd: string;
@@ -35,3 +36,13 @@ export const emailAndMentorEmailAreDifferent = (params: {
   email: string;
   mentorEmail: string;
 }) => params.email !== params.mentorEmail;
+
+export const mustBeSignedByBeneficiaryBeforeReview = (params: {
+  beneficiaryAccepted: boolean;
+  status: ApplicationStatus;
+}) => params.status === "DRAFT" || params.beneficiaryAccepted;
+
+export const mustBeSignedByEstablishmentBeforeReview = (params: {
+  enterpriseAccepted: boolean;
+  status: ApplicationStatus;
+}) => params.status === "DRAFT" || params.enterpriseAccepted;

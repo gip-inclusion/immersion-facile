@@ -1,4 +1,4 @@
-import { GenerateMagicLinkFn } from "../../../../adapters/primary/config";
+import type { GenerateMagicLinkFn } from "../../../../adapters/primary/config";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,

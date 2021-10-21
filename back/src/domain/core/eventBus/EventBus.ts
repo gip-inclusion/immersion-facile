@@ -2,7 +2,7 @@ import { Clock } from "../ports/Clock";
 import { UuidGenerator } from "../ports/UuidGenerator";
 import type { DomainEvent, DomainTopic } from "./events";
 
-type NarrowEvent<
+export type NarrowEvent<
   T extends DomainTopic,
   E extends DomainEvent = DomainEvent,
 > = Extract<E, { topic: T }>;
@@ -22,17 +22,18 @@ type CreateEventDependencies = {
   uuidGenerator: UuidGenerator;
 };
 
-export type CreateNewEvent = (
-  params: Pick<DomainEvent, "topic" | "payload">,
-) => DomainEvent;
+export type CreateNewEvent = <T extends DomainTopic>(params: {
+  topic: T;
+  payload: NarrowEvent<T>["payload"];
+}) => NarrowEvent<T>;
 
-type MakeCreateEvent = (deps: CreateEventDependencies) => CreateNewEvent;
-
-export const makeCreateNewEvent: MakeCreateEvent =
-  ({ uuidGenerator, clock }) =>
-  (params) => ({
-    id: uuidGenerator.new(),
-    occurredAt: clock.now(),
-    wasPublished: false,
-    ...params,
-  });
+export const makeCreateNewEvent =
+  ({ uuidGenerator, clock }: CreateEventDependencies): CreateNewEvent =>
+  (params: any) => {
+    return {
+      id: uuidGenerator.new(),
+      occurredAt: clock.now(),
+      wasPublished: false,
+      ...params,
+    };
+  };

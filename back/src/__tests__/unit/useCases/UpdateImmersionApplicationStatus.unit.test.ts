@@ -11,8 +11,9 @@ import { InMemoryImmersionApplicationRepository } from "../../../adapters/second
 import {
   CreateNewEvent,
   makeCreateNewEvent,
+  NarrowEvent,
 } from "../../../domain/core/eventBus/EventBus";
-import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
+import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
@@ -90,6 +91,26 @@ describe("UpdateImmersionApplicationStatus", () => {
         role: "admin",
         oldStatus: "IN_REVIEW",
       }));
+  });
+
+  describe("* -> DRAFT transition", () => {
+    const validOldStatuses = [
+      "IN_REVIEW",
+      "ACCEPTED_BY_VALIDATOR",
+      "ACCEPTED_BY_COUNSELLOR",
+    ] as Array<ApplicationStatus>;
+    const validRoles = ["counsellor", "validator", "admin"] as Array<Role>;
+
+    for (const status of validOldStatuses) {
+      for (const role of validRoles) {
+        test("accepted from " + role, () =>
+          testAcceptsStatusUpdateToDraftAndInvalidatesSignatures({
+            role: role,
+            oldStatus: status,
+          }),
+        );
+      }
+    }
   });
 
   describe("ACCEPTED_BY_COUNSELLOR -> ACCEPTED_BY_VALIDATOR transition", () => {
@@ -243,8 +264,9 @@ describe("UpdateImmersionApplicationStatus", () => {
     role: Role;
     oldStatus: ApplicationStatus;
     newStatus: ApplicationStatus;
-    expectedDomainTopic?: DomainTopic;
+    expectedDomainTopic: DomainTopic;
   };
+
   const testAcceptsStatusUpdate = async ({
     role,
     oldStatus,
@@ -264,10 +286,22 @@ describe("UpdateImmersionApplicationStatus", () => {
     };
     expect(storedImmersionApplication).toEqual(expectedImmersionApplication);
 
-    await expectNewEvent({
-      topic: expectedDomainTopic,
-      payload: expectedImmersionApplication,
-    });
+    if (expectedDomainTopic === "ImmersionApplicationRequiresModification") {
+      const payload = {
+        application: expectedImmersionApplication,
+        reason: "test-modification-justification",
+      };
+
+      await expectNewEvent(expectedDomainTopic, {
+        topic: "ImmersionApplicationRequiresModification",
+        payload,
+      });
+    } else {
+      await expectNewEvent(expectedDomainTopic, {
+        topic: expectedDomainTopic,
+        payload: expectedImmersionApplication,
+      });
+    }
   };
 
   type TestAcceptsStatusUpdateToRejectedParams = {
@@ -293,9 +327,40 @@ describe("UpdateImmersionApplicationStatus", () => {
     };
     expect(storedImmersionApplication).toEqual(expectedImmersionApplication);
 
-    await expectNewEvent({
-      topic: "ImmersionApplicationRejected",
+    await expectNewEvent("ImmersionApplicationRejected", {
       payload: expectedImmersionApplication,
+    });
+  };
+
+  type TestAcceptsStatusUpdateToDraftParams = {
+    role: Role;
+    oldStatus: ApplicationStatus;
+  };
+  const testAcceptsStatusUpdateToDraftAndInvalidatesSignatures = async ({
+    role,
+    oldStatus,
+  }: TestAcceptsStatusUpdateToDraftParams) => {
+    const originalImmersionApplication = await setupInitialState({ oldStatus });
+    const storedImmersionApplication = await executeUseCase({
+      applicationId: originalImmersionApplication.id,
+      role,
+      newStatus: "DRAFT",
+      justification: "test-modification-justification",
+    });
+
+    const expectedImmersionApplication: ImmersionApplicationDto = {
+      ...originalImmersionApplication,
+      status: "DRAFT",
+      beneficiaryAccepted: false,
+      enterpriseAccepted: false,
+    };
+    expect(storedImmersionApplication).toEqual(expectedImmersionApplication);
+
+    await expectNewEvent("ImmersionApplicationRequiresModification", {
+      payload: {
+        application: expectedImmersionApplication,
+        reason: "test-modification-justification",
+      },
     });
   };
 
@@ -322,7 +387,10 @@ describe("UpdateImmersionApplicationStatus", () => {
     );
   };
 
-  const expectNewEvent = async (expectedEvent: Partial<DomainEvent>) => {
+  const expectNewEvent = async <T extends DomainTopic>(
+    topic: T,
+    expectedEvent: Partial<NarrowEvent<T>>,
+  ) => {
     const allEvents = await outboxRepository.getAllUnpublishedEvents();
     expect(allEvents).toHaveLength(1);
     expect(allEvents[0]).toMatchObject(expectedEvent);

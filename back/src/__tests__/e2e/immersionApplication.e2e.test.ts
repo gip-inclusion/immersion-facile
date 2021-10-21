@@ -467,7 +467,8 @@ describe("/update-application-status route", () => {
       .expect(200);
   });
 
-  test("Returns error 400 for invalid requests", async () => {
+  // Skip: Currently no configuration returns 400. Reenable this test if one is added.
+  xtest("Returns error 400 for invalid requests", async () => {
     // A beneficiary creates a new application in state IN_REVIEW.
     const application = new ImmersionApplicationDtoBuilder()
       .withStatus("IN_REVIEW")

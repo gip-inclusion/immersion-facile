@@ -133,6 +133,29 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   });
 };
 
+export const expectNotifyBeneficiaryAndEnterpriseThatApplicationModificationIsRequested =
+  (
+    templatedEmail: TemplatedEmail,
+    recipients: string[],
+    dto: ImmersionApplicationDto,
+    agencyConfig: AgencyConfig,
+    reason: string,
+  ) => {
+    expectTemplatedEmailToEqual(templatedEmail, {
+      type: "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION",
+      recipients,
+      params: {
+        beneficiaryFirstName: dto.firstName,
+        beneficiaryLastName: dto.lastName,
+        businessName: dto.businessName,
+        reason,
+        signature: agencyConfig.signature,
+        agency: agencyConfig.name,
+        immersionProfession: dto.immersionProfession,
+      },
+    });
+  };
+
 const expectTemplatedEmailToEqual = (
   email: TemplatedEmail,
   expected: TemplatedEmail,

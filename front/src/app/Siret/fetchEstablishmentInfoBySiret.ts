@@ -56,7 +56,8 @@ export const fetchEstablishmentInfoBySiret = async (
           naf: {
             code: establishment.uniteLegale.activitePrincipaleUniteLegale!,
             nomenclature:
-              establishment.uniteLegale.nomenclatureActivitePrincipaleUniteLegale!,
+              establishment.uniteLegale
+                .nomenclatureActivitePrincipaleUniteLegale!,
           },
         }
       : {}),

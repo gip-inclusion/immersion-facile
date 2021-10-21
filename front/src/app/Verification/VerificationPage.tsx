@@ -40,7 +40,9 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
     onError: setErrorMessage,
   };
 
-  const validatedSuccessfully = "La confirmation de l'immersion a bien été programmée pour envoi";
+  const validatedSuccessfully = "La demande d'immersion a bien été mise à jour";
+  const sentForModificationSuccessfully =
+    "La demande d'immersion a bien été renvoyée pour modification";
 
   return (
     <div
@@ -65,6 +67,15 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
             Refuser l'immersion ...
           </VerificationActionButton>
         )}
+
+        <VerificationActionButton
+          {...buttonProps}
+          newStatus="DRAFT"
+          messageToShowOnSuccess={sentForModificationSuccessfully}
+        >
+          Renvoyer au bénéficiaire pour modification
+        </VerificationActionButton>
+
         {actingRole === "counsellor" && (
           <VerificationActionButton
             {...buttonProps}
@@ -83,15 +94,17 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
             Valider la demande
           </VerificationActionButton>
         )}
-        {actingRole === "admin" && buttonProps.immersionApplication?.status === "ACCEPTED_BY_VALIDATOR" && (
-          <VerificationActionButton
-            {...buttonProps}
-            newStatus="VALIDATED"
-            messageToShowOnSuccess={validatedSuccessfully}
-          >
-            Envoyer la convention
-          </VerificationActionButton>
-        )}
+        {actingRole === "admin" &&
+          buttonProps.immersionApplication?.status ===
+            "ACCEPTED_BY_VALIDATOR" && (
+            <VerificationActionButton
+              {...buttonProps}
+              newStatus="VALIDATED"
+              messageToShowOnSuccess={validatedSuccessfully}
+            >
+              Envoyer la convention
+            </VerificationActionButton>
+          )}
 
         {errorMessage && (
           <ErrorMessage title="Désolé: Erreur de traitement sur la plateforme, veuillez réessayer ultérieurement">

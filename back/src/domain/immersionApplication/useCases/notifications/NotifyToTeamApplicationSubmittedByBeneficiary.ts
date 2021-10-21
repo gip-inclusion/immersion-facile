@@ -3,7 +3,7 @@ import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { GenerateMagicLinkFn } from "./NotificationsHelpers";
+import type { GenerateMagicLinkFn } from "../../../../adapters/primary/config";
 import { parseISO } from "date-fns";
 
 const logger = createLogger(__filename);

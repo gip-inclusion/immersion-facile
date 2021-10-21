@@ -60,6 +60,18 @@ const statusTransitionConfigs: Partial<
     validRoles: ["counsellor", "validator", "admin"],
     domainTopic: "ImmersionApplicationRejected",
   },
+
+  // This enables the "require modifications" flow. The agents can put the request
+  // back in the draft state for the beneficiary to modify the request and reapply.
+  DRAFT: {
+    validInitialStatuses: [
+      "IN_REVIEW",
+      "ACCEPTED_BY_VALIDATOR",
+      "ACCEPTED_BY_COUNSELLOR",
+    ],
+    validRoles: ["counsellor", "validator", "admin"],
+    domainTopic: "ImmersionApplicationRequiresModification",
+  },
 };
 
 export class UpdateImmersionApplicationStatus
@@ -101,6 +113,16 @@ export class UpdateImmersionApplicationStatus
       ...immersionApplication.toDto(),
       status,
       rejectionJustification: status === "REJECTED" ? justification : undefined,
+
+      // Invalidate signatures when the application is sent back to the beneficiary.
+      beneficiaryAccepted:
+        status === "DRAFT"
+          ? false
+          : immersionApplication.toDto().beneficiaryAccepted,
+      enterpriseAccepted:
+        status === "DRAFT"
+          ? false
+          : immersionApplication.toDto().enterpriseAccepted,
     });
     const updatedId =
       await this.immersionApplicationRepository.updateImmersionApplication(
@@ -110,10 +132,21 @@ export class UpdateImmersionApplicationStatus
 
     const domainTopic = statusTransitionConfig.domainTopic;
     if (domainTopic) {
-      const event = this.createNewEvent({
-        topic: domainTopic,
-        payload: updatedEntity.toDto(),
-      });
+      let event = undefined;
+      if (domainTopic === "ImmersionApplicationRequiresModification") {
+        event = this.createNewEvent({
+          topic: domainTopic,
+          payload: {
+            application: updatedEntity.toDto(),
+            reason: justification ?? "",
+          },
+        });
+      } else {
+        event = this.createNewEvent({
+          topic: domainTopic,
+          payload: updatedEntity.toDto(),
+        });
+      }
       await this.outboxRepository.save(event);
     }
 
