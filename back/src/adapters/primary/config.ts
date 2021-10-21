@@ -114,7 +114,7 @@ const getGenericRepo = async (config: AppConfig) => {
         genericApplicationDataConverter,
       );
     case "PG": {
-      const pool = new Pool({ connectionString: process.env.PG_URL });
+      const pool = new Pool({ connectionString: config.pgImmersionDbUrl });
       const client = await pool.connect();
       return new PgImmersionApplicationRepository(client);
     }

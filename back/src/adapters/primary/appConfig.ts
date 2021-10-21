@@ -48,8 +48,7 @@ export class AppConfig {
     return throwIfNotInArray({
       processEnv: this.env,
       variableName: "NODE_ENV",
-      authorizedValues: ["test", "production"],
-      defaultValue: "production",
+      authorizedValues: ["test", "local", "production"],
     });
   }
 
@@ -105,12 +104,9 @@ export class AppConfig {
   }
 
   public get pgImmersionDbUrl() {
-    const pgHost = this.env.CI ? "postgres" : "localhost";
-    // TODO: Should some of these come from environment variables?
-    const pgPort = 5432;
-    const pgUser = "postgres";
-    const pgPassword = "pg-password";
-    return `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/immersion-db`;
+    if (this.nodeEnv === "production") return this.throwIfNotDefined("PG_URL");
+    if (this.env.PG_URL) return this.env.PG_URL;
+    return `postgresql://postgres:pg-password@localhost:5432/immersion-db`;
   }
 
   // == Sirene repository ==

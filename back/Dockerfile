@@ -1,6 +1,6 @@
 FROM node:16.5
 COPY package.json package-lock.json /app/
 WORKDIR /app
-RUN npm ci 
+RUN npm ci
 COPY . /app
-CMD npm start
+CMD npm run build-initial-db && npm run start-prod

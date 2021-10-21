@@ -5,6 +5,7 @@ variables:
   POSTGRES_PASSWORD: pg-password
   POSTGRES_PORT: 5432
   POSTGRES_HOST_AUTH_METHOD: trust
+  PG_TEST_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB
 
 stages:
   - test
@@ -34,8 +35,8 @@ back:
   script:
     - cd back
     - npm ci
-    - npm run build-initial-db "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB"
-    - npm run test:all
+    - npm run build-initial-db $PG_TEST_URL
+    - PG_URL=$PG_TEST_URL npm run test:all
     - npm run typecheck
 
 sonarqube-check:
