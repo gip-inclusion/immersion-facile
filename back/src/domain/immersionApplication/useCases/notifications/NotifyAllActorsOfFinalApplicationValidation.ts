@@ -10,6 +10,7 @@ import {
   EmailGateway,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../ports/EmailGateway";
+import { parseISO } from "date-fns";
 
 const logger = createLogger(__filename);
 export class NotifyAllActorsOfFinalApplicationValidation
@@ -77,8 +78,8 @@ export const getValidatedApplicationFinalConfirmationParams = (
   return {
     beneficiaryFirstName: dto.firstName,
     beneficiaryLastName: dto.lastName,
-    dateStart: dto.dateStart,
-    dateEnd: dto.dateEnd,
+    dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
+    dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
     mentorName: dto.mentor,
     scheduleText: dto.legacySchedule?.description
       ? prettyPrintLegacySchedule(dto.legacySchedule)

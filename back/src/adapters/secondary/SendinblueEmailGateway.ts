@@ -137,7 +137,7 @@ export class SendinblueEmailGateway implements EmailGateway {
       emailTypeToTemplateId.REJECTED_APPLICATION_NOTIFICATION;
     sibEmail.to = recipients.map((email) => ({ email }));
     sibEmail.params = {
-      FIRST_NAME: params.beneficiaryFirstName,
+      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
       BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
       BUSINESS_NAME: params.businessName,
       REASON: params.rejectionReason,

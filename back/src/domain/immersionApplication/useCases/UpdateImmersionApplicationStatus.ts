@@ -43,11 +43,7 @@ const statusTransitionConfigs: Partial<
     domainTopic: "ImmersionApplicationAcceptedByValidator",
   },
   VALIDATED: {
-    validInitialStatuses: [
-      "IN_REVIEW",
-      "ACCEPTED_BY_COUNSELLOR",
-      "ACCEPTED_BY_VALIDATOR",
-    ],
+    validInitialStatuses: ["ACCEPTED_BY_COUNSELLOR", "ACCEPTED_BY_VALIDATOR"],
     validRoles: ["admin"],
     domainTopic: "FinalImmersionApplicationValidationByAdmin",
   },

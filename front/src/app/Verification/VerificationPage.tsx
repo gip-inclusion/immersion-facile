@@ -40,7 +40,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
     onError: setErrorMessage,
   };
 
-  const validatedSuccessfully = "La demande d'immersion a bien été mise à jour";
+  const validatedSuccessfully = "La confirmation de l'immersion a bien été programmée pour envoi";
 
   return (
     <div
@@ -56,14 +56,15 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         "Chargement en cours..."
       )}
       <div>
-        <VerificationActionButton
-          {...buttonProps}
-          newStatus="REJECTED"
-          messageToShowOnSuccess="La demande d'immersion a bien été refusé"
-        >
-          Refuser l'immersion ...
-        </VerificationActionButton>
-
+        {actingRole !== "admin" && (
+          <VerificationActionButton
+            {...buttonProps}
+            newStatus="REJECTED"
+            messageToShowOnSuccess="La demande d'immersion a bien été refusé"
+          >
+            Refuser l'immersion ...
+          </VerificationActionButton>
+        )}
         {actingRole === "counsellor" && (
           <VerificationActionButton
             {...buttonProps}
@@ -82,13 +83,13 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
             Valider la demande
           </VerificationActionButton>
         )}
-        {actingRole === "admin" && (
+        {actingRole === "admin" && buttonProps.immersionApplication?.status === "ACCEPTED_BY_VALIDATOR" && (
           <VerificationActionButton
             {...buttonProps}
             newStatus="VALIDATED"
             messageToShowOnSuccess={validatedSuccessfully}
           >
-            Valider et envoyer la convention
+            Envoyer la convention
           </VerificationActionButton>
         )}
 

@@ -457,7 +457,7 @@ describe("/update-application-status route", () => {
       .send(application)
       .expect(200);
 
-    // A counsellor accepts the application.
+    // A counsellor rejects the application.
     const counsellorJwt = generateJwt(
       createMagicLinkPayload(application.id, "counsellor"),
     );
@@ -477,13 +477,22 @@ describe("/update-application-status route", () => {
       .send(application)
       .expect(200);
 
-    // An admin tries to change it to DRAFT but fails.
+    // An establishment tries to change it to DRAFT but fails.
     const establishmentJwt = generateJwt(
       createMagicLinkPayload(application.id, "establishment"),
     );
     await request
       .post(`/auth/${updateApplicationStatusRoute}/${establishmentJwt}`)
       .send({ status: "DRAFT" })
+      .expect(400);
+
+    // An admin tries to change it to VALIDATED but fails.
+    const adminJwt = generateJwt(
+      createMagicLinkPayload(application.id, "admin"),
+    );
+    await request
+      .post(`/auth/${updateApplicationStatusRoute}/${adminJwt}`)
+      .send({ status: "VALIDATED" })
       .expect(400);
   });
 

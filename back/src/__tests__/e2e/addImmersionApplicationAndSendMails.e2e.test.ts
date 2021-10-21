@@ -35,6 +35,7 @@ import {
 } from "../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
+import { parseISO } from "date-fns";
 
 const adminEmail = "admin@email.fr";
 
@@ -159,7 +160,15 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
     expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[2], {
       recipients: [adminEmail],
-      immersionApplication: validDemandeImmersion,
+      immersionApplication: {
+        ...validDemandeImmersion,
+        dateStart: parseISO(validDemandeImmersion.dateStart).toLocaleDateString(
+          "fr",
+        ),
+        dateEnd: parseISO(validDemandeImmersion.dateEnd).toLocaleDateString(
+          "fr",
+        ),
+      },
       magicLink: fakeGenerateMagicLinkUrlFn(validDemandeImmersion.id, "admin"),
       agencyConfig,
     });

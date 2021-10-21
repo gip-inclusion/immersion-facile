@@ -31,7 +31,8 @@ const FrozenMessage = () => (
         Cette demande d'immersion n'est plus modifiable.
       </p>
       <p>
-        Cette demande d'immersion a été soumise et il n'est plus possible de la modifier.
+        Cette demande d'immersion a été soumise et il n'est plus possible de la
+        modifier.
       </p>
     </div>
     <br />
@@ -75,8 +76,8 @@ export const ApplicationFormFields = ({
       />
 
       <TextInput
-        label="Votre nom *"
-        name="lastName"
+        label="Votre prénom *"
+        name="firstName"
         type="text"
         placeholder=""
         description=""
@@ -84,8 +85,8 @@ export const ApplicationFormFields = ({
       />
 
       <TextInput
-        label="Votre prénom *"
-        name="firstName"
+        label="Votre nom *"
+        name="lastName"
         type="text"
         placeholder=""
         description=""

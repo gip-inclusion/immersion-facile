@@ -6,9 +6,11 @@ import { expectEmailAdminNotificationMatchingImmersionApplication } from "../../
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 import { AgencyConfig } from "./../../../domain/immersionApplication/ports/AgencyRepository";
+import { parseISO } from "date-fns";
 
 const adminEmail = "admin@email.fr";
 const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
+
 const defaultAgencyConfig = AgencyConfigBuilder.create(
   validDemandeImmersion.agencyCode,
 )
@@ -50,7 +52,15 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
 
     expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[0], {
       recipients: [adminEmail],
-      immersionApplication: validDemandeImmersion,
+      immersionApplication: {
+        ...validDemandeImmersion,
+        dateStart: parseISO(validDemandeImmersion.dateStart).toLocaleDateString(
+          "fr",
+        ),
+        dateEnd: parseISO(validDemandeImmersion.dateEnd).toLocaleDateString(
+          "fr",
+        ),
+      },
       magicLink: fakeGenerateMagicLinkUrlFn(validDemandeImmersion.id, "admin"),
       agencyConfig,
     });

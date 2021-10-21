@@ -16,6 +16,7 @@ import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } fr
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { AgencyConfig } from "./../../../domain/immersionApplication/ports/AgencyRepository";
+import { parseISO } from "date-fns";
 
 const validDemandeImmersion: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();
@@ -166,8 +167,8 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     const expectedParams: ValidatedApplicationFinalConfirmationParams = {
       beneficiaryFirstName: application.firstName,
       beneficiaryLastName: application.lastName,
-      dateStart: application.dateStart,
-      dateEnd: application.dateEnd,
+      dateStart: parseISO(application.dateStart).toLocaleDateString("fr"),
+      dateEnd: parseISO(application.dateEnd).toLocaleDateString("fr"),
       mentorName: application.mentor,
       scheduleText: prettyPrintSchedule(application.schedule),
       businessName: application.businessName,

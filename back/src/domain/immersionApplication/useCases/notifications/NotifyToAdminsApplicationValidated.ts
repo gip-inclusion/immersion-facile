@@ -1,4 +1,5 @@
 import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
+
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
@@ -7,7 +8,7 @@ import { GenerateMagicLinkFn } from "./NotificationsHelpers";
 import { parseISO } from "date-fns";
 
 const logger = createLogger(__filename);
-export class NotifyToTeamApplicationSubmittedByBeneficiary
+export class NotifyToAdminsApplicationValidated
   implements UseCase<ImmersionApplicationDto>
 {
   constructor(
@@ -25,13 +26,6 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary
     dateEnd,
     businessName,
   }: ImmersionApplicationDto): Promise<void> {
-    logger.info(
-      {
-        demandeImmersionId: id,
-      },
-      "------------- Entering execute.",
-    );
-
     const agencyConfig = await this.agencyRepository.getConfig(agencyCode);
     if (!agencyConfig) {
       throw new Error(
