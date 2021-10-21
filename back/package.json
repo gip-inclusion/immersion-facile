@@ -14,7 +14,8 @@
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "typecheck": "tsc --noEmit",
-    "fullcheck": "npm run format && npm run test && npm run typecheck",
+    "includecheck" : "./check_includes.sh",
+    "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck",
     "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck"
   },
   "keywords": [],
