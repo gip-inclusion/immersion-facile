@@ -10,6 +10,8 @@ import { RomeGateway } from "../ports/RomeGateway";
 import { RomeAppellation, RomeMetier } from "./../ports/RomeGateway";
 
 const logger = createLogger(__filename);
+
+const MIN_SEARCH_TEXT_LENGTH = 3;
 export class RomeSearch
   implements UseCase<RomeSearchRequestDto, RomeSearchResponseDto>
 {
@@ -18,6 +20,8 @@ export class RomeSearch
   public async execute(
     searchText: RomeSearchRequestDto,
   ): Promise<RomeSearchResponseDto> {
+    if (searchText.length <= MIN_SEARCH_TEXT_LENGTH) return [];
+
     const [appellations, metiers] = await Promise.all([
       this.romeGateway.searchAppellation(searchText),
       this.romeGateway.searchMetier(searchText),

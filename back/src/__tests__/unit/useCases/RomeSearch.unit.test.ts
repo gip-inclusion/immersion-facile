@@ -1,17 +1,20 @@
+import { RomeGateway } from "../../../domain/rome/ports/RomeGateway";
 import { InMemoryRomeGateway } from "./../../../adapters/secondary/InMemoryRomeGateway";
 import { RomeSearch } from "./../../../domain/rome/useCases/RomeSearch";
 
 describe("RomeSearch", () => {
-  let repository: InMemoryRomeGateway;
-  let romeSearch: RomeSearch;
+  let gateway: RomeGateway;
 
   beforeEach(() => {
-    repository = new InMemoryRomeGateway();
-    romeSearch = new RomeSearch(repository);
+    gateway = new InMemoryRomeGateway();
   });
 
+  const createUseCase = () => {
+    return new RomeSearch(gateway);
+  };
+
   test("returns the list of found matches with ranges", async () => {
-    const response = await romeSearch.execute("lapins");
+    const response = await createUseCase().execute("lapins");
     expect(response).toEqual([
       {
         profession: {
@@ -30,7 +33,21 @@ describe("RomeSearch", () => {
     ]);
   });
 
+  test("issues no queries for short search texts", async () => {
+    const mockSearchMetierFn = jest.fn();
+    const mockSearchAppellationFn = jest.fn();
+    gateway = {
+      searchMetier: mockSearchMetierFn,
+      searchAppellation: mockSearchAppellationFn,
+    };
+
+    const response = await createUseCase().execute("lap");
+    expect(mockSearchMetierFn.mock.calls).toHaveLength(0);
+    expect(mockSearchAppellationFn.mock.calls).toHaveLength(0);
+    expect(response).toEqual([]);
+  });
+
   test("returns empty list when no match is found ", async () => {
-    expect(await romeSearch.execute("unknown_search_term")).toEqual([]);
+    expect(await createUseCase().execute("unknown_search_term")).toEqual([]);
   });
 });
