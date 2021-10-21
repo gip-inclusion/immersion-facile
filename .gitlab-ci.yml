@@ -89,12 +89,11 @@ deploy_on_dev:
       touch .env &&
       chmod 600 .env &&
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
-      rm -f .env.variables .env.secrets &&
-      docker-compose --env-file .env build &&
-      docker-compose down &&
-      docker-compose up -d;
+      rm -f .env.variables .env.secrets;
+
+      docker-compose --env-file .env up --build -d;
+
       retVal=\$?;
-      rm -f .env;
       if [ \$retVal -ne 0 ]; then
       echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
       exit \$retVal;
@@ -134,12 +133,55 @@ deploy_on_beta:
       touch .env &&
       chmod 600 .env &&
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
-      rm -f .env.variables .env.secrets &&
-      docker-compose --env-file .env build &&
-      docker-compose down &&
-      docker-compose up -d;
+      rm -f .env.variables .env.secrets;
+
+      docker-compose --env-file .env up --build -d;
+
       retVal=\$?;
-      rm -f .env;
+      if [ \$retVal -ne 0 ]; then
+      echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
+      exit \$retVal;
+      fi;
+
+      sleep 60;
+      echo \"Checking server health...\";
+      curl --silent --fail --output /dev/null http://localhost:3100/api/"
+
+deploy_on_staging:
+  cache: []
+  only:
+    - staging
+  image: alpine:latest
+  stage: deploy
+  environment:
+    name: staging
+  script:
+    - chmod og= $DEPLOYER_ID_RSA_DEV
+    - echo $SERVER_USER
+    - apk update && apk add openssh-client
+    - scp -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SECRETS $SERVER_USER@$DEPLOYER_SERVER_IP_DEV:/home/docker/immersion-facile-staging/.env.secrets
+    - scp -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $VARIABLES $SERVER_USER@$DEPLOYER_SERVER_IP_DEV:/home/docker/immersion-facile-staging/.env.variables
+    - ssh -i $DEPLOYER_ID_RSA_DEV -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP_DEV "cd /home/docker/immersion-facile-staging &&
+      chmod 600 .env.secrets;
+      chmod 600 .env.variables;
+
+      git checkout staging &&
+      git fetch &&
+      git reset --hard origin/staging;
+      retVal=\$?;
+      if [ \$retVal -ne 0 ]; then
+      echo \"FATAL:Source code fetch failed. Aborting.\";
+      exit \$retVal;
+      fi;
+
+      touch .env &&
+      chmod 600 .env &&
+      cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+      rm -f .env.variables .env.secrets;
+
+      docker-compose --env-file .env up --build -d;
+
+      retVal=\$?;
       if [ \$retVal -ne 0 ]; then
       echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
       exit \$retVal;
@@ -178,9 +220,11 @@ deploy_on_prod:
 
       touch .env &&
       chmod 600 .env &&
-      cat .env.variables <(echo) .env.secrets <(echo) > .env;
-      rm -f .env.variables .env.secrets &&
+      cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+      rm -f .env.variables .env.secrets;
+
       docker-compose --env-file .env up --build -d;
+
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
       echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
