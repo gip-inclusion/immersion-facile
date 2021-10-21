@@ -8,12 +8,14 @@
     "start-prod": "NODE_ENV=production ts-node src/adapters/primary/startServer.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts",
     "test:e2e": "jest --runInBand --watchAll --testRegex=.e2e.test.ts",
-    "test:integration": "jest --runInBand --testRegex=.integration.test.ts --watchAll",
+    "test:integration": "jest --runInBand --watchAll --testRegex=.integration.test.ts",
+    "test": "jest --runInBand --testRegex='^((?!integration).)*.test.ts$'",
     "test:all": "jest --runInBand",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "typecheck": "tsc --noEmit",
-    "fullcheck": "npm run format && npm run test:all && npm run typecheck"
+    "fullcheck": "npm run format && npm run test && npm run typecheck",
+    "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck"
   },
   "keywords": [],
   "author": "",
