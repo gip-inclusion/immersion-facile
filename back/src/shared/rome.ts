@@ -5,7 +5,7 @@ import { zTrimmedString } from "./zodUtils";
 const romeCodeMetierRegex = /[A-N]\d{4}/;
 
 export type RomeCodeMetierDto = z.infer<typeof romeSearchResponseSchema>;
-const romeCodeMetierSchema = z
+export const romeCodeMetierSchema = z
   .string()
   .regex(romeCodeMetierRegex, "Code ROME incorrect");
 

@@ -4,20 +4,19 @@ import {
   ImmersionOfferDto,
   immersionOfferSchema,
 } from "../../../shared/ImmersionOfferDto";
+import { createLogger } from "../../../utils/logger";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
-import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
 export class AddImmersionOffer
   implements UseCase<ImmersionOfferDto, AddImmersionOfferResponseDto>
 {
-  private readonly logger = logger.child({ logsource: "AddImmersionOffer" });
-
   constructor(
     private readonly immersionOfferRepository: ImmersionOfferRepository,
   ) {}
+
   public async execute(
     dto: ImmersionOfferDto,
   ): Promise<AddImmersionOfferResponseDto> {

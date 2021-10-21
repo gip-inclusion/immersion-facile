@@ -1,10 +1,6 @@
-import { SearchImmersion } from "../../../domain/searchImmersion/useCases/SearchImmersion";
-import {
-  fakeLaBonneBoiteGateway,
-  fakeLaPlateFormeDeLInclusionGateway,
-} from "../../../_testBuilders/FakeHttpCalls";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/searchImmersion/InMemoryImmersonOfferRepository";
 import { ImmersionOfferEntity } from "../../../domain/searchImmersion/entities/ImmersionOfferEntity";
+import { SearchImmersion } from "../../../domain/searchImmersion/useCases/SearchImmersion";
 
 describe("SearchImmersion", () => {
   test("Search immersion works", async () => {
@@ -21,18 +17,57 @@ describe("SearchImmersion", () => {
         name: "Company from la bonne boite",
         voluntary_to_immersion: false,
         data_source: "api_labonneboite",
-        contact_in_establishment: undefined,
         score: 4.5,
         position: { lat: 43.8666, lon: 8.3333 },
+        contact_in_establishment: {
+          id: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
+          name: "Dupont",
+          fistname: "Pierre",
+          email: "test@email.fr",
+          role: "Directeur",
+          siret_institution: "78000403200019",
+        },
       }),
     ]);
 
-    const immersions = await searchImmersion.execute({
-      ROME: "M1607",
-      distance: 30,
-      lat: 49.119146,
-      lon: 6.17602,
+    const response = await searchImmersion.execute({
+      rome: "M1607",
+      nafDivision: "85",
+      distance_km: 30,
+      location: {
+        lat: 49.119146,
+        lon: 6.17602,
+      },
     });
-    expect(immersions[0]).toBeInstanceOf(ImmersionOfferEntity);
+
+    const searches = immersionOfferRepository.getSearches();
+    expect(searches).toEqual([
+      {
+        ROME: "M1607",
+        nafDivision: "85",
+        lat: 49.119146,
+        lon: 6.17602,
+        distance: 30,
+      },
+    ]);
+
+    expect(response).toEqual([
+      {
+        id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
+        rome: "M1607",
+        naf: "8539A",
+        siret: "78000403200019",
+        name: "Company from la bonne boite",
+        voluntary_to_immersion: false,
+        location: { lat: 43.8666, lon: 8.3333 },
+        contact: {
+          id: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
+          last_name: "Dupont",
+          first_name: "Pierre",
+          email: "test@email.fr",
+          role: "Directeur",
+        },
+      },
+    ]);
   });
 });

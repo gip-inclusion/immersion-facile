@@ -15,14 +15,16 @@ import {
   siretRoute,
   validateDemandeRoute,
 } from "../../shared/routes";
+import { searchImmersionRequestSchema } from "../../shared/SearchImmersionDto";
 import { createLogger } from "../../utils/logger";
+import { searchImmersionRoute } from "./../../shared/routes";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
-import expressPrometheusMiddleware = require("express-prometheus-middleware");
 import { subscribeToEvents } from "./subscribeToEvents";
+import expressPrometheusMiddleware = require("express-prometheus-middleware");
 
 const logger = createLogger(__filename);
 
@@ -104,6 +106,16 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
       callUseCase({
         useCase: deps.useCases.addImmersionOffer,
         validationSchema: immersionOfferSchema,
+        useCaseParams: req.body,
+      }),
+    ),
+  );
+
+  router.route(`/${searchImmersionRoute}`).post(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      callUseCase({
+        useCase: deps.useCases.searchImmersion,
+        validationSchema: searchImmersionRequestSchema,
         useCaseParams: req.body,
       }),
     ),

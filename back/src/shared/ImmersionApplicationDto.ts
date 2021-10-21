@@ -8,9 +8,10 @@ import {
 } from "./immersionApplicationRefinement";
 import {
   LegacyScheduleDto,
-  ScheduleDto,
   reasonableSchedule,
+  ScheduleDto,
 } from "./ScheduleSchema";
+import { siretSchema } from "./siret";
 import { Flavor } from "./typeFlavors";
 import { NotEmptyArray, phoneRegExp } from "./utils";
 import { zBoolean, zEmail, zString, zTrimmedString, zTrue } from "./zodUtils";
@@ -92,7 +93,7 @@ export const immersionApplicationSchema = z
     dateStart: zString.regex(dateRegExp, "La date de démarrage est invalide."),
     dateEnd: zString.regex(dateRegExp, "La date de fin invalide."),
 
-    siret: zString.length(14, "SIRET doit étre composé de 14 chiffres"),
+    siret: siretSchema,
     businessName: zTrimmedString,
     mentor: zTrimmedString,
     mentorPhone: zString.regex(

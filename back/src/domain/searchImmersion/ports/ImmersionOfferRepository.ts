@@ -1,6 +1,5 @@
-import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
-import { QueryResult } from "pg";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
 
 export type SearchParams = {
   ROME: string;

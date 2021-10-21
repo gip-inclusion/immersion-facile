@@ -38,3 +38,8 @@ export const nafSchema = z
     nomenclature: z.string(),
   })
   .optional();
+
+const nafDivisionRegex = /\d{2}/;
+export const nafDivisionSchema = z
+  .string()
+  .regex(nafDivisionRegex, "Division NAF incorrect");

@@ -1,12 +1,21 @@
 import { z } from "../../node_modules/zod";
 import { nafSchema } from "./naf";
 import { professionSchema } from "./rome";
+import { siretSchema } from "./siret";
 import { Flavor } from "./typeFlavors";
 import { NotEmptyArray, phoneRegExp } from "./utils";
-import { zEmail, zTrimmedString, zString } from "./zodUtils";
+import { zEmail, zString, zTrimmedString } from "./zodUtils";
 
 export type ImmersionOfferId = Flavor<string, "ImmersionOfferId">;
-const immersionOfferIdSchema: z.ZodSchema<ImmersionOfferId> = zTrimmedString;
+export const immersionOfferIdSchema: z.ZodSchema<ImmersionOfferId> =
+  zTrimmedString;
+
+export type ImmersionContactInEstablishmentId = Flavor<
+  string,
+  "ImmersionContactInEstablishmentId"
+>;
+export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =
+  zTrimmedString;
 
 export type BusinessContactDto = z.infer<typeof businessContactSchema>;
 export const businessContactSchema = z.object({
@@ -28,7 +37,7 @@ export type ImmersionOfferDto = z.infer<typeof immersionOfferSchema>;
 export const immersionOfferSchema = z.object(
   {
     id: immersionOfferIdSchema,
-    siret: zString.length(14, "SIRET doit étre composé de 14 chiffres"),
+    siret: siretSchema,
     businessName: zTrimmedString,
     businessAddress: zTrimmedString,
     naf: nafSchema,

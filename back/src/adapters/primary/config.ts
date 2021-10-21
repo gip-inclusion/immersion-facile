@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Client, Pool } from "pg";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
@@ -26,6 +26,7 @@ import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplicat
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddImmersionOffer } from "../../domain/immersionOffer/useCases/AddImmersionOffer";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
+import { SearchImmersion } from "../../domain/searchImmersion/useCases/SearchImmersion";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../shared/routes";
@@ -69,6 +70,8 @@ import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository"
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PoleEmploiAccessTokenGateway } from "../secondary/PoleEmploiAccessTokenGateway";
 import { PoleEmploiRomeGateway } from "../secondary/PoleEmploiRomeGateway";
+import { InMemoryImmersionOfferRepository as InMemoryImmersionOfferRepositoryForSearch } from "../secondary/searchImmersion/InMemoryImmersonOfferRepository";
+import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/searchImmersion/PgImmersionOfferRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
@@ -174,6 +177,16 @@ const createRepositories = async (config: AppConfig) => {
           immersionOfferDataConverter,
         )
       : new InMemoryImmersionOfferRepository(),
+
+    immersionOfferForSearch:
+      config.repositories === "PG"
+        ? new PgImmersionOfferRepositoryForSearch(
+            // TODO: Revisit how to properly use the postgres connection pool.
+            // Details in https://node-postgres.com/features/pooling
+            new Client(config.pgImmersionDbUrl),
+          )
+        : new InMemoryImmersionOfferRepositoryForSearch(),
+
     agency: new InMemoryAgencyRepository(
       createAgencyConfigsFromAppConfig(config),
     ),
@@ -271,6 +284,9 @@ const createUseCases = (
 
   // immersionOffer
   addImmersionOffer: new AddImmersionOffer(repositories.immersionOffer),
+
+  // searchImmersion
+  searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),
 
   // siret
   getSiret: new GetSiret({

@@ -1,11 +1,8 @@
-import { Flavor } from "../../../shared/typeFlavors";
+import {
+  ImmersionContactInEstablishmentId,
+  ImmersionOfferId,
+} from "../../../shared/ImmersionOfferDto";
 import { Position } from "./EstablishmentEntity";
-
-export type ImmersionOfferId = Flavor<string, "ImmersionOfferId">;
-export type ImmersionContactInEstablishmentId = Flavor<
-  string,
-  "ImmersionContactInEstablishmentId"
->;
 
 export type ImmersionOfferProps = {
   id: ImmersionOfferId;
@@ -31,6 +28,10 @@ export type ImmersionEstablishmentContact = {
 
 export class ImmersionOfferEntity {
   constructor(private props: ImmersionOfferProps) {}
+
+  public getProps() {
+    return this.props;
+  }
 
   public getName() {
     return this.props.name;
