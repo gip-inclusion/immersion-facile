@@ -9,7 +9,6 @@ import {
 } from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
-import { ImmersionApplicationRepository } from "../../domain/immersionApplication/ports/ImmersionApplicationRepository";
 import {
   AddImmersionApplication,
   AddImmersionApplicationML,
@@ -36,19 +35,12 @@ import {
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
-import {
-  genericApplicationDataConverter,
-  legacyApplicationDataConverter,
-} from "../secondary/AirtableApplicationDataConverters";
+import { genericApplicationDataConverter } from "../secondary/AirtableApplicationDataConverters";
 import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
 import {
   AirtableImmersionOfferRepository,
   immersionOfferDataConverter,
 } from "../secondary/AirtableImmersionOfferRepositroy";
-import {
-  ApplicationRepositoryMap,
-  ApplicationRepositorySwitcher,
-} from "../secondary/ApplicationRepositorySwitcher";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
