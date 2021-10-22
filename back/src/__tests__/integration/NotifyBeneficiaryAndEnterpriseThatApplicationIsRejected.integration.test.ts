@@ -5,7 +5,7 @@ import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../d
 import { applicationStatusFromString } from "../../shared/ImmersionApplicationDto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { AgencyRepository } from "./../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
 
 const validDemandeImmersion = new ImmersionApplicationDtoBuilder()
   .withEmail("jean-francois.macresy@beta.gouv.fr")

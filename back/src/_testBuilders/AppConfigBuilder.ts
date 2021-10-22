@@ -3,6 +3,8 @@ import { ProcessEnv } from "../shared/envHelpers";
 import { Builder } from "./Builder";
 
 const defaultConfigParams = {
+  NODE_ENV: "test",
+
   // Test-only key, do not use in production environments!
   JWT_PRIVATE_KEY:
     "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIEUlP92zWRVJTz5bxyP57npwsPCi0lh5C/uxX5ZuJn6OoAoGCCqGSM49\nAwEHoUQDQgAEF0O2Llia9pN283L4DYrVUgIQrqPduq+gkqPLDn9OoVYcbRdeKqCe\n53195KiTm0aSOw/mgml9SVt+Rs4t60Ubkw==\n-----END EC PRIVATE KEY-----",
@@ -17,7 +19,11 @@ const defaultConfigParams = {
 
 // See "Working with AppConfig" in back/README.md for more details.
 export class AppConfigBuilder implements Builder<AppConfig> {
-  public constructor(readonly configParams: ProcessEnv = defaultConfigParams) {}
+  private readonly configParams: ProcessEnv;
+
+  public constructor(configParams: ProcessEnv = {}) {
+    this.configParams = { ...defaultConfigParams, ...configParams };
+  }
 
   public build() {
     return AppConfig.createFromEnv(/* readDotEnv= */ false, this.configParams);

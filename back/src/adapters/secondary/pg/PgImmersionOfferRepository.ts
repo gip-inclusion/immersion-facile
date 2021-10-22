@@ -3,7 +3,7 @@ import {
   ImmersionOfferEntity,
   ImmersionEstablishmentContact,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { Client, QueryResult } from "pg";
+import { PoolClient } from "pg";
 import format from "pg-format";
 import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { createLogger } from "../../../utils/logger";
@@ -13,7 +13,7 @@ import { Position } from "../../../domain/immersionOffer/entities/EstablishmentE
 const logger = createLogger(__filename);
 
 export class PgImmersionOfferRepository implements ImmersionOfferRepository {
-  constructor(private client: Client) {}
+  constructor(private client: PoolClient) {}
 
   async insertSearch(searchParams: SearchParams) {
     this.client
@@ -181,7 +181,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
     let nafCategoryFilter = "";
-    let parameters = [
+    const parameters = [
       searchParams.ROME,
       "POINT(" + searchParams.lon + " " + searchParams.lat + ")",
       searchParams.distance * 1000,

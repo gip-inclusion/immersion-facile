@@ -1,31 +1,30 @@
 import { Pool, PoolClient } from "pg";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { AppConfig } from "./../../adapters/primary/appConfig";
-
-let pool: Pool;
 
 describe("PgImmersionApplicationRepository", () => {
+  let pool: Pool;
   let client: PoolClient;
   let immersionApplicationRepository: PgImmersionApplicationRepository;
 
   beforeAll(async () => {
-    const config = AppConfig.createFromEnv();
-    pool = new Pool({ connectionString: config.pgImmersionDbUrl });
+    const config = new AppConfigBuilder({ REPOSITORIES: "PG" }).build();
+    pool = config.pgPool;
+    client = await pool.connect();
   });
 
   beforeEach(async () => {
-    client = await pool.connect();
     await client.query("TRUNCATE immersion_applications");
     immersionApplicationRepository = new PgImmersionApplicationRepository(
       client,
     );
   });
 
-  afterEach(() => {
+  afterAll(() => {
     client.release();
   });
 

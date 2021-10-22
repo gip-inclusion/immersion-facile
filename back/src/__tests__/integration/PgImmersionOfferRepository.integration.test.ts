@@ -1,61 +1,68 @@
-import { Client } from "pg";
+import { Pool, PoolClient } from "pg";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
 import { EstablishmentEntity } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntity } from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { AppConfig } from "../../adapters/primary/appConfig";
 
-let client: Client;
+const populateWithImmersionOffers = async (
+  pgImmersionOfferRepository: PgImmersionOfferRepository,
+) => {
+  await pgImmersionOfferRepository.insertSearch({
+    ROME: "M1607",
+    distance: 30,
+    lat: 49.119146,
+    lon: 6.17602,
+  });
+  await pgImmersionOfferRepository.insertSearch({
+    ROME: "M1607",
+    distance: 30,
+    lat: 48.119146,
+    lon: 6.17602,
+  });
+  await pgImmersionOfferRepository.insertSearch({
+    ROME: "M1607",
+    distance: 30,
+    lat: 48.119146,
+    lon: 5.17602,
+  });
+  await pgImmersionOfferRepository.insertSearch({
+    ROME: "M1607",
+    distance: 30,
+    lat: 48.119146,
+    lon: 4.17602,
+  });
+  await pgImmersionOfferRepository.insertSearch({
+    ROME: "M1607",
+    distance: 30,
+    lat: 48.129146,
+    lon: 4.17602,
+  });
+  await pgImmersionOfferRepository.insertSearch({
+    ROME: "M1608",
+    distance: 30,
+    lat: 48.129146,
+    lon: 4.17602,
+  });
+};
 
 describe("Postgres implementation of immersion offer repository", () => {
+  let pool: Pool;
+  let client: PoolClient;
+
   beforeAll(async () => {
-    const config = AppConfig.createFromEnv();
-    client = new Client(config.pgImmersionDbUrl);
-    await client.connect();
+    const config = new AppConfigBuilder({ REPOSITORIES: "PG" }).build();
+    pool = config.pgPool;
+    client = await pool.connect();
   });
 
   afterAll(async () => {
-    await client.end();
+    await client.release();
   });
 
   test("Insert search works", async () => {
     const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
+    await populateWithImmersionOffers(pgImmersionOfferRepository);
 
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 49.119146,
-      lon: 6.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 48.119146,
-      lon: 6.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 48.119146,
-      lon: 5.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 48.119146,
-      lon: 4.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 48.129146,
-      lon: 4.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1608",
-      distance: 30,
-      lat: 48.129146,
-      lon: 4.17602,
-    });
     expect(
       (
         await pgImmersionOfferRepository.getSearchInDatabase({
@@ -73,43 +80,8 @@ describe("Postgres implementation of immersion offer repository", () => {
 
   test("Grouping searches close geographically works", async () => {
     const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
+    await populateWithImmersionOffers(pgImmersionOfferRepository);
 
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 49.119146,
-      lon: 6.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 48.119146,
-      lon: 6.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 48.119146,
-      lon: 5.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 48.119146,
-      lon: 4.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1607",
-      distance: 30,
-      lat: 48.129146,
-      lon: 4.17602,
-    });
-    await pgImmersionOfferRepository.insertSearch({
-      ROME: "M1608",
-      distance: 30,
-      lat: 48.129146,
-      lon: 4.17602,
-    });
     //We expect that two of the 6 searches have been grouped by
     expect(
       await pgImmersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem(),

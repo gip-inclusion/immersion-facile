@@ -146,9 +146,10 @@ const createRepositories = async (config: AppConfig) => {
     immersionOfferForSearch:
       config.repositories === "PG"
         ? new PgImmersionOfferRepositoryForSearch(
-            // TODO: Revisit how to properly use the postgres connection pool.
             // Details in https://node-postgres.com/features/pooling
-            new Client(config.pgImmersionDbUrl),
+            // Now using connection pool
+            // TODO: Still we would need to release the connection
+            await config.pgPool.connect(),
           )
         : new InMemoryImmersionOfferRepositoryForSearch(),
 

@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import { Pool } from "pg";
 import { AgencyCode, agencyCodeFromString } from "../../shared/agencies";
 import {
   makeThrowIfNotDefined,
@@ -75,22 +76,6 @@ export class AppConfig {
     };
   }
 
-  public get airtableBoulogneSurMerImmersionApplicationTableConfig(): AirtableTableConfig {
-    return {
-      apiKey: this.airtableApiKey,
-      baseId: this.throwIfNotDefined("AIRTABLE_BASE_ID_BOULOGNE_SUR_MER"),
-      tableName: this.throwIfNotDefined("AIRTABLE_TABLE_NAME_BOULOGNE_SUR_MER"),
-    };
-  }
-
-  public get airtableNarbonneImmersionApplicationTableConfig(): AirtableTableConfig {
-    return {
-      apiKey: this.airtableApiKey,
-      baseId: this.throwIfNotDefined("AIRTABLE_BASE_ID_NARBONNE"),
-      tableName: this.throwIfNotDefined("AIRTABLE_TABLE_NAME_NARBONNE"),
-    };
-  }
-
   public get airtableApplicationTableConfig(): AirtableTableConfig {
     return {
       apiKey: this.airtableApiKey,
@@ -103,6 +88,14 @@ export class AppConfig {
     if (this.nodeEnv === "production") return this.throwIfNotDefined("PG_URL");
     if (this.env.PG_URL) return this.env.PG_URL;
     return `postgresql://postgres:pg-password@localhost:5432/immersion-db`;
+  }
+
+  public get pgPool(): Pool {
+    if (this.repositories !== "PG")
+      throw new Error(
+        `No pool provided if repositories are not PG, received ${this.repositories}`,
+      );
+    return new Pool({ connectionString: this.pgImmersionDbUrl });
   }
 
   // == Sirene repository ==
