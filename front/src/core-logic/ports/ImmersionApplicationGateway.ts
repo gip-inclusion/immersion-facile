@@ -1,3 +1,4 @@
+import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { EstablishmentInfoFromSiretApi } from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import {
   AddImmersionApplicationMLResponseDto,
@@ -35,6 +36,11 @@ export abstract class ImmersionApplicationGateway {
 
   abstract getSiretInfo(siret: string): Promise<EstablishmentInfoFromSiretApi>;
   abstract getAll(): Promise<Array<ImmersionApplicationDto>>;
+
+  abstract generateMagicLink(
+    applicationId: ImmersionApplicationId,
+    role: Role,
+  ): Promise<string>;
 
   public debugPopulateDB(count: number): Promise<Array<string>> {
     const initialArray = Array(count).fill(null);

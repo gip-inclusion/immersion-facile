@@ -24,7 +24,9 @@ import {
   siretRoute,
   updateApplicationStatusRoute,
   validateDemandeRoute,
+  generateMagicLinkRoute,
 } from "src/shared/routes";
+import { Role } from "src/shared/tokens/MagicLinkPayload";
 
 const prefix = "api";
 
@@ -144,5 +146,15 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
   ): Promise<EstablishmentInfoFromSiretApi> {
     const httpResponse = await axios.get(`/${prefix}/${siretRoute}/${siret}`);
     return httpResponse.data;
+  }
+
+  public async generateMagicLink(
+    applicationId: ImmersionApplicationId,
+    role: Role,
+  ): Promise<string> {
+    const httpResponse = await axios.get(
+      `/${prefix}/admin/${generateMagicLinkRoute}?id=${applicationId}&role=${role}`,
+    );
+    return httpResponse.data.jwt;
   }
 }

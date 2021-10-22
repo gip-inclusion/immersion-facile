@@ -3,6 +3,7 @@ import { AppConfig } from "../../adapters/primary/appConfig";
 import { createApp } from "../../adapters/primary/server";
 import { makeGenerateJwt } from "../../domain/auth/jwt";
 import {
+  generateMagicLinkRoute,
   immersionApplicationsRoute,
   updateApplicationStatusRoute,
   validateDemandeRoute,
@@ -161,6 +162,64 @@ describe("/demandes-immersion route", () => {
         .post(`/${immersionApplicationsRoute}`)
         .send(application2)
         .expect(404);
+    });
+
+    describe("Magic Link Generator", () => {
+      const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+
+      beforeEach(async () => {
+        // GET /demandes-immersion returns an empty list.
+        await request
+          .get(`/${immersionApplicationsRoute}`)
+          .auth("e2e_tests", "e2e")
+          .expect(200, []);
+
+        // POSTing a valid application succeeds.
+        await request
+          .post(`/${immersionApplicationsRoute}`)
+          .send(immersionApplication)
+          .expect(200, { id: immersionApplication.id });
+      });
+
+      it("Requires backoffice password to generate magic links", async () => {
+        const role = "beneficiary";
+        const generateMagicLinkUrl = `/admin/${generateMagicLinkRoute}?role=${role}&id=${immersionApplication.id}`;
+
+        await request
+          .get(generateMagicLinkUrl)
+          .auth("e2e_tests", "e2e")
+          .expect(200);
+
+        await request.get(generateMagicLinkUrl).expect(401);
+
+        await request
+          .get(generateMagicLinkUrl)
+          .auth("not_admin_login", "not_admin_password")
+          .expect(403);
+      });
+
+      it("Returns correctly scoped links", async () => {
+        const role: Role = "beneficiary";
+
+        let generateMLResponse = await request
+          .get(
+            `/admin/${generateMagicLinkRoute}?role=${role}&id=${immersionApplication.id}`,
+          )
+          .auth("e2e_tests", "e2e")
+          .expect(200);
+
+        // Getting with this magic link succeds.
+        await request
+          .get(
+            `/auth/${immersionApplicationsRoute}/${generateMLResponse.body.jwt}`,
+          )
+          .expect(200, immersionApplication);
+
+        // But beneficiary link doesn't permit to validate.
+        await request
+          .get(`/${validateDemandeRoute}/${generateMLResponse.body.jwt}`)
+          .expect(401);
+      });
     });
 
     describe("Getting an application", () => {

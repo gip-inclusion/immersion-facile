@@ -40,9 +40,10 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
     onError: setErrorMessage,
   };
 
-  const validatedSuccessfully = "La demande d'immersion a bien été mise à jour";
   const sentForModificationSuccessfully =
     "La demande d'immersion a bien été renvoyée pour modification";
+  const validatedSuccessfully =
+    "La confirmation de l'immersion a bien été programmée pour envoi";
 
   return (
     <div

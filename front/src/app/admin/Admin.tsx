@@ -6,6 +6,7 @@ import { MarianneHeader } from "src/components/MarianneHeader";
 import { Route } from "type-route";
 import "./Admin.css";
 import { FormAccordion } from "src/components/admin/FormAccordion";
+import { FormMagicLinks } from "src/components/admin/FormMagicLinks";
 
 interface AdminState {
   demandeImmersion: Array<ImmersionApplicationDto>;
@@ -39,6 +40,8 @@ export const Admin = ({ route }: AdminProps) => {
             {demandesImmersion.map((item) => (
               <li key={item.id}>
                 <FormAccordion immersionApplication={item} />
+                <FormMagicLinks immersionApplication={item} />
+                <hr />
               </li>
             ))}
           </ul>
