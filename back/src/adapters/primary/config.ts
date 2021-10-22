@@ -1,4 +1,5 @@
 import { Client, Pool } from "pg";
+import { PgFormEstablishmentRepository } from "../secondary/pg/FormEstablishmentRepository";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
@@ -135,13 +136,10 @@ const createRepositories = async (config: AppConfig) => {
 
   return {
     demandeImmersion: await createApplicationRepository(config),
-    immersionOffer:
-      config.repositories === "IN_MEMORY"
-        ? new InMemoryFormEstablishmentRepository()
-        : AirtableFormEstablishmentRepository.create(
-            config.airtableApplicationTableConfig,
-            formEstablishmentDataConverter,
-          ),
+    formEstablishment:
+      config.repositories === "PG"
+        ? new PgFormEstablishmentRepository(await config.pgPool.connect())
+        : new InMemoryFormEstablishmentRepository(),
 
     immersionOfferForSearch:
       config.repositories === "PG"
@@ -254,7 +252,7 @@ const createUseCases = (
   generateMagicLink: new GenerateMagicLink(generateJwtFn),
 
   // immersionOffer
-  addImmersionOffer: new AddFormEstablishment(repositories.immersionOffer),
+  addImmersionOffer: new AddFormEstablishment(repositories.formEstablishment),
 
   // immersionOffer
   searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),

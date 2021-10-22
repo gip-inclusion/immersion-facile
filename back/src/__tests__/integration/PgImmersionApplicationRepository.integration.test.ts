@@ -5,6 +5,7 @@ import { ImmersionApplicationEntity } from "../../domain/immersionApplication/en
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 
 describe("PgImmersionApplicationRepository", () => {
   let pool: Pool;
@@ -12,8 +13,7 @@ describe("PgImmersionApplicationRepository", () => {
   let immersionApplicationRepository: PgImmersionApplicationRepository;
 
   beforeAll(async () => {
-    const config = new AppConfigBuilder({ REPOSITORIES: "PG" }).build();
-    pool = config.pgPool;
+    pool = pool = getTestPgPool();
     client = await pool.connect();
   });
 

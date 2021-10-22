@@ -3,6 +3,7 @@ import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
 import { EstablishmentEntity } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntity } from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 
 const populateWithImmersionOffers = async (
   pgImmersionOfferRepository: PgImmersionOfferRepository,
@@ -50,8 +51,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   let client: PoolClient;
 
   beforeAll(async () => {
-    const config = new AppConfigBuilder({ REPOSITORIES: "PG" }).build();
-    pool = config.pgPool;
+    pool = getTestPgPool();
     client = await pool.connect();
   });
 

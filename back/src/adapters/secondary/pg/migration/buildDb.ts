@@ -49,54 +49,47 @@ const buildDb = async () => {
   logger.info(`Starting build db script for db url : ${pgUrl} -- end`);
 
   const client = await tryToConnect(pgUrl);
+  const checkIfTableExists = makeCheckIfTableAlreadyExists(client);
 
-  const immersionOffersTableAlreadyExists =
-    await checkIfSearchImmersionOffersTableAlreadyExists(client);
+  // prettier-ignore
+  const immersionOffersTableAlreadyExists = await checkIfTableExists("immersion_offers");
   if (!immersionOffersTableAlreadyExists) {
     logger.info("We will thus construct the database");
     await buildSearchImmersionDb(client);
   }
 
-  const immersionApplicationTableAlreadyExists =
-    await checkIfSearchImmersionApplicationTableAlreadyExists(client);
+  // prettier-ignore
+  const immersionApplicationTableAlreadyExists = await checkIfTableExists("immersion_applications");
   if (!immersionApplicationTableAlreadyExists) {
     logger.info("We will thus create the immersion_applications table");
     await buildImmersionApplication(client);
   }
 
+  // prettier-ignore
+  const formEstablishmentTableAlreadyExists = await checkIfTableExists("form_establishments");
+  if (!formEstablishmentTableAlreadyExists) {
+    logger.info("We will thus create the form_establishments table");
+    await buildFormEstablishment(client);
+  }
+
   await client.end();
 };
 
-const checkIfSearchImmersionOffersTableAlreadyExists = async (
-  client: Client,
-): Promise<boolean> => {
-  try {
-    await client.query("SELECT * FROM immersion_offers LIMIT 1");
-    logger.info("immersion_offers table already exists");
-    return true;
-  } catch (e: any) {
-    logger.info(
-      `immersion_offers does not exists, trying to query got: ${e.message}`,
-    );
-    return false;
-  }
-};
-
-const checkIfSearchImmersionApplicationTableAlreadyExists = async (
-  client: Client,
-): Promise<boolean> => {
-  try {
-    await client.query("SELECT * FROM immersion_applications LIMIT 1");
-    logger.info("immersion_applications table was already built");
-    return true;
-  } catch (e: any) {
-    logger.info(
-      "immersion_applications is not built yet. The query returned: ",
-      e.message,
-    );
-    return false;
-  }
-};
+const makeCheckIfTableAlreadyExists =
+  (client: Client) =>
+  async (tableName: string): Promise<boolean> => {
+    try {
+      // template strings for sql queries should be avoided, but how to pass table name otherwise ?
+      await client.query(`SELECT * FROM ${tableName} LIMIT 1`);
+      logger.info(`${tableName} table already exists`);
+      return true;
+    } catch (e: any) {
+      logger.info(
+        `${tableName} does not exists, trying to query got: ${e.message}`,
+      );
+      return false;
+    }
+  };
 
 const buildSearchImmersionDb = async (client: Client) => {
   const file = await readFile(__dirname + "/database.sql");
@@ -105,9 +98,14 @@ const buildSearchImmersionDb = async (client: Client) => {
 };
 
 const buildImmersionApplication = async (client: Client) => {
-  const file = await readFile(
-    __dirname + "/createImmersionApplicationsTable.sql",
-  );
+  // prettier-ignore
+  const file = await readFile(__dirname + "/createImmersionApplicationsTable.sql");
+  const sql = file.toString();
+  await client.query(sql);
+};
+
+const buildFormEstablishment = async (client: Client) => {
+  const file = await readFile(__dirname + "/createFormEstablishmentsTable.sql");
   const sql = file.toString();
   await client.query(sql);
 };

@@ -1,0 +1,17 @@
+version: "3"
+services:
+  postgres:
+    image: postgis/postgis:13-master
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: immersion-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pg-password
+    volumes:
+      - ./docker-data/test-postgresql:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    ports:
+      - "8090:8080"
