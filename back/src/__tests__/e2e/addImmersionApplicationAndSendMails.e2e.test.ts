@@ -10,7 +10,7 @@ import {
   InMemoryEmailGateway,
   TemplatedEmail,
 } from "../../adapters/secondary/InMemoryEmailGateway";
-import { InMemoryEventBus } from "../../adapters/secondary/InMemoryEventBus";
+import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
 import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   CreateNewEvent,

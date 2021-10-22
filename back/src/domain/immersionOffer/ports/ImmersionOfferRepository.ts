@@ -1,13 +1,23 @@
-import {
-  ImmersionOfferId,
-  ImmersionOfferDto,
-} from "../../../shared/ImmersionOfferDto";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
+
+export type SearchParams = {
+  ROME: string;
+  distance: number;
+  lat: number;
+  lon: number;
+  nafDivision?: string;
+};
 
 export interface ImmersionOfferRepository {
-  save: (
-    immersionOfferDto: ImmersionOfferDto,
-  ) => Promise<ImmersionOfferId | undefined>;
+  insertSearch: (searchParams: SearchParams) => Promise<void>;
+  insertImmersions: (immersions: ImmersionOfferEntity[]) => Promise<void>;
+  insertEstablishments: (
+    establishments: EstablishmentEntity[],
+  ) => Promise<void>;
+  markPendingResearchesAsProcessedAndRetrieveThem(): Promise<SearchParams[]>;
 
-  getById: (id: ImmersionOfferId) => Promise<ImmersionOfferDto | undefined>;
-  getAll: () => Promise<ImmersionOfferDto[]>;
+  getFromSearch: (
+    searchParams: SearchParams,
+  ) => Promise<ImmersionOfferEntity[]>;
 }

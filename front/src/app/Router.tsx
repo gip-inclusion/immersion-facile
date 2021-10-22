@@ -7,7 +7,7 @@ import { useRoute } from "src/app/routes";
 import { TodoApp } from "src/app/TodoApp";
 import { ENV } from "src/environmentVariables";
 import { AdminVerification } from "./admin/AdminVerification";
-import { ImmersionOfferForm } from "./ImmersionOffer/ImmersionOfferForm";
+import { EstablishmentForm } from "./FormEstablishment/EstablishmentForm";
 import { PopulateDB } from "./Debug/PopulateDB";
 
 const { dev, featureFlags } = ENV;
@@ -20,7 +20,9 @@ export const Router = () => {
   return (
     <>
       {route.name === "home" && <Home showDebugInfo={dev} />}
-      {route.name === "immersionOffer" && <ImmersionOfferForm route={route} />}
+      {route.name === "formEstablishment" && (
+        <EstablishmentForm route={route} />
+      )}
       {route.name === "immersionApplicationsToValidate" && (
         <VerificationPage route={route} />
       )}

@@ -25,9 +25,9 @@ import { UpdateImmersionApplication } from "../../domain/immersionApplication/us
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
-import { AddImmersionOffer } from "../../domain/immersionOffer/useCases/AddImmersionOffer";
+import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
-import { SearchImmersion } from "../../domain/searchImmersion/useCases/SearchImmersion";
+import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import {
@@ -35,12 +35,12 @@ import {
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
-import { genericApplicationDataConverter } from "../secondary/AirtableApplicationDataConverters";
-import { AirtableDemandeImmersionRepository } from "../secondary/AirtableDemandeImmersionRepository";
+import { genericApplicationDataConverter } from "../secondary/airtable/AirtableApplicationDataConverters";
+import { AirtableDemandeImmersionRepository } from "../secondary/airtable/AirtableDemandeImmersionRepository";
 import {
-  AirtableImmersionOfferRepository,
-  immersionOfferDataConverter,
-} from "../secondary/AirtableImmersionOfferRepositroy";
+  AirtableFormEstablishmentRepository,
+  formEstablishmentDataConverter,
+} from "../secondary/airtable/AirtableImmersionOfferRepositroy";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
@@ -55,16 +55,16 @@ import {
   InMemoryAgencyRepository,
 } from "../secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
-import { InMemoryEventBus } from "../secondary/InMemoryEventBus";
+import { InMemoryEventBus } from "../secondary/core/InMemoryEventBus";
 import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
-import { InMemoryImmersionOfferRepository } from "../secondary/InMemoryImmersionOfferRepository";
+import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
-import { PoleEmploiAccessTokenGateway } from "../secondary/PoleEmploiAccessTokenGateway";
-import { PoleEmploiRomeGateway } from "../secondary/PoleEmploiRomeGateway";
-import { InMemoryImmersionOfferRepository as InMemoryImmersionOfferRepositoryForSearch } from "../secondary/searchImmersion/InMemoryImmersonOfferRepository";
-import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/searchImmersion/PgImmersionOfferRepository";
+import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
+import { PoleEmploiRomeGateway } from "../secondary/immersionOffer/PoleEmploiRomeGateway";
+import { InMemoryImmersionOfferRepository as InMemoryImmersionOfferRepositoryForSearch } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
@@ -121,9 +121,7 @@ const createApplicationRepository = async (config: AppConfig) => {
 };
 
 // prettier-ignore
-type Repositories = ReturnType<typeof createRepositories> extends Promise<
-  infer T
->
+type Repositories = ReturnType<typeof createRepositories> extends Promise<infer T>
   ? T
   : never;
 
@@ -139,10 +137,10 @@ const createRepositories = async (config: AppConfig) => {
     demandeImmersion: await createApplicationRepository(config),
     immersionOffer:
       config.repositories === "IN_MEMORY"
-        ? new InMemoryImmersionOfferRepository()
-        : AirtableImmersionOfferRepository.create(
+        ? new InMemoryFormEstablishmentRepository()
+        : AirtableFormEstablishmentRepository.create(
             config.airtableApplicationTableConfig,
-            immersionOfferDataConverter,
+            formEstablishmentDataConverter,
           ),
 
     immersionOfferForSearch:
@@ -255,9 +253,9 @@ const createUseCases = (
   generateMagicLink: new GenerateMagicLink(generateJwtFn),
 
   // immersionOffer
-  addImmersionOffer: new AddImmersionOffer(repositories.immersionOffer),
+  addImmersionOffer: new AddFormEstablishment(repositories.immersionOffer),
 
-  // searchImmersion
+  // immersionOffer
   searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),
 
   // siret

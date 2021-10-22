@@ -3,12 +3,12 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { App } from "src/app/App";
 import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
-import { HttpImmersionOfferGateway } from "src/core-logic/adapters/HttpImmersionOfferGateway";
+import { HttpFormEstablishmentGateway } from "src/core-logic/adapters/HttpFormEstablishmentGateway";
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
-import { InMemoryImmersionOfferGateway } from "src/core-logic/adapters/InMemoryImmersionOfferGateway";
+import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemoryFormEstablishmentGateway";
 import { InMemoryTodoGateway } from "src/core-logic/adapters/InMemoryTodoGateway";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import { ImmersionOfferGateway } from "src/core-logic/ports/ImmersionOfferGateway";
+import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
 import { configureReduxStore } from "src/core-logic/store/initilizeStore";
 import { ENV } from "src/environmentVariables";
 import "./index.css";
@@ -16,10 +16,10 @@ import { RouteProvider } from "./routes";
 
 const todoGateway = new InMemoryTodoGateway();
 
-export const immersionOfferGateway: ImmersionOfferGateway =
+export const formEstablishmentGateway: FormEstablishmentGateway =
   ENV.gateway === "HTTP"
-    ? new HttpImmersionOfferGateway()
-    : new InMemoryImmersionOfferGateway();
+    ? new HttpFormEstablishmentGateway()
+    : new InMemoryFormEstablishmentGateway();
 
 export const immersionApplicationGateway: ImmersionApplicationGateway =
   ENV.gateway === "HTTP"

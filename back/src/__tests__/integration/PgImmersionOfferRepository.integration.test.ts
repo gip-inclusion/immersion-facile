@@ -1,8 +1,8 @@
 import { Client } from "pg";
-import { PgImmersionOfferRepository } from "../../adapters/secondary/searchImmersion/PgImmersionOfferRepository";
-import { EstablishmentEntity } from "../../domain/searchImmersion/entities/EstablishmentEntity";
-import { ImmersionOfferEntity } from "../../domain/searchImmersion/entities/ImmersionOfferEntity";
-import { AppConfig } from "./../../adapters/primary/appConfig";
+import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
+import { EstablishmentEntity } from "../../domain/immersionOffer/entities/EstablishmentEntity";
+import { ImmersionOfferEntity } from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { AppConfig } from "../../adapters/primary/appConfig";
 
 let client: Client;
 

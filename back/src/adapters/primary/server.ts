@@ -7,7 +7,7 @@ import {
   immersionApplicationSchema,
   validateImmersionApplicationRequestDtoSchema,
 } from "../../shared/ImmersionApplicationDto";
-import { immersionOfferSchema } from "../../shared/ImmersionOfferDto";
+import { formEstablishmentSchema } from "../../shared/FormEstablishmentDto";
 import { romeSearchRequestSchema } from "../../shared/rome";
 import {
   generateMagicLinkRoute,
@@ -121,7 +121,7 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
     sendHttpResponse(req, res, () =>
       callUseCase({
         useCase: deps.useCases.addImmersionOffer,
-        validationSchema: immersionOfferSchema,
+        validationSchema: formEstablishmentSchema,
         useCaseParams: req.body,
       }),
     ),

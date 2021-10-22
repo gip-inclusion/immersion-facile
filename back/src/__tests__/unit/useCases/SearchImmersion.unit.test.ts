@@ -1,6 +1,6 @@
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/searchImmersion/InMemoryImmersonOfferRepository";
-import { ImmersionOfferEntity } from "../../../domain/searchImmersion/entities/ImmersionOfferEntity";
-import { SearchImmersion } from "../../../domain/searchImmersion/useCases/SearchImmersion";
+import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { ImmersionOfferEntity } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 
 describe("SearchImmersion", () => {
   test("Search immersion works", async () => {
@@ -22,7 +22,7 @@ describe("SearchImmersion", () => {
         contact_in_establishment: {
           id: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
           name: "Dupont",
-          fistname: "Pierre",
+          firstname: "Pierre",
           email: "test@email.fr",
           role: "Directeur",
           siret_institution: "78000403200019",

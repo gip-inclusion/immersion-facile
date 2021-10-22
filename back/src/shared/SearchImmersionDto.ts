@@ -1,11 +1,9 @@
 import { z } from "zod";
-import {
-  immersionContactInEstablishmentIdSchema,
-  immersionOfferIdSchema,
-} from "./ImmersionOfferDto";
+import { immersionContactInEstablishmentIdSchema } from "./FormEstablishmentDto";
 import { nafDivisionSchema } from "./naf";
 import { romeCodeMetierSchema } from "./rome";
 import { Flavor } from "./typeFlavors";
+import { zTrimmedString } from "./zodUtils";
 
 export type CompanyId = Flavor<string, "CompanyId">;
 
@@ -37,6 +35,11 @@ export const contactSchema = z.object({
   email: z.string(),
   role: z.string(),
 });
+
+// prettier-ignore
+export type ImmersionOfferId = Flavor<string, "ImmersionOfferId">;
+export const immersionOfferIdSchema: z.ZodSchema<ImmersionOfferId> =
+  zTrimmedString;
 
 export type SearchImmersionResultDto = z.infer<
   typeof searchImmersionResultSchema

@@ -2,11 +2,11 @@ import {
   HttpCallsToLaBonneBoite,
   EstablishmentFromLaBonneBoite,
   LaBonneBoiteGateway,
-} from "../adapters/secondary/searchImmersion/LaBonneBoiteGateway";
-import { Position } from "../domain/searchImmersion/entities/EstablishmentEntity";
+} from "../adapters/secondary/immersionOffer/LaBonneBoiteGateway";
+import { Position } from "../domain/immersionOffer/entities/EstablishmentEntity";
 
-import { SearchParams } from "../domain/searchImmersion/ports/ImmersionOfferRepository";
-import { fakeEstablishmentsLaBonneBoite } from "../adapters/secondary/searchImmersion/fakeEstablishmentsLaBonneBoite";
+import { SearchParams } from "../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { fakeEstablishmentsLaBonneBoite } from "../adapters/secondary/immersionOffer/fakeEstablishmentsLaBonneBoite";
 import {
   AccessTokenGateway,
   GetAccessTokenResponse,
@@ -15,13 +15,13 @@ import {
   HttpCallsToLaPlateFormeDeLInclusion,
   EstablishmentFromLaPlateFormeDeLInclusion,
   LaPlateFormeDeLInclusionGateway,
-} from "../adapters/secondary/searchImmersion/LaPlateFormeDeLInclusionGateway";
-import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../adapters/secondary/searchImmersion/fakeEstablishmentsLaPlateFormeDeLInclusion";
+} from "../adapters/secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
+import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../adapters/secondary/immersionOffer/fakeEstablishmentsLaPlateFormeDeLInclusion";
 import {
   GetPosition,
   GetExtraEstablishmentInfos,
   ExtraEstablishmentInfos,
-} from "../domain/searchImmersion/entities/UncompleteEstablishmentEntity";
+} from "../domain/immersionOffer/entities/UncompleteEstablishmentEntity";
 
 export const fakeHttpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
   getEstablishments: async (

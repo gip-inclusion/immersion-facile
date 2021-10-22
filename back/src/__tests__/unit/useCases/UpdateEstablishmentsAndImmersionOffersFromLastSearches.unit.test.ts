@@ -1,17 +1,17 @@
-import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/searchImmersion/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
-import { EstablishmentsGateway } from "../../../domain/searchImmersion/ports/EstablishmentsGateway";
-import { Position } from "../../../domain/searchImmersion/entities/EstablishmentEntity";
+import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
+import { EstablishmentsGateway } from "../../../domain/immersionOffer/ports/EstablishmentsGateway";
+import { Position } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   GetPosition,
   GetExtraEstablishmentInfos,
-} from "../../../domain/searchImmersion/entities/UncompleteEstablishmentEntity";
-import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
-import { SearchParams } from "../../../domain/searchImmersion/ports/ImmersionOfferRepository";
+} from "../../../domain/immersionOffer/entities/UncompleteEstablishmentEntity";
+import { FormEstablishmentRepository } from "../../../domain/immersionOffer/ports/FormEstablishmentRepository";
+import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import {
   EstablishmentFromLaBonneBoite,
   HttpCallsToLaBonneBoite,
   LaBonneBoiteGateway,
-} from "../../../adapters/secondary/searchImmersion/LaBonneBoiteGateway";
+} from "../../../adapters/secondary/immersionOffer/LaBonneBoiteGateway";
 import {
   AccessTokenGateway,
   GetAccessTokenResponse,
@@ -20,15 +20,15 @@ import {
   HttpCallsToLaPlateFormeDeLInclusion,
   EstablishmentFromLaPlateFormeDeLInclusion,
   LaPlateFormeDeLInclusionGateway,
-} from "../../../adapters/secondary/searchImmersion/LaPlateFormeDeLInclusionGateway";
+} from "../../../adapters/secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
 import {
   fakeGetPosition,
   fakeGetExtraEstablishmentInfos,
   fakeAccessTokenGateway,
 } from "../../../_testBuilders/FakeHttpCalls";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/searchImmersion/InMemoryImmersonOfferRepository";
-import { ImmersionOfferEntity } from "../../../domain/searchImmersion/entities/ImmersionOfferEntity";
-import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../../../adapters/secondary/searchImmersion/fakeEstablishmentsLaPlateFormeDeLInclusion";
+import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { ImmersionOfferEntity } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../../../adapters/secondary/immersionOffer/fakeEstablishmentsLaPlateFormeDeLInclusion";
 
 export const fakeHttpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclusion =
   {

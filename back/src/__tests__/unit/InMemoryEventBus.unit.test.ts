@@ -1,6 +1,6 @@
 import { spyOnTopic } from "../../_testBuilders/test.helpers";
 import type { DomainEvent } from "../../domain/core/eventBus/events";
-import { InMemoryEventBus } from "../../adapters/secondary/InMemoryEventBus";
+import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 
 const domainEvt: DomainEvent = {
