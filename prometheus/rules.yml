@@ -1,5 +1,0 @@
-groups:
-  - name: HTTP server
-    rules:
-    - record: http_request_errors_by_route_group
-      expr: sum by (route, group) (http_requests_total{status=~"4.."})
