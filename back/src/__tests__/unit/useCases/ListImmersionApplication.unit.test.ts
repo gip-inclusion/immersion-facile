@@ -12,10 +12,10 @@ describe("List Immersion Applications", () => {
   beforeEach(() => {
     repository = new InMemoryImmersionApplicationRepository();
     featureFlags = FeatureFlagsBuilder.allOff().build();
-    listImmersionApplication = new ListImmersionApplication({
-      immersionApplicationRepository: repository,
+    listImmersionApplication = new ListImmersionApplication(
+      repository,
       featureFlags,
-    });
+    );
   });
 
   describe("When the repository is empty", () => {

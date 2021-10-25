@@ -1,31 +1,23 @@
+import { z } from "zod";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
-import {
-  FeatureDisabledError,
-  FeatureFlags,
-} from "../../../shared/featureFlags";
+import { FeatureFlags } from "../../../shared/featureFlags";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
 
-type ListImmersionApplicationDependencies = {
-  immersionApplicationRepository: ImmersionApplicationRepository;
-  featureFlags: FeatureFlags;
-};
-
-export class ListImmersionApplication
-  implements UseCase<void, ImmersionApplicationDto[]>
-{
-  private readonly immersionApplicationRepository: ImmersionApplicationRepository;
-  private readonly featureFlags: FeatureFlags;
-
-  constructor({
-    immersionApplicationRepository,
-    featureFlags,
-  }: ListImmersionApplicationDependencies) {
-    this.immersionApplicationRepository = immersionApplicationRepository;
-    this.featureFlags = featureFlags;
+export class ListImmersionApplication extends UseCase<
+  void,
+  ImmersionApplicationDto[]
+> {
+  constructor(
+    private readonly immersionApplicationRepository: ImmersionApplicationRepository,
+    private readonly featureFlags: FeatureFlags,
+  ) {
+    super();
   }
 
-  public async execute() {
+  inputSchema = z.void();
+
+  public async _execute() {
     const entities = await this.immersionApplicationRepository.getAll();
     return entities.map((entity) => entity.toDto());
   }

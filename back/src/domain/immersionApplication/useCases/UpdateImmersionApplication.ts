@@ -1,39 +1,32 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   UpdateImmersionApplicationRequestDto,
+  updateImmersionApplicationRequestDtoSchema,
   UpdateImmersionApplicationResponseDto,
 } from "../../../shared/ImmersionApplicationDto";
-import {
-  FeatureDisabledError,
-  FeatureFlags,
-} from "../../../shared/featureFlags";
+import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { DomainEvent, DomainTopic } from "../../core/eventBus/events";
 
-type UpdateImmersionApplicationDependencies = {
-  immersionApplicationRepository: ImmersionApplicationRepository;
-  featureFlags: FeatureFlags;
-};
-
-export class UpdateImmersionApplication
-  implements
-    UseCase<
-      UpdateImmersionApplicationRequestDto,
-      UpdateImmersionApplicationResponseDto
-    >
-{
+export class UpdateImmersionApplication extends UseCase<
+  UpdateImmersionApplicationRequestDto,
+  UpdateImmersionApplicationResponseDto
+> {
   constructor(
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
     private readonly immersionApplicationRepository: ImmersionApplicationRepository,
     private readonly featureFlags: FeatureFlags,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute(
+  inputSchema = updateImmersionApplicationRequestDtoSchema;
+
+  public async _execute(
     params: UpdateImmersionApplicationRequestDto,
   ): Promise<UpdateImmersionApplicationResponseDto> {
     const immersionApplicationEntity = ImmersionApplicationEntity.create(

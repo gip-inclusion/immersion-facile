@@ -1,5 +1,4 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   InMemorySireneRepository,
   TEST_ESTABLISHMENT1,
@@ -14,14 +13,14 @@ describe("Get SIRET", () => {
 
   beforeEach(() => {
     repository = new InMemorySireneRepository();
-    getSiret = new GetSiret({ sireneRepository: repository });
+    getSiret = new GetSiret(repository);
   });
 
   describe("When the siret does not exist", () => {
     it("throws NotFoundError", async () => {
-      expectPromiseToFailWithError(
-        getSiret.execute("unknown_siret"),
-        new NotFoundError("unknown_siret"),
+      await expectPromiseToFailWithError(
+        getSiret.execute("40440440440400"),
+        new NotFoundError("40440440440400"),
       );
     });
   });

@@ -6,6 +6,7 @@ import {
 import {
   ApplicationStatus,
   UpdateImmersionApplicationStatusRequestDto,
+  updateImmersionApplicationStatusRequestSchema,
   UpdateImmersionApplicationStatusResponseDto,
 } from "../../../shared/ImmersionApplicationDto";
 import {
@@ -74,20 +75,21 @@ const statusTransitionConfigs: Partial<
   },
 };
 
-export class UpdateImmersionApplicationStatus
-  implements
-    UseCase<
-      UpdateImmersionApplicationStatusRequestDto,
-      UpdateImmersionApplicationStatusResponseDto
-    >
-{
+export class UpdateImmersionApplicationStatus extends UseCase<
+  UpdateImmersionApplicationStatusRequestDto,
+  UpdateImmersionApplicationStatusResponseDto
+> {
   constructor(
     private readonly immersionApplicationRepository: ImmersionApplicationRepository,
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute(
+  inputSchema = updateImmersionApplicationStatusRequestSchema;
+
+  public async _execute(
     { status, justification }: UpdateImmersionApplicationStatusRequestDto,
     { applicationId, roles }: MagicLinkPayload,
   ): Promise<UpdateImmersionApplicationStatusResponseDto> {

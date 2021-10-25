@@ -54,11 +54,7 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
     .route(`/${immersionApplicationsRoute}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        callUseCase({
-          useCase: deps.useCases.addDemandeImmersion,
-          validationSchema: immersionApplicationSchema,
-          useCaseParams: req.body,
-        }),
+        deps.useCases.addDemandeImmersion.execute(req.body),
       ),
     )
     .get(async (req, res) => {
@@ -74,12 +70,7 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
     sendHttpResponse(
       req,
       res,
-      () =>
-        callUseCase({
-          useCase: deps.useCases.validateDemandeImmersion,
-          validationSchema: validateImmersionApplicationRequestDtoSchema,
-          useCaseParams: req.params.id,
-        }),
+      () => deps.useCases.validateDemandeImmersion.execute(req.params.id),
       deps.authChecker,
     );
   });
@@ -89,11 +80,10 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
       req,
       res,
       () =>
-        callUseCase({
-          useCase: deps.useCases.generateMagicLink,
-          validationSchema: generateMagicLinkRequestSchema,
-          useCaseParams: { applicationId: req.query.id, role: req.query.role },
-        }),
+        deps.useCases.generateMagicLink.execute({
+          applicationId: req.query.id,
+          role: req.query.role,
+        } as any),
       deps.authChecker,
     );
   });
@@ -107,25 +97,18 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
       sendHttpResponse(
         req,
         res,
-        () =>
-          callUseCase({
-            useCase: deps.useCases.getDemandeImmersion,
-            validationSchema: getImmersionApplicationRequestDtoSchema,
-            useCaseParams: req.params,
-          }),
+        () => deps.useCases.getDemandeImmersion.execute(req.params),
         deps.authChecker,
       ),
     );
 
-  router.route(`/${immersionOffersRoute}`).post(async (req, res) =>
-    sendHttpResponse(req, res, () =>
-      callUseCase({
-        useCase: deps.useCases.addImmersionOffer,
-        validationSchema: formEstablishmentSchema,
-        useCaseParams: req.body,
-      }),
-    ),
-  );
+  router
+    .route(`/${immersionOffersRoute}`)
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.addImmersionOffer.execute(req.body),
+      ),
+    );
 
   router.route(`/${searchImmersionRoute}`).post(async (req, res) =>
     sendHttpResponse(req, res, () =>

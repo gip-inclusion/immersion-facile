@@ -14,9 +14,9 @@ export const expectPromiseToFailWith = async (
 
 export const expectPromiseToFailWithError = async (
   promise: Promise<unknown>,
-  error: Error,
+  expectedError: Error,
 ) => {
-  await expect(promise).rejects.toThrowError(error);
+  await expect(promise).rejects.toThrowError(expectedError);
 };
 
 export const expectPromiseToFailWithErrorMatching = async (

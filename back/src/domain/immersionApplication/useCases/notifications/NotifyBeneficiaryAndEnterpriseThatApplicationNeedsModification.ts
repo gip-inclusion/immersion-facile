@@ -1,4 +1,9 @@
-import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
+import { z } from "zod";
+import {
+  ImmersionApplicationDto,
+  immersionApplicationSchema,
+} from "../../../../shared/ImmersionApplicationDto";
+import { zString } from "../../../../shared/zodUtils";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
@@ -12,21 +17,26 @@ import { frontRoutes } from "../../../../shared/routes";
 
 const logger = createLogger(__filename);
 
-export type ImmersionApplicationRequiresModificationPayload = {
-  application: ImmersionApplicationDto;
-  reason: string;
-};
-export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification
-  implements UseCase<ImmersionApplicationRequiresModificationPayload>
-{
+// prettier-ignore
+export type ImmersionApplicationRequiresModificationPayload = z.infer<typeof immersionApplicationRequiresModificationSchema>
+const immersionApplicationRequiresModificationSchema = z.object({
+  application: immersionApplicationSchema,
+  reason: zString,
+});
+
+export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends UseCase<ImmersionApplicationRequiresModificationPayload> {
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
     private readonly agencyRepository: AgencyRepository,
     private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute({
+  inputSchema = immersionApplicationRequiresModificationSchema;
+
+  public async _execute({
     application,
     reason,
   }: ImmersionApplicationRequiresModificationPayload): Promise<void> {

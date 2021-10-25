@@ -1,3 +1,4 @@
+import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
@@ -41,9 +42,11 @@ describe("Add FormEstablishment", () => {
       .withId("")
       .build();
 
-    await expectPromiseToFailWithErrorMatching(
-      addFormEstablishment.execute(emptyImmersionOffer),
-      { issues: [{ message: "Obligatoire" }] },
-    );
+    try {
+      await addFormEstablishment.execute(emptyImmersionOffer);
+      expect("error").toBe("Should not have been reached");
+    } catch (e) {
+      expect(e).toBeInstanceOf(BadRequestError);
+    }
   });
 });

@@ -1,5 +1,6 @@
 import {
   SearchImmersionRequestDto,
+  searchImmersionRequestSchema,
   SearchImmersionResponseDto,
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
@@ -10,18 +11,23 @@ import {
 } from "../ports/ImmersionOfferRepository";
 import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
 
-export class SearchImmersion
-  implements UseCase<SearchImmersionRequestDto, SearchImmersionResponseDto>
-{
+export class SearchImmersion extends UseCase<
+  SearchImmersionRequestDto,
+  SearchImmersionResponseDto
+> {
   constructor(
     private readonly immersionOfferRepository: ImmersionOfferRepository,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute(
+  inputSchema = searchImmersionRequestSchema;
+
+  public async _execute(
     request: SearchImmersionRequestDto,
   ): Promise<SearchImmersionResponseDto> {
     const searchParams = convertRequestDtoToSearchParams(request);
-    this.immersionOfferRepository.insertSearch(searchParams);
+    await this.immersionOfferRepository.insertSearch(searchParams);
     return this.immersionOfferRepository
       .getFromSearch(searchParams)
       .then((entities) => entities.map(convertEntityToSearchResultDto));

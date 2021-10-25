@@ -10,22 +10,22 @@ import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepositor
 
 const logger = createLogger(__filename);
 
-export class AddFormEstablishment
-  implements UseCase<FormEstablishmentDto, AddFormEstablishmentResponseDto>
-{
+export class AddFormEstablishment extends UseCase<
+  FormEstablishmentDto,
+  AddFormEstablishmentResponseDto
+> {
   constructor(
     private readonly immersionOfferRepository: FormEstablishmentRepository,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute(
+  inputSchema = formEstablishmentSchema;
+
+  public async _execute(
     dto: FormEstablishmentDto,
   ): Promise<AddFormEstablishmentResponseDto> {
-    logger.debug({ dto: dto }, "Execute AddImmersionOffer Use case, with DTO");
-
-    formEstablishmentSchema.parse(dto);
-
     const id = await this.immersionOfferRepository.save(dto);
-
     if (!id) throw new ConflictError("empty");
     return id;
   }

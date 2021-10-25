@@ -2,19 +2,24 @@ import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpRespons
 import {
   ImmersionApplicationDto,
   GetImmersionApplicationRequestDto,
+  getImmersionApplicationRequestDtoSchema,
 } from "../../../shared/ImmersionApplicationDto";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
 
-export class GetImmersionApplication
-  implements
-    UseCase<GetImmersionApplicationRequestDto, ImmersionApplicationDto>
-{
+export class GetImmersionApplication extends UseCase<
+  GetImmersionApplicationRequestDto,
+  ImmersionApplicationDto
+> {
   constructor(
     readonly immersionApplicationRepository: ImmersionApplicationRepository,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute({
+  inputSchema = getImmersionApplicationRequestDtoSchema;
+
+  public async _execute({
     id,
   }: GetImmersionApplicationRequestDto): Promise<ImmersionApplicationDto> {
     const immersionApplicationEntity =

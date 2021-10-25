@@ -5,6 +5,7 @@ import {
 import {
   ImmersionApplicationId,
   ValidateImmersionApplicationRequestDto,
+  validateImmersionApplicationRequestDtoSchema,
   ValidateImmersionApplicationResponseDto,
 } from "../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../utils/logger";
@@ -16,20 +17,21 @@ import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRep
 
 const logger = createLogger(__filename);
 
-export class ValidateImmersionApplication
-  implements
-    UseCase<
-      ValidateImmersionApplicationRequestDto,
-      ValidateImmersionApplicationResponseDto
-    >
-{
+export class ValidateImmersionApplication extends UseCase<
+  ValidateImmersionApplicationRequestDto,
+  ValidateImmersionApplicationResponseDto
+> {
   constructor(
     private readonly demandeImmersionRepository: ImmersionApplicationRepository,
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute(
+  inputSchema = validateImmersionApplicationRequestDtoSchema;
+
+  public async _execute(
     id: ImmersionApplicationId,
   ): Promise<ValidateImmersionApplicationResponseDto> {
     const demandeImmersionEntity =

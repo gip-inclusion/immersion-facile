@@ -4,6 +4,7 @@ import { frontRoutes } from "../../../../shared/routes";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
+  immersionApplicationSchema,
 } from "../../../../shared/ImmersionApplicationDto";
 import { Role } from "../../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../../utils/logger";
@@ -14,16 +15,18 @@ import { AgencyConfig } from "./../../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
 
-export class NotifyNewApplicationNeedsReview
-  implements UseCase<ImmersionApplicationDto>
-{
+export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicationDto> {
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly agencyRepository: AgencyRepository,
     private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute(
+  inputSchema = immersionApplicationSchema;
+
+  public async _execute(
     immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<void> {
     const agencyConfig = await this.agencyRepository.getConfig(

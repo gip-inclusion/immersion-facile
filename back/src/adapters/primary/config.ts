@@ -229,10 +229,10 @@ const createUseCases = (
   getDemandeImmersion: new GetImmersionApplication(
     repositories.demandeImmersion,
   ),
-  listDemandeImmersion: new ListImmersionApplication({
-    immersionApplicationRepository: repositories.demandeImmersion,
-    featureFlags: config.featureFlags,
-  }),
+  listDemandeImmersion: new ListImmersionApplication(
+    repositories.demandeImmersion,
+    config.featureFlags,
+  ),
   updateDemandeImmersion: new UpdateImmersionApplication(
     createNewEvent,
     repositories.outbox,
@@ -258,9 +258,7 @@ const createUseCases = (
   searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),
 
   // siret
-  getSiret: new GetSiret({
-    sireneRepository: repositories.sirene,
-  }),
+  getSiret: new GetSiret(repositories.sirene),
 
   // rome
   romeSearch: new RomeSearch(repositories.rome),

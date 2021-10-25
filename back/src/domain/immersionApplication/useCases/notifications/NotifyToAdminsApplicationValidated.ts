@@ -1,4 +1,7 @@
-import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
+import {
+  ImmersionApplicationDto,
+  immersionApplicationSchema,
+} from "../../../../shared/ImmersionApplicationDto";
 
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
@@ -9,16 +12,18 @@ import { frontRoutes } from "../../../../shared/routes";
 import { parseISO } from "date-fns";
 
 const logger = createLogger(__filename);
-export class NotifyToAdminsApplicationValidated
-  implements UseCase<ImmersionApplicationDto>
-{
+export class NotifyToAdminsApplicationValidated extends UseCase<ImmersionApplicationDto> {
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly agencyRepository: AgencyRepository,
     private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute({
+  inputSchema = immersionApplicationSchema;
+
+  public async _execute({
     id,
     agencyCode,
     firstName,

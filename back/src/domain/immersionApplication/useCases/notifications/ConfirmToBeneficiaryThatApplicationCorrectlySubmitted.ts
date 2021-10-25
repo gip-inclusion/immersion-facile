@@ -1,4 +1,7 @@
-import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
+import {
+  ImmersionApplicationDto,
+  immersionApplicationSchema,
+} from "../../../../shared/ImmersionApplicationDto";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
@@ -6,16 +9,18 @@ import { createLogger } from "./../../../../utils/logger";
 
 const logger = createLogger(__filename);
 
-export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted
-  implements UseCase<ImmersionApplicationDto>
-{
+export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted extends UseCase<ImmersionApplicationDto> {
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
     private readonly agencyRepository: AgencyRepository,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute({
+  inputSchema = immersionApplicationSchema;
+
+  public async _execute({
     id,
     agencyCode,
     email,

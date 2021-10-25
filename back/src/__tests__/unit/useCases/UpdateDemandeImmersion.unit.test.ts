@@ -16,7 +16,7 @@ import { FeatureFlags } from "../../../shared/featureFlags";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { FeatureFlagsBuilder } from "./../../../_testBuilders/FeatureFlagsBuilder";
+import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 
 describe("Update immersionApplication", () => {
   let updateDemandeImmersion: UpdateImmersionApplication;
@@ -70,15 +70,17 @@ describe("Update immersionApplication", () => {
 
   describe("When no immersionApplication with id exists", () => {
     it("throws NotFoundError", async () => {
-      const validDemandeImmersion =
-        new ImmersionApplicationDtoBuilder().build();
+      const id = "40400000000000404";
+      const validImmersionApplication = new ImmersionApplicationDtoBuilder()
+        .withId(id)
+        .build();
 
       await expectPromiseToFailWithError(
         updateDemandeImmersion.execute({
-          id: "unknown_demande_immersion_id",
-          demandeImmersion: validDemandeImmersion,
+          id,
+          demandeImmersion: validImmersionApplication,
         }),
-        new NotFoundError("unknown_demande_immersion_id"),
+        new NotFoundError(id),
       );
     });
   });

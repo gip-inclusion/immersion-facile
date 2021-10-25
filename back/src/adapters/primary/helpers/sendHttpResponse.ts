@@ -1,32 +1,59 @@
 import { Request, Response } from "express";
 import { AuthChecker } from "../../../domain/auth/AuthChecker";
-import { FeatureDisabledError } from "../../../shared/featureFlags";
 
-export class UnauthorizedError extends Error {
+export abstract class HttpError extends Error {
+  abstract httpCode: number;
+
+  constructor(message?: any) {
+    super(message);
+    Object.setPrototypeOf(this, HttpError.prototype);
+  }
+}
+
+export class UnauthorizedError extends HttpError {
+  httpCode = 401;
+
   constructor() {
     super("Veuillez authentifier");
     Object.setPrototypeOf(this, UnauthorizedError.prototype);
   }
 }
-export class ForbiddenError extends Error {
+export class ForbiddenError extends HttpError {
+  httpCode = 403;
+
   constructor() {
     super("Accès refusé");
     Object.setPrototypeOf(this, ForbiddenError.prototype);
   }
 }
-export class NotFoundError extends Error {
+
+export class FeatureDisabledError extends HttpError {
+  httpCode = 404;
+
+  constructor(msg?: string) {
+    super(msg);
+    Object.setPrototypeOf(this, FeatureDisabledError.prototype);
+  }
+}
+
+export class NotFoundError extends HttpError {
+  httpCode = 404;
+
   constructor(msg?: any) {
     super(msg);
     Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 }
-export class BadRequestError extends Error {
+export class BadRequestError extends HttpError {
+  httpCode = 400;
+
   constructor(msg?: any) {
     super(msg);
     Object.setPrototypeOf(this, BadRequestError.prototype);
   }
 }
-export class ConflictError extends Error {
+export class ConflictError extends HttpError {
+  httpCode = 409;
   constructor(msg: any) {
     super(msg);
     Object.setPrototypeOf(this, ConflictError.prototype);
@@ -47,22 +74,15 @@ export const sendHttpResponse = async (
     res.status(200);
     return res.json(response || { success: true });
   } catch (error: any) {
-    if (error instanceof UnauthorizedError) {
-      res.setHeader("WWW-Authenticate", "Basic");
-      res.status(401);
-    } else if (error instanceof ForbiddenError) {
-      res.status(403);
-    } else if (error instanceof FeatureDisabledError) {
-      res.status(404);
-    } else if (error instanceof NotFoundError) {
-      res.status(404);
-    } else if (error instanceof ConflictError) {
-      res.status(409);
-    } else if (error instanceof BadRequestError) {
-      res.status(400);
+    if (error instanceof HttpError) {
+      if (error instanceof UnauthorizedError) {
+        res.setHeader("WWW-Authenticate", "Basic");
+      }
+      res.status(error.httpCode);
     } else {
       res.status(500);
     }
+
     return res.json({ errors: error.errors || [error.message] });
   }
 };

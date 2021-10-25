@@ -1,4 +1,7 @@
-import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
+import {
+  ImmersionApplicationDto,
+  immersionApplicationSchema,
+} from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
@@ -9,16 +12,18 @@ import {
 import { AgencyConfig } from "./../../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
-export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected
-  implements UseCase<ImmersionApplicationDto>
-{
+export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends UseCase<ImmersionApplicationDto> {
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
     private readonly agencyRepository: AgencyRepository,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute(dto: ImmersionApplicationDto): Promise<void> {
+  inputSchema = immersionApplicationSchema;
+
+  public async _execute(dto: ImmersionApplicationDto): Promise<void> {
     const agencyConfig = await this.agencyRepository.getConfig(dto.agencyCode);
     if (!agencyConfig) {
       throw new Error(

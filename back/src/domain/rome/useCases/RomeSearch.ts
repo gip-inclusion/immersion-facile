@@ -1,6 +1,7 @@
 import {
   ProfessionDto,
   RomeSearchRequestDto,
+  romeSearchRequestSchema,
   RomeSearchResponseDto,
 } from "../../../shared/rome";
 import { createLogger } from "../../../utils/logger";
@@ -12,12 +13,17 @@ import { RomeAppellation, RomeMetier } from "./../ports/RomeGateway";
 const logger = createLogger(__filename);
 
 const MIN_SEARCH_TEXT_LENGTH = 3;
-export class RomeSearch
-  implements UseCase<RomeSearchRequestDto, RomeSearchResponseDto>
-{
-  public constructor(readonly romeGateway: RomeGateway) {}
+export class RomeSearch extends UseCase<
+  RomeSearchRequestDto,
+  RomeSearchResponseDto
+> {
+  public constructor(readonly romeGateway: RomeGateway) {
+    super();
+  }
 
-  public async execute(
+  inputSchema = romeSearchRequestSchema;
+
+  public async _execute(
     searchText: RomeSearchRequestDto,
   ): Promise<RomeSearchResponseDto> {
     if (searchText.length <= MIN_SEARCH_TEXT_LENGTH) return [];

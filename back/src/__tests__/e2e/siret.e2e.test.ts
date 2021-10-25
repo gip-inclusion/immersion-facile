@@ -27,6 +27,6 @@ describe("/siret route", () => {
   });
 
   it("returns 404 Not Found for unknown siret", async () => {
-    await request.get("/siret/unknown-siret").expect(404);
+    await request.get("/siret/40400000000404").expect(404);
   });
 });

@@ -1,4 +1,7 @@
-import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplicationDto";
+import {
+  ImmersionApplicationDto,
+  immersionApplicationSchema,
+} from "../../../../shared/ImmersionApplicationDto";
 import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
@@ -13,16 +16,18 @@ import {
 import { parseISO } from "date-fns";
 
 const logger = createLogger(__filename);
-export class NotifyAllActorsOfFinalApplicationValidation
-  implements UseCase<ImmersionApplicationDto>
-{
+export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<ImmersionApplicationDto> {
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly emailAllowList: Readonly<Set<string>>,
     private readonly agencyRepository: AgencyRepository,
-  ) {}
+  ) {
+    super();
+  }
 
-  public async execute(dto: ImmersionApplicationDto): Promise<void> {
+  inputSchema = immersionApplicationSchema;
+
+  public async _execute(dto: ImmersionApplicationDto): Promise<void> {
     logger.info(
       {
         demandeImmersionid: dto.id,
