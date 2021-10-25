@@ -34,7 +34,7 @@ services:
   postgres:
     image: postgis/postgis:13-master
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
       POSTGRES_DB: immersion-db
       POSTGRES_USER: postgres
@@ -45,4 +45,4 @@ services:
   adminer:
     image: adminer
     ports:
-      - "8090:8080"
+      - "${ADMINER_PORT:-8090}:8080"
