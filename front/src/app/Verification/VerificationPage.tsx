@@ -5,6 +5,7 @@ import { VerificationActionButton } from "src/app/Verification/VerificationActio
 import { FormAccordion } from "src/components/admin/FormAccordion";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
+import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 
@@ -27,6 +28,8 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const actingRole = getHighestActingRole(roles);
+  const currentStatus =
+    immersionApplication?.status ?? ("UNKNOWN" as ApplicationStatus);
   if (!actingRole)
     return <div>Vous n'êtes pas autorisé à accéder à cette page"</div>;
 
@@ -82,8 +85,11 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
             {...buttonProps}
             newStatus="ACCEPTED_BY_COUNSELLOR"
             messageToShowOnSuccess={validatedSuccessfully}
+            disabled={!!successMessage || currentStatus != "IN_REVIEW"}
           >
-            Marquer la demande comme légitime
+            {currentStatus === "ACCEPTED_BY_COUNSELLOR"
+              ? "Demande déjà validée."
+              : "Marquer la demande comme légitime"}
           </VerificationActionButton>
         )}
         {actingRole === "validator" && (
@@ -91,8 +97,13 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
             {...buttonProps}
             newStatus="ACCEPTED_BY_VALIDATOR"
             messageToShowOnSuccess={validatedSuccessfully}
+            disabled={
+              !!successMessage || currentStatus != "ACCEPTED_BY_COUNSELLOR"
+            }
           >
-            Valider la demande
+            {currentStatus === "ACCEPTED_BY_VALIDATOR"
+              ? "Demande déjà validée"
+              : "Valider la demande"}
           </VerificationActionButton>
         )}
         {actingRole === "admin" &&
@@ -102,8 +113,13 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
               {...buttonProps}
               newStatus="VALIDATED"
               messageToShowOnSuccess={validatedSuccessfully}
+              disabled={
+                !!successMessage || currentStatus != "ACCEPTED_BY_VALIDATOR"
+              }
             >
-              Envoyer la convention
+              {currentStatus === "VALIDATED"
+                ? "Convention envoyée."
+                : "Envoyer la convention"}
             </VerificationActionButton>
           )}
 
