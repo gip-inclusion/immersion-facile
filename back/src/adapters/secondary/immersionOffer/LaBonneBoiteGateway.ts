@@ -44,7 +44,7 @@ export const httpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
             distance: searchParams.distance,
             longitude: searchParams.lon,
             latitude: searchParams.lat,
-            rome_codes: searchParams.ROME,
+            rome_codes: searchParams.rome,
           },
         },
       )
@@ -76,7 +76,7 @@ export class LaBonneBoiteGateway implements EstablishmentsGateway {
         const establishments: EstablishmentFromLaBonneBoite[] = response;
         return establishments
           .filter((establishment) =>
-            this.keepRelevantEstablishments(searchParams.ROME, establishment),
+            this.keepRelevantEstablishments(searchParams.rome, establishment),
           )
           .map(
             (establishment) =>

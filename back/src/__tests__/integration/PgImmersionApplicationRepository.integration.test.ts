@@ -17,15 +17,15 @@ describe("PgImmersionApplicationRepository", () => {
     client = await pool.connect();
   });
 
+  afterAll(() => {
+    client.release();
+  });
+
   beforeEach(async () => {
     await client.query("TRUNCATE immersion_applications");
     immersionApplicationRepository = new PgImmersionApplicationRepository(
       client,
     );
-  });
-
-  afterAll(() => {
-    client.release();
   });
 
   it("Adds a new ImmersionApplicationEntity", async () => {

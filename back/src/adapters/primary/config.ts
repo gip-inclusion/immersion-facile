@@ -41,7 +41,7 @@ import { AirtableDemandeImmersionRepository } from "../secondary/airtable/Airtab
 import {
   AirtableFormEstablishmentRepository,
   formEstablishmentDataConverter,
-} from "../secondary/airtable/AirtableImmersionOfferRepositroy";
+} from "../secondary/airtable/AirtableImmersionOfferRepository";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {

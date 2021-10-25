@@ -2,7 +2,7 @@ import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
 
 export type SearchParams = {
-  ROME: string;
+  rome: string;
   distance: number;
   lat: number;
   lon: number;

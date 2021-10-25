@@ -46,7 +46,7 @@ export class InMemoryImmersionOfferRepository
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
     const response = this._immersionOffers.filter(
-      (immersionOffer) => immersionOffer.getRome() === searchParams.ROME,
+      (immersionOffer) => immersionOffer.getRome() === searchParams.rome,
     );
     logger.info({ searchParams, response }, "getFromSearch");
     return response;

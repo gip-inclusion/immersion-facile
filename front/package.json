@@ -2,8 +2,8 @@
   "version": "0.0.0",
   "scripts": {
     "test": "npm run symlink-or-copy-shared && jest",
-    "dev": "npm run symlink-or-copy-shared && npm run gen-env-config && vite",
-    "dev-http": "npm run symlink-or-copy-shared && GATEWAY=HTTP npm run gen-env-config && vite",
+    "dev": "npm run symlink-shared && npm run gen-env-config && vite",
+    "dev-http": "npm run symlink-shared && GATEWAY=HTTP npm run gen-env-config && vite",
     "build": "npm run symlink-or-copy-shared && vite build",
     "build-with-shared-as-is": "vite build",
     "serve": "npm run prod-env-config && vite preview",

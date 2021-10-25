@@ -9,37 +9,37 @@ const populateWithImmersionOffers = async (
   pgImmersionOfferRepository: PgImmersionOfferRepository,
 ) => {
   await pgImmersionOfferRepository.insertSearch({
-    ROME: "M1607",
+    rome: "M1607",
     distance: 30,
     lat: 49.119146,
     lon: 6.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
-    ROME: "M1607",
+    rome: "M1607",
     distance: 30,
     lat: 48.119146,
     lon: 6.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
-    ROME: "M1607",
+    rome: "M1607",
     distance: 30,
     lat: 48.119146,
     lon: 5.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
-    ROME: "M1607",
+    rome: "M1607",
     distance: 30,
     lat: 48.119146,
     lon: 4.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
-    ROME: "M1607",
+    rome: "M1607",
     distance: 30,
     lat: 48.129146,
     lon: 4.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
-    ROME: "M1608",
+    rome: "M1608",
     distance: 30,
     lat: 48.129146,
     lon: 4.17602,
@@ -66,7 +66,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     expect(
       (
         await pgImmersionOfferRepository.getSearchInDatabase({
-          ROME: "M1607",
+          rome: "M1607",
           distance: 30,
           lat: 49.119146,
           lon: 6.17602,
@@ -164,7 +164,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       }),
     ]);
     const searchResult = await pgImmersionOfferRepository.getFromSearch({
-      ROME: "M1907",
+      rome: "M1907",
       distance: 30,
       lat: 34.95,
       lon: 50.1,

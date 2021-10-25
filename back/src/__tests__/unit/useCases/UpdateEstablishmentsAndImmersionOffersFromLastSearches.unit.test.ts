@@ -144,7 +144,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 
   it("when Immersion search have been made lately, their information gets persisted in our system", async () => {
     // prepare
-    const search = { ROME: "A1203", distance: 10.0, lat: 10.0, lon: 20.0 };
+    const search = { rome: "A1203", distance: 10.0, lat: 10.0, lon: 20.0 };
     immersionOfferRepository.setSearches([search]);
 
     // act

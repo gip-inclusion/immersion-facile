@@ -20,7 +20,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       .query(
         "INSERT INTO searches_made (ROME, lat, lon ,distance, needsToBeSearched, gps) VALUES ($1, $2, $3, $4, $5, ST_GeographyFromText($6)) ON CONFLICT ON CONSTRAINT pk_searches_made DO UPDATE SET needstobesearched=true, update_date=NOW()",
         [
-          searchParams.ROME,
+          searchParams.rome,
           searchParams.lat,
           searchParams.lon,
           searchParams.distance,
@@ -182,7 +182,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   ): Promise<ImmersionOfferEntity[]> {
     let nafCategoryFilter = "";
     const parameters = [
-      searchParams.ROME,
+      searchParams.rome,
       "POINT(" + searchParams.lon + " " + searchParams.lat + ")",
       searchParams.distance * 1000,
     ];
@@ -250,7 +250,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       .query(
         "SELECT * FROM searches_made WHERE rome=$1 AND lat=$2 AND lon=$3 AND distance=$4",
         [
-          searchParams.ROME,
+          searchParams.rome,
           searchParams.lat,
           searchParams.lon,
           searchParams.distance,

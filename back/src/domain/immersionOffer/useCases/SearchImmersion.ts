@@ -34,7 +34,7 @@ const convertRequestDtoToSearchParams = ({
   location,
   distance_km,
 }: SearchImmersionRequestDto): SearchParams => ({
-  ROME: rome,
+  rome: rome,
   nafDivision,
   lat: location.lat,
   lon: location.lon,

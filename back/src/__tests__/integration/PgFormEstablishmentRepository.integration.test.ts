@@ -1,5 +1,4 @@
 import { Pool, PoolClient } from "pg";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
 import { PgFormEstablishmentRepository } from "../../adapters/secondary/pg/FormEstablishmentRepository";
 import { FormEstablishmentId } from "../../shared/FormEstablishmentDto";

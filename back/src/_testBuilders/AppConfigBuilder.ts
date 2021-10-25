@@ -25,6 +25,20 @@ export class AppConfigBuilder implements Builder<AppConfig> {
     this.configParams = { ...defaultConfigParams, ...configParams };
   }
 
+  public withRepositories(REPOSITORIES: string) {
+    return new AppConfigBuilder({
+      ...this.configParams,
+      REPOSITORIES,
+    });
+  }
+
+  public withPgUrl(PG_URL: string) {
+    return new AppConfigBuilder({
+      ...this.configParams,
+      PG_URL,
+    });
+  }
+
   public build() {
     return AppConfig.createFromEnv(/* readDotEnv= */ false, this.configParams);
   }

@@ -43,7 +43,7 @@ describe("SearchImmersion", () => {
     const searches = immersionOfferRepository.getSearches();
     expect(searches).toEqual([
       {
-        ROME: "M1607",
+        rome: "M1607",
         nafDivision: "85",
         lat: 49.119146,
         lon: 6.17602,
