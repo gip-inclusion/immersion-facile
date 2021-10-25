@@ -132,7 +132,7 @@ export const DropDown = <T extends unknown>({
       className="dropdown-container"
       onBlur={() => {
         // Delay so that any onClick event on the dropdown-proposal has a chance to be registered.
-        setTimeout(() => dispatch({ type: "FOCUS_LOST" }), 100);
+        setTimeout(() => dispatch({ type: "FOCUS_LOST" }), 500);
       }}
     >
       <label className="fr-label" htmlFor={"search"}>
