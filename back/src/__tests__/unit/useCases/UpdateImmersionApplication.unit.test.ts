@@ -89,11 +89,6 @@ describe("Update immersionApplication", () => {
   });
 
   describe("When previous state is not draft (testing with In_review)", () => {
-    beforeEach(() => {
-      featureFlags = FeatureFlagsBuilder.allOff().build();
-      updateDemandeImmersion = createUpdateDemandeImmersionUseCase();
-    });
-
     it("throws Bad request", async () => {
       const validDemandeImmersion =
         new ImmersionApplicationDtoBuilder().build();
