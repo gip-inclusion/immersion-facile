@@ -1,6 +1,5 @@
 import { addSeconds } from "date-fns";
 import isAfter from "date-fns/isAfter";
-import parseISO from "date-fns/parseISO";
 import {
   AccessTokenGateway,
   GetAccessTokenResponse,
@@ -42,7 +41,7 @@ export class CachingAccessTokenGateway implements AccessTokenGateway {
     const response = await this.delegate.getAccessToken(scope);
 
     const expirationTime = addSeconds(
-      parseISO(this.clock.now()),
+      this.clock.now(),
       response.expires_in - minTtlSec || 0,
     );
     this.cache[scope] = {
@@ -55,7 +54,7 @@ export class CachingAccessTokenGateway implements AccessTokenGateway {
   }
 
   private isExpired(entry: CacheEntry): boolean {
-    const now = new Date(this.clock.now());
+    const now = this.clock.now();
     return isAfter(now, entry.expirationTime);
   }
 }

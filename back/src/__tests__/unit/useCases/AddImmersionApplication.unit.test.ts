@@ -1,4 +1,3 @@
-import { date } from "zod";
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -9,7 +8,6 @@ import {
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
-import { DateStr } from "../../../domain/core/ports/Clock";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
@@ -43,7 +41,7 @@ describe("Add immersionApplication", () => {
   };
 
   test("saves valid applications in the repository", async () => {
-    const occurredAt: DateStr = new Date("2021-10-15T15:00").toISOString();
+    const occurredAt = new Date("2021-10-15T15:00");
     const id = "eventId";
     clock.setNextDate(occurredAt);
     uuidGenerator.setNextUuid(id);
@@ -60,7 +58,7 @@ describe("Add immersionApplication", () => {
     expectDomainEventsToBeInOutbox([
       {
         id,
-        occurredAt,
+        occurredAt: occurredAt.toISOString(),
         topic: "ImmersionApplicationSubmittedByBeneficiary",
         payload: validImmersionApplication,
         wasPublished: false,

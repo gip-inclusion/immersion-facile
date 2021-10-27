@@ -1,6 +1,4 @@
-import { Client, Pool } from "pg";
-import { PgFormEstablishmentRepository } from "../secondary/pg/FormEstablishmentRepository";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { Pool } from "pg";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
@@ -14,6 +12,7 @@ import {
   AddImmersionApplication,
   AddImmersionApplicationML,
 } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
+import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
@@ -24,11 +23,10 @@ import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplicati
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
-import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFormEstablishment";
-import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
+import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import {
@@ -38,35 +36,33 @@ import {
 import { createLogger } from "../../utils/logger";
 import { genericApplicationDataConverter } from "../secondary/airtable/AirtableApplicationDataConverters";
 import { AirtableDemandeImmersionRepository } from "../secondary/airtable/AirtableDemandeImmersionRepository";
-import {
-  AirtableFormEstablishmentRepository,
-  formEstablishmentDataConverter,
-} from "../secondary/airtable/AirtableImmersionOfferRepository";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
   BasicEventCrawler,
   RealEventCrawler,
 } from "../secondary/core/EventCrawlerImplementations";
+import { InMemoryEventBus } from "../secondary/core/InMemoryEventBus";
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import { InMemoryImmersionOfferRepository as InMemoryImmersionOfferRepositoryForSearch } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
+import { PoleEmploiRomeGateway } from "../secondary/immersionOffer/PoleEmploiRomeGateway";
 import {
   createAgencyConfigsFromAppConfig,
   InMemoryAgencyRepository,
 } from "../secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
-import { InMemoryEventBus } from "../secondary/core/InMemoryEventBus";
-import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEstablishmentRepository";
+import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
+import { PgFormEstablishmentRepository } from "../secondary/pg/FormEstablishmentRepository";
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
-import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
-import { PoleEmploiRomeGateway } from "../secondary/immersionOffer/PoleEmploiRomeGateway";
-import { InMemoryImmersionOfferRepository as InMemoryImmersionOfferRepositoryForSearch } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
 
@@ -157,7 +153,7 @@ const createRepositories = async (config: AppConfig) => {
 
     sirene:
       config.sireneRepository === "HTTPS"
-        ? HttpsSireneRepository.create(config.sireneHttpsConfig)
+        ? HttpsSireneRepository.create(config.sireneHttpsConfig, clock)
         : new InMemorySireneRepository(),
 
     email:

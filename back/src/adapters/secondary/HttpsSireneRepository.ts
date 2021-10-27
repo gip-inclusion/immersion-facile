@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { formatISO } from "date-fns";
+import { Clock } from "../../domain/core/ports/Clock";
 import {
   SireneRepository,
   SiretResponse,
@@ -11,13 +12,10 @@ import { AxiosConfig } from "../primary/appConfig";
 const logger = createLogger(__filename);
 
 export class HttpsSireneRepository implements SireneRepository {
-  private readonly axiosInstance: AxiosInstance;
-  private readonly nowFn = () => new Date();
-
-  public static create({
-    endpoint,
-    bearerToken,
-  }: AxiosConfig): SireneRepository {
+  public static create(
+    { endpoint, bearerToken }: AxiosConfig,
+    clock: Clock,
+  ): SireneRepository {
     if (new URL(endpoint).protocol !== "https:") {
       throw new Error(`Not an HTTPS endpoint: ${endpoint}`);
     }
@@ -38,12 +36,13 @@ export class HttpsSireneRepository implements SireneRepository {
       return response;
     });
 
-    return new HttpsSireneRepository(axiosInstance);
+    return new HttpsSireneRepository(axiosInstance, clock);
   }
 
-  private constructor(axiosInstance: AxiosInstance) {
-    this.axiosInstance = axiosInstance;
-  }
+  private constructor(
+    private readonly axiosInstance: AxiosInstance,
+    private readonly clock: Clock,
+  ) {}
 
   public async get(siret: SiretDto): Promise<SiretResponse | undefined> {
     try {
@@ -75,7 +74,7 @@ export class HttpsSireneRepository implements SireneRepository {
     //     F= établissement fermé
     if (!includeClosedEstablishments) {
       params.q += " AND periode(etatAdministratifEtablissement:A)";
-      params.date = formatISO(this.nowFn(), { representation: "date" });
+      params.date = formatISO(this.clock.now(), { representation: "date" });
     }
 
     return params;

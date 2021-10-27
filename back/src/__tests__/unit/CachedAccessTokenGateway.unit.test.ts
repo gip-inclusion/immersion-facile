@@ -41,13 +41,13 @@ describe("CachedAccessTokenGateway", () => {
     mockGetAccessTokenFn.mockReturnValueOnce(testResponse1);
 
     // Initial call caches the token.
-    fakeClock.setNextDate("2021-01-01T00:00:00Z");
+    fakeClock.setNextDateStr("2021-01-01T00:00:00Z");
     const response1 = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(mockGetAccessTokenFn.mock.calls).toHaveLength(1);
     expect(response1).toEqual(testResponse1);
 
     // Subsequent call returns the cached token.
-    fakeClock.setNextDate("2021-01-01T00:09:00Z");
+    fakeClock.setNextDateStr("2021-01-01T00:09:00Z");
     const response2 = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(mockGetAccessTokenFn.mock.calls).toHaveLength(1);
     expect(response2).toEqual(testResponse1);
@@ -59,19 +59,19 @@ describe("CachedAccessTokenGateway", () => {
       .mockReturnValueOnce(testResponse2);
 
     // Initial call caches a token.
-    fakeClock.setNextDate("2021-01-01T00:00:00Z");
+    fakeClock.setNextDateStr("2021-01-01T00:00:00Z");
     const response1 = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(mockGetAccessTokenFn.mock.calls).toHaveLength(1);
     expect(response1).toEqual(testResponse1);
 
     // The TTL of the cached token is exceeded so a new one is fetched.
-    fakeClock.setNextDate("2021-01-01T00:10:00Z");
+    fakeClock.setNextDateStr("2021-01-01T00:10:00Z");
     const response2 = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(mockGetAccessTokenFn.mock.calls).toHaveLength(2);
     expect(response2).toEqual(testResponse2);
 
     // Subsequent calls return the refreshed token.
-    fakeClock.setNextDate("2021-01-01T00:19:00Z");
+    fakeClock.setNextDateStr("2021-01-01T00:19:00Z");
     const response3 = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(mockGetAccessTokenFn.mock.calls).toHaveLength(2);
     expect(response3).toEqual(testResponse2);
@@ -83,18 +83,18 @@ describe("CachedAccessTokenGateway", () => {
       .mockReturnValueOnce(testResponse2);
 
     // Initial call caches the token.
-    fakeClock.setNextDate("2021-01-01T00:00:00Z");
+    fakeClock.setNextDateStr("2021-01-01T00:00:00Z");
     const response1 = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(mockGetAccessTokenFn.mock.calls).toHaveLength(1);
     expect(response1).toEqual(testResponse1);
 
     // Not expired yet.
-    fakeClock.setNextDate("2021-01-01T00:09:30Z");
+    fakeClock.setNextDateStr("2021-01-01T00:09:30Z");
     const response2 = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(response2).toEqual(testResponse1);
 
     // Now it's expired.
-    fakeClock.setNextDate("2021-01-01T00:09:31Z");
+    fakeClock.setNextDateStr("2021-01-01T00:09:31Z");
     const response3 = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(response3).toEqual(testResponse2);
   });

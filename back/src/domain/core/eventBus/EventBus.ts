@@ -32,7 +32,7 @@ export const makeCreateNewEvent =
   (params: any) => {
     return {
       id: uuidGenerator.new(),
-      occurredAt: clock.now(),
+      occurredAt: clock.now().toISOString(),
       wasPublished: false,
       ...params,
     };

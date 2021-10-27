@@ -1,4 +1,5 @@
 import { AppConfig } from "../../adapters/primary/appConfig";
+import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { HttpsSireneRepository } from "./../../adapters/secondary/HttpsSireneRepository";
 import { SireneRepository } from "./../../domain/sirene/ports/SireneRepository";
 
@@ -14,7 +15,10 @@ describe("HttpsSireneRepository", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    sireneRepository = HttpsSireneRepository.create(config.sireneHttpsConfig);
+    sireneRepository = HttpsSireneRepository.create(
+      config.sireneHttpsConfig,
+      new RealClock(),
+    );
   });
 
   test("returns open establishments", async () => {
