@@ -8,6 +8,8 @@ import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
+//import { statusTransitionConfigs } from "../../shared/immersionApplicationStatusTransitions";
+
 
 type VerificationPageProps = {
   route: Route<typeof routes.immersionApplicationsToValidate>;
@@ -62,7 +64,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         "Chargement en cours..."
       )}
       <div>
-        {actingRole !== "admin" && (
+        {actingRole !== "admin" && immersionApplication?.status !== "DRAFT" && (
           <VerificationActionButton
             {...buttonProps}
             newStatus="REJECTED"
@@ -72,15 +74,16 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           </VerificationActionButton>
         )}
 
-        <VerificationActionButton
-          {...buttonProps}
-          newStatus="DRAFT"
-          messageToShowOnSuccess={sentForModificationSuccessfully}
-        >
-          Renvoyer au bénéficiaire pour modification
-        </VerificationActionButton>
-
-        {actingRole === "counsellor" && (
+        {immersionApplication?.status !== "DRAFT" && (
+          <VerificationActionButton
+            {...buttonProps}
+            newStatus="DRAFT"
+            messageToShowOnSuccess={sentForModificationSuccessfully}
+          >
+            Renvoyer au bénéficiaire pour modification
+          </VerificationActionButton>
+        )}
+        {actingRole === "counsellor" && immersionApplication?.status === "IN_REVIEW" && (
           <VerificationActionButton
             {...buttonProps}
             newStatus="ACCEPTED_BY_COUNSELLOR"
@@ -108,7 +111,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         )}
         {actingRole === "admin" &&
           buttonProps.immersionApplication?.status ===
-            "ACCEPTED_BY_VALIDATOR" && (
+          "ACCEPTED_BY_VALIDATOR" && (
             <VerificationActionButton
               {...buttonProps}
               newStatus="VALIDATED"

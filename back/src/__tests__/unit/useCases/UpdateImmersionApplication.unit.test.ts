@@ -1,4 +1,7 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -81,6 +84,28 @@ describe("Update immersionApplication", () => {
           demandeImmersion: validImmersionApplication,
         }),
         new NotFoundError(id),
+      );
+    });
+  });
+
+  describe("When previous state is not draft (testing with In_review)", () => {
+    beforeEach(() => {
+      featureFlags = FeatureFlagsBuilder.allOff().build();
+      updateDemandeImmersion = createUpdateDemandeImmersionUseCase();
+    });
+
+    it("throws Bad request", async () => {
+      const validDemandeImmersion =
+        new ImmersionApplicationDtoBuilder().build();
+      //we would expect IN_REVIEW to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
+      validDemandeImmersion.status = "IN_REVIEW";
+
+      expectPromiseToFailWithError(
+        updateDemandeImmersion.execute({
+          id: "demande_id",
+          demandeImmersion: validDemandeImmersion,
+        }),
+        new BadRequestError(),
       );
     });
   });

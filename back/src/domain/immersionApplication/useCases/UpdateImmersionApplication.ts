@@ -1,4 +1,7 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/sendHttpResponse";
 import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   UpdateImmersionApplicationRequestDto,
@@ -32,6 +35,13 @@ export class UpdateImmersionApplication extends UseCase<
     const immersionApplicationEntity = ImmersionApplicationEntity.create(
       params.demandeImmersion,
     );
+
+    const currentApplication =
+      await this.immersionApplicationRepository.getById(params.id);
+    if (!currentApplication) throw new NotFoundError(params.id);
+    if (currentApplication.status != "DRAFT") {
+      throw new BadRequestError(currentApplication.status);
+    }
     const id =
       await this.immersionApplicationRepository.updateImmersionApplication(
         immersionApplicationEntity,
