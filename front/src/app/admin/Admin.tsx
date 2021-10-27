@@ -7,12 +7,13 @@ import { Route } from "type-route";
 import "./Admin.css";
 import { FormAccordion } from "src/components/admin/FormAccordion";
 import { FormMagicLinks } from "src/components/admin/FormMagicLinks";
+import { AgencyCode } from "src/shared/agencies";
 
 interface AdminState {
   demandeImmersion: Array<ImmersionApplicationDto>;
 }
 interface AdminProps {
-  route: Route<typeof routes.admin>;
+  route: Route<typeof routes.admin> | Route<typeof routes.agencyAdmin>;
 }
 
 export const Admin = ({ route }: AdminProps) => {
@@ -21,7 +22,11 @@ export const Admin = ({ route }: AdminProps) => {
   >([]);
 
   useEffect(() => {
-    immersionApplicationGateway.getAll().then(setDemandesImmersion);
+    let agency =
+      "agencyCode" in route.params
+        ? (route.params.agencyCode as AgencyCode)
+        : undefined;
+    immersionApplicationGateway.getAll(agency).then(setDemandesImmersion);
   }, []);
 
   return (

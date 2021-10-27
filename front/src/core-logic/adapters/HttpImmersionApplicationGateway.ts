@@ -1,5 +1,7 @@
+import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
 import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { AgencyCode } from "src/shared/agencies";
 import {
   AddImmersionApplicationMLResponseDto,
   addImmersionApplicationMLResponseDtoSchema,
@@ -74,9 +76,18 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
     return response.data;
   }
 
-  public async getAll(): Promise<Array<ImmersionApplicationDto>> {
+  public async getAll(
+    agency?: AgencyCode,
+    status?: ApplicationStatus,
+  ): Promise<Array<ImmersionApplicationDto>> {
     const response = await axios.get(
       `/${prefix}/${immersionApplicationsRoute}`,
+      {
+        params: {
+          agency,
+          status,
+        },
+      },
     );
 
     return response.data;

@@ -2,12 +2,9 @@ import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import PinoHttp from "pino-http";
 import {
-  generateMagicLinkRequestSchema,
-  getImmersionApplicationRequestDtoSchema,
   immersionApplicationSchema,
-  validateImmersionApplicationRequestDtoSchema,
+  listImmersionApplicationRequestDtoSchema,
 } from "../../shared/ImmersionApplicationDto";
-import { formEstablishmentSchema } from "../../shared/FormEstablishmentDto";
 import { romeSearchRequestSchema } from "../../shared/rome";
 import {
   generateMagicLinkRoute,
@@ -62,7 +59,12 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
       sendHttpResponse(
         req,
         res,
-        () => deps.useCases.listDemandeImmersion.execute(),
+        () =>
+          callUseCase({
+            useCase: deps.useCases.listDemandeImmersion,
+            validationSchema: listImmersionApplicationRequestDtoSchema,
+            useCaseParams: req.query,
+          }),
         deps.authChecker,
       );
     });

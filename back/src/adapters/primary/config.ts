@@ -231,7 +231,6 @@ const createUseCases = (
   ),
   listDemandeImmersion: new ListImmersionApplication(
     repositories.demandeImmersion,
-    config.featureFlags,
   ),
   updateDemandeImmersion: new UpdateImmersionApplication(
     createNewEvent,

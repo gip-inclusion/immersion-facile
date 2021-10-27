@@ -1,5 +1,5 @@
 import { z } from "../../node_modules/zod";
-import { agencyCodeSchema } from "./agencies";
+import { agencyCodeSchema, validAgencyCodes } from "./agencies";
 import {
   emailAndMentorEmailAreDifferent,
   mustBeSignedByBeneficiaryBeforeReview,
@@ -180,6 +180,13 @@ export const updateImmersionApplicationRequestDtoSchema = z
     ({ demandeImmersion, id }) => id === demandeImmersion.id,
     "The ID in the URL path must match the ID in the request body.",
   );
+
+// prettier-ignore
+export type ListImmersionApplicationRequestDto = z.infer<typeof listImmersionApplicationRequestDtoSchema>;
+export const listImmersionApplicationRequestDtoSchema = z.object({
+  agencyCode: z.enum(validAgencyCodes).optional(),
+  status: z.enum(validApplicationStatus).optional(),
+});
 
 // prettier-ignore
 export type UpdateImmersionApplicationResponseDto = z.infer<typeof updateImmersionApplicationResponseDtoSchema>;

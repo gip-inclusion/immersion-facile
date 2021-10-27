@@ -43,6 +43,12 @@ export const Router = () => {
         ) : (
           <NotAvailable />
         ))}
+      {route.name === "agencyAdmin" &&
+        (featureFlags.enableAdminUi ? (
+          <Admin route={route} />
+        ) : (
+          <NotAvailable />
+        ))}
       {dev && route.name === "debugPopulateDB" && <PopulateDB route={route} />}
       {route.name === false && <NotAvailable />}
     </>

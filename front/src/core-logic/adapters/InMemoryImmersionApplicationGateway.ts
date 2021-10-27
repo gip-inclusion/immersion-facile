@@ -1,5 +1,7 @@
+import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { AgencyCode } from "src/shared/agencies";
 import { FeatureFlags } from "src/shared/featureFlags";
 import {
   AddImmersionApplicationMLResponseDto,
@@ -94,10 +96,16 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     return this._demandesImmersion[payload.applicationId];
   }
 
-  public async getAll(): Promise<Array<ImmersionApplicationDto>> {
-    console.log("InMemoryFormulaireGateway.getAll");
+  public async getAll(
+    agency?: AgencyCode,
+    status?: ApplicationStatus,
+  ): Promise<Array<ImmersionApplicationDto>> {
+    console.log("InMemoryFormulaireGateway.getAll: ", agency, status);
     await sleep(SIMULATED_LATENCY_MS);
-    return Object.values(this._demandesImmersion);
+
+    return Object.values(this._demandesImmersion)
+      .filter((demande) => !agency || demande.agencyCode === agency)
+      .filter((demande) => !status || demande.status === status);
   }
 
   public async update(

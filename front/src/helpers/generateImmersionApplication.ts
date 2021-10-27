@@ -1,5 +1,6 @@
 import { addDays, format } from "date-fns";
 import { frenchFirstNames } from "src/helpers/namesList";
+import { validAgencyCodes } from "src/shared/agencies";
 import {
   ImmersionApplicationDto,
   IMMERSION_APPLICATION_TEMPLATE,
@@ -33,6 +34,9 @@ export const generateApplication = (i: number): ImmersionApplicationDto => {
 
   const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
+  const agencyCode =
+    validAgencyCodes[Math.floor(Math.random() * validAgencyCodes.length)];
+
   return {
     ...IMMERSION_APPLICATION_TEMPLATE,
     id: `test-autopopulated-id-${i}`,
@@ -43,5 +47,6 @@ export const generateApplication = (i: number): ImmersionApplicationDto => {
     dateStart: toDateString(dateStart),
     dateEnd: toDateString(dateEnd),
     email: `${firstName}@testimmersionfacileapplication.fr`,
+    agencyCode,
   };
 };

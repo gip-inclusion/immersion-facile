@@ -2,12 +2,14 @@ import { generateApplication } from "src/helpers/generateImmersionApplication";
 import {
   AddImmersionApplicationMLResponseDto,
   ImmersionApplicationDto,
+  ApplicationStatus,
   ImmersionApplicationId,
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
+import { AgencyCode } from "src/shared/agencies";
 
 export abstract class ImmersionApplicationGateway {
   abstract add(
@@ -35,7 +37,10 @@ export abstract class ImmersionApplicationGateway {
   ): Promise<UpdateImmersionApplicationStatusResponseDto>;
 
   abstract getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto>;
-  abstract getAll(): Promise<Array<ImmersionApplicationDto>>;
+  abstract getAll(
+    agency?: AgencyCode,
+    status?: ApplicationStatus,
+  ): Promise<Array<ImmersionApplicationDto>>;
 
   abstract generateMagicLink(
     applicationId: ImmersionApplicationId,
