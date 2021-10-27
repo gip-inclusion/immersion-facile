@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { formatISO } from "date-fns";
 import {
   SireneRepository,
   SiretResponse,
@@ -11,6 +12,7 @@ const logger = createLogger(__filename);
 
 export class HttpsSireneRepository implements SireneRepository {
   private readonly axiosInstance: AxiosInstance;
+  private readonly nowFn = () => new Date();
 
   public static create({
     endpoint,
@@ -46,7 +48,7 @@ export class HttpsSireneRepository implements SireneRepository {
   public async get(siret: SiretDto): Promise<SiretResponse | undefined> {
     try {
       const response = await this.axiosInstance.get("/siret", {
-        params: { q: `siret:${siret}` },
+        params: this.createSiretQueryParams(siret),
       });
       return response.data;
     } catch (error: any) {
@@ -56,5 +58,26 @@ export class HttpsSireneRepository implements SireneRepository {
       }
       throw error;
     }
+  }
+
+  private createSiretQueryParams(
+    siret: SiretDto,
+    includeClosedEstablishments = false,
+  ) {
+    const params: any = {
+      q: `siret:${siret}`,
+    };
+
+    // According to API SIRENE documentation:
+    // etatAdministratifEtablissement:
+    //   État de l'établissement pendant la période :
+    //     A= établissement actif
+    //     F= établissement fermé
+    if (!includeClosedEstablishments) {
+      params.q += " AND periode(etatAdministratifEtablissement:A)";
+      params.date = formatISO(this.nowFn(), { representation: "date" });
+    }
+
+    return params;
   }
 }
