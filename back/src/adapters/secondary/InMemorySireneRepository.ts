@@ -1,10 +1,12 @@
-import { SireneRepository } from "../../domain/sirene/ports/SireneRepository";
+import {
+  SireneRepository,
+  SiretResponse,
+} from "../../domain/sirene/ports/SireneRepository";
+import { SiretDto } from "../../shared/siret";
+import { Establishment } from "./../../domain/sirene/ports/SireneRepository";
 
-export const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
-export const TEST_ESTABLISHMENT1 = {
-  siren: "123456789",
-  nic: "01234",
-  siret: TEST_ESTABLISHMENT1_SIRET,
+export const TEST_ESTABLISHMENT1: Establishment = {
+  siret: "12345678901234",
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE",
     activitePrincipaleUniteLegale: "78.3Z",
@@ -19,29 +21,23 @@ export const TEST_ESTABLISHMENT1 = {
   },
 };
 
-type Repo = { [siret: string]: Object };
-
 export class InMemorySireneRepository implements SireneRepository {
-  private readonly _repo: Repo = {};
+  private readonly _repo = {
+    [TEST_ESTABLISHMENT1.siret]: TEST_ESTABLISHMENT1,
+  };
 
-  public constructor() {
-    this._repo[TEST_ESTABLISHMENT1_SIRET] = TEST_ESTABLISHMENT1;
-  }
+  public constructor() {}
 
-  public async get(siret: string): Promise<Object | undefined> {
+  public async get(siret: SiretDto): Promise<SiretResponse | undefined> {
     const establishment = this._repo[siret];
-    if (!establishment) {
-      return undefined;
-    }
+    if (!establishment) return undefined;
     return {
-      header: {
-        statut: 200,
-        message: "OK",
-        total: 1,
-        debut: 0,
-        nombre: 1,
-      },
       etablissements: [establishment],
     };
+  }
+
+  // Visible for testing
+  public add(establishment: Establishment) {
+    this._repo[establishment.siret] = establishment;
   }
 }

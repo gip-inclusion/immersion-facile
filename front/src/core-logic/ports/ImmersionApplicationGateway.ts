@@ -1,5 +1,4 @@
-import { Role } from "src/shared/tokens/MagicLinkPayload";
-import { EstablishmentInfoFromSiretApi } from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
+import { generateApplication } from "src/helpers/generateImmersionApplication";
 import {
   AddImmersionApplicationMLResponseDto,
   ImmersionApplicationDto,
@@ -7,7 +6,8 @@ import {
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
-import { generateApplication } from "src/helpers/generateImmersionApplication";
+import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
+import { Role } from "src/shared/tokens/MagicLinkPayload";
 
 export abstract class ImmersionApplicationGateway {
   abstract add(
@@ -34,7 +34,7 @@ export abstract class ImmersionApplicationGateway {
     jwt: string,
   ): Promise<UpdateImmersionApplicationStatusResponseDto>;
 
-  abstract getSiretInfo(siret: string): Promise<EstablishmentInfoFromSiretApi>;
+  abstract getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto>;
   abstract getAll(): Promise<Array<ImmersionApplicationDto>>;
 
   abstract generateMagicLink(

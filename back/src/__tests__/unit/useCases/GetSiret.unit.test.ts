@@ -1,13 +1,26 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import {
-  InMemorySireneRepository,
-  TEST_ESTABLISHMENT1,
-  TEST_ESTABLISHMENT1_SIRET,
-} from "../../../adapters/secondary/InMemorySireneRepository";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { Establishment } from "./../../../domain/sirene/ports/SireneRepository";
 
-describe("Get SIRET", () => {
+const validEstablishment: Establishment = {
+  siret: "12345678901234",
+  uniteLegale: {
+    denominationUniteLegale: "MA P'TITE BOITE",
+    activitePrincipaleUniteLegale: "78.3Z",
+    nomenclatureActivitePrincipaleUniteLegale: "Ref2",
+  },
+  adresseEtablissement: {
+    numeroVoieEtablissement: "20",
+    typeVoieEtablissement: "AVENUE",
+    libelleVoieEtablissement: "DE SEGUR",
+    codePostalEtablissement: "75007",
+    libelleCommuneEtablissement: "PARIS 7",
+  },
+};
+
+describe("GetSiret", () => {
   let repository: InMemorySireneRepository;
   let getSiret: GetSiret;
 
@@ -16,28 +29,69 @@ describe("Get SIRET", () => {
     getSiret = new GetSiret(repository);
   });
 
-  describe("When the siret does not exist", () => {
-    it("throws NotFoundError", async () => {
-      await expectPromiseToFailWithError(
-        getSiret.execute("40440440440400"),
-        new NotFoundError("40440440440400"),
-      );
+  test("throws NotFoundError wher siret not found", async () => {
+    await expectPromiseToFailWithError(
+      getSiret.execute({ siret: "40440440440400" }),
+      new NotFoundError("40440440440400"),
+    );
+  });
+
+  test("returns the parsed info when siret found", async () => {
+    repository.add(validEstablishment);
+    const response = await getSiret.execute({
+      siret: validEstablishment.siret,
+    });
+    expect(response).toEqual({
+      siret: "12345678901234",
+      businessName: "MA P'TITE BOITE",
+      businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+      naf: { code: "78.3Z", nomenclature: "Ref2" },
     });
   });
 
-  describe("When a immersionApplication is stored", () => {
-    it("returns the immersionApplication", async () => {
-      const response = await getSiret.execute(TEST_ESTABLISHMENT1_SIRET);
-      expect(response).toEqual({
-        header: {
-          statut: 200,
-          message: "OK",
-          total: 1,
-          debut: 0,
-          nombre: 1,
-        },
-        etablissements: [TEST_ESTABLISHMENT1],
-      });
+  test("populates businessName from nom/prenom when denomination not available", async () => {
+    repository.add({
+      ...validEstablishment,
+      uniteLegale: {
+        prenomUsuelUniteLegale: "ALAIN",
+        nomUniteLegale: "PROST",
+      },
     });
+    const response = await getSiret.execute({
+      siret: validEstablishment.siret,
+    });
+    expect(response.businessName).toEqual("ALAIN PROST");
+  });
+
+  test("skips missing parts of adresseEtablissment", async () => {
+    repository.add({
+      ...validEstablishment,
+      adresseEtablissement: {
+        // No numeroVoieEtablissement
+        typeVoieEtablissement: "L'ESPLANADE",
+        // No libelleVoieEtablissement
+        codePostalEtablissement: "30430",
+        libelleCommuneEtablissement: "BARJAC",
+      },
+    });
+    const response = await getSiret.execute({
+      siret: validEstablishment.siret,
+    });
+    expect(response.businessAddress).toEqual("L'ESPLANADE 30430 BARJAC");
+  });
+
+  test("skips naf when not available", async () => {
+    repository.add({
+      ...validEstablishment,
+      uniteLegale: {
+        denominationUniteLegale: "MA P'TITE BOITE",
+        // no activitePrincipaleUniteLegale
+        // no nomenclatureActivitePrincipaleUniteLegale
+      },
+    });
+    const response = await getSiret.execute({
+      siret: validEstablishment.siret,
+    });
+    expect(response.naf).toBeUndefined();
   });
 });

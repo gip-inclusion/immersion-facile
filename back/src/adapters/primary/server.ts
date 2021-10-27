@@ -27,6 +27,7 @@ import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
+import { getSiretRequestSchema } from "../../shared/siret";
 
 const logger = createLogger(__filename);
 
@@ -132,10 +133,13 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
   });
 
   router.route(`/${siretRoute}/:siret`).get(async (req, res) =>
-    sendHttpResponse(req, res, async () => {
-      logger.info(req);
-      return deps.useCases.getSiret.execute(req.params.siret);
-    }),
+    sendHttpResponse(req, res, async () =>
+      callUseCase({
+        useCase: deps.useCases.getSiret,
+        validationSchema: getSiretRequestSchema,
+        useCaseParams: req.params,
+      }),
+    ),
   );
 
   router.route(`/${immersionApplicationsRoute}`).post(async (req, res) =>

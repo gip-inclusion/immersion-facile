@@ -1,4 +1,5 @@
 import { z } from "../../node_modules/zod";
+import { nafSchema } from "./naf";
 
 const normalizeSiret = (siret: string): string => siret.replace(/\s/g, "");
 
@@ -10,3 +11,16 @@ export const siretSchema = z
   .string()
   .regex(siretRegex, "SIRET doit étre composé de 14 chiffres")
   .transform(normalizeSiret);
+
+export type GetSiretRequestDto = z.infer<typeof getSiretRequestSchema>;
+export const getSiretRequestSchema = z.object({
+  siret: siretSchema,
+});
+
+export type GetSiretResponseDto = z.infer<typeof getSiretResponseSchema>;
+const getSiretResponseSchema = z.object({
+  siret: siretSchema,
+  businessName: z.string(),
+  businessAddress: z.string(),
+  naf: nafSchema.optional(),
+});

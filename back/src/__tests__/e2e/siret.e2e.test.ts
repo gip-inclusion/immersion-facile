@@ -1,9 +1,6 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
-import {
-  TEST_ESTABLISHMENT1,
-  TEST_ESTABLISHMENT1_SIRET,
-} from "../../adapters/secondary/InMemorySireneRepository";
+import { TEST_ESTABLISHMENT1 } from "../../adapters/secondary/InMemorySireneRepository";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 
 describe("/siret route", () => {
@@ -13,20 +10,20 @@ describe("/siret route", () => {
     request = supertest(await createApp(new AppConfigBuilder().build()));
   });
 
-  it("forwards valid requests", async () => {
-    await request.get(`/siret/${TEST_ESTABLISHMENT1_SIRET}`).expect(200, {
-      header: {
-        statut: 200,
-        message: "OK",
-        total: 1,
-        debut: 0,
-        nombre: 1,
-      },
-      etablissements: [TEST_ESTABLISHMENT1],
+  test("processes valid requests", async () => {
+    await request.get(`/siret/${TEST_ESTABLISHMENT1.siret}`).expect(200, {
+      siret: "12345678901234",
+      businessName: "MA P'TITE BOITE",
+      businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+      naf: { code: "78.3Z", nomenclature: "Ref2" },
     });
   });
 
-  it("returns 404 Not Found for unknown siret", async () => {
+  test("returns 400 Bad Request for invalid request", async () => {
+    await request.get("/siret/not_a_valid_siret").expect(400);
+  });
+
+  test("returns 404 Not Found for unknown siret", async () => {
     await request.get("/siret/40400000000404").expect(404);
   });
 });

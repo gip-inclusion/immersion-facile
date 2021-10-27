@@ -1,8 +1,5 @@
 import axios from "axios";
-import { format, addDays } from "date-fns";
-import { EstablishmentInfoFromSiretApi } from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import { frenchFirstNames } from "src/helpers/namesList";
 import {
   AddImmersionApplicationMLResponseDto,
   addImmersionApplicationMLResponseDtoSchema,
@@ -11,21 +8,20 @@ import {
   ImmersionApplicationDto,
   ImmersionApplicationId,
   immersionApplicationSchema,
-  IMMERSION_APPLICATION_TEMPLATE,
   UpdateImmersionApplicationResponseDto,
   updateImmersionApplicationResponseDtoSchema,
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
   updateImmersionApplicationStatusResponseSchema,
-  validApplicationStatus,
 } from "src/shared/ImmersionApplicationDto";
 import {
+  generateMagicLinkRoute,
   immersionApplicationsRoute,
   siretRoute,
   updateApplicationStatusRoute,
   validateDemandeRoute,
-  generateMagicLinkRoute,
 } from "src/shared/routes";
+import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 
 const prefix = "api";
@@ -141,9 +137,7 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
     return data.id;
   }
 
-  public async getSiretInfo(
-    siret: string,
-  ): Promise<EstablishmentInfoFromSiretApi> {
+  public async getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto> {
     const httpResponse = await axios.get(`/${prefix}/${siretRoute}/${siret}`);
     return httpResponse.data;
   }

@@ -1,8 +1,4 @@
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import {
-  Establishment,
-  EstablishmentInfoFromSiretApi,
-} from "src/core-logic/ports/EstablishmentInfoFromSiretApi";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { FeatureFlags } from "src/shared/featureFlags";
 import {
@@ -13,55 +9,31 @@ import {
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
+import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
 
-const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
-const TEST_ESTABLISHMENT1: Establishment = {
-  siren: "123456789",
-  nic: "01234",
-  siret: TEST_ESTABLISHMENT1_SIRET,
-  etablissementSiege: true,
-  uniteLegale: {
-    denominationUniteLegale: "MA P'TITE BOITE",
-    nomUniteLegale: "PROST",
-    prenomUsuelUniteLegale: "ALAIN",
-    activitePrincipaleUniteLegale: "78.3Z",
-    nomenclatureActivitePrincipaleUniteLegale: "Ref2",
+const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
+  {
+    siret: "12345678901234",
+    businessName: "MA P'TITE BOITE",
+    businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+    naf: {
+      code: "78.3Z",
+      nomenclature: "Ref2",
+    },
   },
-  adresseEtablissement: {
-    numeroVoieEtablissement: "20",
-    typeVoieEtablissement: "AVENUE",
-    libelleVoieEtablissement: "DE SEGUR",
-    codePostalEtablissement: "75007",
-    libelleCommuneEtablissement: "PARIS 7",
+  {
+    siret: "11111111111111",
+    businessName: "ALAIN PROST",
+    businessAddress: "CHALET SECRET 73550 MERIBEL",
   },
-};
-
-const TEST_ESTABLISHMENT2_SIRET = "11111111111111";
-const TEST_ESTABLISHMENT2 = {
-  siren: "111111111",
-  nic: "11111",
-  siret: TEST_ESTABLISHMENT2_SIRET,
-  etablissementSiege: true,
-  uniteLegale: {
-    denominationUniteLegale: null,
-    nomUniteLegale: "PROST",
-    prenomUsuelUniteLegale: "ALAIN",
-  },
-  adresseEtablissement: {
-    numeroVoieEtablissement: null,
-    typeVoieEtablissement: "CHALET",
-    libelleVoieEtablissement: "SECRET",
-    codePostalEtablissement: "73550",
-    libelleCommuneEtablissement: "MERIBEL",
-  },
-};
+];
 
 const SIMULATED_LATENCY_MS = 2000;
 export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGateway {
   private _demandesImmersion: { [id: string]: ImmersionApplicationDto } = {};
-  private _establishments: { [siret: string]: Establishment } = {};
+  private _establishments: { [siret: string]: GetSiretResponseDto } = {};
 
   public constructor(readonly featureFlags: FeatureFlags) {
     super();
@@ -78,8 +50,10 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
       email: "IN_REVIEW.esteban@ocon.fr",
     });
 
-    this._establishments[TEST_ESTABLISHMENT1_SIRET] = TEST_ESTABLISHMENT1;
-    this._establishments[TEST_ESTABLISHMENT2_SIRET] = TEST_ESTABLISHMENT2;
+    TEST_ESTABLISHMENTS.forEach(
+      (establishment) =>
+        (this._establishments[establishment.siret] = establishment),
+    );
   }
 
   public async add(
@@ -182,9 +156,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     return "";
   }
 
-  public async getSiretInfo(
-    siret: string,
-  ): Promise<EstablishmentInfoFromSiretApi> {
+  public async getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto> {
     console.log("InMemoryDemandeImmersionGateway.getSiretInfo: " + siret);
     await sleep(SIMULATED_LATENCY_MS);
 
@@ -198,15 +170,6 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
       throw new Error("404 Not found");
     }
 
-    return {
-      header: {
-        statut: 200,
-        message: "OK",
-        total: 1,
-        debut: 0,
-        nombre: 1,
-      },
-      etablissements: [establishment],
-    };
+    return establishment;
   }
 }

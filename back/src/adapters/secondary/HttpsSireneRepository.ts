@@ -1,5 +1,9 @@
 import axios, { AxiosInstance } from "axios";
-import { SireneRepository } from "../../domain/sirene/ports/SireneRepository";
+import {
+  SireneRepository,
+  SiretResponse,
+} from "../../domain/sirene/ports/SireneRepository";
+import { SiretDto } from "../../shared/siret";
 import { createLogger } from "../../utils/logger";
 import { AxiosConfig } from "../primary/appConfig";
 
@@ -39,7 +43,7 @@ export class HttpsSireneRepository implements SireneRepository {
     this.axiosInstance = axiosInstance;
   }
 
-  public async get(siret: string): Promise<Object | undefined> {
+  public async get(siret: SiretDto): Promise<SiretResponse | undefined> {
     try {
       const response = await this.axiosInstance.get("/siret", {
         params: { q: `siret:${siret}` },
