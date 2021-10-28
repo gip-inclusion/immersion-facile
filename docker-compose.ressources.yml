@@ -6,7 +6,7 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: immersion-db
-      POSTGRES_USER: postgres
+      POSTGRES_USER: immersion
       POSTGRES_PASSWORD: pg-password
     volumes:
       - ./docker-data/test-postgresql:/var/lib/postgresql/data

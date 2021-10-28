@@ -19,7 +19,7 @@ SET row_security = off;
 
 CREATE EXTENSION IF NOT EXISTS postgis;
 --
--- Name: contact_mode; Type: TYPE; Schema: public; Owner: postgres
+-- Name: contact_mode; Type: TYPE; Schema: public; Owner: immersion
 --
 
 CREATE TYPE public.contact_mode AS ENUM (
@@ -29,10 +29,10 @@ CREATE TYPE public.contact_mode AS ENUM (
 );
 
 
-ALTER TYPE public.contact_mode OWNER TO postgres;
+ALTER TYPE public.contact_mode OWNER TO immersion;
 
 --
--- Name: data_source; Type: TYPE; Schema: public; Owner: postgres
+-- Name: data_source; Type: TYPE; Schema: public; Owner: immersion
 --
 
 CREATE TYPE public.data_source AS ENUM (
@@ -43,14 +43,14 @@ CREATE TYPE public.data_source AS ENUM (
 );
 
 
-ALTER TYPE public.data_source OWNER TO postgres;
+ALTER TYPE public.data_source OWNER TO immersion;
 
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: establishments; Type: TABLE; Schema: public; Owner: postgres
+-- Name: establishments; Type: TABLE; Schema: public; Owner: immersion
 --
 
 CREATE TABLE public.establishments (
@@ -67,10 +67,10 @@ CREATE TABLE public.establishments (
 );
 
 
-ALTER TABLE public.establishments OWNER TO postgres;
+ALTER TABLE public.establishments OWNER TO immersion;
 
 --
--- Name: immersion_contacts; Type: TABLE; Schema: public; Owner: postgres
+-- Name: immersion_contacts; Type: TABLE; Schema: public; Owner: immersion
 --
 
 CREATE TABLE public.immersion_contacts (
@@ -84,10 +84,10 @@ CREATE TABLE public.immersion_contacts (
 );
 
 
-ALTER TABLE public.immersion_contacts OWNER TO postgres;
+ALTER TABLE public.immersion_contacts OWNER TO immersion;
 
 --
--- Name: immersion_offers; Type: TABLE; Schema: public; Owner: postgres
+-- Name: immersion_offers; Type: TABLE; Schema: public; Owner: immersion
 --
 
 CREATE TABLE public.immersion_offers (
@@ -110,10 +110,10 @@ CREATE TABLE public.immersion_offers (
 );
 
 
-ALTER TABLE public.immersion_offers OWNER TO postgres;
+ALTER TABLE public.immersion_offers OWNER TO immersion;
 
 --
--- Name: searches_made; Type: TABLE; Schema: public; Owner: postgres
+-- Name: searches_made; Type: TABLE; Schema: public; Owner: immersion
 --
 
 CREATE TABLE public.searches_made (
@@ -127,10 +127,10 @@ CREATE TABLE public.searches_made (
 );
 
 
-ALTER TABLE public.searches_made OWNER TO postgres;
+ALTER TABLE public.searches_made OWNER TO immersion;
 
 --
--- Name: immersion_contacts pk_establishment_contact; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: immersion_contacts pk_establishment_contact; Type: CONSTRAINT; Schema: public; Owner: immersion
 --
 
 ALTER TABLE ONLY public.immersion_contacts
@@ -138,7 +138,7 @@ ALTER TABLE ONLY public.immersion_contacts
 
 
 --
--- Name: establishments pk_establishments; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: establishments pk_establishments; Type: CONSTRAINT; Schema: public; Owner: immersion
 --
 
 ALTER TABLE ONLY public.establishments
@@ -146,7 +146,7 @@ ALTER TABLE ONLY public.establishments
 
 
 --
--- Name: immersion_offers pk_immersion_offers; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: immersion_offers pk_immersion_offers; Type: CONSTRAINT; Schema: public; Owner: immersion
 --
 
 ALTER TABLE ONLY public.immersion_offers
@@ -154,7 +154,7 @@ ALTER TABLE ONLY public.immersion_offers
 
 
 --
--- Name: searches_made pk_searches_made; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: searches_made pk_searches_made; Type: CONSTRAINT; Schema: public; Owner: immersion
 --
 
 ALTER TABLE ONLY public.searches_made
@@ -162,35 +162,35 @@ ALTER TABLE ONLY public.searches_made
 
 
 --
--- Name: fki_fk_establishment_contact; Type: INDEX; Schema: public; Owner: postgres
+-- Name: fki_fk_establishment_contact; Type: INDEX; Schema: public; Owner: immersion
 --
 
 CREATE INDEX fki_fk_establishment_contact ON public.immersion_offers USING btree (contact_in_establishment_uuid);
 
 
 --
--- Name: fki_fk_establishment_siret; Type: INDEX; Schema: public; Owner: postgres
+-- Name: fki_fk_establishment_siret; Type: INDEX; Schema: public; Owner: immersion
 --
 
 CREATE INDEX fki_fk_establishment_siret ON public.immersion_offers USING btree (siret);
 
 
 --
--- Name: fki_fk_siret_establishment; Type: INDEX; Schema: public; Owner: postgres
+-- Name: fki_fk_siret_establishment; Type: INDEX; Schema: public; Owner: immersion
 --
 
 CREATE INDEX fki_fk_siret_establishment ON public.immersion_contacts USING btree (siret_establishment);
 
 
 --
--- Name: index_needstobesearched; Type: INDEX; Schema: public; Owner: postgres
+-- Name: index_needstobesearched; Type: INDEX; Schema: public; Owner: immersion
 --
 
 CREATE INDEX index_needstobesearched ON public.searches_made USING btree (needstobesearched);
 
 
 --
--- Name: index_number_displays; Type: INDEX; Schema: public; Owner: postgres
+-- Name: index_number_displays; Type: INDEX; Schema: public; Owner: immersion
 --
 
 CREATE INDEX index_number_displays ON public.immersion_offers USING btree (number_displays);
@@ -200,7 +200,7 @@ CREATE INDEX immersion_offers_gps ON public.immersion_offers USING GIST ( gps );
 CREATE INDEX searches_made_gps ON public.searches_made USING GIST ( gps );
 
 --
--- Name: immersion_offers fk_establishment_contact; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: immersion_offers fk_establishment_contact; Type: FK CONSTRAINT; Schema: public; Owner: immersion
 --
 
 ALTER TABLE ONLY public.immersion_offers
@@ -208,7 +208,7 @@ ALTER TABLE ONLY public.immersion_offers
 
 
 --
--- Name: immersion_offers fk_establishment_siret; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: immersion_offers fk_establishment_siret; Type: FK CONSTRAINT; Schema: public; Owner: immersion
 --
 
 ALTER TABLE ONLY public.immersion_offers
@@ -216,7 +216,7 @@ ALTER TABLE ONLY public.immersion_offers
 
 
 --
--- Name: immersion_contacts fk_siret_establishment; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: immersion_contacts fk_siret_establishment; Type: FK CONSTRAINT; Schema: public; Owner: immersion
 --
 
 ALTER TABLE ONLY public.immersion_contacts

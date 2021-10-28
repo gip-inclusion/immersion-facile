@@ -1,3 +1,4 @@
+
 This directory contains the scripts to generate the initial version of immersion-db.
 
 # Testing schema changes locally
@@ -7,7 +8,7 @@ This directory contains the scripts to generate the initial version of immersion
    ```sh
    NODE_ENV=local
    REPOSTIORIES=PG
-   PG_URL="postgresql://postgres:pg-password@postgres:5432/immersion-db"
+   PG_URL="postgresql://immersion:pg-password@postgres:5432/immersion-db"
    ```
 
 1. Purge any existing database and bring up the docker-compose setup:
@@ -19,10 +20,11 @@ This directory contains the scripts to generate the initial version of immersion
    ```
 
    The local frontend can be reached at http://localhost:80
+   <!-- prettier-ignore -->
    The local adminer UI can be reached at http://localhost:80/__db__admin. To login, use the following parameters:
 
    - System: `PostgreSQL`
    - Server: `postgres:5432`
-   - Username: `postgres`
+   - Username: `immersion`
    - Password: `pg-password`
    - Database: `immersion-db`

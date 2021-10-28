@@ -87,7 +87,7 @@ export class AppConfig {
   public get pgImmersionDbUrl() {
     if (this.nodeEnv === "production") return this.throwIfNotDefined("PG_URL");
     if (this.env.PG_URL) return this.env.PG_URL;
-    return `postgresql://postgres:pg-password@localhost:5432/immersion-db`;
+    return `postgresql://immersion:pg-password@localhost:5432/immersion-db`;
   }
 
   public get pgPool(): Pool {

@@ -1,7 +1,7 @@
 variables:
   SERVER_USER: deployer
   POSTGRES_DB: immersion-db
-  POSTGRES_USER: postgres
+  POSTGRES_USER: immersion
   POSTGRES_PASSWORD: pg-password
   POSTGRES_PORT: 5432
   POSTGRES_HOST_AUTH_METHOD: trust
