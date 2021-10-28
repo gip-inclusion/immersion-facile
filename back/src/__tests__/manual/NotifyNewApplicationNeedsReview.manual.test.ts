@@ -10,6 +10,13 @@ import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 
+// These tests are not hermetic and not meant for automated testing. They will send emails using
+// sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
+// errors.
+//
+// Requires the following environment variables to be set for the tests to pass:
+// - SENDINBLUE_API_KEY
+
 const validDemandeImmersion: ImmersionApplicationDto =
   new ImmersionApplicationDtoBuilder()
     .withEmail("jean-francois.macresy@beta.gouv.fr")
@@ -27,7 +34,7 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
     generateMagicLinkFn = createGenerateVerificationMagicLink(config);
   });
 
-  test.skip("Sends notification mails to check Immersion Application eligibility", async () => {
+  test("Sends notification mails to check Immersion Application eligibility", async () => {
     const counsellorEmails = [
       "jeanfrancois.macresy@gmail.com",
       "jeanfrancois.macresy+beneficiary@gmail.com",
@@ -47,7 +54,7 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
     await notifyNewApplicationNeedsReview.execute(validDemandeImmersion);
   });
 
-  test.skip("Sends notification mails to check Immersion Application eligibility with a real working immersion from Airtable", async () => {
+  test("Sends notification mails to check Immersion Application eligibility with a real working immersion from Airtable", async () => {
     const counsellorEmails = [
       "jeanfrancois.macresy@gmail.com",
       "jean-francois.macresy@beta.gouv.fr",
@@ -69,7 +76,7 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
     await notifyNewApplicationNeedsReview.execute(validDemandeImmersion);
   });
 
-  test.skip("Sends notification mails to check Immersion Application validation  with a real working immersion from Airtable", async () => {
+  test("Sends notification mails to check Immersion Application validation  with a real working immersion from Airtable", async () => {
     const validationEmails = [
       "jeanfrancois.macresy@gmail.com",
       "jean-francois.macresy@beta.gouv.fr",

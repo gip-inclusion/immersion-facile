@@ -6,6 +6,13 @@ import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/imme
 import { AgencyCode } from "../../shared/agencies";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 
+// These tests are not hermetic and not meant for automated testing. They will send emails using
+// sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
+// errors.
+//
+// Requires the following environment variables to be set for the tests to pass:
+// - SENDINBLUE_API_KEY
+
 const validDemandeImmersion = new ImmersionApplicationDtoBuilder()
   .withEmail("jean-francois.macresy@beta.gouv.fr")
   .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
@@ -35,7 +42,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
       );
   });
 
-  test.skip("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
+  test("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
     counsellorEmails[validDemandeImmersion.agencyCode] = [counsellorEmail];
     unrestrictedEmailSendingAgencies.add(validDemandeImmersion.agencyCode);
 
