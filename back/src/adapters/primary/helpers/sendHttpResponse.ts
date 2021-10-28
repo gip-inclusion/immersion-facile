@@ -83,6 +83,13 @@ export const sendHttpResponse = async (
       res.status(500);
     }
 
-    return res.json({ errors: error.errors || [error.message] });
+    let errors: any;
+    try {
+      errors = JSON.parse(error.message);
+    } catch (e) {
+      errors = error.message;
+    }
+
+    return res.json({ errors });
   }
 };
