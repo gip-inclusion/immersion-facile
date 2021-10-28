@@ -72,6 +72,13 @@ const buildDb = async () => {
     await buildFormEstablishment(client);
   }
 
+  // prettier-ignore
+  const agenciesTableAlreadyExists = await checkIfTableExists("agencies");
+  if (!agenciesTableAlreadyExists) {
+    logger.info("We will thus create the agencies table");
+    await buildAgencies(client);
+  }
+
   await client.end();
 };
 
@@ -106,6 +113,12 @@ const buildImmersionApplication = async (client: Client) => {
 
 const buildFormEstablishment = async (client: Client) => {
   const file = await readFile(__dirname + "/createFormEstablishmentsTable.sql");
+  const sql = file.toString();
+  await client.query(sql);
+};
+
+const buildAgencies = async (client: Client) => {
+  const file = await readFile(__dirname + "/createAgenciesTable.sql");
   const sql = file.toString();
   await client.query(sql);
 };
