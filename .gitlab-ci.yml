@@ -93,7 +93,9 @@ deploy_on_dev:
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
       rm -f .env.variables .env.secrets;
 
-      docker-compose --env-file .env up --build -d;
+      docker-compose build &&
+      docker-compose down &&
+      docker-compose up -d;
 
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
@@ -137,7 +139,9 @@ deploy_on_beta:
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
       rm -f .env.variables .env.secrets;
 
-      docker-compose --env-file .env up --build -d;
+      docker-compose build &&
+      docker-compose down &&
+      docker-compose up -d;
 
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
@@ -181,7 +185,9 @@ deploy_on_staging:
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
       rm -f .env.variables .env.secrets;
 
-      docker-compose --env-file .env up --build -d;
+      docker-compose build &&
+      docker-compose down &&
+      docker-compose up -d;
 
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
@@ -225,7 +231,9 @@ deploy_on_prod:
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
       rm -f .env.variables .env.secrets;
 
-      docker-compose --env-file .env up --build -d;
+      docker-compose build &&
+      docker-compose down &&
+      docker-compose up -d;
 
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
