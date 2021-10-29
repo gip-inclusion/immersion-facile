@@ -1,4 +1,3 @@
-
 This directory contains the scripts to generate the initial version of immersion-db.
 
 # Testing schema changes locally

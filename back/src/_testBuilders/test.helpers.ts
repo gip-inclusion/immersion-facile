@@ -16,11 +16,6 @@ export const expectPromiseToFailWithError = async (
   promise: Promise<unknown>,
   expectedError: Error,
 ) => {
-  try {
-    await promise;
-  } catch (error) {
-    console.log(error);
-  }
   await expect(promise).rejects.toThrowError(expectedError);
 };
 

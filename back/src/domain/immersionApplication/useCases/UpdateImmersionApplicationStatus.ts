@@ -4,6 +4,7 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
+  ApplicationStatus,
   UpdateImmersionApplicationStatusRequestDto,
   updateImmersionApplicationStatusRequestSchema,
   UpdateImmersionApplicationStatusResponseDto,
@@ -12,12 +13,23 @@ import { statusTransitionConfigs } from "../../../shared/immersionApplicationSta
 import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { DomainTopic } from "../../core/eventBus/events";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
 
 const logger = createLogger(__filename);
+
+const domainTopicByTargetStautsMap: Partial<
+  Record<ApplicationStatus, DomainTopic>
+> = {
+  ACCEPTED_BY_COUNSELLOR: "ImmersionApplicationAcceptedByCounsellor",
+  ACCEPTED_BY_VALIDATOR: "ImmersionApplicationAcceptedByValidator",
+  VALIDATED: "FinalImmersionApplicationValidationByAdmin",
+  REJECTED: "ImmersionApplicationRejected",
+  DRAFT: "ImmersionApplicationRequiresModification",
+};
 
 export class UpdateImmersionApplicationStatus extends UseCase<
   UpdateImmersionApplicationStatusRequestDto,
@@ -76,7 +88,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
       );
     if (!updatedId) throw new NotFoundError(updatedId);
 
-    const domainTopic = statusTransitionConfig.domainTopic;
+    const domainTopic = domainTopicByTargetStautsMap[status];
     if (domainTopic) {
       let event = undefined;
       if (domainTopic === "ImmersionApplicationRequiresModification") {

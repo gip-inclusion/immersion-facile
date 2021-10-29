@@ -8,8 +8,6 @@ import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
-//import { statusTransitionConfigs } from "../../shared/immersionApplicationStatusTransitions";
-
 
 type VerificationPageProps = {
   route: Route<typeof routes.immersionApplicationsToValidate>;
@@ -83,18 +81,19 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
             Renvoyer au bénéficiaire pour modification
           </VerificationActionButton>
         )}
-        {actingRole === "counsellor" && immersionApplication?.status === "IN_REVIEW" && (
-          <VerificationActionButton
-            {...buttonProps}
-            newStatus="ACCEPTED_BY_COUNSELLOR"
-            messageToShowOnSuccess={validatedSuccessfully}
-            disabled={!!successMessage || currentStatus != "IN_REVIEW"}
-          >
-            {currentStatus === "ACCEPTED_BY_COUNSELLOR"
-              ? "Demande déjà validée."
-              : "Marquer la demande comme légitime"}
-          </VerificationActionButton>
-        )}
+        {actingRole === "counsellor" &&
+          immersionApplication?.status === "IN_REVIEW" && (
+            <VerificationActionButton
+              {...buttonProps}
+              newStatus="ACCEPTED_BY_COUNSELLOR"
+              messageToShowOnSuccess={validatedSuccessfully}
+              disabled={!!successMessage || currentStatus != "IN_REVIEW"}
+            >
+              {currentStatus === "ACCEPTED_BY_COUNSELLOR"
+                ? "Demande déjà validée."
+                : "Marquer la demande comme éligible"}
+            </VerificationActionButton>
+          )}
         {actingRole === "validator" && (
           <VerificationActionButton
             {...buttonProps}
@@ -111,7 +110,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         )}
         {actingRole === "admin" &&
           buttonProps.immersionApplication?.status ===
-          "ACCEPTED_BY_VALIDATOR" && (
+            "ACCEPTED_BY_VALIDATOR" && (
             <VerificationActionButton
               {...buttonProps}
               newStatus="VALIDATED"
