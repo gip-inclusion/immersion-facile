@@ -4,7 +4,6 @@ import { VerificationPage } from "src/app/Verification/VerificationPage";
 import { ApplicationForm } from "src/app/ApplicationForm/ApplicationForm";
 import { Home } from "src/app/Home";
 import { useRoute } from "src/app/routes";
-import { TodoApp } from "src/app/TodoApp";
 import { ENV } from "src/environmentVariables";
 import { AdminVerification } from "./admin/AdminVerification";
 import { EstablishmentForm } from "./FormEstablishment/EstablishmentForm";
@@ -27,8 +26,6 @@ export const Router = () => {
       {route.name === "immersionApplicationsToValidate" && (
         <VerificationPage route={route} />
       )}
-      {route.name === "todos" &&
-        (dev ? <TodoApp route={route} /> : <NotAvailable />)}
       {route.name === "immersionApplication" && (
         <ApplicationForm route={route} />
       )}

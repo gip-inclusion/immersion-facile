@@ -1,23 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Provider } from "react-redux";
 import { App } from "src/app/App";
 import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
 import { HttpFormEstablishmentGateway } from "src/core-logic/adapters/HttpFormEstablishmentGateway";
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
 import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemoryFormEstablishmentGateway";
-import { InMemoryTodoGateway } from "src/core-logic/adapters/InMemoryTodoGateway";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
-import { configureReduxStore } from "src/core-logic/store/initilizeStore";
 import { ENV } from "src/environmentVariables";
 import "./index.css";
 import { RouteProvider } from "./routes";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
-
-const todoGateway = new InMemoryTodoGateway();
 
 export const formEstablishmentGateway: FormEstablishmentGateway =
   ENV.gateway === "HTTP"
@@ -34,14 +29,10 @@ export const immersionSearchGateway: ImmersionSearchGateway =
     ? new HttpImmersionSearchGateway()
     : new InMemoryImmersionSearchGateway();
 
-const store = configureReduxStore({ todoGateway });
-
 ReactDOM.render(
   <React.StrictMode>
     <RouteProvider>
-      <Provider store={store}>
-        <App />
-      </Provider>
+      <App />
     </RouteProvider>
   </React.StrictMode>,
   document.getElementById("root"),

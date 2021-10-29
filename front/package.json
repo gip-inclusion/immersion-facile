@@ -1,7 +1,7 @@
 {
   "version": "0.0.0",
   "scripts": {
-    "test": "npm run symlink-or-copy-shared && jest",
+    "test": "npm run symlink-or-copy-shared && jest --passWithNoTests",
     "dev": "npm run symlink-shared && npm run gen-env-config && vite",
     "dev-http": "npm run symlink-shared && GATEWAY=HTTP npm run gen-env-config && vite",
     "build": "npm run symlink-or-copy-shared && vite build",
@@ -20,13 +20,11 @@
   },
   "dependencies": {
     "@gouvfr/dsfr": "1.1.0",
-    "@reduxjs/toolkit": "^1.6.0",
     "axios": "^0.21.1",
     "date-fns": "^2.23.0",
     "formik": "2.1.4",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "react-redux": "^7.2.4",
     "type-route": "^0.6.0",
     "uuid": "^8.3.2",
     "zod": "^3.9.5"

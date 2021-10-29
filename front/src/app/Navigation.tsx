@@ -13,6 +13,5 @@ export const Navigation = () => (
     {featureFlags.enableAdminUi && <a {...routes.admin().link}>Backoffice</a>}
     {featureFlags.enableAdminUi && " - "}
     <a {...routes.formEstablishment().link}>Formulaire Entreprise {" - "}</a>
-    <a {...routes.todos().link}>Todo list</a>
   </nav>
 );
