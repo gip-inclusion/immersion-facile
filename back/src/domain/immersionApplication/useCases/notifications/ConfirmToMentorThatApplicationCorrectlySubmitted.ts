@@ -3,16 +3,15 @@ import {
   immersionApplicationSchema,
 } from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
+import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
 
 const logger = createLogger(__filename);
 export class ConfirmToMentorThatApplicationCorrectlySubmitted extends UseCase<ImmersionApplicationDto> {
   constructor(
+    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
-    private readonly emailAllowList: Readonly<Set<string>>,
-    private readonly agencyRepository: AgencyRepository,
   ) {
     super();
   }
@@ -21,7 +20,6 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted extends UseCase<Im
 
   public async _execute({
     id,
-    agencyCode,
     mentor,
     mentorEmail,
     firstName,
@@ -34,30 +32,23 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted extends UseCase<Im
       "------------- Entering execute.",
     );
 
-    const agencyConfig = await this.agencyRepository.getConfig(agencyCode);
-    if (!agencyConfig) {
-      throw new Error(
-        `Unable to send mail. No agency config found for ${agencyCode}`,
-      );
-    }
+    const [allowedMentorEmail] = this.emailFilter.filter([mentorEmail], {
+      onRejected: (email) =>
+        logger.info(
+          { id, email },
+          "Sending mentor confirmation email skipped.",
+        ),
+    });
 
-    if (
-      agencyConfig.allowUnrestrictedEmailSending ||
-      this.emailAllowList.has(mentorEmail)
-    ) {
+    if (allowedMentorEmail) {
       await this.emailGateway.sendNewApplicationMentorConfirmation(
-        mentorEmail,
+        allowedMentorEmail,
         {
           demandeId: id,
           mentorName: mentor,
           beneficiaryFirstName: firstName,
           beneficiaryLastName: lastName,
         },
-      );
-    } else {
-      logger.info(
-        { id, mentorEmail, agencyCode },
-        "Sending mentor confirmation email skipped.",
       );
     }
   }

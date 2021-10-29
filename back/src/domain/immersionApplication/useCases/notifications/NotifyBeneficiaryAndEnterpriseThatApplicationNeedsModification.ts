@@ -1,19 +1,19 @@
 import { z } from "zod";
+import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "../../../../shared/ImmersionApplicationDto";
+import { frontRoutes } from "../../../../shared/routes";
 import { zString } from "../../../../shared/zodUtils";
 import { createLogger } from "../../../../utils/logger";
+import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyRepository";
+import { AgencyConfig, AgencyRepository } from "../../ports/AgencyRepository";
 import {
   EmailGateway,
   ModificationRequestApplicationNotificationParams,
 } from "../../ports/EmailGateway";
-import { AgencyConfig } from "../../ports/AgencyRepository";
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import { frontRoutes } from "../../../../shared/routes";
 
 const logger = createLogger(__filename);
 
@@ -26,8 +26,8 @@ const immersionApplicationRequiresModificationSchema = z.object({
 
 export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends UseCase<ImmersionApplicationRequiresModificationPayload> {
   constructor(
+    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
-    private readonly emailAllowList: Readonly<Set<string>>,
     private readonly agencyRepository: AgencyRepository,
     private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
   ) {
@@ -51,17 +51,9 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
 
     // Note that MODIFICATION_REQUEST_APPLICATION_NOTIFICATION template is phrased to address the
     // beneficiary only, so it needs to be updated if the list of recipients is changed.
-    let recipients = [application.email];
-
-    if (!agencyConfig.allowUnrestrictedEmailSending) {
-      recipients = recipients.filter((email) => {
-        if (!this.emailAllowList.has(email)) {
-          logger.info(`Skipped sending email to: ${email}`);
-          return false;
-        }
-        return true;
-      });
-    }
+    const recipients = this.emailFilter.filter([application.email], {
+      onRejected: (email) => logger.info(`Skipped sending email to: ${email}`),
+    });
 
     if (recipients.length > 0) {
       await this.emailGateway.sendModificationRequestApplicationNotification(

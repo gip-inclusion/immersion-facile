@@ -37,8 +37,6 @@ export const createAgencyConfigsFromAppConfig = (
         counsellorEmails: config.counsellorEmails[agencyCode] ?? [],
         validatorEmails: config.validatorEmails[agencyCode] ?? [],
         adminEmails: config.adminEmails,
-        allowUnrestrictedEmailSending:
-          config.unrestrictedEmailSendingAgencies.has(agencyCode),
         questionnaireUrl: questionnaireUrls[agencyCode] ?? "",
         signature: signatures[agencyCode] ?? "",
       },

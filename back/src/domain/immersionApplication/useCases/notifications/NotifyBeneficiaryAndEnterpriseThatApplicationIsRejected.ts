@@ -3,6 +3,7 @@ import {
   immersionApplicationSchema,
 } from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
+import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import {
@@ -14,8 +15,8 @@ import { AgencyConfig } from "./../../ports/AgencyRepository";
 const logger = createLogger(__filename);
 export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends UseCase<ImmersionApplicationDto> {
   constructor(
+    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
-    private readonly emailAllowList: Readonly<Set<string>>,
     private readonly agencyRepository: AgencyRepository,
   ) {
     super();
@@ -31,20 +32,13 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Use
       );
     }
 
-    let recipients = [
-      dto.email,
-      dto.mentorEmail,
-      ...agencyConfig.counsellorEmails,
-    ];
-    if (!agencyConfig.allowUnrestrictedEmailSending) {
-      recipients = recipients.filter((email) => {
-        if (!this.emailAllowList.has(email)) {
-          logger.info(`Skipped sending email to: ${email}`);
-          return false;
-        }
-        return true;
-      });
-    }
+    const recipients = this.emailFilter.filter(
+      [dto.email, dto.mentorEmail, ...agencyConfig.counsellorEmails],
+      {
+        onRejected: (email) =>
+          logger.info(`Skipped sending email to: ${email}`),
+      },
+    );
 
     if (recipients.length > 0) {
       await this.emailGateway.sendRejectedApplicationNotification(

@@ -1,3 +1,4 @@
+import { parseISO } from "date-fns";
 import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
@@ -13,13 +14,13 @@ import {
   EmailGateway,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../ports/EmailGateway";
-import { parseISO } from "date-fns";
+import { EmailFilter } from "./../../../core/ports/EmailFilter";
 
 const logger = createLogger(__filename);
 export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<ImmersionApplicationDto> {
   constructor(
+    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
-    private readonly emailAllowList: Readonly<Set<string>>,
     private readonly agencyRepository: AgencyRepository,
   ) {
     super();
@@ -42,20 +43,13 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
       );
     }
 
-    let recipients = [
-      dto.email,
-      dto.mentorEmail,
-      ...agencyConfig.counsellorEmails,
-    ];
-    if (!agencyConfig.allowUnrestrictedEmailSending) {
-      recipients = recipients.filter((email) => {
-        if (!this.emailAllowList.has(email)) {
-          logger.info(`Skipped sending email to: ${email}`);
-          return false;
-        }
-        return true;
-      });
-    }
+    const recipients = this.emailFilter.filter(
+      [dto.email, dto.mentorEmail, ...agencyConfig.counsellorEmails],
+      {
+        onRejected: (email) =>
+          logger.info(`Skipped sending email to: ${email}`),
+      },
+    );
 
     if (recipients.length > 0) {
       await this.emailGateway.sendValidatedApplicationFinalConfirmation(

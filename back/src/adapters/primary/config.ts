@@ -39,6 +39,10 @@ import { AirtableDemandeImmersionRepository } from "../secondary/airtable/Airtab
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
+  AllowListEmailFilter,
+  AlwaysAllowEmailFilter,
+} from "../secondary/core/EmailFilterImplementations";
+import {
   BasicEventCrawler,
   RealEventCrawler,
 } from "../secondary/core/EventCrawlerImplementations";
@@ -62,6 +66,7 @@ import { PgFormEstablishmentRepository } from "../secondary/pg/FormEstablishment
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { EmailFilter } from "./../../domain/core/ports/EmailFilter";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
@@ -76,6 +81,9 @@ export const createAppDependencies = async (config: AppConfig) => {
   const eventBus = createEventBus();
   const generateJwtFn = createGenerateJwtFn(config);
   const generateMagicLinkFn = createGenerateVerificationMagicLink(config);
+  const emailFilter = config.skipEmailAllowlist
+    ? new AlwaysAllowEmailFilter()
+    : new AllowListEmailFilter(config.emailAllowList);
 
   return {
     useCases: createUseCases(
@@ -83,6 +91,7 @@ export const createAppDependencies = async (config: AppConfig) => {
       repositories,
       generateJwtFn,
       generateMagicLinkFn,
+      emailFilter,
     ),
     authChecker: createAuthChecker(config),
     authMiddleware: createAuthMiddleware(config),
@@ -210,6 +219,7 @@ const createUseCases = (
   repositories: Repositories,
   generateJwtFn: GenerateJwtFn,
   generateMagicLinkFn: GenerateVerificationMagicLink,
+  emailFilter: EmailFilter,
 ) => ({
   addDemandeImmersion: new AddImmersionApplication(
     repositories.demandeImmersion,
@@ -261,20 +271,18 @@ const createUseCases = (
   // notifications
   confirmToBeneficiaryThatApplicationCorrectlySubmitted:
     new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
+      emailFilter,
       repositories.email,
-      config.emailAllowList,
-      repositories.agency,
     ),
   confirmToMentorThatApplicationCorrectlySubmitted:
     new ConfirmToMentorThatApplicationCorrectlySubmitted(
+      emailFilter,
       repositories.email,
-      config.emailAllowList,
-      repositories.agency,
     ),
   notifyAllActorsOfFinalApplicationValidation:
     new NotifyAllActorsOfFinalApplicationValidation(
+      emailFilter,
       repositories.email,
-      config.emailAllowList,
       repositories.agency,
     ),
   notifyNewApplicationNeedsReview: new NotifyNewApplicationNeedsReview(
@@ -290,14 +298,14 @@ const createUseCases = (
     ),
   notifyBeneficiaryAndEnterpriseThatApplicationIsRejected:
     new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+      emailFilter,
       repositories.email,
-      config.emailAllowList,
       repositories.agency,
     ),
   notifyBeneficiaryAndEnterpriseThatApplicationNeedsModifications:
     new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
+      emailFilter,
       repositories.email,
-      config.emailAllowList,
       repositories.agency,
       generateMagicLinkFn,
     ),

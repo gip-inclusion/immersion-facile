@@ -1,43 +1,40 @@
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { expectEmailBeneficiaryConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { InMemoryAgencyRepository } from "./../../../adapters/secondary/InMemoryAgencyRepository";
-import { AgencyConfig } from "./../../../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyConfigBuilder } from "./../../../_testBuilders/AgencyConfigBuilder";
+import {
+  AllowListEmailFilter,
+  AlwaysAllowEmailFilter,
+} from "./../../../adapters/secondary/core/EmailFilterImplementations";
 
 const validImmersionApplication: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();
-const defaultAgencyConfig = AgencyConfigBuilder.create(
-  validImmersionApplication.agencyCode,
-).build();
 
 describe("Add immersionApplication Notifications", () => {
   let emailGw: InMemoryEmailGateway;
-  let allowList: Set<string>;
-  let agencyConfig: AgencyConfig;
+  let emailFilter: EmailFilter;
 
   const createUseCase = () =>
     new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
+      emailFilter,
       emailGw,
-      allowList,
-      new InMemoryAgencyRepository({ [agencyConfig.id]: agencyConfig }),
     );
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
-    allowList = new Set();
-    agencyConfig = defaultAgencyConfig;
+    emailFilter = new AlwaysAllowEmailFilter();
   });
 
-  test("Sends no emails when allowList and unrestricted email sending is disabled", async () => {
+  test("Sends no emails when allowList empty", async () => {
+    emailFilter = new AllowListEmailFilter([]);
     await createUseCase().execute(validImmersionApplication);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
 
   test("Sends confirmation email to beneficiary when on allowList", async () => {
-    allowList.add(validImmersionApplication.email);
+    emailFilter = new AllowListEmailFilter([validImmersionApplication.email]);
 
     await createUseCase().execute(validImmersionApplication);
 
@@ -51,10 +48,6 @@ describe("Add immersionApplication Notifications", () => {
   });
 
   test("Sends confirmation email when unrestricted email sending is enabled", async () => {
-    agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
-      .allowUnrestrictedEmailSending()
-      .build();
-
     await createUseCase().execute(validImmersionApplication);
 
     const sentEmails = emailGw.getSentEmails();

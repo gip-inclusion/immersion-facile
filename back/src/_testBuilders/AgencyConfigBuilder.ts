@@ -8,7 +8,6 @@ const emptyConfig: AgencyConfig = {
   counsellorEmails: [],
   validatorEmails: [],
   adminEmails: [],
-  allowUnrestrictedEmailSending: false,
   questionnaireUrl: "empty-questionnaire-url",
   signature: "empty-signature",
 };
@@ -47,12 +46,6 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
     return new AgencyConfigBuilder({
       ...this.config,
       adminEmails,
-    });
-  }
-  public allowUnrestrictedEmailSending(allowUnrestrictedEmailSending = true) {
-    return new AgencyConfigBuilder({
-      ...this.config,
-      allowUnrestrictedEmailSending,
     });
   }
   public withQuestionnaireUrl(questionnaireUrl: string) {

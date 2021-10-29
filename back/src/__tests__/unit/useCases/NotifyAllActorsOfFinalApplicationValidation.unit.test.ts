@@ -1,5 +1,7 @@
+import { parseISO } from "date-fns";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { ValidatedApplicationFinalConfirmationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
 import {
   getValidatedApplicationFinalConfirmationParams,
@@ -15,8 +17,11 @@ import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder"
 import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
+import {
+  AllowListEmailFilter,
+  AlwaysAllowEmailFilter,
+} from "./../../../adapters/secondary/core/EmailFilterImplementations";
 import { AgencyConfig } from "./../../../domain/immersionApplication/ports/AgencyRepository";
-import { parseISO } from "date-fns";
 
 const validDemandeImmersion: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();
@@ -28,31 +33,32 @@ const defaultAgencyConfig = AgencyConfigBuilder.create(
 ).build();
 
 describe("NotifyAllActorsOfFinalApplicationValidation", () => {
+  let emailFilter: EmailFilter;
   let emailGw: InMemoryEmailGateway;
-  let allowList: Set<string>;
   let agencyConfig: AgencyConfig;
 
   beforeEach(() => {
+    emailFilter = new AlwaysAllowEmailFilter();
     emailGw = new InMemoryEmailGateway();
-    allowList = new Set();
     agencyConfig = defaultAgencyConfig;
   });
 
   const createUseCase = () => {
     return new NotifyAllActorsOfFinalApplicationValidation(
+      emailFilter,
       emailGw,
-      allowList,
       new InMemoryAgencyRepository({ [agencyConfig.id]: agencyConfig }),
     );
   };
 
-  test("Sends no emails when allowList is empty unrestriced email sending is disabled", async () => {
+  test("Sends no emails when allowList is enforced and empty", async () => {
+    emailFilter = new AllowListEmailFilter([]);
     await createUseCase().execute(validDemandeImmersion);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
 
   test("Sends confirmation email to beneficiary when on allowList", async () => {
-    allowList.add(validDemandeImmersion.email);
+    emailFilter = new AllowListEmailFilter([validDemandeImmersion.email]);
 
     await createUseCase().execute(validDemandeImmersion);
 
@@ -68,7 +74,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   });
 
   test("Sends confirmation email to mentor when on allowList", async () => {
-    allowList.add(validDemandeImmersion.mentorEmail);
+    emailFilter = new AllowListEmailFilter([validDemandeImmersion.mentorEmail]);
 
     await createUseCase().execute(validDemandeImmersion);
 
@@ -87,7 +93,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
       .withCounsellorEmails([counsellorEmail])
       .build();
-    allowList.add(counsellorEmail);
+    emailFilter = new AllowListEmailFilter([counsellorEmail]);
 
     await createUseCase().execute(validDemandeImmersion);
 
@@ -106,9 +112,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
       .withCounsellorEmails([counsellorEmail])
       .build();
-    allowList.add(counsellorEmail);
-    allowList.add(validDemandeImmersion.email);
-    allowList.add(validDemandeImmersion.mentorEmail);
+    emailFilter = new AllowListEmailFilter([
+      counsellorEmail,
+      validDemandeImmersion.email,
+      validDemandeImmersion.mentorEmail,
+    ]);
 
     await createUseCase().execute(validDemandeImmersion);
 
@@ -130,7 +138,6 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   test("Sends confirmation email to beneficiary, mentor, and counsellor when unrestricted email sending is allowed", async () => {
     agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
       .withCounsellorEmails([counsellorEmail])
-      .allowUnrestrictedEmailSending()
       .build();
     await createUseCase().execute(validDemandeImmersion);
 

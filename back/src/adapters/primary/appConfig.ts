@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 import { Pool } from "pg";
 import { AgencyCode, agencyCodeFromString } from "../../shared/agencies";
 import {
+  makeGetBooleanVariable,
   makeThrowIfNotDefined,
   ProcessEnv,
   throwIfNotInArray,
@@ -30,6 +31,7 @@ export type AxiosConfig = {
 // See "Working with AppConfig" in back/README.md for more details.
 export class AppConfig {
   private readonly throwIfNotDefined;
+  private readonly getBooleanVariable;
   public readonly featureFlags;
 
   public static createFromEnv(
@@ -42,6 +44,7 @@ export class AppConfig {
 
   private constructor(private readonly env: ProcessEnv) {
     this.throwIfNotDefined = makeThrowIfNotDefined(env);
+    this.getBooleanVariable = makeGetBooleanVariable(env);
     this.featureFlags = getFeatureFlags(env);
   }
 
@@ -179,7 +182,11 @@ export class AppConfig {
   // == Email notifications ==
 
   public get emailAllowList() {
-    return new Set(parseStringList(this.env.EMAIL_ALLOW_LIST));
+    return parseStringList(this.env.EMAIL_ALLOW_LIST);
+  }
+
+  public get skipEmailAllowlist() {
+    return this.getBooleanVariable("SKIP_EMAIL_ALLOW_LIST");
   }
 
   public get adminEmails() {
@@ -192,12 +199,6 @@ export class AppConfig {
 
   public get validatorEmails() {
     return parseEmailsByAgencyCode(this.env.VALIDATOR_EMAILS);
-  }
-
-  public get unrestrictedEmailSendingAgencies() {
-    return new Set(
-      parseAgencyList(this.env.UNRESTRICTED_EMAIL_SENDING_AGENCIES),
-    );
   }
 
   // == Event Bus ==

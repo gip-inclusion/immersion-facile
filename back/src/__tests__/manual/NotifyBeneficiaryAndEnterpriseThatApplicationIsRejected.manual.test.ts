@@ -1,11 +1,12 @@
 import { AppConfig } from "../../adapters/primary/appConfig";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
+import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { applicationStatusFromString } from "../../shared/ImmersionApplicationDto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
+import { AllowListEmailFilter } from "./../../adapters/secondary/core/EmailFilterImplementations";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
@@ -22,7 +23,6 @@ const counsellorEmail = "jean-francois.macresy@beta.gouv.fr";
 
 describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
   let emailGw: SendinblueEmailGateway;
-  let allowList: Set<string>;
   let agencyRepository: AgencyRepository;
   let notifyBeneficiaryAndEnterpriseThatApplicationIsRejected: NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected;
   const rejectionJustification = "Risque d'emploi de main d'oeuvre gratuite";
@@ -37,13 +37,6 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
         .withCounsellorEmails([counsellorEmail])
         .build(),
     });
-    allowList = new Set();
-    notifyBeneficiaryAndEnterpriseThatApplicationIsRejected =
-      new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
-        emailGw,
-        allowList,
-        agencyRepository,
-      );
     validDemandeImmersion.status = applicationStatusFromString("REJECTED");
     validDemandeImmersion.rejectionJustification = rejectionJustification;
   });
@@ -52,9 +45,18 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
     validDemandeImmersion.mentorEmail = "jeanfrancois.macresy@gmail.com";
     validDemandeImmersion.email = "jeanfrancois.macresy+beneficiary@gmail.com";
 
-    allowList.add(validDemandeImmersion.mentorEmail);
-    allowList.add(validDemandeImmersion.email);
-    allowList.add(counsellorEmail);
+    const emailFilter = new AllowListEmailFilter([
+      validDemandeImmersion.mentorEmail,
+      validDemandeImmersion.email,
+      counsellorEmail,
+    ]);
+
+    notifyBeneficiaryAndEnterpriseThatApplicationIsRejected =
+      new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+        emailFilter,
+        emailGw,
+        agencyRepository,
+      );
 
     await notifyBeneficiaryAndEnterpriseThatApplicationIsRejected.execute(
       validDemandeImmersion,

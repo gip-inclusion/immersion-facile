@@ -36,6 +36,8 @@ import {
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
 import { parseISO } from "date-fns";
+import { EmailFilter } from "../../domain/core/ports/EmailFilter";
+import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 
 const adminEmail = "admin@email.fr";
 
@@ -54,7 +56,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
   let validDemandeImmersion: ImmersionApplicationDto;
   let eventBus: EventBus;
   let eventCrawler: BasicEventCrawler;
-  let emailAllowList: Set<string>;
+  let emailFilter: EmailFilter;
   let sentEmails: TemplatedEmail[];
   let agencyConfig: AgencyConfig;
   let agencyConfigs: AgencyConfigs;
@@ -80,10 +82,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       createNewEvent,
       outboxRepository,
     );
-    emailAllowList = new Set([
-      validDemandeImmersion.email,
-      validDemandeImmersion.mentorEmail,
-    ]);
+    emailFilter = new AlwaysAllowEmailFilter();
 
     agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
       .withName("TEST-name")
@@ -99,15 +98,13 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
     confirmToBeneficiary =
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
+        emailFilter,
         emailGw,
-        emailAllowList,
-        agencyRepository,
       );
 
     confirmToMentor = new ConfirmToMentorThatApplicationCorrectlySubmitted(
+      emailFilter,
       emailGw,
-      emailAllowList,
-      agencyRepository,
     );
 
     notifyToTeam = new NotifyToTeamApplicationSubmittedByBeneficiary(
@@ -188,13 +185,12 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     const counsellorEmail = "counsellor@email.fr";
     agencyConfig = new AgencyConfigBuilder(agencyConfig)
       .withCounsellorEmails([counsellorEmail])
-      .allowUnrestrictedEmailSending()
       .build();
     agencyConfigs[demandeImmersionInReview.agencyCode] = agencyConfig;
 
     const notifyAllActors = new NotifyAllActorsOfFinalApplicationValidation(
+      emailFilter,
       emailGw,
-      emailAllowList,
       new InMemoryAgencyRepository(agencyConfigs),
     );
 
