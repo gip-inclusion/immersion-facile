@@ -54,7 +54,9 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
     await notifyNewApplicationNeedsReview.execute(validDemandeImmersion);
   });
 
-  test("Sends notification mails to check Immersion Application eligibility with a real working immersion from Airtable", async () => {
+  // TODO(jfmac)
+  // Needs to be re-done with real db
+  xtest("Sends notification mails to check Immersion Application eligibility with a real working immersion", async () => {
     const counsellorEmails = [
       "jeanfrancois.macresy@gmail.com",
       "jean-francois.macresy@beta.gouv.fr",
@@ -76,7 +78,7 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
     await notifyNewApplicationNeedsReview.execute(validDemandeImmersion);
   });
 
-  test("Sends notification mails to check Immersion Application validation  with a real working immersion from Airtable", async () => {
+  xtest("Sends notification mails to check Immersion Application validation  with a real working immersion", async () => {
     const validationEmails = [
       "jeanfrancois.macresy@gmail.com",
       "jean-francois.macresy@beta.gouv.fr",

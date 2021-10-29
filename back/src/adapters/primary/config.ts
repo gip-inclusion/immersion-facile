@@ -34,8 +34,6 @@ import {
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
-import { genericApplicationDataConverter } from "../secondary/airtable/AirtableApplicationDataConverters";
-import { AirtableDemandeImmersionRepository } from "../secondary/airtable/AirtableDemandeImmersionRepository";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
@@ -111,11 +109,6 @@ const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
 const createApplicationRepository = async (config: AppConfig) => {
   switch (config.repositories) {
-    case "AIRTABLE":
-      return AirtableDemandeImmersionRepository.create(
-        config.airtableGenericImmersionApplicationTableConfig,
-        genericApplicationDataConverter,
-      );
     case "PG": {
       const pool = new Pool({ connectionString: config.pgImmersionDbUrl });
       const client = await pool.connect();

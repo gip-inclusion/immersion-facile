@@ -17,12 +17,6 @@ export type AccessTokenConfig = {
   clientSecret: string;
 };
 
-export type AirtableTableConfig = {
-  apiKey: string;
-  baseId: string;
-  tableName: string;
-};
-
 export type AxiosConfig = {
   endpoint: string;
   bearerToken: string;
@@ -62,29 +56,9 @@ export class AppConfig {
     return throwIfNotInArray({
       processEnv: this.env,
       variableName: "REPOSITORIES",
-      authorizedValues: ["IN_MEMORY", "AIRTABLE", "PG"],
+      authorizedValues: ["IN_MEMORY", "PG"],
       defaultValue: "IN_MEMORY",
     });
-  }
-
-  private get airtableApiKey() {
-    return this.throwIfNotDefined("AIRTABLE_API_KEY");
-  }
-
-  public get airtableGenericImmersionApplicationTableConfig(): AirtableTableConfig {
-    return {
-      apiKey: this.airtableApiKey,
-      baseId: this.throwIfNotDefined("AIRTABLE_BASE_ID_GENERIC"),
-      tableName: this.throwIfNotDefined("AIRTABLE_TABLE_NAME_GENERIC"),
-    };
-  }
-
-  public get airtableApplicationTableConfig(): AirtableTableConfig {
-    return {
-      apiKey: this.airtableApiKey,
-      baseId: this.throwIfNotDefined("AIRTABLE_BASE_ID_IMMERSION_OFFER"),
-      tableName: this.throwIfNotDefined("AIRTABLE_TABLE_NAME_IMMERSION_OFFER"),
-    };
   }
 
   public get pgImmersionDbUrl() {
