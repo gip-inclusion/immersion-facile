@@ -11,7 +11,7 @@ import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { AgencyConfig } from "./../../ports/AgencyRepository";
+import { AgencyConfig } from "../../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
 

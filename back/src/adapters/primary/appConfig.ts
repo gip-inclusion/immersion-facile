@@ -133,7 +133,8 @@ export class AppConfig {
   // == Magic links ==
 
   public get immersionFacileBaseUrl() {
-    return this.throwIfNotDefined("IMMERSION_FACILE_BASE_URL");
+    const domain = this.throwIfNotDefined("DOMAIN");
+    return domain === "localhost" ? domain : `https://${domain}`;
   }
 
   public get jwtPublicKey() {

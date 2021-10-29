@@ -64,8 +64,8 @@ import { PgFormEstablishmentRepository } from "../secondary/pg/FormEstablishment
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import { EmailFilter } from "./../../domain/core/ports/EmailFilter";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { EmailFilter } from "../../domain/core/ports/EmailFilter";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
 
