@@ -220,11 +220,11 @@ const prettyPrintComplexSchedule = (
 ): string => {
   const lines: string[] = weekdays.map(
     (dayLabel: string, dayIndex: number) =>
-      dayLabel + ": " + prettyPrintDaySchedule(complexSchedule[dayIndex]),
+      dayLabel + " : " + prettyPrintDaySchedule(complexSchedule[dayIndex]),
   );
 
   const hours = calculateHoursOfComplexSchedule(complexSchedule);
-  lines.unshift(`Heures de travail hebdomadaires: ${hours}`);
+  lines.unshift(`Heures de travail hebdomadaires : ${hours}`);
   return lines.join("\n");
 };
 

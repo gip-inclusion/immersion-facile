@@ -22,10 +22,10 @@ const mentorFields: FieldsToLabel = {
 };
 
 const candidateFields: FieldsToLabel = {
-  email: "Mail de démandeur",
+  email: "Mail de demandeur",
   lastName: "Nom",
   firstName: "Prénom",
-  phone: "Numero de téléphone",
+  phone: "Numéro de téléphone",
   beneficiaryAccepted: "Signé",
 };
 
@@ -34,7 +34,7 @@ const immersionFields: FieldsToLabel = {
   dateStart: "Début",
   dateEnd: "Fin",
   immersionAddress: "Adresse d'immersion",
-  immersionProfession: "Metier observé",
+  immersionProfession: "Métier observé",
   immersionActivities: "Activités",
   immersionObjective: "Objectif",
   schedule: "Horaires",
