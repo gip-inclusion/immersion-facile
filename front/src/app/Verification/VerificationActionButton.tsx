@@ -1,5 +1,5 @@
 import React from "react";
-import { immersionApplicationGateway } from "src/app/main";
+import { immersionApplicationGateway } from "src/app/dependencies";
 import { Button } from "src/components/Button";
 import {
   ImmersionApplicationDto,

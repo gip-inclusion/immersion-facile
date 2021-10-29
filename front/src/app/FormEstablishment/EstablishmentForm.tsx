@@ -1,5 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
+import { formEstablishmentGateway } from "src/app/dependencies";
 import { BusinessContactList } from "src/app/FormEstablishment/BusinessContactList";
 import {
   fieldsToLabel,
@@ -25,7 +26,6 @@ import {
 } from "src/shared/FormEstablishmentDto";
 import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
-import { formEstablishmentGateway } from "../main";
 
 type EstablishmentFormProps = {
   route: Route<typeof routes.formEstablishment>;

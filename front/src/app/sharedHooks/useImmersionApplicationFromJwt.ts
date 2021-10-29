@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { immersionApplicationGateway } from "src/app/main";
+import { immersionApplicationGateway } from "src/app/dependencies";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 

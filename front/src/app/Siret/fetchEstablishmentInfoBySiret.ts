@@ -1,7 +1,7 @@
 import type { AxiosError } from "axios";
 import { useField } from "formik";
 import { useEffect, useState } from "react";
-import { immersionApplicationGateway } from "src/app/main";
+import { immersionApplicationGateway } from "src/app/dependencies";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { siretSchema } from "./../../shared/siret";
 

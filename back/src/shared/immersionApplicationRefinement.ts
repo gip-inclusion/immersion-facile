@@ -1,4 +1,4 @@
-import { ApplicationStatus } from "./ImmersionApplicationDto";
+import type { ApplicationStatus } from "./ImmersionApplicationDto";
 import { differenceInDays, isMonday, isSunday } from "date-fns";
 
 type DatesInApplication = {

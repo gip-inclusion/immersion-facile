@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from "react";
-import { immersionApplicationGateway } from "src/app/main";
+import { immersionApplicationGateway } from "src/app/dependencies";
 import { routes } from "src/app/routes";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { MarianneHeader } from "src/components/MarianneHeader";

@@ -6,7 +6,7 @@ import {
   createSuccessInfos,
   SuccessInfos,
 } from "src/app/ApplicationForm/createSuccessInfos";
-import { immersionApplicationGateway } from "src/app/main";
+import { immersionApplicationGateway } from "src/app/dependencies";
 import { routes } from "src/app/routes";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { MarianneHeader } from "src/components/MarianneHeader";

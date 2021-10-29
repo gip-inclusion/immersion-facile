@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { formEstablishmentGateway, immersionSearchGateway } from "../main";
+import {
+  formEstablishmentGateway,
+  immersionSearchGateway,
+} from "src/app/dependencies";
 import { Formik, Field, Form, FormikHelpers } from "formik";
 import {
   LatLonDto,

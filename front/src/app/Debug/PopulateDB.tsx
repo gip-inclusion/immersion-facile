@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { immersionApplicationGateway } from "src/app/dependencies";
 import { routes } from "src/app/routes";
 import { Route } from "type-route";
-import { immersionApplicationGateway } from "../main";
 
 interface PopulateDBProps {
   route: Route<typeof routes.debugPopulateDB>;
