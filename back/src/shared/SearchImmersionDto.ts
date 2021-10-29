@@ -7,6 +7,7 @@ import { zTrimmedString } from "./zodUtils";
 
 export type CompanyId = Flavor<string, "CompanyId">;
 
+export type LatLonDto = z.infer<typeof latLonSchema>;
 export const latLonSchema = z.object({
   lat: z
     .number()
@@ -16,6 +17,12 @@ export const latLonSchema = z.object({
     .number()
     .gte(-180, "'lon' doit être >= 180.0")
     .lte(180, "'lon' doit être <= 180.0"),
+});
+
+export type LocationSuggestionDto = z.infer<typeof locationSuggestionSchema>;
+export const locationSuggestionSchema = z.object({
+  coordinates: latLonSchema,
+  label: z.string(),
 });
 
 export type SearchImmersionRequestDto = z.infer<

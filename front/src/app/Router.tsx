@@ -9,6 +9,7 @@ import { ENV } from "src/environmentVariables";
 import { AdminVerification } from "./admin/AdminVerification";
 import { EstablishmentForm } from "./FormEstablishment/EstablishmentForm";
 import { PopulateDB } from "./Debug/PopulateDB";
+import { SearchDebug } from "./Debug/SearchDebug";
 
 const { dev, featureFlags } = ENV;
 
@@ -50,6 +51,7 @@ export const Router = () => {
           <NotAvailable />
         ))}
       {dev && route.name === "debugPopulateDB" && <PopulateDB route={route} />}
+      {dev && route.name === "searchDebug" && <SearchDebug />}
       {route.name === false && <NotAvailable />}
     </>
   );

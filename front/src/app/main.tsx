@@ -13,6 +13,9 @@ import { configureReduxStore } from "src/core-logic/store/initilizeStore";
 import { ENV } from "src/environmentVariables";
 import "./index.css";
 import { RouteProvider } from "./routes";
+import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
+import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
+import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 
 const todoGateway = new InMemoryTodoGateway();
 
@@ -25,6 +28,11 @@ export const immersionApplicationGateway: ImmersionApplicationGateway =
   ENV.gateway === "HTTP"
     ? new HttpImmersionApplicationGateway()
     : new InMemoryImmersionApplicationGateway(ENV.featureFlags);
+
+export const immersionSearchGateway: ImmersionSearchGateway =
+  ENV.gateway === "HTTP"
+    ? new HttpImmersionSearchGateway()
+    : new InMemoryImmersionSearchGateway();
 
 const store = configureReduxStore({ todoGateway });
 
