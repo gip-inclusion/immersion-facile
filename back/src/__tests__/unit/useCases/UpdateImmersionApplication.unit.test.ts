@@ -90,17 +90,17 @@ describe("Update immersionApplication", () => {
 
   describe("When previous state is not draft (testing with In_review)", () => {
     it("throws Bad request", async () => {
-      const validDemandeImmersion =
-        new ImmersionApplicationDtoBuilder().build();
       //we would expect IN_REVIEW to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
-      validDemandeImmersion.status = "IN_REVIEW";
+      const updatedDemandeImmersion = new ImmersionApplicationDtoBuilder()
+        .withStatus("IN_REVIEW")
+        .build();
 
-      expectPromiseToFailWithError(
+      await expectPromiseToFailWithError(
         updateDemandeImmersion.execute({
-          id: "demande_id",
-          demandeImmersion: validDemandeImmersion,
+          id: updatedDemandeImmersion.id,
+          demandeImmersion: updatedDemandeImmersion,
         }),
-        new BadRequestError(),
+        new BadRequestError(updatedDemandeImmersion.id),
       );
     });
   });

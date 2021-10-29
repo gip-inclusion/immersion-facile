@@ -11,7 +11,7 @@ import {
 } from "../shared/ScheduleSchema";
 import { Builder } from "./Builder";
 
-export const DEMANDE_IMMERSION_ID = "test_demande_immersion_id";
+export const DEMANDE_IMMERSION_ID = "40400000000000404";
 export const VALID_EMAILS = ["valid@email.fr", "name@example.com"];
 export const DATE_SUBMISSION = "2021-01-04";
 export const DATE_START = "2021-01-06";
