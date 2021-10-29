@@ -2,6 +2,7 @@ import { AgencyCode } from "../../../shared/agencies";
 
 export type AgencyConfig = {
   id: string;
+  uuid: string;
   name: string;
   counsellorEmails: string[];
   validatorEmails: string[];

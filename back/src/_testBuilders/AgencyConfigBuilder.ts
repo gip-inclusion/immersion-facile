@@ -4,6 +4,7 @@ import { Builder } from "./Builder";
 
 const emptyConfig: AgencyConfig = {
   id: "empty-id",
+  uuid: "empty-uuid",
   name: "empty-name",
   counsellorEmails: [],
   validatorEmails: [],

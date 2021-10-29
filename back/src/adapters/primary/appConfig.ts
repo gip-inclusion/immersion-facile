@@ -50,6 +50,15 @@ export class AppConfig {
     });
   }
 
+  public get envType() {
+    return throwIfNotInArray({
+      processEnv: this.env,
+      variableName: "ENV_TYPE",
+      authorizedValues: ["dev", "staging", "beta", "production", "none"],
+      defaultValue: "none",
+    });
+  }
+
   // == Data repositories ==
 
   public get repositories() {

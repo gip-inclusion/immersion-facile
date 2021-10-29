@@ -1,9 +1,12 @@
-import { Client } from "pg";
 import fs from "fs";
+import { Client } from "pg";
+import format from "pg-format";
 import { promisify } from "util";
-import { createLogger } from "../../../../utils/logger";
 import { sleep } from "../../../../shared/utils";
+import { createLogger } from "../../../../utils/logger";
 import { AppConfig } from "../../../primary/appConfig";
+import { createAgencyConfigsFromAppConfig } from "../../InMemoryAgencyRepository";
+import { AgencyConfigs } from "./../../InMemoryAgencyRepository";
 
 const logger = createLogger(__filename);
 
@@ -77,6 +80,12 @@ const buildDb = async () => {
   if (!agenciesTableAlreadyExists) {
     logger.info("We will thus create the agencies table");
     await buildAgencies(client);
+    if (shouldPopulateWithTestData(appConfig)) {
+      await insertTestAgencies(
+        client,
+        createAgencyConfigsFromAppConfig(appConfig),
+      );
+    }
   }
 
   await client.end();
@@ -121,6 +130,37 @@ const buildAgencies = async (client: Client) => {
   const file = await readFile(__dirname + "/createAgenciesTable.sql");
   const sql = file.toString();
   await client.query(sql);
+};
+
+const shouldPopulateWithTestData = (appConfig: AppConfig) => {
+  switch (appConfig.nodeEnv) {
+    case "local":
+    case "test":
+      return true;
+    case "production":
+      switch (appConfig.envType) {
+        case "dev":
+        case "staging":
+          return true;
+      }
+  }
+  return false;
+};
+
+const insertTestAgencies = async (client: Client, agencies: AgencyConfigs) => {
+  const query = `INSERT INTO public.agencies(
+    id, name, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature
+  ) VALUES %L`;
+  const values = Object.values(agencies).map((agency) => [
+    agency.uuid,
+    agency.name,
+    JSON.stringify(agency.counsellorEmails),
+    JSON.stringify(agency.validatorEmails),
+    JSON.stringify(agency.adminEmails),
+    agency.questionnaireUrl || null,
+    agency.signature,
+  ]);
+  await client.query(format(query, values));
 };
 
 buildDb().then(() => {

@@ -33,16 +33,23 @@ export const createAgencyConfigsFromAppConfig = (
       ...acc,
       [agencyCode]: {
         id: agencyCode,
+        uuid: agencyIds[agencyCode],
         name: agencyCodes[agencyCode],
         counsellorEmails: config.counsellorEmails[agencyCode] ?? [],
         validatorEmails: config.validatorEmails[agencyCode] ?? [],
         adminEmails: config.adminEmails,
         questionnaireUrl: questionnaireUrls[agencyCode] ?? "",
-        signature: signatures[agencyCode] ?? "",
+        signature: signatures[agencyCode],
       },
     }),
     {},
   );
+
+const agencyIds: Partial<Record<AgencyCode, string>> = {
+  AMIE_BOULONAIS: "a025666a-22d7-4752-86eb-d07e27a5766a",
+  MLJ_GRAND_NARBONNE: "b0d734df-3047-4e42-aaca-9d86b9e1c81d",
+  ML_PARIS_SOLEIL: "c0fddfd9-8fdd-4e1e-8b99-ed5d733d3b83",
+};
 
 const questionnaireUrls: Partial<Record<AgencyCode, string>> = {
   AMIE_BOULONAIS:
@@ -54,4 +61,5 @@ const questionnaireUrls: Partial<Record<AgencyCode, string>> = {
 const signatures: Partial<Record<AgencyCode, string>> = {
   AMIE_BOULONAIS: "L'équipe de l'AMIE du Boulonnais",
   MLJ_GRAND_NARBONNE: "L'équipe de la Mission Locale de Narbonne",
+  ML_PARIS_SOLEIL: "L'équipe du Site Soleil de la Mission Locale de Paris",
 };
