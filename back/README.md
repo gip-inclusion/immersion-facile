@@ -60,6 +60,24 @@ The back-end will be accessible on `http://localhost:1234`. The default behaviou
 - event crawling is disabled
 - all log messages of level `info` or higher are printed to the console
 
+
+### Generating JWT keys
+
+A pair of assymmetric keys is used for signing JWTs. These are kept in JWT_PRIVATE_KEY and JWT_PUBLIC_KEY env variables (see below). You can use the following command to generate them:
+
+```
+openssl ecparam -name prime256v1 -genkey -noout -out private.ec.key && openssl ec -in private.ec.key -pubout -out public.pem
+```
+
+Note that this requires OpenSSL (`brew install openssl`);  you can generate an EC key pair through any other cryptographic tool.
+
+You can then copy-paste the variable contents into `.env`, or export it:
+
+```
+export JWT_PRIVATE_KEY=$(cat ./private.ec.key) JWT_PUBLIC_KEY=$(cat ./public.pem)
+```
+
+
 ### Specifying environment variables
 
 The back-end behaviour is controlled by environment variables. They can be specified in mulitple ways:
