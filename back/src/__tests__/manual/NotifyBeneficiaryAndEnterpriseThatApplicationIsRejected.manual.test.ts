@@ -30,13 +30,11 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
-    agencyRepository = new InMemoryAgencyRepository({
-      [validDemandeImmersion.agencyCode]: AgencyConfigBuilder.create(
-        validDemandeImmersion.agencyCode,
-      )
+    agencyRepository = new InMemoryAgencyRepository([
+      AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
         .withCounsellorEmails([counsellorEmail])
         .build(),
-    });
+    ]);
     validDemandeImmersion.status = applicationStatusFromString("REJECTED");
     validDemandeImmersion.rejectionJustification = rejectionJustification;
   });

@@ -1,55 +1,73 @@
-import {
-  AgencyConfig,
-  AgencyRepository,
-} from "../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
 import {
   AgencyCode,
   agencyCodes,
+  AgencyId,
+  legacyAgencyIds,
   validAgencyCodes,
 } from "../../shared/agencies";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "../primary/appConfig";
+import { AgencyConfig } from "./../../domain/immersionApplication/ports/AgencyRepository";
 
 const logger = createLogger(__filename);
 
-export type AgencyConfigs = Partial<Record<AgencyCode, AgencyConfig>>;
+export type AgencyConfigs = {
+  [id: string]: AgencyConfig;
+};
 export class InMemoryAgencyRepository implements AgencyRepository {
-  constructor(private readonly configs: AgencyConfigs) {
-    logger.debug(configs);
+  private readonly configs: AgencyConfigs = {};
+
+  constructor(configList: AgencyConfig[]) {
+    configList.forEach((config) => (this.configs[config.id] = config));
+    logger.info(this.configs);
   }
 
+  // TODO(nwettstein): Remove when agency ids have fully replaced agency codes.
   public async getConfig(
     agencyCode: AgencyCode,
   ): Promise<AgencyConfig | undefined> {
-    return this.configs[agencyCode];
+    const id = legacyAgencyIds[agencyCode];
+    if (!id) return undefined;
+    return await this.getById(id);
+  }
+
+  public async getById(id: AgencyId): Promise<AgencyConfig | undefined> {
+    logger.info({ id, configs: this.configs }, "getById");
+    return this.configs[id];
+  }
+
+  public async getAll(): Promise<AgencyConfig[]> {
+    logger.info({ configs: this.configs }, "getAll");
+    return Object.values(this.configs);
+  }
+
+  public async insert(config: AgencyConfig): Promise<AgencyId | undefined> {
+    logger.info({ config, configs: this.configs }, "insert");
+    if (this.configs[config.id]) return undefined;
+    this.configs[config.id] = config;
+    return config.id;
   }
 }
 
 export const createAgencyConfigsFromAppConfig = (
   config: AppConfig,
-): AgencyConfigs =>
-  validAgencyCodes.reduce(
-    (acc, agencyCode) => ({
-      ...acc,
-      [agencyCode]: {
-        id: agencyCode,
-        uuid: agencyIds[agencyCode],
-        name: agencyCodes[agencyCode],
-        counsellorEmails: config.counsellorEmails[agencyCode] ?? [],
-        validatorEmails: config.validatorEmails[agencyCode] ?? [],
-        adminEmails: config.adminEmails,
-        questionnaireUrl: questionnaireUrls[agencyCode] ?? "",
-        signature: signatures[agencyCode],
-      },
-    }),
-    {},
-  );
-
-const agencyIds: Partial<Record<AgencyCode, string>> = {
-  AMIE_BOULONAIS: "a025666a-22d7-4752-86eb-d07e27a5766a",
-  MLJ_GRAND_NARBONNE: "b0d734df-3047-4e42-aaca-9d86b9e1c81d",
-  ML_PARIS_SOLEIL: "c0fddfd9-8fdd-4e1e-8b99-ed5d733d3b83",
-};
+): AgencyConfig[] =>
+  validAgencyCodes.map((agencyCode) => {
+    const id = legacyAgencyIds[agencyCode];
+    if (!id) {
+      throw new Error(`Missing id for legacy agencyCode ${agencyCode}`);
+    }
+    return {
+      id: id,
+      name: agencyCodes[agencyCode],
+      counsellorEmails: config.counsellorEmails[agencyCode] ?? [],
+      validatorEmails: config.validatorEmails[agencyCode] ?? [],
+      adminEmails: config.adminEmails,
+      questionnaireUrl: questionnaireUrls[agencyCode] ?? "",
+      signature: signatures[agencyCode],
+    } as AgencyConfig;
+  });
 
 const questionnaireUrls: Partial<Record<AgencyCode, string>> = {
   AMIE_BOULONAIS:

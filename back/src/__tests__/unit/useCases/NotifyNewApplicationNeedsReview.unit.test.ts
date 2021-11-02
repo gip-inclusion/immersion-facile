@@ -27,9 +27,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
   });
 
   const createUseCase = () => {
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository({
-      [agencyConfig.id]: agencyConfig,
-    });
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository([
+      agencyConfig,
+    ]);
     return new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,

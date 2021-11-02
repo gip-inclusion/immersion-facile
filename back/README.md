@@ -20,10 +20,24 @@ npm run test:unit
 ```
 
 Integration tests :
+  1. Ensure that you have a docker daemon/agent running on your machine.
 
-```
-npm run test:integration
-```
+  1. Clear out any old data to ensure you initialize the database with the latest schema and test data.
+     ```sh
+     immersion-facile$ rm -rf docker-data/
+     ```
+
+  1. At the very least you will need to run the `postgres` container as well as the `back` container which initializes the database at startup:
+     ```sh
+     immersion-facile$ docker-compose up --build postgres back
+     ```
+     Observe the log output to ensure the database has been properly initialized.
+
+  1. Execute the integration tests in a separate shell"
+     ```
+     immersion-facile$ cd back
+     back$ npm run test:integration
+     ```
 
 End to end tests :
 

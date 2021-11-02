@@ -47,7 +47,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     return new NotifyAllActorsOfFinalApplicationValidation(
       emailFilter,
       emailGw,
-      new InMemoryAgencyRepository({ [agencyConfig.id]: agencyConfig }),
+      new InMemoryAgencyRepository([agencyConfig]),
     );
   };
 

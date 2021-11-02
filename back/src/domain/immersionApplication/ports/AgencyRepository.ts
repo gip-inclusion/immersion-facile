@@ -1,8 +1,7 @@
-import { AgencyCode } from "../../../shared/agencies";
+import { AgencyCode, AgencyId } from "../../../shared/agencies";
 
 export type AgencyConfig = {
-  id: string;
-  uuid: string;
+  id: AgencyId;
   name: string;
   counsellorEmails: string[];
   validatorEmails: string[];
@@ -12,5 +11,10 @@ export type AgencyConfig = {
 };
 
 export interface AgencyRepository {
+  insert: (config: AgencyConfig) => Promise<AgencyId | undefined>;
+  getById: (id: AgencyId) => Promise<AgencyConfig | undefined>;
+  getAll: () => Promise<AgencyConfig[]>;
+
+  // TODO(nwettstein): Remove when agency ids have fully replaced agency codes.
   getConfig: (agencyCode: AgencyCode) => Promise<AgencyConfig | undefined>;
 }

@@ -41,12 +41,12 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     return new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
       emailFilter,
       emailGw,
-      new InMemoryAgencyRepository({ [agencyConfig.id]: agencyConfig }),
+      new InMemoryAgencyRepository([agencyConfig]),
     );
   };
 
   test("Sends rejection email to beneficiary, mentor, and counsellor", async () => {
-    createUseCase().execute(rejectedDemandeImmersion);
+    await createUseCase().execute(rejectedDemandeImmersion);
 
     const sentEmails = await emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);
@@ -65,7 +65,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
 
   test("Sends no emails when allowList is enforced and empty", async () => {
     emailFilter = new AllowListEmailFilter([]);
-    createUseCase().execute(rejectedDemandeImmersion);
+    await createUseCase().execute(rejectedDemandeImmersion);
 
     const sentEmails = await emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(0);
@@ -78,7 +78,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
       ...counsellorEmails,
     ]);
 
-    createUseCase().execute(rejectedDemandeImmersion);
+    await createUseCase().execute(rejectedDemandeImmersion);
 
     const sentEmails = await emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);

@@ -1,5 +1,8 @@
+import { parseISO } from "date-fns";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
+import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
+import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
@@ -10,13 +13,13 @@ import {
   InMemoryEmailGateway,
   TemplatedEmail,
 } from "../../adapters/secondary/InMemoryEmailGateway";
-import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
 import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   CreateNewEvent,
   EventBus,
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
+import { EmailFilter } from "../../domain/core/ports/EmailFilter";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
@@ -35,9 +38,6 @@ import {
 } from "../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
-import { parseISO } from "date-fns";
-import { EmailFilter } from "../../domain/core/ports/EmailFilter";
-import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 
 const adminEmail = "admin@email.fr";
 
@@ -59,7 +59,6 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
   let emailFilter: EmailFilter;
   let sentEmails: TemplatedEmail[];
   let agencyConfig: AgencyConfig;
-  let agencyConfigs: AgencyConfigs;
 
   beforeEach(() => {
     applicationRepository = new InMemoryImmersionApplicationRepository();
@@ -90,11 +89,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       .withQuestionnaireUrl("TEST-questionnaireUrl")
       .withSignature("TEST-signature")
       .build();
-
-    agencyConfigs = {
-      [validDemandeImmersion.agencyCode]: agencyConfig,
-    };
-    const agencyRepository = new InMemoryAgencyRepository(agencyConfigs);
+    const agencyRepository = new InMemoryAgencyRepository([agencyConfig]);
 
     confirmToBeneficiary =
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
@@ -186,12 +181,11 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     agencyConfig = new AgencyConfigBuilder(agencyConfig)
       .withCounsellorEmails([counsellorEmail])
       .build();
-    agencyConfigs[demandeImmersionInReview.agencyCode] = agencyConfig;
 
     const notifyAllActors = new NotifyAllActorsOfFinalApplicationValidation(
       emailFilter,
       emailGw,
-      new InMemoryAgencyRepository(agencyConfigs),
+      new InMemoryAgencyRepository([agencyConfig]),
     );
 
     eventBus.subscribe("FinalImmersionApplicationValidationByAdmin", (event) =>

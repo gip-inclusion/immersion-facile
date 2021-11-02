@@ -43,9 +43,9 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
     agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
       .withCounsellorEmails(counsellorEmails)
       .build();
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository({
-      [agencyConfig.id]: agencyConfig,
-    });
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository([
+      agencyConfig,
+    ]);
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,
@@ -67,9 +67,9 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       .build();
 
     validDemandeImmersion.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository({
-      [agencyConfig.id]: agencyConfig,
-    });
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository([
+      agencyConfig,
+    ]);
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,
@@ -88,9 +88,9 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       .withValidatorEmails(validationEmails)
       .build();
     validDemandeImmersion.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository({
-      [agencyConfig.id]: agencyConfig,
-    });
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository([
+      agencyConfig,
+    ]);
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,

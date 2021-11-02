@@ -1,12 +1,12 @@
 import fs from "fs";
-import { Client } from "pg";
-import format from "pg-format";
+import { Pool, PoolClient } from "pg";
 import { promisify } from "util";
+import { AgencyConfig } from "../../../../domain/immersionApplication/ports/AgencyRepository";
 import { sleep } from "../../../../shared/utils";
 import { createLogger } from "../../../../utils/logger";
 import { AppConfig } from "../../../primary/appConfig";
 import { createAgencyConfigsFromAppConfig } from "../../InMemoryAgencyRepository";
-import { AgencyConfigs } from "./../../InMemoryAgencyRepository";
+import { PgAgencyRepository } from "../PgAgencyRepository";
 
 const logger = createLogger(__filename);
 
@@ -15,13 +15,13 @@ const readFile = promisify(fs.readFile);
 const tryToConnect = async (
   connectionString: string,
   tryNumber = 0,
-): Promise<Client> => {
+): Promise<PoolClient> => {
   if (tryNumber >= 5)
     throw new Error("Tried to connect 5 times without success");
   try {
     logger.info("Trying to connect to DB ...");
-    const client = new Client({ connectionString });
-    await client.connect();
+    const pool = new Pool({ connectionString });
+    const client = await pool.connect();
     logger.info("Successfully connected");
     return client;
   } catch (e: any) {
@@ -81,6 +81,7 @@ const buildDb = async () => {
     logger.info("We will thus create the agencies table");
     await buildAgencies(client);
     if (shouldPopulateWithTestData(appConfig)) {
+      logger.info("Inserting test data into the agencies table");
       await insertTestAgencies(
         client,
         createAgencyConfigsFromAppConfig(appConfig),
@@ -88,11 +89,11 @@ const buildDb = async () => {
     }
   }
 
-  await client.end();
+  await client.release();
 };
 
 const makeCheckIfTableAlreadyExists =
-  (client: Client) =>
+  (client: PoolClient) =>
   async (tableName: string): Promise<boolean> => {
     try {
       // template strings for sql queries should be avoided, but how to pass table name otherwise ?
@@ -107,26 +108,26 @@ const makeCheckIfTableAlreadyExists =
     }
   };
 
-const buildSearchImmersionDb = async (client: Client) => {
+const buildSearchImmersionDb = async (client: PoolClient) => {
   const file = await readFile(__dirname + "/database.sql");
   const sql = file.toString();
   await client.query(sql);
 };
 
-const buildImmersionApplication = async (client: Client) => {
+const buildImmersionApplication = async (client: PoolClient) => {
   // prettier-ignore
   const file = await readFile(__dirname + "/createImmersionApplicationsTable.sql");
   const sql = file.toString();
   await client.query(sql);
 };
 
-const buildFormEstablishment = async (client: Client) => {
+const buildFormEstablishment = async (client: PoolClient) => {
   const file = await readFile(__dirname + "/createFormEstablishmentsTable.sql");
   const sql = file.toString();
   await client.query(sql);
 };
 
-const buildAgencies = async (client: Client) => {
+const buildAgencies = async (client: PoolClient) => {
   const file = await readFile(__dirname + "/createAgenciesTable.sql");
   const sql = file.toString();
   await client.query(sql);
@@ -147,20 +148,14 @@ const shouldPopulateWithTestData = (appConfig: AppConfig) => {
   return false;
 };
 
-const insertTestAgencies = async (client: Client, agencies: AgencyConfigs) => {
-  const query = `INSERT INTO public.agencies(
-    id, name, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature
-  ) VALUES %L`;
-  const values = Object.values(agencies).map((agency) => [
-    agency.uuid,
-    agency.name,
-    JSON.stringify(agency.counsellorEmails),
-    JSON.stringify(agency.validatorEmails),
-    JSON.stringify(agency.adminEmails),
-    agency.questionnaireUrl || null,
-    agency.signature,
-  ]);
-  await client.query(format(query, values));
+const insertTestAgencies = async (
+  client: PoolClient,
+  agencies: AgencyConfig[],
+) => {
+  const agencyRepository = new PgAgencyRepository(client);
+  for (const agency of Object.values(agencies)) {
+    await agencyRepository.insert(agency);
+  }
 };
 
 buildDb().then(() => {
