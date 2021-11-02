@@ -4,7 +4,7 @@ import { NotEmptyArray } from "./utils";
 import { zTrimmedString } from "./zodUtils";
 
 export type AgencyId = Flavor<string, "AgencyId">;
-const immersionApplicationIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
+const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
 
 /// TODO(nwettstein): Remove when agency ids have fully replaced agency codes.
 export const legacyAgencyIds: Partial<Record<AgencyCode, AgencyId>> = {
@@ -38,3 +38,17 @@ export const agencyCodeSchema = z
   .refine((val) => validAgencyCodes.includes(val), {
     message: "Obligatoire",
   });
+
+export type AgencyDto = z.infer<typeof agencySchema>;
+export const agencySchema = z.object({
+  id: agencyIdSchema,
+  name: z.string(),
+});
+
+export type ListAgenciesRequestDto = z.infer<typeof listAgenciesRequestSchema>;
+export const listAgenciesRequestSchema = z.void();
+
+export type ListAgenciesResponseDto = z.infer<
+  typeof listAgenciesResponseSchema
+>;
+export const listAgenciesResponseSchema = z.array(agencySchema);

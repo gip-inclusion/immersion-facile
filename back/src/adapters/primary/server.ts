@@ -7,6 +7,7 @@ import {
 } from "../../shared/ImmersionApplicationDto";
 import { romeSearchRequestSchema } from "../../shared/rome";
 import {
+  agenciesRoute,
   generateMagicLinkRoute,
   immersionApplicationsRoute,
   immersionOffersRoute,
@@ -15,6 +16,7 @@ import {
   validateDemandeRoute,
 } from "../../shared/routes";
 import { searchImmersionRequestSchema } from "../../shared/SearchImmersionDto";
+import { getSiretRequestSchema } from "../../shared/siret";
 import { createLogger } from "../../utils/logger";
 import { searchImmersionRoute } from "./../../shared/routes";
 import { AppConfig } from "./appConfig";
@@ -24,7 +26,6 @@ import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
-import { getSiretRequestSchema } from "../../shared/siret";
 
 const logger = createLogger(__filename);
 
@@ -153,6 +154,12 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
       }),
     ),
   );
+
+  router
+    .route(`/${agenciesRoute}`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, () => deps.useCases.listAgencies.execute()),
+    );
 
   app.use(router);
   app.use("/auth", createMagicLinkRouter(deps));

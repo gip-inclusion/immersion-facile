@@ -7,6 +7,7 @@ import {
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
+import { EmailFilter } from "../../domain/core/ports/EmailFilter";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import {
   AddImmersionApplication,
@@ -14,11 +15,13 @@ import {
 } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
+import { ListAgencies } from "../../domain/immersionApplication/useCases/ListAgencies";
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
 import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
@@ -64,8 +67,6 @@ import { PgFormEstablishmentRepository } from "../secondary/pg/FormEstablishment
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import { EmailFilter } from "../../domain/core/ports/EmailFilter";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
 
@@ -260,6 +261,9 @@ const createUseCases = (
 
   // rome
   romeSearch: new RomeSearch(repositories.rome),
+
+  // agencies
+  listAgencies: new ListAgencies(repositories.agency),
 
   // notifications
   confirmToBeneficiaryThatApplicationCorrectlySubmitted:
