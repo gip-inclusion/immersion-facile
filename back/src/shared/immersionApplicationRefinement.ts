@@ -1,5 +1,6 @@
-import type { ApplicationStatus } from "./ImmersionApplicationDto";
 import { differenceInDays, isMonday, isSunday } from "date-fns";
+import { AgencyCode, AgencyId } from "./agencies";
+import { ApplicationStatus } from "./ImmersionApplicationDto";
 
 type DatesInApplication = {
   dateStart: string;
@@ -66,3 +67,8 @@ export const mustBeSignedByEstablishmentBeforeReview = (params: {
   enterpriseAccepted: boolean;
   status: ApplicationStatus;
 }) => params.status === "DRAFT" || params.enterpriseAccepted;
+
+export const mustHaveAgencyCodeOrAgencyId = (params: {
+  agencyCode?: AgencyCode;
+  agencyId?: AgencyId;
+}) => !!params.agencyCode || !!params.agencyId;

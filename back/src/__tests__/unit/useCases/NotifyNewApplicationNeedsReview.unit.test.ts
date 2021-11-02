@@ -12,7 +12,7 @@ import { frontRoutes } from "../../../shared/routes";
 const defaultImmersionApplication =
   new ImmersionApplicationDtoBuilder().build();
 const defaultAgencyConfig = AgencyConfigBuilder.create(
-  defaultImmersionApplication.agencyCode,
+  defaultImmersionApplication.agencyId,
 ).build();
 
 describe("NotifyImmersionApplicationNeedsReview", () => {

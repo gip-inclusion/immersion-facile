@@ -29,7 +29,7 @@ const validDemandeImmersion: ImmersionApplicationDto =
 const counsellorEmail = "counsellor@email.fr";
 
 const defaultAgencyConfig = AgencyConfigBuilder.create(
-  validDemandeImmersion.agencyCode,
+  validDemandeImmersion.agencyId,
 ).build();
 
 describe("NotifyAllActorsOfFinalApplicationValidation", () => {

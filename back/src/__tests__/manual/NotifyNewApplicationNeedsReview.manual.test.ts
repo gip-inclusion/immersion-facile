@@ -40,7 +40,7 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       "jeanfrancois.macresy+beneficiary@gmail.com",
     ];
 
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
       .withCounsellorEmails(counsellorEmails)
       .build();
     const inMemoryAgencyRepository = new InMemoryAgencyRepository([
@@ -62,7 +62,7 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       "jean-francois.macresy@beta.gouv.fr",
     ];
 
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
       .withCounsellorEmails(counsellorEmails)
       .build();
 
@@ -84,7 +84,7 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       "jean-francois.macresy@beta.gouv.fr",
     ];
 
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
       .withValidatorEmails(validationEmails)
       .build();
     validDemandeImmersion.id = "ef725832-c8f9-41e1-974b-44372e6e474c";

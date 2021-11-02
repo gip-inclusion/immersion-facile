@@ -19,7 +19,7 @@ const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
 const signature = "test-signature";
 
 const defaultAgencyConfig = AgencyConfigBuilder.create(
-  rejectedDemandeImmersion.agencyCode,
+  rejectedDemandeImmersion.agencyId,
 )
   .withName("test-agency-name")
   .withCounsellorEmails(counsellorEmails)

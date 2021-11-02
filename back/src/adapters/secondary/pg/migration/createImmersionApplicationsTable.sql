@@ -5,8 +5,8 @@ CREATE TABLE public.immersion_applications (
     first_name varchar(255) NOT NULL,
     last_name varchar(255) NOT NULL,
     phone varchar(255),
-    agency_code varchar(255), -- TODO: remove once replaced by agency_id.
-    agency_id uuid, -- TODO: make NOT NULL once it replaced agency_code.
+    agency_code varchar(255), -- TODO(nwettstein): remove once replaced by agency_id.
+    agency_id uuid, -- TODO(nwettstein): make NOT NULL once it replaced agency_code.
     date_submission timestamp without time zone NOT NULL,
     date_start timestamp without time zone NOT NULL,
     date_end timestamp without time zone NOT NULL,

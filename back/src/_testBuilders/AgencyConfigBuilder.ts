@@ -1,6 +1,5 @@
 import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyCode, AgencyId } from "../shared/agencies";
-import { legacyAgencyIds } from "./../shared/agencies";
+import { AgencyId } from "../shared/agencies";
 import { Builder } from "./Builder";
 
 const emptyConfig: AgencyConfig = {
@@ -17,13 +16,11 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
   // Initializes all feature flags to be off.
   public constructor(readonly config: AgencyConfig) {}
 
-  // TODO(nwettstein): Remove when agency ids have fully replaced agency codes.
-  public static create(agencyCode: AgencyCode) {
-    const id = legacyAgencyIds[agencyCode];
-    if (!id) throw new Error(`Missing id for legacy agencyCode ${agencyCode}`);
+  // TODO(nwettstein): make id required once we've removed agency codes.
+  public static create(id: AgencyId | undefined) {
     return new AgencyConfigBuilder({
       ...emptyConfig,
-      id,
+      ...(id ? { id } : {}),
     });
   }
 

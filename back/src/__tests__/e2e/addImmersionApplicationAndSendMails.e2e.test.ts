@@ -5,10 +5,7 @@ import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImp
 import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
-import {
-  AgencyConfigs,
-  InMemoryAgencyRepository,
-} from "../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import {
   InMemoryEmailGateway,
   TemplatedEmail,
@@ -83,7 +80,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     );
     emailFilter = new AlwaysAllowEmailFilter();
 
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
       .withName("TEST-name")
       .withAdminEmails([adminEmail])
       .withQuestionnaireUrl("TEST-questionnaireUrl")

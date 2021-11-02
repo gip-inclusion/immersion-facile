@@ -1,3 +1,4 @@
+import { getAgencyCodeFromApplication } from "../../../../shared/agencies";
 import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
@@ -25,7 +26,9 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Use
   inputSchema = immersionApplicationSchema;
 
   public async _execute(dto: ImmersionApplicationDto): Promise<void> {
-    const agencyConfig = await this.agencyRepository.getConfig(dto.agencyCode);
+    const agencyConfig = await this.agencyRepository.getById(
+      getAgencyCodeFromApplication(dto),
+    );
     if (!agencyConfig) {
       throw new Error(
         `Unable to send mail. No agency config found for ${dto.agencyCode}`,

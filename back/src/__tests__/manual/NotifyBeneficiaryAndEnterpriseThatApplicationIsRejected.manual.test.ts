@@ -31,7 +31,7 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
     const config = AppConfig.createFromEnv();
     emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
     agencyRepository = new InMemoryAgencyRepository([
-      AgencyConfigBuilder.create(validDemandeImmersion.agencyCode)
+      AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
         .withCounsellorEmails([counsellorEmail])
         .build(),
     ]);

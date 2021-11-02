@@ -1,17 +1,16 @@
 import type { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import { frontRoutes } from "../../../../shared/routes";
-
+import { getAgencyCodeFromApplication } from "../../../../shared/agencies";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "../../../../shared/ImmersionApplicationDto";
+import { frontRoutes } from "../../../../shared/routes";
 import { Role } from "../../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyRepository";
+import { AgencyConfig, AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { AgencyConfig } from "../../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
 
@@ -29,8 +28,8 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
   public async _execute(
     immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<void> {
-    const agencyConfig = await this.agencyRepository.getConfig(
-      immersionApplicationDto.agencyCode,
+    const agencyConfig = await this.agencyRepository.getById(
+      getAgencyCodeFromApplication(immersionApplicationDto),
     );
     if (!agencyConfig) {
       logger.error(

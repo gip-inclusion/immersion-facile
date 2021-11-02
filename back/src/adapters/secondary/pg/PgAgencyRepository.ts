@@ -4,11 +4,7 @@ import {
   AgencyConfig,
   AgencyRepository,
 } from "../../../domain/immersionApplication/ports/AgencyRepository";
-import {
-  AgencyCode,
-  AgencyId,
-  legacyAgencyIds,
-} from "../../../shared/agencies";
+import { AgencyId } from "../../../shared/agencies";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -19,15 +15,6 @@ export class PgAgencyRepository implements AgencyRepository {
   public async getAll(): Promise<AgencyConfig[]> {
     const pgResult = await this.client.query("SELECT * FROM public.agencies");
     return pgResult.rows.map(pgToEntity);
-  }
-
-  // TODO(nwettstein): Remove when agency ids have fully replaced agency codes.
-  public async getConfig(
-    agencyCode: AgencyCode,
-  ): Promise<AgencyConfig | undefined> {
-    const agencyId = legacyAgencyIds[agencyCode];
-    if (!agencyId) return undefined;
-    return await this.getById(agencyId);
   }
 
   public async getById(id: AgencyId): Promise<AgencyConfig | undefined> {

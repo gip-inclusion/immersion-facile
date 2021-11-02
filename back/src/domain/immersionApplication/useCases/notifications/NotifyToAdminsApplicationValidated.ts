@@ -10,6 +10,7 @@ import { EmailGateway } from "../../ports/EmailGateway";
 import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import { frontRoutes } from "../../../../shared/routes";
 import { parseISO } from "date-fns";
+import { getAgencyCodeFromApplication } from "../../../../shared/agencies";
 
 const logger = createLogger(__filename);
 export class NotifyToAdminsApplicationValidated extends UseCase<ImmersionApplicationDto> {
@@ -26,13 +27,16 @@ export class NotifyToAdminsApplicationValidated extends UseCase<ImmersionApplica
   public async _execute({
     id,
     agencyCode,
+    agencyId,
     firstName,
     lastName,
     dateStart,
     dateEnd,
     businessName,
   }: ImmersionApplicationDto): Promise<void> {
-    const agencyConfig = await this.agencyRepository.getConfig(agencyCode);
+    const agencyConfig = await this.agencyRepository.getById(
+      getAgencyCodeFromApplication({ agencyCode, agencyId }),
+    );
     if (!agencyConfig) {
       throw new Error(
         `Unable to send mail. No agency config found for ${agencyCode}`,

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
+import { getAgencyCodeFromApplication } from "../../../../shared/agencies";
 import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
@@ -40,8 +41,8 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     application,
     reason,
   }: ImmersionApplicationRequiresModificationPayload): Promise<void> {
-    const agencyConfig = await this.agencyRepository.getConfig(
-      application.agencyCode,
+    const agencyConfig = await this.agencyRepository.getById(
+      getAgencyCodeFromApplication(application),
     );
     if (!agencyConfig) {
       throw new Error(

@@ -13,7 +13,7 @@ const adminEmail = "admin@email.fr";
 const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
 
 const defaultAgencyConfig = AgencyConfigBuilder.create(
-  validDemandeImmersion.agencyCode,
+  validDemandeImmersion.agencyId,
 )
   .withName("test-agency-name")
   .build();

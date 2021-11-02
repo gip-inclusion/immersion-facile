@@ -4,8 +4,9 @@ import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepo
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { AgencyConfigBuilder } from "./../../_testBuilders/AgencyConfigBuilder";
 
-const agency1 = AgencyConfigBuilder.empty()
-  .withId("11111111-1111-1111-1111-111111111111")
+const agency1 = AgencyConfigBuilder.create(
+  "11111111-1111-1111-1111-111111111111",
+)
   .withName("agency1")
   .withCounsellorEmails(["counsellorA@agency1.fr", "counsellorB@agency1.fr"])
   .withValidatorEmails(["validatorA@agency1.fr", "validatorB@agency1.fr"])
@@ -13,8 +14,9 @@ const agency1 = AgencyConfigBuilder.empty()
   .withQuestionnaireUrl("http://questionnaire.agency1.fr")
   .withSignature("The team of agency1")
   .build();
-const agency2 = AgencyConfigBuilder.empty()
-  .withId("22222222-2222-2222-2222-222222222222")
+const agency2 = AgencyConfigBuilder.create(
+  "22222222-2222-2222-2222-222222222222",
+)
   .withName("agency2")
   .withCounsellorEmails(["counsellorA@agency2.fr", "counsellorB@agency2.fr"])
   .withValidatorEmails([]) // no validators
@@ -83,8 +85,7 @@ describe("PgAgencyRepository", () => {
   });
 
   test("doesn't insert entities with existing ids", async () => {
-    const agency1a = AgencyConfigBuilder.empty()
-      .withId(agency1.id)
+    const agency1a = AgencyConfigBuilder.create(agency1.id)
       .withName("agency1a")
       .build();
 

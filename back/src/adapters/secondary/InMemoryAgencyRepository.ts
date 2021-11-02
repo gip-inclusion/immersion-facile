@@ -23,15 +23,6 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     logger.info(this.configs);
   }
 
-  // TODO(nwettstein): Remove when agency ids have fully replaced agency codes.
-  public async getConfig(
-    agencyCode: AgencyCode,
-  ): Promise<AgencyConfig | undefined> {
-    const id = legacyAgencyIds[agencyCode];
-    if (!id) return undefined;
-    return await this.getById(id);
-  }
-
   public async getById(id: AgencyId): Promise<AgencyConfig | undefined> {
     logger.info({ id, configs: this.configs }, "getById");
     return this.configs[id];

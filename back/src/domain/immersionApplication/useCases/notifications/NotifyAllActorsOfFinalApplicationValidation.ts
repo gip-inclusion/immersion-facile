@@ -14,6 +14,7 @@ import {
   EmailGateway,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../ports/EmailGateway";
+import { getAgencyCodeFromApplication } from "./../../../../shared/agencies";
 import { EmailFilter } from "./../../../core/ports/EmailFilter";
 
 const logger = createLogger(__filename);
@@ -36,7 +37,9 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
       "------------- Entering execute.",
     );
 
-    const agencyConfig = await this.agencyRepository.getConfig(dto.agencyCode);
+    const agencyConfig = await this.agencyRepository.getById(
+      getAgencyCodeFromApplication(dto),
+    );
     if (!agencyConfig) {
       throw new Error(
         `Unable to send mail. No agency config found for ${dto.agencyCode}`,

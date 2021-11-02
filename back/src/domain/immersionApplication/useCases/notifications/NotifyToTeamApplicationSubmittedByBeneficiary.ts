@@ -9,6 +9,7 @@ import { EmailGateway } from "../../ports/EmailGateway";
 import type { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import { parseISO } from "date-fns";
 import { frontRoutes } from "../../../../shared/routes";
+import { getAgencyCodeFromApplication } from "../../../../shared/agencies";
 
 const logger = createLogger(__filename);
 export class NotifyToTeamApplicationSubmittedByBeneficiary extends UseCase<ImmersionApplicationDto> {
@@ -25,6 +26,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary extends UseCase<Immer
   public async _execute({
     id,
     agencyCode,
+    agencyId,
     firstName,
     lastName,
     dateStart,
@@ -38,7 +40,9 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary extends UseCase<Immer
       "------------- Entering execute.",
     );
 
-    const agencyConfig = await this.agencyRepository.getConfig(agencyCode);
+    const agencyConfig = await this.agencyRepository.getById(
+      getAgencyCodeFromApplication({ agencyCode, agencyId }),
+    );
     if (!agencyConfig) {
       throw new Error(
         `Unable to send mail. No agency config found for ${agencyCode}`,
