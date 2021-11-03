@@ -207,8 +207,8 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
                     Merci ! Nous avons bien enregistré vos informations. Vous
                     pourrez y accéder à tout moment pour les modifier ou les
                     supprimer en nous contactant à :&nbsp;
-                    <a href="mailto:immersionfacile@beta.gouv.fr">
-                      immersionfacile@beta.gouv.fr
+                    <a href="mailto:contact@immersion-facile.beta.gouv.fr">
+                      contact@immersion-facile.beta.gouv.fr
                     </a>
                   </SuccessMessage>
                 )}
