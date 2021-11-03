@@ -1,5 +1,5 @@
 import { generateApplication } from "src/helpers/generateImmersionApplication";
-import { AgencyCode, AgencyDto } from "src/shared/agencies";
+import { AgencyDto, AgencyId } from "src/shared/agencies";
 import {
   AddImmersionApplicationMLResponseDto,
   ApplicationStatus,
@@ -38,7 +38,7 @@ export abstract class ImmersionApplicationGateway {
 
   abstract getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto>;
   abstract getAll(
-    agency?: AgencyCode,
+    agency?: AgencyId,
     status?: ApplicationStatus,
   ): Promise<Array<ImmersionApplicationDto>>;
 

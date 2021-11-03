@@ -1,6 +1,6 @@
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import { AgencyCode, AgencyDto } from "src/shared/agencies";
+import { AgencyDto } from "src/shared/agencies";
 import { FeatureFlags } from "src/shared/featureFlags";
 import {
   AddImmersionApplicationMLResponseDto,
@@ -9,11 +9,12 @@ import {
   ImmersionApplicationId,
   IMMERSION_APPLICATION_TEMPLATE,
   UpdateImmersionApplicationStatusRequestDto,
-  UpdateImmersionApplicationStatusResponseDto
+  UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
+import { AgencyId } from "./../../shared/agencies";
 
 const TEST_AGENCIES: AgencyDto[] = [
   { id: "test-agency-1-front", name: "Test Agency 1 (front)" },
@@ -110,14 +111,14 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   }
 
   public async getAll(
-    agency?: AgencyCode,
+    agency?: AgencyId,
     status?: ApplicationStatus,
   ): Promise<Array<ImmersionApplicationDto>> {
     console.log("InMemoryImmersionApplicationGateway.getAll: ", agency, status);
     await sleep(SIMULATED_LATENCY_MS);
 
     return Object.values(this._demandesImmersion)
-      .filter((demande) => !agency || demande.agencyCode === agency)
+      .filter((demande) => !agency || demande.agencyId === agency)
       .filter((demande) => !status || demande.status === status);
   }
 

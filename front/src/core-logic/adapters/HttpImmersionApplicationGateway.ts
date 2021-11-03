@@ -1,10 +1,6 @@
 import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import {
-  AgencyCode,
-  AgencyDto,
-  listAgenciesResponseSchema,
-} from "src/shared/agencies";
+import { AgencyDto, listAgenciesResponseSchema } from "src/shared/agencies";
 import {
   AddImmersionApplicationMLResponseDto,
   addImmersionApplicationMLResponseDtoSchema,
@@ -30,6 +26,7 @@ import {
 } from "src/shared/routes";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
+import { AgencyId } from "./../../shared/agencies";
 
 const prefix = "api";
 
@@ -82,7 +79,7 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
   }
 
   public async getAll(
-    agency?: AgencyCode,
+    agency?: AgencyId,
     status?: ApplicationStatus,
   ): Promise<Array<ImmersionApplicationDto>> {
     const response = await axios.get(

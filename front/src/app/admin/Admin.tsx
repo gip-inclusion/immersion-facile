@@ -1,13 +1,13 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/dependencies";
 import { routes } from "src/app/routes";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
-import { MarianneHeader } from "src/components/MarianneHeader";
-import { Route } from "type-route";
-import "./Admin.css";
 import { FormAccordion } from "src/components/admin/FormAccordion";
 import { FormMagicLinks } from "src/components/admin/FormMagicLinks";
-import { AgencyCode } from "src/shared/agencies";
+import { MarianneHeader } from "src/components/MarianneHeader";
+import { AgencyId } from "src/shared/agencies";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
+import { Route } from "type-route";
+import "./Admin.css";
 
 interface AdminState {
   demandeImmersion: Array<ImmersionApplicationDto>;
@@ -23,8 +23,8 @@ export const Admin = ({ route }: AdminProps) => {
 
   useEffect(() => {
     let agency =
-      "agencyCode" in route.params
-        ? (route.params.agencyCode as AgencyCode)
+      "agencyId" in route.params
+        ? (route.params.agencyId as AgencyId)
         : undefined;
     immersionApplicationGateway.getAll(agency).then(setDemandesImmersion);
   }, []);

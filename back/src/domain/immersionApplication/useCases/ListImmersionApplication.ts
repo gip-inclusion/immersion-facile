@@ -1,13 +1,10 @@
-import { z } from "zod";
 import {
-  ApplicationStatus,
   ImmersionApplicationDto,
   ListImmersionApplicationRequestDto,
   listImmersionApplicationRequestDtoSchema,
 } from "../../../shared/ImmersionApplicationDto";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
-import { AgencyCode } from "../../../shared/agencies";
 
 export class ListImmersionApplication extends UseCase<
   ListImmersionApplicationRequestDto,
@@ -23,12 +20,12 @@ export class ListImmersionApplication extends UseCase<
 
   public async _execute({
     status,
-    agencyCode,
+    agencyId,
   }: ListImmersionApplicationRequestDto) {
     const entities = await this.immersionApplicationRepository.getAll();
     return entities
       .map((entity) => entity.toDto())
       .filter((dto) => !status || dto.status === status)
-      .filter((dto) => !agencyCode || dto.agencyCode === agencyCode);
+      .filter((dto) => !agencyId || dto.agencyId === agencyId);
   }
 }

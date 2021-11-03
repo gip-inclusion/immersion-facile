@@ -1,12 +1,18 @@
-import { validAgencyCodes } from "./../../../shared/agencies";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ListImmersionApplication } from "../../../domain/immersionApplication/useCases/ListImmersionApplication";
+import { AgencyId } from "../../../shared/agencies";
 import { FeatureFlags } from "../../../shared/featureFlags";
 import { validApplicationStatus } from "../../../shared/ImmersionApplicationDto";
 import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+
+const agencyIds: AgencyId[] = [
+  "11111111-1111-1111-1111-111111111111",
+  "22222222-2222-2222-2222-222222222222",
+  "33333333-3333-3333-3333-333333333333",
+];
 
 describe("List Immersion Applications", () => {
   let listImmersionApplication: ListImmersionApplication;
@@ -23,7 +29,7 @@ describe("List Immersion Applications", () => {
     test("returns empty list", async () => {
       const ImmersionApplications = await listImmersionApplication.execute({
         status: undefined,
-        agencyCode: undefined,
+        agencyId: undefined,
       });
       expect(ImmersionApplications).toEqual([]);
     });
@@ -36,7 +42,7 @@ describe("List Immersion Applications", () => {
 
       const ImmersionApplications = await listImmersionApplication.execute({
         status: undefined,
-        agencyCode: undefined,
+        agencyId: undefined,
       });
       expect(ImmersionApplications).toEqual([entity.toDto()]);
     });
@@ -45,16 +51,16 @@ describe("List Immersion Applications", () => {
   describe("filters", () => {
     let applicationCount = 0;
 
-    // Populate the DB with 1 record of with all possible statuses, agency codes.
+    // Populate the DB with 1 record of with all possible statuses and a set of agency ids.
     beforeEach(async () => {
       const entities: ImmersionApplicationEntity[] = [];
 
       validApplicationStatus.forEach((status) => {
-        validAgencyCodes.forEach((agencyCode) => {
+        agencyIds.forEach((agencyId) => {
           entities.push(
             ImmersionApplicationEntity.create(
               new ImmersionApplicationDtoBuilder()
-                .withAgencyCode(agencyCode)
+                .withAgencyId(agencyId)
                 .withStatus(status)
                 .withId(`id-${applicationCount}`)
                 .build(),
@@ -75,7 +81,7 @@ describe("List Immersion Applications", () => {
     test("without filters returns all applications", async () => {
       const immersionApplications = await listImmersionApplication.execute({
         status: undefined,
-        agencyCode: undefined,
+        agencyId: undefined,
       });
       expect(immersionApplications).toHaveLength(applicationCount);
     });
@@ -83,20 +89,20 @@ describe("List Immersion Applications", () => {
     test("with agency filter returns all applications of the agency", async () => {
       const immersionApplications = await listImmersionApplication.execute({
         status: undefined,
-        agencyCode: validAgencyCodes[0],
+        agencyId: agencyIds[0],
       });
       expect(immersionApplications).toHaveLength(validApplicationStatus.length);
       immersionApplications.forEach((entity) => {
-        expect(entity.agencyCode).toEqual(validAgencyCodes[0]);
+        expect(entity.agencyId).toEqual(agencyIds[0]);
       });
     });
 
     test("with status filter returns all applications with a given status", async () => {
       const immersionApplications = await listImmersionApplication.execute({
         status: validApplicationStatus[0],
-        agencyCode: undefined,
+        agencyId: undefined,
       });
-      expect(immersionApplications).toHaveLength(validAgencyCodes.length);
+      expect(immersionApplications).toHaveLength(agencyIds.length);
       immersionApplications.forEach((entity) => {
         expect(entity.status).toEqual(validApplicationStatus[0]);
       });
@@ -105,13 +111,13 @@ describe("List Immersion Applications", () => {
     test("with multiple filters, applies all filters as logical AND", async () => {
       const immersionApplications = await listImmersionApplication.execute({
         status: validApplicationStatus[0],
-        agencyCode: validAgencyCodes[0],
+        agencyId: agencyIds[0],
       });
       expect(immersionApplications).toHaveLength(1);
       expect(immersionApplications[0].status).toEqual(
         validApplicationStatus[0],
       );
-      expect(immersionApplications[0].agencyCode).toEqual(validAgencyCodes[0]);
+      expect(immersionApplications[0].agencyId).toEqual(agencyIds[0]);
     });
   });
 });

@@ -9,8 +9,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   admin: defineRoute("/admin"),
   agencyAdmin: defineRoute(
-    { agencyCode: param.path.string },
-    (p) => `/agence/${p.agencyCode}`,
+    { agencyId: param.path.string },
+    (p) => `/agence/${p.agencyId}`,
   ),
   adminVerification: defineRoute(
     { demandeId: param.path.string },

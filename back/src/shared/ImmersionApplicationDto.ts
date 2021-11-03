@@ -1,10 +1,5 @@
 import { z } from "../../node_modules/zod";
-import {
-  agencyCodeSchema,
-  agencyIdSchema,
-  legacyAgencyIds,
-  validAgencyCodes,
-} from "./agencies";
+import { agencyCodeSchema, agencyIdSchema, legacyAgencyIds } from "./agencies";
 import {
   emailAndMentorEmailAreDifferent,
   enoughWorkedDaysToReviewFromSubmitDate,
@@ -195,7 +190,7 @@ export const updateImmersionApplicationRequestDtoSchema = z
 // prettier-ignore
 export type ListImmersionApplicationRequestDto = z.infer<typeof listImmersionApplicationRequestDtoSchema>;
 export const listImmersionApplicationRequestDtoSchema = z.object({
-  agencyCode: z.enum(validAgencyCodes).optional(),
+  agencyId: agencyIdSchema.optional(),
   status: z.enum(validApplicationStatus).optional(),
 });
 
