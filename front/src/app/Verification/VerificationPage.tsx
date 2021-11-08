@@ -6,6 +6,7 @@ import { FormAccordion } from "src/components/admin/FormAccordion";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
+import { statusTransitionConfigs } from "src/shared/immersionApplicationStatusTransitions";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 
@@ -18,6 +19,27 @@ const getHighestActingRole = (roles: Role[]) => {
   if (roles.includes("validator")) return "validator";
   if (roles.includes("counsellor")) return "counsellor";
   return undefined;
+};
+
+const isAllowedTransition = (
+  initialStatus: ApplicationStatus | undefined,
+  targetStatus: ApplicationStatus,
+  actingRole: Role,
+) => {
+  const transitionConfig = statusTransitionConfigs[targetStatus];
+  if (!transitionConfig) return false;
+  if (
+    transitionConfig.validInitialStatuses.filter(
+      (status) => status === initialStatus,
+    ).length === 0
+  )
+    return false;
+  if (
+    transitionConfig.validRoles.filter((role) => role === actingRole).length ===
+    0
+  )
+    return false;
+  return true;
 };
 
 export const VerificationPage = ({ route }: VerificationPageProps) => {
@@ -62,7 +84,11 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         "Chargement en cours..."
       )}
       <div>
-        {actingRole !== "admin" && immersionApplication?.status !== "DRAFT" && (
+        {isAllowedTransition(
+          immersionApplication?.status,
+          "REJECTED",
+          actingRole,
+        ) && (
           <VerificationActionButton
             {...buttonProps}
             newStatus="REJECTED"
@@ -72,7 +98,11 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           </VerificationActionButton>
         )}
 
-        {immersionApplication?.status !== "DRAFT" && (
+        {isAllowedTransition(
+          immersionApplication?.status,
+          "DRAFT",
+          actingRole,
+        ) && (
           <VerificationActionButton
             {...buttonProps}
             newStatus="DRAFT"
@@ -81,26 +111,35 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
             Renvoyer au bénéficiaire pour modification
           </VerificationActionButton>
         )}
-        {actingRole === "counsellor" &&
-          immersionApplication?.status === "IN_REVIEW" && (
-            <VerificationActionButton
-              {...buttonProps}
-              newStatus="ACCEPTED_BY_COUNSELLOR"
-              messageToShowOnSuccess={validatedSuccessfully}
-              disabled={!!successMessage || currentStatus != "IN_REVIEW"}
-            >
-              {currentStatus === "ACCEPTED_BY_COUNSELLOR"
-                ? "Demande déjà validée."
-                : "Marquer la demande comme éligible"}
-            </VerificationActionButton>
-          )}
-        {actingRole === "validator" && (
+        {isAllowedTransition(
+          immersionApplication?.status,
+          "ACCEPTED_BY_COUNSELLOR",
+          actingRole,
+        ) && (
+          <VerificationActionButton
+            {...buttonProps}
+            newStatus="ACCEPTED_BY_COUNSELLOR"
+            messageToShowOnSuccess={validatedSuccessfully}
+            disabled={!!successMessage || currentStatus != "IN_REVIEW"}
+          >
+            {currentStatus === "ACCEPTED_BY_COUNSELLOR"
+              ? "Demande déjà validée."
+              : "Marquer la demande comme éligible"}
+          </VerificationActionButton>
+        )}
+        {isAllowedTransition(
+          immersionApplication?.status,
+          "ACCEPTED_BY_VALIDATOR",
+          actingRole,
+        ) && (
           <VerificationActionButton
             {...buttonProps}
             newStatus="ACCEPTED_BY_VALIDATOR"
             messageToShowOnSuccess={validatedSuccessfully}
             disabled={
-              !!successMessage || currentStatus != "ACCEPTED_BY_COUNSELLOR"
+              !!successMessage ||
+              (currentStatus != "IN_REVIEW" &&
+                currentStatus != "ACCEPTED_BY_COUNSELLOR")
             }
           >
             {currentStatus === "ACCEPTED_BY_VALIDATOR"
@@ -108,22 +147,24 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
               : "Valider la demande"}
           </VerificationActionButton>
         )}
-        {actingRole === "admin" &&
-          buttonProps.immersionApplication?.status ===
-            "ACCEPTED_BY_VALIDATOR" && (
-            <VerificationActionButton
-              {...buttonProps}
-              newStatus="VALIDATED"
-              messageToShowOnSuccess={validatedSuccessfully}
-              disabled={
-                !!successMessage || currentStatus != "ACCEPTED_BY_VALIDATOR"
-              }
-            >
-              {currentStatus === "VALIDATED"
-                ? "Convention envoyée."
-                : "Envoyer la convention"}
-            </VerificationActionButton>
-          )}
+        {isAllowedTransition(
+          immersionApplication?.status,
+          "VALIDATED",
+          actingRole,
+        ) && (
+          <VerificationActionButton
+            {...buttonProps}
+            newStatus="VALIDATED"
+            messageToShowOnSuccess={validatedSuccessfully}
+            disabled={
+              !!successMessage || currentStatus != "ACCEPTED_BY_VALIDATOR"
+            }
+          >
+            {currentStatus === "VALIDATED"
+              ? "Convention envoyée."
+              : "Envoyer la convention"}
+          </VerificationActionButton>
+        )}
 
         {errorMessage && (
           <ErrorMessage title="Désolé: Erreur de traitement sur la plateforme, veuillez réessayer ultérieurement">
