@@ -40,36 +40,6 @@ describe("PgImmersionApplicationRepository", () => {
     );
   });
 
-  it("Correctly inserts and reads ImmersionApplicationEntity with no agencyCode", async () => {
-    const immersionApplicationEntity = ImmersionApplicationEntity.create(
-      new ImmersionApplicationDtoBuilder()
-        .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
-        .clearAgencyCode()
-        .build(),
-    );
-    await immersionApplicationRepository.save(immersionApplicationEntity);
-
-    const storedEntity = await immersionApplicationRepository.getById(
-      immersionApplicationEntity.id,
-    );
-    expect(storedEntity).toEqual(immersionApplicationEntity);
-  });
-
-  it("Correctly inserts and reads ImmersionApplicationEntity with no agencyId", async () => {
-    const immersionApplicationEntity = ImmersionApplicationEntity.create(
-      new ImmersionApplicationDtoBuilder()
-        .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
-        .clearAgencyId()
-        .build(),
-    );
-    await immersionApplicationRepository.save(immersionApplicationEntity);
-
-    const storedEntity = await immersionApplicationRepository.getById(
-      immersionApplicationEntity.id,
-    );
-    expect(storedEntity).toEqual(immersionApplicationEntity);
-  });
-
   it("Gets saved immersion", async () => {
     const idA: ImmersionApplicationId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
     const immersionApplicationEntityA = new ImmersionApplicationEntityBuilder()

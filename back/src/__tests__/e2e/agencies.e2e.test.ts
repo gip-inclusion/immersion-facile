@@ -12,16 +12,16 @@ describe("/agencies route", () => {
   test("returns agency list", async () => {
     await request.get(`/agencies`).expect(200, [
       {
-        id: "a025666a-22d7-4752-86eb-d07e27a5766a",
-        name: "AMIE du Boulonnais",
+        id: "test-agency-1-back",
+        name: "Test Agency 1 (back)",
       },
       {
-        id: "b0d734df-3047-4e42-aaca-9d86b9e1c81d",
-        name: "Mission Locale Jeunes du Grand Narbonne",
+        id: "test-agency-2-back",
+        name: "Test Agency 2 (back)",
       },
       {
-        id: "c0fddfd9-8fdd-4e1e-8b99-ed5d733d3b83",
-        name: "Site Soleil - Mission Locale de Paris",
+        id: "test-agency-3-back",
+        name: "Test Agency 3 (back)",
       },
     ]);
   });

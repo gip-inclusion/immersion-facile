@@ -1,5 +1,4 @@
 import type { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import { getAgencyCodeFromApplication } from "../../../../shared/agencies";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -29,11 +28,11 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
     immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<void> {
     const agencyConfig = await this.agencyRepository.getById(
-      getAgencyCodeFromApplication(immersionApplicationDto),
+      immersionApplicationDto.agencyId,
     );
     if (!agencyConfig) {
       logger.error(
-        { agencyCode: immersionApplicationDto.agencyCode },
+        { agencyId: immersionApplicationDto.agencyId },
         "No Agency Config found for this agency code",
       );
       return;
@@ -49,7 +48,7 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
         {
           applicationId: immersionApplicationDto.id,
           status: immersionApplicationDto.status,
-          agencyCode: immersionApplicationDto.agencyCode,
+          agencyId: immersionApplicationDto.agencyId,
         },
         "Unable to find appropriate recipient for validation notification.",
       );

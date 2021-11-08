@@ -163,21 +163,6 @@ describe("demandeImmersionDtoSchema", () => {
 
     expectImmersionApplicationDtoToBeInvalid(demandeImmersion);
   });
-
-  test("rejects requests with no agency code and no agency id", () => {
-    expectDemandeImmersionDtoToBeValid(
-      new ImmersionApplicationDtoBuilder().clearAgencyCode().build(),
-    );
-    expectDemandeImmersionDtoToBeValid(
-      new ImmersionApplicationDtoBuilder().clearAgencyId().build(),
-    );
-    expectImmersionApplicationDtoToBeInvalid(
-      new ImmersionApplicationDtoBuilder()
-        .clearAgencyCode()
-        .clearAgencyId()
-        .build(),
-    );
-  });
 });
 
 describe("applicationStatusFromString", () => {

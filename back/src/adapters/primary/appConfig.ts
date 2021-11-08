@@ -1,6 +1,5 @@
 import * as dotenv from "dotenv";
 import { Pool } from "pg";
-import { AgencyCode, agencyCodeFromString } from "../../shared/agencies";
 import {
   makeGetBooleanVariable,
   makeThrowIfNotDefined,
@@ -173,18 +172,6 @@ export class AppConfig {
     return this.getBooleanVariable("SKIP_EMAIL_ALLOW_LIST");
   }
 
-  public get adminEmails() {
-    return parseStringList(this.env.SUPERVISOR_EMAIL);
-  }
-
-  public get counsellorEmails() {
-    return parseEmailsByAgencyCode(this.env.COUNSELLOR_EMAILS);
-  }
-
-  public get validatorEmails() {
-    return parseEmailsByAgencyCode(this.env.VALIDATOR_EMAILS);
-  }
-
   // == Event Bus ==
   public get eventCrawlerPeriodMs() {
     return parseInteger(this.env.EVENT_CRAWLER_PERIOD_MS, 0);
@@ -199,26 +186,3 @@ const parseInteger = (str: string | undefined, defaultValue: number): number =>
 // Format: <string>,<string>,...
 const parseStringList = (str: string | undefined, separator = ","): string[] =>
   (str || "").split(separator).filter((el) => !!el);
-
-// Format: <agencyCode>,<agencyCode>,...
-const parseAgencyList = (str: string | undefined): AgencyCode[] =>
-  parseStringList(str)
-    .map(agencyCodeFromString)
-    .filter((agencyCode) => agencyCode !== "_UNKNOWN");
-
-type EmailsByAgencyCode = Partial<Record<AgencyCode, string[]>>;
-
-// Format: <agencyCode>:<email>,<agencyCode>:<email>,...
-const parseEmailsByAgencyCode = (
-  str: string | undefined,
-): EmailsByAgencyCode => {
-  return parseStringList(str).reduce<EmailsByAgencyCode>((acc, el) => {
-    const [str, email] = el.split(":", 2);
-    const agencyCode = agencyCodeFromString(str);
-    if (agencyCode === "_UNKNOWN" || !email) return acc;
-    return {
-      ...acc,
-      [agencyCode]: [...(acc[agencyCode] || []), email],
-    };
-  }, {});
-};

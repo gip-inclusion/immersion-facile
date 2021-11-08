@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import { getAgencyCodeFromApplication } from "../../../../shared/agencies";
 import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
@@ -42,11 +41,11 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     reason,
   }: ImmersionApplicationRequiresModificationPayload): Promise<void> {
     const agencyConfig = await this.agencyRepository.getById(
-      getAgencyCodeFromApplication(application),
+      application.agencyId,
     );
     if (!agencyConfig) {
       throw new Error(
-        `Unable to send mail. No agency config found for ${application.agencyCode}`,
+        `Unable to send mail. No agency config found for ${application.agencyId}`,
       );
     }
 

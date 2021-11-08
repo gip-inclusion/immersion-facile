@@ -1,12 +1,9 @@
 import fs from "fs";
 import { Pool, PoolClient } from "pg";
 import { promisify } from "util";
-import { AgencyConfig } from "../../../../domain/immersionApplication/ports/AgencyRepository";
 import { sleep } from "../../../../shared/utils";
 import { createLogger } from "../../../../utils/logger";
 import { AppConfig } from "../../../primary/appConfig";
-import { createAgencyConfigsFromAppConfig } from "../../InMemoryAgencyRepository";
-import { PgAgencyRepository } from "../PgAgencyRepository";
 
 const logger = createLogger(__filename);
 
@@ -78,14 +75,9 @@ const buildDb = async () => {
   // prettier-ignore
   const agenciesTableAlreadyExists = await checkIfTableExists("agencies");
   if (!agenciesTableAlreadyExists) {
-    logger.info("We will thus create the agencies table");
     await buildAgencies(client);
     if (shouldPopulateWithTestData(appConfig)) {
-      logger.info("Inserting test data into the agencies table");
-      await insertTestAgencies(
-        client,
-        createAgencyConfigsFromAppConfig(appConfig),
-      );
+      await insertTestAgencies(client);
     }
   }
 
@@ -109,28 +101,31 @@ const makeCheckIfTableAlreadyExists =
   };
 
 const buildSearchImmersionDb = async (client: PoolClient) => {
-  const file = await readFile(__dirname + "/database.sql");
-  const sql = file.toString();
-  await client.query(sql);
+  await executeSqlFromFile(__dirname + "/database.sql", client);
 };
 
 const buildImmersionApplication = async (client: PoolClient) => {
-  // prettier-ignore
-  const file = await readFile(__dirname + "/createImmersionApplicationsTable.sql");
-  const sql = file.toString();
-  await client.query(sql);
+  await executeSqlFromFile(
+    __dirname + "/createImmersionApplicationsTable.sql",
+    client,
+  );
 };
 
 const buildFormEstablishment = async (client: PoolClient) => {
-  const file = await readFile(__dirname + "/createFormEstablishmentsTable.sql");
-  const sql = file.toString();
-  await client.query(sql);
+  await executeSqlFromFile(
+    __dirname + "/createFormEstablishmentsTable.sql",
+    client,
+  );
 };
 
 const buildAgencies = async (client: PoolClient) => {
-  const file = await readFile(__dirname + "/createAgenciesTable.sql");
-  const sql = file.toString();
-  await client.query(sql);
+  logger.info("agencies: creating table");
+  await executeSqlFromFile(__dirname + "/createAgenciesTable.sql", client);
+};
+
+const insertTestAgencies = async (client: PoolClient) => {
+  logger.info("agencies: inserting test data");
+  await executeSqlFromFile(__dirname + "/insertTestAgencies.sql", client);
 };
 
 const shouldPopulateWithTestData = (appConfig: AppConfig) => {
@@ -148,14 +143,10 @@ const shouldPopulateWithTestData = (appConfig: AppConfig) => {
   return false;
 };
 
-const insertTestAgencies = async (
-  client: PoolClient,
-  agencies: AgencyConfig[],
-) => {
-  const agencyRepository = new PgAgencyRepository(client);
-  for (const agency of Object.values(agencies)) {
-    await agencyRepository.insert(agency);
-  }
+const executeSqlFromFile = async (path: string, client: PoolClient) => {
+  const file = await readFile(path);
+  const sql = file.toString();
+  await client.query(sql);
 };
 
 buildDb().then(() => {

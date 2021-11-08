@@ -4,6 +4,6 @@ CREATE TABLE public.agencies (
     counsellor_emails jsonb NOT NULL,
     validator_emails jsonb NOT NULL,
     admin_emails jsonb NOT NULL,
-    questionnaire_url varchar(255),
+    questionnaire_url varchar(255) NOT NULL,
     email_signature varchar(255) NOT NULL
 );

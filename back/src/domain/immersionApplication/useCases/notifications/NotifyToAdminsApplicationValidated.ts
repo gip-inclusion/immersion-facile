@@ -1,16 +1,14 @@
+import { parseISO } from "date-fns";
+import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "../../../../shared/ImmersionApplicationDto";
-
+import { frontRoutes } from "../../../../shared/routes";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import { frontRoutes } from "../../../../shared/routes";
-import { parseISO } from "date-fns";
-import { getAgencyCodeFromApplication } from "../../../../shared/agencies";
 
 const logger = createLogger(__filename);
 export class NotifyToAdminsApplicationValidated extends UseCase<ImmersionApplicationDto> {
@@ -26,7 +24,6 @@ export class NotifyToAdminsApplicationValidated extends UseCase<ImmersionApplica
 
   public async _execute({
     id,
-    agencyCode,
     agencyId,
     firstName,
     lastName,
@@ -34,17 +31,15 @@ export class NotifyToAdminsApplicationValidated extends UseCase<ImmersionApplica
     dateEnd,
     businessName,
   }: ImmersionApplicationDto): Promise<void> {
-    const agencyConfig = await this.agencyRepository.getById(
-      getAgencyCodeFromApplication({ agencyCode, agencyId }),
-    );
+    const agencyConfig = await this.agencyRepository.getById(agencyId);
     if (!agencyConfig) {
       throw new Error(
-        `Unable to send mail. No agency config found for ${agencyCode}`,
+        `Unable to send mail. No agency config found for ${agencyId}`,
       );
     }
 
     if (agencyConfig.adminEmails.length < 1) {
-      logger.info({ demandeId: id, agencyCode }, "No adminEmail.");
+      logger.info({ demandeId: id, agencyId }, "No adminEmail.");
       return;
     }
 

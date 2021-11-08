@@ -1,11 +1,10 @@
 import { z } from "../../node_modules/zod";
-import { agencyCodeSchema, agencyIdSchema, legacyAgencyIds } from "./agencies";
+import { agencyIdSchema } from "./agencies";
 import {
   emailAndMentorEmailAreDifferent,
   enoughWorkedDaysToReviewFromSubmitDate,
   mustBeSignedByBeneficiaryBeforeReview,
   mustBeSignedByEstablishmentBeforeReview,
-  mustHaveAgencyCodeOrAgencyId,
   startDateIsBeforeEndDate,
   submissionAndStartDatesConstraints,
   underMaxDuration,
@@ -85,8 +84,7 @@ export const immersionApplicationSchema = z
       .string()
       .regex(phoneRegExp, "Numero de téléphone incorrect")
       .optional(),
-    agencyCode: agencyCodeSchema.optional(),
-    agencyId: agencyIdSchema.optional(),
+    agencyId: agencyIdSchema,
     dateSubmission: zString.regex(
       dateRegExp,
       "La date de saisie est invalide.",
@@ -143,10 +141,6 @@ export const immersionApplicationSchema = z
   .refine(mustBeSignedByEstablishmentBeforeReview, {
     message: "L'engagement est obligatoire",
     path: ["enterpriseAccepted"],
-  })
-  .refine(mustHaveAgencyCodeOrAgencyId, {
-    message: "La structure d'accompagnement est obligatoire",
-    path: ["agencyId"],
   });
 
 export const immersionApplicationArraySchema = z.array(
@@ -239,6 +233,7 @@ export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   phone: "+33012345678",
   firstName: "Esteban",
   lastName: "Ocon",
+  agencyId: "fake-agency-id",
   dateSubmission: "2021-07-01",
   dateStart: "2021-08-01",
   dateEnd: "2021-08-31",

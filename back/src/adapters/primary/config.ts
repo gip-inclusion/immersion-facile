@@ -54,10 +54,7 @@ import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { InMemoryImmersionOfferRepository as InMemoryImmersionOfferRepositoryForSearch } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { PoleEmploiRomeGateway } from "../secondary/immersionOffer/PoleEmploiRomeGateway";
-import {
-  createAgencyConfigsFromAppConfig,
-  InMemoryAgencyRepository,
-} from "../secondary/InMemoryAgencyRepository";
+import { InMemoryAgencyRepository } from "../secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
@@ -67,6 +64,7 @@ import { PgFormEstablishmentRepository } from "../secondary/pg/FormEstablishment
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { PgAgencyRepository } from "./../secondary/pg/PgAgencyRepository";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
 
@@ -150,9 +148,10 @@ const createRepositories = async (config: AppConfig) => {
           )
         : new InMemoryImmersionOfferRepositoryForSearch(),
 
-    agency: new InMemoryAgencyRepository(
-      createAgencyConfigsFromAppConfig(config),
-    ),
+    agency:
+      config.repositories === "PG"
+        ? new PgAgencyRepository(await config.pgPool.connect())
+        : new InMemoryAgencyRepository(),
 
     sirene:
       config.sireneRepository === "HTTPS"
