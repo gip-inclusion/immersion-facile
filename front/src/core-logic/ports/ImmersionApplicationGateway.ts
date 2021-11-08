@@ -1,15 +1,15 @@
 import { generateApplication } from "src/helpers/generateImmersionApplication";
+import { AgencyCode, AgencyDto } from "src/shared/agencies";
 import {
   AddImmersionApplicationMLResponseDto,
-  ImmersionApplicationDto,
   ApplicationStatus,
+  ImmersionApplicationDto,
   ImmersionApplicationId,
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
-import { AgencyCode } from "src/shared/agencies";
 
 export abstract class ImmersionApplicationGateway {
   abstract add(
@@ -47,10 +47,13 @@ export abstract class ImmersionApplicationGateway {
     role: Role,
   ): Promise<string>;
 
-  public debugPopulateDB(count: number): Promise<Array<string>> {
+  abstract listAgencies(): Promise<AgencyDto[]>;
+
+  public async debugPopulateDB(count: number): Promise<Array<string>> {
     const initialArray = Array(count).fill(null);
+    const agencies = await this.listAgencies();
     return Promise.all(
-      initialArray.map((_, i) => this.add(generateApplication(i))),
+      initialArray.map((_, i) => this.add(generateApplication(i, agencies))),
     );
   }
 }

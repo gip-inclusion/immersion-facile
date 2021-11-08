@@ -11,7 +11,6 @@ import { routes } from "src/app/routes";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { ENV } from "src/environmentVariables";
-import { AgencyCode } from "src/shared/agencies";
 import {
   ApplicationSource,
   ImmersionApplicationDto,
@@ -44,13 +43,6 @@ const getApplicationSourceForRoute = (
   }
 };
 
-const getAgencyCodeForRoute = (route: ApplicationFormRoute): AgencyCode => {
-  switch (route.name) {
-    default:
-      return "_UNKNOWN";
-  }
-};
-
 const createInitialApplication = (
   route: ApplicationFormRoute,
 ): Partial<ImmersionApplicationDto> => {
@@ -65,7 +57,6 @@ const createInitialApplication = (
     firstName: "",
     lastName: "",
     phone: "",
-    agencyCode: getAgencyCodeForRoute(route),
     dateStart: toDateString(addDays(startOfToday(), 2)),
     dateEnd: toDateString(addDays(startOfToday(), 3)),
 
@@ -103,10 +94,6 @@ const createInitialApplication = (
     firstName: "Sylvanie",
     lastName: "Durand",
     phone: "0612345678",
-    agencyCode:
-      emptyForm.agencyCode !== "_UNKNOWN"
-        ? emptyForm.agencyCode
-        : "AMIE_BOULONAIS",
 
     // Enterprise
     siret: "12345678901234",

@@ -1,5 +1,10 @@
 import { z } from "../../node_modules/zod";
-import { agencyCodeSchema, agencyIdSchema, validAgencyCodes } from "./agencies";
+import {
+  agencyCodeSchema,
+  agencyIdSchema,
+  legacyAgencyIds,
+  validAgencyCodes,
+} from "./agencies";
 import {
   emailAndMentorEmailAreDifferent,
   enoughWorkedDaysToReviewFromSubmitDate,
@@ -146,7 +151,7 @@ export const immersionApplicationSchema = z
   })
   .refine(mustHaveAgencyCodeOrAgencyId, {
     message: "La structure d'accompagnement est obligatoire",
-    path: ["agencyCode"],
+    path: ["agencyId"],
   });
 
 export const immersionApplicationArraySchema = z.array(
@@ -235,7 +240,6 @@ export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   id: "fake-test-id",
   status: "DRAFT",
   source: "GENERIC",
-  agencyCode: "MLJ_GRAND_NARBONNE",
   email: "esteban@ocon.fr",
   phone: "+33012345678",
   firstName: "Esteban",

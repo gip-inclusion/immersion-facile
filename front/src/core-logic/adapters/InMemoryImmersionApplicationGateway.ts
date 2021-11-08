@@ -1,19 +1,25 @@
-import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import { AgencyCode } from "src/shared/agencies";
+import { AgencyCode, AgencyDto } from "src/shared/agencies";
 import { FeatureFlags } from "src/shared/featureFlags";
 import {
   AddImmersionApplicationMLResponseDto,
+  ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
   IMMERSION_APPLICATION_TEMPLATE,
   UpdateImmersionApplicationStatusRequestDto,
-  UpdateImmersionApplicationStatusResponseDto,
+  UpdateImmersionApplicationStatusResponseDto
 } from "src/shared/ImmersionApplicationDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
+
+const TEST_AGENCIES: AgencyDto[] = [
+  { id: "test-agency-1-front", name: "Test Agency 1 (front)" },
+  { id: "test-agency-2-front", name: "Test Agency 2 (front)" },
+  { id: "test-agency-3-front", name: "Test Agency 3 (front)" },
+];
 
 const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
   {
@@ -36,20 +42,24 @@ const SIMULATED_LATENCY_MS = 2000;
 export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGateway {
   private _demandesImmersion: { [id: string]: ImmersionApplicationDto } = {};
   private _establishments: { [siret: string]: GetSiretResponseDto } = {};
+  private _agencies: { [id: string]: AgencyDto } = {};
 
   public constructor(readonly featureFlags: FeatureFlags) {
     super();
+    TEST_AGENCIES.forEach((agency) => (this._agencies[agency.id] = agency));
     this.add({
       ...IMMERSION_APPLICATION_TEMPLATE,
       id: "valid_draft",
       status: "DRAFT",
       email: "DRAFT.esteban@ocon.fr",
+      agencyId: TEST_AGENCIES[0].id,
     });
     this.add({
       ...IMMERSION_APPLICATION_TEMPLATE,
       id: "valid_in_review",
       status: "IN_REVIEW",
       email: "IN_REVIEW.esteban@ocon.fr",
+      agencyId: TEST_AGENCIES[1].id,
     });
 
     TEST_ESTABLISHMENTS.forEach(
@@ -61,7 +71,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   public async add(
     demandeImmersion: ImmersionApplicationDto,
   ): Promise<ImmersionApplicationId> {
-    console.log("InMemoryDemandeImmersionGateway.add: ", demandeImmersion);
+    console.log("InMemoryImmersionApplicationGateway.add: ", demandeImmersion);
     await sleep(SIMULATED_LATENCY_MS);
     this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
     return demandeImmersion.id;
@@ -70,7 +80,10 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   public async addML(
     demandeImmersionDto: ImmersionApplicationDto,
   ): Promise<AddImmersionApplicationMLResponseDto> {
-    console.log("InMemoryDemandeImmersionGateway.addML: ", demandeImmersionDto);
+    console.log(
+      "InMemoryImmersionApplicationGateway.addML: ",
+      demandeImmersionDto,
+    );
     await sleep(SIMULATED_LATENCY_MS);
 
     this._demandesImmersion[demandeImmersionDto.id] = demandeImmersionDto;
@@ -83,7 +96,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   public async get(
     id: ImmersionApplicationId,
   ): Promise<ImmersionApplicationDto> {
-    console.log("InMemoryDemandeImmersionGateway.get: ", id);
+    console.log("InMemoryImmersionApplicationGateway.get: ", id);
     await sleep(SIMULATED_LATENCY_MS);
     return this._demandesImmersion[id];
   }
@@ -100,7 +113,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     agency?: AgencyCode,
     status?: ApplicationStatus,
   ): Promise<Array<ImmersionApplicationDto>> {
-    console.log("InMemoryFormulaireGateway.getAll: ", agency, status);
+    console.log("InMemoryImmersionApplicationGateway.getAll: ", agency, status);
     await sleep(SIMULATED_LATENCY_MS);
 
     return Object.values(this._demandesImmersion)
@@ -111,7 +124,10 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   public async update(
     demandeImmersion: ImmersionApplicationDto,
   ): Promise<ImmersionApplicationId> {
-    console.log("InMemoryDemandeImmersionGateway.update: ", demandeImmersion);
+    console.log(
+      "InMemoryImmersionApplicationGateway.update: ",
+      demandeImmersion,
+    );
     await sleep(SIMULATED_LATENCY_MS);
     this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
     return demandeImmersion.id;
@@ -121,7 +137,10 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     demandeImmersion: ImmersionApplicationDto,
     jwt: string,
   ): Promise<string> {
-    console.log("InMemoryDemandeImmersionGateway.updateML: ", demandeImmersion);
+    console.log(
+      "InMemoryImmersionApplicationGateway.updateML: ",
+      demandeImmersion,
+    );
     const payload = decodeJwt(jwt);
 
     await sleep(SIMULATED_LATENCY_MS);
@@ -143,7 +162,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   }
 
   public async validate(id: ImmersionApplicationId): Promise<string> {
-    console.log("InMemoryDemandeImmersionGateway.validate: ", id);
+    console.log("InMemoryImmersionApplicationGateway.validate: ", id);
     await sleep(SIMULATED_LATENCY_MS);
     let form = { ...this._demandesImmersion[id] };
     if (form.status === "IN_REVIEW") {
@@ -164,13 +183,20 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     return "";
   }
 
+  public async listAgencies(): Promise<AgencyDto[]> {
+    const agencies = Object.values(this._agencies);
+    console.log("InMemoryImmersionApplicationGateway.listAgencies: ", agencies);
+    await sleep(SIMULATED_LATENCY_MS);
+    return agencies;
+  }
+
   public async getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto> {
-    console.log("InMemoryDemandeImmersionGateway.getSiretInfo: " + siret);
+    console.log("InMemoryImmersionApplicationGateway.getSiretInfo: " + siret);
     await sleep(SIMULATED_LATENCY_MS);
 
     const establishment = this._establishments[siret];
     console.log(
-      "InMemoryDemandeImmersionGateway.getSiretInfo: ",
+      "InMemoryImmersionApplicationGateway.getSiretInfo: ",
       establishment,
     );
 

@@ -6,7 +6,7 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/Siret/fetchEstablishmentInfoBySiret";
-import { AgencyCodeDropdown } from "src/components/form/AgencyCodeDropdown";
+import { AgencySelector } from "src/components/form/AgencySelector";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { DateInput } from "src/components/form/DateInput";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
@@ -22,7 +22,7 @@ import type {
   ImmersionApplicationDto,
 } from "src/shared/ImmersionApplicationDto";
 
-const { featureFlags } = ENV;
+const { dev } = ENV;
 
 const FrozenMessage = () => (
   <>
@@ -100,10 +100,11 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
       />
 
-      <AgencyCodeDropdown
-        name="agencyCode"
+      <AgencySelector
+        name="agencyId"
         label="Votre structure d'accompagnement *"
         disabled={isFrozen}
+        setInitialValue={dev}
       />
 
       <DateInput

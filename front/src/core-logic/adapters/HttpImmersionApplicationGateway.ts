@@ -1,12 +1,16 @@
-import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
 import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import { AgencyCode } from "src/shared/agencies";
+import {
+  AgencyCode,
+  AgencyDto,
+  listAgenciesResponseSchema,
+} from "src/shared/agencies";
 import {
   AddImmersionApplicationMLResponseDto,
   addImmersionApplicationMLResponseDtoSchema,
   AddImmersionApplicationResponseDto,
   addImmersionApplicationResponseDtoSchema,
+  ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
   immersionApplicationSchema,
@@ -17,6 +21,7 @@ import {
   updateImmersionApplicationStatusResponseSchema,
 } from "src/shared/ImmersionApplicationDto";
 import {
+  agenciesRoute,
   generateMagicLinkRoute,
   immersionApplicationsRoute,
   siretRoute,
@@ -161,5 +166,11 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
       `/${prefix}/admin/${generateMagicLinkRoute}?id=${applicationId}&role=${role}`,
     );
     return httpResponse.data.jwt;
+  }
+
+  public async listAgencies(): Promise<AgencyDto[]> {
+    const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`);
+    const response = listAgenciesResponseSchema.parse(httpResponse.data);
+    return response;
   }
 }
