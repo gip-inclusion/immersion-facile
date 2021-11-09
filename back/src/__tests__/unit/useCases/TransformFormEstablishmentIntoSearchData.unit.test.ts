@@ -67,9 +67,7 @@ describe("Transform FormEstablishment into search data", () => {
       getEstablishmentFromSirenApi(formEstablishment);
     inMemorySireneRepository.setEstablishment(establishmentFromApi);
 
-    await transformFormEstablishmentIntoSearchData.execute(
-      formEstablishment.id,
-    );
+    await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
 
     await expectEstablishmentInRepo(formEstablishment);
 
@@ -102,9 +100,7 @@ describe("Transform FormEstablishment into search data", () => {
     inMemorySireneRepository.setEstablishment(establishmentFromApi);
 
     // act
-    await transformFormEstablishmentIntoSearchData.execute(
-      formEstablishment.id,
-    );
+    await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
 
     // assert
     const storedImmersion =

@@ -1,8 +1,8 @@
 import { v4 as uuidV4 } from "uuid";
 import {
   BusinessContactDto,
-  FormEstablishmentId,
-  formEstablishmentIdSchema,
+  FormEstablishmentDto,
+  formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../../../shared/rome";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
@@ -18,7 +18,7 @@ import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepositor
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 
 export class TransformFormEstablishmentIntoSearchData extends UseCase<
-  FormEstablishmentId,
+  FormEstablishmentDto,
   void
 > {
   constructor(
@@ -32,11 +32,11 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
     super();
   }
 
-  inputSchema = formEstablishmentIdSchema;
+  inputSchema = formEstablishmentSchema;
 
-  public async _execute(id: FormEstablishmentId): Promise<void> {
+  public async _execute(dto: FormEstablishmentDto): Promise<void> {
     const formEstablishment = await this.formEstablishmentRepository.getById(
-      id,
+      dto.id,
     );
     if (!formEstablishment) return;
 

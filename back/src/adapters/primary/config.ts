@@ -259,6 +259,7 @@ export const createGenerateVerificationMagicLink = (config: AppConfig) => {
   };
 };
 
+export type UseCases = ReturnType<typeof createUseCases>;
 const createUseCases = (
   config: AppConfig,
   repositories: Repositories,
@@ -317,7 +318,7 @@ const createUseCases = (
       getSiret,
     ),
 
-    tranformFormEstablishmentToSearchData:
+    transformFormEstablishmentToSearchData:
       new TransformFormEstablishmentIntoSearchData(
         repositories.formEstablishment,
         repositories.immersionOfferForSearch,
