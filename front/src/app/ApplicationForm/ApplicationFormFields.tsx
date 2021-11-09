@@ -60,6 +60,16 @@ export const ApplicationFormFields = ({
     "immersionAddress",
   );
 
+  let errorMessage = submitError?.message;
+  if (
+    submitError &&
+    "response" in submitError &&
+    "data" in submitError["response"] &&
+    "errors" in submitError["response"]["data"]
+  ) {
+    errorMessage = submitError["response"]["data"]["errors"];
+  }
+
   return (
     <>
       {isFrozen && <FrozenMessage />}
@@ -278,9 +288,9 @@ export const ApplicationFormFields = ({
         <div style={{ color: "red" }}>Veuillez corriger les champs erronés</div>
       )}
 
-      {submitError && (
+      {errorMessage && (
         <ErrorMessage title="Désolé: Erreur de traitement sur la plateforme, veuillez réessayer ultérieurement">
-          {submitError.message}
+          {errorMessage}
         </ErrorMessage>
       )}
 
