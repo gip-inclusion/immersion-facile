@@ -44,7 +44,7 @@ const getPrefix = (status: ApplicationStatus) => {
     case "ACCEPTED_BY_VALIDATOR":
       return "[✅ DEMANDE VALIDÉE]";
     case "REJECTED":
-      return "[❌ RÉJÉTÉ]";
+      return "[❌ DEMANDE REJETÉE]";
   }
 
   return "[⁉️ STATUS DE LA DEMANDE INDÉFINI]";
