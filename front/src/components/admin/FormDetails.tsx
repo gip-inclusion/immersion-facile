@@ -46,7 +46,7 @@ type FieldsAndTitle = { listTitle: string; fields: FieldsToLabel };
 
 const allFields: FieldsAndTitle[] = [
   { listTitle: "Immersion", fields: immersionFields },
-  { listTitle: "Candidate", fields: candidateFields },
+  { listTitle: "Bénéficiaire", fields: candidateFields },
   { listTitle: "Entreprise", fields: enterpriseFields },
   { listTitle: "Tuteur", fields: mentorFields },
 ];
