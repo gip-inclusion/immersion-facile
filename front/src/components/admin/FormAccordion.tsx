@@ -36,7 +36,7 @@ const getPrefix = (status: ApplicationStatus) => {
     case "DRAFT":
       return "[📕 BROUILLON]";
     case "IN_REVIEW":
-      return "[📙 DEMANDE A ETUDIER]";
+      return "[📙 DEMANDE À ETUDIER]";
     case "VALIDATED":
       return "[👩‍💼 DEMANDE CONFIRMÉE PAR ADMIN]";
     case "ACCEPTED_BY_COUNSELLOR":
