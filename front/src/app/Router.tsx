@@ -1,5 +1,6 @@
 import React from "react";
 import { Admin } from "src/app/admin/Admin";
+import { LandingEstablishment } from "src/app/LandingEstablishment/LandingEstablishment";
 import { VerificationPage } from "src/app/Verification/VerificationPage";
 import { ApplicationForm } from "src/app/ApplicationForm/ApplicationForm";
 import { Home } from "src/app/Home";
@@ -20,6 +21,7 @@ export const Router = () => {
   return (
     <>
       {route.name === "home" && <Home showDebugInfo={dev} />}
+      {route.name === "landingEstablishment" && <LandingEstablishment />}
       {route.name === "formEstablishment" && (
         <EstablishmentForm route={route} />
       )}

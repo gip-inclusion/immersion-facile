@@ -3,6 +3,7 @@ import { createRouter, defineRoute, param } from "type-route";
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   home: defineRoute("/"),
+  landingEstablishment: defineRoute("/accueil-etablissement"),
   immersionApplication: defineRoute(
     { jwt: param.query.optional.string },
     () => "/demande-immersion",
