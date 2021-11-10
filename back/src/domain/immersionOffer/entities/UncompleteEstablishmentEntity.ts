@@ -12,7 +12,6 @@ import {
   SireneRepository,
   SireneRepositoryAnswer,
 } from "../../sirene/ports/SireneRepository";
-import { Establishment } from "../../../../../front/src/core-logic/ports/EstablishmentInfoFromSiretApi";
 
 export type GetPosition = (address: string) => Promise<Position>;
 
