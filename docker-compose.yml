@@ -1,7 +1,9 @@
 version: "3"
 services:
   back:
-    build: "./back"
+    build:
+      context: "./back"
+      dockerfile: Dockerfile.back
     env_file:
       - .env
     depends_on:
@@ -9,7 +11,9 @@ services:
     restart: unless-stopped
 
   front:
-    build: "."
+    build:
+      context: "."
+      dockerfile: Dockerfile.front
     env_file:
       - .env
 
@@ -20,6 +24,7 @@ services:
       - back
     build:
       context: ./nginx
+      dockerfile: Dockerfile.nginx
       args:
         - ENV_TYPE=${ENV_TYPE:-develop}
         - DOMAIN=${DOMAIN:-domain.tld}
