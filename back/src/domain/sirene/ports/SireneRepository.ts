@@ -8,6 +8,7 @@ export type Establishment = {
     prenomUsuelUniteLegale?: string;
     activitePrincipaleUniteLegale?: string;
     nomenclatureActivitePrincipaleUniteLegale?: string;
+    trancheEffectifsUniteLegale?: string;
   }>;
   adresseEtablissement: Partial<{
     numeroVoieEtablissement?: string;
@@ -18,10 +19,17 @@ export type Establishment = {
   }>;
 };
 
-export type SiretResponse = {
+export type SireneRepositoryAnswer = {
+  header: {
+    statut: number;
+    message: string;
+    total: number;
+    debut: number;
+    nombre: number;
+  };
   etablissements: Establishment[];
 };
 
 export interface SireneRepository {
-  get: (siret: SiretDto) => Promise<SiretResponse | undefined>;
+  get: (siret: SiretDto) => Promise<SireneRepositoryAnswer | undefined>;
 }

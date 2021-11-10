@@ -1,13 +1,14 @@
 import axios, { AxiosInstance } from "axios";
-import { formatISO } from "date-fns";
-import { Clock } from "../../domain/core/ports/Clock";
 import {
   SireneRepository,
-  SiretResponse,
+  SireneRepositoryAnswer,
 } from "../../domain/sirene/ports/SireneRepository";
-import { SiretDto } from "../../shared/siret";
 import { createLogger } from "../../utils/logger";
 import { AxiosConfig } from "../primary/appConfig";
+import { Establishment } from "../../../../front/src/core-logic/ports/EstablishmentInfoFromSiretApi";
+import { Clock } from "../../domain/core/ports/Clock";
+import { SiretDto } from "../../shared/siret";
+import { formatISO } from "date-fns";
 
 const logger = createLogger(__filename);
 
@@ -44,13 +45,15 @@ export class HttpsSireneRepository implements SireneRepository {
     private readonly clock: Clock,
   ) {}
 
-  public async get(siret: SiretDto): Promise<SiretResponse | undefined> {
+  public async get(
+    siret: SiretDto,
+  ): Promise<SireneRepositoryAnswer | undefined> {
     try {
       const response = await this.axiosInstance.get("/siret", {
         params: this.createSiretQueryParams(siret),
       });
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       logger.error(error);
       if (error.response.status == 404) {
         return undefined;

@@ -40,6 +40,10 @@ export class ImmersionOfferEntity {
   }
 
   public toArrayOfProps() {
+    let idContactInEstablishment = null;
+    if (this.props.contact_in_establishment) {
+      idContactInEstablishment = this.props.contact_in_establishment;
+    }
     return [
       this.props.id,
       this.props.rome,
@@ -49,6 +53,7 @@ export class ImmersionOfferEntity {
       this.props.name,
       this.props.voluntary_to_immersion,
       this.props.data_source,
+      idContactInEstablishment,
       this.props.score,
       this.props.position,
     ];

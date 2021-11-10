@@ -1,5 +1,8 @@
 import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { ImmersionOfferEntity } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import {
+  ImmersionOfferEntity,
+  ImmersionEstablishmentContact,
+} from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import {
   ImmersionOfferRepository,
   SearchParams,
@@ -14,6 +17,7 @@ export class InMemoryImmersionOfferRepository
   private _searches: SearchParams[] = [];
   private _immersionOffers: ImmersionOfferEntity[] = [];
   private _establishments: EstablishmentEntity[] = [];
+  private _establishmentContact: ImmersionEstablishmentContact[] = [];
 
   public async insertSearch(searchParams: SearchParams) {
     logger.info(searchParams, "insertSearch");
@@ -21,6 +25,11 @@ export class InMemoryImmersionOfferRepository
     return;
   }
 
+  async insertEstablishmentContact(
+    immersionEstablishmentContact: ImmersionEstablishmentContact,
+  ) {
+    this._establishmentContact.push(immersionEstablishmentContact);
+  }
   public async insertImmersions(immersions: ImmersionOfferEntity[]) {
     logger.info(immersions, "insertImmersions");
     this._immersionOffers.push(...immersions);

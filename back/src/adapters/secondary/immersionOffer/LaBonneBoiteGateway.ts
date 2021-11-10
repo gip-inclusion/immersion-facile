@@ -83,12 +83,12 @@ export class LaBonneBoiteGateway implements EstablishmentsGateway {
               new UncompleteEstablishmentEntity({
                 id: uuidV4(),
                 address: establishment.address,
-                city: establishment.city,
                 position: { lat: establishment.lat, lon: establishment.lon },
                 naf: establishment.naf,
                 name: establishment.name,
                 siret: establishment.siret,
                 score: establishment.stars,
+                voluntary_to_immersion: false,
                 romes: [establishment.matched_rome_code],
                 dataSource: "api_labonneboite",
               }),

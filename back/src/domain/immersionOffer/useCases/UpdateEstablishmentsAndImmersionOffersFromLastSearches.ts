@@ -8,13 +8,14 @@ import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
 import { v4 as uuidV4 } from "uuid";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { SireneRepository } from "../../sirene/ports/SireneRepository";
 
 export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   constructor(
     private laBonneBoiteGateway: EstablishmentsGateway,
     private laPlateFormeDeLinclusionGateway: EstablishmentsGateway,
     private getPosition: GetPosition,
-    private getExtraEstablishmentInfos: GetExtraEstablishmentInfos,
+    private sireneRepository: SireneRepository,
     private immersionOfferRepository: ImmersionOfferRepository,
   ) {}
 
@@ -35,17 +36,19 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
         const establishmentsLaBonneBoite =
           await this.laBonneBoiteGateway.getEstablishments(searchMade);
 
-        const allEstablishments: EstablishmentEntity[] = await Promise.all(
-          establishmentsLaPlateFormeDeLinclusion
-            .concat(establishmentsLaBonneBoite)
-            .map(
-              async (uncompleteEstablishmentEntity) =>
-                await uncompleteEstablishmentEntity.searchForMissingFields(
-                  this.getPosition,
-                  this.getExtraEstablishmentInfos,
-                ),
-            ),
-        );
+        const allEstablishments: EstablishmentEntity[] = (
+          await Promise.all(
+            establishmentsLaPlateFormeDeLinclusion
+              .concat(establishmentsLaBonneBoite)
+              .map(
+                async (uncompleteEstablishmentEntity) =>
+                  await uncompleteEstablishmentEntity.searchForMissingFields(
+                    this.getPosition,
+                    this.sireneRepository,
+                  ),
+              ),
+          )
+        ).filter((x): x is EstablishmentEntity => x !== undefined);
         //We insert the establishments in the database
         await this.immersionOfferRepository.insertEstablishments(
           allEstablishments,
@@ -53,7 +56,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
 
         //We then transform  dfffdthem into immersions and add them to our database
         const allImmersions = allEstablishments.flatMap((establishment) =>
-          this.extractImmersionsFromEstablishment(establishment),
+          establishment.extractImmersions(),
         );
         await this.immersionOfferRepository.insertImmersions(allImmersions);
       }),

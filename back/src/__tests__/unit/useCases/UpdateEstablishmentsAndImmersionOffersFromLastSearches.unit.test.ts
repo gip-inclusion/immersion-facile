@@ -23,12 +23,12 @@ import {
 } from "../../../adapters/secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
 import {
   fakeGetPosition,
-  fakeGetExtraEstablishmentInfos,
   fakeAccessTokenGateway,
 } from "../../../_testBuilders/FakeHttpCalls";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { ImmersionOfferEntity } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../../../adapters/secondary/immersionOffer/fakeEstablishmentsLaPlateFormeDeLInclusion";
+import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 
 export const fakeHttpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclusion =
   {
@@ -113,10 +113,11 @@ export const fakeHttpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
   ],
 };
 
+const inMemorySireneRepository = new InMemorySireneRepository();
+
 describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let updateEstablishmentsAndImmersionOffersFromLastSearches: UpdateEstablishmentsAndImmersionOffersFromLastSearches;
   let getPosition: GetPosition;
-  let getExtraEstablishmentInfos: GetExtraEstablishmentInfos;
   let immersionOfferRepository: InMemoryImmersionOfferRepository;
   let fakeLaBonneBoiteGateway: LaBonneBoiteGateway;
   let fakeLaPlateFormeDeLInclusionGateway: LaPlateFormeDeLInclusionGateway;
@@ -137,7 +138,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
         fakeLaBonneBoiteGateway,
         fakeLaPlateFormeDeLInclusionGateway,
         fakeGetPosition,
-        fakeGetExtraEstablishmentInfos,
+        inMemorySireneRepository,
         immersionOfferRepository,
       );
   });

@@ -110,7 +110,7 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
     .route(`/${immersionOffersRoute}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.addImmersionOffer.execute(req.body),
+        deps.useCases.addFormEstablishment.execute(req.body),
       ),
     );
 

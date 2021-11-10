@@ -23,6 +23,10 @@ const validFormEstablishment: FormEstablishmentDto = {
       description: "Boulangerie",
     },
     {
+      romeCodeMetier: "B9112",
+      description: "Un métier passionnant",
+    },
+    {
       romeCodeAppellation: "22222",
       description: "Boucher / Bouchère",
     },

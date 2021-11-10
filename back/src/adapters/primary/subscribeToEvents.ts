@@ -26,7 +26,7 @@ export const subscribeToEvents = (deps: AppDependencies) => {
       ),
   );
 
-  // Needs Review by a counsellor or validator
+  //Needs Review by a counsellor or validator
   deps.eventBus.subscribe(
     "ImmersionApplicationSubmittedByBeneficiary",
     (event) => {
@@ -61,4 +61,10 @@ export const subscribeToEvents = (deps: AppDependencies) => {
       event.payload,
     ),
   );
+
+  deps.eventBus.subscribe("FormEstablishmentAdded", (event) => {
+    deps.useCases.tranformFormEstablishmentToSearchData.execute(
+      event.payload.id,
+    );
+  });
 };

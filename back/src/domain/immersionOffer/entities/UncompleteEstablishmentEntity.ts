@@ -1,9 +1,18 @@
-import { EstablishmentEntity, TefenCode } from "./EstablishmentEntity";
+import {
+  EstablishmentEntity,
+  TefenCode,
+  OptionalEstablishmentFields,
+} from "./EstablishmentEntity";
 import type {
   MandatoryEstablishmentFields,
   EstablishmentFieldsToRetrieve,
   Position,
 } from "./EstablishmentEntity";
+import {
+  SireneRepository,
+  SireneRepositoryAnswer,
+} from "../../sirene/ports/SireneRepository";
+import { Establishment } from "../../../../../front/src/core-logic/ports/EstablishmentInfoFromSiretApi";
 
 export type GetPosition = (address: string) => Promise<Position>;
 
@@ -16,7 +25,8 @@ export type GetExtraEstablishmentInfos = (
 ) => Promise<ExtraEstablishmentInfos>;
 
 export type UncompleteEstablishmentProps = MandatoryEstablishmentFields &
-  Partial<EstablishmentFieldsToRetrieve>;
+  Partial<EstablishmentFieldsToRetrieve> &
+  Partial<OptionalEstablishmentFields>;
 
 export class UncompleteEstablishmentEntity {
   constructor(private props: UncompleteEstablishmentProps) {}
@@ -54,23 +64,28 @@ export class UncompleteEstablishmentEntity {
   }
 
   public async updateExtraEstablishmentInfos(
-    getExtraEstablishmentInfos: GetExtraEstablishmentInfos,
-  ) {
-    const extraEstablishmentInfo = await getExtraEstablishmentInfos(
-      this.props.siret,
-    );
-
-    this.props.naf = extraEstablishmentInfo.naf;
-    this.props.numberEmployeesRange = <TefenCode>(
-      +extraEstablishmentInfo.numberEmployeesRange
-    );
-    return extraEstablishmentInfo;
+    sirenRepositiory: SireneRepository,
+  ): Promise<SireneRepositoryAnswer | undefined> {
+    const extraEstablishmentInfo = await sirenRepositiory.get(this.props.siret);
+    if (extraEstablishmentInfo) {
+      this.props.naf =
+        extraEstablishmentInfo.etablissements[0].uniteLegale.activitePrincipaleUniteLegale!;
+      if (
+        extraEstablishmentInfo.etablissements[0].uniteLegale
+          .trancheEffectifsUniteLegale
+      )
+        this.props.numberEmployeesRange = <TefenCode>(
+          +extraEstablishmentInfo.etablissements[0].uniteLegale
+            .trancheEffectifsUniteLegale
+        );
+      return extraEstablishmentInfo;
+    }
   }
 
   public async searchForMissingFields(
     getPosition: GetPosition,
-    getExtraEstablishmentInfos: GetExtraEstablishmentInfos,
-  ): Promise<EstablishmentEntity> {
+    sirenRepositiory: SireneRepository,
+  ): Promise<EstablishmentEntity | undefined> {
     let position: Position;
     if (!this.props.position) {
       position = await this.updatePosition(getPosition);
@@ -81,28 +96,34 @@ export class UncompleteEstablishmentEntity {
     let naf: string;
     let numberEmployeesRange: TefenCode;
     if (!this.props.naf || !this.props.numberEmployeesRange) {
-      const otherProperties = await this.updateExtraEstablishmentInfos(
-        getExtraEstablishmentInfos,
-      );
-      numberEmployeesRange = otherProperties.numberEmployeesRange;
-      naf = otherProperties.naf;
-    } else {
-      naf = this.props.naf;
-      numberEmployeesRange = this.props.numberEmployeesRange;
-    }
+      await this.updateExtraEstablishmentInfos(sirenRepositiory);
 
-    return new EstablishmentEntity({
-      id: this.props.id,
-      address: this.props.address,
-      city: this.props.city,
-      score: this.props.score,
-      romes: this.props.romes,
-      siret: this.props.siret,
-      dataSource: this.props.dataSource,
-      name: this.props.name,
-      numberEmployeesRange: numberEmployeesRange,
-      position: position,
-      naf: naf,
-    });
+      if (this.props.naf && this.props.numberEmployeesRange) {
+        const establishmentToReturn = new EstablishmentEntity({
+          id: this.props.id,
+          address: this.props.address,
+          score: this.props.score,
+          romes: this.props.romes,
+          voluntary_to_immersion: this.props.voluntary_to_immersion,
+          siret: this.props.siret,
+          dataSource: this.props.dataSource,
+          name: this.props.name,
+          numberEmployeesRange: this.props.numberEmployeesRange,
+          position: position,
+          naf: this.props.naf,
+        });
+        if (this.props.contact_mode) {
+          establishmentToReturn.setContact_mode(this.props.contact_mode);
+        }
+        if (this.props.contact_in_establishment) {
+          establishmentToReturn.setContact_in_establishment(
+            this.props.contact_in_establishment,
+          );
+        }
+        return establishmentToReturn;
+      } else {
+        return undefined;
+      }
+    }
   }
 }

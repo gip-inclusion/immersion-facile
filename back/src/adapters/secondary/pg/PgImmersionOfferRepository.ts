@@ -113,6 +113,16 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     });
   }
 
+  async insertEstablishmentContact(
+    immersionEstablishmentContact: ImmersionEstablishmentContact,
+  ) {
+    await this.client.query(
+      format(
+        "INSERT INTO immersion_contacts (uuid, name, firstname, email, role,  siret_establishment) VALUES %L",
+        immersionEstablishmentContact,
+      ),
+    );
+  }
   async insertImmersions(
     immersionOffers: ImmersionOfferEntity[],
   ): Promise<void> {
@@ -132,15 +142,21 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       [],
     );
 
+    const positionIndex = 10;
+
     const deduplicatedArrayOfImmersionsOffersMapped =
       deduplicatedArrayOfImmersionsOffers.map((offer) => {
-        const position: Position = offer[9];
+        const position: Position = offer[positionIndex];
         const newPosition = `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
-        return [...offer.slice(0, 9), newPosition, ...offer.slice(9 + 1)];
+        return [
+          ...offer.slice(0, positionIndex),
+          newPosition,
+          ...offer.slice(positionIndex + 1),
+        ];
       });
 
     const formatedQuery = format(
-      "INSERT INTO immersion_offers (uuid, rome, naf_division, siret, naf,  name,voluntary_to_immersion, data_source, score, gps) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_offers DO UPDATE SET naf=EXCLUDED.naf, name=EXCLUDED.name, voluntary_to_immersion=EXCLUDED.voluntary_to_immersion, \
+      "INSERT INTO immersion_offers (uuid, rome, naf_division, siret, naf,  name,voluntary_to_immersion, data_source, contact_in_establishment_uuid, score, gps) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_offers DO UPDATE SET naf=EXCLUDED.naf, name=EXCLUDED.name, voluntary_to_immersion=EXCLUDED.voluntary_to_immersion, \
     data_source=EXCLUDED.data_source, score=EXCLUDED.score, update_date=NOW() \
     WHERE EXCLUDED.data_source='form' OR (immersion_offers.data_source != 'form' AND \
     (EXCLUDED.data_source = 'api_laplateformedelinclusion' AND immersion_offers.data_source = 'api_labonneboite')) ",

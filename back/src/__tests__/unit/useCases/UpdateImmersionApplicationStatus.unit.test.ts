@@ -260,11 +260,22 @@ describe("UpdateImmersionApplicationStatus", () => {
     return storedImmersionApplication.toDto();
   };
 
+  type ExtractFromDomainTopics<T extends DomainTopic> = Extract<DomainTopic, T>;
+
+  type ImmersionApplicationDomainTopic = ExtractFromDomainTopics<
+    | "ImmersionApplicationSubmittedByBeneficiary"
+    | "ImmersionApplicationAcceptedByCounsellor"
+    | "ImmersionApplicationAcceptedByValidator"
+    | "FinalImmersionApplicationValidationByAdmin"
+    | "ImmersionApplicationRejected"
+    | "ImmersionApplicationRequiresModification"
+  >;
+
   type TestAcceptNewStatusParams = {
     role: Role;
     oldStatus: ApplicationStatus;
     newStatus: ApplicationStatus;
-    expectedDomainTopic: DomainTopic;
+    expectedDomainTopic: ImmersionApplicationDomainTopic;
   };
 
   const testAcceptsStatusUpdate = async ({
