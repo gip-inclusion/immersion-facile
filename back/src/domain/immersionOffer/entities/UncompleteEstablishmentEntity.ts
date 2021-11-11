@@ -68,7 +68,10 @@ export class UncompleteEstablishmentEntity {
     const extraEstablishmentInfo = await sirenRepositiory.get(this.props.siret);
     if (extraEstablishmentInfo) {
       this.props.naf =
-        extraEstablishmentInfo.etablissements[0].uniteLegale.activitePrincipaleUniteLegale!;
+        extraEstablishmentInfo.etablissements[0].uniteLegale.activitePrincipaleUniteLegale!.replace(
+          ".",
+          "",
+        );
       if (
         extraEstablishmentInfo.etablissements[0].uniteLegale
           .trancheEffectifsUniteLegale

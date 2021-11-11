@@ -1,11 +1,13 @@
 import { Pool, PoolClient } from "pg";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
 import { EstablishmentEntity } from "../../domain/immersionOffer/entities/EstablishmentEntity";
-import { ImmersionOfferEntity } from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import {
+  ImmersionEstablishmentContact,
+  ImmersionOfferEntity,
+} from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 
-const populateWithImmersionOffers = async (
+const populateWithImmersionSearches = async (
   pgImmersionOfferRepository: PgImmersionOfferRepository,
 ) => {
   await pgImmersionOfferRepository.insertSearch({
@@ -49,10 +51,16 @@ const populateWithImmersionOffers = async (
 describe("Postgres implementation of immersion offer repository", () => {
   let pool: Pool;
   let client: PoolClient;
+  let pgImmersionOfferRepository: PgImmersionOfferRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
+    await client.query("TRUNCATE searches_made CASCADE");
+    await client.query("TRUNCATE immersion_contacts CASCADE");
+    await client.query("TRUNCATE establishments CASCADE");
+    await client.query("TRUNCATE immersion_offers CASCADE");
+    pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
   });
 
   afterAll(async () => {
@@ -60,8 +68,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   test("Insert search works", async () => {
-    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
-    await populateWithImmersionOffers(pgImmersionOfferRepository);
+    await populateWithImmersionSearches(pgImmersionOfferRepository);
 
     expect(
       (
@@ -79,8 +86,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   test("Grouping searches close geographically works", async () => {
-    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
-    await populateWithImmersionOffers(pgImmersionOfferRepository);
+    await populateWithImmersionSearches(pgImmersionOfferRepository);
 
     //We expect that two of the 6 searches have been grouped by
     expect(
@@ -101,8 +107,6 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   test("Insert immersions and retrieves them back", async () => {
-    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
-
     await pgImmersionOfferRepository.insertEstablishments([
       new EstablishmentEntity({
         id: "13df03a5-a2a5-430a-b558-ed3e2f035443",
@@ -177,8 +181,6 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   test("Insert establishments and retreives them back", async () => {
-    const pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
-
     await pgImmersionOfferRepository.insertEstablishments([
       new EstablishmentEntity({
         id: "13df03a5-a2a5-430a-b558-ed3e2f035443",
@@ -283,5 +285,50 @@ describe("Postgres implementation of immersion offer repository", () => {
         )
       )[0].name,
     ).toBe("Company from form");
+  });
+
+  test("Insert establishment contact", async () => {
+    await pgImmersionOfferRepository.insertEstablishments([
+      new EstablishmentEntity({
+        id: "13df03a5-a2a5-430a-b558-ed3e2f035443",
+        address: "fake address",
+        name: "Fake Establishment from form",
+        score: 5,
+        voluntary_to_immersion: false,
+        romes: ["M1607"],
+        siret: "11112222333344",
+        dataSource: "form",
+        numberEmployeesRange: 1,
+        position: { lat: 10.1, lon: 10.2 },
+        naf: "8539A",
+      }),
+    ]);
+
+    const establishmentContact: ImmersionEstablishmentContact = {
+      id: "84007f00-f1fb-4458-a41f-492143ffc8df",
+      email: "some@mail.com",
+      firstname: "Bob",
+      name: "MyName",
+      role: "Chauffeur",
+      siretEstablishment: "11112222333344",
+    };
+
+    await pgImmersionOfferRepository.insertEstablishmentContact(
+      establishmentContact,
+    );
+
+    const { rows } = await client.query("SELECT * FROM immersion_contacts");
+    expect(rows).toHaveLength(1);
+    expect(rows).toEqual([
+      {
+        uuid: "84007f00-f1fb-4458-a41f-492143ffc8df",
+        name: "MyName",
+        firstname: "Bob",
+        email: "some@mail.com",
+        role: "Chauffeur",
+        siret_establishment: "11112222333344",
+        phone: null,
+      },
+    ]);
   });
 });

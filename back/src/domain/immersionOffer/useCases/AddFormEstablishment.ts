@@ -37,7 +37,7 @@ export class AddFormEstablishment extends UseCase<
       payload: dto,
     });
 
-    this.outboxRepository.save(event);
+    await this.outboxRepository.save(event);
     return id;
   }
 }

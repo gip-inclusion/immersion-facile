@@ -25,7 +25,7 @@ describe("SearchImmersion", () => {
           firstname: "Pierre",
           email: "test@email.fr",
           role: "Directeur",
-          siret_institution: "78000403200019",
+          siretEstablishment: "78000403200019",
         },
       }),
     ]);

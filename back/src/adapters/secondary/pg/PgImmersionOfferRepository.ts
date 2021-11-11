@@ -116,11 +116,12 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   async insertEstablishmentContact(
     immersionEstablishmentContact: ImmersionEstablishmentContact,
   ) {
+    const { id, name, firstname, email, role, siretEstablishment } =
+      immersionEstablishmentContact;
     await this.client.query(
-      format(
-        "INSERT INTO immersion_contacts (uuid, name, firstname, email, role,  siret_establishment) VALUES %L",
-        immersionEstablishmentContact,
-      ),
+      `INSERT INTO immersion_contacts (uuid, name, firstname, email, role,  siret_establishment)
+        VALUES ($1, $2, $3, $4, $5, $6)`,
+      [id, name, firstname, email, role, siretEstablishment],
     );
   }
   async insertImmersions(
@@ -227,7 +228,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               firstname: result.immersion_contacts_firstname,
               email: result.immersion_contacts_email,
               role: result.immersion_contacts_role,
-              siret_institution: result.immersion_contacts_siret_institution,
+              siretEstablishment: result.immersion_contacts_siret_institution,
             };
             return new ImmersionOfferEntity({
               id: result.uuid,

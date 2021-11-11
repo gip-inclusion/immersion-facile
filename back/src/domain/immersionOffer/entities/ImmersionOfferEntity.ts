@@ -21,7 +21,7 @@ export type ImmersionEstablishmentContact = {
   firstname: string;
   email: string;
   role: string;
-  siret_institution: string;
+  siretEstablishment: string;
 };
 
 export class ImmersionOfferEntity {

@@ -36,38 +36,34 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
   public async _execute(
     id: FormEstablishmentId,
   ): Promise<ImmersionOfferEntity[]> {
-    const immersionOfferDto = await this.formEstablishmentRepository.getById(
+    const formEstablishment = await this.formEstablishmentRepository.getById(
       id,
     );
-    if (immersionOfferDto) {
+    if (formEstablishment) {
       //Insert contact
-      //TODO insert contact
       const establishmentContact: ImmersionEstablishmentContact =
         this.convertBusinessContactDtoToImmersionEstablishmentContact(
-          immersionOfferDto.businessContacts[0],
-          immersionOfferDto.siret,
+          formEstablishment.businessContacts[0],
+          formEstablishment.siret,
         );
 
-      await this.immersionOfferRepository.insertEstablishmentContact(
-        establishmentContact,
-      );
       //Insert establishment
-      const romeCodes = await immersionOfferDto.professions
+      const romeCodes = formEstablishment.professions
         .map((x) => x.romeCodeMetier)
         .filter((x): x is string => x !== undefined);
 
       const uncompleteEstablishmentEntity: UncompleteEstablishmentEntity =
         new UncompleteEstablishmentEntity({
           id: uuidV4(),
-          siret: immersionOfferDto.siret,
-          name: immersionOfferDto.businessName,
-          address: immersionOfferDto.businessAddress,
+          siret: formEstablishment.siret,
+          name: formEstablishment.businessName,
+          address: formEstablishment.businessAddress,
           score: 10,
           voluntary_to_immersion: true,
           romes: romeCodes,
           dataSource: "form",
           contact_in_establishment: establishmentContact,
-          contact_mode: immersionOfferDto.preferredContactMethods[0],
+          contact_mode: formEstablishment.preferredContactMethods[0],
         });
 
       const establishmentEntity =
@@ -77,9 +73,19 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
         );
 
       if (establishmentEntity) {
-        //Insert immersion
+        //Extract immersion
         const immersions = establishmentEntity.extractImmersions();
-        this.immersionOfferRepository.insertImmersions(
+
+        //We insert the establishment
+        this.immersionOfferRepository.insertEstablishments([
+          establishmentEntity,
+        ]);
+        //Insert establishment contact
+        await this.immersionOfferRepository.insertEstablishmentContact(
+          establishmentContact,
+        );
+        //Insert immersions
+        await this.immersionOfferRepository.insertImmersions(
           establishmentEntity.extractImmersions(),
         );
         return immersions;
@@ -99,7 +105,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
       firstname: businessContactDto.firstName,
       email: businessContactDto.email,
       role: businessContactDto.job,
-      siret_institution: siret_institution,
+      siretEstablishment: siret_institution,
     };
   }
 }

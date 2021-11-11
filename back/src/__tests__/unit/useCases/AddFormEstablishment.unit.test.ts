@@ -143,8 +143,17 @@ describe("Add FormEstablishment", () => {
         lat: position.lat,
         lon: position.lon,
       });
+
       //Verify that immersion matches
       expect(immersions[0].getProps().siret).toEqual(formEstablishment.siret);
+
+      //Verify that establishment is there and naf is 5 characters
+      const establishment =
+        await inMemoryImmersionOfferRepository.getEstablishmentFromSiret(
+          formEstablishment.siret,
+        );
+      expect(establishment[0].getSiret()).toEqual(formEstablishment.siret);
+      expect(establishment[0].getNaf().length).toEqual(5);
 
       //Verify that the company contact is here
       const contact_in_establishment_from_immersion =
