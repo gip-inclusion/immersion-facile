@@ -56,6 +56,9 @@ describe("Postgres implementation of immersion offer repository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
+  });
+
+  beforeEach(async () => {
     await client.query("TRUNCATE searches_made CASCADE");
     await client.query("TRUNCATE immersion_contacts CASCADE");
     await client.query("TRUNCATE establishments CASCADE");
