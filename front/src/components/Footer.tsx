@@ -28,28 +28,38 @@ export const Footer = () => (
         <div className="fr-footer__bottom">
           <ul className="fr-footer__bottom-list">
             <li className="fr-footer__bottom-item">
-              <a className="fr-footer__bottom-link" href="#">
-                Plan du site
-              </a>
-            </li>
-            <li className="fr-footer__bottom-item">
-              <a className="fr-footer__bottom-link" href="#">
-                Accessibilité: non/partiellement/totalement conforme
-              </a>
-            </li>
-            <li className="fr-footer__bottom-item">
-              <a className="fr-footer__bottom-link" href="#">
+              <a
+                className="fr-footer__bottom-link"
+                href="https://immersion-facile-1.gitbook.io/mentions-legales/"
+                target="_blank"
+              >
                 Mentions légales
               </a>
             </li>
             <li className="fr-footer__bottom-item">
-              <a className="fr-footer__bottom-link" href="#">
-                Données personnelles
+              <a
+                className="fr-footer__bottom-link"
+                href="https://immersion-facile-1.gitbook.io/mentions-legales/politique-de-confidentialite"
+                target="_blank"
+              >
+                Politique de confidentialité
               </a>
             </li>
             <li className="fr-footer__bottom-item">
-              <a className="fr-footer__bottom-link" href="#">
-                Gestion des cookies
+              <a
+                className="fr-footer__bottom-link"
+                href="https://immersion-facile-1.gitbook.io/mentions-legales/conditions-generales-dutilisation"
+                target="_blank"
+              >
+                Conditions générales d'utilisation
+              </a>
+            </li>
+            <li className="fr-footer__bottom-item">
+              <a
+                className="fr-footer__bottom-link"
+                href="mailto:contact@immersion-facile.beta.gouv.fr"
+              >
+                Nous contacter
               </a>
             </li>
           </ul>

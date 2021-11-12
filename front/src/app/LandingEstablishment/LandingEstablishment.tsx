@@ -34,18 +34,19 @@ export const LandingEstablishment = () => (
       <a
         {...routes.formEstablishment().link}
         className="no-underline shadow-none bg-white py-3 px-8 rounded-md text-immersionBlue-dark"
+        target="_blank"
       >
-        Référencer votre entreprise {">"}
+        Référencer votre entreprise
       </a>
     </section>
     <section className="flex flex-col items-center mx-3 sm:mx-20">
-      <Title>Ce que l'immersion facile tente de résoudre...</Title>
+      <Title>Ce que l'immersion facile tente de résoudre ...</Title>
       <div className="flex justify-center sm:justify-between flex-wrap">
         <Statistic
-          title="...pour les entreprises ?"
-          subtitle="Il est difficile de découvrir de nouveaux talents..."
+          title="... pour les entreprises ?"
+          subtitle="Il est difficile de découvrir de nouveaux talents."
           stat={81}
-          text="des employeurs utilisant l'immersion professionnelle déclarent qu'ils cherchent à repérer un futur collaborateur"
+          text="des employeurs utilisant l'immersion professionnelle déclarent qu'ils cherchent à repérer un futur collaborateur."
         />
         <div
           className="w-64 h-44"
@@ -55,10 +56,10 @@ export const LandingEstablishment = () => (
           }}
         />
         <Statistic
-          title="...pour les candidats ?"
+          title="... pour les candidats ?"
           subtitle="Il est difficile d'essayer un nouveau métier"
           stat={89}
-          text="des demandeurs d'emploi assurent avoir cherché une entreprise d'accueil seuls ou avoir fait appel à leur réseau"
+          text="des demandeurs d'emploi assurent avoir cherché une entreprise d'accueil seuls ou avoir fait appel à leur réseau."
         />
       </div>
     </section>
@@ -90,8 +91,9 @@ export const LandingEstablishment = () => (
       <a
         {...routes.formEstablishment().link}
         className="no-underline shadow-none bg-immersionBlue py-3 px-8 rounded-md text-white font-semibold my-3"
+        target="_blank"
       >
-        Référencer votre entreprise {">"}
+        Référencer votre entreprise
       </a>
     </section>
     <section className="flex flex-col items-center">
@@ -110,29 +112,29 @@ export const LandingEstablishment = () => (
         <div className="flex-1 max-w-md" style={{ minWidth: "250px" }}>
           <BulletPoint>
             C'est une <Colored>période courte et non rémunérée</Colored> en
-            entreprise{" "}
+            entreprise.
           </BulletPoint>
           <BulletPoint>
             Cela permet de <Colored>découvrir un métier</Colored> et un
             environnement de travail tout en vérifiant des compétences et
-            aptitudes auprès d'un professionnel en activité
+            aptitudes auprès d'un professionnel en activité.
           </BulletPoint>
           <BulletPoint>
-            Le bénéficiaire <Colored>conserve son status initial</Colored> et
+            Le bénéficiaire <Colored>conserve son statut initial</Colored> et
             est couvert par un prescripteur (Pôle emploi, Cap Emploi, Mission
-            Locale, etc) grâce à la signature d'une convention (lien:{" "}
-            <a {...routes.immersionApplication().link}>
-              faire une demande d'immersion
+            Locale, etc) grâce à la{" "}
+            <a {...routes.immersionApplication().link} target="_blank">
+              signature d'une convention
             </a>
-            )
+            .
           </BulletPoint>
         </div>
       </div>
     </section>
     <section className="flex flex-col items-center">
       <Title red>L'immersion facile, comment ça fonctionne ?</Title>
-      <div className="flex max-w-3xl flex-wrap justify-center">
-        <div className="max-w-md" style={{ minWidth: "250px" }}>
+      <div className="flex max-w-7xl flex-wrap justify-center items-center">
+        <div className="max-w-xs" style={{ minWidth: "250px" }}>
           <BulletPoint red num={1}>
             <Colored red>Sélectionnez les métiers</Colored> pour lesquels chaque
             établissement peut accueillir en immersion et préciser un contact
@@ -147,12 +149,21 @@ export const LandingEstablishment = () => (
             débuter l'immersion professionnelle.
           </BulletPoint>
         </div>
-        <div className="w-72 pl-4">
-          <Title red>L'immersion professionnelle, mode d'emploi</Title>
-          <div className="text-center">
-            <a href="https://www.powtoon.com/c/c8x7n7AR2XE/2/m" target="_blank">
-              Voir la vidéo de présentation
-            </a>
+        <div
+          className="pl-4 flex flex-col items-center"
+          style={{ width: "480px" }}
+        >
+          <div className="text-immersionRed-dark font-semibold text-center py-4">
+            L'immersion professionnelle, mode d'emploi
+          </div>
+          <div className="border-blue-200 border border-solid">
+            <iframe
+              width="480"
+              height="270"
+              src="https://www.powtoon.com/embed/e1lglPbeknD/"
+              frameBorder="0"
+              allowFullScreen
+            />
           </div>
         </div>
       </div>
