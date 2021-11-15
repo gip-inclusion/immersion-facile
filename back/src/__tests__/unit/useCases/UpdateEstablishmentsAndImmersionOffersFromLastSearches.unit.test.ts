@@ -158,9 +158,9 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
       naf: "8559A",
       siret: "24570135400111",
       name: "Chantier d'insertion de l'Arc Mosellan (CCAM)",
-      voluntary_to_immersion: false,
+      voluntaryToImmersion: false,
       data_source: "api_laplateformedelinclusion",
-      contact_in_establishment: undefined,
+      contactInEstablishment: undefined,
       score: 6,
       position: { lat: 43.8666, lon: 1.3333 },
     });

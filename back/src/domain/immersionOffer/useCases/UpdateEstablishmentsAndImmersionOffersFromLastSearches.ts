@@ -54,7 +54,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           allEstablishments,
         );
 
-        //We then transform  dfffdthem into immersions and add them to our database
+        //We then transform  them into immersions and add them to our database
         const allImmersions = allEstablishments.flatMap((establishment) =>
           establishment.extractImmersions(),
         );
@@ -75,9 +75,9 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           naf: establishment.getNaf(),
           siret: establishment.getSiret(),
           name: establishment.getName(),
-          voluntary_to_immersion: false,
+          voluntaryToImmersion: false,
           data_source: establishment.getDataSource(),
-          contact_in_establishment: undefined,
+          contactInEstablishment: undefined,
           score: establishment.getScore(),
           position: establishment.getPosition(),
         }),

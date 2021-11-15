@@ -92,10 +92,6 @@ export class InMemorySireneRepository implements SireneRepository {
     this._repo[TEST_ESTABLISHMENT4_SIRET] = TEST_ESTABLISHMENT4;
   }
 
-  public insert(siret: string, establishment: Establishment) {
-    this._repo[siret] = establishment;
-  }
-
   public async get(
     siret: SiretDto,
   ): Promise<SireneRepositoryAnswer | undefined> {
@@ -114,7 +110,7 @@ export class InMemorySireneRepository implements SireneRepository {
   }
 
   // Visible for testing
-  public add(establishment: Establishment) {
+  public setEstablishment(establishment: Establishment) {
     this._repo[establishment.siret] = establishment;
   }
 }

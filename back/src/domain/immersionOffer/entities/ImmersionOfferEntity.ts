@@ -8,9 +8,9 @@ export type ImmersionOfferProps = {
   naf?: string;
   siret: string;
   name: string;
-  voluntary_to_immersion: boolean;
+  voluntaryToImmersion: boolean;
   data_source: string;
-  contact_in_establishment?: ImmersionEstablishmentContact;
+  contactInEstablishment?: ImmersionEstablishmentContact;
   score: number;
   position?: Position;
 };
@@ -41,8 +41,8 @@ export class ImmersionOfferEntity {
 
   public toArrayOfProps() {
     let idContactInEstablishment = null;
-    if (this.props.contact_in_establishment) {
-      idContactInEstablishment = this.props.contact_in_establishment;
+    if (this.props.contactInEstablishment) {
+      idContactInEstablishment = this.props.contactInEstablishment;
     }
     return [
       this.props.id,
@@ -51,7 +51,7 @@ export class ImmersionOfferEntity {
       this.props.siret,
       this.props.naf,
       this.props.name,
-      this.props.voluntary_to_immersion,
+      this.props.voluntaryToImmersion,
       this.props.data_source,
       idContactInEstablishment,
       this.props.score,

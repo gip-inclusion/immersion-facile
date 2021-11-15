@@ -24,7 +24,7 @@ const validFormEstablishment: FormEstablishmentDto = {
     },
     {
       romeCodeMetier: "B9112",
-      description: "Un métier passionnant",
+      description: "Patissier",
     },
     {
       romeCodeAppellation: "22222",

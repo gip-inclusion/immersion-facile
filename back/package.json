@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "build-initial-db": "ts-node src/adapters/secondary/pg/migration/buildDb.ts",
+    "dev": "NODE_ENV=local ts-node-dev src/adapters/primary/startServer.ts",
     "start": "NODE_ENV=local ts-node src/adapters/primary/startServer.ts",
     "start-prod": "NODE_ENV=production ts-node src/adapters/primary/startServer.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts",
@@ -43,6 +44,7 @@
     "prettier": "^2.3.2",
     "supertest": "^6.1.3",
     "ts-jest": "^27.0.3",
+    "ts-node-dev": "^1.1.8",
     "typescript": "^4.3.5"
   },
   "dependencies": {

@@ -37,7 +37,7 @@ describe("GetSiret", () => {
   });
 
   test("returns the parsed info when siret found", async () => {
-    repository.add(validEstablishment);
+    repository.setEstablishment(validEstablishment);
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
     });
@@ -50,7 +50,7 @@ describe("GetSiret", () => {
   });
 
   test("populates businessName from nom/prenom when denomination not available", async () => {
-    repository.add({
+    repository.setEstablishment({
       ...validEstablishment,
       uniteLegale: {
         prenomUsuelUniteLegale: "ALAIN",
@@ -64,7 +64,7 @@ describe("GetSiret", () => {
   });
 
   test("skips missing parts of adresseEtablissment", async () => {
-    repository.add({
+    repository.setEstablishment({
       ...validEstablishment,
       adresseEtablissement: {
         // No numeroVoieEtablissement
@@ -81,7 +81,7 @@ describe("GetSiret", () => {
   });
 
   test("skips naf when not available", async () => {
-    repository.add({
+    repository.setEstablishment({
       ...validEstablishment,
       uniteLegale: {
         denominationUniteLegale: "MA P'TITE BOITE",

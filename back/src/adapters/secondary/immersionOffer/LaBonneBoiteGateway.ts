@@ -88,7 +88,7 @@ export class LaBonneBoiteGateway implements EstablishmentsGateway {
                 name: establishment.name,
                 siret: establishment.siret,
                 score: establishment.stars,
-                voluntary_to_immersion: false,
+                voluntaryToImmersion: false,
                 romes: [establishment.matched_rome_code],
                 dataSource: "api_labonneboite",
               }),

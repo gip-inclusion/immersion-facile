@@ -6,11 +6,20 @@ import {
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import { createLogger } from "../../../utils/logger";
 import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { Position } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 
 const logger = createLogger(__filename);
+
+type PgContactMethod = "phone" | "mail" | "in_person" | null;
+const contactModeMap: Record<ContactMethod, PgContactMethod> = {
+  PHONE: "phone",
+  EMAIL: "mail",
+  IN_PERSON: "in_person",
+  UNKNOWN: null,
+};
 
 export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   constructor(private client: PoolClient) {}
@@ -25,7 +34,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           searchParams.lon,
           searchParams.distance,
           true,
-          "POINT(" + searchParams.lon + " " + searchParams.lat + ")",
+          `POINT(${searchParams.lon} ${searchParams.lat})`,
         ],
       )
       .catch((e) => {
@@ -79,29 +88,37 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       [],
     );
 
-    deduplicatedArrayOfEstablishments.map((establishment: any[]) => {
-      const position: Position = establishment[7];
-      establishment[7] =
-        "ST_GeographyFromText('POINT(" +
-        position.lon +
-        " " +
-        position.lat +
-        ")')";
-      return establishment;
-    });
+    const contactModeIndex = 5;
+    const positionIndex = 7;
+    const uniqImmersionsOffersWithCorrectPosition =
+      deduplicatedArrayOfEstablishments.map((establishment: any[]) => {
+        const position: Position = establishment[positionIndex];
+        const newPosition = `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
+        const contactMethod = establishment[contactModeIndex] as
+          | ContactMethod
+          | undefined;
+        const pgContactMethod = contactModeMap[contactMethod ?? "UNKNOWN"];
+
+        return [
+          ...establishment.slice(0, contactModeIndex),
+          pgContactMethod,
+          ...establishment.slice(contactModeIndex + 1, positionIndex),
+          newPosition,
+        ];
+      });
 
     const formatedQuery = format(
-      "INSERT INTO establishments (siret, name, address,number_employees, naf, contact_mode, \
+      "INSERT INTO establishments (siret, name, address, number_employees, naf, contact_mode, \
       data_source, gps) VALUES %L ON CONFLICT ON CONSTRAINT pk_establishments DO UPDATE SET \
       name=EXCLUDED.name, address=EXCLUDED.address, number_employees=EXCLUDED.number_employees, \
       naf=EXCLUDED.naf, contact_mode=EXCLUDED.contact_mode, data_source=EXCLUDED.data_source, \
       update_date=NOW() \
       WHERE EXCLUDED.data_source='form' OR (establishments.data_source != 'form' AND \
       (EXCLUDED.data_source = 'api_laplateformedelinclusion' AND establishments.data_source = 'api_labonneboite')) ",
-      deduplicatedArrayOfEstablishments,
+      uniqImmersionsOffersWithCorrectPosition,
     );
 
-    //We remove the dashes arround method ST_GeographyFromText to make it work
+    //We remove the dashes around method ST_GeographyFromText to make it work
     const re =
       /'ST_GeographyFromText\(''POINT\((\d+(\.\d+)?)\s(\d+(\.\d+)?)\)''\)'/;
     const formatedQueryWorking = formatedQuery.replace(
@@ -144,33 +161,40 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     );
 
     const positionIndex = 10;
+    const contactIndex = 8;
 
-    const deduplicatedArrayOfImmersionsOffersMapped =
+    const uniqImmersionsOffersWithCorrectPosition =
       deduplicatedArrayOfImmersionsOffers.map((offer) => {
         const position: Position = offer[positionIndex];
         const newPosition = `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
+        const contactUuid = offer[contactIndex]?.id;
+
         return [
-          ...offer.slice(0, positionIndex),
+          ...offer.slice(0, contactIndex),
+          contactUuid,
+          ...offer.slice(contactIndex + 1, positionIndex),
           newPosition,
           ...offer.slice(positionIndex + 1),
         ];
       });
 
     const formatedQuery = format(
-      "INSERT INTO immersion_offers (uuid, rome, naf_division, siret, naf,  name,voluntary_to_immersion, data_source, contact_in_establishment_uuid, score, gps) VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_offers DO UPDATE SET naf=EXCLUDED.naf, name=EXCLUDED.name, voluntary_to_immersion=EXCLUDED.voluntary_to_immersion, \
-    data_source=EXCLUDED.data_source, score=EXCLUDED.score, update_date=NOW() \
-    WHERE EXCLUDED.data_source='form' OR (immersion_offers.data_source != 'form' AND \
-    (EXCLUDED.data_source = 'api_laplateformedelinclusion' AND immersion_offers.data_source = 'api_labonneboite')) ",
-      deduplicatedArrayOfImmersionsOffersMapped,
+      "INSERT INTO immersion_offers (uuid, rome, naf_division, siret, naf,  name, voluntary_to_immersion, data_source, contact_in_establishment_uuid, score, gps) \
+      VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_offers DO UPDATE SET naf=EXCLUDED.naf, name=EXCLUDED.name, voluntary_to_immersion=EXCLUDED.voluntary_to_immersion, \
+      data_source=EXCLUDED.data_source, score=EXCLUDED.score, update_date=NOW() \
+      WHERE EXCLUDED.data_source='form' OR (immersion_offers.data_source != 'form' AND \
+      (EXCLUDED.data_source = 'api_laplateformedelinclusion' AND immersion_offers.data_source = 'api_labonneboite')) ",
+      uniqImmersionsOffersWithCorrectPosition,
     );
 
-    //We remove the dashes arround method ST_GeographyFromText to make it work
+    // Replace the escaped quotes ('') with single quotes (') in ST_GeographyFromText.
     const re =
-      /'ST_GeographyFromText\(''POINT\((\d+(\.\d+)?)\s(\d+(\.\d+)?)\)''\)'/;
+      /'ST_GeographyFromText\(''POINT\((\d+(\.\d+)?)\s(\d+(\.\d+)?)\)''\)'/g;
     const formatedQueryWorking = formatedQuery.replace(
       re,
       "ST_GeographyFromText('POINT($1 $3)')",
     );
+
     await this.client.query(formatedQueryWorking);
   }
 
@@ -184,23 +208,13 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       });
   }
 
-  async getEstablishmentFromSiret(siret: string) {
-    return this.client
-      .query("SELECT * FROM establishments WHERE siret=$1", [siret])
-      .then((res) => res.rows)
-      .catch((e) => {
-        logger.error(e);
-        return [];
-      });
-  }
-
   async getFromSearch(
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
     let nafCategoryFilter = "";
     const parameters = [
       searchParams.rome,
-      "POINT(" + searchParams.lon + " " + searchParams.lat + ")",
+      `POINT(${searchParams.lon} ${searchParams.lat})`,
       searchParams.distance * 1000,
     ];
     if (searchParams.nafDivision) {
@@ -235,10 +249,10 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               rome: result.rome,
               siret: result.siret,
               name: result.name,
-              voluntary_to_immersion: result.voluntary_to_immersion,
+              voluntaryToImmersion: result.voluntary_to_immersion,
               data_source: result.data_source,
               score: result.score,
-              contact_in_establishment: immersionContact,
+              contactInEstablishment: immersionContact,
             });
           }
           return new ImmersionOfferEntity({
@@ -246,7 +260,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
             rome: result.rome,
             siret: result.siret,
             name: result.name,
-            voluntary_to_immersion: result.voluntary_to_immersion,
+            voluntaryToImmersion: result.voluntary_to_immersion,
             data_source: result.data_source,
             score: result.score,
           });

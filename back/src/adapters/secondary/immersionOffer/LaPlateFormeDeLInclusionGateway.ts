@@ -47,7 +47,7 @@ export const convertLaPlateFormeDeLInclusionToUncompletEstablishment = (
     id: uuidV4(),
     address: `${addresse_ligne_1} ${addresse_ligne_2} ${code_postal} ${ville}`,
     score: 6,
-    voluntary_to_immersion: false,
+    voluntaryToImmersion: false,
     romes: establishment.postes.map((poste) =>
       poste.rome.substring(poste.rome.length - 6, poste.rome.length - 1),
     ),

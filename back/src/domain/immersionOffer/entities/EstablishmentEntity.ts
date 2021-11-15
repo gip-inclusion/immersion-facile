@@ -1,13 +1,10 @@
+import { v4 as uuidV4 } from "uuid";
+import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import { Flavor } from "../../../shared/typeFlavors";
 import {
-  ContactMethod,
-  BusinessContactDto,
-} from "../../../shared/FormEstablishmentDto";
-import {
-  ImmersionOfferEntity,
   ImmersionEstablishmentContact,
+  ImmersionOfferEntity,
 } from "./ImmersionOfferEntity";
-import { v4 as uuidV4 } from "uuid";
 
 export type EstablishmentId = Flavor<string, "EstablishmentId">;
 
@@ -23,7 +20,7 @@ export type MandatoryEstablishmentFields = {
   address: string;
   score: number;
   romes: string[];
-  voluntary_to_immersion: boolean;
+  voluntaryToImmersion: boolean;
   dataSource:
     | "api_labonneboite"
     | "api_laplateformedelinclusion"
@@ -56,8 +53,8 @@ export type EstablishmentFieldsToRetrieve = {
 };
 
 export type OptionalEstablishmentFields = {
-  contact_mode: ContactMethod;
-  contact_in_establishment: ImmersionEstablishmentContact;
+  contactMode: ContactMethod;
+  contactInEstablishment: ImmersionEstablishmentContact;
 };
 
 type EstablishmentProps = MandatoryEstablishmentFields &
@@ -65,16 +62,18 @@ type EstablishmentProps = MandatoryEstablishmentFields &
   Partial<OptionalEstablishmentFields>;
 
 export class EstablishmentEntity {
-  toArrayOfProps(): any {
+  toArrayOfProps(): any[] {
     return [
       this.props.siret,
       this.props.name,
       this.props.address,
       this.props.numberEmployeesRange,
       this.props.naf,
-      this.props.contact_mode,
+      this.props.contactMode,
       this.props.dataSource,
       this.props.position,
+      this.props.contactMode,
+      this.props.contactInEstablishment,
     ];
   }
   constructor(private props: EstablishmentProps) {}
@@ -111,45 +110,33 @@ export class EstablishmentEntity {
     return this.props.naf;
   }
 
-  public setContact_mode(contact_mode: ContactMethod) {
-    this.props.contact_mode = contact_mode;
+  public setContactMode(contactMode: ContactMethod) {
+    this.props.contactMode = contactMode;
   }
 
-  public setContact_in_establishment(
-    contact_in_establishment: ImmersionEstablishmentContact,
+  public setContactInEstablishment(
+    immersionEstablishmentContact: ImmersionEstablishmentContact,
   ) {
-    this.props.contact_in_establishment = contact_in_establishment;
+    this.props.contactInEstablishment = immersionEstablishmentContact;
   }
 
   public extractImmersions(): ImmersionOfferEntity[] {
     const romeArray = this.getRomeCodesArray();
-    return romeArray.map((rome) => {
-      if (this.props.contact_in_establishment) {
-        return new ImmersionOfferEntity({
+
+    return romeArray.map(
+      (rome) =>
+        new ImmersionOfferEntity({
           id: uuidV4(),
           rome: rome,
           naf: this.props.naf,
           siret: this.props.siret,
           name: this.props.name,
-          voluntary_to_immersion: this.props.voluntary_to_immersion,
+          voluntaryToImmersion: this.props.voluntaryToImmersion,
           data_source: this.getDataSource(),
-          contact_in_establishment: this.props.contact_in_establishment,
+          contactInEstablishment: this.props.contactInEstablishment,
           score: this.getScore(),
           position: this.getPosition(),
-        });
-      } else {
-        return new ImmersionOfferEntity({
-          id: uuidV4(),
-          rome: rome,
-          naf: this.props.naf,
-          siret: this.props.siret,
-          name: this.props.name,
-          voluntary_to_immersion: this.props.voluntary_to_immersion,
-          data_source: this.getDataSource(),
-          score: this.getScore(),
-          position: this.getPosition(),
-        });
-      }
-    });
+        }),
+    );
   }
 }

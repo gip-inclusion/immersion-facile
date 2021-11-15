@@ -9,12 +9,10 @@ export class APIAdresseGateway {
           q: address,
         },
       })
-      .then((response: any) => {
-        return {
-          lat: response.data.features[0].geometry.coordinates[0],
-          lon: response.data.features[0].geometry.coordinates[0],
-        };
-      })
+      .then((response: any) => ({
+        lat: response.data.features[0].geometry.coordinates[1],
+        lon: response.data.features[0].geometry.coordinates[0],
+      }))
       .catch(function (error: any) {
         return { lat: -1, lon: -1 };
       });

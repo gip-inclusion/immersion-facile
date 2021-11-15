@@ -51,10 +51,6 @@ export class InMemoryImmersionOfferRepository
     return searchesToReturn;
   }
 
-  async getEstablishmentFromSiret(siret: string) {
-    return this._establishments.filter((x) => x.getSiret() == siret);
-  }
-
   public async getFromSearch(
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
@@ -76,5 +72,9 @@ export class InMemoryImmersionOfferRepository
 
   getImmersionOffers(): ImmersionOfferEntity[] {
     return this._immersionOffers;
+  }
+
+  async getEstablishmentsFromSiret(siret: string) {
+    return this._establishments.filter((x) => x.getSiret() == siret);
   }
 }

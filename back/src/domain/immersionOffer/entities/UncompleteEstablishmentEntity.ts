@@ -66,39 +66,33 @@ export class UncompleteEstablishmentEntity {
     sirenRepositiory: SireneRepository,
   ): Promise<SireneRepositoryAnswer | undefined> {
     const extraEstablishmentInfo = await sirenRepositiory.get(this.props.siret);
-    if (extraEstablishmentInfo) {
-      this.props.naf =
-        extraEstablishmentInfo.etablissements[0].uniteLegale.activitePrincipaleUniteLegale!.replace(
-          ".",
-          "",
-        );
-      if (
-        extraEstablishmentInfo.etablissements[0].uniteLegale
-          .trancheEffectifsUniteLegale
-      )
-        this.props.numberEmployeesRange = <TefenCode>(
-          +extraEstablishmentInfo.etablissements[0].uniteLegale
-            .trancheEffectifsUniteLegale
-        );
-      return extraEstablishmentInfo;
-    }
+    if (!extraEstablishmentInfo) return;
+
+    this.props.naf =
+      extraEstablishmentInfo.etablissements[0].uniteLegale.activitePrincipaleUniteLegale?.replace(
+        ".",
+        "",
+      );
+
+    const trancheEffectifsUniteLegale =
+      extraEstablishmentInfo.etablissements[0].uniteLegale
+        .trancheEffectifsUniteLegale;
+
+    if (trancheEffectifsUniteLegale)
+      this.props.numberEmployeesRange = <TefenCode>+trancheEffectifsUniteLegale;
+
+    return extraEstablishmentInfo;
   }
 
   public async searchForMissingFields(
     getPosition: GetPosition,
-    sirenRepositiory: SireneRepository,
+    sireneRepository: SireneRepository,
   ): Promise<EstablishmentEntity | undefined> {
-    let position: Position;
-    if (!this.props.position) {
-      position = await this.updatePosition(getPosition);
-    } else {
-      position = this.props.position;
-    }
+    const position: Position =
+      this.props.position ?? (await this.updatePosition(getPosition));
 
-    let naf: string;
-    let numberEmployeesRange: TefenCode;
     if (!this.props.naf || !this.props.numberEmployeesRange) {
-      await this.updateExtraEstablishmentInfos(sirenRepositiory);
+      await this.updateExtraEstablishmentInfos(sireneRepository);
 
       if (this.props.naf && this.props.numberEmployeesRange) {
         const establishmentToReturn = new EstablishmentEntity({
@@ -106,7 +100,7 @@ export class UncompleteEstablishmentEntity {
           address: this.props.address,
           score: this.props.score,
           romes: this.props.romes,
-          voluntary_to_immersion: this.props.voluntary_to_immersion,
+          voluntaryToImmersion: this.props.voluntaryToImmersion,
           siret: this.props.siret,
           dataSource: this.props.dataSource,
           name: this.props.name,
@@ -114,12 +108,13 @@ export class UncompleteEstablishmentEntity {
           position: position,
           naf: this.props.naf,
         });
-        if (this.props.contact_mode) {
-          establishmentToReturn.setContact_mode(this.props.contact_mode);
+
+        if (this.props.contactMode) {
+          establishmentToReturn.setContactMode(this.props.contactMode);
         }
-        if (this.props.contact_in_establishment) {
-          establishmentToReturn.setContact_in_establishment(
-            this.props.contact_in_establishment,
+        if (this.props.contactInEstablishment) {
+          establishmentToReturn.setContactInEstablishment(
+            this.props.contactInEstablishment,
           );
         }
         return establishmentToReturn;

@@ -52,7 +52,7 @@ const initialValues: FormEstablishmentDto = ENV.dev
           firstName: "John",
           lastName: "Doe",
           job: "super job",
-          phone: "0D2837",
+          phone: "02837",
           email: "joe@mail.com",
         },
       ],

@@ -57,15 +57,15 @@ const convertEntityToSearchResultDto = (
     naf: props.naf,
     siret: props.siret,
     name: props.name,
-    voluntary_to_immersion: props.voluntary_to_immersion,
+    voluntary_to_immersion: props.voluntaryToImmersion,
     location: props.position,
-    contact: props.contact_in_establishment
+    contact: props.contactInEstablishment
       ? {
-          id: props.contact_in_establishment.id,
-          first_name: props.contact_in_establishment.firstname,
-          last_name: props.contact_in_establishment.name,
-          email: props.contact_in_establishment.email,
-          role: props.contact_in_establishment.role,
+          id: props.contactInEstablishment.id,
+          first_name: props.contactInEstablishment.firstname,
+          last_name: props.contactInEstablishment.name,
+          email: props.contactInEstablishment.email,
+          role: props.contactInEstablishment.role,
         }
       : undefined,
   };
