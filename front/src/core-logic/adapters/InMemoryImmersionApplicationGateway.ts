@@ -31,11 +31,13 @@ const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
       code: "78.3Z",
       nomenclature: "Ref2",
     },
+    isOpen: true,
   },
   {
     siret: "11111111111111",
     businessName: "ALAIN PROST",
     businessAddress: "CHALET SECRET 73550 MERIBEL",
+    isOpen: true,
   },
 ];
 

@@ -46,10 +46,11 @@ export class HttpsSireneRepository implements SireneRepository {
 
   public async get(
     siret: SiretDto,
+    includeClosedEstablishments = false,
   ): Promise<SireneRepositoryAnswer | undefined> {
     try {
       const response = await this.axiosInstance.get("/siret", {
-        params: this.createSiretQueryParams(siret),
+        params: this.createSiretQueryParams(siret, includeClosedEstablishments),
       });
       return response.data;
     } catch (error) {

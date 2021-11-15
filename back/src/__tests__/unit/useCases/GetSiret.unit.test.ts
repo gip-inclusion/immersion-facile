@@ -10,6 +10,7 @@ const validEstablishment: Establishment = {
     denominationUniteLegale: "MA P'TITE BOITE",
     activitePrincipaleUniteLegale: "78.3Z",
     nomenclatureActivitePrincipaleUniteLegale: "Ref2",
+    etatAdministratifUniteLegale: "A",
   },
   adresseEtablissement: {
     numeroVoieEtablissement: "20",
@@ -29,6 +30,33 @@ describe("GetSiret", () => {
     getSiret = new GetSiret(repository);
   });
 
+  describe("Checking for business being opened", () => {
+    const closedEstablishment = {
+      ...validEstablishment,
+      siret: "11111111111111",
+      etatAdministratifUniteLegale: "F",
+    };
+
+    beforeEach(() => {
+      repository.setEstablishment(validEstablishment);
+      repository.setEstablishment(closedEstablishment);
+    });
+
+    it("marks an open establishment as open, regardless of the period count", async () => {
+      const response = await getSiret.execute({
+        siret: validEstablishment.siret,
+      });
+
+      expect(response).toEqual({
+        siret: "12345678901234",
+        businessName: "MA P'TITE BOITE",
+        businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+        naf: { code: "78.3Z", nomenclature: "Ref2" },
+        isOpen: true,
+      });
+    });
+  });
+
   test("throws NotFoundError wher siret not found", async () => {
     await expectPromiseToFailWithError(
       getSiret.execute({ siret: "40440440440400" }),
@@ -46,6 +74,7 @@ describe("GetSiret", () => {
       businessName: "MA P'TITE BOITE",
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
       naf: { code: "78.3Z", nomenclature: "Ref2" },
+      isOpen: true,
     });
   });
 

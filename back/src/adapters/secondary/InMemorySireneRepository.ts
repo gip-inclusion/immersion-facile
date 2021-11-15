@@ -18,6 +18,7 @@ export const TEST_ESTABLISHMENT1: Establishment = {
     activitePrincipaleUniteLegale: "71.12B",
     nomenclatureActivitePrincipaleUniteLegale: "Ref2",
     trancheEffectifsUniteLegale: "01",
+    etatAdministratifUniteLegale: "A",
   },
   adresseEtablissement: {
     numeroVoieEtablissement: "20",
@@ -94,9 +95,16 @@ export class InMemorySireneRepository implements SireneRepository {
 
   public async get(
     siret: SiretDto,
+    includeClosedEstablishments = false,
   ): Promise<SireneRepositoryAnswer | undefined> {
     const establishment = this._repo[siret];
     if (!establishment) return undefined;
+    if (
+      establishment.uniteLegale.etatAdministratifUniteLegale === "F" &&
+      !includeClosedEstablishments
+    ) {
+      return undefined;
+    }
     return {
       header: {
         statut: 400,

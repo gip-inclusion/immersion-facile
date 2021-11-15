@@ -16,6 +16,7 @@ describe("/siret route", () => {
       businessName: "MA P'TITE BOITE",
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
       naf: { code: "71.12B", nomenclature: "Ref2" },
+      isOpen: true,
     });
   });
 

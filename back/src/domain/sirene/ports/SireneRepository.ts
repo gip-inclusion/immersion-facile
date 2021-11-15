@@ -9,6 +9,7 @@ export type Establishment = {
     activitePrincipaleUniteLegale?: string;
     nomenclatureActivitePrincipaleUniteLegale?: string;
     trancheEffectifsUniteLegale?: string;
+    etatAdministratifUniteLegale?: string;
   }>;
   adresseEtablissement: Partial<{
     numeroVoieEtablissement?: string;
@@ -31,5 +32,8 @@ export type SireneRepositoryAnswer = {
 };
 
 export interface SireneRepository {
-  get: (siret: SiretDto) => Promise<SireneRepositoryAnswer | undefined>;
+  get: (
+    siret: SiretDto,
+    includeClosedEstablishments?: boolean,
+  ) => Promise<SireneRepositoryAnswer | undefined>;
 }

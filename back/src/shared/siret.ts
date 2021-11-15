@@ -15,6 +15,7 @@ export const siretSchema = z
 export type GetSiretRequestDto = z.infer<typeof getSiretRequestSchema>;
 export const getSiretRequestSchema = z.object({
   siret: siretSchema,
+  includeClosedEstablishments: z.boolean().optional(),
 });
 
 export type GetSiretResponseDto = z.infer<typeof getSiretResponseSchema>;
@@ -23,4 +24,6 @@ const getSiretResponseSchema = z.object({
   businessName: z.string(),
   businessAddress: z.string(),
   naf: nafSchema.optional(),
+  // true if the office is currently open for business.
+  isOpen: z.boolean(),
 });

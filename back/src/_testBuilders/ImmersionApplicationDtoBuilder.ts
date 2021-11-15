@@ -36,7 +36,7 @@ const validDemandeImmersion: ImmersionApplicationDto = {
   dateStart: DATE_START,
   dateEnd: DATE_END,
   businessName: "Beta.gouv.fr",
-  siret: "01234567890123",
+  siret: "12345678901234",
   mentor: "Alain Prost",
   mentorPhone: VALID_PHONES[1],
   mentorEmail: VALID_EMAILS[1],

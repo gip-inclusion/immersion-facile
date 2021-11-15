@@ -1,3 +1,5 @@
+import { InMemorySireneRepository } from "./../../adapters/secondary/InMemorySireneRepository";
+import { GetSiret } from "./../../domain/sirene/useCases/GetSiret";
 import { parseISO } from "date-fns";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
@@ -42,6 +44,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
   let addDemandeImmersion: AddImmersionApplication;
   let validateDemandeImmersion: ValidateImmersionApplication;
   let applicationRepository: InMemoryImmersionApplicationRepository;
+  let sireneRepository: InMemorySireneRepository;
   let outboxRepository: OutboxRepository;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
@@ -56,6 +59,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
   let emailFilter: EmailFilter;
   let sentEmails: TemplatedEmail[];
   let agencyConfig: AgencyConfig;
+  let getSiret: GetSiret;
 
   beforeEach(() => {
     applicationRepository = new InMemoryImmersionApplicationRepository();
@@ -67,11 +71,14 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
     eventBus = new InMemoryEventBus();
     eventCrawler = new BasicEventCrawler(eventBus, outboxRepository);
+    sireneRepository = new InMemorySireneRepository();
+    getSiret = new GetSiret(sireneRepository);
 
     addDemandeImmersion = new AddImmersionApplication(
       applicationRepository,
       createNewEvent,
       outboxRepository,
+      getSiret,
     );
     validateDemandeImmersion = new ValidateImmersionApplication(
       applicationRepository,
@@ -113,6 +120,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       applicationRepository,
       createNewEvent,
       outboxRepository,
+      getSiret,
     );
 
     eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>

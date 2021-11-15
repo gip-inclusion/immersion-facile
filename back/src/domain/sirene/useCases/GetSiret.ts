@@ -16,8 +16,12 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
 
   public async _execute({
     siret,
+    includeClosedEstablishments = false,
   }: GetSiretRequestDto): Promise<GetSiretResponseDto> {
-    const response = await this.sireneRepository.get(siret);
+    const response = await this.sireneRepository.get(
+      siret,
+      includeClosedEstablishments,
+    );
     if (!response || response.etablissements.length < 1) {
       throw new NotFoundError(siret);
     }
@@ -62,6 +66,11 @@ const getNaf = (etablissement: Establishment): NafDto | undefined => {
   };
 };
 
+const checkOpenForBusiness = (etablissement: Establishment): boolean => {
+  // The etatAdministratifUniteLegale is "C" for closed establishments, "A" for active ones.
+  return etablissement.uniteLegale.etatAdministratifUniteLegale === "A";
+};
+
 export const convertEtablissementToResponse = async (
   establishment: Establishment,
 ): Promise<GetSiretResponseDto> => ({
@@ -69,4 +78,5 @@ export const convertEtablissementToResponse = async (
   businessName: getBusinessName(establishment),
   businessAddress: getBusinessAddress(establishment),
   naf: getNaf(establishment),
+  isOpen: checkOpenForBusiness(establishment),
 });

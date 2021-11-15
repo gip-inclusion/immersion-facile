@@ -218,110 +218,116 @@ const createUseCases = (
   generateMagicLinkFn: GenerateVerificationMagicLink,
   emailFilter: EmailFilter,
   addressGateway: APIAdresseGateway,
-) => ({
-  addDemandeImmersion: new AddImmersionApplication(
-    repositories.demandeImmersion,
-    createNewEvent,
-    repositories.outbox,
-  ),
-  addDemandeImmersionML: new AddImmersionApplicationML(
-    repositories.demandeImmersion,
-    createNewEvent,
-    repositories.outbox,
-    generateJwtFn,
-  ),
-  getDemandeImmersion: new GetImmersionApplication(
-    repositories.demandeImmersion,
-  ),
-  listDemandeImmersion: new ListImmersionApplication(
-    repositories.demandeImmersion,
-  ),
-  updateDemandeImmersion: new UpdateImmersionApplication(
-    createNewEvent,
-    repositories.outbox,
-    repositories.demandeImmersion,
-    config.featureFlags,
-  ),
-  validateDemandeImmersion: new ValidateImmersionApplication(
-    repositories.demandeImmersion,
-    createNewEvent,
-    repositories.outbox,
-  ),
-  updateImmersionApplicationStatus: new UpdateImmersionApplicationStatus(
-    repositories.demandeImmersion,
-    createNewEvent,
-    repositories.outbox,
-  ),
-  generateMagicLink: new GenerateMagicLink(generateJwtFn),
+) => {
+  const siretGetter = new GetSiret(repositories.sirene);
 
-  // immersionOffer
-  searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),
+  return {
+    addDemandeImmersion: new AddImmersionApplication(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox,
+      siretGetter,
+    ),
+    addDemandeImmersionML: new AddImmersionApplicationML(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox,
+      generateJwtFn,
+      siretGetter,
+    ),
+    getDemandeImmersion: new GetImmersionApplication(
+      repositories.demandeImmersion,
+    ),
+    listDemandeImmersion: new ListImmersionApplication(
+      repositories.demandeImmersion,
+    ),
+    updateDemandeImmersion: new UpdateImmersionApplication(
+      createNewEvent,
+      repositories.outbox,
+      repositories.demandeImmersion,
+      config.featureFlags,
+    ),
+    validateDemandeImmersion: new ValidateImmersionApplication(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox,
+    ),
+    updateImmersionApplicationStatus: new UpdateImmersionApplicationStatus(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox,
+    ),
+    generateMagicLink: new GenerateMagicLink(generateJwtFn),
 
-  addFormEstablishment: new AddFormEstablishment(
-    repositories.formEstablishment,
-    createNewEvent,
-    repositories.outbox,
-  ),
+    // immersionOffer
+    searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),
 
-  tranformFormEstablishmentToSearchData:
-    new TransformFormEstablishmentIntoSearchData(
+    addFormEstablishment: new AddFormEstablishment(
       repositories.formEstablishment,
-      repositories.immersionOfferForSearch,
-      addressGateway.getGPSFromAddressAPIAdresse,
-      repositories.sirene,
+      createNewEvent,
+      repositories.outbox,
     ),
 
-  // siret
-  getSiret: new GetSiret(repositories.sirene),
+    tranformFormEstablishmentToSearchData:
+      new TransformFormEstablishmentIntoSearchData(
+        repositories.formEstablishment,
+        repositories.immersionOfferForSearch,
+        addressGateway.getGPSFromAddressAPIAdresse,
+        repositories.sirene,
+      ),
 
-  // rome
-  romeSearch: new RomeSearch(repositories.rome),
+    // siret
+    getSiret: new GetSiret(repositories.sirene),
 
-  // agencies
-  listAgencies: new ListAgencies(repositories.agency),
+    // rome
+    romeSearch: new RomeSearch(repositories.rome),
 
-  // notifications
-  confirmToBeneficiaryThatApplicationCorrectlySubmitted:
-    new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
-      emailFilter,
-      repositories.email,
-    ),
-  confirmToMentorThatApplicationCorrectlySubmitted:
-    new ConfirmToMentorThatApplicationCorrectlySubmitted(
-      emailFilter,
-      repositories.email,
-    ),
-  notifyAllActorsOfFinalApplicationValidation:
-    new NotifyAllActorsOfFinalApplicationValidation(
-      emailFilter,
-      repositories.email,
-      repositories.agency,
-    ),
-  notifyNewApplicationNeedsReview: new NotifyNewApplicationNeedsReview(
-    repositories.email,
-    repositories.agency,
-    generateMagicLinkFn,
-  ),
-  notifyToTeamApplicationSubmittedByBeneficiary:
-    new NotifyToTeamApplicationSubmittedByBeneficiary(
-      repositories.email,
-      repositories.agency,
-      generateMagicLinkFn,
-    ),
-  notifyBeneficiaryAndEnterpriseThatApplicationIsRejected:
-    new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
-      emailFilter,
-      repositories.email,
-      repositories.agency,
-    ),
-  notifyBeneficiaryAndEnterpriseThatApplicationNeedsModifications:
-    new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
-      emailFilter,
+    // agencies
+    listAgencies: new ListAgencies(repositories.agency),
+
+    // notifications
+    confirmToBeneficiaryThatApplicationCorrectlySubmitted:
+      new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
+        emailFilter,
+        repositories.email,
+      ),
+    confirmToMentorThatApplicationCorrectlySubmitted:
+      new ConfirmToMentorThatApplicationCorrectlySubmitted(
+        emailFilter,
+        repositories.email,
+      ),
+    notifyAllActorsOfFinalApplicationValidation:
+      new NotifyAllActorsOfFinalApplicationValidation(
+        emailFilter,
+        repositories.email,
+        repositories.agency,
+      ),
+    notifyNewApplicationNeedsReview: new NotifyNewApplicationNeedsReview(
       repositories.email,
       repositories.agency,
       generateMagicLinkFn,
     ),
-});
+    notifyToTeamApplicationSubmittedByBeneficiary:
+      new NotifyToTeamApplicationSubmittedByBeneficiary(
+        repositories.email,
+        repositories.agency,
+        generateMagicLinkFn,
+      ),
+    notifyBeneficiaryAndEnterpriseThatApplicationIsRejected:
+      new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+        emailFilter,
+        repositories.email,
+        repositories.agency,
+      ),
+    notifyBeneficiaryAndEnterpriseThatApplicationNeedsModifications:
+      new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
+        emailFilter,
+        repositories.email,
+        repositories.agency,
+        generateMagicLinkFn,
+      ),
+  };
+};
 
 const createEventBus = () => new InMemoryEventBus();
 
