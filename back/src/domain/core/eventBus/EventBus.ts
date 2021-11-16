@@ -1,4 +1,4 @@
-import { Clock } from "../ports/Clock";
+import { Clock, DateStr } from "../ports/Clock";
 import { UuidGenerator } from "../ports/UuidGenerator";
 import type { DomainEvent, DomainTopic } from "./events";
 
@@ -25,6 +25,7 @@ type CreateEventDependencies = {
 export type CreateNewEvent = <T extends DomainTopic>(params: {
   topic: T;
   payload: NarrowEvent<T>["payload"];
+  wasPublished?: boolean;
 }) => NarrowEvent<T>;
 
 export const makeCreateNewEvent =

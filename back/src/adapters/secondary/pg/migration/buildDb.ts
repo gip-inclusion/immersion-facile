@@ -81,6 +81,12 @@ const buildDb = async () => {
     }
   }
 
+  const outboxTableAlreadyExists = await checkIfTableExists("outbox");
+  if (!outboxTableAlreadyExists) {
+    logger.info("We will thus create the outbox table");
+    await buildOutbox(client);
+  }
+
   await client.release();
 };
 
@@ -102,6 +108,10 @@ const makeCheckIfTableAlreadyExists =
 
 const buildSearchImmersionDb = async (client: PoolClient) => {
   await executeSqlFromFile(__dirname + "/database.sql", client);
+};
+
+const buildOutbox = async (client: PoolClient) => {
+  await executeSqlFromFile(__dirname + "/outbox.sql", client);
 };
 
 const buildImmersionApplication = async (client: PoolClient) => {

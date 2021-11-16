@@ -1,4 +1,3 @@
-import { Pool } from "pg";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
@@ -29,6 +28,7 @@ import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplicat
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
+import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
@@ -51,6 +51,7 @@ import { InMemoryEventBus } from "../secondary/core/InMemoryEventBus";
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
 import { InMemoryImmersionOfferRepository as InMemoryImmersionOfferRepositoryForSearch } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { PoleEmploiRomeGateway } from "../secondary/immersionOffer/PoleEmploiRomeGateway";
@@ -60,15 +61,14 @@ import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEs
 import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
-import { PgFormEstablishmentRepository } from "../secondary/pg/FormEstablishmentRepository";
+import { PgAgencyRepository } from "../secondary/pg/PgAgencyRepository";
+import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
+import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import { PgAgencyRepository } from "./../secondary/pg/PgAgencyRepository";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
-import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
-import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
 
 const logger = createLogger(__filename);
 
@@ -83,7 +83,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const emailFilter = config.skipEmailAllowlist
     ? new AlwaysAllowEmailFilter()
     : new AllowListEmailFilter(config.emailAllowList);
-  const adressGateway = new APIAdresseGateway();
+  const addressGateway = new APIAdresseGateway();
 
   return {
     useCases: createUseCases(
@@ -92,7 +92,7 @@ export const createAppDependencies = async (config: AppConfig) => {
       generateJwtFn,
       generateMagicLinkFn,
       emailFilter,
-      adressGateway,
+      addressGateway,
     ),
     authChecker: createAuthChecker(config),
     authMiddleware: createAuthMiddleware(config),
@@ -110,18 +110,6 @@ export type AppDependencies = ReturnType<
 
 const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-const createApplicationRepository = async (config: AppConfig) => {
-  switch (config.repositories) {
-    case "PG": {
-      const pool = new Pool({ connectionString: config.pgImmersionDbUrl });
-      const client = await pool.connect();
-      return new PgImmersionApplicationRepository(client);
-    }
-    default:
-      return new InMemoryImmersionApplicationRepository();
-  }
-};
-
 // prettier-ignore
 type Repositories = ReturnType<typeof createRepositories> extends Promise<infer T>
   ? T
@@ -136,7 +124,10 @@ const createRepositories = async (config: AppConfig) => {
   });
 
   return {
-    demandeImmersion: await createApplicationRepository(config),
+    demandeImmersion:
+      config.repositories === "PG"
+        ? new PgImmersionApplicationRepository(await config.pgPool.connect())
+        : new InMemoryImmersionApplicationRepository(),
     formEstablishment:
       config.repositories === "PG"
         ? new PgFormEstablishmentRepository(await config.pgPool.connect())
@@ -179,7 +170,10 @@ const createRepositories = async (config: AppConfig) => {
           )
         : new InMemoryRomeGateway(),
 
-    outbox: new InMemoryOutboxRepository(),
+    outbox:
+      config.repositories === "PG"
+        ? new PgOutboxRepository(await config.pgPool.connect())
+        : new InMemoryOutboxRepository(),
   };
 };
 
