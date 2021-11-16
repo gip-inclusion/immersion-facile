@@ -14,6 +14,5 @@ export const Navigation = () => (
     {featureFlags.enableAdminUi && " - "}
     <a {...routes.formEstablishment().link}>Formulaire Entreprise</a> {" - "}
     <a {...routes.landingEstablishment().link}>Landing entreprise </a>
-    <a {...routes.landing().link}>Landing  </a>
   </nav>
 );
