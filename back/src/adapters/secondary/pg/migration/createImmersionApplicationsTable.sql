@@ -1,5 +1,6 @@
 CREATE TABLE public.immersion_applications (
     id uuid PRIMARY KEY,
+    created_at timestamp without time zone DEFAULT now(),
     status varchar(255) NOT NULL,
     email varchar(255) NOT NULL,
     first_name varchar(255) NOT NULL,

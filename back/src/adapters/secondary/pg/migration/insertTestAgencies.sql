@@ -1,5 +1,12 @@
-INSERT INTO public.agencies VALUES
-(
+INSERT INTO public.agencies (
+  id,
+  name,
+  counsellor_emails,
+  validator_emails,
+  admin_emails,
+  questionnaire_url,
+  email_signature
+) VALUES (
   '11111111-1111-1111-1111-111111111111',
   'Test Agency 1 (db)',
   '["counsellor@agency1.fr"]',
