@@ -17,7 +17,7 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 --
 -- Name: contact_mode; Type: TYPE; Schema: public; Owner: immersion
 --

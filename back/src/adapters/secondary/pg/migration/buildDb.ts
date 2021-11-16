@@ -4,6 +4,11 @@ import { promisify } from "util";
 import { sleep } from "../../../../shared/utils";
 import { createLogger } from "../../../../utils/logger";
 import { AppConfig } from "../../../primary/appConfig";
+import {
+  insertRomesPublicData,
+  insertAppellationPublicData,
+  addTsVectorData,
+} from "./insertAppellationAndRomesPublicData";
 
 const logger = createLogger(__filename);
 
@@ -87,6 +92,13 @@ const buildDb = async () => {
     await buildOutbox(client);
   }
 
+  // prettier-ignore
+  const appellationsPublicDataTableAlreadyExists = await checkIfTableExists("appellations_public_data");
+  if (!appellationsPublicDataTableAlreadyExists) {
+    await buildRomesAppellations(client);
+    await insertRomesAppellations(client);
+  }
+
   await client.release();
 };
 
@@ -136,6 +148,22 @@ const buildAgencies = async (client: PoolClient) => {
 const insertTestAgencies = async (client: PoolClient) => {
   logger.info("agencies: inserting test data");
   await executeSqlFromFile(__dirname + "/insertTestAgencies.sql", client);
+};
+
+const buildRomesAppellations = async (client: PoolClient) => {
+  logger.info("romes and appellations data: creating tables");
+  await executeSqlFromFile(
+    __dirname + "/createAppellationAndRomePublicDataTables.sql",
+    client,
+  );
+  console.log("created rome");
+};
+
+const insertRomesAppellations = async (client: PoolClient) => {
+  logger.info("romes and appellations data: inserting public data");
+  await insertRomesPublicData(client);
+  await insertAppellationPublicData(client);
+  await addTsVectorData(client);
 };
 
 const shouldPopulateWithTestData = (appConfig: AppConfig) => {
