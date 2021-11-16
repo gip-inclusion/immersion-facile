@@ -69,7 +69,7 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
                 </div>
             </div>
         </section >
-        <ImmersionHowTo videoUrl="" />
+        <ImmersionHowTo videoUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/" />
         <Footer />
     </div >
 );
