@@ -44,24 +44,24 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
                 className="flex flex-wrap justify-center "
                 style={{ minWidth: "420px" }}
             >
-                <div className="border-2 border-blue-200 px-4  p-8 m-2 w-48 bg-blue-50  flex flex-col items-center justify-start " style={{ width: "400px", height: "250px" }}>
+                <div className="border-2 border-blue-200 px-4  p-8 m-2 w-48 bg-blue-50  flex flex-col items-center justify-between " style={{ width: "400px", height: "250px" }}>
 
                     <div className="text-immersionBlue-dark  text-center font-light text-xs py-2 tracking-widest">ENTREPRISE</div>
                     <div className="text-immersionBlue-dark font-semibold text-center">Vos équipes souhaitent accueillir des immersions professionnelles?</div>
                     <a
                         {...routes.formEstablishment().link}
-                        className="no-underline shadow-none bg-immersionBlue py-3 px-2 rounded-md text-white font-semibold w-full text-center  h-15 text-sm mt-auto"
+                        className="no-underline shadow-none bg-immersionBlue py-3 px-2 rounded-md text-white font-semibold w-full text-center  h-15 text-sm "
                         target="_blank"
                     >
                         Référencer votre entreprise
                     </a>
                 </div>
-                <div className="border-2 border-red-200 px-4  p-8 m-2 w-48 bg-red-50  flex flex-col items-center " style={{ width: "400px" }}>
+                <div className="border-2 border-red-200 px-4  p-8 m-2 w-48 bg-red-50  flex flex-col items-center justify-between" style={{ width: "400px", height: "250px" }}>
                     <div className="text-immersionRed-dark text-center  font-light ext-immersionRed-dark text-xs py-2  tracking-widest">CANDIDAT A UNE IMMERSION</div>
-                    <div className="text-immersionRed-dark font-semibold text-center">Vous voulez essayez un métier en conditions réelles?</div>
+                    <div className="text-immersionRed-dark font-semibold text-center">Vous voulez essayez un métier <p /> en conditions réelles?</div>
                     <a
                         {...routes.immersionApplication().link}
-                        className="no-underline shadow-none bg-immersionRed py-3 px-2 rounded-md text-white font-semibold  w-full text-center h-15 text-sm mt-auto"
+                        className="no-underline shadow-none bg-immersionRed py-3 px-2 rounded-md text-white font-semibold  w-full text-center h-15 text-sm "
                         target="_blank"
                     >
                         Faire une demande d'immersion professionnelle
