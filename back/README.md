@@ -238,3 +238,57 @@ beforeEach(async () => {
  request = superTest(await createApp(config));
 });
 ```
+
+# Data Processing Pipelines
+
+This section describes how to work with our pipelines, both locally and remotely. We will use the *establishmenBackfill* pipeline (currently our only pipeline) as an example throughout this section:
+
+## Code structure
+The source code is located in `back/src` so that it can take advantage of the adapters and other helpers implemented there.
+
+For the *establishmenBackfill* pipeline:
+  * [back/src/adapters/primary/startEstablishmentBackfill.ts](./src/adapters/primary/startEstablishmentBackfill.ts)
+    * The main entry point.
+    * Reads the parameters from the environment variables.
+    * Creates the necessary secondary adapters.
+    * Creates and starts the use case.
+  * [back/src/domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches.ts](./src/domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches.ts)
+    * The core business logic of the pipeline.
+
+## Production setup
+
+We use a docker container that is running [cron](https://en.wikipedia.org/wiki/Cron) to schedule the execution of the pipelines. The main configuration files are
+  * [docker-compose.yml](../docker-compose.yml)
+    * defines the `pipelines` docker container
+  * [back/Dockerfile.pipelines](./Dockerfile.pipelines)
+    * creates the docker image
+  * [back/bin/start_pipelines_cron.sh](./bin/start_pipelines_cron.sh):
+    * initializes the docker container
+    * defines the execution schedule (crontab)
+    * runs cron
+
+Each pipeline has its own log file, to which log output will be appended by every new run (e.g. `docker-data/pipelines/logs/establishment-backfill.log`). The log directory is mapped to a filesystem volume in order to persist across restarts of the docker container.
+## Running a pipeline locally
+
+Each pipeline has its own `npm start` script with which it can be started:
+```
+back$ npm run start-establishment-backfill
+```
+
+As with the back-end, we use environment variables for parametrization.
+
+## Running the pipelines docker container
+
+Alternatively, you can execute it inside a local docker container:
+```
+immersion-facile$ docker-compose up --build pipelines
+```
+
+Doing this will start `cron`, which will execute all registered pipelines according to their default schedules (e.g. *establishmentBackfill* is run every day at midnight).
+
+You can **override the default schedule** by explicitly setting the `ESTABLISHMENT_BACKFILL_SCHEDULE` environment variable (see [Specifying environment variables](#Specifying-environment-variables)).
+
+Example: To start a container that schedules a run of *establishmentBackfill* every 10 minutes:
+```
+immersion-facile$ ESTABLISHMENT_BACKFILL_SCHEDULE="*/10 * * * *" docker-compose up --build pipelines
+```

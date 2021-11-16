@@ -1,0 +1,9 @@
+FROM node:16.5
+RUN apt-get update && apt-get install -y cron && rm -rf /var/lib/apt/lists/*
+
+COPY package.json package-lock.json /app/
+WORKDIR /app
+RUN npm ci
+COPY . /app
+
+CMD ./bin/start_pipelines_cron.sh

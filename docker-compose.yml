@@ -17,6 +17,19 @@ services:
     env_file:
       - .env
 
+  pipelines:
+    build:
+      context: ./back
+      dockerfile: Dockerfile.pipelines
+    env_file:
+      - .env
+    environment:
+      - LOGDIR=/var/lib/pipelines/log
+      - CRONFILE=/var/lib/pipelines/crontab
+      - ESTABLISHMENT_BACKFILL_SCHEDULE
+    volumes:
+      - ./docker-data/pipelines:/var/lib/pipelines
+
   nginx:
     restart: unless-stopped
     depends_on:
