@@ -3,7 +3,6 @@ import { BulletPoint } from "./BulletPoint";
 import { Colored } from "./Colored";
 import { Title } from "./Title";
 
-
 type ImmersionHowToProps = {
   videoUrl: string;
 };
