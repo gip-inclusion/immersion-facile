@@ -49,6 +49,7 @@ import {
 } from "../secondary/core/EventCrawlerImplementations";
 import { InMemoryEventBus } from "../secondary/core/InMemoryEventBus";
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
+import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
@@ -74,6 +75,7 @@ const logger = createLogger(__filename);
 
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
+const sequenceRunner = new ThrottledSequenceRunner(1500, 3);
 
 export const createAppDependencies = async (config: AppConfig) => {
   const repositories = await createRepositories(config);
@@ -268,6 +270,8 @@ const createUseCases = (
         repositories.immersionOfferForSearch,
         addressGateway.getGPSFromAddressAPIAdresse,
         repositories.sirene,
+        repositories.rome,
+        sequenceRunner,
       ),
 
     // siret

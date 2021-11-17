@@ -12,13 +12,13 @@ import {
   immersionApplicationsRoute,
   immersionOffersRoute,
   romeRoute,
+  searchImmersionRoute,
   siretRoute,
   validateDemandeRoute,
 } from "../../shared/routes";
 import { searchImmersionRequestSchema } from "../../shared/SearchImmersionDto";
 import { getSiretRequestSchema } from "../../shared/siret";
 import { createLogger } from "../../utils/logger";
-import { searchImmersionRoute } from "./../../shared/routes";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies } from "./config";
 import { callUseCase } from "./helpers/callUseCase";

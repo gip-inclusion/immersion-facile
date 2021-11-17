@@ -6,6 +6,10 @@ import {
 } from "../../../domain/rome/ports/RomeGateway";
 import { createLogger } from "../../../utils/logger";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
+import {
+  RomeCodeAppellationDto,
+  RomeCodeMetierDto,
+} from "../../../shared/rome";
 
 const logger = createLogger(__filename);
 export class PoleEmploiRomeGateway implements RomeGateway {
@@ -40,6 +44,29 @@ export class PoleEmploiRomeGateway implements RomeGateway {
       "api_romev1",
       "nomenclatureRome",
     ].join(" ");
+  }
+
+  public async appellationToCodeMetier(
+    romeCodeAppellation: RomeCodeAppellationDto,
+  ): Promise<RomeCodeMetierDto | undefined> {
+    const accessToken = await this.accessTokenGateway.getAccessToken(
+      this.scope,
+    );
+    try {
+      const response = await this.axiosInstance.get(
+        `/appellation/${romeCodeAppellation}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken.access_token}`,
+          },
+        },
+      );
+      return response.data.metier.code;
+    } catch (error: any) {
+      logger.warn(
+        `Status was ${error.response.status} when calling Rome API from Pole Emploi / appellation`,
+      );
+    }
   }
 
   public async searchMetier(query: string): Promise<RomeMetier[]> {

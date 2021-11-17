@@ -1,14 +1,22 @@
+import {
+  RomeCodeAppellationDto,
+  RomeCodeMetierDto,
+} from "../../../shared/rome";
+
 export type RomeMetier = {
-  codeMetier: string;
+  codeMetier: RomeCodeMetierDto;
   libelle: string;
 };
 
 export type RomeAppellation = {
-  codeAppellation: string;
+  codeAppellation: RomeCodeAppellationDto;
   libelle: string;
 };
 
 export interface RomeGateway {
+  appellationToCodeMetier(
+    romeCodeAppellation: RomeCodeAppellationDto,
+  ): Promise<RomeCodeMetierDto | undefined>;
   searchMetier: (query: string) => Promise<RomeMetier[]>;
   searchAppellation: (query: string) => Promise<RomeAppellation[]>;
 }

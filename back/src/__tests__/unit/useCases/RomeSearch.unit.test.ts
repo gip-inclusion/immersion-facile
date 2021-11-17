@@ -36,9 +36,11 @@ describe("RomeSearch", () => {
   test("issues no queries for short search texts", async () => {
     const mockSearchMetierFn = jest.fn();
     const mockSearchAppellationFn = jest.fn();
+    const mockAppellationToCodeMetier = jest.fn();
     gateway = {
       searchMetier: mockSearchMetierFn,
       searchAppellation: mockSearchAppellationFn,
+      appellationToCodeMetier: mockAppellationToCodeMetier,
     };
 
     const response = await createUseCase().execute("lap");

@@ -1,4 +1,5 @@
 import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
+import { ProfessionDto } from "../shared/rome";
 import { Builder } from "./Builder";
 
 const validFormEstablishment: FormEstablishmentDto = {
@@ -59,6 +60,10 @@ export class FormEstablishmentDtoBuilder
 
   public withId(id: string) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, id });
+  }
+
+  public withProfessions(professions: ProfessionDto[]) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, professions });
   }
 
   public build() {

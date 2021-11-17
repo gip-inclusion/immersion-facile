@@ -36,12 +36,11 @@ describe("Add FormEstablishment", () => {
     const storedInRepo = await formEstablishmentRepository.getAll();
     expect(storedInRepo.length).toBe(1);
     expect(storedInRepo[0]).toEqual(formEstablishment);
-    // to uncomment after bug fix
-    // expect(outboxRepository.events).toHaveLength(1);
-    // expect(outboxRepository.events[0]).toMatchObject({
-    //   topic: "FormEstablishmentAdded",
-    //   payload: formEstablishment,
-    // });
+    expect(outboxRepository.events).toHaveLength(1);
+    expect(outboxRepository.events[0]).toMatchObject({
+      topic: "FormEstablishmentAdded",
+      payload: formEstablishment,
+    });
   });
 
   test("reject when trying to save Form Establishment in the repository with null values", async () => {

@@ -11,8 +11,6 @@ type ProfessionProps = {
   onDelete: () => void;
 };
 
-const romeCodeField: keyof ProfessionDto = "romeCodeMetier";
-
 export const Profession = ({ name, label, onDelete }: ProfessionProps) => {
   const [__, _, { setValue }] = useField<ProfessionDto>(name);
 

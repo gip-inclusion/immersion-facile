@@ -4,11 +4,12 @@ import { zTrimmedString } from "./zodUtils";
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 const romeCodeMetierRegex = /[A-N]\d{4}/;
 
-export type RomeCodeMetierDto = z.infer<typeof romeSearchResponseSchema>;
+export type RomeCodeMetierDto = z.infer<typeof romeCodeMetierSchema>;
 export const romeCodeMetierSchema = z
   .string()
   .regex(romeCodeMetierRegex, "Code ROME incorrect");
 
+export type RomeCodeAppellationDto = z.infer<typeof romeCodeAppellationSchema>;
 const romeCodeAppellationRegex = /\d{5}/;
 const romeCodeAppellationSchema = z
   .string()

@@ -45,7 +45,7 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
         { headers },
       );
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       logger.error(error);
       throw error;
     }

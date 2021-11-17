@@ -1,4 +1,4 @@
-import { FormikErrors, useField } from "formik";
+import { useField } from "formik";
 import React from "react";
 import { Profession } from "src/app/FormEstablishment/Profession";
 import { ButtonAdd } from "src/components/ButtonAdd";

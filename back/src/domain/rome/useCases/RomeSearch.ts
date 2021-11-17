@@ -8,7 +8,7 @@ import { createLogger } from "../../../utils/logger";
 import { findMatchRanges } from "../../../utils/textSearch";
 import { UseCase } from "../../core/UseCase";
 import { RomeGateway } from "../ports/RomeGateway";
-import { RomeAppellation, RomeMetier } from "./../ports/RomeGateway";
+import { RomeAppellation, RomeMetier } from "../ports/RomeGateway";
 
 const logger = createLogger(__filename);
 

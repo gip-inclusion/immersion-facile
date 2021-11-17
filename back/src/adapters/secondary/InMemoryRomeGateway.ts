@@ -3,6 +3,7 @@ import {
   RomeGateway,
   RomeMetier,
 } from "../../domain/rome/ports/RomeGateway";
+import { RomeCodeAppellationDto, RomeCodeMetierDto } from "../../shared/rome";
 import { createLogger } from "../../utils/logger";
 import { normalize } from "../../utils/textSearch";
 
@@ -39,7 +40,23 @@ const appellations: RomeAppellation[] = [
   { codeAppellation: "20714", libelle: "Vitrailliste" },
 ];
 
+const appellationsToRome: Array<{
+  codeAppellation: RomeCodeAppellationDto;
+  rome: RomeCodeMetierDto;
+}> = [
+  { codeAppellation: "11987", rome: "A1101" },
+  { codeAppellation: "12120", rome: "B2200" },
+];
+
 export class InMemoryRomeGateway implements RomeGateway {
+  public async appellationToCodeMetier(
+    romeCodeAppellation: RomeCodeAppellationDto,
+  ): Promise<RomeCodeMetierDto | undefined> {
+    return appellationsToRome.find(
+      (x) => x.codeAppellation == romeCodeAppellation,
+    )?.rome;
+  }
+
   public async searchMetier(query: string): Promise<RomeMetier[]> {
     logger.info({ query }, "searchMetier");
     const normalizedQuery = normalize(query);
@@ -47,6 +64,7 @@ export class InMemoryRomeGateway implements RomeGateway {
       (metier) => normalize(metier.libelle).indexOf(normalizedQuery) >= 0,
     );
   }
+
   public async searchAppellation(query: string): Promise<RomeAppellation[]> {
     logger.info({ query }, "searchAppellation");
     const normalizedQuery = normalize(query);

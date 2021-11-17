@@ -142,6 +142,10 @@ describe("Postgres implementation of immersion offer repository", () => {
     );
   });
 
+  test("Insert immersion does not crash if empty array is provided", async () => {
+    await pgImmersionOfferRepository.insertImmersions([]);
+  });
+
   test("Insert establishments and retrieves them back", async () => {
     await pgImmersionOfferRepository.insertEstablishments([
       new EstablishmentEntity({

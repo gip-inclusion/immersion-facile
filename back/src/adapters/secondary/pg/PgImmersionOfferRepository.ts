@@ -144,6 +144,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   async insertImmersions(
     immersionOffers: ImmersionOfferEntity[],
   ): Promise<void> {
+    if (immersionOffers.length === 0) return;
     const arrayOfImmersionsOffers = immersionOffers.map((immersion) =>
       immersion.toArrayOfProps(),
     );

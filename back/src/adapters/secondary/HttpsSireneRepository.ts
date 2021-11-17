@@ -53,7 +53,7 @@ export class HttpsSireneRepository implements SireneRepository {
         params: this.createSiretQueryParams(siret, includeClosedEstablishments),
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       logger.error(error);
       if (error.response.status == 404) {
         return undefined;

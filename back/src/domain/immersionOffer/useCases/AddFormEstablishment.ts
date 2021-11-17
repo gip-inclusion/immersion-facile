@@ -32,13 +32,12 @@ export class AddFormEstablishment extends UseCase<
     const id = await this.formEstablishmentRepository.save(dto);
     if (!id) throw new ConflictError("empty");
 
-    // This is a quick bug fix, for prod to stop crashing, it should be uncommented as soon as possible :
-    // const event = this.createNewEvent({
-    //   topic: "FormEstablishmentAdded",
-    //   payload: dto,
-    // });
-    //
-    // await this.outboxRepository.save(event);
+    const event = this.createNewEvent({
+      topic: "FormEstablishmentAdded",
+      payload: dto,
+    });
+
+    await this.outboxRepository.save(event);
     return id;
   }
 }

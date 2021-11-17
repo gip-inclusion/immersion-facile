@@ -4,7 +4,10 @@ import {
   FormEstablishmentId,
   formEstablishmentIdSchema,
 } from "../../../shared/FormEstablishmentDto";
+import { ProfessionDto } from "../../../shared/rome";
+import { SequenceRunner } from "../../core/ports/SequenceRunner";
 import { UseCase } from "../../core/UseCase";
+import { RomeGateway } from "../../rome/ports/RomeGateway";
 import { SireneRepository } from "../../sirene/ports/SireneRepository";
 import { ImmersionEstablishmentContact } from "../entities/ImmersionOfferEntity";
 import {
@@ -22,7 +25,9 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
     private readonly formEstablishmentRepository: FormEstablishmentRepository,
     private immersionOfferRepository: ImmersionOfferRepository,
     private getPosition: GetPosition,
-    private sireneRepository: SireneRepository, // private getExtraEstablishmentInfos: GetExtraEstablishmentInfos,
+    private sireneRepository: SireneRepository,
+    private romeGateway: RomeGateway,
+    private sequenceRunner: SequenceRunner,
   ) {
     super();
   }
@@ -41,9 +46,26 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
         formEstablishment.siret,
       );
 
+    const romeAppellationToConvert = formEstablishment.professions
+      .filter(
+        ({ romeCodeAppellation, romeCodeMetier }) =>
+          !romeCodeMetier && !!romeCodeAppellation,
+      )
+      .map((p): string => p.romeCodeAppellation!);
+
+    const romeCodesFromAppellation = (
+      await this.sequenceRunner.run(
+        romeAppellationToConvert,
+        async (appellation) =>
+          this.romeGateway.appellationToCodeMetier(appellation),
+      )
+    ).filter((x): x is string => x !== undefined);
+
     const romeCodes = formEstablishment.professions
-      .map((x) => x.romeCodeMetier)
-      .filter((x): x is string => x !== undefined);
+      .filter((p): p is Required<ProfessionDto> => !!p.romeCodeMetier)
+      .map((p) => p.romeCodeMetier);
+
+    const allRomeCodes = [...romeCodesFromAppellation, ...romeCodes];
 
     const uncompleteEstablishmentEntity: UncompleteEstablishmentEntity =
       new UncompleteEstablishmentEntity({
@@ -53,7 +75,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
         address: formEstablishment.businessAddress,
         score: 10,
         voluntaryToImmersion: true,
-        romes: romeCodes,
+        romes: allRomeCodes,
         dataSource: "form",
         contactInEstablishment: establishmentContact,
         contactMode: formEstablishment.preferredContactMethods[0],
