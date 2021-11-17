@@ -1,6 +1,7 @@
 CREATE TABLE public.immersion_applications (
     id uuid PRIMARY KEY,
     created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
     status varchar(255) NOT NULL,
     email varchar(255) NOT NULL,
     first_name varchar(255) NOT NULL,
@@ -27,3 +28,17 @@ CREATE TABLE public.immersion_applications (
     beneficiary_accepted boolean NOT NULL,
     enterprise_accepted boolean NOT NULL
 );
+
+-- Automatically update the immersion_applications column on any row change.
+
+CREATE OR REPLACE FUNCTION public.update_immersion_applications_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_immersion_applications_updated_at BEFORE UPDATE
+  ON public.immersion_applications FOR EACH ROW EXECUTE PROCEDURE
+  public.update_immersion_applications_updated_at_column();
