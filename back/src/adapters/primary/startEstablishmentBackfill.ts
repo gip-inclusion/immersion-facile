@@ -4,11 +4,11 @@ import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenG
 import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
 import {
   httpCallToLaBonneBoite,
-  LaBonneBoiteGateway
+  LaBonneBoiteGateway,
 } from "../secondary/immersionOffer/LaBonneBoiteGateway";
 import {
   httpCallToLaPlateFormeDeLInclusion,
-  LaPlateFormeDeLInclusionGateway
+  LaPlateFormeDeLInclusionGateway,
 } from "../secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "./appConfig";

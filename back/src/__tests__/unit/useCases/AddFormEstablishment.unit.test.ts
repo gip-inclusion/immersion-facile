@@ -1,4 +1,6 @@
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
+import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -11,10 +13,12 @@ describe("Add FormEstablishment", () => {
   let addFormEstablishment: AddFormEstablishment;
   let formEstablishmentRepository: InMemoryFormEstablishmentRepository;
   let outboxRepository: InMemoryOutboxRepository;
+  let stubGetSiret: StubGetSiret;
 
   beforeEach(() => {
     formEstablishmentRepository = new InMemoryFormEstablishmentRepository();
     outboxRepository = new InMemoryOutboxRepository();
+    stubGetSiret = new StubGetSiret();
     const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
@@ -23,6 +27,7 @@ describe("Add FormEstablishment", () => {
       formEstablishmentRepository,
       createNewEvent,
       outboxRepository,
+      stubGetSiret,
     );
   });
 
@@ -63,5 +68,51 @@ describe("Add FormEstablishment", () => {
     } catch (e) {
       expect(e).toBeInstanceOf(BadRequestError);
     }
+  });
+
+  describe("SIRET validation", () => {
+    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
+
+    it("rejects formEstablishment with SIRETs that don't correspond to active businesses", async () => {
+      stubGetSiret.setNextResponse({
+        siret: formEstablishment.siret,
+        businessName: "INACTIVE BUSINESS",
+        businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+        naf: { code: "78.3Z", nomenclature: "Ref2" },
+        isOpen: false,
+      });
+
+      await expectPromiseToFailWithError(
+        addFormEstablishment.execute(formEstablishment),
+        new BadRequestError(
+          "Siret ne correspond pas à une entreprise active : " +
+            formEstablishment.siret,
+        ),
+      );
+    });
+
+    it("accepts formEstablishment with SIRETs that  correspond to active businesses", async () => {
+      stubGetSiret.setNextResponse({
+        siret: formEstablishment.siret,
+        businessName: "ACTIVE BUSINESS",
+        businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+        naf: { code: "78.3Z", nomenclature: "Ref2" },
+        isOpen: true,
+      });
+
+      expect(await addFormEstablishment.execute(formEstablishment)).toBe(
+        formEstablishment.id,
+      );
+    });
+
+    it("Throws errors when the SIRET endpoint throws erorrs", async () => {
+      const error = new Error("test error");
+      stubGetSiret.setErrorForNextCall(error);
+
+      await expectPromiseToFailWithError(
+        addFormEstablishment.execute(formEstablishment),
+        error,
+      );
+    });
   });
 });

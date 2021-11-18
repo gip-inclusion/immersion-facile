@@ -215,21 +215,21 @@ const createUseCases = (
   emailFilter: EmailFilter,
   addressGateway: APIAdresseGateway,
 ) => {
-  const siretGetter = new GetSiret(repositories.sirene);
+  const getSiret = new GetSiret(repositories.sirene);
 
   return {
     addDemandeImmersion: new AddImmersionApplication(
       repositories.demandeImmersion,
       createNewEvent,
       repositories.outbox,
-      siretGetter,
+      getSiret,
     ),
     addDemandeImmersionML: new AddImmersionApplicationML(
       repositories.demandeImmersion,
       createNewEvent,
       repositories.outbox,
       generateJwtFn,
-      siretGetter,
+      getSiret,
     ),
     getDemandeImmersion: new GetImmersionApplication(
       repositories.demandeImmersion,
@@ -262,6 +262,7 @@ const createUseCases = (
       repositories.formEstablishment,
       createNewEvent,
       repositories.outbox,
+      getSiret,
     ),
 
     tranformFormEstablishmentToSearchData:
@@ -275,7 +276,7 @@ const createUseCases = (
       ),
 
     // siret
-    getSiret: new GetSiret(repositories.sirene),
+    getSiret,
 
     // rome
     romeSearch: new RomeSearch(repositories.rome),

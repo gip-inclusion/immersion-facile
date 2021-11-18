@@ -1,4 +1,6 @@
-import { BadRequestError } from "./../../../adapters/primary/helpers/sendHttpResponse";
+import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
+import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
+import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   AddImmersionApplicationMLResponseDto,
@@ -26,10 +28,7 @@ export class AddImmersionApplication extends UseCase<
     private readonly applicationRepository: ImmersionApplicationRepository,
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
-    private readonly siretGetter: UseCase<
-      GetSiretRequestDto,
-      GetSiretResponseDto
-    >,
+    private readonly getSiret: GetSiretUseCase,
   ) {
     super();
   }
@@ -42,17 +41,11 @@ export class AddImmersionApplication extends UseCase<
     const applicationEntity = ImmersionApplicationEntity.create(
       immersionApplicationDto,
     );
-    // Reject applications with sirets that don't belong to an open seat.
-    const siret = immersionApplicationDto.siret;
-    const siretLookupRes = await this.siretGetter.execute({
-      siret,
-      includeClosedEstablishments: true,
-    });
-    if (!siretLookupRes.isOpen) {
-      throw new BadRequestError(
-        "Siret ne correspond pas à une siège active: " + siret,
-      );
-    }
+
+    await rejectsSiretIfNotAnOpenCompany(
+      this.getSiret,
+      immersionApplicationDto.siret,
+    );
 
     const id = await this.applicationRepository.save(applicationEntity);
     if (!id) throw new ConflictError(applicationEntity.id);
@@ -77,10 +70,7 @@ export class AddImmersionApplicationML extends UseCase<
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
     private readonly generateJwt: GenerateJwtFn,
-    private readonly siretGetter: UseCase<
-      GetSiretRequestDto,
-      GetSiretResponseDto
-    >,
+    private readonly getSiret: GetSiretUseCase,
   ) {
     super();
   }
@@ -97,17 +87,10 @@ export class AddImmersionApplicationML extends UseCase<
 
     if (!id) throw new ConflictError(applicationEntity.id);
 
-    // Reject applications with sirets that don't belong to an open seat.
-    const siret = immersionApplicationDto.siret;
-    const siretLookupRes = await this.siretGetter.execute({
-      siret,
-      includeClosedEstablishments: true,
-    });
-    if (!siretLookupRes.isOpen) {
-      throw new BadRequestError(
-        "Siret ne correspond pas à une siège active: " + siret,
-      );
-    }
+    await rejectsSiretIfNotAnOpenCompany(
+      this.getSiret,
+      immersionApplicationDto.siret,
+    );
 
     const event = this.createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",

@@ -4,8 +4,11 @@ import {
   FormEstablishmentDto,
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
+import { GetSiretRequestDto, GetSiretResponseDto } from "../../../shared/siret";
 import { createLogger } from "../../../utils/logger";
 import { UseCase } from "../../core/UseCase";
+import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
+import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
@@ -20,6 +23,7 @@ export class AddFormEstablishment extends UseCase<
     private readonly formEstablishmentRepository: FormEstablishmentRepository,
     private createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
+    private readonly getSiret: GetSiretUseCase,
   ) {
     super();
   }
@@ -29,6 +33,8 @@ export class AddFormEstablishment extends UseCase<
   public async _execute(
     dto: FormEstablishmentDto,
   ): Promise<AddFormEstablishmentResponseDto> {
+    await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
+
     const id = await this.formEstablishmentRepository.save(dto);
     if (!id) throw new ConflictError("empty");
 

@@ -1,5 +1,10 @@
-import { BadRequestError } from "./../../../adapters/primary/helpers/sendHttpResponse";
-import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import {
+  BadRequestError,
+  ConflictError,
+} from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -11,41 +16,6 @@ import {
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
-import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { UseCase } from "../../../domain/core/UseCase";
-import {
-  GetSiretRequestDto,
-  getSiretRequestSchema,
-  GetSiretResponseDto,
-} from "../../../shared/siret";
-
-// Stub implementation for tests:
-
-class StubGetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
-  error: Error = new Error(
-    "StubGetSiret not initialized, set error or response",
-  );
-  response: GetSiretResponseDto | null = {
-    siret: "12345678901234",
-    businessName: "TEST BUSINESS NAME",
-    businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-    naf: { code: "78.3Z", nomenclature: "Ref2" },
-    isOpen: true,
-  };
-
-  inputSchema = getSiretRequestSchema;
-
-  public async _execute({
-    siret,
-  }: GetSiretRequestDto): Promise<GetSiretResponseDto> {
-    if (this.response) {
-      return this.response;
-    } else {
-      throw this.error;
-    }
-  }
-}
 
 describe("Add immersionApplication", () => {
   let addImmersionApplication: AddImmersionApplication;
@@ -56,7 +26,7 @@ describe("Add immersionApplication", () => {
   let outboxRepository: InMemoryOutboxRepository;
   const validImmersionApplication =
     new ImmersionApplicationDtoBuilder().build();
-  let stubGetSiret = new StubGetSiret();
+  let stubGetSiret: StubGetSiret;
 
   beforeEach(() => {
     applicationRepository = new InMemoryImmersionApplicationRepository();
@@ -64,17 +34,17 @@ describe("Add immersionApplication", () => {
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    stubGetSiret = new StubGetSiret();
     addImmersionApplication = createAddDemandeImmersionUseCase();
   });
 
-  const createAddDemandeImmersionUseCase = () => {
-    return new AddImmersionApplication(
+  const createAddDemandeImmersionUseCase = () =>
+    new AddImmersionApplication(
       applicationRepository,
       createNewEvent,
       outboxRepository,
       stubGetSiret,
     );
-  };
 
   test("saves valid applications in the repository", async () => {
     const occurredAt = new Date("2021-10-15T15:00");
@@ -114,43 +84,32 @@ describe("Add immersionApplication", () => {
   });
 
   describe("SIRET validation", () => {
-    let originalStubResponse = stubGetSiret.response;
-
-    beforeAll(() => {
-      originalStubResponse = stubGetSiret.response;
-    });
-
-    afterAll(() => {
-      // Restore the original stub configuration to avoid leaking state to other tests
-      stubGetSiret.response = originalStubResponse;
-    });
-
     it("rejects applications with SIRETs that don't correspond to active businesses", async () => {
-      stubGetSiret.response = {
+      stubGetSiret.setNextResponse({
         siret: validImmersionApplication.siret,
         businessName: "INACTIVE BUSINESS",
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
         naf: { code: "78.3Z", nomenclature: "Ref2" },
         isOpen: false,
-      };
+      });
 
       await expectPromiseToFailWithError(
         addImmersionApplication.execute(validImmersionApplication),
         new BadRequestError(
-          "Siret ne correspond pas à une siège active: " +
+          "Siret ne correspond pas à une entreprise active : " +
             validImmersionApplication.siret,
         ),
       );
     });
 
     it("accepts applications with SIRETs that  correspond to active businesses", async () => {
-      stubGetSiret.response = {
+      stubGetSiret.setNextResponse({
         siret: validImmersionApplication.siret,
         businessName: "ACTIVE BUSINESS",
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
         naf: { code: "78.3Z", nomenclature: "Ref2" },
         isOpen: true,
-      };
+      });
 
       expect(
         await addImmersionApplication.execute(validImmersionApplication),
@@ -160,9 +119,8 @@ describe("Add immersionApplication", () => {
     });
 
     it("Throws errors when the SIRET endpoint throws erorrs", async () => {
-      stubGetSiret.response = null;
       const error = new Error("test error");
-      stubGetSiret.error = error;
+      stubGetSiret.setErrorForNextCall(error);
 
       await expectPromiseToFailWithError(
         addImmersionApplication.execute(validImmersionApplication),

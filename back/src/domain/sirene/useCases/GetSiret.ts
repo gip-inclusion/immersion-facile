@@ -7,6 +7,9 @@ import {
 } from "../../../shared/siret";
 import { UseCase } from "../../core/UseCase";
 import { Establishment, SireneRepository } from "../ports/SireneRepository";
+
+export type GetSiretUseCase = UseCase<GetSiretRequestDto, GetSiretResponseDto>;
+
 export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
   constructor(private readonly sireneRepository: SireneRepository) {
     super();
