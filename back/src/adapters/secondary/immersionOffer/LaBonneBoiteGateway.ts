@@ -1,11 +1,10 @@
 import axios from "axios";
 import { v4 as uuidV4 } from "uuid";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
-import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
+import { UncompleteEstablishmentEntity } from "../../../domain/immersionOffer/entities/UncompleteEstablishmentEntity";
 import { EstablishmentsGateway } from "../../../domain/immersionOffer/ports/EstablishmentsGateway";
 import type { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { createLogger } from "../../../utils/logger";
-import { UncompleteEstablishmentEntity } from "../../../domain/immersionOffer/entities/UncompleteEstablishmentEntity";
 
 const logger = createLogger(__filename);
 
@@ -60,7 +59,7 @@ export class LaBonneBoiteGateway implements EstablishmentsGateway {
   constructor(
     private readonly accessTokenGateway: AccessTokenGateway,
     private readonly poleEmploiClientId: string,
-    private readonly httpCallToLaBonneBoite: HttpCallsToLaBonneBoite,
+    private readonly callToLaBonneBoite: HttpCallsToLaBonneBoite,
   ) {}
 
   async getEstablishments(
@@ -70,7 +69,7 @@ export class LaBonneBoiteGateway implements EstablishmentsGateway {
       `application_${this.poleEmploiClientId} api_labonneboitev1`,
     );
 
-    return this.httpCallToLaBonneBoite
+    return this.callToLaBonneBoite
       .getEstablishments(searchParams, response.access_token)
       .then((response: any) => {
         const establishments: EstablishmentFromLaBonneBoite[] = response;

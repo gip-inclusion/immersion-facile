@@ -117,7 +117,7 @@ type Repositories = ReturnType<typeof createRepositories> extends Promise<infer 
   ? T
   : never;
 
-const createRepositories = async (config: AppConfig) => {
+export const createRepositories = async (config: AppConfig) => {
   logger.info({
     repositories: config.repositories,
     sireneRepository: config.sireneRepository,
