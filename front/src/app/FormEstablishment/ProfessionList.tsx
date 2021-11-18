@@ -24,8 +24,8 @@ export const ProfessionList = ({ name, title }: ProfessionListProps) => {
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      <div style={{ width: "100%" }}>
-        {title && <h5 style={{ marginTop: "25px" }}>{title}</h5>}
+      <div className="w-full">
+        {title && <h5 className="text-lg font-semibold mt-6">{title}</h5>}
         {professions.map(({ description }, index) => (
           <Profession
             name={`${name}[${index}]`}

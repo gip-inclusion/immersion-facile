@@ -164,7 +164,9 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
                 formulaire pour chaque établissement (Siret différent).
               </p>
               <Form>
-                Votre établissement
+                <span className="py-6 block text-lg font-semibold">
+                  Votre établissement
+                </span>
                 <SiretRelatedInputs />
                 <ProfessionList
                   name="professions"

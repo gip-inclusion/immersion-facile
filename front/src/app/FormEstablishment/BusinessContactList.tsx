@@ -38,12 +38,14 @@ const BusinessContact = ({ index, onDelete }: BusinessContactProps) => {
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center", padding: "10px" }}>
+      <div className=" py-2 my-2">
         {typeof onDelete !== "undefined" && (
           <DeleteButton onClick={() => onDelete(index)} />
         )}
-        <h4 style={{ margin: 0 }}>Détails du correspondant immersion :</h4>
-        <p>Le correspondant reçoit les demandes et les traite</p>
+        <h4 className="text-lg font-semibold m-0">
+          Détails du correspondant immersion :
+        </h4>
+        <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
       <TextInput label="Nom du référent *" name={makeName("lastName")} />
       <TextInput label="Prénom du référent *" name={makeName("firstName")} />

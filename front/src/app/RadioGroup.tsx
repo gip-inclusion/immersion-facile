@@ -97,7 +97,7 @@ export const RadioGroup = ({
 
   return (
     <>
-      <div className="fr-form-group">
+      <div className="fr-form-group mt-10">
         <fieldset
           className={error ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
           aria-labelledby={

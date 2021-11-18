@@ -22,8 +22,8 @@ export const ImmersionHowTo = ({ videoUrl }: ImmersionHowToProps) => (
           recherche d'opportunités d'immersion.
         </BulletPoint>
         <BulletPoint red num={3}>
-          <Colored red>Signer la convention</Colored> avec le candidat et
-          débuter l'immersion professionnelle.
+          <Colored red>Complétez la convention.</Colored> Dès la validation
+          reçue, démarrez l’immersion.
         </BulletPoint>
       </div>
       <div

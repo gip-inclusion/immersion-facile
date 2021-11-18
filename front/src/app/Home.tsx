@@ -52,11 +52,11 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
           className="border-2 border-blue-200 px-4  p-8 m-2 w-48 bg-blue-50  flex flex-col items-center justify-between "
           style={{ width: "400px", height: "250px" }}
         >
-          <div className="text-immersionBlue-dark  text-center font-light text-xs py-2 tracking-widest">
+          <div className="text-immersionBlue-dark  text-center text-sm py-2 tracking-widest">
             ENTREPRISE
           </div>
           <div className="text-immersionBlue-dark font-semibold text-center">
-            Vos équipes souhaitent accueillir des immersions professionnelles?
+            Vos équipes souhaitent accueillir en immersions professionnelles?
           </div>
           <a
             {...routes.formEstablishment().link}
@@ -70,11 +70,11 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
           className="border-2 border-red-200 px-4  p-8 m-2 w-48 bg-red-50  flex flex-col items-center justify-between"
           style={{ width: "400px", height: "250px" }}
         >
-          <div className="text-immersionRed-dark text-center  font-light ext-immersionRed-dark text-xs py-2  tracking-widest">
-            CANDIDAT A UNE IMMERSION
+          <div className="text-immersionRed-dark text-center ext-immersionRed-dark text-sm py-2  tracking-widest">
+            CANDIDAT À UNE IMMERSION
           </div>
           <div className="text-immersionRed-dark font-semibold text-center">
-            Vous voulez essayez un métier <p /> en conditions réelles?
+            Vous voulez essayer un métier <p /> en conditions réelles ?
           </div>
           <a
             {...routes.immersionApplication().link}
