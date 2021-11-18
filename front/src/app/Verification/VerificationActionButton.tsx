@@ -27,16 +27,19 @@ const onSubmit = async ({
 }: VerificationActionButtonProps) => {
   if (!immersionApplication) return;
 
-  let justification: string | null = null;
+  let justification: string | undefined = undefined;
   if (newStatus === "REJECTED") {
-    justification = prompt("Pourquoi l'immersion est-elle refusée ?");
+    justification =
+      prompt("Pourquoi l'immersion est-elle refusée ?") ?? undefined;
+    if (!justification) return; // case when cancel button is clicked or field is empty
   } else if (newStatus === "DRAFT") {
-    justification = prompt("Precisez la raison et la modification necessaire");
+    justification =
+      prompt("Precisez la raison et la modification nécessaire") ?? undefined;
+    if (!justification) return; // case when cancel button is clicked or field is empty
   }
-  if (justification === null) return; // case when cancel button is clicked
 
   return immersionApplicationGateway
-    .updateStatus({ status: newStatus, justification }, jwt)
+    .updateStatus({ status: newStatus, justification: justification }, jwt)
     .then(() => onSuccess(messageToShowOnSuccess))
     .catch((e) => onError(e.message));
 };
