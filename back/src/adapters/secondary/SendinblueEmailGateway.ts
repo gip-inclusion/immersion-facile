@@ -1,4 +1,4 @@
-import { ModificationRequestApplicationNotificationParams } from "./../../domain/immersionApplication/ports/EmailGateway";
+import client from "prom-client";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import type {
   EmailType,
@@ -10,9 +10,28 @@ import type {
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
+import { ModificationRequestApplicationNotificationParams } from "./../../domain/immersionApplication/ports/EmailGateway";
 import { createLogger } from "./../../utils/logger";
 
 const logger = createLogger(__filename);
+
+const counterSendTransactEmailTotal = new client.Counter({
+  name: "sendinblue_send_transac_email_total",
+  help: "The total count of sendTransacEmail requests, broken down by email type.",
+  labelNames: ["emailType"],
+});
+
+const counterSendTransactEmailSuccess = new client.Counter({
+  name: "sendinblue_send_transac_email_success",
+  help: "The success count of sendTransacEmail requests, broken down by email type.",
+  labelNames: ["emailType"],
+});
+
+const counterSendTransactEmailError = new client.Counter({
+  name: "sendinblue_send_transac_email_error",
+  help: "The error count of sendTransacEmail requests, broken down by email type.",
+  labelNames: ["emailType", "errorType"],
+});
 
 const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/10/message-setup
@@ -55,146 +74,153 @@ export class SendinblueEmailGateway implements EmailGateway {
     recipient: string,
     params: NewApplicationBeneficiaryConfirmationParams,
   ): Promise<void> {
-    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sibEmail.templateId =
-      emailTypeToTemplateId.NEW_APPLICATION_BENEFICIARY_CONFIRMATION;
-    sibEmail.to = [{ email: recipient }];
-    sibEmail.params = {
-      DEMANDE_ID: params.demandeId,
-      FIRST_NAME: params.firstName,
-      LAST_NAME: params.lastName,
-    };
-    this.sendTransacEmail(sibEmail);
+    await this.sendTransacEmail(
+      "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
+      [recipient],
+      {
+        DEMANDE_ID: params.demandeId,
+        FIRST_NAME: params.firstName,
+        LAST_NAME: params.lastName,
+      },
+    );
   }
 
   public async sendNewApplicationMentorConfirmation(
     recipient: string,
     params: NewApplicationMentorConfirmationParams,
   ): Promise<void> {
-    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sibEmail.templateId =
-      emailTypeToTemplateId.NEW_APPLICATION_MENTOR_CONFIRMATION;
-    sibEmail.to = [{ email: recipient }];
-    sibEmail.params = {
-      DEMANDE_ID: params.demandeId,
-      MENTOR_NAME: params.mentorName,
-      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-    };
-    this.sendTransacEmail(sibEmail);
+    await this.sendTransacEmail(
+      "NEW_APPLICATION_MENTOR_CONFIRMATION",
+      [recipient],
+      {
+        DEMANDE_ID: params.demandeId,
+        MENTOR_NAME: params.mentorName,
+        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+      },
+    );
   }
 
   public async sendNewApplicationAdminNotification(
     recipients: string[],
     params: NewApplicationAdminNotificationParams,
   ) {
-    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sibEmail.templateId =
-      emailTypeToTemplateId.NEW_APPLICATION_ADMIN_NOTIFICATION;
-    sibEmail.to = recipients.map((email) => ({ email }));
-    sibEmail.params = {
-      DEMANDE_ID: params.demandeId,
-      FIRST_NAME: params.firstName,
-      LAST_NAME: params.lastName,
-      DATE_START: params.dateStart,
-      DATE_END: params.dateEnd,
-      BUSINESS_NAME: params.businessName,
-      AGENCY_NAME: params.agencyName,
-      MAGIC_LINK: params.magicLink,
-    };
-    this.sendTransacEmail(sibEmail);
+    await this.sendTransacEmail(
+      "NEW_APPLICATION_ADMIN_NOTIFICATION",
+      recipients,
+      {
+        DEMANDE_ID: params.demandeId,
+        FIRST_NAME: params.firstName,
+        LAST_NAME: params.lastName,
+        DATE_START: params.dateStart,
+        DATE_END: params.dateEnd,
+        BUSINESS_NAME: params.businessName,
+        AGENCY_NAME: params.agencyName,
+        MAGIC_LINK: params.magicLink,
+      },
+    );
   }
 
   public async sendValidatedApplicationFinalConfirmation(
     recipients: string[],
     params: ValidatedApplicationFinalConfirmationParams,
   ): Promise<void> {
-    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sibEmail.templateId =
-      emailTypeToTemplateId.VALIDATED_APPLICATION_FINAL_CONFIRMATION;
-    sibEmail.to = recipients.map((email) => ({ email }));
-    sibEmail.params = {
-      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-      DATE_START: params.dateStart,
-      DATE_END: params.dateEnd,
-      MENTOR_NAME: params.mentorName,
-      SCHEDULE_LINES: params.scheduleText.split("\n"),
-      BUSINESS_NAME: params.businessName,
-      IMMERSION_ADDRESS: params.immersionAddress,
-      IMMERSION_PROFESSION: params.immersionProfession,
-      IMMERSION_ACTIVITIES: params.immersionActivities,
-      SANITARY_PREVENTION_DESCRIPTION: params.sanitaryPrevention,
-      INDIVIDUAL_PROTECTION: params.individualProtection,
-      QUESTIONNAIRE_URL: params.questionnaireUrl,
-      SIGNATURE: params.signature,
-    };
-    this.sendTransacEmail(sibEmail);
+    await this.sendTransacEmail(
+      "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
+      recipients,
+      {
+        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+        DATE_START: params.dateStart,
+        DATE_END: params.dateEnd,
+        MENTOR_NAME: params.mentorName,
+        SCHEDULE_LINES: params.scheduleText.split("\n"),
+        BUSINESS_NAME: params.businessName,
+        IMMERSION_ADDRESS: params.immersionAddress,
+        IMMERSION_PROFESSION: params.immersionProfession,
+        IMMERSION_ACTIVITIES: params.immersionActivities,
+        SANITARY_PREVENTION_DESCRIPTION: params.sanitaryPrevention,
+        INDIVIDUAL_PROTECTION: params.individualProtection,
+        QUESTIONNAIRE_URL: params.questionnaireUrl,
+        SIGNATURE: params.signature,
+      },
+    );
   }
 
   public async sendRejectedApplicationNotification(
     recipients: string[],
     params: RejectedApplicationNotificationParams,
   ): Promise<void> {
-    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sibEmail.templateId =
-      emailTypeToTemplateId.REJECTED_APPLICATION_NOTIFICATION;
-    sibEmail.to = recipients.map((email) => ({ email }));
-    sibEmail.params = {
-      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-      BUSINESS_NAME: params.businessName,
-      REASON: params.rejectionReason,
-      AGENCY: params.agency,
-      SIGNATURE: params.signature,
-    };
-    this.sendTransacEmail(sibEmail);
+    await this.sendTransacEmail(
+      "REJECTED_APPLICATION_NOTIFICATION",
+      recipients,
+      {
+        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+        BUSINESS_NAME: params.businessName,
+        REASON: params.rejectionReason,
+        AGENCY: params.agency,
+        SIGNATURE: params.signature,
+      },
+    );
   }
 
   public async sendModificationRequestApplicationNotification(
     recipients: string[],
     params: ModificationRequestApplicationNotificationParams,
   ): Promise<void> {
-    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sibEmail.templateId =
-      emailTypeToTemplateId.MODIFICATION_REQUEST_APPLICATION_NOTIFICATION;
-    sibEmail.to = recipients.map((email) => ({ email }));
-    sibEmail.params = {
-      AGENCY: params.agency,
-      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-      BUSINESS_NAME: params.businessName,
-      REASON: params.reason,
-      SIGNATURE: params.signature,
-      URL: params.magicLink,
-    };
-    this.sendTransacEmail(sibEmail);
+    await this.sendTransacEmail(
+      "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION",
+      recipients,
+      {
+        AGENCY: params.agency,
+        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+        BUSINESS_NAME: params.businessName,
+        REASON: params.reason,
+        SIGNATURE: params.signature,
+        URL: params.magicLink,
+      },
+    );
   }
 
   public async sendNewApplicationForReviewNotification(
     recipients: string[],
     params: NewImmersionApplicationReviewForEligibilityOrValidationParams,
   ): Promise<void> {
-    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sibEmail.templateId =
-      emailTypeToTemplateId.NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION;
-    sibEmail.to = recipients.map((email) => ({ email }));
-    sibEmail.params = {
-      BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-      BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-      BUSINESS_NAME: params.businessName,
-      MAGIC_LINK: params.magicLink,
-      POSSIBLE_ROLE_ACTION: params.possibleRoleAction,
-    };
-    this.sendTransacEmail(sibEmail);
+    await this.sendTransacEmail(
+      "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+      recipients,
+      {
+        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+        BUSINESS_NAME: params.businessName,
+        MAGIC_LINK: params.magicLink,
+        POSSIBLE_ROLE_ACTION: params.possibleRoleAction,
+      },
+    );
   }
 
-  private async sendTransacEmail(sibEmail: SibApiV3Sdk.SendSmtpEmail) {
-    logger.info(sibEmail, "Sending email");
+  private async sendTransacEmail(
+    emailType: EmailType,
+    recipients: string[],
+    params: any,
+  ) {
+    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sibEmail.templateId = emailTypeToTemplateId[emailType];
+    sibEmail.to = recipients.map((email) => ({ email }));
+    sibEmail.params = params;
+
     try {
+      counterSendTransactEmailTotal.inc({ emailType });
+      logger.info({ sibEmail }, "Sending email");
+
       const data = await this.apiInstance.sendTransacEmail(sibEmail);
+
+      counterSendTransactEmailSuccess.inc({ emailType });
       logger.info(data, "Email sending succeeded");
     } catch (e: any) {
+      counterSendTransactEmailError.inc({ emailType });
       logger.error(e, "Email sending failed");
     }
   }
