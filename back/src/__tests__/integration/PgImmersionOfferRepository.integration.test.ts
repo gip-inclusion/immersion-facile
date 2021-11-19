@@ -26,7 +26,8 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   afterAll(async () => {
-    await client.release();
+    client.release();
+    await pool.end();
   });
 
   test("Insert search", async () => {

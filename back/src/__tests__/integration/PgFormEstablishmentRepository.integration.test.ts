@@ -19,8 +19,9 @@ describe("PgFormEstablishmentRepository", () => {
     formEstablishmentRepository = new PgFormEstablishmentRepository(client);
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     client.release();
+    await pool.end();
   });
 
   it("Adds a new FormEstablishment", async () => {

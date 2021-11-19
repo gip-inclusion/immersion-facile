@@ -35,8 +35,9 @@ describe("PgAgencyRepository", () => {
     client = await pool.connect();
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     client.release();
+    await pool.end();
   });
 
   beforeEach(async () => {

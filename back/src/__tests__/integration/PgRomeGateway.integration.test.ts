@@ -1,18 +1,11 @@
 import { Pool, PoolClient } from "pg";
 import { PgRomeGateway } from "../../adapters/secondary/pg/PgRomeGateway";
-import { EstablishmentEntity } from "../../domain/immersionOffer/entities/EstablishmentEntity";
-import {
-  ImmersionEstablishmentContact,
-  ImmersionOfferEntity,
-} from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { RomeMetier } from "../../domain/rome/ports/RomeGateway";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import {
-  RomeMetier,
-  RomeAppellation,
-} from "../../domain/rome/ports/RomeGateway";
 
 describe("Postgres implementation of Rome Gateway", () => {
   let pool: Pool;
+
   let client: PoolClient;
   let pgRomeGateway: PgRomeGateway;
 
@@ -24,9 +17,9 @@ describe("Postgres implementation of Rome Gateway", () => {
   });
 
   afterAll(async () => {
-    await client.release();
+    client.release();
+    await pool.end();
   });
-
   test("Conversion of appellation to ROME works", async () => {
     expect(await pgRomeGateway.appellationToCodeMetier("10200")).toBe("F1402");
   });

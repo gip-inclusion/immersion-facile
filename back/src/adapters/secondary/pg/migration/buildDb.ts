@@ -99,7 +99,7 @@ const buildDb = async () => {
     await insertRomesAppellations(client);
   }
 
-  await client.release();
+  client.release();
 };
 
 const makeCheckIfTableAlreadyExists =
