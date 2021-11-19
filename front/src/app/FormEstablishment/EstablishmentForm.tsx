@@ -157,8 +157,10 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
             <div style={{ margin: "5px 12px", maxWidth: "600px" }}>
               <p>
                 Bienvenue sur l'espace de référencement des entreprises
-                volontaires pour l'accueil des immersions professionnelles. Ce
-                formulaire vous permet d'indiquer les métiers de votre
+                volontaires pour l'accueil des immersions professionnelles.
+              </p>
+              <p className="mt-4">
+                Ce formulaire vous permet d'indiquer les métiers de votre
                 établissement ouverts aux immersions. Si votre entreprise
                 comprend plusieurs établissements, il convient de renseigner un
                 formulaire pour chaque établissement (Siret différent).

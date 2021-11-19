@@ -123,7 +123,7 @@ export const ApplicationFormFields = ({
         type="date"
         disabled={isFrozen}
       />
-
+      <br />
       <DateInput
         label="Date de fin de l'immersion *"
         name="dateEnd"

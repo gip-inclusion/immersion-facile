@@ -35,16 +35,16 @@ const getPrefix = (status: ApplicationStatus) => {
   switch (status) {
     case "DRAFT":
       return "[📕 BROUILLON]";
+    case "REJECTED":
+      return "[❌ DEMANDE REJETÉE]";
     case "IN_REVIEW":
       return "[📙 DEMANDE À ETUDIER]";
-    case "VALIDATED":
-      return "[👩‍💼 DEMANDE CONFIRMÉE PAR ADMIN]";
     case "ACCEPTED_BY_COUNSELLOR":
       return "[📗 DEMANDE ÉLIGIBLE]";
     case "ACCEPTED_BY_VALIDATOR":
       return "[✅ DEMANDE VALIDÉE]";
-    case "REJECTED":
-      return "[❌ DEMANDE REJETÉE]";
+    case "VALIDATED":
+      return "[👩‍💼 ENVOI DE CONVENTION VALIDÉE PAR ADMIN]";
   }
 
   return "[⁉️ STATUS DE LA DEMANDE INDÉFINI]";

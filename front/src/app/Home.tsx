@@ -55,8 +55,11 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
           <div className="text-immersionBlue-dark  text-center text-sm py-2 tracking-widest">
             ENTREPRISE
           </div>
-          <div className="text-immersionBlue-dark font-semibold text-center">
-            Vos équipes souhaitent accueillir en immersions professionnelles?
+          <div
+            className="text-immersionBlue-dark font-semibold text-center"
+            style={{ maxWidth: "16rem" }}
+          >
+            Vos équipes souhaitent accueillir en immersion professionnelle ?
           </div>
           <a
             {...routes.formEstablishment().link}
