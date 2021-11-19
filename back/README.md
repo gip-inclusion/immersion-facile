@@ -137,6 +137,12 @@ back$ LOG_LEVEL=debug npm run test:unit
 back$ LOGGER_MULTI_LINE=yes npm run test:all
 ```
 
+### Adding new metrics (aka prometheus counters)
+
+We use the [prom-client](https://github.com/siimon/prom-client) library for metric exports. See [their documentation](https://github.com/siimon/prom-client#readme) for thev different metric types (counters, histograms, etc.)
+
+Adding new counters is very simple, just follow the example in [merge request 327](!327).
+
 # Working with `AppConfig`
 
 The [appConfig.ts](./src/adapters/primary/appConfig.ts) file encapsulates all configuration parameters used by the immersion facile back-end, such as feature flags, api keys, signing/encryption keys, etc. Basically anything that we want to be able to modify without code changes or that should remain secret.
@@ -268,6 +274,7 @@ We use a docker container that is running [cron](https://en.wikipedia.org/wiki/C
     * runs cron
 
 Each pipeline has its own log file, to which log output will be appended by every new run (e.g. `docker-data/pipelines/logs/establishment-backfill.log`). The log directory is mapped to a filesystem volume in order to persist across restarts of the docker container.
+
 ## Running a pipeline locally
 
 Each pipeline has its own `npm start` script with which it can be started:
