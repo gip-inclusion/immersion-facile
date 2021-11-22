@@ -31,7 +31,7 @@ describe("PgAgencyRepository", () => {
   let agencyRepository: PgAgencyRepository;
 
   beforeAll(async () => {
-    pool = pool = getTestPgPool();
+    pool = getTestPgPool();
     client = await pool.connect();
   });
 

@@ -1,3 +1,4 @@
+import { PoolClient } from "pg";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
@@ -8,6 +9,10 @@ import {
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../domain/core/ports/UnitOfWork";
 import {
   AddImmersionApplication,
   AddImmersionApplicationML,
@@ -53,7 +58,7 @@ import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunn
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
-import { InMemoryImmersionOfferRepository as InMemoryImmersionOfferRepositoryForSearch } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { InMemoryImmersionOfferRepository } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { PoleEmploiRomeGateway } from "../secondary/immersionOffer/PoleEmploiRomeGateway";
 import { InMemoryAgencyRepository } from "../secondary/InMemoryAgencyRepository";
@@ -62,11 +67,13 @@ import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEs
 import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
+import { InMemoryUowPerformer } from "../secondary/InMemoryUowPerformer";
 import { PgAgencyRepository } from "../secondary/pg/PgAgencyRepository";
 import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
+import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
@@ -79,6 +86,7 @@ const sequenceRunner = new ThrottledSequenceRunner(1500, 3);
 
 export const createAppDependencies = async (config: AppConfig) => {
   const repositories = await createRepositories(config);
+  const uowPerformer = createUowPerformer(config);
   const eventBus = createEventBus();
   const generateJwtFn = createGenerateJwtFn(config);
   const generateMagicLinkFn = createGenerateVerificationMagicLink(config);
@@ -95,6 +103,7 @@ export const createAppDependencies = async (config: AppConfig) => {
       generateMagicLinkFn,
       emailFilter,
       addressGateway,
+      uowPerformer,
     ),
     authChecker: createAuthChecker(config),
     authMiddleware: createAuthMiddleware(config),
@@ -143,7 +152,7 @@ export const createRepositories = async (config: AppConfig) => {
             // TODO: Still we would need to release the connection
             await config.pgPool.connect(),
           )
-        : new InMemoryImmersionOfferRepositoryForSearch(),
+        : new InMemoryImmersionOfferRepository(),
 
     agency:
       config.repositories === "PG"
@@ -178,6 +187,28 @@ export const createRepositories = async (config: AppConfig) => {
         : new InMemoryOutboxRepository(),
   };
 };
+
+export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;
+export const createInMemoryUow = () => ({
+  outboxRepo: new InMemoryOutboxRepository(),
+  formEstablishmentRepo: new InMemoryFormEstablishmentRepository(),
+});
+
+// following function is for type check only, it is verifies InMemoryUnitOfWork is assignable to UnitOfWork
+const isAssignable = (): UnitOfWork => {
+  const inMemory = null as unknown as InMemoryUnitOfWork;
+  return inMemory;
+};
+
+export const createPgUow = (client: PoolClient): UnitOfWork => ({
+  outboxRepo: new PgOutboxRepository(client),
+  formEstablishmentRepo: new PgFormEstablishmentRepository(client),
+});
+
+const createUowPerformer = (config: AppConfig): UnitOfWorkPerformer =>
+  config.repositories === "PG"
+    ? new PgUowPerformer(config.pgPool, createPgUow)
+    : new InMemoryUowPerformer(createInMemoryUow);
 
 export const createAuthChecker = (config: AppConfig) => {
   if (!config.backofficeUsername || !config.backofficePassword) {
@@ -214,6 +245,7 @@ const createUseCases = (
   generateMagicLinkFn: GenerateVerificationMagicLink,
   emailFilter: EmailFilter,
   addressGateway: APIAdresseGateway,
+  uowPerformer: UnitOfWorkPerformer,
 ) => {
   const getSiret = new GetSiret(repositories.sirene);
 
@@ -259,9 +291,8 @@ const createUseCases = (
     searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),
 
     addFormEstablishment: new AddFormEstablishment(
-      repositories.formEstablishment,
+      uowPerformer,
       createNewEvent,
-      repositories.outbox,
       getSiret,
     ),
 

@@ -4,38 +4,36 @@ import {
   FormEstablishmentDto,
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
-import { GetSiretRequestDto, GetSiretResponseDto } from "../../../shared/siret";
 import { createLogger } from "../../../utils/logger";
-import { UseCase } from "../../core/UseCase";
+import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
-import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
-import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
 
 const logger = createLogger(__filename);
 
-export class AddFormEstablishment extends UseCase<
+export class AddFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,
   AddFormEstablishmentResponseDto
 > {
   constructor(
-    private readonly formEstablishmentRepository: FormEstablishmentRepository,
+    uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
-    private readonly outboxRepository: OutboxRepository,
     private readonly getSiret: GetSiretUseCase,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = formEstablishmentSchema;
 
   public async _execute(
     dto: FormEstablishmentDto,
+    uow: UnitOfWork,
   ): Promise<AddFormEstablishmentResponseDto> {
     await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
 
-    const id = await this.formEstablishmentRepository.save(dto);
+    const id = await uow.formEstablishmentRepo.save(dto);
     if (!id) throw new ConflictError("empty");
 
     const event = this.createNewEvent({
@@ -43,7 +41,7 @@ export class AddFormEstablishment extends UseCase<
       payload: dto,
     });
 
-    await this.outboxRepository.save(event);
+    await uow.outboxRepo.save(event);
     return id;
   }
 }

@@ -1,32 +1,46 @@
+import { makeCreateInMemoryUow } from "../../../_testBuilders/makeCreateInMemoryUow";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config";
 import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 
 describe("Add FormEstablishment", () => {
   let addFormEstablishment: AddFormEstablishment;
-  let formEstablishmentRepository: InMemoryFormEstablishmentRepository;
-  let outboxRepository: InMemoryOutboxRepository;
+  let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
+  let outboxRepo: InMemoryOutboxRepository;
   let stubGetSiret: StubGetSiret;
+  let uowPerformer: UnitOfWorkPerformer;
 
   beforeEach(() => {
-    formEstablishmentRepository = new InMemoryFormEstablishmentRepository();
-    outboxRepository = new InMemoryOutboxRepository();
     stubGetSiret = new StubGetSiret();
+    formEstablishmentRepo = new InMemoryFormEstablishmentRepository();
+    outboxRepo = new InMemoryOutboxRepository();
+
+    uowPerformer = new InMemoryUowPerformer(
+      makeCreateInMemoryUow({
+        outboxRepo,
+        formEstablishmentRepo,
+      }),
+    );
     const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
     addFormEstablishment = new AddFormEstablishment(
-      formEstablishmentRepository,
+      uowPerformer,
       createNewEvent,
-      outboxRepository,
       stubGetSiret,
     );
   });
@@ -38,11 +52,11 @@ describe("Add FormEstablishment", () => {
       formEstablishment.id,
     );
 
-    const storedInRepo = await formEstablishmentRepository.getAll();
+    const storedInRepo = await formEstablishmentRepo.getAll();
     expect(storedInRepo.length).toBe(1);
     expect(storedInRepo[0]).toEqual(formEstablishment);
-    expect(outboxRepository.events).toHaveLength(1);
-    expect(outboxRepository.events[0]).toMatchObject({
+    expect(outboxRepo.events).toHaveLength(1);
+    expect(outboxRepo.events[0]).toMatchObject({
       topic: "FormEstablishmentAdded",
       payload: formEstablishment,
     });

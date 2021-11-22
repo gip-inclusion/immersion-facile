@@ -16,7 +16,7 @@ describe("PgOutboxRepository", () => {
   const createNewEvent = makeCreateNewEvent({ uuidGenerator, clock });
 
   beforeAll(async () => {
-    pool = pool = getTestPgPool();
+    pool = getTestPgPool();
     client = await pool.connect();
   });
 

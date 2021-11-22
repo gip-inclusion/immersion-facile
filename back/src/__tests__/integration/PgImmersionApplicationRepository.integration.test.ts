@@ -12,7 +12,7 @@ describe("PgImmersionApplicationRepository", () => {
   let immersionApplicationRepository: PgImmersionApplicationRepository;
 
   beforeAll(async () => {
-    pool = pool = getTestPgPool();
+    pool = getTestPgPool();
     client = await pool.connect();
   });
 
