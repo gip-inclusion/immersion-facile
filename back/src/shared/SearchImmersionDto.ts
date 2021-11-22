@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { immersionContactInEstablishmentIdSchema } from "./FormEstablishmentDto";
 import { nafDivisionSchema } from "./naf";
+import { siretSchema } from "./siret";
 import { romeCodeMetierSchema } from "./rome";
 import { Flavor } from "./typeFlavors";
 import { zTrimmedString } from "./zodUtils";
@@ -31,6 +32,7 @@ export type SearchImmersionRequestDto = z.infer<
 export const searchImmersionRequestSchema = z.object({
   rome: romeCodeMetierSchema,
   nafDivision: nafDivisionSchema.optional(),
+  siret: siretSchema.optional(),
   location: latLonSchema,
   distance_km: z.number().positive("'distance_km' doit être > 0"),
 });

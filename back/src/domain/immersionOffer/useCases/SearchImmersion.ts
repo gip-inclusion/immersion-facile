@@ -37,11 +37,13 @@ export class SearchImmersion extends UseCase<
 const convertRequestDtoToSearchParams = ({
   rome,
   nafDivision,
+  siret,
   location,
   distance_km,
 }: SearchImmersionRequestDto): SearchParams => ({
   rome: rome,
   nafDivision,
+  siret,
   lat: location.lat,
   lon: location.lon,
   distance: distance_km,

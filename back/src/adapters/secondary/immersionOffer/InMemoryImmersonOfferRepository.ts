@@ -54,9 +54,21 @@ export class InMemoryImmersionOfferRepository
   public async getFromSearch(
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
-    const response = this._immersionOffers.filter(
+    let response = this._immersionOffers.filter(
       (immersionOffer) => immersionOffer.getRome() === searchParams.rome,
     );
+    if (searchParams.nafDivision) {
+      response = response.filter(
+        (immersionOffer) =>
+          immersionOffer.extractCategory() + "" === searchParams.nafDivision,
+      );
+    }
+    if (searchParams.siret) {
+      response = response.filter(
+        (immersionOffer) =>
+          immersionOffer.getProps().siret + "" === searchParams.siret,
+      );
+    }
     logger.info({ searchParams, response }, "getFromSearch");
     return response;
   }

@@ -137,10 +137,23 @@ describe("Postgres implementation of immersion offer repository", () => {
       lon: 50.1,
       nafDivision: "85",
     });
+
     expect(searchResult).toHaveLength(2);
     expect(searchResult[0].getName()).toBe(
       "Company from la bonne boite for search",
     );
+
+    const searchResultWithSiret =
+      await pgImmersionOfferRepository.getFromSearch({
+        rome: "M1907",
+        distance: 30,
+        lat: 34.95,
+        lon: 50.1,
+        nafDivision: "85",
+        siret: "78000403200040",
+      });
+    expect(searchResultWithSiret).toHaveLength(1);
+    expect(searchResultWithSiret[0].getProps().siret).toBe("78000403200040");
   });
 
   test("Insert immersion does not crash if empty array is provided", async () => {

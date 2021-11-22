@@ -10,6 +10,7 @@ export type SearchParams = {
   lat: number;
   lon: number;
   nafDivision?: string;
+  siret?: string;
 };
 
 export interface ImmersionOfferRepository {

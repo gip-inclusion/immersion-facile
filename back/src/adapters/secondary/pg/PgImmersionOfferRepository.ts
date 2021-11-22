@@ -213,22 +213,30 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
     let nafCategoryFilter = "";
+    let siretCategoryFilter = "";
+
     const parameters = [
       searchParams.rome,
       `POINT(${searchParams.lon} ${searchParams.lat})`,
       searchParams.distance * 1000,
     ];
+
     if (searchParams.nafDivision) {
-      nafCategoryFilter = "AND naf_division=$4";
+      nafCategoryFilter = "AND naf_division=$" + (parameters.length + 1);
       parameters.push(searchParams.nafDivision);
+    }
+
+    if (searchParams.siret) {
+      siretCategoryFilter = "AND siret=$" + (parameters.length + 1);
+      parameters.push(searchParams.siret);
     }
 
     return this.client
       .query(
         `SELECT immersion_offers.* as immersion_offers, immersion_contacts.uuid as immersion_contacts_uuid, immersion_contacts.name as immersion_contacts_name, immersion_contacts.firstname as immersion_contacts_firstname, immersion_contacts.email as immersion_contacts_email, immersion_contacts.role as immersion_contacts_role, immersion_contacts.siret_establishment as immersion_contacts_siret_establishment, immersion_contacts.phone as immersion_contacts_phone \
-         FROM (SELECT * FROM immersion_offers WHERE ROME=$1 AND ST_DWithin( \
+         FROM (SELECT * FROM immersion_offers WHERE ROME=$1 ${nafCategoryFilter} ${siretCategoryFilter} AND ST_DWithin( \
          immersion_offers.gps, st_geographyfromtext($2), $3) \ 
-         ${nafCategoryFilter} AND data_source != 'api_laplateformedelinclusion' ORDER BY data_source DESC) as immersion_offers \
+          AND data_source != 'api_laplateformedelinclusion' ORDER BY data_source DESC) as immersion_offers \
          LEFT JOIN immersion_contacts as immersion_contacts \
          ON immersion_offers.contact_in_establishment_uuid = immersion_contacts.uuid`,
         parameters,
