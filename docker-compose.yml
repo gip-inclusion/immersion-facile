@@ -29,6 +29,7 @@ services:
       - ESTABLISHMENT_BACKFILL_SCHEDULE
     volumes:
       - ./docker-data/pipelines:/var/lib/pipelines
+      - ./.env:/app/.env
 
   nginx:
     restart: unless-stopped
