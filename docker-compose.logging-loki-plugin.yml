@@ -3,10 +3,10 @@ version: "3"
 x-logging-config:
   &logging-config
   logging:
-    driver: loki-plugin
+    driver: loki
     options:
       loki-url: http://${LOKI_HOST:-localhost:9092}/loki/api/v1/push
-      loki-retries: 5
+      loki-retries: "5"
       loki-external-labels: "environment=${ENV_TYPE:-unknown},container_name={{.Name}}"
 
 services:
