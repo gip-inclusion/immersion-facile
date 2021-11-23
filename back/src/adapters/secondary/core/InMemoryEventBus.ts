@@ -1,11 +1,31 @@
+import promClient from "prom-client";
 import {
   EventBus,
-  EventCallback,
+  EventCallback
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
+
+const counterPublishedEventsTotal = new promClient.Counter({
+  name: "in_memory_event_bus_published_events_total",
+  help: "The total count of events published by InMemoryEventBus.",
+  labelNames: ["topic"],
+});
+
+const counterPublishedEventsSuccess = new promClient.Counter({
+  name: "in_memory_event_bus_published_events_success",
+  help: "The success count of events published by InMemoryEventBus.",
+  labelNames: ["topic"],
+});
+
+const counterPublishedEventsError = new promClient.Counter({
+  name: "in_memory_event_bus_published_events_error",
+  help: "The error count of events published by InMemoryEventBus.",
+  labelNames: ["topic", "errorType"],
+});
+
 export class InMemoryEventBus implements EventBus {
   public subscriptions: Partial<
     Record<DomainTopic, EventCallback<DomainTopic>[]>
@@ -16,16 +36,34 @@ export class InMemoryEventBus implements EventBus {
 
   public publish(event: DomainEvent) {
     logger.info({ event }, "publish");
-    const callbacks = this.subscriptions[event.topic];
+
+    const topic = event.topic;
+    counterPublishedEventsTotal.inc({ topic });
+
+    const callbacks = this.subscriptions[topic];
     if (callbacks === undefined) {
       logger.info({ eventTopic: event.topic }, "No Callbacks exist for topic.");
+      counterPublishedEventsError.inc({
+        topic,
+        errorType: "no_callback_found",
+      });
       return;
     }
 
-    callbacks.forEach((cb) => {
-      cb(event);
-      logger.info({ eventId: event.id }, `XXXXXXXXXXXXXXXX  Sending an event`);
-    });
+    try {
+      callbacks.forEach((cb) => {
+        cb(event);
+        logger.info(
+          { eventId: event.id },
+          `XXXXXXXXXXXXXXXX  Sending an event`,
+        );
+      });
+      counterPublishedEventsSuccess.inc({ topic });
+    } catch (e: any) {
+      logger.error(e, "callback failed");
+      counterPublishedEventsError.inc({ topic, errorType: "callback_failed" });
+      throw e;
+    }
   }
 
   public subscribe<T extends DomainTopic>(

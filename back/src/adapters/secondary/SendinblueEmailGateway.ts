@@ -1,4 +1,4 @@
-import client from "prom-client";
+import promClient from "prom-client";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import type {
   EmailType,
@@ -15,19 +15,19 @@ import { createLogger } from "./../../utils/logger";
 
 const logger = createLogger(__filename);
 
-const counterSendTransactEmailTotal = new client.Counter({
+const counterSendTransactEmailTotal = new promClient.Counter({
   name: "sendinblue_send_transac_email_total",
   help: "The total count of sendTransacEmail requests, broken down by email type.",
   labelNames: ["emailType"],
 });
 
-const counterSendTransactEmailSuccess = new client.Counter({
+const counterSendTransactEmailSuccess = new promClient.Counter({
   name: "sendinblue_send_transac_email_success",
   help: "The success count of sendTransacEmail requests, broken down by email type.",
   labelNames: ["emailType"],
 });
 
-const counterSendTransactEmailError = new client.Counter({
+const counterSendTransactEmailError = new promClient.Counter({
   name: "sendinblue_send_transac_email_error",
   help: "The error count of sendTransacEmail requests, broken down by email type.",
   labelNames: ["emailType", "errorType"],

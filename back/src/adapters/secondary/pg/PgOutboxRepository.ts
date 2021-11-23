@@ -1,6 +1,19 @@
 import { PoolClient } from "pg";
+import promClient from "prom-client";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
+
+const counterEventsSaved = new promClient.Counter({
+  name: "pg_outbox_repository_events_saved",
+  help: "The total count of events saved by PgOutboxRepository.",
+  labelNames: ["topic"],
+});
+
+const counterEventsMarkedAsPublished = new promClient.Counter({
+  name: "pg_outbox_repository_events_marked_as_published",
+  help: "The total count of events marked as published by PgOutboxRepository.",
+  labelNames: ["topic"],
+});
 
 export class PgOutboxRepository implements OutboxRepository {
   constructor(private client: PoolClient) {}
@@ -10,7 +23,7 @@ export class PgOutboxRepository implements OutboxRepository {
       .query(
         `SELECT id, TO_CHAR(occurred_at, 'YYYY-MM-DD"T"HH:MI:SS.MS"Z"') as "occurredAt", was_published as "wasPublished", topic, payload
             FROM outbox
-            WHERE was_published = false 
+            WHERE was_published = false
             ORDER BY occurred_at ASC`,
       )
       .then(({ rows }) => rows);
@@ -24,6 +37,7 @@ export class PgOutboxRepository implements OutboxRepository {
 
     // prettier-ignore
     await this.client.query(query, [id, occurredAt, wasPublished, topic, payload]);
+    counterEventsSaved.inc({ topic });
   }
 
   async markEventsAsPublished(events: DomainEvent[]): Promise<void> {
@@ -32,6 +46,10 @@ export class PgOutboxRepository implements OutboxRepository {
     await this.client.query(
       "UPDATE outbox SET was_published = true WHERE id = ANY($1::uuid[])",
       [idsToMarkAsPublished],
+    );
+
+    events.forEach(({ topic }) =>
+      counterEventsMarkedAsPublished.inc({ topic }),
     );
   }
 }
