@@ -1,7 +1,7 @@
 import promClient from "prom-client";
 import {
   EventBus,
-  EventCallback
+  EventCallback,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
 import { createLogger } from "../../../utils/logger";

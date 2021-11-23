@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import { Pool, PoolClient } from "pg";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
@@ -85,8 +85,9 @@ const uuidGenerator = new UuidV4Generator();
 const sequenceRunner = new ThrottledSequenceRunner(1500, 3);
 
 export const createAppDependencies = async (config: AppConfig) => {
-  const repositories = await createRepositories(config);
-  const uowPerformer = createUowPerformer(config);
+  const getPgPoolFn = createGetPgPoolFn(config);
+  const repositories = await createRepositories(config, getPgPoolFn);
+  const uowPerformer = createUowPerformer(config, getPgPoolFn);
   const eventBus = createEventBus();
   const generateJwtFn = createGenerateJwtFn(config);
   const generateMagicLinkFn = createGenerateVerificationMagicLink(config);
@@ -126,7 +127,24 @@ type Repositories = ReturnType<typeof createRepositories> extends Promise<infer 
   ? T
   : never;
 
-export const createRepositories = async (config: AppConfig) => {
+export type GetPgPoolFn = () => Pool;
+export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
+  let pgPool: Pool;
+  return () => {
+    if (config.repositories !== "PG")
+      throw new Error(
+        `No pool provided if repositories are not PG, received ${config.repositories}`,
+      );
+    if (!pgPool)
+      pgPool = new Pool({ connectionString: config.pgImmersionDbUrl });
+    return pgPool;
+  };
+};
+
+export const createRepositories = async (
+  config: AppConfig,
+  getPgPoolFn: GetPgPoolFn,
+) => {
   logger.info({
     repositories: config.repositories,
     sireneRepository: config.sireneRepository,
@@ -137,11 +155,11 @@ export const createRepositories = async (config: AppConfig) => {
   return {
     demandeImmersion:
       config.repositories === "PG"
-        ? new PgImmersionApplicationRepository(await config.pgPool.connect())
+        ? new PgImmersionApplicationRepository(await getPgPoolFn().connect())
         : new InMemoryImmersionApplicationRepository(),
     formEstablishment:
       config.repositories === "PG"
-        ? new PgFormEstablishmentRepository(await config.pgPool.connect())
+        ? new PgFormEstablishmentRepository(await getPgPoolFn().connect())
         : new InMemoryFormEstablishmentRepository(),
 
     immersionOfferForSearch:
@@ -150,13 +168,13 @@ export const createRepositories = async (config: AppConfig) => {
             // Details in https://node-postgres.com/features/pooling
             // Now using connection pool
             // TODO: Still we would need to release the connection
-            await config.pgPool.connect(),
+            await getPgPoolFn().connect(),
           )
         : new InMemoryImmersionOfferRepository(),
 
     agency:
       config.repositories === "PG"
-        ? new PgAgencyRepository(await config.pgPool.connect())
+        ? new PgAgencyRepository(await getPgPoolFn().connect())
         : new InMemoryAgencyRepository(),
 
     sirene:
@@ -183,7 +201,7 @@ export const createRepositories = async (config: AppConfig) => {
 
     outbox:
       config.repositories === "PG"
-        ? new PgOutboxRepository(await config.pgPool.connect())
+        ? new PgOutboxRepository(await getPgPoolFn().connect())
         : new InMemoryOutboxRepository(),
   };
 };
@@ -205,9 +223,12 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
 });
 
-const createUowPerformer = (config: AppConfig): UnitOfWorkPerformer =>
+const createUowPerformer = (
+  config: AppConfig,
+  getPgPoolFn: GetPgPoolFn,
+): UnitOfWorkPerformer =>
   config.repositories === "PG"
-    ? new PgUowPerformer(config.pgPool, createPgUow)
+    ? new PgUowPerformer(getPgPoolFn(), createPgUow)
     : new InMemoryUowPerformer(createInMemoryUow);
 
 export const createAuthChecker = (config: AppConfig) => {

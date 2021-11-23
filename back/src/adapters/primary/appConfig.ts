@@ -1,5 +1,4 @@
 import * as dotenv from "dotenv";
-import { Pool } from "pg";
 import {
   makeGetBooleanVariable,
   makeThrowIfNotDefined,
@@ -73,14 +72,6 @@ export class AppConfig {
     if (this.nodeEnv === "production") return this.throwIfNotDefined("PG_URL");
     if (this.env.PG_URL) return this.env.PG_URL;
     return `postgresql://immersion:pg-password@localhost:5432/immersion-db`;
-  }
-
-  public get pgPool(): Pool {
-    if (this.repositories !== "PG")
-      throw new Error(
-        `No pool provided if repositories are not PG, received ${this.repositories}`,
-      );
-    return new Pool({ connectionString: this.pgImmersionDbUrl });
   }
 
   // == Sirene repository ==

@@ -4,15 +4,15 @@ import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenG
 import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
 import {
   httpCallToLaBonneBoite,
-  LaBonneBoiteGateway,
+  LaBonneBoiteGateway
 } from "../secondary/immersionOffer/LaBonneBoiteGateway";
 import {
   httpCallToLaPlateFormeDeLInclusion,
-  LaPlateFormeDeLInclusionGateway,
+  LaPlateFormeDeLInclusionGateway
 } from "../secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "./appConfig";
-import { createRepositories } from "./config";
+import { createGetPgPoolFn, createRepositories } from "./config";
 
 const logger = createLogger(__filename);
 
@@ -40,7 +40,10 @@ const main = async () => {
 
   const addressGateway = new APIAdresseGateway();
 
-  const repositories = await createRepositories(config);
+  const repositories = await createRepositories(
+    config,
+    createGetPgPoolFn(config),
+  );
 
   const updateEstablishmentsAndImmersionOffersFromLastSearches =
     new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
