@@ -1,4 +1,8 @@
 import promClient from "prom-client";
+import {
+  ModificationRequestApplicationNotificationParams,
+  SendRenewedMagicLinkParams,
+} from "./../../domain/immersionApplication/ports/EmailGateway";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import type {
   EmailType,
@@ -10,7 +14,6 @@ import type {
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
-import { ModificationRequestApplicationNotificationParams } from "./../../domain/immersionApplication/ports/EmailGateway";
 import { createLogger } from "./../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -54,6 +57,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/11/message-setup
   NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: 11,
+
+  // https://my.sendinblue.com/camp/template/14/message-setup
+  MAGIC_LINK_RENEWAL: 14,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -201,6 +207,15 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
+  public async sendRenewedMagicLink(
+    recipients: string[],
+    params: SendRenewedMagicLinkParams,
+  ): Promise<void> {
+    this.sendTransacEmail("MAGIC_LINK_RENEWAL", recipients, {
+      MAGIC_LINK: params.magicLink,
+    });
+  }
+
   private async sendTransacEmail(
     emailType: EmailType,
     recipients: string[],
@@ -210,7 +225,6 @@ export class SendinblueEmailGateway implements EmailGateway {
     sibEmail.templateId = emailTypeToTemplateId[emailType];
     sibEmail.to = recipients.map((email) => ({ email }));
     sibEmail.params = params;
-
     try {
       counterSendTransactEmailTotal.inc({ emailType });
       logger.info({ sibEmail }, "Sending email");

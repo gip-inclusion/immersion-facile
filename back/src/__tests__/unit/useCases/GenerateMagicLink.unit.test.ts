@@ -7,7 +7,9 @@ import {
 } from "../../../shared/tokens/MagicLinkPayload";
 
 const generateJwtFn: GenerateJwtFn = (payload: MagicLinkPayload) => {
-  return payload.applicationId + "; " + payload.roles.join(",");
+  return (
+    payload.applicationId + ";" + payload.roles.join(",") + ";" + payload.iat
+  );
 };
 
 describe("Generate magic links", () => {
@@ -25,6 +27,7 @@ describe("Generate magic links", () => {
       const result = await generateMagicLink.execute({
         applicationId: id,
         role,
+        expired: false,
       });
 
       expect(result).toEqual({

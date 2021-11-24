@@ -156,6 +156,20 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationModificationIsRe
     });
   };
 
+export const expectEmailMatchingLinkRenewalEmail = (
+  templatedEmail: TemplatedEmail,
+  recipients: string[],
+  magicLink: string,
+) => {
+  expectTemplatedEmailToEqual(templatedEmail, {
+    type: "MAGIC_LINK_RENEWAL",
+    recipients,
+    params: {
+      magicLink,
+    },
+  });
+};
+
 const expectTemplatedEmailToEqual = (
   email: TemplatedEmail,
   expected: TemplatedEmail,

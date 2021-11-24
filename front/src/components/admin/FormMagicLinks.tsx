@@ -13,10 +13,11 @@ export const FormMagicLinks = ({
     Object.keys(frontRoutes)[0] as keyof typeof frontRoutes,
   );
   const [link, setLink] = useState(undefined as string | undefined);
+  const [expired, setExpired] = useState(false);
 
   useEffect(() => {
     immersionApplicationGateway
-      .generateMagicLink(immersionApplication.id, role)
+      .generateMagicLink(immersionApplication.id, role, expired)
       .then((jwt) => {
         return (
           location.protocol +
@@ -29,7 +30,7 @@ export const FormMagicLinks = ({
         );
       })
       .then(setLink);
-  }, [role, route]);
+  }, [role, route, expired]);
 
   const handleRolesDropdownChange = (evt: ChangeEvent) => {
     const target = evt.currentTarget as HTMLSelectElement;
@@ -84,6 +85,17 @@ export const FormMagicLinks = ({
             </option>
           ))}
         </select>
+
+        <label>
+          <input
+            type="checkbox"
+            checked={expired}
+            onChange={() => {
+              setExpired(!expired);
+            }}
+          />
+          Expired
+        </label>
 
         {!link && <p>⌛️ generating... </p>}
 

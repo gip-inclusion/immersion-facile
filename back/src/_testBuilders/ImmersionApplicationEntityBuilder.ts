@@ -1,3 +1,4 @@
+import { AgencyId } from "../shared/agencies";
 import { ImmersionApplicationEntity } from "../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationId } from "../shared/ImmersionApplicationDto";
 import { Builder } from "./Builder";
@@ -16,6 +17,14 @@ export class ImmersionApplicationEntityBuilder
     return new ImmersionApplicationEntityBuilder(
       ImmersionApplicationEntity.create(
         new ImmersionApplicationDtoBuilder().withId(id).build(),
+      ),
+    );
+  }
+
+  public withAgencyId(id: AgencyId) {
+    return new ImmersionApplicationEntityBuilder(
+      ImmersionApplicationEntity.create(
+        new ImmersionApplicationDtoBuilder().withAgencyId(id).build(),
       ),
     );
   }

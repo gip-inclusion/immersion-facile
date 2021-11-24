@@ -40,6 +40,7 @@ const getUseCasesByTopics = (
     useCases.notifyAllActorsOfFinalApplicationValidation,
   ],
   FormEstablishmentAdded: [useCases.transformFormEstablishmentToSearchData],
+  MagicLinkRenewalRequested: [useCases.deliverRenewedMagicLink],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

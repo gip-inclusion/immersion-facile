@@ -24,6 +24,13 @@ const immersionApplicationRequiresModificationSchema = z.object({
   reason: zString,
 });
 
+// prettier-ignore
+export type RenewMagicLinkPayload = z.infer<typeof renewMagicLinkPayloadSchema>
+export const renewMagicLinkPayloadSchema = z.object({
+  emails: z.array(z.string()),
+  magicLink: z.string(),
+});
+
 export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends UseCase<ImmersionApplicationRequiresModificationPayload> {
   constructor(
     private readonly emailFilter: EmailFilter,

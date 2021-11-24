@@ -168,7 +168,7 @@ describe("/demandes-immersion route", () => {
           .expect(200, immersionApplication);
       });
 
-      it("fails with expired magic link", async () => {
+      it("redirects expired magic links to a renewal page", async () => {
         const payload = createMagicLinkPayload(
           immersionApplication.id,
           "beneficiary",
@@ -179,10 +179,13 @@ describe("/demandes-immersion route", () => {
         );
         const jwt = generateJwt(payload);
 
-        // GETting the created application fails due to token being expired.
+        // GETting the created application 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
         await request
           .get(`/auth/${immersionApplicationsRoute}/${jwt}`)
-          .expect(403);
+          .expect(403, {
+            message: "Le lien magique est périmé",
+            needsNewMagicLink: true,
+          });
       });
     });
 

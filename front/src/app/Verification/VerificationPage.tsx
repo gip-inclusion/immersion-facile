@@ -7,6 +7,7 @@ import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
 import { statusTransitionConfigs } from "src/shared/immersionApplicationStatusTransitions";
+import { frontRoutes } from "src/shared/routes";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 
@@ -43,9 +44,15 @@ const isAllowedTransition = (
 };
 
 export const VerificationPage = ({ route }: VerificationPageProps) => {
-  const { immersionApplication, roles, jwt } = useImmersionApplicationFromJwt(
-    route.params.jwt,
-  );
+  const {
+    immersionApplication,
+    roles,
+    applicationId,
+    jwt,
+    error,
+    needsMagicLinkRefresh,
+  } = useImmersionApplicationFromJwt(route.params.jwt);
+
   const [successMessage, setSuccessMessage] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
 
@@ -69,6 +76,20 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
     "La demande d'immersion a bien été renvoyée pour modification";
   const validatedSuccessfully =
     "La confirmation de l'immersion a bien été programmée pour envoi";
+
+  if (needsMagicLinkRefresh) {
+    location.href =
+      location.origin +
+      "/" +
+      frontRoutes.magicLinkRenewal +
+      "?" +
+      "id=" +
+      applicationId +
+      "&role=" +
+      roles[0] +
+      "&originalURL=" +
+      encodeURIComponent(location.origin + location.pathname + "?jwt=%jwt%");
+  }
 
   return (
     <div

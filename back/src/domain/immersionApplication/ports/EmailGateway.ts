@@ -68,6 +68,10 @@ export type NewImmersionApplicationReviewForEligibilityOrValidationParams = {
   possibleRoleAction: string;
 };
 
+export type SendRenewedMagicLinkParams = {
+  magicLink: string;
+};
+
 export type EmailType =
   | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
   | "NEW_APPLICATION_MENTOR_CONFIRMATION"
@@ -75,7 +79,8 @@ export type EmailType =
   | "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION"
   | "VALIDATED_APPLICATION_FINAL_CONFIRMATION"
   | "REJECTED_APPLICATION_NOTIFICATION"
-  | "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION";
+  | "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION"
+  | "MAGIC_LINK_RENEWAL";
 
 export interface EmailGateway {
   sendNewApplicationBeneficiaryConfirmation: (
@@ -105,5 +110,9 @@ export interface EmailGateway {
   sendNewApplicationForReviewNotification: (
     recipient: string[],
     params: NewImmersionApplicationReviewForEligibilityOrValidationParams,
+  ) => Promise<void>;
+  sendRenewedMagicLink: (
+    recipient: string[],
+    params: SendRenewedMagicLinkParams,
   ) => Promise<void>;
 }

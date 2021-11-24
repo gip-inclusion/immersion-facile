@@ -217,12 +217,21 @@ export type GenerateMagicLinkRequestDto = z.infer<typeof generateMagicLinkReques
 export const generateMagicLinkRequestSchema = z.object({
   applicationId: immersionApplicationIdSchema,
   role: z.enum(allRoles),
+  expired: z.boolean(), //< defaults to false
 });
 
 // prettier-ignore
 export type GenerateMagicLinkResponseDto = z.infer<typeof generateMagicLinkResponseSchema>;
 export const generateMagicLinkResponseSchema = z.object({
   jwt: z.string(),
+});
+
+// prettier-ignore
+export type RenewMagicLinkRequestDto = z.infer<typeof renewMagicLinkRequestSchema>;
+export const renewMagicLinkRequestSchema = z.object({
+  applicationId: immersionApplicationIdSchema,
+  role: z.enum(allRoles),
+  linkFormat: z.string(),
 });
 
 export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {

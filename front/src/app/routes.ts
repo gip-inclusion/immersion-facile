@@ -26,6 +26,15 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     "/immersion-offer" /* old name, still redirected*/,
   ]),
 
+  renewMagicLink: defineRoute(
+    {
+      id: param.query.string,
+      role: param.query.string,
+      originalURL: param.query.string,
+    },
+    () => `/${frontRoutes.magicLinkRenewal}`,
+  ),
+
   debugPopulateDB: defineRoute(
     { count: param.path.number },
     (p) => `/debug/populate/${p.count}`,

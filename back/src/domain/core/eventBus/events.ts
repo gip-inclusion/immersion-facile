@@ -1,6 +1,9 @@
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import type { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
-import { ImmersionApplicationRequiresModificationPayload } from "../../immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import {
+  ImmersionApplicationRequiresModificationPayload,
+  RenewMagicLinkPayload,
+} from "../../immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import type { DateStr } from "../ports/Clock";
 
 type GenericEvent<T extends string, P> = {
@@ -24,7 +27,9 @@ export type DomainEvent =
   | GenericEvent<"ImmersionApplicationRejected", ImmersionApplicationDto>
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationRequiresModification", ImmersionApplicationRequiresModificationPayload>
-  | GenericEvent<"FormEstablishmentAdded", FormEstablishmentDto>;
+  | GenericEvent<"FormEstablishmentAdded", FormEstablishmentDto>
+  | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>;
+
 export type DomainTopic = DomainEvent["topic"];
 
 export const eventToDebugInfo = (event: DomainEvent) => ({

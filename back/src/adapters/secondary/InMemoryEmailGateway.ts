@@ -1,4 +1,7 @@
-import { ModificationRequestApplicationNotificationParams } from "./../../domain/immersionApplication/ports/EmailGateway";
+import {
+  ModificationRequestApplicationNotificationParams,
+  SendRenewedMagicLinkParams,
+} from "./../../domain/immersionApplication/ports/EmailGateway";
 import type {
   EmailType,
   NewApplicationAdminNotificationParams,
@@ -113,6 +116,18 @@ export class InMemoryEmailGateway implements EmailGateway {
     );
     this.sentEmails.push({
       type: "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION",
+      recipients: recipients,
+      params: params,
+    });
+  }
+
+  public async sendRenewedMagicLink(
+    recipients: string[],
+    params: SendRenewedMagicLinkParams,
+  ): Promise<void> {
+    logger.info({ recipients, params }, "sendRenewedMagicLink");
+    this.sentEmails.push({
+      type: "MAGIC_LINK_RENEWAL",
       recipients: recipients,
       params: params,
     });

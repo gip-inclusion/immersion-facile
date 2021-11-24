@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg";
+import { DeliverRenewedMagicLink } from "./../../domain/immersionApplication/useCases/notifications/DeliverRenewedMagicLink";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
@@ -18,6 +19,7 @@ import {
   AddImmersionApplicationML,
 } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
+import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
 import { ListAgencies } from "../../domain/immersionApplication/useCases/ListAgencies";
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
@@ -33,7 +35,6 @@ import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplicat
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
-import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
@@ -77,6 +78,8 @@ import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
+import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
+import { frontRoutes } from "../../shared/routes";
 
 const logger = createLogger(__filename);
 
@@ -257,7 +260,15 @@ export const createGenerateVerificationMagicLink = (config: AppConfig) => {
   };
 };
 
+export const createRenewMagicLinkUrl = (
+  role: Role,
+  applicationId: ImmersionApplicationId,
+) => {
+  return `/${frontRoutes.magicLinkRenewal}?id=${applicationId}&role=${role}`;
+};
+
 export type UseCases = ReturnType<typeof createUseCases>;
+
 const createUseCases = (
   config: AppConfig,
   repositories: Repositories,
@@ -311,6 +322,13 @@ const createUseCases = (
       repositories.outbox,
     ),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
+    renewMagicLink: new RenewMagicLink(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox,
+      repositories.agency,
+      generateJwtFn,
+    ),
 
     // immersionOffer
     searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),
@@ -381,6 +399,10 @@ const createUseCases = (
         repositories.agency,
         generateMagicLinkFn,
       ),
+    deliverRenewedMagicLink: new DeliverRenewedMagicLink(
+      emailFilter,
+      repositories.email,
+    ),
   };
 };
 

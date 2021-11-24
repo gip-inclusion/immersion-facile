@@ -9,6 +9,7 @@ import { romeSearchRequestSchema } from "../../shared/rome";
 import {
   agenciesRoute,
   generateMagicLinkRoute,
+  renewMagicLinkRoute,
   immersionApplicationsRoute,
   immersionOffersRoute,
   romeRoute,
@@ -87,8 +88,19 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
         deps.useCases.generateMagicLink.execute({
           applicationId: req.query.id,
           role: req.query.role,
+          expired: req.query.expired === "true",
         } as any),
       deps.authChecker,
+    );
+  });
+
+  router.route(`/${renewMagicLinkRoute}`).get(async (req, res) => {
+    sendHttpResponse(req, res, () =>
+      deps.useCases.renewMagicLink.execute({
+        applicationId: req.query.id,
+        role: req.query.role,
+        linkFormat: req.query.linkFormat,
+      } as any),
     );
   });
 

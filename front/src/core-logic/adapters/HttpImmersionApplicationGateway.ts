@@ -19,6 +19,7 @@ import {
 import {
   agenciesRoute,
   generateMagicLinkRoute,
+  renewMagicLinkRoute,
   immersionApplicationsRoute,
   siretRoute,
   updateApplicationStatusRoute,
@@ -158,11 +159,24 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
   public async generateMagicLink(
     applicationId: ImmersionApplicationId,
     role: Role,
+    expired: boolean,
   ): Promise<string> {
     const httpResponse = await axios.get(
-      `/${prefix}/admin/${generateMagicLinkRoute}?id=${applicationId}&role=${role}`,
+      `/${prefix}/admin/${generateMagicLinkRoute}?id=${applicationId}&role=${role}&expired=${expired}`,
     );
     return httpResponse.data.jwt;
+  }
+
+  public async renewMagicLink(
+    applicationId: ImmersionApplicationId,
+    role: Role,
+    linkFormat: string,
+  ): Promise<void> {
+    await axios.get(
+      `/${prefix}/${renewMagicLinkRoute}?id=${applicationId}&role=${role}&linkFormat=${encodeURIComponent(
+        linkFormat,
+      )}`,
+    );
   }
 
   public async listAgencies(): Promise<AgencyDto[]> {

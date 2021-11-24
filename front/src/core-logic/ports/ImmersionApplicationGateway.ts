@@ -45,7 +45,14 @@ export abstract class ImmersionApplicationGateway {
   abstract generateMagicLink(
     applicationId: ImmersionApplicationId,
     role: Role,
+    expired: boolean,
   ): Promise<string>;
+
+  abstract renewMagicLink(
+    applicationId: ImmersionApplicationId,
+    role: Role,
+    linkFormat: string,
+  ): Promise<void>;
 
   abstract listAgencies(): Promise<AgencyDto[]>;
 
