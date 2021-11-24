@@ -245,6 +245,24 @@ beforeEach(async () => {
 });
 ```
 
+
+# Asynchronous Event Processing
+
+This section describes the workings of our event processing setup and explains how to perform various operations relating to it.
+
+TODO(jburkhard/jfmacresy): Describe the architecture and how to schedule events.
+
+## Quarantined Events
+
+Quarantined events are recorded in the outbox just like regular events, but the EventBus will make no attempt to publish them.
+
+There is currently only one way to quarantine events:
+* If the event's domain topic is included in the `QUARANTINED_TOPICS` environment variable, all newly created events will automatically be marked as quarantined.
+
+  This is meant for dealing with production issues: if we find that certain events causes bugs crashes, we can quickly disable their processing until we have fixed the bug.
+
+ Quarantining could be used in other scenarios in the future, e.g. individual events could be quarantined after 3 unsuccessful processing attempts.
+
 # Data Processing Pipelines
 
 This section describes how to work with our pipelines, both locally and remotely. We will use the *establishmenBackfill* pipeline (currently our only pipeline) as an example throughout this section:

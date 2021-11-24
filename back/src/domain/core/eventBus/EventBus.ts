@@ -1,4 +1,4 @@
-import { Clock, DateStr } from "../ports/Clock";
+import { Clock } from "../ports/Clock";
 import { UuidGenerator } from "../ports/UuidGenerator";
 import type { DomainEvent, DomainTopic } from "./events";
 
@@ -20,6 +20,7 @@ export interface EventBus {
 type CreateEventDependencies = {
   clock: Clock;
   uuidGenerator: UuidGenerator;
+  quarantinedTopics?: DomainTopic[];
 };
 
 export type CreateNewEvent = <T extends DomainTopic>(params: {
@@ -28,13 +29,17 @@ export type CreateNewEvent = <T extends DomainTopic>(params: {
   wasPublished?: boolean;
 }) => NarrowEvent<T>;
 
-export const makeCreateNewEvent =
-  ({ uuidGenerator, clock }: CreateEventDependencies): CreateNewEvent =>
-  (params: any) => {
-    return {
-      id: uuidGenerator.new(),
-      occurredAt: clock.now().toISOString(),
-      wasPublished: false,
-      ...params,
-    };
-  };
+export const makeCreateNewEvent = ({
+  uuidGenerator,
+  clock,
+  quarantinedTopics = [],
+}: CreateEventDependencies): CreateNewEvent => {
+  const quarantinedTopicSet = new Set(quarantinedTopics);
+  return (params: any) => ({
+    id: uuidGenerator.new(),
+    occurredAt: clock.now().toISOString(),
+    wasPublished: false,
+    wasQuarantined: quarantinedTopicSet.has(params.topic),
+    ...params,
+  });
+};

@@ -1,7 +1,7 @@
+import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import type { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { ImmersionApplicationRequiresModificationPayload } from "../../immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import type { DateStr } from "../ports/Clock";
-import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 
 type GenericEvent<T extends string, P> = {
   id: string;
@@ -9,6 +9,7 @@ type GenericEvent<T extends string, P> = {
   topic: T;
   payload: P;
   wasPublished?: boolean;
+  wasQuarantined?: boolean;
 };
 
 export type DomainEvent =
@@ -24,13 +25,13 @@ export type DomainEvent =
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationRequiresModification", ImmersionApplicationRequiresModificationPayload>
   | GenericEvent<"FormEstablishmentAdded", FormEstablishmentDto>;
-
 export type DomainTopic = DomainEvent["topic"];
 
 export const eventToDebugInfo = (event: DomainEvent) => ({
   event: event.id,
   topic: event.topic,
   wasPublished: event.wasPublished,
+  wasQuarantined: event.wasQuarantined,
 });
 export const eventsToDebugInfo = (events: DomainEvent[]) =>
   events.map(eventToDebugInfo);

@@ -6,7 +6,7 @@ import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 const counterEventsSaved = new promClient.Counter({
   name: "pg_outbox_repository_events_saved",
   help: "The total count of events saved by PgOutboxRepository.",
-  labelNames: ["topic"],
+  labelNames: ["topic", "wasQuarantined"],
 });
 
 const counterEventsMarkedAsPublished = new promClient.Counter({
@@ -21,23 +21,31 @@ export class PgOutboxRepository implements OutboxRepository {
   async getAllUnpublishedEvents(): Promise<DomainEvent[]> {
     return this.client
       .query(
-        `SELECT id, TO_CHAR(occurred_at, 'YYYY-MM-DD"T"HH:MI:SS.MS"Z"') as "occurredAt", was_published as "wasPublished", topic, payload
-            FROM outbox
-            WHERE was_published = false
-            ORDER BY occurred_at ASC`,
+        `SELECT id, TO_CHAR(occurred_at, 'YYYY-MM-DD"T"HH:MI:SS.MS"Z"') as "occurredAt",
+          was_published as "wasPublished", was_quarantined as "wasQuarantined",
+          topic, payload
+        FROM outbox
+        WHERE was_published = false
+          AND was_quarantined = false
+        ORDER BY occurred_at ASC`,
       )
       .then(({ rows }) => rows);
   }
 
   async save(event: DomainEvent): Promise<void> {
-    const { id, occurredAt, wasPublished, topic, payload } = event;
+    const { id, occurredAt, wasPublished, wasQuarantined, topic, payload } =
+      event;
     const query = `INSERT INTO outbox(
-        id, occurred_at, was_published, topic, payload
-      ) VALUES($1, $2, $3, $4, $5)`;
+        id, occurred_at, was_published, was_quarantined, topic, payload
+      ) VALUES($1, $2, $3, $4, $5, $6)`;
 
     // prettier-ignore
-    await this.client.query(query, [id, occurredAt, wasPublished, topic, payload]);
-    counterEventsSaved.inc({ topic });
+    await this.client.query(query, [id, occurredAt, wasPublished, wasQuarantined, topic, payload]);
+
+    counterEventsSaved.inc({
+      topic,
+      wasQuarantined: wasQuarantined ? "true" : "false",
+    });
   }
 
   async markEventsAsPublished(events: DomainEvent[]): Promise<void> {

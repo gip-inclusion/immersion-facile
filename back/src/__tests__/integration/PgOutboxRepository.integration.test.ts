@@ -2,10 +2,11 @@ import { Pool, PoolClient } from "pg";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
-import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
+import { DomainEvent } from "../../domain/core/eventBus/events";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { DomainEvent } from "../../domain/core/eventBus/events";
+import { makeCreateNewEvent } from "./../../domain/core/eventBus/EventBus";
+import { DomainTopic } from "./../../domain/core/eventBus/events";
 
 describe("PgOutboxRepository", () => {
   let pool: Pool;
@@ -13,7 +14,13 @@ describe("PgOutboxRepository", () => {
   let outboxRepository: PgOutboxRepository;
   const uuidGenerator = new TestUuidGenerator();
   const clock = new CustomClock();
-  const createNewEvent = makeCreateNewEvent({ uuidGenerator, clock });
+  const quarantinedTopic: DomainTopic = "ImmersionApplicationRejected";
+
+  let createNewEvent = makeCreateNewEvent({
+    uuidGenerator,
+    clock,
+    quarantinedTopics: [quarantinedTopic],
+  });
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -45,11 +52,36 @@ describe("PgOutboxRepository", () => {
     // assert
     const eventsStored = await getAllEventsStored();
     expect(eventsStored).toHaveLength(1);
-    const { occurredAt, wasPublished, ...rest } = event;
+    const { occurredAt, wasPublished, wasQuarantined, ...rest } = event;
     expect(eventsStored[0]).toEqual({
       ...rest,
       occurred_at: new Date(occurredAt),
       was_published: wasPublished,
+      was_quarantined: wasQuarantined,
+    });
+  });
+
+  it("sets was_quarantined for quarantined event types", async () => {
+    // prepare
+    uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
+    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+    const event = createNewEvent({
+      topic: quarantinedTopic,
+      payload: immersionApplication,
+    });
+
+    // act
+    await outboxRepository.save(event);
+
+    // assert
+    const eventsStored = await getAllEventsStored();
+    expect(eventsStored).toHaveLength(1);
+    const { occurredAt, wasPublished, wasQuarantined, ...rest } = event;
+    expect(eventsStored[0]).toEqual({
+      ...rest,
+      occurred_at: new Date(occurredAt),
+      was_published: wasPublished,
+      was_quarantined: true,
     });
   });
 
@@ -78,7 +110,19 @@ describe("PgOutboxRepository", () => {
       wasPublished: true,
     });
 
-    await storeInOutbox([event2, event1, alreadyProcessedEvent]);
+    clock.setNextDate(new Date("2021-11-15T10:03:00.000Z"));
+    uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
+    const quarantinedEvent = createNewEvent({
+      topic: quarantinedTopic,
+      payload: immersionApplication,
+    });
+
+    await storeInOutbox([
+      event2,
+      event1,
+      alreadyProcessedEvent,
+      quarantinedEvent,
+    ]);
 
     // act
     const events = await outboxRepository.getAllUnpublishedEvents();

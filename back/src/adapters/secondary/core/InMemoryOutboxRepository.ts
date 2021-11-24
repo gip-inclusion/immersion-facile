@@ -25,7 +25,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
       "getAllUnpublishedEvents",
     );
     const unpublishedEvents = this._events.filter(
-      ({ wasPublished }) => !wasPublished,
+      ({ wasPublished, wasQuarantined }) => !wasPublished && !wasQuarantined,
     );
 
     if (unpublishedEvents.length > 0) {

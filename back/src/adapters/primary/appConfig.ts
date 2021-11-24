@@ -7,6 +7,7 @@ import {
 } from "../../shared/envHelpers";
 import { getFeatureFlags } from "../../shared/featureFlags";
 import { createLogger } from "../../utils/logger";
+import { DomainTopic } from "./../../domain/core/eventBus/events";
 
 const logger = createLogger(__filename);
 
@@ -166,6 +167,12 @@ export class AppConfig {
   // == Event Bus ==
   public get eventCrawlerPeriodMs() {
     return parseInteger(this.env.EVENT_CRAWLER_PERIOD_MS, 0);
+  }
+
+  public get quarantinedTopics(): DomainTopic[] {
+    return parseStringList(this.env.QUARANTINED_TOPICS).filter(
+      (el) => !!el,
+    ) as DomainTopic[];
   }
 }
 

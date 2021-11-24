@@ -120,8 +120,6 @@ export type AppDependencies = ReturnType<
   ? T
   : never;
 
-const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
-
 // prettier-ignore
 type Repositories = ReturnType<typeof createRepositories> extends Promise<infer T>
   ? T
@@ -269,6 +267,11 @@ const createUseCases = (
   addressGateway: APIAdresseGateway,
   uowPerformer: UnitOfWorkPerformer,
 ) => {
+  const createNewEvent = makeCreateNewEvent({
+    clock,
+    uuidGenerator,
+    quarantinedTopics: config.quarantinedTopics,
+  });
   const getSiret = new GetSiret(repositories.sirene);
 
   return {

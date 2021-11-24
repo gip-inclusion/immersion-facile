@@ -68,6 +68,7 @@ describe("Add immersionApplication", () => {
         topic: "ImmersionApplicationSubmittedByBeneficiary",
         payload: validImmersionApplication,
         wasPublished: false,
+        wasQuarantined: false,
       },
     ]);
   });
