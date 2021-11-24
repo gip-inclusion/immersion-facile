@@ -10,6 +10,17 @@ x-logging-config:
       loki-external-labels: "environment=${ENV_TYPE:-unknown},container_name={{.Name}}"
 
 services:
+  promtail:
+    image: grafana/promtail:2.4.1
+    volumes:
+      - ./promtail/config.yml:/etc/promtail/config.yml
+      - ./docker-data/pipelines/log:/var/log/pipelines
+    network_mode: host
+    environment:
+      LOKI_HOST: "${LOKI_HOST:-localhost:9092}"
+      ENV_TYPE: "${ENV_TYPE:-unknown}"
+    command: -config.expand-env=true -config.file=/etc/promtail/config.yml -print-config-stderr
+
   back:
     <<: *logging-config
 
@@ -27,3 +38,4 @@ services:
 
   adminer:
     <<: *logging-config
+
