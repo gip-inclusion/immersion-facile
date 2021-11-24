@@ -136,6 +136,7 @@ export class EstablishmentEntity {
           contactInEstablishment: this.props.contactInEstablishment,
           score: this.getScore(),
           position: this.getPosition(),
+          address: this.props.address,
         }),
     );
   }

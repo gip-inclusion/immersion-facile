@@ -40,4 +40,5 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     (p) => `/debug/populate/${p.count}`,
   ),
   searchDebug: defineRoute("/debug/search"),
+  search: defineRoute("/recherche"),
 });

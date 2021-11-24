@@ -262,6 +262,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               data_source: result.data_source,
               score: result.score,
               contactInEstablishment: immersionContact,
+              address: result.address,
             });
           }
           return new ImmersionOfferEntity({
@@ -272,6 +273,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
             voluntaryToImmersion: result.voluntary_to_immersion,
             data_source: result.data_source,
             score: result.score,
+            address: result.address,
           });
         });
       })

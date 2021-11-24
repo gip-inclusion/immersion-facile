@@ -112,6 +112,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactInEstablishment: undefined,
         score: 4.5,
         position: { lat: 35, lon: 50 },
+        address: "55 rue de Faubourg Sante Honoré",
       }),
     ]);
 
@@ -127,6 +128,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactInEstablishment: undefined,
         score: 4.5,
         position: { lat: 35, lon: 50 },
+        address: "55 rue de Faubourg Sante Honoré",
       }),
     ]);
 
@@ -236,6 +238,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactInEstablishment,
         score: 4.5,
         position: { lat: 48.8666, lon: 2.3333 },
+        address: "55 rue de Faubourg Sante Honoré",
       }),
       new ImmersionOfferEntity({
         id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
@@ -248,6 +251,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactInEstablishment: undefined,
         score: 4.5,
         position: { lat: 46.8666, lon: 3.3333 },
+        address: "55 rue de Faubourg Sante Honoré",
       }),
     ]);
     await pgImmersionOfferRepository.insertImmersions([
@@ -262,6 +266,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactInEstablishment: undefined,
         score: 4.5,
         position: { lat: 43.8666, lon: 8.3333 },
+        address: "55 rue de Faubourg Sante Honoré",
       }),
     ]);
 

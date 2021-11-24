@@ -11,6 +11,7 @@ import { EstablishmentForm } from "./FormEstablishment/EstablishmentForm";
 import { PopulateDB } from "./Debug/PopulateDB";
 import { SearchDebug } from "./Debug/SearchDebug";
 import { RenewExpiredLink } from "../helpers/RenewExpiredLink";
+import { Search } from "./Search/Search";
 
 const { dev, featureFlags } = ENV;
 
@@ -53,6 +54,7 @@ export const Router = () => {
       {route.name === "renewMagicLink" && <RenewExpiredLink route={route} />}
       {dev && route.name === "debugPopulateDB" && <PopulateDB route={route} />}
       {dev && route.name === "searchDebug" && <SearchDebug />}
+      {route.name === "search" && <Search />}
       {route.name === false && <NotAvailable />}
     </>
   );

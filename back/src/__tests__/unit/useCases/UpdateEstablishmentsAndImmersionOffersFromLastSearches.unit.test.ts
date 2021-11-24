@@ -163,6 +163,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
       contactInEstablishment: undefined,
       score: 6,
       position: { lat: 43.8666, lon: 1.3333 },
+      address: "55 Rue du Faubourg Saint-Honoré",
     });
 
     expect(await immersionOfferRepository.getSearches()).toHaveLength(0);

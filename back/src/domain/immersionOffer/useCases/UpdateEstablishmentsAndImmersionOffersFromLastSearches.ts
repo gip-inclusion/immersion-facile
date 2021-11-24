@@ -80,6 +80,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           contactInEstablishment: undefined,
           score: establishment.getScore(),
           position: establishment.getPosition(),
+          address: establishment.getAddress(),
         }),
     );
   }

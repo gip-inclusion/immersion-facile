@@ -13,6 +13,7 @@ export type ImmersionOfferProps = {
   contactInEstablishment?: ImmersionEstablishmentContact;
   score: number;
   position?: Position;
+  address: string;
 };
 
 export type ImmersionEstablishmentContact = {

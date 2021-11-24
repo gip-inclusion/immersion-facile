@@ -61,7 +61,9 @@ export const searchImmersionResultSchema = z.object({
   name: z.string(),
   voluntary_to_immersion: z.boolean(),
   location: latLonSchema.optional(),
+  address: z.string(),
   contact: contactSchema.optional(),
+  distance_m: z.number().optional(),
 });
 
 export type SearchImmersionResponseDto = z.infer<

@@ -19,6 +19,7 @@ describe("SearchImmersion", () => {
         data_source: "api_labonneboite",
         score: 4.5,
         position: { lat: 43.8666, lon: 8.3333 },
+        address: "55 Rue du Faubourg Saint-Honoré",
         contactInEstablishment: {
           id: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
           name: "Dupont",
@@ -60,6 +61,7 @@ describe("SearchImmersion", () => {
         name: "Company from la bonne boite",
         voluntary_to_immersion: false,
         location: { lat: 43.8666, lon: 8.3333 },
+        address: "55 Rue du Faubourg Saint-Honoré",
         contact: {
           id: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
           last_name: "Dupont",
@@ -67,6 +69,7 @@ describe("SearchImmersion", () => {
           email: "test@email.fr",
           role: "Directeur",
         },
+        distance_m: 606885.31,
       },
     ]);
   });
