@@ -83,6 +83,9 @@ export class EstablishmentEntity {
     return this.props.romes;
   }
 
+  public getContact() {
+    return this.props.contactInEstablishment;
+  }
   public getName() {
     return this.props.name;
   }

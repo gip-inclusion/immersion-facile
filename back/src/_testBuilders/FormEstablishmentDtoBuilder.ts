@@ -1,6 +1,9 @@
 import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../shared/rome";
 import { Builder } from "./Builder";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger(__filename);
 
 const validFormEstablishment: FormEstablishmentDto = {
   id: "test_demande_immersion_id",
@@ -56,6 +59,13 @@ export class FormEstablishmentDtoBuilder
 
   public static allEmptyFields() {
     return new FormEstablishmentDtoBuilder(emptyFormEstablishment);
+  }
+
+  public withMail(email: string) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.dto,
+      businessContacts: [{ ...this.dto.businessContacts[0], email }],
+    });
   }
 
   public withId(id: string) {

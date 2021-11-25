@@ -39,16 +39,19 @@ const getUseCasesByTopics = (
   FinalImmersionApplicationValidationByAdmin: [
     useCases.notifyAllActorsOfFinalApplicationValidation,
   ],
-  FormEstablishmentAdded: [useCases.transformFormEstablishmentToSearchData],
   MagicLinkRenewalRequested: [useCases.deliverRenewedMagicLink],
+  FormEstablishmentAdded: [
+    useCases.transformFormEstablishmentToSearchData,
+    useCases.notifyConfirmationEstablishmentCreated,
+  ],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {
   const useCasesByTopic = getUseCasesByTopics(deps.useCases);
   keys(useCasesByTopic).forEach((topic) => {
-    const useCase = useCasesByTopic[topic];
+    const useCases = useCasesByTopic[topic];
 
-    useCase.forEach((useCase) =>
+    useCases.forEach((useCase) =>
       deps.eventBus.subscribe(topic, (event) =>
         useCase.execute(event.payload as any),
       ),

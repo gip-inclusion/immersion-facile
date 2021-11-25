@@ -34,6 +34,7 @@ import { UpdateImmersionApplication } from "../../domain/immersionApplication/us
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFormEstablishment";
+import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
@@ -403,6 +404,11 @@ const createUseCases = (
       emailFilter,
       repositories.email,
     ),
+    notifyConfirmationEstablishmentCreated:
+      new NotifyConfirmationEstablishmentCreated(
+        emailFilter,
+        repositories.email,
+      ),
   };
 };
 

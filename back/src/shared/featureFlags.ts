@@ -10,7 +10,9 @@ export const getFeatureFlags = (processEnv: ProcessEnv) => {
     // both the company and the beneficiary; as well as state transitions that permit
     // the company and the beneficiary modify the application (revoking other
     // party's signature, if present).
-    enableEnterpriseSignature: getBooleanVariable("ENABLE_ENTERPRISE_SIGNATURE"),
+    enableEnterpriseSignature: getBooleanVariable(
+      "ENABLE_ENTERPRISE_SIGNATURE",
+    ),
   };
 };
 

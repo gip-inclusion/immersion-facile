@@ -1,5 +1,6 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
 import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
 import { AgencyConfig } from "./../domain/immersionApplication/ports/AgencyRepository";
 
@@ -86,6 +87,17 @@ export const expectEmailFinalValidationConfirmationMatchingImmersionApplication 
       ),
     });
   };
+
+export const expectedEmailEstablisentCreatedReviewMatchingEstablisment = (
+  templatedEmail: TemplatedEmail,
+  establishmentDto: FormEstablishmentDto,
+) => {
+  expectTemplatedEmailToEqual(templatedEmail, {
+    type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
+    recipients: [establishmentDto.businessContacts[0].email],
+    params: { establishmentDto },
+  });
+};
 
 export const expectedEmailImmersionApplicationReviewMatchingImmersionApplication =
   (

@@ -1,7 +1,3 @@
-import {
-  ModificationRequestApplicationNotificationParams,
-  SendRenewedMagicLinkParams,
-} from "./../../domain/immersionApplication/ports/EmailGateway";
 import type {
   EmailType,
   NewApplicationAdminNotificationParams,
@@ -12,7 +8,12 @@ import type {
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
+import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
 import { createLogger } from "../../utils/logger";
+import {
+  ModificationRequestApplicationNotificationParams,
+  SendRenewedMagicLinkParams,
+} from "./../../domain/immersionApplication/ports/EmailGateway";
 
 const logger = createLogger(__filename);
 
@@ -24,6 +25,21 @@ export type TemplatedEmail = {
 
 export class InMemoryEmailGateway implements EmailGateway {
   private readonly sentEmails: TemplatedEmail[] = [];
+
+  public async sendNewEstablismentContactConfirmation(
+    recipient: string,
+    formEstablishmentDto: FormEstablishmentDto,
+  ): Promise<void> {
+    logger.info(
+      { recipient, formEstablishmentDto },
+      "sendNewEstablismentContactConfirmation",
+    );
+    this.sentEmails.push({
+      type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
+      recipients: [recipient],
+      params: { establishmentDto: formEstablishmentDto },
+    });
+  }
 
   public async sendNewApplicationBeneficiaryConfirmation(
     recipient: string,
