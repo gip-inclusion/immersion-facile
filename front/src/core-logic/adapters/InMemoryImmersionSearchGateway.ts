@@ -33,6 +33,7 @@ export class InMemoryImmersionSearchGateway extends ImmersionSearchGateway {
           first_name: "FirstName",
           email: "contact@supercorp.com",
           role: "batwoman",
+          phone: "0640295453",
         },
       },
       {
@@ -50,6 +51,7 @@ export class InMemoryImmersionSearchGateway extends ImmersionSearchGateway {
           first_name: "FirstName",
           email: "contact@megacorp.eu",
           role: "batmobile",
+          phone: "0640295453",
         },
       },
       {
@@ -67,6 +69,7 @@ export class InMemoryImmersionSearchGateway extends ImmersionSearchGateway {
           first_name: "FirstName",
           email: "contact@hypercorp.fr",
           role: "batman",
+          phone: "0640295453",
         },
       },
     ];

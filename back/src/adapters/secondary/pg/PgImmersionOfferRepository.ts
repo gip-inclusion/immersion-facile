@@ -120,25 +120,26 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
     //We remove the dashes around method ST_GeographyFromText to make it work
     const re =
-      /'ST_GeographyFromText\(''POINT\((\d+(\.\d+)?)\s(\d+(\.\d+)?)\)''\)'/;
+      /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
     const formatedQueryWorking = formatedQuery.replace(
       re,
       "ST_GeographyFromText('POINT($1 $3)')",
     );
-    await this.client.query(format(formatedQueryWorking)).catch((e) => {
-      logger.error(e);
+    const query = format(formatedQueryWorking);
+    await this.client.query(query).catch((e) => {
+      logger.error("Error when trying to insert establishment " + e);
     });
   }
 
   async insertEstablishmentContact(
     immersionEstablishmentContact: ImmersionEstablishmentContact,
   ) {
-    const { id, name, firstname, email, role, siretEstablishment } =
+    const { id, name, firstname, email, role, siretEstablishment, phone } =
       immersionEstablishmentContact;
     await this.client.query(
-      `INSERT INTO immersion_contacts (uuid, name, firstname, email, role,  siret_establishment)
-        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id, name, firstname, email, role, siretEstablishment],
+      `INSERT INTO immersion_contacts (uuid, name, firstname, email, role,  siret_establishment, phone)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [id, name, firstname, email, role, siretEstablishment, phone],
     );
   }
   async insertImmersions(
@@ -190,13 +191,14 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
     // Replace the escaped quotes ('') with single quotes (') in ST_GeographyFromText.
     const re =
-      /'ST_GeographyFromText\(''POINT\((\d+(\.\d+)?)\s(\d+(\.\d+)?)\)''\)'/g;
+      /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
     const formatedQueryWorking = formatedQuery.replace(
       re,
       "ST_GeographyFromText('POINT($1 $3)')",
     );
-
-    await this.client.query(formatedQueryWorking);
+    await this.client.query(formatedQueryWorking).catch((e) => {
+      logger.error("Inserting immersions " + e);
+    });
   }
 
   async getImmersionsFromSiret(siret: string) {
@@ -252,6 +254,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               email: result.immersion_contacts_email,
               role: result.immersion_contacts_role,
               siretEstablishment: result.immersion_contacts_siret_institution,
+              phone: result.immersion_contacts_phone,
             };
             return new ImmersionOfferEntity({
               id: result.uuid,

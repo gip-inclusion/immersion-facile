@@ -139,7 +139,6 @@ describe("Postgres implementation of immersion offer repository", () => {
       lon: 50.1,
       nafDivision: "85",
     });
-
     expect(searchResult).toHaveLength(2);
     expect(searchResult[0].getName()).toBe(
       "Company from la bonne boite for search",
@@ -220,6 +219,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       email: "joe@mail.com",
       role: "super job",
       siretEstablishment: "78000403200019",
+      phone: "0640295453",
     };
 
     await pgImmersionOfferRepository.insertEstablishmentContact(
@@ -303,6 +303,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       name: "MyName",
       role: "Chauffeur",
       siretEstablishment: "11112222333344",
+      phone: "0640295453",
     };
 
     await pgImmersionOfferRepository.insertEstablishmentContact(
@@ -319,7 +320,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         email: "some@mail.com",
         role: "Chauffeur",
         siret_establishment: "11112222333344",
-        phone: null,
+        phone: "0640295453",
       },
     ]);
   });

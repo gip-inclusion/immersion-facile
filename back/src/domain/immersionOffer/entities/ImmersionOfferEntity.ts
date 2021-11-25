@@ -23,6 +23,7 @@ export type ImmersionEstablishmentContact = {
   email: string;
   role: string;
   siretEstablishment: string;
+  phone: string;
 };
 
 export class ImmersionOfferEntity {

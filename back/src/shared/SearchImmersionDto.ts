@@ -43,6 +43,7 @@ export const contactSchema = z.object({
   first_name: z.string(),
   email: z.string(),
   role: z.string(),
+  phone: z.string(),
 });
 
 // prettier-ignore

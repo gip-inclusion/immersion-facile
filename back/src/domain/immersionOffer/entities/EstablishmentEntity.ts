@@ -44,7 +44,8 @@ export type TefenCode =
   | 42
   | 51
   | 52
-  | 53;
+  | 53
+  | -1;
 
 export type EstablishmentFieldsToRetrieve = {
   numberEmployeesRange: TefenCode;

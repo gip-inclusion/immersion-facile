@@ -66,6 +66,7 @@ export class UncompleteEstablishmentEntity {
     sirenRepositiory: SireneRepository,
   ): Promise<SireneRepositoryAnswer | undefined> {
     const extraEstablishmentInfo = await sirenRepositiory.get(this.props.siret);
+
     if (!extraEstablishmentInfo) return;
 
     this.props.naf =
@@ -78,8 +79,11 @@ export class UncompleteEstablishmentEntity {
       extraEstablishmentInfo.etablissements[0].uniteLegale
         .trancheEffectifsUniteLegale;
 
-    if (trancheEffectifsUniteLegale)
+    if (trancheEffectifsUniteLegale && trancheEffectifsUniteLegale == "NN")
+      this.props.numberEmployeesRange = -1;
+    else if (trancheEffectifsUniteLegale)
       this.props.numberEmployeesRange = <TefenCode>+trancheEffectifsUniteLegale;
+    else this.props.numberEmployeesRange = -1;
 
     return extraEstablishmentInfo;
   }

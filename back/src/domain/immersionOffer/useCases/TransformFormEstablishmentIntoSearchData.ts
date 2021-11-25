@@ -16,6 +16,9 @@ import {
 } from "../entities/UncompleteEstablishmentEntity";
 import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { createLogger } from "../../../utils/logger";
+
+const logger = createLogger(__filename);
 
 export class TransformFormEstablishmentIntoSearchData extends UseCase<
   FormEstablishmentDto,
@@ -87,14 +90,30 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
         this.sireneRepository,
       );
 
-    if (!establishmentEntity) return;
+    if (!establishmentEntity) {
+      logger.error(
+        "Tried to add invalid establishment in database with siret " +
+          uncompleteEstablishmentEntity.getSiret(),
+      );
+      return;
+    }
 
-    await this.immersionOfferRepository.insertEstablishments([
-      establishmentEntity,
-    ]);
-    await this.immersionOfferRepository.insertEstablishmentContact(
-      establishmentContact,
-    );
+    await this.immersionOfferRepository
+      .insertEstablishments([establishmentEntity])
+      .catch((err) => {
+        logger.error(
+          "Error in inserting establishment for siret : " +
+            formEstablishment.siret,
+        );
+      });
+    await this.immersionOfferRepository
+      .insertEstablishmentContact(establishmentContact)
+      .catch((err) => {
+        logger.error(
+          "Error in inserting form establishment contact for siret : " +
+            formEstablishment.siret,
+        );
+      });
     await this.immersionOfferRepository.insertImmersions(
       establishmentEntity.extractImmersions(),
     );
@@ -111,4 +130,5 @@ const convertBusinessContactDtoToImmersionEstablishmentContact = (
   email: businessContactDto.email,
   role: businessContactDto.job,
   siretEstablishment: siret_institution,
+  phone: businessContactDto.phone,
 });

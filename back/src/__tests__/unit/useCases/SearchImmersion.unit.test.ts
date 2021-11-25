@@ -27,6 +27,7 @@ describe("SearchImmersion", () => {
           email: "test@email.fr",
           role: "Directeur",
           siretEstablishment: "78000403200019",
+          phone: "0640295453",
         },
       }),
     ]);
@@ -68,6 +69,7 @@ describe("SearchImmersion", () => {
           first_name: "Pierre",
           email: "test@email.fr",
           role: "Directeur",
+          phone: "0640295453",
         },
         distance_m: 606885.31,
       },

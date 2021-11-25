@@ -96,6 +96,7 @@ const convertEntityToSearchResultDto = (
           last_name: props.contactInEstablishment.name,
           email: props.contactInEstablishment.email,
           role: props.contactInEstablishment.role,
+          phone: props.contactInEstablishment.phone,
         }
       : undefined,
     distance_m: props.position
