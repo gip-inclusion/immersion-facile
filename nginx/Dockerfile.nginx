@@ -9,6 +9,17 @@ ENV DOMAIN=${DOMAIN:-domain.tld}
 ARG LETSENCRYPT_MAIL
 ENV LETSENCRYPT_MAIL=${LETSENCRYPT_MAIL:-not_provided@mail.com}
 
+ARG ADMIN_ALLOWED_IP=${ADMIN_ALLOWED_IP:-}
+ARG ALLOW_CONF_PATH=/etc/nginx/allow.conf
+RUN rm -f $ALLOW_CONF_PATH && \
+    if [ "$ADMIN_ALLOWED_IP" != "" ]; then\
+        for IP in $ADMIN_ALLOWED_IP;\
+            do echo "allow $IP;" >> $ALLOW_CONF_PATH;\
+        done; \
+    fi;\
+    echo "deny all;" >> $ALLOW_CONF_PATH;
+
+
 ADD ./web/nginxautossl.tar.xz /
 
 RUN [ "$ENV_TYPE" = "production" ] && INIT="ssl"; /nginxautossl.sh "init$INIT";
