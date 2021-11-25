@@ -61,8 +61,8 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/14/message-setup
   MAGIC_LINK_RENEWAL: 14,
-  // https://my.sendinblue.com/camp/template/12/message-setup
-  NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: 12,
+  // https://my.sendinblue.com/camp/template/15/message-setup
+  NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: 15,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
