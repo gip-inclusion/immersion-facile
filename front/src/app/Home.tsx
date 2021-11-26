@@ -1,6 +1,6 @@
 import React from "react";
 import { routes } from "src/app/routes";
-import immersionFacileLogo from "src/assets/logo-immersion-facile.svg";
+import immersionFacileLogo from "src/assets/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 import { Footer } from "src/components/Footer";
 import { ImmersionHowTo } from "src/components/ImmersionHowTo";
 import { MarianneLogo } from "src/components/MarianneHeader";
@@ -38,7 +38,7 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
       <MarianneLogo />
       <div
         className="flex flex-wrap justify-center"
-        style={{ minWidth: "420px" }}
+        style={{ minWidth: "100px" }}
       >
         <img src={immersionFacileLogo} alt="Logo Immersion-Facile" />
       </div>
@@ -68,6 +68,12 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
           >
             Référencer votre entreprise
           </a>
+          <div
+            className="text-immersionBlue-dark font-sans text-center"
+            style={{ maxWidth: "16rem" }}
+          ><a {...routes.landingEstablishment().link} target="_blank">
+              En savoir plus</a>
+          </div>
         </div>
         <div
           className="border-2 border-red-200 px-4  p-8 m-2 w-48 bg-red-50  flex flex-col items-center justify-between"

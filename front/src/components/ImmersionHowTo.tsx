@@ -9,7 +9,7 @@ type ImmersionHowToProps = {
 
 export const ImmersionHowTo = ({ videoUrl }: ImmersionHowToProps) => (
   <section className="flex flex-col items-center">
-    <Title red>L'immersion facile, comment ça fonctionne ?</Title>
+    <Title red>L'immersion facilitée, comment ça fonctionne ?</Title>
     <div className="flex max-w-7xl flex-wrap justify-center items-center">
       <div className="max-w-xs" style={{ minWidth: "250px" }}>
         <BulletPoint red num={1}>
@@ -25,6 +25,10 @@ export const ImmersionHowTo = ({ videoUrl }: ImmersionHowToProps) => (
           <Colored red>Complétez la convention.</Colored> Dès la validation
           reçue, démarrez l’immersion.
         </BulletPoint>
+        <div className="flex py-1 text-sm sm:mx-3-">Vous pouvez être accompagné à chacune de ces étapes par  votre conseiller emploi habituel. C’est lui qui validera avec vous la convention.
+          Vous ne le connaissez pas  ?
+          Pas de souci, nous saurons l’identifier.
+        </div>
       </div>
       <div
         className="pl-4 flex flex-col items-center"
