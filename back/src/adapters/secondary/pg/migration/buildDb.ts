@@ -17,7 +17,7 @@ const readFile = promisify(fs.readFile);
 const tryToConnect = async (
   connectionString: string,
   tryNumber = 0,
-): Promise<PoolClient> => {
+): Promise<{ client: PoolClient; pool: Pool }> => {
   if (tryNumber >= 10)
     throw new Error(`Tried to connect ${tryNumber} times without success`);
   try {
@@ -25,7 +25,7 @@ const tryToConnect = async (
     const pool = new Pool({ connectionString });
     const client = await pool.connect();
     logger.info("Successfully connected");
-    return client;
+    return { client, pool };
   } catch (e: any) {
     const newTryNumber = tryNumber + 1;
     logger.error(
@@ -53,7 +53,7 @@ const buildDb = async () => {
   if (!pgUrl) throw new Error("Please provide PG url");
   logger.info(`Starting build db script for db url : ${pgUrl} -- end`);
 
-  const client = await tryToConnect(pgUrl);
+  const { client, pool } = await tryToConnect(pgUrl);
   const checkIfTableExists = makeCheckIfTableAlreadyExists(client);
 
   // prettier-ignore
@@ -100,6 +100,7 @@ const buildDb = async () => {
   }
 
   client.release();
+  await pool.end();
 };
 
 const makeCheckIfTableAlreadyExists =

@@ -21,7 +21,18 @@ export class PgRomeGateway implements RomeGateway {
         WHERE ogr_appellation=$1`,
         [romeCodeAppellation],
       )
-      .then((res) => res.rows[0].code_rome)
+      .then((res) => {
+        try {
+          return res.rows[0].code_rome;
+        } catch (e) {
+          logger.error(
+            { romeCodeAppellation, resultFromQuery: res },
+            "could not fetch rome code with given appellation",
+          );
+
+          return;
+        }
+      })
       .catch((e) => {
         logger.error(e);
         return;
