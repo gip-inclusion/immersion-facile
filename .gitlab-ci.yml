@@ -94,7 +94,7 @@ deploy_on_dev:
       rm -f .env.variables .env.secrets;
 
       docker-compose build &&
-      docker-compose down &&
+      docker-compose -f docker-compose.yml -f docker-compose.logging-loki-plugin.yml down --remove-orphans &&
       docker-compose -f docker-compose.yml -f docker-compose.logging-loki-plugin.yml up -d;
 
       retVal=\$?;
