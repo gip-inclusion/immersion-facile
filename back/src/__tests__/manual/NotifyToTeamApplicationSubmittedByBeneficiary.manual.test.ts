@@ -21,14 +21,12 @@ const counsellorEmail = "jean-francois.macresy@beta.gouv.fr";
 
 describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   let emailGw: SendinblueEmailGateway;
-  let allowList: Set<string>;
   let notifyToTeamApplicationSubmittedByBeneficiary: NotifyToTeamApplicationSubmittedByBeneficiary;
   let agencyRepo: InMemoryAgencyRepository;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
-    allowList = new Set();
     notifyToTeamApplicationSubmittedByBeneficiary =
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         emailGw,
@@ -40,10 +38,6 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   test("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
     validDemandeImmersion.mentorEmail = "jeanfrancois.macresy@gmail.com";
     validDemandeImmersion.email = "jeanfrancois.macresy+beneficiary@gmail.com";
-
-    allowList.add(validDemandeImmersion.mentorEmail);
-    allowList.add(validDemandeImmersion.email);
-    allowList.add(counsellorEmail);
 
     await notifyToTeamApplicationSubmittedByBeneficiary.execute(
       validDemandeImmersion,

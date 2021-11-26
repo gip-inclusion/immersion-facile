@@ -39,7 +39,7 @@ describe("NotifyConfirmationEstablismentCreated", () => {
     emailFilter = new AllowListEmailFilter([]);
     await createUseCase().execute(validEstablishment);
 
-    const sentEmails = await emailGw.getSentEmails();
+    const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(0);
   });
 });

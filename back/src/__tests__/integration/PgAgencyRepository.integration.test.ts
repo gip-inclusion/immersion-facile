@@ -109,4 +109,4 @@ describe("PgAgencyRepository", () => {
 });
 
 const sortById = (configs: AgencyConfig[]): AgencyConfig[] =>
-  configs.sort((a, b) => (a.id < b.id ? -1 : 1));
+  [...configs].sort((a, b) => (a.id < b.id ? -1 : 1));

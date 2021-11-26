@@ -17,11 +17,9 @@ const agencyIds: AgencyId[] = [
 describe("List Immersion Applications", () => {
   let listImmersionApplication: ListImmersionApplication;
   let repository: InMemoryImmersionApplicationRepository;
-  let featureFlags: FeatureFlags;
 
   beforeEach(() => {
     repository = new InMemoryImmersionApplicationRepository();
-    featureFlags = FeatureFlagsBuilder.allOff().build();
     listImmersionApplication = new ListImmersionApplication(repository);
   });
 

@@ -48,7 +48,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
   test("Sends rejection email to beneficiary, mentor, and counsellor", async () => {
     await createUseCase().execute(rejectedDemandeImmersion);
 
-    const sentEmails = await emailGw.getSentEmails();
+    const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);
 
     expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
@@ -67,7 +67,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     emailFilter = new AllowListEmailFilter([]);
     await createUseCase().execute(rejectedDemandeImmersion);
 
-    const sentEmails = await emailGw.getSentEmails();
+    const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(0);
   });
 
@@ -80,7 +80,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
 
     await createUseCase().execute(rejectedDemandeImmersion);
 
-    const sentEmails = await emailGw.getSentEmails();
+    const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);
 
     expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(

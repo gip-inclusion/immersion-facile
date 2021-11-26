@@ -115,9 +115,9 @@ export const SearchDebug = () => {
                   newTerm,
                 );
 
-                return results.map((result) => ({
-                  value: result.coordinates,
-                  description: result.label,
+                return results.map((res) => ({
+                  value: res.coordinates,
+                  description: res.label,
                   matchRanges: [],
                 }));
               }}

@@ -48,9 +48,7 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
           }
         }
       })
-      .catch((error) => {
-        setError(error);
-      });
+      .catch(setError);
   }, []);
 
   const sendValidationRequest = () => {
@@ -64,8 +62,8 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
         );
         setForm({ ...form, status: "VALIDATED" });
       })
-      .catch((error: React.SetStateAction<Error | null>) => {
-        setError(error);
+      .catch((err: React.SetStateAction<Error | null>) => {
+        setError(err);
       })
       .finally(() => {
         setSubmitting(false);

@@ -49,7 +49,6 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
     roles,
     applicationId,
     jwt,
-    error,
     needsMagicLinkRefresh,
   } = useImmersionApplicationFromJwt(route.params.jwt);
 

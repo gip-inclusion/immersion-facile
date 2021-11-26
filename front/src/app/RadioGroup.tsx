@@ -88,7 +88,7 @@ export const BoolRadioGroup = ({
 
 export const RadioGroup = ({
   name,
-  label,
+  label: groupLabel,
   options,
   disabled,
 }: CheckboxGroupProps) => {
@@ -109,7 +109,7 @@ export const RadioGroup = ({
             className="fr-fieldset__legend fr-text--regular"
             id={error ? "radio-error-legend" : "radio-legend"}
           >
-            {label}
+            {groupLabel}
           </legend>
           <div className="fr-fieldset__content">
             {options.map(({ value, label }) => {

@@ -53,7 +53,6 @@ export const Search = () => {
             values,
             { setSubmitting }: FormikHelpers<Values>,
           ) => {
-            let requestDate = new Date();
             immersionSearchGateway
               .search({
                 rome: values.rome,
@@ -74,7 +73,6 @@ export const Search = () => {
                 console.log(e.toString());
               })
               .finally(() => {
-                let responseDate = new Date();
                 setSubmitting(false);
               });
           }}
@@ -122,9 +120,9 @@ export const Search = () => {
                       const results =
                         await immersionSearchGateway.addressLookup(newTerm);
 
-                      return results.map((result) => ({
-                        value: result.coordinates,
-                        description: result.label,
+                      return results.map((res) => ({
+                        value: res.coordinates,
+                        description: res.label,
                         matchRanges: [],
                       }));
                     }}

@@ -10,7 +10,7 @@ describe("/search-immersion route", () => {
   });
 
   test("accepts valid requests", async () => {
-    const httpResponse = await request
+    await request
       .post(`/search-immersion`)
       .send({
         rome: "A1000",
@@ -24,7 +24,7 @@ describe("/search-immersion route", () => {
   });
 
   test("rejects invalid requests with error code 400", async () => {
-    const httpResponse = await request
+    await request
       .post(`/search-immersion`)
       .send({
         rome: "XXXXX", // not a valid rome code

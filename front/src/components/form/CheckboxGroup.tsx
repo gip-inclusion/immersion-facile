@@ -87,7 +87,7 @@ export type CheckboxGroupProps = {
 
 export const CheckboxGroup = ({
   name,
-  label,
+  label: groupLabel,
   options,
   disabled,
 }: CheckboxGroupProps) => {
@@ -110,7 +110,7 @@ export const CheckboxGroup = ({
             className="fr-fieldset__legend fr-text--regular"
             id="checkboxes-error-legend"
           >
-            {label}
+            {groupLabel}
           </legend>
           <div className="fr-fieldset__content">
             {options.map(({ value, label }) => {

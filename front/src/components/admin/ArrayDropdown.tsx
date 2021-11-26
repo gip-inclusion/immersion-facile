@@ -3,19 +3,11 @@ import React, { ChangeEvent, useState } from "react";
 interface ArrayDropdownProps {
   labels: string[];
   didPick: (index: number, label: string) => void;
-  initialValue?: number;
 }
 
-export const ArrayDropdown = ({
-  labels,
-  initialValue,
-  didPick,
-}: ArrayDropdownProps) => {
-  const [value, setValue] = useState(initialValue ?? 0);
-
+export const ArrayDropdown = ({ labels, didPick }: ArrayDropdownProps) => {
   const handleDropdownChange = (evt: ChangeEvent) => {
     const target = evt.currentTarget as HTMLSelectElement;
-    setValue(target.selectedIndex);
     didPick(target.selectedIndex, labels[target.selectedIndex]);
   };
 

@@ -37,8 +37,6 @@ const defaultAgencyConfig = AgencyConfigBuilder.create(
 ).build();
 
 describe("RenewMagicLink use case", () => {
-  let emailFilter: EmailFilter;
-  let emailGw: InMemoryEmailGateway;
   let agencyConfig: AgencyConfig;
   let applicationRepository: InMemoryImmersionApplicationRepository;
   let outboxRepository: InMemoryOutboxRepository;
@@ -52,8 +50,6 @@ describe("RenewMagicLink use case", () => {
   };
 
   beforeEach(() => {
-    emailFilter = new AlwaysAllowEmailFilter();
-    emailGw = new InMemoryEmailGateway();
     agencyConfig = defaultAgencyConfig;
     applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();

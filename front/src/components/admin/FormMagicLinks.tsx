@@ -18,17 +18,10 @@ export const FormMagicLinks = ({
   useEffect(() => {
     immersionApplicationGateway
       .generateMagicLink(immersionApplication.id, role, expired)
-      .then((jwt) => {
-        return (
-          location.protocol +
-          "//" +
-          location.host +
-          "/" +
-          frontRoutes[route] +
-          "/?jwt=" +
-          jwt
-        );
-      })
+      .then(
+        (jwt) =>
+          `${location.protocol}//${location.host}/${frontRoutes[route]}/?jwt=${jwt}`,
+      )
       .then(setLink);
   }, [role, route, expired]);
 
