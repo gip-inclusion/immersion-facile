@@ -54,7 +54,14 @@ const main = async () => {
       repositories.immersionOfferForSearch,
     );
 
-  await updateEstablishmentsAndImmersionOffersFromLastSearches.execute();
+  try {
+    await updateEstablishmentsAndImmersionOffersFromLastSearches.execute();
+    logger.info("Execution completed successfully.");
+    process.exit(0);
+  } catch (e: any) {
+    logger.error(e, "Execution failed.");
+    process.exit(1);
+  }
 };
 
 main();
