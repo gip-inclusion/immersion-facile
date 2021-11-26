@@ -27,9 +27,10 @@ export const Profession = ({ name, label, onDelete }: ProfessionProps) => {
         onSelection={setValue}
         initialTerm={label}
         onTermChange={async (newTerm) => {
-          if (!newTerm) return [];
+          const sanitizedTerm = newTerm.trim();
+          if (!sanitizedTerm) return [];
           const romeOptions = await formEstablishmentGateway.searchProfession(
-            newTerm,
+            sanitizedTerm,
           );
 
           return romeOptions.map(({ matchRanges, profession }) => ({
