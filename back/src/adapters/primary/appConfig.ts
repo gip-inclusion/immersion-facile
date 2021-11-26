@@ -114,7 +114,7 @@ export class AppConfig {
     return throwIfNotInArray({
       processEnv: this.env,
       variableName: "ROME_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "POLE_EMPLOI"],
+      authorizedValues: ["IN_MEMORY", "POLE_EMPLOI", "PG"],
       defaultValue: "IN_MEMORY",
     });
   }

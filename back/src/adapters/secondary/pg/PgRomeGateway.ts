@@ -1,9 +1,9 @@
-import {
-  RomeGateway,
-  RomeMetier,
-  RomeAppellation,
-} from "../../../domain/rome/ports/RomeGateway";
 import { PoolClient } from "pg";
+import {
+  RomeAppellation,
+  RomeGateway,
+  RomeMetier
+} from "../../../domain/rome/ports/RomeGateway";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -16,7 +16,9 @@ export class PgRomeGateway implements RomeGateway {
   ): Promise<string | undefined> {
     return this.client
       .query(
-        "SELECT code_rome FROM appellations_public_data WHERE ogr_appellation=$1",
+        `SELECT code_rome
+        FROM appellations_public_data
+        WHERE ogr_appellation=$1`,
         [romeCodeAppellation],
       )
       .then((res) => res.rows[0].code_rome)
@@ -27,20 +29,22 @@ export class PgRomeGateway implements RomeGateway {
   }
 
   public async searchMetier(query: string): Promise<RomeMetier[]> {
-    const queryWithPatternCode = "%" + query + "%";
     return this.client
       .query(
-        "SELECT code_rome, libelle_rome FROM romes_public_data WHERE libelle_rome_tsvector@@to_tsquery('french', $1) OR libelle_rome ILIKE $2",
-        [query, queryWithPatternCode],
+        `SELECT code_rome, libelle_rome
+        FROM romes_public_data
+        WHERE
+          libelle_rome_tsvector@@to_tsquery('french', $1)
+          OR libelle_rome ILIKE $2`,
+        [toTsQuery(query), `%${query}%`],
       )
       .then((res) =>
-        res.rows.map((x) => {
-          const romeMetier: RomeMetier = {
-            codeMetier: x.code_rome,
-            libelle: x.libelle_rome,
-          };
-          return romeMetier;
-        }),
+        res.rows.map(
+          (row): RomeMetier => ({
+            codeMetier: row.code_rome,
+            libelle: row.libelle_rome,
+          }),
+        ),
       )
       .catch((e) => {
         logger.error(e);
@@ -49,16 +53,29 @@ export class PgRomeGateway implements RomeGateway {
   }
 
   public async searchAppellation(query: string): Promise<RomeAppellation[]> {
-    const queryWithPatternCode = "%" + query + "%";
     return await this.client
       .query(
-        "SELECT ogr_appellation as codeAppellation, libelle_appellation_court as libelle, code_rome as rome FROM appellations_public_data WHERE libelle_appellation_long_tsvector @@ to_tsquery('french',$1)  OR libelle_appellation_long ILIKE $2",
-        [query, queryWithPatternCode],
+        `SELECT ogr_appellation, libelle_appellation_court, code_rome
+        FROM appellations_public_data
+        WHERE
+          libelle_appellation_long_tsvector @@ to_tsquery('french',$1)
+          OR libelle_appellation_long ILIKE $2`,
+        [toTsQuery(query), `%${query}%`],
       )
-      .then((res) => res.rows as RomeAppellation[])
+      .then((res) =>
+        res.rows.map(
+          (row): RomeAppellation => ({
+            codeAppellation: row.ogr_appellation,
+            libelle: row.libelle_appellation_court,
+            codeMetier: row.code_rome,
+          }),
+        ),
+      )
       .catch((e) => {
         logger.error(e);
         return [];
       });
   }
 }
+
+const toTsQuery = (query: string): string => query.split(/\s+/).join(" & ");

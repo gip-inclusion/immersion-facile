@@ -1,6 +1,5 @@
 import { Pool, PoolClient } from "pg";
 import { PgRomeGateway } from "../../adapters/secondary/pg/PgRomeGateway";
-import { RomeMetier } from "../../domain/rome/ports/RomeGateway";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 
 describe("Postgres implementation of Rome Gateway", () => {
@@ -20,24 +19,65 @@ describe("Postgres implementation of Rome Gateway", () => {
     client.release();
     await pool.end();
   });
-  test("Conversion of appellation to ROME works", async () => {
-    expect(await pgRomeGateway.appellationToCodeMetier("10200")).toBe("F1402");
+
+  describe("appellationToCodeMetier", () => {
+    test("Conversion of appellation to ROME works", async () => {
+      expect(await pgRomeGateway.appellationToCodeMetier("10868")).toBe(
+        "D1102",
+      );
+    });
   });
 
-  test("Search of appellation works", async () => {
-    const resultOfSearch: RomeMetier[] = [
-      { codeMetier: "D1102", libelle: "Boulangerie - viennoiserie" },
-    ];
-    expect(await pgRomeGateway.searchMetier("boulangère")).toEqual(
-      resultOfSearch,
-    );
+  describe("searchMetier", () => {
+    test("Search of metier works", async () => {
+      expect(await pgRomeGateway.searchMetier("boulangère")).toEqual([
+        { codeMetier: "D1102", libelle: "Boulangerie - viennoiserie" },
+      ]);
+    });
+
+    test("Correctly handles search queries with multiple words", async () => {
+      expect(await pgRomeGateway.searchMetier("recherche en sciences")).toEqual(
+        [
+          {
+            codeMetier: "K2401",
+            libelle: "Recherche en sciences de l'homme et de la société",
+          },
+          {
+            codeMetier: "K2402",
+            libelle:
+              "Recherche en sciences de l'univers, de la matière et du vivant",
+          },
+        ],
+      );
+    });
   });
 
-  test("Conversion of appellation to ROME works", async () => {
-    expect(await pgRomeGateway.searchAppellation("boulang")).toHaveLength(13);
+  describe("searchAppellation", () => {
+    test("Conversion of appellation to ROME works", async () => {
+      expect(await pgRomeGateway.searchAppellation("boulang")).toHaveLength(13);
 
-    expect(
-      (await pgRomeGateway.searchAppellation("Aide-boulanger"))[0].rome,
-    ).toBe("D1102");
+      expect(await pgRomeGateway.searchAppellation("Aide-boulanger")).toEqual([
+        {
+          codeAppellation: 10868,
+          libelle: "Aide-boulanger / Aide-boulangère",
+          codeMetier: "D1102",
+        },
+      ]);
+    });
+
+    test("Correctly handles search queries with multiple words", async () => {
+      expect(await pgRomeGateway.searchAppellation("Chef de boule")).toEqual([
+        {
+          codeAppellation: 12071,
+          libelle: "Chef de boule",
+          codeMetier: "G1206",
+        },
+        {
+          codeAppellation: 12197,
+          libelle: "Chef de partie de boule",
+          codeMetier: "G1206",
+        },
+      ]);
+    });
   });
 });

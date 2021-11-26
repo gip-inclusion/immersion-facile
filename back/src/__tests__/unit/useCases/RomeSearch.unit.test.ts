@@ -20,6 +20,7 @@ describe("RomeSearch", () => {
         profession: {
           romeCodeAppellation: "14704",
           description: "Éleveur / Éleveuse de lapins angoras",
+          romeCodeMetier: "A1409",
         },
         matchRanges: [{ startIndexInclusive: 22, endIndexExclusive: 28 }],
       },

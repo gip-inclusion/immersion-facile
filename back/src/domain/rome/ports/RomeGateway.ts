@@ -11,7 +11,7 @@ export type RomeMetier = {
 export type RomeAppellation = {
   codeAppellation: RomeCodeAppellationDto;
   libelle: string;
-  rome?: RomeCodeMetierDto;
+  codeMetier?: RomeCodeMetierDto;
 };
 
 export interface RomeGateway {

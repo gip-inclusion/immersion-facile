@@ -29,15 +29,32 @@ const metiers: RomeMetier[] = [
 ];
 
 const appellations: RomeAppellation[] = [
-  { codeAppellation: "12694", libelle: "Coiffeur / Coiffeuse mixte" },
-  { codeAppellation: "14704", libelle: "Éleveur / Éleveuse de lapins angoras" },
-  { codeAppellation: "16067", libelle: "Jardinier / Jardinière" },
+  {
+    codeAppellation: "12694",
+    libelle: "Coiffeur / Coiffeuse mixte",
+    codeMetier: "D1202",
+  },
+  {
+    codeAppellation: "14704",
+    libelle: "Éleveur / Éleveuse de lapins angoras",
+    codeMetier: "A1409",
+  },
+  {
+    codeAppellation: "16067",
+    libelle: "Jardinier / Jardinière",
+    codeMetier: "A1203",
+  },
   {
     codeAppellation: "20560",
     libelle: "Vendeur / Vendeuse en boulangerie-pâtisserie",
+    codeMetier: "D1106",
   },
-  { codeAppellation: "20567", libelle: "Vendeur / Vendeuse en chocolaterie" },
-  { codeAppellation: "20714", libelle: "Vitrailliste" },
+  {
+    codeAppellation: "20567",
+    libelle: "Vendeur / Vendeuse en chocolaterie",
+    codeMetier: "D1106",
+  },
+  { codeAppellation: "20714", libelle: "Vitrailliste", codeMetier: "B1602" },
 ];
 
 const appellationsToRome: Array<{
@@ -46,6 +63,12 @@ const appellationsToRome: Array<{
 }> = [
   { codeAppellation: "11987", rome: "A1101" },
   { codeAppellation: "12120", rome: "B2200" },
+  { codeAppellation: "12694", rome: "D1202" },
+  { codeAppellation: "14704", rome: "A1409" },
+  { codeAppellation: "16067", rome: "A1203" },
+  { codeAppellation: "20560", rome: "D1106" },
+  { codeAppellation: "20567", rome: "D1106" },
+  { codeAppellation: "20714", rome: "B1602" },
 ];
 
 export class InMemoryRomeGateway implements RomeGateway {

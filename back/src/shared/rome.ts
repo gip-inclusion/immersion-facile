@@ -24,7 +24,7 @@ export const professionSchema = z
   })
   .refine(
     ({ romeCodeMetier, romeCodeAppellation }) =>
-      !!romeCodeMetier !== !!romeCodeAppellation,
+      romeCodeMetier || romeCodeAppellation,
     { message: "Obligatoire: 'romeCodeMetier' ou 'romeCodeAppellation'" },
   );
 

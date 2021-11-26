@@ -15,6 +15,7 @@ describe("/rome route", () => {
         profession: {
           romeCodeAppellation: "20714",
           description: "Vitrailliste",
+          romeCodeMetier: "B1602",
         },
         matchRanges: [
           {

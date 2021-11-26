@@ -1,5 +1,4 @@
 import { Pool, PoolClient } from "pg";
-import { DeliverRenewedMagicLink } from "./../../domain/immersionApplication/useCases/notifications/DeliverRenewedMagicLink";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
@@ -19,26 +18,30 @@ import {
   AddImmersionApplicationML,
 } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
-import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
 import { ListAgencies } from "../../domain/immersionApplication/useCases/ListAgencies";
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
 import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
+import { DeliverRenewedMagicLink } from "../../domain/immersionApplication/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
+import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
+import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
+import { RomeGateway } from "../../domain/rome/ports/RomeGateway";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
+import { frontRoutes } from "../../shared/routes";
 import {
   createMagicLinkPayload,
   Role,
@@ -75,12 +78,11 @@ import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishme
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
+import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
-import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
-import { frontRoutes } from "../../shared/routes";
 
 const logger = createLogger(__filename);
 
@@ -133,9 +135,10 @@ export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
   let pgPool: Pool;
   return () => {
-    if (config.repositories !== "PG")
+    if (config.repositories !== "PG" && config.romeGateway !== "PG")
       throw new Error(
-        `No pool provided if repositories are not PG, received ${config.repositories}`,
+        `Unexpected pg pool creation: REPOSITORIES=${config.repositories},
+         ROME_GATEWAY=${config.romeGateway}`,
       );
     if (!pgPool)
       pgPool = new Pool({ connectionString: config.pgImmersionDbUrl });
@@ -189,23 +192,32 @@ export const createRepositories = async (
         ? SendinblueEmailGateway.create(config.sendinblueApiKey)
         : new InMemoryEmailGateway(),
 
-    rome:
-      config.romeGateway === "POLE_EMPLOI"
-        ? new PoleEmploiRomeGateway(
-            new CachingAccessTokenGateway(
-              new PoleEmploiAccessTokenGateway(
-                config.poleEmploiAccessTokenConfig,
-              ),
-            ),
-            config.poleEmploiClientId,
-          )
-        : new InMemoryRomeGateway(),
+    rome: await createRomeGateway(config, getPgPoolFn),
 
     outbox:
       config.repositories === "PG"
         ? new PgOutboxRepository(await getPgPoolFn().connect())
         : new InMemoryOutboxRepository(),
   };
+};
+
+const createRomeGateway = async (
+  config: AppConfig,
+  getPgPoolFn: GetPgPoolFn,
+): Promise<RomeGateway> => {
+  switch (config.romeGateway) {
+    case "POLE_EMPLOI":
+      return new PoleEmploiRomeGateway(
+        new CachingAccessTokenGateway(
+          new PoleEmploiAccessTokenGateway(config.poleEmploiAccessTokenConfig),
+        ),
+        config.poleEmploiClientId,
+      );
+    case "PG":
+      return new PgRomeGateway(await getPgPoolFn().connect());
+    default:
+      return new InMemoryRomeGateway();
+  }
 };
 
 export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;

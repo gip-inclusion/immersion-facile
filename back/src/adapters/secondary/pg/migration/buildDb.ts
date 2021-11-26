@@ -18,8 +18,8 @@ const tryToConnect = async (
   connectionString: string,
   tryNumber = 0,
 ): Promise<PoolClient> => {
-  if (tryNumber >= 5)
-    throw new Error("Tried to connect 5 times without success");
+  if (tryNumber >= 10)
+    throw new Error(`Tried to connect ${tryNumber} times without success`);
   try {
     logger.info("Trying to connect to DB ...");
     const pool = new Pool({ connectionString });

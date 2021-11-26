@@ -7,8 +7,7 @@ import {
 import { createLogger } from "../../../utils/logger";
 import { findMatchRanges } from "../../../utils/textSearch";
 import { UseCase } from "../../core/UseCase";
-import { RomeGateway } from "../ports/RomeGateway";
-import { RomeAppellation, RomeMetier } from "../ports/RomeGateway";
+import { RomeAppellation, RomeGateway, RomeMetier } from "../ports/RomeGateway";
 
 const logger = createLogger(__filename);
 
@@ -48,8 +47,9 @@ export class RomeSearch extends UseCase<
 const romeAppellationToProfession = (
   appellation: RomeAppellation,
 ): ProfessionDto => ({
-  romeCodeAppellation: appellation.codeAppellation,
+  romeCodeAppellation: appellation.codeAppellation.toString(),
   description: appellation.libelle,
+  romeCodeMetier: appellation.codeMetier,
 });
 
 const romeMetierToProfession = (metier: RomeMetier): ProfessionDto => ({
