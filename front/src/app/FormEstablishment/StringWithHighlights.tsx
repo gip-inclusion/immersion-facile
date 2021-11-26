@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import type { Proposal } from "src/app/FormEstablishment/DropDown";
+import type { Proposal } from "src/app/FormEstablishment/useDropdown";
 
 type SliceOfString = {
   startIndexInclusive: number;

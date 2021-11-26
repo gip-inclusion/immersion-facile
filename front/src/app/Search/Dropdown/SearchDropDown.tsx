@@ -1,43 +1,45 @@
 import React from "react";
 import { StringWithHighlights } from "src/app/FormEstablishment/StringWithHighlights";
 import { Proposal, useDropdown } from "src/app/FormEstablishment/useDropdown";
-import "./dropdown.css";
+import "./searchdropdown.css";
 
-type DropDownProps<T> = {
+type SearchDropDownProps<T> = {
   title: string;
   initialTerm?: string;
   onSelection: (value: T) => void;
   onTermChange: (newTerm: string) => Promise<Proposal<T>[]>;
-  headerStyle?: any;
-  inputStyle?: any; //< Overrides input class
+  inputStyle?: React.CSSProperties; //< Overrides input class
+  defaultProposals?: Proposal<T>[];
 };
 
-export const DropDown = <T extends unknown>({
+export const SearchDropDown = <T extends unknown>({
   title,
   initialTerm = "",
   onSelection,
   onTermChange,
-  headerStyle,
   inputStyle,
-}: DropDownProps<T>) => {
+}: SearchDropDownProps<T>) => {
   const { dispatch, isOpen, error, searchTerm, showSpinner, proposals } =
     useDropdown(onTermChange, initialTerm);
 
   return (
     <div
-      className="search-dropdown-container"
+      className="autocomplete"
       onBlur={() => {
-        // Delay so that any onClick event on the dropdown-proposal has a chance to be registered.
+        // Delay so that any onClic event on the dropdown-proposal has a chance to be registered.
         setTimeout(() => dispatch({ type: "FOCUS_LOST" }), 500);
       }}
     >
-      <label className="fr-label" htmlFor={"search"} style={headerStyle}>
+      <label
+        className="searchdropdown-header inputLabel"
+        htmlFor={"search"}
+      >
         {title}
       </label>
       <input
         id="search"
         type="text"
-        className={inputStyle ? "" : "fr-input"}
+        className="autocomplete-input"
         autoComplete="off"
         value={searchTerm}
         style={inputStyle}
@@ -46,7 +48,7 @@ export const DropDown = <T extends unknown>({
         }
       />
       {isOpen && (
-        <div className="dropdown-proposals">
+        <div className="autocomplete-items">
           {error && <div className="dropdown-error">Erreur: {error}</div>}
           {!error && showSpinner && <div className="dropdown-spinner">...</div>}
           {!error && searchTerm && proposals.length == 0 && !showSpinner && (

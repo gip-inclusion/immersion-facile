@@ -9,9 +9,15 @@ import {
   SearchImmersionResponseDto,
   SearchImmersionResultDto,
 } from "src/shared/SearchImmersionDto";
-import { DropDown } from "../FormEstablishment/DropDown";
 import { ProfessionDto } from "src/shared/rome";
 import { MarianneHeader } from "src/components/MarianneHeader";
+import { SearchDropDown } from "./Dropdown/SearchDropDown";
+import locationSearchIcon from "src/assets/location-search-icon.svg";
+import distanceSearchIcon from "src/assets/distance-search-icon.svg";
+import searchButtonIcon from "src/assets/search-button-icon.svg";
+import { StaticDropdown } from "./Dropdown/StaticDropdown";
+import "./search.css";
+import { EnterpriseSearchResult } from "./SearchResult";
 
 interface Values {
   rome: string;
@@ -21,66 +27,64 @@ interface Values {
   radiusKm: number;
 }
 
+const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
+
 export const Search = () => {
   const [result, setResult] = useState<SearchImmersionResponseDto | null>(null);
-  const [responseText, setResponseText] = useState("");
-  const [latency, setLatency] = useState(0);
-  const [searchPosition, setSearchPosition] = useState([0, 0]);
 
   return (
     <div>
       <MarianneHeader />
-      <h1>Trouver une immersion en entreprise</h1>
-      <div className="fr-container">
-        <div className="fr-grid-row">
-          <Formik
-            initialValues={{
-              rome: "M1607",
-              nafDivision: "85",
-              lat: 48.8666,
-              lon: 2.3333,
-              radiusKm: 12,
-            }}
-            onSubmit={async (
-              values,
-              { setSubmitting }: FormikHelpers<Values>,
-            ) => {
-              setLatency(0);
-              let requestDate = new Date();
-              setSearchPosition([values.lat, values.lon]);
 
-              immersionSearchGateway
-                .search({
-                  rome: values.rome,
-                  location: {
-                    lat: values.lat,
-                    lon: values.lon,
-                  },
+      <div className="mainContainer">
+        <h1 className="headerText">
+          Trouver une entreprise accueillante pour réaliser une immersion facile
+        </h1>
+        <span style={{ height: "30px" }} />
+        <Formik
+          initialValues={{
+            rome: "M1607",
+            nafDivision: "85",
+            lat: 48.8666,
+            lon: 2.3333,
+            radiusKm: 12,
+          }}
+          onSubmit={async (
+            values,
+            { setSubmitting }: FormikHelpers<Values>,
+          ) => {
+            let requestDate = new Date();
+            immersionSearchGateway
+              .search({
+                rome: values.rome,
+                location: {
+                  lat: values.lat,
+                  lon: values.lon,
+                },
                 distance_km: values.radiusKm,
-                  nafDivision:
-                    values.nafDivision.length === 0
-                      ? values.nafDivision
-                      : undefined,
-                })
-                .then((response) => {
-                  setResponseText(JSON.stringify(response));
-                  setResult(response);
-                })
-                .catch((e) => {
-                  setResponseText(e.toString());
-                })
-                .finally(() => {
-                  let responseDate = new Date();
-                  setLatency(responseDate.getTime() - requestDate.getTime());
-                  setSubmitting(false);
-                });
-            }}
-          >
-            {({ setFieldValue }) => (
-              <Form>
-                <div className="fr-col">
-                  <DropDown
-                    title="Rechercher un métier"
+                nafDivision:
+                  values.nafDivision.length === 0
+                    ? values.nafDivision
+                    : undefined,
+              })
+              .then((response) => {
+                setResult(response);
+              })
+              .catch((e) => {
+                console.log(e.toString());
+              })
+              .finally(() => {
+                let responseDate = new Date();
+                setSubmitting(false);
+              });
+          }}
+        >
+          {({ setFieldValue }) => (
+            <Form>
+              <div className="formContentsContainer">
+                <div>
+                  <SearchDropDown
+                    title="Métier recherché"
                     onSelection={(newValue: ProfessionDto) => {
                       console.log(newValue);
                       setFieldValue("rome", newValue.romeCodeMetier);
@@ -101,9 +105,13 @@ export const Search = () => {
                   />
                 </div>
 
-                <div className="fr-col">
-                  <DropDown
-                    title="Rechercher un endroit"
+                <div>
+                  <SearchDropDown
+                    inputStyle={{
+                      paddingLeft: "48px",
+                      background: `white url(${locationSearchIcon}) no-repeat scroll 11px 8px`,
+                    }}
+                    title="Lieu"
                     onSelection={(newValue: LatLonDto) => {
                       setFieldValue("lat", newValue.lat);
                       setFieldValue("lon", newValue.lon);
@@ -123,64 +131,50 @@ export const Search = () => {
                   />
                 </div>
 
-                <div className="fr-row">
-                  <div className="fr-col">
-                    <label htmlFor="radius">Radius, km</label>
-                    <Field
-                      id="radius"
-                      name="radius"
-                      type="number"
-                      placeholder="30"
-                    />
-                  </div>
-                  <button type="submit" className="fr-btn">
-                    Rechercher Immersions
-                  </button>
+                <div>
+                  <StaticDropdown
+                    inputStyle={{
+                      paddingLeft: "48px",
+                      background: `white url(${distanceSearchIcon}) no-repeat scroll 11px 8px`,
+                    }}
+                    title="Rayon"
+                    onSelection={(newValue: string, selectedIndex: number) => {
+                      setFieldValue("radiusKm", radiusOptions[selectedIndex]);
+                    }}
+                    options={radiusOptions.map((n) => `${n} km`)}
+                  />
                 </div>
-              </Form>
-            )}
-          </Formik>
-          <div className="fr-col"></div>
-          <div className="fr-col-4"></div>
-          <div className="fr-col-12 fr-col-lg-4"></div>
-        </div>
-      </div>
-      <div>Elapsed time: {latency}ms</div>
-      Result count: {result ? result.length : 0}
-      <br />
-      Result:
-      {result &&
-        result.map((r: SearchImmersionResultDto) => {
-          return (
-            <>
-              <div
-                className="fr-card fr-card--horizontal fr-enlarge-link"
-                id={r.id}
-              >
-                <div className="fr-card__body">
-                  <h4 className="fr-card__title">
-                    <a
-                      href={"mailto:" + r.contact?.email}
-                      className="fr-card__link"
-                    >
-                      {r.name}
-                    </a>
-                  </h4>
-                  <p className="fr-card">{r.address}</p>
-                  <p className="fr-card__desc">
-                    {r.distance_m && (r.distance_m / 1000).toFixed(1)} km(s) du lieu
-                    de recherche{" "}
-                  </p>
-                </div>
+
+                <button type="submit" className="searchButton">
+                  <img
+                    className="searchButtonImage"
+                    src={searchButtonIcon}
+                    alt=""
+                  />
+                  Rechercher
+                </button>
               </div>
-            </>
-          );
-        })}
+            </Form>
+          )}
+        </Formik>
+      </div>
+      <div className="searchResultContainer">
+        {result &&
+          result.map((r) => {
+            return (
+              <EnterpriseSearchResult
+                key={r.id}
+                title={r.name}
+                employeeCount="TODO: count"
+                metierDescription="TODO: add rome description"
+                radius={`${(r.distance_m ?? 0 / 1000).toFixed(1)} km`}
+                address={r.address}
+                phone={r.naf ?? r.rome}
+                siret={r.siret}
+              />
+            );
+          })}
+      </div>
     </div>
   );
 };
-
-// TODO:
-// 1. Open a modal with card on click
-// 2. Query params
-// 3. Fix back to send human-readable ROME stuff
