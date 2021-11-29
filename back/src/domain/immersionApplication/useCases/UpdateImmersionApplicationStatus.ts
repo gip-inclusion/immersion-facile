@@ -3,13 +3,18 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   ApplicationStatus,
   UpdateImmersionApplicationStatusRequestDto,
   updateImmersionApplicationStatusRequestSchema,
   UpdateImmersionApplicationStatusResponseDto,
 } from "../../../shared/ImmersionApplicationDto";
-import { statusTransitionConfigs } from "../../../shared/immersionApplicationStatusTransitions";
+import {
+  StatusTransitionConfig,
+  statusTransitionConfigsEnterpriseSign,
+  statusTransitionConfigsLegacy,
+} from "../../../shared/immersionApplicationStatusTransitions";
 import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
@@ -39,9 +44,18 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     private readonly immersionApplicationRepository: ImmersionApplicationRepository,
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
+    private readonly featureFlags: FeatureFlags,
   ) {
     super();
+
+    this.statusTransitionConfigs = featureFlags.enableEnterpriseSignature
+      ? statusTransitionConfigsEnterpriseSign
+      : statusTransitionConfigsLegacy;
   }
+
+  private statusTransitionConfigs: Partial<
+    Record<ApplicationStatus, StatusTransitionConfig>
+  >;
 
   inputSchema = updateImmersionApplicationStatusRequestSchema;
 
@@ -50,7 +64,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     { applicationId, roles }: MagicLinkPayload,
   ): Promise<UpdateImmersionApplicationStatusResponseDto> {
     logger.debug({ status, applicationId, roles });
-    const statusTransitionConfig = statusTransitionConfigs[status];
+    const statusTransitionConfig = this.statusTransitionConfigs[status];
     if (!statusTransitionConfig) throw new BadRequestError(status);
 
     if (!roles.some((role) => statusTransitionConfig.validRoles.includes(role)))

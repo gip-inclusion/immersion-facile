@@ -6,10 +6,16 @@ import { FormAccordion } from "src/components/admin/FormAccordion";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
-import { statusTransitionConfigs } from "src/shared/immersionApplicationStatusTransitions";
+import {
+  statusTransitionConfigsLegacy,
+  statusTransitionConfigsEnterpriseSign,
+} from "src/shared/immersionApplicationStatusTransitions";
 import { frontRoutes } from "src/shared/routes";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
+import { ENV } from "src/environmentVariables";
+
+const { featureFlags, dev } = ENV;
 
 type VerificationPageProps = {
   route: Route<typeof routes.immersionApplicationsToValidate>;
@@ -27,6 +33,9 @@ const isAllowedTransition = (
   targetStatus: ApplicationStatus,
   actingRole: Role,
 ) => {
+  const statusTransitionConfigs = featureFlags.enableEnterpriseSignature
+    ? statusTransitionConfigsEnterpriseSign
+    : statusTransitionConfigsLegacy;
   const transitionConfig = statusTransitionConfigs[targetStatus];
   if (!transitionConfig) return false;
   if (

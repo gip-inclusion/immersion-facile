@@ -26,6 +26,8 @@ const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
 export type ApplicationStatus =
   | "UNKNOWN"
   | "DRAFT"
+  | "READY_TO_SIGN"
+  | "PARTIALLY_SIGNED"
   | "IN_REVIEW"
   | "ACCEPTED_BY_COUNSELLOR"
   | "ACCEPTED_BY_VALIDATOR"
@@ -33,6 +35,8 @@ export type ApplicationStatus =
   | "REJECTED";
 export const validApplicationStatus: NotEmptyArray<ApplicationStatus> = [
   "DRAFT",
+  "READY_TO_SIGN",
+  "PARTIALLY_SIGNED",
   "IN_REVIEW",
   "ACCEPTED_BY_COUNSELLOR",
   "ACCEPTED_BY_VALIDATOR",

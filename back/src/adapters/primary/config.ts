@@ -336,6 +336,7 @@ const createUseCases = (
       repositories.demandeImmersion,
       createNewEvent,
       repositories.outbox,
+      config.featureFlags,
     ),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewMagicLink: new RenewMagicLink(
