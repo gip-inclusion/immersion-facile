@@ -6,6 +6,13 @@ You need node 12+ to use the app :
 npm install
 ```
 
+**Env variables**
+Copy (or simlink) the .env from the root to here.
+
+```
+cp ../.env.sample ./env
+```
+
 **To test the app :**
 
 ```
@@ -53,6 +60,8 @@ The simplest way to get a back-end up and running is using the command:
 immersion-facile$ cd back/
 back$ npm start
 ```
+If you're using PG repositories and you're running locally, you need to set PG_URL host to `localhost` (see commented lines in .env.sample file) 
+
 
 The back-end will be accessible on `http://localhost:1234`. The default behaviour when no environment variables are specified (see below) is as follows:
 
@@ -308,6 +317,8 @@ Alternatively, you can execute it inside a local docker container:
 ```
 immersion-facile$ docker-compose up --build pipelines
 ```
+If you're using PG repositories and you're running with docker, you need to set PG_URL host to `postgres` (see commented lines in .env.sample file) 
+
 
 Doing this will start `cron`, which will execute all registered pipelines according to their default schedules (e.g. *establishmentBackfill* is run every day at midnight).
 
