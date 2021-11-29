@@ -103,7 +103,7 @@ deploy_on_dev:
       exit \$retVal;
       fi;
 
-      sleep 100;
+      sleep 60;
       echo \"Checking server health...\";
       curl --silent --fail --output /dev/null http://localhost:80/api/"
 
@@ -149,9 +149,9 @@ deploy_on_staging:
       exit \$retVal;
       fi;
 
-      sleep 100;
+      sleep 60;
       echo \"Checking server health...\";
-      curl --silent --fail --output /dev/null http://localhost:3100/api/"
+      curl --silent --fail --output /dev/null http://localhost:3000/api/"
 
 deploy_on_prod:
   cache: []
@@ -195,6 +195,6 @@ deploy_on_prod:
       exit \$retVal;
       fi;
 
-      sleep 100;
+      sleep 60;
       echo \"Checking server health...\";
       curl --silent --fail --output /dev/null http://localhost:80/api/"
