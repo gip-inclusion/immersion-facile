@@ -99,8 +99,7 @@ describe("Add FormEstablishment", () => {
       await expectPromiseToFailWithError(
         addFormEstablishment.execute(formEstablishment),
         new BadRequestError(
-          "Siret ne correspond pas à une entreprise active : " +
-            formEstablishment.siret,
+          `Ce SIRET (${formEstablishment.siret}) ne correspond pas à une entreprise en activité. Merci de le corriger.`,
         ),
       );
     });

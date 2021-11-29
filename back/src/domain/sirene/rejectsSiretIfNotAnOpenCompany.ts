@@ -11,7 +11,7 @@ export const rejectsSiretIfNotAnOpenCompany = async (
   });
   if (!siretLookupRes.isOpen) {
     throw new BadRequestError(
-      "Siret ne correspond pas à une entreprise active : " + siret,
+      `Ce SIRET (${siret}) ne correspond pas à une entreprise en activité. Merci de le corriger.`,
     );
   }
 };
