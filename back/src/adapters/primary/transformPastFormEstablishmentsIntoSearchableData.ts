@@ -39,7 +39,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   );
   const apiAdresseGateway = new APIAdresseGateway();
   const sequenceRunner = new ThrottledSequenceRunner(100, 3);
-  const sireneRepository = HttpsSireneRepository.create(
+  const sireneRepository = new HttpsSireneRepository(
     config.sireneHttpsConfig,
     new RealClock(),
   );

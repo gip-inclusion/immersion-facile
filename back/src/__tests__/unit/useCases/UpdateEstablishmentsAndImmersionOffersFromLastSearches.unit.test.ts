@@ -1,41 +1,29 @@
-import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
-import { EstablishmentsGateway } from "../../../domain/immersionOffer/ports/EstablishmentsGateway";
-import { Position } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import {
-  GetPosition,
-  GetExtraEstablishmentInfos,
-} from "../../../domain/immersionOffer/entities/UncompleteEstablishmentEntity";
-import { FormEstablishmentRepository } from "../../../domain/immersionOffer/ports/FormEstablishmentRepository";
-import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import {
   EstablishmentFromLaBonneBoite,
   HttpCallsToLaBonneBoite,
   LaBonneBoiteGateway,
 } from "../../../adapters/secondary/immersionOffer/LaBonneBoiteGateway";
 import {
-  AccessTokenGateway,
-  GetAccessTokenResponse,
-} from "../../../domain/core/ports/AccessTokenGateway";
-import {
+  GetEstablishmentsResponse,
   HttpCallsToLaPlateFormeDeLInclusion,
-  EstablishmentFromLaPlateFormeDeLInclusion,
   LaPlateFormeDeLInclusionGateway,
 } from "../../../adapters/secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
-import {
-  fakeGetPosition,
-  fakeAccessTokenGateway,
-} from "../../../_testBuilders/FakeHttpCalls";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
-import { ImmersionOfferEntity } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../../../adapters/secondary/immersionOffer/fakeEstablishmentsLaPlateFormeDeLInclusion";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
+import { ImmersionOfferEntity } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
+import {
+  fakeAccessTokenGateway,
+  fakeGetPosition,
+} from "../../../_testBuilders/FakeHttpCalls";
 
 export const fakeHttpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclusion =
   {
     getEstablishments: async (
-      searchParams: SearchParams,
-    ): Promise<[EstablishmentFromLaPlateFormeDeLInclusion[], string]> => [
-      [
+      _searchParams: SearchParams,
+    ): Promise<GetEstablishmentsResponse> => ({
+      results: [
         {
           cree_le: new Date("2019-12-05T15:37:56.609000+01:00"),
           mis_a_jour_le: new Date("2020-10-08T17:29:40.320879+02:00"),
@@ -88,15 +76,17 @@ export const fakeHttpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLI
           ],
         },
       ],
-      "",
-    ],
-    getNextEstablishments: async (url: string) => [],
+      nextPageUrl: "",
+    }),
+    getNextEstablishments: async (
+      _url: string,
+    ): Promise<GetEstablishmentsResponse> => ({ results: [] }),
   };
 
 export const fakeHttpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
   getEstablishments: async (
-    searchParams: SearchParams,
-    accessToken: string,
+    _searchParams: SearchParams,
+    _accessToken: string,
   ): Promise<EstablishmentFromLaBonneBoite[]> => [
     {
       address:
@@ -117,7 +107,6 @@ const inMemorySireneRepository = new InMemorySireneRepository();
 
 describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let updateEstablishmentsAndImmersionOffersFromLastSearches: UpdateEstablishmentsAndImmersionOffersFromLastSearches;
-  let getPosition: GetPosition;
   let immersionOfferRepository: InMemoryImmersionOfferRepository;
   let fakeLaBonneBoiteGateway: LaBonneBoiteGateway;
   let fakeLaPlateFormeDeLInclusionGateway: LaPlateFormeDeLInclusionGateway;
@@ -145,7 +134,12 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 
   it("when Immersion search have been made lately, their information gets persisted in our system", async () => {
     // prepare
-    const search = { rome: "A1203", distance: 10.0, lat: 10.0, lon: 20.0 };
+    const search: SearchParams = {
+      rome: "A1203",
+      distance_km: 10.0,
+      lat: 10.0,
+      lon: 20.0,
+    };
     immersionOfferRepository.setSearches([search]);
 
     // act
@@ -166,11 +160,10 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
       address: "55 Rue du Faubourg Saint-Honoré",
     });
 
-    expect(await immersionOfferRepository.getSearches()).toHaveLength(0);
+    expect(immersionOfferRepository.getSearches()).toHaveLength(0);
 
     //We expect to find the immersion in results
-    const immersionOffersInRepo =
-      await immersionOfferRepository.getImmersionOffers();
+    const immersionOffersInRepo = immersionOfferRepository.getImmersionOffers();
 
     expect(immersionOffersInRepo).toHaveLength(4);
 

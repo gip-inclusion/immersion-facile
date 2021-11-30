@@ -1,5 +1,6 @@
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
 import { createLogger } from "../../utils/logger";
+import { PipelineStats } from "../../utils/pipelineStats";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
 import {
@@ -16,11 +17,13 @@ import { createGetPgPoolFn, createRepositories } from "./config";
 
 const logger = createLogger(__filename);
 
+const STATS_LOGGING_INTERVAL_MS = 30_000;
+
+const stats: PipelineStats = new PipelineStats("startEstablishmentBackfill");
+
 const main = async () => {
   logger.info(`Executing pipeline: establishment-backfill`);
-
-  // TODO(nsw): Refactor config.ts to create dependencies on demand so that we can keep all the
-  // dependency creation and injection in a single file and reuse it across multiple binaries.
+  stats.startTimer("pipeline-timer");
 
   const config = AppConfig.createFromEnv();
 
@@ -54,14 +57,39 @@ const main = async () => {
       repositories.immersionOfferForSearch,
     );
 
+  const intermediateStatsLogger = setInterval(
+    () =>
+      logger.info(
+        {
+          ...stats.readStats(),
+          ...updateEstablishmentsAndImmersionOffersFromLastSearches.stats.readStats(),
+        },
+        "Intermediate Pipeline Statistics",
+      ),
+    STATS_LOGGING_INTERVAL_MS,
+  );
+
+  let errorCode;
   try {
     await updateEstablishmentsAndImmersionOffersFromLastSearches.execute();
     logger.info("Execution completed successfully.");
-    process.exit(0);
+    errorCode = 0;
   } catch (e: any) {
     logger.error(e, "Execution failed.");
-    process.exit(1);
+    errorCode = 1;
   }
+  stats.stopTimer("pipeline-timer");
+  clearInterval(intermediateStatsLogger);
+
+  logger.info(
+    {
+      ...stats.readStats(),
+      ...updateEstablishmentsAndImmersionOffersFromLastSearches.stats.readStats(),
+    },
+    "Final Pipeline Statistics",
+  );
+
+  process.exit(errorCode);
 };
 
 main();

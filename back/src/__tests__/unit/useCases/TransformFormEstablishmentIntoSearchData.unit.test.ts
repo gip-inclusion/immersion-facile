@@ -119,7 +119,7 @@ describe("Transform FormEstablishment into search data", () => {
     const immersionsBoulanger =
       await inMemoryImmersionOfferRepository.getFromSearch({
         rome,
-        distance: 30,
+        distance_km: 30,
         ...fakePosition,
       });
 

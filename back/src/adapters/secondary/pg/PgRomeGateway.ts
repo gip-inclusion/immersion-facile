@@ -2,7 +2,7 @@ import { PoolClient } from "pg";
 import {
   RomeAppellation,
   RomeGateway,
-  RomeMetier
+  RomeMetier,
 } from "../../../domain/rome/ports/RomeGateway";
 import { createLogger } from "../../../utils/logger";
 

@@ -49,7 +49,7 @@ describe("SearchImmersion", () => {
         nafDivision: "85",
         lat: 49.119146,
         lon: 6.17602,
-        distance: 30,
+        distance_km: 30,
       },
     ]);
 

@@ -1,9 +1,9 @@
-import axios from "axios";
 import { v4 as uuidV4 } from "uuid";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
 import { UncompleteEstablishmentEntity } from "../../../domain/immersionOffer/entities/UncompleteEstablishmentEntity";
 import { EstablishmentsGateway } from "../../../domain/immersionOffer/ports/EstablishmentsGateway";
 import type { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -28,30 +28,25 @@ export type HttpCallsToLaBonneBoite = {
 };
 
 export const httpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
-  getEstablishments: (searchParams: SearchParams, accessToken: string) => {
-    const headers = {
-      Authorization: "Bearer " + accessToken,
-    };
-
-    return axios
-      .get(
-        "https://api.emploi-store.fr/partenaire/labonneboite/v1/establishment/",
-
-        {
-          headers: headers,
-          params: {
-            distance: searchParams.distance,
-            longitude: searchParams.lon,
-            latitude: searchParams.lat,
-            rome_codes: searchParams.rome,
-          },
+  getEstablishments: async (
+    searchParams: SearchParams,
+    accessToken: string,
+  ): Promise<EstablishmentFromLaBonneBoite[]> => {
+    const response = await createAxiosInstance(logger).get(
+      "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
+      {
+        headers: {
+          Authorization: "Bearer " + accessToken,
         },
-      )
-      .then((response: any) => {
-        const establishments: EstablishmentFromLaBonneBoite[] =
-          response.data.establishments;
-        return establishments;
-      });
+        params: {
+          distance: searchParams.distance_km,
+          longitude: searchParams.lon,
+          latitude: searchParams.lat,
+          rome_codes: searchParams.rome,
+        },
+      },
+    );
+    return response.data.companies || [];
   },
 };
 
@@ -62,45 +57,51 @@ export class LaBonneBoiteGateway implements EstablishmentsGateway {
     private readonly callToLaBonneBoite: HttpCallsToLaBonneBoite,
   ) {}
 
-  async getEstablishments(
+  public async getEstablishments(
     searchParams: SearchParams,
   ): Promise<UncompleteEstablishmentEntity[]> {
-    const response = await this.accessTokenGateway.getAccessToken(
+    logger.debug({ searchParams }, "getEstablishments");
+    const getAccessTokenResponse = await this.accessTokenGateway.getAccessToken(
       `application_${this.poleEmploiClientId} api_labonneboitev1`,
     );
 
-    return this.callToLaBonneBoite
-      .getEstablishments(searchParams, response.access_token)
-      .then((response: any) => {
-        const establishments: EstablishmentFromLaBonneBoite[] = response;
-        return establishments
-          .filter((establishment) =>
-            this.keepRelevantEstablishments(searchParams.rome, establishment),
-          )
-          .map(
-            (establishment) =>
-              new UncompleteEstablishmentEntity({
-                id: uuidV4(),
-                address: establishment.address,
-                position: { lat: establishment.lat, lon: establishment.lon },
-                naf: establishment.naf,
-                name: establishment.name,
-                siret: establishment.siret,
-                score: establishment.stars,
-                voluntaryToImmersion: false,
-                romes: [establishment.matched_rome_code],
-                dataSource: "api_labonneboite",
-              }),
-          );
-      })
-      .catch(function (error: any) {
-        // handle error
-        logger.error(error, "Could not fetch La Bonne Boite API results");
-        return [];
-      });
+    try {
+      const laBonneBoiteResponse =
+        await this.callToLaBonneBoite.getEstablishments(
+          searchParams,
+          getAccessTokenResponse.access_token,
+        );
+
+      return laBonneBoiteResponse
+        .filter((establishment) =>
+          this.keepRelevantEstablishments(searchParams.rome, establishment),
+        )
+        .map(
+          (establishment) =>
+            new UncompleteEstablishmentEntity({
+              id: uuidV4(),
+              address: establishment.address,
+              position: { lat: establishment.lat, lon: establishment.lon },
+              naf: establishment.naf,
+              name: establishment.name,
+              siret: establishment.siret,
+              score: establishment.stars,
+              voluntaryToImmersion: false,
+              romes: [establishment.matched_rome_code],
+              dataSource: "api_labonneboite",
+            }),
+        );
+    } catch (error: any) {
+      logAxiosError(
+        logger,
+        error,
+        "Could not fetch La Bonne Boite API results",
+      );
+      return [];
+    }
   }
 
-  keepRelevantEstablishments(
+  private keepRelevantEstablishments(
     romeSearched: string,
     establishment: EstablishmentFromLaBonneBoite,
   ): boolean {
@@ -124,8 +125,10 @@ export class LaBonneBoiteGateway implements EstablishmentsGateway {
           "G1803",
         ].indexOf(romeSearched) > -1)
     ) {
+      logger.info({ establishment }, "Not relevant, discarding.");
       return false;
     } else {
+      logger.debug({ establishment }, "Relevant.");
       return true;
     }
   }

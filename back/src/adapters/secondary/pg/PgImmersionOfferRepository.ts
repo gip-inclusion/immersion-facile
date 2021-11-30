@@ -1,15 +1,19 @@
-import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
-import {
-  ImmersionOfferEntity,
-  ImmersionEstablishmentContact,
-} from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import {
+  EstablishmentEntity,
+  Position,
+} from "../../../domain/immersionOffer/entities/EstablishmentEntity";
+import {
+  ImmersionEstablishmentContact,
+  ImmersionOfferEntity,
+} from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import {
+  ImmersionOfferRepository,
+  SearchParams,
+} from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import { createLogger } from "../../../utils/logger";
-import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { Position } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 
 const logger = createLogger(__filename);
 
@@ -27,12 +31,16 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   async insertSearch(searchParams: SearchParams) {
     this.client
       .query(
-        "INSERT INTO searches_made (ROME, lat, lon ,distance, needsToBeSearched, gps) VALUES ($1, $2, $3, $4, $5, ST_GeographyFromText($6)) ON CONFLICT ON CONSTRAINT pk_searches_made DO UPDATE SET needstobesearched=true, update_date=NOW()",
+        `INSERT INTO searches_made (ROME, lat, lon ,distance, needsToBeSearched, gps)
+        VALUES ($1, $2, $3, $4, $5, ST_GeographyFromText($6))
+        ON CONFLICT
+          ON CONSTRAINT pk_searches_made
+            DO UPDATE SET needstobesearched=true, update_date=NOW()`,
         [
           searchParams.rome,
           searchParams.lat,
           searchParams.lon,
-          searchParams.distance,
+          searchParams.distance_km,
           true,
           `POINT(${searchParams.lon} ${searchParams.lat})`,
         ],
@@ -53,13 +61,20 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     */
     return this.client
       .query(
-        "SELECT requestGroupBy.ROME, requestGroupBy.max_distance as distance, ST_Y(requestGroupBy.point) as latitude, ST_X(requestGroupBy.point) as longitude \
-        FROM ( \
-        select ROME, MAX(distance) as max_distance, ST_AsText(ST_GeometryN(unnest(ST_ClusterWithin(gps::geometry, 0.27)),1)) as point \
-        from searches_made \
-        WHERE needstobesearched=true \
-        GROUP by ROME \
-          ) as requestGroupBy",
+        `SELECT
+          requestGroupBy.rome as rome,
+          requestGroupBy.max_distance AS distance_km,
+          ST_Y(requestGroupBy.point) AS lat,
+          ST_X(requestGroupBy.point) AS lon
+        FROM (
+          SELECT
+            rome,
+            MAX(distance) AS max_distance,
+            ST_AsText(ST_GeometryN(unnest(ST_ClusterWithin(gps::geometry, 0.27)),1)) AS point
+          FROM searches_made
+          WHERE needstobesearched=true
+          GROUP BY rome
+        ) AS requestGroupBy`,
       )
       .then((res) => {
         this.client.query("UPDATE searches_made SET needstobesearched=false");
@@ -74,6 +89,11 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   public async insertEstablishments(
     establishments: EstablishmentEntity[],
   ): Promise<void> {
+    if (establishments.length == 0)
+      throw new Error(
+        "Inavlid argument 'establishments': array must not be empty",
+      );
+
     const arrayOfEstablishments = establishments.map((establishment) =>
       establishment.toArrayOfProps(),
     );
@@ -108,13 +128,26 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       });
 
     const formatedQuery = format(
-      "INSERT INTO establishments (siret, name, address, number_employees, naf, contact_mode, \
-      data_source, gps) VALUES %L ON CONFLICT ON CONSTRAINT pk_establishments DO UPDATE SET \
-      name=EXCLUDED.name, address=EXCLUDED.address, number_employees=EXCLUDED.number_employees, \
-      naf=EXCLUDED.naf, contact_mode=EXCLUDED.contact_mode, data_source=EXCLUDED.data_source, \
-      update_date=NOW() \
-      WHERE EXCLUDED.data_source='form' OR (establishments.data_source != 'form' AND \
-      (EXCLUDED.data_source = 'api_laplateformedelinclusion' AND establishments.data_source = 'api_labonneboite')) ",
+      `
+      INSERT INTO establishments (
+        siret, name, address, number_employees, naf, contact_mode, data_source, gps)
+      VALUES %L
+      ON CONFLICT
+        ON CONSTRAINT pk_establishments
+          DO UPDATE
+            SET
+              name=EXCLUDED.name, address=EXCLUDED.address,
+              number_employees=EXCLUDED.number_employees, naf=EXCLUDED.naf,
+              contact_mode=EXCLUDED.contact_mode, data_source=EXCLUDED.data_source,
+              update_date=NOW()
+            WHERE
+              EXCLUDED.data_source='form'
+              OR (
+                establishments.data_source != 'form'
+                AND (
+                  EXCLUDED.data_source = 'api_laplateformedelinclusion'
+                  AND establishments.data_source = 'api_labonneboite'))
+      `,
       uniqImmersionsOffersWithCorrectPosition,
     );
 
@@ -220,7 +253,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     const parameters = [
       searchParams.rome,
       `POINT(${searchParams.lon} ${searchParams.lat})`,
-      searchParams.distance * 1000,
+      searchParams.distance_km * 1000,
     ];
 
     if (searchParams.nafDivision) {
@@ -298,7 +331,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           searchParams.rome,
           searchParams.lat,
           searchParams.lon,
-          searchParams.distance,
+          searchParams.distance_km,
         ],
       )
       .then((res) => res.rows)

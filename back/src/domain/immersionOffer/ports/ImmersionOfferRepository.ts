@@ -6,7 +6,7 @@ import {
 
 export type SearchParams = {
   rome: string;
-  distance: number;
+  distance_km: number;
   lat: number;
   lon: number;
   nafDivision?: string;

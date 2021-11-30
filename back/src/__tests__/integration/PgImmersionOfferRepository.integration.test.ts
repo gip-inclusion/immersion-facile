@@ -37,7 +37,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       (
         await pgImmersionOfferRepository.getSearchInDatabase({
           rome: "M1607",
-          distance: 30,
+          distance_km: 30,
           lat: 49.119146,
           lon: 6.17602,
         })
@@ -134,7 +134,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
     const searchResult = await pgImmersionOfferRepository.getFromSearch({
       rome: "M1907",
-      distance: 30,
+      distance_km: 30,
       lat: 34.95,
       lon: 50.1,
       nafDivision: "85",
@@ -147,7 +147,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     const searchResultWithSiret =
       await pgImmersionOfferRepository.getFromSearch({
         rome: "M1907",
-        distance: 30,
+        distance_km: 30,
         lat: 34.95,
         lon: 50.1,
         nafDivision: "85",
@@ -336,37 +336,37 @@ const populateWithImmersionSearches = async (
 ) => {
   await pgImmersionOfferRepository.insertSearch({
     rome: "M1607",
-    distance: 30,
+    distance_km: 30,
     lat: 49.119146,
     lon: 6.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
     rome: "M1607",
-    distance: 30,
+    distance_km: 30,
     lat: 48.119146,
     lon: 6.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
     rome: "M1607",
-    distance: 30,
+    distance_km: 30,
     lat: 48.119146,
     lon: 5.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
     rome: "M1607",
-    distance: 30,
+    distance_km: 30,
     lat: 48.119146,
     lon: 4.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
     rome: "M1607",
-    distance: 30,
+    distance_km: 30,
     lat: 48.129146,
     lon: 4.17602,
   });
   await pgImmersionOfferRepository.insertSearch({
     rome: "M1608",
-    distance: 30,
+    distance_km: 30,
     lat: 48.129146,
     lon: 4.17602,
   });

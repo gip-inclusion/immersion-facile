@@ -1,60 +1,46 @@
-import axios, { AxiosInstance } from "axios";
+import { formatISO } from "date-fns";
+import { Clock } from "../../domain/core/ports/Clock";
 import {
   SireneRepository,
   SireneRepositoryAnswer,
 } from "../../domain/sirene/ports/SireneRepository";
+import { SiretDto } from "../../shared/siret";
+import { logAxiosError } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
 import { AxiosConfig } from "../primary/appConfig";
-import { Clock } from "../../domain/core/ports/Clock";
-import { SiretDto } from "../../shared/siret";
-import { formatISO } from "date-fns";
+import { createAxiosInstance } from "./../../utils/axiosUtils";
 
 const logger = createLogger(__filename);
 
 export class HttpsSireneRepository implements SireneRepository {
-  public static create(
-    { endpoint, bearerToken }: AxiosConfig,
-    clock: Clock,
-  ): SireneRepository {
-    if (new URL(endpoint).protocol !== "https:") {
-      throw new Error(`Not an HTTPS endpoint: ${endpoint}`);
-    }
+  public constructor(
+    private readonly axiosConfig: AxiosConfig,
+    private readonly clock: Clock,
+  ) {}
 
-    const axiosInstance = axios.create({
-      baseURL: endpoint,
+  private createAxiosInstance() {
+    return createAxiosInstance(logger, {
+      baseURL: this.axiosConfig.endpoint,
       headers: {
-        Authorization: `Bearer ${bearerToken}`,
+        Authorization: `Bearer ${this.axiosConfig.bearerToken}`,
         Accept: "application/json",
       },
     });
-    axiosInstance.interceptors.request.use((request) => {
-      logger.info(request);
-      return request;
-    });
-    axiosInstance.interceptors.response.use((response) => {
-      logger.debug(response);
-      return response;
-    });
-
-    return new HttpsSireneRepository(axiosInstance, clock);
   }
-
-  private constructor(
-    private readonly axiosInstance: AxiosInstance,
-    private readonly clock: Clock,
-  ) {}
 
   public async get(
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SireneRepositoryAnswer | undefined> {
+    logger.debug({ siret, includeClosedEstablishments }, "get");
+
     try {
-      const response = await this.axiosInstance.get("/siret", {
+      const response = await this.createAxiosInstance().get("/siret", {
         params: this.createSiretQueryParams(siret, includeClosedEstablishments),
       });
       return response.data;
     } catch (error: any) {
-      logger.error(error);
+      logAxiosError(logger, error);
       if (error.response.status == 404) {
         return undefined;
       }

@@ -140,8 +140,11 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
         `Unexpected pg pool creation: REPOSITORIES=${config.repositories},
          ROME_GATEWAY=${config.romeGateway}`,
       );
-    if (!pgPool)
+    if (!pgPool) {
+      const { host, pathname } = new URL(config.pgImmersionDbUrl);
+      logger.info({ host, pathname }, "creating postgresql connection pool");
       pgPool = new Pool({ connectionString: config.pgImmersionDbUrl });
+    }
     return pgPool;
   };
 };
@@ -184,7 +187,7 @@ export const createRepositories = async (
 
     sirene:
       config.sireneRepository === "HTTPS"
-        ? HttpsSireneRepository.create(config.sireneHttpsConfig, clock)
+        ? new HttpsSireneRepository(config.sireneHttpsConfig, clock)
         : new InMemorySireneRepository(),
 
     email:

@@ -15,7 +15,7 @@ describe("HttpsSireneRepository", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    sireneRepository = HttpsSireneRepository.create(
+    sireneRepository = new HttpsSireneRepository(
       config.sireneHttpsConfig,
       new RealClock(),
     );

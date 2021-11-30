@@ -1,27 +1,26 @@
+import { fakeEstablishmentsLaBonneBoite } from "../adapters/secondary/immersionOffer/fakeEstablishmentsLaBonneBoite";
+import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../adapters/secondary/immersionOffer/fakeEstablishmentsLaPlateFormeDeLInclusion";
 import {
-  HttpCallsToLaBonneBoite,
   EstablishmentFromLaBonneBoite,
+  HttpCallsToLaBonneBoite,
   LaBonneBoiteGateway,
 } from "../adapters/secondary/immersionOffer/LaBonneBoiteGateway";
-import { Position } from "../domain/immersionOffer/entities/EstablishmentEntity";
-
-import { SearchParams } from "../domain/immersionOffer/ports/ImmersionOfferRepository";
-import { fakeEstablishmentsLaBonneBoite } from "../adapters/secondary/immersionOffer/fakeEstablishmentsLaBonneBoite";
+import {
+  HttpCallsToLaPlateFormeDeLInclusion,
+  LaPlateFormeDeLInclusionGateway,
+} from "../adapters/secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
 import {
   AccessTokenGateway,
   GetAccessTokenResponse,
 } from "../domain/core/ports/AccessTokenGateway";
+import { Position } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import {
-  HttpCallsToLaPlateFormeDeLInclusion,
-  EstablishmentFromLaPlateFormeDeLInclusion,
-  LaPlateFormeDeLInclusionGateway,
-} from "../adapters/secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
-import { fakeEstablishmentsLaPlateFormeDeLInclusion } from "../adapters/secondary/immersionOffer/fakeEstablishmentsLaPlateFormeDeLInclusion";
-import {
-  GetPosition,
-  GetExtraEstablishmentInfos,
   ExtraEstablishmentInfos,
+  GetExtraEstablishmentInfos,
+  GetPosition,
 } from "../domain/immersionOffer/entities/UncompleteEstablishmentEntity";
+import { SearchParams } from "../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { GetEstablishmentsResponse } from "./../adapters/secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
 
 export const fakeHttpCallToLaBonneBoite: HttpCallsToLaBonneBoite = {
   getEstablishments: async (
@@ -52,14 +51,15 @@ export const fakeLaBonneBoiteGateway = new LaBonneBoiteGateway(
 
 export const fakeHttpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclusion =
   {
-    getEstablishments: async (searchParams: SearchParams) => {
-      const returnedEstablishments: [
-        EstablishmentFromLaPlateFormeDeLInclusion[],
-        string,
-      ] = [fakeEstablishmentsLaPlateFormeDeLInclusion, ""];
-      return returnedEstablishments;
-    },
-    getNextEstablishments: async (url: string) => [],
+    getEstablishments: async (
+      _searchParams: SearchParams,
+    ): Promise<GetEstablishmentsResponse> => ({
+      results: fakeEstablishmentsLaPlateFormeDeLInclusion,
+      nextPageUrl: "",
+    }),
+    getNextEstablishments: async (
+      _url: string,
+    ): Promise<GetEstablishmentsResponse> => ({ results: [] }),
   };
 
 export const fakeLaPlateFormeDeLInclusionGateway =

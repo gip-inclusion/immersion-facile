@@ -72,7 +72,7 @@ const convertRequestDtoToSearchParams = ({
   siret,
   lat: location.lat,
   lon: location.lon,
-  distance: distance_km,
+  distance_km,
 });
 
 const convertEntityToSearchResultDto = (

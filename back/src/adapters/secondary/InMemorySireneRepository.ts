@@ -1,9 +1,12 @@
+import { createLogger } from "./../../utils/logger";
 import {
   Establishment,
   SireneRepositoryAnswer,
   SireneRepository,
 } from "../../domain/sirene/ports/SireneRepository";
 import { SiretDto } from "../../shared/siret";
+
+const logger = createLogger(__filename);
 
 export const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
 export const TEST_ESTABLISHMENT2_SIRET = "20006765000016";
@@ -97,6 +100,7 @@ export class InMemorySireneRepository implements SireneRepository {
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SireneRepositoryAnswer | undefined> {
+    logger.info({ siret, includeClosedEstablishments }, "get");
     const establishment = this._repo[siret];
     if (!establishment) return undefined;
     if (

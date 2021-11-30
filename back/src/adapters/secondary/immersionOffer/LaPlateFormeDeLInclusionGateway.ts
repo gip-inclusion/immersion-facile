@@ -1,12 +1,18 @@
-import axios from "axios";
 import { v4 as uuidV4 } from "uuid";
 import { UncompleteEstablishmentEntity } from "../../../domain/immersionOffer/entities/UncompleteEstablishmentEntity";
 import { EstablishmentsGateway } from "../../../domain/immersionOffer/ports/EstablishmentsGateway";
 import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 import { APIAdresseGateway } from "./APIAdresseGateway";
 
 const logger = createLogger(__filename);
+
+// The maximum number of response pages to fetch from the API of la plateforme de l'inclusion.
+const MAX_PAGE_READS = 20;
+
+// The maximum distance accepted by the API of la plateforme de l'inclusion.
+const SIAES_MAX_DISTANCE_KM = 100;
 
 export type EstablishmentFromLaPlateFormeDeLInclusion = {
   cree_le: Date;
@@ -57,84 +63,73 @@ export const convertLaPlateFormeDeLInclusionToUncompletEstablishment = (
   });
 };
 
+export type GetEstablishmentsResponse = {
+  results: EstablishmentFromLaPlateFormeDeLInclusion[];
+  nextPageUrl?: string;
+};
 export type HttpCallsToLaPlateFormeDeLInclusion = {
   getEstablishments: (
     searchParams: SearchParams,
-  ) => Promise<[EstablishmentFromLaPlateFormeDeLInclusion[], string]>;
-  getNextEstablishments: (
-    url: string,
-  ) => Promise<EstablishmentFromLaPlateFormeDeLInclusion[]>;
+  ) => Promise<GetEstablishmentsResponse>;
+  getNextEstablishments: (url: string) => Promise<GetEstablishmentsResponse>;
 };
 
-//TODO delete
 export const httpCallToLaPlateFormeDeLInclusion: HttpCallsToLaPlateFormeDeLInclusion =
   {
-    getEstablishments: async (searchParams: SearchParams) => {
+    getEstablishments: async (
+      searchParams: SearchParams,
+    ): Promise<GetEstablishmentsResponse> => {
       const apiAdresseGateway = new APIAdresseGateway();
       const cityCode = await apiAdresseGateway.getCityCodeFromLatLongAPIAdresse(
         searchParams.lat,
         searchParams.lon,
       );
-      if (cityCode == -1) {
-        return [[], ""];
-      } else {
-        return axios
-          .get("https://emplois.inclusion.beta.gouv.fr/api/v1/siaes/", {
+      if (cityCode == -1) return { results: [] };
+
+      try {
+        const response = await createAxiosInstance(logger).get(
+          "https://emplois.inclusion.beta.gouv.fr/api/v1/siaes/",
+          {
             params: {
               code_insee: cityCode,
-              distance_max_km: searchParams.distance,
+              distance_max_km: Math.min(
+                searchParams.distance_km,
+                SIAES_MAX_DISTANCE_KM,
+              ),
               format: "json",
             },
-          })
-          .then(async (response: any) => {
-            const establishments: [
-              EstablishmentFromLaPlateFormeDeLInclusion[],
-              string,
-            ] = [response.data.results, response.data.next];
-            return establishments;
-          })
-          .catch(function (error: any) {
-            // handle error
-            logger.error(
-              error,
-              "Could not fetch La Plate Forme de L'Inclusion API results",
-            );
-            return [[], ""];
-          });
+          },
+        );
+        return {
+          results: response.data.results,
+          nextPageUrl: response.data.next,
+        };
+      } catch (error: any) {
+        logAxiosError(
+          logger,
+          error,
+          "Could not fetch La Plate Forme de L'Inclusion API results",
+        );
+        return { results: [] };
       }
     },
-    getNextEstablishments: async (url: string) => {
-      return axios
-        .get(url)
-        .then(async (response: any) => {
-          if (response.data.next != null) {
-            return httpCallToLaPlateFormeDeLInclusion
-              .getNextEstablishments(response.data.next)
-              .then((nextEstablishments) => {
-                return response.data.results.concat(nextEstablishments);
-              })
-              .catch(function (error: any) {
-                // handle error
-                logger.error(
-                  error,
-                  "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
-                );
-                return [];
-              });
-          } else {
-            const results: EstablishmentFromLaPlateFormeDeLInclusion[] =
-              response.data.results;
-            return results;
-          }
-        })
-        .catch(function (error: any) {
-          // handle error
-          logger.error(
-            error,
-            "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
-          );
-          return [];
-        });
+    getNextEstablishments: async (
+      url: string,
+    ): Promise<GetEstablishmentsResponse> => {
+      try {
+        const response = await createAxiosInstance(logger).get(url);
+        return {
+          results: response.data.results,
+          nextPageUrl: response.data.next,
+        };
+      } catch (error: any) {
+        logAxiosError(
+          logger,
+          error,
+          "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
+        );
+        return { results: [] };
+      }
     },
   };
 
@@ -144,35 +139,24 @@ export class LaPlateFormeDeLInclusionGateway implements EstablishmentsGateway {
   async getEstablishments(
     searchParams: SearchParams,
   ): Promise<UncompleteEstablishmentEntity[]> {
-    return this.httpCalls
-      .getEstablishments(searchParams)
-      .then(async (response: any) => {
-        const establishments: EstablishmentFromLaPlateFormeDeLInclusion[] =
-          response[0];
-        const nextPageURL = response[1];
-        return this.httpCalls
-          .getNextEstablishments(nextPageURL)
-          .then((nextEstablishments) =>
-            establishments
-              .concat(nextEstablishments)
-              .map(convertLaPlateFormeDeLInclusionToUncompletEstablishment),
-          )
-          .catch(function (error: any) {
-            // handle error
-            logger.error(
-              error,
-              "Could not fetch La Plate Forme de L'Inclusion API results",
-            );
-            return [];
-          });
-      })
-      .catch(function (error: any) {
-        // handle error
-        logger.error(
-          error,
-          "Could not fetch La Plate Forme de L'Inclusion API results",
+    logger.debug({ searchParams }, "getEstablishments");
+
+    let page = await this.httpCalls.getEstablishments(searchParams);
+    let pageReads = 0;
+    let results = [...page.results];
+
+    while (page.nextPageUrl) {
+      if (pageReads >= MAX_PAGE_READS) {
+        logger.warn(
+          `Reached page limit (${pageReads}) but more pages are available.`,
         );
-        return [];
-      });
+        break;
+      }
+      page = await this.httpCalls.getNextEstablishments(page.nextPageUrl);
+      pageReads++;
+      results = [...results, ...page.results];
+    }
+
+    return results.map(convertLaPlateFormeDeLInclusionToUncompletEstablishment);
   }
 }
