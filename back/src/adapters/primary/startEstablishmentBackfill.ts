@@ -23,7 +23,7 @@ const stats: PipelineStats = new PipelineStats("startEstablishmentBackfill");
 
 const main = async () => {
   logger.info(`Executing pipeline: establishment-backfill`);
-  stats.startTimer("pipeline-timer");
+  stats.startTimer("total_runtime");
 
   const config = AppConfig.createFromEnv();
 
@@ -78,7 +78,7 @@ const main = async () => {
     logger.error(e, "Execution failed.");
     errorCode = 1;
   }
-  stats.stopTimer("pipeline-timer");
+  stats.stopTimer("total_runtime");
   clearInterval(intermediateStatsLogger);
 
   logger.info(
