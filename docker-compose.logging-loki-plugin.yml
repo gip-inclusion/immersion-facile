@@ -7,7 +7,11 @@ x-logging-config:
     options:
       loki-url: http://${LOKI_HOST:-localhost:9092}/loki/api/v1/push
       loki-retries: "5"
-      loki-external-labels: "environment=${ENV_TYPE:-unknown},container_name={{.Name}}"
+      loki-external-labels: 'environment=${ENV_TYPE:-unknown},container_name={{.Name}}'
+      loki-relabel-config: |
+        - action: labelmap
+          regex: compose_service
+          replacement: job
 
 services:
   promtail:
