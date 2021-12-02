@@ -176,6 +176,17 @@ CREATE INDEX fki_fk_establishment_siret ON public.immersion_offers USING btree (
 
 
 --
+-- Name: index_uuid; Type: INDEX; Schema: public; Owner: immersion
+--
+CREATE INDEX index_uuid ON public.immersion_offers USING btree (uuid);
+
+
+--
+-- Name: unique_uuid_immersion_offers; Type: CONSTRAIN; Schema: public; Owner: immersion
+--
+ALTER TABLE public.immersion_offers ADD CONSTRAINT unique_uuid_immersion_offers UNIQUE (uuid);
+
+--
 -- Name: fki_fk_siret_establishment; Type: INDEX; Schema: public; Owner: immersion
 --
 

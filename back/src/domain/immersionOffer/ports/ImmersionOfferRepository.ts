@@ -23,7 +23,7 @@ export interface ImmersionOfferRepository {
     establishments: EstablishmentEntity[],
   ) => Promise<void>;
   markPendingResearchesAsProcessedAndRetrieveThem(): Promise<SearchParams[]>;
-
+  getImmersionFromUuid(uuid: string): Promise<ImmersionOfferEntity | undefined>;
   getFromSearch: (
     searchParams: SearchParams,
   ) => Promise<ImmersionOfferEntity[]>;

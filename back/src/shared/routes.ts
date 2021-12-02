@@ -7,6 +7,7 @@ export const siretRoute = "siret";
 export const romeRoute = "rome";
 export const updateApplicationStatusRoute = "update-application-status";
 export const searchImmersionRoute = "search-immersion";
+export const getImmersionOfferByIdRoute = "get-immersion-by-id";
 export const agenciesRoute = "agencies";
 
 export const frontRoutes = {

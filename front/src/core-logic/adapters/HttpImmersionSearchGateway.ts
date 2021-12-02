@@ -2,7 +2,7 @@ import { searchImmersionRoute } from "./../../shared/routes";
 import {
   LocationSuggestionDto,
   SearchImmersionRequestDto,
-  SearchImmersionResponseDto,
+  SearchImmersionResultDto,
   searchImmersionResponseSchema,
 } from "./../../shared/SearchImmersionDto";
 import axios from "axios";
@@ -13,7 +13,7 @@ const prefix = "api";
 export class HttpImmersionSearchGateway extends ImmersionSearchGateway {
   public async search(
     searchParams: SearchImmersionRequestDto,
-  ): Promise<SearchImmersionResponseDto> {
+  ): Promise<SearchImmersionResultDto[]> {
     const response = await axios.post(
       `/${prefix}/${searchImmersionRoute}`,
       searchParams,

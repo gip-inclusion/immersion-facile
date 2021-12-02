@@ -1,13 +1,13 @@
 import {
   LocationSuggestionDto,
   SearchImmersionRequestDto,
-  SearchImmersionResponseDto,
+  SearchImmersionResultDto,
 } from "src/shared/SearchImmersionDto";
 
 export abstract class ImmersionSearchGateway {
   abstract search(
     searchParams: SearchImmersionRequestDto,
-  ): Promise<SearchImmersionResponseDto>;
+  ): Promise<SearchImmersionResultDto[]>;
 
   abstract addressLookup(query: string): Promise<Array<LocationSuggestionDto>>;
 }

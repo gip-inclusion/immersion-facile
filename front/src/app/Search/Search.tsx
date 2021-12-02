@@ -6,7 +6,6 @@ import {
 import { Formik, Field, Form, FormikHelpers } from "formik";
 import {
   LatLonDto,
-  SearchImmersionResponseDto,
   SearchImmersionResultDto,
 } from "src/shared/SearchImmersionDto";
 import { ProfessionDto } from "src/shared/rome";
@@ -30,7 +29,7 @@ interface Values {
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 
 export const Search = () => {
-  const [result, setResult] = useState<SearchImmersionResponseDto | null>(null);
+  const [result, setResult] = useState<SearchImmersionResultDto[] | null>(null);
 
   return (
     <div>

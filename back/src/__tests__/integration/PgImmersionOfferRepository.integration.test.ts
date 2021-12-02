@@ -118,7 +118,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
     await pgImmersionOfferRepository.insertImmersions([
       new ImmersionOfferEntity({
-        id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
+        id: "13df03a5-a2a5-430a-b558-ed3e2f03556d",
         rome: "M1907",
         naf: "8539A",
         siret: "78000403200040",
@@ -134,7 +134,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
     const searchResult = await pgImmersionOfferRepository.getFromSearch({
       rome: "M1907",
-      distance_km: 30,
+      distance_km: 300,
       lat: 34.95,
       lon: 50.1,
       nafDivision: "85",
@@ -161,7 +161,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     await pgImmersionOfferRepository.insertImmersions([]);
   });
 
-  test("Insert establishments and retrieves them back", async () => {
+  test("Insert establishments & immersions and retrieves them back", async () => {
     await pgImmersionOfferRepository.insertEstablishments([
       new EstablishmentEntity({
         id: "13df03a5-a2a5-430a-b558-ed3e2f035443",
@@ -270,13 +270,14 @@ describe("Postgres implementation of immersion offer repository", () => {
       }),
     ]);
 
-    expect(
-      (
-        await pgImmersionOfferRepository.getImmersionsFromSiret(
-          "78000403200019",
-        )
-      )[0].name,
-    ).toBe("Company from form");
+    const immersionOffer =
+      await pgImmersionOfferRepository.getImmersionFromUuid(
+        "13df03a5-a2a5-430a-b558-ed3e2f03536d",
+      );
+    expect(immersionOffer).toBeDefined;
+    if (immersionOffer) {
+      expect(immersionOffer.getName()).toBe("Company from form");
+    }
   });
 
   test("Insert establishment contact", async () => {

@@ -9,9 +9,10 @@ import { romeSearchRequestSchema } from "../../shared/rome";
 import {
   agenciesRoute,
   generateMagicLinkRoute,
-  renewMagicLinkRoute,
+  getImmersionOfferByIdRoute as getImmersionOfferByIdRoute,
   immersionApplicationsRoute,
   immersionOffersRoute,
+  renewMagicLinkRoute,
   romeRoute,
   searchImmersionRoute,
   siretRoute,
@@ -135,6 +136,14 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
       }),
     ),
   );
+
+  router
+    .route(`/${getImmersionOfferByIdRoute}/:id`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getImmersionOfferById.execute(req.params.id),
+      ),
+    );
 
   router.route(`/${romeRoute}`).get(async (req, res) => {
     sendHttpResponse(req, res, async () => {

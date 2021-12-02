@@ -11,11 +11,27 @@ import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
+const immersions = [
+  new ImmersionOfferEntity({
+    id: "13df03a5-a2a5-430a-b558-ed3e2f03512d",
+    rome: "M1907",
+    naf: "8539A",
+    siret: "78000403200029",
+    name: "Company inside repository",
+    voluntaryToImmersion: false,
+    data_source: "api_labonneboite",
+    contactInEstablishment: undefined,
+    score: 4.5,
+    position: { lat: 35, lon: 50 },
+    address: "55 rue de Faubourg Sante Honoré",
+  }),
+];
+
 export class InMemoryImmersionOfferRepository
   implements ImmersionOfferRepository
 {
   private _searches: SearchParams[] = [];
-  private _immersionOffers: ImmersionOfferEntity[] = [];
+  private _immersionOffers: ImmersionOfferEntity[] = immersions;
   private _establishments: EstablishmentEntity[] = [];
   private _establishmentContact: ImmersionEstablishmentContact[] = [];
 
@@ -23,6 +39,13 @@ export class InMemoryImmersionOfferRepository
     logger.info(searchParams, "insertSearch");
     this._searches.push(searchParams);
     return;
+  }
+
+  empty() {
+    this._searches = [];
+    this._immersionOffers = [];
+    this._establishments = [];
+    this._establishmentContact = [];
   }
 
   async insertEstablishmentContact(
@@ -88,5 +111,9 @@ export class InMemoryImmersionOfferRepository
 
   async getEstablishmentsFromSiret(siret: string) {
     return this._establishments.filter((x) => x.getSiret() == siret);
+  }
+
+  async getImmersionFromUuid(uuid: string) {
+    return this._immersionOffers.filter((x) => x.getProps().id == uuid)[0];
   }
 }

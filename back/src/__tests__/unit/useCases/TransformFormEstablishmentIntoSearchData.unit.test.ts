@@ -48,7 +48,7 @@ describe("Transform FormEstablishment into search data", () => {
     const getPosition = async () => fakePosition;
     const inMemoryRomeGateway = new InMemoryRomeGateway();
     const sequencerRunner = new TestSequenceRunner();
-
+    inMemoryImmersionOfferRepository.empty();
     transformFormEstablishmentIntoSearchData =
       new TransformFormEstablishmentIntoSearchData(
         formEstablishmentRepository,

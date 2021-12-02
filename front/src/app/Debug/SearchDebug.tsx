@@ -6,7 +6,7 @@ import {
 import { Formik, Field, Form, FormikHelpers } from "formik";
 import {
   LatLonDto,
-  SearchImmersionResponseDto,
+  SearchImmersionResultDto,
 } from "src/shared/SearchImmersionDto";
 import { DropDown } from "../FormEstablishment/DropDown";
 import { ProfessionDto } from "src/shared/rome";
@@ -20,7 +20,7 @@ interface Values {
 }
 
 export const SearchDebug = () => {
-  const [result, setResult] = useState<SearchImmersionResponseDto | null>(null);
+  const [result, setResult] = useState<SearchImmersionResultDto[] | null>(null);
   const [responseText, setResponseText] = useState("");
   const [latency, setLatency] = useState(0);
 

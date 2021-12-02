@@ -2,7 +2,7 @@ import {
   LatLonDto,
   LocationSuggestionDto,
   SearchImmersionRequestDto,
-  SearchImmersionResponseDto,
+  SearchImmersionResultDto,
   searchImmersionResponseSchema,
 } from "./../../shared/SearchImmersionDto";
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
@@ -13,7 +13,7 @@ const SIMULATED_LATENCY_MS = 150;
 export class InMemoryImmersionSearchGateway extends ImmersionSearchGateway {
   public async search(
     searchParams: SearchImmersionRequestDto,
-  ): Promise<SearchImmersionResponseDto> {
+  ): Promise<SearchImmersionResultDto[]> {
     console.log("search immersion: " + searchParams);
     await sleep(SIMULATED_LATENCY_MS);
 

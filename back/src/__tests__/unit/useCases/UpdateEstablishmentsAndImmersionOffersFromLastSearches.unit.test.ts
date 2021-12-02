@@ -113,6 +113,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 
   beforeEach(() => {
     immersionOfferRepository = new InMemoryImmersionOfferRepository();
+    immersionOfferRepository.empty();
     fakeLaBonneBoiteGateway = new LaBonneBoiteGateway(
       fakeAccessTokenGateway,
       "poleEmploiClientId",

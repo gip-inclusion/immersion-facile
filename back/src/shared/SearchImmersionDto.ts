@@ -67,9 +67,6 @@ export const searchImmersionResultSchema = z.object({
   distance_m: z.number().optional(),
 });
 
-export type SearchImmersionResponseDto = z.infer<
-  typeof searchImmersionResponseSchema
->;
 export const searchImmersionResponseSchema = z.array(
   searchImmersionResultSchema,
 );

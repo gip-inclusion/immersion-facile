@@ -81,6 +81,7 @@ import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { GetImmersionOfferById } from "../../domain/immersionOffer/useCases/GetImmersionOfferById";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
 
@@ -349,6 +350,9 @@ const createUseCases = (
 
     // immersionOffer
     searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),
+    getImmersionOfferById: new GetImmersionOfferById(
+      repositories.immersionOfferForSearch,
+    ),
 
     addFormEstablishment: new AddFormEstablishment(
       uowPerformer,

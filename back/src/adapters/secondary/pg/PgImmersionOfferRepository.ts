@@ -244,6 +244,31 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       });
   }
 
+  async getImmersionFromUuid(
+    uuid: string,
+  ): Promise<ImmersionOfferEntity | undefined> {
+    return this.client
+      .query(
+        "SELECT immersion_offers.* as immersion_offers, immersion_contacts.uuid as immersion_contacts_uuid, immersion_contacts.name as immersion_contacts_name, immersion_contacts.firstname as immersion_contacts_firstname, immersion_contacts.email as immersion_contacts_email, immersion_contacts.role as immersion_contacts_role, immersion_contacts.siret_establishment as immersion_contacts_siret_establishment, immersion_contacts.phone as immersion_contacts_phone \
+      FROM (SELECT * FROM immersion_offers WHERE uuid=$1) as immersion_offers LEFT JOIN immersion_contacts as immersion_contacts \
+      ON immersion_offers.contact_in_establishment_uuid = immersion_contacts.uuid",
+        [uuid],
+      )
+      .then((res) => {
+        if (res.rows.length > 0) {
+          res.rows.map((result) =>
+            this.buildImmersionOfferFromResults(result),
+          )[0];
+        } else {
+          return undefined;
+        }
+      })
+      .catch((e) => {
+        logger.error(e);
+        throw e;
+      });
+  }
+
   async getFromSearch(
     searchParams: SearchParams,
   ): Promise<ImmersionOfferEntity[]> {
@@ -278,45 +303,51 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       )
       .then((res) => {
         /* todo  add contact in establishment*/
-        return res.rows.map((result) => {
-          if (result.contact_in_establishment_uuid != null) {
-            const immersionContact: ImmersionEstablishmentContact = {
-              id: result.immersion_contacts_uuid,
-              name: result.immersion_contacts_name,
-              firstname: result.immersion_contacts_firstname,
-              email: result.immersion_contacts_email,
-              role: result.immersion_contacts_role,
-              siretEstablishment: result.immersion_contacts_siret_institution,
-              phone: result.immersion_contacts_phone,
-            };
-            return new ImmersionOfferEntity({
-              id: result.uuid,
-              rome: result.rome,
-              siret: result.siret,
-              name: result.name,
-              voluntaryToImmersion: result.voluntary_to_immersion,
-              data_source: result.data_source,
-              score: result.score,
-              contactInEstablishment: immersionContact,
-              address: result.address,
-            });
-          }
-          return new ImmersionOfferEntity({
-            id: result.uuid,
-            rome: result.rome,
-            siret: result.siret,
-            name: result.name,
-            voluntaryToImmersion: result.voluntary_to_immersion,
-            data_source: result.data_source,
-            score: result.score,
-            address: result.address,
-          });
-        });
+        return res.rows.map((result) =>
+          this.buildImmersionOfferFromResults(result),
+        );
       })
       .catch((e) => {
         logger.error(e);
         return [];
       });
+  }
+
+  buildImmersionOfferFromResults(result: any): ImmersionOfferEntity {
+    {
+      if (result.contact_in_establishment_uuid != null) {
+        const immersionContact: ImmersionEstablishmentContact = {
+          id: result.immersion_contacts_uuid,
+          name: result.immersion_contacts_name,
+          firstname: result.immersion_contacts_firstname,
+          email: result.immersion_contacts_email,
+          role: result.immersion_contacts_role,
+          siretEstablishment: result.immersion_contacts_siret_institution,
+          phone: result.immersion_contacts_phone,
+        };
+        return new ImmersionOfferEntity({
+          id: result.uuid,
+          rome: result.rome,
+          siret: result.siret,
+          name: result.name,
+          voluntaryToImmersion: result.voluntary_to_immersion,
+          data_source: result.data_source,
+          score: result.score,
+          contactInEstablishment: immersionContact,
+          address: result.address,
+        });
+      }
+      return new ImmersionOfferEntity({
+        id: result.uuid,
+        rome: result.rome,
+        siret: result.siret,
+        name: result.name,
+        voluntaryToImmersion: result.voluntary_to_immersion,
+        data_source: result.data_source,
+        score: result.score,
+        address: result.address,
+      });
+    }
   }
 
   async getAllSearches() {
