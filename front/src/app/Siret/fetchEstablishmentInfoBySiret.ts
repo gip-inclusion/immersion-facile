@@ -47,7 +47,7 @@ export const useSiretFetcher = () => {
         setEstablishmentInfo(response);
       })
       .catch((err: AxiosError) => {
-        if (err.isAxiosError && err.code === "404") {
+        if (err.isAxiosError && err.response && err.response.status === 404) {
           setError("SIRET inconnu ou inactif");
         } else {
           setError(err.message);
