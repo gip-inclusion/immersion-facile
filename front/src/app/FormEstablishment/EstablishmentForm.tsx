@@ -102,7 +102,7 @@ const getLabelAndName = (field: FieldsWithLabel) => ({
 });
 
 const SiretRelatedInputs = () => {
-  const { establishmentInfo } = useSiretFetcher();
+  const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField("businessAddress", establishmentInfo);
   useSiretRelatedField("naf", establishmentInfo);
@@ -112,9 +112,16 @@ const SiretRelatedInputs = () => {
       <TextInput
         {...getLabelAndName("siret")}
         placeholder="362 521 879 00034"
+        disabled={isFetchingSiret}
       />
-      <TextInput {...getLabelAndName("businessName")} />
-      <TextInput {...getLabelAndName("businessAddress")} />
+      <TextInput
+        {...getLabelAndName("businessName")}
+        disabled={isFetchingSiret}
+      />
+      <TextInput
+        {...getLabelAndName("businessAddress")}
+        disabled={isFetchingSiret}
+      />
     </>
   );
 };
