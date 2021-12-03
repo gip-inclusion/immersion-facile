@@ -33,31 +33,44 @@ export const EnterpriseSearchResult = ({
       <p className="metierDescription">{metierDescription}</p>
       <div className="searchResultDistanceCompanySizeContainer">
         <p className="distanceIconLabelContainer">
-          <img src={distanceSearchIcon} alt=""/>
+          <img src={distanceSearchIcon} alt="" />
           {radius}
         </p>
         <p>{employeeCount}</p>
       </div>
-      <div className="searchDetailsSeparator"/>
-      <button className="expandResultDetailsButton" onClick={()=>{setExpanded(!isExpanded)}}>
-      {isExpanded ? "Masquer les coordonnées" : "Afficher les coordonnées" }
+      <div className="searchDetailsSeparator" />
+      <button
+        className="expandResultDetailsButton"
+        onClick={() => {
+          setExpanded(!isExpanded);
+        }}
+      >
+        {isExpanded ? "Masquer les coordonnées" : "Afficher les coordonnées"}
       </button>
-      {isExpanded && 
-      <>
-      <div className="detailContainer">
-      <img src={locationSearchIcon} className="iconFilter" alt="adresse"/>
-      {address}
-        </div>
-        <div className="detailContainer">
-      <img src={phoneSearchIcon} alt="numero de téléphone"/>
-      {phone}
-        </div>
-        <div className="detailContainer">
-      <img src={distanceSearchIcon} className="iconFilter" alt="numero siret"/>
-      {siret}
-        </div>
-
-        </>}
+      {isExpanded && (
+        <>
+          <div className="detailContainer">
+            <img
+              src={locationSearchIcon}
+              className="iconFilter"
+              alt="adresse"
+            />
+            {address}
+          </div>
+          <div className="detailContainer">
+            <img src={phoneSearchIcon} alt="numero de téléphone" />
+            {phone}
+          </div>
+          <div className="detailContainer">
+            <img
+              src={distanceSearchIcon}
+              className="iconFilter"
+              alt="numero siret"
+            />
+            {siret}
+          </div>
+        </>
+      )}
     </div>
   );
 };

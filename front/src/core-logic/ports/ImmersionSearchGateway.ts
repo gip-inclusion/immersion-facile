@@ -4,10 +4,10 @@ import {
   SearchImmersionResultDto,
 } from "src/shared/SearchImmersionDto";
 
-export abstract class ImmersionSearchGateway {
-  abstract search(
+export interface ImmersionSearchGateway {
+  search(
     searchParams: SearchImmersionRequestDto,
   ): Promise<SearchImmersionResultDto[]>;
 
-  abstract addressLookup(query: string): Promise<Array<LocationSuggestionDto>>;
+  addressLookup(query: string): Promise<Array<LocationSuggestionDto>>;
 }

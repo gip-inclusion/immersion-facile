@@ -1,3 +1,4 @@
+import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import {
   ImmersionOfferEntity,
@@ -23,8 +24,11 @@ export interface ImmersionOfferRepository {
     establishments: EstablishmentEntity[],
   ) => Promise<void>;
   markPendingResearchesAsProcessedAndRetrieveThem(): Promise<SearchParams[]>;
-  getImmersionFromUuid(uuid: string): Promise<ImmersionOfferEntity | undefined>;
+
+  getImmersionFromUuid(
+    uuid: string,
+  ): Promise<SearchImmersionResultDto | undefined>;
   getFromSearch: (
     searchParams: SearchParams,
-  ) => Promise<ImmersionOfferEntity[]>;
+  ) => Promise<SearchImmersionResultDto[]>;
 }

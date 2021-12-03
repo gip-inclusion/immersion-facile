@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { immersionContactInEstablishmentIdSchema } from "./FormEstablishmentDto";
+import {
+  immersionContactInEstablishmentIdSchema,
+  preferredContactMethodSchema,
+} from "./FormEstablishmentDto";
 import { nafDivisionSchema } from "./naf";
 import { siretSchema } from "./siret";
 import { romeCodeMetierSchema } from "./rome";
@@ -39,8 +42,8 @@ export const searchImmersionRequestSchema = z.object({
 
 export const contactSchema = z.object({
   id: immersionContactInEstablishmentIdSchema,
-  last_name: z.string(),
-  first_name: z.string(),
+  lastName: z.string(),
+  firstName: z.string(),
   email: z.string(),
   role: z.string(),
   phone: z.string(),
@@ -60,10 +63,11 @@ export const searchImmersionResultSchema = z.object({
   naf: z.string().optional(),
   siret: z.string(),
   name: z.string(),
-  voluntary_to_immersion: z.boolean(),
+  voluntaryToImmersion: z.boolean(),
   location: latLonSchema.optional(),
   address: z.string(),
-  contact: contactSchema.optional(),
+  contactId: immersionContactInEstablishmentIdSchema.optional(),
+  contactMode: preferredContactMethodSchema.optional(),
   distance_m: z.number().optional(),
 });
 

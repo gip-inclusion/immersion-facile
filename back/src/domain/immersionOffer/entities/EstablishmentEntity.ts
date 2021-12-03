@@ -58,7 +58,7 @@ export type OptionalEstablishmentFields = {
   contactInEstablishment: ImmersionEstablishmentContact;
 };
 
-type EstablishmentProps = MandatoryEstablishmentFields &
+export type EstablishmentProps = MandatoryEstablishmentFields &
   EstablishmentFieldsToRetrieve &
   Partial<OptionalEstablishmentFields>;
 
@@ -73,11 +73,14 @@ export class EstablishmentEntity {
       this.props.contactMode,
       this.props.dataSource,
       this.props.position,
-      this.props.contactMode,
       this.props.contactInEstablishment,
     ];
   }
   constructor(private props: EstablishmentProps) {}
+
+  public getProps() {
+    return this.props;
+  }
 
   public getRomeCodesArray() {
     return this.props.romes;
@@ -114,6 +117,10 @@ export class EstablishmentEntity {
     return this.props.naf;
   }
 
+  public getContactMode() {
+    return this.props.contactMode;
+  }
+
   public setContactMode(contactMode: ContactMethod) {
     this.props.contactMode = contactMode;
   }
@@ -131,7 +138,7 @@ export class EstablishmentEntity {
       (rome) =>
         new ImmersionOfferEntity({
           id: uuidV4(),
-          rome: rome,
+          rome,
           naf: this.props.naf,
           siret: this.props.siret,
           name: this.props.name,
@@ -140,7 +147,6 @@ export class EstablishmentEntity {
           contactInEstablishment: this.props.contactInEstablishment,
           score: this.getScore(),
           position: this.getPosition(),
-          address: this.props.address,
         }),
     );
   }

@@ -10,7 +10,7 @@ import { sleep } from "src/shared/utils";
 
 const SIMULATED_LATENCY_MS = 150;
 
-export class InMemoryImmersionSearchGateway extends ImmersionSearchGateway {
+export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
   public async search(
     searchParams: SearchImmersionRequestDto,
   ): Promise<SearchImmersionResultDto[]> {
@@ -24,17 +24,11 @@ export class InMemoryImmersionSearchGateway extends ImmersionSearchGateway {
         naf: searchParams.nafDivision,
         siret: "12345678901234",
         name: "Super Corp",
-        voluntary_to_immersion: true,
+        voluntaryToImmersion: true,
         location: { lat: 48.8666, lon: 2.3333 },
         address: "55 rue du Faubourg Saint-Honoré",
-        contact: {
-          id: "contact_id",
-          last_name: "LastName",
-          first_name: "FirstName",
-          email: "contact@supercorp.com",
-          role: "batwoman",
-          phone: "0640295453",
-        },
+        contactId: "contact_id",
+        contactMode: "EMAIL",
       },
       {
         id: "search_result_id2",
@@ -42,17 +36,11 @@ export class InMemoryImmersionSearchGateway extends ImmersionSearchGateway {
         naf: searchParams.nafDivision,
         siret: "12345678901234",
         name: "Mega Corp",
-        voluntary_to_immersion: true,
+        voluntaryToImmersion: true,
         location: { lat: 48.8666, lon: 2.3333 },
         address: "55 rue du Faubourg Saint-Honoré",
-        contact: {
-          id: "contact_id2",
-          last_name: "LastName",
-          first_name: "FirstName",
-          email: "contact@megacorp.eu",
-          role: "batmobile",
-          phone: "0640295453",
-        },
+        contactId: "contact_id2",
+        contactMode: "PHONE",
       },
       {
         id: "search_result_id3",
@@ -60,17 +48,11 @@ export class InMemoryImmersionSearchGateway extends ImmersionSearchGateway {
         naf: searchParams.nafDivision,
         siret: "12345678901234",
         name: "Hyper Corp",
-        voluntary_to_immersion: true,
+        voluntaryToImmersion: true,
         location: { lat: 48.8666, lon: 2.3333 },
         address: "55 rue du Faubourg Saint-Honoré",
-        contact: {
-          id: "contact_id3",
-          last_name: "LastName",
-          first_name: "FirstName",
-          email: "contact@hypercorp.fr",
-          role: "batman",
-          phone: "0640295453",
-        },
+        contactId: "contact_id3",
+        contactMode: "IN_PERSON",
       },
     ];
   }

@@ -18,9 +18,10 @@ describe("/get-immersion-by-id route", () => {
         naf: "8539A",
         siret: "78000403200029",
         name: "Company inside repository",
-        voluntary_to_immersion: false,
+        voluntaryToImmersion: false,
         location: { lat: 35, lon: 50 },
         address: "55 rue de Faubourg Sante Honoré",
+        contactMode: "EMAIL",
       });
   });
 

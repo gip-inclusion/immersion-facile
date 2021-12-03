@@ -71,8 +71,10 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
           <div
             className="text-immersionBlue-dark font-sans text-center"
             style={{ maxWidth: "16rem" }}
-          ><a {...routes.landingEstablishment().link} target="_blank">
-              En savoir plus</a>
+          >
+            <a {...routes.landingEstablishment().link} target="_blank">
+              En savoir plus
+            </a>
           </div>
         </div>
         <div

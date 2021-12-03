@@ -10,7 +10,7 @@ import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 
 const prefix = "api";
 
-export class HttpImmersionSearchGateway extends ImmersionSearchGateway {
+export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
   public async search(
     searchParams: SearchImmersionRequestDto,
   ): Promise<SearchImmersionResultDto[]> {

@@ -30,6 +30,7 @@ const validContactMethods: NotEmptyArray<ContactMethod> = [
   "PHONE",
   "IN_PERSON",
 ];
+export const preferredContactMethodSchema = z.enum(validContactMethods);
 
 export type FormEstablishmentDto = z.infer<typeof formEstablishmentSchema>;
 export const formEstablishmentSchema = z.object(
@@ -46,7 +47,7 @@ export const formEstablishmentSchema = z.object(
       .array(businessContactSchema, { required_error: "Obligatoire" })
       .length(1, "Spécifiez 1 seul référent"),
     preferredContactMethods: z
-      .array(z.enum(validContactMethods), { required_error: "Obligatoire" })
+      .array(preferredContactMethodSchema, { required_error: "Obligatoire" })
       .length(1, "Spécifiez un mode de contact"),
   },
   { required_error: "Obligatoire" },

@@ -60,7 +60,7 @@
 .searchResultContainer {
   display: flex;
   flex-direction: column;
-  align-items:center;
+  align-items: center;
 }
 
 .searchResult {
@@ -117,7 +117,7 @@
 }
 
 .searchDetailsSeparator {
-  background-color: #CECECE;
+  background-color: #cecece;
   height: 0.89px;
 }
 
@@ -135,11 +135,12 @@
 }
 
 .detailContainer {
-  display:flex;
+  display: flex;
   flex-direction: row;
   gap: 16px;
 }
 
-.iconFilter{
-  filter: invert(66%) sepia(14%) saturate(1543%) hue-rotate(322deg) brightness(102%) contrast(101%);
+.iconFilter {
+  filter: invert(66%) sepia(14%) saturate(1543%) hue-rotate(322deg)
+    brightness(102%) contrast(101%);
 }

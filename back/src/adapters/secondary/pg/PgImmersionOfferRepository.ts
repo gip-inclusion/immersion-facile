@@ -13,16 +13,32 @@ import {
   SearchParams,
 } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
+import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
-type PgContactMethod = "phone" | "mail" | "in_person" | null;
-const contactModeMap: Record<ContactMethod, PgContactMethod> = {
+type PgContactMethod = "phone" | "mail" | "in_person";
+type KnownContactMethod = Exclude<ContactMethod, "UNKNOWN">;
+const contactModeMap: Record<KnownContactMethod, PgContactMethod> = {
   PHONE: "phone",
   EMAIL: "mail",
   IN_PERSON: "in_person",
-  UNKNOWN: null,
+};
+
+const pgContactToContactMethod = Object.fromEntries(
+  Object.entries(contactModeMap).map(([method, pgMethod]) => [
+    pgMethod,
+    method,
+  ]),
+) as Record<PgContactMethod, KnownContactMethod>;
+
+const parseGeoJson = (raw: string): Position => {
+  const json = JSON.parse(raw);
+  return {
+    lat: json.coordinates[1],
+    lon: json.coordinates[0],
+  };
 };
 
 export class PgImmersionOfferRepository implements ImmersionOfferRepository {
@@ -99,25 +115,28 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     );
 
     //We deduplicate establishments because postgres does not support duplicate rows
-    const deduplicatedArrayOfEstablishments = arrayOfEstablishments.reduce(
-      (acc, cur) => {
+    const deduplicatedArrayOfEstablishments: any[][] =
+      arrayOfEstablishments.reduce((acc, cur) => {
         const alreadyExist = acc.some((item: any[]) => item[0] === cur[0]);
         if (alreadyExist) return acc;
         return [...acc, cur];
-      },
-      [],
-    );
+      }, []);
 
     const contactModeIndex = 5;
     const positionIndex = 7;
     const uniqImmersionsOffersWithCorrectPosition =
-      deduplicatedArrayOfEstablishments.map((establishment: any[]) => {
+      deduplicatedArrayOfEstablishments.map((establishment) => {
         const position: Position = establishment[positionIndex];
         const newPosition = `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
         const contactMethod = establishment[contactModeIndex] as
           | ContactMethod
           | undefined;
-        const pgContactMethod = contactModeMap[contactMethod ?? "UNKNOWN"];
+        const existingContactMethod = contactMethod
+          ? contactMethod !== "UNKNOWN"
+          : false;
+        const pgContactMethod = existingContactMethod
+          ? contactModeMap[contactMethod as KnownContactMethod]
+          : null;
 
         return [
           ...establishment.slice(0, contactModeIndex),
@@ -215,10 +234,18 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
     const formatedQuery = format(
       "INSERT INTO immersion_offers (uuid, rome, naf_division, siret, naf,  name, voluntary_to_immersion, data_source, contact_in_establishment_uuid, score, gps) \
-      VALUES %L ON CONFLICT ON CONSTRAINT pk_immersion_offers DO UPDATE SET naf=EXCLUDED.naf, name=EXCLUDED.name, voluntary_to_immersion=EXCLUDED.voluntary_to_immersion, \
-      data_source=EXCLUDED.data_source, score=EXCLUDED.score, update_date=NOW() \
-      WHERE EXCLUDED.data_source='form' OR (immersion_offers.data_source != 'form' AND \
-      (EXCLUDED.data_source = 'api_laplateformedelinclusion' AND immersion_offers.data_source = 'api_labonneboite')) ",
+        VALUES %L \
+          ON CONFLICT ON CONSTRAINT pk_immersion_offers \
+            DO UPDATE SET \
+              naf=EXCLUDED.naf,\
+              name=EXCLUDED.name,\
+              voluntary_to_immersion=EXCLUDED.voluntary_to_immersion, \
+              data_source=EXCLUDED.data_source,\
+              score=EXCLUDED.score,\
+              update_date=NOW() \
+        WHERE EXCLUDED.data_source='form' OR (immersion_offers.data_source != 'form' \
+        AND (EXCLUDED.data_source = 'api_laplateformedelinclusion' \
+        AND immersion_offers.data_source = 'api_labonneboite'))",
       uniqImmersionsOffersWithCorrectPosition,
     );
 
@@ -230,7 +257,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       "ST_GeographyFromText('POINT($1 $3)')",
     );
     await this.client.query(formatedQueryWorking).catch((e) => {
-      logger.error("Inserting immersions " + e);
+      console.error("Error Inserting immersions " + e); // we keep this one too because otherwise the error does not appear in tests
+      logger.error("Error Inserting immersions " + e);
     });
   }
 
@@ -246,22 +274,34 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
   async getImmersionFromUuid(
     uuid: string,
-  ): Promise<ImmersionOfferEntity | undefined> {
+  ): Promise<SearchImmersionResultDto | undefined> {
+    // const { rows } = await this.client.query(
+    //   "SELECT * FROM immersion_offers WHERE uuid=$1",
+    //   [uuid],
+    // );
+    // console.log("MY value : ", rows);
+
+    // const { rows: all } = await this.client.query(
+    //   "SELECT * FROM immersion_offers",
+    // );
+    // console.log("ALL : ", all);
     return this.client
       .query(
-        "SELECT immersion_offers.* as immersion_offers, immersion_contacts.uuid as immersion_contacts_uuid, immersion_contacts.name as immersion_contacts_name, immersion_contacts.firstname as immersion_contacts_firstname, immersion_contacts.email as immersion_contacts_email, immersion_contacts.role as immersion_contacts_role, immersion_contacts.siret_establishment as immersion_contacts_siret_establishment, immersion_contacts.phone as immersion_contacts_phone \
+        "SELECT immersion_offers.* as immersion_offers,\
+        immersion_contacts.uuid as immersion_contacts_uuid,\
+        immersion_contacts.name as immersion_contacts_name,\
+        immersion_contacts.firstname as immersion_contacts_firstname,\
+        immersion_contacts.email as immersion_contacts_email,\
+        immersion_contacts.role as immersion_contacts_role,\
+        immersion_contacts.siret_establishment as immersion_contacts_siret_establishment,\
+        immersion_contacts.phone as immersion_contacts_phone \
       FROM (SELECT * FROM immersion_offers WHERE uuid=$1) as immersion_offers LEFT JOIN immersion_contacts as immersion_contacts \
       ON immersion_offers.contact_in_establishment_uuid = immersion_contacts.uuid",
         [uuid],
       )
       .then((res) => {
-        if (res.rows.length > 0) {
-          res.rows.map((result) =>
-            this.buildImmersionOfferFromResults(result),
-          )[0];
-        } else {
-          return undefined;
-        }
+        const firstResult = res.rows[0];
+        return firstResult && this.buildImmersionOfferFromResults(firstResult);
       })
       .catch((e) => {
         logger.error(e);
@@ -271,7 +311,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
   async getFromSearch(
     searchParams: SearchParams,
-  ): Promise<ImmersionOfferEntity[]> {
+  ): Promise<SearchImmersionResultDto[]> {
     let nafCategoryFilter = "";
     let siretCategoryFilter = "";
 
@@ -290,22 +330,39 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       siretCategoryFilter = "AND siret=$" + (parameters.length + 1);
       parameters.push(searchParams.siret);
     }
+    //             establishments.id as establishment_id,
+    //             establishments.voluntaryToImmersion as establishment_voluntaryToImmersion,
 
     return this.client
       .query(
-        `SELECT immersion_offers.* as immersion_offers, immersion_contacts.uuid as immersion_contacts_uuid, immersion_contacts.name as immersion_contacts_name, immersion_contacts.firstname as immersion_contacts_firstname, immersion_contacts.email as immersion_contacts_email, immersion_contacts.role as immersion_contacts_role, immersion_contacts.siret_establishment as immersion_contacts_siret_establishment, immersion_contacts.phone as immersion_contacts_phone \
-         FROM (SELECT * FROM immersion_offers WHERE ROME=$1 ${nafCategoryFilter} ${siretCategoryFilter} AND ST_DWithin( \
-         immersion_offers.gps, st_geographyfromtext($2), $3) \
-          AND data_source != 'api_laplateformedelinclusion' ORDER BY data_source DESC) as immersion_offers \
-         LEFT JOIN immersion_contacts as immersion_contacts \
-         ON immersion_offers.contact_in_establishment_uuid = immersion_contacts.uuid`,
+        `SELECT 
+            immersion_offers.* as immersion_offers,
+            immersion_contacts.uuid as immersion_contacts_uuid,
+            immersion_contacts.name as immersion_contacts_name,
+            immersion_contacts.firstname as immersion_contacts_firstname,
+            immersion_contacts.email as immersion_contacts_email,
+            immersion_contacts.role as immersion_contacts_role,
+            immersion_contacts.siret_establishment as immersion_contacts_siret_establishment,
+            immersion_contacts.phone as immersion_contacts_phone,
+            establishments.contact_mode as establishment_contact_mode,
+            establishments.address as establishment_address,
+            establishments.naf as establishment_naf,
+            st_distance(immersion_offers.gps, st_geographyfromtext($2)) as distance_m,
+            st_asgeojson(immersion_offers.gps) as position
+         FROM (SELECT * FROM immersion_offers WHERE ROME=$1 ${nafCategoryFilter} ${siretCategoryFilter} AND ST_DWithin(
+         immersion_offers.gps, st_geographyfromtext($2), $3)
+          AND data_source != 'api_laplateformedelinclusion' ORDER BY data_source DESC) as immersion_offers
+         LEFT JOIN immersion_contacts as immersion_contacts
+         ON immersion_offers.contact_in_establishment_uuid = immersion_contacts.uuid
+         LEFT JOIN establishments as establishments
+         ON immersion_offers.siret = establishments.siret
+         `,
         parameters,
       )
       .then((res) => {
-        /* todo  add contact in establishment*/
-        return res.rows.map((result) =>
-          this.buildImmersionOfferFromResults(result),
-        );
+        return res.rows.map((result) => {
+          return this.buildImmersionOfferFromResults(result);
+        });
       })
       .catch((e) => {
         logger.error(e);
@@ -313,41 +370,42 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       });
   }
 
-  buildImmersionOfferFromResults(result: any): ImmersionOfferEntity {
-    {
-      if (result.contact_in_establishment_uuid != null) {
-        const immersionContact: ImmersionEstablishmentContact = {
-          id: result.immersion_contacts_uuid,
-          name: result.immersion_contacts_name,
-          firstname: result.immersion_contacts_firstname,
-          email: result.immersion_contacts_email,
-          role: result.immersion_contacts_role,
-          siretEstablishment: result.immersion_contacts_siret_institution,
-          phone: result.immersion_contacts_phone,
-        };
-        return new ImmersionOfferEntity({
-          id: result.uuid,
-          rome: result.rome,
-          siret: result.siret,
-          name: result.name,
-          voluntaryToImmersion: result.voluntary_to_immersion,
-          data_source: result.data_source,
-          score: result.score,
-          contactInEstablishment: immersionContact,
-          address: result.address,
-        });
-      }
-      return new ImmersionOfferEntity({
-        id: result.uuid,
-        rome: result.rome,
-        siret: result.siret,
-        name: result.name,
-        voluntaryToImmersion: result.voluntary_to_immersion,
-        data_source: result.data_source,
-        score: result.score,
-        address: result.address,
-      });
+  buildImmersionOfferFromResults(result: any): SearchImmersionResultDto {
+    let immersionContact: ImmersionEstablishmentContact | null = null;
+    if (result.contact_in_establishment_uuid != null) {
+      immersionContact = {
+        id: result.immersion_contacts_uuid,
+        name: result.immersion_contacts_name,
+        firstname: result.immersion_contacts_firstname,
+        email: result.immersion_contacts_email,
+        role: result.immersion_contacts_role,
+        siretEstablishment: result.immersion_contacts_siret_institution,
+        phone: result.immersion_contacts_phone,
+      };
     }
+
+    const pgContactMode = result.establishment_contact_mode as PgContactMethod;
+
+    const contactMode: ContactMethod =
+      pgContactMode !== null
+        ? pgContactToContactMethod[pgContactMode]
+        : "UNKNOWN";
+
+    const contactId = immersionContact ? immersionContact.id : undefined;
+
+    return {
+      id: result.uuid,
+      rome: result.rome,
+      naf: result.establishment_naf,
+      siret: result.siret,
+      name: result.name,
+      voluntaryToImmersion: result.voluntary_to_immersion,
+      address: result.establishment_address,
+      contactId,
+      contactMode,
+      location: result.position && parseGeoJson(result.position),
+      distance_m: Math.round(result.distance_m),
+    };
   }
 
   async getAllSearches() {

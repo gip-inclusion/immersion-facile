@@ -103,8 +103,7 @@ describe("Transform FormEstablishment into search data", () => {
     await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
 
     // assert
-    const storedImmersion =
-      inMemoryImmersionOfferRepository.getImmersionOffers();
+    const storedImmersion = inMemoryImmersionOfferRepository.immersionOffers;
     expect(storedImmersion).toHaveLength(1);
     expect(storedImmersion[0].getProps()).toMatchObject({
       data_source: "form",
@@ -117,11 +116,9 @@ describe("Transform FormEstablishment into search data", () => {
     expected: { siret: string; contactEmail: string },
   ) => {
     const immersionsBoulanger =
-      await inMemoryImmersionOfferRepository.getFromSearch({
-        rome,
-        distance_km: 30,
-        ...fakePosition,
-      });
+      await inMemoryImmersionOfferRepository.immersionOffers.filter(
+        (offer) => offer.getRome() === rome,
+      );
 
     //Verify that immersion matches
     expect(immersionsBoulanger).toHaveLength(1);

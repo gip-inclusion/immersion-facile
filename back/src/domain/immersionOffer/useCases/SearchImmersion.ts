@@ -8,7 +8,6 @@ import {
   ImmersionOfferRepository,
   SearchParams,
 } from "../ports/ImmersionOfferRepository";
-import { convertEntityToSearchResultDto } from "./helpers";
 
 export class SearchImmersion extends UseCase<
   SearchImmersionRequestDto,
@@ -23,16 +22,11 @@ export class SearchImmersion extends UseCase<
   inputSchema = searchImmersionRequestSchema;
 
   public async _execute(
-    request: SearchImmersionRequestDto,
+    params: SearchImmersionRequestDto,
   ): Promise<SearchImmersionResultDto[]> {
-    const searchParams = convertRequestDtoToSearchParams(request);
+    const searchParams = convertRequestDtoToSearchParams(params);
     await this.immersionOfferRepository.insertSearch(searchParams);
-    const entities = await this.immersionOfferRepository.getFromSearch(
-      searchParams,
-    );
-    return entities.map((e) =>
-      convertEntityToSearchResultDto(e, request.location),
-    );
+    return this.immersionOfferRepository.getFromSearch(searchParams);
   }
 }
 

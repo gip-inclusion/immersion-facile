@@ -25,9 +25,11 @@ export const ImmersionHowTo = ({ videoUrl }: ImmersionHowToProps) => (
           <Colored red>Complétez la convention.</Colored> Dès la validation
           reçue, démarrez l’immersion.
         </BulletPoint>
-        <div className="flex py-1 text-sm sm:mx-3-">Vous pouvez être accompagné à chacune de ces étapes par  votre conseiller emploi habituel. C’est lui qui validera avec vous la convention.
-          Vous ne le connaissez pas  ?
-          Pas de souci, nous saurons l’identifier.
+        <div className="flex py-1 text-sm sm:mx-3-">
+          Vous pouvez être accompagné à chacune de ces étapes par votre
+          conseiller emploi habituel. C’est lui qui validera avec vous la
+          convention. Vous ne le connaissez pas ? Pas de souci, nous saurons
+          l’identifier.
         </div>
       </div>
       <div

@@ -30,10 +30,7 @@ export const SearchDropDown = <T extends unknown>({
         setTimeout(() => dispatch({ type: "FOCUS_LOST" }), 500);
       }}
     >
-      <label
-        className="searchdropdown-header inputLabel"
-        htmlFor={"search"}
-      >
+      <label className="searchdropdown-header inputLabel" htmlFor={"search"}>
         {title}
       </label>
       <input

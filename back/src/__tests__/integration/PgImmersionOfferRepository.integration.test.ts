@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg";
+import { EstablishmentEntityBuilder } from "../../_testBuilders/EstablishmentEntityBuilder";
 import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
 import { EstablishmentEntity } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
@@ -6,6 +7,7 @@ import {
   ImmersionOfferEntity,
 } from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import { SearchImmersionResultDto } from "../../shared/SearchImmersionDto";
 
 describe("Postgres implementation of immersion offer repository", () => {
   let pool: Pool;
@@ -72,37 +74,39 @@ describe("Postgres implementation of immersion offer repository", () => {
   test("Insert immersions and retrieves them back", async () => {
     await pgImmersionOfferRepository.insertEstablishments([
       new EstablishmentEntity({
-        id: "13df03a5-a2a5-430a-b558-ed3e2f035443",
-        address: "fake address",
+        id: "13df03a5-a2a5-430a-b558-111111111111",
+        address: "fake address establishment 1",
         name: "Fake Establishment from la plate forme de l'inclusion",
         voluntaryToImmersion: false,
         score: 5,
         romes: ["M1907"],
         siret: "78000403200029",
-        dataSource: "api_labonneboite",
+        dataSource: "api_laplateformedelinclusion",
         numberEmployeesRange: 1,
-        position: { lat: 10.1, lon: 10.1 },
+        position: { lat: 10, lon: 15 },
         naf: "8539A",
+        contactMode: "EMAIL",
       }),
     ]);
     await pgImmersionOfferRepository.insertEstablishments([
       new EstablishmentEntity({
-        id: "13df03a5-a2a5-430a-b558-ed3e2f035443",
-        address: "fake address",
+        id: "13df03a5-a2a5-430a-b558-222222222222",
+        address: "fake address establishment 2",
         name: "Fake Establishment from la plate forme de l'inclusion",
         voluntaryToImmersion: false,
         score: 5,
         romes: ["M1907"],
         siret: "78000403200040",
-        dataSource: "api_labonneboite",
+        dataSource: "api_laplateformedelinclusion",
         numberEmployeesRange: 1,
-        position: { lat: 10.1, lon: 10.1 },
+        position: { lat: 11, lon: 16 },
         naf: "8539A",
+        contactMode: "PHONE",
       }),
     ]);
     await pgImmersionOfferRepository.insertImmersions([
       new ImmersionOfferEntity({
-        id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
+        id: "13df03a5-a2a5-430a-b558-111111111122",
         rome: "M1907",
         naf: "8539A",
         siret: "78000403200029",
@@ -111,14 +115,13 @@ describe("Postgres implementation of immersion offer repository", () => {
         data_source: "api_labonneboite",
         contactInEstablishment: undefined,
         score: 4.5,
-        position: { lat: 35, lon: 50 },
-        address: "55 rue de Faubourg Sante Honoré",
+        position: { lat: 49, lon: 6 },
       }),
     ]);
 
     await pgImmersionOfferRepository.insertImmersions([
       new ImmersionOfferEntity({
-        id: "13df03a5-a2a5-430a-b558-ed3e2f03556d",
+        id: "13df03a5-a2a5-430a-b558-333333333344",
         rome: "M1907",
         naf: "8539A",
         siret: "78000403200040",
@@ -127,34 +130,57 @@ describe("Postgres implementation of immersion offer repository", () => {
         data_source: "api_sirene",
         contactInEstablishment: undefined,
         score: 4.5,
-        position: { lat: 35, lon: 50 },
-        address: "55 rue de Faubourg Sante Honoré",
+        position: { lat: 49.05, lon: 6.05 },
       }),
     ]);
 
     const searchResult = await pgImmersionOfferRepository.getFromSearch({
       rome: "M1907",
-      distance_km: 300,
-      lat: 34.95,
-      lon: 50.1,
+      distance_km: 30,
+      lat: 49.1,
+      lon: 6.1,
       nafDivision: "85",
     });
     expect(searchResult).toHaveLength(2);
-    expect(searchResult[0].getName()).toBe(
-      "Company from la bonne boite for search",
-    );
+    const expectedResult1: SearchImmersionResultDto = {
+      id: "13df03a5-a2a5-430a-b558-333333333344",
+      address: "fake address establishment 2",
+      name: "Company from api sirene for search",
+      naf: "8539A",
+      contactMode: "PHONE",
+      location: { lat: 49.05, lon: 6.05 },
+      voluntaryToImmersion: false,
+      rome: "M1907",
+      siret: "78000403200040",
+      distance_m: 6653,
+    };
+    const expectedResult2: SearchImmersionResultDto = {
+      id: "13df03a5-a2a5-430a-b558-111111111122",
+      address: "fake address establishment 1",
+      name: "Company from la bonne boite for search",
+      voluntaryToImmersion: false,
+      rome: "M1907",
+      siret: "78000403200029",
+      location: { lat: 49, lon: 6 },
+      distance_m: 13308,
+      naf: "8539A",
+      contactMode: "EMAIL",
+    };
 
-    const searchResultWithSiret =
-      await pgImmersionOfferRepository.getFromSearch({
-        rome: "M1907",
-        distance_km: 30,
-        lat: 34.95,
-        lon: 50.1,
-        nafDivision: "85",
-        siret: "78000403200040",
-      });
-    expect(searchResultWithSiret).toHaveLength(1);
-    expect(searchResultWithSiret[0].getProps().siret).toBe("78000403200040");
+    expect(
+      searchResult.sort((a, b) => a.distance_m! - b.distance_m!),
+    ).toMatchObject([expectedResult1, expectedResult2]);
+
+    const searchResuts = await pgImmersionOfferRepository.getFromSearch({
+      rome: "M1907",
+      distance_km: 30,
+      lat: 49.1,
+      lon: 6.1,
+      nafDivision: "85",
+      siret: "78000403200040",
+    });
+    expect(searchResuts).toHaveLength(1);
+    expect(searchResuts[0].siret).toBe("78000403200040");
   });
 
   test("Insert immersion does not crash if empty array is provided", async () => {
@@ -238,7 +264,6 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactInEstablishment,
         score: 4.5,
         position: { lat: 48.8666, lon: 2.3333 },
-        address: "55 rue de Faubourg Sante Honoré",
       }),
       new ImmersionOfferEntity({
         id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
@@ -251,33 +276,51 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactInEstablishment: undefined,
         score: 4.5,
         position: { lat: 46.8666, lon: 3.3333 },
-        address: "55 rue de Faubourg Sante Honoré",
       }),
     ]);
+  });
+
+  test("getImmersionFromUuid", async () => {
+    const immersionOfferId = "11111111-1111-1111-1111-111111111111";
+    const siret = "11112222333344";
+    const establishment = new EstablishmentEntityBuilder()
+      .withSiret(siret)
+      .build();
+
+    await pgImmersionOfferRepository.insertEstablishments([establishment]);
+
+    const contactInEstablishment: ImmersionEstablishmentContact = {
+      id: "11111111-0000-0000-0000-111111111111",
+      name: "Doe",
+      firstname: "John",
+      email: "joe@mail.com",
+      role: "super job",
+      siretEstablishment: siret,
+      phone: "0640295453",
+    };
+    await pgImmersionOfferRepository.insertEstablishmentContact(
+      contactInEstablishment,
+    );
+
     await pgImmersionOfferRepository.insertImmersions([
       new ImmersionOfferEntity({
-        id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
+        id: immersionOfferId,
         rome: "M1607",
         naf: "8539A",
-        siret: "78000403200019",
+        siret: siret,
         name: "Company from la bonne boite",
         voluntaryToImmersion: false,
         data_source: "api_labonneboite",
-        contactInEstablishment: undefined,
+        contactInEstablishment,
         score: 4.5,
         position: { lat: 43.8666, lon: 8.3333 },
-        address: "55 rue de Faubourg Sante Honoré",
       }),
     ]);
 
-    const immersionOffer =
-      await pgImmersionOfferRepository.getImmersionFromUuid(
-        "13df03a5-a2a5-430a-b558-ed3e2f03536d",
-      );
-    expect(immersionOffer).toBeDefined;
-    if (immersionOffer) {
-      expect(immersionOffer.getName()).toBe("Company from form");
-    }
+    const immersionSearchResult =
+      await pgImmersionOfferRepository.getImmersionFromUuid(immersionOfferId);
+    expect(immersionSearchResult).toBeDefined();
+    expect(immersionSearchResult!.name).toBe("Company from la bonne boite");
   });
 
   test("Insert establishment contact", async () => {
