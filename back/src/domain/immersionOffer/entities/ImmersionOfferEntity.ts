@@ -12,7 +12,7 @@ export type ImmersionOfferProps = {
   data_source: string;
   contactInEstablishment?: ImmersionEstablishmentContact;
   score: number;
-  position?: Position;
+  position: Position;
 };
 
 export type ImmersionEstablishmentContact = {

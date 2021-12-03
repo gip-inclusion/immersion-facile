@@ -153,6 +153,9 @@ describe("Postgres implementation of immersion offer repository", () => {
       rome: "M1907",
       siret: "78000403200040",
       distance_m: 6653,
+      city: "xxxx",
+      nafLabel: "xxxx",
+      romeLabel: "xxxx",
     };
     const expectedResult2: SearchImmersionResultDto = {
       id: "13df03a5-a2a5-430a-b558-111111111122",
@@ -165,6 +168,9 @@ describe("Postgres implementation of immersion offer repository", () => {
       distance_m: 13308,
       naf: "8539A",
       contactMode: "EMAIL",
+      city: "xxxx",
+      nafLabel: "xxxx",
+      romeLabel: "xxxx",
     };
 
     expect(

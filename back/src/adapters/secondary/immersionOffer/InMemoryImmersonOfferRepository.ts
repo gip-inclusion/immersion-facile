@@ -138,7 +138,6 @@ export class InMemoryImmersionOfferRepository
       contactId: contactInEstablishment?.id,
       contactMode: establishment.getContactMode(),
       distance_m:
-        position &&
         searchParams &&
         distanceBetweenCoordinates(
           searchParams.lat,
@@ -147,6 +146,9 @@ export class InMemoryImmersionOfferRepository
           position.lon,
         ),
       location: position,
+      city: "xxxx",
+      nafLabel: "xxxx",
+      romeLabel: "xxxx",
     };
   }
 

@@ -405,6 +405,9 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       contactMode,
       location: result.position && parseGeoJson(result.position),
       distance_m: Math.round(result.distance_m),
+      city: "xxxx",
+      nafLabel: "xxxx",
+      romeLabel: "xxxx",
     };
   }
 

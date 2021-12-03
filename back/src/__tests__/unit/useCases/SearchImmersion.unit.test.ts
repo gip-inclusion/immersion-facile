@@ -62,6 +62,9 @@ describe("SearchImmersion", () => {
         contactId: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
         contactMode: "EMAIL",
         distance_m: 606885,
+        city: "xxxx",
+        nafLabel: "xxxx",
+        romeLabel: "xxxx",
       },
     ];
     expect(response).toEqual(expectedResponse);

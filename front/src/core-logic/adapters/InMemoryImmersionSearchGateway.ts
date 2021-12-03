@@ -10,6 +10,8 @@ import { sleep } from "src/shared/utils";
 
 const SIMULATED_LATENCY_MS = 150;
 
+const defaultNaf = "MyNaf";
+
 export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
   public async search(
     searchParams: SearchImmersionRequestDto,
@@ -21,7 +23,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
       {
         id: "search_result_id",
         rome: searchParams.rome,
-        naf: searchParams.nafDivision,
+        naf: searchParams.nafDivision ?? defaultNaf,
         siret: "12345678901234",
         name: "Super Corp",
         voluntaryToImmersion: true,
@@ -29,11 +31,14 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         address: "55 rue du Faubourg Saint-Honoré",
         contactId: "contact_id",
         contactMode: "EMAIL",
+        romeLabel: "xxxx",
+        nafLabel: "xxxx",
+        city: "xxxx",
       },
       {
         id: "search_result_id2",
         rome: searchParams.rome,
-        naf: searchParams.nafDivision,
+        naf: searchParams.nafDivision ?? defaultNaf,
         siret: "12345678901234",
         name: "Mega Corp",
         voluntaryToImmersion: true,
@@ -41,11 +46,14 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         address: "55 rue du Faubourg Saint-Honoré",
         contactId: "contact_id2",
         contactMode: "PHONE",
+        romeLabel: "xxxx",
+        nafLabel: "xxxx",
+        city: "xxxx",
       },
       {
         id: "search_result_id3",
         rome: searchParams.rome,
-        naf: searchParams.nafDivision,
+        naf: searchParams.nafDivision ?? defaultNaf,
         siret: "12345678901234",
         name: "Hyper Corp",
         voluntaryToImmersion: true,
@@ -53,6 +61,9 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         address: "55 rue du Faubourg Saint-Honoré",
         contactId: "contact_id3",
         contactMode: "IN_PERSON",
+        romeLabel: "xxxx",
+        nafLabel: "xxxx",
+        city: "xxxx",
       },
     ];
   }
