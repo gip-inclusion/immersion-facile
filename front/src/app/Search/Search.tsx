@@ -1,19 +1,27 @@
-import React, { useState } from "react";
+import { Form, Formik, FormikHelpers } from "formik";
+import React, { useReducer, useState } from "react";
 import {
   formEstablishmentGateway,
   immersionSearchGateway,
 } from "src/app/dependencies";
-import { Formik, Field, Form, FormikHelpers } from "formik";
+import {
+  ContactEstablishmentModal,
+  useContactEstablishmentModal,
+} from "src/app/Search/ContactEstablishmentModal";
+import distanceSearchIcon from "src/assets/distance-search-icon.svg";
+import locationSearchIcon from "src/assets/location-search-icon.svg";
+import searchButtonIcon from "src/assets/search-button-icon.svg";
+import { MarianneHeader } from "src/components/MarianneHeader";
+import {
+  ContactMethod,
+  ImmersionContactInEstablishmentId,
+} from "src/shared/FormEstablishmentDto";
+import { ProfessionDto } from "src/shared/rome";
 import {
   LatLonDto,
   SearchImmersionResultDto,
 } from "src/shared/SearchImmersionDto";
-import { ProfessionDto } from "src/shared/rome";
-import { MarianneHeader } from "src/components/MarianneHeader";
 import { SearchDropDown } from "./Dropdown/SearchDropDown";
-import locationSearchIcon from "src/assets/location-search-icon.svg";
-import distanceSearchIcon from "src/assets/distance-search-icon.svg";
-import searchButtonIcon from "src/assets/search-button-icon.svg";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import "./search.css";
 import { EnterpriseSearchResult } from "./SearchResult";
@@ -30,6 +38,7 @@ const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 
 export const Search = () => {
   const [result, setResult] = useState<SearchImmersionResultDto[] | null>(null);
+  const { modalState, dispatch } = useContactEstablishmentModal();
 
   return (
     <div>
@@ -168,10 +177,22 @@ export const Search = () => {
                 address={r.address}
                 phone={r.naf ?? r.rome}
                 siret={r.siret}
+                onButtonClick={() =>
+                  dispatch({
+                    type: "CLICKED_OPEN",
+                    payload: {
+                      contactId: r.contactId,
+                      contactMethod: r.contactMode,
+                    },
+                  })
+                }
+                disableButton={modalState.isValidating}
               />
             );
           })}
       </div>
+
+      <ContactEstablishmentModal modalState={modalState} dispatch={dispatch} />
     </div>
   );
 };

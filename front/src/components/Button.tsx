@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 
 type SubmitButtonProps = {
   disable?: boolean;
-  onSubmit: () => Promise<void>;
+  onSubmit: () => void | Promise<void>;
   children: ReactNode;
   className?: string;
   level?: "primary" | "secondary";

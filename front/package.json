@@ -19,6 +19,7 @@
     "symlink-shared": "rm -rf ./src/shared; ln -fs ../../back/src/shared ./src/;"
   },
   "dependencies": {
+    "@dataesr/react-dsfr": "^0.8.5",
     "@gouvfr/dsfr": "1.1.0",
     "axios": "^0.21.1",
     "date-fns": "^2.23.0",

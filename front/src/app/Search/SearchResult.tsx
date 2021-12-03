@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import "./search.css";
+import { ContactEstablishmentModal } from "src/app/Search/ContactEstablishmentModal";
 import distanceSearchIcon from "src/assets/distance-search-icon.svg";
-import locationSearchIcon from "src/assets/location-search-icon.svg";
-import phoneSearchIcon from "src/assets/phone-search-icon.svg";
+import "./search.css";
 
 type EnterpriseSearchResultProps = {
   title: string;
@@ -12,7 +11,8 @@ type EnterpriseSearchResultProps = {
   address: string;
   phone: string;
   siret: string;
-  key: string;
+  onButtonClick: () => void;
+  disableButton?: boolean;
 };
 
 export const EnterpriseSearchResult = ({
@@ -23,12 +23,11 @@ export const EnterpriseSearchResult = ({
   address,
   phone,
   siret,
-  key,
+  onButtonClick,
+  disableButton,
 }: EnterpriseSearchResultProps) => {
-  const [isExpanded, setExpanded] = useState(false);
-
   return (
-    <div key={key} className="searchResult">
+    <div className="searchResult">
       <h2 className="searchResultTitle">{title}</h2>
       <p className="metierDescription">{metierDescription}</p>
       <div className="searchResultDistanceCompanySizeContainer">
@@ -41,36 +40,11 @@ export const EnterpriseSearchResult = ({
       <div className="searchDetailsSeparator" />
       <button
         className="expandResultDetailsButton"
-        onClick={() => {
-          setExpanded(!isExpanded);
-        }}
+        onClick={onButtonClick}
+        disabled={disableButton}
       >
-        {isExpanded ? "Masquer les coordonnées" : "Afficher les coordonnées"}
+        Contacter l'entreprise
       </button>
-      {isExpanded && (
-        <>
-          <div className="detailContainer">
-            <img
-              src={locationSearchIcon}
-              className="iconFilter"
-              alt="adresse"
-            />
-            {address}
-          </div>
-          <div className="detailContainer">
-            <img src={phoneSearchIcon} alt="numero de téléphone" />
-            {phone}
-          </div>
-          <div className="detailContainer">
-            <img
-              src={distanceSearchIcon}
-              className="iconFilter"
-              alt="numero siret"
-            />
-            {siret}
-          </div>
-        </>
-      )}
     </div>
   );
 };
