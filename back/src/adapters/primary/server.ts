@@ -8,20 +8,18 @@ import {
 import { romeSearchRequestSchema } from "../../shared/rome";
 import {
   agenciesRoute,
+  contactEstablishmentRoute,
   generateMagicLinkRoute,
-  getImmersionOfferByIdRoute as getImmersionOfferByIdRoute,
   immersionApplicationsRoute,
   immersionOffersRoute,
   renewMagicLinkRoute,
   romeRoute,
-  searchImmersionRoute,
   siretRoute,
   validateDemandeRoute,
 } from "../../shared/routes";
-import { searchImmersionRequestSchema } from "../../shared/SearchImmersionDto";
 import { getSiretRequestSchema } from "../../shared/siret";
 import { createLogger } from "../../utils/logger";
-import { contactEstablishmentRoute } from "./../../shared/routes";
+import { createApiKeyAuthRouter } from "./ApiKeyAuthRouter";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
@@ -128,24 +126,6 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
       ),
     );
 
-  router.route(`/${searchImmersionRoute}`).post(async (req, res) =>
-    sendHttpResponse(req, res, () =>
-      callUseCase({
-        useCase: deps.useCases.searchImmersion,
-        validationSchema: searchImmersionRequestSchema,
-        useCaseParams: req.body,
-      }),
-    ),
-  );
-
-  router
-    .route(`/${getImmersionOfferByIdRoute}/:id`)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.getImmersionOfferById.execute(req.params.id),
-      ),
-    );
-
   router
     .route(`/${contactEstablishmentRoute}`)
     .post(async (req, res) =>
@@ -193,6 +173,7 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
 
   app.use(router);
   app.use("/auth", createMagicLinkRouter(deps));
+  app.use(createApiKeyAuthRouter(deps));
 
   subscribeToEvents(deps);
 

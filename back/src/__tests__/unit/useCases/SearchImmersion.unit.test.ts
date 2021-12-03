@@ -5,7 +5,7 @@ import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 
 describe("SearchImmersion", () => {
-  test("Search immersion works", async () => {
+  test("Search immersion, give contact details only if authenticated", async () => {
     const immersionOfferRepository = new InMemoryImmersionOfferRepository();
     const searchImmersion = new SearchImmersion(immersionOfferRepository);
     const siret = "78000403200019";
@@ -34,12 +34,12 @@ describe("SearchImmersion", () => {
           email: "test@email.fr",
           role: "Directeur",
           siretEstablishment: "78000403200019",
-          phone: "0640295453",
+          phone: "0640404040",
         },
       }),
     ]);
 
-    const response = await searchImmersion.execute({
+    const unauthenticatedResponse = await searchImmersion.execute({
       rome: "M1607",
       nafDivision: "85",
       distance_km: 30,
@@ -65,9 +65,10 @@ describe("SearchImmersion", () => {
         city: "xxxx",
         nafLabel: "xxxx",
         romeLabel: "xxxx",
+        contactDetails: undefined,
       },
     ];
-    expect(response).toEqual(expectedResponse);
+    expect(unauthenticatedResponse).toEqual(expectedResponse);
 
     const searches = immersionOfferRepository.searches;
     expect(searches).toEqual([
@@ -79,5 +80,35 @@ describe("SearchImmersion", () => {
         distance_km: 30,
       },
     ]);
+
+    const authenticatedResponse = await searchImmersion.execute(
+      {
+        rome: "M1607",
+        nafDivision: "85",
+        distance_km: 30,
+        location: {
+          lat: 49.119146,
+          lon: 6.17602,
+        },
+      },
+      {
+        name: "passeEmploi",
+        id: "my-valid-apikey-id",
+        exp: new Date("2022-01-01").getTime(),
+        iat: new Date("2021-12-20").getTime(),
+      },
+    );
+    const expectedAuthResponse: SearchImmersionResultDto = {
+      ...expectedResponse[0],
+      contactDetails: {
+        id: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
+        firstName: "Pierre",
+        lastName: "Dupont",
+        email: "test@email.fr",
+        role: "Directeur",
+        phone: "0640404040",
+      },
+    };
+    expect(authenticatedResponse).toEqual([expectedAuthResponse]);
   });
 });

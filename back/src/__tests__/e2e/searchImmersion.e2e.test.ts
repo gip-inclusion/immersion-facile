@@ -23,6 +23,8 @@ describe("/search-immersion route", () => {
       .expect(200, []);
   });
 
+  // TODO add test which actually recovers data (and one with token, one without)
+
   test("rejects invalid requests with error code 400", async () => {
     await request
       .post(`/search-immersion`)
@@ -34,6 +36,6 @@ describe("/search-immersion route", () => {
         },
         distance_km: 30,
       })
-      .expect(400, /Code ROME incorrect/);
+      .expect(400, "Code ROME incorrect");
   });
 });

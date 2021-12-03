@@ -1,17 +1,26 @@
+// import promClient from "prom-client";
 import {
   SearchImmersionRequestDto,
   searchImmersionRequestSchema,
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
+import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 import { UseCase } from "../../core/UseCase";
 import {
   ImmersionOfferRepository,
   SearchParams,
 } from "../ports/ImmersionOfferRepository";
 
+// const countRequests = new promClient.Counter({
+//   name: "sendinblue_send_transac_email_total",
+//   help: "The total count of sendTransacEmail requests, broken down by email type.",
+//   labelNames: ["emailType"],
+// });
+
 export class SearchImmersion extends UseCase<
   SearchImmersionRequestDto,
-  SearchImmersionResultDto[]
+  SearchImmersionResultDto[],
+  ApiConsumer
 > {
   constructor(
     private readonly immersionOfferRepository: ImmersionOfferRepository,
@@ -23,10 +32,16 @@ export class SearchImmersion extends UseCase<
 
   public async _execute(
     params: SearchImmersionRequestDto,
+    apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
     const searchParams = convertRequestDtoToSearchParams(params);
     await this.immersionOfferRepository.insertSearch(searchParams);
-    return this.immersionOfferRepository.getFromSearch(searchParams);
+    const apiConsumerName = apiConsumer?.name;
+    // TODO: count api calls with prometheus
+    return this.immersionOfferRepository.getFromSearch(
+      searchParams,
+      apiConsumerName !== undefined,
+    );
   }
 }
 

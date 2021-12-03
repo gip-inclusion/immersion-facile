@@ -13,7 +13,7 @@ export const makeVerifyJwt =
   (jwtPublicKey: string) =>
   (
     jwtString: string,
-    cb: (err: jwt.VerifyErrors | null, payload: MagicLinkPayload) => void,
+    cb: (err: jwt.VerifyErrors | null, payload: any) => void,
   ) => {
     jwt.verify(
       jwtString,
@@ -22,7 +22,7 @@ export const makeVerifyJwt =
         algorithms: [algo],
       },
       (err, payload) => {
-        cb(err, payload as MagicLinkPayload);
+        cb(err, payload);
       },
     );
   };

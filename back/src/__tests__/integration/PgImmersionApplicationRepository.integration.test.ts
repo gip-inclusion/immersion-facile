@@ -4,7 +4,7 @@ import { ImmersionApplicationEntity } from "../../domain/immersionApplication/en
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { ImmersionApplicationDtoBuilder } from "./../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 
 describe("PgImmersionApplicationRepository", () => {
   let pool: Pool;

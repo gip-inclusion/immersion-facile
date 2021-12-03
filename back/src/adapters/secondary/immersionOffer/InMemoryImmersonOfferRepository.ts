@@ -1,15 +1,15 @@
 import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   ImmersionEstablishmentContact,
-  ImmersionOfferEntity
+  ImmersionOfferEntity,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import {
   ImmersionOfferRepository,
-  SearchParams
+  SearchParams,
 } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import {
   ImmersionOfferId,
-  SearchImmersionResultDto
+  SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
@@ -105,6 +105,7 @@ export class InMemoryImmersionOfferRepository
 
   public async getFromSearch(
     searchParams: SearchParams,
+    withContactDetails: boolean,
   ): Promise<SearchImmersionResultDto[]> {
     let offers = Object.values(this._immersionOffers).filter(
       (immersionOffer) => immersionOffer.getRome() === searchParams.rome,
@@ -123,12 +124,13 @@ export class InMemoryImmersionOfferRepository
     }
     logger.info({ searchParams, response: offers }, "getFromSearch");
     return offers.map((offer): SearchImmersionResultDto => {
-      return this.buildSearchResult(offer, searchParams);
+      return this.buildSearchResult(offer, withContactDetails, searchParams);
     });
   }
 
   private buildSearchResult(
     offer: ImmersionOfferEntity,
+    withContactDetails: boolean,
     searchParams?: SearchParams,
   ): SearchImmersionResultDto {
     const establishment = this._establishments[offer.getProps().siret];
@@ -162,12 +164,23 @@ export class InMemoryImmersionOfferRepository
       city: "xxxx",
       nafLabel: "xxxx",
       romeLabel: "xxxx",
+      ...(withContactDetails &&
+        contactInEstablishment && {
+          contactDetails: {
+            id: contactInEstablishment.id,
+            firstName: contactInEstablishment.firstname,
+            lastName: contactInEstablishment.name,
+            email: contactInEstablishment.email,
+            phone: contactInEstablishment.phone,
+            role: contactInEstablishment.role,
+          },
+        }),
     };
   }
 
-  async getImmersionFromUuid(uuid: ImmersionOfferId) {
+  async getImmersionFromUuid(uuid: string) {
     const offer = this._immersionOffers[uuid];
-    return offer && this.buildSearchResult(offer);
+    return offer && this.buildSearchResult(offer, false);
   }
 
   // for test purposes only :

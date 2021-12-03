@@ -85,7 +85,10 @@ import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { AppConfig } from "./appConfig";
-import { createAuthMiddleware } from "./authMiddleware";
+import {
+  createApiKeyAuthMiddleware,
+  createJwtAuthMiddleware,
+} from "./authMiddleware";
 
 const logger = createLogger(__filename);
 
@@ -116,7 +119,8 @@ export const createAppDependencies = async (config: AppConfig) => {
       uowPerformer,
     ),
     authChecker: createAuthChecker(config),
-    authMiddleware: createAuthMiddleware(config),
+    jwtAuthMiddleware: createJwtAuthMiddleware(config),
+    apiKeyAuthMiddleware: createApiKeyAuthMiddleware(config),
     generateJwtFn,
     eventBus,
     eventCrawler: createEventCrawler(config, repositories.outbox, eventBus),

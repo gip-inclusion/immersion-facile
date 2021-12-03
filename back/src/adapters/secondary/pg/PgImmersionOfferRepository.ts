@@ -13,7 +13,10 @@ import {
   SearchParams,
 } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
-import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
+import {
+  SearchContact,
+  SearchImmersionResultDto,
+} from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -299,7 +302,9 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       )
       .then((res) => {
         const firstResult = res.rows[0];
-        return firstResult && this.buildImmersionOfferFromResults(firstResult);
+        return (
+          firstResult && this.buildImmersionOfferFromResults(firstResult, false)
+        );
       })
       .catch((e) => {
         logger.error(e);
@@ -309,6 +314,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
   async getFromSearch(
     searchParams: SearchParams,
+    withContactDetails: boolean,
   ): Promise<SearchImmersionResultDto[]> {
     let nafCategoryFilter = "";
     let siretCategoryFilter = "";
@@ -359,7 +365,10 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       )
       .then((res) => {
         return res.rows.map((result) => {
-          return this.buildImmersionOfferFromResults(result);
+          return this.buildImmersionOfferFromResults(
+            result,
+            withContactDetails,
+          );
         });
       })
       .catch((e) => {
@@ -368,16 +377,18 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       });
   }
 
-  buildImmersionOfferFromResults(result: any): SearchImmersionResultDto {
-    let immersionContact: ImmersionEstablishmentContact | null = null;
+  buildImmersionOfferFromResults(
+    result: any,
+    withContactDetails: boolean,
+  ): SearchImmersionResultDto {
+    let immersionContact: SearchContact | null = null;
     if (result.contact_in_establishment_uuid != null) {
       immersionContact = {
         id: result.immersion_contacts_uuid,
-        name: result.immersion_contacts_name,
-        firstname: result.immersion_contacts_firstname,
+        firstName: result.immersion_contacts_firstname,
+        lastName: result.immersion_contacts_name,
         email: result.immersion_contacts_email,
         role: result.immersion_contacts_role,
-        siretEstablishment: result.immersion_contacts_siret_institution,
         phone: result.immersion_contacts_phone,
       };
     }
@@ -406,6 +417,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       city: "xxxx",
       nafLabel: "xxxx",
       romeLabel: "xxxx",
+      ...(withContactDetails &&
+        immersionContact && { contactDetails: immersionContact }),
     };
   }
 

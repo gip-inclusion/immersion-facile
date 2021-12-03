@@ -30,5 +30,6 @@ export interface ImmersionOfferRepository {
   ): Promise<SearchImmersionResultDto | undefined>;
   getFromSearch: (
     searchParams: SearchParams,
+    withContactDetails: boolean,
   ) => Promise<SearchImmersionResultDto[]>;
 }

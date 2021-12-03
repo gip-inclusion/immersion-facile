@@ -174,6 +174,11 @@ export class AppConfig {
       (el) => !!el,
     ) as DomainTopic[];
   }
+
+  // == Api Keys ==
+  public get authorizedApiKeyIds() {
+    return parseStringList(this.env.AUTHORIZED_API_KEY_IDS);
+  }
 }
 
 // Parsers

@@ -40,6 +40,7 @@ export const searchImmersionRequestSchema = z.object({
   distance_km: z.number().positive("'distance_km' doit être > 0"),
 });
 
+export type SearchContact = z.infer<typeof contactSchema>;
 export const contactSchema = z.object({
   id: immersionContactInEstablishmentIdSchema,
   lastName: z.string(),
@@ -72,6 +73,7 @@ export const searchImmersionResultSchema = z.object({
   contactId: immersionContactInEstablishmentIdSchema.optional(),
   contactMode: preferredContactMethodSchema.optional(),
   distance_m: z.number().optional(),
+  contactDetails: contactSchema.optional(),
 });
 
 export const searchImmersionResponseSchema = z.array(

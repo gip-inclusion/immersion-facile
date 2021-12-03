@@ -5,14 +5,31 @@ import { createLogger } from "../../utils/logger";
 import { makeVerifyJwt } from "./../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
 import jwt from "jsonwebtoken";
-import { createRenewMagicLinkUrl } from "./config";
+import { ApiConsumer } from "../../shared/tokens/ApiConsumer";
 
 const logger = createLogger(__filename);
 
-export const createAuthMiddleware =
-  (config: AppConfig) => (req: Request, res: Response, next: NextFunction) => {
-    const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
+export const createApiKeyAuthMiddleware = (config: AppConfig) => {
+  const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
+  const authorizedIds = config.authorizedApiKeyIds;
 
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.headers.authorization) next();
+    verifyJwt(req.headers.authorization as string, (err, payload) => {
+      if (err) next();
+      if (authorizedIds.includes(payload.id)) next();
+
+      // only if the user is known, and the id authorized, we add apiConsumer payload to the request:
+      req.apiConsumer = payload as ApiConsumer;
+      next();
+    });
+  };
+};
+
+export const createJwtAuthMiddleware = (config: AppConfig) => {
+  const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
+
+  return (req: Request, res: Response, next: NextFunction) => {
     const pathComponents = req.path.split("/");
     const maybeJwt = pathComponents[pathComponents.length - 1];
     if (!maybeJwt) {
@@ -40,6 +57,7 @@ export const createAuthMiddleware =
       next();
     });
   };
+};
 
 const sendForbiddenError = (res: Response, err: Error) => {
   logger.error({ err }, "authentication failed");
