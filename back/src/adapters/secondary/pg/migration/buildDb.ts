@@ -5,9 +5,7 @@ import { sleep } from "../../../../shared/utils";
 import { createLogger } from "../../../../utils/logger";
 import { AppConfig } from "../../../primary/appConfig";
 import {
-  insertRomesPublicData,
-  insertAppellationPublicData,
-  addTsVectorData,
+  addTsVectorData, insertAppellationPublicData, insertRomesPublicData
 } from "./insertAppellationAndRomesPublicData";
 
 const logger = createLogger(__filename);
@@ -99,6 +97,12 @@ const buildDb = async () => {
     await insertRomesAppellations(client);
   }
 
+  // prettier-ignore
+  const nafClassesDataTableAlreadyExists = await checkIfTableExists("naf_classes_2008");
+  if (!nafClassesDataTableAlreadyExists) {
+    await buildAndInsertNafClasses(client);
+  }
+
   client.release();
   await pool.end();
 };
@@ -165,6 +169,11 @@ const insertRomesAppellations = async (client: PoolClient) => {
   await insertRomesPublicData(client);
   await insertAppellationPublicData(client);
   await addTsVectorData(client);
+};
+
+const buildAndInsertNafClasses = async (client: PoolClient) => {
+  logger.info("NAF classes data: creating tables");
+  await executeSqlFromFile(__dirname + "/createNafClassesTable.sql", client);
 };
 
 const shouldPopulateWithTestData = (appConfig: AppConfig) => {
