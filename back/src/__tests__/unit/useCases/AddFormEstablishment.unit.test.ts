@@ -1,11 +1,3 @@
-import { makeCreateInMemoryUow } from "../../../_testBuilders/makeCreateInMemoryUow";
-import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
-import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import {
-  createInMemoryUow,
-  InMemoryUnitOfWork,
-} from "../../../adapters/primary/config";
 import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -15,6 +7,10 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
+import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
+import { makeCreateInMemoryUow } from "../../../_testBuilders/makeCreateInMemoryUow";
+import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 describe("Add FormEstablishment", () => {
   let addFormEstablishment: AddFormEstablishment;

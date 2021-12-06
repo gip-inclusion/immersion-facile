@@ -3,7 +3,11 @@ import { nafSchema } from "./naf";
 import { professionSchema } from "./rome";
 import { siretSchema } from "./siret";
 import { Flavor } from "./typeFlavors";
-import { NotEmptyArray, phoneRegExp } from "./utils";
+import {
+  addressWithPostalCodeSchema,
+  NotEmptyArray,
+  phoneRegExp,
+} from "./utils";
 import { zEmail, zString, zTrimmedString } from "./zodUtils";
 
 export type FormEstablishmentId = Flavor<string, "FormEstablishmentId">;
@@ -38,7 +42,7 @@ export const formEstablishmentSchema = z.object(
     id: formEstablishmentIdSchema,
     siret: siretSchema,
     businessName: zTrimmedString,
-    businessAddress: zTrimmedString,
+    businessAddress: addressWithPostalCodeSchema,
     naf: nafSchema,
     professions: z
       .array(professionSchema)

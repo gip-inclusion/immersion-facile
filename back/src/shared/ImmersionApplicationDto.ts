@@ -17,7 +17,11 @@ import {
 import { siretSchema } from "./siret";
 import { allRoles } from "./tokens/MagicLinkPayload";
 import { Flavor } from "./typeFlavors";
-import { NotEmptyArray, phoneRegExp } from "./utils";
+import {
+  addressWithPostalCodeSchema,
+  NotEmptyArray,
+  phoneRegExp,
+} from "./utils";
 import { zBoolean, zEmail, zString, zTrimmedString } from "./zodUtils";
 
 // Matches valid dates of the format 'yyyy-mm-dd'.
@@ -109,7 +113,7 @@ export const immersionApplicationSchema = z
     individualProtection: zBoolean,
     sanitaryPrevention: zBoolean,
     sanitaryPreventionDescription: z.string().optional(),
-    immersionAddress: z.string().optional(),
+    immersionAddress: addressWithPostalCodeSchema.optional(),
     immersionObjective: z.string().optional(),
     immersionProfession: zTrimmedString,
     immersionActivities: zTrimmedString,

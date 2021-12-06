@@ -7,7 +7,7 @@ const logger = createLogger(__filename);
 
 const validFormEstablishment: FormEstablishmentDto = {
   id: "test_demande_immersion_id",
-  businessAddress: "Quelque part",
+  businessAddress: "1 Rue du Moulin 12345 Quelque Part",
   businessContacts: [
     {
       email: "amil@mail.com",
