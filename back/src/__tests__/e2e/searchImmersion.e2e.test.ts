@@ -36,6 +36,6 @@ describe("/search-immersion route", () => {
         },
         distance_km: 30,
       })
-      .expect(400, "Code ROME incorrect");
+      .expect(400, /Code ROME incorrect/);
   });
 });

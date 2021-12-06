@@ -152,16 +152,13 @@ describe("Postgres implementation of immersion offer repository", () => {
       }),
     ]);
 
-    const searchResult = await pgImmersionOfferRepository.getFromSearch(
-      {
-        rome: "M1907",
-        distance_km: 30,
-        lat: 49.1,
-        lon: 6.1,
-        nafDivision: "85",
-      },
-      false,
-    );
+    const searchResult = await pgImmersionOfferRepository.getFromSearch({
+      rome: "M1907",
+      distance_km: 30,
+      lat: 49.1,
+      lon: 6.1,
+      nafDivision: "85",
+    });
     expect(searchResult).toHaveLength(2);
     const expectedResult1: SearchImmersionResultDto = {
       id: "13df03a5-a2a5-430a-b558-333333333344",
@@ -198,17 +195,14 @@ describe("Postgres implementation of immersion offer repository", () => {
       searchResult.sort((a, b) => a.distance_m! - b.distance_m!),
     ).toMatchObject([expectedResult1, expectedResult2]);
 
-    const searchResuts = await pgImmersionOfferRepository.getFromSearch(
-      {
-        rome: "M1907",
-        distance_km: 30,
-        lat: 49.1,
-        lon: 6.1,
-        nafDivision: "85",
-        siret: "78000403200040",
-      },
-      false,
-    );
+    const searchResuts = await pgImmersionOfferRepository.getFromSearch({
+      rome: "M1907",
+      distance_km: 30,
+      lat: 49.1,
+      lon: 6.1,
+      nafDivision: "85",
+      siret: "78000403200040",
+    });
     expect(searchResuts).toHaveLength(1);
     expect(searchResuts[0].siret).toBe("78000403200040");
     expect(searchResuts[0].contactDetails).toBeUndefined();
@@ -379,6 +373,25 @@ describe("Postgres implementation of immersion offer repository", () => {
       await pgImmersionOfferRepository.getImmersionFromUuid(immersionOfferId);
     expect(immersionSearchResult).toBeDefined();
     expect(immersionSearchResult!.name).toBe("Company from la bonne boite");
+    expect(immersionSearchResult!.contactDetails).toBeUndefined();
+
+    const immersionSearchResultWithDetails =
+      await pgImmersionOfferRepository.getImmersionFromUuid(
+        immersionOfferId,
+        true,
+      );
+    expect(immersionSearchResultWithDetails).toBeDefined();
+    const expectedSearchContact: SearchContact = {
+      id: contactInEstablishment.id,
+      firstName: contactInEstablishment.firstname,
+      lastName: contactInEstablishment.name,
+      email: contactInEstablishment.email,
+      phone: contactInEstablishment.phone,
+      role: contactInEstablishment.role,
+    };
+    expect(immersionSearchResultWithDetails!.contactDetails).toEqual(
+      expectedSearchContact,
+    );
   });
 
   test("Insert establishment contact", async () => {

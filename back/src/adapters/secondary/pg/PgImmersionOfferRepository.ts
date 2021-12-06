@@ -277,6 +277,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
   async getImmersionFromUuid(
     uuid: string,
+    withContactDetails = false,
   ): Promise<SearchImmersionResultDto | undefined> {
     return this.client
       .query(
@@ -303,7 +304,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       .then((res) => {
         const firstResult = res.rows[0];
         return (
-          firstResult && this.buildImmersionOfferFromResults(firstResult, false)
+          firstResult &&
+          this.buildImmersionOfferFromResults(firstResult, withContactDetails)
         );
       })
       .catch((e) => {
@@ -314,7 +316,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
   async getFromSearch(
     searchParams: SearchParams,
-    withContactDetails: boolean,
+    withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
     let nafCategoryFilter = "";
     let siretCategoryFilter = "";

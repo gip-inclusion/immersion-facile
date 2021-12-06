@@ -7,10 +7,7 @@ import {
   ImmersionOfferRepository,
   SearchParams,
 } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
-import {
-  ImmersionOfferId,
-  SearchImmersionResultDto,
-} from "../../../shared/SearchImmersionDto";
+import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionEstablishmentContactBuilder } from "../../../_testBuilders/ImmersionEstablishmentContactBuilder";
@@ -105,7 +102,7 @@ export class InMemoryImmersionOfferRepository
 
   public async getFromSearch(
     searchParams: SearchParams,
-    withContactDetails: boolean,
+    withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
     let offers = Object.values(this._immersionOffers).filter(
       (immersionOffer) => immersionOffer.getRome() === searchParams.rome,

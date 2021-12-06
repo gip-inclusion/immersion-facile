@@ -27,9 +27,10 @@ export interface ImmersionOfferRepository {
 
   getImmersionFromUuid(
     uuid: string,
+    withContactDetails?: boolean,
   ): Promise<SearchImmersionResultDto | undefined>;
   getFromSearch: (
     searchParams: SearchParams,
-    withContactDetails: boolean,
+    withContactDetails?: boolean,
   ) => Promise<SearchImmersionResultDto[]>;
 }

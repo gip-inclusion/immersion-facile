@@ -1,4 +1,3 @@
-// import promClient from "prom-client";
 import {
   SearchImmersionRequestDto,
   searchImmersionRequestSchema,
@@ -10,12 +9,6 @@ import {
   ImmersionOfferRepository,
   SearchParams,
 } from "../ports/ImmersionOfferRepository";
-
-// const countRequests = new promClient.Counter({
-//   name: "sendinblue_send_transac_email_total",
-//   help: "The total count of sendTransacEmail requests, broken down by email type.",
-//   labelNames: ["emailType"],
-// });
 
 export class SearchImmersion extends UseCase<
   SearchImmersionRequestDto,
@@ -37,7 +30,7 @@ export class SearchImmersion extends UseCase<
     const searchParams = convertRequestDtoToSearchParams(params);
     await this.immersionOfferRepository.insertSearch(searchParams);
     const apiConsumerName = apiConsumer?.name;
-    // TODO: count api calls with prometheus
+
     return this.immersionOfferRepository.getFromSearch(
       searchParams,
       apiConsumerName !== undefined,

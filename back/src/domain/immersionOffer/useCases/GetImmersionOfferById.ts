@@ -5,12 +5,13 @@ import {
 } from "../../../shared/SearchImmersionDto";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
-import { ImmersionOfferEntity } from "../entities/ImmersionOfferEntity";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 
 export class GetImmersionOfferById extends UseCase<
   ImmersionOfferId,
-  SearchImmersionResultDto
+  SearchImmersionResultDto,
+  ApiConsumer
 > {
   constructor(
     private readonly immersionOfferRepository: ImmersionOfferRepository,
@@ -22,9 +23,14 @@ export class GetImmersionOfferById extends UseCase<
 
   public async _execute(
     id: ImmersionOfferId,
+    apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto> {
+    const withContactDetails = !!apiConsumer;
     const immersionOffer =
-      await this.immersionOfferRepository.getImmersionFromUuid(id);
+      await this.immersionOfferRepository.getImmersionFromUuid(
+        id,
+        withContactDetails,
+      );
     if (!immersionOffer) throw new NotFoundError(id);
     return immersionOffer;
   }
