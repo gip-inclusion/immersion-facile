@@ -6,16 +6,19 @@ import {
   ModalTitle,
 } from "@dataesr/react-dsfr";
 import React, { useEffect, useReducer } from "react";
+import { ContactByEmail } from "src/app/Search/ContactByEmail";
 import { Button } from "src/components/Button";
 import {
   ContactMethod,
   ImmersionContactInEstablishmentId,
 } from "src/shared/FormEstablishmentDto";
+import { ImmersionOfferId } from "src/shared/SearchImmersionDto";
 
 type ModalState = {
   isOpen: boolean;
   isValidating: boolean;
   contactId?: ImmersionContactInEstablishmentId;
+  immersionOfferId: ImmersionOfferId;
   contactMethod?: ContactMethod;
 };
 
@@ -23,6 +26,7 @@ type ModalAction =
   | {
       type: "CLICKED_OPEN";
       payload: {
+        immersionOfferId: ImmersionOfferId;
         contactId?: ImmersionContactInEstablishmentId;
         contactMethod?: ContactMethod;
       };
@@ -31,21 +35,16 @@ type ModalAction =
   | { type: "CLICKED_VALIDATE" }
   | { type: "VALIDATION_HANDLED" };
 
-const initialModalState: ModalState = {
-  isOpen: false,
-  isValidating: false,
-};
-
 const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
   switch (action.type) {
     case "CLICKED_OPEN":
       return { ...state, isOpen: true, ...action.payload };
     case "CLICKED_CLOSE":
-      return { isOpen: false, isValidating: false };
+      return { immersionOfferId: "", isOpen: false, isValidating: false };
     case "CLICKED_VALIDATE":
       return { ...state, isOpen: false, isValidating: true };
     case "VALIDATION_HANDLED":
-      return { isOpen: false, isValidating: false };
+      return { immersionOfferId: "", isOpen: false, isValidating: false };
     default:
       const shouldNeverBeAssigned: never = action;
       return shouldNeverBeAssigned;
@@ -53,25 +52,13 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
 };
 
 export const useContactEstablishmentModal = () => {
-  const [modalState, dispatch] = useReducer(modalReducer, initialModalState);
+  const initialModalState: ModalState = {
+    immersionOfferId: "",
+    isOpen: false,
+    isValidating: false,
+  };
 
-  useEffect(() => {
-    if (modalState.isValidating) {
-      switch (modalState.contactMethod) {
-        case "EMAIL":
-          // TODO : call back , and then dispatch({type: "VALIDATION_HANDLED"})
-          break;
-        case "PHONE":
-          // TODO : call back , and then dispatch({type: "VALIDATION_HANDLED"})
-          break;
-        case "IN_PERSON":
-          // TODO : call back , and then dispatch({type: "VALIDATION_HANDLED"})
-          break;
-        default:
-        // TODO : what should we do ? then dispatch({type: "VALIDATION_HANDLED"})
-      }
-    }
-  }, [modalState.isValidating]);
+  const [modalState, dispatch] = useReducer(modalReducer, initialModalState);
 
   return { modalState, dispatch };
 };
@@ -92,17 +79,8 @@ export const ContactEstablishmentModal = ({
       <ModalClose hide={hide} title="Close the modal window" />
       <ModalTitle icon="ri-arrow-right-fill">Modal Title</ModalTitle>
       <ModalContent>
-        <p>Contact ID: {modalState.contactId}</p>
         <ModalContactContent modalState={modalState} />
       </ModalContent>
-      <ModalFooter>
-        <Button
-          level="secondary"
-          onSubmit={() => dispatch({ type: "CLICKED_VALIDATE" })}
-        >
-          Modal Button
-        </Button>
-      </ModalFooter>
     </Modal>
   );
 };
@@ -110,7 +88,7 @@ export const ContactEstablishmentModal = ({
 const ModalContactContent = ({ modalState }: { modalState: ModalState }) => {
   switch (modalState.contactMethod) {
     case "EMAIL":
-      return <ContactByEmail />;
+      return <ContactByEmail immersionOfferId={modalState.immersionOfferId} />;
     case "PHONE":
       return <ContactByPhone />;
     case "IN_PERSON":
@@ -118,10 +96,6 @@ const ModalContactContent = ({ modalState }: { modalState: ModalState }) => {
     default:
       return <div>Aucun contact trouvé pour cette entreprise</div>;
   }
-};
-
-const ContactByEmail = () => {
-  return <div>TODO : Contacter par email</div>;
 };
 
 const ContactByPhone = () => {

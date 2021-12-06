@@ -181,6 +181,7 @@ export const Search = () => {
                   dispatch({
                     type: "CLICKED_OPEN",
                     payload: {
+                      immersionOfferId: r.id,
                       contactId: r.contactId,
                       contactMethod: r.contactMode,
                     },

@@ -1,3 +1,4 @@
+import { ContactEstablishmentRequestDto } from "src/shared/contactEstablishment";
 import {
   LocationSuggestionDto,
   SearchImmersionRequestDto,
@@ -10,4 +11,8 @@ export interface ImmersionSearchGateway {
   ): Promise<SearchImmersionResultDto[]>;
 
   addressLookup(query: string): Promise<Array<LocationSuggestionDto>>;
+
+  contactEstablishment: (
+    params: ContactEstablishmentRequestDto,
+  ) => Promise<void>;
 }

@@ -2,9 +2,10 @@ import React, { ReactNode } from "react";
 
 type SubmitButtonProps = {
   disable?: boolean;
-  onSubmit: () => void | Promise<void>;
+  onSubmit?: () => void | Promise<void>;
   children: ReactNode;
   className?: string;
+  type?: "submit" | "button" | "reset";
   level?: "primary" | "secondary";
 };
 
@@ -13,6 +14,7 @@ export const Button = ({
   disable,
   children,
   className,
+  type = "button",
   level = "primary",
 }: SubmitButtonProps) => {
   const isSecondary = level === "secondary" ? "fr-btn--secondary" : "";
@@ -21,7 +23,7 @@ export const Button = ({
     <button
       className={`fr-btn ${isSecondary} ${className}`}
       style={{ margin: "5px" }}
-      type="button"
+      type={type}
       onClick={onSubmit}
       disabled={disable}
     >

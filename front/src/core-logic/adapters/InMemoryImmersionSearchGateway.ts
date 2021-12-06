@@ -1,10 +1,11 @@
+import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
 import {
   LatLonDto,
   LocationSuggestionDto,
   SearchImmersionRequestDto,
   SearchImmersionResultDto,
   searchImmersionResponseSchema,
-} from "./../../shared/SearchImmersionDto";
+} from "../../shared/SearchImmersionDto";
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 import { sleep } from "src/shared/utils";
 
@@ -75,5 +76,12 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
     await sleep(SIMULATED_LATENCY_MS);
 
     return [{ coordinates: { lat: 1.234, lon: 5.678 }, label: "Paris" }];
+  }
+
+  public async contactEstablishment(
+    params: ContactEstablishmentRequestDto,
+  ): Promise<void> {
+    await sleep(SIMULATED_LATENCY_MS);
+    return;
   }
 }
