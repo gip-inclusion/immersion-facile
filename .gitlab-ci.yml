@@ -186,8 +186,8 @@ deploy_on_prod:
       rm -f .env.variables .env.secrets;
 
       docker-compose build &&
-      docker-compose down &&
-      docker-compose up -d;
+      docker-compose -f docker-compose.yml -f docker-compose.logging-loki-plugin.yml down --remove-orphans &&
+      docker-compose -f docker-compose.yml -f docker-compose.logging-loki-plugin.yml up -d;
 
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
