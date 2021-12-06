@@ -8,8 +8,8 @@ import {
   LatLonDto,
   SearchImmersionResultDto,
 } from "src/shared/SearchImmersionDto";
-import { DropDown } from "../FormEstablishment/DropDown";
 import { ProfessionDto } from "src/shared/rome";
+import { DropDown } from "src/components/DropDown";
 
 interface Values {
   rome: string;

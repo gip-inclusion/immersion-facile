@@ -10,6 +10,7 @@ type DropDownProps<T> = {
   onTermChange: (newTerm: string) => Promise<Proposal<T>[]>;
   headerStyle?: any;
   inputStyle?: any; //< Overrides input class
+  disabled?: boolean;
 };
 
 export const DropDown = <T extends unknown>({
@@ -19,6 +20,7 @@ export const DropDown = <T extends unknown>({
   onTermChange,
   headerStyle,
   inputStyle,
+  disabled,
 }: DropDownProps<T>) => {
   const { dispatch, isOpen, error, searchTerm, showSpinner, proposals } =
     useDropdown(onTermChange, initialTerm);
@@ -44,6 +46,7 @@ export const DropDown = <T extends unknown>({
         onChange={(e) =>
           dispatch({ type: "SEARCH_TERM_CHANGED", payload: e.target.value })
         }
+        disabled={disabled}
       />
       {isOpen && (
         <div className="dropdown-proposals">

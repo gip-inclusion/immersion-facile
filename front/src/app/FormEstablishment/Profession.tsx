@@ -1,8 +1,8 @@
 import { useField } from "formik";
 import React from "react";
 import { formEstablishmentGateway } from "src/app/dependencies";
-import { DropDown } from "src/app/FormEstablishment/DropDown";
 import { DeleteButton } from "src/components/DeleteButton";
+import { DropDown } from "src/components/DropDown";
 import { ProfessionDto } from "src/shared/rome";
 
 type ProfessionProps = {

@@ -1,9 +1,12 @@
+import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
 import { HttpFormEstablishmentGateway } from "src/core-logic/adapters/HttpFormEstablishmentGateway";
 import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
+import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemoryFormEstablishmentGateway";
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
+import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
@@ -23,3 +26,8 @@ export const immersionSearchGateway: ImmersionSearchGateway =
   ENV.gateway === "HTTP"
     ? new HttpImmersionSearchGateway()
     : new InMemoryImmersionSearchGateway();
+
+export const apiAdresseGateway: ApiAdresseGateway =
+  ENV.gateway === "HTTP"
+    ? new HttpApiAdresseGateway()
+    : new InMemoryApiAdresseGateway();

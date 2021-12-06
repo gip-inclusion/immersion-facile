@@ -6,6 +6,7 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/Siret/fetchEstablishmentInfoBySiret";
+import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { AgencySelector } from "src/components/form/AgencySelector";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { DateInput } from "src/components/form/DateInput";
@@ -190,12 +191,9 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
       />
 
-      <TextInput
+      <AddressAutocomplete
         label="Adresse du lieu où se fera l'immersion"
         name="immersionAddress"
-        type="text"
-        placeholder=""
-        description=""
         disabled={isFrozen || isFetchingSiret}
       />
 

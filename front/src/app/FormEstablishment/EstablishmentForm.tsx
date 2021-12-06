@@ -13,6 +13,7 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/Siret/fetchEstablishmentInfoBySiret";
+import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
@@ -118,7 +119,7 @@ const SiretRelatedInputs = () => {
         {...getLabelAndName("businessName")}
         disabled={isFetchingSiret}
       />
-      <TextInput
+      <AddressAutocomplete
         {...getLabelAndName("businessAddress")}
         disabled={isFetchingSiret}
       />
