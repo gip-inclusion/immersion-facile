@@ -21,6 +21,7 @@ import {
 import { searchImmersionRequestSchema } from "../../shared/SearchImmersionDto";
 import { getSiretRequestSchema } from "../../shared/siret";
 import { createLogger } from "../../utils/logger";
+import { contactEstablishmentRoute } from "./../../shared/routes";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
@@ -142,6 +143,14 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getImmersionOfferById.execute(req.params.id),
+      ),
+    );
+
+  router
+    .route(`/${contactEstablishmentRoute}`)
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.contactEstablishment.execute(req.body),
       ),
     );
 

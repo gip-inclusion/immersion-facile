@@ -34,6 +34,8 @@ import { UpdateImmersionApplication } from "../../domain/immersionApplication/us
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFormEstablishment";
+import { ContactEstablishment } from "../../domain/immersionOffer/useCases/ContactEstablishment";
+import { GetImmersionOfferById } from "../../domain/immersionOffer/useCases/GetImmersionOfferById";
 import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
 import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
@@ -81,7 +83,6 @@ import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import { GetImmersionOfferById } from "../../domain/immersionOffer/useCases/GetImmersionOfferById";
 import { AppConfig } from "./appConfig";
 import { createAuthMiddleware } from "./authMiddleware";
 
@@ -369,6 +370,11 @@ const createUseCases = (
         repositories.rome,
         sequenceRunner,
       ),
+
+    contactEstablishment: new ContactEstablishment(
+      uowPerformer,
+      createNewEvent,
+    ),
 
     // siret
     getSiret,
