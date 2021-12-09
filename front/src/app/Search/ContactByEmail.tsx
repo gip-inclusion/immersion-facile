@@ -1,5 +1,5 @@
 import { Form, Formik } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import { immersionSearchGateway } from "src/app/dependencies";
 import { Button } from "src/components/Button";
 import { TextInput } from "src/components/form/TextInput";
@@ -11,9 +11,13 @@ import {
 
 type ContactByEmailProps = {
   immersionOfferId: string;
+  closeModal: () => void;
 };
 
-export const ContactByEmail = ({ immersionOfferId }: ContactByEmailProps) => {
+export const ContactByEmail = ({
+  immersionOfferId,
+  closeModal,
+}: ContactByEmailProps) => {
   const initialValues: ContactEstablishmentRequestDto = {
     immersionOfferId,
     contactMode: "EMAIL",
@@ -21,6 +25,7 @@ export const ContactByEmail = ({ immersionOfferId }: ContactByEmailProps) => {
     senderName: "",
     message: "",
   };
+  const [isSubmiting, setIsSubmitting] = useState(false);
 
   return (
     <Formik
@@ -28,7 +33,12 @@ export const ContactByEmail = ({ immersionOfferId }: ContactByEmailProps) => {
       validationSchema={toFormikValidationSchema(
         contactEstablishmentRequestSchema,
       )}
-      onSubmit={(values) => immersionSearchGateway.contactEstablishment(values)}
+      onSubmit={async (values) => {
+        setIsSubmitting(true);
+        await immersionSearchGateway.contactEstablishment(values);
+        setIsSubmitting(false);
+        closeModal();
+      }}
     >
       {({ errors, submitCount }) => (
         <Form>
@@ -38,7 +48,7 @@ export const ContactByEmail = ({ immersionOfferId }: ContactByEmailProps) => {
           {submitCount !== 0 &&
             Object.values(errors).length > 0 &&
             console.log({ errors })}
-          <Button level="secondary" type="submit">
+          <Button level="secondary" type="submit" disable={isSubmiting}>
             Envoyer
           </Button>
         </Form>

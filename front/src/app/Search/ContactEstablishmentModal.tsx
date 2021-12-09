@@ -79,16 +79,29 @@ export const ContactEstablishmentModal = ({
       <ModalClose hide={hide} title="Close the modal window" />
       <ModalTitle icon="ri-arrow-right-fill">Modal Title</ModalTitle>
       <ModalContent>
-        <ModalContactContent modalState={modalState} />
+        <ModalContactContent modalState={modalState} hide={hide} />
       </ModalContent>
     </Modal>
   );
 };
 
-const ModalContactContent = ({ modalState }: { modalState: ModalState }) => {
+type ModalContactContentProps = {
+  modalState: ModalState;
+  hide: () => void;
+};
+
+const ModalContactContent = ({
+  modalState,
+  hide,
+}: ModalContactContentProps) => {
   switch (modalState.contactMethod) {
     case "EMAIL":
-      return <ContactByEmail immersionOfferId={modalState.immersionOfferId} />;
+      return (
+        <ContactByEmail
+          immersionOfferId={modalState.immersionOfferId}
+          closeModal={hide}
+        />
+      );
     case "PHONE":
       return <ContactByPhone />;
     case "IN_PERSON":
