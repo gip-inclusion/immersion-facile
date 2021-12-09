@@ -120,6 +120,8 @@ const determineRecipients = (
         ? { role: "admin", emails: agencyConfig.adminEmails }
         : undefined;
     default:
-      throw new Error(`Unexpected status: ${status}`);
+      // This notification may fire when using the /debug/populate route, with
+      // statuses not included in the above list. Ignore this case.
+      return undefined;
   }
 };
