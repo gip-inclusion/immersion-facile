@@ -3,7 +3,7 @@ import {
   FormEstablishmentDto,
   FormEstablishmentId,
 } from "src/shared/FormEstablishmentDto";
-import { RomeSearchResponseDto } from "src/shared/rome";
+import { RomeSearchMatchDto } from "src/shared/rome";
 import { sleep } from "src/shared/utils";
 
 export class InMemoryFormEstablishmentGateway
@@ -21,7 +21,7 @@ export class InMemoryFormEstablishmentGateway
 
   public async searchProfession(
     searchText: string,
-  ): Promise<RomeSearchResponseDto> {
+  ): Promise<RomeSearchMatchDto[]> {
     await sleep(700);
     if (searchText === "givemeanemptylistplease") return [];
     if (searchText === "givemeanerrorplease")

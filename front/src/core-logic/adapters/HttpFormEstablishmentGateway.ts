@@ -6,10 +6,7 @@ import {
   FormEstablishmentId,
   addFormEstablishmentResponseSchema,
 } from "src/shared/FormEstablishmentDto";
-import {
-  RomeSearchResponseDto,
-  romeSearchResponseSchema,
-} from "src/shared/rome";
+import { RomeSearchMatchDto, romeSearchResponseSchema } from "src/shared/rome";
 import { immersionOffersRoute, romeRoute } from "src/shared/routes";
 
 const prefix = "api";
@@ -29,11 +26,11 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
 
   public async searchProfession(
     searchText: string,
-  ): Promise<RomeSearchResponseDto> {
+  ): Promise<RomeSearchMatchDto[]> {
     const httpResponse = await axios.get(`/${prefix}/${romeRoute}`, {
       params: { searchText },
     });
-    const responseDto: RomeSearchResponseDto = httpResponse.data;
+    const responseDto: RomeSearchMatchDto[] = httpResponse.data;
     romeSearchResponseSchema.parse(responseDto);
     return responseDto;
   }

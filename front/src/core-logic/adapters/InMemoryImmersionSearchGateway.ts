@@ -69,15 +69,6 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
     ];
   }
 
-  public async addressLookup(
-    query: string,
-  ): Promise<Array<LocationSuggestionDto>> {
-    console.log("address lookup: " + query);
-    await sleep(SIMULATED_LATENCY_MS);
-
-    return [{ coordinates: { lat: 1.234, lon: 5.678 }, label: "Paris" }];
-  }
-
   public async contactEstablishment(
     params: ContactEstablishmentRequestDto,
   ): Promise<void> {

@@ -1,15 +1,10 @@
+import { Field, Form, Formik, FormikHelpers } from "formik";
 import React, { useState } from "react";
-import {
-  formEstablishmentGateway,
-  immersionSearchGateway,
-} from "src/app/dependencies";
-import { Formik, Field, Form, FormikHelpers } from "formik";
-import {
-  LatLonDto,
-  SearchImmersionResultDto,
-} from "src/shared/SearchImmersionDto";
+import { immersionSearchGateway } from "src/app/dependencies";
+import { ProfessionAutocomplete } from "src/app/FormEstablishment/ProfessionAutocomplete";
+import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { ProfessionDto } from "src/shared/rome";
-import { DropDown } from "src/components/DropDown";
+import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 
 interface Values {
   rome: string;
@@ -69,26 +64,12 @@ export const SearchDebug = () => {
           <Form>
             <label htmlFor="rome">Rome</label>
             <Field id="rome" name="rome" placeholder="M1607" />
-
-            <DropDown
-              title="Rechercher un métier (or enter its code above directly)"
-              onSelection={(newValue: ProfessionDto) => {
-                console.log(newValue);
+            <ProfessionAutocomplete
+              title="Rechercher un métier (ou saissir son code ci-dessus)"
+              setFormValue={(newValue: ProfessionDto) => {
                 setFieldValue("rome", newValue.romeCodeMetier);
               }}
-              onTermChange={async (newTerm) => {
-                if (!newTerm) return [];
-                const romeOptions =
-                  await formEstablishmentGateway.searchProfession(newTerm);
-
-                return romeOptions.map(({ matchRanges, profession }) => ({
-                  value: profession,
-                  description: profession.description,
-                  matchRanges,
-                }));
-              }}
             />
-
             <br />
 
             <label htmlFor="nafDivision">Naf division (optional)</label>
@@ -101,28 +82,13 @@ export const SearchDebug = () => {
             <Field id="lon" name="lon" placeholder="42.123" />
             <label htmlFor="radius">Radius, km</label>
             <Field id="radius" name="radius" type="number" placeholder="30" />
-
-            <DropDown
-              title="Rechercher un endroit (or enter lat/lon directly above)"
-              onSelection={(newValue: LatLonDto) => {
-                setFieldValue("lat", newValue.lat);
-                setFieldValue("lon", newValue.lon);
-              }}
-              onTermChange={async (newTerm: string) => {
-                if (!newTerm) return [];
-
-                const results = await immersionSearchGateway.addressLookup(
-                  newTerm,
-                );
-
-                return results.map((res) => ({
-                  value: res.coordinates,
-                  description: res.label,
-                  matchRanges: [],
-                }));
+            <AddressAutocomplete
+              label="Rechercher un endroit (ou saisir lat/lon ci-dessus)"
+              setFormValue={({ coordinates }) => {
+                setFieldValue("lat", coordinates.lat);
+                setFieldValue("lon", coordinates.lon);
               }}
             />
-
             <br />
 
             <button type="submit">Search Immersions</button>

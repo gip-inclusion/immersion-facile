@@ -10,8 +10,6 @@ export interface ImmersionSearchGateway {
     searchParams: SearchImmersionRequestDto,
   ): Promise<SearchImmersionResultDto[]>;
 
-  addressLookup(query: string): Promise<Array<LocationSuggestionDto>>;
-
   contactEstablishment: (
     params: ContactEstablishmentRequestDto,
   ) => Promise<void>;

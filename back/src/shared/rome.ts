@@ -46,7 +46,6 @@ export const romeSearchMatchSchema = z.object(
 export type RomeSearchRequestDto = z.infer<typeof romeSearchRequestSchema>;
 export const romeSearchRequestSchema = zTrimmedString;
 
-export type RomeSearchResponseDto = z.infer<typeof romeSearchResponseSchema>;
 export const romeSearchResponseSchema = z.array(romeSearchMatchSchema, {
   required_error: "Obligatoire",
 });

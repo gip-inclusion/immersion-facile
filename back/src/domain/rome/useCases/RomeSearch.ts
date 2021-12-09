@@ -2,7 +2,7 @@ import {
   ProfessionDto,
   RomeSearchRequestDto,
   romeSearchRequestSchema,
-  RomeSearchResponseDto,
+  RomeSearchMatchDto,
 } from "../../../shared/rome";
 import { createLogger } from "../../../utils/logger";
 import { findMatchRanges } from "../../../utils/textSearch";
@@ -14,7 +14,7 @@ const logger = createLogger(__filename);
 const MIN_SEARCH_TEXT_LENGTH = 3;
 export class RomeSearch extends UseCase<
   RomeSearchRequestDto,
-  RomeSearchResponseDto
+  RomeSearchMatchDto[]
 > {
   public constructor(readonly romeGateway: RomeGateway) {
     super();
@@ -24,7 +24,7 @@ export class RomeSearch extends UseCase<
 
   public async _execute(
     searchText: RomeSearchRequestDto,
-  ): Promise<RomeSearchResponseDto> {
+  ): Promise<RomeSearchMatchDto[]> {
     if (searchText.length <= MIN_SEARCH_TEXT_LENGTH) return [];
 
     const [appellations, metiers] = await Promise.all([

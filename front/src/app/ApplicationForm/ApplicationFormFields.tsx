@@ -192,8 +192,8 @@ export const ApplicationFormFields = ({
       />
 
       <AddressAutocomplete
-        label="Adresse du lieu où se fera l'immersion"
-        name="immersionAddress"
+        label="Adresse du lieu où se fera l'immersion * "
+        setFormValue={({ label }) => setFieldValue("immersionAddress", label)}
         disabled={isFrozen || isFetchingSiret}
       />
 

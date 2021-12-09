@@ -1,9 +1,7 @@
 import { Form, Formik, FormikHelpers } from "formik";
-import React, { useReducer, useState } from "react";
-import {
-  formEstablishmentGateway,
-  immersionSearchGateway,
-} from "src/app/dependencies";
+import React, { useState } from "react";
+import { immersionSearchGateway } from "src/app/dependencies";
+import { ProfessionAutocomplete } from "src/app/FormEstablishment/ProfessionAutocomplete";
 import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,
@@ -11,17 +9,9 @@ import {
 import distanceSearchIcon from "src/assets/distance-search-icon.svg";
 import locationSearchIcon from "src/assets/location-search-icon.svg";
 import searchButtonIcon from "src/assets/search-button-icon.svg";
+import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { MarianneHeader } from "src/components/MarianneHeader";
-import {
-  ContactMethod,
-  ImmersionContactInEstablishmentId,
-} from "src/shared/FormEstablishmentDto";
-import { ProfessionDto } from "src/shared/rome";
-import {
-  LatLonDto,
-  SearchImmersionResultDto,
-} from "src/shared/SearchImmersionDto";
-import { SearchDropDown } from "./Dropdown/SearchDropDown";
+import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import "./search.css";
 import { EnterpriseSearchResult } from "./SearchResult";
@@ -89,50 +79,26 @@ export const Search = () => {
             <Form>
               <div className="formContentsContainer">
                 <div>
-                  <SearchDropDown
+                  <ProfessionAutocomplete
                     title="Métier recherché"
-                    onSelection={(newValue: ProfessionDto) => {
-                      console.log(newValue);
-                      setFieldValue("rome", newValue.romeCodeMetier);
-                    }}
-                    onTermChange={async (newTerm) => {
-                      if (!newTerm) return [];
-                      const romeOptions =
-                        await formEstablishmentGateway.searchProfession(
-                          newTerm,
-                        );
-
-                      return romeOptions.map(({ matchRanges, profession }) => ({
-                        value: profession,
-                        description: profession.description,
-                        matchRanges,
-                      }));
-                    }}
+                    setFormValue={(newValue) =>
+                      setFieldValue("rome", newValue.romeCodeMetier)
+                    }
+                    className="searchdropdown-header inputLabel"
                   />
                 </div>
 
                 <div>
-                  <SearchDropDown
+                  <AddressAutocomplete
+                    label="Lieu"
+                    headerClassName="searchdropdown-header inputLabel"
                     inputStyle={{
                       paddingLeft: "48px",
                       background: `white url(${locationSearchIcon}) no-repeat scroll 11px 8px`,
                     }}
-                    title="Lieu"
-                    onSelection={(newValue: LatLonDto) => {
-                      setFieldValue("lat", newValue.lat);
-                      setFieldValue("lon", newValue.lon);
-                    }}
-                    onTermChange={async (newTerm: string) => {
-                      if (!newTerm) return [];
-
-                      const results =
-                        await immersionSearchGateway.addressLookup(newTerm);
-
-                      return results.map((res) => ({
-                        value: res.coordinates,
-                        description: res.label,
-                        matchRanges: [],
-                      }));
+                    setFormValue={({ coordinates }) => {
+                      setFieldValue("lat", coordinates.lat);
+                      setFieldValue("lon", coordinates.lon);
                     }}
                   />
                 </div>

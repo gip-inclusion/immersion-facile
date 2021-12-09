@@ -1,4 +1,4 @@
-import { Form, Formik } from "formik";
+import { Form, Formik, useField } from "formik";
 import React, { useState } from "react";
 import { formEstablishmentGateway } from "src/app/dependencies";
 import { BusinessContactList } from "src/app/FormEstablishment/BusinessContactList";
@@ -108,6 +108,9 @@ const SiretRelatedInputs = () => {
   useSiretRelatedField("businessAddress", establishmentInfo);
   useSiretRelatedField("naf", establishmentInfo);
 
+  const businessLabelAndName = getLabelAndName("businessAddress");
+  const [_, __, { setValue }] = useField<string>(businessLabelAndName.name);
+
   return (
     <>
       <TextInput
@@ -120,7 +123,8 @@ const SiretRelatedInputs = () => {
         disabled={isFetchingSiret}
       />
       <AddressAutocomplete
-        {...getLabelAndName("businessAddress")}
+        setFormValue={(address) => setValue(address.label)}
+        label={businessLabelAndName.label}
         disabled={isFetchingSiret}
       />
     </>
@@ -161,7 +165,7 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
             }
           }}
         >
-          {({ isSubmitting, submitCount, errors }) => (
+          {({ isSubmitting, submitCount, errors, values }) => (
             <div style={{ margin: "5px 12px", maxWidth: "600px" }}>
               <p>
                 Bienvenue sur l'espace de référencement des entreprises

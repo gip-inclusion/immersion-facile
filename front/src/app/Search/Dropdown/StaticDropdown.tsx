@@ -4,7 +4,6 @@ import "./searchdropdown.css";
 type StaticDropdownProps = {
   title: string;
   onSelection: (value: string, index: number) => void;
-  headerStyle?: any;
   inputStyle?: any;
   options: string[];
 };
@@ -12,7 +11,6 @@ type StaticDropdownProps = {
 export const StaticDropdown = ({
   title,
   onSelection,
-  headerStyle,
   inputStyle,
   options,
 }: StaticDropdownProps) => {

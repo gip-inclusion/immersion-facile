@@ -1,8 +1,7 @@
 import { useField } from "formik";
 import React from "react";
-import { formEstablishmentGateway } from "src/app/dependencies";
+import { ProfessionAutocomplete } from "src/app/FormEstablishment/ProfessionAutocomplete";
 import { DeleteButton } from "src/components/DeleteButton";
-import { DropDown } from "src/components/DropDown";
 import { ProfessionDto } from "src/shared/rome";
 
 type ProfessionProps = {
@@ -12,7 +11,7 @@ type ProfessionProps = {
 };
 
 export const Profession = ({ name, label, onDelete }: ProfessionProps) => {
-  const [__, _, { setValue }] = useField<ProfessionDto>(name);
+  const [{ value }, _, { setValue }] = useField<ProfessionDto>(name);
 
   return (
     <div
@@ -22,23 +21,10 @@ export const Profession = ({ name, label, onDelete }: ProfessionProps) => {
         margin: "15px 20px",
       }}
     >
-      <DropDown
+      <ProfessionAutocomplete
         title="Rechercher un métier *"
-        onSelection={setValue}
-        initialTerm={label}
-        onTermChange={async (newTerm) => {
-          const sanitizedTerm = newTerm.trim();
-          if (!sanitizedTerm) return [];
-          const romeOptions = await formEstablishmentGateway.searchProfession(
-            sanitizedTerm,
-          );
-
-          return romeOptions.map(({ matchRanges, profession }) => ({
-            value: profession,
-            description: profession.description,
-            matchRanges,
-          }));
-        }}
+        initialValue={value}
+        setFormValue={setValue}
       />
       <DeleteButton onClick={onDelete} />
     </div>
