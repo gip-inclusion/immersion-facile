@@ -20,7 +20,9 @@ const getUseCasesByTopics = (
 ): UseCaseSubscriptionsByTopics => ({
   ImmersionApplicationSubmittedByBeneficiary: [
     useCases.confirmToBeneficiaryThatApplicationCorrectlySubmitted,
+    useCases.confirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature,
     useCases.confirmToMentorThatApplicationCorrectlySubmitted,
+    useCases.confirmToMentorThatApplicationCorrectlySubmittedRequestSignature,
     useCases.notifyToTeamApplicationSubmittedByBeneficiary,
     useCases.notifyNewApplicationNeedsReview,
   ],
@@ -49,7 +51,7 @@ const getUseCasesByTopics = (
     useCases.notifyEstablishmentOfContactRequest,
   ],
   ImmersionApplicationPartiallySigned: [
-    useCases.notifyApplicationPartiallySigned,
+    useCases.notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty,
   ],
 });
 

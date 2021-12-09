@@ -1,3 +1,6 @@
+import { expectEmailMentorConfirmationSignatureRequesMatchingImmersionApplication } from "./../../_testBuilders/emailAssertions";
+import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "./../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "./../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { InMemorySireneRepository } from "./../../adapters/secondary/InMemorySireneRepository";
 import { GetSiret } from "./../../domain/sirene/useCases/GetSiret";
 import { parseISO } from "date-fns";
@@ -32,11 +35,15 @@ import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import {
   expectEmailAdminNotificationMatchingImmersionApplication,
   expectEmailBeneficiaryConfirmationMatchingImmersionApplication,
+  expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication,
   expectEmailFinalValidationConfirmationMatchingImmersionApplication,
   expectEmailMentorConfirmationMatchingImmersionApplication,
 } from "../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
+import { FeatureFlags } from "../../shared/featureFlags";
+import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import { frontRoutes } from "../../shared/routes";
 
 const adminEmail = "admin@email.fr";
 
@@ -60,6 +67,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
   let sentEmails: TemplatedEmail[];
   let agencyConfig: AgencyConfig;
   let getSiret: GetSiret;
+  let featureFlags: FeatureFlags;
 
   beforeEach(() => {
     applicationRepository = new InMemoryImmersionApplicationRepository();
@@ -73,6 +81,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     eventCrawler = new BasicEventCrawler(eventBus, outboxRepository);
     sireneRepository = new InMemorySireneRepository();
     getSiret = new GetSiret(sireneRepository);
+    featureFlags = FeatureFlagsBuilder.allOff().build();
 
     addDemandeImmersion = new AddImmersionApplication(
       applicationRepository,
@@ -99,11 +108,13 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
         emailFilter,
         emailGw,
+        featureFlags,
       );
 
     confirmToMentor = new ConfirmToMentorThatApplicationCorrectlySubmitted(
       emailFilter,
       emailGw,
+      featureFlags,
     );
 
     notifyToTeam = new NotifyToTeamApplicationSubmittedByBeneficiary(
@@ -169,7 +180,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       magicLink: fakeGenerateMagicLinkUrlFn(
         validDemandeImmersion.id,
         "admin",
-        "",
+        frontRoutes.immersionApplicationsToValidate,
       ),
       agencyConfig,
     });
@@ -221,5 +232,176 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       agencyConfig,
       demandeImmersionInReview,
     );
+  });
+});
+
+// Same as above, but with enableEnterpriseSignatures flag. When it's on by default, merge the two test blocks.
+describe("Add immersionApplication Notifications, then checks the mails are sent (trigerred by events)", () => {
+  let addDemandeImmersion: AddImmersionApplication;
+  let validateDemandeImmersion: ValidateImmersionApplication;
+  let applicationRepository: InMemoryImmersionApplicationRepository;
+  let sireneRepository: InMemorySireneRepository;
+  let outboxRepository: OutboxRepository;
+  let clock: CustomClock;
+  let uuidGenerator: TestUuidGenerator;
+  let createNewEvent: CreateNewEvent;
+  let emailGw: InMemoryEmailGateway;
+  let confirmToBeneficiaryRequestSignature: ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature;
+  let confirmToMentorRequestSignature: ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature;
+  let notifyToTeam: NotifyToTeamApplicationSubmittedByBeneficiary;
+  let validDemandeImmersion: ImmersionApplicationDto;
+  let eventBus: EventBus;
+  let eventCrawler: BasicEventCrawler;
+  let emailFilter: EmailFilter;
+  let sentEmails: TemplatedEmail[];
+  let agencyConfig: AgencyConfig;
+  let getSiret: GetSiret;
+  let featureFlags: FeatureFlags;
+  let confirmToBeneficiary: ConfirmToBeneficiaryThatApplicationCorrectlySubmitted;
+  let confirmToMentor: ConfirmToMentorThatApplicationCorrectlySubmitted;
+
+  beforeEach(() => {
+    applicationRepository = new InMemoryImmersionApplicationRepository();
+    outboxRepository = new InMemoryOutboxRepository();
+    clock = new CustomClock();
+    uuidGenerator = new TestUuidGenerator();
+    createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    emailGw = new InMemoryEmailGateway();
+    validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
+    eventBus = new InMemoryEventBus();
+    eventCrawler = new BasicEventCrawler(eventBus, outboxRepository);
+    sireneRepository = new InMemorySireneRepository();
+    getSiret = new GetSiret(sireneRepository);
+    featureFlags = FeatureFlagsBuilder.allOff()
+      .enableEnterpriseSignatures()
+      .build();
+
+    addDemandeImmersion = new AddImmersionApplication(
+      applicationRepository,
+      createNewEvent,
+      outboxRepository,
+      getSiret,
+    );
+    validateDemandeImmersion = new ValidateImmersionApplication(
+      applicationRepository,
+      createNewEvent,
+      outboxRepository,
+    );
+    emailFilter = new AlwaysAllowEmailFilter();
+
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
+      .withName("TEST-name")
+      .withAdminEmails([adminEmail])
+      .withQuestionnaireUrl("TEST-questionnaireUrl")
+      .withSignature("TEST-signature")
+      .build();
+    const agencyRepository = new InMemoryAgencyRepository([agencyConfig]);
+
+    confirmToBeneficiaryRequestSignature =
+      new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
+        emailFilter,
+        emailGw,
+        fakeGenerateMagicLinkUrlFn,
+        featureFlags,
+      );
+
+    confirmToMentorRequestSignature =
+      new ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature(
+        emailFilter,
+        emailGw,
+        fakeGenerateMagicLinkUrlFn,
+        featureFlags,
+      );
+
+    confirmToBeneficiary =
+      new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
+        emailFilter,
+        emailGw,
+        featureFlags,
+      );
+
+    confirmToMentor = new ConfirmToMentorThatApplicationCorrectlySubmitted(
+      emailFilter,
+      emailGw,
+      featureFlags,
+    );
+
+    notifyToTeam = new NotifyToTeamApplicationSubmittedByBeneficiary(
+      emailGw,
+      agencyRepository,
+      fakeGenerateMagicLinkUrlFn,
+    );
+  });
+
+  // Creates a DemandeImmersion, check it is saved properly and that event had been triggered (thanks to subscription),
+  // then check mails have been sent trough the inmemory mail gateway
+  test("saves valid applications in the repository", async () => {
+    addDemandeImmersion = new AddImmersionApplication(
+      applicationRepository,
+      createNewEvent,
+      outboxRepository,
+      getSiret,
+    );
+
+    eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
+      confirmToBeneficiaryRequestSignature.execute(event.payload),
+    );
+
+    eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
+      confirmToMentorRequestSignature.execute(event.payload),
+    );
+
+    eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
+      notifyToTeam.execute(event.payload),
+    );
+
+    // Remove the following two subscriptions (together with the use cases) when enableEnterpriseSignatures is on by default
+
+    eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
+      confirmToBeneficiary.execute(event.payload),
+    );
+
+    eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
+      confirmToMentor.execute(event.payload),
+    );
+
+    // We expect this execute to trigger an event on ImmersionApplicationSubmittedByBeneficiary topic
+    const result = await addDemandeImmersion.execute(validDemandeImmersion);
+    expect(result).toEqual({ id: validDemandeImmersion.id });
+
+    // the following line triggers the eventCrawler (in prod it would be triggered every 10sec or so)
+    await eventCrawler.processEvents();
+
+    sentEmails = emailGw.getSentEmails();
+    expect(sentEmails).toHaveLength(3);
+
+    expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication(
+      sentEmails[0],
+      validDemandeImmersion,
+    );
+
+    expectEmailMentorConfirmationSignatureRequesMatchingImmersionApplication(
+      sentEmails[1],
+      validDemandeImmersion,
+    );
+
+    expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[2], {
+      recipients: [adminEmail],
+      immersionApplication: {
+        ...validDemandeImmersion,
+        dateStart: parseISO(validDemandeImmersion.dateStart).toLocaleDateString(
+          "fr",
+        ),
+        dateEnd: parseISO(validDemandeImmersion.dateEnd).toLocaleDateString(
+          "fr",
+        ),
+      },
+      magicLink: fakeGenerateMagicLinkUrlFn(
+        validDemandeImmersion.id,
+        "admin",
+        frontRoutes.immersionApplicationsToValidate,
+      ),
+      agencyConfig,
+    });
   });
 });

@@ -1,3 +1,4 @@
+import { FeatureFlags } from "../../../../shared/featureFlags";
 import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
@@ -13,6 +14,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted extends UseCa
   constructor(
     private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
+    private readonly featureFlags: FeatureFlags,
   ) {
     super();
   }
@@ -25,6 +27,10 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted extends UseCa
     firstName,
     lastName,
   }: ImmersionApplicationDto): Promise<void> {
+    if (this.featureFlags.enableEnterpriseSignature) {
+      logger.info(`Skipping sending non-signature beneficiary confirmation`);
+      return;
+    }
     logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
 
     const [allowedBeneficiaryEmail] = this.emailFilter.filter([email], {

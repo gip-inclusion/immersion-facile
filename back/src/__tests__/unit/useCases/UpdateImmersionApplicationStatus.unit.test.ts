@@ -306,6 +306,7 @@ describe("UpdateImmersionApplicationStatus", () => {
       const payload = {
         application: expectedImmersionApplication,
         reason: "test-modification-justification",
+        roles: ["beneficiary" as Role],
       };
 
       await expectNewEvent(expectedDomainTopic, {
@@ -376,6 +377,7 @@ describe("UpdateImmersionApplicationStatus", () => {
       payload: {
         application: expectedImmersionApplication,
         reason: "test-modification-justification",
+        roles: ["beneficiary"],
       },
     });
   };

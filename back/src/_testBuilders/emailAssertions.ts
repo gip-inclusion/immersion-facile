@@ -2,7 +2,9 @@ import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
 import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
+import { frontRoutes } from "../shared/routes";
 import { AgencyConfig } from "./../domain/immersionApplication/ports/AgencyRepository";
+import { fakeGenerateMagicLinkUrlFn } from "./test.helpers";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
@@ -33,6 +35,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
   });
 };
 
+// Remove when enableEnterpriseSignatures is default
 export const expectEmailBeneficiaryConfirmationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
   immersionApplication: ImmersionApplicationDto,
@@ -50,6 +53,31 @@ export const expectEmailBeneficiaryConfirmationMatchingImmersionApplication = (
   });
 };
 
+export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication =
+  (
+    templatedEmail: TemplatedEmail,
+    immersionApplication: ImmersionApplicationDto,
+  ) => {
+    const { email, id, firstName, lastName, businessName } =
+      immersionApplication;
+
+    expectTemplatedEmailToEqual(templatedEmail, {
+      type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      recipients: [email],
+      params: {
+        beneficiaryFirstName: firstName,
+        beneficiaryLastName: lastName,
+        magicLink: fakeGenerateMagicLinkUrlFn(
+          id,
+          "beneficiary",
+          frontRoutes.immersionApplicationsToSign,
+        ),
+        businessName,
+      },
+    });
+  };
+
+// Remove when enableEnterpriseSignatures is default
 export const expectEmailMentorConfirmationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
   immersionApplication: ImmersionApplicationDto,
@@ -67,6 +95,31 @@ export const expectEmailMentorConfirmationMatchingImmersionApplication = (
     },
   });
 };
+
+export const expectEmailMentorConfirmationSignatureRequesMatchingImmersionApplication =
+  (
+    templatedEmail: TemplatedEmail,
+    immersionApplication: ImmersionApplicationDto,
+  ) => {
+    const { id, mentor, mentorEmail, firstName, lastName, businessName } =
+      immersionApplication;
+
+    expectTemplatedEmailToEqual(templatedEmail, {
+      type: "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+      recipients: [mentorEmail],
+      params: {
+        mentorName: mentor,
+        beneficiaryFirstName: firstName,
+        beneficiaryLastName: lastName,
+        magicLink: fakeGenerateMagicLinkUrlFn(
+          id,
+          "establishment",
+          frontRoutes.immersionApplicationsToSign,
+        ),
+        businessName,
+      },
+    });
+  };
 
 export const expectEmailFinalValidationConfirmationMatchingImmersionApplication =
   (

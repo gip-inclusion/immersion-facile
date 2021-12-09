@@ -74,6 +74,30 @@ export type SendRenewedMagicLinkParams = {
   magicLink: string;
 };
 
+// For BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION
+export type SignedByOtherPartyNotificationParams = {
+  magicLink: string; //< MAGIC_LINK
+  existingSignatureName: string; //< EXISTING_SIGNATURE_NAME
+  missingSignatureName: string; //< MISSING_SIGNATURE_NAME
+};
+
+// NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE
+export type BeneficiarySignatureRequestNotificationParams = {
+  beneficiaryFirstName: string; //< FIRST_NAME
+  beneficiaryLastName: string; //< LAST_NAME
+  magicLink: string; //< MAGIC_LINK
+  businessName: string; //< COMPANY_NAME
+};
+
+// NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE
+export type EnterpriseSignatureRequestNotificationParams = {
+  beneficiaryFirstName: string; //< FIRST_NAME
+  beneficiaryLastName: string; //< LAST_NAME
+  mentorName: string; //< MENTOR_NAME
+  magicLink: string; //< MAGIC_LINK
+  businessName: string; //< COMPANY_NAME
+};
+
 export type EmailType =
   | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
   | "NEW_APPLICATION_MENTOR_CONFIRMATION"
@@ -83,7 +107,10 @@ export type EmailType =
   | "REJECTED_APPLICATION_NOTIFICATION"
   | "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION"
   | "MAGIC_LINK_RENEWAL"
-  | "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION";
+  | "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION"
+  | "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION"
+  | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE"
+  | "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE";
 
 export interface EmailGateway {
   sendNewApplicationBeneficiaryConfirmation: (
@@ -121,5 +148,17 @@ export interface EmailGateway {
   sendRenewedMagicLink: (
     recipient: string[],
     params: SendRenewedMagicLinkParams,
+  ) => Promise<void>;
+  sendSignedByOtherPartyNotification: (
+    recipient: string,
+    params: SignedByOtherPartyNotificationParams,
+  ) => Promise<void>;
+  sendBeneficiarySignatureRequestNotification: (
+    recipient: string,
+    params: BeneficiarySignatureRequestNotificationParams,
+  ) => Promise<void>;
+  sendEnterpriseSignatureRequestNotification: (
+    recipient: string,
+    params: EnterpriseSignatureRequestNotificationParams,
   ) => Promise<void>;
 }

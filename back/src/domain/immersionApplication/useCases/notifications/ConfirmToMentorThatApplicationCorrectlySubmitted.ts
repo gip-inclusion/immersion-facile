@@ -1,3 +1,4 @@
+import { FeatureFlags } from "../../../../shared/featureFlags";
 import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
@@ -12,6 +13,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted extends UseCase<Im
   constructor(
     private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
+    private readonly featureFlags: FeatureFlags,
   ) {
     super();
   }
@@ -25,6 +27,11 @@ export class ConfirmToMentorThatApplicationCorrectlySubmitted extends UseCase<Im
     firstName,
     lastName,
   }: ImmersionApplicationDto): Promise<void> {
+    if (this.featureFlags.enableEnterpriseSignature) {
+      logger.info(`Skipping sending non-signature mentor confirmation`);
+      return;
+    }
+
     logger.info(
       {
         demandeImmersionid: id,

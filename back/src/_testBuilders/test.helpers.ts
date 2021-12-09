@@ -45,4 +45,5 @@ export const spyOnTopic = (
 export const fakeGenerateMagicLinkUrlFn: GenerateVerificationMagicLink = (
   applicationId: ImmersionApplicationId,
   role: Role,
-) => `http://fake-magic-link/${applicationId}/${role}`;
+  targetRoute: string,
+) => `http://fake-magic-link/${applicationId}/${targetRoute}/${role}`;

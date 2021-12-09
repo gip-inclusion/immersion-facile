@@ -5,6 +5,7 @@ import {
   immersionApplicationSchema,
 } from "../../../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../../../shared/routes";
+import { allRoles } from "../../../../shared/tokens/MagicLinkPayload";
 import { zString } from "../../../../shared/zodUtils";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
@@ -22,12 +23,21 @@ export type ImmersionApplicationRequiresModificationPayload = z.infer<typeof imm
 const immersionApplicationRequiresModificationSchema = z.object({
   application: immersionApplicationSchema,
   reason: zString,
+  roles: z.array(z.enum(allRoles)),
 });
 
 // prettier-ignore
 export type RenewMagicLinkPayload = z.infer<typeof renewMagicLinkPayloadSchema>
 export const renewMagicLinkPayloadSchema = z.object({
   emails: z.array(z.string()),
+  magicLink: z.string(),
+});
+
+export type RequestSignaturePayload = z.infer<
+  typeof requestSignaturePayloadSchema
+>;
+export const requestSignaturePayloadSchema = z.object({
+  application: immersionApplicationSchema,
   magicLink: z.string(),
 });
 
@@ -46,6 +56,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
   public async _execute({
     application,
     reason,
+    roles,
   }: ImmersionApplicationRequiresModificationPayload): Promise<void> {
     const agencyConfig = await this.agencyRepository.getById(
       application.agencyId,
@@ -56,35 +67,51 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
       );
     }
 
-    // Note that MODIFICATION_REQUEST_APPLICATION_NOTIFICATION template is phrased to address the
-    // beneficiary only, so it needs to be updated if the list of recipients is changed.
+    const unfilteredRecipients = [];
+    if (roles.includes("beneficiary")) {
+      unfilteredRecipients.push(application.email);
+    }
+
     const recipients = this.emailFilter.filter([application.email], {
       onRejected: (email) => logger.info(`Skipped sending email to: ${email}`),
     });
 
-    if (recipients.length > 0) {
+    for (const role of roles) {
+      let email: string | undefined = undefined;
+      if (role === "beneficiary") {
+        email = application.email;
+      } else if (role === "establishment") {
+        email = application.mentorEmail;
+      }
+
+      if (!email) {
+        throw new Error(
+          "unexpected role for beneficiary/enterprise modificaton request notification: " +
+            role,
+        );
+      }
+
+      if (
+        this.emailFilter.filter([email], {
+          onRejected: (email) =>
+            logger.info(`Skipped sending email to: ${email}`),
+        }).length === 0
+      ) {
+        continue;
+      }
+
       await this.emailGateway.sendModificationRequestApplicationNotification(
-        recipients,
+        [email],
         getModificationRequestApplicationNotificationParams(
           application,
           agencyConfig,
           reason,
           this.generateMagicLinkFn(
             application.id,
-            "beneficiary",
+            role,
             frontRoutes.immersionApplicationsRoute,
           ),
         ),
-      );
-    } else {
-      logger.info(
-        {
-          id: application.id,
-          recipients,
-          source: application.source,
-          reason,
-        },
-        "Sending modification request confirmation email skipped.",
       );
     }
   }

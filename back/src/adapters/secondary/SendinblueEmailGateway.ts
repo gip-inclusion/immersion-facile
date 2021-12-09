@@ -1,12 +1,15 @@
 import promClient from "prom-client";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import type {
+  BeneficiarySignatureRequestNotificationParams,
   EmailType,
+  EnterpriseSignatureRequestNotificationParams,
   NewApplicationAdminNotificationParams,
   NewApplicationBeneficiaryConfirmationParams,
   NewApplicationMentorConfirmationParams,
   NewImmersionApplicationReviewForEligibilityOrValidationParams,
   RejectedApplicationNotificationParams,
+  SignedByOtherPartyNotificationParams,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
@@ -63,6 +66,12 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   MAGIC_LINK_RENEWAL: 14,
   // https://my.sendinblue.com/camp/template/15/message-setup
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: 15,
+  // https://my.sendinblue.com/camp/template/17/message-setup
+  BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION: 17, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
+  // https://my.sendinblue.com/camp/template/17/message-setup
+  NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE: 18,
+  // https://my.sendinblue.com/camp/template/18/message-setup
+  NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE: 19,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -231,6 +240,54 @@ export class SendinblueEmailGateway implements EmailGateway {
     this.sendTransacEmail("MAGIC_LINK_RENEWAL", recipients, {
       MAGIC_LINK: params.magicLink,
     });
+  }
+
+  public async sendSignedByOtherPartyNotification(
+    recipient: string,
+    params: SignedByOtherPartyNotificationParams,
+  ): Promise<void> {
+    this.sendTransacEmail(
+      "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
+      [recipient],
+      {
+        MAGIC_LINK: params.magicLink,
+        EXISTING_SIGNATURE_NAME: params.existingSignatureName,
+        MISSING_SIGNATURE_NAME: params.missingSignatureName,
+      },
+    );
+  }
+
+  public async sendBeneficiarySignatureRequestNotification(
+    recipient: string,
+    params: BeneficiarySignatureRequestNotificationParams,
+  ): Promise<void> {
+    this.sendTransacEmail(
+      "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      [recipient],
+      {
+        MAGIC_LINK: params.magicLink,
+        FIRST_NAME: params.beneficiaryFirstName,
+        LAST_NAME: params.beneficiaryLastName,
+        COMPANY_NAME: params.businessName,
+      },
+    );
+  }
+
+  public async sendEnterpriseSignatureRequestNotification(
+    recipient: string,
+    params: EnterpriseSignatureRequestNotificationParams,
+  ): Promise<void> {
+    this.sendTransacEmail(
+      "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      [recipient],
+      {
+        MAGIC_LINK: params.magicLink,
+        FIRST_NAME: params.beneficiaryFirstName,
+        LAST_NAME: params.beneficiaryLastName,
+        COMPANY_NAME: params.businessName,
+        MENTOR_NAME: params.mentorName,
+      },
+    );
   }
 
   private async sendTransacEmail(

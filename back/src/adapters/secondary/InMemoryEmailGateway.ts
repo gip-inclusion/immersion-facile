@@ -1,10 +1,13 @@
 import type {
+  BeneficiarySignatureRequestNotificationParams,
   EmailType,
+  EnterpriseSignatureRequestNotificationParams,
   NewApplicationAdminNotificationParams,
   NewApplicationBeneficiaryConfirmationParams,
   NewApplicationMentorConfirmationParams,
   NewImmersionApplicationReviewForEligibilityOrValidationParams,
   RejectedApplicationNotificationParams,
+  SignedByOtherPartyNotificationParams,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
@@ -145,6 +148,48 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "MAGIC_LINK_RENEWAL",
       recipients: recipients,
+      params: params,
+    });
+  }
+
+  public async sendSignedByOtherPartyNotification(
+    recipient: string,
+    params: SignedByOtherPartyNotificationParams,
+  ): Promise<void> {
+    logger.info({ recipient, params }, "sendSignedByOtherPartyNotification");
+    this.sentEmails.push({
+      type: "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
+      recipients: [recipient],
+      params: params,
+    });
+  }
+
+  public async sendBeneficiarySignatureRequestNotification(
+    recipient: string,
+    params: BeneficiarySignatureRequestNotificationParams,
+  ): Promise<void> {
+    logger.info(
+      { recipient, params },
+      "sendBeneficiarySignatureRequestNotification",
+    );
+    this.sentEmails.push({
+      type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      recipients: [recipient],
+      params: params,
+    });
+  }
+
+  public async sendEnterpriseSignatureRequestNotification(
+    recipient: string,
+    params: EnterpriseSignatureRequestNotificationParams,
+  ): Promise<void> {
+    logger.info(
+      { recipient, params },
+      "sendEnterpriseSignatureRequestNotification",
+    );
+    this.sentEmails.push({
+      type: "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+      recipients: [recipient],
       params: params,
     });
   }

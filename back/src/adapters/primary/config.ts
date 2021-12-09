@@ -87,7 +87,9 @@ import {
   createJwtAuthMiddleware,
 } from "./authMiddleware";
 import { SignImmersionApplication } from "../../domain/immersionApplication/useCases/SignImmersionApplication";
-import { NotifyApplicationPartiallySigned } from "../../domain/immersionApplication/useCases/notifications/NotifyApplicationPartiallySigned";
+import { NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
+import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 
 const logger = createLogger(__filename);
 
@@ -394,11 +396,29 @@ const createUseCases = (
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
         emailFilter,
         repositories.email,
+        config.featureFlags,
       ),
     confirmToMentorThatApplicationCorrectlySubmitted:
       new ConfirmToMentorThatApplicationCorrectlySubmitted(
         emailFilter,
         repositories.email,
+        config.featureFlags,
+      ),
+
+    // notifications
+    confirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature:
+      new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
+        emailFilter,
+        repositories.email,
+        generateMagicLinkFn,
+        config.featureFlags,
+      ),
+    confirmToMentorThatApplicationCorrectlySubmittedRequestSignature:
+      new ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature(
+        emailFilter,
+        repositories.email,
+        generateMagicLinkFn,
+        config.featureFlags,
       ),
     notifyAllActorsOfFinalApplicationValidation:
       new NotifyAllActorsOfFinalApplicationValidation(
@@ -441,10 +461,13 @@ const createUseCases = (
       ),
     notifyEstablishmentOfContactRequest:
       new NotifyEstablishmentOfContactRequest(emailFilter, repositories.email),
-    notifyApplicationPartiallySigned: new NotifyApplicationPartiallySigned(
-      emailFilter,
-      repositories.email,
-    ),
+    notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty:
+      new NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty(
+        emailFilter,
+        repositories.email,
+        repositories.agency,
+        generateMagicLinkFn,
+      ),
   };
 };
 
