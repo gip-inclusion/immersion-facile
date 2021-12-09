@@ -145,6 +145,14 @@ export class AppConfig {
     return this.throwIfNotDefined("JWT_PRIVATE_KEY");
   }
 
+  public get jwtPreviousPublicKey() {
+    return this.env.JWT_PREVIOUS_PUBLIC_KEY;
+  }
+
+  public get jwtPreviousPrivateKey() {
+    return this.env.JWT_PREVIOUS_PRIVATE_KEY;
+  }
+
   // == Backoffice ==
 
   public get backofficeUsername() {

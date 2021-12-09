@@ -5,7 +5,9 @@ import { sleep } from "../../../../shared/utils";
 import { createLogger } from "../../../../utils/logger";
 import { AppConfig } from "../../../primary/appConfig";
 import {
-  addTsVectorData, insertAppellationPublicData, insertRomesPublicData
+  addTsVectorData,
+  insertAppellationPublicData,
+  insertRomesPublicData,
 } from "./insertAppellationAndRomesPublicData";
 
 const logger = createLogger(__filename);

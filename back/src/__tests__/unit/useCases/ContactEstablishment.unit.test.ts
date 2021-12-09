@@ -61,7 +61,9 @@ describe("ContactEstablishment", () => {
 
   test("schedules event for valid EMAIL contact request", async () => {
     await immersionOfferRepository.insertEstablishments([establishment]);
-    await immersionOfferRepository.insertEstablishmentContact(establishmentContact);
+    await immersionOfferRepository.insertEstablishmentContact(
+      establishmentContact,
+    );
     await immersionOfferRepository.insertImmersions([immersionOffer]);
 
     const eventId = "event_id";
@@ -90,10 +92,15 @@ describe("ContactEstablishment", () => {
         .withContactMode("PHONE")
         .build(),
     ]);
-    await immersionOfferRepository.insertEstablishmentContact(establishmentContact);
+    await immersionOfferRepository.insertEstablishmentContact(
+      establishmentContact,
+    );
     await immersionOfferRepository.insertImmersions([immersionOffer]);
 
-    await contactEstablishment.execute({...validRequest, contactMode: "PHONE"});
+    await contactEstablishment.execute({
+      ...validRequest,
+      contactMode: "PHONE",
+    });
 
     expect(outboxRepository.events).toHaveLength(0);
   });
@@ -104,10 +111,15 @@ describe("ContactEstablishment", () => {
         .withContactMode("IN_PERSON")
         .build(),
     ]);
-    await immersionOfferRepository.insertEstablishmentContact(establishmentContact);
+    await immersionOfferRepository.insertEstablishmentContact(
+      establishmentContact,
+    );
     await immersionOfferRepository.insertImmersions([immersionOffer]);
 
-    await contactEstablishment.execute({...validRequest, contactMode: "IN_PERSON"});
+    await contactEstablishment.execute({
+      ...validRequest,
+      contactMode: "IN_PERSON",
+    });
 
     expect(outboxRepository.events).toHaveLength(0);
   });
@@ -130,7 +142,9 @@ describe("ContactEstablishment", () => {
         .withContactMode("PHONE")
         .build(),
     ]);
-    await immersionOfferRepository.insertEstablishmentContact(establishmentContact);
+    await immersionOfferRepository.insertEstablishmentContact(
+      establishmentContact,
+    );
     await immersionOfferRepository.insertImmersions([immersionOffer]);
 
     await expectPromiseToFailWithError(

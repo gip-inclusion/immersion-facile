@@ -10,19 +10,9 @@ export const makeGenerateJwt =
     jwt.sign(payload, jwtPrivateKey, { algorithm: algo });
 
 export const makeVerifyJwt =
-  (jwtPublicKey: string) =>
-  (
-    jwtString: string,
-    cb: (err: jwt.VerifyErrors | null, payload: any) => void,
-  ) => {
-    jwt.verify(
-      jwtString,
-      jwtPublicKey,
-      {
-        algorithms: [algo],
-      },
-      (err, payload) => {
-        cb(err, payload);
-      },
-    );
-  };
+  <Payload>(jwtPublicKey: string) =>
+  (jwtString: string) =>
+    jwt.verify(jwtString, jwtPublicKey, {
+      algorithms: [algo],
+      complete: false,
+    }) as Payload;

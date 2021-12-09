@@ -20,7 +20,7 @@ const convertRouteToLog = (originalUrl: string) =>
   "/" + originalUrl.split("/")[1];
 
 export const createApiKeyAuthMiddleware = (config: AppConfig) => {
-  const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
+  const verifyJwt = makeVerifyJwt<ApiConsumer>(config.jwtPublicKey);
   const authorizedIds = config.authorizedApiKeyIds;
 
   return (req: Request, res: Response, next: NextFunction) => {
@@ -31,79 +31,76 @@ export const createApiKeyAuthMiddleware = (config: AppConfig) => {
       });
       return next();
     }
-    verifyJwt(
-      req.headers.authorization as string,
-      (err, apiConsumerPayload: ApiConsumer) => {
-        if (err) {
-          apiKeyAuthMiddlewareRequestsTotal.inc({
-            route: req.route,
-            method: req.method,
-            consumerName: apiConsumerPayload.name,
-            authorisationStatus: "incorrectJwt",
-          });
-          return next();
-        }
-        if (!authorizedIds.includes(apiConsumerPayload.id)) {
-          apiKeyAuthMiddlewareRequestsTotal.inc({
-            route: req.route,
-            method: req.method,
-            consumerName: apiConsumerPayload.name,
-            authorisationStatus: "unauthorizedId",
-          });
-          return next();
-        }
 
+    try {
+      const apiConsumerPayload = verifyJwt(req.headers.authorization as string);
+      // todo: consider notifying the caller that he cannot access privileged fields (due to possible compromised key)
+      if (!authorizedIds.includes(apiConsumerPayload.id)) {
         apiKeyAuthMiddlewareRequestsTotal.inc({
-          route: req.route,
+          route: convertRouteToLog(req.route),
           method: req.method,
           consumerName: apiConsumerPayload.name,
-          authorisationStatus: "authorised",
+          authorisationStatus: "unauthorisedId",
         });
-
-        // only if the user is known, and the id authorized, we add apiConsumer payload to the request:
-        req.apiConsumer = apiConsumerPayload;
         return next();
-      },
-    );
+      }
+
+      // only if the user is known, and the id authorized, we add apiConsumer payload to the request:
+      apiKeyAuthMiddlewareRequestsTotal.inc({
+        route: convertRouteToLog(req.route),
+        method: req.method,
+        consumerName: apiConsumerPayload.name,
+        authorisationStatus: "authorised",
+      });
+
+      req.apiConsumer = apiConsumerPayload;
+      return next();
+    } catch (err) {
+      apiKeyAuthMiddlewareRequestsTotal.inc({
+        route: req.route,
+        method: req.method,
+        authorisationStatus: "incorrectJwt",
+      });
+      return next();
+    }
   };
 };
 
 export const createJwtAuthMiddleware = (config: AppConfig) => {
-  const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
+  const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(config);
 
   return (req: Request, res: Response, next: NextFunction) => {
     const pathComponents = req.path.split("/");
     const maybeJwt = pathComponents[pathComponents.length - 1];
     if (!maybeJwt) {
-      sendForbiddenError(res, new Error("impossible to authenticate"));
+      sendAuthenticationError(res, new Error("impossible to authenticate"));
     }
 
-    verifyJwt(maybeJwt as string, (err, payload) => {
-      if (err) {
-        if (err instanceof TokenExpiredError) {
-          // Decode the payload without verifying it to extract the application id and role.
-          const expiredPayload = jwt.decode(maybeJwt) as MagicLinkPayload;
-          if (!expiredPayload) {
-            sendForbiddenError(res, err);
-          } else {
-            sendNeedsRenewedLinkError(res, err);
-          }
-
-          return;
-        }
-
-        sendForbiddenError(res, err);
-        return;
-      }
-      req.jwtPayload = payload as MagicLinkPayload;
+    try {
+      const payload = verifyJwt(maybeJwt as string);
+      req.jwtPayload = payload;
       next();
-    });
+    } catch (err: any) {
+      const unsafePayload = jwt.decode(maybeJwt) as MagicLinkPayload;
+      if (err instanceof TokenExpiredError) {
+        return unsafePayload
+          ? sendNeedsRenewedLinkError(res, err)
+          : sendAuthenticationError(res, err);
+      }
+
+      try {
+        verifyDeprecatedJwt(maybeJwt);
+        return sendNeedsRenewedLinkError(res, err);
+      } catch (deprecatedError: any) {
+        return sendAuthenticationError(res, deprecatedError);
+      }
+    }
   };
 };
 
-const sendForbiddenError = (res: Response, err: Error) => {
+const sendAuthenticationError = (res: Response, err: Error) => {
   logger.error({ err }, "authentication failed");
-  res.status(403);
+  res.status(401);
   return res.json({
     message: "Provided token is invalid",
   });
@@ -117,3 +114,13 @@ const sendNeedsRenewedLinkError = (res: Response, err: Error) => {
     needsNewMagicLink: true,
   });
 };
+export function verifyJwtConfig(config: AppConfig) {
+  const verifyJwt = makeVerifyJwt<MagicLinkPayload>(config.jwtPublicKey);
+
+  const verifyDeprecatedJwt = config.jwtPreviousPublicKey
+    ? makeVerifyJwt<MagicLinkPayload>(config.jwtPreviousPublicKey)
+    : () => {
+        throw new Error("No deprecated JWT private key provided");
+      };
+  return { verifyJwt, verifyDeprecatedJwt };
+}
