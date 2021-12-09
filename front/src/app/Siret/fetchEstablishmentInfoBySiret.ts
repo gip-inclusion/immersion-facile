@@ -48,7 +48,9 @@ export const useSiretFetcher = () => {
       })
       .catch((err: AxiosError) => {
         if (err.isAxiosError && err.response && err.response.status === 404) {
-          setError("SIRET inconnu ou inactif");
+          setError(
+            "Ce SIRET n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.",
+          );
         } else {
           setError(err.message);
         }

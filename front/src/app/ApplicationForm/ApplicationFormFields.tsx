@@ -1,4 +1,4 @@
-import { useField, useFormikContext } from "formik";
+import { Formik, useField, useFormikContext } from "formik";
 import React from "react";
 import { SuccessInfos } from "src/app/ApplicationForm/createSuccessInfos";
 import { BoolRadioGroup, RadioGroup } from "src/app/RadioGroup";
@@ -21,7 +21,9 @@ import { ENV } from "src/environmentVariables";
 import type {
   ApplicationStatus,
   ImmersionApplicationDto,
+  validApplicationStatus,
 } from "src/shared/ImmersionApplicationDto";
+import { submissionAndStartDatesConstraints } from "src/shared/immersionApplicationRefinement";
 
 const { featureFlags, dev } = ENV;
 
@@ -78,7 +80,7 @@ export const ApplicationFormFields = ({
   alreadySubmitted,
   onRejectForm,
 }: ApplicationFieldsProps) => {
-  const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
+  const { errors, submitCount, initialValues, setFieldValue, isSubmitting, submitForm } =
     useFormikContext<ImmersionApplicationDto>();
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", establishmentInfo);
@@ -324,19 +326,21 @@ export const ApplicationFormFields = ({
         )}
 
       {errorMessage && (
-        <ErrorMessage title="Désolé: Erreur de traitement sur la plateforme, veuillez réessayer ultérieurement">
+        <ErrorMessage title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement">
           {errorMessage}
         </ErrorMessage>
       )}
 
       {successInfos && (
-        <SuccessMessage title="Succès de l'envoi">
+        <SuccessMessage
+          title="Succès de l'envoi">
           {successInfos.message}
           {successInfos.link && (
             <a href={successInfos.link}>{successInfos.link}</a>
           )}
         </SuccessMessage>
-      )}
+      )
+      }
 
       <p />
 
@@ -363,11 +367,10 @@ export const ApplicationFormFields = ({
                     ? "enterpriseAccepted"
                     : "beneficiaryAccepted"
                 }
-                label={`Je, ${signeeName} (${
-                  isSignatureEnterprise
+                label={`Je, ${signeeName} (${isSignatureEnterprise
                     ? "représentant de la structure d'accueil"
                     : "bénéficiaire de l'immersion"
-                }) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
+                  }) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
                 description="Avant de répondre, consultez ces dispositions ici"
                 descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
                 disabled={false}

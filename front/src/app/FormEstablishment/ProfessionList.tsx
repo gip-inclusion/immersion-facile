@@ -45,9 +45,7 @@ export const ProfessionList = ({ name, title }: ProfessionListProps) => {
 
       {touched && error && (
         <div id={name + "-error-description"} className="fr-error-text">
-          {typeof error === "string"
-            ? error
-            : "Veuillez saisir des metiers valides."}
+          {typeof error === "string" ? error : "Indiquez au moins 1 métier."}
         </div>
       )}
     </div>

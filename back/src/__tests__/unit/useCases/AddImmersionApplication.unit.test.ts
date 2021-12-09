@@ -97,7 +97,7 @@ describe("Add immersionApplication", () => {
       await expectPromiseToFailWithError(
         addImmersionApplication.execute(validImmersionApplication),
         new BadRequestError(
-          `Ce SIRET (${validImmersionApplication.siret}) ne correspond pas à une entreprise en activité. Merci de le corriger.`,
+          `Ce SIRET (${validImmersionApplication.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
         ),
       );
     });

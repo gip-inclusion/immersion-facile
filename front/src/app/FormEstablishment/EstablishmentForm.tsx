@@ -34,68 +34,68 @@ type EstablishmentFormProps = {
 
 const initialValues: FormEstablishmentDto = ENV.dev
   ? {
-      id: uuidV4(),
-      siret: "1234567890123",
-      businessName: "My business name",
-      businessAddress: "My businessAddress:",
-      professions: [
-        {
-          romeCodeMetier: "A1000",
-          description: "Boulanger",
-        },
-        {
-          romeCodeMetier: "B2000",
-          description: "Boucher",
-        },
-      ],
-      businessContacts: [
-        {
-          firstName: "John",
-          lastName: "Doe",
-          job: "super job",
-          phone: "02837",
-          email: "joe@mail.com",
-        },
-      ],
-      preferredContactMethods: ["EMAIL"],
-    }
+    id: uuidV4(),
+    siret: "1234567890123",
+    businessName: "My business name",
+    businessAddress: "My businessAddress:",
+    professions: [
+      {
+        romeCodeMetier: "A1000",
+        description: "Boulanger",
+      },
+      {
+        romeCodeMetier: "B2000",
+        description: "Boucher",
+      },
+    ],
+    businessContacts: [
+      {
+        firstName: "John",
+        lastName: "Doe",
+        job: "super job",
+        phone: "02837",
+        email: "joe@mail.com",
+      },
+    ],
+    preferredContactMethods: ["EMAIL"],
+  }
   : {
-      id: uuidV4(),
-      siret: "",
-      businessName: "",
-      businessAddress: "",
-      professions: [],
-      businessContacts: [
-        {
-          firstName: "",
-          lastName: "",
-          job: "",
-          phone: "",
-          email: "",
-        },
-      ],
-      preferredContactMethods: [],
-    };
+    id: uuidV4(),
+    siret: "",
+    businessName: "",
+    businessAddress: "",
+    professions: [],
+    businessContacts: [
+      {
+        firstName: "",
+        lastName: "",
+        job: "",
+        phone: "",
+        email: "",
+      },
+    ],
+    preferredContactMethods: [],
+  };
 
 const preferredContactMethodOptions: Array<{
   label?: string;
   value: ContactMethod[];
 }> = [
-  {
-    value: ["EMAIL"],
-    label:
-      "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
-  },
-  {
-    value: ["PHONE"],
-    label:
-      "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
-  },
-  {
-    value: ["IN_PERSON"],
-    label: "Se présenter en personne à votre établissement",
-  },
-];
+    {
+      value: ["EMAIL"],
+      label:
+        "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
+    },
+    {
+      value: ["PHONE"],
+      label:
+        "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
+    },
+    {
+      value: ["IN_PERSON"],
+      label: "Se présenter en personne à votre établissement",
+    },
+  ];
 
 const getLabelAndName = (field: FieldsWithLabel) => ({
   label: fieldsToLabel[field] + " *",
@@ -212,7 +212,7 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
                 <br />
                 {submitError && (
                   <>
-                    <ErrorMessage title="Erreur de serveur">
+                    <ErrorMessage title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. ">
                       {submitError.message}
                     </ErrorMessage>
                     <br />
@@ -220,12 +220,8 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
                 )}
                 {isSuccess && (
                   <SuccessMessage title="Succès de l'envoi">
-                    Merci ! Nous avons bien enregistré vos informations. Vous
-                    pourrez y accéder à tout moment pour les modifier ou les
-                    supprimer en nous contactant à :&nbsp;
-                    <a href="mailto:contact@immersion-facile.beta.gouv.fr">
-                      contact@immersion-facile.beta.gouv.fr
-                    </a>
+                    Succès.
+                    Nous avons bien enregistré les informations concernant votre entreprise.
                   </SuccessMessage>
                 )}
                 {!isSuccess && (

@@ -122,7 +122,8 @@ export const immersionApplicationSchema = z
     enterpriseAccepted: zBoolean,
   })
   .refine(submissionAndStartDatesConstraints, {
-    message: "La date de démarrage doit étre au moins 2 jours après la saisie.",
+    message:
+      "Il n'est pas possible de faire une demande moins de 48h avant la date de démarrage souhaitée. Veuillez proposez une nouvelle date",
     path: ["dateStart"],
   })
   .refine(enoughWorkedDaysToReviewFromSubmitDate, {
@@ -143,11 +144,11 @@ export const immersionApplicationSchema = z
     path: ["mentorEmail"],
   })
   .refine(mustBeSignedByBeneficiaryBeforeReview, {
-    message: "L'engagement est obligatoire",
+    message: "La confirmation de votre accord est obligatoire.",
     path: ["beneficiaryAccepted"],
   })
   .refine(mustBeSignedByEstablishmentBeforeReview, {
-    message: "L'engagement est obligatoire",
+    message: "La confirmation de votre accord est obligatoire.",
     path: ["enterpriseAccepted"],
   });
 

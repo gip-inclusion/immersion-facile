@@ -96,12 +96,12 @@ const createInitialApplication = (
     phone: "0612345678",
 
     // Enterprise
-    siret: "12345678901234",
-    businessName: "business",
-    mentor: "The Mentor",
-    mentorPhone: "0687654321",
+    siret: "444 030 902 00019",
+    businessName: "Futuroscope",
+    mentor: "Le Mentor du futur",
+    mentorPhone: "0101100110",
     mentorEmail: "mentor@supermentor.fr",
-    immersionAddress: "1 rue Karl Marx",
+    immersionAddress: "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
 
     // Covid
     individualProtection: true,
@@ -139,7 +139,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
     if (!("jwt" in route.params) || route.params.jwt === undefined) {
       return;
     }
-
     immersionApplicationGateway
       .getML(route.params.jwt)
       .then((response) => {
@@ -147,6 +146,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
           response.dateSubmission = toDateString(startOfToday());
         }
         setInitialValues(response);
+
       })
       .catch((e) => {
         console.log(e);
@@ -215,6 +215,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
           >
             {(props) => (
               <div>
+                {console.log(props.errors)}
                 <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
                   <ApplicationFormFields
                     isFrozen={isFrozen}

@@ -95,7 +95,7 @@ describe("Add FormEstablishment", () => {
       await expectPromiseToFailWithError(
         addFormEstablishment.execute(formEstablishment),
         new BadRequestError(
-          `Ce SIRET (${formEstablishment.siret}) ne correspond pas à une entreprise en activité. Merci de le corriger.`,
+          `Ce SIRET (${formEstablishment.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
         ),
       );
     });

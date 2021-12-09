@@ -64,7 +64,7 @@ export const RenewExpiredLink = ({ route }: RenewExpiredLinkProps) => {
         </p>
       )}
       {errorMessage && (
-        <ErrorMessage title="Désolé: Erreur de traitement sur la plateforme, veuillez réessayer">
+        <ErrorMessage title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement.">
           {errorMessage}
         </ErrorMessage>
       )}
