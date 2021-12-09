@@ -89,6 +89,8 @@ import {
   createApiKeyAuthMiddleware,
   createJwtAuthMiddleware,
 } from "./authMiddleware";
+import { SignImmersionApplication } from "../../domain/immersionApplication/useCases/SignImmersionApplication";
+import { NotifyApplicationPartiallySigned } from "../../domain/immersionApplication/useCases/notifications/NotifyApplicationPartiallySigned";
 
 const logger = createLogger(__filename);
 
@@ -347,6 +349,11 @@ const createUseCases = (
       repositories.outbox,
       config.featureFlags,
     ),
+    signImmersionApplication: new SignImmersionApplication(
+      repositories.demandeImmersion,
+      createNewEvent,
+      repositories.outbox,
+    ),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewMagicLink: new RenewMagicLink(
       repositories.demandeImmersion,
@@ -444,6 +451,10 @@ const createUseCases = (
       ),
     notifyEstablishmentOfContactRequest:
       new NotifyEstablishmentOfContactRequest(emailFilter, repositories.email),
+    notifyApplicationPartiallySigned: new NotifyApplicationPartiallySigned(
+      emailFilter,
+      repositories.email,
+    ),
   };
 };
 

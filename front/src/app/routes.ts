@@ -21,6 +21,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.immersionApplicationsToValidate}`,
   ),
+  immersionApplicationsToSign: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.immersionApplicationsToSign}`,
+  ),
   formEstablishment: defineRoute([
     "/etablissement",
     "/immersion-offer" /* old name, still redirected*/,

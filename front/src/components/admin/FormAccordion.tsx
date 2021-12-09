@@ -35,6 +35,10 @@ const getPrefix = (status: ApplicationStatus) => {
   switch (status) {
     case "DRAFT":
       return "[📕 BROUILLON]";
+    case "READY_TO_SIGN":
+      return "[📄 Prête à etre signée]";
+    case "PARTIALLY_SIGNED":
+      return "[✍️ Partiellement signée]";
     case "REJECTED":
       return "[❌ DEMANDE REJETÉE]";
     case "IN_REVIEW":

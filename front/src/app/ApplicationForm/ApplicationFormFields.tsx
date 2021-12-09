@@ -23,7 +23,7 @@ import type {
   ImmersionApplicationDto,
 } from "src/shared/ImmersionApplicationDto";
 
-const { dev } = ENV;
+const { featureFlags, dev } = ENV;
 
 const FrozenMessage = () => (
   <>
@@ -40,16 +40,43 @@ const FrozenMessage = () => (
   </>
 );
 
+const SignOnlyMessage = () => (
+  <>
+    <div role="alert" className="fr-alert fr-alert--info">
+      <p className="fr-alert__title">
+        <h1 color="red"> TODO: changer ce message </h1>
+        Cette demande d'immersion est prête à être signé.
+      </p>
+      <p>
+        <h1 color="red"> TODO: changer ce message </h1>
+        Cette demande d'immersion n'est plus possible modifiable. Veuillez
+        signer ou renvoyer pour la modification.
+      </p>
+    </div>
+    <br />
+  </>
+);
+
 type ApplicationFieldsProps = {
   isFrozen?: boolean;
   submitError: Error | null;
   successInfos: SuccessInfos | null;
+  isSignOnly?: boolean;
+  isSignatureEnterprise?: boolean; //< Ignored if !isSignOnly. Determines who's signing (enterprise or beneficiary)
+  signeeName?: string; //< Ignored if !isSignOnly. Name of the person signing.
+  alreadySubmitted?: boolean;
+  onRejectForm?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
 };
 
 export const ApplicationFormFields = ({
   isFrozen,
   submitError,
   successInfos,
+  isSignOnly,
+  isSignatureEnterprise,
+  signeeName,
+  alreadySubmitted,
+  onRejectForm,
 }: ApplicationFieldsProps) => {
   const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
     useFormikContext<ImmersionApplicationDto>();
@@ -71,9 +98,12 @@ export const ApplicationFormFields = ({
     errorMessage = submitError["response"]["data"]["errors"];
   }
 
+  const isSignatureMode = featureFlags.enableEnterpriseSignature && isSignOnly;
+
   return (
     <>
-      {isFrozen && <FrozenMessage />}
+      {isFrozen && !isSignatureMode && <FrozenMessage />}
+      {isFrozen && isSignatureMode && <SignOnlyMessage />}
 
       <TextInput
         label="Email *"
@@ -259,32 +289,39 @@ export const ApplicationFormFields = ({
       />
 
       <p />
+      {!featureFlags.enableEnterpriseSignature && (
+        <>
+          <BoolCheckboxGroup
+            name="beneficiaryAccepted"
+            label={
+              "Je (bénéficiaire de l'immersion) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"
+            }
+            description="Avant de répondre, consultez ces dispositions ici"
+            descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+            disabled={isFrozen}
+          />
 
-      <BoolCheckboxGroup
-        name="beneficiaryAccepted"
-        label={
-          "Je (bénéficiaire de l'immersion) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"
-        }
-        description="Avant de répondre, consultez ces dispositions ici"
-        descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-        disabled={isFrozen}
-      />
-
-      <BoolCheckboxGroup
-        name="enterpriseAccepted"
-        label={
-          "Je (représentant de la structure d'accueil ) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"
-        }
-        description="Avant de répondre, consultez ces dispositions ici"
-        descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-        disabled={isFrozen}
-      />
+          <BoolCheckboxGroup
+            name="enterpriseAccepted"
+            label={
+              "Je (représentant de la structure d'accueil ) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"
+            }
+            description="Avant de répondre, consultez ces dispositions ici"
+            descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+            disabled={isFrozen}
+          />
+        </>
+      )}
 
       <p />
 
-      {submitCount !== 0 && Object.values(errors).length > 0 && (
-        <div style={{ color: "red" }}>Veuillez corriger les champs erronés</div>
-      )}
+      {!isSignatureMode &&
+        submitCount !== 0 &&
+        Object.values(errors).length > 0 && (
+          <div style={{ color: "red" }}>
+            Veuillez corriger les champs erronés
+          </div>
+        )}
 
       {errorMessage && (
         <ErrorMessage title="Désolé: Erreur de traitement sur la plateforme, veuillez réessayer ultérieurement">
@@ -303,8 +340,49 @@ export const ApplicationFormFields = ({
 
       <p />
 
-      {!isFrozen && (
+      {!isFrozen && !isSignatureMode && (
         <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
+      )}
+
+      {isSignatureMode && (
+        <>
+          {alreadySubmitted && (
+            <p>
+              <h1 style={{ color: "red", fontSize: 50 }}>
+                {" "}
+                TODO: changer ce message{" "}
+              </h1>
+              Vous avez déjà signé la convention.
+            </p>
+          )}
+          {!alreadySubmitted && (
+            <>
+              <BoolCheckboxGroup
+                name={
+                  isSignatureEnterprise
+                    ? "enterpriseAccepted"
+                    : "beneficiaryAccepted"
+                }
+                label={`Je, ${signeeName} (${
+                  isSignatureEnterprise
+                    ? "représentant de la structure d'accueil"
+                    : "bénéficiaire de l'immersion"
+                }) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
+                description="Avant de répondre, consultez ces dispositions ici"
+                descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+                disabled={false}
+              />
+              <p style={{ display: "flex", gap: "50px" }}>
+                <SignButton isSubmitting={isSubmitting} onSubmit={submitForm} />
+
+                <RequestModificationButton
+                  onSubmit={onRejectForm!}
+                  isSubmitting={isSubmitting}
+                />
+              </p>
+            </>
+          )}
+        </>
       )}
     </>
   );
@@ -330,7 +408,9 @@ const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
   const [_, __, { setValue }] = useField<ApplicationStatus>({ name: "status" });
 
   const makeInReviewAndSubmit = () => {
-    setValue("IN_REVIEW");
+    setValue(
+      featureFlags.enableEnterpriseSignature ? "READY_TO_SIGN" : "IN_REVIEW",
+    );
     return onSubmit();
   };
 
@@ -341,6 +421,35 @@ const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
       onClick={makeInReviewAndSubmit}
     >
       {isSubmitting ? "Éxecution" : "Envoyer la demande"}
+    </button>
+  );
+};
+
+const SignButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
+  return (
+    <button
+      className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+      type="button"
+      onClick={onSubmit}
+    >
+      {isSubmitting ? "Éxecution" : "Confirmer et signer"}
+    </button>
+  );
+};
+
+export const RequestModificationButton = ({
+  onSubmit,
+  isSubmitting,
+}: SubmitButtonProps) => {
+  return (
+    <button
+      className="fr-btn fr-fi-edit-fill fr-btn--icon-left fr-btn--secondary"
+      type="button"
+      onClick={onSubmit}
+    >
+      {isSubmitting
+        ? "Éxecution"
+        : "Rétirer les signatures et renvoyer pour modification"}
     </button>
   );
 };

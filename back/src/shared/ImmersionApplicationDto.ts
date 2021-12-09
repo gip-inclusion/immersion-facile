@@ -15,7 +15,7 @@ import {
   ScheduleDto,
 } from "./ScheduleSchema";
 import { siretSchema } from "./siret";
-import { allRoles } from "./tokens/MagicLinkPayload";
+import { allRoles, Role } from "./tokens/MagicLinkPayload";
 import { Flavor } from "./typeFlavors";
 import {
   addressWithPostalCodeSchema,
@@ -220,6 +220,16 @@ export const updateImmersionApplicationStatusRequestSchema = z.object({
 export type UpdateImmersionApplicationStatusResponseDto = z.infer<typeof updateImmersionApplicationStatusResponseSchema>;
 export const updateImmersionApplicationStatusResponseSchema = idInObject;
 
+export type SignImmersionApplicationRequestDto = z.infer<
+  typeof signImmersionApplicationRequestSchema
+>;
+export const signImmersionApplicationRequestSchema = z.object({});
+
+export type SignImmersionApplicationResponseDto = z.infer<
+  typeof signImmersionApplicationResponseSchema
+>;
+export const signImmersionApplicationResponseSchema = idInObject;
+
 // prettier-ignore
 export type GenerateMagicLinkRequestDto = z.infer<typeof generateMagicLinkRequestSchema>;
 export const generateMagicLinkRequestSchema = z.object({
@@ -261,7 +271,7 @@ export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   mentorEmail: "alain@prost.fr",
   schedule: reasonableSchedule,
   legacySchedule: undefined,
-  immersionAddress: "",
+  immersionAddress: "75001 Centre du monde",
   individualProtection: true,
   sanitaryPrevention: true,
   sanitaryPreventionDescription: "fourniture de gel",
@@ -271,4 +281,42 @@ export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
   beneficiaryAccepted: true,
   enterpriseAccepted: true,
+};
+
+// Returns an application signed by provided roles.
+export const signApplicationDtoWithRoles = (
+  application: ImmersionApplicationDto,
+  roles: Role[],
+) => {
+  if (
+    !["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(application.status)
+  ) {
+    throw new Error(
+      "Incorrect initial application status: " + application.status,
+    );
+  }
+
+  const enterpriseAccepted = roles.includes("establishment")
+    ? true
+    : application.enterpriseAccepted;
+  const beneficiaryAccepted = roles.includes("beneficiary")
+    ? true
+    : application.beneficiaryAccepted;
+  let status: ApplicationStatus = "READY_TO_SIGN";
+  // if beneficiaryAccepted XOR enterpise accepted
+  if (
+    (enterpriseAccepted && !beneficiaryAccepted) ||
+    (!enterpriseAccepted && beneficiaryAccepted)
+  ) {
+    status = "PARTIALLY_SIGNED";
+  }
+  if (enterpriseAccepted && beneficiaryAccepted) {
+    status = "IN_REVIEW";
+  }
+  return {
+    ...application,
+    beneficiaryAccepted,
+    enterpriseAccepted,
+    status,
+  };
 };

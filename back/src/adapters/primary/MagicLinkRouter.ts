@@ -6,6 +6,7 @@ import {
 } from "../../shared/ImmersionApplicationDto";
 import {
   immersionApplicationsRoute,
+  signApplicationRoute,
   updateApplicationStatusRoute,
 } from "../../shared/routes";
 import { AppDependencies } from "./config";
@@ -51,6 +52,14 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
           useCaseParams: req.body,
           jwtPayload: req.jwtPayload,
         }),
+      );
+    });
+
+  authenticatedRouter
+    .route(`/${signApplicationRoute}/:jwt`)
+    .post(async (req, res) => {
+      sendHttpResponse(req, res, () =>
+        deps.useCases.signImmersionApplication.execute({}, req.jwtPayload),
       );
     });
 

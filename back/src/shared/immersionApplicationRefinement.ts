@@ -60,9 +60,13 @@ export const emailAndMentorEmailAreDifferent = (params: {
 export const mustBeSignedByBeneficiaryBeforeReview = (params: {
   beneficiaryAccepted: boolean;
   status: ApplicationStatus;
-}) => params.status === "DRAFT" || params.beneficiaryAccepted;
+}) =>
+  ["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(params.status) ||
+  params.beneficiaryAccepted;
 
 export const mustBeSignedByEstablishmentBeforeReview = (params: {
   enterpriseAccepted: boolean;
   status: ApplicationStatus;
-}) => params.status === "DRAFT" || params.enterpriseAccepted;
+}) =>
+  ["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(params.status) ||
+  params.enterpriseAccepted;

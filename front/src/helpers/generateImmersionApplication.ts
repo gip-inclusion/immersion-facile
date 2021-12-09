@@ -1,4 +1,5 @@
 import { addDays, format } from "date-fns";
+import { ENV } from "src/environmentVariables";
 import { frenchFirstNames } from "src/helpers/namesList";
 import { AgencyDto } from "src/shared/agencies";
 import {
@@ -6,6 +7,8 @@ import {
   IMMERSION_APPLICATION_TEMPLATE,
   validApplicationStatus,
 } from "src/shared/ImmersionApplicationDto";
+
+const { featureFlags } = ENV;
 
 export const generateApplication = (
   i: number,
@@ -17,6 +20,22 @@ export const generateApplication = (
     validApplicationStatus[
       Math.floor(Math.random() * validApplicationStatus.length)
     ];
+  let beneficiaryAccepted = true;
+  let enterpriseAccepted = true;
+  if (featureFlags.enableEnterpriseSignature) {
+    // Configure signatures depending on the status
+    if (status === "DRAFT" || status === "READY_TO_SIGN") {
+      beneficiaryAccepted = false;
+      enterpriseAccepted = false;
+    } else if (status === "PARTIALLY_SIGNED") {
+      if (Math.random() > 0.5) {
+        beneficiaryAccepted = false;
+      } else {
+        enterpriseAccepted = false;
+      }
+    }
+    // Otherwise it's signed by both beneficiary and enterprise.
+  }
 
   // Created up to, days
   const creationMaxDelay = 14;
@@ -25,11 +44,11 @@ export const generateApplication = (
     -1 * Math.floor(Math.random() * creationMaxDelay),
   );
 
-  // Date start: at least 2 days after creation, no more than maxStartDelay
+  // Date start: at least 2 business days after creation, so add 3, but no more than maxStartDelay
   const maxStartDelay = 28;
   const dateStart = addDays(
     dateSubmission,
-    2 + Math.floor(Math.random() * maxStartDelay),
+    3 + Math.floor(Math.random() * maxStartDelay),
   );
 
   // Ends between 1 and 28 days after start.
@@ -50,5 +69,7 @@ export const generateApplication = (
     dateEnd: toDateString(dateEnd),
     email: `${firstName}@testimmersionfacileapplication.fr`,
     agencyId,
+    enterpriseAccepted,
+    beneficiaryAccepted,
   };
 };

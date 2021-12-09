@@ -12,6 +12,7 @@ import { PopulateDB } from "./Debug/PopulateDB";
 import { SearchDebug } from "./Debug/SearchDebug";
 import { RenewExpiredLink } from "../helpers/RenewExpiredLink";
 import { Search } from "./Search/Search";
+import { SignForm } from "./ApplicationForm/SignForm";
 
 const { dev, featureFlags } = ENV;
 
@@ -30,6 +31,10 @@ export const Router = () => {
       {route.name === "immersionApplicationsToValidate" && (
         <VerificationPage route={route} />
       )}
+      {featureFlags.enableEnterpriseSignature &&
+        route.name === "immersionApplicationsToSign" && (
+          <SignForm route={route} />
+        )}
       {route.name === "immersionApplication" && (
         <ApplicationForm route={route} />
       )}

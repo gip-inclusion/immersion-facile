@@ -44,8 +44,12 @@ const getUseCasesByTopics = (
     useCases.transformFormEstablishmentToSearchData,
     useCases.notifyConfirmationEstablishmentCreated,
   ],
+
   EmailContactRequestedByBeneficiary: [
     useCases.notifyEstablishmentOfContactRequest,
+  ],
+  ImmersionApplicationPartiallySigned: [
+    useCases.notifyApplicationPartiallySigned,
   ],
 });
 

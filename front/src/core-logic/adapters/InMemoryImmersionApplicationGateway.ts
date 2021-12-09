@@ -10,6 +10,7 @@ import {
   IMMERSION_APPLICATION_TEMPLATE,
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
+  signApplicationDtoWithRoles,
 } from "src/shared/ImmersionApplicationDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
@@ -161,6 +162,17 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
       ...this._demandesImmersion[payload.applicationId],
       status,
     };
+    return { id: payload.applicationId };
+  }
+
+  public async signApplication(
+    jwt: string,
+  ): Promise<UpdateImmersionApplicationStatusResponseDto> {
+    await sleep(SIMULATED_LATENCY_MS);
+    const payload = decodeJwt(jwt);
+    const application = this._demandesImmersion[payload.applicationId];
+    this._demandesImmersion[payload.applicationId] =
+      signApplicationDtoWithRoles(application, payload.roles);
     return { id: payload.applicationId };
   }
 

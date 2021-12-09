@@ -36,6 +36,10 @@ export abstract class ImmersionApplicationGateway {
     jwt: string,
   ): Promise<UpdateImmersionApplicationStatusResponseDto>;
 
+  abstract signApplication(
+    jwt: string,
+  ): Promise<UpdateImmersionApplicationStatusResponseDto>;
+
   abstract getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto>;
   abstract getAll(
     agency?: AgencyId,

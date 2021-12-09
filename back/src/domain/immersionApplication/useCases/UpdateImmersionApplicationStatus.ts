@@ -26,7 +26,7 @@ import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRep
 
 const logger = createLogger(__filename);
 
-const domainTopicByTargetStautsMap: Partial<
+const domainTopicByTargetStatusMap: Partial<
   Record<ApplicationStatus, DomainTopic>
 > = {
   ACCEPTED_BY_COUNSELLOR: "ImmersionApplicationAcceptedByCounsellor",
@@ -102,7 +102,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
       );
     if (!updatedId) throw new NotFoundError(updatedId);
 
-    const domainTopic = domainTopicByTargetStautsMap[status];
+    const domainTopic = domainTopicByTargetStatusMap[status];
     if (domainTopic) {
       let event = undefined;
       if (domainTopic === "ImmersionApplicationRequiresModification") {
