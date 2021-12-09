@@ -76,9 +76,7 @@ body {
 }
 
 .searchdropdown-header {
-  font-size: 18px;
   font-weight: bold;
-  line-height: 28px;
   text-align: center;
-  color: white;
+  color: white !important;
 }

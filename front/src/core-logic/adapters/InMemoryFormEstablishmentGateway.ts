@@ -29,6 +29,14 @@ export class InMemoryFormEstablishmentGateway
     return [
       {
         profession: {
+          description:
+            "Agent(e) chargé(e) protection, sauvegarde patrimoine naturel",
+          romeCodeMetier: "A1204",
+        },
+        matchRanges: [{ startIndexInclusive: 9, endIndexExclusive: 13 }],
+      },
+      {
+        profession: {
           description: "Boulanger",
           romeCodeMetier: "A1111",
         },

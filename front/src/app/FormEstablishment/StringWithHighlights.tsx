@@ -59,17 +59,22 @@ export const StringWithHighlights = ({
         );
 
   return (
-    <>
+    <span>
       {slices.map(
         ({ startIndexInclusive, endIndexExclusive, bolded }, index) => {
           const text = description.slice(
             startIndexInclusive,
             endIndexExclusive,
           );
-          if (bolded) return <strong key={index}>{text}</strong>;
+          if (bolded)
+            return (
+              <span className="font-bold" key={index}>
+                {text}
+              </span>
+            );
           return <Fragment key={index}>{text}</Fragment>;
         },
       )}
-    </>
+    </span>
   );
 };
