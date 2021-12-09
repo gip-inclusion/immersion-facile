@@ -6,23 +6,65 @@ import { makeVerifyJwt } from "./../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
 import jwt from "jsonwebtoken";
 import { ApiConsumer } from "../../shared/tokens/ApiConsumer";
+import promClient from "prom-client";
 
 const logger = createLogger(__filename);
+
+const apiKeyAuthMiddlewareRequestsTotal = new promClient.Counter({
+  name: "api_key_auth_middleware_requests_total",
+  help: "The total count each api keys that tried to use the api",
+  labelNames: ["route", "method", "consumerName", "authorisationStatus"],
+});
+
+const convertRouteToLog = (originalUrl: string) =>
+  "/" + originalUrl.split("/")[1];
 
 export const createApiKeyAuthMiddleware = (config: AppConfig) => {
   const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
   const authorizedIds = config.authorizedApiKeyIds;
 
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.headers.authorization) next();
-    verifyJwt(req.headers.authorization as string, (err, payload) => {
-      if (err) next();
-      if (authorizedIds.includes(payload.id)) next();
+    if (!req.headers.authorization) {
+      apiKeyAuthMiddlewareRequestsTotal.inc({
+        route: convertRouteToLog(req.originalUrl),
+        method: req.method,
+      });
+      return next();
+    }
+    verifyJwt(
+      req.headers.authorization as string,
+      (err, apiConsumerPayload: ApiConsumer) => {
+        if (err) {
+          apiKeyAuthMiddlewareRequestsTotal.inc({
+            route: req.route,
+            method: req.method,
+            consumerName: apiConsumerPayload.name,
+            authorisationStatus: "incorrectJwt",
+          });
+          return next();
+        }
+        if (!authorizedIds.includes(apiConsumerPayload.id)) {
+          apiKeyAuthMiddlewareRequestsTotal.inc({
+            route: req.route,
+            method: req.method,
+            consumerName: apiConsumerPayload.name,
+            authorisationStatus: "unauthorizedId",
+          });
+          return next();
+        }
 
-      // only if the user is known, and the id authorized, we add apiConsumer payload to the request:
-      req.apiConsumer = payload as ApiConsumer;
-      next();
-    });
+        apiKeyAuthMiddlewareRequestsTotal.inc({
+          route: req.route,
+          method: req.method,
+          consumerName: apiConsumerPayload.name,
+          authorisationStatus: "authorised",
+        });
+
+        // only if the user is known, and the id authorized, we add apiConsumer payload to the request:
+        req.apiConsumer = apiConsumerPayload;
+        return next();
+      },
+    );
   };
 };
 
