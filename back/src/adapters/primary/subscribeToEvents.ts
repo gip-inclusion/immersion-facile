@@ -44,6 +44,9 @@ const getUseCasesByTopics = (
     useCases.transformFormEstablishmentToSearchData,
     useCases.notifyConfirmationEstablishmentCreated,
   ],
+  EmailContactRequestedByBeneficiary: [
+    useCases.notifyEstablishmentOfContactRequest,
+  ],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

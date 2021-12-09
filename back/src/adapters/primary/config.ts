@@ -37,6 +37,7 @@ import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFo
 import { ContactEstablishment } from "../../domain/immersionOffer/useCases/ContactEstablishment";
 import { GetImmersionOfferById } from "../../domain/immersionOffer/useCases/GetImmersionOfferById";
 import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
+import { NotifyEstablishmentOfContactRequest } from "../../domain/immersionOffer/useCases/notifications/NotifyEstablishmentOfContactRequest";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
 import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { RomeGateway } from "../../domain/rome/ports/RomeGateway";
@@ -229,6 +230,7 @@ export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;
 export const createInMemoryUow = () => ({
   outboxRepo: new InMemoryOutboxRepository(),
   formEstablishmentRepo: new InMemoryFormEstablishmentRepository(),
+  immersionOfferRepo: new InMemoryImmersionOfferRepository(),
 });
 
 // following function is for type check only, it is verifies InMemoryUnitOfWork is assignable to UnitOfWork
@@ -240,6 +242,7 @@ const isAssignable = (): UnitOfWork => {
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
   outboxRepo: new PgOutboxRepository(client),
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
+  immersionOfferRepo: new PgImmersionOfferRepositoryForSearch(client),
 });
 
 const createUowPerformer = (
@@ -435,6 +438,8 @@ const createUseCases = (
         emailFilter,
         repositories.email,
       ),
+    notifyEstablishmentOfContactRequest:
+      new NotifyEstablishmentOfContactRequest(emailFilter, repositories.email),
   };
 };
 

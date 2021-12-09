@@ -275,28 +275,26 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   async getImmersionFromUuid(
     uuid: string,
   ): Promise<SearchImmersionResultDto | undefined> {
-    // const { rows } = await this.client.query(
-    //   "SELECT * FROM immersion_offers WHERE uuid=$1",
-    //   [uuid],
-    // );
-    // console.log("MY value : ", rows);
-
-    // const { rows: all } = await this.client.query(
-    //   "SELECT * FROM immersion_offers",
-    // );
-    // console.log("ALL : ", all);
     return this.client
       .query(
-        "SELECT immersion_offers.* as immersion_offers,\
-        immersion_contacts.uuid as immersion_contacts_uuid,\
-        immersion_contacts.name as immersion_contacts_name,\
-        immersion_contacts.firstname as immersion_contacts_firstname,\
-        immersion_contacts.email as immersion_contacts_email,\
-        immersion_contacts.role as immersion_contacts_role,\
-        immersion_contacts.siret_establishment as immersion_contacts_siret_establishment,\
-        immersion_contacts.phone as immersion_contacts_phone \
-      FROM (SELECT * FROM immersion_offers WHERE uuid=$1) as immersion_offers LEFT JOIN immersion_contacts as immersion_contacts \
-      ON immersion_offers.contact_in_establishment_uuid = immersion_contacts.uuid",
+        `SELECT
+          immersion_offers.* AS immersion_offers,
+          immersion_contacts.uuid AS immersion_contacts_uuid,
+          immersion_contacts.name AS immersion_contacts_name,
+          immersion_contacts.firstname AS immersion_contacts_firstname,
+          immersion_contacts.email AS immersion_contacts_email,
+          immersion_contacts.role AS immersion_contacts_role,
+          immersion_contacts.siret_establishment AS immersion_contacts_siret_establishment,
+          immersion_contacts.phone AS immersion_contacts_phone,
+          establishments.contact_mode AS establishment_contact_mode
+      FROM
+        immersion_offers
+        LEFT JOIN immersion_contacts
+          ON immersion_offers.contact_in_establishment_uuid = immersion_contacts.uuid
+        LEFT JOIN establishments
+          ON immersion_offers.siret = establishments.siret
+      WHERE
+        immersion_offers.uuid=$1`,
         [uuid],
       )
       .then((res) => {
@@ -335,7 +333,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
     return this.client
       .query(
-        `SELECT 
+        `SELECT
             immersion_offers.* as immersion_offers,
             immersion_contacts.uuid as immersion_contacts_uuid,
             immersion_contacts.name as immersion_contacts_name,

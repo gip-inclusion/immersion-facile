@@ -135,13 +135,11 @@ describe("Transform FormEstablishment into search data", () => {
   const expectEstablishmentInRepo = async (
     formEstablishment: FormEstablishmentDto,
   ) => {
-    const establishments =
-      await inMemoryImmersionOfferRepository.getEstablishmentsFromSiret(
+    const establishment =
+      await inMemoryImmersionOfferRepository.getEstablishmentFromSiret(
         formEstablishment.siret,
       );
 
-    expect(establishments).toHaveLength(1);
-    const establishment = establishments[0];
     expect(establishment.getSiret()).toEqual(formEstablishment.siret);
     expect(establishment.getNaf().length).toEqual(5);
   };

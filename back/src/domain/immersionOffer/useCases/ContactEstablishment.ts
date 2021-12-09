@@ -1,3 +1,8 @@
+import { createLogger } from "./../../../utils/logger";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
@@ -14,7 +19,7 @@ export class ContactEstablishment extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
+    private readonly createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
@@ -23,7 +28,29 @@ export class ContactEstablishment extends TransactionalUseCase<
     params: ContactEstablishmentRequestDto,
     unitOfWork: UnitOfWork,
   ): Promise<void> {
-    throw new Error("implement");
-    // await unitOfWork.outboxRepo.save(event);
+    const immersionOffer =
+      await unitOfWork.immersionOfferRepo.getImmersionFromUuid(
+        params.immersionOfferId,
+      );
+
+    if (!immersionOffer) throw new NotFoundError(params.immersionOfferId);
+    if (params.contactMode !== immersionOffer.contactMode)
+      throw new BadRequestError(
+        `contact mode mismatch: ${params.contactMode} in immersion offer: ${params.immersionOfferId}`,
+      );
+
+    if (params.contactMode === "EMAIL") {
+      if (!immersionOffer.contactId) {
+        throw new BadRequestError(
+          `no contact id in immersion offer: ${params.immersionOfferId}`,
+        );
+      }
+
+      const event = this.createNewEvent({
+        topic: "EmailContactRequestedByBeneficiary",
+        payload: params,
+      });
+      await unitOfWork.outboxRepo.save(event);
+    }
   }
 }

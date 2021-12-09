@@ -32,6 +32,10 @@ export class ImmersionOfferEntity {
     return this.props;
   }
 
+  public getId(): ImmersionOfferId {
+    return this.props.id;
+  }
+
   public getName() {
     return this.props.name;
   }

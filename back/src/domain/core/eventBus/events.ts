@@ -1,3 +1,4 @@
+import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablishment";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import type { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import {
@@ -28,7 +29,11 @@ export type DomainEvent =
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationRequiresModification", ImmersionApplicationRequiresModificationPayload>
   | GenericEvent<"FormEstablishmentAdded", FormEstablishmentDto>
-  | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>;
+  | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>
+  | GenericEvent<
+      "EmailContactRequestedByBeneficiary",
+      ContactEstablishmentRequestDto
+    >;
 
 export type DomainTopic = DomainEvent["topic"];
 
