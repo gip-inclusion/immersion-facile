@@ -155,16 +155,6 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
     ),
   );
 
-  router.route(`/${immersionApplicationsRoute}`).post(async (req, res) =>
-    sendHttpResponse(req, res, () =>
-      callUseCase({
-        useCase: deps.useCases.addDemandeImmersionML,
-        validationSchema: immersionApplicationSchema,
-        useCaseParams: req.body,
-      }),
-    ),
-  );
-
   router
     .route(`/${agenciesRoute}`)
     .get(async (req, res) =>

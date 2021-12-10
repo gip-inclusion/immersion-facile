@@ -13,10 +13,7 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../domain/core/ports/UnitOfWork";
-import {
-  AddImmersionApplication,
-  AddImmersionApplicationML,
-} from "../../domain/immersionApplication/useCases/AddImmersionApplication";
+import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
 import { ListAgencies } from "../../domain/immersionApplication/useCases/ListAgencies";
@@ -317,13 +314,6 @@ const createUseCases = (
       repositories.demandeImmersion,
       createNewEvent,
       repositories.outbox,
-      getSiret,
-    ),
-    addDemandeImmersionML: new AddImmersionApplicationML(
-      repositories.demandeImmersion,
-      createNewEvent,
-      repositories.outbox,
-      generateJwtFn,
       getSiret,
     ),
     getDemandeImmersion: new GetImmersionApplication(

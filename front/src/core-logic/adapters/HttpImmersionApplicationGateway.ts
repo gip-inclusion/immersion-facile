@@ -2,8 +2,6 @@ import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { AgencyDto, listAgenciesResponseSchema } from "src/shared/agencies";
 import {
-  AddImmersionApplicationMLResponseDto,
-  addImmersionApplicationMLResponseDtoSchema,
   AddImmersionApplicationResponseDto,
   addImmersionApplicationResponseDtoSchema,
   ApplicationStatus,
@@ -48,24 +46,7 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
     return addDemandeImmersionResponse.id;
   }
 
-  public async addML(
-    demandeImmersionDto: ImmersionApplicationDto,
-  ): Promise<AddImmersionApplicationMLResponseDto> {
-    await immersionApplicationSchema.parse(demandeImmersionDto);
-    const httpResponse = await axios.post(
-      `/${prefix}/auth/${immersionApplicationsRoute}`,
-      demandeImmersionDto,
-    );
-    const addDemandeImmersionResponse: AddImmersionApplicationMLResponseDto =
-      httpResponse.data;
-
-    await addImmersionApplicationMLResponseDtoSchema.parse(
-      addDemandeImmersionResponse,
-    );
-    return addDemandeImmersionResponse;
-  }
-
-  public async get(id: string): Promise<ImmersionApplicationDto> {
+  public async backofficeGet(id: string): Promise<ImmersionApplicationDto> {
     const response = await axios.get(
       `/${prefix}/${immersionApplicationsRoute}/${id}`,
     );

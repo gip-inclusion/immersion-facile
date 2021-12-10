@@ -203,7 +203,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                 }
                 setInitialValues(immersionApplication);
 
-                // TODO: change success message to show both new links
                 setSuccessInfos(createSuccessInfos(undefined));
                 setSubmitError(null);
               } catch (e: any) {

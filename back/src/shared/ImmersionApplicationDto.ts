@@ -163,16 +163,6 @@ const idInObject = z.object({
 export type AddImmersionApplicationResponseDto = z.infer<typeof addImmersionApplicationResponseDtoSchema>;
 export const addImmersionApplicationResponseDtoSchema = idInObject;
 
-// TODO: remove links once email sending is set up. This is purely for debugging.
-export const addImmersionApplicationMLResponseDtoSchema = z.object({
-  magicLinkApplicant: z.string(),
-  magicLinkEnterprise: z.string(),
-});
-
-export type AddImmersionApplicationMLResponseDto = z.infer<
-  typeof addImmersionApplicationMLResponseDtoSchema
->;
-
 // prettier-ignore
 export type GetImmersionApplicationRequestDto = z.infer<typeof getImmersionApplicationRequestDtoSchema>;
 export const getImmersionApplicationRequestDtoSchema = idInObject;

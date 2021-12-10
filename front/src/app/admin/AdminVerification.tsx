@@ -29,7 +29,7 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
 
   useEffect(() => {
     immersionApplicationGateway
-      .get(id)
+      .backofficeGet(id)
       .then((data) => {
         setForm(data);
         if (form) {

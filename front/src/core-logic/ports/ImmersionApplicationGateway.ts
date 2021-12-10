@@ -1,7 +1,6 @@
 import { generateApplication } from "src/helpers/generateImmersionApplication";
 import { AgencyDto, AgencyId } from "src/shared/agencies";
 import {
-  AddImmersionApplicationMLResponseDto,
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
@@ -15,10 +14,11 @@ export abstract class ImmersionApplicationGateway {
   abstract add(
     immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<string>;
-  abstract addML(
-    immersionApplicationDto: ImmersionApplicationDto,
-  ): Promise<AddImmersionApplicationMLResponseDto>;
-  abstract get(id: ImmersionApplicationId): Promise<ImmersionApplicationDto>;
+
+  // Get an immersion application through backoffice, password-protected route.
+  abstract backofficeGet(
+    id: ImmersionApplicationId,
+  ): Promise<ImmersionApplicationDto>;
   abstract getML(jwt: string): Promise<ImmersionApplicationDto>;
 
   abstract update(

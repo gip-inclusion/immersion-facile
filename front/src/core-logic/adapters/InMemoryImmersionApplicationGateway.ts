@@ -3,7 +3,6 @@ import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionAppli
 import { AgencyDto } from "src/shared/agencies";
 import { FeatureFlags } from "src/shared/featureFlags";
 import {
-  AddImmersionApplicationMLResponseDto,
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
@@ -81,23 +80,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     return demandeImmersion.id;
   }
 
-  public async addML(
-    demandeImmersionDto: ImmersionApplicationDto,
-  ): Promise<AddImmersionApplicationMLResponseDto> {
-    console.log(
-      "InMemoryImmersionApplicationGateway.addML: ",
-      demandeImmersionDto,
-    );
-    await sleep(SIMULATED_LATENCY_MS);
-
-    this._demandesImmersion[demandeImmersionDto.id] = demandeImmersionDto;
-
-    // TODO: generate actual JWTs here
-    throw new Error("500 Not Implemented In InMemory Gateway");
-    return { magicLinkApplicant: "", magicLinkEnterprise: "" };
-  }
-
-  public async get(
+  public async backofficeGet(
     id: ImmersionApplicationId,
   ): Promise<ImmersionApplicationDto> {
     console.log("InMemoryImmersionApplicationGateway.get: ", id);
