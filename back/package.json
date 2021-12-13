@@ -19,7 +19,8 @@
     "typecheck": "tsc --noEmit",
     "includecheck": "./check_includes.sh",
     "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck",
-    "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck"
+    "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck",
+    "generate-api-key": "ts-node src/adapters/primary/generateApiKey.ts"
   },
   "keywords": [],
   "author": "",
