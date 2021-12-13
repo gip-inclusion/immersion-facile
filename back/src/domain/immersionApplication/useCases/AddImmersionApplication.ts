@@ -1,6 +1,3 @@
-import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
-import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
-import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   AddImmersionApplicationResponseDto,
@@ -8,14 +5,13 @@ import {
   immersionApplicationSchema,
 } from "../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../utils/logger";
-import { GenerateJwtFn } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
+import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
+import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
-import { Role } from "../../../shared/tokens/MagicLinkPayload";
-import { GetSiretRequestDto, GetSiretResponseDto } from "../../../shared/siret";
 
 const logger = createLogger(__filename);
 

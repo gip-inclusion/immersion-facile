@@ -4,14 +4,14 @@ import {
   GenerateMagicLinkResponseDto,
 } from "../../../shared/ImmersionApplicationDto";
 import { createMagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
-import { GenerateJwtFn } from "../../auth/jwt";
+import { GenerateMagicLinkJwt } from "../../auth/jwt";
 import { UseCase } from "../../core/UseCase";
 
 export class GenerateMagicLink extends UseCase<
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto
 > {
-  constructor(private readonly generateJwtFn: GenerateJwtFn) {
+  constructor(private readonly generateJwtFn: GenerateMagicLinkJwt) {
     super();
   }
 

@@ -1,4 +1,4 @@
-import { GenerateJwtFn } from "./../../../domain/auth/jwt";
+import { GenerateMagicLinkJwt } from "./../../../domain/auth/jwt";
 import { GenerateMagicLink } from "./../../../domain/immersionApplication/useCases/GenerateMagicLink";
 import {
   createMagicLinkPayload,
@@ -6,11 +6,8 @@ import {
   MagicLinkPayload,
 } from "../../../shared/tokens/MagicLinkPayload";
 
-const generateJwtFn: GenerateJwtFn = (payload: MagicLinkPayload) => {
-  return (
-    payload.applicationId + ";" + payload.roles.join(",") + ";" + payload.iat
-  );
-};
+const generateJwtFn: GenerateMagicLinkJwt = (payload) =>
+  payload.applicationId + ";" + payload.roles.join(",") + ";" + payload.iat;
 
 describe("Generate magic links", () => {
   let generateMagicLink: GenerateMagicLink;

@@ -1,33 +1,30 @@
 import {
-  CreateNewEvent,
-  makeCreateNewEvent,
-} from "./../../../domain/core/eventBus/EventBus";
-import { InMemoryOutboxRepository } from "./../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { RenewMagicLink } from "./../../../domain/immersionApplication/useCases/RenewMagicLink";
+  BadRequestError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/sendHttpResponse";
+import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
+import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
+import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
 import {
   ImmersionApplicationDto,
   RenewMagicLinkRequestDto,
 } from "../../../shared/ImmersionApplicationDto";
-import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { AlwaysAllowEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { GenerateJwtFn } from "../../../domain/auth/jwt";
 import {
   createMagicLinkPayload,
   MagicLinkPayload,
 } from "../../../shared/tokens/MagicLinkPayload";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/sendHttpResponse";
+import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
+import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { InMemoryOutboxRepository } from "./../../../adapters/secondary/core/InMemoryOutboxRepository";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "./../../../domain/core/eventBus/EventBus";
+import { RenewMagicLink } from "./../../../domain/immersionApplication/useCases/RenewMagicLink";
 
 const validDemandeImmersion: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();
@@ -45,9 +42,8 @@ describe("RenewMagicLink use case", () => {
   let createNewEvent: CreateNewEvent;
   let agencyRepository: InMemoryAgencyRepository;
 
-  const generateJwtFn: GenerateJwtFn = (payload: MagicLinkPayload) => {
-    return payload.applicationId + "; " + payload.roles.join(",");
-  };
+  const generateJwtFn: GenerateMagicLinkJwt = (payload) =>
+    payload.applicationId + "; " + payload.roles.join(",");
 
   beforeEach(() => {
     agencyConfig = defaultAgencyConfig;

@@ -27,7 +27,7 @@ import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { expectEmailMatchingLinkRenewalEmail } from "../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
-import { GenerateJwtFn } from "../../domain/auth/jwt";
+import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 import {
   createMagicLinkPayload,
   MagicLinkPayload,
@@ -52,7 +52,7 @@ describe("Magic link renewal flow", () => {
   let renewMagicLink: RenewMagicLink;
   let deliverRenewedMagicLink: DeliverRenewedMagicLink;
 
-  const generateJwtFn: GenerateJwtFn = (payload: MagicLinkPayload) => {
+  const generateJwtFn: GenerateMagicLinkJwt = (payload: MagicLinkPayload) => {
     return payload.applicationId + "; " + payload.roles.join(",");
   };
 

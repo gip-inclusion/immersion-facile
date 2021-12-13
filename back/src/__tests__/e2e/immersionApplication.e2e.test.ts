@@ -13,14 +13,14 @@ import {
 } from "../../shared/tokens/MagicLinkPayload";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { GenerateJwtFn } from "../../domain/auth/jwt";
+import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 
 let request: SuperTest<Test>;
-let generateJwt: GenerateJwtFn;
+let generateJwt: GenerateMagicLinkJwt;
 
 const initializeSystemUnderTest = async (config: AppConfig) => {
   request = supertest(await createApp(config));
-  generateJwt = makeGenerateJwt(config.jwtPrivateKey);
+  generateJwt = makeGenerateJwt(config);
 };
 
 describe("/demandes-immersion route", () => {

@@ -4,7 +4,7 @@ import {
   RenewMagicLinkRequestDto,
   renewMagicLinkRequestSchema,
 } from "../../../shared/ImmersionApplicationDto";
-import { GenerateJwtFn } from "../../auth/jwt";
+import { GenerateMagicLinkJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
@@ -21,7 +21,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
     private readonly agencyRepository: AgencyRepository,
-    private readonly generateJwtFn: GenerateJwtFn,
+    private readonly generateJwtFn: GenerateMagicLinkJwt,
   ) {
     super();
   }

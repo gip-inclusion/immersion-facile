@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
-import { GenerateJwtFn, makeGenerateJwt } from "../../domain/auth/jwt";
+import { GenerateMagicLinkJwt, makeGenerateJwt } from "../../domain/auth/jwt";
 import {
   EventBus,
   makeCreateNewEvent,
@@ -102,7 +102,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const repositories = await createRepositories(config, getPgPoolFn);
   const uowPerformer = createUowPerformer(config, getPgPoolFn);
   const eventBus = createEventBus();
-  const generateJwtFn = createGenerateJwtFn(config);
+  const generateJwtFn = makeGenerateJwt(config);
   const generateMagicLinkFn = createGenerateVerificationMagicLink(config);
   const emailFilter = config.skipEmailAllowlist
     ? new AlwaysAllowEmailFilter()
@@ -269,15 +269,12 @@ export const createAuthChecker = (config: AppConfig) => {
   );
 };
 
-export const createGenerateJwtFn = (config: AppConfig): GenerateJwtFn =>
-  makeGenerateJwt(config.jwtPrivateKey);
-
 export type GenerateVerificationMagicLink = ReturnType<
   typeof createGenerateVerificationMagicLink
 >;
 // Visible for testing.
 export const createGenerateVerificationMagicLink = (config: AppConfig) => {
-  const generateJwt = createGenerateJwtFn(config);
+  const generateJwt = makeGenerateJwt(config);
 
   return (id: ImmersionApplicationId, role: Role, targetRoute: string) => {
     const baseUrl = config.immersionFacileBaseUrl;
@@ -298,7 +295,7 @@ export type UseCases = ReturnType<typeof createUseCases>;
 const createUseCases = (
   config: AppConfig,
   repositories: Repositories,
-  generateJwtFn: GenerateJwtFn,
+  generateJwtFn: GenerateMagicLinkJwt,
   generateMagicLinkFn: GenerateVerificationMagicLink,
   emailFilter: EmailFilter,
   addressGateway: APIAdresseGateway,

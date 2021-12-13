@@ -1,13 +1,18 @@
 import jwt from "jsonwebtoken";
+import { AppConfig } from "../../adapters/primary/appConfig";
 import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 
 const algo = "ES256";
 
-export type GenerateJwtFn = (payload: MagicLinkPayload) => string;
+type AnyObject = Record<string, unknown>;
+
+export type GenerateMagicLinkJwt = GenerateJwtFn<MagicLinkPayload>;
+// prettier-ignore
+type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload) => string;
 export const makeGenerateJwt =
-  (jwtPrivateKey: string): GenerateJwtFn =>
-  (payload: MagicLinkPayload) =>
-    jwt.sign(payload, jwtPrivateKey, { algorithm: algo });
+  <P extends AnyObject>(config: AppConfig): GenerateJwtFn<P> =>
+  (payload) =>
+    jwt.sign(payload, config.jwtPrivateKey, { algorithm: algo });
 
 export const makeVerifyJwt =
   <Payload>(jwtPublicKey: string) =>
