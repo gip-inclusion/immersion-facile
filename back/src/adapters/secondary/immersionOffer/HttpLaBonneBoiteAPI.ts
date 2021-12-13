@@ -4,7 +4,7 @@ import {
   LaBonneBoiteAPI,
   LaBonneBoiteCompany,
 } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
-import { createAxiosInstance } from "../../../utils/axiosUtils";
+import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -21,20 +21,25 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
     const accessToken = await this.accessTokenGateway.getAccessToken(
       `application_${this.poleEmploiClientId} api_labonneboitev1`,
     );
-    const response = await createAxiosInstance(logger).get(
-      "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+    try {
+      const response = await createAxiosInstance(logger).get(
+        "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            distance: searchParams.distance_km,
+            longitude: searchParams.lon,
+            latitude: searchParams.lat,
+            rome_codes: searchParams.rome,
+          },
         },
-        params: {
-          distance: searchParams.distance_km,
-          longitude: searchParams.lon,
-          latitude: searchParams.lat,
-          rome_codes: searchParams.rome,
-        },
-      },
-    );
-    return response.data.companies || [];
+      );
+      return response.data.companies || [];
+    } catch (error: any) {
+      logAxiosError(logger, error, "Error calling labonneboite API");
+      throw error;
+    }
   }
 }

@@ -2,12 +2,11 @@ import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../do
 import { createLogger } from "../../utils/logger";
 import { PipelineStats } from "../../utils/pipelineStats";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
+import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
-import { LaBonneBoiteGateway } from "../secondary/immersionOffer/LaBonneBoiteGateway";
-import { LaPlateFormeDeLInclusionGateway } from "../secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
+import { HttpLaPlateformeDeLInclusionAPI } from "../secondary/immersionOffer/HttpLaPlateformeDeLInclusionAPI";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
-import { HttpLaPlateformeDeLInclusionAPI } from "./../secondary/immersionOffer/HttpLaPlateformeDeLInclusionAPI";
 import { AppConfig } from "./appConfig";
 import { createGetPgPoolFn, createRepositories } from "./config";
 
@@ -23,21 +22,21 @@ const main = async () => {
 
   const config = AppConfig.createFromEnv();
 
+  const uuidGenerator = new UuidV4Generator();
+
   const poleEmploiAccessTokenGateway = new CachingAccessTokenGateway(
     new PoleEmploiAccessTokenGateway(config.poleEmploiAccessTokenConfig),
   );
 
-  const laBonneBoite = new LaBonneBoiteGateway(
-    new HttpLaBonneBoiteAPI(
-      poleEmploiAccessTokenGateway,
-      config.poleEmploiClientId,
-    ),
+  const laBonneBoiteAPI = new HttpLaBonneBoiteAPI(
+    poleEmploiAccessTokenGateway,
+    config.poleEmploiClientId,
   );
 
   const addressGateway = new APIAdresseGateway();
 
-  const laPlateFormeDeLInclusion = new LaPlateFormeDeLInclusionGateway(
-    new HttpLaPlateformeDeLInclusionAPI(addressGateway),
+  const laPlateFormeDeLInclusionAPI = new HttpLaPlateformeDeLInclusionAPI(
+    addressGateway,
   );
 
   const repositories = await createRepositories(
@@ -47,8 +46,9 @@ const main = async () => {
 
   const updateEstablishmentsAndImmersionOffersFromLastSearches =
     new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
-      laBonneBoite,
-      laPlateFormeDeLInclusion,
+      uuidGenerator,
+      laBonneBoiteAPI,
+      laPlateFormeDeLInclusionAPI,
       addressGateway.getGPSFromAddressAPIAdresse,
       repositories.sirene,
       repositories.immersionOfferForSearch,

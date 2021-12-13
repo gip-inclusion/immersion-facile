@@ -1,5 +1,5 @@
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
-import { LaPlateFormeDeLInclusionGateway } from "../../../adapters/secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { GetPosition } from "../../../domain/immersionOffer/ports/GetPosition";
 import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
@@ -7,19 +7,21 @@ import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../..
 import { LaPlateFormeDeLInclusionPosteBuilder } from "../../../_testBuilders/LaPlateFormeDeLInclusionPosteBuilder";
 import { InMemoryLaBonneBoiteAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryLaPlateformeDeLInclusionAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryLaPlateformeDeLInclusionAPI";
-import { LaBonneBoiteGateway } from "./../../../adapters/secondary/immersionOffer/LaBonneBoiteGateway";
 import { LaBonneBoiteCompanyBuilder } from "./../../../_testBuilders/LaBonneBoiteResponseBuilder";
 import { LaPlateformeDeLInclusionResultBuilder } from "./../../../_testBuilders/LaPlateformeDeLInclusionResultBuilder";
 
 const inMemorySireneRepository = new InMemorySireneRepository();
 
 describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
+  let testUuidGenerator: TestUuidGenerator;
   let updateEstablishmentsAndImmersionOffersFromLastSearches: UpdateEstablishmentsAndImmersionOffersFromLastSearches;
   let immersionOfferRepository: InMemoryImmersionOfferRepository;
   let laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   let laPlateFormeDeLInclusionAPI: InMemoryLaPlateformeDeLInclusionAPI;
 
   beforeEach(() => {
+    testUuidGenerator = new TestUuidGenerator();
+
     immersionOfferRepository = new InMemoryImmersionOfferRepository();
     immersionOfferRepository.empty();
 
@@ -33,8 +35,9 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 
     updateEstablishmentsAndImmersionOffersFromLastSearches =
       new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
-        new LaBonneBoiteGateway(laBonneBoiteAPI),
-        new LaPlateFormeDeLInclusionGateway(laPlateFormeDeLInclusionAPI),
+        testUuidGenerator,
+        laBonneBoiteAPI,
+        laPlateFormeDeLInclusionAPI,
         fakeGetPosition,
         inMemorySireneRepository,
         immersionOfferRepository,

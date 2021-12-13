@@ -2,11 +2,16 @@ import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { SireneRepository } from "../../sirene/ports/SireneRepository";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { EstablishmentsGateway } from "../ports/EstablishmentsGateway";
 import { GetPosition } from "../ports/GetPosition";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { LaPlateformeDeLInclusionAPI } from "../ports/LaPlateformeDeLInclusionAPI";
+import { UuidGenerator } from "./../../core/ports/UuidGenerator";
 import { UncompleteEstablishmentEntity } from "./../entities/UncompleteEstablishmentEntity";
 import { SearchParams } from "./../ports/ImmersionOfferRepository";
+import {
+  LaBonneBoiteAPI,
+  LaBonneBoiteCompany,
+} from "./../ports/LaBonneBoiteAPI";
 
 const logger = createLogger(__filename);
 
@@ -14,8 +19,9 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   public readonly stats = new PipelineStats(this.constructor.name);
 
   constructor(
-    private readonly laBonneBoiteGateway: EstablishmentsGateway,
-    private readonly laPlateFormeDeLInclusionGateway: EstablishmentsGateway,
+    private readonly uuidGenerator: UuidGenerator,
+    private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
+    private readonly laPlateFormeDeLInclusionAPI: LaPlateformeDeLInclusionAPI,
     private readonly getPosition: GetPosition,
     private readonly sireneRepository: SireneRepository,
     private readonly immersionOfferRepository: ImmersionOfferRepository,
@@ -85,26 +91,22 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     // TODO(nsw): Parallelize once we have request throttling.
     return [
       await this.searchInternal(
-        this.laPlateFormeDeLInclusionGateway,
-        searchParams,
+        () => this.searchLaBonneBoite(searchParams),
         "search-la_plateforme_de_l_inclusion",
       ),
       await this.searchInternal(
-        this.laBonneBoiteGateway,
-        searchParams,
+        () => this.searchLaPlateformeDeLInclusion(searchParams),
         "search-la_bonne_boite",
       ),
     ].flat();
   }
 
   private async searchInternal(
-    establishmentGateway: EstablishmentsGateway,
-    searchParams: SearchParams,
+    searchFn: () => Promise<UncompleteEstablishmentEntity[]>,
     counterNamePrefix: string,
   ): Promise<EstablishmentEntity[]> {
     this.stats.startAggregateTimer(`${counterNamePrefix}-latency`);
-    const uncompleteEstablishments =
-      await establishmentGateway.getEstablishments(searchParams);
+    const uncompleteEstablishments = await searchFn();
     this.stats.stopAggregateTimer(`${counterNamePrefix}-latency`);
 
     this.stats.recordSample(
@@ -145,5 +147,99 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
         completeEstablishments.push(completeEstablishment);
     }
     return completeEstablishments;
+  }
+
+  private async searchLaBonneBoite(
+    searchParams: SearchParams,
+  ): Promise<UncompleteEstablishmentEntity[]> {
+    try {
+      const laBonneBoiteResponse = await this.laBonneBoiteAPI.searchCompanies(
+        searchParams,
+      );
+
+      return laBonneBoiteResponse
+        .filter((company) =>
+          this.keepRelevantCompanies(searchParams.rome, company),
+        )
+        .map(
+          (company) =>
+            new UncompleteEstablishmentEntity({
+              id: this.uuidGenerator.new(),
+              address: company.address,
+              position: { lat: company.lat, lon: company.lon },
+              naf: company.naf,
+              name: company.name,
+              siret: company.siret,
+              score: company.stars,
+              voluntaryToImmersion: false,
+              romes: [company.matched_rome_code],
+              dataSource: "api_labonneboite",
+            }),
+        );
+    } catch (error: any) {
+      return [];
+    }
+  }
+
+  private keepRelevantCompanies(
+    romeSearched: string,
+    company: LaBonneBoiteCompany,
+  ): boolean {
+    if (
+      (company.naf.startsWith("9609") && romeSearched == "A1408") ||
+      (company.naf == "XXXXX" && romeSearched == "A1503") ||
+      (company.naf == "5610C" && romeSearched == "D1102") ||
+      (company.naf.startsWith("8411") && romeSearched == "D1202") ||
+      (company.naf.startsWith("8411") &&
+        [
+          "D1202",
+          "G1404",
+          "G1501",
+          "G1502",
+          "G1503",
+          "G1601",
+          "G1602",
+          "G1603",
+          "G1605",
+          "G1802",
+          "G1803",
+        ].indexOf(romeSearched) > -1)
+    ) {
+      logger.info({ company }, "Not relevant, discarding.");
+      return false;
+    } else {
+      logger.debug({ company }, "Relevant.");
+      return true;
+    }
+  }
+
+  private async searchLaPlateformeDeLInclusion(
+    searchParams: SearchParams,
+  ): Promise<UncompleteEstablishmentEntity[]> {
+    const results = await this.laPlateFormeDeLInclusionAPI.getResults(
+      searchParams,
+    );
+    return results.map(
+      (result) =>
+        new UncompleteEstablishmentEntity({
+          id: this.uuidGenerator.new(),
+          address: [
+            result.addresse_ligne_1,
+            result.addresse_ligne_2,
+            result.code_postal,
+            result.ville,
+          ]
+            .filter((el) => !!el)
+            .join(" "),
+          score: 6,
+          voluntaryToImmersion: false,
+          romes: result.postes.map((poste) =>
+            poste.rome.substring(poste.rome.length - 6, poste.rome.length - 1),
+          ),
+          siret: result.siret,
+          dataSource: "api_laplateformedelinclusion",
+          name: result.enseigne,
+        }),
+    );
   }
 }
