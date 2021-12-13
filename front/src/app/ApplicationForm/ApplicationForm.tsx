@@ -101,7 +101,8 @@ const createInitialApplication = (
     mentor: "Le Mentor du futur",
     mentorPhone: "0101100110",
     mentorEmail: "mentor@supermentor.fr",
-    immersionAddress: "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
+    immersionAddress:
+      "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
 
     // Covid
     individualProtection: true,
@@ -146,7 +147,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
           response.dateSubmission = toDateString(startOfToday());
         }
         setInitialValues(response);
-
       })
       .catch((e) => {
         console.log(e);

@@ -80,7 +80,7 @@ export const ApplicationFormFields = ({
   alreadySubmitted,
   onRejectForm,
 }: ApplicationFieldsProps) => {
-  const { errors, submitCount, initialValues, setFieldValue, isSubmitting, submitForm } =
+  const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
     useFormikContext<ImmersionApplicationDto>();
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", establishmentInfo);
@@ -224,6 +224,7 @@ export const ApplicationFormFields = ({
       />
 
       <AddressAutocomplete
+        initialSearchTerm={establishmentInfo?.businessAddress}
         label="Adresse du lieu où se fera l'immersion * "
         setFormValue={({ label }) => setFieldValue("immersionAddress", label)}
         disabled={isFrozen || isFetchingSiret}
@@ -332,15 +333,13 @@ export const ApplicationFormFields = ({
       )}
 
       {successInfos && (
-        <SuccessMessage
-          title="Succès de l'envoi">
+        <SuccessMessage title="Succès de l'envoi">
           {successInfos.message}
           {successInfos.link && (
             <a href={successInfos.link}>{successInfos.link}</a>
           )}
         </SuccessMessage>
-      )
-      }
+      )}
 
       <p />
 
@@ -367,10 +366,11 @@ export const ApplicationFormFields = ({
                     ? "enterpriseAccepted"
                     : "beneficiaryAccepted"
                 }
-                label={`Je, ${signeeName} (${isSignatureEnterprise
+                label={`Je, ${signeeName} (${
+                  isSignatureEnterprise
                     ? "représentant de la structure d'accueil"
                     : "bénéficiaire de l'immersion"
-                  }) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
+                }) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
                 description="Avant de répondre, consultez ces dispositions ici"
                 descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
                 disabled={false}

@@ -10,13 +10,16 @@ export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
   establishmentInfos: GetSiretResponseDto | undefined,
   fieldToUpdate?: string,
 ) => {
-  const [_, { touched }, { setValue }] = useField<GetSiretResponseDto[K]>({
+  const [{ value }, { touched }, { setValue }] = useField<
+    GetSiretResponseDto[K]
+  >({
     name: fieldToUpdate ?? fieldFromInfo,
   });
 
   useEffect(() => {
     if (!establishmentInfos) return;
-    if (!touched) setValue(establishmentInfos[fieldFromInfo]);
+    if (!touched)
+      setValue(establishmentInfos && establishmentInfos[fieldFromInfo]);
   }, [establishmentInfos]);
 };
 

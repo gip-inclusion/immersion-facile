@@ -199,12 +199,14 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   }
 
   public async getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto> {
-    console.log("InMemoryImmersionApplicationGateway.getSiretInfo: " + siret);
+    console.log(
+      "InMemoryImmersionApplicationGateway.getSiretInfo for siret: " + siret,
+    );
     await sleep(SIMULATED_LATENCY_MS);
 
     const establishment = this._establishments[siret];
     console.log(
-      "InMemoryImmersionApplicationGateway.getSiretInfo: ",
+      "InMemoryImmersionApplicationGateway.getSiretInfo returned: ",
       establishment,
     );
 

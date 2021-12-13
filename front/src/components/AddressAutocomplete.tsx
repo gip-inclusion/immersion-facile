@@ -1,5 +1,4 @@
 import Autocomplete from "@mui/material/Autocomplete";
-import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { apiAdresseGateway } from "src/app/dependencies";
 import { useDebounce } from "src/app/useDebounce";
@@ -9,6 +8,7 @@ type Option = AddressWithCoordinates;
 
 export type AddressAutocompleteProps = {
   label: string;
+  initialSearchTerm?: string;
   disabled?: boolean;
   headerClassName?: string;
   inputStyle?: React.CSSProperties;
@@ -21,29 +21,49 @@ export const AddressAutocomplete = ({
   disabled,
   headerClassName,
   inputStyle,
+  initialSearchTerm = "",
 }: AddressAutocompleteProps) => {
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>(initialSearchTerm);
   const [options, setOptions] = useState<Option[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm, 400);
 
+  const getAddressesFromApi = async (
+    term: string,
+  ): Promise<AddressWithCoordinates[]> => {
+    const sanitizedTerm = term.trim();
+    if (!sanitizedTerm) return [];
+    try {
+      setIsSearching(true);
+      const addresses = await apiAdresseGateway.lookupStreetAddress(
+        sanitizedTerm,
+      );
+      setOptions(addresses);
+      return addresses;
+    } catch (e: any) {
+      console.error(e);
+      return [];
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      const sanitizedTerm = debounceSearchTerm.trim();
-      if (!sanitizedTerm) return [];
-      try {
-        setIsSearching(true);
-        const addresses = await apiAdresseGateway.lookupStreetAddress(
-          sanitizedTerm,
-        );
-        setOptions(addresses);
-      } catch (e: any) {
-        console.error(e);
-      } finally {
-        setIsSearching(false);
-      }
-    })();
+    if (initialSearchTerm && initialSearchTerm !== selectedOption?.label) {
+      getAddressesFromApi(initialSearchTerm).then((addresses) =>
+        setSelectedOption(addresses?.[0] ?? null),
+      );
+    }
+  }, [initialSearchTerm]);
+
+  useEffect(() => {
+    if (
+      debounceSearchTerm &&
+      ![initialSearchTerm, selectedOption?.label].includes(debounceSearchTerm)
+    ) {
+      getAddressesFromApi(debounceSearchTerm);
+    }
   }, [debounceSearchTerm]);
 
   const noOptionText =
