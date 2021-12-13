@@ -75,7 +75,7 @@ export const Search = () => {
               });
           }}
         >
-          {({ setFieldValue }) => (
+          {({ setFieldValue, values }) => (
             <Form>
               <div className="formContentsContainer">
                 <div>
@@ -133,13 +133,15 @@ export const Search = () => {
       <div className="searchResultContainer">
         {result &&
           result.map((r) => {
+            const distanceKm = ((r.distance_m ?? 0) / 1000).toFixed(1);
+
             return (
               <EnterpriseSearchResult
                 key={r.id}
                 title={r.name}
                 employeeCount="TODO: count"
                 metierDescription="TODO: add rome description"
-                radius={`${(r.distance_m ?? 0 / 1000).toFixed(1)} km`}
+                radius={`${distanceKm} km`}
                 address={r.address}
                 phone={r.naf ?? r.rome}
                 siret={r.siret}

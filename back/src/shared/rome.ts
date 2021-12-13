@@ -16,17 +16,11 @@ const romeCodeAppellationSchema = z
   .regex(romeCodeAppellationRegex, "Code ROME incorrect");
 
 export type ProfessionDto = z.infer<typeof professionSchema>;
-export const professionSchema = z
-  .object({
-    romeCodeMetier: romeCodeMetierSchema.optional(),
-    romeCodeAppellation: romeCodeAppellationSchema.optional(),
-    description: zTrimmedString,
-  })
-  .refine(
-    ({ romeCodeMetier, romeCodeAppellation }) =>
-      romeCodeMetier || romeCodeAppellation,
-    { message: "Obligatoire: 'romeCodeMetier' ou 'romeCodeAppellation'" },
-  );
+export const professionSchema = z.object({
+  romeCodeMetier: romeCodeMetierSchema,
+  romeCodeAppellation: romeCodeAppellationSchema.optional(),
+  description: zTrimmedString,
+});
 
 export type MatchRangeDto = z.infer<typeof matchRangeSchema>;
 const matchRangeSchema = z.object({

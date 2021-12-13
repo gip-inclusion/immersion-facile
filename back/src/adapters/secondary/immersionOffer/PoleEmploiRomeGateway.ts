@@ -13,6 +13,13 @@ import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
+
+/*
+ * PoleEmploiRomeGateway is Deprecated
+ * Please use PgRomeGateway instead (faster, no query limit, and always sends a Rome Code)
+ *
+ */
+
 export class PoleEmploiRomeGateway implements RomeGateway {
   private readonly axiosInstance: AxiosInstance;
   private readonly scope: string;

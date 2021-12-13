@@ -31,6 +31,7 @@ const validFormEstablishment: FormEstablishmentDto = {
       description: "Patissier",
     },
     {
+      romeCodeMetier: "D1103",
       romeCodeAppellation: "22222",
       description: "Boucher / Bouchère",
     },

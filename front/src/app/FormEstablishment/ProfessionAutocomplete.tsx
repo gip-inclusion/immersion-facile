@@ -48,7 +48,7 @@ export const ProfessionAutocomplete = ({
   );
   const [options, setOptions] = useState<Option[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const debounceSearchTerm = useDebounce(searchTerm, 400);
+  const debounceSearchTerm = useDebounce(searchTerm, 300);
 
   useEffect(() => {
     (async () => {
@@ -90,7 +90,9 @@ export const ProfessionAutocomplete = ({
         onChange={(_, selectedOption: Option | null) => {
           setSelectedOption(selectedOption ?? null);
           setFormValue(
-            selectedOption ? selectedOption.value : { description: "" },
+            selectedOption
+              ? selectedOption.value
+              : { description: "", romeCodeMetier: "" },
           );
         }}
         onInputChange={(_, newSearchTerm) => {

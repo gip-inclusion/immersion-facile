@@ -89,7 +89,11 @@ describe("Transform FormEstablishment into search data", () => {
   it("converts Form establishment event when they only have romeAppelation (not romeCode)", async () => {
     // prepare
     const professions: ProfessionDto[] = [
-      { romeCodeAppellation: "11987", description: "métier A" },
+      {
+        romeCodeAppellation: "11987",
+        romeCodeMetier: "A1101",
+        description: "métier A",
+      },
     ];
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withProfessions(professions)

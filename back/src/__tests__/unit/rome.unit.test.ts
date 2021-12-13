@@ -1,7 +1,7 @@
 import { professionSchema } from "../../shared/rome";
 
 describe("professionSchema", () => {
-  test("must include at least one code", () => {
+  test("must include rome code and can inculde appellation", () => {
     expect(() =>
       professionSchema.parse({
         romeCodeMetier: "A0000",
@@ -16,7 +16,7 @@ describe("professionSchema", () => {
         romeCodeAppellation: "00000",
         description: "description",
       }),
-    ).not.toThrowError();
+    ).toThrowError();
 
     expect(() =>
       professionSchema.parse({

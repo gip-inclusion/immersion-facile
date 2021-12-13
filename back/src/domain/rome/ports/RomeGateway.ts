@@ -9,9 +9,9 @@ export type RomeMetier = {
 };
 
 export type RomeAppellation = {
-  codeAppellation: RomeCodeAppellationDto;
   libelle: string;
-  codeMetier?: RomeCodeMetierDto;
+  codeAppellation: RomeCodeAppellationDto;
+  codeMetier: RomeCodeMetierDto;
 };
 
 export interface RomeGateway {

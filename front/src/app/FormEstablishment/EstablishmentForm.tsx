@@ -40,12 +40,14 @@ const initialValues: FormEstablishmentDto = ENV.dev
       businessAddress: "My business address, replaced by result from API",
       professions: [
         {
-          romeCodeMetier: "A1000",
+          romeCodeAppellation: "11573",
+          romeCodeMetier: "D1102",
           description: "Boulanger",
         },
         {
-          romeCodeMetier: "B2000",
-          description: "Boucher",
+          description: "Boucher / Bouchère",
+          romeCodeAppellation: "11564",
+          romeCodeMetier: "D1101",
         },
       ],
       businessContacts: [
