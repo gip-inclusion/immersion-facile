@@ -68,9 +68,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: 15,
   // https://my.sendinblue.com/camp/template/17/message-setup
   BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION: 17, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
-  // https://my.sendinblue.com/camp/template/17/message-setup
-  NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE: 18,
   // https://my.sendinblue.com/camp/template/18/message-setup
+  NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE: 18,
+  // https://my.sendinblue.com/camp/template/19/message-setup
   NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE: 19,
 };
 
@@ -278,7 +278,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     params: EnterpriseSignatureRequestNotificationParams,
   ): Promise<void> {
     this.sendTransacEmail(
-      "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
       [recipient],
       {
         MAGIC_LINK: params.magicLink,

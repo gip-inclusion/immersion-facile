@@ -60,10 +60,10 @@ export class NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty e
     const existingSignatureName =
       recipientRole === "establishment"
         ? application.mentor
-        : application.lastName.toUpperCase + " " + application.firstName;
+        : application.lastName.toUpperCase() + " " + application.firstName;
     const missingSignatureName =
       recipientRole === "establishment"
-        ? application.lastName.toUpperCase + " " + application.firstName
+        ? application.lastName.toUpperCase() + " " + application.firstName
         : application.mentor;
 
     const recipients = this.emailFilter.filter([recipientEmail], {
@@ -77,6 +77,9 @@ export class NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty e
           magicLink,
           existingSignatureName,
           missingSignatureName,
+          beneficiaryFirstName: application.firstName,
+          beneficiaryLastName: application.lastName,
+          immersionProfession: application.immersionProfession,
         },
       );
     } else {
@@ -88,6 +91,9 @@ export class NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty e
           magicLink,
           existingSignatureName,
           missingSignatureName,
+          beneficiaryFirstName: application.firstName,
+          beneficiaryLastName: application.lastName,
+          immersionProfession: application.immersionProfession,
         },
         "Sending modification request confirmation email skipped.",
       );
