@@ -7,6 +7,7 @@ import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { Route } from "type-route";
 import { routes } from "../routes";
 import { InfoMessage } from "src/components/form/InfoMessage";
+import { successMessageByStatus } from "../Verification/VerificationPage";
 
 // Temporary "final verification" page for the admin to re-verify the form.
 

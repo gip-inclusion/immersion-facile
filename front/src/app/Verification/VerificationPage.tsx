@@ -52,6 +52,27 @@ const isAllowedTransition = (
   return true;
 };
 
+export const successMessageByStatus = {
+  REJECTED:
+    "Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise.",
+  ACCEPTED_BY_COUNSELLOR:
+    "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la convention.",
+  ACCEPTED_BY_VALIDATOR:
+    "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail au bénéficiaire et à l'entreprise.",
+  VALIDATED:
+    "Succès. La confirmation de cette validation est bien envoyée par mail au bénéficiaire et à l'entreprise.",
+  UNKNOWN:
+    "Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement",
+  DRAFT:
+    "Succès. Cette demande de modification va être communiquée par mail au bénéficiaire et à l'entreprise",
+  READY_TO_SIGN:
+    "Attention! Cette demande d'immersion est à statut 'Prête à ëtre Signée', donc vous ne devriez pas encore pouvoir la visualiser. Veuillez consulter l'équipe Immérsion Facilitée",
+  PARTIALLY_SIGNED:
+    "Attention! Cette demande d'immersion est à statut 'Signée Partiellement', donc vous ne devriez pas encore pouvoir la visualiser. Veuillez consulter l'équipe Immérsion Facilitée",
+  IN_REVIEW:
+    "Attention! Cette demande d'immersion est à statut 'En cours de revue', l'opération que vous venez d'effectuer ne semble pas avoir été appliquée. Veuillez réésayer ou consulter l'équipe Immérsion Facilitée",
+};
+
 export const VerificationPage = ({ route }: VerificationPageProps) => {
   const {
     immersionApplication,
@@ -121,7 +142,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           <VerificationActionButton
             {...buttonProps}
             newStatus="REJECTED"
-            messageToShowOnSuccess="La demande d'immersion a bien été refusé"
+            messageToShowOnSuccess="Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise."
           >
             Refuser l'immersion ...
           </VerificationActionButton>
@@ -135,7 +156,9 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           <VerificationActionButton
             {...buttonProps}
             newStatus="DRAFT"
-            messageToShowOnSuccess={sentForModificationSuccessfully}
+            messageToShowOnSuccess={
+              "Succès. Cette demande de modification va être communiquée par mail au bénéficiaire et à l'entreprise"
+            }
           >
             Renvoyer au bénéficiaire pour modification
           </VerificationActionButton>
@@ -148,7 +171,9 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           <VerificationActionButton
             {...buttonProps}
             newStatus="ACCEPTED_BY_COUNSELLOR"
-            messageToShowOnSuccess={validatedSuccessfully}
+            messageToShowOnSuccess={
+              "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la convention."
+            }
             disabled={!!successMessage || currentStatus != "IN_REVIEW"}
           >
             {currentStatus === "ACCEPTED_BY_COUNSELLOR"
@@ -164,7 +189,9 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           <VerificationActionButton
             {...buttonProps}
             newStatus="ACCEPTED_BY_VALIDATOR"
-            messageToShowOnSuccess={validatedSuccessfully}
+            messageToShowOnSuccess={
+              "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail au bénéficiaire et à l'entreprise."
+            }
             disabled={
               !!successMessage ||
               (currentStatus != "IN_REVIEW" &&
@@ -184,7 +211,9 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           <VerificationActionButton
             {...buttonProps}
             newStatus="VALIDATED"
-            messageToShowOnSuccess={validatedSuccessfully}
+            messageToShowOnSuccess={
+              "Succès. La confirmation de cette validation est bien envoyée par mail au bénéficiaire et à l'entreprise."
+            }
             disabled={
               !!successMessage || currentStatus != "ACCEPTED_BY_VALIDATOR"
             }
@@ -196,7 +225,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         )}
 
         {errorMessage && (
-          <ErrorMessage title="Désolé: Erreur de traitement sur la plateforme, veuillez réessayer ultérieurement">
+          <ErrorMessage title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. Veuillez réessayer ultérieurement">
             {errorMessage}
           </ErrorMessage>
         )}
