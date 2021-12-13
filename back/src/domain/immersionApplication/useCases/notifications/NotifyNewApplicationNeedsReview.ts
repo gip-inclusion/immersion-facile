@@ -42,6 +42,9 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
       immersionApplicationDto.status,
       agencyConfig,
     );
+    logger.debug(
+      "immersionApplicationDto.status : " + immersionApplicationDto.status,
+    );
 
     if (!recipients) {
       logger.error(

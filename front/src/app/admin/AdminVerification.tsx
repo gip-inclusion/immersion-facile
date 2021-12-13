@@ -23,10 +23,31 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
 
   const id = route.params.demandeId;
 
+  const successMessageByStatus = {
+    REJECTED:
+      "Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise.",
+    ACCEPTED_BY_COUNSELLOR:
+      "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la convention.",
+    ACCEPTED_BY_VALIDATOR:
+      "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail au bénéficiaire et à l'entreprise.",
+    VALIDATED:
+      "Succès. La confirmation de cette validation est bien envoyée par mail au bénéficiaire et à l'entreprise.",
+    UNKNOWN:
+      "Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement",
+    DRAFT:
+      "Succès. Cette demande de modification va être communiquée par mail au bénéficiaire et à l'entreprise",
+    READY_TO_SIGN:
+      "Attention! Cette demande d'immersion est à statut 'Prête à ëtre Signée', donc vous ne devriez pas encore pouvoir la visualiser. Veuillez consulter l'équipe Immérsion Facilitée",
+    PARTIALLY_SIGNED:
+      "Attention! Cette demande d'immersion est à statut 'Signée Partiellement', donc vous ne devriez pas encore pouvoir la visualiser. Veuillez consulter l'équipe Immérsion Facilitée",
+    IN_REVIEW:
+      "Attention! Cette demande d'immersion est à statut 'En cours de revue', l'opération que vous venez d'effectuer ne semble pas avoir été appliquée. Veuillez réésayer ou consulter l'équipe Immérsion Facilitée",
+  };
+
+
   const validationDisabled = () => {
     return !form || form.status !== "IN_REVIEW";
   };
-
   useEffect(() => {
     immersionApplicationGateway
       .backofficeGet(id)
@@ -54,12 +75,14 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
   const sendValidationRequest = () => {
     if (!form) return;
     setSubmitting(true);
+
+
     immersionApplicationGateway
       .validate(form.id)
       .then(() => {
         setSuccessMessage(
-          "La demande est validée et les mails de confirmation vont être envoyés au tuteur et demandeur.",
-        );
+          successMessageByStatus[form.status])
+
         setForm({ ...form, status: "VALIDATED" });
       })
       .catch((err: React.SetStateAction<Error | null>) => {
