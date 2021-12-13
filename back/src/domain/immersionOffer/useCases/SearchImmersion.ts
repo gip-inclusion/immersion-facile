@@ -29,7 +29,7 @@ export class SearchImmersion extends UseCase<
   ): Promise<SearchImmersionResultDto[]> {
     const searchParams = convertRequestDtoToSearchParams(params);
     await this.immersionOfferRepository.insertSearch(searchParams);
-    const apiConsumerName = apiConsumer?.name;
+    const apiConsumerName = apiConsumer?.consumer;
 
     return this.immersionOfferRepository.getFromSearch(
       searchParams,

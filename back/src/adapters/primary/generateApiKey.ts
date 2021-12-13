@@ -17,11 +17,11 @@ const validityDurationInSeconds = 2 * 365 * 24 * 3600; // = 2 years
 
 const apiConsumer: ApiConsumer = {
   id: uuidGenerator.new(),
-  name: "passeEmploi",
+  consumer: "passeEmploi",
   iat: Math.round(numberOfSecondsSince1970),
   exp: Math.round(numberOfSecondsSince1970) + validityDurationInSeconds,
 };
 
-logger.info("Generating api key with payload : ", apiConsumer);
+logger.info(apiConsumer, "Generating api key with payload ");
 console.log("\n ID of api key : ", apiConsumer.id);
 console.log("\n JWT : ", generateJwt(apiConsumer));

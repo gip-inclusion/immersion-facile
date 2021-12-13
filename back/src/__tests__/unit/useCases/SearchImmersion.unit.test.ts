@@ -92,7 +92,7 @@ describe("SearchImmersion", () => {
         },
       },
       {
-        name: "passeEmploi",
+        consumer: "passeEmploi",
         id: "my-valid-apikey-id",
         exp: new Date("2022-01-01").getTime(),
         iat: new Date("2021-12-20").getTime(),

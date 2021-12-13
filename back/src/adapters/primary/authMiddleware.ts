@@ -39,7 +39,7 @@ export const createApiKeyAuthMiddleware = (config: AppConfig) => {
         apiKeyAuthMiddlewareRequestsTotal.inc({
           route: convertRouteToLog(req.route),
           method: req.method,
-          consumerName: apiConsumerPayload.name,
+          consumerName: apiConsumerPayload.consumer,
           authorisationStatus: "unauthorisedId",
         });
         return next();
@@ -49,7 +49,7 @@ export const createApiKeyAuthMiddleware = (config: AppConfig) => {
       apiKeyAuthMiddlewareRequestsTotal.inc({
         route: convertRouteToLog(req.route),
         method: req.method,
-        consumerName: apiConsumerPayload.name,
+        consumerName: apiConsumerPayload.consumer,
         authorisationStatus: "authorised",
       });
 
