@@ -85,14 +85,11 @@ export const SignForm = ({ route }: SignFormProps) => {
             Formulaire pour conventionner une période de mise en situation
             professionnelle (PMSMP)
           </h2>
-          <h1 style={{ color: "red", fontSize: 50 }}>
-            {" "}
-            TODO: changer ce message{" "}
-          </h1>
+
           <div className="fr-text">
-            Voici la convention à étudier. <br />
-            Veuillez en prendre connaisence et signer si vous etes d'accord.{" "}
-            <br />
+            Voici la demande de convention que vous venez de compléter. <br />
+            Relisez la bien et si cela vous convient, signez la avec le bouton
+            "je signe cette demande" <br />
             <p className="fr-text--xs">
               Ce formulaire vaut équivalence de la signature du CERFA 13912 * 03
             </p>
@@ -133,11 +130,11 @@ export const SignForm = ({ route }: SignFormProps) => {
                     );
 
                     setSuccessInfos({
-                      message:
-                        "TODO: changer ce message. Votre accord a été enregistré.",
+                      message: "Votre accord a été enregistré.",
                       link: undefined,
                     });
                     setSubmitError(null);
+                    setAlreadySigned(true);
                   } catch (e: any) {
                     console.log(e);
                     setSubmitError(e);

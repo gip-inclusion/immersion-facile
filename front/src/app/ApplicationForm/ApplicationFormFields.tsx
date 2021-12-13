@@ -34,8 +34,7 @@ const FrozenMessage = () => (
         Cette demande d'immersion n'est plus modifiable.
       </p>
       <p>
-        Cette demande d'immersion a été soumise et il n'est plus possible de la
-        modifier.
+        Cette demande d'immersion n'est plus modifiable. Veuillez la signer ou demander des modifications.
       </p>
     </div>
     <br />
@@ -46,12 +45,10 @@ const SignOnlyMessage = () => (
   <>
     <div role="alert" className="fr-alert fr-alert--info">
       <p className="fr-alert__title">
-        <h1 color="red"> TODO: changer ce message </h1>
         Cette demande d'immersion est prête à être signé.
       </p>
       <p>
-        <h1 color="red"> TODO: changer ce message </h1>
-        Cette demande d'immersion n'est plus possible modifiable. Veuillez
+        Cette demande d'immersion n'est plus modifiable. Veuillez la
         signer ou renvoyer pour la modification.
       </p>
     </div>
@@ -80,8 +77,13 @@ export const ApplicationFormFields = ({
   alreadySubmitted,
   onRejectForm,
 }: ApplicationFieldsProps) => {
-  const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
-    useFormikContext<ImmersionApplicationDto>();
+  const {
+    errors,
+    submitCount,
+    setFieldValue,
+    isSubmitting,
+    submitForm,
+  } = useFormikContext<ImmersionApplicationDto>();
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField(
@@ -349,15 +351,7 @@ export const ApplicationFormFields = ({
 
       {isSignatureMode && (
         <>
-          {alreadySubmitted && (
-            <p>
-              <h1 style={{ color: "red", fontSize: 50 }}>
-                {" "}
-                TODO: changer ce message{" "}
-              </h1>
-              Vous avez déjà signé la convention.
-            </p>
-          )}
+          {alreadySubmitted && <p>Vous avez signé la convention.</p>}
           {!alreadySubmitted && (
             <>
               <BoolCheckboxGroup
@@ -366,7 +360,7 @@ export const ApplicationFormFields = ({
                     ? "enterpriseAccepted"
                     : "beneficiaryAccepted"
                 }
-                label={`Je, ${signeeName} (${
+                label={`Je, soussigné ${signeeName} (${
                   isSignatureEnterprise
                     ? "représentant de la structure d'accueil"
                     : "bénéficiaire de l'immersion"
@@ -452,7 +446,7 @@ export const RequestModificationButton = ({
     >
       {isSubmitting
         ? "Éxecution"
-        : "Rétirer les signatures et renvoyer pour modification"}
+        : "Annuler les signatures et demander des modifications"}
     </button>
   );
 };
