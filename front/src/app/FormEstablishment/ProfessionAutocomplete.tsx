@@ -1,8 +1,10 @@
 import Autocomplete from "@mui/material/Autocomplete";
 import React, { useEffect, useState } from "react";
 import { formEstablishmentGateway } from "src/app/dependencies";
-import { StringWithHighlights } from "src/app/FormEstablishment/StringWithHighlights";
-import { Proposal } from "src/app/FormEstablishment/useDropdown";
+import {
+  Proposal,
+  StringWithHighlights,
+} from "src/app/FormEstablishment/StringWithHighlights";
 import { useDebounce } from "src/app/useDebounce";
 import { ProfessionDto, RomeSearchMatchDto } from "src/shared/rome";
 

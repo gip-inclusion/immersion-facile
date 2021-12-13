@@ -1,5 +1,15 @@
 import React, { Fragment } from "react";
-import type { Proposal } from "src/app/FormEstablishment/useDropdown";
+
+type MatchRange = {
+  startIndexInclusive: number;
+  endIndexExclusive: number;
+};
+
+export type Proposal<T> = {
+  description: string;
+  value: T;
+  matchRanges: MatchRange[];
+};
 
 type SliceOfString = {
   startIndexInclusive: number;

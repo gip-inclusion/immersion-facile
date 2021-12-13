@@ -34,7 +34,8 @@ const FrozenMessage = () => (
         Cette demande d'immersion n'est plus modifiable.
       </p>
       <p>
-        Cette demande d'immersion n'est plus modifiable. Veuillez la signer ou demander des modifications.
+        Cette demande d'immersion n'est plus modifiable. Veuillez la signer ou
+        demander des modifications.
       </p>
     </div>
     <br />
@@ -77,13 +78,8 @@ export const ApplicationFormFields = ({
   alreadySubmitted,
   onRejectForm,
 }: ApplicationFieldsProps) => {
-  const {
-    errors,
-    submitCount,
-    setFieldValue,
-    isSubmitting,
-    submitForm,
-  } = useFormikContext<ImmersionApplicationDto>();
+  const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
+    useFormikContext<ImmersionApplicationDto>();
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField(
