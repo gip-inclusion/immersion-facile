@@ -29,6 +29,12 @@ export class ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature ex
       logger.info(`Skipping sending signature-requesting mentor confirmation`);
       return;
     }
+    if (application.status === "PARTIALLY_SIGNED") {
+      logger.info(
+        `Skipping sending signature-requiring mentor confirmation as application is already partially signed`,
+      );
+      return;
+    }
 
     const { id, mentorEmail, firstName, lastName, businessName, mentor } =
       application;

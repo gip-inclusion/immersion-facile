@@ -27,7 +27,13 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignatu
   public async _execute(application: ImmersionApplicationDto): Promise<void> {
     if (!this.featureFlags.enableEnterpriseSignature) {
       logger.info(
-        `Skipping sending signature-requiring beneficiary confirmation`,
+        `Skipping sending signature-requiring beneficiary confirmation as enableEnterpriseSignature flag is off`,
+      );
+      return;
+    }
+    if (application.status === "PARTIALLY_SIGNED") {
+      logger.info(
+        `Skipping sending signature-requiring beneficiary confirmation as application is already partially signed`,
       );
       return;
     }
