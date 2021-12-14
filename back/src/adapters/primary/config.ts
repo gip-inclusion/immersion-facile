@@ -19,14 +19,18 @@ import { GetImmersionApplication } from "../../domain/immersionApplication/useCa
 import { ListAgencies } from "../../domain/immersionApplication/useCases/ListAgencies";
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
+import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../domain/immersionApplication/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
+import { SignImmersionApplication } from "../../domain/immersionApplication/useCases/SignImmersionApplication";
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
@@ -81,15 +85,12 @@ import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { unrestrictedRateLimiter } from "./../../domain/core/ports/RateLimiter";
 import { AppConfig } from "./appConfig";
 import {
   createApiKeyAuthMiddleware,
   createJwtAuthMiddleware,
 } from "./authMiddleware";
-import { SignImmersionApplication } from "../../domain/immersionApplication/useCases/SignImmersionApplication";
-import { NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty";
-import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
-import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 
 const logger = createLogger(__filename);
 
@@ -107,7 +108,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const emailFilter = config.skipEmailAllowlist
     ? new AlwaysAllowEmailFilter()
     : new AllowListEmailFilter(config.emailAllowList);
-  const addressGateway = new APIAdresseGateway();
+  const addressGateway = new APIAdresseGateway(unrestrictedRateLimiter);
 
   return {
     useCases: createUseCases(
@@ -195,7 +196,11 @@ export const createRepositories = async (
 
     sirene:
       config.sireneRepository === "HTTPS"
-        ? new HttpsSireneRepository(config.sireneHttpsConfig, clock)
+        ? new HttpsSireneRepository(
+            config.sireneHttpsConfig,
+            clock,
+            unrestrictedRateLimiter,
+          )
         : new InMemorySireneRepository(),
 
     email:

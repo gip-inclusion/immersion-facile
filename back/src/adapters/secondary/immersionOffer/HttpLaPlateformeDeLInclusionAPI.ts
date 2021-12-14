@@ -5,6 +5,7 @@ import {
 } from "../../../domain/immersionOffer/ports/LaPlateformeDeLInclusionAPI";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
+import { RateLimiter } from "./../../../domain/core/ports/RateLimiter";
 import { APIAdresseGateway } from "./APIAdresseGateway";
 
 const logger = createLogger(__filename);
@@ -22,7 +23,10 @@ type LaPlateformeDeLInclusionGetResponse = {
 export class HttpLaPlateformeDeLInclusionAPI
   implements LaPlateformeDeLInclusionAPI
 {
-  public constructor(private readonly apiAdresseGateway: APIAdresseGateway) {}
+  public constructor(
+    private readonly apiAdresseGateway: APIAdresseGateway,
+    private readonly rateLimiter: RateLimiter,
+  ) {}
 
   public async getResults(
     searchParams: SearchParams,
@@ -58,9 +62,9 @@ export class HttpLaPlateformeDeLInclusionAPI
     if (cityCode == -1) return { results: [] };
 
     try {
-      const response = await createAxiosInstance(logger).get(
-        "https://emplois.inclusion.beta.gouv.fr/api/v1/siaes/",
-        {
+      const axios = createAxiosInstance(logger);
+      const response = await this.rateLimiter.whenReady(() =>
+        axios.get("https://emplois.inclusion.beta.gouv.fr/api/v1/siaes/", {
           params: {
             code_insee: cityCode,
             distance_max_km: Math.min(
@@ -69,7 +73,7 @@ export class HttpLaPlateformeDeLInclusionAPI
             ),
             format: "json",
           },
-        },
+        }),
       );
       return {
         results: response.data.results,
@@ -89,7 +93,8 @@ export class HttpLaPlateformeDeLInclusionAPI
     url: string,
   ): Promise<LaPlateformeDeLInclusionGetResponse> {
     try {
-      const response = await createAxiosInstance(logger).get(url);
+      const axios = createAxiosInstance(logger);
+      const response = await this.rateLimiter.whenReady(() => axios.get(url));
       return {
         results: response.data.results,
         nextPageUrl: response.data.next,

@@ -1,3 +1,4 @@
+import { addMilliseconds } from "date-fns";
 import { Clock, DateStr } from "../../../domain/core/ports/Clock";
 
 export class CustomClock implements Clock {
@@ -13,6 +14,10 @@ export class CustomClock implements Clock {
 
   setNextDate(date: Date) {
     this._nextDate = date;
+  }
+
+  advanceByMs(ms: number) {
+    this._nextDate = addMilliseconds(this._nextDate, ms);
   }
 }
 

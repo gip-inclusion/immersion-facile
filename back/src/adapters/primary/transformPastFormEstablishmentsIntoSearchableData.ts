@@ -1,3 +1,4 @@
+import { unrestrictedRateLimiter } from "./../../domain/core/ports/RateLimiter";
 import { Pool } from "pg";
 import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { createLogger } from "../../utils/logger";
@@ -37,11 +38,12 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   const immersionOfferRepository = new PgImmersionOfferRepository(
     clientDestination,
   );
-  const apiAdresseGateway = new APIAdresseGateway();
+  const apiAdresseGateway = new APIAdresseGateway(unrestrictedRateLimiter);
   const sequenceRunner = new ThrottledSequenceRunner(100, 3);
   const sireneRepository = new HttpsSireneRepository(
     config.sireneHttpsConfig,
     new RealClock(),
+    unrestrictedRateLimiter,
   );
   const poleEmploiGateway = new PgRomeGateway(clientOrigin);
 

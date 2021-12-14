@@ -1,3 +1,4 @@
+import { unrestrictedRateLimiter } from "./../../domain/core/ports/RateLimiter";
 import { AppConfig } from "../../adapters/primary/appConfig";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { HttpsSireneRepository } from "./../../adapters/secondary/HttpsSireneRepository";
@@ -18,6 +19,7 @@ describe("HttpsSireneRepository", () => {
     sireneRepository = new HttpsSireneRepository(
       config.sireneHttpsConfig,
       new RealClock(),
+      unrestrictedRateLimiter,
     );
   });
 

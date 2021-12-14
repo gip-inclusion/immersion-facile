@@ -3,9 +3,10 @@ import { z } from "zod";
 // TODO: find the standard for gouv.fr phone verification
 export const phoneRegExp = /^\+?[0-9]+$/;
 
-export const sleep = (ms: number) => {
+export type SleepFn = typeof sleep;
+export const sleep = (ms: number): Promise<number> => {
   if (ms <= 0) {
-    return;
+    return Promise.resolve(0);
   }
   return new Promise((r) => setTimeout(r, ms));
 };

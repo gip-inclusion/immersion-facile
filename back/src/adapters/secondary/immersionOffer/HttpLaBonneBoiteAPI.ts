@@ -2,10 +2,11 @@ import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGatewa
 import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import {
   LaBonneBoiteAPI,
-  LaBonneBoiteCompany,
+  LaBonneBoiteCompany
 } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
+import { RateLimiter } from "./../../../domain/core/ports/RateLimiter";
 
 const logger = createLogger(__filename);
 
@@ -13,6 +14,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
   constructor(
     private readonly accessTokenGateway: AccessTokenGateway,
     private readonly poleEmploiClientId: string,
+    private readonly rateLimiter: RateLimiter,
   ) {}
 
   public async searchCompanies(
@@ -22,19 +24,22 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
       `application_${this.poleEmploiClientId} api_labonneboitev1`,
     );
     try {
-      const response = await createAxiosInstance(logger).get(
-        "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+      const axios = createAxiosInstance(logger);
+      const response = await this.rateLimiter.whenReady(() =>
+        axios.get(
+          "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: {
+              distance: searchParams.distance_km,
+              longitude: searchParams.lon,
+              latitude: searchParams.lat,
+              rome_codes: searchParams.rome,
+            },
           },
-          params: {
-            distance: searchParams.distance_km,
-            longitude: searchParams.lon,
-            latitude: searchParams.lat,
-            rome_codes: searchParams.rome,
-          },
-        },
+        ),
       );
       return response.data.companies || [];
     } catch (error: any) {

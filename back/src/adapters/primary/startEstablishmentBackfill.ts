@@ -1,8 +1,12 @@
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
+import { sleep } from "../../shared/utils";
 import { createLogger } from "../../utils/logger";
 import { PipelineStats } from "../../utils/pipelineStats";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
+import { RealClock } from "../secondary/core/ClockImplementations";
+import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
+import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { HttpLaPlateformeDeLInclusionAPI } from "../secondary/immersionOffer/HttpLaPlateformeDeLInclusionAPI";
@@ -14,6 +18,11 @@ const logger = createLogger(__filename);
 
 const STATS_LOGGING_INTERVAL_MS = 30_000;
 
+const MAX_QPS_LA_BONNE_BOITE_GATEWAY = 1;
+const MAX_QPS_LA_PLATEFORME_DE_L_INCLUSION = 1;
+const MAX_QPS_API_ADRESSE = 5;
+const MAX_QPS_SIRENE_API = 5;
+
 const stats: PipelineStats = new PipelineStats("startEstablishmentBackfill");
 
 const main = async () => {
@@ -21,6 +30,8 @@ const main = async () => {
   stats.startTimer("total_runtime");
 
   const config = AppConfig.createFromEnv();
+
+  const clock = new RealClock();
 
   const uuidGenerator = new UuidV4Generator();
 
@@ -31,12 +42,22 @@ const main = async () => {
   const laBonneBoiteAPI = new HttpLaBonneBoiteAPI(
     poleEmploiAccessTokenGateway,
     config.poleEmploiClientId,
+    new QpsRateLimiter(MAX_QPS_LA_BONNE_BOITE_GATEWAY, clock, sleep),
   );
 
-  const addressGateway = new APIAdresseGateway();
+  const addressGateway = new APIAdresseGateway(
+    new QpsRateLimiter(MAX_QPS_API_ADRESSE, clock, sleep),
+  );
 
   const laPlateFormeDeLInclusionAPI = new HttpLaPlateformeDeLInclusionAPI(
     addressGateway,
+    new QpsRateLimiter(MAX_QPS_LA_PLATEFORME_DE_L_INCLUSION, clock, sleep),
+  );
+
+  const sireneGateway = new HttpsSireneRepository(
+    config.sireneHttpsConfig,
+    clock,
+    new QpsRateLimiter(MAX_QPS_SIRENE_API, clock, sleep),
   );
 
   const repositories = await createRepositories(
@@ -50,7 +71,7 @@ const main = async () => {
       laBonneBoiteAPI,
       laPlateFormeDeLInclusionAPI,
       addressGateway.getGPSFromAddressAPIAdresse,
-      repositories.sirene,
+      sireneGateway,
       repositories.immersionOfferForSearch,
     );
 

@@ -1,14 +1,14 @@
 import { formatISO } from "date-fns";
 import { Clock } from "../../domain/core/ports/Clock";
+import { RateLimiter } from "../../domain/core/ports/RateLimiter";
 import {
   SireneRepository,
   SireneRepositoryAnswer,
 } from "../../domain/sirene/ports/SireneRepository";
 import { SiretDto } from "../../shared/siret";
-import { logAxiosError } from "../../utils/axiosUtils";
+import { createAxiosInstance, logAxiosError } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
 import { AxiosConfig } from "../primary/appConfig";
-import { createAxiosInstance } from "./../../utils/axiosUtils";
 
 const logger = createLogger(__filename);
 
@@ -16,6 +16,7 @@ export class HttpsSireneRepository implements SireneRepository {
   public constructor(
     private readonly axiosConfig: AxiosConfig,
     private readonly clock: Clock,
+    private readonly rateLimiter: RateLimiter,
   ) {}
 
   private createAxiosInstance() {
@@ -35,9 +36,15 @@ export class HttpsSireneRepository implements SireneRepository {
     logger.debug({ siret, includeClosedEstablishments }, "get");
 
     try {
-      const response = await this.createAxiosInstance().get("/siret", {
-        params: this.createSiretQueryParams(siret, includeClosedEstablishments),
-      });
+      const axios = this.createAxiosInstance();
+      const response = await this.rateLimiter.whenReady(() =>
+        axios.get("/siret", {
+          params: this.createSiretQueryParams(
+            siret,
+            includeClosedEstablishments,
+          ),
+        }),
+      );
       return response.data;
     } catch (error: any) {
       logAxiosError(logger, error);

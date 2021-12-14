@@ -1,3 +1,4 @@
+import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import { Position } from "../../../domain/immersionOffer/ports/GetPosition";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
@@ -5,17 +6,19 @@ import { createLogger } from "../../../utils/logger";
 const logger = createLogger(__filename);
 
 export class APIAdresseGateway {
+  public constructor(private readonly rateLimiter: RateLimiter) {}
+
   async getGPSFromAddressAPIAdresse(address: string): Promise<Position> {
     logger.debug({ address }, "getGPSFromAddressAPIAdresse");
 
     try {
-      const response = await createAxiosInstance(logger).get(
-        "https://api-adresse.data.gouv.fr/search/",
-        {
+      const axios = createAxiosInstance(logger);
+      const response = await this.rateLimiter.whenReady(() =>
+        axios.get("https://api-adresse.data.gouv.fr/search/", {
           params: {
             q: address,
           },
-        },
+        }),
       );
       return {
         lat: response.data.features[0].geometry.coordinates[1],
@@ -37,11 +40,11 @@ export class APIAdresseGateway {
   ): Promise<number> {
     logger.debug({ lat, lon }, "getCityCodeFromLatLongAPIAdresse");
     try {
-      const response = await createAxiosInstance(logger).get(
-        "https://api-adresse.data.gouv.fr/reverse/",
-        {
+      const axios = createAxiosInstance(logger);
+      const response = await this.rateLimiter.whenReady(() =>
+        axios.get("https://api-adresse.data.gouv.fr/reverse/", {
           params: { lon, lat },
-        },
+        }),
       );
       if (response.data.features.length != 0)
         return response.data.features[0].properties.citycode;
