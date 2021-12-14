@@ -5,18 +5,16 @@ import {
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../../../shared/rome";
+import { createLogger } from "../../../utils/logger";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
 import { UseCase } from "../../core/UseCase";
 import { RomeGateway } from "../../rome/ports/RomeGateway";
 import { SireneRepository } from "../../sirene/ports/SireneRepository";
 import { ImmersionEstablishmentContact } from "../entities/ImmersionOfferEntity";
-import {
-  GetPosition,
-  UncompleteEstablishmentEntity,
-} from "../entities/UncompleteEstablishmentEntity";
+import { UncompleteEstablishmentEntity } from "../entities/UncompleteEstablishmentEntity";
 import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
+import { GetPosition } from "../ports/GetPosition";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
-import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 

@@ -1,6 +1,6 @@
 import { ImmersionContactInEstablishmentId } from "../../../shared/FormEstablishmentDto";
 import { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
-import { Position } from "./EstablishmentEntity";
+import { Position } from "../ports/GetPosition";
 
 export type ImmersionOfferProps = {
   id: ImmersionOfferId;

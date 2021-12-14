@@ -1,13 +1,11 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import {
-  EstablishmentEntity,
-  Position,
-} from "../../../domain/immersionOffer/entities/EstablishmentEntity";
+import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   ImmersionEstablishmentContact,
   ImmersionOfferEntity,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { Position } from "../../../domain/immersionOffer/ports/GetPosition";
 import {
   ImmersionOfferRepository,
   SearchParams,

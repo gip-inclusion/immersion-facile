@@ -1,9 +1,9 @@
-import { Position } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { createAxiosInstance } from "../../../utils/axiosUtils";
-import { logAxiosError } from "./../../../utils/axiosUtils";
-import { createLogger } from "./../../../utils/logger";
+import { Position } from "../../../domain/immersionOffer/ports/GetPosition";
+import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
+import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
+
 export class APIAdresseGateway {
   async getGPSFromAddressAPIAdresse(address: string): Promise<Position> {
     logger.debug({ address }, "getGPSFromAddressAPIAdresse");

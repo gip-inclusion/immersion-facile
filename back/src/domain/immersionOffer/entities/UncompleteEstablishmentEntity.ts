@@ -2,12 +2,12 @@ import {
   SireneRepository,
   SireneRepositoryAnswer,
 } from "../../sirene/ports/SireneRepository";
+import { GetPosition } from "../ports/GetPosition";
 import { logAxiosError } from "./../../../utils/axiosUtils";
 import { createLogger } from "./../../../utils/logger";
 import type {
   EstablishmentFieldsToRetrieve,
   MandatoryEstablishmentFields,
-  Position,
 } from "./EstablishmentEntity";
 import {
   EstablishmentEntity,
@@ -16,8 +16,6 @@ import {
 } from "./EstablishmentEntity";
 
 const logger = createLogger(__filename);
-
-export type GetPosition = (address: string) => Promise<Position>;
 
 export type ExtraEstablishmentInfos = {
   naf: string;

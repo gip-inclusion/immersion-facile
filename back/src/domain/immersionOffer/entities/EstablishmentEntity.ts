@@ -1,17 +1,13 @@
 import { v4 as uuidV4 } from "uuid";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import { Flavor } from "../../../shared/typeFlavors";
+import { Position } from "../ports/GetPosition";
 import {
   ImmersionEstablishmentContact,
   ImmersionOfferEntity,
 } from "./ImmersionOfferEntity";
 
 export type EstablishmentId = Flavor<string, "EstablishmentId">;
-
-export type Position = {
-  lat: number;
-  lon: number;
-};
 
 export type MandatoryEstablishmentFields = {
   id: EstablishmentId;

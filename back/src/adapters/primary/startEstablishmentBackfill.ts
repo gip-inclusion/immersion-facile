@@ -3,15 +3,11 @@ import { createLogger } from "../../utils/logger";
 import { PipelineStats } from "../../utils/pipelineStats";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
-import {
-  httpCallToLaBonneBoite,
-  LaBonneBoiteGateway,
-} from "../secondary/immersionOffer/LaBonneBoiteGateway";
-import {
-  httpCallToLaPlateFormeDeLInclusion,
-  LaPlateFormeDeLInclusionGateway,
-} from "../secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
+import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
+import { LaBonneBoiteGateway } from "../secondary/immersionOffer/LaBonneBoiteGateway";
+import { LaPlateFormeDeLInclusionGateway } from "../secondary/immersionOffer/LaPlateFormeDeLInclusionGateway";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
+import { HttpLaPlateformeDeLInclusionAPI } from "./../secondary/immersionOffer/HttpLaPlateformeDeLInclusionAPI";
 import { AppConfig } from "./appConfig";
 import { createGetPgPoolFn, createRepositories } from "./config";
 
@@ -32,16 +28,17 @@ const main = async () => {
   );
 
   const laBonneBoite = new LaBonneBoiteGateway(
-    poleEmploiAccessTokenGateway,
-    config.poleEmploiClientId,
-    httpCallToLaBonneBoite,
-  );
-
-  const laPlateFormeDeLInclusion = new LaPlateFormeDeLInclusionGateway(
-    httpCallToLaPlateFormeDeLInclusion,
+    new HttpLaBonneBoiteAPI(
+      poleEmploiAccessTokenGateway,
+      config.poleEmploiClientId,
+    ),
   );
 
   const addressGateway = new APIAdresseGateway();
+
+  const laPlateFormeDeLInclusion = new LaPlateFormeDeLInclusionGateway(
+    new HttpLaPlateformeDeLInclusionAPI(addressGateway),
+  );
 
   const repositories = await createRepositories(
     config,
