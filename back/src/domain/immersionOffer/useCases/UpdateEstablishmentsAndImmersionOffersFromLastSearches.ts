@@ -1,18 +1,15 @@
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
+import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { SireneRepository } from "../../sirene/ports/SireneRepository";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { SearchParams } from "../entities/SearchParams";
-import { GetPosition } from "../ports/GetPosition";
+import { UncompleteEstablishmentEntity } from "../entities/UncompleteEstablishmentEntity";
+import { AdresseAPI } from "../ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { LaBonneBoiteAPI, LaBonneBoiteCompany } from "../ports/LaBonneBoiteAPI";
 import { LaPlateformeDeLInclusionAPI } from "../ports/LaPlateformeDeLInclusionAPI";
-import { UuidGenerator } from "./../../core/ports/UuidGenerator";
-import { UncompleteEstablishmentEntity } from "./../entities/UncompleteEstablishmentEntity";
-import {
-  LaBonneBoiteAPI,
-  LaBonneBoiteCompany,
-} from "./../ports/LaBonneBoiteAPI";
-import { SearchesMadeRepository } from "./../ports/SearchesMadeRepository";
+import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
 
 const logger = createLogger(__filename);
 
@@ -23,7 +20,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     private readonly uuidGenerator: UuidGenerator,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly laPlateFormeDeLInclusionAPI: LaPlateformeDeLInclusionAPI,
-    private readonly getPosition: GetPosition,
+    private readonly adresseAPI: AdresseAPI,
     private readonly sireneRepository: SireneRepository,
     private readonly searchesMadeRepository: SearchesMadeRepository,
     private readonly immersionOfferRepository: ImmersionOfferRepository,
@@ -141,7 +138,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       this.stats.startAggregateTimer("search_for_missing_fields-latency");
       const completeEstablishment =
         await uncompleteEstablishment.searchForMissingFields(
-          this.getPosition,
+          this.adresseAPI,
           this.sireneRepository,
         );
       this.stats.stopAggregateTimer("search_for_missing_fields-latency");

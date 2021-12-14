@@ -9,6 +9,7 @@ import {
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
+import { unrestrictedRateLimiter } from "../../domain/core/ports/RateLimiter";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -51,7 +52,6 @@ import {
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
-import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
   AllowListEmailFilter,
@@ -66,10 +66,9 @@ import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxReposi
 import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
-import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
+import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { InMemoryImmersionOfferRepository } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
-import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
-import { PoleEmploiRomeGateway } from "../secondary/immersionOffer/PoleEmploiRomeGateway";
+import { InMemorySearchesMadeRepository } from "../secondary/immersionOffer/InMemorySearchesMadeRepository";
 import { InMemoryAgencyRepository } from "../secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEstablishmentRepository";
@@ -86,8 +85,6 @@ import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { PgSearchesMadeRepository } from "../secondary/pg/PgSearchesMadeRepository";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
-import { unrestrictedRateLimiter } from "./../../domain/core/ports/RateLimiter";
-import { InMemorySearchesMadeRepository } from "./../secondary/immersionOffer/InMemorySearchesMadeRepository";
 import { AppConfig } from "./appConfig";
 import {
   createApiKeyAuthMiddleware,
@@ -110,7 +107,6 @@ export const createAppDependencies = async (config: AppConfig) => {
   const emailFilter = config.skipEmailAllowlist
     ? new AlwaysAllowEmailFilter()
     : new AllowListEmailFilter(config.emailAllowList);
-  const addressGateway = new APIAdresseGateway(unrestrictedRateLimiter);
 
   return {
     useCases: createUseCases(
@@ -119,7 +115,6 @@ export const createAppDependencies = async (config: AppConfig) => {
       generateJwtFn,
       generateMagicLinkFn,
       emailFilter,
-      addressGateway,
       uowPerformer,
     ),
     authChecker: createAuthChecker(config),
@@ -304,7 +299,6 @@ const createUseCases = (
   generateJwtFn: GenerateMagicLinkJwt,
   generateMagicLinkFn: GenerateVerificationMagicLink,
   emailFilter: EmailFilter,
-  addressGateway: APIAdresseGateway,
   uowPerformer: UnitOfWorkPerformer,
 ) => {
   const createNewEvent = makeCreateNewEvent({
@@ -313,6 +307,7 @@ const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const getSiret = new GetSiret(repositories.sirene);
+  const adresseAPI = new HttpAdresseAPI(unrestrictedRateLimiter);
 
   return {
     addDemandeImmersion: new AddImmersionApplication(
@@ -377,7 +372,7 @@ const createUseCases = (
       new TransformFormEstablishmentIntoSearchData(
         repositories.formEstablishment,
         repositories.immersionOffer,
-        addressGateway.getGPSFromAddressAPIAdresse,
+        adresseAPI,
         repositories.sirene,
         repositories.rome,
         sequenceRunner,

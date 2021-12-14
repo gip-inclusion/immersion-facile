@@ -4,7 +4,7 @@ import {
   SireneRepository,
   SireneRepositoryAnswer,
 } from "../../sirene/ports/SireneRepository";
-import { GetPosition } from "../ports/GetPosition";
+import { AdresseAPI } from "../ports/AdresseAPI";
 import { TefenCode } from "./EstablishmentAggregate";
 import type {
   EstablishmentFieldsToRetrieve,
@@ -95,17 +95,15 @@ export class UncompleteEstablishmentEntity {
   }
 
   public async searchForMissingFields(
-    getPosition: GetPosition,
+    adresseAPI: AdresseAPI,
     sireneRepository: SireneRepository,
   ): Promise<EstablishmentEntity | undefined> {
     logger.debug({ props: this.props }, "searchForMissingFields");
 
     if (!this.props.position) {
-      try {
-        this.props.position = await getPosition(this.props.address);
-      } catch (error: any) {
-        logAxiosError(logger, error);
-      }
+      this.props.position = await adresseAPI.getPositionFromAddress(
+        this.props.address,
+      );
     }
 
     if (!this.props.naf || !this.props.numberEmployeesRange) {

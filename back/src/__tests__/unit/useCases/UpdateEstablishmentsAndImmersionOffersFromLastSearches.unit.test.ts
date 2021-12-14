@@ -1,17 +1,15 @@
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
+import { InMemoryLaPlateformeDeLInclusionAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaPlateformeDeLInclusionAPI";
+import { InMemorySearchesMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
-import { GetPosition } from "../../../domain/immersionOffer/ports/GetPosition";
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
+import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
 import { LaPlateFormeDeLInclusionPosteBuilder } from "../../../_testBuilders/LaPlateFormeDeLInclusionPosteBuilder";
-import { InMemoryLaBonneBoiteAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
-import { InMemoryLaPlateformeDeLInclusionAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryLaPlateformeDeLInclusionAPI";
-import { InMemorySearchesMadeRepository } from "./../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
-import { LaBonneBoiteCompanyBuilder } from "./../../../_testBuilders/LaBonneBoiteResponseBuilder";
-import { LaPlateformeDeLInclusionResultBuilder } from "./../../../_testBuilders/LaPlateformeDeLInclusionResultBuilder";
-
-const inMemorySireneRepository = new InMemorySireneRepository();
+import { LaPlateformeDeLInclusionResultBuilder } from "../../../_testBuilders/LaPlateformeDeLInclusionResultBuilder";
 
 describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let testUuidGenerator: TestUuidGenerator;
@@ -20,6 +18,8 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let searchesMadeRepository: InMemorySearchesMadeRepository;
   let laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   let laPlateFormeDeLInclusionAPI: InMemoryLaPlateformeDeLInclusionAPI;
+  let adresseAPI: InMemoryAdresseAPI;
+  let sireneRepository: InMemorySireneRepository;
 
   beforeEach(() => {
     testUuidGenerator = new TestUuidGenerator();
@@ -32,18 +32,16 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
     laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
     laPlateFormeDeLInclusionAPI = new InMemoryLaPlateformeDeLInclusionAPI();
 
-    const fakeGetPosition: GetPosition = async (_address: string) => ({
-      lat: 49.119146,
-      lon: 6.17602,
-    });
+    adresseAPI = new InMemoryAdresseAPI();
+    sireneRepository = new InMemorySireneRepository();
 
     updateEstablishmentsAndImmersionOffersFromLastSearches =
       new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
         testUuidGenerator,
         laBonneBoiteAPI,
         laPlateFormeDeLInclusionAPI,
-        fakeGetPosition,
-        inMemorySireneRepository,
+        adresseAPI,
+        sireneRepository,
         searchesMadeRepository,
         immersionOfferRepository,
       );
@@ -66,6 +64,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
         ])
         .build(),
     ]);
+    adresseAPI.setNextPosition({ lat: 49.119146, lon: 6.17602 });
 
     // prepare
     const search: SearchParams = {

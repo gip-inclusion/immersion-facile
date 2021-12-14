@@ -1,5 +1,5 @@
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
-import { Position } from "../ports/GetPosition";
+import { Position } from "../ports/AdresseAPI";
 import {
   ContactEntityV2,
   ImmersionOfferEntityV2,

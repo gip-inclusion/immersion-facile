@@ -1,12 +1,12 @@
+import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import {
   LaPlateformeDeLInclusionAPI,
   LaPlateformeDeLInclusionResult,
 } from "../../../domain/immersionOffer/ports/LaPlateformeDeLInclusionAPI";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
-import { RateLimiter } from "./../../../domain/core/ports/RateLimiter";
-import { APIAdresseGateway } from "./APIAdresseGateway";
 
 const logger = createLogger(__filename);
 
@@ -24,7 +24,7 @@ export class HttpLaPlateformeDeLInclusionAPI
   implements LaPlateformeDeLInclusionAPI
 {
   public constructor(
-    private readonly apiAdresseGateway: APIAdresseGateway,
+    private readonly adresseAPI: AdresseAPI,
     private readonly rateLimiter: RateLimiter,
   ) {}
 
@@ -54,12 +54,11 @@ export class HttpLaPlateformeDeLInclusionAPI
   private async getFirstResponse(
     searchParams: SearchParams,
   ): Promise<LaPlateformeDeLInclusionGetResponse> {
-    const cityCode =
-      await this.apiAdresseGateway.getCityCodeFromLatLongAPIAdresse(
-        searchParams.lat,
-        searchParams.lon,
-      );
-    if (cityCode == -1) return { results: [] };
+    const cityCode = await this.adresseAPI.getCityCodeFromPosition({
+      lat: searchParams.lat,
+      lon: searchParams.lon,
+    });
+    if (!cityCode) return { results: [] };
 
     try {
       const axios = createAxiosInstance(logger);

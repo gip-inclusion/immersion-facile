@@ -1,11 +1,11 @@
-import { unrestrictedRateLimiter } from "./../../domain/core/ports/RateLimiter";
 import { Pool } from "pg";
+import { unrestrictedRateLimiter } from "../../domain/core/ports/RateLimiter";
 import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { createLogger } from "../../utils/logger";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
-import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
+import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
@@ -38,7 +38,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   const immersionOfferRepository = new PgImmersionOfferRepository(
     clientDestination,
   );
-  const apiAdresseGateway = new APIAdresseGateway(unrestrictedRateLimiter);
+  const adresseAPI = new HttpAdresseAPI(unrestrictedRateLimiter);
   const sequenceRunner = new ThrottledSequenceRunner(100, 3);
   const sireneRepository = new HttpsSireneRepository(
     config.sireneHttpsConfig,
@@ -51,7 +51,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     new TransformFormEstablishmentIntoSearchData(
       originFormEstablishmentRepository,
       immersionOfferRepository,
-      apiAdresseGateway.getGPSFromAddressAPIAdresse,
+      adresseAPI,
       sireneRepository,
       poleEmploiGateway,
       sequenceRunner,

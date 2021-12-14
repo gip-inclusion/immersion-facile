@@ -12,8 +12,8 @@ import { RomeGateway } from "../../rome/ports/RomeGateway";
 import { SireneRepository } from "../../sirene/ports/SireneRepository";
 import { ImmersionEstablishmentContact } from "../entities/ImmersionOfferEntity";
 import { UncompleteEstablishmentEntity } from "../entities/UncompleteEstablishmentEntity";
+import { AdresseAPI } from "../ports/AdresseAPI";
 import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
-import { GetPosition } from "../ports/GetPosition";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 
 const logger = createLogger(__filename);
@@ -24,11 +24,11 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
 > {
   constructor(
     private readonly formEstablishmentRepository: FormEstablishmentRepository,
-    private immersionOfferRepository: ImmersionOfferRepository,
-    private getPosition: GetPosition,
-    private sireneRepository: SireneRepository,
-    private romeGateway: RomeGateway,
-    private sequenceRunner: SequenceRunner,
+    private readonly immersionOfferRepository: ImmersionOfferRepository,
+    private readonly adresseAPI: AdresseAPI,
+    private readonly sireneRepository: SireneRepository,
+    private readonly romeGateway: RomeGateway,
+    private readonly sequenceRunner: SequenceRunner,
   ) {
     super();
   }
@@ -84,7 +84,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
 
     const establishmentEntity =
       await uncompleteEstablishmentEntity.searchForMissingFields(
-        this.getPosition,
+        this.adresseAPI,
         this.sireneRepository,
       );
 

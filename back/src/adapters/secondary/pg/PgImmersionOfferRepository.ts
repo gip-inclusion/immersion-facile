@@ -7,7 +7,7 @@ import {
   ImmersionOfferEntity,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
-import { Position } from "../../../domain/immersionOffer/ports/GetPosition";
+import { Position } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import {

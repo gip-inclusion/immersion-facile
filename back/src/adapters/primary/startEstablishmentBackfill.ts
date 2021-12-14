@@ -7,7 +7,7 @@ import { RealClock } from "../secondary/core/ClockImplementations";
 import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
-import { APIAdresseGateway } from "../secondary/immersionOffer/APIAdresseGateway";
+import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { HttpLaPlateformeDeLInclusionAPI } from "../secondary/immersionOffer/HttpLaPlateformeDeLInclusionAPI";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
@@ -45,12 +45,12 @@ const main = async () => {
     new QpsRateLimiter(MAX_QPS_LA_BONNE_BOITE_GATEWAY, clock, sleep),
   );
 
-  const addressGateway = new APIAdresseGateway(
+  const adresseAPI = new HttpAdresseAPI(
     new QpsRateLimiter(MAX_QPS_API_ADRESSE, clock, sleep),
   );
 
   const laPlateFormeDeLInclusionAPI = new HttpLaPlateformeDeLInclusionAPI(
-    addressGateway,
+    adresseAPI,
     new QpsRateLimiter(MAX_QPS_LA_PLATEFORME_DE_L_INCLUSION, clock, sleep),
   );
 
@@ -70,7 +70,7 @@ const main = async () => {
       uuidGenerator,
       laBonneBoiteAPI,
       laPlateFormeDeLInclusionAPI,
-      addressGateway.getGPSFromAddressAPIAdresse,
+      adresseAPI,
       sireneGateway,
       repositories.searchesMade,
       repositories.immersionOffer,

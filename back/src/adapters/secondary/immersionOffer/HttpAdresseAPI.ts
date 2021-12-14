@@ -1,15 +1,20 @@
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
-import { Position } from "../../../domain/immersionOffer/ports/GetPosition";
+import {
+  AdresseAPI,
+  Position,
+} from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
-export class APIAdresseGateway {
+export class HttpAdresseAPI implements AdresseAPI {
   public constructor(private readonly rateLimiter: RateLimiter) {}
 
-  async getGPSFromAddressAPIAdresse(address: string): Promise<Position> {
-    logger.debug({ address }, "getGPSFromAddressAPIAdresse");
+  public async getPositionFromAddress(
+    address: string,
+  ): Promise<Position | undefined> {
+    logger.debug({ address }, "getPositionFromAddress");
 
     try {
       const axios = createAxiosInstance(logger);
@@ -26,32 +31,25 @@ export class APIAdresseGateway {
       };
     } catch (error: any) {
       logAxiosError(logger, error);
-      return { lat: -1, lon: -1 };
+      return;
     }
   }
 
-  /*
-    Returns city code from latitude and longitude parameters using the api-adresse API from data.gouv
-    Returns -1 if did not find
-  */
-  async getCityCodeFromLatLongAPIAdresse(
-    lat: number,
-    lon: number,
-  ): Promise<number> {
-    logger.debug({ lat, lon }, "getCityCodeFromLatLongAPIAdresse");
+  public async getCityCodeFromPosition(
+    position: Position,
+  ): Promise<number | undefined> {
+    logger.debug({ position }, "getCityCodeFromPosition");
     try {
       const axios = createAxiosInstance(logger);
       const response = await this.rateLimiter.whenReady(() =>
         axios.get("https://api-adresse.data.gouv.fr/reverse/", {
-          params: { lon, lat },
+          params: position,
         }),
       );
-      if (response.data.features.length != 0)
-        return response.data.features[0].properties.citycode;
-      return -1;
+      return response.data.features[0]?.properties?.citycode;
     } catch (error: any) {
       logAxiosError(logger, error);
-      return -1;
+      return;
     }
   }
 }

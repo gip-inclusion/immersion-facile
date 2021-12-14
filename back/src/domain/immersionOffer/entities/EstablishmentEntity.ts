@@ -1,7 +1,7 @@
 import { v4 as uuidV4 } from "uuid";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import { Flavor } from "../../../shared/typeFlavors";
-import { Position } from "../ports/GetPosition";
+import { Position } from "../ports/AdresseAPI";
 import { TefenCode } from "./EstablishmentAggregate";
 import {
   ImmersionEstablishmentContact,

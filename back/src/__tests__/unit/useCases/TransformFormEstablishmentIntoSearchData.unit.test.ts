@@ -1,9 +1,10 @@
+import { InMemoryAdresseAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
-import { Position } from "../../../domain/immersionOffer/ports/GetPosition";
+import { Position } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { TransformFormEstablishmentIntoSearchData } from "../../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { Establishment } from "../../../domain/sirene/ports/SireneRepository";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
@@ -39,13 +40,14 @@ describe("Transform FormEstablishment into search data", () => {
   let formEstablishmentRepository: InMemoryFormEstablishmentRepository;
   let inMemorySireneRepository: InMemorySireneRepository;
   let inMemoryImmersionOfferRepository: InMemoryImmersionOfferRepository;
+  let inMemoryAdresseAPI: InMemoryAdresseAPI;
   let transformFormEstablishmentIntoSearchData: TransformFormEstablishmentIntoSearchData;
 
   beforeEach(() => {
     formEstablishmentRepository = new InMemoryFormEstablishmentRepository();
     inMemorySireneRepository = new InMemorySireneRepository();
     inMemoryImmersionOfferRepository = new InMemoryImmersionOfferRepository();
-    const getPosition = async () => fakePosition;
+    inMemoryAdresseAPI = new InMemoryAdresseAPI(fakePosition);
     const inMemoryRomeGateway = new InMemoryRomeGateway();
     const sequencerRunner = new TestSequenceRunner();
     inMemoryImmersionOfferRepository.empty();
@@ -53,7 +55,7 @@ describe("Transform FormEstablishment into search data", () => {
       new TransformFormEstablishmentIntoSearchData(
         formEstablishmentRepository,
         inMemoryImmersionOfferRepository,
-        getPosition,
+        inMemoryAdresseAPI,
         inMemorySireneRepository,
         inMemoryRomeGateway,
         sequencerRunner,
