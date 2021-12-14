@@ -253,6 +253,9 @@ export class SendinblueEmailGateway implements EmailGateway {
         MAGIC_LINK: params.magicLink,
         EXISTING_SIGNATURE_NAME: params.existingSignatureName,
         MISSING_SIGNATURE_NAME: params.missingSignatureName,
+        FIRST_NAME: params.beneficiaryFirstName,
+        LAST_NAME: params.beneficiaryLastName,
+        IMMERSION_PROFESSION: params.immersionProfession,
       },
     );
   }
