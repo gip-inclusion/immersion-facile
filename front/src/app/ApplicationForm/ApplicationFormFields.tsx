@@ -49,8 +49,8 @@ const SignOnlyMessage = () => (
         Cette demande d'immersion est prête à être signée.
       </p>
       <p>
-        Cette demande d'immersion n'est plus modifiable. Veuillez la
-        signer ou la renvoyer pour modification.
+        Cette demande d'immersion n'est plus modifiable. Veuillez la signer ou
+        la renvoyer pour modification.
       </p>
     </div>
     <br />
@@ -356,10 +356,11 @@ export const ApplicationFormFields = ({
                     ? "enterpriseAccepted"
                     : "beneficiaryAccepted"
                 }
-                label={`Je, soussigné ${signeeName} (${isSignatureEnterprise
-                  ? "représentant de la structure d'accueil"
-                  : "bénéficiaire de l'immersion"
-                  }) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
+                label={`Je, soussigné ${signeeName} (${
+                  isSignatureEnterprise
+                    ? "représentant de la structure d'accueil"
+                    : "bénéficiaire de l'immersion"
+                }) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
                 description="Avant de répondre, consultez ces dispositions ici"
                 descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
                 disabled={false}

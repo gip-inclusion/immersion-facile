@@ -148,7 +148,6 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
     errorMessage = submitError["response"]["data"]["errors"];
   }
 
-
   return (
     <>
       <MarianneHeader />

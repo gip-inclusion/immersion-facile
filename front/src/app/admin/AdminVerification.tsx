@@ -45,7 +45,6 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
       "Attention! Cette demande d'immersion est à statut 'En cours de revue', l'opération que vous venez d'effectuer ne semble pas avoir été appliquée. Veuillez réésayer ou consulter l'équipe Immérsion Facilitée",
   };
 
-
   const validationDisabled = () => {
     return !form || form.status !== "IN_REVIEW";
   };
@@ -77,12 +76,10 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
     if (!form) return;
     setSubmitting(true);
 
-
     immersionApplicationGateway
       .validate(form.id)
       .then(() => {
-        setSuccessMessage(
-          successMessageByStatus[form.status])
+        setSuccessMessage(successMessageByStatus[form.status]);
 
         setForm({ ...form, status: "VALIDATED" });
       })

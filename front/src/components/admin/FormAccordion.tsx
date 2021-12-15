@@ -51,7 +51,6 @@ const getPrefix = (status: ApplicationStatus) => {
       return "[👩‍💼 ENVOI DE CONVENTION VALIDÉE PAR ADMIN]";
   }
 
-
   return "[⁉️ STATUS DE LA DEMANDE INDÉFINI]";
 };
 
