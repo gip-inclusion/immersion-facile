@@ -51,7 +51,7 @@ export class UpdateImmersionApplication extends UseCase<
 
     const statusThatTriggerEvent: ApplicationStatus = this.featureFlags
       .enableEnterpriseSignature
-      ? "DRAFT"
+      ? "READY_TO_SIGN"
       : "IN_REVIEW";
 
     if (params.demandeImmersion.status == statusThatTriggerEvent) {

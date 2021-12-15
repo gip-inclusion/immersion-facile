@@ -96,7 +96,7 @@ const createInitialApplication = (
     phone: "0612345678",
 
     // Enterprise
-    siret: "444 030 902 00019",
+    siret: "1234567890123",
     businessName: "Futuroscope",
     mentor: "Le Mentor du futur",
     mentorPhone: "0101100110",
@@ -116,8 +116,8 @@ const createInitialApplication = (
     immersionSkills: "Attention au détail",
 
     // Signatures
-    beneficiaryAccepted: true,
-    enterpriseAccepted: true,
+    beneficiaryAccepted: false,
+    enterpriseAccepted: false,
   };
 };
 
