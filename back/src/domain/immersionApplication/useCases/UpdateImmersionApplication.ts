@@ -4,6 +4,7 @@ import {
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { FeatureFlags } from "../../../shared/featureFlags";
 import {
+  ApplicationStatus,
   UpdateImmersionApplicationRequestDto,
   updateImmersionApplicationRequestDtoSchema,
   UpdateImmersionApplicationResponseDto,
@@ -48,7 +49,12 @@ export class UpdateImmersionApplication extends UseCase<
       );
     if (!id) throw new NotFoundError(params.id);
 
-    if (params.demandeImmersion.status == "IN_REVIEW") {
+    const statusThatTriggerEvent: ApplicationStatus = this.featureFlags
+      .enableEnterpriseSignature
+      ? "DRAFT"
+      : "IN_REVIEW";
+
+    if (params.demandeImmersion.status == statusThatTriggerEvent) {
       // So far we are in the case where a beneficiary made an update on an Immersion Application, and we just need to review it for eligibility
       const event = this.createNewEvent({
         topic: "ImmersionApplicationSubmittedByBeneficiary",
