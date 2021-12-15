@@ -35,7 +35,9 @@ export type DomainEvent =
       ContactEstablishmentRequestDto
     >
   // prettier-ignore
-  | GenericEvent<"ImmersionApplicationPartiallySigned", ImmersionApplicationDto>;
+  | GenericEvent<"ImmersionApplicationPartiallySigned", ImmersionApplicationDto>
+  // prettier-ignore
+  | GenericEvent<"ImmersionApplicationFullySigned", ImmersionApplicationDto>;
 
 export type DomainTopic = DomainEvent["topic"];
 

@@ -22,7 +22,7 @@ const domainTopicByTargetStatusMap: Partial<
   Record<ApplicationStatus, DomainTopic>
 > = {
   PARTIALLY_SIGNED: "ImmersionApplicationPartiallySigned",
-  IN_REVIEW: "ImmersionApplicationSubmittedByBeneficiary",
+  IN_REVIEW: "ImmersionApplicationFullySigned",
 };
 
 export class SignImmersionApplication extends UseCase<

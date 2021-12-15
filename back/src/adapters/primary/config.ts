@@ -126,6 +126,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateJwtFn,
     eventBus,
     eventCrawler: createEventCrawler(config, repositories.outbox, eventBus),
+    featureFlags: config.featureFlags,
   };
 };
 
