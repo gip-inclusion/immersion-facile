@@ -223,13 +223,6 @@ const createRomeGateway = async (
   getPgPoolFn: GetPgPoolFn,
 ): Promise<RomeGateway> => {
   switch (config.romeGateway) {
-    case "POLE_EMPLOI":
-      return new PoleEmploiRomeGateway(
-        new CachingAccessTokenGateway(
-          new PoleEmploiAccessTokenGateway(config.poleEmploiAccessTokenConfig),
-        ),
-        config.poleEmploiClientId,
-      );
     case "PG":
       return new PgRomeGateway(await getPgPoolFn().connect());
     default:
