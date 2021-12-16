@@ -1,4 +1,4 @@
-import { Formik, useField, useFormikContext } from "formik";
+import { useField, useFormikContext } from "formik";
 import React from "react";
 import { SuccessInfos } from "src/app/ApplicationForm/createSuccessInfos";
 import { BoolRadioGroup, RadioGroup } from "src/app/RadioGroup";
@@ -21,9 +21,7 @@ import { ENV } from "src/environmentVariables";
 import type {
   ApplicationStatus,
   ImmersionApplicationDto,
-  validApplicationStatus,
 } from "src/shared/ImmersionApplicationDto";
-import { submissionAndStartDatesConstraints } from "src/shared/immersionApplicationRefinement";
 
 const { featureFlags, dev } = ENV;
 
@@ -42,15 +40,22 @@ const FrozenMessage = () => (
   </>
 );
 
-const SignOnlyMessage = () => (
+type SignOnlyMessageProps = {
+  isAlreadySigned: boolean;
+};
+
+const SignOnlyMessage = ({ isAlreadySigned }: SignOnlyMessageProps) => (
   <>
     <div role="alert" className="fr-alert fr-alert--info">
       <p className="fr-alert__title">
-        Cette demande d'immersion est prête à être signée.
+        {isAlreadySigned
+          ? "Vous avez déjà signé cette demande d'immersion."
+          : "Cette demande d'immersion est prête à être signée."}
       </p>
       <p>
-        Cette demande d'immersion n'est plus modifiable. Veuillez la signer ou
-        la renvoyer pour modification.
+        {"Cette demande d'immersion n'est plus modifiable. " + isAlreadySigned
+          ? "Vous avez déjà signé cette demande d'immersion."
+          : "Veuillez la signer ou la renvoyer pour modification."}
       </p>
     </div>
     <br />
@@ -103,7 +108,9 @@ export const ApplicationFormFields = ({
   return (
     <>
       {isFrozen && !isSignatureMode && <FrozenMessage />}
-      {isFrozen && isSignatureMode && <SignOnlyMessage />}
+      {isFrozen && isSignatureMode && (
+        <SignOnlyMessage isAlreadySigned={alreadySubmitted ?? false} />
+      )}
 
       <TextInput
         label="Email *"
