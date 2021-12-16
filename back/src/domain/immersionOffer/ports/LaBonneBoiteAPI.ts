@@ -1,4 +1,4 @@
-import { SearchParams } from "./ImmersionOfferRepository";
+import { SearchParams } from "../entities/SearchParams";
 
 export type LaBonneBoiteCompany = {
   address: string;

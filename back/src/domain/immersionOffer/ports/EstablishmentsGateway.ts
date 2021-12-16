@@ -1,5 +1,4 @@
-import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import type { SearchParams } from "./ImmersionOfferRepository";
+import { SearchParams } from "../entities/SearchParams";
 import type { UncompleteEstablishmentEntity } from "../entities/UncompleteEstablishmentEntity";
 
 export interface EstablishmentsGateway {

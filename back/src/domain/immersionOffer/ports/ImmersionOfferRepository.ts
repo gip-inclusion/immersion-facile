@@ -1,29 +1,19 @@
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import {
-  ImmersionOfferEntity,
   ImmersionEstablishmentContact,
+  ImmersionOfferEntity,
 } from "../entities/ImmersionOfferEntity";
-
-export type SearchParams = {
-  rome: string;
-  distance_km: number;
-  lat: number;
-  lon: number;
-  nafDivision?: string;
-  siret?: string;
-};
+import { SearchParams } from "../entities/SearchParams";
 
 export interface ImmersionOfferRepository {
   insertEstablishmentContact: (
     establishmentContact: ImmersionEstablishmentContact,
   ) => Promise<void>;
-  insertSearch: (searchParams: SearchParams) => Promise<void>;
   insertImmersions: (immersions: ImmersionOfferEntity[]) => Promise<void>;
   insertEstablishments: (
     establishments: EstablishmentEntity[],
   ) => Promise<void>;
-  markPendingResearchesAsProcessedAndRetrieveThem(): Promise<SearchParams[]>;
 
   getImmersionFromUuid(
     uuid: string,

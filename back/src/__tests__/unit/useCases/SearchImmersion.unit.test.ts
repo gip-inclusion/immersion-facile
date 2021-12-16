@@ -1,4 +1,5 @@
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { InMemorySearchesMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
 import { ImmersionOfferEntity } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
@@ -7,7 +8,11 @@ import { EstablishmentEntityBuilder } from "../../../_testBuilders/Establishment
 describe("SearchImmersion", () => {
   test("Search immersion, give contact details only if authenticated", async () => {
     const immersionOfferRepository = new InMemoryImmersionOfferRepository();
-    const searchImmersion = new SearchImmersion(immersionOfferRepository);
+    const searchesMadeRepository = new InMemorySearchesMadeRepository();
+    const searchImmersion = new SearchImmersion(
+      searchesMadeRepository,
+      immersionOfferRepository,
+    );
     const siret = "78000403200019";
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
@@ -70,8 +75,7 @@ describe("SearchImmersion", () => {
     ];
     expect(unauthenticatedResponse).toEqual(expectedResponse);
 
-    const searches = immersionOfferRepository.searches;
-    expect(searches).toEqual([
+    expect(searchesMadeRepository.searchesMade).toEqual([
       {
         rome: "M1607",
         nafDivision: "85",

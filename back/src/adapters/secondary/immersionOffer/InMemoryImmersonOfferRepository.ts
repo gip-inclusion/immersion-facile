@@ -3,10 +3,8 @@ import {
   ImmersionEstablishmentContact,
   ImmersionOfferEntity,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
-import {
-  ImmersionOfferRepository,
-  SearchParams,
-} from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
@@ -33,7 +31,6 @@ export class InMemoryImmersionOfferRepository
   implements ImmersionOfferRepository
 {
   public constructor(
-    private _searches: SearchParams[] = [],
     private _immersionOffers: {
       [id: string]: ImmersionOfferEntity;
     } = {},
@@ -48,14 +45,7 @@ export class InMemoryImmersionOfferRepository
     this._immersionOffers[immersionOffer.getId()] = immersionOffer;
   }
 
-  public async insertSearch(searchParams: SearchParams) {
-    logger.info(searchParams, "insertSearch");
-    this._searches.push(searchParams);
-    return;
-  }
-
   empty() {
-    this._searches = [];
     this._immersionOffers = {};
     this._establishments = {};
     this._establishmentContacts = {};
@@ -89,15 +79,6 @@ export class InMemoryImmersionOfferRepository
       (establishment) =>
         (this._establishments[establishment.getSiret()] = establishment),
     );
-  }
-
-  public async markPendingResearchesAsProcessedAndRetrieveThem(): Promise<
-    SearchParams[]
-  > {
-    logger.info("markPendingResearchesAsProcessedAndRetrieveThem");
-    const searchesToReturn = this._searches;
-    this._searches = [];
-    return searchesToReturn;
   }
 
   public async getFromSearch(
@@ -185,12 +166,6 @@ export class InMemoryImmersionOfferRepository
     return this._establishments[siret];
   }
 
-  setSearches(searches: SearchParams[]) {
-    this._searches = searches;
-  }
-  get searches() {
-    return this._searches;
-  }
   get immersionOffers() {
     return Object.values(this._immersionOffers);
   }

@@ -5,10 +5,9 @@ import {
 } from "../../../shared/SearchImmersionDto";
 import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 import { UseCase } from "../../core/UseCase";
-import {
-  ImmersionOfferRepository,
-  SearchParams,
-} from "../ports/ImmersionOfferRepository";
+import { SearchParams } from "../entities/SearchParams";
+import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { SearchesMadeRepository } from "./../ports/SearchesMadeRepository";
 
 export class SearchImmersion extends UseCase<
   SearchImmersionRequestDto,
@@ -16,6 +15,7 @@ export class SearchImmersion extends UseCase<
   ApiConsumer
 > {
   constructor(
+    private readonly searchesMadeRepository: SearchesMadeRepository,
     private readonly immersionOfferRepository: ImmersionOfferRepository,
   ) {
     super();
@@ -28,7 +28,7 @@ export class SearchImmersion extends UseCase<
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
     const searchParams = convertRequestDtoToSearchParams(params);
-    await this.immersionOfferRepository.insertSearch(searchParams);
+    await this.searchesMadeRepository.insertSearchMade(searchParams);
     const apiConsumerName = apiConsumer?.consumer;
 
     return this.immersionOfferRepository.getFromSearch(

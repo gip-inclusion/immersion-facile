@@ -72,7 +72,8 @@ const main = async () => {
       laPlateFormeDeLInclusionAPI,
       addressGateway.getGPSFromAddressAPIAdresse,
       sireneGateway,
-      repositories.immersionOfferForSearch,
+      repositories.searchesMade,
+      repositories.immersionOffer,
     );
 
   const intermediateStatsLogger = setInterval(

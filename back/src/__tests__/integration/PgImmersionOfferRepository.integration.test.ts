@@ -23,7 +23,6 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE searches_made CASCADE");
     await client.query("TRUNCATE immersion_contacts CASCADE");
     await client.query("TRUNCATE establishments CASCADE");
     await client.query("TRUNCATE immersion_offers CASCADE");
@@ -33,45 +32,6 @@ describe("Postgres implementation of immersion offer repository", () => {
   afterAll(async () => {
     client.release();
     await pool.end();
-  });
-
-  test("Insert search", async () => {
-    await populateWithImmersionSearches(pgImmersionOfferRepository);
-
-    expect(
-      (
-        await pgImmersionOfferRepository.getSearchInDatabase({
-          rome: "M1607",
-          distance_km: 30,
-          lat: 49.119146,
-          lon: 6.17602,
-        })
-      )[0].rome,
-    ).toBe("M1607");
-
-    //We empty the searches for the next tests
-    await pgImmersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem();
-  });
-
-  test("Grouping searches close geographically", async () => {
-    await populateWithImmersionSearches(pgImmersionOfferRepository);
-
-    //We expect that two of the 6 searches have been grouped by
-    expect(
-      await pgImmersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem(),
-    ).toHaveLength(5);
-
-    //We expect then that all searches have been retrieved
-    expect(
-      await pgImmersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem(),
-    ).toHaveLength(0);
-
-    //We expect that all searches are not to be searched anymore
-    const allSearches = (await pgImmersionOfferRepository.getAllSearches())
-      .rows;
-    allSearches.map((row) => {
-      expect(row.needstobesearched).toBe(false);
-    });
   });
 
   test("Insert immersions and retrieves them back", async () => {

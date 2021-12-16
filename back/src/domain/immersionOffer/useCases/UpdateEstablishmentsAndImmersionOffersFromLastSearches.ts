@@ -2,16 +2,17 @@ import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { SireneRepository } from "../../sirene/ports/SireneRepository";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import { SearchParams } from "../entities/SearchParams";
 import { GetPosition } from "../ports/GetPosition";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaPlateformeDeLInclusionAPI } from "../ports/LaPlateformeDeLInclusionAPI";
 import { UuidGenerator } from "./../../core/ports/UuidGenerator";
 import { UncompleteEstablishmentEntity } from "./../entities/UncompleteEstablishmentEntity";
-import { SearchParams } from "./../ports/ImmersionOfferRepository";
 import {
   LaBonneBoiteAPI,
   LaBonneBoiteCompany,
 } from "./../ports/LaBonneBoiteAPI";
+import { SearchesMadeRepository } from "./../ports/SearchesMadeRepository";
 
 const logger = createLogger(__filename);
 
@@ -24,13 +25,14 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     private readonly laPlateFormeDeLInclusionAPI: LaPlateformeDeLInclusionAPI,
     private readonly getPosition: GetPosition,
     private readonly sireneRepository: SireneRepository,
+    private readonly searchesMadeRepository: SearchesMadeRepository,
     private readonly immersionOfferRepository: ImmersionOfferRepository,
   ) {}
 
   public async execute() {
     // Take all searches made in the past.
     const searchesMade =
-      await this.immersionOfferRepository.markPendingResearchesAsProcessedAndRetrieveThem();
+      await this.searchesMadeRepository.markPendingSearchesAsProcessedAndRetrieveThem();
 
     logger.info(
       `Found ${searchesMade.length} unprocessed rows in the searches_made table.`,

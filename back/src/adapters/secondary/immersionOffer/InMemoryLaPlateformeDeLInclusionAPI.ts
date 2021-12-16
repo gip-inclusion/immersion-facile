@@ -1,4 +1,4 @@
-import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import {
   LaPlateformeDeLInclusionResult,
   LaPlateformeDeLInclusionAPI,

@@ -80,12 +80,14 @@ import { InMemoryUowPerformer } from "../secondary/InMemoryUowPerformer";
 import { PgAgencyRepository } from "../secondary/pg/PgAgencyRepository";
 import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
-import { PgImmersionOfferRepository as PgImmersionOfferRepositoryForSearch } from "../secondary/pg/PgImmersionOfferRepository";
+import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
+import { PgSearchesMadeRepository } from "../secondary/pg/PgSearchesMadeRepository";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { unrestrictedRateLimiter } from "./../../domain/core/ports/RateLimiter";
+import { InMemorySearchesMadeRepository } from "./../secondary/immersionOffer/InMemorySearchesMadeRepository";
 import { AppConfig } from "./appConfig";
 import {
   createApiKeyAuthMiddleware,
@@ -180,9 +182,14 @@ export const createRepositories = async (
         ? new PgFormEstablishmentRepository(await getPgPoolFn().connect())
         : new InMemoryFormEstablishmentRepository(),
 
-    immersionOfferForSearch:
+    searchesMade:
       config.repositories === "PG"
-        ? new PgImmersionOfferRepositoryForSearch(
+        ? new PgSearchesMadeRepository(await getPgPoolFn().connect())
+        : new InMemorySearchesMadeRepository(),
+
+    immersionOffer:
+      config.repositories === "PG"
+        ? new PgImmersionOfferRepository(
             // Details in https://node-postgres.com/features/pooling
             // Now using connection pool
             // TODO: Still we would need to release the connection
@@ -246,7 +253,7 @@ const isAssignable = (): UnitOfWork => {
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
   outboxRepo: new PgOutboxRepository(client),
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
-  immersionOfferRepo: new PgImmersionOfferRepositoryForSearch(client),
+  immersionOfferRepo: new PgImmersionOfferRepository(client),
 });
 
 const createUowPerformer = (
@@ -352,9 +359,12 @@ const createUseCases = (
     ),
 
     // immersionOffer
-    searchImmersion: new SearchImmersion(repositories.immersionOfferForSearch),
+    searchImmersion: new SearchImmersion(
+      repositories.searchesMade,
+      repositories.immersionOffer,
+    ),
     getImmersionOfferById: new GetImmersionOfferById(
-      repositories.immersionOfferForSearch,
+      repositories.immersionOffer,
     ),
 
     addFormEstablishment: new AddFormEstablishment(
@@ -366,7 +376,7 @@ const createUseCases = (
     transformFormEstablishmentToSearchData:
       new TransformFormEstablishmentIntoSearchData(
         repositories.formEstablishment,
-        repositories.immersionOfferForSearch,
+        repositories.immersionOffer,
         addressGateway.getGPSFromAddressAPIAdresse,
         repositories.sirene,
         repositories.rome,

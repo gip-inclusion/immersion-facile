@@ -5,11 +5,9 @@ import {
   ImmersionEstablishmentContact,
   ImmersionOfferEntity,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import { Position } from "../../../domain/immersionOffer/ports/GetPosition";
-import {
-  ImmersionOfferRepository,
-  SearchParams,
-} from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import {
   SearchContact,
@@ -420,27 +418,5 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       ...(withContactDetails &&
         immersionContact && { contactDetails: immersionContact }),
     };
-  }
-
-  async getAllSearches() {
-    return this.client.query("SELECT * FROM searches_made");
-  }
-
-  async getSearchInDatabase(searchParams: SearchParams) {
-    return this.client
-      .query(
-        "SELECT * FROM searches_made WHERE rome=$1 AND lat=$2 AND lon=$3 AND distance=$4",
-        [
-          searchParams.rome,
-          searchParams.lat,
-          searchParams.lon,
-          searchParams.distance_km,
-        ],
-      )
-      .then((res) => res.rows)
-      .catch((e) => {
-        logger.error(e);
-        return [];
-      });
   }
 }

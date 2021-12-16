@@ -1,12 +1,13 @@
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
+import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import { GetPosition } from "../../../domain/immersionOffer/ports/GetPosition";
-import { SearchParams } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
 import { LaPlateFormeDeLInclusionPosteBuilder } from "../../../_testBuilders/LaPlateFormeDeLInclusionPosteBuilder";
 import { InMemoryLaBonneBoiteAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryLaPlateformeDeLInclusionAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryLaPlateformeDeLInclusionAPI";
+import { InMemorySearchesMadeRepository } from "./../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
 import { LaBonneBoiteCompanyBuilder } from "./../../../_testBuilders/LaBonneBoiteResponseBuilder";
 import { LaPlateformeDeLInclusionResultBuilder } from "./../../../_testBuilders/LaPlateformeDeLInclusionResultBuilder";
 
@@ -16,6 +17,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let testUuidGenerator: TestUuidGenerator;
   let updateEstablishmentsAndImmersionOffersFromLastSearches: UpdateEstablishmentsAndImmersionOffersFromLastSearches;
   let immersionOfferRepository: InMemoryImmersionOfferRepository;
+  let searchesMadeRepository: InMemorySearchesMadeRepository;
   let laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   let laPlateFormeDeLInclusionAPI: InMemoryLaPlateformeDeLInclusionAPI;
 
@@ -24,6 +26,8 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 
     immersionOfferRepository = new InMemoryImmersionOfferRepository();
     immersionOfferRepository.empty();
+
+    searchesMadeRepository = new InMemorySearchesMadeRepository();
 
     laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
     laPlateFormeDeLInclusionAPI = new InMemoryLaPlateformeDeLInclusionAPI();
@@ -40,6 +44,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
         laPlateFormeDeLInclusionAPI,
         fakeGetPosition,
         inMemorySireneRepository,
+        searchesMadeRepository,
         immersionOfferRepository,
       );
   });
@@ -69,12 +74,12 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
       lat: 10.0,
       lon: 20.0,
     };
-    immersionOfferRepository.setSearches([search]);
+    searchesMadeRepository.setSearchesMade([search]);
 
     // act
     await updateEstablishmentsAndImmersionOffersFromLastSearches.execute();
 
-    expect(immersionOfferRepository.searches).toHaveLength(0);
+    expect(searchesMadeRepository.searchesMade).toHaveLength(0);
 
     //We expect to find the immersion in results
     const immersionOffersInRepo = immersionOfferRepository.immersionOffers;
