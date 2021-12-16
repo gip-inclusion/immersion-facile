@@ -10,6 +10,7 @@ import { createLogger } from "../../../utils/logger";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionEstablishmentContactBuilder } from "../../../_testBuilders/ImmersionEstablishmentContactBuilder";
 import { ImmersionOfferEntityBuilder } from "../../../_testBuilders/ImmersionOfferEntityBuilder";
+import { EstablishmentAggregate } from "./../../../domain/immersionOffer/entities/EstablishmentAggregate";
 
 const logger = createLogger(__filename);
 
@@ -38,6 +39,7 @@ export class InMemoryImmersionOfferRepository
     private _establishmentContacts: {
       [siret: string]: ImmersionEstablishmentContact;
     } = {},
+    private _establishmentAggregates: EstablishmentAggregate[] = [],
   ) {
     this._establishments[establishment.getSiret()] = establishment;
     this._establishmentContacts[establishmentContact.siretEstablishment] =
@@ -50,6 +52,13 @@ export class InMemoryImmersionOfferRepository
     this._establishments = {};
     this._establishmentContacts = {};
     return this;
+  }
+
+  async insertEstablishmentAggregates(aggregates: EstablishmentAggregate[]) {
+    this._establishmentAggregates = [
+      ...this._establishmentAggregates,
+      ...aggregates,
+    ];
   }
 
   async insertEstablishmentContact(

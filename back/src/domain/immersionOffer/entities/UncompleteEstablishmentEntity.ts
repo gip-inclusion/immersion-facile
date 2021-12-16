@@ -1,10 +1,11 @@
+import { logAxiosError } from "../../../utils/axiosUtils";
+import { createLogger } from "../../../utils/logger";
 import {
   SireneRepository,
   SireneRepositoryAnswer,
 } from "../../sirene/ports/SireneRepository";
 import { GetPosition } from "../ports/GetPosition";
-import { logAxiosError } from "./../../../utils/axiosUtils";
-import { createLogger } from "./../../../utils/logger";
+import { TefenCode } from "./EstablishmentAggregate";
 import type {
   EstablishmentFieldsToRetrieve,
   MandatoryEstablishmentFields,
@@ -12,7 +13,6 @@ import type {
 import {
   EstablishmentEntity,
   OptionalEstablishmentFields,
-  TefenCode,
 } from "./EstablishmentEntity";
 
 const logger = createLogger(__filename);

@@ -1,5 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
+import { EstablishmentAggregate } from "../../../domain/immersionOffer/entities/EstablishmentAggregate";
 import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   ImmersionEstablishmentContact,
@@ -101,6 +102,95 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       });
   }
 
+  public async insertEstablishmentAggregates(
+    aggregates: EstablishmentAggregate[],
+  ) {
+    await this._upsertEstablishmentsFromAggregates(aggregates);
+    await this._insertContactsFromAggregates(aggregates);
+    await this._upsertImmersionOffersFromAggregates(aggregates);
+  }
+
+  private async _upsertEstablishmentsFromAggregates(
+    aggregates: EstablishmentAggregate[],
+  ) {
+    const establishmentFields = aggregates.map(({ establishment }) => [
+      establishment.siret,
+      establishment.name,
+      establishment.address,
+      establishment.numberEmployeesRange,
+      establishment.naf,
+      contactModeMap[establishment.contactMethod as KnownContactMethod] || null,
+      establishment.dataSource,
+      convertPositionToStGeography(establishment.position),
+    ]);
+
+    if (establishmentFields.length === 0) return;
+
+    try {
+      const query = buildUpsertEstablishmentsQuery(establishmentFields);
+      await this.client.query(query);
+    } catch (e: any) {
+      logger.error(e, "Error inserting establishments");
+      throw e;
+    }
+  }
+
+  private async _insertContactsFromAggregates(
+    aggregates: EstablishmentAggregate[],
+  ) {
+    const contactFields = aggregates.flatMap(({ establishment, contacts }) =>
+      contacts.map((contact) => [
+        contact.id,
+        contact.lastName,
+        contact.firstName,
+        contact.email,
+        contact.job,
+        establishment.siret,
+        contact.phone,
+      ]),
+    );
+
+    if (contactFields.length === 0) return;
+
+    try {
+      const query = buildInsertContactsQuery(contactFields);
+      await this.client.query(query);
+    } catch (e: any) {
+      logger.error(e, "Error inserting contacts");
+    }
+  }
+
+  private async _upsertImmersionOffersFromAggregates(
+    aggregates: EstablishmentAggregate[],
+  ) {
+    const immersionOfferFields = aggregates.flatMap(
+      ({ establishment, contacts, immersionOffers }) =>
+        immersionOffers.map((immersionOffer) => [
+          immersionOffer.id,
+          immersionOffer.rome,
+          extractNafDivision(establishment.naf),
+          establishment.siret,
+          establishment.naf,
+          establishment.name,
+          establishment.voluntaryToImmersion,
+          establishment.dataSource,
+          contacts[0]?.id,
+          immersionOffer.score,
+          convertPositionToStGeography(establishment.position),
+        ]),
+    );
+
+    if (immersionOfferFields.length === 0) return;
+
+    try {
+      const query = buildUpsertImmersionOffersQuery(immersionOfferFields);
+      await this.client.query(query);
+    } catch (e: any) {
+      logger.error(e, "Error inserting contacts");
+    }
+  }
+
+  // DEPRECATED.
   public async insertEstablishments(
     establishments: EstablishmentEntity[],
   ): Promise<void> {
@@ -145,54 +235,28 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         ];
       });
 
-    const formatedQuery = format(
-      `
-      INSERT INTO establishments (
-        siret, name, address, number_employees, naf, contact_mode, data_source, gps)
-      VALUES %L
-      ON CONFLICT
-        ON CONSTRAINT pk_establishments
-          DO UPDATE
-            SET
-              name=EXCLUDED.name, address=EXCLUDED.address,
-              number_employees=EXCLUDED.number_employees, naf=EXCLUDED.naf,
-              contact_mode=EXCLUDED.contact_mode, data_source=EXCLUDED.data_source,
-              update_date=NOW()
-            WHERE
-              EXCLUDED.data_source='form'
-              OR (
-                establishments.data_source != 'form'
-                AND (
-                  EXCLUDED.data_source = 'api_laplateformedelinclusion'
-                  AND establishments.data_source = 'api_labonneboite'))
-      `,
+    const query = buildUpsertEstablishmentsQuery(
       uniqImmersionsOffersWithCorrectPosition,
     );
 
-    //We remove the dashes around method ST_GeographyFromText to make it work
-    const re =
-      /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
-    const formatedQueryWorking = formatedQuery.replace(
-      re,
-      "ST_GeographyFromText('POINT($1 $3)')",
-    );
-    const query = format(formatedQueryWorking);
     await this.client.query(query).catch((e) => {
       logger.error("Error when trying to insert establishment " + e);
     });
   }
 
+  // DEPRECATED.
   async insertEstablishmentContact(
     immersionEstablishmentContact: ImmersionEstablishmentContact,
   ) {
     const { id, name, firstname, email, role, siretEstablishment, phone } =
       immersionEstablishmentContact;
-    await this.client.query(
-      `INSERT INTO immersion_contacts (uuid, name, firstname, email, role,  siret_establishment, phone)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    const query = buildInsertContactsQuery([
       [id, name, firstname, email, role, siretEstablishment, phone],
-    );
+    ]);
+    await this.client.query(query);
   }
+
+  // DEPRECATED.
   async insertImmersions(
     immersionOffers: ImmersionOfferEntity[],
   ): Promise<void> {
@@ -231,31 +295,11 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         ];
       });
 
-    const formatedQuery = format(
-      "INSERT INTO immersion_offers (uuid, rome, naf_division, siret, naf,  name, voluntary_to_immersion, data_source, contact_in_establishment_uuid, score, gps) \
-        VALUES %L \
-          ON CONFLICT ON CONSTRAINT pk_immersion_offers \
-            DO UPDATE SET \
-              naf=EXCLUDED.naf,\
-              name=EXCLUDED.name,\
-              voluntary_to_immersion=EXCLUDED.voluntary_to_immersion, \
-              data_source=EXCLUDED.data_source,\
-              score=EXCLUDED.score,\
-              update_date=NOW() \
-        WHERE EXCLUDED.data_source='form' OR (immersion_offers.data_source != 'form' \
-        AND (EXCLUDED.data_source = 'api_laplateformedelinclusion' \
-        AND immersion_offers.data_source = 'api_labonneboite'))",
+    const query = buildUpsertImmersionOffersQuery(
       uniqImmersionsOffersWithCorrectPosition,
     );
 
-    // Replace the escaped quotes ('') with single quotes (') in ST_GeographyFromText.
-    const re =
-      /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
-    const formatedQueryWorking = formatedQuery.replace(
-      re,
-      "ST_GeographyFromText('POINT($1 $3)')",
-    );
-    await this.client.query(formatedQueryWorking).catch((e) => {
+    await this.client.query(query).catch((e) => {
       console.error("Error Inserting immersions " + e); // we keep this one too because otherwise the error does not appear in tests
       logger.error("Error Inserting immersions " + e);
     });
@@ -420,3 +464,84 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     };
   }
 }
+
+const buildUpsertEstablishmentsQuery = (establishmentFields: any[][]) => {
+  const query = format(
+    `INSERT INTO establishments (
+      siret, name, address, number_employees, naf, contact_mode, data_source, gps
+    ) VALUES %L
+    ON CONFLICT
+      ON CONSTRAINT pk_establishments
+        DO UPDATE
+          SET
+            name=EXCLUDED.name,
+            address=EXCLUDED.address,
+            number_employees=EXCLUDED.number_employees,
+            naf=EXCLUDED.naf,
+            contact_mode=EXCLUDED.contact_mode,
+            data_source=EXCLUDED.data_source,
+            update_date=NOW()
+          WHERE
+            EXCLUDED.data_source='form'
+            OR (
+              establishments.data_source != 'form'
+              AND (
+                EXCLUDED.data_source = 'api_laplateformedelinclusion'
+                AND establishments.data_source = 'api_labonneboite'
+              )
+            )`,
+    establishmentFields,
+  );
+  return fixStGeographyEscapingInQuery(query);
+};
+
+const buildInsertContactsQuery = (contactFields: any[][]) =>
+  format(
+    `INSERT INTO immersion_contacts (
+    uuid, name, firstname, email, role, siret_establishment, phone
+  ) VALUES %L`,
+    contactFields,
+  );
+
+const buildUpsertImmersionOffersQuery = (immersionOfferFields: any[][]) => {
+  const query = format(
+    `INSERT INTO immersion_offers (
+      uuid, rome, naf_division, siret, naf,  name, voluntary_to_immersion, data_source,
+      contact_in_establishment_uuid, score, gps
+    ) VALUES %L
+    ON CONFLICT
+      ON CONSTRAINT pk_immersion_offers
+        DO UPDATE
+          SET
+            naf=EXCLUDED.naf,
+            name=EXCLUDED.name,
+            voluntary_to_immersion=EXCLUDED.voluntary_to_immersion,
+            data_source=EXCLUDED.data_source,
+            score=EXCLUDED.score,
+            update_date=NOW()
+          WHERE
+            EXCLUDED.data_source='form'
+            OR (
+              immersion_offers.data_source != 'form'
+              AND (
+                EXCLUDED.data_source = 'api_laplateformedelinclusion'
+                AND immersion_offers.data_source = 'api_labonneboite'
+              )
+            )`,
+    immersionOfferFields,
+  );
+  return fixStGeographyEscapingInQuery(query);
+};
+
+// Extract the NAF division (e.g. 84) from a NAF code (e.g. 8413Z)
+const extractNafDivision = (naf: string) => parseInt(naf.substring(0, 2));
+
+const convertPositionToStGeography = ({ lat, lon }: Position) =>
+  `ST_GeographyFromText('POINT(${lon} ${lat})')`;
+
+const reStGeographyFromText =
+  /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
+
+// Remove any repeated single quotes ('') inside ST_GeographyFromText.
+const fixStGeographyEscapingInQuery = (query: string) =>
+  query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");

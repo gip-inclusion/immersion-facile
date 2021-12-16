@@ -2,6 +2,7 @@ import { v4 as uuidV4 } from "uuid";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import { Flavor } from "../../../shared/typeFlavors";
 import { Position } from "../ports/GetPosition";
+import { TefenCode } from "./EstablishmentAggregate";
 import {
   ImmersionEstablishmentContact,
   ImmersionOfferEntity,
@@ -23,25 +24,6 @@ export type MandatoryEstablishmentFields = {
     | "form"
     | "api_sirene";
 };
-
-// Code Tefen : Tranche Effectif Entreprise
-export type TefenCode =
-  | 0
-  | 1
-  | 2
-  | 3
-  | 11
-  | 12
-  | 21
-  | 22
-  | 31
-  | 32
-  | 41
-  | 42
-  | 51
-  | 52
-  | 53
-  | -1;
 
 export type EstablishmentFieldsToRetrieve = {
   numberEmployeesRange: TefenCode;

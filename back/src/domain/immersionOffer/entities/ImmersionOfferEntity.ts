@@ -2,6 +2,21 @@ import { ImmersionContactInEstablishmentId } from "../../../shared/FormEstablish
 import { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 import { Position } from "../ports/GetPosition";
 
+export type ContactEntityV2 = {
+  id: ImmersionContactInEstablishmentId;
+  lastName: string;
+  firstName: string;
+  email: string;
+  job: string;
+  phone: string;
+};
+
+export type ImmersionOfferEntityV2 = {
+  id: ImmersionOfferId;
+  rome: string;
+  score: number;
+};
+
 export type ImmersionOfferProps = {
   id: ImmersionOfferId;
   rome: string;

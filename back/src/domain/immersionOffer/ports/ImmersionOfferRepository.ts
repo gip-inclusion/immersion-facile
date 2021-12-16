@@ -1,4 +1,5 @@
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
+import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import {
   ImmersionEstablishmentContact,
@@ -7,6 +8,12 @@ import {
 import { SearchParams } from "../entities/SearchParams";
 
 export interface ImmersionOfferRepository {
+  insertEstablishmentAggregates: (
+    establishments: EstablishmentAggregate[],
+  ) => Promise<void>;
+
+  // DEPRECATED.
+
   insertEstablishmentContact: (
     establishmentContact: ImmersionEstablishmentContact,
   ) => Promise<void>;

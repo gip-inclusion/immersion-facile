@@ -1,16 +1,17 @@
 import { Pool, PoolClient } from "pg";
-import { EstablishmentEntityBuilder } from "../../_testBuilders/EstablishmentEntityBuilder";
 import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
 import { EstablishmentEntity } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   ImmersionEstablishmentContact,
   ImmersionOfferEntity,
 } from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import {
   SearchContact,
   SearchImmersionResultDto,
 } from "../../shared/SearchImmersionDto";
+import { EstablishmentEntityBuilder } from "../../_testBuilders/EstablishmentEntityBuilder";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import { EstablishmentAggregateBuilder } from "./../../_testBuilders/EstablishmentAggregateBuilder";
 
 describe("Postgres implementation of immersion offer repository", () => {
   let pool: Pool;
@@ -34,169 +35,238 @@ describe("Postgres implementation of immersion offer repository", () => {
     await pool.end();
   });
 
-  test("Insert immersions and retrieves them back", async () => {
-    await pgImmersionOfferRepository.insertEstablishments([
-      new EstablishmentEntity({
-        id: "13df03a5-a2a5-430a-b558-111111111111",
-        address: "fake address establishment 1",
-        name: "Fake Establishment from la plate forme de l'inclusion",
-        voluntaryToImmersion: false,
-        score: 5,
-        romes: ["M1907"],
-        siret: "78000403200029",
-        dataSource: "api_laplateformedelinclusion",
-        numberEmployeesRange: 1,
-        position: { lat: 10, lon: 15 },
-        naf: "8539A",
-        contactMode: "EMAIL",
-      }),
-    ]);
-    await pgImmersionOfferRepository.insertEstablishments([
-      new EstablishmentEntity({
-        id: "13df03a5-a2a5-430a-b558-222222222222",
+  describe("Insert immersions and retrieves them back", () => {
+    test("Using V2 interface", async () => {
+      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment({
+            address: "fake address establishment 1",
+            name: "Company from la bonne boite for search",
+            voluntaryToImmersion: false,
+            siret: "78000403200029",
+            dataSource: "api_labonneboite",
+            numberEmployeesRange: 1,
+            position: { lat: 49, lon: 6 },
+            naf: "8539A",
+            contactMethod: "EMAIL",
+          })
+          .withImmersionOffers([
+            {
+              id: "13df03a5-a2a5-430a-b558-111111111122",
+              rome: "M1907",
+              score: 4.5,
+            },
+          ])
+          .build(),
+        new EstablishmentAggregateBuilder()
+          .withEstablishment({
+            address: "fake address establishment 2",
+            name: "Company from api sirene for search",
+            voluntaryToImmersion: false,
+            siret: "78000403200040",
+            dataSource: "api_sirene",
+            numberEmployeesRange: 1,
+            position: { lat: 49.05, lon: 6.05 },
+            naf: "8539A",
+            contactMethod: "PHONE",
+          })
+          .withContacts([
+            {
+              id: "93144fe8-56a7-4807-8990-726badc6332b",
+              lastName: "Doe",
+              firstName: "John",
+              email: "joe@mail.com",
+              job: "super job",
+              phone: "0640404040",
+            },
+          ])
+          .withImmersionOffers([
+            {
+              id: "13df03a5-a2a5-430a-b558-333333333344",
+              rome: "M1907",
+              score: 4.5,
+            },
+          ])
+          .build(),
+      ]);
+
+      await checkDatabaseContents();
+    });
+
+    test("Using V1 (deprecated) interface", async () => {
+      await pgImmersionOfferRepository.insertEstablishments([
+        new EstablishmentEntity({
+          id: "13df03a5-a2a5-430a-b558-111111111111",
+          address: "fake address establishment 1",
+          name: "Fake Establishment from la plate forme de l'inclusion",
+          voluntaryToImmersion: false,
+          score: 5,
+          romes: ["M1907"],
+          siret: "78000403200029",
+          dataSource: "api_laplateformedelinclusion",
+          numberEmployeesRange: 1,
+          position: { lat: 10, lon: 15 },
+          naf: "8539A",
+          contactMode: "EMAIL",
+        }),
+      ]);
+      await pgImmersionOfferRepository.insertEstablishments([
+        new EstablishmentEntity({
+          id: "13df03a5-a2a5-430a-b558-222222222222",
+          address: "fake address establishment 2",
+          name: "Fake Establishment from la plate forme de l'inclusion",
+          voluntaryToImmersion: false,
+          score: 5,
+          romes: ["M1907"],
+          siret: "78000403200040",
+          dataSource: "api_laplateformedelinclusion",
+          numberEmployeesRange: 1,
+          position: { lat: 11, lon: 16 },
+          naf: "8539A",
+          contactMode: "PHONE",
+        }),
+      ]);
+
+      const contactInEstablishment: ImmersionEstablishmentContact = {
+        id: "93144fe8-56a7-4807-8990-726badc6332b",
+        name: "Doe",
+        firstname: "John",
+        email: "joe@mail.com",
+        role: "super job",
+        siretEstablishment: "78000403200040",
+        phone: "0640404040",
+      };
+
+      await pgImmersionOfferRepository.insertEstablishmentContact(
+        contactInEstablishment,
+      );
+
+      await pgImmersionOfferRepository.insertImmersions([
+        new ImmersionOfferEntity({
+          id: "13df03a5-a2a5-430a-b558-111111111122",
+          rome: "M1907",
+          naf: "8539A",
+          siret: "78000403200029",
+          name: "Company from la bonne boite for search",
+          voluntaryToImmersion: false,
+          data_source: "api_labonneboite",
+          contactInEstablishment: undefined,
+          score: 4.5,
+          position: { lat: 49, lon: 6 },
+        }),
+      ]);
+
+      await pgImmersionOfferRepository.insertImmersions([
+        new ImmersionOfferEntity({
+          id: "13df03a5-a2a5-430a-b558-333333333344",
+          rome: "M1907",
+          naf: "8539A",
+          siret: "78000403200040",
+          name: "Company from api sirene for search",
+          voluntaryToImmersion: false,
+          data_source: "api_sirene",
+          contactInEstablishment,
+          score: 4.5,
+          position: { lat: 49.05, lon: 6.05 },
+        }),
+      ]);
+
+      await checkDatabaseContents();
+    });
+
+    const checkDatabaseContents = async () => {
+      const searchResult = await pgImmersionOfferRepository.getFromSearch({
+        rome: "M1907",
+        distance_km: 30,
+        lat: 49.1,
+        lon: 6.1,
+        nafDivision: "85",
+      });
+      expect(searchResult).toHaveLength(2);
+      const expectedResult1: SearchImmersionResultDto = {
+        id: "13df03a5-a2a5-430a-b558-333333333344",
         address: "fake address establishment 2",
-        name: "Fake Establishment from la plate forme de l'inclusion",
-        voluntaryToImmersion: false,
-        score: 5,
-        romes: ["M1907"],
-        siret: "78000403200040",
-        dataSource: "api_laplateformedelinclusion",
-        numberEmployeesRange: 1,
-        position: { lat: 11, lon: 16 },
+        name: "Company from api sirene for search",
         naf: "8539A",
         contactMode: "PHONE",
-      }),
-    ]);
-
-    const contactInEstablishment: ImmersionEstablishmentContact = {
-      id: "93144fe8-56a7-4807-8990-726badc6332b",
-      name: "Doe",
-      firstname: "John",
-      email: "joe@mail.com",
-      role: "super job",
-      siretEstablishment: "78000403200040",
-      phone: "0640404040",
-    };
-
-    await pgImmersionOfferRepository.insertEstablishmentContact(
-      contactInEstablishment,
-    );
-
-    await pgImmersionOfferRepository.insertImmersions([
-      new ImmersionOfferEntity({
-        id: "13df03a5-a2a5-430a-b558-111111111122",
+        location: { lat: 49.05, lon: 6.05 },
+        voluntaryToImmersion: false,
         rome: "M1907",
-        naf: "8539A",
-        siret: "78000403200029",
+        siret: "78000403200040",
+        distance_m: 6653,
+        city: "xxxx",
+        nafLabel: "xxxx",
+        romeLabel: "xxxx",
+      };
+      const expectedResult2: SearchImmersionResultDto = {
+        id: "13df03a5-a2a5-430a-b558-111111111122",
+        address: "fake address establishment 1",
         name: "Company from la bonne boite for search",
         voluntaryToImmersion: false,
-        data_source: "api_labonneboite",
-        contactInEstablishment: undefined,
-        score: 4.5,
-        position: { lat: 49, lon: 6 },
-      }),
-    ]);
-
-    await pgImmersionOfferRepository.insertImmersions([
-      new ImmersionOfferEntity({
-        id: "13df03a5-a2a5-430a-b558-333333333344",
         rome: "M1907",
+        siret: "78000403200029",
+        location: { lat: 49, lon: 6 },
+        distance_m: 13308,
         naf: "8539A",
+        contactMode: "EMAIL",
+        city: "xxxx",
+        nafLabel: "xxxx",
+        romeLabel: "xxxx",
+      };
+
+      expect(
+        searchResult.sort((a, b) => a.distance_m! - b.distance_m!),
+      ).toMatchObject([expectedResult1, expectedResult2]);
+
+      const searchResuts = await pgImmersionOfferRepository.getFromSearch({
+        rome: "M1907",
+        distance_km: 30,
+        lat: 49.1,
+        lon: 6.1,
+        nafDivision: "85",
         siret: "78000403200040",
-        name: "Company from api sirene for search",
-        voluntaryToImmersion: false,
-        data_source: "api_sirene",
-        contactInEstablishment,
-        score: 4.5,
-        position: { lat: 49.05, lon: 6.05 },
-      }),
-    ]);
+      });
+      expect(searchResuts).toHaveLength(1);
+      expect(searchResuts[0].siret).toBe("78000403200040");
+      expect(searchResuts[0].contactDetails).toBeUndefined();
 
-    const searchResult = await pgImmersionOfferRepository.getFromSearch({
-      rome: "M1907",
-      distance_km: 30,
-      lat: 49.1,
-      lon: 6.1,
-      nafDivision: "85",
-    });
-    expect(searchResult).toHaveLength(2);
-    const expectedResult1: SearchImmersionResultDto = {
-      id: "13df03a5-a2a5-430a-b558-333333333344",
-      address: "fake address establishment 2",
-      name: "Company from api sirene for search",
-      naf: "8539A",
-      contactMode: "PHONE",
-      location: { lat: 49.05, lon: 6.05 },
-      voluntaryToImmersion: false,
-      rome: "M1907",
-      siret: "78000403200040",
-      distance_m: 6653,
-      city: "xxxx",
-      nafLabel: "xxxx",
-      romeLabel: "xxxx",
-    };
-    const expectedResult2: SearchImmersionResultDto = {
-      id: "13df03a5-a2a5-430a-b558-111111111122",
-      address: "fake address establishment 1",
-      name: "Company from la bonne boite for search",
-      voluntaryToImmersion: false,
-      rome: "M1907",
-      siret: "78000403200029",
-      location: { lat: 49, lon: 6 },
-      distance_m: 13308,
-      naf: "8539A",
-      contactMode: "EMAIL",
-      city: "xxxx",
-      nafLabel: "xxxx",
-      romeLabel: "xxxx",
-    };
+      const searchResultsWithDetails =
+        await pgImmersionOfferRepository.getFromSearch(
+          {
+            rome: "M1907",
+            distance_km: 30,
+            lat: 49.1,
+            lon: 6.1,
+            nafDivision: "85",
+            siret: "78000403200040",
+          },
+          true,
+        );
+      expect(searchResultsWithDetails).toHaveLength(1);
+      expect(searchResultsWithDetails[0].siret).toBe("78000403200040");
 
-    expect(
-      searchResult.sort((a, b) => a.distance_m! - b.distance_m!),
-    ).toMatchObject([expectedResult1, expectedResult2]);
-
-    const searchResuts = await pgImmersionOfferRepository.getFromSearch({
-      rome: "M1907",
-      distance_km: 30,
-      lat: 49.1,
-      lon: 6.1,
-      nafDivision: "85",
-      siret: "78000403200040",
-    });
-    expect(searchResuts).toHaveLength(1);
-    expect(searchResuts[0].siret).toBe("78000403200040");
-    expect(searchResuts[0].contactDetails).toBeUndefined();
-
-    const searchResultsWithDetails =
-      await pgImmersionOfferRepository.getFromSearch(
-        {
-          rome: "M1907",
-          distance_km: 30,
-          lat: 49.1,
-          lon: 6.1,
-          nafDivision: "85",
-          siret: "78000403200040",
-        },
-        true,
+      const expectedContactDetails: SearchContact = {
+        id: "93144fe8-56a7-4807-8990-726badc6332b",
+        lastName: "Doe",
+        firstName: "John",
+        email: "joe@mail.com",
+        role: "super job",
+        phone: "0640404040",
+      };
+      expect(searchResultsWithDetails[0].contactDetails).toEqual(
+        expectedContactDetails,
       );
-    expect(searchResultsWithDetails).toHaveLength(1);
-    expect(searchResultsWithDetails[0].siret).toBe("78000403200040");
-
-    const expectedContactDetails: SearchContact = {
-      id: "93144fe8-56a7-4807-8990-726badc6332b",
-      lastName: "Doe",
-      firstName: "John",
-      email: "joe@mail.com",
-      role: "super job",
-      phone: "0640404040",
     };
-    expect(searchResultsWithDetails[0].contactDetails).toEqual(
-      expectedContactDetails,
-    );
   });
 
-  test("Insert immersion does not crash if empty array is provided", async () => {
-    await pgImmersionOfferRepository.insertImmersions([]);
+  describe("Insert immersion does not crash if empty array is provided", () => {
+    test("Using V2 interface", async () => {
+      await pgImmersionOfferRepository.insertEstablishmentAggregates([]);
+    });
+
+    test("Using V1 (deprecated) interface", async () => {
+      await pgImmersionOfferRepository.insertImmersions([]);
+    });
   });
 
   test("Insert establishments & immersions and retrieves them back", async () => {
