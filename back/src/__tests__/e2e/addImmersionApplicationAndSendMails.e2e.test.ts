@@ -1,3 +1,8 @@
+import supertest from "supertest";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { createApp } from "../../adapters/primary/server";
+import { DomainEvent } from "../../domain/core/eventBus/events";
+import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { expectEmailMentorConfirmationSignatureRequesMatchingImmersionApplication } from "./../../_testBuilders/emailAssertions";
 import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "./../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "./../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
@@ -43,7 +48,7 @@ import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApp
 import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
 import { FeatureFlags } from "../../shared/featureFlags";
 import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
-import { frontRoutes } from "../../shared/routes";
+import { frontRoutes, immersionApplicationsRoute } from "../../shared/routes";
 
 const adminEmail = "admin@email.fr";
 
@@ -404,4 +409,110 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       agencyConfig,
     });
   });
+
+  const buildTestApp = async () => {
+    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
+      .withName("TEST-name")
+      .withAdminEmails([adminEmail])
+      .withQuestionnaireUrl("TEST-questionnaireUrl")
+      .withSignature("TEST-signature")
+      .build();
+
+    const appConfig = new AppConfigBuilder({
+      ENABLE_ENTERPRISE_SIGNATURE: "TRUE",
+      SKIP_EMAIL_ALLOW_LIST: "TRUE",
+      EMAIL_GATEWAY: "IN_MEMORY",
+      DOMAIN: "my-domain",
+      REPOSITORIES: "IN_MEMORY",
+      EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
+    }).build();
+
+    const {
+      app,
+      repositories,
+      eventCrawler: rawEventCrawler,
+    } = await createApp(appConfig);
+
+    const request = supertest(app);
+    const agencyRepo = repositories.agency as InMemoryAgencyRepository;
+    await agencyRepo.insert(agencyConfig);
+    const outboxRepo = repositories.outbox as InMemoryOutboxRepository;
+    const emailGateway = repositories.email as InMemoryEmailGateway;
+    const immersionApplicationRepo =
+      repositories.demandeImmersion as InMemoryImmersionApplicationRepository;
+    const eventCrawler = rawEventCrawler as BasicEventCrawler;
+
+    return {
+      request,
+      outboxRepo,
+      emailGateway,
+      immersionApplicationRepo,
+      eventCrawler,
+    };
+  };
+
+  test("saves valid app in repository with full express app", async () => {
+    const {
+      request,
+      outboxRepo,
+      immersionApplicationRepo,
+      eventCrawler,
+      emailGateway,
+    } = await buildTestApp();
+
+    const res = await request
+      .post(`/${immersionApplicationsRoute}`)
+      .send(validDemandeImmersion);
+
+    expectResponseBody(res, { id: validDemandeImmersion.id });
+    expect(await immersionApplicationRepo.getAll()).toEqual([
+      ImmersionApplicationEntity.create(validDemandeImmersion),
+    ]);
+    expectEventsInOutbox(outboxRepo, [
+      {
+        topic: "ImmersionApplicationSubmittedByBeneficiary",
+        payload: validDemandeImmersion,
+        wasPublished: false,
+      },
+    ]);
+
+    await eventCrawler.processEvents();
+
+    expectSentEmails(emailGateway, [
+      {
+        type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+        recipients: [validDemandeImmersion.email],
+      },
+      {
+        type: "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+        recipients: [validDemandeImmersion.mentorEmail],
+      },
+      {
+        type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
+        recipients: ["admin@email.fr"],
+      },
+    ]);
+  });
+
+  const expectSentEmails = (
+    emailGateway: InMemoryEmailGateway,
+    emails: Partial<TemplatedEmail>[],
+  ) => {
+    expect(emailGateway.getSentEmails()).toMatchObject(emails);
+  };
+
+  const expectEventsInOutbox = (
+    outbox: InMemoryOutboxRepository,
+    events: Partial<DomainEvent>[],
+  ) => {
+    expect(outbox.events).toMatchObject(events);
+  };
+
+  const expectResponseBody = (
+    res: supertest.Response,
+    body: Record<string, unknown>,
+  ) => {
+    expect(res.body).toEqual(body);
+    expect(res.status).toBe(200);
+  };
 });

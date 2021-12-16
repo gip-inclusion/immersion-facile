@@ -100,7 +100,7 @@ const sequenceRunner = new ThrottledSequenceRunner(1500, 3);
 export const createAppDependencies = async (config: AppConfig) => {
   const getPgPoolFn = createGetPgPoolFn(config);
   const repositories = await createRepositories(config, getPgPoolFn);
-  const uowPerformer = createUowPerformer(config, getPgPoolFn);
+  const uowPerformer = createUowPerformer(config, getPgPoolFn, repositories);
   const eventBus = createEventBus();
   const generateJwtFn = makeGenerateJwt(config);
   const generateMagicLinkFn = createGenerateVerificationMagicLink(config);
@@ -117,6 +117,7 @@ export const createAppDependencies = async (config: AppConfig) => {
       emailFilter,
       uowPerformer,
     ),
+    repositories,
     authChecker: createAuthChecker(config),
     jwtAuthMiddleware: createJwtAuthMiddleware(config),
     apiKeyAuthMiddleware: createApiKeyAuthMiddleware(config),
@@ -130,11 +131,6 @@ export const createAppDependencies = async (config: AppConfig) => {
 export type AppDependencies = ReturnType<
   typeof createAppDependencies
 > extends Promise<infer T>
-  ? T
-  : never;
-
-// prettier-ignore
-type Repositories = ReturnType<typeof createRepositories> extends Promise<infer T>
   ? T
   : never;
 
@@ -156,6 +152,10 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
   };
 };
 
+// prettier-ignore
+export type Repositories = ReturnType<typeof createRepositories> extends Promise<infer T>
+  ? T
+  : never;
 export const createRepositories = async (
   config: AppConfig,
   getPgPoolFn: GetPgPoolFn,
@@ -233,10 +233,16 @@ const createRomeGateway = async (
 };
 
 export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;
-export const createInMemoryUow = () => ({
-  outboxRepo: new InMemoryOutboxRepository(),
-  formEstablishmentRepo: new InMemoryFormEstablishmentRepository(),
-  immersionOfferRepo: new InMemoryImmersionOfferRepository(),
+export const createInMemoryUow = (repositories?: Repositories) => ({
+  outboxRepo:
+    (repositories?.outbox as InMemoryOutboxRepository) ??
+    new InMemoryOutboxRepository(),
+  formEstablishmentRepo:
+    (repositories?.formEstablishment as InMemoryFormEstablishmentRepository) ??
+    new InMemoryFormEstablishmentRepository(),
+  immersionOfferRepo:
+    (repositories?.immersionOfferForSearch as InMemoryImmersionOfferRepository) ??
+    new InMemoryImmersionOfferRepository(),
 });
 
 // following function is for type check only, it is verifies InMemoryUnitOfWork is assignable to UnitOfWork
@@ -254,10 +260,11 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
 const createUowPerformer = (
   config: AppConfig,
   getPgPoolFn: GetPgPoolFn,
+  repositories: Repositories,
 ): UnitOfWorkPerformer =>
   config.repositories === "PG"
     ? new PgUowPerformer(getPgPoolFn(), createPgUow)
-    : new InMemoryUowPerformer(createInMemoryUow);
+    : new InMemoryUowPerformer(createInMemoryUow(repositories));
 
 export const createAuthChecker = (config: AppConfig) => {
   if (!config.backofficeUsername || !config.backofficePassword) {

@@ -201,7 +201,8 @@ An [AppConfig](./src/adapters/primary/appConfig.ts) instance must be provided to
 
    ```ts
    const appConfig = AppConfig.createFromEnv();
-   createApp(appConfig).listen(port);
+   const { app } = await createApp(appConfig)
+   app.listen(port);
    ```
 
 2. **e2e tests**: The test files use [AppConfigBuilder.ts](./src/_testBuilders/AppConfigBuilder.ts) to create one or more server instances with custom configurations as needed for the test.
@@ -210,8 +211,9 @@ An [AppConfig](./src/adapters/primary/appConfig.ts) instance must be provided to
 
    ```ts
    beforeEach(async () => {
-     const config = new AppConfigBuilder().enableAdminUi().build();
-     request = superTest(await createApp(config));
+      const config = new AppConfigBuilder().enableAdminUi().build();
+      const { app } = await createApp(config);
+      request = supertest(app);
    });
    ```
 
@@ -250,7 +252,8 @@ beforeEach(async () => {
  const config = new AppConfigBuilder()
    .withMyNewOptionalParameter("test-value")
    .build();
- request = superTest(await createApp(config));
+  const { app } = await createApp(config);
+  request = supertest(app);
 });
 ```
 

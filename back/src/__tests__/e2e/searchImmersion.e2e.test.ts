@@ -6,7 +6,8 @@ describe("/search-immersion route", () => {
   let request: SuperTest<Test>;
 
   beforeEach(async () => {
-    request = supertest(await createApp(new AppConfigBuilder().build()));
+    const { app } = await createApp(new AppConfigBuilder().build());
+    request = supertest(app);
   });
 
   test("accepts valid requests", async () => {

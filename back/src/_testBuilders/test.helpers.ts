@@ -37,7 +37,7 @@ export const spyOnTopic = (
   topic: DomainTopic,
 ): DomainEvent[] => {
   const publishedEvents: DomainEvent[] = [];
-  eventBus.subscribe(topic, (event) => {
+  eventBus.subscribe(topic, async (event) => {
     publishedEvents.push(event);
   });
   return publishedEvents;

@@ -1,3 +1,4 @@
+import { createInMemoryUow } from "../../../adapters/primary/config";
 import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -8,7 +9,6 @@ import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
-import { makeCreateInMemoryUow } from "../../../_testBuilders/makeCreateInMemoryUow";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
@@ -24,12 +24,11 @@ describe("Add FormEstablishment", () => {
     formEstablishmentRepo = new InMemoryFormEstablishmentRepository();
     outboxRepo = new InMemoryOutboxRepository();
 
-    uowPerformer = new InMemoryUowPerformer(
-      makeCreateInMemoryUow({
-        outboxRepo,
-        formEstablishmentRepo,
-      }),
-    );
+    uowPerformer = new InMemoryUowPerformer({
+      ...createInMemoryUow(),
+      outboxRepo,
+      formEstablishmentRepo,
+    });
     const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });

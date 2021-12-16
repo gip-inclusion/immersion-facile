@@ -9,7 +9,7 @@ const port = 1234;
 const appConfig = AppConfig.createFromEnv();
 logger.info({ featureFlags: appConfig.featureFlags });
 
-createApp(appConfig).then((app) => {
+createApp(appConfig).then(({ app }) => {
   app.listen(port, () => {
     logger.info(`server started at http://localhost:${port}`);
   });

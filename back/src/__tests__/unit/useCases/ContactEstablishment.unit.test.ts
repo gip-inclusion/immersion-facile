@@ -1,3 +1,4 @@
+import { createInMemoryUow } from "../../../adapters/primary/config";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -10,10 +11,9 @@ import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/Co
 import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablishment";
 import { ImmersionEstablishmentContactBuilder } from "../../../_testBuilders/ImmersionEstablishmentContactBuilder";
 import { ImmersionOfferEntityBuilder } from "../../../_testBuilders/ImmersionOfferEntityBuilder";
-import { makeCreateInMemoryUow } from "../../../_testBuilders/makeCreateInMemoryUow";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { BadRequestError } from "./../../../adapters/primary/helpers/sendHttpResponse";
-import { EstablishmentEntityBuilder } from "./../../../_testBuilders/EstablishmentEntityBuilder";
+import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 
 const establishment = new EstablishmentEntityBuilder().build();
 const establishmentContact = new ImmersionEstablishmentContactBuilder()
@@ -43,12 +43,11 @@ describe("ContactEstablishment", () => {
   beforeEach(() => {
     immersionOfferRepository = new InMemoryImmersionOfferRepository().empty();
     outboxRepository = new InMemoryOutboxRepository();
-    uowPerformer = new InMemoryUowPerformer(
-      makeCreateInMemoryUow({
-        immersionOfferRepo: immersionOfferRepository,
-        outboxRepo: outboxRepository,
-      }),
-    );
+    uowPerformer = new InMemoryUowPerformer({
+      ...createInMemoryUow(),
+      immersionOfferRepo: immersionOfferRepository,
+      outboxRepo: outboxRepository,
+    });
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });

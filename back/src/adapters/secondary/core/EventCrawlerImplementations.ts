@@ -20,9 +20,7 @@ export class BasicEventCrawler {
   public async processEvents() {
     const events = await this.outboxRepository.getAllUnpublishedEvents();
     logger.debug({ events: eventsToDebugInfo(events) }, "processEvents");
-    events.forEach((event) => {
-      this.eventBus.publish(event);
-    });
+    await Promise.all(events.map((event) => this.eventBus.publish(event)));
     await this.outboxRepository.markEventsAsPublished(events);
   }
 }

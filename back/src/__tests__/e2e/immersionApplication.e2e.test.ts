@@ -19,7 +19,8 @@ let request: SuperTest<Test>;
 let generateJwt: GenerateMagicLinkJwt;
 
 const initializeSystemUnderTest = async (config: AppConfig) => {
-  request = supertest(await createApp(config));
+  const { app } = await createApp(config);
+  request = supertest(app);
   generateJwt = makeGenerateJwt(config);
 };
 

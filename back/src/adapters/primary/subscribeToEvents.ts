@@ -82,9 +82,9 @@ export const subscribeToEvents = (deps: AppDependencies) => {
     const useCases = useCasesByTopic[topic];
 
     useCases.forEach((useCase) =>
-      deps.eventBus.subscribe(topic, (event) =>
-        useCase.execute(event.payload as any),
-      ),
+      deps.eventBus.subscribe(topic, async (event) => {
+        await useCase.execute(event.payload as any);
+      }),
     );
   });
 };

@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import PinoHttp from "pino-http";
+import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import {
   immersionApplicationSchema,
   listImmersionApplicationRequestDtoSchema,
@@ -21,7 +22,7 @@ import { getSiretRequestSchema } from "../../shared/siret";
 import { createLogger } from "../../utils/logger";
 import { createApiKeyAuthRouter } from "./ApiKeyAuthRouter";
 import { AppConfig } from "./appConfig";
-import { createAppDependencies } from "./config";
+import { createAppDependencies, Repositories } from "./config";
 import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
@@ -35,7 +36,13 @@ const metrics = expressPrometheusMiddleware({
   collectDefaultMetrics: true,
 });
 
-export const createApp = async (config: AppConfig): Promise<Express> => {
+export const createApp = async (
+  config: AppConfig,
+): Promise<{
+  app: Express;
+  repositories: Repositories;
+  eventCrawler: EventCrawler;
+}> => {
   const app = express();
   const router = Router();
   app.use(PinoHttp({ logger }));
@@ -169,5 +176,9 @@ export const createApp = async (config: AppConfig): Promise<Express> => {
 
   deps.eventCrawler.startCrawler();
 
-  return app;
+  return {
+    app,
+    repositories: deps.repositories,
+    eventCrawler: deps.eventCrawler,
+  };
 };

@@ -34,7 +34,7 @@ export class InMemoryEventBus implements EventBus {
     this.subscriptions = {};
   }
 
-  public publish(event: DomainEvent) {
+  public async publish(event: DomainEvent) {
     logger.info({ event }, "publish");
 
     const topic = event.topic;
@@ -51,13 +51,15 @@ export class InMemoryEventBus implements EventBus {
     }
 
     try {
-      callbacks.forEach((cb) => {
-        cb(event);
-        logger.info(
-          { eventId: event.id },
-          `XXXXXXXXXXXXXXXX  Sending an event`,
-        );
-      });
+      await Promise.all(
+        callbacks.map(async (cb) => {
+          logger.info(
+            { eventId: event.id },
+            `XXXXXXXXXXXXXXXX  Sending an event`,
+          );
+          await cb(event);
+        }),
+      );
       counterPublishedEventsSuccess.inc({ topic });
     } catch (e: any) {
       logger.error(e, "callback failed");
