@@ -1,14 +1,17 @@
-import supertest from "supertest";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { createApp } from "../../adapters/primary/server";
-import { DomainEvent } from "../../domain/core/eventBus/events";
-import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
-import { expectEmailMentorConfirmationSignatureRequesMatchingImmersionApplication } from "./../../_testBuilders/emailAssertions";
-import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "./../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
-import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "./../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
-import { InMemorySireneRepository } from "./../../adapters/secondary/InMemorySireneRepository";
-import { GetSiret } from "./../../domain/sirene/useCases/GetSiret";
 import { parseISO } from "date-fns";
+import supertest from "supertest";
+import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
+import { buildTestApp } from "../../_testBuilders/buildTestApp";
+import {
+  expectEmailAdminNotificationMatchingImmersionApplication,
+  expectEmailBeneficiaryConfirmationMatchingImmersionApplication,
+  expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication,
+  expectEmailFinalValidationConfirmationMatchingImmersionApplication,
+  expectEmailMentorConfirmationMatchingImmersionApplication,
+} from "../../_testBuilders/emailAssertions";
+import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
@@ -21,13 +24,16 @@ import {
   TemplatedEmail,
 } from "../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemorySireneRepository } from "../../adapters/secondary/InMemorySireneRepository";
 import {
   CreateNewEvent,
   EventBus,
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
+import { DomainEvent } from "../../domain/core/eventBus/events";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
+import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
@@ -35,20 +41,13 @@ import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/i
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
-import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
-import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
-import {
-  expectEmailAdminNotificationMatchingImmersionApplication,
-  expectEmailBeneficiaryConfirmationMatchingImmersionApplication,
-  expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication,
-  expectEmailFinalValidationConfirmationMatchingImmersionApplication,
-  expectEmailMentorConfirmationMatchingImmersionApplication,
-} from "../../_testBuilders/emailAssertions";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
+import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { FeatureFlags } from "../../shared/featureFlags";
-import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
 import { frontRoutes, immersionApplicationsRoute } from "../../shared/routes";
+import { expectEmailMentorConfirmationSignatureRequesMatchingImmersionApplication } from "../../_testBuilders/emailAssertions";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
+import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 
 const adminEmail = "admin@email.fr";
 
@@ -410,65 +409,18 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     });
   });
 
-  const buildTestApp = async () => {
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
-      .withName("TEST-name")
-      .withAdminEmails([adminEmail])
-      .withQuestionnaireUrl("TEST-questionnaireUrl")
-      .withSignature("TEST-signature")
-      .build();
-
-    const appConfig = new AppConfigBuilder({
-      ENABLE_ENTERPRISE_SIGNATURE: "TRUE",
-      SKIP_EMAIL_ALLOW_LIST: "TRUE",
-      EMAIL_GATEWAY: "IN_MEMORY",
-      DOMAIN: "my-domain",
-      REPOSITORIES: "IN_MEMORY",
-      EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
-    }).build();
-
-    const {
-      app,
-      repositories,
-      eventCrawler: rawEventCrawler,
-    } = await createApp(appConfig);
-
-    const request = supertest(app);
-    const agencyRepo = repositories.agency as InMemoryAgencyRepository;
-    await agencyRepo.insert(agencyConfig);
-    const outboxRepo = repositories.outbox as InMemoryOutboxRepository;
-    const emailGateway = repositories.email as InMemoryEmailGateway;
-    const immersionApplicationRepo =
-      repositories.demandeImmersion as InMemoryImmersionApplicationRepository;
-    const eventCrawler = rawEventCrawler as BasicEventCrawler;
-
-    return {
-      request,
-      outboxRepo,
-      emailGateway,
-      immersionApplicationRepo,
-      eventCrawler,
-    };
-  };
-
   test("saves valid app in repository with full express app", async () => {
-    const {
-      request,
-      outboxRepo,
-      immersionApplicationRepo,
-      eventCrawler,
-      emailGateway,
-    } = await buildTestApp();
+    const { request, reposAndGateways, eventCrawler } = await buildTestApp();
 
     const res = await request
       .post(`/${immersionApplicationsRoute}`)
       .send(validDemandeImmersion);
 
     expectResponseBody(res, { id: validDemandeImmersion.id });
-    expect(await immersionApplicationRepo.getAll()).toEqual([
+    expect(await reposAndGateways.demandeImmersion.getAll()).toEqual([
       ImmersionApplicationEntity.create(validDemandeImmersion),
     ]);
-    expectEventsInOutbox(outboxRepo, [
+    expectEventsInOutbox(reposAndGateways.outbox, [
       {
         topic: "ImmersionApplicationSubmittedByBeneficiary",
         payload: validDemandeImmersion,
@@ -478,7 +430,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
     await eventCrawler.processEvents();
 
-    expectSentEmails(emailGateway, [
+    expectSentEmails(reposAndGateways.email, [
       {
         type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [validDemandeImmersion.email],

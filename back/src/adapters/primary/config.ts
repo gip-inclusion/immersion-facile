@@ -241,7 +241,7 @@ export const createInMemoryUow = (repositories?: Repositories) => ({
     (repositories?.formEstablishment as InMemoryFormEstablishmentRepository) ??
     new InMemoryFormEstablishmentRepository(),
   immersionOfferRepo:
-    (repositories?.immersionOfferForSearch as InMemoryImmersionOfferRepository) ??
+    (repositories?.immersionOffer as InMemoryImmersionOfferRepository) ??
     new InMemoryImmersionOfferRepository(),
 });
 
