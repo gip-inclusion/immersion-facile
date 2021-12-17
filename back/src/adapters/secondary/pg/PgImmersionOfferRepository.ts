@@ -330,7 +330,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           immersion_contacts.role AS immersion_contacts_role,
           immersion_contacts.siret_establishment AS immersion_contacts_siret_establishment,
           immersion_contacts.phone AS immersion_contacts_phone,
-          establishments.contact_mode AS establishment_contact_mode
+          establishments.contact_mode AS establishment_contact_mode,
+          establishments.address as establishment_address
       FROM
         immersion_offers
         LEFT JOIN immersion_contacts

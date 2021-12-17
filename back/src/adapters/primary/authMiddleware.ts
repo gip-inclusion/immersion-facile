@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
-import { makeVerifyJwt } from "./../../domain/auth/jwt";
+import { makeVerifyJwt } from "../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
 import jwt from "jsonwebtoken";
 import { ApiConsumer } from "../../shared/tokens/ApiConsumer";
@@ -19,36 +19,51 @@ const apiKeyAuthMiddlewareRequestsTotal = new promClient.Counter({
 const convertRouteToLog = (originalUrl: string) =>
   "/" + originalUrl.split("/")[1];
 
+type TotalCountProps = {
+  consumerName?: ApiConsumer["consumer"];
+  authorisationStatus:
+    | "authorised"
+    | "unauthorisedId"
+    | "incorrectJwt"
+    | "unauthenticated";
+};
+
+const createIncTotalCountForRequest =
+  (req: Request) =>
+  ({ consumerName, authorisationStatus }: TotalCountProps) =>
+    apiKeyAuthMiddlewareRequestsTotal.inc({
+      route: convertRouteToLog(req.originalUrl),
+      method: req.method,
+      consumerName,
+      authorisationStatus,
+    });
+
 export const createApiKeyAuthMiddleware = (config: AppConfig) => {
   const verifyJwt = makeVerifyJwt<ApiConsumer>(config.jwtPublicKey);
   const authorizedIds = config.authorizedApiKeyIds;
 
   return (req: Request, res: Response, next: NextFunction) => {
+    const incTotalCountForRequest = createIncTotalCountForRequest(req);
+
     if (!req.headers.authorization) {
-      apiKeyAuthMiddlewareRequestsTotal.inc({
-        route: convertRouteToLog(req.originalUrl),
-        method: req.method,
-      });
+      incTotalCountForRequest({ authorisationStatus: "unauthenticated" });
       return next();
     }
 
     try {
       const apiConsumerPayload = verifyJwt(req.headers.authorization as string);
+
       // todo: consider notifying the caller that he cannot access privileged fields (due to possible compromised key)
       if (!authorizedIds.includes(apiConsumerPayload.id)) {
-        apiKeyAuthMiddlewareRequestsTotal.inc({
-          route: convertRouteToLog(req.route),
-          method: req.method,
-          consumerName: apiConsumerPayload.consumer,
+        incTotalCountForRequest({
           authorisationStatus: "unauthorisedId",
+          consumerName: apiConsumerPayload.consumer,
         });
         return next();
       }
 
       // only if the user is known, and the id authorized, we add apiConsumer payload to the request:
-      apiKeyAuthMiddlewareRequestsTotal.inc({
-        route: convertRouteToLog(req.route),
-        method: req.method,
+      incTotalCountForRequest({
         consumerName: apiConsumerPayload.consumer,
         authorisationStatus: "authorised",
       });
@@ -56,9 +71,7 @@ export const createApiKeyAuthMiddleware = (config: AppConfig) => {
       req.apiConsumer = apiConsumerPayload;
       return next();
     } catch (err) {
-      apiKeyAuthMiddlewareRequestsTotal.inc({
-        route: req.route,
-        method: req.method,
+      incTotalCountForRequest({
         authorisationStatus: "incorrectJwt",
       });
       return next();
