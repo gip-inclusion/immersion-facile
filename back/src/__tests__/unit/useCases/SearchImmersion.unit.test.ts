@@ -34,8 +34,8 @@ describe("SearchImmersion", () => {
         position: { lat: 43.8666, lon: 8.3333 },
         contactInEstablishment: {
           id: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
-          name: "Dupont",
-          firstname: "Pierre",
+          lastName: "Dupont",
+          firstName: "Pierre",
           email: "test@email.fr",
           role: "Directeur",
           siretEstablishment: "78000403200019",

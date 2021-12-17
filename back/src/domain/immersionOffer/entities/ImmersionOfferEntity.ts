@@ -32,8 +32,8 @@ export type ImmersionOfferProps = {
 
 export type ImmersionEstablishmentContact = {
   id: ImmersionContactInEstablishmentId;
-  name: string;
-  firstname: string;
+  lastName: string;
+  firstName: string;
   email: string;
   role: string;
   siretEstablishment: string;

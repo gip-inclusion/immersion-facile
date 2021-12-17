@@ -129,8 +129,8 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       const contactInEstablishment: ImmersionEstablishmentContact = {
         id: "93144fe8-56a7-4807-8990-726badc6332b",
-        name: "Doe",
-        firstname: "John",
+        lastName: "Doe",
+        firstName: "John",
         email: "joe@mail.com",
         role: "super job",
         siretEstablishment: "78000403200040",
@@ -322,8 +322,8 @@ describe("Postgres implementation of immersion offer repository", () => {
 
     const contactInEstablishment: ImmersionEstablishmentContact = {
       id: "93144fe8-56a7-4807-8990-726badc6332b",
-      name: "Doe",
-      firstname: "John",
+      lastName: "Doe",
+      firstName: "John",
       email: "joe@mail.com",
       role: "super job",
       siretEstablishment: "78000403200019",
@@ -373,8 +373,8 @@ describe("Postgres implementation of immersion offer repository", () => {
 
     const contactInEstablishment: ImmersionEstablishmentContact = {
       id: "11111111-0000-0000-0000-111111111111",
-      name: "Doe",
-      firstname: "John",
+      lastName: "Doe",
+      firstName: "John",
       email: "joe@mail.com",
       role: "super job",
       siretEstablishment: siret,
@@ -413,8 +413,8 @@ describe("Postgres implementation of immersion offer repository", () => {
     expect(immersionSearchResultWithDetails).toBeDefined();
     const expectedSearchContact: SearchContact = {
       id: contactInEstablishment.id,
-      firstName: contactInEstablishment.firstname,
-      lastName: contactInEstablishment.name,
+      firstName: contactInEstablishment.firstName,
+      lastName: contactInEstablishment.lastName,
       email: contactInEstablishment.email,
       phone: contactInEstablishment.phone,
       role: contactInEstablishment.role,
@@ -444,8 +444,8 @@ describe("Postgres implementation of immersion offer repository", () => {
     const establishmentContact: ImmersionEstablishmentContact = {
       id: "84007f00-f1fb-4458-a41f-492143ffc8df",
       email: "some@mail.com",
-      firstname: "Bob",
-      name: "MyName",
+      firstName: "Bob",
+      lastName: "MyName",
       role: "Chauffeur",
       siretEstablishment: "11112222333344",
       phone: "0640295453",
