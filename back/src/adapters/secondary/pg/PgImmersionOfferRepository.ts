@@ -248,8 +248,15 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   async insertEstablishmentContact(
     immersionEstablishmentContact: ImmersionEstablishmentContact,
   ) {
-    const { id, name, firstname, email, role, siretEstablishment, phone } =
-      immersionEstablishmentContact;
+    const {
+      id,
+      lastName: name,
+      firstName: firstname,
+      email,
+      role,
+      siretEstablishment,
+      phone,
+    } = immersionEstablishmentContact;
     const query = buildInsertContactsQuery([
       [id, name, firstname, email, role, siretEstablishment, phone],
     ]);

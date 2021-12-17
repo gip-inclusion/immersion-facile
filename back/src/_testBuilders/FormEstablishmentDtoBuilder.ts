@@ -1,9 +1,7 @@
 import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../shared/rome";
 import { Builder } from "./Builder";
-import { createLogger } from "../utils/logger";
-
-const logger = createLogger(__filename);
+import { ContactEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 
 const validFormEstablishment: FormEstablishmentDto = {
   id: "test_demande_immersion_id",
@@ -73,10 +71,15 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({ ...this.dto, id });
   }
 
+  public withSiret(siret: string) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, siret });
+  }
   public withProfessions(professions: ProfessionDto[]) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, professions });
   }
-
+  public withBusinessContacts(businessContacts: ContactEntityV2[]) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, businessContacts });
+  }
   public build() {
     return this.dto;
   }

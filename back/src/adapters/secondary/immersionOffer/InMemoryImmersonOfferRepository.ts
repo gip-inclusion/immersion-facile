@@ -48,9 +48,11 @@ export class InMemoryImmersionOfferRepository
   }
 
   empty() {
+    // TODO : remove this method and do not insert entities in constructor.
     this._immersionOffers = {};
     this._establishments = {};
     this._establishmentContacts = {};
+    this._establishmentAggregates = [];
     return this;
   }
 
@@ -155,8 +157,8 @@ export class InMemoryImmersionOfferRepository
         contactInEstablishment && {
           contactDetails: {
             id: contactInEstablishment.id,
-            firstName: contactInEstablishment.firstname,
-            lastName: contactInEstablishment.name,
+            firstName: contactInEstablishment.firstName,
+            lastName: contactInEstablishment.lastName,
             email: contactInEstablishment.email,
             phone: contactInEstablishment.phone,
             role: contactInEstablishment.role,
@@ -172,7 +174,10 @@ export class InMemoryImmersionOfferRepository
 
   // for test purposes only :
   async getEstablishmentFromSiret(siret: string) {
-    return this._establishments[siret];
+    return this._establishmentAggregates.find(
+      (establishmentAggregate) =>
+        establishmentAggregate.establishment.siret == siret,
+    );
   }
 
   get immersionOffers() {

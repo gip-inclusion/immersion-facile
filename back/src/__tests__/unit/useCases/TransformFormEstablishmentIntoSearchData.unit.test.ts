@@ -1,6 +1,5 @@
-import { InMemoryAdresseAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
-import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
@@ -9,22 +8,29 @@ import { TransformFormEstablishmentIntoSearchData } from "../../../domain/immers
 import { Establishment } from "../../../domain/sirene/ports/SireneRepository";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../../../shared/rome";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
+import { InMemoryAdresseAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 
 class TestSequenceRunner implements SequenceRunner {
   public run<Input, Output>(array: Input[], cb: (a: Input) => Promise<Output>) {
     return Promise.all(array.map(cb));
   }
 }
-
+const fakeSiret = "90040893100013";
 const fakePosition: Position = { lat: 49.119146, lon: 6.17602 };
-const getEstablishmentFromSirenApi = (
+const fakeActivitePrincipaleUniteLegale = "85.59A";
+const fakeBusinessContact = new ContactEntityV2Builder().build();
+
+const expectedNaf = "8559A";
+
+const getEstablishmentFromSireneApi = (
   formEstablishment: FormEstablishmentDto,
 ): Establishment => ({
   siret: formEstablishment.siret,
   uniteLegale: {
     denominationUniteLegale: formEstablishment.businessName,
-    activitePrincipaleUniteLegale: "85.59A",
+    activitePrincipaleUniteLegale: fakeActivitePrincipaleUniteLegale,
     trancheEffectifsUniteLegale: "01",
   },
   adresseEtablissement: {
@@ -37,59 +43,68 @@ const getEstablishmentFromSirenApi = (
 });
 
 describe("Transform FormEstablishment into search data", () => {
-  let formEstablishmentRepository: InMemoryFormEstablishmentRepository;
   let inMemorySireneRepository: InMemorySireneRepository;
   let inMemoryImmersionOfferRepository: InMemoryImmersionOfferRepository;
   let inMemoryAdresseAPI: InMemoryAdresseAPI;
   let transformFormEstablishmentIntoSearchData: TransformFormEstablishmentIntoSearchData;
+  let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    formEstablishmentRepository = new InMemoryFormEstablishmentRepository();
+    // formEstablishmentRepository = new InMemoryFormEstablishmentRepository();
     inMemorySireneRepository = new InMemorySireneRepository();
     inMemoryImmersionOfferRepository = new InMemoryImmersionOfferRepository();
     inMemoryAdresseAPI = new InMemoryAdresseAPI(fakePosition);
+    uuidGenerator = new TestUuidGenerator();
     const inMemoryRomeGateway = new InMemoryRomeGateway();
     const sequencerRunner = new TestSequenceRunner();
     inMemoryImmersionOfferRepository.empty();
     transformFormEstablishmentIntoSearchData =
       new TransformFormEstablishmentIntoSearchData(
-        formEstablishmentRepository,
         inMemoryImmersionOfferRepository,
         inMemoryAdresseAPI,
         inMemorySireneRepository,
         inMemoryRomeGateway,
         sequencerRunner,
+        uuidGenerator,
       );
   });
 
   it("converts Form Establishment in search format", async () => {
-    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
-    await formEstablishmentRepository.save(formEstablishment);
+    // Prepare
+    const professions: ProfessionDto[] = [
+      {
+        romeCodeMetier: "A1101",
+        description: "métier A",
+      },
+      {
+        romeCodeMetier: "A1102",
+        description: "métier B",
+      },
+    ];
+    const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withSiret(fakeSiret)
+      .withProfessions(professions)
+      .withBusinessContacts([fakeBusinessContact])
+      .build();
+
     const establishmentFromApi =
-      getEstablishmentFromSirenApi(formEstablishment);
+      getEstablishmentFromSireneApi(formEstablishment);
     inMemorySireneRepository.setEstablishment(establishmentFromApi);
 
+    // Act
     await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
 
-    await expectEstablishmentInRepo(formEstablishment);
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const romeBoulanger = formEstablishment.professions[0].romeCodeMetier!;
-    await expectImmersionOfferAndContactInRepo(romeBoulanger, {
-      siret: formEstablishment.siret,
-      contactEmail: formEstablishment.businessContacts[0].email,
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const romePatissier = formEstablishment.professions[1].romeCodeMetier!;
-    await expectImmersionOfferAndContactInRepo(romePatissier, {
-      siret: formEstablishment.siret,
-      contactEmail: formEstablishment.businessContacts[0].email,
+    // Assert
+    await expectEstablishmentAggregateInRepo({
+      siret: fakeSiret,
+      naf: expectedNaf,
+      offerRomes: ["A1101", "A1102"],
+      contactEmail: fakeBusinessContact.email,
     });
   });
-
-  it("converts Form establishment event when they only have romeAppelation (not romeCode)", async () => {
-    // prepare
+  // Note : I'm not sure what this second use-case is testing since romeCodeMetier is required in type ProfessionDto
+  it("converts Form establishment event when it has only romeAppelation (not romeCode)", async () => {
+    // Prepare
     const professions: ProfessionDto[] = [
       {
         romeCodeAppellation: "11987",
@@ -98,55 +113,58 @@ describe("Transform FormEstablishment into search data", () => {
       },
     ];
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withSiret(fakeSiret)
       .withProfessions(professions)
+      .withBusinessContacts([fakeBusinessContact])
       .build();
-    await formEstablishmentRepository.save(formEstablishment);
+
     const establishmentFromApi =
-      getEstablishmentFromSirenApi(formEstablishment);
+      getEstablishmentFromSireneApi(formEstablishment);
     inMemorySireneRepository.setEstablishment(establishmentFromApi);
 
-    // act
+    // Act
     await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
 
-    // assert
-    const storedImmersion = inMemoryImmersionOfferRepository.immersionOffers;
-    expect(storedImmersion).toHaveLength(1);
-    expect(storedImmersion[0].getProps()).toMatchObject({
-      data_source: "form",
-      rome: "A1101",
+    // Assert
+    await expectEstablishmentAggregateInRepo({
+      siret: fakeSiret,
+      naf: expectedNaf,
+      offerRomes: ["A1101"],
+      contactEmail: fakeBusinessContact.email,
     });
   });
 
-  const expectImmersionOfferAndContactInRepo = async (
-    rome: string,
-    expected: { siret: string; contactEmail: string },
-  ) => {
-    const immersionsBoulanger =
-      await inMemoryImmersionOfferRepository.immersionOffers.filter(
-        (offer) => offer.getRome() === rome,
-      );
-
-    //Verify that immersion matches
-    expect(immersionsBoulanger).toHaveLength(1);
-    const immersionBoulanger = immersionsBoulanger[0];
-    expect(immersionBoulanger.getProps().siret).toEqual(expected.siret);
-
-    //Verify that the company contact is here
-    const boulangerEstablishmentContact =
-      immersionsBoulanger[0].getProps().contactInEstablishment;
-    expect(boulangerEstablishmentContact).toBeDefined();
-    expect(boulangerEstablishmentContact?.email).toEqual(expected.contactEmail);
-  };
-
-  const expectEstablishmentInRepo = async (
-    formEstablishment: FormEstablishmentDto,
-  ) => {
-    const establishment =
+  const expectEstablishmentAggregateInRepo = async (expected: {
+    siret: string;
+    naf: string;
+    contactEmail: string;
+    offerRomes: string[];
+  }) => {
+    const repoEstablishmentAggregate =
       await inMemoryImmersionOfferRepository.getEstablishmentFromSiret(
-        formEstablishment.siret,
+        expected.siret,
       );
+    expect(repoEstablishmentAggregate).toBeDefined();
+    expect(repoEstablishmentAggregate?.establishment.siret).toEqual(
+      expected.siret,
+    );
+    expect(repoEstablishmentAggregate?.establishment.naf).toEqual(expected.naf);
+    expect(repoEstablishmentAggregate?.establishment.dataSource).toEqual(
+      "form",
+    );
 
-    expect(establishment.getSiret()).toEqual(formEstablishment.siret);
-    expect(establishment.getNaf().length).toEqual(5);
+    // Contact
+    expect(repoEstablishmentAggregate?.contacts).toHaveLength(1);
+    expect(repoEstablishmentAggregate?.contacts[0].email).toEqual(
+      expected.contactEmail,
+    );
+
+    // Offer
+    expect(repoEstablishmentAggregate?.immersionOffers).toHaveLength(
+      expected.offerRomes.length,
+    );
+    expect(
+      repoEstablishmentAggregate?.immersionOffers.map((offer) => offer.rome),
+    ).toEqual(expected.offerRomes);
   };
 });

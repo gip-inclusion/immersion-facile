@@ -4,9 +4,9 @@ import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersion
 import { createLogger } from "../../utils/logger";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
+import { TestUuidGenerator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
-import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { AppConfig } from "./appConfig";
@@ -27,9 +27,6 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   //We create the use case transformFormEstablishementIntoSearchData
   const poolOrigin = new Pool({ connectionString: originPgConnectionString });
   const clientOrigin = await poolOrigin.connect();
-  const originFormEstablishmentRepository = new PgFormEstablishmentRepository(
-    clientOrigin,
-  );
 
   const poolDestination = new Pool({
     connectionString: destinationPgConnectionString,
@@ -49,12 +46,12 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
 
   const transformFormEstablishmentIntoSearchData =
     new TransformFormEstablishmentIntoSearchData(
-      originFormEstablishmentRepository,
       immersionOfferRepository,
       adresseAPI,
       sireneRepository,
       poleEmploiGateway,
       sequenceRunner,
+      new TestUuidGenerator(),
     );
   const AllIdsResult = await clientOrigin.query(
     "SELECT id FROM public.form_establishments",

@@ -1,132 +1,158 @@
-import { v4 as uuidV4 } from "uuid";
 import {
-  BusinessContactDto,
   FormEstablishmentDto,
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
-import { ProfessionDto } from "../../../shared/rome";
 import { createLogger } from "../../../utils/logger";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
+import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
 import { RomeGateway } from "../../rome/ports/RomeGateway";
-import { SireneRepository } from "../../sirene/ports/SireneRepository";
-import { ImmersionEstablishmentContact } from "../entities/ImmersionOfferEntity";
-import { UncompleteEstablishmentEntity } from "../entities/UncompleteEstablishmentEntity";
+import {
+  SireneRepository,
+  SireneRepositoryAnswer,
+} from "../../sirene/ports/SireneRepository";
+import {
+  EstablishmentAggregate,
+  EstablishmentEntityV2,
+  TefenCode,
+} from "../entities/EstablishmentAggregate";
+import {
+  ContactEntityV2,
+  ImmersionOfferEntityV2,
+} from "../entities/ImmersionOfferEntity";
 import { AdresseAPI } from "../ports/AdresseAPI";
-import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 
 const logger = createLogger(__filename);
+
+const offerFromFormScore = 10; // 10/10 if voluntaryToImmersion=true (consider removing this field)
 
 export class TransformFormEstablishmentIntoSearchData extends UseCase<
   FormEstablishmentDto,
   void
 > {
   constructor(
-    private readonly formEstablishmentRepository: FormEstablishmentRepository,
     private readonly immersionOfferRepository: ImmersionOfferRepository,
     private readonly adresseAPI: AdresseAPI,
     private readonly sireneRepository: SireneRepository,
     private readonly romeGateway: RomeGateway,
     private readonly sequenceRunner: SequenceRunner,
+    private uuidGenerator: UuidGenerator,
   ) {
     super();
   }
 
   inputSchema = formEstablishmentSchema;
 
-  public async _execute(dto: FormEstablishmentDto): Promise<void> {
-    const formEstablishment = await this.formEstablishmentRepository.getById(
-      dto.id,
+  public async _execute(
+    formEstablishment: FormEstablishmentDto,
+  ): Promise<void> {
+    const establishmentSiret = formEstablishment.siret;
+
+    const position = await this.adresseAPI.getPositionFromAddress(
+      formEstablishment.businessAddress,
     );
-    if (!formEstablishment) return;
-
-    const establishmentContact: ImmersionEstablishmentContact =
-      convertBusinessContactDtoToImmersionEstablishmentContact(
-        formEstablishment.businessContacts[0],
-        formEstablishment.siret,
-      );
-
-    const romeAppellationToConvert = formEstablishment.professions
-      .filter(
-        ({ romeCodeAppellation, romeCodeMetier }) =>
-          !romeCodeMetier && !!romeCodeAppellation,
-      )
-      .map((p): string => p.romeCodeAppellation!);
-
-    const romeCodesFromAppellation = (
-      await this.sequenceRunner.run(
-        romeAppellationToConvert,
-        async (appellation) =>
-          this.romeGateway.appellationToCodeMetier(appellation),
-      )
-    ).filter((x): x is string => x !== undefined);
-
-    const romeCodes = formEstablishment.professions
-      .filter((p): p is Required<ProfessionDto> => !!p.romeCodeMetier)
-      .map((p) => p.romeCodeMetier);
-
-    const allRomeCodes = [...romeCodesFromAppellation, ...romeCodes];
-
-    const uncompleteEstablishmentEntity: UncompleteEstablishmentEntity =
-      new UncompleteEstablishmentEntity({
-        id: uuidV4(),
-        siret: formEstablishment.siret,
-        name: formEstablishment.businessName,
-        address: formEstablishment.businessAddress,
-        score: 10,
-        voluntaryToImmersion: true,
-        romes: allRomeCodes,
-        dataSource: "form",
-        contactInEstablishment: establishmentContact,
-        contactMode: formEstablishment.preferredContactMethods[0],
-      });
-
-    const establishmentEntity =
-      await uncompleteEstablishmentEntity.searchForMissingFields(
-        this.adresseAPI,
-        this.sireneRepository,
-      );
-
-    if (!establishmentEntity) {
+    const sireneRepoAnswer = await this.sireneRepository.get(
+      establishmentSiret,
+    );
+    if (!sireneRepoAnswer) {
       logger.error(
-        "Tried to add invalid establishment in database with siret " +
-          uncompleteEstablishmentEntity.getSiret(),
+        `Could not get siret ${establishmentSiret} from siren gateway`,
+      );
+      return;
+    }
+    const naf = inferNafFromSireneAnswer(sireneRepoAnswer);
+    const numberEmployeesRange =
+      inferNumberEmployeesRangeFromSireneAnswer(sireneRepoAnswer);
+
+    if (!naf || !numberEmployeesRange || !position) {
+      logger.error(
+        `Some field from siren gateway are missing for establishment with siret ${establishmentSiret}`,
       );
       return;
     }
 
+    const contact: ContactEntityV2 = {
+      id: this.uuidGenerator.new(),
+      firstName: formEstablishment.businessContacts[0].firstName,
+      lastName: formEstablishment.businessContacts[0].lastName,
+      email: formEstablishment.businessContacts[0].email,
+      phone: formEstablishment.businessContacts[0].phone,
+      job: formEstablishment.businessContacts[0].job,
+    };
+
+    const immersionOffers: ImmersionOfferEntityV2[] = (
+      await this.sequenceRunner.run(
+        formEstablishment.professions,
+        async ({
+          romeCodeMetier,
+          romeCodeAppellation,
+        }): Promise<ImmersionOfferEntityV2 | undefined> => {
+          if (romeCodeMetier) {
+            return {
+              id: this.uuidGenerator.new(),
+              rome: romeCodeMetier,
+              score: offerFromFormScore,
+            };
+          } else if (romeCodeAppellation) {
+            const correspondingRome =
+              await this.romeGateway.appellationToCodeMetier(
+                romeCodeAppellation,
+              );
+
+            return correspondingRome
+              ? {
+                  id: this.uuidGenerator.new(),
+                  rome: correspondingRome,
+                  score: offerFromFormScore,
+                }
+              : undefined;
+          }
+        },
+      )
+    ).filter((offer): offer is ImmersionOfferEntityV2 => !!offer);
+
+    const establishment: EstablishmentEntityV2 = {
+      siret: establishmentSiret,
+      name: formEstablishment.businessName,
+      address: formEstablishment.businessAddress,
+      voluntaryToImmersion: true,
+      dataSource: "form",
+      naf,
+      position,
+      numberEmployeesRange,
+
+      // contactMode: formEstablishment.preferredContactMethods[0],
+    };
+
+    const establishmentAggregate: EstablishmentAggregate = {
+      establishment,
+      contacts: [contact],
+      immersionOffers,
+    };
     await this.immersionOfferRepository
-      .insertEstablishments([establishmentEntity])
+      .insertEstablishmentAggregates([establishmentAggregate])
       .catch((err) => {
         logger.error(
-          "Error in inserting establishment for siret : " +
-            formEstablishment.siret,
+          { error: err, siret: establishmentSiret },
+          "Error when adding establishment aggregate ",
         );
       });
-    await this.immersionOfferRepository
-      .insertEstablishmentContact(establishmentContact)
-      .catch((err) => {
-        logger.error(
-          "Error in inserting form establishment contact for siret : " +
-            formEstablishment.siret,
-        );
-      });
-    await this.immersionOfferRepository.insertImmersions(
-      establishmentEntity.extractImmersions(),
-    );
   }
 }
 
-const convertBusinessContactDtoToImmersionEstablishmentContact = (
-  businessContactDto: BusinessContactDto,
-  siret_institution: string,
-): ImmersionEstablishmentContact => ({
-  id: uuidV4(),
-  name: businessContactDto.lastName,
-  firstname: businessContactDto.firstName,
-  email: businessContactDto.email,
-  role: businessContactDto.job,
-  siretEstablishment: siret_institution,
-  phone: businessContactDto.phone,
-});
+// Those will probably be shared in a utils/helpers folder
+const inferNafFromSireneAnswer = (sireneRepoAnswer: SireneRepositoryAnswer) =>
+  sireneRepoAnswer.etablissements[0].uniteLegale.activitePrincipaleUniteLegale?.replace(
+    ".",
+    "",
+  );
+
+const inferNumberEmployeesRangeFromSireneAnswer = (
+  sireneRepoAnswer: SireneRepositoryAnswer,
+): TefenCode => {
+  const tefenCode =
+    sireneRepoAnswer.etablissements[0].uniteLegale.trancheEffectifsUniteLegale;
+
+  return !tefenCode || tefenCode == "NN" ? -1 : <TefenCode>+tefenCode;
+};

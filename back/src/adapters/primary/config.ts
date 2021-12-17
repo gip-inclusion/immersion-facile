@@ -377,12 +377,12 @@ const createUseCases = (
 
     transformFormEstablishmentToSearchData:
       new TransformFormEstablishmentIntoSearchData(
-        repositories.formEstablishment,
         repositories.immersionOffer,
         adresseAPI,
         repositories.sirene,
         repositories.rome,
         sequenceRunner,
+        uuidGenerator,
       ),
 
     contactEstablishment: new ContactEstablishment(
