@@ -15,7 +15,7 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
     .route(`/${searchImmersionRoute}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.searchImmersion.execute(req.body),
+        deps.useCases.searchImmersion.execute(req.body, req.apiConsumer),
       ),
     );
 
@@ -23,7 +23,10 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
     .route(`/${getImmersionOfferByIdRoute}/:id`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getImmersionOfferById.execute(req.params.id),
+        deps.useCases.getImmersionOfferById.execute(
+          req.params.id,
+          req.apiConsumer,
+        ),
       ),
     );
 
