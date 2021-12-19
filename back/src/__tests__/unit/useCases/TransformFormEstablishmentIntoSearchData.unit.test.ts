@@ -110,30 +110,29 @@ describe("Transform FormEstablishment into search data", () => {
     offerRomes: string[];
   }) => {
     const repoEstablishmentAggregate =
-      await inMemoryImmersionOfferRepository.getEstablishmentFromSiret(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      (await inMemoryImmersionOfferRepository.getEstablishmentFromSiret(
         expected.siret,
-      );
+      ))!;
     expect(repoEstablishmentAggregate).toBeDefined();
-    expect(repoEstablishmentAggregate?.establishment.siret).toEqual(
+    expect(repoEstablishmentAggregate.establishment.siret).toEqual(
       expected.siret,
     );
-    expect(repoEstablishmentAggregate?.establishment.naf).toEqual(expected.naf);
-    expect(repoEstablishmentAggregate?.establishment.dataSource).toEqual(
-      "form",
-    );
+    expect(repoEstablishmentAggregate.establishment.naf).toEqual(expected.naf);
+    expect(repoEstablishmentAggregate.establishment.dataSource).toEqual("form");
 
     // Contact
-    expect(repoEstablishmentAggregate?.contacts).toHaveLength(1);
-    expect(repoEstablishmentAggregate?.contacts[0].email).toEqual(
+    expect(repoEstablishmentAggregate.contacts).toHaveLength(1);
+    expect(repoEstablishmentAggregate.contacts[0].email).toEqual(
       expected.contactEmail,
     );
 
     // Offer
-    expect(repoEstablishmentAggregate?.immersionOffers).toHaveLength(
+    expect(repoEstablishmentAggregate.immersionOffers).toHaveLength(
       expected.offerRomes.length,
     );
     expect(
-      repoEstablishmentAggregate?.immersionOffers.map((offer) => offer.rome),
+      repoEstablishmentAggregate.immersionOffers.map((offer) => offer.rome),
     ).toEqual(expected.offerRomes);
   };
 });

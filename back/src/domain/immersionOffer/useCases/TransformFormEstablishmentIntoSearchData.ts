@@ -37,7 +37,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
     private readonly sireneRepository: SireneRepository,
     private readonly romeGateway: RomeGateway,
     private readonly sequenceRunner: SequenceRunner,
-    private uuidGenerator: UuidGenerator,
+    private readonly uuidGenerator: UuidGenerator,
   ) {
     super();
   }
@@ -100,13 +100,12 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
                 romeCodeAppellation,
               );
 
-            return correspondingRome
-              ? {
-                  id: this.uuidGenerator.new(),
-                  rome: correspondingRome,
-                  score: offerFromFormScore,
-                }
-              : undefined;
+            if (correspondingRome)
+              return {
+                id: this.uuidGenerator.new(),
+                rome: correspondingRome,
+                score: offerFromFormScore,
+              };
           }
         },
       )
@@ -121,8 +120,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
       naf,
       position,
       numberEmployeesRange,
-
-      // contactMode: formEstablishment.preferredContactMethods[0],
+      contactMethod: formEstablishment.preferredContactMethods[0],
     };
 
     const establishmentAggregate: EstablishmentAggregate = {
