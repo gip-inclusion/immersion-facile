@@ -102,37 +102,6 @@ describe("Transform FormEstablishment into search data", () => {
       contactEmail: fakeBusinessContact.email,
     });
   });
-  // Note : I'm not sure what this second use-case is testing since romeCodeMetier is required in type ProfessionDto
-  it("converts Form establishment event when it has only romeAppelation (not romeCode)", async () => {
-    // Prepare
-    const professions: ProfessionDto[] = [
-      {
-        romeCodeAppellation: "11987",
-        romeCodeMetier: "A1101",
-        description: "métier A",
-      },
-    ];
-    const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withSiret(fakeSiret)
-      .withProfessions(professions)
-      .withBusinessContacts([fakeBusinessContact])
-      .build();
-
-    const establishmentFromApi =
-      getEstablishmentFromSireneApi(formEstablishment);
-    inMemorySireneRepository.setEstablishment(establishmentFromApi);
-
-    // Act
-    await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
-
-    // Assert
-    await expectEstablishmentAggregateInRepo({
-      siret: fakeSiret,
-      naf: expectedNaf,
-      offerRomes: ["A1101"],
-      contactEmail: fakeBusinessContact.email,
-    });
-  });
 
   const expectEstablishmentAggregateInRepo = async (expected: {
     siret: string;
