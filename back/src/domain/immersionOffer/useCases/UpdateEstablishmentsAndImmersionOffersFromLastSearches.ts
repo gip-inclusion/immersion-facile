@@ -253,26 +253,36 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     romeSearched: string,
     companyNaf: string,
   ): boolean {
-    if (
-      (companyNaf.startsWith("9609") && romeSearched == "A1408") ||
-      (companyNaf == "XXXXX" && romeSearched == "A1503") ||
-      (companyNaf == "5610C" && romeSearched == "D1102") ||
-      (companyNaf.startsWith("8411") && romeSearched == "D1202") ||
-      (companyNaf.startsWith("8411") &&
-        [
-          "D1202",
-          "G1404",
-          "G1501",
-          "G1502",
-          "G1503",
-          "G1601",
-          "G1602",
-          "G1603",
-          "G1605",
-          "G1802",
-          "G1803",
-        ].indexOf(romeSearched) > -1)
-    ) {
+    // those conditions are business specific, see with Nathalie for any questions
+    const isNafAutreServiceWithRomeElevageOrToilettage =
+      companyNaf.startsWith("9609") &&
+      ["A1503", "A1408"].includes(romeSearched);
+
+    const isNafRestaurationRapideWithRomeBoulangerie =
+      companyNaf == "5610C" && romeSearched == "D1102";
+
+    const isRomeIgnoredForPublicAdministration =
+      companyNaf.startsWith("8411") &&
+      [
+        "D1202",
+        "G1404",
+        "G1501",
+        "G1502",
+        "G1503",
+        "G1601",
+        "G1602",
+        "G1603",
+        "G1605",
+        "G1802",
+        "G1803",
+      ].includes(romeSearched);
+
+    const establishmentShouldBeIgnored =
+      isNafAutreServiceWithRomeElevageOrToilettage ||
+      isNafRestaurationRapideWithRomeBoulangerie ||
+      isRomeIgnoredForPublicAdministration;
+
+    if (establishmentShouldBeIgnored) {
       logger.info({ company: companyNaf }, "Not relevant, discarding.");
       return false;
     } else {
