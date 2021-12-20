@@ -81,7 +81,13 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       new TestUuidGenerator(),
     );
   const AllIdsResult = await clientOrigin.query(
-    "SELECT id FROM public.form_establishments",
+    "WITH siretInFormEstablishment AS ( \
+    SELECT DISTINCT siret::text \
+      FROM   form_establishments\
+    ), \
+    siretFromFormInImmersionOffer AS (SELECT DISTINCT siret::text from immersion_offers where data_source = 'form') \
+    SELECT id FROM public.form_establishments WHERE siret IN \
+    ((SELECT siret FROM siretInFormEstablishment) EXCEPT (SELECT siret FROM siretFromFormInImmersionOffer))",
   );
   for (let pas = 0; pas < AllIdsResult.rows.length; pas++) {
     await transformFormEstablishmentIntoSearchData._execute(
