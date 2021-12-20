@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
+
 import { random, sleep } from "../../shared/utils";
 import { createLogger } from "../../utils/logger";
 import { RealClock } from "../secondary/core/ClockImplementations";
@@ -86,12 +87,23 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       FROM   form_establishments\
     ), \
     siretFromFormInImmersionOffer AS (SELECT DISTINCT siret::text from immersion_offers where data_source = 'form') \
-    SELECT id FROM public.form_establishments WHERE siret IN \
+    SELECT * FROM public.form_establishments WHERE siret IN \
     ((SELECT siret FROM siretInFormEstablishment) EXCEPT (SELECT siret FROM siretFromFormInImmersionOffer))",
   );
+  console.log(AllIdsResult.rows);
   for (let pas = 0; pas < AllIdsResult.rows.length; pas++) {
+    const formEstablishmentDto = {
+      id: AllIdsResult.rows[pas].id,
+      siret: AllIdsResult.rows[pas].siret,
+      businessName: AllIdsResult.rows[pas].business_name,
+      businessAddress: AllIdsResult.rows[pas].business_address,
+      naf: AllIdsResult.rows[pas].naf,
+      professions: AllIdsResult.rows[pas].professions,
+      businessContacts: AllIdsResult.rows[pas].business_contacts,
+      preferredContactMethods: AllIdsResult.rows[pas].preferred_contact_methods,
+    };
     await transformFormEstablishmentIntoSearchData._execute(
-      AllIdsResult.rows[pas],
+      formEstablishmentDto,
     );
   }
   clientOrigin.release();
