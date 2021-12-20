@@ -1,8 +1,14 @@
 import { Pool } from "pg";
-import { unrestrictedRateLimiter } from "../../domain/core/ports/RateLimiter";
 import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
+import { random, sleep } from "../../shared/utils";
 import { createLogger } from "../../utils/logger";
 import { RealClock } from "../secondary/core/ClockImplementations";
+import {
+  defaultMaxBackoffPeriodMs,
+  defaultRetryDeadlineMs,
+  ExponentialBackoffRetryStrategy,
+} from "../secondary/core/ExponentialBackoffRetryStrategy";
+import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
 import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
 import { TestUuidGenerator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
@@ -11,7 +17,12 @@ import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepo
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { AppConfig } from "./appConfig";
 
+const maxQpsApiAdresse = 5;
+const maxQpsSireneApi = 5;
+
 const logger = createLogger(__filename);
+
+const clock = new RealClock();
 
 const config = AppConfig.createFromEnv();
 
@@ -35,12 +46,28 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   const immersionOfferRepository = new PgImmersionOfferRepository(
     clientDestination,
   );
-  const adresseAPI = new HttpAdresseAPI(unrestrictedRateLimiter);
+  const adresseAPI = new HttpAdresseAPI(
+    new QpsRateLimiter(maxQpsApiAdresse, clock, sleep),
+    new ExponentialBackoffRetryStrategy(
+      defaultMaxBackoffPeriodMs,
+      defaultRetryDeadlineMs,
+      clock,
+      sleep,
+      random,
+    ),
+  );
   const sequenceRunner = new ThrottledSequenceRunner(100, 3);
   const sireneRepository = new HttpsSireneRepository(
     config.sireneHttpsConfig,
-    new RealClock(),
-    unrestrictedRateLimiter,
+    clock,
+    new QpsRateLimiter(maxQpsSireneApi, clock, sleep),
+    new ExponentialBackoffRetryStrategy(
+      defaultMaxBackoffPeriodMs,
+      defaultRetryDeadlineMs,
+      clock,
+      sleep,
+      random,
+    ),
   );
   const poleEmploiGateway = new PgRomeGateway(clientOrigin);
 

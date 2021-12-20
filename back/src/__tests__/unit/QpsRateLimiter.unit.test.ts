@@ -1,5 +1,5 @@
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
-import { QpsRateLimiter } from "./../../adapters/secondary/core/QpsRateLimiter";
+import { QpsRateLimiter } from "../../adapters/secondary/core/QpsRateLimiter";
 
 describe("QpsRateLimiter", () => {
   let fakeClock: CustomClock;

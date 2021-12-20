@@ -1,4 +1,5 @@
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
+import { RetryStrategy } from "../../../domain/core/ports/RetryStrategy";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import {
@@ -26,6 +27,7 @@ export class HttpLaPlateformeDeLInclusionAPI
   public constructor(
     private readonly adresseAPI: AdresseAPI,
     private readonly rateLimiter: RateLimiter,
+    private readonly retryStrategy: RetryStrategy,
   ) {}
 
   public async getResults(
@@ -62,17 +64,19 @@ export class HttpLaPlateformeDeLInclusionAPI
 
     try {
       const axios = createAxiosInstance(logger);
-      const response = await this.rateLimiter.whenReady(() =>
-        axios.get("https://emplois.inclusion.beta.gouv.fr/api/v1/siaes/", {
-          params: {
-            code_insee: cityCode,
-            distance_max_km: Math.min(
-              searchParams.distance_km,
-              SIAES_MAX_DISTANCE_KM,
-            ),
-            format: "json",
-          },
-        }),
+      const response = await this.retryStrategy.apply(() =>
+        this.rateLimiter.whenReady(() =>
+          axios.get("https://emplois.inclusion.beta.gouv.fr/api/v1/siaes/", {
+            params: {
+              code_insee: cityCode,
+              distance_max_km: Math.min(
+                searchParams.distance_km,
+                SIAES_MAX_DISTANCE_KM,
+              ),
+              format: "json",
+            },
+          }),
+        ),
       );
       return {
         results: response.data.results,
@@ -93,7 +97,9 @@ export class HttpLaPlateformeDeLInclusionAPI
   ): Promise<LaPlateformeDeLInclusionGetResponse> {
     try {
       const axios = createAxiosInstance(logger);
-      const response = await this.rateLimiter.whenReady(() => axios.get(url));
+      const response = await this.retryStrategy.apply(() =>
+        this.rateLimiter.whenReady(() => axios.get(url)),
+      );
       return {
         results: response.data.results,
         nextPageUrl: response.data.next,

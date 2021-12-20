@@ -11,6 +11,11 @@ export const sleep = (ms: number): Promise<number> => {
   return new Promise((r) => setTimeout(r, ms));
 };
 
+export type RandomFn = typeof random;
+export const random = (max: number): number => {
+  return Math.floor(Math.random() * max);
+};
+
 // Matches strings that contain at least one 5-digit number.
 const postalCodeRegex = /(^|\s|,)\d{5}(\s|$|,)/;
 export const addressWithPostalCodeSchema = z

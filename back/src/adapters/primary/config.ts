@@ -9,7 +9,8 @@ import {
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
-import { unrestrictedRateLimiter } from "../../domain/core/ports/RateLimiter";
+import { noRateLimit } from "../../domain/core/ports/RateLimiter";
+import { noRetries } from "../../domain/core/ports/RetryStrategy";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -202,7 +203,8 @@ export const createRepositories = async (
         ? new HttpsSireneRepository(
             config.sireneHttpsConfig,
             clock,
-            unrestrictedRateLimiter,
+            noRateLimit,
+            noRetries,
           )
         : new InMemorySireneRepository(),
 
@@ -314,7 +316,7 @@ const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const getSiret = new GetSiret(repositories.sirene);
-  const adresseAPI = new HttpAdresseAPI(unrestrictedRateLimiter);
+  const adresseAPI = new HttpAdresseAPI(noRateLimit, noRetries);
 
   return {
     addDemandeImmersion: new AddImmersionApplication(

@@ -1,6 +1,7 @@
 import { formatISO } from "date-fns";
 import { Clock } from "../../domain/core/ports/Clock";
 import { RateLimiter } from "../../domain/core/ports/RateLimiter";
+import { RetryStrategy } from "../../domain/core/ports/RetryStrategy";
 import {
   SireneRepository,
   SireneRepositoryAnswer,
@@ -17,6 +18,7 @@ export class HttpsSireneRepository implements SireneRepository {
     private readonly axiosConfig: AxiosConfig,
     private readonly clock: Clock,
     private readonly rateLimiter: RateLimiter,
+    private readonly retryStrategy: RetryStrategy,
   ) {}
 
   private createAxiosInstance() {
@@ -37,13 +39,15 @@ export class HttpsSireneRepository implements SireneRepository {
 
     try {
       const axios = this.createAxiosInstance();
-      const response = await this.rateLimiter.whenReady(() =>
-        axios.get("/siret", {
-          params: this.createSiretQueryParams(
-            siret,
-            includeClosedEstablishments,
-          ),
-        }),
+      const response = await this.retryStrategy.apply(() =>
+        this.rateLimiter.whenReady(() =>
+          axios.get("/siret", {
+            params: this.createSiretQueryParams(
+              siret,
+              includeClosedEstablishments,
+            ),
+          }),
+        ),
       );
       return response.data;
     } catch (error: any) {

@@ -1,4 +1,5 @@
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
+import { RetryStrategy } from "../../../domain/core/ports/RetryStrategy";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import {
   LaBonneBoiteAPI,
@@ -15,6 +16,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
     private readonly accessTokenGateway: AccessTokenGateway,
     private readonly poleEmploiClientId: string,
     private readonly rateLimiter: RateLimiter,
+    private readonly retryStrategy: RetryStrategy,
   ) {}
 
   public async searchCompanies(
@@ -25,20 +27,22 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
     );
     try {
       const axios = createAxiosInstance(logger);
-      const response = await this.rateLimiter.whenReady(() =>
-        axios.get(
-          "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
+      const response = await this.retryStrategy.apply(() =>
+        this.rateLimiter.whenReady(() =>
+          axios.get(
+            "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+              params: {
+                distance: searchParams.distance_km,
+                longitude: searchParams.lon,
+                latitude: searchParams.lat,
+                rome_codes: searchParams.rome,
+              },
             },
-            params: {
-              distance: searchParams.distance_km,
-              longitude: searchParams.lon,
-              latitude: searchParams.lat,
-              rome_codes: searchParams.rome,
-            },
-          },
+          ),
         ),
       );
       return response.data.companies || [];

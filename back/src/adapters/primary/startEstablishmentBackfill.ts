@@ -1,9 +1,14 @@
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
-import { sleep } from "../../shared/utils";
+import { random, sleep } from "../../shared/utils";
 import { createLogger } from "../../utils/logger";
 import { PipelineStats } from "../../utils/pipelineStats";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
+import {
+  defaultRetryDeadlineMs,
+  defaultMaxBackoffPeriodMs,
+  ExponentialBackoffRetryStrategy,
+} from "../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
@@ -43,21 +48,49 @@ const main = async () => {
     poleEmploiAccessTokenGateway,
     config.poleEmploiClientId,
     new QpsRateLimiter(MAX_QPS_LA_BONNE_BOITE_GATEWAY, clock, sleep),
+    new ExponentialBackoffRetryStrategy(
+      defaultMaxBackoffPeriodMs,
+      defaultRetryDeadlineMs,
+      clock,
+      sleep,
+      random,
+    ),
   );
 
   const adresseAPI = new HttpAdresseAPI(
     new QpsRateLimiter(MAX_QPS_API_ADRESSE, clock, sleep),
+    new ExponentialBackoffRetryStrategy(
+      defaultMaxBackoffPeriodMs,
+      defaultRetryDeadlineMs,
+      clock,
+      sleep,
+      random,
+    ),
   );
 
   const laPlateFormeDeLInclusionAPI = new HttpLaPlateformeDeLInclusionAPI(
     adresseAPI,
     new QpsRateLimiter(MAX_QPS_LA_PLATEFORME_DE_L_INCLUSION, clock, sleep),
+    new ExponentialBackoffRetryStrategy(
+      defaultMaxBackoffPeriodMs,
+      defaultRetryDeadlineMs,
+      clock,
+      sleep,
+      random,
+    ),
   );
 
   const sireneGateway = new HttpsSireneRepository(
     config.sireneHttpsConfig,
     clock,
     new QpsRateLimiter(MAX_QPS_SIRENE_API, clock, sleep),
+    new ExponentialBackoffRetryStrategy(
+      defaultMaxBackoffPeriodMs,
+      defaultRetryDeadlineMs,
+      clock,
+      sleep,
+      random,
+    ),
   );
 
   const repositories = await createRepositories(

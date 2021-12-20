@@ -1,4 +1,5 @@
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
+import { RetryStrategy } from "../../../domain/core/ports/RetryStrategy";
 import {
   AdresseAPI,
   Position,
@@ -9,7 +10,10 @@ import { createLogger } from "../../../utils/logger";
 const logger = createLogger(__filename);
 
 export class HttpAdresseAPI implements AdresseAPI {
-  public constructor(private readonly rateLimiter: RateLimiter) {}
+  public constructor(
+    private readonly rateLimiter: RateLimiter,
+    private readonly retryStrategy: RetryStrategy,
+  ) {}
 
   public async getPositionFromAddress(
     address: string,
@@ -18,12 +22,14 @@ export class HttpAdresseAPI implements AdresseAPI {
 
     try {
       const axios = createAxiosInstance(logger);
-      const response = await this.rateLimiter.whenReady(() =>
-        axios.get("https://api-adresse.data.gouv.fr/search/", {
-          params: {
-            q: address,
-          },
-        }),
+      const response = await this.retryStrategy.apply(() =>
+        this.rateLimiter.whenReady(() =>
+          axios.get("https://api-adresse.data.gouv.fr/search/", {
+            params: {
+              q: address,
+            },
+          }),
+        ),
       );
       return {
         lat: response.data.features[0].geometry.coordinates[1],
