@@ -1,7 +1,7 @@
 import { addDays as dateFnsAddDays, format } from "date-fns";
+import type { GenerateVerificationMagicLink } from "../adapters/primary/config";
 import { EventBus } from "../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
-import type { GenerateVerificationMagicLink } from "../adapters/primary/config";
 import { ImmersionApplicationId } from "../shared/ImmersionApplicationDto";
 import { Role } from "../shared/tokens/MagicLinkPayload";
 
@@ -47,3 +47,11 @@ export const fakeGenerateMagicLinkUrlFn: GenerateVerificationMagicLink = (
   role: Role,
   targetRoute: string,
 ) => `http://fake-magic-link/${applicationId}/${targetRoute}/${role}`;
+
+export const expectArraysToMatch = <T>(actual: T[], expected: Partial<T>[]) => {
+  expect(actual).toMatchObject(expected);
+};
+
+export const expectArraysToEqual = <T>(actual: T[], expected: T[]) => {
+  expect(actual).toEqual(expected);
+};

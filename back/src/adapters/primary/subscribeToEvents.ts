@@ -62,12 +62,12 @@ const getUseCasesByTopics = (
       useCases.notifyBeneficiaryAndEnterpriseThatApplicationIsRejected,
     ],
 
-    // Estasblishment form and search related.
+    // Establishment form and search related.
     FormEstablishmentAdded: [
       useCases.transformFormEstablishmentToSearchData,
       useCases.notifyConfirmationEstablishmentCreated,
     ],
-    EmailContactRequestedByBeneficiary: [
+    ContactRequestedByBeneficiary: [
       useCases.notifyEstablishmentOfContactRequest,
     ],
 

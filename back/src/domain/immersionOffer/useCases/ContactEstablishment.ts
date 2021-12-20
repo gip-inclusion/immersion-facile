@@ -1,4 +1,3 @@
-import { createLogger } from "./../../../utils/logger";
 import {
   BadRequestError,
   NotFoundError,
@@ -7,9 +6,25 @@ import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "../../../shared/contactEstablishment";
+import { ContactMethod } from "../../../shared/FormEstablishmentDto";
+import {
+  ImmersionOfferId,
+  SearchImmersionResultDto,
+} from "../../../shared/SearchImmersionDto";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork, UnitOfWorkPerformer } from "./../../core/ports/UnitOfWork";
+
+const throwIfNoContactId = (
+  searchImmersionResult: SearchImmersionResultDto,
+  searchedOfferId: ImmersionOfferId,
+) => {
+  if (!searchImmersionResult.contactId) {
+    throw new BadRequestError(
+      `no contact id in immersion offer: ${searchedOfferId}`,
+    );
+  }
+};
 
 export class ContactEstablishment extends TransactionalUseCase<
   ContactEstablishmentRequestDto,
@@ -39,17 +54,16 @@ export class ContactEstablishment extends TransactionalUseCase<
         `contact mode mismatch: ${params.contactMode} in immersion offer: ${params.immersionOfferId}`,
       );
 
-    if (params.contactMode === "EMAIL") {
-      if (!immersionOffer.contactId) {
-        throw new BadRequestError(
-          `no contact id in immersion offer: ${params.immersionOfferId}`,
-        );
-      }
+    const handledContactMode: ContactMethod[] = ["EMAIL", "PHONE"];
+
+    if (handledContactMode.includes(params.contactMode)) {
+      throwIfNoContactId(immersionOffer, params.immersionOfferId);
 
       const event = this.createNewEvent({
-        topic: "EmailContactRequestedByBeneficiary",
+        topic: "ContactRequestedByBeneficiary",
         payload: params,
       });
+
       await unitOfWork.outboxRepo.save(event);
     }
   }

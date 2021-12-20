@@ -11,7 +11,11 @@ import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/Co
 import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablishment";
 import { ImmersionEstablishmentContactBuilder } from "../../../_testBuilders/ImmersionEstablishmentContactBuilder";
 import { ImmersionOfferEntityBuilder } from "../../../_testBuilders/ImmersionOfferEntityBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import {
+  expectArraysToEqual,
+  expectArraysToMatch,
+  expectPromiseToFailWithError,
+} from "../../../_testBuilders/test.helpers";
 import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 
@@ -24,12 +28,19 @@ const immersionOffer = new ImmersionOfferEntityBuilder()
   .withContactInEstablishment(establishmentContact)
   .build();
 
-const validRequest: ContactEstablishmentRequestDto = {
+const validEmailRequest: ContactEstablishmentRequestDto = {
   immersionOfferId: immersionOffer.getId(),
   contactMode: "EMAIL",
   senderName: "sender_name",
   senderEmail: "sender@email.fr",
   message: "message_to_send",
+};
+
+const validPhoneRequest: ContactEstablishmentRequestDto = {
+  immersionOfferId: immersionOffer.getId(),
+  contactMode: "PHONE",
+  senderName: "My name",
+  senderEmail: "askingForPhone@email.fr",
 };
 
 describe("ContactEstablishment", () => {
@@ -71,37 +82,53 @@ describe("ContactEstablishment", () => {
     const now = new Date("2021-12-08T15:00");
     clock.setNextDate(now);
 
-    await contactEstablishment.execute(validRequest);
+    await contactEstablishment.execute(validEmailRequest);
 
-    expect(outboxRepository.events).toEqual([
+    expectArraysToEqual(outboxRepository.events, [
       {
         id: eventId,
         occurredAt: now.toISOString(),
-        topic: "EmailContactRequestedByBeneficiary",
+        topic: "ContactRequestedByBeneficiary",
         wasPublished: false,
         wasQuarantined: false,
-        payload: validRequest,
+        payload: validEmailRequest,
       },
     ]);
   });
 
-  test("schedules no event for valid PHONE contact requests", async () => {
+  test("schedules event for valid PHONE contact request", async () => {
+    const establishmentContactByPhone = new EstablishmentEntityBuilder(
+      establishment,
+    )
+      .withContactMode("PHONE")
+      .build();
+
     await immersionOfferRepository.insertEstablishments([
-      new EstablishmentEntityBuilder(establishment)
-        .withContactMode("PHONE")
-        .build(),
+      establishmentContactByPhone,
     ]);
     await immersionOfferRepository.insertEstablishmentContact(
       establishmentContact,
     );
     await immersionOfferRepository.insertImmersions([immersionOffer]);
 
-    await contactEstablishment.execute({
-      ...validRequest,
-      contactMode: "PHONE",
-    });
+    const eventId = "event_id";
+    uuidGenerator.setNextUuid(eventId);
 
-    expect(outboxRepository.events).toHaveLength(0);
+    const now = new Date("2021-12-08T15:00");
+    clock.setNextDate(now);
+
+    await contactEstablishment.execute(validPhoneRequest);
+
+    expectArraysToEqual(outboxRepository.events, [
+      {
+        id: eventId,
+        occurredAt: now.toISOString(),
+        topic: "ContactRequestedByBeneficiary",
+        wasPublished: false,
+        wasQuarantined: false,
+        payload: validPhoneRequest,
+      },
+    ]);
   });
 
   test("schedules no event for valid IN_PERSON contact requests", async () => {
@@ -116,7 +143,7 @@ describe("ContactEstablishment", () => {
     await immersionOfferRepository.insertImmersions([immersionOffer]);
 
     await contactEstablishment.execute({
-      ...validRequest,
+      ...validEmailRequest,
       contactMode: "IN_PERSON",
     });
 
@@ -128,7 +155,7 @@ describe("ContactEstablishment", () => {
 
     await expectPromiseToFailWithError(
       contactEstablishment.execute({
-        ...validRequest,
+        ...validEmailRequest,
         immersionOfferId: "missing_offer_id",
       }),
       new NotFoundError("missing_offer_id"),
@@ -148,11 +175,11 @@ describe("ContactEstablishment", () => {
 
     await expectPromiseToFailWithError(
       contactEstablishment.execute({
-        ...validRequest,
+        ...validEmailRequest,
         contactMode: "IN_PERSON",
       }),
       new BadRequestError(
-        `contact mode mismatch: IN_PERSON in immersion offer: ${validRequest.immersionOfferId}`,
+        `contact mode mismatch: IN_PERSON in immersion offer: ${validEmailRequest.immersionOfferId}`,
       ),
     );
   });
@@ -166,9 +193,9 @@ describe("ContactEstablishment", () => {
     ]);
 
     await expectPromiseToFailWithError(
-      contactEstablishment.execute(validRequest),
+      contactEstablishment.execute(validEmailRequest),
       new BadRequestError(
-        `no contact id in immersion offer: ${validRequest.immersionOfferId}`,
+        `no contact id in immersion offer: ${validEmailRequest.immersionOfferId}`,
       ),
     );
   });

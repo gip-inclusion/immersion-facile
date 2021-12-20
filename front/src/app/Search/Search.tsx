@@ -11,6 +11,7 @@ import locationSearchIcon from "src/assets/location-search-icon.svg";
 import searchButtonIcon from "src/assets/search-button-icon.svg";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { MarianneHeader } from "src/components/MarianneHeader";
+import { SuccessFeedback } from "src/components/SuccessFeedback";
 import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import "./search.css";
@@ -28,6 +29,7 @@ const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 
 export const Search = () => {
   const [result, setResult] = useState<SearchImmersionResultDto[] | null>(null);
+  const [successFullyValidated, setSuccessfullyValidated] = useState(false);
   const { modalState, dispatch } = useContactEstablishmentModal();
 
   return (
@@ -161,7 +163,17 @@ export const Search = () => {
           })}
       </div>
 
-      <ContactEstablishmentModal modalState={modalState} dispatch={dispatch} />
+      <ContactEstablishmentModal
+        modalState={modalState}
+        dispatch={dispatch}
+        onSuccess={() => setSuccessfullyValidated(true)}
+      />
+      <SuccessFeedback
+        open={successFullyValidated}
+        handleClose={() => setSuccessfullyValidated(false)}
+      >
+        L'entreprise a été contacté avec succès.
+      </SuccessFeedback>
     </div>
   );
 };

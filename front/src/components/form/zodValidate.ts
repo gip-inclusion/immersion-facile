@@ -29,6 +29,7 @@ export const toFormikValidationSchema = <T>(
     try {
       schema.parse(obj);
     } catch (err: unknown) {
+      console.log("zod error :", err);
       throw createValidationError(err as z.ZodError<T>);
     }
   },

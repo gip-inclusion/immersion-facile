@@ -2,12 +2,11 @@ import {
   Modal,
   ModalClose,
   ModalContent,
-  ModalFooter,
   ModalTitle,
 } from "@dataesr/react-dsfr";
-import React, { useEffect, useReducer } from "react";
+import React, { useReducer } from "react";
 import { ContactByEmail } from "src/app/Search/ContactByEmail";
-import { Button } from "src/components/Button";
+import { ContactByPhone } from "src/app/Search/ContactByPhone";
 import {
   ContactMethod,
   ImmersionContactInEstablishmentId,
@@ -66,20 +65,30 @@ export const useContactEstablishmentModal = () => {
 type ContactEstablishmentModalProps = {
   modalState: ModalState;
   dispatch: React.Dispatch<ModalAction>;
+  onSuccess: () => void;
 };
 
 export const ContactEstablishmentModal = ({
   modalState,
   dispatch,
+  onSuccess,
 }: ContactEstablishmentModalProps) => {
   const hide = () => dispatch({ type: "CLICKED_CLOSE" });
+
+  const hideAndShowSuccess = () => {
+    hide();
+    onSuccess();
+  };
 
   return (
     <Modal isOpen={modalState.isOpen} hide={hide}>
       <ModalClose hide={hide} title="Close the modal window" />
-      <ModalTitle icon="ri-arrow-right-fill">Modal Title</ModalTitle>
+      <ModalTitle icon="ri-arrow-right-fill">Contacter l'entreprise</ModalTitle>
       <ModalContent>
-        <ModalContactContent modalState={modalState} hide={hide} />
+        <ModalContactContent
+          modalState={modalState}
+          onSuccess={hideAndShowSuccess}
+        />
       </ModalContent>
     </Modal>
   );
@@ -87,32 +96,33 @@ export const ContactEstablishmentModal = ({
 
 type ModalContactContentProps = {
   modalState: ModalState;
-  hide: () => void;
+  onSuccess: () => void;
 };
 
 const ModalContactContent = ({
   modalState,
-  hide,
+  onSuccess,
 }: ModalContactContentProps) => {
   switch (modalState.contactMethod) {
     case "EMAIL":
       return (
         <ContactByEmail
           immersionOfferId={modalState.immersionOfferId}
-          closeModal={hide}
+          onSuccess={onSuccess}
         />
       );
     case "PHONE":
-      return <ContactByPhone />;
+      return (
+        <ContactByPhone
+          immersionOfferId={modalState.immersionOfferId}
+          onSuccess={onSuccess}
+        />
+      );
     case "IN_PERSON":
       return <ContactInPerson />;
     default:
       return <div>Aucun contact trouvé pour cette entreprise</div>;
   }
-};
-
-const ContactByPhone = () => {
-  return <div>TODO : Contacter par téléphone</div>;
 };
 
 const ContactInPerson = () => {

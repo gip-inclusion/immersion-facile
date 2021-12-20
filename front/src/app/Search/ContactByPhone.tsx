@@ -9,22 +9,23 @@ import {
   contactEstablishmentRequestSchema,
 } from "src/shared/contactEstablishment";
 
-type ContactByEmailProps = {
+type ContactByPhoneProps = {
   immersionOfferId: string;
   onSuccess: () => void;
 };
 
-export const ContactByEmail = ({
+export const ContactByPhone = ({
   immersionOfferId,
   onSuccess,
-}: ContactByEmailProps) => {
+}: ContactByPhoneProps) => {
   const initialValues: ContactEstablishmentRequestDto = {
     immersionOfferId,
-    contactMode: "EMAIL",
+    contactMode: "PHONE",
     senderEmail: "",
     senderName: "",
     message: "",
   };
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
@@ -42,13 +43,9 @@ export const ContactByEmail = ({
     >
       {({ errors, submitCount }) => (
         <Form>
-          <TextInput label="Votre email *" name="senderEmail" />
-          <TextInput label="Votre nom" name="senderName" />
           <TextInput
-            label="Votre message *"
-            name="message"
-            type="text"
-            multiline
+            label="Veuillez laisser votre email pour recevoir le numéro de téléphone de l'entreprise *"
+            name="senderEmail"
           />
           {submitCount !== 0 &&
             Object.values(errors).length > 0 &&

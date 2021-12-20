@@ -17,27 +17,33 @@ type GenericEvent<T extends string, P> = {
 };
 
 export type DomainEvent =
+  // IMMERSION APPLICATION RELATED
+  // HAPPY PATH
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ImmersionApplicationDto>
+  // prettier-ignore
+  | GenericEvent<"ImmersionApplicationPartiallySigned", ImmersionApplicationDto>
+  // prettier-ignore
+  | GenericEvent<"ImmersionApplicationFullySigned", ImmersionApplicationDto>
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ImmersionApplicationDto>
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationAcceptedByValidator", ImmersionApplicationDto>
   // prettier-ignore
   | GenericEvent<"FinalImmersionApplicationValidationByAdmin", ImmersionApplicationDto>
+
+  // UNHAPPY PATHS
   | GenericEvent<"ImmersionApplicationRejected", ImmersionApplicationDto>
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationRequiresModification", ImmersionApplicationRequiresModificationPayload>
-  | GenericEvent<"FormEstablishmentAdded", FormEstablishmentDto>
+
+  // MAGIC LINK RENEWAL
   | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>
-  | GenericEvent<
-      "EmailContactRequestedByBeneficiary",
-      ContactEstablishmentRequestDto
-    >
+
+  // FORM ESTABLISHMENT RELATED
+  | GenericEvent<"FormEstablishmentAdded", FormEstablishmentDto>
   // prettier-ignore
-  | GenericEvent<"ImmersionApplicationPartiallySigned", ImmersionApplicationDto>
-  // prettier-ignore
-  | GenericEvent<"ImmersionApplicationFullySigned", ImmersionApplicationDto>;
+  | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentRequestDto>;
 
 export type DomainTopic = DomainEvent["topic"];
 

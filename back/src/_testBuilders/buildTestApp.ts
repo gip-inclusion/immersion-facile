@@ -15,7 +15,7 @@ import { AgencyConfigBuilder } from "./AgencyConfigBuilder";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
 
-type InMemoryRepositories = {
+export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
   immersionOffer: InMemoryImmersionOfferRepository;
   agency: InMemoryAgencyRepository;

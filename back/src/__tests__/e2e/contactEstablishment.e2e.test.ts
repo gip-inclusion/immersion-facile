@@ -1,8 +1,12 @@
-import supertest, { SuperTest, Test } from "supertest";
-import { createApp } from "../../adapters/primary/server";
+import { SuperTest, Test } from "supertest";
+import {
+  buildTestApp,
+  InMemoryRepositories,
+} from "../../_testBuilders/buildTestApp";
+import { expectArraysToMatch } from "../../_testBuilders/test.helpers";
+import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import { validImmersionOfferId } from "../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 
 const validRequest: ContactEstablishmentRequestDto = {
   immersionOfferId: validImmersionOfferId,
@@ -14,14 +18,31 @@ const validRequest: ContactEstablishmentRequestDto = {
 
 describe("/contact-establishment route", () => {
   let request: SuperTest<Test>;
+  let reposAndGateways: InMemoryRepositories;
+  let eventCrawler: BasicEventCrawler;
 
   beforeEach(async () => {
-    const { app } = await createApp(new AppConfigBuilder().build());
-    request = supertest(app);
+    ({ request, reposAndGateways, eventCrawler } = await buildTestApp());
   });
 
-  test("succeeds for valid request", async () => {
-    await request.post(`/contact-establishment`).send(validRequest).expect(200);
+  test("succeeds for valid request of contact by Email", async () => {
+    const response = await request
+      .post(`/contact-establishment`)
+      .send(validRequest);
+
+    expect(response.status).toBe(200);
+
+    expectArraysToMatch(reposAndGateways.outbox.events, [
+      { topic: "ContactRequestedByBeneficiary", payload: validRequest },
+    ]);
+
+    // TODO: check email are sent when NotifyEstablishmentOfContactRequest use case is implemented
+    // await eventCrawler.processEvents();
+    // const expectedEmail: TemplatedEmail = {
+    //   type: "",
+    //   recipients: [],
+    // };
+    // expect(reposAndGateways.email.getSentEmails()).toEqual([expectedEmail]);
   });
 
   test("fails with 404 for unknown immersion offers", async () => {
