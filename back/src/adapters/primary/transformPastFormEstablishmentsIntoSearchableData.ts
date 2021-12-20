@@ -81,7 +81,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       sequenceRunner,
       new TestUuidGenerator(),
     );
-  const AllIdsResult = await clientOrigin.query(
+  const allIdsResult = await clientOrigin.query(
     "WITH siretInFormEstablishment AS ( \
     SELECT DISTINCT siret::text \
       FROM   form_establishments\
