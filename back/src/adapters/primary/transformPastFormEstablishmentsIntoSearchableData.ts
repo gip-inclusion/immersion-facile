@@ -90,7 +90,6 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     SELECT * FROM public.form_establishments WHERE siret IN \
     ((SELECT siret FROM siretInFormEstablishment) EXCEPT (SELECT siret FROM siretFromFormInImmersionOffer))",
   );
-  console.log(AllIdsResult.rows);
   for (let pas = 0; pas < AllIdsResult.rows.length; pas++) {
     const formEstablishmentDto = {
       id: AllIdsResult.rows[pas].id,
