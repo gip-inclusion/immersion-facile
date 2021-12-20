@@ -79,12 +79,12 @@ export class UncompleteEstablishmentEntity {
         extraEstablishmentInfo.etablissements[0].uniteLegale
           .trancheEffectifsUniteLegale;
 
-      if (!trancheEffectifsUniteLegale || trancheEffectifsUniteLegale == "NN") {
-        this.props.numberEmployeesRange = -1;
-      } else if (trancheEffectifsUniteLegale) {
+      if (trancheEffectifsUniteLegale && trancheEffectifsUniteLegale !== "NN") {
         this.props.numberEmployeesRange = <TefenCode>(
           +trancheEffectifsUniteLegale
         );
+      } else {
+        this.props.numberEmployeesRange = -1;
       }
 
       return extraEstablishmentInfo;
@@ -113,7 +113,8 @@ export class UncompleteEstablishmentEntity {
     if (
       !this.props.position ||
       !this.props.naf ||
-      !this.props.numberEmployeesRange
+      this.props.numberEmployeesRange === undefined ||
+      this.props.numberEmployeesRange === -1
     ) {
       logger.warn(
         { props: this.props },

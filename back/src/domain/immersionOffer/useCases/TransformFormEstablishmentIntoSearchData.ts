@@ -1,6 +1,6 @@
 import {
   FormEstablishmentDto,
-  formEstablishmentSchema,
+  formEstablishmentSchema
 } from "../../../shared/FormEstablishmentDto";
 import { createLogger } from "../../../utils/logger";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
@@ -9,16 +9,16 @@ import { UseCase } from "../../core/UseCase";
 import { RomeGateway } from "../../rome/ports/RomeGateway";
 import {
   SireneRepository,
-  SireneRepositoryAnswer,
+  SireneRepositoryAnswer
 } from "../../sirene/ports/SireneRepository";
 import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
-  TefenCode,
+  TefenCode
 } from "../entities/EstablishmentAggregate";
 import {
   ContactEntityV2,
-  ImmersionOfferEntityV2,
+  ImmersionOfferEntityV2
 } from "../entities/ImmersionOfferEntity";
 import { AdresseAPI } from "../ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
@@ -65,7 +65,12 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
     const numberEmployeesRange =
       inferNumberEmployeesRangeFromSireneAnswer(sireneRepoAnswer);
 
-    if (!naf || !numberEmployeesRange || !position) {
+    if (
+      !naf ||
+      !position ||
+      numberEmployeesRange === undefined ||
+      numberEmployeesRange == -1
+    ) {
       logger.error(
         `Some field from siren gateway are missing for establishment with siret ${establishmentSiret}`,
       );
@@ -152,5 +157,6 @@ const inferNumberEmployeesRangeFromSireneAnswer = (
   const tefenCode =
     sireneRepoAnswer.etablissements[0].uniteLegale.trancheEffectifsUniteLegale;
 
-  return !tefenCode || tefenCode == "NN" ? -1 : <TefenCode>+tefenCode;
+  if (tefenCode && tefenCode != "NN") return <TefenCode>+tefenCode;
+  return -1;
 };

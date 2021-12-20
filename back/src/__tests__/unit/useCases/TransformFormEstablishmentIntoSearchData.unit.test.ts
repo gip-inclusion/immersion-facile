@@ -135,4 +135,29 @@ describe("Transform FormEstablishment into search data", () => {
       repoEstablishmentAggregate.immersionOffers.map((offer) => offer.rome),
     ).toEqual(expected.offerRomes);
   };
+
+  it("correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {
+    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
+    const establishmentFromApi =
+      getEstablishmentFromSireneApi(formEstablishment);
+
+    inMemorySireneRepository.setEstablishment({
+      ...establishmentFromApi,
+      uniteLegale: {
+        ...establishmentFromApi.uniteLegale,
+        trancheEffectifsUniteLegale: "00",
+      },
+    });
+
+    await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
+
+    const establishmentAggregate =
+      await inMemoryImmersionOfferRepository.getEstablishmentFromSiret(
+        formEstablishment.siret,
+      );
+    expect(establishmentAggregate).toBeDefined();
+    expect(establishmentAggregate?.establishment.numberEmployeesRange).toEqual(
+      0,
+    );
+  });
 });
