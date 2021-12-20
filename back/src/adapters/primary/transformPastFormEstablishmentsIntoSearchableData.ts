@@ -90,16 +90,16 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     SELECT * FROM public.form_establishments WHERE siret IN \
     ((SELECT siret FROM siretInFormEstablishment) EXCEPT (SELECT siret FROM siretFromFormInImmersionOffer))",
   );
-  for (let pas = 0; pas < AllIdsResult.rows.length; pas++) {
+  for (const row of allIdsResult.rows) {
     const formEstablishmentDto = {
-      id: AllIdsResult.rows[pas].id,
-      siret: AllIdsResult.rows[pas].siret,
-      businessName: AllIdsResult.rows[pas].business_name,
-      businessAddress: AllIdsResult.rows[pas].business_address,
-      naf: AllIdsResult.rows[pas].naf,
-      professions: AllIdsResult.rows[pas].professions,
-      businessContacts: AllIdsResult.rows[pas].business_contacts,
-      preferredContactMethods: AllIdsResult.rows[pas].preferred_contact_methods,
+      id: row.id,
+      siret: row.siret,
+      businessName: row.business_name,
+      businessAddress: row.business_address,
+      naf: row.naf,
+      professions: row.professions,
+      businessContacts: row.business_contacts,
+      preferredContactMethods: row.preferred_contact_methods,
     };
     await transformFormEstablishmentIntoSearchData._execute(
       formEstablishmentDto,
