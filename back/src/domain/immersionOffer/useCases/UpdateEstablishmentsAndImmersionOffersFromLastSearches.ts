@@ -1,18 +1,30 @@
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { SireneRepository } from "../../sirene/ports/SireneRepository";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import {
+  SireneRepository,
+  SireneRepositoryAnswer,
+} from "../../sirene/ports/SireneRepository";
+import {
+  EstablishmentAggregate,
+  EstablishmentEntityV2,
+  TefenCode,
+} from "../entities/EstablishmentAggregate";
 import { SearchParams } from "../entities/SearchParams";
-import { UncompleteEstablishmentEntity } from "../entities/UncompleteEstablishmentEntity";
 import { AdresseAPI } from "../ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaBonneBoiteAPI, LaBonneBoiteCompany } from "../ports/LaBonneBoiteAPI";
-import { LaPlateformeDeLInclusionAPI } from "../ports/LaPlateformeDeLInclusionAPI";
+import {
+  LaPlateformeDeLInclusionAPI,
+  LaPlateformeDeLInclusionResult,
+} from "../ports/LaPlateformeDeLInclusionAPI";
 import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
 
 const logger = createLogger(__filename);
 
+class ExternalApiError extends Error {}
+
+const scoreForLaPlateFormeDeLInclusionOffer = 6; // This is arbitraty /!\
 export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   public readonly stats = new PipelineStats(this.constructor.name);
 
@@ -39,7 +51,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       searchesMade.length,
     );
 
-    for (let searchParams of searchesMade) {
+    for (const searchParams of searchesMade) {
       await this.processSearchMade(searchParams);
     }
   }
@@ -50,146 +62,203 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     this.stats.startAggregateTimer("process_search_made-latency");
 
     // Check if we have potential immersions in our available databases.
-    const establishments = await this.search(searchParams);
+    const establishmentAggregates = await this.search(searchParams);
 
-    // Transform them into immersions.
-    const immersions = establishments.flatMap((establishment) =>
-      establishment.extractImmersions(),
-    );
+    const nbOfOffers = establishmentAggregates
+      .map((aggregate) => aggregate.immersionOffers.length)
+      .reduce((accumulator, curr) => accumulator + curr);
 
     logger.info(
       { searchParams },
-      `Search yielded ${establishments.length} establishments and ` +
-        `${immersions.length} immersions to insert.`,
+      `Search yielded ${establishmentAggregates.length} establishments and ` +
+        `${nbOfOffers} immersions to insert.`,
     );
 
     // Insert the establishments and immersions in the database.
-    if (establishments.length > 0) {
-      await this.immersionOfferRepository.insertEstablishments(establishments);
+    if (establishmentAggregates.length > 0) {
+      await this.immersionOfferRepository.insertEstablishmentAggregates(
+        establishmentAggregates,
+      );
       this.stats.recordSample(
         "pg-establishments-rows_inserted",
-        establishments.length,
+        establishmentAggregates.length,
       );
     }
-    if (immersions.length > 0) {
-      await this.immersionOfferRepository.insertImmersions(immersions);
-      this.stats.recordSample(
-        "pg-immersion_offers-rows_inserted",
-        immersions.length,
-      );
-    }
+
     this.stats.stopAggregateTimer("process_search_made-latency");
     this.stats.incCounter("process_search_made-success");
   }
 
   private async search(
     searchParams: SearchParams,
-  ): Promise<EstablishmentEntity[]> {
+  ): Promise<EstablishmentAggregate[]> {
     this.stats.incCounter("search-total");
 
     // TODO(nsw): Parallelize once we have request throttling.
     return [
       await this.searchInternal(
-        () => this.searchLaBonneBoite(searchParams),
+        () => this.searchLaPlateformeDeLInclusion(searchParams),
         "search-la_plateforme_de_l_inclusion",
       ),
       await this.searchInternal(
-        () => this.searchLaPlateformeDeLInclusion(searchParams),
+        () => this.searchLaBonneBoite(searchParams),
         "search-la_bonne_boite",
       ),
     ].flat();
   }
 
   private async searchInternal(
-    searchFn: () => Promise<UncompleteEstablishmentEntity[]>,
+    searchFn: () => Promise<EstablishmentAggregate[]>,
     counterNamePrefix: string,
-  ): Promise<EstablishmentEntity[]> {
+  ): Promise<EstablishmentAggregate[]> {
     this.stats.startAggregateTimer(`${counterNamePrefix}-latency`);
-    const uncompleteEstablishments = await searchFn();
+    const establishments = await searchFn();
     this.stats.stopAggregateTimer(`${counterNamePrefix}-latency`);
 
     this.stats.recordSample(
       `${counterNamePrefix}-establishments_found`,
-      uncompleteEstablishments.length,
+      establishments.length,
     );
-
-    const usableEstablishments = await this.populateMissingFields(
-      uncompleteEstablishments,
-    );
-    this.stats.recordSample(
-      `${counterNamePrefix}-establishments_used`,
-      usableEstablishments.length,
-    );
-    this.stats.recordSample(
-      `${counterNamePrefix}-establishments_skipped`,
-      uncompleteEstablishments.length - usableEstablishments.length,
-    );
-
-    return usableEstablishments;
-  }
-
-  private async populateMissingFields(
-    uncompleteEstablishments: UncompleteEstablishmentEntity[],
-  ): Promise<EstablishmentEntity[]> {
-    const completeEstablishments: EstablishmentEntity[] = [];
-
-    // TODO(nsw): Parallelize once we have request throttling.
-    for (let uncompleteEstablishment of uncompleteEstablishments) {
-      this.stats.startAggregateTimer("search_for_missing_fields-latency");
-      const completeEstablishment =
-        await uncompleteEstablishment.searchForMissingFields(
-          this.adresseAPI,
-          this.sireneRepository,
-        );
-      this.stats.stopAggregateTimer("search_for_missing_fields-latency");
-      if (completeEstablishment)
-        completeEstablishments.push(completeEstablishment);
-    }
-    return completeEstablishments;
+    return establishments;
   }
 
   private async searchLaBonneBoite(
     searchParams: SearchParams,
-  ): Promise<UncompleteEstablishmentEntity[]> {
+  ): Promise<EstablishmentAggregate[]> {
     try {
-      const laBonneBoiteResponse = await this.laBonneBoiteAPI.searchCompanies(
+      const laBonneBoiteCompanies = await this.laBonneBoiteAPI.searchCompanies(
         searchParams,
       );
+      const laBonneBoiteReleventCompanies = laBonneBoiteCompanies.filter(
+        (company) => this.keepRelevantCompanies(searchParams.rome, company.naf),
+      );
 
-      return laBonneBoiteResponse
-        .filter((company) =>
-          this.keepRelevantCompanies(searchParams.rome, company),
-        )
-        .map(
-          (company) =>
-            new UncompleteEstablishmentEntity({
-              id: this.uuidGenerator.new(),
-              address: company.address,
-              position: { lat: company.lat, lon: company.lon },
-              naf: company.naf,
-              name: company.name,
-              siret: company.siret,
-              score: company.stars,
-              voluntaryToImmersion: false,
-              romes: [company.matched_rome_code],
-              dataSource: "api_labonneboite",
-            }),
-        );
+      // Todo : Eventually use a sequenceRunner or parallelize
+      const establishmentAggregates: EstablishmentAggregate[] = [];
+      for (const laBonneBoiteCompany of laBonneBoiteReleventCompanies) {
+        const establishmentAggregate =
+          await this.convertLaBonneBoiteCompanyToEstablishmentAggregate(
+            laBonneBoiteCompany,
+          );
+        if (establishmentAggregate !== null)
+          establishmentAggregates.push(establishmentAggregate);
+      }
+      return establishmentAggregates;
     } catch (error: any) {
+      logger.warn("Error in searchLaBonneBoite: ", error);
       return [];
     }
   }
 
+  private async convertLaBonneBoiteCompanyToEstablishmentAggregate(
+    laBonneBoiteCompany: LaBonneBoiteCompany,
+  ): Promise<EstablishmentAggregate | null> {
+    const sireneAnswer = await this.sireneRepository.get(
+      laBonneBoiteCompany.siret,
+    );
+    if (!sireneAnswer) {
+      logger.warn(
+        `Could not find LaBonneBoite company with siret ${laBonneBoiteCompany.siret} in Siren Gateway`,
+      );
+      return null;
+    }
+
+    const naf = inferNafFromSireneAnswer(sireneAnswer);
+    const numberEmployeesRange =
+      inferNumberEmployeesRangeFromSireneAnswer(sireneAnswer);
+
+    const establishment: EstablishmentEntityV2 = {
+      address: laBonneBoiteCompany.address,
+      position: {
+        lat: laBonneBoiteCompany.lat,
+        lon: laBonneBoiteCompany.lon,
+      },
+      naf: laBonneBoiteCompany.naf ?? naf,
+      dataSource: "api_labonneboite",
+      numberEmployeesRange,
+      name: laBonneBoiteCompany.name,
+      siret: laBonneBoiteCompany.siret,
+      voluntaryToImmersion: false,
+    };
+
+    const establishmentAggregate: EstablishmentAggregate = {
+      establishment,
+
+      immersionOffers: [
+        {
+          id: this.uuidGenerator.new(),
+          rome: laBonneBoiteCompany.matched_rome_code,
+          score: laBonneBoiteCompany.stars,
+        },
+      ],
+      contacts: [],
+    };
+    return establishmentAggregate;
+  }
+
+  private async convertLaPlateformeDeLInclusionResultToEstablishment(
+    laPlateFormeDeLInclusionResult: LaPlateformeDeLInclusionResult,
+  ): Promise<EstablishmentAggregate | null> {
+    const siret = laPlateFormeDeLInclusionResult.siret;
+
+    const { addresse_ligne_1, addresse_ligne_2, code_postal, ville } =
+      laPlateFormeDeLInclusionResult;
+
+    const sireneAnswer = await this.sireneRepository.get(siret);
+
+    if (!sireneAnswer)
+      throw new ExternalApiError(
+        `Could not find La Plateforme de L'Inclusion company with siret ${siret} in Siren Gateway`,
+      );
+
+    const naf = inferNafFromSireneAnswer(sireneAnswer);
+    const numberEmployeesRange =
+      inferNumberEmployeesRangeFromSireneAnswer(sireneAnswer);
+
+    if (!naf)
+      throw new ExternalApiError(
+        `Could not retrieve naf from siret ${siret}. `,
+      );
+
+    const address = `${addresse_ligne_1} ${addresse_ligne_2} ${code_postal} ${ville}`;
+    const position = await this.adresseAPI.getPositionFromAddress(address);
+    if (!position)
+      throw new ExternalApiError(
+        `Could not retrieve position from address ${address}. Hence, cannot add establishment with siret ${siret}`,
+      );
+
+    const establishment: EstablishmentEntityV2 = {
+      address,
+      voluntaryToImmersion: false,
+      siret,
+      dataSource: "api_laplateformedelinclusion",
+      name: laPlateFormeDeLInclusionResult.enseigne,
+      numberEmployeesRange,
+      position,
+      naf,
+    };
+    const establishmentAggregate: EstablishmentAggregate = {
+      establishment,
+      contacts: [],
+      immersionOffers: laPlateFormeDeLInclusionResult.postes.map((poste) => ({
+        id: this.uuidGenerator.new(),
+        rome: poste.rome,
+        score: scoreForLaPlateFormeDeLInclusionOffer,
+      })),
+    };
+    return establishmentAggregate;
+  }
+
   private keepRelevantCompanies(
     romeSearched: string,
-    company: LaBonneBoiteCompany,
+    companyNaf: string,
   ): boolean {
     if (
-      (company.naf.startsWith("9609") && romeSearched == "A1408") ||
-      (company.naf == "XXXXX" && romeSearched == "A1503") ||
-      (company.naf == "5610C" && romeSearched == "D1102") ||
-      (company.naf.startsWith("8411") && romeSearched == "D1202") ||
-      (company.naf.startsWith("8411") &&
+      (companyNaf.startsWith("9609") && romeSearched == "A1408") ||
+      (companyNaf == "XXXXX" && romeSearched == "A1503") ||
+      (companyNaf == "5610C" && romeSearched == "D1102") ||
+      (companyNaf.startsWith("8411") && romeSearched == "D1202") ||
+      (companyNaf.startsWith("8411") &&
         [
           "D1202",
           "G1404",
@@ -204,41 +273,47 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           "G1803",
         ].indexOf(romeSearched) > -1)
     ) {
-      logger.info({ company }, "Not relevant, discarding.");
+      logger.info({ company: companyNaf }, "Not relevant, discarding.");
       return false;
     } else {
-      logger.debug({ company }, "Relevant.");
+      logger.debug({ company: companyNaf }, "Relevant.");
       return true;
     }
   }
 
   private async searchLaPlateformeDeLInclusion(
     searchParams: SearchParams,
-  ): Promise<UncompleteEstablishmentEntity[]> {
-    const results = await this.laPlateFormeDeLInclusionAPI.getResults(
-      searchParams,
-    );
-    return results.map(
-      (result) =>
-        new UncompleteEstablishmentEntity({
-          id: this.uuidGenerator.new(),
-          address: [
-            result.addresse_ligne_1,
-            result.addresse_ligne_2,
-            result.code_postal,
-            result.ville,
-          ]
-            .filter((el) => !!el)
-            .join(" "),
-          score: 6,
-          voluntaryToImmersion: false,
-          romes: result.postes.map((poste) =>
-            poste.rome.substring(poste.rome.length - 6, poste.rome.length - 1),
-          ),
-          siret: result.siret,
-          dataSource: "api_laplateformedelinclusion",
-          name: result.enseigne,
-        }),
-    );
+  ): Promise<EstablishmentAggregate[]> {
+    const laPlateFormeDeLInclusionResults =
+      await this.laPlateFormeDeLInclusionAPI.getResults(searchParams);
+
+    // Todo : Eventually use a sequenceRunner or parallelize
+    const establishmentAggregates: EstablishmentAggregate[] = [];
+    for (const laPlateFormeDeLInclusionResult of laPlateFormeDeLInclusionResults) {
+      const establishmentAggregate =
+        await this.convertLaPlateformeDeLInclusionResultToEstablishment(
+          laPlateFormeDeLInclusionResult,
+        );
+
+      if (establishmentAggregate !== null)
+        establishmentAggregates.push(establishmentAggregate);
+    }
+    return establishmentAggregates;
   }
 }
+
+// Those will probably be shared in a utils/helpers folder
+const inferNafFromSireneAnswer = (sireneRepoAnswer: SireneRepositoryAnswer) =>
+  sireneRepoAnswer.etablissements[0].uniteLegale.activitePrincipaleUniteLegale?.replace(
+    ".",
+    "",
+  );
+
+const inferNumberEmployeesRangeFromSireneAnswer = (
+  sireneRepoAnswer: SireneRepositoryAnswer,
+): TefenCode => {
+  const tefenCode =
+    sireneRepoAnswer.etablissements[0].uniteLegale.trancheEffectifsUniteLegale;
+
+  return !tefenCode || tefenCode == "NN" ? -1 : <TefenCode>+tefenCode;
+};

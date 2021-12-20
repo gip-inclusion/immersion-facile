@@ -66,7 +66,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
     ]);
     adresseAPI.setNextPosition({ lat: 49.119146, lon: 6.17602 });
 
-    // prepare
+    // Prepare
     const search: SearchParams = {
       rome: "A1203",
       distance_km: 10.0,
@@ -75,20 +75,53 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
     };
     searchesMadeRepository.setSearchesMade([search]);
 
-    // act
+    // Act
     await updateEstablishmentsAndImmersionOffersFromLastSearches.execute();
 
+    // Expect that no new searches are retrieved
+    // Note : This assertion is confusing because it's highly dependent on how the  in-memory adapter...
+    // Real problem is : we should have two method : one reading (getNextUnprocessedSearchMade),
+    // the other writing ("setSearchMadeAsProcessed").
     expect(searchesMadeRepository.searchesMade).toHaveLength(0);
 
-    //We expect to find the immersion in results
-    const immersionOffersInRepo = immersionOfferRepository.immersionOffers;
+    // We expect to find the establishments in results
+    const establishmentAggregatesInRepo =
+      immersionOfferRepository.establishmentAggregates;
 
-    expect(immersionOffersInRepo).toHaveLength(4);
+    expect(establishmentAggregatesInRepo).toHaveLength(2);
+
+    // 1 establishment from la plateforme de l'inclusion with 3 offers, no contact.
+    const establishmentAggregateFromLaPlateformeDeLinclusionInRepo =
+      establishmentAggregatesInRepo.find(
+        (aggregate) =>
+          aggregate.establishment.dataSource === "api_laplateformedelinclusion",
+      );
+    expect(
+      establishmentAggregateFromLaPlateformeDeLinclusionInRepo,
+    ).toBeDefined();
 
     expect(
-      immersionOffersInRepo.filter(
-        (immersionOffer) => immersionOffer.getRome() === "M1607",
-      ),
-    ).toHaveLength(2);
+      establishmentAggregateFromLaPlateformeDeLinclusionInRepo?.immersionOffers,
+    ).toHaveLength(3);
+
+    expect(
+      establishmentAggregateFromLaPlateformeDeLinclusionInRepo?.contacts,
+    ).toHaveLength(0);
+
+    // 1 offer from la bonne boite with 1 offer, no contact.
+    const establishmentAggregateFromLaBonneBoiteInRepo =
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      establishmentAggregatesInRepo.find(
+        (aggregate) =>
+          aggregate.establishment.dataSource === "api_labonneboite",
+      )!;
+
+    expect(establishmentAggregateFromLaBonneBoiteInRepo).toBeDefined();
+    expect(
+      establishmentAggregateFromLaBonneBoiteInRepo.immersionOffers,
+    ).toHaveLength(1);
+    expect(establishmentAggregateFromLaBonneBoiteInRepo.contacts).toHaveLength(
+      0,
+    );
   });
 });

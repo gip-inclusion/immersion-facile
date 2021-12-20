@@ -189,6 +189,9 @@ export class InMemoryImmersionOfferRepository
   get establishmentContacts() {
     return Object.values(this._establishmentContacts);
   }
+  get establishmentAggregates() {
+    return Object.values(this._establishmentAggregates);
+  }
 }
 
 // Takes two coordinates (in degrees) and returns distance in meters.
