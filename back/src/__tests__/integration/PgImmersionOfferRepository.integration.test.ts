@@ -9,9 +9,12 @@ import {
   SearchContact,
   SearchImmersionResultDto,
 } from "../../shared/SearchImmersionDto";
+import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../_testBuilders/EstablishmentEntityBuilder";
+import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { EstablishmentAggregateBuilder } from "./../../_testBuilders/EstablishmentAggregateBuilder";
+import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 describe("Postgres implementation of immersion offer repository", () => {
   let pool: Pool;
@@ -269,6 +272,116 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
+  describe("getEstablishmentByImmersionOfferId", () => {
+    test("fetches existing establishment", async () => {
+      const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
+      const storedEstablishment = new EstablishmentEntityV2Builder().build();
+      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(storedEstablishment)
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withId(immersionOfferId)
+              .build(),
+          ])
+          .build(),
+      ]);
+      const establishment =
+        await pgImmersionOfferRepository.getEstablishmentByImmersionOfferId(
+          immersionOfferId,
+        );
+      expect(establishment).toEqual(storedEstablishment);
+    });
+
+    test("returns undefined for missing establishment", async () => {
+      const missingOfferId = "82e37a80-eb0b-4de6-a531-68d30af7887a";
+      expect(
+        await pgImmersionOfferRepository.getEstablishmentByImmersionOfferId(
+          missingOfferId,
+        ),
+      ).toBeUndefined();
+    });
+  });
+
+  describe("getContactByImmersionOfferId", () => {
+    test("fetches existing contact", async () => {
+      const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
+      const storedContact = new ContactEntityV2Builder().build();
+      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(new EstablishmentEntityV2Builder().build())
+          .withContacts([storedContact])
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withId(immersionOfferId)
+              .build(),
+          ])
+          .build(),
+      ]);
+      const contact =
+        await pgImmersionOfferRepository.getContactByImmersionOfferId(
+          immersionOfferId,
+        );
+      expect(contact).toEqual(storedContact);
+    });
+
+    test("returns undefined for offer without contact", async () => {
+      const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
+      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(new EstablishmentEntityV2Builder().build())
+          .withContacts([]) // no contact
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withId(immersionOfferId)
+              .build(),
+          ])
+          .build(),
+      ]);
+      expect(
+        await pgImmersionOfferRepository.getContactByImmersionOfferId(
+          immersionOfferId,
+        ),
+      ).toBeUndefined();
+    });
+
+    test("returns undefined for missing offer", async () => {
+      const missingOfferId = "82e37a80-eb0b-4de6-a531-68d30af7887a";
+      expect(
+        await pgImmersionOfferRepository.getContactByImmersionOfferId(
+          missingOfferId,
+        ),
+      ).toBeUndefined();
+    });
+  });
+
+  describe("getImmersionOfferById", () => {
+    test("fetches existing offer", async () => {
+      const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
+      const storedImmersionOffer = new ImmersionOfferEntityV2Builder()
+        .withId(immersionOfferId)
+        .build();
+      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(new EstablishmentEntityV2Builder().build())
+          .withImmersionOffers([storedImmersionOffer])
+          .build(),
+      ]);
+      const immersionOffer =
+        await pgImmersionOfferRepository.getImmersionOfferById(
+          immersionOfferId,
+        );
+      expect(immersionOffer).toEqual(storedImmersionOffer);
+    });
+
+    test("returns undefined for missing offer", async () => {
+      const missingOfferId = "82e37a80-eb0b-4de6-a531-68d30af7887a";
+      expect(
+        await pgImmersionOfferRepository.getImmersionOfferById(missingOfferId),
+      ).toBeUndefined();
+    });
+  });
+
   test("Insert establishments & immersions and retrieves them back", async () => {
     await pgImmersionOfferRepository.insertEstablishments([
       new EstablishmentEntity({
@@ -475,44 +588,3 @@ describe("Postgres implementation of immersion offer repository", () => {
       .query("SELECT * FROM establishments WHERE siret=$1", [siret])
       .then((res) => res.rows);
 });
-
-const populateWithImmersionSearches = async (
-  pgImmersionOfferRepository: PgImmersionOfferRepository,
-) => {
-  await pgImmersionOfferRepository.insertSearch({
-    rome: "M1607",
-    distance_km: 30,
-    lat: 49.119146,
-    lon: 6.17602,
-  });
-  await pgImmersionOfferRepository.insertSearch({
-    rome: "M1607",
-    distance_km: 30,
-    lat: 48.119146,
-    lon: 6.17602,
-  });
-  await pgImmersionOfferRepository.insertSearch({
-    rome: "M1607",
-    distance_km: 30,
-    lat: 48.119146,
-    lon: 5.17602,
-  });
-  await pgImmersionOfferRepository.insertSearch({
-    rome: "M1607",
-    distance_km: 30,
-    lat: 48.119146,
-    lon: 4.17602,
-  });
-  await pgImmersionOfferRepository.insertSearch({
-    rome: "M1607",
-    distance_km: 30,
-    lat: 48.129146,
-    lon: 4.17602,
-  });
-  await pgImmersionOfferRepository.insertSearch({
-    rome: "M1608",
-    distance_km: 30,
-    lat: 48.129146,
-    lon: 4.17602,
-  });
-};

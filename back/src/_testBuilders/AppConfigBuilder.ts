@@ -39,6 +39,13 @@ export class AppConfigBuilder implements Builder<AppConfig> {
     });
   }
 
+  public withAuthorizedApiKeyIds(authorizedApiKeyIds: string[]) {
+    return new AppConfigBuilder({
+      ...this.configParams,
+      AUTHORIZED_API_KEY_IDS: authorizedApiKeyIds.join(","),
+    });
+  }
+
   public build() {
     return AppConfig.createFromEnv(/* readDotEnv= */ false, this.configParams);
   }

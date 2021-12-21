@@ -1,17 +1,31 @@
+import { getUnixTime } from "date-fns";
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { makeGenerateJwt } from "../../domain/auth/jwt";
 import { SearchImmersionResultDto } from "../../shared/SearchImmersionDto";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { RealClock } from "./../../adapters/secondary/core/ClockImplementations";
+import { GenerateApiConsumerJtw } from "./../../domain/auth/jwt";
+
+const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
 
 describe("/get-immersion-by-id route", () => {
+  let clock = new RealClock();
+
   let request: SuperTest<Test>;
+  let generateJwt: GenerateApiConsumerJtw;
 
   beforeEach(async () => {
-    const { app } = await createApp(new AppConfigBuilder().build());
+    const config = new AppConfigBuilder()
+      .withRepositories("IN_MEMORY")
+      .withAuthorizedApiKeyIds([authorizedApiKeyId])
+      .build();
+    const { app } = await createApp(config);
+    generateJwt = makeGenerateJwt(config);
     request = supertest(app);
   });
 
-  test("accepts valid requests", async () => {
+  test("accepts valid unauthenticated requests", async () => {
     const expectedResult: SearchImmersionResultDto = {
       id: "13df03a5-a2a5-430a-b558-ed3e2f03512d",
       rome: "M1907",
@@ -22,7 +36,6 @@ describe("/get-immersion-by-id route", () => {
       location: { lat: 35, lon: 50 },
       address: "55 rue de Faubourg Sante Honoré",
       contactMode: "EMAIL",
-      contactId: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
       romeLabel: "xxxx",
       nafLabel: "xxxx",
       city: "xxxx",
@@ -30,6 +43,43 @@ describe("/get-immersion-by-id route", () => {
 
     await request
       .get("/get-immersion-by-id/13df03a5-a2a5-430a-b558-ed3e2f03512d")
+      .expect(200, expectedResult);
+  });
+
+  test("accepts valid authenticated requests", async () => {
+    const expectedResult: SearchImmersionResultDto = {
+      id: "13df03a5-a2a5-430a-b558-ed3e2f03512d",
+      rome: "M1907",
+      naf: "8539A",
+      siret: "78000403200019",
+      name: "Company inside repository",
+      voluntaryToImmersion: false,
+      location: { lat: 35, lon: 50 },
+      address: "55 rue de Faubourg Sante Honoré",
+      contactMode: "EMAIL",
+      contactDetails: {
+        id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
+        lastName: "Prost",
+        firstName: "Alain",
+        email: "alain.prost@email.fr",
+        phone: "0612345678",
+        role: "le big boss",
+      },
+      romeLabel: "xxxx",
+      nafLabel: "xxxx",
+      city: "xxxx",
+    };
+
+    const authToken = generateJwt({
+      id: authorizedApiKeyId,
+      consumer: "testConsumer",
+      iat: getUnixTime(clock.now()),
+      exp: getUnixTime(clock.now()) + 600,
+    });
+
+    await request
+      .get("/get-immersion-by-id/13df03a5-a2a5-430a-b558-ed3e2f03512d")
+      .set("Authorization", authToken)
       .expect(200, expectedResult);
   });
 

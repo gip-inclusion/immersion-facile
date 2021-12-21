@@ -13,7 +13,9 @@ export class ImmersionOfferEntityV2Builder
   constructor(
     private readonly entity: ImmersionOfferEntityV2 = validImmersionOfferEntityV2,
   ) {}
-
+  withId(id: string) {
+    return new ImmersionOfferEntityV2Builder({ ...this.entity, id });
+  }
   build() {
     return this.entity;
   }

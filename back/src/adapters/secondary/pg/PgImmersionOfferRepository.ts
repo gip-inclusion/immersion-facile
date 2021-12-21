@@ -1,16 +1,22 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { EstablishmentAggregate } from "../../../domain/immersionOffer/entities/EstablishmentAggregate";
+import {
+  EstablishmentAggregate,
+  EstablishmentEntityV2,
+} from "../../../domain/immersionOffer/entities/EstablishmentAggregate";
 import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
+  ContactEntityV2,
   ImmersionEstablishmentContact,
   ImmersionOfferEntity,
+  ImmersionOfferEntityV2,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import { Position } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import {
+  ImmersionOfferId,
   SearchContact,
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
@@ -32,6 +38,12 @@ const pgContactToContactMethod = Object.fromEntries(
     method,
   ]),
 ) as Record<PgContactMethod, KnownContactMethod>;
+
+const parseContactMethod = (raw: string): ContactMethod => {
+  const pgContactMethod = raw as PgContactMethod;
+  if (pgContactMethod == null) return "UNKNOWN";
+  return pgContactToContactMethod[pgContactMethod];
+};
 
 const parseGeoJson = (raw: string): Position => {
   const json = JSON.parse(raw);
@@ -443,13 +455,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       };
     }
 
-    const pgContactMode = result.establishment_contact_mode as PgContactMethod;
-
-    const contactMode: ContactMethod =
-      pgContactMode !== null
-        ? pgContactToContactMethod[pgContactMode]
-        : "UNKNOWN";
-
     const contactId = immersionContact ? immersionContact.id : undefined;
 
     return {
@@ -461,7 +466,9 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       voluntaryToImmersion: result.voluntary_to_immersion,
       address: result.establishment_address,
       contactId,
-      contactMode,
+      contactMode:
+        result.establishment_contact_mode &&
+        parseContactMethod(result.establishment_contact_mode),
       location: result.position && parseGeoJson(result.position),
       distance_m: Math.round(result.distance_m),
       city: "xxxx",
@@ -469,6 +476,100 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       romeLabel: "xxxx",
       ...(withContactDetails &&
         immersionContact && { contactDetails: immersionContact }),
+    };
+  }
+  async getEstablishmentByImmersionOfferId(
+    immersionOfferId: ImmersionOfferId,
+  ): Promise<EstablishmentEntityV2 | undefined> {
+    const query = format(
+      `SELECT
+        establishments.siret,
+        establishments.name,
+        establishments.address,
+        immersion_offers.voluntary_to_immersion,
+        establishments.data_source,
+        establishments.contact_mode,
+        st_asgeojson(establishments.gps) as position,
+        establishments.naf,
+        establishments.number_employees
+      FROM
+        establishments
+        JOIN immersion_offers
+          ON (immersion_offers.siret = establishments.siret)
+      WHERE
+        immersion_offers.uuid = %L`,
+      immersionOfferId,
+    );
+
+    const pgResult = await this.client.query(query);
+    const row = pgResult.rows[0];
+
+    if (!row) return;
+    return {
+      siret: row.siret,
+      name: row.name,
+      address: row.address,
+      voluntaryToImmersion: row.voluntary_to_immersion,
+      dataSource: row.data_source,
+      contactMethod: row.contact_mode && parseContactMethod(row.contact_mode),
+      position: row.position && parseGeoJson(row.position),
+      naf: row.naf,
+      numberEmployeesRange: row.number_employees,
+    };
+  }
+
+  async getContactByImmersionOfferId(
+    immersionOfferId: ImmersionOfferId,
+  ): Promise<ContactEntityV2 | undefined> {
+    const query = format(
+      `SELECT
+        immersion_contacts.uuid,
+        immersion_contacts.name,
+        immersion_contacts.firstname,
+        immersion_contacts.email,
+        immersion_contacts.role,
+        immersion_contacts.phone
+      FROM
+        immersion_contacts
+        JOIN immersion_offers
+          ON (immersion_offers.siret = immersion_contacts.siret_establishment)
+      WHERE
+        immersion_offers.uuid = %L`,
+      immersionOfferId,
+    );
+
+    const pgResult = await this.client.query(query);
+    const row = pgResult.rows[0];
+
+    if (!row) return;
+    return {
+      id: row.uuid,
+      lastName: row.name,
+      firstName: row.firstname,
+      email: row.email,
+      job: row.role,
+      phone: row.phone,
+    };
+  }
+
+  async getImmersionOfferById(
+    immersionOfferId: ImmersionOfferId,
+  ): Promise<ImmersionOfferEntityV2 | undefined> {
+    const query = format(
+      `SELECT uuid, rome, score
+      FROM immersion_offers
+      WHERE uuid = %L`,
+      immersionOfferId,
+    );
+
+    const pgResult = await this.client.query(query);
+    const row = pgResult.rows[0];
+
+    if (!row) return;
+    return {
+      id: row.uuid,
+      rome: row.rome,
+      score: row.score,
     };
   }
 }

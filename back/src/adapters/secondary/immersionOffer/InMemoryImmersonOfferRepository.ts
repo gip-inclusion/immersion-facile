@@ -1,16 +1,25 @@
 import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
+  ContactEntityV2,
   ImmersionEstablishmentContact,
   ImmersionOfferEntity,
+  ImmersionOfferEntityV2,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionEstablishmentContactBuilder } from "../../../_testBuilders/ImmersionEstablishmentContactBuilder";
 import { ImmersionOfferEntityBuilder } from "../../../_testBuilders/ImmersionOfferEntityBuilder";
-import { EstablishmentAggregate } from "./../../../domain/immersionOffer/entities/EstablishmentAggregate";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import {
+  EstablishmentAggregate,
+  EstablishmentEntityV2,
+} from "./../../../domain/immersionOffer/entities/EstablishmentAggregate";
 
 const logger = createLogger(__filename);
 
@@ -28,6 +37,18 @@ const immersionOffer = new ImmersionOfferEntityBuilder()
   .withSiret(establishment.getProps().siret)
   .build();
 
+const establishmentAggregate = new EstablishmentAggregateBuilder()
+  .withEstablishment(
+    new EstablishmentEntityV2Builder()
+      .withAddress("55 rue de Faubourg Sante Honoré")
+      .withContactMode("EMAIL")
+      .build(),
+  )
+  .withImmersionOffers([
+    new ImmersionOfferEntityV2Builder().withId(validImmersionOfferId).build(),
+  ])
+  .build();
+
 export class InMemoryImmersionOfferRepository
   implements ImmersionOfferRepository
 {
@@ -35,11 +56,14 @@ export class InMemoryImmersionOfferRepository
     private _immersionOffers: {
       [id: string]: ImmersionOfferEntity;
     } = {},
+    // TODO : DO NOT ADD ENTITIES IN CONSTRUCTOR ! This can be really confusing ..
     private _establishments: { [siret: string]: EstablishmentEntity } = {},
     private _establishmentContacts: {
       [siret: string]: ImmersionEstablishmentContact;
     } = {},
-    private _establishmentAggregates: EstablishmentAggregate[] = [],
+    private _establishmentAggregates: EstablishmentAggregate[] = [
+      establishmentAggregate,
+    ],
   ) {
     this._establishments[establishment.getSiret()] = establishment;
     this._establishmentContacts[establishmentContact.siretEstablishment] =
@@ -48,7 +72,7 @@ export class InMemoryImmersionOfferRepository
   }
 
   empty() {
-    // TODO : remove this method and do not insert entities in constructor.
+    // TODO: Remove this. Do not add entities in constructor !
     this._immersionOffers = {};
     this._establishments = {};
     this._establishmentContacts = {};
@@ -63,6 +87,36 @@ export class InMemoryImmersionOfferRepository
     ];
   }
 
+  async getEstablishmentByImmersionOfferId(
+    immersionOfferId: ImmersionOfferId,
+  ): Promise<EstablishmentEntityV2 | undefined> {
+    return this._establishmentAggregates.find((aggregate) =>
+      aggregate.immersionOffers.some((offer) => offer.id === immersionOfferId),
+    )?.establishment;
+  }
+
+  async getContactByImmersionOfferId(
+    immersionOfferId: ImmersionOfferId,
+  ): Promise<ContactEntityV2 | undefined> {
+    const establishment = await this.getEstablishmentByImmersionOfferId(
+      immersionOfferId,
+    );
+    if (!establishment) return;
+    const contacts = this._establishmentAggregates.find(
+      (aggregate) => aggregate.establishment.siret == establishment?.siret,
+    )?.contacts;
+    return contacts && contacts[0];
+  }
+
+  async getImmersionOfferById(
+    immersionOfferId: ImmersionOfferId,
+  ): Promise<ImmersionOfferEntityV2 | undefined> {
+    return this._establishmentAggregates
+      .flatMap((aggregate) => aggregate.immersionOffers)
+      .find((immersionOffer) => (immersionOffer.id = immersionOfferId));
+  }
+
+  // DEPRECATED.
   async insertEstablishmentContact(
     immersionEstablishmentContact: ImmersionEstablishmentContact,
   ) {
