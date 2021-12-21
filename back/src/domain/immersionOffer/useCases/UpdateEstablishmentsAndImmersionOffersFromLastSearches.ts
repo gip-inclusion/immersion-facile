@@ -22,8 +22,6 @@ import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
 
 const logger = createLogger(__filename);
 
-class ExternalApiError extends Error {}
-
 const scoreForLaPlateFormeDeLInclusionOffer = 6; // This is arbitraty /!\
 export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   public readonly stats = new PipelineStats(this.constructor.name);
@@ -94,17 +92,18 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   ): Promise<EstablishmentAggregate[]> {
     this.stats.incCounter("search-total");
 
-    // TODO(nsw): Parallelize once we have request throttling.
-    return [
-      await this.searchInternal(
+    const establishmentAggregateLists = await Promise.all([
+      this.searchInternal(
         () => this.searchLaPlateformeDeLInclusion(searchParams),
         "search-la_plateforme_de_l_inclusion",
       ),
-      await this.searchInternal(
+      this.searchInternal(
         () => this.searchLaBonneBoite(searchParams),
         "search-la_bonne_boite",
       ),
-    ].flat();
+    ]);
+
+    return establishmentAggregateLists.flat();
   }
 
   private async searchInternal(
@@ -140,27 +139,28 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           await this.convertLaBonneBoiteCompanyToEstablishmentAggregate(
             laBonneBoiteCompany,
           );
-        if (establishmentAggregate !== null)
+        if (!!establishmentAggregate)
           establishmentAggregates.push(establishmentAggregate);
       }
       return establishmentAggregates;
     } catch (error: any) {
-      logger.warn("Error in searchLaBonneBoite: ", error);
+      logger.warn("Error in searchLaBonneBoite: " + error);
       return [];
     }
   }
 
   private async convertLaBonneBoiteCompanyToEstablishmentAggregate(
     laBonneBoiteCompany: LaBonneBoiteCompany,
-  ): Promise<EstablishmentAggregate | null> {
+  ): Promise<EstablishmentAggregate | undefined> {
     const sireneAnswer = await this.sireneRepository.get(
       laBonneBoiteCompany.siret,
     );
     if (!sireneAnswer) {
       logger.warn(
-        `Could not find LaBonneBoite company with siret ${laBonneBoiteCompany.siret} in Siren Gateway`,
+        { siret: laBonneBoiteCompany.siret },
+        "Company not found in SIRENE",
       );
-      return null;
+      return;
     }
 
     const naf = inferNafFromSireneAnswer(sireneAnswer);
@@ -198,7 +198,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
 
   private async convertLaPlateformeDeLInclusionResultToEstablishment(
     laPlateFormeDeLInclusionResult: LaPlateformeDeLInclusionResult,
-  ): Promise<EstablishmentAggregate | null> {
+  ): Promise<EstablishmentAggregate | undefined> {
     const siret = laPlateFormeDeLInclusionResult.siret;
 
     const { addresse_ligne_1, addresse_ligne_2, code_postal, ville } =
@@ -206,26 +206,29 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
 
     const sireneAnswer = await this.sireneRepository.get(siret);
 
-    if (!sireneAnswer)
-      throw new ExternalApiError(
-        `Could not find La Plateforme de L'Inclusion company with siret ${siret} in Siren Gateway`,
-      );
+    if (!sireneAnswer) {
+      logger.warn({ siret }, "Company not found in SIRENE.");
+      return;
+    }
 
     const naf = inferNafFromSireneAnswer(sireneAnswer);
     const numberEmployeesRange =
       inferNumberEmployeesRangeFromSireneAnswer(sireneAnswer);
 
-    if (!naf)
-      throw new ExternalApiError(
-        `Could not retrieve naf from siret ${siret}. `,
-      );
+    if (!naf) {
+      logger.warn({ sireneAnswer }, "Unable to retrieve NAF");
+      return;
+    }
 
     const address = `${addresse_ligne_1} ${addresse_ligne_2} ${code_postal} ${ville}`;
     const position = await this.adresseAPI.getPositionFromAddress(address);
-    if (!position)
-      throw new ExternalApiError(
-        `Could not retrieve position from address ${address}. Hence, cannot add establishment with siret ${siret}`,
+    if (!position) {
+      logger.warn(
+        { siret, address },
+        "Unable to retrieve position from API Adresse",
       );
+      return;
+    }
 
     const establishment: EstablishmentEntityV2 = {
       address,
@@ -305,7 +308,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           laPlateFormeDeLInclusionResult,
         );
 
-      if (establishmentAggregate !== null)
+      if (!!establishmentAggregate)
         establishmentAggregates.push(establishmentAggregate);
     }
     return establishmentAggregates;

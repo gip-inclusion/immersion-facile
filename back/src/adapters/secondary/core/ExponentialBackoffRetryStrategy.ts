@@ -7,8 +7,8 @@ import { Clock } from "../../../domain/core/ports/Clock";
 import { RetryStrategy } from "../../../domain/core/ports/RetryStrategy";
 import { RandomFn, SleepFn } from "../../../shared/utils";
 
-export const defaultMaxBackoffPeriodMs = secondsToMilliseconds(32);
-export const defaultRetryDeadlineMs = minutesToMilliseconds(10);
+export const defaultMaxBackoffPeriodMs = minutesToMilliseconds(1);
+export const defaultRetryDeadlineMs = minutesToMilliseconds(5);
 
 // Simple truncated exponential backoff retry strategy implementation:
 // - the 1st try is done immediately
