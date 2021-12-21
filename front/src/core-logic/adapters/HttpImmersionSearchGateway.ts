@@ -1,15 +1,13 @@
+import axios from "axios";
 import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
 import {
   contactEstablishmentRoute,
   searchImmersionRoute,
 } from "../../shared/routes";
 import {
-  LocationSuggestionDto,
   SearchImmersionRequestDto,
   SearchImmersionResultDto,
-  searchImmersionResponseSchema,
 } from "../../shared/SearchImmersionDto";
-import axios from "axios";
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 
 const prefix = "api";
@@ -22,9 +20,8 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
       `/${prefix}/${searchImmersionRoute}`,
       searchParams,
     );
-    console.log(response.data);
 
-    return searchImmersionResponseSchema.parse(response.data);
+    return response.data;
   }
 
   public async contactEstablishment(

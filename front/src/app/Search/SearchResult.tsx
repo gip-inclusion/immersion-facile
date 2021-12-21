@@ -1,41 +1,37 @@
-import React, { useState } from "react";
-import { ContactEstablishmentModal } from "src/app/Search/ContactEstablishmentModal";
+import React from "react";
 import distanceSearchIcon from "src/assets/distance-search-icon.svg";
 import "./search.css";
+import { ContactMethod } from "src/shared/FormEstablishmentDto";
 
 type EnterpriseSearchResultProps = {
   title: string;
-  metierDescription: string;
   radius: string;
-  employeeCount: string;
   address: string;
-  phone: string;
   siret: string;
+  contactMode?: ContactMethod;
   onButtonClick: () => void;
   disableButton?: boolean;
 };
 
 export const EnterpriseSearchResult = ({
   title,
-  metierDescription,
   radius,
-  employeeCount,
   address,
-  phone,
   siret,
+  contactMode,
   onButtonClick,
   disableButton,
 }: EnterpriseSearchResultProps) => {
   return (
     <div className="searchResult">
       <h2 className="searchResultTitle">{title}</h2>
-      <p className="metierDescription">{metierDescription}</p>
+      <span className="text-xs">siret: {siret}</span>
+      <p>{address.toLocaleLowerCase()}</p>
       <div className="searchResultDistanceCompanySizeContainer">
         <p className="distanceIconLabelContainer">
           <img src={distanceSearchIcon} alt="" />
           {radius}
         </p>
-        <p>{employeeCount}</p>
       </div>
       <div className="searchDetailsSeparator" />
       <button
@@ -43,7 +39,9 @@ export const EnterpriseSearchResult = ({
         onClick={onButtonClick}
         disabled={disableButton}
       >
-        Contacter l'entreprise
+        {contactMode === "PHONE" || contactMode === "EMAIL"
+          ? "Contacter l'entreprise"
+          : "Tentez votre chance"}
       </button>
     </div>
   );

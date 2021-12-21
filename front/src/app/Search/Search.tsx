@@ -70,7 +70,7 @@ export const Search = () => {
                 setResult(response);
               })
               .catch((e) => {
-                console.log(e.toString());
+                console.error(e.toString());
               })
               .finally(() => {
                 setSubmitting(false);
@@ -141,12 +141,10 @@ export const Search = () => {
               <EnterpriseSearchResult
                 key={r.id}
                 title={r.name}
-                employeeCount="TODO: count"
-                metierDescription="TODO: add rome description"
                 radius={`${distanceKm} km`}
                 address={r.address}
-                phone={r.naf ?? r.rome}
                 siret={r.siret}
+                contactMode={r.contactMode}
                 onButtonClick={() =>
                   dispatch({
                     type: "CLICKED_OPEN",

@@ -1,13 +1,10 @@
+import { sleep } from "src/shared/utils";
 import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
 import {
-  LatLonDto,
-  LocationSuggestionDto,
   SearchImmersionRequestDto,
   SearchImmersionResultDto,
-  searchImmersionResponseSchema,
 } from "../../shared/SearchImmersionDto";
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
-import { sleep } from "src/shared/utils";
 
 const SIMULATED_LATENCY_MS = 150;
 

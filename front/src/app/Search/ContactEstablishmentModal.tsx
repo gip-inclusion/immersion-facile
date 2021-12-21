@@ -118,13 +118,13 @@ const ModalContactContent = ({
           onSuccess={onSuccess}
         />
       );
-    case "IN_PERSON":
-      return <ContactInPerson />;
     default:
-      return <div>Aucun contact trouvé pour cette entreprise</div>;
+      return <AdvisesForContact />;
   }
 };
 
-const ContactInPerson = () => {
-  return <div>TODO : Rencontrer en personne</div>;
+const AdvisesForContact = () => {
+  return (
+    <div>Conseils pour rencontrer l'entreprise: TODO ajouter les conseils</div>
+  );
 };
