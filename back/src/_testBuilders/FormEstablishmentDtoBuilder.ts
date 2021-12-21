@@ -17,6 +17,7 @@ const validFormEstablishment: FormEstablishmentDto = {
   ],
   naf: { code: "A", nomenclature: "nomenclature code A" },
   businessName: "Ma super entreprise",
+  businessNameCustomized: "Ma belle enseigne du quartier",
   preferredContactMethods: ["EMAIL"],
   siret: "01234567890123",
   professions: [

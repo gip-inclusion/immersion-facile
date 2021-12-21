@@ -37,6 +37,8 @@ const initialValues: FormEstablishmentDto = ENV.dev
       id: uuidV4(),
       siret: "1234567890123",
       businessName: "My business name, replaced by result from API",
+      businessNameCustomized:
+        "My Customized Business name, not replaced by API",
       businessAddress: "My business address, replaced by result from API",
       professions: [
         {
@@ -120,8 +122,9 @@ const SiretRelatedInputs = () => {
         placeholder="362 521 879 00034"
         disabled={isFetchingSiret}
       />
+      <TextInput {...getLabelAndName("businessName")} disabled={true} />
       <TextInput
-        {...getLabelAndName("businessName")}
+        {...getLabelAndName("businessNameCustomized")}
         disabled={isFetchingSiret}
       />
       <AddressAutocomplete

@@ -38,15 +38,15 @@ export class PgFormEstablishmentRepository
     formEstablishmentDto: FormEstablishmentDto,
   ): Promise<FormEstablishmentId | undefined> {
     // prettier-ignore
-    const { id, siret, businessName, businessAddress, naf, professions, businessContacts, preferredContactMethods } =
+    const { id, siret, businessName, businessNameCustomized, businessAddress, naf, professions, businessContacts, preferredContactMethods } =
       formEstablishmentDto
 
     const query = `INSERT INTO form_establishments(
-        id, siret, business_name, business_address, naf, professions, business_contacts, preferred_contact_methods
-      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`;
+        id, siret, business_name, business_Name_Customized, business_address, naf, professions, business_contacts, preferred_contact_methods
+      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
 
     // prettier-ignore
-    await this.client.query(query, [id, siret, businessName, businessAddress, naf, JSON.stringify(professions), JSON.stringify(businessContacts), JSON.stringify(preferredContactMethods)]);
+    await this.client.query(query, [id, siret, businessName, businessNameCustomized, businessAddress, naf, JSON.stringify(professions), JSON.stringify(businessContacts), JSON.stringify(preferredContactMethods)]);
     return formEstablishmentDto.id;
   }
 
@@ -55,6 +55,7 @@ export class PgFormEstablishmentRepository
       id: params.id,
       siret: params.siret,
       businessName: params.business_name,
+      businessNameCustomized: params.business_name_customized,
       businessAddress: params.business_address,
       naf: params.naf,
       professions: params.professions,

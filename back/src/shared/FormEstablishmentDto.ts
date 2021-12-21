@@ -42,6 +42,7 @@ export const formEstablishmentSchema = z.object(
     id: formEstablishmentIdSchema,
     siret: siretSchema,
     businessName: zTrimmedString,
+    businessNameCustomized: zTrimmedString.optional(),
     businessAddress: addressWithPostalCodeSchema,
     naf: nafSchema,
     professions: z

@@ -78,6 +78,10 @@ const buildDb = async () => {
   }
 
   // prettier-ignore
+  // no existence checks as it will be taken care of in the ALTER clause within Postgres
+  await alterFormEstablishment(client);
+
+  // prettier-ignore
   const agenciesTableAlreadyExists = await checkIfTableExists("agencies");
   if (!agenciesTableAlreadyExists) {
     await buildAgencies(client);
@@ -143,6 +147,13 @@ const buildImmersionApplication = async (client: PoolClient) => {
 const buildFormEstablishment = async (client: PoolClient) => {
   await executeSqlFromFile(
     __dirname + "/createFormEstablishmentsTable.sql",
+    client,
+  );
+};
+
+const alterFormEstablishment = async (client: PoolClient) => {
+  await executeSqlFromFile(
+    __dirname + "/alterFormEstablishmentsTable.sql",
     client,
   );
 };
