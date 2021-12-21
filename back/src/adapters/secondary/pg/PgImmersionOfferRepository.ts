@@ -378,61 +378,62 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     searchParams: SearchParams,
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
-    let nafCategoryFilter = "";
-    let siretCategoryFilter = "";
-
     const parameters = [
       searchParams.rome,
       `POINT(${searchParams.lon} ${searchParams.lat})`,
       searchParams.distance_km * 1000,
     ];
 
+    let nafDivisionFilter = "";
     if (searchParams.nafDivision) {
-      nafCategoryFilter = "AND naf_division=$" + (parameters.length + 1);
       parameters.push(searchParams.nafDivision);
+      nafDivisionFilter = `AND immersion_offers.naf_division = $${parameters.length}`;
     }
 
+    let siretFilter = "";
     if (searchParams.siret) {
-      siretCategoryFilter = "AND siret=$" + (parameters.length + 1);
       parameters.push(searchParams.siret);
+      siretFilter = `AND immersion_offers.siret = $${parameters.length}`;
     }
-    //             establishments.id as establishment_id,
-    //             establishments.voluntaryToImmersion as establishment_voluntaryToImmersion,
 
     return this.client
       .query(
         `SELECT
-            immersion_offers.* as immersion_offers,
-            immersion_contacts.uuid as immersion_contacts_uuid,
-            immersion_contacts.name as immersion_contacts_name,
-            immersion_contacts.firstname as immersion_contacts_firstname,
-            immersion_contacts.email as immersion_contacts_email,
-            immersion_contacts.role as immersion_contacts_role,
-            immersion_contacts.siret_establishment as immersion_contacts_siret_establishment,
-            immersion_contacts.phone as immersion_contacts_phone,
-            establishments.contact_mode as establishment_contact_mode,
-            establishments.address as establishment_address,
-            establishments.naf as establishment_naf,
-            st_distance(immersion_offers.gps, st_geographyfromtext($2)) as distance_m,
-            st_asgeojson(immersion_offers.gps) as position
-         FROM (SELECT * FROM immersion_offers WHERE ROME=$1 ${nafCategoryFilter} ${siretCategoryFilter} AND ST_DWithin(
-         immersion_offers.gps, st_geographyfromtext($2), $3)
-          AND data_source != 'api_laplateformedelinclusion' ORDER BY data_source DESC) as immersion_offers
-         LEFT JOIN immersion_contacts as immersion_contacts
-         ON immersion_offers.contact_in_establishment_uuid = immersion_contacts.uuid
-         LEFT JOIN establishments as establishments
-         ON immersion_offers.siret = establishments.siret
-         `,
+            immersion_offers.* AS immersion_offers,
+            immersion_contacts.uuid AS immersion_contacts_uuid,
+            immersion_contacts.name AS immersion_contacts_name,
+            immersion_contacts.firstname AS immersion_contacts_firstname,
+            immersion_contacts.email AS immersion_contacts_email,
+            immersion_contacts.role AS immersion_contacts_role,
+            immersion_contacts.siret_establishment AS immersion_contacts_siret_establishment,
+            immersion_contacts.phone AS immersion_contacts_phone,
+            establishments.contact_mode AS establishment_contact_mode,
+            establishments.address AS establishment_address,
+            establishments.naf AS establishment_naf,
+            ST_Distance(immersion_offers.gps, ST_GeographyFromText($2)) AS distance_m,
+            ST_AsGeoJSON(immersion_offers.gps) AS position
+        FROM
+          immersion_offers
+          LEFT JOIN immersion_contacts
+            ON (immersion_offers.contact_in_establishment_uuid = immersion_contacts.uuid)
+          LEFT JOIN establishments
+            ON (immersion_offers.siret = establishments.siret)
+        WHERE
+          immersion_offers.rome = $1
+          ${nafDivisionFilter}
+          ${siretFilter}
+          AND ST_DWithin(immersion_offers.gps, ST_GeographyFromText($2), $3)
+          AND immersion_offers.data_source != 'api_laplateformedelinclusion'
+        ORDER BY
+          distance_m,
+          immersion_offers.data_source DESC`,
         parameters,
       )
-      .then((res) => {
-        return res.rows.map((result) => {
-          return this.buildImmersionOfferFromResults(
-            result,
-            withContactDetails,
-          );
-        });
-      })
+      .then((res) =>
+        res.rows.map((result) =>
+          this.buildImmersionOfferFromResults(result, withContactDetails),
+        ),
+      )
       .catch((e) => {
         logger.error(e);
         return [];

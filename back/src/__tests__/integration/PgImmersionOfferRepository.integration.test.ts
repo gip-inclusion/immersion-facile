@@ -217,9 +217,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         romeLabel: "xxxx",
       };
 
-      expect(
-        searchResult.sort((a, b) => a.distance_m! - b.distance_m!),
-      ).toMatchObject([expectedResult1, expectedResult2]);
+      expect(searchResult).toMatchObject([expectedResult1, expectedResult2]);
 
       const searchResuts = await pgImmersionOfferRepository.getFromSearch({
         rome: "M1907",
