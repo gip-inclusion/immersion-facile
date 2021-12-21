@@ -1,5 +1,8 @@
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
-import { RetryStrategy } from "../../../domain/core/ports/RetryStrategy";
+import {
+  RetriableError,
+  RetryStrategy,
+} from "../../../domain/core/ports/RetryStrategy";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import {
   LaBonneBoiteAPI,
@@ -22,13 +25,13 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
   public async searchCompanies(
     searchParams: SearchParams,
   ): Promise<LaBonneBoiteCompany[]> {
-    const accessToken = await this.accessTokenGateway.getAccessToken(
-      `application_${this.poleEmploiClientId} api_labonneboitev1`,
-    );
-    try {
-      const axios = createAxiosInstance(logger);
-      const response = await this.retryStrategy.apply(() =>
-        this.rateLimiter.whenReady(() =>
+    return this.retryStrategy.apply(async () => {
+      const accessToken = await this.accessTokenGateway.getAccessToken(
+        `application_${this.poleEmploiClientId} api_labonneboitev1`,
+      );
+      try {
+        const axios = createAxiosInstance(logger);
+        const response = await this.rateLimiter.whenReady(() =>
           axios.get(
             "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
             {
@@ -43,12 +46,16 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
               },
             },
           ),
-        ),
-      );
-      return response.data.companies || [];
-    } catch (error: any) {
-      logAxiosError(logger, error, "Error calling labonneboite API");
-      throw error;
-    }
+        );
+        return response.data.companies || [];
+      } catch (error: any) {
+        if (error.response.status == 429) {
+          logger.warn("Too many requests: " + error);
+          throw new RetriableError(error);
+        }
+        logAxiosError(logger, error, "Error calling labonneboite API");
+        throw error;
+      }
+    });
   }
 }

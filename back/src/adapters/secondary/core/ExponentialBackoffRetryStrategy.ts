@@ -4,7 +4,10 @@ import {
   secondsToMilliseconds,
 } from "date-fns";
 import { Clock } from "../../../domain/core/ports/Clock";
-import { RetryStrategy } from "../../../domain/core/ports/RetryStrategy";
+import {
+  RetriableError,
+  RetryStrategy,
+} from "../../../domain/core/ports/RetryStrategy";
 import { RandomFn, SleepFn } from "../../../shared/utils";
 
 export const defaultMaxBackoffPeriodMs = minutesToMilliseconds(1);
@@ -36,9 +39,10 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
       try {
         return await cb();
       } catch (error: any) {
-        // Callback failed, wait and retry.
+        if (!(error instanceof RetriableError)) throw error;
 
-        // TODO: Distinguish retriable from non-retriable errors.
+        // Callback failed with retriable error, wait and retry.
+
         const backoffDurationMs =
           secondsToMilliseconds(backoffDurationS) + this.randomFn(1000);
         const truncatedBackoffDurationMs = Math.min(
@@ -52,10 +56,7 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
           differenceInMilliseconds(this.clock.now(), startTime) >=
           this.retryDeadlineMs
         ) {
-          throw new Error(
-            "Timeout exceeded while retrying failed requests. Last error: " +
-              error,
-          );
+          throw error.cause;
         }
 
         backoffDurationS *= 2;

@@ -1,10 +1,13 @@
 import { formatISO } from "date-fns";
 import { Clock } from "../../domain/core/ports/Clock";
 import { RateLimiter } from "../../domain/core/ports/RateLimiter";
-import { RetryStrategy } from "../../domain/core/ports/RetryStrategy";
+import {
+  RetriableError,
+  RetryStrategy
+} from "../../domain/core/ports/RetryStrategy";
 import {
   SireneRepository,
-  SireneRepositoryAnswer,
+  SireneRepositoryAnswer
 } from "../../domain/sirene/ports/SireneRepository";
 import { SiretDto } from "../../shared/siret";
 import { createAxiosInstance, logAxiosError } from "../../utils/axiosUtils";
@@ -37,26 +40,30 @@ export class HttpsSireneRepository implements SireneRepository {
   ): Promise<SireneRepositoryAnswer | undefined> {
     logger.debug({ siret, includeClosedEstablishments }, "get");
 
-    try {
-      const axios = this.createAxiosInstance();
-      const response = await this.retryStrategy.apply(() =>
-        this.rateLimiter.whenReady(() =>
+    return this.retryStrategy.apply(async () => {
+      try {
+        const axios = this.createAxiosInstance();
+        const response = await this.rateLimiter.whenReady(() =>
           axios.get("/siret", {
             params: this.createSiretQueryParams(
               siret,
               includeClosedEstablishments,
             ),
           }),
-        ),
-      );
-      return response.data;
-    } catch (error: any) {
-      logAxiosError(logger, error);
-      if (error.response.status == 404) {
-        return undefined;
+        );
+        return response.data;
+      } catch (error: any) {
+        if (error.response.status == 404) {
+          return undefined;
+        }
+
+        logAxiosError(logger, error);
+        if (error.response.status == 429) {
+          throw new RetriableError(error);
+        }
+        throw error;
       }
-      throw error;
-    }
+    });
   }
 
   private createSiretQueryParams(

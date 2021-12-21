@@ -1,5 +1,8 @@
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
-import { RetryStrategy } from "../../../domain/core/ports/RetryStrategy";
+import {
+  RetriableError,
+  RetryStrategy,
+} from "../../../domain/core/ports/RetryStrategy";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import {
@@ -62,10 +65,10 @@ export class HttpLaPlateformeDeLInclusionAPI
     });
     if (!cityCode) return { results: [] };
 
-    try {
-      const axios = createAxiosInstance(logger);
-      const response = await this.retryStrategy.apply(() =>
-        this.rateLimiter.whenReady(() =>
+    return this.retryStrategy.apply(async () => {
+      try {
+        const axios = createAxiosInstance(logger);
+        const response = await this.rateLimiter.whenReady(() =>
           axios.get("https://emplois.inclusion.beta.gouv.fr/api/v1/siaes/", {
             params: {
               code_insee: cityCode,
@@ -76,41 +79,49 @@ export class HttpLaPlateformeDeLInclusionAPI
               format: "json",
             },
           }),
-        ),
-      );
-      return {
-        results: response.data.results,
-        nextPageUrl: response.data.next,
-      };
-    } catch (error: any) {
-      logAxiosError(
-        logger,
-        error,
-        "Could not fetch La Plate Forme de L'Inclusion API results",
-      );
-      return { results: [] };
-    }
+        );
+        return {
+          results: response.data.results,
+          nextPageUrl: response.data.next,
+        };
+      } catch (error: any) {
+        if (error.response.status == 429) {
+          logger.warn("Too many requests: " + error);
+          throw new RetriableError(error);
+        }
+        logAxiosError(
+          logger,
+          error,
+          "Could not fetch La Plate Forme de L'Inclusion API results",
+        );
+        return { results: [] };
+      }
+    });
   }
 
   private async getNextResponse(
     url: string,
   ): Promise<LaPlateformeDeLInclusionGetResponse> {
-    try {
-      const axios = createAxiosInstance(logger);
-      const response = await this.retryStrategy.apply(() =>
-        this.rateLimiter.whenReady(() => axios.get(url)),
-      );
-      return {
-        results: response.data.results,
-        nextPageUrl: response.data.next,
-      };
-    } catch (error: any) {
-      logAxiosError(
-        logger,
-        error,
-        "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
-      );
-      return { results: [] };
-    }
+    return this.retryStrategy.apply(async () => {
+      try {
+        const axios = createAxiosInstance(logger);
+        const response = await this.rateLimiter.whenReady(() => axios.get(url));
+        return {
+          results: response.data.results,
+          nextPageUrl: response.data.next,
+        };
+      } catch (error: any) {
+        if (error.response.status == 429) {
+          logger.warn("Too many requests: " + error);
+          throw new RetriableError(error);
+        }
+        logAxiosError(
+          logger,
+          error,
+          "Could not fetch La Plate Forme de L'Inclusion API results when going on next page",
+        );
+        return { results: [] };
+      }
+    });
   }
 }

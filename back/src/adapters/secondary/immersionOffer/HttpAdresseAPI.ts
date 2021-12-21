@@ -1,5 +1,8 @@
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
-import { RetryStrategy } from "../../../domain/core/ports/RetryStrategy";
+import {
+  RetriableError,
+  RetryStrategy,
+} from "../../../domain/core/ports/RetryStrategy";
 import {
   AdresseAPI,
   Position,
@@ -20,42 +23,53 @@ export class HttpAdresseAPI implements AdresseAPI {
   ): Promise<Position | undefined> {
     logger.debug({ address }, "getPositionFromAddress");
 
-    try {
-      const axios = createAxiosInstance(logger);
-      const response = await this.retryStrategy.apply(() =>
-        this.rateLimiter.whenReady(() =>
-          axios.get("https://api-adresse.data.gouv.fr/search/", {
+    return this.retryStrategy.apply(async () => {
+      try {
+        const axios = createAxiosInstance(logger);
+        const response = await axios.get(
+          "https://api-adresse.data.gouv.fr/search/",
+          {
             params: {
               q: address,
             },
-          }),
-        ),
-      );
-      return {
-        lat: response.data.features[0].geometry.coordinates[1],
-        lon: response.data.features[0].geometry.coordinates[0],
-      };
-    } catch (error: any) {
-      logAxiosError(logger, error);
-      return;
-    }
+          },
+        );
+        return {
+          lat: response.data.features[0].geometry.coordinates[1],
+          lon: response.data.features[0].geometry.coordinates[0],
+        };
+      } catch (error: any) {
+        if (error.response.status == 429) {
+          logger.warn("Too many requests: " + error);
+          throw new RetriableError(error);
+        }
+        logAxiosError(logger, error);
+        return;
+      }
+    });
   }
 
   public async getCityCodeFromPosition(
     position: Position,
   ): Promise<number | undefined> {
     logger.debug({ position }, "getCityCodeFromPosition");
-    try {
-      const axios = createAxiosInstance(logger);
-      const response = await this.rateLimiter.whenReady(() =>
-        axios.get("https://api-adresse.data.gouv.fr/reverse/", {
-          params: position,
-        }),
-      );
-      return response.data.features[0]?.properties?.citycode;
-    } catch (error: any) {
-      logAxiosError(logger, error);
-      return;
-    }
+    return this.retryStrategy.apply(async () => {
+      try {
+        const axios = createAxiosInstance(logger);
+        const response = await this.rateLimiter.whenReady(() =>
+          axios.get("https://api-adresse.data.gouv.fr/reverse/", {
+            params: position,
+          }),
+        );
+        return response.data.features[0]?.properties?.citycode;
+      } catch (error: any) {
+        if (error.response.status == 429) {
+          logger.warn("Too many requests: " + error);
+          throw new RetriableError(error);
+        }
+        logAxiosError(logger, error);
+        return;
+      }
+    });
   }
 }

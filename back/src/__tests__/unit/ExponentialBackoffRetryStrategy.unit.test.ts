@@ -1,9 +1,10 @@
 import { ExponentialBackoffRetryStrategy } from "../../adapters/secondary/core/ExponentialBackoffRetryStrategy";
-import { expectPromiseToFailWith } from "../../_testBuilders/test.helpers";
+import { RetriableError } from "../../domain/core/ports/RetryStrategy";
+import { expectPromiseToFailWithError } from "../../_testBuilders/test.helpers";
 
 const dummyCallbackResult = { some: "value" };
-const callbackFailed = () => {
-  throw new Error("Request failed.");
+const throwRetriableError = () => {
+  throw new RetriableError(new Error("429: Too many requests"));
 };
 const maxBackoffPeriodMs = 10_000;
 const deadlineMs = 100_000;
@@ -41,12 +42,27 @@ describe("ExponentialBackoffRetryStrategy", () => {
     expect(mockSleep).not.toHaveBeenCalled();
   });
 
-  test("exponential backoff on retries", async () => {
+  test("no retry of non-retriable error", async () => {
+    const nonRetriableError = new Error("404: Not found");
+    mockCallback.mockImplementationOnce(() => {
+      throw nonRetriableError;
+    });
+
+    await expectPromiseToFailWithError(
+      retryStrategy.apply(mockCallback),
+      nonRetriableError,
+    );
+
+    expect(mockCallback).toHaveBeenCalledTimes(1);
+    expect(mockSleep).not.toHaveBeenCalled();
+  });
+
+  test("exponential backoff on retriable errors", async () => {
     mockCallback
-      .mockImplementationOnce(callbackFailed)
-      .mockImplementationOnce(callbackFailed)
-      .mockImplementationOnce(callbackFailed)
-      .mockImplementationOnce(callbackFailed)
+      .mockImplementationOnce(throwRetriableError)
+      .mockImplementationOnce(throwRetriableError)
+      .mockImplementationOnce(throwRetriableError)
+      .mockImplementationOnce(throwRetriableError)
       .mockResolvedValueOnce(dummyCallbackResult);
 
     mockRandom
@@ -69,13 +85,13 @@ describe("ExponentialBackoffRetryStrategy", () => {
   test("exponential backoff period is truncated at maxbackoffPeriodMs", async () => {
     mockRandom.mockReturnValue(0);
     mockCallback
-      .mockImplementationOnce(callbackFailed)
-      .mockImplementationOnce(callbackFailed) // 1. backoff: 1000ms
-      .mockImplementationOnce(callbackFailed) // 2. backoff: 2000ms
-      .mockImplementationOnce(callbackFailed) // 3. backoff: 4000ms
-      .mockImplementationOnce(callbackFailed) // 4. backoff: 8000ms
-      .mockImplementationOnce(callbackFailed) // 5. backoff: 16000ms
-      .mockImplementationOnce(callbackFailed) // 6. backoff: 32000ms
+      .mockImplementationOnce(throwRetriableError)
+      .mockImplementationOnce(throwRetriableError) // 1. backoff: 1000ms
+      .mockImplementationOnce(throwRetriableError) // 2. backoff: 2000ms
+      .mockImplementationOnce(throwRetriableError) // 3. backoff: 4000ms
+      .mockImplementationOnce(throwRetriableError) // 4. backoff: 8000ms
+      .mockImplementationOnce(throwRetriableError) // 5. backoff: 16000ms
+      .mockImplementationOnce(throwRetriableError) // 6. backoff: 32000ms
       .mockResolvedValue(dummyCallbackResult); // 7. backoff: 64000ms
 
     await retryStrategy.apply(mockCallback);
@@ -86,8 +102,13 @@ describe("ExponentialBackoffRetryStrategy", () => {
   });
 
   test("aborts after timeout exceeded", async () => {
+    const retriableError = new RetriableError(
+      new Error("429: Too many requests"),
+    );
+    mockCallback.mockImplementation(() => {
+      throw retriableError;
+    });
     mockRandom.mockReturnValue(0);
-    mockCallback.mockImplementation(callbackFailed);
 
     mockNow
       .mockReturnValueOnce(0) // start time
@@ -95,9 +116,9 @@ describe("ExponentialBackoffRetryStrategy", () => {
       .mockReturnValueOnce(10_000)
       .mockReturnValueOnce(100_000); // timeout exceeded
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       retryStrategy.apply(mockCallback),
-      "Timeout exceeded while retrying failed requests. Last error: Error: Request failed.",
+      retriableError.cause,
     );
 
     expect(mockCallback).toHaveBeenCalledTimes(3);
