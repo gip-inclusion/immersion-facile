@@ -86,6 +86,7 @@ export const FormMagicLinks = ({
             onChange={() => {
               setExpired(!expired);
             }}
+            style={{ appearance: "checkbox" }}
           />
           Expired
         </label>
