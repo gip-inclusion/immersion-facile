@@ -5,8 +5,8 @@ import { Button } from "src/components/Button";
 import { TextInput } from "src/components/form/TextInput";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import {
-  ContactEstablishmentRequestDto,
-  contactEstablishmentRequestSchema,
+  ContactEstablishmentByPhoneDto,
+  contactEstablishmentByPhoneSchema,
 } from "src/shared/contactEstablishment";
 
 type ContactByPhoneProps = {
@@ -14,16 +14,18 @@ type ContactByPhoneProps = {
   onSuccess: () => void;
 };
 
+const getName = (v: keyof ContactEstablishmentByPhoneDto) => v;
+
 export const ContactByPhone = ({
   immersionOfferId,
   onSuccess,
 }: ContactByPhoneProps) => {
-  const initialValues: ContactEstablishmentRequestDto = {
+  const initialValues: ContactEstablishmentByPhoneDto = {
     immersionOfferId,
     contactMode: "PHONE",
-    senderEmail: "",
-    senderName: "",
-    message: "",
+    potentialBeneficiaryFirstName: "",
+    potentialBeneficiaryLastName: "",
+    potentialBeneficiaryEmail: "",
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +34,7 @@ export const ContactByPhone = ({
     <Formik
       initialValues={initialValues}
       validationSchema={toFormikValidationSchema(
-        contactEstablishmentRequestSchema,
+        contactEstablishmentByPhoneSchema,
       )}
       onSubmit={async (values) => {
         setIsSubmitting(true);
@@ -43,9 +45,33 @@ export const ContactByPhone = ({
     >
       {({ errors, submitCount }) => (
         <Form>
+          <p>
+            Cette entreprise souhaite être contactée par téléphone. Merci de
+            nous indiquer vos coordonnées.
+          </p>
+          <br />
+          <p>
+            Nous allons vous transmettre par e-mail le nom de la personne à
+            contacter, son numéro de téléphone ainsi que des conseils pour
+            présenter votre demande d’immersion.
+          </p>
+          <br />
+          <p>
+            Ces informations sont personnelles et confidentielles. Elles ne
+            peuvent pas être communiquées à d’autres personnes. Merci !
+          </p>
+          <br />
           <TextInput
-            label="Veuillez laisser votre email pour recevoir le numéro de téléphone de l'entreprise *"
-            name="senderEmail"
+            label="Votre email *"
+            name={getName("potentialBeneficiaryEmail")}
+          />
+          <TextInput
+            label="Votre prénom *"
+            name={getName("potentialBeneficiaryFirstName")}
+          />
+          <TextInput
+            label="Votre nom *"
+            name={getName("potentialBeneficiaryLastName")}
           />
           {submitCount !== 0 &&
             Object.values(errors).length > 0 &&

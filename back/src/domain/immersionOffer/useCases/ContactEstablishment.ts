@@ -6,25 +6,9 @@ import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "../../../shared/contactEstablishment";
-import { ContactMethod } from "../../../shared/FormEstablishmentDto";
-import {
-  ImmersionOfferId,
-  SearchImmersionResultDto,
-} from "../../../shared/SearchImmersionDto";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-
-const throwIfNoContactId = (
-  searchImmersionResult: SearchImmersionResultDto,
-  searchedOfferId: ImmersionOfferId,
-) => {
-  if (!searchImmersionResult.contactId) {
-    throw new BadRequestError(
-      `no contact id in immersion offer: ${searchedOfferId}`,
-    );
-  }
-};
 
 export class ContactEstablishment extends TransactionalUseCase<
   ContactEstablishmentRequestDto,
@@ -41,30 +25,39 @@ export class ContactEstablishment extends TransactionalUseCase<
 
   public async _execute(
     params: ContactEstablishmentRequestDto,
-    unitOfWork: UnitOfWork,
+    { immersionOfferRepo, outboxRepo }: UnitOfWork,
   ): Promise<void> {
-    const immersionOffer =
-      await unitOfWork.immersionOfferRepo.getImmersionFromUuid(
-        params.immersionOfferId,
-      );
+    const { immersionOfferId, contactMode } = params;
 
-    if (!immersionOffer) throw new NotFoundError(params.immersionOfferId);
-    if (params.contactMode !== immersionOffer.contactMode)
+    const immersionOffer = await immersionOfferRepo.getImmersionOfferById(
+      immersionOfferId,
+    );
+    if (!immersionOffer) throw new NotFoundError(immersionOfferId);
+
+    const contact = await immersionOfferRepo.getContactByImmersionOfferId(
+      immersionOfferId,
+    );
+    if (!contact)
       throw new BadRequestError(
-        `contact mode mismatch: ${params.contactMode} in immersion offer: ${params.immersionOfferId}`,
+        `No contact for immersion offer: ${immersionOfferId}`,
       );
 
-    const handledContactMode: ContactMethod[] = ["EMAIL", "PHONE"];
+    const establishment =
+      await immersionOfferRepo.getEstablishmentByImmersionOfferId(
+        immersionOfferId,
+      );
+    if (!establishment) throw new NotFoundError(immersionOfferId);
 
-    if (handledContactMode.includes(params.contactMode)) {
-      throwIfNoContactId(immersionOffer, params.immersionOfferId);
+    if (contactMode !== establishment.contactMethod)
+      throw new BadRequestError(
+        `Contact mode mismatch: IN_PERSON in immersion offer: ${immersionOfferId}`,
+      );
 
-      const event = this.createNewEvent({
-        topic: "ContactRequestedByBeneficiary",
-        payload: params,
-      });
+    const event = this.createNewEvent({
+      topic: "ContactRequestedByBeneficiary",
+      payload: params,
+    });
 
-      await unitOfWork.outboxRepo.save(event);
-    }
+    await outboxRepo.save(event);
   }
 }

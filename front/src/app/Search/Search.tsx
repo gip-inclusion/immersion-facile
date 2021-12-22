@@ -150,7 +150,7 @@ export const Search = () => {
                     type: "CLICKED_OPEN",
                     payload: {
                       immersionOfferId: r.id,
-                      contactId: r.contactId,
+                      contactId: r.contactDetails?.id,
                       contactMethod: r.contactMode,
                     },
                   })

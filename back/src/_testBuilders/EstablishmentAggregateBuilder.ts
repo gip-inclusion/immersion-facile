@@ -3,7 +3,7 @@ import {
   EstablishmentEntityV2,
 } from "../domain/immersionOffer/entities/EstablishmentAggregate";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { ContactEntityV2 } from "./../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { ContactEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { Builder } from "./Builder";
 import { ContactEntityV2Builder } from "./ContactEntityV2Builder";
 import { EstablishmentEntityV2Builder } from "./EstablishmentEntityV2Builder";

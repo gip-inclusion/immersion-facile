@@ -41,10 +41,6 @@ export interface ImmersionOfferRepository {
     establishments: EstablishmentEntity[],
   ) => Promise<void>;
 
-  getImmersionFromUuid(
-    uuid: string,
-    withContactDetails?: boolean,
-  ): Promise<SearchImmersionResultDto | undefined>;
   getFromSearch: (
     searchParams: SearchParams,
     withContactDetails?: boolean,

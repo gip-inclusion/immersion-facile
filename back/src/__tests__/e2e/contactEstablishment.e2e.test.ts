@@ -1,18 +1,23 @@
 import { SuperTest, Test } from "supertest";
+import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
+import { validImmersionOfferId } from "../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
 import {
   buildTestApp,
   InMemoryRepositories,
 } from "../../_testBuilders/buildTestApp";
+import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { expectArraysToMatch } from "../../_testBuilders/test.helpers";
-import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
-import { validImmersionOfferId } from "../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
-import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
+import { ContactEntityV2Builder } from "./../../_testBuilders/ContactEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "./../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 const validRequest: ContactEstablishmentRequestDto = {
   immersionOfferId: validImmersionOfferId,
   contactMode: "EMAIL",
-  senderName: "sender_name",
-  senderEmail: "sender@email.fr",
+  potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
+  potentialBeneficiaryLastName: "potential_beneficiary_last_name",
+  potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
   message: "message_to_send",
 };
 
@@ -23,26 +28,48 @@ describe("/contact-establishment route", () => {
 
   beforeEach(async () => {
     ({ request, reposAndGateways, eventCrawler } = await buildTestApp());
+    reposAndGateways.immersionOffer.empty();
   });
 
-  test("succeeds for valid request of contact by Email", async () => {
-    const response = await request
-      .post(`/contact-establishment`)
-      .send(validRequest);
+  test("sends email for valid request", async () => {
+    const establishment = new EstablishmentEntityV2Builder()
+      .withContactMode("EMAIL")
+      .build();
+    const contact = new ContactEntityV2Builder().build();
+    const immersionOffer = new ImmersionOfferEntityV2Builder()
+      .withId("61649067-cd6a-4aa3-8866-d1f3d61292b4")
+      .build();
 
-    expect(response.status).toBe(200);
-
-    expectArraysToMatch(reposAndGateways.outbox.events, [
-      { topic: "ContactRequestedByBeneficiary", payload: validRequest },
+    await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(establishment)
+        .withContacts([contact])
+        .withImmersionOffers([immersionOffer])
+        .build(),
     ]);
 
-    // TODO: check email are sent when NotifyEstablishmentOfContactRequest use case is implemented
-    // await eventCrawler.processEvents();
-    // const expectedEmail: TemplatedEmail = {
-    //   type: "",
-    //   recipients: [],
-    // };
-    // expect(reposAndGateways.email.getSentEmails()).toEqual([expectedEmail]);
+    const contactEstablishmentRequest = {
+      ...validRequest,
+      immersionOfferId: immersionOffer.id,
+    };
+
+    await request
+      .post(`/contact-establishment`)
+      .send(contactEstablishmentRequest)
+      .expect(200);
+
+    expectArraysToMatch(reposAndGateways.outbox.events, [
+      {
+        topic: "ContactRequestedByBeneficiary",
+        payload: contactEstablishmentRequest,
+      },
+    ]);
+
+    await eventCrawler.processEvents();
+    expect(reposAndGateways.email.getSentEmails()).toHaveLength(1);
+    expect(reposAndGateways.email.getSentEmails()[0].type).toEqual(
+      "CONTACT_BY_EMAIL_REQUEST",
+    );
   });
 
   test("fails with 404 for unknown immersion offers", async () => {

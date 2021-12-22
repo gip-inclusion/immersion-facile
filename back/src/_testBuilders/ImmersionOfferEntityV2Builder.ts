@@ -1,4 +1,5 @@
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { ImmersionOfferId } from "../shared/SearchImmersionDto";
 import { Builder } from "./Builder";
 
 const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {
@@ -13,7 +14,7 @@ export class ImmersionOfferEntityV2Builder
   constructor(
     private readonly entity: ImmersionOfferEntityV2 = validImmersionOfferEntityV2,
   ) {}
-  withId(id: string) {
+  withId(id: ImmersionOfferId) {
     return new ImmersionOfferEntityV2Builder({ ...this.entity, id });
   }
   build() {

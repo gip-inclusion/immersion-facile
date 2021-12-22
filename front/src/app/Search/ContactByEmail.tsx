@@ -5,8 +5,8 @@ import { Button } from "src/components/Button";
 import { TextInput } from "src/components/form/TextInput";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import {
-  ContactEstablishmentRequestDto,
-  contactEstablishmentRequestSchema,
+  ContactEstablishmentByMailDto,
+  contactEstablishmentByMailSchema,
 } from "src/shared/contactEstablishment";
 
 type ContactByEmailProps = {
@@ -14,24 +14,28 @@ type ContactByEmailProps = {
   onSuccess: () => void;
 };
 
+const getName = (v: keyof ContactEstablishmentByMailDto) => v;
+
 export const ContactByEmail = ({
   immersionOfferId,
   onSuccess,
 }: ContactByEmailProps) => {
-  const initialValues: ContactEstablishmentRequestDto = {
+  const initialValues: ContactEstablishmentByMailDto = {
     immersionOfferId,
     contactMode: "EMAIL",
-    senderEmail: "",
-    senderName: "",
+    potentialBeneficiaryFirstName: "",
+    potentialBeneficiaryLastName: "",
+    potentialBeneficiaryEmail: "",
     message: "",
   };
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={toFormikValidationSchema(
-        contactEstablishmentRequestSchema,
+        contactEstablishmentByMailSchema,
       )}
       onSubmit={async (values) => {
         setIsSubmitting(true);
@@ -42,11 +46,21 @@ export const ContactByEmail = ({
     >
       {({ errors, submitCount }) => (
         <Form>
-          <TextInput label="Votre email *" name="senderEmail" />
-          <TextInput label="Votre nom" name="senderName" />
+          <TextInput
+            label="Votre email *"
+            name={getName("potentialBeneficiaryEmail")}
+          />
+          <TextInput
+            label="Votre prénom *"
+            name={getName("potentialBeneficiaryFirstName")}
+          />
+          <TextInput
+            label="Votre nom *"
+            name={getName("potentialBeneficiaryLastName")}
+          />
           <TextInput
             label="Votre message *"
-            name="message"
+            name={getName("message")}
             type="text"
             multiline
           />

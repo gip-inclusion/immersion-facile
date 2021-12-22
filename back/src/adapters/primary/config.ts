@@ -40,7 +40,7 @@ import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFo
 import { ContactEstablishment } from "../../domain/immersionOffer/useCases/ContactEstablishment";
 import { GetImmersionOfferById } from "../../domain/immersionOffer/useCases/GetImmersionOfferById";
 import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
-import { NotifyEstablishmentOfContactRequest } from "../../domain/immersionOffer/useCases/notifications/NotifyEstablishmentOfContactRequest";
+import { NotifyContactRequest } from "../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
 import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { RomeGateway } from "../../domain/rome/ports/RomeGateway";
@@ -469,8 +469,11 @@ const createUseCases = (
         emailFilter,
         repositories.email,
       ),
-    notifyEstablishmentOfContactRequest:
-      new NotifyEstablishmentOfContactRequest(emailFilter, repositories.email),
+    notifyContactRequest: new NotifyContactRequest(
+      repositories.immersionOffer,
+      emailFilter,
+      repositories.email,
+    ),
     notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty:
       new NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty(
         emailFilter,

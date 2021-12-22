@@ -67,9 +67,7 @@ const getUseCasesByTopics = (
       useCases.transformFormEstablishmentToSearchData,
       useCases.notifyConfirmationEstablishmentCreated,
     ],
-    ContactRequestedByBeneficiary: [
-      useCases.notifyEstablishmentOfContactRequest,
-    ],
+    ContactRequestedByBeneficiary: [useCases.notifyContactRequest],
 
     // Magic link renewal.
     MagicLinkRenewalRequested: [useCases.deliverRenewedMagicLink],

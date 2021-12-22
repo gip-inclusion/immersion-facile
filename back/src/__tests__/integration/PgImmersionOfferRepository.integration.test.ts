@@ -473,68 +473,6 @@ describe("Postgres implementation of immersion offer repository", () => {
     ]);
   });
 
-  test("getImmersionFromUuid", async () => {
-    const immersionOfferId = "11111111-1111-1111-1111-111111111111";
-    const siret = "11112222333344";
-    const establishment = new EstablishmentEntityBuilder()
-      .withSiret(siret)
-      .build();
-
-    await pgImmersionOfferRepository.insertEstablishments([establishment]);
-
-    const contactInEstablishment: ImmersionEstablishmentContact = {
-      id: "11111111-0000-0000-0000-111111111111",
-      lastName: "Doe",
-      firstName: "John",
-      email: "joe@mail.com",
-      role: "super job",
-      siretEstablishment: siret,
-      phone: "0640295453",
-    };
-    await pgImmersionOfferRepository.insertEstablishmentContact(
-      contactInEstablishment,
-    );
-
-    await pgImmersionOfferRepository.insertImmersions([
-      new ImmersionOfferEntity({
-        id: immersionOfferId,
-        rome: "M1607",
-        naf: "8539A",
-        siret: siret,
-        name: "Company from la bonne boite",
-        voluntaryToImmersion: false,
-        data_source: "api_labonneboite",
-        contactInEstablishment,
-        score: 4.5,
-        position: { lat: 43.8666, lon: 8.3333 },
-      }),
-    ]);
-
-    const immersionSearchResult =
-      await pgImmersionOfferRepository.getImmersionFromUuid(immersionOfferId);
-    expect(immersionSearchResult).toBeDefined();
-    expect(immersionSearchResult!.name).toBe("Company from la bonne boite");
-    expect(immersionSearchResult!.contactDetails).toBeUndefined();
-
-    const immersionSearchResultWithDetails =
-      await pgImmersionOfferRepository.getImmersionFromUuid(
-        immersionOfferId,
-        true,
-      );
-    expect(immersionSearchResultWithDetails).toBeDefined();
-    const expectedSearchContact: SearchContact = {
-      id: contactInEstablishment.id,
-      firstName: contactInEstablishment.firstName,
-      lastName: contactInEstablishment.lastName,
-      email: contactInEstablishment.email,
-      phone: contactInEstablishment.phone,
-      role: contactInEstablishment.role,
-    };
-    expect(immersionSearchResultWithDetails!.contactDetails).toEqual(
-      expectedSearchContact,
-    );
-  });
-
   test("Insert establishment contact", async () => {
     await pgImmersionOfferRepository.insertEstablishments([
       new EstablishmentEntity({

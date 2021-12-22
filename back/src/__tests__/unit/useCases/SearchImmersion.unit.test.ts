@@ -64,7 +64,6 @@ describe("SearchImmersion", () => {
         voluntaryToImmersion: false,
         location: { lat: 43.8666, lon: 8.3333 },
         address: "55 Rue du Faubourg Saint-Honoré",
-        contactId: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
         contactMode: "EMAIL",
         distance_m: 606885,
         city: "xxxx",

@@ -20,8 +20,8 @@ import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/Immers
 import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,
-} from "./../../../adapters/secondary/core/EmailFilterImplementations";
-import { AgencyConfig } from "./../../../domain/immersionApplication/ports/AgencyRepository";
+} from "../../../adapters/secondary/core/EmailFilterImplementations";
+import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
 
 const validDemandeImmersion: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();

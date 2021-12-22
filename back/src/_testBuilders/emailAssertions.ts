@@ -1,9 +1,16 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
+import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyRepository";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentAggregate";
+import { ContactEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
+import {
+  ContactEstablishmentByMailDto,
+  ContactEstablishmentInPersonDto,
+} from "../shared/contactEstablishment";
 import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
 import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../shared/routes";
-import { AgencyConfig } from "./../domain/immersionApplication/ports/AgencyRepository";
+import { ContactEstablishmentByPhoneDto } from "./../shared/contactEstablishment";
 import { fakeGenerateMagicLinkUrlFn } from "./test.helpers";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
@@ -231,6 +238,71 @@ export const expectEmailMatchingLinkRenewalEmail = (
     recipients,
     params: {
       magicLink,
+    },
+  });
+};
+
+export const expectContactByEmailRequest = (
+  templatedEmail: TemplatedEmail,
+  recipients: string[],
+  establishment: EstablishmentEntityV2,
+  contact: ContactEntityV2,
+  payload: ContactEstablishmentByMailDto,
+) => {
+  expectTemplatedEmailToEqual(templatedEmail, {
+    type: "CONTACT_BY_EMAIL_REQUEST",
+    recipients,
+    params: {
+      businessName: establishment.name,
+      contactFirstName: contact.firstName,
+      contactLastName: contact.lastName,
+      jobLabel: "XXXX",
+      potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
+      potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+      potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
+      message: payload.message,
+    },
+  });
+};
+
+export const expectContactByPhoneInstructions = (
+  templatedEmail: TemplatedEmail,
+  recipients: string[],
+  establishment: EstablishmentEntityV2,
+  contact: ContactEntityV2,
+  payload: ContactEstablishmentByPhoneDto,
+) => {
+  expectTemplatedEmailToEqual(templatedEmail, {
+    type: "CONTACT_BY_PHONE_INSTRUCTIONS",
+    recipients,
+    params: {
+      businessName: establishment.name,
+      contactFirstName: contact.firstName,
+      contactLastName: contact.lastName,
+      contactPhone: contact.phone,
+      potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
+      potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+    },
+  });
+};
+
+export const expectContactInPersonInstructions = (
+  templatedEmail: TemplatedEmail,
+  recipients: string[],
+  establishment: EstablishmentEntityV2,
+  contact: ContactEntityV2,
+  payload: ContactEstablishmentInPersonDto,
+) => {
+  expectTemplatedEmailToEqual(templatedEmail, {
+    type: "CONTACT_IN_PERSON_INSTRUCTIONS",
+    recipients,
+    params: {
+      businessName: establishment.name,
+      contactFirstName: contact.firstName,
+      contactLastName: contact.lastName,
+      businessAddress: establishment.address,
+      potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
+      potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
     },
   });
 };

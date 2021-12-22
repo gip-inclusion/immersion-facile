@@ -2,22 +2,23 @@ import promClient from "prom-client";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import type {
   BeneficiarySignatureRequestNotificationParams,
+  ContactByEmailRequestParams,
+  ContactByPhoneInstructionsParams,
+  ContactInPersonInstructionsParams,
   EmailType,
   EnterpriseSignatureRequestNotificationParams,
+  ModificationRequestApplicationNotificationParams,
   NewApplicationAdminNotificationParams,
   NewApplicationBeneficiaryConfirmationParams,
   NewApplicationMentorConfirmationParams,
   NewImmersionApplicationReviewForEligibilityOrValidationParams,
   RejectedApplicationNotificationParams,
+  SendRenewedMagicLinkParams,
   SignedByOtherPartyNotificationParams,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
 import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
-import {
-  ModificationRequestApplicationNotificationParams,
-  SendRenewedMagicLinkParams,
-} from "./../../domain/immersionApplication/ports/EmailGateway";
 import { createLogger } from "./../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -64,14 +65,27 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/14/message-setup
   MAGIC_LINK_RENEWAL: 14,
+
   // https://my.sendinblue.com/camp/template/15/message-setup
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: 15,
+
   // https://my.sendinblue.com/camp/template/17/message-setup
   BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION: 17, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
+
   // https://my.sendinblue.com/camp/template/18/message-setup
   NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE: 18,
+
   // https://my.sendinblue.com/camp/template/19/message-setup
   NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE: 19,
+
+  // https://my.sendinblue.com/camp/template/20/message-setup
+  CONTACT_BY_EMAIL_REQUEST: 20,
+
+  // https://my.sendinblue.com/camp/template/21/message-setup
+  CONTACT_BY_PHONE_INSTRUCTIONS: 21,
+
+  // https://my.sendinblue.com/camp/template/22/message-setup
+  CONTACT_IN_PERSON_INSTRUCTIONS: 22,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -92,7 +106,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     recipient: string,
     formEstablishmentDto: FormEstablishmentDto,
   ): Promise<void> {
-    this.sendTransacEmail(
+    await this.sendTransacEmail(
       "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
       [recipient],
       {
@@ -237,7 +251,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     recipients: string[],
     params: SendRenewedMagicLinkParams,
   ): Promise<void> {
-    this.sendTransacEmail("MAGIC_LINK_RENEWAL", recipients, {
+    await this.sendTransacEmail("MAGIC_LINK_RENEWAL", recipients, {
       MAGIC_LINK: params.magicLink,
     });
   }
@@ -246,7 +260,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     recipient: string,
     params: SignedByOtherPartyNotificationParams,
   ): Promise<void> {
-    this.sendTransacEmail(
+    await this.sendTransacEmail(
       "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
       [recipient],
       {
@@ -264,7 +278,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     recipient: string,
     params: BeneficiarySignatureRequestNotificationParams,
   ): Promise<void> {
-    this.sendTransacEmail(
+    await this.sendTransacEmail(
       "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
       [recipient],
       {
@@ -280,7 +294,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     recipient: string,
     params: EnterpriseSignatureRequestNotificationParams,
   ): Promise<void> {
-    this.sendTransacEmail(
+    await this.sendTransacEmail(
       "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
       [recipient],
       {
@@ -291,6 +305,50 @@ export class SendinblueEmailGateway implements EmailGateway {
         MENTOR_NAME: params.mentorName,
       },
     );
+  }
+
+  public async sendContactByEmailRequest(
+    recipient: string,
+    params: ContactByEmailRequestParams,
+  ): Promise<void> {
+    await this.sendTransacEmail("CONTACT_BY_EMAIL_REQUEST", [recipient], {
+      BUSINESS_NAME: params.businessName,
+      CONTACT_FIRSTNAME: params.contactFirstName,
+      CONTACT_LASTNAME: params.contactLastName,
+      JOB_LABEL: params.jobLabel,
+      POTENTIAL_BENEFICIARY_FIRSTNAME: params.potentialBeneficiaryFirstName,
+      POTENTIAL_BENEFICIARY_LASTNAME: params.potentialBeneficiaryLastName,
+      POTENTIAL_BENEFICIARY_EMAIL: params.potentialBeneficiaryEmail,
+      MESSAGE: params.message,
+    });
+  }
+
+  public async sendContactByPhoneInstructions(
+    recipient: string,
+    params: ContactByPhoneInstructionsParams,
+  ): Promise<void> {
+    await this.sendTransacEmail("CONTACT_BY_PHONE_INSTRUCTIONS", [recipient], {
+      BUSINESS_NAME: params.businessName,
+      CONTACT_FIRSTNAME: params.contactFirstName,
+      CONTACT_LASTNAME: params.contactLastName,
+      CONTACT_PHONE: params.contactPhone,
+      POTENTIAL_BENEFICIARY_FIRSTNAME: params.potentialBeneficiaryFirstName,
+      POTENTIAL_BENEFICIARY_LASTNAME: params.potentialBeneficiaryLastName,
+    });
+  }
+
+  public async sendContactInPersonInstructions(
+    recipient: string,
+    params: ContactInPersonInstructionsParams,
+  ): Promise<void> {
+    await this.sendTransacEmail("CONTACT_IN_PERSON_INSTRUCTIONS", [recipient], {
+      BUSINESS_NAME: params.businessName,
+      CONTACT_FIRSTNAME: params.contactFirstName,
+      CONTACT_LASTNAME: params.contactLastName,
+      BUSINESS_ADDRESS: params.businessAddress,
+      POTENTIAL_BENEFICIARY_FIRSTNAME: params.potentialBeneficiaryFirstName,
+      POTENTIAL_BENEFICIARY_LASTNAME: params.potentialBeneficiaryLastName,
+    });
   }
 
   private async sendTransacEmail(

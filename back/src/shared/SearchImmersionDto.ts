@@ -70,7 +70,6 @@ export const searchImmersionResultSchema = z.object({
   location: latLonSchema,
   address: z.string(),
   city: z.string(),
-  contactId: immersionContactInEstablishmentIdSchema.optional(),
   contactMode: preferredContactMethodSchema.optional(),
   distance_m: z.number().optional(),
   contactDetails: contactSchema.optional(),

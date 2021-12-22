@@ -1,3 +1,7 @@
+import {
+  EstablishmentAggregate,
+  EstablishmentEntityV2,
+} from "../../../domain/immersionOffer/entities/EstablishmentAggregate";
 import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   ContactEntityV2,
@@ -16,10 +20,6 @@ import { EstablishmentEntityV2Builder } from "../../../_testBuilders/Establishme
 import { ImmersionEstablishmentContactBuilder } from "../../../_testBuilders/ImmersionEstablishmentContactBuilder";
 import { ImmersionOfferEntityBuilder } from "../../../_testBuilders/ImmersionOfferEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import {
-  EstablishmentAggregate,
-  EstablishmentEntityV2,
-} from "./../../../domain/immersionOffer/entities/EstablishmentAggregate";
 
 const logger = createLogger(__filename);
 
@@ -72,7 +72,6 @@ export class InMemoryImmersionOfferRepository
   }
 
   empty() {
-    // TODO: Remove this. Do not add entities in constructor !
     this._immersionOffers = {};
     this._establishments = {};
     this._establishmentContacts = {};
@@ -81,6 +80,7 @@ export class InMemoryImmersionOfferRepository
   }
 
   async insertEstablishmentAggregates(aggregates: EstablishmentAggregate[]) {
+    logger.info({ aggregates }, "insertEstablishmentAggregates");
     this._establishmentAggregates = [
       ...this._establishmentAggregates,
       ...aggregates,
@@ -193,7 +193,6 @@ export class InMemoryImmersionOfferRepository
       rome,
       siret,
       voluntaryToImmersion,
-      contactId: contactInEstablishment?.id,
       contactMode: establishment.getContactMode(),
       distance_m:
         searchParams &&

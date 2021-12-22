@@ -101,6 +101,38 @@ export type EnterpriseSignatureRequestNotificationParams = {
   businessName: string; //< COMPANY_NAME
 };
 
+// CONTACT_BY_EMAIL_REQUEST
+export type ContactByEmailRequestParams = {
+  businessName: string; //< BUSINESS_NAME
+  contactFirstName: string; //< CONTACT_FIRSTNAME
+  contactLastName: string; //< CONTACT_LASTNAME
+  jobLabel: string; //< JOB_LABEL
+  potentialBeneficiaryFirstName: string; //< POTENTIAL_BENEFICIARY_FIRSTNAME
+  potentialBeneficiaryLastName: string; //< POTENTIAL_BENEFICIARY_LASTNAME
+  potentialBeneficiaryEmail: string; //< POTENTIAL_BENEFICIARY_EMAIL
+  message: string; //< MESSAGE
+};
+
+// CONTACT_BY_PHONE_INSTRUCTIONS
+export type ContactByPhoneInstructionsParams = {
+  businessName: string; //< BUSINESS_NAME
+  contactFirstName: string; //< CONTACT_FIRSTNAME
+  contactLastName: string; //< CONTACT_LASTNAME
+  contactPhone: string; //< CONTACT_PHONE
+  potentialBeneficiaryFirstName: string; //< POTENTIAL_BENEFICIARY_FIRSTNAME
+  potentialBeneficiaryLastName: string; //< POTENTIAL_BENEFICIARY_LASTNAME
+};
+
+// CONTACT_IN_PERSON_INSTRUCTIONS
+export type ContactInPersonInstructionsParams = {
+  businessName: string; //< BUSINESS_NAME
+  contactFirstName: string; //< CONTACT_FIRSTNAME
+  contactLastName: string; //< CONTACT_LASTNAME
+  businessAddress: string; //< BUSINESS_ADDRESS
+  potentialBeneficiaryFirstName: string; //< POTENTIAL_BENEFICIARY_FIRSTNAME
+  potentialBeneficiaryLastName: string; //< POTENTIAL_BENEFICIARY_LASTNAME
+};
+
 export type EmailType =
   | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
   | "NEW_APPLICATION_MENTOR_CONFIRMATION"
@@ -113,7 +145,10 @@ export type EmailType =
   | "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION"
   | "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION"
   | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE"
-  | "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE";
+  | "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE"
+  | "CONTACT_BY_EMAIL_REQUEST"
+  | "CONTACT_BY_PHONE_INSTRUCTIONS"
+  | "CONTACT_IN_PERSON_INSTRUCTIONS";
 
 export interface EmailGateway {
   sendNewApplicationBeneficiaryConfirmation: (
@@ -163,5 +198,17 @@ export interface EmailGateway {
   sendEnterpriseSignatureRequestNotification: (
     recipient: string,
     params: EnterpriseSignatureRequestNotificationParams,
+  ) => Promise<void>;
+  sendContactByEmailRequest: (
+    recipient: string,
+    params: ContactByEmailRequestParams,
+  ) => Promise<void>;
+  sendContactByPhoneInstructions: (
+    recipient: string,
+    params: ContactByPhoneInstructionsParams,
+  ) => Promise<void>;
+  sendContactInPersonInstructions: (
+    recipient: string,
+    params: ContactInPersonInstructionsParams,
   ) => Promise<void>;
 }

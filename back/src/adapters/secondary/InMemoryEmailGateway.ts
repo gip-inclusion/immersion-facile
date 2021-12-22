@@ -1,22 +1,23 @@
 import type {
   BeneficiarySignatureRequestNotificationParams,
+  ContactInPersonInstructionsParams,
+  ContactByEmailRequestParams,
+  ContactByPhoneInstructionsParams,
   EmailType,
   EnterpriseSignatureRequestNotificationParams,
+  ModificationRequestApplicationNotificationParams,
   NewApplicationAdminNotificationParams,
   NewApplicationBeneficiaryConfirmationParams,
   NewApplicationMentorConfirmationParams,
   NewImmersionApplicationReviewForEligibilityOrValidationParams,
   RejectedApplicationNotificationParams,
+  SendRenewedMagicLinkParams,
   SignedByOtherPartyNotificationParams,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
 import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
 import { createLogger } from "../../utils/logger";
-import {
-  ModificationRequestApplicationNotificationParams,
-  SendRenewedMagicLinkParams,
-} from "./../../domain/immersionApplication/ports/EmailGateway";
 
 const logger = createLogger(__filename);
 
@@ -189,6 +190,42 @@ export class InMemoryEmailGateway implements EmailGateway {
     );
     this.sentEmails.push({
       type: "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+      recipients: [recipient],
+      params: params,
+    });
+  }
+
+  public async sendContactByEmailRequest(
+    recipient: string,
+    params: ContactByEmailRequestParams,
+  ): Promise<void> {
+    logger.info({ recipient, params }, "sendContactByEmailRequest");
+    this.sentEmails.push({
+      type: "CONTACT_BY_EMAIL_REQUEST",
+      recipients: [recipient],
+      params: params,
+    });
+  }
+
+  public async sendContactByPhoneInstructions(
+    recipient: string,
+    params: ContactByPhoneInstructionsParams,
+  ): Promise<void> {
+    logger.info({ recipient, params }, "sendContactByPhoneInstructions");
+    this.sentEmails.push({
+      type: "CONTACT_BY_PHONE_INSTRUCTIONS",
+      recipients: [recipient],
+      params: params,
+    });
+  }
+
+  public async sendContactInPersonInstructions(
+    recipient: string,
+    params: ContactInPersonInstructionsParams,
+  ): Promise<void> {
+    logger.info({ recipient, params }, "sendContactInPersonInstructions");
+    this.sentEmails.push({
+      type: "CONTACT_IN_PERSON_INSTRUCTIONS",
       recipients: [recipient],
       params: params,
     });

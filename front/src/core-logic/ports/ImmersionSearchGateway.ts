@@ -1,6 +1,5 @@
 import { ContactEstablishmentRequestDto } from "src/shared/contactEstablishment";
 import {
-  LocationSuggestionDto,
   SearchImmersionRequestDto,
   SearchImmersionResultDto,
 } from "src/shared/SearchImmersionDto";

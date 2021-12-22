@@ -3,11 +3,11 @@ import { Clock } from "../../domain/core/ports/Clock";
 import { RateLimiter } from "../../domain/core/ports/RateLimiter";
 import {
   RetriableError,
-  RetryStrategy
+  RetryStrategy,
 } from "../../domain/core/ports/RetryStrategy";
 import {
   SireneRepository,
-  SireneRepositoryAnswer
+  SireneRepositoryAnswer,
 } from "../../domain/sirene/ports/SireneRepository";
 import { SiretDto } from "../../shared/siret";
 import { createAxiosInstance, logAxiosError } from "../../utils/axiosUtils";

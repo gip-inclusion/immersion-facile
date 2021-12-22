@@ -27,7 +27,6 @@ type SearchImmersionResultPublic = {
   address: string;
   city: string;
   distance_m?: number;
-  contactId?: string;
   contactMode?: ContactMethodPublic;
   contactDetails?: ContactDetailsPublic; // only if authenticated with api key
 };

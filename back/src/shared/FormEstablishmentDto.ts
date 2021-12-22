@@ -34,6 +34,9 @@ const validContactMethods: NotEmptyArray<ContactMethod> = [
   "PHONE",
   "IN_PERSON",
 ];
+export const preferEmailContactSchema = z.literal("EMAIL");
+export const preferPhoneContactSchema = z.literal("PHONE");
+export const preferInPersonContactSchema = z.literal("IN_PERSON");
 export const preferredContactMethodSchema = z.enum(validContactMethods);
 
 export type FormEstablishmentDto = z.infer<typeof formEstablishmentSchema>;
