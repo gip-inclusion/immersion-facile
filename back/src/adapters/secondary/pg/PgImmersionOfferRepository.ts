@@ -175,7 +175,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   private async _upsertImmersionOffersFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
-    const immersionOfferFields = aggregates.flatMap(
+    const immersionOfferFields: any[][] = aggregates.flatMap(
       ({ establishment, contacts, immersionOffers }) =>
         immersionOffers.map((immersionOffer) => [
           immersionOffer.id,
@@ -194,11 +194,23 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
     if (immersionOfferFields.length === 0) return;
 
+    //Deduplication in case we have multiple times the same SIRET + ROMES, this due to the fact that different appellations can be transformed in the same ROME
+    const deduplicatedArrayOfImmersionOffers: any[][] =
+      immersionOfferFields.reduce((acc, cur) => {
+        const alreadyExist = acc.some(
+          (item: any[]) => item[1] == cur[1] && item[3] == cur[3], //ROME is at position 1 and SIRET at position 3
+        );
+        if (alreadyExist) return acc;
+        return [...acc, cur];
+      }, []);
+
     try {
-      const query = buildUpsertImmersionOffersQuery(immersionOfferFields);
+      const query = buildUpsertImmersionOffersQuery(
+        deduplicatedArrayOfImmersionOffers,
+      );
       await this.client.query(query);
     } catch (e: any) {
-      logger.error(e, "Error inserting contacts");
+      logger.error(e, "Error inserting immersion offers");
     }
   }
 
@@ -218,7 +230,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     //We deduplicate establishments because postgres does not support duplicate rows
     const deduplicatedArrayOfEstablishments: any[][] =
       arrayOfEstablishments.reduce((acc, cur) => {
-        const alreadyExist = acc.some((item: any[]) => item[0] === cur[0]);
+        const alreadyExist = acc.some((item: any[]) => item[0] === cur[0]); //We deduplicate on the SIRET field that is place at 0 in the array
         if (alreadyExist) return acc;
         return [...acc, cur];
       }, []);
@@ -288,7 +300,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       (acc: any[][], cur: any[]) => {
         const alreadyExist = acc.some(
           (item: any[]) =>
-            item[1] === cur[1] && item[2] === cur[2] && item[3] === cur[3],
+            item[1] === cur[1] && item[2] === cur[2] && item[3] === cur[3], //We deduplicate on the trio ROME / NAF Category / SIRET that is the primary key of the immersion-offers table. There fields are place respectively at place 1, 2 and 3
         );
         if (alreadyExist) return acc;
         return [...acc, cur];

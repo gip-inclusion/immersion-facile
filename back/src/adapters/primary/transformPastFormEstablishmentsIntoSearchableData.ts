@@ -11,7 +11,7 @@ import {
 } from "../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
 import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
-import { TestUuidGenerator } from "../secondary/core/UuidGeneratorImplementations";
+import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
@@ -79,7 +79,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       sireneRepository,
       poleEmploiGateway,
       sequenceRunner,
-      new TestUuidGenerator(),
+      new UuidV4Generator(),
     );
   const allIdsResult = await clientOrigin.query(
     "WITH siretInFormEstablishment AS ( \

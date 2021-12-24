@@ -65,12 +65,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
     const numberEmployeesRange =
       inferNumberEmployeesRangeFromSireneAnswer(sireneRepoAnswer);
 
-    if (
-      !naf ||
-      !position ||
-      numberEmployeesRange === undefined ||
-      numberEmployeesRange == -1
-    ) {
+    if (!naf || !position || numberEmployeesRange === undefined) {
       logger.error(
         `Some field from siren gateway are missing for establishment with siret ${establishmentSiret}`,
       );
