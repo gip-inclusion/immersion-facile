@@ -25,6 +25,13 @@ export class AppConfigBuilder implements Builder<AppConfig> {
     this.configParams = { ...defaultConfigParams, ...configParams };
   }
 
+  public withConfigParams(configParams: ProcessEnv) {
+    return new AppConfigBuilder({
+      ...this.configParams,
+      ...configParams,
+    });
+  }
+
   public withRepositories(REPOSITORIES: string) {
     return new AppConfigBuilder({
       ...this.configParams,

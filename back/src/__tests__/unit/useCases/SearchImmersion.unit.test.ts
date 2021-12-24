@@ -1,9 +1,17 @@
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import {
+  InMemoryImmersionOfferRepository,
+  TEST_CITY,
+  TEST_NAF_LABEL,
+  TEST_POSITION,
+  TEST_ROME_LABEL,
+} from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemorySearchesMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
-import { ImmersionOfferEntity } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
-import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 describe("SearchImmersion", () => {
   test("Search immersion, give contact details only if authenticated", async () => {
@@ -14,36 +22,26 @@ describe("SearchImmersion", () => {
       immersionOfferRepository,
     );
     const siret = "78000403200019";
-    const establishment = new EstablishmentEntityBuilder()
+    const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03536d";
+    const establishment = new EstablishmentEntityV2Builder()
       .withSiret(siret)
       .withContactMode("EMAIL")
       .withAddress("55 Rue du Faubourg Saint-Honoré")
+      .withNaf("8539A")
       .build();
+    const immersionOffer = new ImmersionOfferEntityV2Builder()
+      .withId(immersionOfferId)
+      .withRome("M1607")
+      .build();
+    const contact = new ContactEntityV2Builder().build();
 
-    await immersionOfferRepository.insertEstablishments([establishment]);
-    await immersionOfferRepository.insertImmersions([
-      new ImmersionOfferEntity({
-        id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
-        rome: "M1607",
-        naf: "8539A",
-        siret: "78000403200019",
-        name: "Company from la bonne boite",
-        voluntaryToImmersion: false,
-        data_source: "api_labonneboite",
-        score: 4.5,
-        position: { lat: 43.8666, lon: 8.3333 },
-        contactInEstablishment: {
-          id: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
-          lastName: "Dupont",
-          firstName: "Pierre",
-          email: "test@email.fr",
-          role: "Directeur",
-          siretEstablishment: "78000403200019",
-          phone: "0640404040",
-        },
-      }),
+    await immersionOfferRepository.insertEstablishmentAggregates([
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(establishment)
+        .withContacts([contact])
+        .withImmersionOffers([immersionOffer])
+        .build(),
     ]);
-
     const unauthenticatedResponse = await searchImmersion.execute({
       rome: "M1607",
       nafDivision: "85",
@@ -56,19 +54,19 @@ describe("SearchImmersion", () => {
 
     const expectedResponse: SearchImmersionResultDto[] = [
       {
-        id: "13df03a5-a2a5-430a-b558-ed3e2f03536d",
+        id: immersionOfferId,
         rome: "M1607",
         naf: "8539A",
         siret: "78000403200019",
-        name: "Company from la bonne boite",
+        name: "Company inside repository",
         voluntaryToImmersion: false,
-        location: { lat: 43.8666, lon: 8.3333 },
+        location: TEST_POSITION,
         address: "55 Rue du Faubourg Saint-Honoré",
         contactMode: "EMAIL",
         distance_m: 606885,
-        city: "xxxx",
-        nafLabel: "xxxx",
-        romeLabel: "xxxx",
+        city: TEST_CITY,
+        nafLabel: TEST_NAF_LABEL,
+        romeLabel: TEST_ROME_LABEL,
         contactDetails: undefined,
       },
     ];
@@ -104,12 +102,12 @@ describe("SearchImmersion", () => {
     const expectedAuthResponse: SearchImmersionResultDto = {
       ...expectedResponse[0],
       contactDetails: {
-        id: "37dd0b5e-3270-11ec-8d3d-0242ac130003",
-        firstName: "Pierre",
-        lastName: "Dupont",
-        email: "test@email.fr",
-        role: "Directeur",
-        phone: "0640404040",
+        id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
+        firstName: "Alain",
+        lastName: "Prost",
+        email: "alain.prost@email.fr",
+        role: "le big boss",
+        phone: "0612345678",
       },
     };
     expect(authenticatedResponse).toEqual([expectedAuthResponse]);

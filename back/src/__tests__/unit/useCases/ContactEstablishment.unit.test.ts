@@ -41,7 +41,7 @@ describe("ContactEstablishment", () => {
   let clock: CustomClock;
 
   beforeEach(() => {
-    immersionOfferRepository = new InMemoryImmersionOfferRepository().empty();
+    immersionOfferRepository = new InMemoryImmersionOfferRepository();
     outboxRepository = new InMemoryOutboxRepository();
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),

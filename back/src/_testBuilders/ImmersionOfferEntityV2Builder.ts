@@ -17,6 +17,9 @@ export class ImmersionOfferEntityV2Builder
   withId(id: ImmersionOfferId) {
     return new ImmersionOfferEntityV2Builder({ ...this.entity, id });
   }
+  withRome(rome: string) {
+    return new ImmersionOfferEntityV2Builder({ ...this.entity, rome });
+  }
   build() {
     return this.entity;
   }

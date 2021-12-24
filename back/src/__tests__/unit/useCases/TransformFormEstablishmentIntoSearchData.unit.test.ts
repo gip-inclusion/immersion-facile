@@ -1,4 +1,5 @@
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
@@ -10,7 +11,6 @@ import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../../../shared/rome";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
-import { InMemoryAdresseAPI } from "./../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 
 class TestSequenceRunner implements SequenceRunner {
   public run<Input, Output>(array: Input[], cb: (a: Input) => Promise<Output>) {
@@ -50,14 +50,12 @@ describe("Transform FormEstablishment into search data", () => {
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    // formEstablishmentRepository = new InMemoryFormEstablishmentRepository();
     inMemorySireneRepository = new InMemorySireneRepository();
     inMemoryImmersionOfferRepository = new InMemoryImmersionOfferRepository();
     inMemoryAdresseAPI = new InMemoryAdresseAPI(fakePosition);
     uuidGenerator = new TestUuidGenerator();
     const inMemoryRomeGateway = new InMemoryRomeGateway();
     const sequencerRunner = new TestSequenceRunner();
-    inMemoryImmersionOfferRepository.empty();
     transformFormEstablishmentIntoSearchData =
       new TransformFormEstablishmentIntoSearchData(
         inMemoryImmersionOfferRepository,
@@ -110,10 +108,8 @@ describe("Transform FormEstablishment into search data", () => {
     offerRomes: string[];
   }) => {
     const repoEstablishmentAggregate =
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      (await inMemoryImmersionOfferRepository.getEstablishmentFromSiret(
-        expected.siret,
-      ))!;
+      inMemoryImmersionOfferRepository.establishmentAggregates[0];
+
     expect(repoEstablishmentAggregate).toBeDefined();
     expect(repoEstablishmentAggregate.establishment.siret).toEqual(
       expected.siret,
@@ -152,11 +148,12 @@ describe("Transform FormEstablishment into search data", () => {
     await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
 
     const establishmentAggregate =
-      await inMemoryImmersionOfferRepository.getEstablishmentFromSiret(
-        formEstablishment.siret,
-      );
+      inMemoryImmersionOfferRepository.establishmentAggregates[0];
     expect(establishmentAggregate).toBeDefined();
-    expect(establishmentAggregate?.establishment.numberEmployeesRange).toEqual(
+    expect(establishmentAggregate.establishment.siret).toEqual(
+      formEstablishment.siret,
+    );
+    expect(establishmentAggregate.establishment.numberEmployeesRange).toEqual(
       0,
     );
   });

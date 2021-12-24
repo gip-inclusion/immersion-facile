@@ -11,15 +11,13 @@ import {
   SireneRepository,
   SireneRepositoryAnswer,
 } from "../../sirene/ports/SireneRepository";
+import { ContactEntityV2 } from "../entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
   TefenCode,
-} from "../entities/EstablishmentAggregate";
-import {
-  ContactEntityV2,
-  ImmersionOfferEntityV2,
-} from "../entities/ImmersionOfferEntity";
+} from "../entities/EstablishmentEntity";
+import { ImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { AdresseAPI } from "../ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 

@@ -7,7 +7,7 @@ import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 import { UseCase } from "../../core/UseCase";
 import { SearchParams } from "../entities/SearchParams";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
-import { SearchesMadeRepository } from "./../ports/SearchesMadeRepository";
+import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
 
 export class SearchImmersion extends UseCase<
   SearchImmersionRequestDto,
@@ -33,7 +33,7 @@ export class SearchImmersion extends UseCase<
 
     return this.immersionOfferRepository.getFromSearch(
       searchParams,
-      apiConsumerName !== undefined,
+      /* withContactDetails= */ apiConsumerName !== undefined,
     );
   }
 }

@@ -1,4 +1,4 @@
-import { ContactEntityV2 } from "./../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import { Builder } from "./Builder";
 
 const validContactEntityV2: ContactEntityV2 = {

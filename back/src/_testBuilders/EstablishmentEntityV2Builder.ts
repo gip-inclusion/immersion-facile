@@ -1,4 +1,7 @@
-import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentAggregate";
+import {
+  DataSource,
+  EstablishmentEntityV2,
+} from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ContactMethod } from "../shared/FormEstablishmentDto";
 import { Builder } from "./Builder";
 
@@ -20,11 +23,20 @@ export class EstablishmentEntityV2Builder
   constructor(
     private readonly entity: EstablishmentEntityV2 = validEstablishmentEntityV2,
   ) {}
+  withSiret(siret: string) {
+    return new EstablishmentEntityV2Builder({ ...this.entity, siret });
+  }
   withAddress(address: string) {
     return new EstablishmentEntityV2Builder({ ...this.entity, address });
   }
   withContactMode(contactMethod: ContactMethod) {
     return new EstablishmentEntityV2Builder({ ...this.entity, contactMethod });
+  }
+  withDataSource(dataSource: DataSource) {
+    return new EstablishmentEntityV2Builder({ ...this.entity, dataSource });
+  }
+  withNaf(naf: string) {
+    return new EstablishmentEntityV2Builder({ ...this.entity, naf });
   }
   build() {
     return this.entity;

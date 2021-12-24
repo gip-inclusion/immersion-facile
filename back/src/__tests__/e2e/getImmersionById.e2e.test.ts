@@ -1,18 +1,32 @@
 import { getUnixTime } from "date-fns";
-import supertest, { SuperTest, Test } from "supertest";
-import { createApp } from "../../adapters/primary/server";
+import { SuperTest, Test } from "supertest";
+import {
+  TEST_NAF_LABEL,
+  TEST_POSITION,
+  TEST_ROME_LABEL,
+} from "../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { makeGenerateJwt } from "../../domain/auth/jwt";
 import { SearchImmersionResultDto } from "../../shared/SearchImmersionDto";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import {
+  buildTestApp,
+  InMemoryRepositories,
+} from "../../_testBuilders/buildTestApp";
+import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { RealClock } from "./../../adapters/secondary/core/ClockImplementations";
 import { GenerateApiConsumerJtw } from "./../../domain/auth/jwt";
 
 const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
+const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03512d";
 
 describe("/get-immersion-by-id route", () => {
   let clock = new RealClock();
 
   let request: SuperTest<Test>;
+  let reposAndGateways: InMemoryRepositories;
   let generateJwt: GenerateApiConsumerJtw;
 
   beforeEach(async () => {
@@ -20,25 +34,39 @@ describe("/get-immersion-by-id route", () => {
       .withRepositories("IN_MEMORY")
       .withAuthorizedApiKeyIds([authorizedApiKeyId])
       .build();
-    const { app } = await createApp(config);
+    ({ request, reposAndGateways } = await buildTestApp(config));
     generateJwt = makeGenerateJwt(config);
-    request = supertest(app);
+
+    await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityV2Builder()
+            .withContactMode("EMAIL")
+            .withAddress("55 rue de Faubourg Sante Honoré 75008 Paris")
+            .build(),
+        )
+        .withContacts([new ContactEntityV2Builder().build()])
+        .withImmersionOffers([
+          new ImmersionOfferEntityV2Builder().withId(immersionOfferId).build(),
+        ])
+        .build(),
+    ]);
   });
 
   test("accepts valid unauthenticated requests", async () => {
     const expectedResult: SearchImmersionResultDto = {
-      id: "13df03a5-a2a5-430a-b558-ed3e2f03512d",
+      id: immersionOfferId,
       rome: "M1907",
       naf: "8539A",
       siret: "78000403200019",
       name: "Company inside repository",
       voluntaryToImmersion: false,
-      location: { lat: 35, lon: 50 },
-      address: "55 rue de Faubourg Sante Honoré",
+      location: TEST_POSITION,
+      address: "55 rue de Faubourg Sante Honoré 75008 Paris",
       contactMode: "EMAIL",
-      romeLabel: "xxxx",
-      nafLabel: "xxxx",
-      city: "xxxx",
+      romeLabel: TEST_ROME_LABEL,
+      nafLabel: TEST_NAF_LABEL,
+      city: "Paris",
     };
 
     await request
@@ -54,8 +82,8 @@ describe("/get-immersion-by-id route", () => {
       siret: "78000403200019",
       name: "Company inside repository",
       voluntaryToImmersion: false,
-      location: { lat: 35, lon: 50 },
-      address: "55 rue de Faubourg Sante Honoré",
+      location: TEST_POSITION,
+      address: "55 rue de Faubourg Sante Honoré 75008 Paris",
       contactMode: "EMAIL",
       contactDetails: {
         id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
@@ -65,9 +93,9 @@ describe("/get-immersion-by-id route", () => {
         phone: "0612345678",
         role: "le big boss",
       },
-      romeLabel: "xxxx",
-      nafLabel: "xxxx",
-      city: "xxxx",
+      romeLabel: TEST_ROME_LABEL,
+      nafLabel: TEST_NAF_LABEL,
+      city: "Paris",
     };
 
     const authToken = generateJwt({

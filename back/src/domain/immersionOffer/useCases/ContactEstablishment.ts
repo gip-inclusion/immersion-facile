@@ -29,10 +29,9 @@ export class ContactEstablishment extends TransactionalUseCase<
   ): Promise<void> {
     const { immersionOfferId, contactMode } = params;
 
-    const immersionOffer = await immersionOfferRepo.getImmersionOfferById(
-      immersionOfferId,
-    );
-    if (!immersionOffer) throw new NotFoundError(immersionOfferId);
+    const annotatedImmersionOffer =
+      await immersionOfferRepo.getAnnotatedImmersionOfferById(immersionOfferId);
+    if (!annotatedImmersionOffer) throw new NotFoundError(immersionOfferId);
 
     const contact = await immersionOfferRepo.getContactByImmersionOfferId(
       immersionOfferId,
@@ -42,13 +41,13 @@ export class ContactEstablishment extends TransactionalUseCase<
         `No contact for immersion offer: ${immersionOfferId}`,
       );
 
-    const establishment =
-      await immersionOfferRepo.getEstablishmentByImmersionOfferId(
+    const annotatedEstablishment =
+      await immersionOfferRepo.getAnnotatedEstablishmentByImmersionOfferId(
         immersionOfferId,
       );
-    if (!establishment) throw new NotFoundError(immersionOfferId);
+    if (!annotatedEstablishment) throw new NotFoundError(immersionOfferId);
 
-    if (contactMode !== establishment.contactMethod)
+    if (contactMode !== annotatedEstablishment.contactMethod)
       throw new BadRequestError(
         `Contact mode mismatch: IN_PERSON in immersion offer: ${immersionOfferId}`,
       );

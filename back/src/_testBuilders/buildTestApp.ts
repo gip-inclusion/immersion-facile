@@ -1,6 +1,8 @@
 import supertest from "supertest";
+import { AppConfig } from "../adapters/primary/appConfig";
 import type { Repositories } from "../adapters/primary/config";
 import { createApp } from "../adapters/primary/server";
+import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import type { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
 import { InMemoryImmersionOfferRepository } from "../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemorySearchesMadeRepository } from "../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
@@ -8,7 +10,6 @@ import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAge
 import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
 import type { InMemoryImmersionApplicationRepository } from "../adapters/secondary/InMemoryImmersionApplicationRepository";
-import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import { InMemoryRomeGateway } from "../adapters/secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../adapters/secondary/InMemorySireneRepository";
 import { AgencyConfigBuilder } from "./AgencyConfigBuilder";
@@ -37,7 +38,9 @@ type TestAppAndDeps = {
   eventCrawler: BasicEventCrawler;
 };
 
-export const buildTestApp = async (): Promise<TestAppAndDeps> => {
+export const buildTestApp = async (
+  appConfigOverrides?: AppConfig,
+): Promise<TestAppAndDeps> => {
   const adminEmail = "admin@email.fr";
   const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
   const agencyConfig = AgencyConfigBuilder.create(
@@ -57,7 +60,12 @@ export const buildTestApp = async (): Promise<TestAppAndDeps> => {
     DOMAIN: "my-domain",
     REPOSITORIES: "IN_MEMORY",
     EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
+    ...appConfigOverrides?.configParams,
   }).build();
+
+  if (appConfig.emailGateway !== "IN_MEMORY") throwNotSupportedError();
+  if (appConfig.repositories !== "IN_MEMORY") throwNotSupportedError();
+  if (appConfig.sireneRepository !== "IN_MEMORY") throwNotSupportedError();
 
   const {
     app,
@@ -76,4 +84,8 @@ export const buildTestApp = async (): Promise<TestAppAndDeps> => {
     reposAndGateways,
     eventCrawler,
   };
+};
+
+const throwNotSupportedError = () => {
+  throw new Error("AppConfig not supported.");
 };

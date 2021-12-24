@@ -1,7 +1,7 @@
+import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../shared/rome";
 import { Builder } from "./Builder";
-import { ContactEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 
 const validFormEstablishment: FormEstablishmentDto = {
   id: "test_demande_immersion_id",

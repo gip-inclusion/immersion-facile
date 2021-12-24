@@ -9,7 +9,7 @@ import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
   TefenCode,
-} from "../entities/EstablishmentAggregate";
+} from "../entities/EstablishmentEntity";
 import { SearchParams } from "../entities/SearchParams";
 import { AdresseAPI } from "../ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";

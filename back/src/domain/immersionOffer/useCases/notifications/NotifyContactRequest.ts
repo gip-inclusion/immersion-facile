@@ -25,11 +25,11 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
   ): Promise<void> {
     const { immersionOfferId } = payload;
 
-    const immersionOffer =
-      await this.immersionOfferRepository.getImmersionOfferById(
+    const annotatedImmersionOffer =
+      await this.immersionOfferRepository.getAnnotatedImmersionOfferById(
         immersionOfferId,
       );
-    if (!immersionOffer)
+    if (!annotatedImmersionOffer)
       throw new Error(`Not found: immersionOfferId=${immersionOfferId}`);
 
     const contact =
@@ -38,21 +38,21 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
       );
     if (!contact)
       throw new Error(
-        `Missing contact details: immersionOffer.id=${immersionOffer.id}`,
+        `Missing contact details: immersionOffer.id=${annotatedImmersionOffer.id}`,
       );
 
-    const establishment =
-      await this.immersionOfferRepository.getEstablishmentByImmersionOfferId(
+    const annotatedEstablishment =
+      await this.immersionOfferRepository.getAnnotatedEstablishmentByImmersionOfferId(
         immersionOfferId,
       );
-    if (!establishment)
+    if (!annotatedEstablishment)
       throw new Error(
-        `Missing establishment: immersionOffer.id=${immersionOffer.id}`,
+        `Missing establishment: immersionOffer.id=${annotatedImmersionOffer.id}`,
       );
-    if (establishment.contactMethod !== payload.contactMode) {
+    if (annotatedEstablishment.contactMethod !== payload.contactMode) {
       throw new Error(
-        `Contact mode mismatch: immersionOffer.id=${immersionOffer.id}, ` +
-          `establishment.contactMethod=${establishment.contactMethod}, ` +
+        `Contact mode mismatch: immersionOffer.id=${annotatedImmersionOffer.id}, ` +
+          `establishment.contactMethod=${annotatedEstablishment.contactMethod}, ` +
           `payload.contactMode=${payload.contactMode}`,
       );
     }
@@ -61,10 +61,10 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
       case "EMAIL": {
         await this.withAllowedRecipient(contact.email, (recipient) =>
           this.emailGateway.sendContactByEmailRequest(recipient, {
-            businessName: establishment.name,
+            businessName: annotatedEstablishment.name,
             contactFirstName: contact.firstName,
             contactLastName: contact.lastName,
-            jobLabel: "XXXX", // TODO: Populate with ROME label from immersionOffer.
+            jobLabel: annotatedImmersionOffer.romeLabel,
             potentialBeneficiaryFirstName:
               payload.potentialBeneficiaryFirstName,
             potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
@@ -79,7 +79,7 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
           payload.potentialBeneficiaryEmail,
           (recipient) =>
             this.emailGateway.sendContactByPhoneInstructions(recipient, {
-              businessName: establishment.name,
+              businessName: annotatedEstablishment.name,
               contactFirstName: contact.firstName,
               contactLastName: contact.lastName,
               contactPhone: contact.phone,
@@ -96,10 +96,10 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
           payload.potentialBeneficiaryEmail,
           (recipient) =>
             this.emailGateway.sendContactInPersonInstructions(recipient, {
-              businessName: establishment.name,
+              businessName: annotatedEstablishment.name,
               contactFirstName: contact.firstName,
               contactLastName: contact.lastName,
-              businessAddress: establishment.address,
+              businessAddress: annotatedEstablishment.address,
               potentialBeneficiaryFirstName:
                 payload.potentialBeneficiaryFirstName,
               potentialBeneficiaryLastName:

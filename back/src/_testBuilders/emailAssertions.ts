@@ -1,8 +1,7 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
 import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyRepository";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentAggregate";
-import { ContactEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   ContactEstablishmentByMailDto,
   ContactEstablishmentInPersonDto,
@@ -10,8 +9,10 @@ import {
 import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
 import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../shared/routes";
-import { ContactEstablishmentByPhoneDto } from "./../shared/contactEstablishment";
+import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { ContactEstablishmentByPhoneDto } from "../shared/contactEstablishment";
 import { fakeGenerateMagicLinkUrlFn } from "./test.helpers";
+import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
@@ -245,6 +246,7 @@ export const expectEmailMatchingLinkRenewalEmail = (
 export const expectContactByEmailRequest = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
+  annotatedImmersionOffer: AnnotatedImmersionOfferEntityV2,
   establishment: EstablishmentEntityV2,
   contact: ContactEntityV2,
   payload: ContactEstablishmentByMailDto,
@@ -256,7 +258,7 @@ export const expectContactByEmailRequest = (
       businessName: establishment.name,
       contactFirstName: contact.firstName,
       contactLastName: contact.lastName,
-      jobLabel: "XXXX",
+      jobLabel: annotatedImmersionOffer.romeLabel,
       potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
       potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
       potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,

@@ -1,12 +1,11 @@
+import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
+  AnnotatedEstablishmentEntityV2,
   EstablishmentAggregate,
   EstablishmentEntityV2,
-} from "../../../domain/immersionOffer/entities/EstablishmentAggregate";
-import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
+} from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
-  ContactEntityV2,
-  ImmersionEstablishmentContact,
-  ImmersionOfferEntity,
+  AnnotatedImmersionOfferEntityV2,
   ImmersionOfferEntityV2,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
@@ -14,70 +13,20 @@ import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/I
 import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { ImmersionEstablishmentContactBuilder } from "../../../_testBuilders/ImmersionEstablishmentContactBuilder";
-import { ImmersionOfferEntityBuilder } from "../../../_testBuilders/ImmersionOfferEntityBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 const logger = createLogger(__filename);
 
-export const validImmersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03512d";
-
-const establishment = new EstablishmentEntityBuilder()
-  .withAddress("55 rue de Faubourg Sante Honoré")
-  .withContactMode("EMAIL")
-  .build();
-const establishmentContact = new ImmersionEstablishmentContactBuilder()
-  .withSiret(establishment.getSiret())
-  .build();
-const immersionOffer = new ImmersionOfferEntityBuilder()
-  .withId(validImmersionOfferId)
-  .withSiret(establishment.getProps().siret)
-  .build();
-
-const establishmentAggregate = new EstablishmentAggregateBuilder()
-  .withEstablishment(
-    new EstablishmentEntityV2Builder()
-      .withAddress("55 rue de Faubourg Sante Honoré")
-      .withContactMode("EMAIL")
-      .build(),
-  )
-  .withImmersionOffers([
-    new ImmersionOfferEntityV2Builder().withId(validImmersionOfferId).build(),
-  ])
-  .build();
+export const TEST_NAF_LABEL = "test_naf_label";
+export const TEST_ROME_LABEL = "test_rome_label";
+export const TEST_CITY = "test_city";
+export const TEST_POSITION = { lat: 43.8666, lon: 8.3333 };
 
 export class InMemoryImmersionOfferRepository
   implements ImmersionOfferRepository
 {
   public constructor(
-    private _immersionOffers: {
-      [id: string]: ImmersionOfferEntity;
-    } = {},
-    // TODO : DO NOT ADD ENTITIES IN CONSTRUCTOR ! This can be really confusing ..
-    private _establishments: { [siret: string]: EstablishmentEntity } = {},
-    private _establishmentContacts: {
-      [siret: string]: ImmersionEstablishmentContact;
-    } = {},
-    private _establishmentAggregates: EstablishmentAggregate[] = [
-      establishmentAggregate,
-    ],
-  ) {
-    this._establishments[establishment.getSiret()] = establishment;
-    this._establishmentContacts[establishmentContact.siretEstablishment] =
-      establishmentContact;
-    this._immersionOffers[immersionOffer.getId()] = immersionOffer;
-  }
-
-  empty() {
-    this._immersionOffers = {};
-    this._establishments = {};
-    this._establishmentContacts = {};
-    this._establishmentAggregates = [];
-    return this;
-  }
+    private _establishmentAggregates: EstablishmentAggregate[] = [],
+  ) {}
 
   async insertEstablishmentAggregates(aggregates: EstablishmentAggregate[]) {
     logger.info({ aggregates }, "insertEstablishmentAggregates");
@@ -87,20 +36,32 @@ export class InMemoryImmersionOfferRepository
     ];
   }
 
-  async getEstablishmentByImmersionOfferId(
+  async getAnnotatedEstablishmentByImmersionOfferId(
     immersionOfferId: ImmersionOfferId,
-  ): Promise<EstablishmentEntityV2 | undefined> {
-    return this._establishmentAggregates.find((aggregate) =>
+  ): Promise<AnnotatedEstablishmentEntityV2 | undefined> {
+    logger.info(
+      { immersionOfferId },
+      "getAnnotatedEstablishmentByImmersionOfferId",
+    );
+
+    const establishment = this._establishmentAggregates.find((aggregate) =>
       aggregate.immersionOffers.some((offer) => offer.id === immersionOfferId),
     )?.establishment;
+
+    if (establishment)
+      return {
+        ...establishment,
+        nafLabel: TEST_NAF_LABEL,
+        position: TEST_POSITION,
+      };
   }
 
   async getContactByImmersionOfferId(
     immersionOfferId: ImmersionOfferId,
   ): Promise<ContactEntityV2 | undefined> {
-    const establishment = await this.getEstablishmentByImmersionOfferId(
-      immersionOfferId,
-    );
+    logger.info({ immersionOfferId }, "getContactByImmersionOfferId");
+    const establishment =
+      await this.getAnnotatedEstablishmentByImmersionOfferId(immersionOfferId);
     if (!establishment) return;
     const contacts = this._establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret == establishment?.siret,
@@ -108,144 +69,95 @@ export class InMemoryImmersionOfferRepository
     return contacts && contacts[0];
   }
 
-  async getImmersionOfferById(
+  async getAnnotatedImmersionOfferById(
     immersionOfferId: ImmersionOfferId,
-  ): Promise<ImmersionOfferEntityV2 | undefined> {
-    return this._establishmentAggregates
+  ): Promise<AnnotatedImmersionOfferEntityV2 | undefined> {
+    logger.info({ immersionOfferId }, "getAnnotatedImmersionOfferById");
+    const immersionOffer = this._establishmentAggregates
       .flatMap((aggregate) => aggregate.immersionOffers)
       .find((immersionOffer) => (immersionOffer.id = immersionOfferId));
-  }
 
-  // DEPRECATED.
-  async insertEstablishmentContact(
-    immersionEstablishmentContact: ImmersionEstablishmentContact,
-  ) {
-    logger.info(immersionEstablishmentContact, "insertEstablishmentContact");
-    this._establishmentContacts[
-      immersionEstablishmentContact.siretEstablishment
-    ] = immersionEstablishmentContact;
-  }
-
-  public async insertImmersions(immersions: ImmersionOfferEntity[]) {
-    logger.info(immersions, "insertImmersions");
-    immersions.forEach((immersion) => {
-      this._immersionOffers[immersion.getId()] = immersion;
-
-      const establishmentContact = immersion.getProps().contactInEstablishment;
-      if (establishmentContact) {
-        this.insertEstablishmentContact(establishmentContact);
-      }
-    });
-  }
-
-  public async insertEstablishments(establishments: EstablishmentEntity[]) {
-    logger.info(establishments, "insertEstablishments");
-    establishments.forEach(
-      (establishment) =>
-        (this._establishments[establishment.getSiret()] = establishment),
-    );
+    if (immersionOffer)
+      return {
+        ...immersionOffer,
+        romeLabel: TEST_ROME_LABEL,
+      };
   }
 
   public async getFromSearch(
     searchParams: SearchParams,
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
-    let offers = Object.values(this._immersionOffers).filter(
-      (immersionOffer) => immersionOffer.getRome() === searchParams.rome,
-    );
-    if (searchParams.nafDivision) {
-      offers = offers.filter(
-        (immersionOffer) =>
-          immersionOffer.extractCategory() + "" === searchParams.nafDivision,
+    logger.info({ searchParams, withContactDetails }, "getFromSearch");
+    return this._establishmentAggregates
+      .filter(
+        (aggregate) =>
+          !searchParams.nafDivision ||
+          aggregate.establishment.naf.startsWith(searchParams.nafDivision),
+      )
+      .filter(
+        (aggregate) =>
+          !searchParams.siret ||
+          aggregate.establishment.siret === searchParams.siret,
+      )
+      .flatMap((aggregate) =>
+        aggregate.immersionOffers
+          .filter((immersionOffer) => immersionOffer.rome === searchParams.rome)
+          .map((immersionOffer) =>
+            buildSearchImmersionResultDto(
+              immersionOffer,
+              aggregate.establishment,
+              aggregate.contacts[0],
+              searchParams,
+              withContactDetails,
+            ),
+          ),
       );
-    }
-    if (searchParams.siret) {
-      offers = offers.filter(
-        (immersionOffer) =>
-          immersionOffer.getProps().siret + "" === searchParams.siret,
-      );
-    }
-    logger.info({ searchParams, response: offers }, "getFromSearch");
-    return offers.map((offer): SearchImmersionResultDto => {
-      return this.buildSearchResult(offer, withContactDetails, searchParams);
-    });
-  }
-
-  private buildSearchResult(
-    offer: ImmersionOfferEntity,
-    withContactDetails: boolean,
-    searchParams?: SearchParams,
-  ): SearchImmersionResultDto {
-    const establishment = this._establishments[offer.getProps().siret];
-    if (!establishment)
-      throw new Error("No establishment matching offer siret");
-    const contactInEstablishment =
-      this._establishmentContacts[offer.getProps().siret];
-
-    const { id, name, siret, voluntaryToImmersion, rome, position } =
-      offer.getProps();
-
-    return {
-      id,
-      address: establishment.getAddress(),
-      naf: establishment.getNaf(),
-      name,
-      rome,
-      siret,
-      voluntaryToImmersion,
-      contactMode: establishment.getContactMode(),
-      distance_m:
-        searchParams &&
-        distanceBetweenCoordinates(
-          searchParams.lat,
-          searchParams.lon,
-          position.lat,
-          position.lon,
-        ),
-      location: position,
-      city: "xxxx",
-      nafLabel: "xxxx",
-      romeLabel: "xxxx",
-      ...(withContactDetails &&
-        contactInEstablishment && {
-          contactDetails: {
-            id: contactInEstablishment.id,
-            firstName: contactInEstablishment.firstName,
-            lastName: contactInEstablishment.lastName,
-            email: contactInEstablishment.email,
-            phone: contactInEstablishment.phone,
-            role: contactInEstablishment.role,
-          },
-        }),
-    };
-  }
-
-  async getImmersionFromUuid(uuid: string) {
-    const offer = this._immersionOffers[uuid];
-    return offer && this.buildSearchResult(offer, false);
   }
 
   // for test purposes only :
-  async getEstablishmentFromSiret(siret: string) {
-    return this._establishmentAggregates.find(
-      (establishmentAggregate) =>
-        establishmentAggregate.establishment.siret == siret,
-    );
-  }
-
-  get immersionOffers() {
-    return Object.values(this._immersionOffers);
-  }
-  get establishments() {
-    return Object.values(this._establishments);
-  }
-  get establishmentContacts() {
-    return Object.values(this._establishmentContacts);
-  }
   get establishmentAggregates() {
     return Object.values(this._establishmentAggregates);
   }
 }
+
+const buildSearchImmersionResultDto = (
+  immersionOffer: ImmersionOfferEntityV2,
+  establishment: EstablishmentEntityV2,
+  contact: ContactEntityV2 | undefined,
+  searchParams: SearchParams,
+  withContactDetails: boolean,
+): SearchImmersionResultDto => ({
+  id: immersionOffer.id,
+  address: establishment.address,
+  naf: establishment.naf,
+  nafLabel: TEST_NAF_LABEL,
+  name: establishment.name,
+  rome: immersionOffer.rome,
+  romeLabel: TEST_ROME_LABEL,
+  siret: establishment.siret,
+  voluntaryToImmersion: establishment.voluntaryToImmersion,
+  contactMode: establishment.contactMethod,
+  distance_m: distanceBetweenCoordinates(
+    TEST_POSITION.lat,
+    TEST_POSITION.lon,
+    searchParams.lat,
+    searchParams.lon,
+  ),
+  location: TEST_POSITION,
+  city: TEST_CITY,
+  ...(withContactDetails &&
+    contact && {
+      contactDetails: {
+        id: contact.id,
+        firstName: contact.firstName,
+        lastName: contact.lastName,
+        email: contact.email,
+        phone: contact.phone,
+        role: contact.job,
+      },
+    }),
+});
 
 // Takes two coordinates (in degrees) and returns distance in meters.
 // Taken from https://www.movable-type.co.uk/scripts/latlong.html (MIT license)

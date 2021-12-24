@@ -1,6 +1,5 @@
 import { SuperTest, Test } from "supertest";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
-import { validImmersionOfferId } from "../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
 import {
   buildTestApp,
@@ -12,8 +11,9 @@ import { expectArraysToMatch } from "../../_testBuilders/test.helpers";
 import { ContactEntityV2Builder } from "./../../_testBuilders/ContactEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "./../../_testBuilders/ImmersionOfferEntityV2Builder";
 
+const immersionOfferId = "61649067-cd6a-4aa3-8866-d1f3d61292b4";
 const validRequest: ContactEstablishmentRequestDto = {
-  immersionOfferId: validImmersionOfferId,
+  immersionOfferId,
   contactMode: "EMAIL",
   potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",
@@ -28,7 +28,6 @@ describe("/contact-establishment route", () => {
 
   beforeEach(async () => {
     ({ request, reposAndGateways, eventCrawler } = await buildTestApp());
-    reposAndGateways.immersionOffer.empty();
   });
 
   test("sends email for valid request", async () => {
@@ -37,7 +36,7 @@ describe("/contact-establishment route", () => {
       .build();
     const contact = new ContactEntityV2Builder().build();
     const immersionOffer = new ImmersionOfferEntityV2Builder()
-      .withId("61649067-cd6a-4aa3-8866-d1f3d61292b4")
+      .withId(immersionOfferId)
       .build();
 
     await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
@@ -50,7 +49,7 @@ describe("/contact-establishment route", () => {
 
     const contactEstablishmentRequest = {
       ...validRequest,
-      immersionOfferId: immersionOffer.id,
+      immersionOfferId,
     };
 
     await request

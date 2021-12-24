@@ -25,7 +25,6 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
     testUuidGenerator = new TestUuidGenerator();
 
     immersionOfferRepository = new InMemoryImmersionOfferRepository();
-    immersionOfferRepository.empty();
 
     searchesMadeRepository = new InMemorySearchesMadeRepository();
 

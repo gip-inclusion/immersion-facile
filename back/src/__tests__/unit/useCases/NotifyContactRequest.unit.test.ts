@@ -1,5 +1,8 @@
 import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import {
+  InMemoryImmersionOfferRepository,
+  TEST_ROME_LABEL,
+} from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
@@ -31,7 +34,7 @@ describe("NotifyContactRequest", () => {
   let emailFilter: EmailFilter;
 
   beforeEach(() => {
-    immersionOfferRepository = new InMemoryImmersionOfferRepository().empty();
+    immersionOfferRepository = new InMemoryImmersionOfferRepository();
     emailGw = new InMemoryEmailGateway();
     emailFilter = new AllowListEmailFilter([
       contact.email,
@@ -73,6 +76,10 @@ describe("NotifyContactRequest", () => {
     expectContactByEmailRequest(
       sentEmails[0],
       [contact.email],
+      {
+        ...immersionOffer,
+        romeLabel: TEST_ROME_LABEL,
+      },
       establishment,
       contact,
       validEmailPayload,

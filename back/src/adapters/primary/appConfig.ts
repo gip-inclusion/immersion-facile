@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import { DomainTopic } from "../../domain/core/eventBus/events";
 import {
   makeGetBooleanVariable,
   makeThrowIfNotDefined,
@@ -7,7 +8,6 @@ import {
 } from "../../shared/envHelpers";
 import { getFeatureFlags } from "../../shared/featureFlags";
 import { createLogger } from "../../utils/logger";
-import { DomainTopic } from "./../../domain/core/eventBus/events";
 
 const logger = createLogger(__filename);
 
@@ -186,6 +186,11 @@ export class AppConfig {
   // == Api Keys ==
   public get authorizedApiKeyIds() {
     return parseStringList(this.env.AUTHORIZED_API_KEY_IDS);
+  }
+
+  // Visible for testing.
+  public get configParams() {
+    return this.env;
   }
 }
 

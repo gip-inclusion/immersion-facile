@@ -2,17 +2,12 @@ import {
   ImmersionOfferId,
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
+import { ContactEntityV2 } from "../entities/ContactEntity";
 import {
+  AnnotatedEstablishmentEntityV2,
   EstablishmentAggregate,
-  EstablishmentEntityV2,
-} from "../entities/EstablishmentAggregate";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import {
-  ContactEntityV2,
-  ImmersionEstablishmentContact,
-  ImmersionOfferEntity,
-  ImmersionOfferEntityV2,
-} from "../entities/ImmersionOfferEntity";
+} from "../entities/EstablishmentEntity";
+import { AnnotatedImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchParams } from "../entities/SearchParams";
 
 export interface ImmersionOfferRepository {
@@ -20,26 +15,17 @@ export interface ImmersionOfferRepository {
     establishments: EstablishmentAggregate[],
   ) => Promise<void>;
 
-  getEstablishmentByImmersionOfferId: (
+  getAnnotatedEstablishmentByImmersionOfferId: (
     immersionOfferId: ImmersionOfferId,
-  ) => Promise<EstablishmentEntityV2 | undefined>;
+  ) => Promise<AnnotatedEstablishmentEntityV2 | undefined>;
+
+  getAnnotatedImmersionOfferById: (
+    immersionOfferId: ImmersionOfferId,
+  ) => Promise<AnnotatedImmersionOfferEntityV2 | undefined>;
 
   getContactByImmersionOfferId: (
     immersionOfferId: ImmersionOfferId,
   ) => Promise<ContactEntityV2 | undefined>;
-
-  getImmersionOfferById: (
-    immersionOfferId: ImmersionOfferId,
-  ) => Promise<ImmersionOfferEntityV2 | undefined>;
-
-  // DEPRECATED.
-  insertEstablishmentContact: (
-    establishmentContact: ImmersionEstablishmentContact,
-  ) => Promise<void>;
-  insertImmersions: (immersions: ImmersionOfferEntity[]) => Promise<void>;
-  insertEstablishments: (
-    establishments: EstablishmentEntity[],
-  ) => Promise<void>;
 
   getFromSearch: (
     searchParams: SearchParams,

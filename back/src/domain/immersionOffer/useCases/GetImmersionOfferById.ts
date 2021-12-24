@@ -6,6 +6,7 @@ import {
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
 import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
+import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 
@@ -26,19 +27,21 @@ export class GetImmersionOfferById extends UseCase<
     immersionOfferId: ImmersionOfferId,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto> {
-    const establishment =
-      await this.immersionOfferRepository.getEstablishmentByImmersionOfferId(
+    const annotatedEstablishment =
+      await this.immersionOfferRepository.getAnnotatedEstablishmentByImmersionOfferId(
         immersionOfferId,
       );
-    const offer = await this.immersionOfferRepository.getImmersionOfferById(
-      immersionOfferId,
-    );
+    const annotatedOffer =
+      await this.immersionOfferRepository.getAnnotatedImmersionOfferById(
+        immersionOfferId,
+      );
     const contact =
       await this.immersionOfferRepository.getContactByImmersionOfferId(
         immersionOfferId,
       );
 
-    if (!establishment || !offer) throw new NotFoundError(immersionOfferId);
+    if (!annotatedEstablishment || !annotatedOffer)
+      throw new NotFoundError(immersionOfferId);
 
     const contactDetails: SearchContact | undefined =
       !!contact && !!apiConsumer
@@ -55,24 +58,24 @@ export class GetImmersionOfferById extends UseCase<
     const searchImmersionResultDto: SearchImmersionResultDto = {
       id: immersionOfferId,
       // Establishment informations
-      address: establishment.address,
-      location: establishment.position,
-      naf: establishment.naf,
-      name: establishment.name,
-      siret: establishment.siret,
-      voluntaryToImmersion: establishment.voluntaryToImmersion,
-      contactMode: establishment.contactMethod,
+      address: annotatedEstablishment.address,
+      location: annotatedEstablishment.position,
+      naf: annotatedEstablishment.naf,
+      nafLabel: annotatedEstablishment.nafLabel,
+      name: annotatedEstablishment.name,
+      siret: annotatedEstablishment.siret,
+      voluntaryToImmersion: annotatedEstablishment.voluntaryToImmersion,
+      contactMode: annotatedEstablishment.contactMethod,
 
       // Offer information
-      rome: offer.rome,
+      rome: annotatedOffer.rome,
+      romeLabel: annotatedOffer.romeLabel,
 
       // Contact informations
       contactDetails,
 
       // Complementary informations
-      city: "xxxx",
-      nafLabel: "xxxx",
-      romeLabel: "xxxx",
+      city: extractCityFromAddress(annotatedEstablishment.address),
       distance_m: undefined,
     };
 
