@@ -110,6 +110,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
             application.id,
             role,
             frontRoutes.immersionApplicationsRoute,
+            email,
           ),
         ),
       );

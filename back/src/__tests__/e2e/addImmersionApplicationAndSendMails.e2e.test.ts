@@ -173,7 +173,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     );
 
     expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[2], {
-      recipients: [adminEmail],
+      recipient: adminEmail,
       immersionApplication: {
         ...validDemandeImmersion,
         dateStart: parseISO(validDemandeImmersion.dateStart).toLocaleDateString(
@@ -187,6 +187,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
         validDemandeImmersion.id,
         "admin",
         frontRoutes.immersionApplicationsToValidate,
+        adminEmail,
       ),
       agencyConfig,
     });
@@ -394,7 +395,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     );
 
     expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[2], {
-      recipients: [adminEmail],
+      recipient: adminEmail,
       immersionApplication: {
         ...validDemandeImmersion,
         dateStart: parseISO(validDemandeImmersion.dateStart).toLocaleDateString(
@@ -408,6 +409,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
         validDemandeImmersion.id,
         "admin",
         frontRoutes.immersionApplicationsToValidate,
+        "admin@if.fr",
       ),
       agencyConfig,
     });

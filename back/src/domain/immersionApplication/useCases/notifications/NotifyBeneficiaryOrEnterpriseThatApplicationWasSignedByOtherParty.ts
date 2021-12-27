@@ -46,17 +46,17 @@ export class NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty e
     const recipientRole: Role = application.beneficiaryAccepted
       ? "establishment"
       : "beneficiary";
-
-    const magicLink = this.generateMagicLinkFn(
-      application.id,
-      recipientRole,
-      frontRoutes.immersionApplicationsRoute,
-    );
-
     const recipientEmail =
       recipientRole === "establishment"
         ? application.mentorEmail
         : application.email;
+    const magicLink = this.generateMagicLinkFn(
+      application.id,
+      recipientRole,
+      frontRoutes.immersionApplicationsRoute,
+      recipientEmail,
+    );
+
     const existingSignatureName =
       recipientRole === "establishment"
         ? application.mentor

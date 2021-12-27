@@ -5,7 +5,7 @@ import {
   SignImmersionApplicationRequestDto,
   signImmersionApplicationRequestSchema,
   SignImmersionApplicationResponseDto,
-  signApplicationDtoWithRoles,
+  signApplicationDtoWithRole,
 } from "../../../shared/ImmersionApplicationDto";
 import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
@@ -41,16 +41,16 @@ export class SignImmersionApplication extends UseCase<
 
   public async _execute(
     params: any,
-    { applicationId, roles }: MagicLinkPayload,
+    { applicationId, role }: MagicLinkPayload,
   ): Promise<SignImmersionApplicationResponseDto> {
-    logger.debug({ applicationId, roles });
+    logger.debug({ applicationId, role });
 
     const applicationEntity = await this.immersionApplicationRepository.getById(
       applicationId,
     );
     if (!applicationEntity) throw new NotFoundError(applicationId);
     const application = applicationEntity.toDto();
-    const signedApplication = signApplicationDtoWithRoles(application, roles);
+    const signedApplication = signApplicationDtoWithRole(application, role);
 
     const signedEntity = ImmersionApplicationEntity.create(signedApplication);
 

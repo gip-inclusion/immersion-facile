@@ -1,3 +1,4 @@
+import { emailHashForMagicLink } from "./../../../shared/tokens/MagicLinkPayload";
 import { BadRequestError } from "./../../../adapters/primary/helpers/sendHttpResponse";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
@@ -31,6 +32,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
   public async _execute({
     applicationId,
     role,
+    emailHash,
     linkFormat,
   }: RenewMagicLinkRequestDto) {
     const immersionApplicationEntity =
@@ -46,6 +48,10 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
         "No Agency Config found for this agency code",
       );
       throw new BadRequestError(dto.agencyId);
+    }
+
+    if (!linkFormat.includes("%jwt%")) {
+      throw new BadRequestError(linkFormat);
     }
 
     let emails = [];
@@ -66,22 +72,31 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
         break;
     }
 
-    const jwt = this.generateJwtFn(createMagicLinkPayload(applicationId, role));
+    let foundHit = false;
+    for (const email of emails) {
+      if (emailHashForMagicLink(email) === emailHash) {
+        foundHit = true;
+        const jwt = this.generateJwtFn(
+          createMagicLinkPayload(applicationId, role, email),
+        );
 
-    if (!linkFormat.includes("%jwt%")) {
-      throw new BadRequestError(linkFormat);
+        const magicLink = linkFormat.replaceAll("%jwt%", jwt);
+
+        const event = this.createNewEvent({
+          topic: "MagicLinkRenewalRequested",
+          payload: {
+            emails,
+            magicLink,
+          },
+        });
+
+        await this.outboxRepository.save(event);
+      }
     }
-
-    const magicLink = linkFormat.replaceAll("%jwt%", jwt);
-
-    const event = this.createNewEvent({
-      topic: "MagicLinkRenewalRequested",
-      payload: {
-        emails,
-        magicLink,
-      },
-    });
-
-    await this.outboxRepository.save(event);
+    if (!foundHit) {
+      throw new BadRequestError(
+        "Le lien magique n'est pas associé à cette demande d'immersion",
+      );
+    }
   }
 }

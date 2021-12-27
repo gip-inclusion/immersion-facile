@@ -221,6 +221,7 @@ describe("UpdateImmersionApplicationStatus", () => {
       executeUseCase({
         applicationId: "unknown_application_id",
         role: "admin",
+        email: "test@test.fr",
         newStatus: "VALIDATED",
       }),
       new NotFoundError("unknown_application_id"),
@@ -246,18 +247,20 @@ describe("UpdateImmersionApplicationStatus", () => {
   type ExecuteUseCaseParams = {
     applicationId: string;
     role: Role;
+    email: string;
     newStatus: ApplicationStatus;
     justification?: string;
   };
   const executeUseCase = async ({
     applicationId,
     role,
+    email,
     newStatus,
     justification,
   }: ExecuteUseCaseParams): Promise<ImmersionApplicationDto> => {
     const response = await updateImmersionApplicationStatus.execute(
       { status: newStatus, justification },
-      createMagicLinkPayload(applicationId, role),
+      createMagicLinkPayload(applicationId, role, email),
     );
     expect(response.id).toEqual(applicationId);
     const storedImmersionApplication =
@@ -293,6 +296,7 @@ describe("UpdateImmersionApplicationStatus", () => {
     const storedImmersionApplication = await executeUseCase({
       applicationId: originalImmersionApplication.id,
       role,
+      email: "test@test.fr",
       newStatus,
     });
 
@@ -335,6 +339,7 @@ describe("UpdateImmersionApplicationStatus", () => {
       role,
       newStatus: "REJECTED",
       justification: "test-rejection-justification",
+      email: "test@test.fr",
     });
 
     const expectedImmersionApplication: ImmersionApplicationDto = {
@@ -363,6 +368,7 @@ describe("UpdateImmersionApplicationStatus", () => {
       role,
       newStatus: "DRAFT",
       justification: "test-modification-justification",
+      email: "test@test.fr",
     });
 
     const expectedImmersionApplication: ImmersionApplicationDto = {
@@ -400,6 +406,7 @@ describe("UpdateImmersionApplicationStatus", () => {
         applicationId: originalImmersionApplication.id,
         role,
         newStatus,
+        email: "test@test.fr",
       }),
       expectedError,
     );

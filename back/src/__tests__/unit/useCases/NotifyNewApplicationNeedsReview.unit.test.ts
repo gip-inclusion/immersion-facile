@@ -57,20 +57,24 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       await createUseCase().execute(validImmersionApplication);
 
       const sentEmails = emailGw.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
+      expect(sentEmails).toHaveLength(2);
 
-      expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
-        sentEmails[0],
-        counsellorEmails,
-        agencyConfig,
-        validImmersionApplication,
-        fakeGenerateMagicLinkUrlFn(
-          validImmersionApplication.id,
-          "counsellor",
-          frontRoutes.immersionApplicationsToValidate,
-        ),
-        "en vérifier l'éligibilité",
-      );
+      for (let i = 0; i < 2; i++) {
+        const email = counsellorEmails[i];
+        expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
+          sentEmails[i],
+          email,
+          agencyConfig,
+          validImmersionApplication,
+          fakeGenerateMagicLinkUrlFn(
+            validImmersionApplication.id,
+            "counsellor",
+            frontRoutes.immersionApplicationsToValidate,
+            email,
+          ),
+          "en vérifier l'éligibilité",
+        );
+      }
     });
 
     test("No counsellors available: we fall back to validators: Sends notification email to those validators (using 2 of them)", async () => {
@@ -84,20 +88,24 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       await createUseCase().execute(validImmersionApplication);
 
       const sentEmails = emailGw.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
+      expect(sentEmails).toHaveLength(2);
 
-      expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
-        sentEmails[0],
-        validatorEmails,
-        agencyConfig,
-        validImmersionApplication,
-        fakeGenerateMagicLinkUrlFn(
-          validImmersionApplication.id,
-          "validator",
-          frontRoutes.immersionApplicationsToValidate,
-        ),
-        "en considérer la validation",
-      );
+      for (let i = 0; i < 2; i++) {
+        const email = validatorEmails[i];
+        expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
+          sentEmails[i],
+          email,
+          agencyConfig,
+          validImmersionApplication,
+          fakeGenerateMagicLinkUrlFn(
+            validImmersionApplication.id,
+            "validator",
+            frontRoutes.immersionApplicationsToValidate,
+            email,
+          ),
+          "en considérer la validation",
+        );
+      }
     });
 
     test("No counsellors available, neither validators => ensure no mail is sent", async () => {
@@ -138,20 +146,24 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       await createUseCase().execute(validImmersionApplication);
 
       const sentEmails = emailGw.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
+      expect(sentEmails).toHaveLength(2);
 
-      expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
-        sentEmails[0],
-        validatorEmails,
-        agencyConfig,
-        validImmersionApplication,
-        fakeGenerateMagicLinkUrlFn(
-          validImmersionApplication.id,
-          "validator",
-          frontRoutes.immersionApplicationsToValidate,
-        ),
-        "en considérer la validation",
-      );
+      for (let i = 0; i < 2; i++) {
+        const email = validatorEmails[i];
+        expectedEmailImmersionApplicationReviewMatchingImmersionApplication(
+          sentEmails[i],
+          email,
+          agencyConfig,
+          validImmersionApplication,
+          fakeGenerateMagicLinkUrlFn(
+            validImmersionApplication.id,
+            "validator",
+            frontRoutes.immersionApplicationsToValidate,
+            email,
+          ),
+          "en considérer la validation",
+        );
+      }
     });
 
     test("No validators available => ensure no mail is sent", async () => {
@@ -180,9 +192,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     test("Nominal case: Sends notification email to admins", async () => {
-      const adminEmail = ["anAdmin@unmail.com"];
+      const adminEmail = "anAdmin@unmail.com";
       agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
-        .withAdminEmails(adminEmail)
+        .withAdminEmails([adminEmail])
         .build();
       await createUseCase().execute(validImmersionApplication);
 
@@ -198,6 +210,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           validImmersionApplication.id,
           "admin",
           frontRoutes.immersionApplicationsToValidate,
+          adminEmail,
         ),
         "en considérer la validation",
       );

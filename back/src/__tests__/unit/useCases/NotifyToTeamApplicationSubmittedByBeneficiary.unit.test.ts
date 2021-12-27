@@ -52,7 +52,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
     expect(sentEmails).toHaveLength(1);
 
     expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[0], {
-      recipients: [adminEmail],
+      recipient: adminEmail,
       immersionApplication: {
         ...validDemandeImmersion,
         dateStart: parseISO(validDemandeImmersion.dateStart).toLocaleDateString(
@@ -66,6 +66,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
         validDemandeImmersion.id,
         "admin",
         frontRoutes.immersionApplicationsToValidate,
+        "admin@if.fr",
       ),
       agencyConfig,
     });

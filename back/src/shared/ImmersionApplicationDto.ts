@@ -226,6 +226,7 @@ export type GenerateMagicLinkRequestDto = z.infer<typeof generateMagicLinkReques
 export const generateMagicLinkRequestSchema = z.object({
   applicationId: immersionApplicationIdSchema,
   role: z.enum(allRoles),
+  emailHash: z.string(),
   expired: z.boolean(), //< defaults to false
 });
 
@@ -241,6 +242,7 @@ export const renewMagicLinkRequestSchema = z.object({
   applicationId: immersionApplicationIdSchema,
   role: z.enum(allRoles),
   linkFormat: z.string(),
+  emailHash: z.string(),
 });
 
 export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
@@ -275,9 +277,9 @@ export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
 };
 
 // Returns an application signed by provided roles.
-export const signApplicationDtoWithRoles = (
+export const signApplicationDtoWithRole = (
   application: ImmersionApplicationDto,
-  roles: Role[],
+  role: Role,
 ) => {
   if (
     !["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(application.status)
@@ -287,12 +289,10 @@ export const signApplicationDtoWithRoles = (
     );
   }
 
-  const enterpriseAccepted = roles.includes("establishment")
-    ? true
-    : application.enterpriseAccepted;
-  const beneficiaryAccepted = roles.includes("beneficiary")
-    ? true
-    : application.beneficiaryAccepted;
+  const enterpriseAccepted =
+    role === "establishment" ? true : application.enterpriseAccepted;
+  const beneficiaryAccepted =
+    role === "beneficiary" ? true : application.beneficiaryAccepted;
   let status: ApplicationStatus = "READY_TO_SIGN";
   // if beneficiaryAccepted XOR enterpise accepted
   if (

@@ -14,6 +14,7 @@ import {
 } from "src/shared/ImmersionApplicationDto";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
+import { useImmersionApplicationFromJwt } from "../sharedHooks/useImmersionApplicationFromJwt";
 
 type SignFormRoute = Route<typeof routes.immersionApplicationsToSign>;
 
@@ -28,7 +29,7 @@ const extractRoleAndName = (
   application: ImmersionApplicationDto,
 ): [Role, string] => {
   const payload = decodeJwt(jwt);
-  const role = payload.roles[0];
+  const role = payload.role;
   const name =
     role === "beneficiary"
       ? `${application.lastName.toUpperCase()} ${application.firstName}`

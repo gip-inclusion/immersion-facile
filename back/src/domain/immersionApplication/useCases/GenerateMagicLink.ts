@@ -1,3 +1,4 @@
+import { currentJwtVersion } from "./../../../shared/tokens/MagicLinkPayload";
 import {
   GenerateMagicLinkRequestDto,
   generateMagicLinkRequestSchema,
@@ -20,6 +21,7 @@ export class GenerateMagicLink extends UseCase<
   public async _execute({
     applicationId,
     role,
+    emailHash,
     expired,
   }: GenerateMagicLinkRequestDto) {
     const twoDaysAgo = Math.round((Date.now() - 48 * 3600 * 1000) / 1000);
@@ -28,12 +30,13 @@ export class GenerateMagicLink extends UseCase<
       ? createMagicLinkPayload(
           applicationId,
           role,
+          "backoffice administrator",
           1,
           undefined,
           undefined,
           twoDaysAgo,
         )
-      : createMagicLinkPayload(applicationId, role);
+      : createMagicLinkPayload(applicationId, role, "backoffice administrator");
     return {
       jwt: this.generateJwtFn(payload),
     };

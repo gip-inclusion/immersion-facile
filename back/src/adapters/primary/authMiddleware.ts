@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
-import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
+import {
+  currentJwtVersion,
+  MagicLinkPayload,
+} from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
 import { makeVerifyJwt } from "../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
@@ -91,6 +94,17 @@ export const createJwtAuthMiddleware = (config: AppConfig) => {
 
     try {
       const payload = verifyJwt(maybeJwt as string);
+
+      if (!payload.version || payload.version < currentJwtVersion) {
+        return sendNeedsRenewedLinkError(
+          res,
+          new TokenExpiredError(
+            "Token corresponds to an old version, please renew",
+            new Date(currentJwtVersion),
+          ),
+        );
+      }
+
       req.jwtPayload = payload;
       next();
     } catch (err: any) {

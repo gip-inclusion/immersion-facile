@@ -21,13 +21,6 @@ type VerificationPageProps = {
   route: Route<typeof routes.immersionApplicationsToValidate>;
 };
 
-const getHighestActingRole = (roles: Role[]) => {
-  if (roles.includes("admin")) return "admin";
-  if (roles.includes("validator")) return "validator";
-  if (roles.includes("counsellor")) return "counsellor";
-  return undefined;
-};
-
 const isAllowedTransition = (
   initialStatus: ApplicationStatus | undefined,
   targetStatus: ApplicationStatus,
@@ -76,7 +69,7 @@ export const successMessageByStatus = {
 export const VerificationPage = ({ route }: VerificationPageProps) => {
   const {
     immersionApplication,
-    roles,
+    role,
     applicationId,
     jwt,
     needsMagicLinkRefresh,
@@ -85,11 +78,9 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
   const [successMessage, setSuccessMessage] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
 
-  const actingRole = getHighestActingRole(roles);
   const currentStatus =
     immersionApplication?.status ?? ("UNKNOWN" as ApplicationStatus);
-  if (!actingRole)
-    return <div>Vous n'êtes pas autorisé à accéder à cette page"</div>;
+  if (!role) return <div>Vous n'êtes pas autorisé à accéder à cette page"</div>;
 
   const disabled = !!successMessage;
 
@@ -115,7 +106,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
       "id=" +
       applicationId +
       "&role=" +
-      roles[0] +
+      role +
       "&originalURL=" +
       encodeURIComponent(location.origin + location.pathname + "?jwt=%jwt%");
   }
@@ -137,7 +128,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         {isAllowedTransition(
           immersionApplication?.status,
           "REJECTED",
-          actingRole,
+          role,
         ) && (
           <VerificationActionButton
             {...buttonProps}
@@ -148,11 +139,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(
-          immersionApplication?.status,
-          "DRAFT",
-          actingRole,
-        ) && (
+        {isAllowedTransition(immersionApplication?.status, "DRAFT", role) && (
           <VerificationActionButton
             {...buttonProps}
             newStatus="DRAFT"
@@ -166,7 +153,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         {isAllowedTransition(
           immersionApplication?.status,
           "ACCEPTED_BY_COUNSELLOR",
-          actingRole,
+          role,
         ) && (
           <VerificationActionButton
             {...buttonProps}
@@ -184,7 +171,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         {isAllowedTransition(
           immersionApplication?.status,
           "ACCEPTED_BY_VALIDATOR",
-          actingRole,
+          role,
         ) && (
           <VerificationActionButton
             {...buttonProps}
@@ -206,7 +193,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
         {isAllowedTransition(
           immersionApplication?.status,
           "VALIDATED",
-          actingRole,
+          role,
         ) && (
           <VerificationActionButton
             {...buttonProps}

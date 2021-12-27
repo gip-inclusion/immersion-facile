@@ -1,3 +1,4 @@
+import { emailHashForMagicLink } from "./../../../shared/tokens/MagicLinkPayload";
 import {
   BadRequestError,
   NotFoundError,
@@ -43,7 +44,7 @@ describe("RenewMagicLink use case", () => {
   let agencyRepository: InMemoryAgencyRepository;
 
   const generateJwtFn: GenerateMagicLinkJwt = (payload) =>
-    payload.applicationId + "; " + payload.roles.join(",");
+    payload.applicationId + "; " + payload.role;
 
   beforeEach(() => {
     agencyConfig = defaultAgencyConfig;
@@ -73,6 +74,7 @@ describe("RenewMagicLink use case", () => {
       applicationId: "not-a-valid-id",
       role: "counsellor",
       linkFormat: "immersionfacile.com/%jwt%",
+      emailHash: "some email hash",
     };
 
     await expectPromiseToFailWithError(
@@ -92,6 +94,7 @@ describe("RenewMagicLink use case", () => {
       applicationId: validDemandeImmersion.id,
       role: "counsellor",
       linkFormat: "immersionfacile.fr/%jwt%",
+      emailHash: "some email hash",
     };
 
     await expectPromiseToFailWithError(
@@ -106,6 +109,7 @@ describe("RenewMagicLink use case", () => {
       applicationId: validDemandeImmersion.id,
       role: "admin",
       linkFormat: "immersionfacile.fr/%jwt%",
+      emailHash: "some email hash",
     };
 
     await expectPromiseToFailWithError(
@@ -119,6 +123,7 @@ describe("RenewMagicLink use case", () => {
       applicationId: validDemandeImmersion.id,
       role: "counsellor",
       linkFormat: "immersionfacile.fr/",
+      emailHash: "some email hash",
     };
 
     await expectPromiseToFailWithError(
@@ -133,12 +138,17 @@ describe("RenewMagicLink use case", () => {
       applicationId: validDemandeImmersion.id,
       role: "beneficiary",
       linkFormat,
+      emailHash: emailHashForMagicLink(validDemandeImmersion.email),
     };
 
     await createUseCase().execute(request);
 
     const expectedJWT = generateJwtFn(
-      createMagicLinkPayload(validDemandeImmersion.id, "beneficiary"),
+      createMagicLinkPayload(
+        validDemandeImmersion.id,
+        "beneficiary",
+        validDemandeImmersion.email,
+      ),
     );
 
     expect(outboxRepository.events).toEqual([

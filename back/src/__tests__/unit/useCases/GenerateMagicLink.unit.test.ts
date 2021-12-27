@@ -1,3 +1,4 @@
+import { emailHashForMagicLink } from "./../../../shared/tokens/MagicLinkPayload";
 import { GenerateMagicLinkJwt } from "./../../../domain/auth/jwt";
 import { GenerateMagicLink } from "./../../../domain/immersionApplication/useCases/GenerateMagicLink";
 import {
@@ -7,7 +8,7 @@ import {
 } from "../../../shared/tokens/MagicLinkPayload";
 
 const generateJwtFn: GenerateMagicLinkJwt = (payload) =>
-  payload.applicationId + ";" + payload.roles.join(",") + ";" + payload.iat;
+  payload.applicationId + ";" + payload.role + ";" + payload.iat;
 
 describe("Generate magic links", () => {
   let generateMagicLink: GenerateMagicLink;
@@ -20,15 +21,17 @@ describe("Generate magic links", () => {
     test("Generates magic links with its fn", async () => {
       const id = "123";
       const role = "validator" as Role;
+      const email = "foo@bar.com";
 
       const result = await generateMagicLink.execute({
         applicationId: id,
         role,
         expired: false,
+        emailHash: emailHashForMagicLink(email),
       });
 
       expect(result).toEqual({
-        jwt: generateJwtFn(createMagicLinkPayload(id, role)),
+        jwt: generateJwtFn(createMagicLinkPayload(id, role, email)),
       });
     });
   });

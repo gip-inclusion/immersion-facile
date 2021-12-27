@@ -66,22 +66,24 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
       "Sending Mail to review an immersion",
     );
 
-    await this.emailGateway.sendNewApplicationForReviewNotification(
-      recipients.emails,
-      {
-        businessName: immersionApplicationDto.businessName,
-        magicLink: this.generateMagicLinkFn(
-          immersionApplicationDto.id,
-          recipients.role,
-          frontRoutes.immersionApplicationsToValidate,
-        ),
-        beneficiaryFirstName: immersionApplicationDto.firstName,
-        beneficiaryLastName: immersionApplicationDto.lastName,
-        possibleRoleAction:
-          recipients.role === "counsellor"
-            ? "en vérifier l'éligibilité"
-            : "en considérer la validation",
-      },
+    await Promise.all(
+      recipients.emails.map((email) =>
+        this.emailGateway.sendNewApplicationForReviewNotification([email], {
+          businessName: immersionApplicationDto.businessName,
+          magicLink: this.generateMagicLinkFn(
+            immersionApplicationDto.id,
+            recipients.role,
+            frontRoutes.immersionApplicationsToValidate,
+            email,
+          ),
+          beneficiaryFirstName: immersionApplicationDto.firstName,
+          beneficiaryLastName: immersionApplicationDto.lastName,
+          possibleRoleAction:
+            recipients.role === "counsellor"
+              ? "en vérifier l'éligibilité"
+              : "en considérer la validation",
+        }),
+      ),
     );
 
     logger.info(

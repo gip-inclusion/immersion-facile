@@ -4,7 +4,7 @@ import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 
 export const useImmersionApplicationFromJwt = (jwt: string) => {
-  const { roles, applicationId } = decodeJwt(jwt);
+  const { role, applicationId } = decodeJwt(jwt);
   let error: any | null = null;
   let [needsMagicLinkRefresh, setNeedsMagicLinkRefresh] = useState(false);
 
@@ -25,7 +25,7 @@ export const useImmersionApplicationFromJwt = (jwt: string) => {
 
   return {
     immersionApplication,
-    roles,
+    role,
     applicationId,
     jwt,
     error,

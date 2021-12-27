@@ -286,9 +286,14 @@ export type GenerateVerificationMagicLink = ReturnType<
 export const createGenerateVerificationMagicLink = (config: AppConfig) => {
   const generateJwt = makeGenerateJwt(config);
 
-  return (id: ImmersionApplicationId, role: Role, targetRoute: string) => {
+  return (
+    id: ImmersionApplicationId,
+    role: Role,
+    targetRoute: string,
+    email: string,
+  ) => {
     const baseUrl = config.immersionFacileBaseUrl;
-    const jwt = generateJwt(createMagicLinkPayload(id, role));
+    const jwt = generateJwt(createMagicLinkPayload(id, role, email));
     return `${baseUrl}/${targetRoute}?jwt=${jwt}`;
   };
 };

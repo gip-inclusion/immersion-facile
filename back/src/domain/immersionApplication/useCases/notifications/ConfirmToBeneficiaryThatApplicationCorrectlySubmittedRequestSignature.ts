@@ -60,6 +60,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignatu
             application.id,
             "beneficiary",
             frontRoutes.immersionApplicationsToSign,
+            allowedBeneficiaryEmail,
           ),
           businessName,
         },

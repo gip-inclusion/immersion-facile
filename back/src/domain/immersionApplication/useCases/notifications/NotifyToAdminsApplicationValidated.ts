@@ -43,22 +43,24 @@ export class NotifyToAdminsApplicationValidated extends UseCase<ImmersionApplica
       return;
     }
 
-    await this.emailGateway.sendNewApplicationAdminNotification(
-      agencyConfig.adminEmails,
-      {
-        demandeId: id,
-        firstName,
-        lastName,
-        dateStart: parseISO(dateStart).toLocaleDateString("fr"),
-        dateEnd: parseISO(dateEnd).toLocaleDateString("fr"),
-        businessName,
-        agencyName: agencyConfig.name,
-        magicLink: this.generateMagicLinkFn(
-          id,
-          "admin",
-          frontRoutes.immersionApplicationsToValidate,
-        ),
-      },
+    await Promise.all(
+      agencyConfig.adminEmails.map((email) =>
+        this.emailGateway.sendNewApplicationAdminNotification([email], {
+          demandeId: id,
+          firstName,
+          lastName,
+          dateStart: parseISO(dateStart).toLocaleDateString("fr"),
+          dateEnd: parseISO(dateEnd).toLocaleDateString("fr"),
+          businessName,
+          agencyName: agencyConfig.name,
+          magicLink: this.generateMagicLinkFn(
+            id,
+            "admin",
+            frontRoutes.immersionApplicationsToValidate,
+            email,
+          ),
+        }),
+      ),
     );
   }
 }

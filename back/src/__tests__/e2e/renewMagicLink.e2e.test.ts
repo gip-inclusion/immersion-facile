@@ -30,6 +30,7 @@ import { RenewMagicLink } from "../../domain/immersionApplication/useCases/Renew
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 import {
   createMagicLinkPayload,
+  emailHashForMagicLink,
   MagicLinkPayload,
 } from "../../shared/tokens/MagicLinkPayload";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
@@ -53,7 +54,7 @@ describe("Magic link renewal flow", () => {
   let deliverRenewedMagicLink: DeliverRenewedMagicLink;
 
   const generateJwtFn: GenerateMagicLinkJwt = (payload: MagicLinkPayload) => {
-    return payload.applicationId + "; " + payload.roles.join(",");
+    return payload.applicationId + "; " + payload.role;
   };
 
   beforeEach(() => {
@@ -101,12 +102,17 @@ describe("Magic link renewal flow", () => {
       applicationId: validDemandeImmersion.id,
       role: "beneficiary",
       linkFormat,
+      emailHash: emailHashForMagicLink(validDemandeImmersion.email),
     };
 
     await renewMagicLink.execute(request);
 
     const expectedJWT = generateJwtFn(
-      createMagicLinkPayload(validDemandeImmersion.id, "beneficiary"),
+      createMagicLinkPayload(
+        validDemandeImmersion.id,
+        "beneficiary",
+        validDemandeImmersion.email,
+      ),
     );
 
     await eventCrawler.processEvents();
@@ -116,7 +122,7 @@ describe("Magic link renewal flow", () => {
 
     expectEmailMatchingLinkRenewalEmail(
       sentEmails[0],
-      [validDemandeImmersion.email],
+      validDemandeImmersion.email,
       "immersionfacile.fr/" + expectedJWT,
     );
   });

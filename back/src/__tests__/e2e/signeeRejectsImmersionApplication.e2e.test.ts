@@ -196,6 +196,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     const beneficiaryMLPayload = createMagicLinkPayload(
       validDemandeImmersion.id,
       "beneficiary",
+      validDemandeImmersion.email,
     );
     const resultRequestModif = await updateImmersionApplicationStatus.execute(
       { justification: "test justification", status: "DRAFT" },
@@ -218,6 +219,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     const mentorMLPayload = createMagicLinkPayload(
       validDemandeImmersion.id,
       "establishment",
+      validDemandeImmersion.mentorEmail,
     );
     await updateImmersionApplication.execute(
       {

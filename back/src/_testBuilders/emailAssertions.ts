@@ -17,19 +17,19 @@ import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
   params: {
-    recipients: string[];
+    recipient: string;
     immersionApplication: ImmersionApplicationDto;
     magicLink: string;
     agencyConfig: AgencyConfig;
   },
 ) => {
-  const { recipients, immersionApplication, magicLink, agencyConfig } = params;
+  const { recipient, immersionApplication, magicLink, agencyConfig } = params;
   const { id, firstName, lastName, dateStart, dateEnd, businessName } =
     immersionApplication;
 
   expectTemplatedEmailToEqual(templatedEmail, {
     type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
-    recipients: recipients,
+    recipients: [recipient],
     params: {
       demandeId: id,
       firstName,
@@ -79,6 +79,7 @@ export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersion
           id,
           "beneficiary",
           frontRoutes.immersionApplicationsToSign,
+          email,
         ),
         businessName,
       },
@@ -123,6 +124,7 @@ export const expectEmailMentorConfirmationSignatureRequesMatchingImmersionApplic
           id,
           "establishment",
           frontRoutes.immersionApplicationsToSign,
+          mentorEmail,
         ),
         businessName,
       },
@@ -163,7 +165,7 @@ export const expectedEmailEstablisentCreatedReviewMatchingEstablisment = (
 export const expectedEmailImmersionApplicationReviewMatchingImmersionApplication =
   (
     templatedEmail: TemplatedEmail,
-    recipients: string[],
+    recipient: string,
     agencyConfig: AgencyConfig | undefined,
     immersionApplication: ImmersionApplicationDto,
     magicLink: string,
@@ -174,7 +176,7 @@ export const expectedEmailImmersionApplicationReviewMatchingImmersionApplication
     }
     expectTemplatedEmailToEqual(templatedEmail, {
       type: "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-      recipients,
+      recipients: [recipient],
       params: {
         beneficiaryFirstName: immersionApplication.firstName,
         beneficiaryLastName: immersionApplication.lastName,
@@ -231,12 +233,12 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationModificationIsRe
 
 export const expectEmailMatchingLinkRenewalEmail = (
   templatedEmail: TemplatedEmail,
-  recipients: string[],
+  recipient: string,
   magicLink: string,
 ) => {
   expectTemplatedEmailToEqual(templatedEmail, {
     type: "MAGIC_LINK_RENEWAL",
-    recipients,
+    recipients: [recipient],
     params: {
       magicLink,
     },

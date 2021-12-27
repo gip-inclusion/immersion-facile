@@ -64,13 +64,13 @@ export class UpdateImmersionApplicationStatus extends UseCase<
 
   public async _execute(
     { status, justification }: UpdateImmersionApplicationStatusRequestDto,
-    { applicationId, roles }: MagicLinkPayload,
+    { applicationId, role }: MagicLinkPayload,
   ): Promise<UpdateImmersionApplicationStatusResponseDto> {
-    logger.debug({ status, applicationId, roles });
+    logger.debug({ status, applicationId, role });
     const statusTransitionConfig = this.statusTransitionConfigs[status];
     if (!statusTransitionConfig) throw new BadRequestError(status);
 
-    if (!roles.some((role) => statusTransitionConfig.validRoles.includes(role)))
+    if (!statusTransitionConfig.validRoles.includes(role))
       throw new ForbiddenError();
 
     const immersionApplication =
