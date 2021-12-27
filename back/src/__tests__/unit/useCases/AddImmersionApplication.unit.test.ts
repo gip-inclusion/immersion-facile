@@ -4,6 +4,7 @@ import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helper
 import {
   BadRequestError,
   ConflictError,
+  ForbiddenError,
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -16,6 +17,8 @@ import {
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
+import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
+import { validApplicationStatus } from "../../../shared/ImmersionApplicationDto";
 
 describe("Add immersionApplication", () => {
   let addImmersionApplication: AddImmersionApplication;
@@ -27,6 +30,7 @@ describe("Add immersionApplication", () => {
   const validImmersionApplication =
     new ImmersionApplicationDtoBuilder().build();
   let stubGetSiret: StubGetSiret;
+  let featureFlags = FeatureFlagsBuilder.allOff().build();
 
   beforeEach(() => {
     applicationRepository = new InMemoryImmersionApplicationRepository();
@@ -44,6 +48,7 @@ describe("Add immersionApplication", () => {
       createNewEvent,
       outboxRepository,
       stubGetSiret,
+      featureFlags,
     );
 
   test("saves valid applications in the repository", async () => {
@@ -82,6 +87,45 @@ describe("Add immersionApplication", () => {
       addImmersionApplication.execute(validImmersionApplication),
       new ConflictError(validImmersionApplication.id),
     );
+  });
+
+  describe("Status validation", () => {
+    // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021
+    it("allows applications submitted as DRAFT", async () => {
+      expect(
+        await addImmersionApplication.execute(validImmersionApplication),
+      ).toEqual({
+        id: validImmersionApplication.id,
+      });
+    });
+
+    // Replace IN_REVIEW with READY_TO_SIGN when enabling ENABLE_ENTERPRISE_SIGNATURE by default.
+    it("allows applications submitted as IN_REVIEW", async () => {
+      expect(
+        await addImmersionApplication.execute({
+          ...validImmersionApplication,
+          status: "IN_REVIEW",
+        }),
+      ).toEqual({
+        id: validImmersionApplication.id,
+      });
+    });
+
+    it("rejects applications if the status is not DRAFT or IN_REVIEW", async () => {
+      for (const status of validApplicationStatus) {
+        // With ENABLE_ENTERPRISE_SIGNATURE flag, replace IN_REVIEW with READY_TO_SIGN
+        if (status === "DRAFT" || status === "IN_REVIEW") {
+          continue;
+        }
+        await expectPromiseToFailWithError(
+          addImmersionApplication.execute({
+            ...validImmersionApplication,
+            status,
+          }),
+          new ForbiddenError(),
+        );
+      }
+    });
   });
 
   describe("SIRET validation", () => {

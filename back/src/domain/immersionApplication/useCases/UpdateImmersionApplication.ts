@@ -1,5 +1,6 @@
 import {
   BadRequestError,
+  ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { FeatureFlags } from "../../../shared/featureFlags";
@@ -33,6 +34,16 @@ export class UpdateImmersionApplication extends UseCase<
   public async _execute(
     params: UpdateImmersionApplicationRequestDto,
   ): Promise<UpdateImmersionApplicationResponseDto> {
+    const minimalValidStatus = this.featureFlags.enableEnterpriseSignature
+      ? "READY_TO_SIGN"
+      : "IN_REVIEW";
+    if (
+      params.demandeImmersion.status != "DRAFT" &&
+      params.demandeImmersion.status != minimalValidStatus
+    ) {
+      throw new ForbiddenError();
+    }
+
     const immersionApplicationEntity = ImmersionApplicationEntity.create(
       params.demandeImmersion,
     );
@@ -49,12 +60,7 @@ export class UpdateImmersionApplication extends UseCase<
       );
     if (!id) throw new NotFoundError(params.id);
 
-    const statusThatTriggerEvent: ApplicationStatus = this.featureFlags
-      .enableEnterpriseSignature
-      ? "READY_TO_SIGN"
-      : "IN_REVIEW";
-
-    if (params.demandeImmersion.status == statusThatTriggerEvent) {
+    if (params.demandeImmersion.status === minimalValidStatus) {
       // So far we are in the case where a beneficiary made an update on an Immersion Application, and we just need to review it for eligibility
       const event = this.createNewEvent({
         topic: "ImmersionApplicationSubmittedByBeneficiary",

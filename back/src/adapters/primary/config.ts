@@ -324,6 +324,7 @@ const createUseCases = (
       createNewEvent,
       repositories.outbox,
       getSiret,
+      config.featureFlags,
     ),
     getDemandeImmersion: new GetImmersionApplication(
       repositories.demandeImmersion,

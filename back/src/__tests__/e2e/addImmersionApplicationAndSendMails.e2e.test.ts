@@ -92,6 +92,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       createNewEvent,
       outboxRepository,
       getSiret,
+      featureFlags,
     );
     validateDemandeImmersion = new ValidateImmersionApplication(
       applicationRepository,
@@ -136,6 +137,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       createNewEvent,
       outboxRepository,
       getSiret,
+      featureFlags,
     );
 
     eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
@@ -285,6 +287,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       createNewEvent,
       outboxRepository,
       getSiret,
+      featureFlags,
     );
     validateDemandeImmersion = new ValidateImmersionApplication(
       applicationRepository,
@@ -345,6 +348,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       createNewEvent,
       outboxRepository,
       getSiret,
+      featureFlags,
     );
 
     eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>

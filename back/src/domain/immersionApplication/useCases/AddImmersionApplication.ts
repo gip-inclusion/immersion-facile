@@ -1,4 +1,7 @@
-import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import {
+  ConflictError,
+  ForbiddenError,
+} from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   AddImmersionApplicationResponseDto,
   ImmersionApplicationDto,
@@ -12,6 +15,7 @@ import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAn
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
+import { FeatureFlags } from "../../../shared/featureFlags";
 
 const logger = createLogger(__filename);
 
@@ -24,6 +28,7 @@ export class AddImmersionApplication extends UseCase<
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
     private readonly getSiret: GetSiretUseCase,
+    private readonly featureFlags: FeatureFlags,
   ) {
     super();
   }
@@ -33,6 +38,16 @@ export class AddImmersionApplication extends UseCase<
   public async _execute(
     immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<AddImmersionApplicationResponseDto> {
+    const minimalValidStatus = this.featureFlags.enableEnterpriseSignature
+      ? "READY_TO_SIGN"
+      : "IN_REVIEW";
+    if (
+      immersionApplicationDto.status != "DRAFT" &&
+      immersionApplicationDto.status != minimalValidStatus
+    ) {
+      throw new ForbiddenError();
+    }
+
     const applicationEntity = ImmersionApplicationEntity.create(
       immersionApplicationDto,
     );

@@ -1,5 +1,6 @@
 import {
   BadRequestError,
+  ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
@@ -20,6 +21,10 @@ import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/Immersion
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
+import {
+  ImmersionApplicationId,
+  validApplicationStatus,
+} from "../../../shared/ImmersionApplicationDto";
 
 describe("Update immersionApplication", () => {
   let updateDemandeImmersion: UpdateImmersionApplication;
@@ -102,6 +107,71 @@ describe("Update immersionApplication", () => {
         }),
         new BadRequestError(updatedDemandeImmersion.id),
       );
+    });
+  });
+
+  describe("Status validation", () => {
+    let id: ImmersionApplicationId;
+    beforeEach(() => {
+      const demandesImmersion: ImmersionApplications = {};
+      const demandeImmersionEntity =
+        new ImmersionApplicationEntityBuilder().build();
+      demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
+      immersionApplicationRepository.setDemandesImmersion(demandesImmersion);
+      id = demandeImmersionEntity.id;
+    });
+
+    // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021
+    it("allows applications submitted as DRAFT", async () => {
+      const validImmersionApplication = new ImmersionApplicationDtoBuilder()
+        .withId(id)
+        .build();
+
+      expect(
+        await updateDemandeImmersion.execute({
+          demandeImmersion: validImmersionApplication,
+          id: validImmersionApplication.id,
+        }),
+      ).toEqual({
+        id: validImmersionApplication.id,
+      });
+    });
+
+    // Replace IN_REVIEW with READY_TO_SIGN when enabling ENABLE_ENTERPRISE_SIGNATURE by default.
+    it("allows applications submitted as IN_REVIEW", async () => {
+      const inReviewImmersionApplication = new ImmersionApplicationDtoBuilder()
+        .withStatus("IN_REVIEW")
+        .withId(id)
+        .build();
+
+      expect(
+        await updateDemandeImmersion.execute({
+          demandeImmersion: inReviewImmersionApplication,
+          id: inReviewImmersionApplication.id,
+        }),
+      ).toEqual({
+        id: inReviewImmersionApplication.id,
+      });
+    });
+
+    it("rejects applications if the status is not DRAFT or IN_REVIEW", async () => {
+      for (const status of validApplicationStatus) {
+        // With ENABLE_ENTERPRISE_SIGNATURE flag, replace IN_REVIEW with READY_TO_SIGN
+        if (status === "DRAFT" || status === "IN_REVIEW") {
+          continue;
+        }
+        const immersionApplication = new ImmersionApplicationDtoBuilder()
+          .withStatus(status)
+          .withId(id)
+          .build();
+        await expectPromiseToFailWithError(
+          updateDemandeImmersion.execute({
+            demandeImmersion: immersionApplication,
+            id: immersionApplication.id,
+          }),
+          new ForbiddenError(),
+        );
+      }
     });
   });
 });
