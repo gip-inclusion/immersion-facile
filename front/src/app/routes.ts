@@ -32,8 +32,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
 
   renewMagicLink: defineRoute(
     {
-      id: param.query.string,
-      role: param.query.string,
+      expiredJwt: param.query.string,
       originalURL: param.query.string,
     },
     () => `/${frontRoutes.magicLinkRenewal}`,

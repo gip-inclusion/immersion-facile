@@ -366,6 +366,8 @@ const createUseCases = (
       repositories.outbox,
       repositories.agency,
       generateJwtFn,
+      config,
+      clock,
     ),
 
     // immersionOffer

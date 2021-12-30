@@ -1,3 +1,4 @@
+import { makeGenerateJwt, makeVerifyJwt } from "./../../domain/auth/jwt";
 import { DeliverRenewedMagicLink } from "./../../domain/immersionApplication/useCases/notifications/DeliverRenewedMagicLink";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
@@ -28,12 +29,10 @@ import { expectEmailMatchingLinkRenewalEmail } from "../../_testBuilders/emailAs
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
-import {
-  createMagicLinkPayload,
-  emailHashForMagicLink,
-  MagicLinkPayload,
-} from "../../shared/tokens/MagicLinkPayload";
+import { createMagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { AppConfig } from "../../adapters/primary/appConfig";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 
 const adminEmail = "admin@email.fr";
 
@@ -52,15 +51,14 @@ describe("Magic link renewal flow", () => {
   let agencyConfig: AgencyConfig;
   let renewMagicLink: RenewMagicLink;
   let deliverRenewedMagicLink: DeliverRenewedMagicLink;
-
-  const generateJwtFn: GenerateMagicLinkJwt = (payload: MagicLinkPayload) => {
-    return payload.applicationId + "; " + payload.role;
-  };
+  let config: AppConfig;
+  let generateJwtFn: GenerateMagicLinkJwt;
 
   beforeEach(() => {
     applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
+    clock.setNextDate(new Date());
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     emailGw = new InMemoryEmailGateway();
@@ -77,6 +75,9 @@ describe("Magic link renewal flow", () => {
       .withSignature("TEST-signature")
       .build();
     const agencyRepository = new InMemoryAgencyRepository([agencyConfig]);
+    config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
+
+    generateJwtFn = makeGenerateJwt(config);
 
     renewMagicLink = new RenewMagicLink(
       applicationRepository,
@@ -84,6 +85,8 @@ describe("Magic link renewal flow", () => {
       outboxRepository,
       agencyRepository,
       generateJwtFn,
+      config,
+      clock,
     );
 
     deliverRenewedMagicLink = new DeliverRenewedMagicLink(emailFilter, emailGw);
@@ -97,33 +100,32 @@ describe("Magic link renewal flow", () => {
       deliverRenewedMagicLink.execute(event.payload),
     );
 
-    const linkFormat = "immersionfacile.fr/%jwt%";
+    const payload = createMagicLinkPayload(
+      validDemandeImmersion.id,
+      "beneficiary",
+      validDemandeImmersion.email,
+    );
+
     const request: RenewMagicLinkRequestDto = {
-      applicationId: validDemandeImmersion.id,
-      role: "beneficiary",
-      linkFormat,
-      emailHash: emailHashForMagicLink(validDemandeImmersion.email),
+      linkFormat: "immersionfacile.fr/%jwt%",
+      expiredJWT: generateJwtFn(payload),
     };
 
     await renewMagicLink.execute(request);
-
-    const expectedJWT = generateJwtFn(
-      createMagicLinkPayload(
-        validDemandeImmersion.id,
-        "beneficiary",
-        validDemandeImmersion.email,
-      ),
-    );
-
     await eventCrawler.processEvents();
 
     sentEmails = emailGw.getSentEmails();
+
     expect(sentEmails).toHaveLength(1);
 
-    expectEmailMatchingLinkRenewalEmail(
-      sentEmails[0],
-      validDemandeImmersion.email,
-      "immersionfacile.fr/" + expectedJWT,
-    );
+    expect(sentEmails[0].type).toEqual("MAGIC_LINK_RENEWAL");
+    expect(sentEmails[0].recipients).toEqual([validDemandeImmersion.email]);
+
+    const ml = sentEmails[0].params.magicLink as string;
+    expect(ml.startsWith("immersionfacile.fr/"));
+    const jwt = ml.replace("immersionfacile.fr/", "");
+
+    const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
+    expect(verifyJwt(jwt)).not.toBeUndefined();
   });
 });

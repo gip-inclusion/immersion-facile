@@ -53,6 +53,17 @@ export class AppConfigBuilder implements Builder<AppConfig> {
     });
   }
 
+  public withTestPresetPreviousKeys() {
+    return new AppConfigBuilder({
+      ...this.configParams,
+      JWT_PREVIOUS_PUBLIC_KEY:
+        "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXM1fwl4kRy3ivmtJt2CdLTDx/HgS\nOeLqLQ+q+pqjLnsCJaQtiiy7kceujtxAhZcJBSh0QFBoq8JsuaZxNrrBpg==\n-----END PUBLIC KEY-----",
+
+      JWT_PREVIOUS_PRIVATE_KEY:
+        "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIOgvkzcTPgVdse0fey6Lix4M6mywCpuWbdjFVj23OA2YoAoGCCqGSM49\nAwEHoUQDQgAEXM1fwl4kRy3ivmtJt2CdLTDx/HgSOeLqLQ+q+pqjLnsCJaQtiiy7\nkceujtxAhZcJBSh0QFBoq8JsuaZxNrrBpg==\n-----END EC PRIVATE KEY-----",
+    });
+  }
+
   public build() {
     return AppConfig.createFromEnv(/* readDotEnv= */ false, this.configParams);
   }

@@ -11,23 +11,28 @@ interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewMagicLink>;
 }
 
-export const RenewExpiredLink = ({ route }: RenewExpiredLinkProps) => {
+interface RenewExpiredLinkContentsProps {
+  expiredJwt: string;
+  originalURL: string;
+}
+
+export const RenewExpiredLinkContent = ({
+  expiredJwt,
+  originalURL,
+}: RenewExpiredLinkContentsProps) => {
   // Flag that tracks if the link renewal had already been requested.
   const [requested, setRequested] = useState(false);
   // Tracks the success of the server request.
   const [requestSuccessful, setRequestSuccessful] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
   const onClick = async () => {
     if (location.search.length === 0) {
       setErrorMessage("URL invalide");
       return;
     }
 
-    const params = route.params;
-
-    if (!params.id || !params.role) {
+    if (!expiredJwt) {
       setRequestSuccessful(false);
       setErrorMessage("URL invalide");
       return;
@@ -35,7 +40,7 @@ export const RenewExpiredLink = ({ route }: RenewExpiredLinkProps) => {
 
     setRequested(true);
     immersionApplicationGateway
-      .renewMagicLink(params.id, params.role as Role, params.originalURL)
+      .renewMagicLink(expiredJwt, originalURL)
       .then(() => {
         setRequestSuccessful(true);
       })
@@ -69,5 +74,14 @@ export const RenewExpiredLink = ({ route }: RenewExpiredLinkProps) => {
         </ErrorMessage>
       )}
     </>
+  );
+};
+
+export const RenewExpiredLink = ({ route }: RenewExpiredLinkProps) => {
+  return (
+    <RenewExpiredLinkContent
+      expiredJwt={route.params.expiredJwt}
+      originalURL={route.params.originalURL}
+    />
   );
 };

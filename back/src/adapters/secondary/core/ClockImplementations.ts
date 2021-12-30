@@ -1,10 +1,12 @@
 import { addMilliseconds } from "date-fns";
 import { Clock, DateStr } from "../../../domain/core/ports/Clock";
 
-export class CustomClock implements Clock {
-  constructor(private _nextDate = new Date("2021-09-01T10:10:00.000Z")) {}
+export class CustomClock extends Clock {
+  constructor(private _nextDate = new Date("2021-09-01T10:10:00.000Z")) {
+    super();
+  }
 
-  public now() {
+  now() {
     return this._nextDate;
   }
 
@@ -21,7 +23,7 @@ export class CustomClock implements Clock {
   }
 }
 
-export class RealClock implements Clock {
+export class RealClock extends Clock {
   public now() {
     return new Date();
   }

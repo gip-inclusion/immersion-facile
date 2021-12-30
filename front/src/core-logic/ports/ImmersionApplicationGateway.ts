@@ -53,8 +53,7 @@ export abstract class ImmersionApplicationGateway {
   ): Promise<string>;
 
   abstract renewMagicLink(
-    applicationId: ImmersionApplicationId,
-    role: Role,
+    expiredJwt: string,
     linkFormat: string,
   ): Promise<void>;
 

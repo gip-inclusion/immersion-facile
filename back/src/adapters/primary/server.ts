@@ -3,7 +3,6 @@ import express, { Express, Router } from "express";
 import PinoHttp from "pino-http";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import {
-  immersionApplicationSchema,
   listImmersionApplicationRequestDtoSchema,
 } from "../../shared/ImmersionApplicationDto";
 import { romeSearchRequestSchema } from "../../shared/rome";
@@ -104,8 +103,7 @@ export const createApp = async (
   router.route(`/${renewMagicLinkRoute}`).get(async (req, res) => {
     sendHttpResponse(req, res, () =>
       deps.useCases.renewMagicLink.execute({
-        applicationId: req.query.id,
-        role: req.query.role,
+        expiredJwt: req.query.expiredJwt,
         linkFormat: req.query.linkFormat,
       } as any),
     );

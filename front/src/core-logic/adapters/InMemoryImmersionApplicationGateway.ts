@@ -184,13 +184,13 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   }
 
   public async renewMagicLink(
-    applicationId: ImmersionApplicationId,
-    role: Role,
+    expiredJwt: string,
     linkFormat: string,
   ): Promise<void> {
     // This is supposed to ask the backend to send a new email to the owner of the expired magic link.
     // Since this operation makes no sense for local development, the implementation here is left empty.
     await sleep(SIMULATED_LATENCY_MS);
+    throw new Error("500 Not Implemented In InMemory Gateway");
   }
 
   public async listAgencies(): Promise<AgencyDto[]> {

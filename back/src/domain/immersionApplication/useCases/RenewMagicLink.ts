@@ -1,5 +1,14 @@
-import { emailHashForMagicLink } from "./../../../shared/tokens/MagicLinkPayload";
-import { BadRequestError } from "./../../../adapters/primary/helpers/sendHttpResponse";
+import { ImmersionApplicationId } from "./../../../shared/ImmersionApplicationDto";
+import jwt from "jsonwebtoken";
+import {
+  emailHashForMagicLink,
+  MagicLinkPayload,
+  Role,
+} from "./../../../shared/tokens/MagicLinkPayload";
+import {
+  BadRequestError,
+  ForbiddenError,
+} from "./../../../adapters/primary/helpers/sendHttpResponse";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   RenewMagicLinkRequestDto,
@@ -13,8 +22,40 @@ import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { AgencyRepository } from "../ports/AgencyRepository";
 import { createLogger } from "../../../utils/logger";
 import { createMagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { AppConfig } from "../../../adapters/primary/appConfig";
+import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
+import { TokenExpiredError } from "jsonwebtoken";
+import { Clock } from "../../core/ports/Clock";
 
 const logger = createLogger(__filename);
+
+interface LinkRenewData {
+  role: Role;
+  applicationId: ImmersionApplicationId;
+  emailHash?: string;
+}
+
+// Extracts the data necessary for link renewal from any version of magic link payload.
+const extractDataFromExpiredJWT: (payload: any) => LinkRenewData = (
+  payload: any,
+) => {
+  if (!payload.version) {
+    return {
+      role: payload.roles[0],
+      applicationId: payload.applicationId,
+      emailHash: undefined,
+    };
+  }
+  // Once there are more JWT versions, expand this code to upgrade old JWTs, e.g.:
+  // else if (payload.version === 1) {...}
+  else {
+    return {
+      role: payload.role,
+      applicationId: payload.applicationId,
+      emailHash: payload.emailHash,
+    };
+  }
+};
 
 export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
   constructor(
@@ -23,18 +64,51 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     private readonly outboxRepository: OutboxRepository,
     private readonly agencyRepository: AgencyRepository,
     private readonly generateJwtFn: GenerateMagicLinkJwt,
+    private readonly config: AppConfig,
+    private readonly clock: Clock,
   ) {
     super();
   }
 
   inputSchema = renewMagicLinkRequestSchema;
 
-  public async _execute({
-    applicationId,
-    role,
-    emailHash,
-    linkFormat,
-  }: RenewMagicLinkRequestDto) {
+  public async _execute({ expiredJWT, linkFormat }: RenewMagicLinkRequestDto) {
+    const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(this.config);
+
+    let payloadToExtract: any | undefined;
+
+    try {
+      // If the following doesn't throw, we're dealing with a JWT that we signed, so it's
+      // probably expired or an old version.
+      payloadToExtract = verifyJwt(expiredJWT);
+    } catch (err: any) {
+      // If this JWT is signed by us but expired, deal with it.
+      if (err instanceof TokenExpiredError) {
+        payloadToExtract = jwt.decode(expiredJWT) as MagicLinkPayload;
+      } else {
+        // Perhaps this is a JWT that is signed by a compromised key.
+        try {
+          verifyDeprecatedJwt(expiredJWT);
+          // If the above didn't throw, this is a JWT that we issued. Renew it.
+          // However, we cannot trust the contents of it, as the private key was potentially
+          // compromised. Therefore, only use the application ID and the role from it, and fill
+          // the remaining data from the database to prevent a hacker from getting magic links
+          // for any application form.
+          payloadToExtract = jwt.decode(expiredJWT);
+        } catch (deprecatedError: any) {
+          // We don't want to renew this JWT.
+          throw new ForbiddenError();
+        }
+      }
+    }
+
+    if (!payloadToExtract) {
+      throw new BadRequestError("Malformed expired JWT");
+    }
+
+    const { emailHash, role, applicationId } =
+      extractDataFromExpiredJWT(payloadToExtract);
+
     const immersionApplicationEntity =
       await this.immersionApplicationRepository.getById(applicationId);
     if (!immersionApplicationEntity) throw new NotFoundError(applicationId);
@@ -54,7 +128,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
       throw new BadRequestError(linkFormat);
     }
 
-    let emails = [];
+    let emails: string[] = [];
     switch (role) {
       case "admin":
         throw new BadRequestError("L'admin n'a pas de liens magiques.");
@@ -72,12 +146,19 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
         break;
     }
 
+    // Only renew the link if the email hash matches
     let foundHit = false;
     for (const email of emails) {
-      if (emailHashForMagicLink(email) === emailHash) {
+      if (!emailHash || emailHashForMagicLink(email) === emailHash) {
         foundHit = true;
         const jwt = this.generateJwtFn(
-          createMagicLinkPayload(applicationId, role, email),
+          createMagicLinkPayload(
+            applicationId,
+            role,
+            email,
+            undefined,
+            this.clock.timestamp.bind(this.clock),
+          ),
         );
 
         const magicLink = linkFormat.replaceAll("%jwt%", jwt);
@@ -95,7 +176,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     }
     if (!foundHit) {
       throw new BadRequestError(
-        "Le lien magique n'est pas associé à cette demande d'immersion",
+        "Le lien magique n'est plus associé à cette demande d'immersion",
       );
     }
   }

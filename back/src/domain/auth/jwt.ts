@@ -15,7 +15,10 @@ type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload) => string;
 export const makeGenerateJwt =
   <P extends AnyObject>(config: AppConfig): GenerateJwtFn<P> =>
   (payload) =>
-    jwt.sign(payload, config.jwtPrivateKey, { algorithm: algo });
+    jwt.sign(payload, config.jwtPrivateKey, {
+      algorithm: algo,
+      noTimestamp: true,
+    });
 
 export const makeVerifyJwt =
   <Payload>(jwtPublicKey: string) =>

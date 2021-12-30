@@ -1,4 +1,5 @@
-import { emailHashForMagicLink } from "./../../../shared/tokens/MagicLinkPayload";
+import { makeGenerateJwt, makeVerifyJwt } from "./../../../domain/auth/jwt";
+import { AppConfig } from "./../../../adapters/primary/appConfig";
 import {
   BadRequestError,
   NotFoundError,
@@ -13,10 +14,7 @@ import {
   ImmersionApplicationDto,
   RenewMagicLinkRequestDto,
 } from "../../../shared/ImmersionApplicationDto";
-import {
-  createMagicLinkPayload,
-  MagicLinkPayload,
-} from "../../../shared/tokens/MagicLinkPayload";
+import { createMagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
@@ -26,6 +24,9 @@ import {
   makeCreateNewEvent,
 } from "./../../../domain/core/eventBus/EventBus";
 import { RenewMagicLink } from "./../../../domain/immersionApplication/useCases/RenewMagicLink";
+import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
+import jwt from "jsonwebtoken";
+import { RenewMagicLinkPayload } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 
 const validDemandeImmersion: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();
@@ -42,21 +43,31 @@ describe("RenewMagicLink use case", () => {
   let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
   let agencyRepository: InMemoryAgencyRepository;
+  let config: AppConfig;
 
-  const generateJwtFn: GenerateMagicLinkJwt = (payload) =>
-    payload.applicationId + "; " + payload.role;
+  let generateJwtFn: GenerateMagicLinkJwt;
+  let generateLegacyV0JwtFn: (payload: any) => string;
 
   beforeEach(() => {
     agencyConfig = defaultAgencyConfig;
     applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
+    clock.setNextDate(new Date());
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     agencyRepository = new InMemoryAgencyRepository([agencyConfig]);
 
     const entity = new ImmersionApplicationEntityBuilder().build();
     applicationRepository.setDemandesImmersion({ [entity.id]: entity });
+    config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
+
+    generateJwtFn = makeGenerateJwt(config);
+    // This is the JWT function that was used with the V0 magic links
+    generateLegacyV0JwtFn = (payload: any) =>
+      jwt.sign(payload, config.jwtPreviousPrivateKey as string, {
+        algorithm: "ES256",
+      });
   });
 
   const createUseCase = () => {
@@ -66,15 +77,21 @@ describe("RenewMagicLink use case", () => {
       outboxRepository,
       agencyRepository,
       generateJwtFn,
+      config,
+      clock,
     );
   };
 
   it("requires a valid application id", async () => {
+    const payload = createMagicLinkPayload(
+      "not-a-valid-id",
+      "counsellor",
+      "some email",
+    );
+
     const request: RenewMagicLinkRequestDto = {
-      applicationId: "not-a-valid-id",
-      role: "counsellor",
       linkFormat: "immersionfacile.com/%jwt%",
-      emailHash: "some email hash",
+      expiredJWT: generateJwtFn(payload),
     };
 
     await expectPromiseToFailWithError(
@@ -90,11 +107,15 @@ describe("RenewMagicLink use case", () => {
       .build();
     applicationRepository.setDemandesImmersion({ [entity.id]: entity });
 
+    const payload = createMagicLinkPayload(
+      validDemandeImmersion.id,
+      "counsellor",
+      "some email",
+    );
+
     const request: RenewMagicLinkRequestDto = {
-      applicationId: validDemandeImmersion.id,
-      role: "counsellor",
-      linkFormat: "immersionfacile.fr/%jwt%",
-      emailHash: "some email hash",
+      linkFormat: "immersionfacile.com/%jwt%",
+      expiredJWT: generateJwtFn(payload),
     };
 
     await expectPromiseToFailWithError(
@@ -105,11 +126,15 @@ describe("RenewMagicLink use case", () => {
 
   // Admins use non-magic-link based authentication, so no need to renew these.
   it("Refuses to generate admin magic links", async () => {
+    const payload = createMagicLinkPayload(
+      validDemandeImmersion.id,
+      "admin",
+      "some email",
+    );
+
     const request: RenewMagicLinkRequestDto = {
-      applicationId: validDemandeImmersion.id,
-      role: "admin",
-      linkFormat: "immersionfacile.fr/%jwt%",
-      emailHash: "some email hash",
+      linkFormat: "immersionfacile.com/%jwt%",
+      expiredJWT: generateJwtFn(payload),
     };
 
     await expectPromiseToFailWithError(
@@ -119,11 +144,15 @@ describe("RenewMagicLink use case", () => {
   });
 
   it("requires a link format that includes %jwt% string", async () => {
+    const payload = createMagicLinkPayload(
+      validDemandeImmersion.id,
+      "counsellor",
+      "some email",
+    );
+
     const request: RenewMagicLinkRequestDto = {
-      applicationId: validDemandeImmersion.id,
-      role: "counsellor",
-      linkFormat: "immersionfacile.fr/",
-      emailHash: "some email hash",
+      linkFormat: "immersionfacile.com/",
+      expiredJWT: generateJwtFn(payload),
     };
 
     await expectPromiseToFailWithError(
@@ -133,12 +162,15 @@ describe("RenewMagicLink use case", () => {
   });
 
   it("Posts an event to deliver a correct JWT for correct responses", async () => {
-    const linkFormat = "immersionfacile.fr/%jwt%";
+    const expiredPayload = createMagicLinkPayload(
+      validDemandeImmersion.id,
+      "beneficiary",
+      validDemandeImmersion.email,
+    );
+
     const request: RenewMagicLinkRequestDto = {
-      applicationId: validDemandeImmersion.id,
-      role: "beneficiary",
-      linkFormat,
-      emailHash: emailHashForMagicLink(validDemandeImmersion.email),
+      linkFormat: "immersionfacile.fr/%jwt%",
+      expiredJWT: generateJwtFn(expiredPayload),
     };
 
     await createUseCase().execute(request);
@@ -151,14 +183,16 @@ describe("RenewMagicLink use case", () => {
       ),
     );
 
-    expect(outboxRepository.events).toEqual([
-      createNewEvent({
-        topic: "MagicLinkRenewalRequested",
-        payload: {
-          emails: [validDemandeImmersion.email],
-          magicLink: "immersionfacile.fr/" + expectedJWT,
-        },
-      }),
-    ]);
+    expect(outboxRepository.events).toHaveLength(1);
+    const renewalEvent = outboxRepository.events[0];
+    expect(renewalEvent.topic).toEqual("MagicLinkRenewalRequested");
+    const dispatchedPayload = renewalEvent.payload as RenewMagicLinkPayload;
+    expect(dispatchedPayload["emails"]).toEqual([validDemandeImmersion.email]);
+    const ml = dispatchedPayload.magicLink;
+    expect(ml.startsWith("immersionfacile.fr/"));
+    const jwt = ml.replace("immersionfacile.fr/", "");
+
+    const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
+    expect(verifyJwt(jwt)).not.toBeUndefined();
   });
 });
