@@ -1,3 +1,4 @@
+import { Checkbox } from "@mui/material";
 import { Form, Formik, useField } from "formik";
 import React, { useState } from "react";
 import { formEstablishmentGateway } from "src/app/dependencies";
@@ -14,6 +15,7 @@ import {
   useSiretRelatedField,
 } from "src/app/Siret/fetchEstablishmentInfoBySiret";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
+import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
@@ -40,6 +42,7 @@ const initialValues: FormEstablishmentDto = ENV.dev
       businessNameCustomized:
         "My Customized Business name, not replaced by API",
       businessAddress: "My business address, replaced by result from API",
+      isEngagedEnterprise: true,
       professions: [
         {
           romeCodeAppellation: "11573",
@@ -198,6 +201,13 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
                   Votre établissement
                 </span>
                 <SiretRelatedInputs />
+                <p className="mt-4" />
+                <BoolCheckboxGroup
+                  {...getLabelAndName("isEngagedEnterprise")}
+                  description=""
+                  descriptionLink=""
+                  disabled={false}
+                />{" "}
                 <ProfessionList
                   name="professions"
                   title={`${fieldsToLabel["professions"]} *`}

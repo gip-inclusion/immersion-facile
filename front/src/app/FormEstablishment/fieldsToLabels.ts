@@ -14,4 +14,6 @@ export const fieldsToLabel: Record<FieldsWithLabel, string> = {
     "Comment souhaitez-vous que les candidats vous contactent ?",
   professions: "Métiers ouverts à l'immersion",
   siret: "Indiquez le SIRET de la structure d'accueil",
+  isEngagedEnterprise:
+    "Mon entreprise appartient au réseau des entreprises s'engagent",
 };

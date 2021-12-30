@@ -8,7 +8,7 @@ import {
   NotEmptyArray,
   phoneRegExp,
 } from "./utils";
-import { zEmail, zString, zTrimmedString } from "./zodUtils";
+import { zBoolean, zEmail, zString, zTrimmedString } from "./zodUtils";
 
 export type FormEstablishmentId = Flavor<string, "FormEstablishmentId">;
 export const formEstablishmentIdSchema: z.ZodSchema<FormEstablishmentId> =
@@ -47,6 +47,7 @@ export const formEstablishmentSchema = z.object(
     businessName: zTrimmedString,
     businessNameCustomized: zTrimmedString.optional(),
     businessAddress: addressWithPostalCodeSchema,
+    isEngagedEnterprise: zBoolean.optional(),
     naf: nafSchema,
     professions: z
       .array(professionSchema)
