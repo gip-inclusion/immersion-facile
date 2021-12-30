@@ -21,7 +21,6 @@ export class GenerateMagicLink extends UseCase<
   public async _execute({
     applicationId,
     role,
-    emailHash,
     expired,
   }: GenerateMagicLinkRequestDto) {
     const twoDaysAgo = Math.round((Date.now() - 48 * 3600 * 1000) / 1000);

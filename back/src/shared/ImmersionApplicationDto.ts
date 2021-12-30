@@ -226,7 +226,6 @@ export type GenerateMagicLinkRequestDto = z.infer<typeof generateMagicLinkReques
 export const generateMagicLinkRequestSchema = z.object({
   applicationId: immersionApplicationIdSchema,
   role: z.enum(allRoles),
-  emailHash: z.string(),
   expired: z.boolean(), //< defaults to false
 });
 
@@ -240,7 +239,7 @@ export const generateMagicLinkResponseSchema = z.object({
 export type RenewMagicLinkRequestDto = z.infer<typeof renewMagicLinkRequestSchema>;
 export const renewMagicLinkRequestSchema = z.object({
   linkFormat: z.string(),
-  expiredJWT: z.string(),
+  expiredJwt: z.string(),
 });
 
 export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {

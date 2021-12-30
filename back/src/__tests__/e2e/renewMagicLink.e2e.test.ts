@@ -108,7 +108,7 @@ describe("Magic link renewal flow", () => {
 
     const request: RenewMagicLinkRequestDto = {
       linkFormat: "immersionfacile.fr/%jwt%",
-      expiredJWT: generateJwtFn(payload),
+      expiredJwt: generateJwtFn(payload),
     };
 
     await renewMagicLink.execute(request);

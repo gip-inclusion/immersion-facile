@@ -36,7 +36,7 @@ interface LinkRenewData {
 }
 
 // Extracts the data necessary for link renewal from any version of magic link payload.
-const extractDataFromExpiredJWT: (payload: any) => LinkRenewData = (
+const extractDataFromExpiredJwt: (payload: any) => LinkRenewData = (
   payload: any,
 ) => {
   if (!payload.version) {
@@ -72,7 +72,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
 
   inputSchema = renewMagicLinkRequestSchema;
 
-  public async _execute({ expiredJWT, linkFormat }: RenewMagicLinkRequestDto) {
+  public async _execute({ expiredJwt, linkFormat }: RenewMagicLinkRequestDto) {
     const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(this.config);
 
     let payloadToExtract: any | undefined;
@@ -80,21 +80,21 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     try {
       // If the following doesn't throw, we're dealing with a JWT that we signed, so it's
       // probably expired or an old version.
-      payloadToExtract = verifyJwt(expiredJWT);
+      payloadToExtract = verifyJwt(expiredJwt);
     } catch (err: any) {
       // If this JWT is signed by us but expired, deal with it.
       if (err instanceof TokenExpiredError) {
-        payloadToExtract = jwt.decode(expiredJWT) as MagicLinkPayload;
+        payloadToExtract = jwt.decode(expiredJwt) as MagicLinkPayload;
       } else {
         // Perhaps this is a JWT that is signed by a compromised key.
         try {
-          verifyDeprecatedJwt(expiredJWT);
+          verifyDeprecatedJwt(expiredJwt);
           // If the above didn't throw, this is a JWT that we issued. Renew it.
           // However, we cannot trust the contents of it, as the private key was potentially
           // compromised. Therefore, only use the application ID and the role from it, and fill
           // the remaining data from the database to prevent a hacker from getting magic links
           // for any application form.
-          payloadToExtract = jwt.decode(expiredJWT);
+          payloadToExtract = jwt.decode(expiredJwt);
         } catch (deprecatedError: any) {
           // We don't want to renew this JWT.
           throw new ForbiddenError();
@@ -107,7 +107,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     }
 
     const { emailHash, role, applicationId } =
-      extractDataFromExpiredJWT(payloadToExtract);
+      extractDataFromExpiredJwt(payloadToExtract);
 
     const immersionApplicationEntity =
       await this.immersionApplicationRepository.getById(applicationId);

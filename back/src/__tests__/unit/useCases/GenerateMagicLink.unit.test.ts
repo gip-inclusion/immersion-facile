@@ -1,10 +1,8 @@
-import { emailHashForMagicLink } from "./../../../shared/tokens/MagicLinkPayload";
 import { GenerateMagicLinkJwt } from "./../../../domain/auth/jwt";
 import { GenerateMagicLink } from "./../../../domain/immersionApplication/useCases/GenerateMagicLink";
 import {
   createMagicLinkPayload,
   Role,
-  MagicLinkPayload,
 } from "../../../shared/tokens/MagicLinkPayload";
 
 const generateJwtFn: GenerateMagicLinkJwt = (payload) =>
@@ -27,7 +25,6 @@ describe("Generate magic links", () => {
         applicationId: id,
         role,
         expired: false,
-        emailHash: emailHashForMagicLink(email),
       });
 
       expect(result).toEqual({

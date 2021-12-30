@@ -91,7 +91,7 @@ describe("RenewMagicLink use case", () => {
 
     const request: RenewMagicLinkRequestDto = {
       linkFormat: "immersionfacile.com/%jwt%",
-      expiredJWT: generateJwtFn(payload),
+      expiredJwt: generateJwtFn(payload),
     };
 
     await expectPromiseToFailWithError(
@@ -115,7 +115,7 @@ describe("RenewMagicLink use case", () => {
 
     const request: RenewMagicLinkRequestDto = {
       linkFormat: "immersionfacile.com/%jwt%",
-      expiredJWT: generateJwtFn(payload),
+      expiredJwt: generateJwtFn(payload),
     };
 
     await expectPromiseToFailWithError(
@@ -134,7 +134,7 @@ describe("RenewMagicLink use case", () => {
 
     const request: RenewMagicLinkRequestDto = {
       linkFormat: "immersionfacile.com/%jwt%",
-      expiredJWT: generateJwtFn(payload),
+      expiredJwt: generateJwtFn(payload),
     };
 
     await expectPromiseToFailWithError(
@@ -152,7 +152,7 @@ describe("RenewMagicLink use case", () => {
 
     const request: RenewMagicLinkRequestDto = {
       linkFormat: "immersionfacile.com/",
-      expiredJWT: generateJwtFn(payload),
+      expiredJwt: generateJwtFn(payload),
     };
 
     await expectPromiseToFailWithError(
@@ -170,7 +170,7 @@ describe("RenewMagicLink use case", () => {
 
     const request: RenewMagicLinkRequestDto = {
       linkFormat: "immersionfacile.fr/%jwt%",
-      expiredJWT: generateJwtFn(expiredPayload),
+      expiredJwt: generateJwtFn(expiredPayload),
     };
 
     await createUseCase().execute(request);

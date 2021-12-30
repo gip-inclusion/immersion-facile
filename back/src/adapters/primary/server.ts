@@ -2,9 +2,7 @@ import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import PinoHttp from "pino-http";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
-import {
-  listImmersionApplicationRequestDtoSchema,
-} from "../../shared/ImmersionApplicationDto";
+import { listImmersionApplicationRequestDtoSchema } from "../../shared/ImmersionApplicationDto";
 import { romeSearchRequestSchema } from "../../shared/rome";
 import {
   agenciesRoute,
