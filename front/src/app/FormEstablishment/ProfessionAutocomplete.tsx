@@ -75,6 +75,7 @@ export const ProfessionAutocomplete = ({
     <>
       <Autocomplete
         disablePortal
+        filterOptions={(x) => x}
         options={options}
         value={selectedOption}
         noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
