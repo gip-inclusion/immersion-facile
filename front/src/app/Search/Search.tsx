@@ -170,7 +170,7 @@ export const Search = () => {
         open={successFullyValidated}
         handleClose={() => setSuccessfullyValidated(false)}
       >
-        L'entreprise a été contacté avec succès.
+        L'entreprise a été contactée avec succès.
       </SuccessFeedback>
     </div>
   );
