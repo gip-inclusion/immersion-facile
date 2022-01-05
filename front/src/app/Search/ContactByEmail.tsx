@@ -16,16 +16,15 @@ type ContactByEmailProps = {
 
 const getName = (v: keyof ContactEstablishmentByMailDto) => v;
 
-const initialMessage = `Bonjour, 
-  J’ai trouvé votre entreprise sur “Immersion Facilitée.” 
-  Je souhaiterais passer quelques jours dans votre entreprise en immersion professionnelle auprès de vos salariés pour découvrir ce métier.
-  
-  Pourriez-vous me contacter par téléphone ou par mail pour me proposer un rendez-vous ? 
-  Je pourrais alors vous expliquer directement mon projet. 
-  
-  En vous remerciant,  
-  
-`;
+const initialMessage =
+  "Bonjour, \n\
+  J’ai trouvé votre entreprise sur 'Immersion Facilitée.'\n\
+  Je souhaiterais passer quelques jours dans votre entreprise en immersion professionnelle auprès de vos salariés pour découvrir ce métier.\n\
+  \n\
+  Pourriez-vous me contacter par mail pour me proposer un rendez-vous ? \n\
+  Je pourrais alors vous expliquer directement mon projet. \n\
+  \n\
+  En vous remerciant,";
 
 export const ContactByEmail = ({
   immersionOfferId,
