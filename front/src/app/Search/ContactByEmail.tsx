@@ -16,6 +16,17 @@ type ContactByEmailProps = {
 
 const getName = (v: keyof ContactEstablishmentByMailDto) => v;
 
+const initialMessage = `Bonjour, 
+  J’ai trouvé votre entreprise sur “Immersion Facilitée.” 
+  Je souhaiterais passer quelques jours dans votre entreprise en immersion professionnelle auprès de vos salariés pour découvrir ce métier.
+  
+  Pourriez-vous me contacter par téléphone ou par mail pour me proposer un rendez-vous ? 
+  Je pourrais alors vous expliquer directement mon projet. 
+  
+  En vous remerciant,  
+  
+`;
+
 export const ContactByEmail = ({
   immersionOfferId,
   onSuccess,
@@ -26,7 +37,7 @@ export const ContactByEmail = ({
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",
     potentialBeneficiaryEmail: "",
-    message: "",
+    message: initialMessage,
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);

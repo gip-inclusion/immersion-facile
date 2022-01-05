@@ -12,6 +12,7 @@ import searchButtonIcon from "src/assets/search-button-icon.svg";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { SuccessFeedback } from "src/components/SuccessFeedback";
+import { ContactMethod } from "src/shared/FormEstablishmentDto";
 import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import "./search.css";
@@ -27,9 +28,24 @@ interface Values {
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 
+const getFeedBackMessage = (contactMethod?: ContactMethod) => {
+  switch (contactMethod) {
+    case "EMAIL":
+      return "L'entreprise a été contactée avec succès.";
+    case "PHONE":
+    case "IN_PERSON":
+      return "Un email vient de vous être envoyé.";
+    default:
+      return null;
+  }
+};
+
 export const Search = () => {
   const [result, setResult] = useState<SearchImmersionResultDto[] | null>(null);
   const [successFullyValidated, setSuccessfullyValidated] = useState(false);
+  const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<
+    string | null
+  >(null);
   const { modalState, dispatch } = useContactEstablishmentModal();
 
   return (
@@ -164,14 +180,24 @@ export const Search = () => {
       <ContactEstablishmentModal
         modalState={modalState}
         dispatch={dispatch}
-        onSuccess={() => setSuccessfullyValidated(true)}
+        onSuccess={() => {
+          setSuccessfulValidatedMessage(
+            getFeedBackMessage(modalState.contactMethod),
+          );
+          setSuccessfullyValidated(true);
+        }}
       />
-      <SuccessFeedback
-        open={successFullyValidated}
-        handleClose={() => setSuccessfullyValidated(false)}
-      >
-        L'entreprise a été contactée avec succès.
-      </SuccessFeedback>
+      {successfulValidationMessage && (
+        <SuccessFeedback
+          open={successFullyValidated}
+          handleClose={() => {
+            setSuccessfulValidatedMessage(null);
+            setSuccessfullyValidated(false);
+          }}
+        >
+          {successfulValidationMessage}
+        </SuccessFeedback>
+      )}
     </div>
   );
 };

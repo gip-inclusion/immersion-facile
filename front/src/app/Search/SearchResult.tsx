@@ -39,7 +39,9 @@ export const EnterpriseSearchResult = ({
         onClick={onButtonClick}
         disabled={disableButton}
       >
-        {contactMode === "PHONE" || contactMode === "EMAIL"
+        {contactMode === "PHONE" ||
+        contactMode === "EMAIL" ||
+        contactMode === "IN_PERSON"
           ? "Contacter l'entreprise"
           : "Tentez votre chance"}
       </button>
