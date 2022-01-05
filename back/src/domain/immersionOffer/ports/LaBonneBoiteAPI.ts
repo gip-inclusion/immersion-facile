@@ -1,19 +1,8 @@
 import { SearchParams } from "../entities/SearchParams";
-
-export type LaBonneBoiteCompany = {
-  address: string;
-  city: string;
-  lat: number;
-  lon: number;
-  matched_rome_code: string;
-  naf: string;
-  name: string;
-  siret: string;
-  stars: number;
-};
+import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 export interface LaBonneBoiteAPI {
   searchCompanies: (
     searchParams: SearchParams,
-  ) => Promise<LaBonneBoiteCompany[]>;
+  ) => Promise<LaBonneBoiteCompanyVO[]>;
 }

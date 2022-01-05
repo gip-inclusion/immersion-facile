@@ -13,12 +13,13 @@ import {
 import { SearchParams } from "../entities/SearchParams";
 import { AdresseAPI } from "../ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
-import { LaBonneBoiteAPI, LaBonneBoiteCompany } from "../ports/LaBonneBoiteAPI";
+import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
 import {
   LaPlateformeDeLInclusionAPI,
   LaPlateformeDeLInclusionResult,
 } from "../ports/LaPlateformeDeLInclusionAPI";
 import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
+import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 const logger = createLogger(__filename);
 
@@ -128,13 +129,13 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       const laBonneBoiteCompanies = await this.laBonneBoiteAPI.searchCompanies(
         searchParams,
       );
-      const laBonneBoiteReleventCompanies = laBonneBoiteCompanies.filter(
-        (company) => this.keepRelevantCompanies(searchParams.rome, company.naf),
+      const laBonneBoiteRelevantCompanies = laBonneBoiteCompanies.filter(
+        (company) => company.isCompanyRelevant(),
       );
 
       // Todo : Eventually use a sequenceRunner or parallelize
       const establishmentAggregates: EstablishmentAggregate[] = [];
-      for (const laBonneBoiteCompany of laBonneBoiteReleventCompanies) {
+      for (const laBonneBoiteCompany of laBonneBoiteRelevantCompanies) {
         const establishmentAggregate =
           await this.convertLaBonneBoiteCompanyToEstablishmentAggregate(
             laBonneBoiteCompany,
@@ -150,7 +151,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   }
 
   private async convertLaBonneBoiteCompanyToEstablishmentAggregate(
-    laBonneBoiteCompany: LaBonneBoiteCompany,
+    laBonneBoiteCompany: LaBonneBoiteCompanyVO,
   ): Promise<EstablishmentAggregate | undefined> {
     const sireneAnswer = await this.sireneRepository.get(
       laBonneBoiteCompany.siret,
@@ -167,33 +168,10 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     const numberEmployeesRange =
       inferNumberEmployeesRangeFromSireneAnswer(sireneAnswer);
 
-    const establishment: EstablishmentEntityV2 = {
-      address: laBonneBoiteCompany.address,
-      position: {
-        lat: laBonneBoiteCompany.lat,
-        lon: laBonneBoiteCompany.lon,
-      },
-      naf: laBonneBoiteCompany.naf ?? naf,
-      dataSource: "api_labonneboite",
+    return laBonneBoiteCompany.toEstablishmentAggregate(this.uuidGenerator, {
+      naf,
       numberEmployeesRange,
-      name: laBonneBoiteCompany.name,
-      siret: laBonneBoiteCompany.siret,
-      voluntaryToImmersion: false,
-    };
-
-    const establishmentAggregate: EstablishmentAggregate = {
-      establishment,
-
-      immersionOffers: [
-        {
-          id: this.uuidGenerator.new(),
-          rome: laBonneBoiteCompany.matched_rome_code,
-          score: laBonneBoiteCompany.stars,
-        },
-      ],
-      contacts: [],
-    };
-    return establishmentAggregate;
+    });
   }
 
   private async convertLaPlateformeDeLInclusionResultToEstablishment(
@@ -250,48 +228,6 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       })),
     };
     return establishmentAggregate;
-  }
-
-  private keepRelevantCompanies(
-    romeSearched: string,
-    companyNaf: string,
-  ): boolean {
-    // those conditions are business specific, see with Nathalie for any questions
-    const isNafAutreServiceWithRomeElevageOrToilettage =
-      companyNaf.startsWith("9609") &&
-      ["A1503", "A1408"].includes(romeSearched);
-
-    const isNafRestaurationRapideWithRomeBoulangerie =
-      companyNaf == "5610C" && romeSearched == "D1102";
-
-    const isRomeIgnoredForPublicAdministration =
-      companyNaf.startsWith("8411") &&
-      [
-        "D1202",
-        "G1404",
-        "G1501",
-        "G1502",
-        "G1503",
-        "G1601",
-        "G1602",
-        "G1603",
-        "G1605",
-        "G1802",
-        "G1803",
-      ].includes(romeSearched);
-
-    const establishmentShouldBeIgnored =
-      isNafAutreServiceWithRomeElevageOrToilettage ||
-      isNafRestaurationRapideWithRomeBoulangerie ||
-      isRomeIgnoredForPublicAdministration;
-
-    if (establishmentShouldBeIgnored) {
-      logger.info({ company: companyNaf }, "Not relevant, discarding.");
-      return false;
-    } else {
-      logger.debug({ company: companyNaf }, "Relevant.");
-      return true;
-    }
   }
 
   private async searchLaPlateformeDeLInclusion(

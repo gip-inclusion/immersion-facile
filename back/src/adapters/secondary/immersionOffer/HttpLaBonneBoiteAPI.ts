@@ -4,10 +4,8 @@ import {
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
-import {
-  LaBonneBoiteAPI,
-  LaBonneBoiteCompany,
-} from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
+import { LaBonneBoiteAPI } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
+import { LaBonneBoiteCompanyVO } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 import { RateLimiter } from "./../../../domain/core/ports/RateLimiter";
@@ -24,7 +22,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
 
   public async searchCompanies(
     searchParams: SearchParams,
-  ): Promise<LaBonneBoiteCompany[]> {
+  ): Promise<LaBonneBoiteCompanyVO[]> {
     return this.retryStrategy.apply(async () => {
       const accessToken = await this.accessTokenGateway.getAccessToken(
         `application_${this.poleEmploiClientId} api_labonneboitev1`,

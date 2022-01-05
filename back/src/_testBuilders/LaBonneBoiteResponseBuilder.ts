@@ -1,7 +1,10 @@
-import { LaBonneBoiteCompany } from "../domain/immersionOffer/ports/LaBonneBoiteAPI";
+import {
+  LaBonneBoiteCompanyVO,
+  LaBonneBoiteCompanyProps,
+} from "../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 import { Builder } from "./Builder";
 
-const validEstablishmentFromLaBonneBoite: LaBonneBoiteCompany = {
+const validEstablishmentFromLaBonneBoite: LaBonneBoiteCompanyProps = {
   address:
     "Service des ressources humaines,  IMPASSE FENDERIE, 57290 SEREMANGE-ERZANGE",
   city: "SEREMANGE-ERZANGE",
@@ -15,26 +18,26 @@ const validEstablishmentFromLaBonneBoite: LaBonneBoiteCompany = {
 };
 
 export class LaBonneBoiteCompanyBuilder
-  implements Builder<LaBonneBoiteCompany>
+  implements Builder<LaBonneBoiteCompanyVO>
 {
   public constructor(
-    private entity: LaBonneBoiteCompany = validEstablishmentFromLaBonneBoite,
+    private props: LaBonneBoiteCompanyProps = validEstablishmentFromLaBonneBoite,
   ) {}
 
   public withSiret(siret: string): LaBonneBoiteCompanyBuilder {
     return new LaBonneBoiteCompanyBuilder({
-      ...this.entity,
+      ...this.props,
       siret,
     });
   }
 
   public withNaf(naf: string): LaBonneBoiteCompanyBuilder {
     return new LaBonneBoiteCompanyBuilder({
-      ...this.entity,
+      ...this.props,
       naf,
     });
   }
   public build() {
-    return this.entity;
+    return new LaBonneBoiteCompanyVO(this.props);
   }
 }
