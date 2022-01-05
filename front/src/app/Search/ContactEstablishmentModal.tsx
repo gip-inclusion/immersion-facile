@@ -12,6 +12,7 @@ import {
   ImmersionContactInEstablishmentId,
 } from "src/shared/FormEstablishmentDto";
 import { ImmersionOfferId } from "src/shared/SearchImmersionDto";
+import { ContactInPerson } from "./ContactInPerson";
 
 type ModalState = {
   isOpen: boolean;
@@ -114,6 +115,13 @@ const ModalContactContent = ({
     case "PHONE":
       return (
         <ContactByPhone
+          immersionOfferId={modalState.immersionOfferId}
+          onSuccess={onSuccess}
+        />
+      );
+    case "IN_PERSON":
+      return (
+        <ContactInPerson
           immersionOfferId={modalState.immersionOfferId}
           onSuccess={onSuccess}
         />
