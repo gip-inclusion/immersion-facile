@@ -80,7 +80,7 @@ deploy_on_dev:
       chmod 600 .env.variables;
 
       git checkout dev &&
-      git fetch &&
+      git fetch origin dev &&
       git reset --hard origin/dev;
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
@@ -126,7 +126,7 @@ deploy_on_staging:
       chmod 600 .env.variables;
 
       git checkout staging &&
-      git fetch &&
+      git fetch origin staging &&
       git reset --hard origin/staging;
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
@@ -172,7 +172,7 @@ deploy_on_prod:
       chmod 600 .env.variables;
 
       git checkout main &&
-      git fetch &&
+      git fetch origin main &&
       git reset --hard origin/main;
       retVal=\$?;
       if [ \$retVal -ne 0 ]; then
