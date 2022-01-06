@@ -2,12 +2,12 @@ import {
   SearchMade,
   SearchMadeEntity,
 } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { SearchesMadeRepository } from "../../../domain/immersionOffer/ports/SearchesMadeRepository";
+import { SearchMadeRepository } from "../../../domain/immersionOffer/ports/SearchMadeRepository";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
-export class InMemorySearchesMadeRepository implements SearchesMadeRepository {
+export class InMemorySearchMadeRepository implements SearchMadeRepository {
   constructor(private _searchesMadeEntities: SearchMadeEntity[] = []) {}
 
   public async insertSearchMade(searchMadeEntity: SearchMadeEntity) {

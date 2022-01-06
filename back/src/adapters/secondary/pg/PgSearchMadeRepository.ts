@@ -3,9 +3,9 @@ import {
   SearchMade,
   SearchMadeEntity,
 } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { SearchesMadeRepository } from "./../../../domain/immersionOffer/ports/SearchesMadeRepository";
+import { SearchMadeRepository } from "../../../domain/immersionOffer/ports/SearchMadeRepository";
 
-export class PgSearchesMadeRepository implements SearchesMadeRepository {
+export class PgSearchMadeRepository implements SearchMadeRepository {
   constructor(private client: PoolClient) {}
 
   async insertSearchMade(searchMade: SearchMadeEntity) {

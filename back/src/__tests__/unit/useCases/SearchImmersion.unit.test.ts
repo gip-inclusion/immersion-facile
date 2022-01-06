@@ -9,7 +9,7 @@ import {
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
-import { InMemorySearchesMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
+import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import {
@@ -30,7 +30,7 @@ const prepareSearchableData =
   ({ withLBBSearchOnFetch }: PrepareSearchableDataProps) =>
   async () => {
     const immersionOfferRepository = new InMemoryImmersionOfferRepository();
-    const searchesMadeRepository = new InMemorySearchesMadeRepository();
+    const searchMadeRepository = new InMemorySearchMadeRepository();
     const laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
     const uuidGenerator = new TestUuidGenerator();
     const featureFlagBuilder = FeatureFlagsBuilder.allOff();
@@ -48,7 +48,7 @@ const prepareSearchableData =
     uuidGenerator.setNextUuid(generatedOfferId);
 
     const searchImmersion = new SearchImmersion(
-      searchesMadeRepository,
+      searchMadeRepository,
       immersionOfferRepository,
       laBonneBoiteAPI,
       uuidGenerator,
@@ -79,7 +79,7 @@ const prepareSearchableData =
     return {
       searchImmersion,
       immersionOfferId,
-      searchesMadeRepository,
+      searchesMadeRepository: searchMadeRepository,
       immersionOfferRepository,
       generatedOfferId,
       uuidGenerator,
