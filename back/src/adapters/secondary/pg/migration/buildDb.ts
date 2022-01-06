@@ -62,6 +62,7 @@ const buildDb = async () => {
     logger.info("We will thus construct the database");
     await buildSearchImmersionDb(client);
   }
+  await addSearchMadeId(client);
 
   // prettier-ignore
   const immersionApplicationTableAlreadyExists = await checkIfTableExists("immersion_applications");
@@ -132,6 +133,10 @@ const makeCheckIfTableAlreadyExists =
 
 const buildSearchImmersionDb = async (client: PoolClient) => {
   await executeSqlFromFile(__dirname + "/database.sql", client);
+};
+
+const addSearchMadeId = async (client: PoolClient) => {
+  await executeSqlFromFile(__dirname + "/addSearchMadeId.sql", client);
 };
 
 const buildOutbox = async (client: PoolClient) => {
