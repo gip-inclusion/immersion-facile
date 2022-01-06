@@ -34,7 +34,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
             "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
             {
               headers: {
-                Authorization: `Bearer ${accessToken}`,
+                Authorization: createAuthorization(accessToken.access_token),
               },
               params: {
                 distance: searchParams.distance_km,
@@ -57,3 +57,5 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
     });
   }
 }
+
+const createAuthorization = (accessToken: string) => `Bearer ${accessToken}`;

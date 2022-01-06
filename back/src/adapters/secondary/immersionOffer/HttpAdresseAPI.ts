@@ -34,12 +34,18 @@ export class HttpAdresseAPI implements AdresseAPI {
             },
           },
         );
+
+        if (!response.data.features || response.data.features.length == 0) {
+          logger.warn(`Failed finding lat/lon for address: ${address}`);
+          return;
+        }
+
         return {
           lat: response.data.features[0].geometry.coordinates[1],
           lon: response.data.features[0].geometry.coordinates[0],
         };
       } catch (error: any) {
-        if (error.response.status == 429) {
+        if (error.response?.status == 429) {
           logger.warn("Too many requests: " + error);
           throw new RetriableError(error);
         }
@@ -63,7 +69,7 @@ export class HttpAdresseAPI implements AdresseAPI {
         );
         return response.data.features[0]?.properties?.citycode;
       } catch (error: any) {
-        if (error.response.status == 429) {
+        if (error.response?.status == 429) {
           logger.warn("Too many requests: " + error);
           throw new RetriableError(error);
         }

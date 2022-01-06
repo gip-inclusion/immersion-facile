@@ -63,9 +63,10 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     // Check if we have potential immersions in our available databases.
     const establishmentAggregates = await this.search(searchParams);
 
-    const nbOfOffers = establishmentAggregates
-      .map((aggregate) => aggregate.immersionOffers.length)
-      .reduce((accumulator, curr) => accumulator + curr);
+    const nbOfOffers = establishmentAggregates.reduce(
+      (acc, aggregate) => acc + aggregate.immersionOffers.length,
+      0,
+    );
 
     logger.info(
       { searchParams },

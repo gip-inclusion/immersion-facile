@@ -85,15 +85,17 @@ export class HttpLaPlateformeDeLInclusionAPI
           nextPageUrl: response.data.next,
         };
       } catch (error: any) {
-        if (error.response.status == 429) {
+        if (error.response?.status == 429) {
           logger.warn("Too many requests: " + error);
           throw new RetriableError(error);
         }
-        logAxiosError(
-          logger,
-          error,
-          "Could not fetch La Plate Forme de L'Inclusion API results",
-        );
+        if (error.response?.status != 404) {
+          logAxiosError(
+            logger,
+            error,
+            "Could not fetch La Plate Forme de L'Inclusion API results",
+          );
+        }
         return { results: [] };
       }
     });
@@ -111,7 +113,7 @@ export class HttpLaPlateformeDeLInclusionAPI
           nextPageUrl: response.data.next,
         };
       } catch (error: any) {
-        if (error.response.status == 429) {
+        if (error.response?.status == 429) {
           logger.warn("Too many requests: " + error);
           throw new RetriableError(error);
         }
