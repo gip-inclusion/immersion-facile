@@ -3,10 +3,10 @@ import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "../../../../shared/ImmersionApplicationDto";
+import { createLogger } from "../../../../utils/logger";
+import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { createLogger } from "./../../../../utils/logger";
-import { EmailFilter } from "./../../../core/ports/EmailFilter";
 
 const logger = createLogger(__filename);
 
@@ -33,23 +33,15 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted extends UseCa
     }
     logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
 
-    const [allowedBeneficiaryEmail] = this.emailFilter.filter([email], {
-      onRejected: (email) =>
-        logger.info(
-          { id, email },
-          "Sending beneficiary confirmation email skipped.",
-        ),
-    });
-
-    if (allowedBeneficiaryEmail) {
-      await this.emailGateway.sendNewApplicationBeneficiaryConfirmation(
-        allowedBeneficiaryEmail,
-        {
+    await this.emailFilter.withAllowedRecipients(
+      [email],
+      ([email]) =>
+        this.emailGateway.sendNewApplicationBeneficiaryConfirmation(email, {
           demandeId: id,
           firstName,
           lastName,
-        },
-      );
-    }
+        }),
+      logger,
+    );
   }
 }

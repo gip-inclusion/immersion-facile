@@ -41,30 +41,25 @@ export class ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature ex
 
     logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
 
-    const [allowedMentorEmail] = this.emailFilter.filter([mentorEmail], {
-      onRejected: (email) =>
-        logger.info(
-          { id, email },
-          "Sending mentor confirmation email skipped.",
+    await this.emailFilter.withAllowedRecipients(
+      [mentorEmail],
+      ([mentorEmail]) =>
+        this.emailGateway.sendEnterpriseSignatureRequestNotification(
+          mentorEmail,
+          {
+            beneficiaryFirstName: firstName,
+            beneficiaryLastName: lastName,
+            magicLink: this.generateMagicLinkFn(
+              application.id,
+              "establishment",
+              frontRoutes.immersionApplicationsToSign,
+              mentorEmail,
+            ),
+            businessName,
+            mentorName: mentor,
+          },
         ),
-    });
-
-    if (allowedMentorEmail) {
-      await this.emailGateway.sendEnterpriseSignatureRequestNotification(
-        allowedMentorEmail,
-        {
-          beneficiaryFirstName: firstName,
-          beneficiaryLastName: lastName,
-          magicLink: this.generateMagicLinkFn(
-            application.id,
-            "establishment",
-            frontRoutes.immersionApplicationsToSign,
-            allowedMentorEmail,
-          ),
-          businessName: businessName,
-          mentorName: mentor,
-        },
-      );
-    }
+      logger,
+    );
   }
 }

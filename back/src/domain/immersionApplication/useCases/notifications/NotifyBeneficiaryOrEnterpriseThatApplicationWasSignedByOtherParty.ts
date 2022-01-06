@@ -66,37 +66,18 @@ export class NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty e
         ? application.lastName.toUpperCase() + " " + application.firstName
         : application.mentor;
 
-    const recipients = this.emailFilter.filter([recipientEmail], {
-      onRejected: (email) => logger.info(`Skipped sending email to: ${email}`),
-    });
-
-    if (recipients.length > 0) {
-      await this.emailGateway.sendSignedByOtherPartyNotification(
-        recipients[0],
-        {
+    await this.emailFilter.withAllowedRecipients(
+      [recipientEmail],
+      ([recipientEmail]) =>
+        this.emailGateway.sendSignedByOtherPartyNotification(recipientEmail, {
           magicLink,
           existingSignatureName,
           missingSignatureName,
           beneficiaryFirstName: application.firstName,
           beneficiaryLastName: application.lastName,
           immersionProfession: application.immersionProfession,
-        },
-      );
-    } else {
-      logger.info(
-        {
-          id: application.id,
-          recipients,
-          source: application.source,
-          magicLink,
-          existingSignatureName,
-          missingSignatureName,
-          beneficiaryFirstName: application.firstName,
-          beneficiaryLastName: application.lastName,
-          immersionProfession: application.immersionProfession,
-        },
-        "Sending modification request confirmation email skipped.",
-      );
-    }
+        }),
+      logger,
+    );
   }
 }

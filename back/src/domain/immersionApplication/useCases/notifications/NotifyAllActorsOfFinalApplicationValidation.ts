@@ -30,9 +30,7 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
 
   public async _execute(dto: ImmersionApplicationDto): Promise<void> {
     logger.info(
-      {
-        demandeImmersionid: dto.id,
-      },
+      { demandeImmersionid: dto.id },
       "------------- Entering execute.",
     );
 
@@ -43,29 +41,20 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
       );
     }
 
-    const recipients = this.emailFilter.filter(
-      [dto.email, dto.mentorEmail, ...agencyConfig.counsellorEmails],
-      {
-        onRejected: (email) =>
-          logger.info(`Skipped sending email to: ${email}`),
-      },
-    );
-
-    if (recipients.length > 0) {
-      await this.emailGateway.sendValidatedApplicationFinalConfirmation(
-        recipients,
-        getValidatedApplicationFinalConfirmationParams(agencyConfig, dto),
-      );
-    } else {
-      logger.info(
-        {
-          id: dto.id,
+    const recipients = [
+      dto.email,
+      dto.mentorEmail,
+      ...agencyConfig.counsellorEmails,
+    ];
+    await this.emailFilter.withAllowedRecipients(
+      recipients,
+      (recipients) =>
+        this.emailGateway.sendValidatedApplicationFinalConfirmation(
           recipients,
-          agencyId: dto.agencyId,
-        },
-        "Sending validation confirmation email skipped.",
-      );
-    }
+          getValidatedApplicationFinalConfirmationParams(agencyConfig, dto),
+        ),
+      logger,
+    );
   }
 }
 

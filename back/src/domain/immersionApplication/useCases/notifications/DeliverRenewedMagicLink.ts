@@ -22,23 +22,11 @@ export class DeliverRenewedMagicLink extends UseCase<RenewMagicLinkPayload> {
     emails,
     magicLink,
   }: RenewMagicLinkPayload): Promise<void> {
-    logger.info(
-      {
-        emails,
-        magicLink,
-      },
-      "------------- Entering execute.",
+    logger.info({ emails, magicLink }, "------------- Entering execute.");
+    await this.emailFilter.withAllowedRecipients(
+      emails,
+      (emails) => this.emailGateway.sendRenewedMagicLink(emails, { magicLink }),
+      logger,
     );
-
-    const allowedMails = this.emailFilter.filter(emails, {
-      onRejected: (email) =>
-        logger.info({ email }, "Sending magic link renewal email skipped."),
-    });
-
-    if (allowedMails) {
-      await this.emailGateway.sendRenewedMagicLink(emails, {
-        magicLink,
-      });
-    }
   }
 }

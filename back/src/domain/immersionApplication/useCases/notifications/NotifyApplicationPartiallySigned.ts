@@ -39,23 +39,18 @@ export class NotifyApplicationPartiallySigned extends UseCase<ImmersionApplicati
       // Notify differently
     }
 
-    const [allowedBeneficiaryEmail] = this.emailFilter.filter([email], {
-      onRejected: (email) =>
-        logger.info(
-          { id, email },
-          "Sending beneficiary confirmation email skipped.",
+    await this.emailFilter.withAllowedRecipients(
+      [email],
+      ([beneeficiaryEmail]) =>
+        this.emailGateway.sendNewApplicationBeneficiaryConfirmation(
+          beneeficiaryEmail,
+          {
+            demandeId: id,
+            firstName,
+            lastName,
+          },
         ),
-    });
-
-    if (allowedBeneficiaryEmail) {
-      await this.emailGateway.sendNewApplicationBeneficiaryConfirmation(
-        allowedBeneficiaryEmail,
-        {
-          demandeId: id,
-          firstName,
-          lastName,
-        },
-      );
-    }
+      logger,
+    );
   }
 }

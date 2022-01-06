@@ -59,71 +59,70 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
 
     switch (payload.contactMode) {
       case "EMAIL": {
-        await this.withAllowedRecipient(contact.email, (recipient) =>
-          this.emailGateway.sendContactByEmailRequest(recipient, {
-            businessName: annotatedEstablishment.name,
-            contactFirstName: contact.firstName,
-            contactLastName: contact.lastName,
-            jobLabel: annotatedImmersionOffer.romeLabel,
-            potentialBeneficiaryFirstName:
-              payload.potentialBeneficiaryFirstName,
-            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
-            potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
-            message: payload.message!,
-          }),
+        await this.emailFilter.withAllowedRecipients(
+          [contact.email],
+          ([establishmentContactEmail]) =>
+            this.emailGateway.sendContactByEmailRequest(
+              establishmentContactEmail,
+              {
+                businessName: annotatedEstablishment.name,
+                contactFirstName: contact.firstName,
+                contactLastName: contact.lastName,
+                jobLabel: annotatedImmersionOffer.romeLabel,
+                potentialBeneficiaryFirstName:
+                  payload.potentialBeneficiaryFirstName,
+                potentialBeneficiaryLastName:
+                  payload.potentialBeneficiaryLastName,
+                potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
+                message: payload.message!,
+              },
+            ),
+          logger,
         );
         break;
       }
       case "PHONE": {
-        await this.withAllowedRecipient(
-          payload.potentialBeneficiaryEmail,
-          (recipient) =>
-            this.emailGateway.sendContactByPhoneInstructions(recipient, {
-              businessName: annotatedEstablishment.name,
-              contactFirstName: contact.firstName,
-              contactLastName: contact.lastName,
-              contactPhone: contact.phone,
-              potentialBeneficiaryFirstName:
-                payload.potentialBeneficiaryFirstName,
-              potentialBeneficiaryLastName:
-                payload.potentialBeneficiaryLastName,
-            }),
+        await this.emailFilter.withAllowedRecipients(
+          [payload.potentialBeneficiaryEmail],
+          ([potentialBeneficiaryEmail]) =>
+            this.emailGateway.sendContactByPhoneInstructions(
+              potentialBeneficiaryEmail,
+              {
+                businessName: annotatedEstablishment.name,
+                contactFirstName: contact.firstName,
+                contactLastName: contact.lastName,
+                contactPhone: contact.phone,
+                potentialBeneficiaryFirstName:
+                  payload.potentialBeneficiaryFirstName,
+                potentialBeneficiaryLastName:
+                  payload.potentialBeneficiaryLastName,
+              },
+            ),
+          logger,
         );
         break;
       }
       case "IN_PERSON": {
-        await this.withAllowedRecipient(
-          payload.potentialBeneficiaryEmail,
-          (recipient) =>
-            this.emailGateway.sendContactInPersonInstructions(recipient, {
-              businessName: annotatedEstablishment.name,
-              contactFirstName: contact.firstName,
-              contactLastName: contact.lastName,
-              businessAddress: annotatedEstablishment.address,
-              potentialBeneficiaryFirstName:
-                payload.potentialBeneficiaryFirstName,
-              potentialBeneficiaryLastName:
-                payload.potentialBeneficiaryLastName,
-            }),
+        await this.emailFilter.withAllowedRecipients(
+          [payload.potentialBeneficiaryEmail],
+          ([potentialBeneficiaryEmail]) =>
+            this.emailGateway.sendContactInPersonInstructions(
+              potentialBeneficiaryEmail,
+              {
+                businessName: annotatedEstablishment.name,
+                contactFirstName: contact.firstName,
+                contactLastName: contact.lastName,
+                businessAddress: annotatedEstablishment.address,
+                potentialBeneficiaryFirstName:
+                  payload.potentialBeneficiaryFirstName,
+                potentialBeneficiaryLastName:
+                  payload.potentialBeneficiaryLastName,
+              },
+            ),
+          logger,
         );
         break;
       }
     }
-  }
-
-  private async withAllowedRecipient<P>(
-    recipient: string,
-    sendFn: (recipient: string) => Promise<void>,
-  ): Promise<void> {
-    const [allowedRecipient] = this.emailFilter.filter([recipient], {
-      onRejected: (email) => logger.info(`Skipped sending email to: ${email}`),
-    });
-
-    if (!allowedRecipient) {
-      logger.info("No allowed recipients. Email sending skipped.");
-      return;
-    }
-
-    return sendFn(allowedRecipient);
   }
 }

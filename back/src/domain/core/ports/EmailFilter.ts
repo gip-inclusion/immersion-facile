@@ -1,7 +1,9 @@
-export type EmailFilterConfig = {
-  onRejected: (filteredEmail: string) => void;
-};
+import { Logger } from "pino";
 
 export interface EmailFilter {
-  filter: (unfilteredEmails: string[], config?: EmailFilterConfig) => string[];
+  withAllowedRecipients: (
+    unfilteredRecipients: string[],
+    sendCb: (recipients: string[]) => Promise<void>,
+    logger: Logger,
+  ) => Promise<void>;
 }

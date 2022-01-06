@@ -67,15 +67,6 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
       );
     }
 
-    const unfilteredRecipients = [];
-    if (roles.includes("beneficiary")) {
-      unfilteredRecipients.push(application.email);
-    }
-
-    const recipients = this.emailFilter.filter([application.email], {
-      onRejected: (email) => logger.info(`Skipped sending email to: ${email}`),
-    });
-
     for (const role of roles) {
       let email: string | undefined = undefined;
       if (role === "beneficiary") {
@@ -91,28 +82,24 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
         );
       }
 
-      if (
-        this.emailFilter.filter([email], {
-          onRejected: (email) =>
-            logger.info(`Skipped sending email to: ${email}`),
-        }).length === 0
-      ) {
-        continue;
-      }
-
-      await this.emailGateway.sendModificationRequestApplicationNotification(
+      await this.emailFilter.withAllowedRecipients(
         [email],
-        getModificationRequestApplicationNotificationParams(
-          application,
-          agencyConfig,
-          reason,
-          this.generateMagicLinkFn(
-            application.id,
-            role,
-            frontRoutes.immersionApplicationsRoute,
-            email,
+        ([email]) =>
+          this.emailGateway.sendModificationRequestApplicationNotification(
+            [email],
+            getModificationRequestApplicationNotificationParams(
+              application,
+              agencyConfig,
+              reason,
+              this.generateMagicLinkFn(
+                application.id,
+                role,
+                frontRoutes.immersionApplicationsRoute,
+                email,
+              ),
+            ),
           ),
-        ),
+        logger,
       );
     }
   }

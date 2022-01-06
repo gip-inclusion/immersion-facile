@@ -32,30 +32,20 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Use
       );
     }
 
-    const recipients = this.emailFilter.filter(
-      [dto.email, dto.mentorEmail, ...agencyConfig.counsellorEmails],
-      {
-        onRejected: (email) =>
-          logger.info(`Skipped sending email to: ${email}`),
-      },
-    );
-
-    if (recipients.length > 0) {
-      await this.emailGateway.sendRejectedApplicationNotification(
-        recipients,
-        getRejectedApplicationNotificationParams(dto, agencyConfig),
-      );
-    } else {
-      logger.info(
-        {
-          id: dto.id,
+    const recipients = [
+      dto.email,
+      dto.mentorEmail,
+      ...agencyConfig.counsellorEmails,
+    ];
+    await this.emailFilter.withAllowedRecipients(
+      recipients,
+      (recipients) =>
+        this.emailGateway.sendRejectedApplicationNotification(
           recipients,
-          source: dto.source,
-          rejectionJustification: dto.rejectionJustification,
-        },
-        "Sending validation confirmation email skipped.",
-      );
-    }
+          getRejectedApplicationNotificationParams(dto, agencyConfig),
+        ),
+      logger,
+    );
   }
 }
 

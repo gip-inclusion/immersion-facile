@@ -42,29 +42,21 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignatu
 
     logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
 
-    const [allowedBeneficiaryEmail] = this.emailFilter.filter([email], {
-      onRejected: (email) =>
-        logger.info(
-          { id, email },
-          "Sending beneficiary confirmation email skipped.",
-        ),
-    });
-
-    if (allowedBeneficiaryEmail) {
-      await this.emailGateway.sendBeneficiarySignatureRequestNotification(
-        allowedBeneficiaryEmail,
-        {
+    await this.emailFilter.withAllowedRecipients(
+      [email],
+      ([email]) =>
+        this.emailGateway.sendBeneficiarySignatureRequestNotification(email, {
           beneficiaryFirstName: firstName,
           beneficiaryLastName: lastName,
           magicLink: this.generateMagicLinkFn(
             application.id,
             "beneficiary",
             frontRoutes.immersionApplicationsToSign,
-            allowedBeneficiaryEmail,
+            email,
           ),
           businessName,
-        },
-      );
-    }
+        }),
+      logger,
+    );
   }
 }
