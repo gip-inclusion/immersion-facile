@@ -56,6 +56,9 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
   public async markSearchAsProcessed(
     searchMadeId: SearchMadeId,
   ): Promise<void> {
-    return;
+    await this.client.query(
+      "UPDATE searches_made SET needstobesearched=false WHERE id = $1 ; ",
+      [searchMadeId],
+    );
   }
 }

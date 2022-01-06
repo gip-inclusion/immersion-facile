@@ -71,6 +71,22 @@ describe("PgSearchesMadeRepository", () => {
     expect(retrievedSearches[0].id).toEqual(entityNeedingToBeProcessed.id);
   });
 
+  test("Mark search as processed", async () => {
+    // Prepare : insert entity with needToBeProcessed flag to false
+    const searchMadeId = "ed2ca622-6f06-11ec-90d6-0242ac120006";
+    const searchMade = new SearchMadeEntityBuilder()
+      .withId(searchMadeId)
+      .build();
+    await insertEntity(searchMade, true);
+    // Act : call method
+    pgSearchesMadeRepository.markSearchAsProcessed(searchMadeId);
+    // Assert flag has been set to False
+    const result = await client.query(
+      `SELECT needsToBeSearched from searches_made WHERE id='${searchMadeId}';`,
+    );
+    expect(result.rows[0]).toEqual({ needstobesearched: false });
+  });
+
   test("Grouping searches close geographically", async () => {
     await populateWithImmersionSearches();
 
