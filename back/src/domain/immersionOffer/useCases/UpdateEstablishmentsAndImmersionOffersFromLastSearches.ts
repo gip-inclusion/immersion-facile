@@ -28,14 +28,14 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     private readonly uuidGenerator: UuidGenerator,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly sireneRepository: SireneRepository,
-    private readonly searchesMadeRepository: SearchMadeRepository,
+    private readonly searchMadeRepository: SearchMadeRepository,
     private readonly immersionOfferRepository: ImmersionOfferRepository,
   ) {}
 
   public async execute() {
     // Take all searches made in the past.
     const searchesMade =
-      await this.searchesMadeRepository.markPendingSearchesAsProcessedAndRetrieveThem();
+      await this.searchMadeRepository.retrievePendingSearches();
 
     logger.info(
       `Found ${searchesMade.length} unprocessed rows in the searches_made table.`,
@@ -58,6 +58,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           throw error;
         }
       }
+      this.searchMadeRepository.markSearchAsProcessed(searchMade.id);
     }
   }
 

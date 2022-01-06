@@ -1,3 +1,4 @@
+import { ro } from "date-fns/locale";
 import { PoolClient } from "pg";
 import {
   SearchMade,
@@ -51,7 +52,16 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
   }
 
   public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {
-    return [];
+    const requestResult = await this.client.query(
+      "SELECT * from searches_made WHERE needstobesearched=true",
+    );
+    return requestResult.rows.map((row) => ({
+      id: row.id,
+      distance_km: row.distance_km,
+      lat: row.lat,
+      lon: row.lon,
+      rome: row.rome,
+    }));
   }
   public async markSearchAsProcessed(
     searchMadeId: SearchMadeId,

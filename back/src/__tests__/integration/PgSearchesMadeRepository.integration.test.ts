@@ -20,9 +20,6 @@ describe("PgSearchesMadeRepository", () => {
   beforeEach(async () => {
     await client.query("TRUNCATE searches_made CASCADE; ");
     pgSearchesMadeRepository = new PgSearchMadeRepository(client);
-
-    const lala = await client.query("SELECT * FROM searches_made");
-    console.log(lala);
   });
 
   afterAll(async () => {
@@ -49,16 +46,10 @@ describe("PgSearchesMadeRepository", () => {
     const entityNeedingToBeProcessed = new SearchMadeEntityBuilder()
       .withId("b0a81d02-6f07-11ec-90d6-0242ac120004")
       .build();
-    const entityAlreadyProcessed = {
-      id: "ed2ca622-6f06-11ec-90d6-0242ac120006",
-      rome: "M1607",
-      distance_km: 30,
-      lat: 49.119146,
-      lon: 6.17602,
-    };
-    // new SearchMadeEntityBuilder()
-    //   .withId("ed2ca622-6f06-11ec-90d6-0242ac120006")
-    //   .build();
+    const entityAlreadyProcessed = new SearchMadeEntityBuilder()
+      .withId("ed2ca622-6f06-11ec-90d6-0242ac120006")
+      .build();
+
     await insertEntity(entityNeedingToBeProcessed, true);
     await insertEntity(entityAlreadyProcessed, false);
 
@@ -169,7 +160,7 @@ describe("PgSearchesMadeRepository", () => {
   ) => {
     await client.query(
       `INSERT INTO searches_made (
-       uuid, ROME, lat, lon, distance, needsToBeSearched, gps
+       id, ROME, lat, lon, distance, needsToBeSearched, gps
      ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7));`,
       [
         searchMade.id,
