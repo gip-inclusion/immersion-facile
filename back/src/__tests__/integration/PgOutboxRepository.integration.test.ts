@@ -16,7 +16,7 @@ describe("PgOutboxRepository", () => {
   const clock = new CustomClock();
   const quarantinedTopic: DomainTopic = "ImmersionApplicationRejected";
 
-  let createNewEvent = makeCreateNewEvent({
+  const createNewEvent = makeCreateNewEvent({
     uuidGenerator,
     clock,
     quarantinedTopics: [quarantinedTopic],

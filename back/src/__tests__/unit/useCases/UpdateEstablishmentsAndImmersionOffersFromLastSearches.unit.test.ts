@@ -1,7 +1,7 @@
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
-import { InMemorySearchesMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
+import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
@@ -11,7 +11,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let testUuidGenerator: TestUuidGenerator;
   let updateEstablishmentsAndImmersionOffersFromLastSearches: UpdateEstablishmentsAndImmersionOffersFromLastSearches;
   let immersionOfferRepository: InMemoryImmersionOfferRepository;
-  let searchesMadeRepository: InMemorySearchesMadeRepository;
+  let searchesMadeRepository: InMemorySearchMadeRepository;
   let laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   let sireneRepository: InMemorySireneRepository;
 
@@ -20,7 +20,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 
     immersionOfferRepository = new InMemoryImmersionOfferRepository();
 
-    searchesMadeRepository = new InMemorySearchesMadeRepository();
+    searchesMadeRepository = new InMemorySearchMadeRepository();
 
     laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
 

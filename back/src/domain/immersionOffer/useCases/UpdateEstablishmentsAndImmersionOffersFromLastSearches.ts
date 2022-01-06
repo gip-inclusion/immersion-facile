@@ -13,7 +13,7 @@ import {
 import { SearchMade } from "../entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
-import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
+import { SearchMadeRepository } from "../ports/SearchMadeRepository";
 import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 // The number of unexpected errors to tolerate befor aborting the pipeline execution.
@@ -28,7 +28,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     private readonly uuidGenerator: UuidGenerator,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly sireneRepository: SireneRepository,
-    private readonly searchesMadeRepository: SearchesMadeRepository,
+    private readonly searchesMadeRepository: SearchMadeRepository,
     private readonly immersionOfferRepository: ImmersionOfferRepository,
   ) {}
 

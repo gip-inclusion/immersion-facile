@@ -1,12 +1,16 @@
 import { Pool, PoolClient } from "pg";
-import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
+import {
+  SearchMade,
+  SearchMadeEntity,
+} from "../../domain/immersionOffer/entities/SearchMadeEntity";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { PgSearchesMadeRepository } from "./../../adapters/secondary/pg/PgSearchesMadeRepository";
+import { PgSearchMadeRepository } from "../../adapters/secondary/pg/PgSearchMadeRepository";
+import { SearchMadeEntityBuilder } from "../../_testBuilders/SearchMadeEntityBuilder";
 
 describe("PgSearchesMadeRepository", () => {
   let pool: Pool;
   let client: PoolClient;
-  let pgSearchesMadeRepository: PgSearchesMadeRepository;
+  let pgSearchesMadeRepository: PgSearchMadeRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -14,8 +18,11 @@ describe("PgSearchesMadeRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE searches_made CASCADE");
-    pgSearchesMadeRepository = new PgSearchesMadeRepository(client);
+    await client.query("TRUNCATE searches_made CASCADE; ");
+    pgSearchesMadeRepository = new PgSearchMadeRepository(client);
+
+    const lala = await client.query("SELECT * FROM searches_made");
+    console.log(lala);
   });
 
   afterAll(async () => {
@@ -36,6 +43,32 @@ describe("PgSearchesMadeRepository", () => {
         })
       )[0].rome,
     ).toBe("M1607");
+  });
+  test("Retrieve pending searches", async () => {
+    // Prepare : insert two entities : one already processed, the other not yet processed
+    const entityNeedingToBeProcessed = new SearchMadeEntityBuilder()
+      .withId("b0a81d02-6f07-11ec-90d6-0242ac120004")
+      .build();
+    const entityAlreadyProcessed = {
+      id: "ed2ca622-6f06-11ec-90d6-0242ac120006",
+      rome: "M1607",
+      distance_km: 30,
+      lat: 49.119146,
+      lon: 6.17602,
+    };
+    // new SearchMadeEntityBuilder()
+    //   .withId("ed2ca622-6f06-11ec-90d6-0242ac120006")
+    //   .build();
+    await insertEntity(entityNeedingToBeProcessed, true);
+    await insertEntity(entityAlreadyProcessed, false);
+
+    // Act : Retrieve unprocessed entities
+    const retrievedSearches =
+      await pgSearchesMadeRepository.retrievePendingSearches();
+
+    // Assert
+    expect(retrievedSearches).toHaveLength(1);
+    expect(retrievedSearches[0].id).toEqual(entityNeedingToBeProcessed.id);
   });
 
   test("Grouping searches close geographically", async () => {
@@ -113,4 +146,24 @@ describe("PgSearchesMadeRepository", () => {
 
   const getAllSearchesMade = async () =>
     await client.query("SELECT * FROM searches_made");
+
+  const insertEntity = async (
+    searchMade: SearchMadeEntity,
+    needsToBeSearched: boolean,
+  ) => {
+    await client.query(
+      `INSERT INTO searches_made (
+       uuid, ROME, lat, lon, distance, needsToBeSearched, gps
+     ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7));`,
+      [
+        searchMade.id,
+        searchMade.rome,
+        searchMade.lat,
+        searchMade.lon,
+        searchMade.distance_km,
+        needsToBeSearched,
+        `POINT(${searchMade.lon} ${searchMade.lat})`,
+      ],
+    );
+  };
 });

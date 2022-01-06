@@ -2,6 +2,7 @@ import { PoolClient } from "pg";
 import {
   SearchMade,
   SearchMadeEntity,
+  SearchMadeId,
 } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchMadeRepository } from "../../../domain/immersionOffer/ports/SearchMadeRepository";
 
@@ -47,5 +48,14 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
     );
     await this.client.query("UPDATE searches_made SET needstobesearched=false");
     return searchesMade.rows;
+  }
+
+  public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {
+    return [];
+  }
+  public async markSearchAsProcessed(
+    searchMadeId: SearchMadeId,
+  ): Promise<void> {
+    return;
   }
 }

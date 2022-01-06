@@ -6,7 +6,7 @@ import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplem
 import type { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
 import { InMemoryImmersionOfferRepository } from "../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
-import { InMemorySearchesMadeRepository } from "../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
+import { InMemorySearchMadeRepository } from "../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAgencyRepository";
 import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
@@ -23,7 +23,7 @@ export type InMemoryRepositories = {
   agency: InMemoryAgencyRepository;
   formEstablishment: InMemoryFormEstablishmentRepository;
   demandeImmersion: InMemoryImmersionApplicationRepository;
-  searchesMade: InMemorySearchesMadeRepository;
+  searchesMade: InMemorySearchMadeRepository;
   rome: InMemoryRomeGateway;
   email: InMemoryEmailGateway;
   sirene: InMemorySireneRepository;

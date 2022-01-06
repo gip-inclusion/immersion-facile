@@ -72,7 +72,7 @@ import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { InMemoryImmersionOfferRepository } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryLaBonneBoiteAPI } from "../secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
-import { InMemorySearchesMadeRepository } from "../secondary/immersionOffer/InMemorySearchesMadeRepository";
+import { InMemorySearchMadeRepository } from "../secondary/immersionOffer/InMemorySearchMadeRepository";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { InMemoryAgencyRepository } from "../secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
@@ -87,7 +87,7 @@ import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApp
 import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
-import { PgSearchesMadeRepository } from "../secondary/pg/PgSearchesMadeRepository";
+import { PgSearchMadeRepository } from "../secondary/pg/PgSearchMadeRepository";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
 import { AppConfig } from "./appConfig";
@@ -184,8 +184,8 @@ export const createRepositories = async (
 
     searchesMade:
       config.repositories === "PG"
-        ? new PgSearchesMadeRepository(await getPgPoolFn().connect())
-        : new InMemorySearchesMadeRepository(),
+        ? new PgSearchMadeRepository(await getPgPoolFn().connect())
+        : new InMemorySearchMadeRepository(),
 
     immersionOffer:
       config.repositories === "PG"

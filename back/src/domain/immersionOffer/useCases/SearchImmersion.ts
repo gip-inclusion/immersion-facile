@@ -12,7 +12,7 @@ import { UseCase } from "../../core/UseCase";
 import { SearchMade } from "../entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
-import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
+import { SearchMadeRepository } from "../ports/SearchMadeRepository";
 
 const logger = createLogger(__filename);
 
@@ -45,7 +45,7 @@ export class SearchImmersion extends UseCase<
   ApiConsumer
 > {
   constructor(
-    private readonly searchesMadeRepository: SearchesMadeRepository,
+    private readonly searchesMadeRepository: SearchMadeRepository,
     private readonly immersionOfferRepository: ImmersionOfferRepository,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly uuidGenerator: UuidGenerator,
