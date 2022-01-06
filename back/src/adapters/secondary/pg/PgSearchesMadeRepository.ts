@@ -9,13 +9,12 @@ export class PgSearchesMadeRepository implements SearchesMadeRepository {
   constructor(private client: PoolClient) {}
 
   async insertSearchMade(searchMade: SearchMadeEntity) {
+    // TODO : Why NAF and SIRET are not saved ?
+    // => I think that there might be an "amalgam" between SearchMade params by users and SearchMade params by PassEmploi, that could explain those parameters.
     await this.client.query(
       `INSERT INTO searches_made (
-         uuid, ROME, lat, lon, distance, needsToBeSearched, gps
-       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7))
-       ON CONFLICT
-         ON CONSTRAINT pk_searches_made
-           DO UPDATE SET needstobesearched=true, update_date=NOW()`,
+         id, ROME, lat, lon, distance, needsToBeSearched, gps
+       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7))`,
       [
         searchMade.id,
         searchMade.rome,
