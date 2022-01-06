@@ -51,12 +51,14 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
     // Act
     await updateEstablishmentsAndImmersionOffersFromLastSearches.execute();
 
-    // Expect that no new searches are retrieved
+    // Expect that all searches have been processed
     // Note : This assertion is confusing because it's highly dependent on how the  in-memory adapter...
     // Real problem is : we should have two method : one reading (getNextUnprocessedSearchMade),
     // the other writing ("setSearchMadeAsProcessed").
-    expect(searchesMadeRepository.searchesMade).toHaveLength(0);
-
+    expect(searchesMadeRepository.processedSearchesMadeIds.size).toBe(1);
+    expect(
+      searchesMadeRepository.processedSearchesMadeIds.has("searchMadeId"),
+    ).toBe(true);
     // We expect to find the establishments in results
     const establishmentAggregatesInRepo =
       immersionOfferRepository.establishmentAggregates;
