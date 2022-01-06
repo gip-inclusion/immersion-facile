@@ -46,4 +46,13 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
       [searchMadeId],
     );
   }
+
+  public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {
+    return [];
+  }
+  public async markSearchAsProcessed(
+    searchMadeId: SearchMadeId,
+  ): Promise<void> {
+    return;
+  }
 }

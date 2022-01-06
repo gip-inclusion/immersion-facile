@@ -1,4 +1,5 @@
 import {
+  SearchMade,
   SearchMadeEntity,
   SearchMadeId,
 } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -21,6 +22,24 @@ export class InMemorySearchMadeRepository implements SearchMadeRepository {
     return;
   }
 
+  public async markPendingSearchesAsProcessedAndRetrieveThem() {
+    logger.info("markPendingSearchesAsProcessedAndRetrieveThem");
+    const searchesToReturn = this._searchesMadeEntities;
+    this._processedSearchesMadeIds = new Set(
+      this._searchesMadeEntities.map((entity) => entity.id),
+    );
+    return searchesToReturn.map((searchMadeEntity) => {
+      const searchMade: SearchMade = {
+        distance_km: searchMadeEntity.distance_km,
+        lat: searchMadeEntity.lat,
+        lon: searchMadeEntity.lon,
+        rome: searchMadeEntity.rome,
+        siret: searchMadeEntity.siret,
+        nafDivision: searchMadeEntity.nafDivision,
+      };
+      return searchMade;
+    });
+  }
   public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {
     return this._searchesMadeEntities.filter(
       (entity) => !this._processedSearchesMadeIds.has(entity.id),
