@@ -1,6 +1,8 @@
-import { SearchParams } from "../entities/SearchParams";
+import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 
 export interface SearchesMadeRepository {
-  insertSearchMade: (searchParams: SearchParams) => Promise<void>;
-  markPendingSearchesAsProcessedAndRetrieveThem(): Promise<SearchParams[]>;
+  insertSearchMade: (searchMadeEntity: SearchMadeEntity) => Promise<void>;
+  markPendingSearchesAsProcessedAndRetrieveThem(): Promise<SearchMade[]>;
+  // retrievePendingSearches(): Promise<SearchMadeEntity[]>;
+  // markSearchAsProcessed(): Promise<SearchMadeId>;
 }

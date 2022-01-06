@@ -8,7 +8,7 @@ import {
   AnnotatedImmersionOfferEntityV2,
   ImmersionOfferEntityV2,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
@@ -85,30 +85,30 @@ export class InMemoryImmersionOfferRepository
   }
 
   public async getFromSearch(
-    searchParams: SearchParams,
+    searchMade: SearchMade,
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
-    logger.info({ searchParams, withContactDetails }, "getFromSearch");
+    logger.info({ searchMade, withContactDetails }, "getFromSearch");
     return this._establishmentAggregates
       .filter(
         (aggregate) =>
-          !searchParams.nafDivision ||
-          aggregate.establishment.naf.startsWith(searchParams.nafDivision),
+          !searchMade.nafDivision ||
+          aggregate.establishment.naf.startsWith(searchMade.nafDivision),
       )
       .filter(
         (aggregate) =>
-          !searchParams.siret ||
-          aggregate.establishment.siret === searchParams.siret,
+          !searchMade.siret ||
+          aggregate.establishment.siret === searchMade.siret,
       )
       .flatMap((aggregate) =>
         aggregate.immersionOffers
-          .filter((immersionOffer) => immersionOffer.rome === searchParams.rome)
+          .filter((immersionOffer) => immersionOffer.rome === searchMade.rome)
           .map((immersionOffer) =>
             buildSearchImmersionResultDto(
               immersionOffer,
               aggregate.establishment,
               aggregate.contacts[0],
-              searchParams,
+              searchMade,
               withContactDetails,
             ),
           ),
@@ -125,7 +125,7 @@ const buildSearchImmersionResultDto = (
   immersionOffer: ImmersionOfferEntityV2,
   establishment: EstablishmentEntityV2,
   contact: ContactEntityV2 | undefined,
-  searchParams: SearchParams,
+  searchMade: SearchMade,
   withContactDetails: boolean,
 ): SearchImmersionResultDto => ({
   id: immersionOffer.id,
@@ -141,8 +141,8 @@ const buildSearchImmersionResultDto = (
   distance_m: distanceBetweenCoordinates(
     TEST_POSITION.lat,
     TEST_POSITION.lon,
-    searchParams.lat,
-    searchParams.lon,
+    searchMade.lat,
+    searchMade.lon,
   ),
   location: TEST_POSITION,
   city: TEST_CITY,

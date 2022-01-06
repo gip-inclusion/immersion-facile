@@ -1,4 +1,4 @@
-import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import {
   LaPlateformeDeLInclusionResult,
   LaPlateformeDeLInclusionAPI,
@@ -11,7 +11,7 @@ export class InMemoryLaPlateformeDeLInclusionAPI
 
   public async getResults(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _searchParams: SearchParams,
+    searchMade: SearchMade,
   ): Promise<LaPlateformeDeLInclusionResult[]> {
     return this._results;
   }

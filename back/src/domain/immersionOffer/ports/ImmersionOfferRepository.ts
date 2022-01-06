@@ -8,7 +8,7 @@ import {
   EstablishmentAggregate,
 } from "../entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
-import { SearchParams } from "../entities/SearchParams";
+import { SearchMade } from "../entities/SearchMadeEntity";
 
 export interface ImmersionOfferRepository {
   insertEstablishmentAggregates: (
@@ -28,7 +28,7 @@ export interface ImmersionOfferRepository {
   ) => Promise<ContactEntityV2 | undefined>;
 
   getFromSearch: (
-    searchParams: SearchParams,
+    searchMade: SearchMade,
     withContactDetails?: boolean,
   ) => Promise<SearchImmersionResultDto[]>;
 }

@@ -5,7 +5,7 @@ import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOf
 import { InMemoryLaPlateformeDeLInclusionAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaPlateformeDeLInclusionAPI";
 import { InMemorySearchesMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
-import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
 import { LaPlateFormeDeLInclusionPosteBuilder } from "../../../_testBuilders/LaPlateFormeDeLInclusionPosteBuilder";
@@ -66,7 +66,8 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
     adresseAPI.setNextPosition({ lat: 49.119146, lon: 6.17602 });
 
     // Prepare
-    const search: SearchParams = {
+    const search: SearchMadeEntity = {
+      id: "searchMadeId",
       rome: "A1203",
       distance_km: 10.0,
       lat: 10.0,

@@ -3,7 +3,7 @@ import {
   RetriableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
-import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { LaBonneBoiteAPI } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { LaBonneBoiteCompanyVO } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
@@ -21,7 +21,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
   ) {}
 
   public async searchCompanies(
-    searchParams: SearchParams,
+    searchMade: SearchMade,
   ): Promise<LaBonneBoiteCompanyVO[]> {
     return this.retryStrategy.apply(async () => {
       const accessToken = await this.accessTokenGateway.getAccessToken(
@@ -37,10 +37,10 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
                 Authorization: createAuthorization(accessToken.access_token),
               },
               params: {
-                distance: searchParams.distance_km,
-                longitude: searchParams.lon,
-                latitude: searchParams.lat,
-                rome_codes: searchParams.rome,
+                distance: searchMade.distance_km,
+                longitude: searchMade.lon,
+                latitude: searchMade.lat,
+                rome_codes: searchMade.rome,
               },
             },
           ),

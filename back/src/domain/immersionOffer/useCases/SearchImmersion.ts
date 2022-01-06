@@ -9,7 +9,6 @@ import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 import { createLogger } from "../../../utils/logger";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
-import { SearchParams } from "../entities/SearchParams";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
 import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
@@ -60,13 +59,24 @@ export class SearchImmersion extends UseCase<
     params: SearchImmersionRequestDto,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
-    const searchParams = convertRequestDtoToSearchParams(params);
-    await this.searchesMadeRepository.insertSearchMade(searchParams);
+    const searchMade = {
+      rome: params.rome,
+      nafDivision: params.nafDivision,
+      siret: params.siret,
+      lat: params.location.lat,
+      lon: params.location.lon,
+      distance_km: params.distance_km,
+    };
+    const searchMadeEntity = {
+      ...searchMade,
+      id: this.uuidGenerator.new(),
+    };
+    await this.searchesMadeRepository.insertSearchMade(searchMadeEntity);
     const apiConsumerName = apiConsumer?.consumer;
 
     const resultsFromStorage =
       await this.immersionOfferRepository.getFromSearch(
-        searchParams,
+        searchMade,
         /* withContactDetails= */ apiConsumerName !== undefined,
       );
 
@@ -88,7 +98,7 @@ export class SearchImmersion extends UseCase<
     }
 
     return this.immersionOfferRepository.getFromSearch(
-      searchParams,
+      searchMade,
       /* withContactDetails= */ apiConsumerName !== undefined,
     );
   }
@@ -111,18 +121,3 @@ export class SearchImmersion extends UseCase<
     );
   }
 }
-
-const convertRequestDtoToSearchParams = ({
-  rome,
-  nafDivision,
-  siret,
-  location,
-  distance_km,
-}: SearchImmersionRequestDto): SearchParams => ({
-  rome: rome,
-  nafDivision,
-  siret,
-  lat: location.lat,
-  lon: location.lon,
-  distance_km,
-});

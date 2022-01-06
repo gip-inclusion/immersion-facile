@@ -1,8 +1,6 @@
-import { SearchParams } from "../entities/SearchParams";
+import { SearchMade } from "../entities/SearchMadeEntity";
 import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 export interface LaBonneBoiteAPI {
-  searchCompanies: (
-    searchParams: SearchParams,
-  ) => Promise<LaBonneBoiteCompanyVO[]>;
+  searchCompanies: (searchMade: SearchMade) => Promise<LaBonneBoiteCompanyVO[]>;
 }

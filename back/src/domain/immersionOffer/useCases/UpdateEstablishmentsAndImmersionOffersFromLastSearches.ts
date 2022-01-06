@@ -10,7 +10,7 @@ import {
   EstablishmentEntityV2,
   TefenCode,
 } from "../entities/EstablishmentEntity";
-import { SearchParams } from "../entities/SearchParams";
+import { SearchMade } from "../entities/SearchMadeEntity";
 import { AdresseAPI } from "../ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
@@ -50,18 +50,18 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       searchesMade.length,
     );
 
-    for (const searchParams of searchesMade) {
-      await this.processSearchMade(searchParams);
+    for (const searchMade of searchesMade) {
+      await this.processSearchMade(searchMade);
     }
   }
 
-  private async processSearchMade(searchParams: SearchParams) {
-    logger.debug({ searchParams }, "processSearchMade");
+  private async processSearchMade(searchMade: SearchMade) {
+    logger.debug({ searchMade }, "processSearchMade");
     this.stats.incCounter("process_search_made-total");
     this.stats.startAggregateTimer("process_search_made-latency");
 
     // Check if we have potential immersions in our available databases.
-    const establishmentAggregates = await this.search(searchParams);
+    const establishmentAggregates = await this.search(searchMade);
 
     const nbOfOffers = establishmentAggregates.reduce(
       (acc, aggregate) => acc + aggregate.immersionOffers.length,
@@ -69,7 +69,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     );
 
     logger.info(
-      { searchParams },
+      { searchMade },
       `Search yielded ${establishmentAggregates.length} establishments and ` +
         `${nbOfOffers} immersions to insert.`,
     );
@@ -90,17 +90,17 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   }
 
   private async search(
-    searchParams: SearchParams,
+    searchMade: SearchMade,
   ): Promise<EstablishmentAggregate[]> {
     this.stats.incCounter("search-total");
 
     const establishmentAggregateLists = await Promise.all([
       this.searchInternal(
-        () => this.searchLaPlateformeDeLInclusion(searchParams),
+        () => this.searchLaPlateformeDeLInclusion(searchMade),
         "search-la_plateforme_de_l_inclusion",
       ),
       this.searchInternal(
-        () => this.searchLaBonneBoite(searchParams),
+        () => this.searchLaBonneBoite(searchMade),
         "search-la_bonne_boite",
       ),
     ]);
@@ -124,11 +124,11 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   }
 
   private async searchLaBonneBoite(
-    searchParams: SearchParams,
+    searchMade: SearchMade,
   ): Promise<EstablishmentAggregate[]> {
     try {
       const laBonneBoiteCompanies = await this.laBonneBoiteAPI.searchCompanies(
-        searchParams,
+        searchMade,
       );
       const laBonneBoiteRelevantCompanies = laBonneBoiteCompanies.filter(
         (company) => company.isCompanyRelevant(),
@@ -232,10 +232,10 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   }
 
   private async searchLaPlateformeDeLInclusion(
-    searchParams: SearchParams,
+    searchMade: SearchMade,
   ): Promise<EstablishmentAggregate[]> {
     const laPlateFormeDeLInclusionResults =
-      await this.laPlateFormeDeLInclusionAPI.getResults(searchParams);
+      await this.laPlateFormeDeLInclusionAPI.getResults(searchMade);
 
     // Todo : Eventually use a sequenceRunner or parallelize
     const establishmentAggregates: EstablishmentAggregate[] = [];

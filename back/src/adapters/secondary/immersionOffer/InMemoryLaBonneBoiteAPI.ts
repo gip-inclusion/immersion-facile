@@ -1,4 +1,4 @@
-import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { LaBonneBoiteAPI } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { LaBonneBoiteCompanyVO } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 
@@ -7,7 +7,7 @@ export class InMemoryLaBonneBoiteAPI implements LaBonneBoiteAPI {
 
   public async searchCompanies(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _searchParams: SearchParams,
+    searchMade: SearchMade,
   ): Promise<LaBonneBoiteCompanyVO[]> {
     return this._results;
   }

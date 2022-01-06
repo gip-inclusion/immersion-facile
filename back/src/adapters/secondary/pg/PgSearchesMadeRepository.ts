@@ -1,35 +1,34 @@
 import { PoolClient } from "pg";
-import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
-import { createLogger } from "../../../utils/logger";
+import {
+  SearchMade,
+  SearchMadeEntity,
+} from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchesMadeRepository } from "./../../../domain/immersionOffer/ports/SearchesMadeRepository";
-
-const logger = createLogger(__filename);
 
 export class PgSearchesMadeRepository implements SearchesMadeRepository {
   constructor(private client: PoolClient) {}
 
-  async insertSearchMade(searchParams: SearchParams) {
+  async insertSearchMade(searchMade: SearchMadeEntity) {
     await this.client.query(
       `INSERT INTO searches_made (
-         ROME, lat, lon, distance, needsToBeSearched, gps
-       ) VALUES ($1, $2, $3, $4, $5, ST_GeographyFromText($6))
+         uuid, ROME, lat, lon, distance, needsToBeSearched, gps
+       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7))
        ON CONFLICT
          ON CONSTRAINT pk_searches_made
            DO UPDATE SET needstobesearched=true, update_date=NOW()`,
       [
-        searchParams.rome,
-        searchParams.lat,
-        searchParams.lon,
-        searchParams.distance_km,
+        searchMade.id,
+        searchMade.rome,
+        searchMade.lat,
+        searchMade.lon,
+        searchMade.distance_km,
         true,
-        `POINT(${searchParams.lon} ${searchParams.lat})`,
+        `POINT(${searchMade.lon} ${searchMade.lat})`,
       ],
     );
   }
 
-  async markPendingSearchesAsProcessedAndRetrieveThem(): Promise<
-    SearchParams[]
-  > {
+  async markPendingSearchesAsProcessedAndRetrieveThem(): Promise<SearchMade[]> {
     // In order to lower the amount of request made to third-party services, after grouping by ROME
     // searched, we make an aggregation of the searches made in a radius of 0.3 degrees (=29.97 km)
     // and take the max distance searched.

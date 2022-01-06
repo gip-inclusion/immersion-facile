@@ -6,7 +6,7 @@ import {
   EstablishmentAggregate,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { Position } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
@@ -153,24 +153,24 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   }
 
   async getFromSearch(
-    searchParams: SearchParams,
+    searchMade: SearchMade,
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
     const parameters = [
-      searchParams.rome,
-      `POINT(${searchParams.lon} ${searchParams.lat})`,
-      searchParams.distance_km * 1000,
+      searchMade.rome,
+      `POINT(${searchMade.lon} ${searchMade.lat})`,
+      searchMade.distance_km * 1000,
     ];
 
     let nafDivisionFilter = "";
-    if (searchParams.nafDivision) {
-      parameters.push(searchParams.nafDivision);
+    if (searchMade.nafDivision) {
+      parameters.push(searchMade.nafDivision);
       nafDivisionFilter = `AND immersion_offers.naf_division = $${parameters.length}`;
     }
 
     let siretFilter = "";
-    if (searchParams.siret) {
-      parameters.push(searchParams.siret);
+    if (searchMade.siret) {
+      parameters.push(searchMade.siret);
       siretFilter = `AND immersion_offers.siret = $${parameters.length}`;
     }
 

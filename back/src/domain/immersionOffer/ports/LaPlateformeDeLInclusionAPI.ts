@@ -1,4 +1,4 @@
-import { SearchParams } from "../entities/SearchParams";
+import { SearchMade } from "../entities/SearchMadeEntity";
 
 export type LaPlateformeDeLInclusionResult = {
   cree_le: Date;
@@ -30,6 +30,6 @@ export type LaPlateFormeDeLInclusionPoste = {
 
 export type LaPlateformeDeLInclusionAPI = {
   getResults: (
-    searchParams: SearchParams,
+    searchMade: SearchMade,
   ) => Promise<LaPlateformeDeLInclusionResult[]>;
 };

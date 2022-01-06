@@ -10,7 +10,7 @@ import {
 } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemorySearchesMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
-import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import {
   ImmersionOfferId,
@@ -119,6 +119,7 @@ describe("SearchImmersionUseCase", () => {
 
     expectSearchesStoredToEqual(searchesMadeRepository.searchesMade, [
       {
+        id: "searchMadeUuid",
         rome: "M1607",
         nafDivision: "85",
         lat: 49.119146,
@@ -304,8 +305,8 @@ const expectSearchResponseToMatch = (
 };
 
 const expectSearchesStoredToEqual = (
-  actual: SearchParams[],
-  expected: SearchParams[],
+  actual: SearchMadeEntity[],
+  expected: SearchMadeEntity[],
 ) => {
   expect(actual).toEqual(expected);
 };

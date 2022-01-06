@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { SearchParams } from "../../domain/immersionOffer/entities/SearchParams";
+import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { PgSearchesMadeRepository } from "./../../adapters/secondary/pg/PgSearchesMadeRepository";
 
@@ -60,36 +60,42 @@ describe("PgSearchesMadeRepository", () => {
 
   const populateWithImmersionSearches = async () => {
     await pgSearchesMadeRepository.insertSearchMade({
+      id: "9f6da868-6f02-11ec-90d6-0242ac120003",
       rome: "M1607",
       distance_km: 30,
       lat: 49.119146,
       lon: 6.17602,
     });
     await pgSearchesMadeRepository.insertSearchMade({
+      id: "9f6daac0-6f02-11ec-90d6-0242ac120003",
       rome: "M1607",
       distance_km: 30,
       lat: 48.119146,
       lon: 6.17602,
     });
     await pgSearchesMadeRepository.insertSearchMade({
+      id: "9f6dac00-6f02-11ec-90d6-0242ac120003",
       rome: "M1607",
       distance_km: 30,
       lat: 48.119146,
       lon: 5.17602,
     });
     await pgSearchesMadeRepository.insertSearchMade({
+      id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
       rome: "M1607",
       distance_km: 30,
       lat: 48.119146,
       lon: 4.17602,
     });
     await pgSearchesMadeRepository.insertSearchMade({
+      id: "9f6dae4e-6f02-11ec-90d6-0242ac120003",
       rome: "M1607",
       distance_km: 30,
       lat: 48.129146,
       lon: 4.17602,
     });
     await pgSearchesMadeRepository.insertSearchMade({
+      id: "bee68ce6-6f02-11ec-90d6-0242ac120003",
       rome: "M1608",
       distance_km: 30,
       lat: 48.129146,
@@ -97,15 +103,10 @@ describe("PgSearchesMadeRepository", () => {
     });
   };
 
-  const lookupSearcheMade = async (searchParams: SearchParams) => {
+  const lookupSearcheMade = async (searchMade: SearchMade) => {
     const res = await client.query(
       "SELECT * FROM searches_made WHERE rome=$1 AND lat=$2 AND lon=$3 AND distance=$4",
-      [
-        searchParams.rome,
-        searchParams.lat,
-        searchParams.lon,
-        searchParams.distance_km,
-      ],
+      [searchMade.rome, searchMade.lat, searchMade.lon, searchMade.distance_km],
     );
     return res.rows;
   };

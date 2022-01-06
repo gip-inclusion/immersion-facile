@@ -3,7 +3,7 @@ import {
   RetriableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
-import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
+import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import {
   LaPlateformeDeLInclusionAPI,
@@ -34,11 +34,11 @@ export class HttpLaPlateformeDeLInclusionAPI
   ) {}
 
   public async getResults(
-    searchParams: SearchParams,
+    searchMade: SearchMade,
   ): Promise<LaPlateformeDeLInclusionResult[]> {
-    logger.debug({ searchParams }, "getEstablishments");
+    logger.debug({ searchMade }, "getEstablishments");
 
-    let page = await this.getFirstResponse(searchParams);
+    let page = await this.getFirstResponse(searchMade);
     let pageReads = 0;
     let results = [...page.results];
 
@@ -57,11 +57,11 @@ export class HttpLaPlateformeDeLInclusionAPI
   }
 
   private async getFirstResponse(
-    searchParams: SearchParams,
+    searchMade: SearchMade,
   ): Promise<LaPlateformeDeLInclusionGetResponse> {
     const cityCode = await this.adresseAPI.getCityCodeFromPosition({
-      lat: searchParams.lat,
-      lon: searchParams.lon,
+      lat: searchMade.lat,
+      lon: searchMade.lon,
     });
     if (!cityCode) return { results: [] };
 
@@ -73,7 +73,7 @@ export class HttpLaPlateformeDeLInclusionAPI
             params: {
               code_insee: cityCode,
               distance_max_km: Math.min(
-                searchParams.distance_km,
+                searchMade.distance_km,
                 SIAES_MAX_DISTANCE_KM,
               ),
               format: "json",
