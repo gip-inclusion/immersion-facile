@@ -36,10 +36,13 @@ Integration tests :
 
   1. At the very least you will need to run the `postgres` container as well as the `back` container which initializes the database at startup:
      ```sh
-     immersion-facile$ docker-compose up --build postgres back
+     immersion-facile$ docker-compose -f docker-compose.resources.yml up --build
      ```
      Observe the log output to ensure the database has been properly initialized.
-
+  1. Run DB migration : 
+    ```sh
+    npm run build-initial-db
+    ```
   1. Execute the integration tests in a separate shell"
      ```
      immersion-facile$ cd back
