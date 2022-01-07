@@ -1,4 +1,9 @@
-import { groupBy, removeUndefinedElements } from "../../../shared/utils";
+import {
+  groupBy,
+  removeUndefinedElements,
+  replaceArrayElement,
+} from "../../../shared/utils";
+import { distanceBetweenCoordinates } from "../../../utils/distanceBetweenCoordinates";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -18,6 +23,7 @@ import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 // The number of unexpected errors to tolerate befor aborting the pipeline execution.
 const MAX_UNEXPECTED_ERRORS = 10;
+const GROUP_DISTANCE_CRITERIA = 30;
 
 const logger = createLogger(__filename);
 
@@ -37,20 +43,46 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     const searchesMade: SearchMadeEntity[] =
       await this.searchMadeRepository.retrievePendingSearches();
 
+    const searchMadeGroups: SearchMadeGroup[] = searchesMade.reduce(
+      matchBelongingGroupOrCreateNewGroup,
+      [] as SearchMadeGroup[],
+    );
+
     logger.info(
       `Found ${searchesMade.length} unprocessed rows in the searches_made table.`,
     );
-
     this.stats.incCounter(
       "pg-searches_made-unprocessed_searches_found",
       searchesMade.length,
     );
 
     const unexpectedErrors = [];
-    for (const searchMade of searchesMade) {
+    for (const searchMadeGroup of searchMadeGroups) {
       try {
-        await this.processSearchMade(searchMade);
-        await this.searchMadeRepository.markSearchAsProcessed(searchMade.id);
+        const {
+          rome: romeToCallAPIWith,
+          lon: lonToCallAPIWith,
+          lat: latToCallAPIWith,
+        } = searchMadeGroup[0];
+        const maxGroupDistanceKm = Math.max(
+          ...searchMadeGroup.map((searchMade) => searchMade.distance_km),
+        );
+
+        const distanceKmToCallAPIWith =
+          GROUP_DISTANCE_CRITERIA + maxGroupDistanceKm;
+
+        const searchHasBeenProcessed = await this.processSearchMade({
+          rome: romeToCallAPIWith,
+          lon: lonToCallAPIWith,
+          lat: latToCallAPIWith,
+          distance_km: distanceKmToCallAPIWith,
+        });
+        if (searchHasBeenProcessed)
+          await Promise.all(
+            searchMadeGroup.map((searchMade) =>
+              this.searchMadeRepository.markSearchAsProcessed(searchMade.id),
+            ),
+          );
       } catch (error: any) {
         unexpectedErrors.push(error);
         if (unexpectedErrors.length > MAX_UNEXPECTED_ERRORS) {
@@ -110,19 +142,17 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
 
   private async search(
     searchMade: SearchMade,
-  ): Promise<EstablishmentAggregate[] | null> {
+  ): Promise<EstablishmentAggregate[]> {
     this.stats.incCounter("search-total");
 
     const laBonneBoiteSearchResults = await this.searchLaBonneBoite(searchMade);
-
-    if (!laBonneBoiteSearchResults) return null;
 
     return laBonneBoiteSearchResults;
   }
 
   private async searchLaBonneBoite(
     searchMade: SearchMade,
-  ): Promise<EstablishmentAggregate[] | null> {
+  ): Promise<EstablishmentAggregate[]> {
     try {
       const laBonneBoiteCompanies = await this.laBonneBoiteAPI.searchCompanies(
         searchMade,
@@ -216,3 +246,42 @@ const dedupeEstablishmentAggregates = (
 
   return dedupedAggregates;
 };
+
+const matchBelongingGroupOrCreateNewGroup = (
+  searchMadeGroups: SearchMadeGroup[],
+  searchMade: SearchMadeEntity,
+) => {
+  const belongingGroup = findFirstBelongingGroupIndex(
+    searchMade,
+    searchMadeGroups,
+  );
+  if (belongingGroup !== -1) {
+    return replaceArrayElement(searchMadeGroups, belongingGroup, [
+      ...searchMadeGroups[belongingGroup],
+      searchMade,
+    ]);
+  }
+
+  return [...searchMadeGroups, [searchMade]];
+};
+
+type SearchMadeGroup = SearchMadeEntity[];
+
+const findFirstBelongingGroupIndex = (
+  searchMade: SearchMadeEntity,
+  groups: SearchMadeGroup[],
+): number =>
+  groups.findIndex((group) => {
+    const distanceBetweenSearchesKm =
+      distanceBetweenCoordinates(
+        group[0].lon,
+        group[0].lat,
+        searchMade.lon,
+        searchMade.lat,
+      ) / 1000;
+
+    return (
+      group[0].rome === searchMade.rome &&
+      distanceBetweenSearchesKm < GROUP_DISTANCE_CRITERIA
+    );
+  });

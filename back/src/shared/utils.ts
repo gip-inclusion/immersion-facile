@@ -66,3 +66,15 @@ export const groupBy = <T>(
     acc[key] = [...values, el];
     return acc;
   }, {} as { [key: string]: T[] });
+
+export const replaceArrayElement = <T extends any>(
+  original: Array<T>,
+  replaceAt: number,
+  replaceBy: T,
+) => {
+  return [
+    ...original.slice(0, replaceAt),
+    replaceBy,
+    ...original.slice(replaceAt + 1),
+  ];
+};

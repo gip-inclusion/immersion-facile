@@ -247,7 +247,8 @@ describe("Update establishments and offers based on searches made during the day
       });
     });
   });
-  describe("when two searches have same ROME and very close location", () => {
+
+  describe("when two searches have same ROME", () => {
     const rome = "A1203";
     const makeSearchMadeInParis17 = (): SearchMadeEntity =>
       ({
@@ -262,7 +263,13 @@ describe("Update establishments and offers based on searches made during the day
         lon: 2.3651789,
       } as SearchMadeEntity);
 
-    it("Should call LBC API only once", () => {
+    const makeSearchMadeInEvry = (): SearchMadeEntity =>
+      ({
+        rome,
+        lat: 48.5961, // Ikea Evry
+        lon: 2.4406,
+      } as SearchMadeEntity);
+    it("Should call LBC API only once if distance between locations is smaller than 30 km", async () => {
       // Prepare
       const { laBonneBoiteAPI, searchesMadeRepository, useCase } =
         prepareUseCase();
@@ -271,9 +278,22 @@ describe("Update establishments and offers based on searches made during the day
         makeSearchMadeInParis10(),
       ]);
       // Act
-      useCase.execute();
+      await useCase.execute();
       // Assert
       expect(laBonneBoiteAPI.nbOfCalls).toBe(1);
+    });
+    it("Should call LBC API twice if distance between location is greater than 30 km", async () => {
+      // Prepare
+      const { laBonneBoiteAPI, searchesMadeRepository, useCase } =
+        prepareUseCase();
+      searchesMadeRepository.setSearchesMade([
+        makeSearchMadeInParis17(),
+        makeSearchMadeInEvry(),
+      ]);
+      // Act
+      await useCase.execute();
+      // Assert
+      expect(laBonneBoiteAPI.nbOfCalls).toBe(2);
     });
     it("Should turn the search made flag `needs to be processed` of those two searches to False", async () => {
       // Prepare
@@ -286,10 +306,6 @@ describe("Update establishments and offers based on searches made during the day
 
       // Act
       await useCase.execute();
-      console.log(
-        "processedSearchesMadeIds: ",
-        searchesMadeRepository.processedSearchesMadeIds,
-      );
       // Assert
       expect(
         searchesMadeRepository.processedSearchesMadeIds.has("searchParis17"),

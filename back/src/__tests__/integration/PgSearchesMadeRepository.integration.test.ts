@@ -60,9 +60,7 @@ describe("PgSearchesMadeRepository", () => {
 
     // Assert
     expect(retrievedSearches).toHaveLength(1);
-    expect(retrievedSearches[0]).toEqual(
-      expect.objectContaining(entityNeedingToBeProcessed),
-    );
+    expect(retrievedSearches[0]).toMatchObject(entityNeedingToBeProcessed);
   });
 
   test("Mark search as processed", async () => {
