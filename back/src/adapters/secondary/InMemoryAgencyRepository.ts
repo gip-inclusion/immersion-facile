@@ -14,6 +14,10 @@ const testAgencies: AgencyConfig[] = [
     adminEmails: ["admin@agency1.fr"],
     questionnaireUrl: "http://questionnaire.agency1.fr",
     signature: "Signature of Test Agency 1",
+    position: {
+      lat: 1,
+      lon: 2,
+    },
   },
   {
     id: "test-agency-2-back",
@@ -23,6 +27,10 @@ const testAgencies: AgencyConfig[] = [
     adminEmails: ["admin1@agency2.fr", "admin2@agency2.fr"],
     questionnaireUrl: "http://questionnaire.agency2.fr",
     signature: "Signature of Test Agency 2",
+    position: {
+      lat: 40,
+      lon: 50,
+    },
   },
   {
     id: "test-agency-3-back",
@@ -32,6 +40,10 @@ const testAgencies: AgencyConfig[] = [
     adminEmails: ["admin@agency3.fr"],
     questionnaireUrl: "http://questionnaire.agency3.fr",
     signature: "Signature of Test Agency 3",
+    position: {
+      lat: 88,
+      lon: 89.9999,
+    },
   },
 ];
 

@@ -89,6 +89,7 @@ const buildDb = async () => {
       await insertTestAgencies(client);
     }
   }
+  await alterAgencies(client);
 
   const outboxTableAlreadyExists = await checkIfTableExists("outbox");
   if (!outboxTableAlreadyExists) {
@@ -156,6 +157,10 @@ const alterFormEstablishment = async (client: PoolClient) => {
     __dirname + "/alterFormEstablishmentsTable.sql",
     client,
   );
+};
+
+const alterAgencies = async (client: PoolClient) => {
+  await executeSqlFromFile(__dirname + "/alterAgenciesTable.sql", client);
 };
 
 const buildAgencies = async (client: PoolClient) => {

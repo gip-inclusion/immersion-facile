@@ -26,4 +26,8 @@ export class ListAgencies extends UseCase<
 const agencyConfigToAgencyDto = (config: AgencyConfig): AgencyDto => ({
   id: config.id,
   name: config.name,
+  position: {
+    lat: config.position.lat,
+    lon: config.position.lon,
+  },
 });

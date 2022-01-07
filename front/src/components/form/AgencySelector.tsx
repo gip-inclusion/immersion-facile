@@ -42,6 +42,10 @@ export const AgencySelector = ({
           {
             id: "",
             name: "",
+            position: {
+              lat: 0,
+              lon: 0,
+            },
           },
           ...agencies,
         ]);

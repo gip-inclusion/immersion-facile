@@ -17,9 +17,30 @@ import { sleep } from "src/shared/utils";
 import { AgencyId } from "./../../shared/agencies";
 
 const TEST_AGENCIES: AgencyDto[] = [
-  { id: "test-agency-1-front", name: "Test Agency 1 (front)" },
-  { id: "test-agency-2-front", name: "Test Agency 2 (front)" },
-  { id: "test-agency-3-front", name: "Test Agency 3 (front)" },
+  {
+    id: "test-agency-1-front",
+    name: "Test Agency 1 (front)",
+    position: {
+      lat: 1.0,
+      lon: 2.0,
+    },
+  },
+  {
+    id: "test-agency-2-front",
+    name: "Test Agency 2 (front)",
+    position: {
+      lat: 30.0,
+      lon: 20.0,
+    },
+  },
+  {
+    id: "test-agency-3-front",
+    name: "Test Agency 3 (front)",
+    position: {
+      lat: 74.0,
+      lon: 2.0,
+    },
+  },
 ];
 
 const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [

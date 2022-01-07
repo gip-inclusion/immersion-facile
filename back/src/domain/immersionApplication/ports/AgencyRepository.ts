@@ -1,4 +1,5 @@
 import { AgencyId } from "../../../shared/agencies";
+import { Position } from "../../immersionOffer/ports/AdresseAPI";
 
 export type AgencyConfig = {
   id: AgencyId;
@@ -8,6 +9,7 @@ export type AgencyConfig = {
   adminEmails: string[];
   questionnaireUrl: string;
   signature: string;
+  position: Position;
 };
 
 export interface AgencyRepository {

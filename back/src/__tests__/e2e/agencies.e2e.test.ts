@@ -15,14 +15,26 @@ describe("/agencies route", () => {
       {
         id: "test-agency-1-back",
         name: "Test Agency 1 (back)",
+        position: {
+          lat: 1,
+          lon: 2,
+        },
       },
       {
         id: "test-agency-2-back",
         name: "Test Agency 2 (back)",
+        position: {
+          lat: 40,
+          lon: 50,
+        },
       },
       {
         id: "test-agency-3-back",
         name: "Test Agency 3 (back)",
+        position: {
+          lat: 88,
+          lon: 89.9999,
+        },
       },
     ]);
   });

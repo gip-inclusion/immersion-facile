@@ -10,6 +10,7 @@ const agency1 = AgencyConfigBuilder.empty()
 const agency2 = AgencyConfigBuilder.empty()
   .withId("22222222-2222-2222-2222-222222222222")
   .withName("agency2")
+  .withPosition(10, 10)
   .build();
 
 describe("ListAgencies", () => {
@@ -27,8 +28,22 @@ describe("ListAgencies", () => {
 
     const agencies = await listAgencies.execute();
     expect(agencies).toEqual([
-      { id: "11111111-1111-1111-1111-111111111111", name: "agency1" },
-      { id: "22222222-2222-2222-2222-222222222222", name: "agency2" },
+      {
+        id: "11111111-1111-1111-1111-111111111111",
+        name: "agency1",
+        position: {
+          lat: 0,
+          lon: 0,
+        },
+      },
+      {
+        id: "22222222-2222-2222-2222-222222222222",
+        name: "agency2",
+        position: {
+          lat: 10,
+          lon: 10,
+        },
+      },
     ]);
   });
 });

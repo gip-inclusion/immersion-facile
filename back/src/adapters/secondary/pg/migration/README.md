@@ -10,7 +10,7 @@ This directory contains the scripts to generate the initial version of immersion
    PG_URL="postgresql://immersion:pg-password@postgres:5432/immersion-db"
    ```
 
-1. Purge any existing database and bring up the docker-compose setup:
+2. Purge any existing database and bring up the docker-compose setup:
 
    ```sh
    immersion-facile$ docker-compose down --volumes
@@ -27,3 +27,16 @@ This directory contains the scripts to generate the initial version of immersion
    - Username: `immersion`
    - Password: `pg-password`
    - Database: `immersion-db`
+
+3. To bring up only postgres and adminer with postgres port open for e.g. running `build-initial-db`:
+
+   ```sh
+      immersion-facile$ docker-compose -f docker-compose.resources.yml up --build
+   ```
+
+   Now in another terminal, you can connect to it, e.g. like so:
+
+   ```sh
+      immersion-facile$ cd back
+      back$ npm run build-initial-db
+   ```

@@ -41,7 +41,7 @@ const parseContactMethod = (raw: string): ContactMethod => {
   return pgContactToContactMethod[pgContactMethod];
 };
 
-const parseGeoJson = (raw: string): Position => {
+export const parseGeoJson = (raw: string): Position => {
   const json = JSON.parse(raw);
   return {
     lat: json.coordinates[1],

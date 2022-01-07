@@ -7,7 +7,8 @@ CREATE TABLE public.agencies (
     validator_emails jsonb NOT NULL,
     admin_emails jsonb NOT NULL,
     questionnaire_url varchar(255) NOT NULL,
-    email_signature varchar(255) NOT NULL
+    email_signature varchar(255) NOT NULL,
+    position public.geography(Point, 4326) NOT NULL DEFAULT public.st_geographyfromtext('POINT(0.00 0.00)'::text)
 );
 
 -- Automatically update the updated_at column on any row change.
