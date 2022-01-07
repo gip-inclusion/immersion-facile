@@ -115,15 +115,12 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
 
 describe("SearchImmersionUseCase", () => {
   it("stores searches made", async () => {
-    const {
-      searchImmersion,
-      searchMadeRepository: searchesMadeRepository,
-      uuidGenerator,
-    } = await prepareSearchableDataWithFeatureFlagON();
+    const { searchImmersion, searchMadeRepository, uuidGenerator } =
+      await prepareSearchableDataWithFeatureFlagON();
     uuidGenerator.setNextUuid("searchMadeUuid");
     await searchImmersion.execute(searchSecretariatInMetzParams);
 
-    expectSearchesStoredToEqual(searchesMadeRepository.searchesMade, [
+    expectSearchesStoredToEqual(searchMadeRepository.searchesMade, [
       {
         id: "searchMadeUuid",
         rome: "M1607",
