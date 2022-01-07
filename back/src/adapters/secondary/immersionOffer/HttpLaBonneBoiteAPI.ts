@@ -1,14 +1,17 @@
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
+import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
   RetriableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { LaBonneBoiteAPI } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
-import { LaBonneBoiteCompanyVO } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
+import {
+  LaBonneBoiteCompanyProps,
+  LaBonneBoiteCompanyVO,
+} from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
-import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 
 const logger = createLogger(__filename);
 
@@ -45,10 +48,12 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
             },
           ),
         );
-        return response.data.companies || [];
+        return (response.data.companies || []).map(
+          (props: LaBonneBoiteCompanyProps) => new LaBonneBoiteCompanyVO(props),
+        );
       } catch (error: any) {
         if (error.response.status == 429) {
-          logger.warn("Too many requests: " + error);
+          logger.warn("Request quota exceeded: " + error);
           throw new RetriableError(error);
         }
         logAxiosError(logger, error, "Error calling labonneboite API");

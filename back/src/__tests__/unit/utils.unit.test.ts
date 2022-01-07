@@ -1,4 +1,8 @@
-import { addressWithPostalCodeSchema, uniqBy } from "../../shared/utils";
+import {
+  addressWithPostalCodeSchema,
+  uniqBy,
+  groupBy,
+} from "../../shared/utils";
 
 describe("utils", () => {
   describe("addressWithPostalCodeSchema", () => {
@@ -44,6 +48,17 @@ describe("utils", () => {
       const newArray = uniqBy(array1, first3LettersCaseInsensitive);
 
       expect(newArray).toEqual(["bobby", "tom"]);
+    });
+  });
+
+  describe("groupBy", () => {
+    test("groups elements by the specified keyFn", () => {
+      expect(groupBy([], (el) => "testKey")).toEqual({});
+
+      expect(groupBy(["Amy", "Bob", "Al"], (name) => name.charAt(0))).toEqual({
+        A: ["Amy", "Al"],
+        B: ["Bob"],
+      });
     });
   });
 });

@@ -1,12 +1,12 @@
 import {
   addMilliseconds,
   differenceInMilliseconds,
+  max,
   secondsToMilliseconds,
 } from "date-fns";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
-import { sleep, SleepFn } from "../../../shared/utils";
-import { RealClock } from "./ClockImplementations";
+import { SleepFn } from "../../../shared/utils";
 
 // Simple rate limiter that limits the output to the specified queries per second (QPS) rate.
 //
@@ -31,7 +31,7 @@ export const withQpsLimit = <Input, Output>(
 
 export class QpsRateLimiter implements RateLimiter {
   private readonly minMillisBetweenRequests;
-  private lastRequestTime = new Date(0);
+  private nextRequestTime = new Date(0);
 
   public constructor(
     qps: number,
@@ -42,24 +42,19 @@ export class QpsRateLimiter implements RateLimiter {
   }
 
   public async whenReady<T>(cb: () => Promise<T>): Promise<T> {
-    const sleepDurationMs = this.millisUntilReady();
-    if (sleepDurationMs > 0) await this.sleepFn(sleepDurationMs);
-    this.recordRequest();
-    return cb();
-  }
+    const now = this.clock.now();
 
-  private millisUntilReady() {
-    const nextRequestTime = addMilliseconds(
-      this.lastRequestTime,
+    const myRequestTime = max([this.nextRequestTime, now]);
+    this.nextRequestTime = addMilliseconds(
+      myRequestTime,
       this.minMillisBetweenRequests,
     );
-    return Math.max(
-      0,
-      differenceInMilliseconds(nextRequestTime, this.clock.now()),
-    );
-  }
 
-  private recordRequest() {
-    this.lastRequestTime = this.clock.now();
+    if (myRequestTime > now) {
+      const sleepDurationMs = differenceInMilliseconds(myRequestTime, now);
+      await this.sleepFn(sleepDurationMs);
+    }
+
+    return cb();
   }
 }

@@ -1,3 +1,5 @@
+import { RomeCodeMetierDto } from "../../../shared/rome";
+import { groupBy, removeUndefinedElements } from "../../../shared/utils";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -41,9 +43,9 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       searchesMade.length,
     );
 
-    for (const searchMade of searchesMade) {
-      await this.processSearchMade(searchMade);
-    }
+    await Promise.all(
+      searchesMade.map((searchMade) => this.processSearchMade(searchMade)),
+    );
   }
 
   private async processSearchMade(searchMade: SearchMade) {
@@ -51,29 +53,38 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     this.stats.incCounter("process_search_made-total");
     this.stats.startAggregateTimer("process_search_made-latency");
 
-    // Check if we have potential immersions in our available databases.
-    const establishmentAggregates = await this.search(searchMade);
+    try {
+      const establishmentAggregates = await this.search(searchMade);
 
-    const nbOfOffers = establishmentAggregates.reduce(
-      (acc, aggregate) => acc + aggregate.immersionOffers.length,
-      0,
-    );
+      logger.info(
+        { searchParams: searchMade },
+        `Search yielded ${establishmentAggregates.length} establishments and ` +
+          `${countOffers(establishmentAggregates)} immersions.`,
+      );
 
-    logger.info(
-      { searchMade },
-      `Search yielded ${establishmentAggregates.length} establishments and ` +
-        `${nbOfOffers} immersions to insert.`,
-    );
-
-    // Insert the establishments and immersions in the database.
-    if (establishmentAggregates.length > 0) {
-      await this.immersionOfferRepository.insertEstablishmentAggregates(
+      const dedupedAggregates = dedupeEstablishmentAggregates(
         establishmentAggregates,
       );
-      this.stats.recordSample(
-        "pg-establishments-rows_inserted",
-        establishmentAggregates.length,
+
+      logger.info(
+        { searchParams: searchMade },
+        `After deduping: ${dedupedAggregates.length} establishments and ` +
+          `${countOffers(dedupedAggregates)} immersions to insert.`,
       );
+
+      await this.immersionOfferRepository.insertEstablishmentAggregates(
+        dedupedAggregates,
+      );
+      this.stats.recordSample(
+        "pg-establishment-aggregates_inserted",
+        dedupedAggregates.length,
+      );
+    } catch (error: any) {
+      logger.error(
+        { searchParams: searchMade },
+        "Error in processSearchMade: " + error,
+      );
+      this.stats.incCounter("process_search_made-error");
     }
 
     this.stats.stopAggregateTimer("process_search_made-latency");
@@ -102,20 +113,14 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       const laBonneBoiteRelevantCompanies = laBonneBoiteCompanies.filter(
         (company) => company.isCompanyRelevant(),
       );
-
-      // Todo : Eventually use a sequenceRunner or parallelize
-      const establishmentAggregates: EstablishmentAggregate[] = [];
-      for (const laBonneBoiteCompany of laBonneBoiteRelevantCompanies) {
-        const establishmentAggregate =
-          await this.convertLaBonneBoiteCompanyToEstablishmentAggregate(
-            laBonneBoiteCompany,
-          );
-        if (!!establishmentAggregate)
-          establishmentAggregates.push(establishmentAggregate);
-      }
-      return establishmentAggregates;
+      const establishmentAggregates = await Promise.all(
+        laBonneBoiteRelevantCompanies.map((aggregate) =>
+          this.convertLaBonneBoiteCompanyToEstablishmentAggregate(aggregate),
+        ),
+      );
+      return removeUndefinedElements(establishmentAggregates);
     } catch (error: any) {
-      logger.warn("Error in searchLaBonneBoite: " + error);
+      logger.error({ searchMade }, "Error in searchLaBonneBoite: " + error);
       return [];
     }
   }
@@ -129,7 +134,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     if (!sireneAnswer) {
       logger.warn(
         { siret: laBonneBoiteCompany.siret },
-        "Company not found in SIRENE",
+        "Company from LaBonneBoite API not found in SIRENE",
       );
       return;
     }
@@ -159,4 +164,37 @@ const inferNumberEmployeesRangeFromSireneAnswer = (
     sireneRepoAnswer.etablissements[0].uniteLegale.trancheEffectifsUniteLegale;
 
   return !tefenCode || tefenCode == "NN" ? -1 : <TefenCode>+tefenCode;
+};
+
+const countOffers = (aggregates: EstablishmentAggregate[]) =>
+  aggregates.reduce(
+    (acc, aggregate) => acc + aggregate.immersionOffers.length,
+    0,
+  );
+
+const dedupeEstablishmentAggregates = (
+  aggregates: EstablishmentAggregate[],
+) => {
+  const aggregatesBySiret = groupBy(
+    aggregates,
+    (aggregate) => aggregate.establishment.siret,
+  );
+
+  // Keep only the first aggregate for each siret.
+  // TODO: Consider additional consolidations, e.g. keeping all (deduped)
+  // immersion offers or contacts.
+  const dedupedAggregates = Object.values(aggregatesBySiret).map(
+    (aggregateList) => {
+      const [head, ...tail] = aggregateList;
+      if (tail.length > 0) {
+        logger.warn(
+          { head, tail },
+          "Duplicate establishment aggregates found. Keeping head, discarding tail.",
+        );
+      }
+      return head;
+    },
+  );
+
+  return dedupedAggregates;
 };

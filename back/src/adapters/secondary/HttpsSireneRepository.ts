@@ -56,11 +56,11 @@ export class HttpsSireneRepository implements SireneRepository {
         if (error.response.status == 404) {
           return undefined;
         }
-
-        logAxiosError(logger, error);
         if (error.response.status == 429) {
+          logger.warn("Request quota exceeded: " + error);
           throw new RetriableError(error);
         }
+        logAxiosError(logger, error);
         throw error;
       }
     });

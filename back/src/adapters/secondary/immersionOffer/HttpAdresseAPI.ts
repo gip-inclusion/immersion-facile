@@ -24,27 +24,24 @@ export class HttpAdresseAPI implements AdresseAPI {
     return this.retryStrategy.apply(async () => {
       try {
         const axios = createAxiosInstance(logger);
-        const response = await axios.get(
-          "https://api-adresse.data.gouv.fr/search/",
-          {
+        const response = await this.rateLimiter.whenReady(() =>
+          axios.get("https://api-adresse.data.gouv.fr/search/", {
             params: {
               q: address,
             },
-          },
+          }),
         );
 
-        if (!response.data.features || response.data.features.length == 0) {
-          logger.warn(`Failed finding lat/lon for address: ${address}`);
+        if (!response.data.features || response.data.features.length == 0)
           return;
-        }
 
         return {
           lat: response.data.features[0].geometry.coordinates[1],
           lon: response.data.features[0].geometry.coordinates[0],
         };
       } catch (error: any) {
-        if (error.response?.status == 429) {
-          logger.warn("Too many requests: " + error);
+        if (error.response?.status == 429 || error.response?.status == 503) {
+          logger.warn("Request quota exceeded: " + error);
           throw new RetriableError(error);
         }
         logAxiosError(logger, error);
@@ -67,8 +64,8 @@ export class HttpAdresseAPI implements AdresseAPI {
         );
         return response.data.features[0]?.properties?.citycode;
       } catch (error: any) {
-        if (error.response?.status == 429) {
-          logger.warn("Too many requests: " + error);
+        if (error.response?.status == 429 || error.response?.status == 503) {
+          logger.warn("Request quota exceeded: " + error);
           throw new RetriableError(error);
         }
         logAxiosError(logger, error);
