@@ -9,6 +9,7 @@ import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 import { createLogger } from "../../../utils/logger";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
+import { SearchMade } from "../entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
 import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
@@ -59,7 +60,7 @@ export class SearchImmersion extends UseCase<
     params: SearchImmersionRequestDto,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
-    const searchMade = {
+    const searchMade: SearchMade = {
       rome: params.rome,
       nafDivision: params.nafDivision,
       siret: params.siret,
