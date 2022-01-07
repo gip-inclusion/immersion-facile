@@ -44,8 +44,6 @@ const prepareSearchableData =
       .withNaf("8500A")
       .build();
     laBonneBoiteAPI.setNextResults([lbbCompany]);
-    const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
-    uuidGenerator.setNextUuid(generatedOfferId);
 
     const searchImmersion = new SearchImmersion(
       searchMadeRepository,
@@ -81,7 +79,6 @@ const prepareSearchableData =
       immersionOfferId,
       searchMadeRepository,
       immersionOfferRepository,
-      generatedOfferId,
       uuidGenerator,
     };
   };
@@ -153,8 +150,11 @@ describe("SearchImmersionUseCase", () => {
 
     describe("authenticated with api key", () => {
       test("Search immersion, and provide contact details", async () => {
-        const { searchImmersion, immersionOfferId, generatedOfferId } =
+        const { searchImmersion, immersionOfferId, uuidGenerator } =
           await prepareSearchableDataWithFeatureFlagON();
+        const generatedOfferId: ImmersionOfferId =
+          "generated-immersion-offer-id";
+        uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
 
         const authenticatedResponse = await searchImmersion.execute(
           searchSecretariatInMetzParams,
@@ -197,9 +197,11 @@ describe("SearchImmersionUseCase", () => {
 
     describe("Not authenticated with api key", () => {
       test("Search immersion, and do NOT provide contact details", async () => {
-        const { searchImmersion, immersionOfferId, generatedOfferId } =
+        const { searchImmersion, immersionOfferId, uuidGenerator } =
           await prepareSearchableDataWithFeatureFlagON();
-
+        const generatedOfferId: ImmersionOfferId =
+          "generated-immersion-offer-id";
+        uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
         const unauthenticatedResponse = await searchImmersion.execute(
           searchSecretariatInMetzParams,
         );
