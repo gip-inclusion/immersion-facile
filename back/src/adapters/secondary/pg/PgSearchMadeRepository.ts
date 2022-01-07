@@ -1,7 +1,5 @@
-import { ro } from "date-fns/locale";
 import { PoolClient } from "pg";
 import {
-  SearchMade,
   SearchMadeEntity,
   SearchMadeId,
 } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -25,30 +23,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         `POINT(${searchMade.lon} ${searchMade.lat})`,
       ],
     );
-  }
-
-  async markPendingSearchesAsProcessedAndRetrieveThem(): Promise<SearchMade[]> {
-    // In order to lower the amount of request made to third-party services, after grouping by ROME
-    // searched, we make an aggregation of the searches made in a radius of 0.3 degrees (=29.97 km)
-    // and take the max distance searched.
-    const searchesMade = await this.client.query(
-      `SELECT
-          requestGroupBy.rome as rome,
-          requestGroupBy.max_distance AS distance_km,
-          ST_Y(requestGroupBy.point) AS lat,
-          ST_X(requestGroupBy.point) AS lon
-       FROM (
-          SELECT
-            rome,
-            MAX(distance) AS max_distance,
-            ST_AsText(ST_GeometryN(unnest(ST_ClusterWithin(gps::geometry, 0.27)),1)) AS point
-          FROM searches_made
-          WHERE needstobesearched=true
-          GROUP BY rome
-        ) AS requestGroupBy`,
-    );
-    await this.client.query("UPDATE searches_made SET needstobesearched=false");
-    return searchesMade.rows;
   }
 
   public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {

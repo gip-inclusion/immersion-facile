@@ -78,26 +78,6 @@ describe("PgSearchesMadeRepository", () => {
     expect(result.rows[0]).toEqual({ needstobesearched: false });
   });
 
-  test("Grouping searches close geographically", async () => {
-    await populateWithImmersionSearches();
-
-    //We expect that two of the 6 searches have been grouped by
-    expect(
-      await pgSearchesMadeRepository.markPendingSearchesAsProcessedAndRetrieveThem(),
-    ).toHaveLength(5);
-
-    //We expect then that all searches have been retrieved
-    expect(
-      await pgSearchesMadeRepository.markPendingSearchesAsProcessedAndRetrieveThem(),
-    ).toHaveLength(0);
-
-    //We expect that all searches are not to be searched anymore
-    const allSearches = (await getAllSearchesMade()).rows;
-    allSearches.map((row) => {
-      expect(row.needstobesearched).toBe(false);
-    });
-  });
-
   const populateWithImmersionSearches = async () => {
     await pgSearchesMadeRepository.insertSearchMade({
       id: "9f6da868-6f02-11ec-90d6-0242ac120003",
@@ -150,9 +130,6 @@ describe("PgSearchesMadeRepository", () => {
     );
     return res.rows;
   };
-
-  const getAllSearchesMade = async () =>
-    await client.query("SELECT * FROM searches_made");
 
   const insertEntity = async (
     searchMade: SearchMadeEntity,
