@@ -1,6 +1,6 @@
 import { SiretDto } from "../../../shared/siret";
 
-export type Establishment = {
+export type SireneEstablishment = {
   siret: string;
   uniteLegale: Partial<{
     denominationUniteLegale?: string;
@@ -28,7 +28,7 @@ export type SireneRepositoryAnswer = {
     debut: number;
     nombre: number;
   };
-  etablissements: Establishment[];
+  etablissements: SireneEstablishment[];
 };
 
 export interface SireneRepository {

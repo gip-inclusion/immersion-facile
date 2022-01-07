@@ -6,7 +6,10 @@ import {
   GetSiretResponseDto,
 } from "../../../shared/siret";
 import { UseCase } from "../../core/UseCase";
-import { Establishment, SireneRepository } from "../ports/SireneRepository";
+import {
+  SireneEstablishment,
+  SireneRepository,
+} from "../ports/SireneRepository";
 
 export type GetSiretUseCase = UseCase<GetSiretRequestDto, GetSiretResponseDto>;
 
@@ -32,7 +35,7 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
   }
 }
 
-const getBusinessName = (etablissement: Establishment) => {
+const getBusinessName = (etablissement: SireneEstablishment) => {
   const denomination = etablissement.uniteLegale.denominationUniteLegale;
   if (denomination) return denomination;
 
@@ -44,7 +47,7 @@ const getBusinessName = (etablissement: Establishment) => {
     .join(" ");
 };
 
-const getBusinessAddress = (etablissement: Establishment) =>
+const getBusinessAddress = (etablissement: SireneEstablishment) =>
   [
     etablissement.adresseEtablissement.numeroVoieEtablissement,
     etablissement.adresseEtablissement.typeVoieEtablissement,
@@ -55,7 +58,7 @@ const getBusinessAddress = (etablissement: Establishment) =>
     .filter((el) => !!el)
     .join(" ");
 
-const getNaf = (etablissement: Establishment): NafDto | undefined => {
+const getNaf = (etablissement: SireneEstablishment): NafDto | undefined => {
   if (
     !etablissement.uniteLegale.activitePrincipaleUniteLegale ||
     !etablissement.uniteLegale.nomenclatureActivitePrincipaleUniteLegale
@@ -69,13 +72,13 @@ const getNaf = (etablissement: Establishment): NafDto | undefined => {
   };
 };
 
-const checkOpenForBusiness = (etablissement: Establishment): boolean => {
+const checkOpenForBusiness = (etablissement: SireneEstablishment): boolean => {
   // The etatAdministratifUniteLegale is "C" for closed establishments, "A" for active ones.
   return etablissement.uniteLegale.etatAdministratifUniteLegale === "A";
 };
 
 export const convertEtablissementToResponse = async (
-  establishment: Establishment,
+  establishment: SireneEstablishment,
 ): Promise<GetSiretResponseDto> => ({
   siret: establishment.siret,
   businessName: getBusinessName(establishment),

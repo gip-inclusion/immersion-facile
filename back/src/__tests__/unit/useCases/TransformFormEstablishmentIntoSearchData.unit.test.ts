@@ -5,7 +5,7 @@ import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGat
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
 import { TransformFormEstablishmentIntoSearchData } from "../../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
-import { Establishment } from "../../../domain/sirene/ports/SireneRepository";
+import { SireneEstablishment } from "../../../domain/sirene/ports/SireneRepository";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../../../shared/rome";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
@@ -26,7 +26,7 @@ const expectedNaf = "8559A";
 
 const getEstablishmentFromSireneApi = (
   formEstablishment: FormEstablishmentDto,
-): Establishment => ({
+): SireneEstablishment => ({
   siret: formEstablishment.siret,
   uniteLegale: {
     denominationUniteLegale: formEstablishment.businessName,

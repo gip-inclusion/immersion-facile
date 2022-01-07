@@ -6,6 +6,7 @@ import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySi
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
+import { SireneEstablishmentBuilder } from "../../../_testBuilders/SireneEstablishmentBuilder";
 
 describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let testUuidGenerator: TestUuidGenerator;
@@ -60,6 +61,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
     expect(
       searchesMadeRepository.processedSearchesMadeIds.has("searchMadeId"),
     ).toBe(true);
+
     // We expect to find the establishments in results
     const establishmentAggregatesInRepo =
       immersionOfferRepository.establishmentAggregates;
@@ -81,5 +83,219 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
     expect(establishmentAggregateFromLaBonneBoiteInRepo.contacts).toHaveLength(
       0,
     );
+  });
+});
+
+const prepareUseCase = () => {
+  const testUuidGenerator = new TestUuidGenerator();
+
+  const immersionOfferRepository = new InMemoryImmersionOfferRepository();
+
+  const searchesMadeRepository = new InMemorySearchMadeRepository();
+
+  const laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
+
+  const sireneRepository = new InMemorySireneRepository();
+
+  const useCase = new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
+    testUuidGenerator,
+    laBonneBoiteAPI,
+    sireneRepository,
+    searchesMadeRepository,
+    immersionOfferRepository,
+  );
+  return {
+    useCase,
+    sireneRepository,
+    searchesMadeRepository,
+    immersionOfferRepository,
+    testUuidGenerator,
+    laBonneBoiteAPI,
+  };
+};
+
+describe("Update establishments and offers based on searches made during the day", () => {
+  describe("One immersion search has been made during the day and needs to be processed", () => {
+    describe("when LBB API returns 2 establishments", () => {
+      describe("LBB establishments siren exist", () => {
+        it("Should add those 2 establishments, each with one offer", async () => {
+          // Prepare
+          const {
+            searchesMadeRepository,
+            laBonneBoiteAPI,
+            sireneRepository,
+            testUuidGenerator,
+            immersionOfferRepository,
+            useCase,
+          } = prepareUseCase();
+
+          searchesMadeRepository.setSearchesMade([
+            { id: "searchMadeId" } as SearchMadeEntity,
+          ]);
+          const matchedRomeCode = "A1201";
+          laBonneBoiteAPI.setNextResults([
+            new LaBonneBoiteCompanyBuilder()
+              .withSiret("siretLBB1")
+              .withStars(1)
+              .withMatchedRomeCode(matchedRomeCode)
+              .build(),
+            new LaBonneBoiteCompanyBuilder()
+              .withSiret("siretLBB2")
+              .withStars(2)
+              .withMatchedRomeCode(matchedRomeCode)
+              .build(),
+          ]);
+
+          sireneRepository.setEstablishment(
+            new SireneEstablishmentBuilder().withSiret("siretLBB1").build(),
+          );
+          sireneRepository.setEstablishment(
+            new SireneEstablishmentBuilder().withSiret("siretLBB2").build(),
+          );
+          testUuidGenerator.setNextUuids(["uuidLBB1", "uuidLBB2"]);
+          // Act
+          await useCase.execute();
+          // Assert
+          expect(laBonneBoiteAPI.nbOfCalls).toBe(1);
+          expect(immersionOfferRepository.establishmentAggregates).toHaveLength(
+            2,
+          );
+          expect(
+            immersionOfferRepository.establishmentAggregates[0].immersionOffers,
+          ).toEqual([
+            {
+              id: "uuidLBB1",
+              rome: matchedRomeCode,
+              score: 1,
+            },
+          ]);
+          expect(
+            immersionOfferRepository.establishmentAggregates[1].immersionOffers,
+          ).toEqual([
+            {
+              id: "uuidLBB2",
+              rome: matchedRomeCode,
+              score: 2,
+            },
+          ]);
+        });
+      });
+      describe("LBB establishments siren don't exist", () => {
+        it("Should not insert establishment", async () => {
+          // Prepare
+          const {
+            laBonneBoiteAPI,
+            searchesMadeRepository,
+            useCase,
+            immersionOfferRepository,
+          } = prepareUseCase();
+          searchesMadeRepository.setSearchesMade([
+            { id: "searchMadeId" } as SearchMadeEntity,
+          ]);
+          laBonneBoiteAPI.setNextResults([
+            new LaBonneBoiteCompanyBuilder().withSiret("unknownSiret").build(),
+          ]);
+          // Act
+          await useCase.execute();
+          // Assert
+          expect(immersionOfferRepository.establishmentAggregates).toHaveLength(
+            0,
+          );
+        });
+      });
+      it("Should turn the search made flag `needs to be processed` to False", async () => {
+        // Prepare
+        const { laBonneBoiteAPI, searchesMadeRepository, useCase } =
+          prepareUseCase();
+        searchesMadeRepository.setSearchesMade([
+          { id: "searchMadeId" } as SearchMadeEntity,
+        ]);
+        laBonneBoiteAPI.setNextResults([
+          new LaBonneBoiteCompanyBuilder().build(),
+        ]);
+        // Act
+        await useCase.execute();
+        // Assert
+        expect(
+          searchesMadeRepository.processedSearchesMadeIds.has("searchMadeId"),
+        ).toBe(true);
+      });
+    });
+    describe("when LBB API has an error", () => {
+      const {
+        laBonneBoiteAPI,
+        searchesMadeRepository,
+        useCase,
+        immersionOfferRepository,
+      } = prepareUseCase();
+
+      searchesMadeRepository.setSearchesMade([
+        { id: "searchMadeId" } as SearchMadeEntity,
+      ]);
+      laBonneBoiteAPI.setError(Error("La Bonne Boite API is down :("));
+      useCase.execute();
+
+      it("Should not add any establishment", () => {
+        // Assert
+        expect(laBonneBoiteAPI.nbOfCalls).toBe(1);
+        expect(immersionOfferRepository.establishmentAggregates).toHaveLength(
+          0,
+        );
+      });
+      it("Should leave the search made flag `needs to be processed` to True", () => {
+        // Assert
+        expect(
+          searchesMadeRepository.processedSearchesMadeIds.has("searchMadeId"),
+        ).toBe(false);
+      });
+    });
+  });
+  describe("when two searches have same ROME and very close location", () => {
+    // Prepare
+    const { laBonneBoiteAPI, searchesMadeRepository, useCase } =
+      prepareUseCase();
+    const rome = "A1203";
+    const makeSearchMadeInParis17 = (id?: string): SearchMadeEntity =>
+      ({
+        id,
+        rome,
+        lat: 48.862725, // 7 rue guillaume Tell, 75017 Paris
+        lon: 2.287592,
+      } as SearchMadeEntity);
+    const makeSearchMadeInParis10 = (id?: string): SearchMadeEntity =>
+      ({
+        id,
+        rome,
+        lat: 48.8841446, // 169 Bd de la Villette, 75010 Paris
+        lon: 2.3651789,
+      } as SearchMadeEntity);
+
+    it("Should call LBC API only one", () => {
+      // Prepare
+      searchesMadeRepository.setSearchesMade([
+        makeSearchMadeInParis17(),
+        makeSearchMadeInParis10(),
+      ]);
+      // Act
+      useCase.execute();
+      // Assert
+      expect(laBonneBoiteAPI.nbOfCalls).toBe(1);
+    });
+    it("Should turn the search made flag `needs to be processed` of those two searches to False", () => {
+      // Prepare
+      searchesMadeRepository.setSearchesMade([
+        makeSearchMadeInParis17("searchParis17"),
+        makeSearchMadeInParis10("searchParis10"),
+      ]);
+      // Act
+      useCase.execute();
+      // Assert
+      expect(
+        searchesMadeRepository.processedSearchesMadeIds.has("searchParis17"),
+      ).toBe(true);
+      expect(
+        searchesMadeRepository.processedSearchesMadeIds.has("searchPardis10"),
+      ).toBe(true);
+    });
   });
 });

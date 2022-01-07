@@ -2,9 +2,9 @@ import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpRespons
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { Establishment } from "./../../../domain/sirene/ports/SireneRepository";
+import { SireneEstablishment } from "./../../../domain/sirene/ports/SireneRepository";
 
-const validEstablishment: Establishment = {
+const validEstablishment: SireneEstablishment = {
   siret: "12345678901234",
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE",
