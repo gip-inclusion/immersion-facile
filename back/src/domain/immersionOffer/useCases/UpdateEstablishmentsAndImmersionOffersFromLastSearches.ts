@@ -49,7 +49,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     for (const searchMade of searchesMade) {
       try {
         await this.processSearchMade(searchMade);
-        this.searchMadeRepository.markSearchAsProcessed(searchMade.id);
+        await this.searchMadeRepository.markSearchAsProcessed(searchMade.id);
       } catch (error: any) {
         unexpectedErrors.push(error);
         if (unexpectedErrors.length > MAX_UNEXPECTED_ERRORS) {
@@ -59,7 +59,6 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           throw error;
         }
       }
-      await this.searchMadeRepository.markSearchAsProcessed(searchMade.id);
     }
   }
 
@@ -131,6 +130,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       );
       return removeUndefinedElements(establishmentAggregates);
     } catch (error: any) {
+      console.log("Error in searchLaBonneBoite ", error);
       logger.error({ searchMade }, "Error in searchLaBonneBoite: " + error);
       throw error;
     }

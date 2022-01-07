@@ -28,17 +28,14 @@ export class InMemorySearchMadeRepository implements SearchMadeRepository {
     this._processedSearchesMadeIds = new Set(
       this._searchesMadeEntities.map((entity) => entity.id),
     );
-    return searchesToReturn.map((searchMadeEntity) => {
-      const searchMade: SearchMade = {
-        distance_km: searchMadeEntity.distance_km,
-        lat: searchMadeEntity.lat,
-        lon: searchMadeEntity.lon,
-        rome: searchMadeEntity.rome,
-        siret: searchMadeEntity.siret,
-        nafDivision: searchMadeEntity.nafDivision,
-      };
-      return searchMade;
-    });
+    return searchesToReturn.map((searchMadeEntity) => ({
+      distance_km: searchMadeEntity.distance_km,
+      lat: searchMadeEntity.lat,
+      lon: searchMadeEntity.lon,
+      rome: searchMadeEntity.rome,
+      siret: searchMadeEntity.siret,
+      nafDivision: searchMadeEntity.nafDivision,
+    }));
   }
   public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {
     return this._searchesMadeEntities.filter(

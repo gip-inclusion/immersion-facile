@@ -35,7 +35,7 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
   }
 }
 
-const getBusinessName = (etablissement: SireneEstablishment) => {
+const getBusinessName = (etablissement: SireneEstablishment): string => {
   const denomination = etablissement.uniteLegale.denominationUniteLegale;
   if (denomination) return denomination;
 
@@ -47,7 +47,7 @@ const getBusinessName = (etablissement: SireneEstablishment) => {
     .join(" ");
 };
 
-const getBusinessAddress = (etablissement: SireneEstablishment) =>
+const getBusinessAddress = (etablissement: SireneEstablishment): string =>
   [
     etablissement.adresseEtablissement.numeroVoieEtablissement,
     etablissement.adresseEtablissement.typeVoieEtablissement,

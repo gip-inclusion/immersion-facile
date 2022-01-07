@@ -31,7 +31,7 @@ export class SireneEstablishmentBuilder
       siret,
     });
   }
-  build() {
+  build(): SireneEstablishment {
     return this.entity;
   }
 }
