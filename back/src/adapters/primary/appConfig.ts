@@ -86,6 +86,14 @@ export class AppConfig {
     });
   }
 
+  public get laBonneBoiteGateway() {
+    return throwIfNotInArray({
+      processEnv: this.env,
+      variableName: "LA_BONNE_BOITE_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+    });
+  }
+
   public get sireneHttpsConfig(): AxiosConfig {
     return {
       endpoint: this.throwIfNotDefined("SIRENE_ENDPOINT"),

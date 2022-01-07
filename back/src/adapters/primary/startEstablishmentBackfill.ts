@@ -5,8 +5,8 @@ import { PipelineStats } from "../../utils/pipelineStats";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
-  defaultRetryDeadlineMs,
   defaultMaxBackoffPeriodMs,
+  defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
 } from "../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";

@@ -28,10 +28,10 @@ export class LaBonneBoiteCompanyVO {
     return this.props.siret;
   }
 
-  public async toEstablishmentAggregate(
+  public toEstablishmentAggregate(
     uuidGenerator: UuidGenerator,
     extraData?: { naf?: string; numberEmployeesRange?: TefenCode },
-  ): Promise<EstablishmentAggregate> {
+  ): EstablishmentAggregate {
     const establishment: EstablishmentEntityV2 = {
       address: this.props.address,
       position: {

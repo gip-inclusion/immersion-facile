@@ -32,3 +32,16 @@ export type NotEmptyArray<T> = [T, ...T[]];
 export const keys = <T extends string | number | symbol>(
   obj: Partial<Record<T, unknown>>,
 ): T[] => Object.keys(obj) as T[];
+
+export const uniqBy = <T>(arr: T[], unicityCheck: (t: T) => string): T[] => {
+  const itemsByUniqKey = arr.reduce((acc, item) => {
+    if (item === null || item === undefined) return acc;
+    const key = unicityCheck(item);
+
+    if (acc.hasOwnProperty(key)) return acc;
+
+    return { ...acc, [key]: item };
+  }, {} as Record<string, T>);
+
+  return Object.values(itemsByUniqKey);
+};

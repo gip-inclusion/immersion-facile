@@ -37,6 +37,14 @@ export class LaBonneBoiteCompanyBuilder
       naf,
     });
   }
+
+  public withRome(rome: string): LaBonneBoiteCompanyBuilder {
+    return new LaBonneBoiteCompanyBuilder({
+      ...this.props,
+      matched_rome_code: rome,
+    });
+  }
+
   public build() {
     return new LaBonneBoiteCompanyVO(this.props);
   }

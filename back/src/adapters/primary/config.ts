@@ -53,6 +53,7 @@ import {
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
+import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
   AllowListEmailFilter,
@@ -68,8 +69,11 @@ import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunn
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
+import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { InMemoryImmersionOfferRepository } from "../secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { InMemoryLaBonneBoiteAPI } from "../secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemorySearchesMadeRepository } from "../secondary/immersionOffer/InMemorySearchesMadeRepository";
+import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { InMemoryAgencyRepository } from "../secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEstablishmentRepository";
@@ -219,6 +223,21 @@ export const createRepositories = async (
       config.repositories === "PG"
         ? new PgOutboxRepository(await getPgPoolFn().connect())
         : new InMemoryOutboxRepository(),
+
+    laBonneBoite:
+      config.laBonneBoiteGateway === "HTTPS"
+        ? new HttpLaBonneBoiteAPI(
+            new CachingAccessTokenGateway(
+              new PoleEmploiAccessTokenGateway(
+                config.poleEmploiAccessTokenConfig,
+              ),
+              clock,
+            ),
+            config.poleEmploiClientId,
+            noRateLimit,
+            noRetries,
+          )
+        : new InMemoryLaBonneBoiteAPI(),
   };
 };
 
@@ -374,6 +393,9 @@ const createUseCases = (
     searchImmersion: new SearchImmersion(
       repositories.searchesMade,
       repositories.immersionOffer,
+      repositories.laBonneBoite,
+      uuidGenerator,
+      config.featureFlags,
     ),
     getImmersionOfferById: new GetImmersionOfferById(
       repositories.immersionOffer,

@@ -4,7 +4,7 @@ import { Builder } from "./Builder";
 
 const defaultConfigParams = {
   NODE_ENV: "test",
-
+  LA_BONNE_BOITE_GATEWAY: "IN_MEMORY",
   // Test-only key, do not use in production environments!
   JWT_PRIVATE_KEY:
     "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIEUlP92zWRVJTz5bxyP57npwsPCi0lh5C/uxX5ZuJn6OoAoGCCqGSM49\nAwEHoUQDQgAEF0O2Llia9pN283L4DYrVUgIQrqPduq+gkqPLDn9OoVYcbRdeKqCe\n53195KiTm0aSOw/mgml9SVt+Rs4t60Ubkw==\n-----END EC PRIVATE KEY-----",

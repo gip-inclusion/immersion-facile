@@ -5,6 +5,7 @@ import { createApp } from "../adapters/primary/server";
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import type { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
 import { InMemoryImmersionOfferRepository } from "../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemorySearchesMadeRepository } from "../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
 import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAgencyRepository";
 import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
@@ -26,6 +27,7 @@ export type InMemoryRepositories = {
   rome: InMemoryRomeGateway;
   email: InMemoryEmailGateway;
   sirene: InMemorySireneRepository;
+  laBonneBoite: InMemoryLaBonneBoiteAPI;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
@@ -59,6 +61,7 @@ export const buildTestApp = async (
     SIRENE_REPOSITORY: "IN_MEMORY",
     DOMAIN: "my-domain",
     REPOSITORIES: "IN_MEMORY",
+    LA_BONNE_BOITE_GATEWAY: "IN_MEMORY",
     EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
     ...appConfigOverrides?.configParams,
   }).build();

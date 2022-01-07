@@ -1,3 +1,6 @@
+import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
+import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   InMemoryImmersionOfferRepository,
   TEST_CITY,
@@ -5,21 +8,51 @@ import {
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemorySearchesMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchesMadeRepository";
+import { SearchParams } from "../../../domain/immersionOffer/entities/SearchParams";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
-import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
+import {
+  ImmersionOfferId,
+  SearchImmersionResultDto,
+} from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 
-describe("SearchImmersion", () => {
-  test("Search immersion, give contact details only if authenticated", async () => {
+type PrepareSearchableDataProps = {
+  withLBBSearchOnFetch?: boolean;
+};
+
+const prepareSearchableData =
+  ({ withLBBSearchOnFetch }: PrepareSearchableDataProps) =>
+  async () => {
     const immersionOfferRepository = new InMemoryImmersionOfferRepository();
     const searchesMadeRepository = new InMemorySearchesMadeRepository();
+    const laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
+    const uuidGenerator = new TestUuidGenerator();
+    const featureFlagBuilder = FeatureFlagsBuilder.allOff();
+    const featureFlags = withLBBSearchOnFetch
+      ? featureFlagBuilder.enableLBBFetchOnSearch().build()
+      : featureFlagBuilder.build();
+
+    const lbbCompany = new LaBonneBoiteCompanyBuilder()
+      .withRome("M1607")
+      .withSiret("11112222333344")
+      .withNaf("8500A")
+      .build();
+    laBonneBoiteAPI.setNextResults([lbbCompany]);
+    const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
+    uuidGenerator.setNextUuid(generatedOfferId);
+
     const searchImmersion = new SearchImmersion(
       searchesMadeRepository,
       immersionOfferRepository,
+      laBonneBoiteAPI,
+      uuidGenerator,
+      featureFlags,
     );
     const siret = "78000403200019";
     const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03536d";
@@ -42,37 +75,49 @@ describe("SearchImmersion", () => {
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);
-    const unauthenticatedResponse = await searchImmersion.execute({
-      rome: "M1607",
-      nafDivision: "85",
-      distance_km: 30,
-      location: {
-        lat: 49.119146,
-        lon: 6.17602,
-      },
-    });
 
-    const expectedResponse: SearchImmersionResultDto[] = [
-      {
-        id: immersionOfferId,
-        rome: "M1607",
-        naf: "8539A",
-        siret: "78000403200019",
-        name: "Company inside repository",
-        voluntaryToImmersion: false,
-        location: TEST_POSITION,
-        address: "55 Rue du Faubourg Saint-Honoré",
-        contactMode: "EMAIL",
-        distance_m: 606885,
-        city: TEST_CITY,
-        nafLabel: TEST_NAF_LABEL,
-        romeLabel: TEST_ROME_LABEL,
-        contactDetails: undefined,
-      },
-    ];
-    expect(unauthenticatedResponse).toEqual(expectedResponse);
+    return {
+      searchImmersion,
+      immersionOfferId,
+      searchesMadeRepository,
+      immersionOfferRepository,
+      generatedOfferId,
+    };
+  };
 
-    expect(searchesMadeRepository.searchesMade).toEqual([
+const prepareSearchableDataWithFeatureFlagON = prepareSearchableData({
+  withLBBSearchOnFetch: true,
+});
+
+const prepareSearchableDataWithFeatureFlagOFF = prepareSearchableData({
+  withLBBSearchOnFetch: false,
+});
+
+const searchSecretariatInMetzParams = {
+  rome: "M1607",
+  nafDivision: "85",
+  distance_km: 30,
+  location: {
+    lat: 49.119146,
+    lon: 6.17602,
+  },
+};
+
+const authenticatedApiConsumerPayload: ApiConsumer = {
+  consumer: "passeEmploi",
+  id: "my-valid-apikey-id",
+  exp: new Date("2022-01-01").getTime(),
+  iat: new Date("2021-12-20").getTime(),
+};
+
+describe("SearchImmersionUseCase", () => {
+  it("stores searches made", async () => {
+    const { searchImmersion, searchesMadeRepository } =
+      await prepareSearchableDataWithFeatureFlagON();
+
+    await searchImmersion.execute(searchSecretariatInMetzParams);
+
+    expectSearchesStoredToEqual(searchesMadeRepository.searchesMade, [
       {
         rome: "M1607",
         nafDivision: "85",
@@ -81,35 +126,186 @@ describe("SearchImmersion", () => {
         distance_km: 30,
       },
     ]);
+  });
 
-    const authenticatedResponse = await searchImmersion.execute(
-      {
-        rome: "M1607",
-        nafDivision: "85",
-        distance_km: 30,
-        location: {
-          lat: 49.119146,
-          lon: 6.17602,
-        },
-      },
-      {
-        consumer: "passeEmploi",
-        id: "my-valid-apikey-id",
-        exp: new Date("2022-01-01").getTime(),
-        iat: new Date("2021-12-20").getTime(),
-      },
-    );
-    const expectedAuthResponse: SearchImmersionResultDto = {
-      ...expectedResponse[0],
-      contactDetails: {
-        id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
-        firstName: "Alain",
-        lastName: "Prost",
-        email: "alain.prost@email.fr",
-        role: "le big boss",
-        phone: "0612345678",
-      },
-    };
-    expect(authenticatedResponse).toEqual([expectedAuthResponse]);
+  describe("With feature flag ON", () => {
+    test("when more than 15 results, return unmutated object", async () => {
+      const { searchImmersion, immersionOfferRepository } =
+        await prepareSearchableDataWithFeatureFlagON();
+
+      const fakeSearchResponse = Array(16).fill({} as SearchImmersionResultDto);
+
+      immersionOfferRepository.getFromSearch = async () => fakeSearchResponse;
+
+      const authenticatedResponse = await searchImmersion.execute(
+        searchSecretariatInMetzParams,
+        authenticatedApiConsumerPayload,
+      );
+
+      expect(authenticatedResponse).toBe(fakeSearchResponse);
+    });
+
+    describe("authenticated with api key", () => {
+      test("Search immersion, and provide contact details", async () => {
+        const { searchImmersion, immersionOfferId, generatedOfferId } =
+          await prepareSearchableDataWithFeatureFlagON();
+
+        const authenticatedResponse = await searchImmersion.execute(
+          searchSecretariatInMetzParams,
+          authenticatedApiConsumerPayload,
+        );
+
+        expectSearchResponseToMatch(authenticatedResponse, [
+          {
+            id: immersionOfferId,
+            rome: "M1607",
+            naf: "8539A",
+            siret: "78000403200019",
+            name: "Company inside repository",
+            voluntaryToImmersion: false,
+            location: TEST_POSITION,
+            address: "55 Rue du Faubourg Saint-Honoré",
+            contactMode: "EMAIL",
+            distance_m: 606885,
+            city: TEST_CITY,
+            nafLabel: TEST_NAF_LABEL,
+            romeLabel: TEST_ROME_LABEL,
+            contactDetails: {
+              id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
+              firstName: "Alain",
+              lastName: "Prost",
+              email: "alain.prost@email.fr",
+              role: "le big boss",
+              phone: "0612345678",
+            },
+          },
+          {
+            id: generatedOfferId,
+            rome: "M1607",
+            siret: "11112222333344",
+          },
+        ]);
+        expect(authenticatedResponse[1].contactDetails).toBeUndefined();
+      });
+    });
+
+    describe("Not authenticated with api key", () => {
+      test("Search immersion, and do NOT provide contact details", async () => {
+        const { searchImmersion, immersionOfferId, generatedOfferId } =
+          await prepareSearchableDataWithFeatureFlagON();
+
+        const unauthenticatedResponse = await searchImmersion.execute(
+          searchSecretariatInMetzParams,
+        );
+
+        expectSearchResponseToMatch(unauthenticatedResponse, [
+          {
+            id: immersionOfferId,
+            rome: "M1607",
+            naf: "8539A",
+            siret: "78000403200019",
+            name: "Company inside repository",
+            voluntaryToImmersion: false,
+            location: TEST_POSITION,
+            address: "55 Rue du Faubourg Saint-Honoré",
+            contactMode: "EMAIL",
+            distance_m: 606885,
+            city: TEST_CITY,
+            nafLabel: TEST_NAF_LABEL,
+            romeLabel: TEST_ROME_LABEL,
+          },
+          {
+            id: generatedOfferId,
+            rome: "M1607",
+            siret: "11112222333344",
+          },
+        ]);
+        expect(unauthenticatedResponse[1].contactDetails).toBeUndefined();
+      });
+    });
+  });
+
+  describe("With feature flag OFF", () => {
+    describe("authenticated with api key", () => {
+      test("Search immersion, and provide contact details", async () => {
+        const { searchImmersion, immersionOfferId } =
+          await prepareSearchableDataWithFeatureFlagOFF();
+
+        const authenticatedResponse = await searchImmersion.execute(
+          searchSecretariatInMetzParams,
+          authenticatedApiConsumerPayload,
+        );
+
+        expectSearchResponseToMatch(authenticatedResponse, [
+          {
+            id: immersionOfferId,
+            rome: "M1607",
+            naf: "8539A",
+            siret: "78000403200019",
+            name: "Company inside repository",
+            voluntaryToImmersion: false,
+            location: TEST_POSITION,
+            address: "55 Rue du Faubourg Saint-Honoré",
+            contactMode: "EMAIL",
+            distance_m: 606885,
+            city: TEST_CITY,
+            nafLabel: TEST_NAF_LABEL,
+            romeLabel: TEST_ROME_LABEL,
+            contactDetails: {
+              id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
+              firstName: "Alain",
+              lastName: "Prost",
+              email: "alain.prost@email.fr",
+              role: "le big boss",
+              phone: "0612345678",
+            },
+          },
+        ]);
+      });
+    });
+
+    describe("Not authenticated with api key", () => {
+      test("Search immersion, and do NOT provide contact details", async () => {
+        const { searchImmersion, immersionOfferId } =
+          await prepareSearchableDataWithFeatureFlagOFF();
+
+        const unauthenticatedResponse = await searchImmersion.execute(
+          searchSecretariatInMetzParams,
+        );
+
+        expectSearchResponseToMatch(unauthenticatedResponse, [
+          {
+            id: immersionOfferId,
+            rome: "M1607",
+            naf: "8539A",
+            siret: "78000403200019",
+            name: "Company inside repository",
+            voluntaryToImmersion: false,
+            location: TEST_POSITION,
+            address: "55 Rue du Faubourg Saint-Honoré",
+            contactMode: "EMAIL",
+            distance_m: 606885,
+            city: TEST_CITY,
+            nafLabel: TEST_NAF_LABEL,
+            romeLabel: TEST_ROME_LABEL,
+          },
+        ]);
+        expect(unauthenticatedResponse[0].contactDetails).toBeUndefined();
+      });
+    });
   });
 });
+
+const expectSearchResponseToMatch = (
+  actual: SearchImmersionResultDto[],
+  expected: Partial<SearchImmersionResultDto>[],
+) => {
+  expect(actual).toMatchObject(expected);
+};
+
+const expectSearchesStoredToEqual = (
+  actual: SearchParams[],
+  expected: SearchParams[],
+) => {
+  expect(actual).toEqual(expected);
+};

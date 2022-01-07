@@ -8,7 +8,7 @@ import { LaBonneBoiteAPI } from "../../../domain/immersionOffer/ports/LaBonneBoi
 import { LaBonneBoiteCompanyVO } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
-import { RateLimiter } from "./../../../domain/core/ports/RateLimiter";
+import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 
 const logger = createLogger(__filename);
 

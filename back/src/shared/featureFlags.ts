@@ -13,6 +13,7 @@ export const getFeatureFlags = (processEnv: ProcessEnv) => {
     enableEnterpriseSignature: getBooleanVariable(
       "ENABLE_ENTERPRISE_SIGNATURE",
     ),
+    enableLBBFetchOnSearch: getBooleanVariable("ENABLE_LBB_FETCH_ON_SEARCH"),
   };
 };
 

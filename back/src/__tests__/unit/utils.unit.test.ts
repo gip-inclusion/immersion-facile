@@ -1,4 +1,4 @@
-import { addressWithPostalCodeSchema } from "../../shared/utils";
+import { addressWithPostalCodeSchema, uniqBy } from "../../shared/utils";
 
 describe("utils", () => {
   describe("addressWithPostalCodeSchema", () => {
@@ -33,6 +33,17 @@ describe("utils", () => {
       expect(() =>
         addressWithPostalCodeSchema.parse("20 AVENUE DE SEGUR,123456,PARIS 7"),
       ).toThrow();
+    });
+  });
+
+  describe("uniqBy", () => {
+    it("deduplicates in respect to provided function", () => {
+      const array1 = ["bobby", "Bob", "tom", "bob"];
+      const first3LettersCaseInsensitive = (str: string) =>
+        str.slice(0, 3).toLowerCase();
+      const newArray = uniqBy(array1, first3LettersCaseInsensitive);
+
+      expect(newArray).toEqual(["bobby", "tom"]);
     });
   });
 });
