@@ -180,6 +180,11 @@ describe("Update establishments and offers based on searches made during the day
           ]);
         });
       });
+      describe("LBB offer is irrevent ", () => {
+        it("Should be ignored ", () => {
+          return; // TODO : test method `isCompanyRelevant` from LaBonneBoiteCompanyVO.
+        });
+      });
       describe("LBB establishments siren don't exist", () => {
         it("Should not insert establishment", async () => {
           // Prepare
@@ -222,27 +227,19 @@ describe("Update establishments and offers based on searches made during the day
       });
     });
     describe("when LBB API has an error", () => {
-      const {
-        laBonneBoiteAPI,
-        searchesMadeRepository,
-        useCase,
-        immersionOfferRepository,
-      } = prepareUseCase();
+      it("Should  leave the search made flag `needs to be processed` to True ", async () => {
+        // Prepare
+        const { laBonneBoiteAPI, searchesMadeRepository, useCase } =
+          prepareUseCase();
 
-      searchesMadeRepository.setSearchesMade([
-        { id: "searchMadeId" } as SearchMadeEntity,
-      ]);
-      laBonneBoiteAPI.setError(Error("La Bonne Boite API is down :("));
-      useCase.execute();
+        searchesMadeRepository.setSearchesMade([
+          { id: "searchMadeId" } as SearchMadeEntity,
+        ]);
+        laBonneBoiteAPI.setError(Error("La Bonne Boite API is down :("));
 
-      it("Should not add any establishment", () => {
-        // Assert
-        expect(laBonneBoiteAPI.nbOfCalls).toBe(1);
-        expect(immersionOfferRepository.establishmentAggregates).toHaveLength(
-          0,
-        );
-      });
-      it("Should leave the search made flag `needs to be processed` to True", () => {
+        // Act
+        await useCase.execute();
+
         // Assert
         expect(
           searchesMadeRepository.processedSearchesMadeIds.has("searchMadeId"),
@@ -251,27 +248,24 @@ describe("Update establishments and offers based on searches made during the day
     });
   });
   describe("when two searches have same ROME and very close location", () => {
-    // Prepare
-    const { laBonneBoiteAPI, searchesMadeRepository, useCase } =
-      prepareUseCase();
     const rome = "A1203";
-    const makeSearchMadeInParis17 = (id?: string): SearchMadeEntity =>
+    const makeSearchMadeInParis17 = (): SearchMadeEntity =>
       ({
-        id,
         rome,
         lat: 48.862725, // 7 rue guillaume Tell, 75017 Paris
         lon: 2.287592,
       } as SearchMadeEntity);
-    const makeSearchMadeInParis10 = (id?: string): SearchMadeEntity =>
+    const makeSearchMadeInParis10 = (): SearchMadeEntity =>
       ({
-        id,
         rome,
         lat: 48.8841446, // 169 Bd de la Villette, 75010 Paris
         lon: 2.3651789,
       } as SearchMadeEntity);
 
-    it("Should call LBC API only one", () => {
+    it("Should call LBC API only once", () => {
       // Prepare
+      const { laBonneBoiteAPI, searchesMadeRepository, useCase } =
+        prepareUseCase();
       searchesMadeRepository.setSearchesMade([
         makeSearchMadeInParis17(),
         makeSearchMadeInParis10(),
@@ -281,20 +275,27 @@ describe("Update establishments and offers based on searches made during the day
       // Assert
       expect(laBonneBoiteAPI.nbOfCalls).toBe(1);
     });
-    it("Should turn the search made flag `needs to be processed` of those two searches to False", () => {
+    it("Should turn the search made flag `needs to be processed` of those two searches to False", async () => {
       // Prepare
+      const { searchesMadeRepository, useCase } = prepareUseCase();
+
       searchesMadeRepository.setSearchesMade([
-        makeSearchMadeInParis17("searchParis17"),
-        makeSearchMadeInParis10("searchParis10"),
+        { ...makeSearchMadeInParis17(), id: "searchParis17" },
+        { ...makeSearchMadeInParis10(), id: "searchParis10" },
       ]);
+
       // Act
-      useCase.execute();
+      await useCase.execute();
+      console.log(
+        "processedSearchesMadeIds: ",
+        searchesMadeRepository.processedSearchesMadeIds,
+      );
       // Assert
       expect(
         searchesMadeRepository.processedSearchesMadeIds.has("searchParis17"),
       ).toBe(true);
       expect(
-        searchesMadeRepository.processedSearchesMadeIds.has("searchPardis10"),
+        searchesMadeRepository.processedSearchesMadeIds.has("searchParis10"),
       ).toBe(true);
     });
   });

@@ -45,6 +45,20 @@ export class LaBonneBoiteCompanyBuilder
     });
   }
 
+  public withStars(stars: number): LaBonneBoiteCompanyBuilder {
+    return new LaBonneBoiteCompanyBuilder({
+      ...this.props,
+      stars,
+    });
+  }
+  public withMatchedRomeCode(
+    matchedRomeCode: string,
+  ): LaBonneBoiteCompanyBuilder {
+    return new LaBonneBoiteCompanyBuilder({
+      ...this.props,
+      matched_rome_code: matchedRomeCode,
+    });
+  }
   public build() {
     return new LaBonneBoiteCompanyVO(this.props);
   }

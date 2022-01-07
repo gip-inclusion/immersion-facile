@@ -49,6 +49,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     for (const searchMade of searchesMade) {
       try {
         await this.processSearchMade(searchMade);
+        this.searchMadeRepository.markSearchAsProcessed(searchMade.id);
       } catch (error: any) {
         unexpectedErrors.push(error);
         if (unexpectedErrors.length > MAX_UNEXPECTED_ERRORS) {
