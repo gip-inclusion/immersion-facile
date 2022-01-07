@@ -14,7 +14,6 @@ import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations"
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
-import { HttpLaPlateformeDeLInclusionAPI } from "../secondary/immersionOffer/HttpLaPlateformeDeLInclusionAPI";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "./appConfig";
 import { createGetPgPoolFn, createRepositories } from "./config";
@@ -24,7 +23,6 @@ const logger = createLogger(__filename);
 const STATS_LOGGING_INTERVAL_MS = 30_000;
 
 const MAX_QPS_LA_BONNE_BOITE_GATEWAY = 1;
-const MAX_QPS_LA_PLATEFORME_DE_L_INCLUSION = 1;
 const MAX_QPS_API_ADRESSE = 5;
 const MAX_QPS_SIRENE_API = 5;
 
@@ -68,18 +66,6 @@ const main = async () => {
     ),
   );
 
-  const laPlateFormeDeLInclusionAPI = new HttpLaPlateformeDeLInclusionAPI(
-    adresseAPI,
-    new QpsRateLimiter(MAX_QPS_LA_PLATEFORME_DE_L_INCLUSION, clock, sleep),
-    new ExponentialBackoffRetryStrategy(
-      defaultMaxBackoffPeriodMs,
-      defaultRetryDeadlineMs,
-      clock,
-      sleep,
-      random,
-    ),
-  );
-
   const sireneGateway = new HttpsSireneRepository(
     config.sireneHttpsConfig,
     clock,
@@ -102,8 +88,6 @@ const main = async () => {
     new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
       uuidGenerator,
       laBonneBoiteAPI,
-      laPlateFormeDeLInclusionAPI,
-      adresseAPI,
       sireneGateway,
       repositories.searchesMade,
       repositories.immersionOffer,

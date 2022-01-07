@@ -3,11 +3,7 @@ import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2 } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
 
-export type DataSource =
-  | "api_labonneboite"
-  | "api_laplateformedelinclusion"
-  | "form"
-  | "api_sirene";
+export type DataSource = "api_labonneboite" | "form" | "api_sirene";
 
 // prettier-ignore
 export type TefenCode = -1 | 0 | 1 | 2 | 3 | 11 | 12 | 21 | 22 | 31 | 32 | 41 | 42 | 51 | 52 | 53;

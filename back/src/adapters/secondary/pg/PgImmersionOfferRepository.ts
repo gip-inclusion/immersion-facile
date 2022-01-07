@@ -208,7 +208,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           ${nafDivisionFilter}
           ${siretFilter}
           AND ST_DWithin(immersion_offers.gps, ST_GeographyFromText($2), $3)
-          AND immersion_offers.data_source != 'api_laplateformedelinclusion'
         ORDER BY
           distance_m,
           immersion_offers.data_source DESC`,
@@ -392,8 +391,7 @@ const buildUpsertEstablishmentsQuery = (establishmentFields: any[][]) => {
             OR (
               establishments.data_source != 'form'
               AND (
-                EXCLUDED.data_source = 'api_laplateformedelinclusion'
-                AND establishments.data_source = 'api_labonneboite'
+                establishments.data_source = 'api_labonneboite'
               )
             )`,
     establishmentFields,
@@ -430,8 +428,7 @@ const buildUpsertImmersionOffersQuery = (immersionOfferFields: any[][]) => {
             OR (
               immersion_offers.data_source != 'form'
               AND (
-                EXCLUDED.data_source = 'api_laplateformedelinclusion'
-                AND immersion_offers.data_source = 'api_labonneboite'
+                immersion_offers.data_source = 'api_labonneboite'
               )
             )`,
     immersionOfferFields,
