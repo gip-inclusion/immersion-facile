@@ -189,7 +189,7 @@ export const ApplicationFormFields = ({
         type="text"
         placeholder=""
         description=""
-        disabled={isFrozen || isFetchingSiret}
+        disabled={true}
       />
 
       <TextInput
@@ -363,11 +363,10 @@ export const ApplicationFormFields = ({
                     ? "enterpriseAccepted"
                     : "beneficiaryAccepted"
                 }
-                label={`Je, soussigné ${signeeName} (${
-                  isSignatureEnterprise
-                    ? "représentant de la structure d'accueil"
-                    : "bénéficiaire de l'immersion"
-                }) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
+                label={`Je, soussigné ${signeeName} (${isSignatureEnterprise
+                  ? "représentant de la structure d'accueil"
+                  : "bénéficiaire de l'immersion"
+                  }) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
                 description="Avant de répondre, consultez ces dispositions ici"
                 descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
                 disabled={false}
