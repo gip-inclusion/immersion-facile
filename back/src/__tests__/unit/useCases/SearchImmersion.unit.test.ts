@@ -82,6 +82,7 @@ const prepareSearchableData =
       searchesMadeRepository,
       immersionOfferRepository,
       generatedOfferId,
+      uuidGenerator,
     };
   };
 
@@ -112,9 +113,9 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
 
 describe("SearchImmersionUseCase", () => {
   it("stores searches made", async () => {
-    const { searchImmersion, searchesMadeRepository } =
+    const { searchImmersion, searchesMadeRepository, uuidGenerator } =
       await prepareSearchableDataWithFeatureFlagON();
-
+    uuidGenerator.setNextUuid("searchMadeUuid");
     await searchImmersion.execute(searchSecretariatInMetzParams);
 
     expectSearchesStoredToEqual(searchesMadeRepository.searchesMade, [
