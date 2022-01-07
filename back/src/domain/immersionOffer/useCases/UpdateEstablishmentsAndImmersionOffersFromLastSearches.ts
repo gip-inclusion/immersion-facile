@@ -40,6 +40,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     logger.info(
       `Found ${searchesMade.length} unprocessed rows in the searches_made table.`,
     );
+
     this.stats.incCounter(
       "pg-searches_made-unprocessed_searches_found",
       searchesMade.length,
@@ -62,13 +63,15 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     }
   }
 
-  private async processSearchMade(searchMade: SearchMade) {
+  private async processSearchMade(searchMade: SearchMade): Promise<boolean> {
     logger.debug({ searchMade }, "processSearchMade");
     this.stats.incCounter("process_search_made-total");
     this.stats.startAggregateTimer("process_search_made-latency");
 
     try {
+      // Check if we have potential immersions in our available databases.
       const establishmentAggregates = await this.search(searchMade);
+      if (establishmentAggregates === null) return false;
 
       logger.debug(
         { searchParams: searchMade },
@@ -99,23 +102,27 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     } finally {
       this.stats.stopAggregateTimer("process_search_made-latency");
     }
+
+    this.stats.stopAggregateTimer("process_search_made-latency");
+    this.stats.incCounter("process_search_made-success");
+    return true;
   }
 
   private async search(
     searchMade: SearchMade,
-  ): Promise<EstablishmentAggregate[]> {
+  ): Promise<EstablishmentAggregate[] | null> {
     this.stats.incCounter("search-total");
 
-    const establishmentAggregateLists = await this.searchLaBonneBoite(
-      searchMade,
-    );
+    const laBonneBoiteSearchResults = await this.searchLaBonneBoite(searchMade);
 
-    return establishmentAggregateLists.flat();
+    if (!laBonneBoiteSearchResults) return null;
+
+    return laBonneBoiteSearchResults;
   }
 
   private async searchLaBonneBoite(
     searchMade: SearchMade,
-  ): Promise<EstablishmentAggregate[]> {
+  ): Promise<EstablishmentAggregate[] | null> {
     try {
       const laBonneBoiteCompanies = await this.laBonneBoiteAPI.searchCompanies(
         searchMade,
