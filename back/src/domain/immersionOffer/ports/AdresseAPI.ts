@@ -1,6 +1,6 @@
-export type Position = { lat: number; lon: number };
+import { LatLonDto } from "../../../shared/SearchImmersionDto";
 
 export interface AdresseAPI {
-  getPositionFromAddress: (address: string) => Promise<Position | undefined>;
-  getCityCodeFromPosition: (position: Position) => Promise<number | undefined>;
+  getPositionFromAddress: (address: string) => Promise<LatLonDto | undefined>;
+  getCityCodeFromPosition: (position: LatLonDto) => Promise<number | undefined>;
 }

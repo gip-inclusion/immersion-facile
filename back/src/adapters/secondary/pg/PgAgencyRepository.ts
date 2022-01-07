@@ -4,8 +4,8 @@ import {
   AgencyConfig,
   AgencyRepository,
 } from "../../../domain/immersionApplication/ports/AgencyRepository";
-import { Position } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { AgencyId } from "../../../shared/agencies";
+import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
 import { parseGeoJson } from "./PgImmersionOfferRepository";
 

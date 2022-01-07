@@ -1,5 +1,5 @@
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
-import { Position } from "../ports/AdresseAPI";
+import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2 } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
 
@@ -19,7 +19,7 @@ export type EstablishmentEntityV2 = {
   voluntaryToImmersion: boolean;
   dataSource: DataSource;
   contactMethod?: ContactMethod;
-  position: Position;
+  position: LatLonDto;
   naf: string;
   numberEmployeesRange: TefenCode;
 };

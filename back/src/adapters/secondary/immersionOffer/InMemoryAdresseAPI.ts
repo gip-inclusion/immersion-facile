@@ -1,25 +1,23 @@
-import {
-  AdresseAPI,
-  Position,
-} from "../../../domain/immersionOffer/ports/AdresseAPI";
+import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
+import { LatLonDto } from "../../../shared/SearchImmersionDto";
 
 export class InMemoryAdresseAPI implements AdresseAPI {
-  constructor(private _position?: Position, private _cityCode?: number) {}
+  constructor(private _position?: LatLonDto, private _cityCode?: number) {}
 
   public async getPositionFromAddress(
     _address: string,
-  ): Promise<Position | undefined> {
+  ): Promise<LatLonDto | undefined> {
     return this._position;
   }
 
   public async getCityCodeFromPosition(
-    position: Position,
+    position: LatLonDto,
   ): Promise<number | undefined> {
     return this._cityCode;
   }
 
   // for test purposes only
-  public setNextPosition(position: Position | undefined) {
+  public setNextPosition(position: LatLonDto | undefined) {
     this._position = position;
   }
 

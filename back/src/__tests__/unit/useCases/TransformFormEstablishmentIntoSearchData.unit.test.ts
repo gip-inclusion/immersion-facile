@@ -4,11 +4,11 @@ import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/im
 import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
-import { Position } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { TransformFormEstablishmentIntoSearchData } from "../../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { Establishment } from "../../../domain/sirene/ports/SireneRepository";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../../../shared/rome";
+import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 
@@ -18,7 +18,7 @@ class TestSequenceRunner implements SequenceRunner {
   }
 }
 const fakeSiret = "90040893100013";
-const fakePosition: Position = { lat: 49.119146, lon: 6.17602 };
+const fakePosition: LatLonDto = { lat: 49.119146, lon: 6.17602 };
 const fakeActivitePrincipaleUniteLegale = "85.59A";
 const fakeBusinessContact = new ContactEntityV2Builder().build();
 

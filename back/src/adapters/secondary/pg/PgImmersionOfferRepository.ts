@@ -7,11 +7,11 @@ import {
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { Position } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import {
   ImmersionOfferId,
+  LatLonDto,
   SearchContact,
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
@@ -41,7 +41,7 @@ const parseContactMethod = (raw: string): ContactMethod => {
   return pgContactToContactMethod[pgContactMethod];
 };
 
-export const parseGeoJson = (raw: string): Position => {
+export const parseGeoJson = (raw: string): LatLonDto => {
   const json = JSON.parse(raw);
   return {
     lat: json.coordinates[1],
@@ -442,7 +442,7 @@ const buildUpsertImmersionOffersQuery = (immersionOfferFields: any[][]) => {
 // Extract the NAF division (e.g. 84) from a NAF code (e.g. 8413Z)
 const extractNafDivision = (naf: string) => parseInt(naf.substring(0, 2));
 
-const convertPositionToStGeography = ({ lat, lon }: Position) =>
+const convertPositionToStGeography = ({ lat, lon }: LatLonDto) =>
   `ST_GeographyFromText('POINT(${lon} ${lat})')`;
 
 const reStGeographyFromText =

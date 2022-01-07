@@ -3,10 +3,8 @@ import {
   RetriableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
-import {
-  AdresseAPI,
-  Position,
-} from "../../../domain/immersionOffer/ports/AdresseAPI";
+import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
+import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 
@@ -20,7 +18,7 @@ export class HttpAdresseAPI implements AdresseAPI {
 
   public async getPositionFromAddress(
     address: string,
-  ): Promise<Position | undefined> {
+  ): Promise<LatLonDto | undefined> {
     logger.debug({ address }, "getPositionFromAddress");
 
     return this.retryStrategy.apply(async () => {
@@ -56,7 +54,7 @@ export class HttpAdresseAPI implements AdresseAPI {
   }
 
   public async getCityCodeFromPosition(
-    position: Position,
+    position: LatLonDto,
   ): Promise<number | undefined> {
     logger.debug({ position }, "getCityCodeFromPosition");
     return this.retryStrategy.apply(async () => {
