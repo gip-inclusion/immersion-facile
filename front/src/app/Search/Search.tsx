@@ -27,6 +27,7 @@ interface Values {
 }
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
+const initialySelectedIndex = 3; // to get 10 km radius by default
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -93,7 +94,7 @@ export const Search = () => {
               });
           }}
         >
-          {({ setFieldValue, values }) => (
+          {({ setFieldValue }) => (
             <Form>
               <div className="formContentsContainer">
                 <div>
@@ -131,6 +132,7 @@ export const Search = () => {
                     onSelection={(newValue: string, selectedIndex: number) => {
                       setFieldValue("radiusKm", radiusOptions[selectedIndex]);
                     }}
+                    defaultSelectedIndex={initialySelectedIndex}
                     options={radiusOptions.map((n) => `${n} km`)}
                   />
                 </div>

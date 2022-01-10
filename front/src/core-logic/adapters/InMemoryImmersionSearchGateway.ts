@@ -17,7 +17,6 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
     console.log("search immersion: " + searchParams);
     await sleep(SIMULATED_LATENCY_MS);
 
-    return [];
     return [
       {
         id: "search_result_id",

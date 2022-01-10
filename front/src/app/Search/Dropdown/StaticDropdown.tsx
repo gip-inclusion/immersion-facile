@@ -6,6 +6,7 @@ type StaticDropdownProps = {
   onSelection: (value: string, index: number) => void;
   inputStyle?: any;
   options: string[];
+  defaultSelectedIndex?: number;
 };
 
 export const StaticDropdown = ({
@@ -13,9 +14,10 @@ export const StaticDropdown = ({
   onSelection,
   inputStyle,
   options,
+  defaultSelectedIndex = 0,
 }: StaticDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(defaultSelectedIndex);
 
   return (
     <div className="autocomplete">
