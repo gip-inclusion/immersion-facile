@@ -55,6 +55,7 @@ const buildDb = async () => {
 
   const { client, pool } = await tryToConnect(pgUrl);
   const checkIfTableExists = makeCheckIfTableAlreadyExists(client);
+  const isQuerySuccessful = makeIsQuerySuccessful(client);
 
   // prettier-ignore
   const immersionOffersTableAlreadyExists = await checkIfTableExists("immersion_offers");
@@ -62,7 +63,13 @@ const buildDb = async () => {
     logger.info("We will thus construct the database");
     await buildSearchImmersionDb(client);
   }
-  await addSearchMadeId(client);
+
+  // prettier-ignore
+  const pkSearchMadeExists = await isQuerySuccessful("SELECT id FROM searches_made");
+  if (!pkSearchMadeExists) {
+    logger.info("We will thus change primary key");
+    await addSearchMadeId(client);
+  }
 
   // prettier-ignore
   const immersionApplicationTableAlreadyExists = await checkIfTableExists("immersion_applications");
@@ -127,6 +134,19 @@ const makeCheckIfTableAlreadyExists =
       logger.info(
         `${tableName} does not exists, trying to query got: ${e.message}`,
       );
+      return false;
+    }
+  };
+
+const makeIsQuerySuccessful =
+  (client: PoolClient) =>
+  async (query: string): Promise<boolean> => {
+    try {
+      await client.query(query);
+      logger.info({ query }, "Query succeeded");
+      return true;
+    } catch (e: any) {
+      logger.info({ query }, "Query failed");
       return false;
     }
   };
