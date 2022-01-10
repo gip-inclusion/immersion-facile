@@ -1,7 +1,7 @@
 import React from "react";
 import { BulletPoint } from "./BulletPoint";
 import { Colored } from "./Colored";
-import { Title } from "./Title";
+import { SubTitle, Title } from "./Title";
 
 type ImmersionHowToProps = {
   videoUrl: string;
@@ -36,9 +36,7 @@ export const ImmersionHowTo = ({ videoUrl }: ImmersionHowToProps) => (
         className="pl-4 flex flex-col items-center"
         style={{ width: "480px" }}
       >
-        <div className="text-immersionRed-dark font-semibold text-center py-4">
-          L'immersion professionnelle, mode d'emploi
-        </div>
+        <SubTitle red>L'immersion professionnelle, mode d'emploi</SubTitle>
         <div className="border-blue-200 border border-solid">
           <iframe
             width="480"

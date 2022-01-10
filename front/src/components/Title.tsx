@@ -11,3 +11,13 @@ export const Title = ({ children, red }: TitleProps) => (
     {children}
   </div>
 );
+
+export const SubTitle = ({ children, red }: TitleProps) => (
+  <div
+    className={`${
+      red ? "text-immersionRed-dark" : "text-immersionBlue-dark"
+    } font-semibold text-center py-4`}
+  >
+    {children}
+  </div>
+);

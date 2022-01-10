@@ -17,6 +17,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
     console.log("search immersion: " + searchParams);
     await sleep(SIMULATED_LATENCY_MS);
 
+    return [];
     return [
       {
         id: "search_result_id",
@@ -56,6 +57,20 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         location: { lat: 48.8666, lon: 2.3333 },
         address: "55 rue du Faubourg Saint-Honoré",
         contactMode: "IN_PERSON",
+        romeLabel: "xxxx",
+        nafLabel: "xxxx",
+        city: "xxxx",
+      },
+      {
+        id: "search_result_id4",
+        rome: searchParams.rome,
+        naf: searchParams.nafDivision ?? defaultNaf,
+        siret: "12345678901235",
+        name: "Giga Corp",
+        voluntaryToImmersion: true,
+        location: { lat: 48.8666, lon: 2.3333 },
+        address: "55 rue du Faubourg Saint-Honoré",
+        contactMode: "UNKNOWN",
         romeLabel: "xxxx",
         nafLabel: "xxxx",
         city: "xxxx",

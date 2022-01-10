@@ -149,32 +149,38 @@ export const Search = () => {
         </Formik>
       </div>
       <div className="searchResultContainer">
-        {result &&
-          result.map((r) => {
-            const distanceKm = ((r.distance_m ?? 0) / 1000).toFixed(1);
+        {result !== null &&
+          (result.length === 0 ? (
+            <p className="p-5">
+              Pas de résultat. Essayez avec un plus grand rayon de recherche...
+            </p>
+          ) : (
+            result.map((r) => {
+              const distanceKm = ((r.distance_m ?? 0) / 1000).toFixed(1);
 
-            return (
-              <EnterpriseSearchResult
-                key={r.id}
-                title={r.name}
-                radius={`${distanceKm} km`}
-                address={r.address}
-                siret={r.siret}
-                contactMode={r.contactMode}
-                onButtonClick={() =>
-                  dispatch({
-                    type: "CLICKED_OPEN",
-                    payload: {
-                      immersionOfferId: r.id,
-                      contactId: r.contactDetails?.id,
-                      contactMethod: r.contactMode,
-                    },
-                  })
-                }
-                disableButton={modalState.isValidating}
-              />
-            );
-          })}
+              return (
+                <EnterpriseSearchResult
+                  key={r.id}
+                  title={r.name}
+                  radius={`${distanceKm} km`}
+                  address={r.address}
+                  siret={r.siret}
+                  contactMode={r.contactMode}
+                  onButtonClick={() =>
+                    dispatch({
+                      type: "CLICKED_OPEN",
+                      payload: {
+                        immersionOfferId: r.id,
+                        contactId: r.contactDetails?.id,
+                        contactMethod: r.contactMode,
+                      },
+                    })
+                  }
+                  disableButton={modalState.isValidating}
+                />
+              );
+            })
+          ))}
       </div>
 
       <ContactEstablishmentModal

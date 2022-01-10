@@ -56,6 +56,10 @@ export const ContactByEmail = ({
     >
       {({ errors, submitCount }) => (
         <Form>
+          <p className="pb-6">
+            Cette entreprise a choisi d'être contactée par mail. Veuillez
+            compléter ce formulaire qui sera transmis à l'entreprise.
+          </p>
           <TextInput
             label="Votre email *"
             name={getName("potentialBeneficiaryEmail")}
