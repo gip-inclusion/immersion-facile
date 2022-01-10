@@ -18,7 +18,7 @@ describe("ListAgencies", () => {
     const repository = new InMemoryAgencyRepository([]);
     const listAgencies = new ListAgencies(repository);
 
-    const agencies = await listAgencies.execute();
+    const agencies = await listAgencies.execute({});
     expect(agencies).toEqual([]);
   });
 
@@ -26,7 +26,7 @@ describe("ListAgencies", () => {
     const repository = new InMemoryAgencyRepository([agency1, agency2]);
     const listAgencies = new ListAgencies(repository);
 
-    const agencies = await listAgencies.execute();
+    const agencies = await listAgencies.execute({});
     expect(agencies).toEqual([
       {
         id: "11111111-1111-1111-1111-111111111111",
@@ -45,5 +45,27 @@ describe("ListAgencies", () => {
         },
       },
     ]);
+  });
+
+  test("returns 20 nearest agencies", async () => {
+    const agencies = [];
+    for (let i = 0; i < 100; i++) {
+      agencies.push(
+        AgencyConfigBuilder.empty()
+          .withId(i.toString())
+          .withName("agency " + i)
+          .withPosition(i, i)
+          .build(),
+      );
+    }
+
+    const repository = new InMemoryAgencyRepository(agencies);
+    const listAgencies = new ListAgencies(repository);
+
+    const nearestAgencies = await listAgencies.execute({
+      position: { lat: 20, lon: 20 },
+    });
+    expect(nearestAgencies).toHaveLength(20);
+    expect(nearestAgencies[0].id).toEqual("20");
   });
 });

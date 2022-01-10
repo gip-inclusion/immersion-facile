@@ -14,7 +14,9 @@ export const agencySchema = z.object({
 });
 
 export type ListAgenciesRequestDto = z.infer<typeof listAgenciesRequestSchema>;
-export const listAgenciesRequestSchema = z.void();
+export const listAgenciesRequestSchema = z.object({
+  position: latLonSchema.optional(),
+});
 
 export type ListAgenciesResponseDto = z.infer<
   typeof listAgenciesResponseSchema

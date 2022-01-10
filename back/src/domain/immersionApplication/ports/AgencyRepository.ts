@@ -15,5 +15,6 @@ export type AgencyConfig = {
 export interface AgencyRepository {
   insert: (config: AgencyConfig) => Promise<AgencyId | undefined>;
   getById: (id: AgencyId) => Promise<AgencyConfig | undefined>;
+  getNearby: (position: LatLonDto) => Promise<AgencyConfig[]>;
   getAll: () => Promise<AgencyConfig[]>;
 }

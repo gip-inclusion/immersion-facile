@@ -25,6 +25,7 @@ import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
+import { listAgenciesRequestSchema } from "../../shared/agencies";
 
 const logger = createLogger(__filename);
 
@@ -158,11 +159,15 @@ export const createApp = async (
     ),
   );
 
-  router
-    .route(`/${agenciesRoute}`)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () => deps.useCases.listAgencies.execute()),
-    );
+  router.route(`/${agenciesRoute}`).get(async (req, res) =>
+    sendHttpResponse(req, res, async () =>
+      callUseCase({
+        useCase: deps.useCases.listAgencies,
+        validationSchema: listAgenciesRequestSchema,
+        useCaseParams: req.params,
+      }),
+    ),
+  );
 
   app.use(router);
   app.use("/auth", createMagicLinkRouter(deps));

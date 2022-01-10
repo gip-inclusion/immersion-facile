@@ -1,7 +1,9 @@
 import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyId } from "../../shared/agencies";
+import { AgencyDto, AgencyId } from "../../shared/agencies";
+import { LatLonDto } from "../../shared/SearchImmersionDto";
 import { createLogger } from "../../utils/logger";
 import { AgencyConfig } from "./../../domain/immersionApplication/ports/AgencyRepository";
+import { distanceBetweenCoordinates } from "./immersionOffer/distanceBetweenCoordinates";
 
 const logger = createLogger(__filename);
 
@@ -60,6 +62,28 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   public async getById(id: AgencyId): Promise<AgencyConfig | undefined> {
     logger.info({ id, configs: this.agencies }, "getById");
     return this.agencies[id];
+  }
+
+  public async getNearby(position: LatLonDto): Promise<AgencyConfig[]> {
+    logger.info({ position, configs: this.agencies }, "getNearby");
+    return Object.values(this.agencies)
+      .sort(function (a: AgencyDto, b: AgencyDto) {
+        return (
+          distanceBetweenCoordinates(
+            a.position.lat,
+            a.position.lon,
+            position.lat,
+            position.lon,
+          ) -
+          distanceBetweenCoordinates(
+            b.position.lat,
+            b.position.lon,
+            position.lat,
+            position.lon,
+          )
+        );
+      })
+      .slice(0, 20);
   }
 
   public async getAll(): Promise<AgencyConfig[]> {
