@@ -209,8 +209,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           ${siretFilter}
           AND ST_DWithin(immersion_offers.gps, ST_GeographyFromText($2), $3)
         ORDER BY
-          distance_m,
-          immersion_offers.data_source DESC`,
+          immersion_offers.data_source DESC,
+          distance_m`,
         parameters,
       )
       .then((res) =>

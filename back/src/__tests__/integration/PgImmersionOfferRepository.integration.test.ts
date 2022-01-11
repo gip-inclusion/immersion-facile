@@ -126,7 +126,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactMode: "EMAIL",
       };
 
-      expect(searchResult).toMatchObject([expectedResult1, expectedResult2]);
+      expect(searchResult).toMatchObject([expectedResult2, expectedResult1]);
 
       const searchResuts = await pgImmersionOfferRepository.getFromSearch({
         rome: "M1808",
