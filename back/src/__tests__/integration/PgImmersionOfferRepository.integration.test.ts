@@ -58,10 +58,10 @@ describe("Postgres implementation of immersion offer repository", () => {
         new EstablishmentAggregateBuilder()
           .withEstablishment({
             address: "fake address establishment 2 12345 some city",
-            name: "Company from api sirene for search",
+            name: "Company from FORM for search",
             voluntaryToImmersion: false,
             siret: "78000403200040",
-            dataSource: "api_sirene",
+            dataSource: "form",
             numberEmployeesRange: 1,
             position: { lat: 49.05, lon: 6.05 },
             naf: "8520A",
@@ -99,7 +99,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         id: "13df03a5-a2a5-430a-b558-333333333344",
         address: "fake address establishment 2 12345 some city",
         city: "some city",
-        name: "Company from api sirene for search",
+        name: "Company from FORM for search",
         naf: "8520A",
         nafLabel: "Enseignement primaire",
         contactMode: "PHONE",
@@ -126,7 +126,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactMode: "EMAIL",
       };
 
-      expect(searchResult).toMatchObject([expectedResult2, expectedResult1]);
+      expect(searchResult).toMatchObject([expectedResult1, expectedResult2]);
 
       const searchResuts = await pgImmersionOfferRepository.getFromSearch({
         rome: "M1808",
