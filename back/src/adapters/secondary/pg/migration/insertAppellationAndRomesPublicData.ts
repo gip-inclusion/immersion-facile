@@ -11,7 +11,9 @@ const makeQueryArray = (filePath: string) => {
 };
 
 export const insertRomesPublicData = async (client: PoolClient) => {
-  const arrayOfRomeData = makeQueryArray(`${__dirname}/romes_public.csv`);
+  const arrayOfRomeData = makeQueryArray(
+    `${__dirname}/../staticData/romes_public.csv`,
+  );
   arrayOfRomeData.map((x) => {
     if (x.length == 1) {
       console.log(x);
@@ -27,7 +29,7 @@ export const insertRomesPublicData = async (client: PoolClient) => {
 
 export const insertAppellationPublicData = async (client: PoolClient) => {
   const arrayOfAppellationData = makeQueryArray(
-    `${__dirname}/appellations_public.csv`,
+    `${__dirname}/../staticData/appellations_public.csv`,
   );
 
   await client.query(

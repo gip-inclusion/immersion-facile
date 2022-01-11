@@ -21,7 +21,8 @@
     "includecheck": "./check_includes.sh",
     "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck",
     "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck",
-    "generate-api-key": "ts-node src/adapters/primary/generateApiKey.ts"
+    "generate-api-key": "ts-node src/adapters/primary/generateApiKey.ts",
+    "migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations"
   },
   "keywords": [],
   "author": "",
@@ -57,6 +58,7 @@
     "express": "^4.17.1",
     "express-prometheus-middleware": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
+    "node-pg-migrate": "^6.2.1",
     "pg": "^8.7.1",
     "pg-format": "^1.0.4",
     "pino": "^6.13.0",
