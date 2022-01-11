@@ -1,9 +1,8 @@
 import { AppConfig } from "../../adapters/primary/appConfig";
-import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
-import { HttpsSireneRepository } from "./../../adapters/secondary/HttpsSireneRepository";
-import { SireneRepository } from "./../../domain/sirene/ports/SireneRepository";
-import { PoleEmploiRomeGateway } from "../../adapters/secondary/immersionOffer/PoleEmploiRomeGateway";
 import { PoleEmploiAccessTokenGateway } from "../../adapters/secondary/immersionOffer/PoleEmploiAccessTokenGateway";
+import { PoleEmploiRomeGateway } from "../../adapters/secondary/immersionOffer/PoleEmploiRomeGateway";
+import { noRateLimit } from "./../../domain/core/ports/RateLimiter";
+import { noRetries } from "./../../domain/core/ports/RetryStrategy";
 
 describe("PoleEmploiRomeGateway", () => {
   let poleEmploiRomeGateway: PoleEmploiRomeGateway;
@@ -12,6 +11,8 @@ describe("PoleEmploiRomeGateway", () => {
     const config = AppConfig.createFromEnv();
     const accessTokenGateway = new PoleEmploiAccessTokenGateway(
       config.poleEmploiAccessTokenConfig,
+      noRateLimit,
+      noRetries,
     );
     poleEmploiRomeGateway = new PoleEmploiRomeGateway(
       accessTokenGateway,

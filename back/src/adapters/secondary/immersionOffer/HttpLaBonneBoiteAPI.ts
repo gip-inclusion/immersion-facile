@@ -1,3 +1,4 @@
+import { secondsToMilliseconds } from "date-fns";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
@@ -10,7 +11,11 @@ import {
   LaBonneBoiteCompanyProps,
   LaBonneBoiteCompanyVO,
 } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
-import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
+import {
+  createAxiosInstance,
+  isRetriableError,
+  logAxiosError,
+} from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -39,6 +44,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
               headers: {
                 Authorization: createAuthorization(accessToken.access_token),
               },
+              timeout: secondsToMilliseconds(10),
               params: {
                 distance: searchMade.distance_km,
                 longitude: searchMade.lon,
@@ -52,11 +58,8 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
           (props: LaBonneBoiteCompanyProps) => new LaBonneBoiteCompanyVO(props),
         );
       } catch (error: any) {
-        if (error.response.status == 429) {
-          logger.warn("Request quota exceeded: " + error);
-          throw new RetriableError(error);
-        }
-        logAxiosError(logger, error, "Error calling labonneboite API");
+        if (isRetriableError(logger, error)) throw new RetriableError(error);
+        logAxiosError(logger, error);
         throw error;
       }
     });

@@ -1,4 +1,4 @@
-import { formatISO } from "date-fns";
+import { formatISO, secondsToMilliseconds } from "date-fns";
 import { Clock } from "../../domain/core/ports/Clock";
 import { RateLimiter } from "../../domain/core/ports/RateLimiter";
 import {
@@ -10,7 +10,11 @@ import {
   SireneRepositoryAnswer,
 } from "../../domain/sirene/ports/SireneRepository";
 import { SiretDto } from "../../shared/siret";
-import { createAxiosInstance, logAxiosError } from "../../utils/axiosUtils";
+import {
+  createAxiosInstance,
+  isRetriableError,
+  logAxiosError,
+} from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
 import { AxiosConfig } from "../primary/appConfig";
 
@@ -31,6 +35,7 @@ export class HttpsSireneRepository implements SireneRepository {
         Authorization: `Bearer ${this.axiosConfig.bearerToken}`,
         Accept: "application/json",
       },
+      timeout: secondsToMilliseconds(10),
     });
   }
 
@@ -56,10 +61,7 @@ export class HttpsSireneRepository implements SireneRepository {
         if (error.response.status == 404) {
           return undefined;
         }
-        if (error.response.status == 429) {
-          logger.warn("Request quota exceeded: " + error);
-          throw new RetriableError(error);
-        }
+        if (isRetriableError(logger, error)) throw new RetriableError(error);
         logAxiosError(logger, error);
         throw error;
       }

@@ -12,7 +12,6 @@ import {
 import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
-import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "./appConfig";
@@ -22,8 +21,8 @@ const logger = createLogger(__filename);
 
 const STATS_LOGGING_INTERVAL_MS = 30_000;
 
+const MAX_QPS_POLE_EMPLOI_ACCESS_TOKEN_GATEWAY = 1;
 const MAX_QPS_LA_BONNE_BOITE_GATEWAY = 1;
-const MAX_QPS_API_ADRESSE = 5;
 const MAX_QPS_SIRENE_API = 5;
 
 const stats: PipelineStats = new PipelineStats("startEstablishmentBackfill");
@@ -36,47 +35,38 @@ const main = async () => {
 
   const clock = new RealClock();
 
-  const uuidGenerator = new UuidV4Generator();
+  const retryStrategy = new ExponentialBackoffRetryStrategy(
+    defaultMaxBackoffPeriodMs,
+    defaultRetryDeadlineMs,
+    clock,
+    sleep,
+    random,
+  );
 
   const poleEmploiAccessTokenGateway = new CachingAccessTokenGateway(
-    new PoleEmploiAccessTokenGateway(config.poleEmploiAccessTokenConfig),
+    new PoleEmploiAccessTokenGateway(
+      config.poleEmploiAccessTokenConfig,
+      new QpsRateLimiter(
+        MAX_QPS_POLE_EMPLOI_ACCESS_TOKEN_GATEWAY,
+        clock,
+        sleep,
+      ),
+      retryStrategy,
+    ),
   );
 
   const laBonneBoiteAPI = new HttpLaBonneBoiteAPI(
     poleEmploiAccessTokenGateway,
     config.poleEmploiClientId,
     new QpsRateLimiter(MAX_QPS_LA_BONNE_BOITE_GATEWAY, clock, sleep),
-    new ExponentialBackoffRetryStrategy(
-      defaultMaxBackoffPeriodMs,
-      defaultRetryDeadlineMs,
-      clock,
-      sleep,
-      random,
-    ),
-  );
-
-  const adresseAPI = new HttpAdresseAPI(
-    new QpsRateLimiter(MAX_QPS_API_ADRESSE, clock, sleep),
-    new ExponentialBackoffRetryStrategy(
-      defaultMaxBackoffPeriodMs,
-      defaultRetryDeadlineMs,
-      clock,
-      sleep,
-      random,
-    ),
+    retryStrategy,
   );
 
   const sireneGateway = new HttpsSireneRepository(
     config.sireneHttpsConfig,
     clock,
     new QpsRateLimiter(MAX_QPS_SIRENE_API, clock, sleep),
-    new ExponentialBackoffRetryStrategy(
-      defaultMaxBackoffPeriodMs,
-      defaultRetryDeadlineMs,
-      clock,
-      sleep,
-      random,
-    ),
+    retryStrategy,
   );
 
   const repositories = await createRepositories(
@@ -86,7 +76,7 @@ const main = async () => {
 
   const updateEstablishmentsAndImmersionOffersFromLastSearches =
     new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
-      uuidGenerator,
+      new UuidV4Generator(),
       laBonneBoiteAPI,
       sireneGateway,
       repositories.searchesMade,

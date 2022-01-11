@@ -4,7 +4,7 @@ import { createLogger } from "./logger";
 
 const _logger = createLogger(__filename);
 
-// TODO(nsw): Add prometheus counters.
+// TODO: Add prometheus counters.
 
 export const createAxiosInstance = (
   logger: Logger = _logger,
@@ -12,7 +12,7 @@ export const createAxiosInstance = (
 ): AxiosInstance => {
   const axiosInstance = axios.create(config);
   axiosInstance.interceptors.request.use((request) => {
-    logger.info(
+    logger.debug(
       { request: extractPartialRequest(request) },
       "Sending HTTP request",
     );
@@ -28,14 +28,28 @@ export const createAxiosInstance = (
   return axiosInstance;
 };
 
+const QUOTA_EXEEDED_STATUSES = new Set([429, 503]);
+const TIMEOUT_CODES = new Set(["ETIMEDOUT", "ECONNABORTED"]);
+
+export const isRetriableError = (logger: Logger, error: any): boolean => {
+  if (QUOTA_EXEEDED_STATUSES.has(error.response?.status)) {
+    logger.warn("Request quota exceeded: " + error);
+    return true;
+  }
+  if (TIMEOUT_CODES.has(error.code)) {
+    logger.warn("Request timed out: " + error);
+    return true;
+  }
+
+  return false;
+};
+
 export const logAxiosError = (logger: Logger, error: any, msg?: string) => {
+  const message = `${msg || "Axios error"}: ${error}`;
   if (error.response) {
-    logger.error(
-      { response: extractPartialResponse(error.response) },
-      msg || error.message,
-    );
+    logger.error({ response: extractPartialResponse(error.response) }, message);
   } else {
-    logger.error(error, msg);
+    logger.error(message);
   }
 };
 

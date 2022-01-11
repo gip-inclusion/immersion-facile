@@ -1,3 +1,4 @@
+import { secondsToMilliseconds } from "date-fns";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
   RetriableError,
@@ -5,7 +6,11 @@ import {
 } from "../../../domain/core/ports/RetryStrategy";
 import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
-import { createAxiosInstance, logAxiosError } from "../../../utils/axiosUtils";
+import {
+  createAxiosInstance,
+  isRetriableError,
+  logAxiosError,
+} from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -26,6 +31,7 @@ export class HttpAdresseAPI implements AdresseAPI {
         const axios = createAxiosInstance(logger);
         const response = await this.rateLimiter.whenReady(() =>
           axios.get("https://api-adresse.data.gouv.fr/search/", {
+            timeout: secondsToMilliseconds(10),
             params: {
               q: address,
             },
@@ -40,10 +46,7 @@ export class HttpAdresseAPI implements AdresseAPI {
           lon: response.data.features[0].geometry.coordinates[0],
         };
       } catch (error: any) {
-        if (error.response?.status == 429 || error.response?.status == 503) {
-          logger.warn("Request quota exceeded: " + error);
-          throw new RetriableError(error);
-        }
+        if (isRetriableError(logger, error)) throw new RetriableError(error);
         logAxiosError(logger, error);
         return;
       }
@@ -59,15 +62,13 @@ export class HttpAdresseAPI implements AdresseAPI {
         const axios = createAxiosInstance(logger);
         const response = await this.rateLimiter.whenReady(() =>
           axios.get("https://api-adresse.data.gouv.fr/reverse/", {
+            timeout: secondsToMilliseconds(10),
             params: position,
           }),
         );
         return response.data.features[0]?.properties?.citycode;
       } catch (error: any) {
-        if (error.response?.status == 429 || error.response?.status == 503) {
-          logger.warn("Request quota exceeded: " + error);
-          throw new RetriableError(error);
-        }
+        if (isRetriableError(logger, error)) throw new RetriableError(error);
         logAxiosError(logger, error);
         return;
       }

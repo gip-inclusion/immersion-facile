@@ -27,7 +27,7 @@ const minTtlSec = 30;
 //
 // Expired tokens are refreshed lazily.
 export class CachingAccessTokenGateway implements AccessTokenGateway {
-  private readonly cache: Record<Scope, CacheEntry> = {};
+  private readonly cache: Record<Scope, Promise<CacheEntry>> = {};
 
   public constructor(
     private readonly delegate: AccessTokenGateway,
@@ -35,22 +35,27 @@ export class CachingAccessTokenGateway implements AccessTokenGateway {
   ) {}
 
   public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
-    const cacheEntry = this.cache[scope];
-    if (cacheEntry && !this.isExpired(cacheEntry)) return cacheEntry.response;
+    const cacheEntryPromise = this.cache[scope];
+    if (!cacheEntryPromise || this.isExpired(await cacheEntryPromise)) {
+      this.cache[scope] = this.refreshToken(scope);
+    }
 
+    const cacheEntry = await this.cache[scope];
+    return cacheEntry.response;
+  }
+
+  private async refreshToken(scope: Scope): Promise<CacheEntry> {
     const response = await this.delegate.getAccessToken(scope);
 
     const expirationTime = addSeconds(
       this.clock.now(),
       response.expires_in - minTtlSec || 0,
     );
-    this.cache[scope] = {
+
+    return {
       response,
       expirationTime,
     };
-    logger.debug({ response, expirationTime }, "caching entry");
-
-    return response;
   }
 
   private isExpired(entry: CacheEntry): boolean {

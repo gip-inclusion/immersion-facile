@@ -50,7 +50,7 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
           this.maxBackoffPeriodMs,
         );
 
-        this.sleepFn(truncatedBackoffDurationMs);
+        await this.sleepFn(truncatedBackoffDurationMs);
 
         if (
           differenceInMilliseconds(this.clock.now(), startTime) >=

@@ -1,4 +1,3 @@
-import { RomeCodeMetierDto } from "../../../shared/rome";
 import { groupBy, removeUndefinedElements } from "../../../shared/utils";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
@@ -56,7 +55,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     try {
       const establishmentAggregates = await this.search(searchMade);
 
-      logger.info(
+      logger.debug(
         { searchParams: searchMade },
         `Search yielded ${establishmentAggregates.length} establishments and ` +
           `${countOffers(establishmentAggregates)} immersions.`,
@@ -66,14 +65,13 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
         establishmentAggregates,
       );
 
-      logger.info(
-        { searchParams: searchMade },
-        `After deduping: ${dedupedAggregates.length} establishments and ` +
-          `${countOffers(dedupedAggregates)} immersions to insert.`,
-      );
-
       await this.immersionOfferRepository.insertEstablishmentAggregates(
         dedupedAggregates,
+      );
+      logger.info(
+        { searchParams: searchMade },
+        `Inserted ${dedupedAggregates.length} establishments and ` +
+          `${countOffers(dedupedAggregates)} immersions.`,
       );
       this.stats.recordSample(
         "pg-establishment-aggregates_inserted",

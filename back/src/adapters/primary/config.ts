@@ -230,6 +230,8 @@ export const createRepositories = async (
             new CachingAccessTokenGateway(
               new PoleEmploiAccessTokenGateway(
                 config.poleEmploiAccessTokenConfig,
+                noRateLimit,
+                noRetries,
               ),
               clock,
             ),

@@ -1,7 +1,7 @@
 import minutesToSeconds from "date-fns/minutesToSeconds";
 import { CachingAccessTokenGateway } from "../../adapters/secondary/core/CachingAccessTokenGateway";
+import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { GetAccessTokenResponse } from "../../domain/core/ports/AccessTokenGateway";
-import { CustomClock } from "./../../adapters/secondary/core/ClockImplementations";
 
 const testResponse1: GetAccessTokenResponse = {
   access_token: "token1",
@@ -12,7 +12,7 @@ const testResponse2: GetAccessTokenResponse = {
   expires_in: minutesToSeconds(10),
 };
 
-describe("CachedAccessTokenGateway", () => {
+describe("CachingAccessTokenGateway", () => {
   let mockGetAccessTokenFn: jest.Mock<any, any>;
   let fakeClock: CustomClock;
   let cachedAccessTokenGateway: CachingAccessTokenGateway;
@@ -97,5 +97,19 @@ describe("CachedAccessTokenGateway", () => {
     fakeClock.setNextDateStr("2021-01-01T00:09:31Z");
     const response3 = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(response3).toEqual(testResponse2);
+  });
+
+  test("multiple requests wait the same token while it is being refreshed", async () => {
+    mockGetAccessTokenFn.mockReturnValue(testResponse1);
+
+    const responses = await Promise.all([
+      cachedAccessTokenGateway.getAccessToken("scope"),
+      cachedAccessTokenGateway.getAccessToken("scope"),
+      cachedAccessTokenGateway.getAccessToken("scope"),
+    ]);
+
+    expect(mockGetAccessTokenFn.mock.calls).toHaveLength(1);
+    expect(responses[1]).toEqual(responses[0]);
+    expect(responses[2]).toEqual(responses[0]);
   });
 });
