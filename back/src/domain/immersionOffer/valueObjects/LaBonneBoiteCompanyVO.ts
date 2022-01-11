@@ -63,6 +63,8 @@ export class LaBonneBoiteCompanyVO {
     const companyNaf = this.props.naf;
     const rome = this.props.matched_rome_code;
     // those conditions are business specific, see with Nathalie for any questions
+    const isNafInterim = companyNaf === "7820Z";
+
     const isNafAutreServiceWithRomeElevageOrToilettage =
       companyNaf.startsWith("9609") && ["A1503", "A1408"].includes(rome);
 
@@ -86,6 +88,7 @@ export class LaBonneBoiteCompanyVO {
       ].includes(rome);
 
     const establishmentShouldBeIgnored =
+      isNafInterim ||
       isNafAutreServiceWithRomeElevageOrToilettage ||
       isNafRestaurationRapideWithRomeBoulangerie ||
       isRomeIgnoredForPublicAdministration;
