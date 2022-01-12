@@ -13,6 +13,7 @@ import {
   validApplicationStatus,
 } from "src/shared/ImmersionApplicationDto";
 import { ArrayDropdown } from "src/components/admin/ArrayDropdown";
+import { ApiDataContainer } from "./ApiDataContainer";
 
 interface AdminProps {
   route: Route<typeof routes.admin> | Route<typeof routes.agencyAdmin>;
@@ -27,15 +28,10 @@ export const Admin = ({ route }: AdminProps) => {
     ApplicationStatus | undefined
   >();
 
-  useEffect(() => {
-    let agency =
-      "agencyId" in route.params
-        ? (route.params.agencyId as AgencyId)
-        : undefined;
-    immersionApplicationGateway
-      .getAll(agency, statusFilter)
-      .then(setDemandesImmersion);
-  }, [statusFilter]);
+  let agency =
+    "agencyId" in route.params
+      ? (route.params.agencyId as AgencyId)
+      : undefined;
 
   const filterChanged = (selectedIndex: number, selectedLabel: string) => {
     setDemandesImmersion([]);
@@ -48,39 +44,54 @@ export const Admin = ({ route }: AdminProps) => {
 
       <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
         <div className="fr-col-lg-8 fr-p-2w" style={{ width: "95%" }}>
-          <h2>Backoffice</h2>
-          <div className="fr-text">
-            Bienvenue dans le backoffice ! <br />
-            Veuillez autentifier pour acceder aux donnes. <br />
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "30px",
-                backgroundColor: "#E5E5F4",
-                padding: "10px",
-              }}
-            >
-              <p>filtres</p>
-              <ArrayDropdown
-                labels={validApplicationStatus}
-                didPick={filterChanged}
-              />
-            </div>
-          </div>
+          <ApiDataContainer
+            apiCall={() =>
+              immersionApplicationGateway.getAll(agency, statusFilter)
+            }
+          >
+            {(data) => {
+              if (!data) return <p />;
 
-          <ul className="fr-accordions-group">
-            {demandesImmersion.map((item) => (
-              <li key={item.id}>
-                <FormAccordion immersionApplication={item} />
-                {route.name === "admin" && (
-                  <FormMagicLinks immersionApplication={item} />
-                )}
-                <hr />
-              </li>
-            ))}
-          </ul>
+              const demandesImmersion = data as ImmersionApplicationDto[];
+              return (
+                <>
+                  <h2>Backoffice</h2>
+                  <div className="fr-text">
+                    Bienvenue dans le backoffice ! <br />
+                    Veuillez autentifier pour acceder aux donnes. <br />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: "30px",
+                        backgroundColor: "#E5E5F4",
+                        padding: "10px",
+                      }}
+                    >
+                      <p>filtres</p>
+                      <ArrayDropdown
+                        labels={validApplicationStatus}
+                        didPick={filterChanged}
+                      />
+                    </div>
+                  </div>
+
+                  <ul className="fr-accordions-group">
+                    {demandesImmersion.map((item) => (
+                      <li key={item.id}>
+                        <FormAccordion immersionApplication={item} />
+                        {route.name === "admin" && (
+                          <FormMagicLinks immersionApplication={item} />
+                        )}
+                        <hr />
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              );
+            }}
+          </ApiDataContainer>
         </div>
       </div>
     </>
