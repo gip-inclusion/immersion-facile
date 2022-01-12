@@ -16,6 +16,9 @@ import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
 import { SearchesMadeRepository } from "../ports/SearchesMadeRepository";
 import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
+// The number of unexpected errors to tolerate befor aborting the pipeline execution.
+const MAX_UNEXPECTED_ERRORS = 10;
+
 const logger = createLogger(__filename);
 
 export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
@@ -42,9 +45,20 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       searchesMade.length,
     );
 
-    await Promise.all(
-      searchesMade.map((searchMade) => this.processSearchMade(searchMade)),
-    );
+    const unexpectedErrors = [];
+    for (const searchMade of searchesMade) {
+      try {
+        await this.processSearchMade(searchMade);
+      } catch (error: any) {
+        unexpectedErrors.push(error);
+        if (unexpectedErrors.length > MAX_UNEXPECTED_ERRORS) {
+          logger.fatal(
+            "Too many unexpected errors. Aborting pipeline execution.",
+          );
+          throw error;
+        }
+      }
+    }
   }
 
   private async processSearchMade(searchMade: SearchMade) {
@@ -77,16 +91,13 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
         "pg-establishment-aggregates_inserted",
         dedupedAggregates.length,
       );
+      this.stats.incCounter("process_search_made-success");
     } catch (error: any) {
-      logger.error(
-        { searchParams: searchMade },
-        "Error in processSearchMade: " + error,
-      );
       this.stats.incCounter("process_search_made-error");
+      throw error;
+    } finally {
+      this.stats.stopAggregateTimer("process_search_made-latency");
     }
-
-    this.stats.stopAggregateTimer("process_search_made-latency");
-    this.stats.incCounter("process_search_made-success");
   }
 
   private async search(
@@ -119,7 +130,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       return removeUndefinedElements(establishmentAggregates);
     } catch (error: any) {
       logger.error({ searchMade }, "Error in searchLaBonneBoite: " + error);
-      return [];
+      throw error;
     }
   }
 
