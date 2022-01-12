@@ -64,14 +64,22 @@ export class PgRomeGateway implements RomeGateway {
   }
 
   public async searchAppellation(query: string): Promise<RomeAppellation[]> {
+    const queryWords = query.split(" ");
+    const lastWord = queryWords[queryWords.length - 1];
+    const queryBeginning =
+      queryWords.length === 1
+        ? queryWords.join(" ")
+        : queryWords.slice(0, queryWords.length - 1).join(" ");
+
     return await this.client
       .query(
         `SELECT ogr_appellation, libelle_appellation_court, code_rome
         FROM appellations_public_data
         WHERE
-          libelle_appellation_long_tsvector @@ to_tsquery('french',$1)
-          OR libelle_appellation_long ILIKE $2`,
-        [toTsQuery(query), `%${query}%`],
+           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long ILIKE $3)
+           OR (libelle_appellation_long ILIKE $2 AND libelle_appellation_long ILIKE $3)
+        LIMIT 80`,
+        [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
       )
       .then((res) =>
         res.rows.map(
