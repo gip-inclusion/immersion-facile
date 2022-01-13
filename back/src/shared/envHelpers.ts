@@ -13,12 +13,14 @@ export const throwIfNotInArray = <T extends string | undefined>({
   variableName,
   defaultValue,
 }: ThrowIfNotInArrayParams<T>): T => {
-  const value = (processEnv[variableName] || defaultValue) as T;
+  const envValue = processEnv[variableName]?.trim();
+
+  const value = (envValue || defaultValue) as T;
   if (!authorizedValues.includes(value))
     throw new Error(
       `Expected ${variableName} to be one of : ` +
-        `${authorizedValues.join(" | ")},` +
-        `got : ${processEnv[variableName]}`,
+        `${authorizedValues.join(" | ")}, ` +
+        `got : '${envValue}'`,
     );
   return value;
 };
