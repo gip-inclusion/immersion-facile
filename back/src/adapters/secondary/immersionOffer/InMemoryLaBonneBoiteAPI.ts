@@ -1,5 +1,7 @@
-import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { LaBonneBoiteAPI } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
+import {
+  LaBonneBoiteAPI,
+  LaBonneBoiteRequestParams,
+} from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { LaBonneBoiteCompanyVO } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 
 export class InMemoryLaBonneBoiteAPI implements LaBonneBoiteAPI {
@@ -11,7 +13,7 @@ export class InMemoryLaBonneBoiteAPI implements LaBonneBoiteAPI {
 
   public async searchCompanies(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    searchMade: SearchMade,
+    searchParams: LaBonneBoiteRequestParams,
   ): Promise<LaBonneBoiteCompanyVO[]> {
     this.nbOfCalls = this.nbOfCalls + 1;
     if (this._error) throw this._error;
