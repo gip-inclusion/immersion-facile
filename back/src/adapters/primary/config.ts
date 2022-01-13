@@ -224,7 +224,7 @@ export const createRepositories = async (
         ? new PgOutboxRepository(await getPgPoolFn().connect())
         : new InMemoryOutboxRepository(),
 
-    laBonneBoite:
+    laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteAPI(
             new CachingAccessTokenGateway(
@@ -395,8 +395,10 @@ const createUseCases = (
     searchImmersion: new SearchImmersion(
       repositories.searchesMade,
       repositories.immersionOffer,
-      repositories.laBonneBoite,
+      repositories.laBonneBoiteRequest,
+      repositories.laBonneBoiteAPI,
       uuidGenerator,
+      clock,
       config.featureFlags,
     ),
     getImmersionOfferById: new GetImmersionOfferById(

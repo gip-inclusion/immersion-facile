@@ -7,6 +7,7 @@ import type { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemo
 import { InMemoryImmersionOfferRepository } from "../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemorySearchMadeRepository } from "../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
+import { InMemoryLaBonneBoiteRequestRepository } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
 import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAgencyRepository";
 import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
@@ -27,7 +28,8 @@ export type InMemoryRepositories = {
   rome: InMemoryRomeGateway;
   email: InMemoryEmailGateway;
   sirene: InMemorySireneRepository;
-  laBonneBoite: InMemoryLaBonneBoiteAPI;
+  laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
+  laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :

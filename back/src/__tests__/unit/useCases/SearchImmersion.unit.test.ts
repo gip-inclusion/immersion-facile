@@ -14,6 +14,7 @@ import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/Search
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import {
   ImmersionOfferId,
+  SearchImmersionRequestDto,
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
@@ -21,6 +22,13 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/Establishm
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
+import { InMemoryLaBonneBoiteRequestRepository } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
+import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
+import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import {
+  LaBonneBoiteCompanyProps,
+  LaBonneBoiteCompanyVO,
+} from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 
 type PrepareSearchableDataProps = {
   withLBBSearchOnFetch?: boolean;
@@ -35,8 +43,12 @@ const prepareSearchableData =
   async (params: PrepareParams | void) => {
     const immersionOfferRepository = new InMemoryImmersionOfferRepository();
     const searchMadeRepository = new InMemorySearchMadeRepository();
+    const laBonneBoiteRequestRepository =
+      new InMemoryLaBonneBoiteRequestRepository();
+
     const laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
     const uuidGenerator = new TestUuidGenerator();
+    const clock = new CustomClock();
     const featureFlagBuilder = FeatureFlagsBuilder.allOff();
     const featureFlags = withLBBSearchOnFetch
       ? featureFlagBuilder.enableLBBFetchOnSearch().build()
@@ -52,8 +64,10 @@ const prepareSearchableData =
     const searchImmersion = new SearchImmersion(
       searchMadeRepository,
       immersionOfferRepository,
+      laBonneBoiteRequestRepository,
       laBonneBoiteAPI,
       uuidGenerator,
+      clock,
       featureFlags,
     );
     const siret = "78000403200019";
@@ -83,8 +97,10 @@ const prepareSearchableData =
       immersionOfferId,
       searchMadeRepository,
       immersionOfferRepository,
-      uuidGenerator,
+      laBonneBoiteRequestRepository,
       laBonneBoiteAPI,
+      uuidGenerator,
+      clock,
     };
   };
 
@@ -134,22 +150,6 @@ describe("SearchImmersionUseCase", () => {
   });
 
   describe("With feature flag ON", () => {
-    test("when more than 15 results, return unmutated object", async () => {
-      const { searchImmersion, immersionOfferRepository } =
-        await prepareSearchableDataWithFeatureFlagON();
-
-      const fakeSearchResponse = Array(16).fill({} as SearchImmersionResultDto);
-
-      immersionOfferRepository.getFromSearch = async () => fakeSearchResponse;
-
-      const authenticatedResponse = await searchImmersion.execute(
-        searchSecretariatInMetzParams,
-        authenticatedApiConsumerPayload,
-      );
-
-      expect(authenticatedResponse).toBe(fakeSearchResponse);
-    });
-
     describe("authenticated with api key", () => {
       test("Search immersion, and provide contact details", async () => {
         const { searchImmersion, immersionOfferId, uuidGenerator } =
@@ -296,6 +296,139 @@ describe("SearchImmersionUseCase", () => {
           },
         ]);
       });
+    });
+
+    describe("Eventually requests LBB and adds offers and partial establishments in repositories", () => {
+      describe("LBB has not been requested for this rome code", () => {
+        const searchImmersionDto: SearchImmersionRequestDto = {
+          rome: "M1607",
+          location: { lon: 10, lat: 9 },
+          distance_km: 30,
+        };
+
+        const nextDate = new Date(2022);
+
+        test("Should add the reqeuest entity to the repository", async () => {
+          // Prepare
+          const {
+            searchImmersion,
+            laBonneBoiteRequestRepository,
+            laBonneBoiteAPI,
+            clock,
+          } = await prepareSearchableDataWithFeatureFlagON();
+
+          clock.setNextDate(nextDate);
+          laBonneBoiteAPI.setNextResults([]);
+
+          // Act
+          await searchImmersion.execute(searchImmersionDto);
+
+          // Assert
+          expect(
+            laBonneBoiteRequestRepository.laBonneBoiteRequests,
+          ).toHaveLength(1);
+
+          const expectedRequestEntity: LaBonneBoiteRequestEntity = {
+            params: {
+              rome: searchImmersionDto.rome,
+              lon: searchImmersionDto.location.lon,
+              lat: searchImmersionDto.location.lat,
+              distance_km: 50, // LBB_DISTANCE_KM_REQUEST_PARAM
+            },
+            result: { error: null, number0fEstablishments: 0 },
+            requestedAt: nextDate,
+          };
+
+          expect(laBonneBoiteRequestRepository.laBonneBoiteRequests[0]).toEqual(
+            expectedRequestEntity,
+          );
+        });
+        test("Should insert as many establishment and offers in repositories as LBB responded", async () => {
+          // Prepare
+          const { searchImmersion, laBonneBoiteAPI, immersionOfferRepository } =
+            await prepareSearchableDataWithFeatureFlagON();
+          immersionOfferRepository.establishmentAggregates = [];
+          laBonneBoiteAPI.setNextResults([
+            new LaBonneBoiteCompanyVO({} as LaBonneBoiteCompanyProps),
+            new LaBonneBoiteCompanyVO({} as LaBonneBoiteCompanyProps),
+          ]);
+
+          // Act
+          await searchImmersion.execute(searchImmersionDto);
+
+          // Assert
+          expect(immersionOfferRepository.establishmentAggregates).toHaveLength(
+            2,
+          );
+        });
+      }),
+        describe("LBB has been requested for this rome code and this geographic area", () => {
+          const userSearchedRome = "M1234";
+          const userSearchedLocationInParis17 = {
+            lat: 48.862725, // 7 rue guillaume Tell, 75017 Paris
+            lon: 2.287592,
+          };
+          const previouslySearchedLocationInParis10 = {
+            lat: 48.8841446, // 169 Bd de la Villette, 75010 Paris
+            lon: 2.3651789,
+          };
+
+          const previousSimilarRequestEntity = {
+            params: {
+              rome: userSearchedRome,
+              lat: previouslySearchedLocationInParis10.lat,
+              lon: previouslySearchedLocationInParis10.lon,
+              distance_km: 50,
+            },
+            requestedAt: new Date("2021-01-01"),
+          } as LaBonneBoiteRequestEntity;
+
+          test("Should not request LBB if the request has been made in the last 7 days", async () => {
+            // Prepare
+            const { searchImmersion, laBonneBoiteRequestRepository, clock } =
+              await prepareSearchableDataWithFeatureFlagON();
+
+            laBonneBoiteRequestRepository.laBonneBoiteRequests = [
+              previousSimilarRequestEntity,
+            ];
+            clock.setNextDate(new Date("2021-01-08"));
+
+            // Act
+            await searchImmersion.execute({
+              rome: userSearchedRome,
+              location: userSearchedLocationInParis17,
+              distance_km: 10,
+            });
+
+            // Assert
+            expect(
+              laBonneBoiteRequestRepository.laBonneBoiteRequests,
+            ).toHaveLength(1);
+          });
+
+          test("Should request LBB if the request was made more than 7 days ago", async () => {
+            // Prepare
+            const { searchImmersion, laBonneBoiteRequestRepository, clock } =
+              await prepareSearchableDataWithFeatureFlagON();
+
+            laBonneBoiteRequestRepository.laBonneBoiteRequests = [
+              previousSimilarRequestEntity,
+            ];
+            clock.setNextDate(new Date("2021-01-09"));
+
+            // Act
+            await searchImmersion.execute({
+              rome: userSearchedRome,
+              location: userSearchedLocationInParis17,
+              distance_km: 10,
+            });
+
+            // Assert
+            expect(
+              laBonneBoiteRequestRepository.laBonneBoiteRequests,
+            ).toHaveLength(2);
+          });
+        });
     });
   });
 
