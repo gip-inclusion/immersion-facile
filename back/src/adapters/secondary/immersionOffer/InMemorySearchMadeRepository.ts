@@ -38,7 +38,7 @@ export class InMemorySearchMadeRepository implements SearchMadeRepository {
   public get searchesMade() {
     return this._searchesMadeEntities;
   }
-  public get processedSearchesMadeIds() {
+  public get processedSearchesMadeIds(): Set<SearchMadeId> {
     return this._processedSearchesMadeIds;
   }
 }

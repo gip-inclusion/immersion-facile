@@ -23,7 +23,7 @@ export class SearchMadeEntityBuilder implements Builder<SearchMadeEntity> {
       id,
     });
   }
-  build() {
+  build(): SearchMadeEntity {
     return this.entity;
   }
 }

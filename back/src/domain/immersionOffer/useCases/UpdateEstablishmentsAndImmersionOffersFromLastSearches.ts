@@ -10,7 +10,7 @@ import {
   EstablishmentAggregate,
   TefenCode,
 } from "../entities/EstablishmentEntity";
-import { SearchMade } from "../entities/SearchMadeEntity";
+import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
 import { SearchMadeRepository } from "../ports/SearchMadeRepository";
@@ -34,7 +34,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
 
   public async execute() {
     // Take all searches made in the past.
-    const searchesMade =
+    const searchesMade: SearchMadeEntity[] =
       await this.searchMadeRepository.retrievePendingSearches();
 
     logger.info(
