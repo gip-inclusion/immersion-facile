@@ -31,7 +31,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
     );
     return requestResult.rows.map((row) => ({
       id: row.id,
-      distance_km: row.distance_km,
+      distance_km: row.distance,
       lat: row.lat,
       lon: row.lon,
       rome: row.rome,
