@@ -32,13 +32,13 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
     searchMade: SearchMade,
   ): Promise<LaBonneBoiteCompanyVO[]> {
     return this.retryStrategy.apply(async () => {
-      const accessToken = await this.accessTokenGateway.getAccessToken(
-        `application_${this.poleEmploiClientId} api_labonneboitev1`,
-      );
       try {
         const axios = createAxiosInstance(logger);
-        const response = await this.rateLimiter.whenReady(() =>
-          axios.get(
+        const response = await this.rateLimiter.whenReady(async () => {
+          const accessToken = await this.accessTokenGateway.getAccessToken(
+            `application_${this.poleEmploiClientId} api_labonneboitev1`,
+          );
+          return axios.get(
             "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/",
             {
               headers: {
@@ -52,8 +52,8 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
                 rome_codes: searchMade.rome,
               },
             },
-          ),
-        );
+          );
+        });
         return (response.data.companies || []).map(
           (props: LaBonneBoiteCompanyProps) => new LaBonneBoiteCompanyVO(props),
         );
