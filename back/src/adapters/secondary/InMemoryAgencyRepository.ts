@@ -3,7 +3,7 @@ import { AgencyDto, AgencyId } from "../../shared/agencies";
 import { LatLonDto } from "../../shared/SearchImmersionDto";
 import { createLogger } from "../../utils/logger";
 import { AgencyConfig } from "./../../domain/immersionApplication/ports/AgencyRepository";
-import { distanceBetweenCoordinates } from "./immersionOffer/distanceBetweenCoordinates";
+import { distanceMetersBetweenCoordinates } from "./immersionOffer/distanceBetweenCoordinates";
 
 const logger = createLogger(__filename);
 
@@ -69,13 +69,13 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return Object.values(this.agencies)
       .sort(function (a: AgencyDto, b: AgencyDto) {
         return (
-          distanceBetweenCoordinates(
+          distanceMetersBetweenCoordinates(
             a.position.lat,
             a.position.lon,
             position.lat,
             position.lon,
           ) -
-          distanceBetweenCoordinates(
+          distanceMetersBetweenCoordinates(
             b.position.lat,
             b.position.lon,
             position.lat,

@@ -1,7 +1,7 @@
 // Takes two coordinates (in degrees) and returns distance in meters.
 // Taken from https://www.movable-type.co.uk/scripts/latlong.html (MIT license)
 
-export const distanceBetweenCoordinates = (
+export const distanceMetersBetweenCoordinates = (
   lat1: number,
   lon1: number,
   lat2: number,

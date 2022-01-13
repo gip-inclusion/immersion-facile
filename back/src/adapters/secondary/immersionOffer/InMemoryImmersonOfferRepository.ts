@@ -13,7 +13,7 @@ import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/I
 import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
-import { distanceBetweenCoordinates } from "./distanceBetweenCoordinates";
+import { distanceMetersBetweenCoordinates } from "./distanceBetweenCoordinates";
 
 const logger = createLogger(__filename);
 
@@ -118,7 +118,12 @@ export class InMemoryImmersionOfferRepository
 
   // for test purposes only :
   get establishmentAggregates() {
-    return Object.values(this._establishmentAggregates);
+    return this._establishmentAggregates;
+  }
+  set establishmentAggregates(
+    establishmentAggregates: EstablishmentAggregate[],
+  ) {
+    this._establishmentAggregates = establishmentAggregates;
   }
 }
 
@@ -139,7 +144,7 @@ const buildSearchImmersionResultDto = (
   siret: establishment.siret,
   voluntaryToImmersion: establishment.voluntaryToImmersion,
   contactMode: establishment.contactMethod,
-  distance_m: distanceBetweenCoordinates(
+  distance_m: distanceMetersBetweenCoordinates(
     TEST_POSITION.lat,
     TEST_POSITION.lon,
     searchMade.lat,
