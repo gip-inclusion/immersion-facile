@@ -1,3 +1,4 @@
+import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { sleep } from "src/shared/utils";
 import {
   AddressWithCoordinates,
@@ -34,5 +35,15 @@ export class InMemoryApiAdresseGateway implements ApiAdresseGateway {
         coordinates: { lat: 45.5, lon: 1.9 },
       },
     ];
+  }
+
+  public async lookupPostCode(query: string): Promise<LatLonDto | null> {
+    console.log("InMemoryApiAddresseGateway.lookupPostCode", query);
+    await sleep(SIMULATED_LATENCY_MS);
+
+    if (query === "00000") return null;
+    if (query === "99999") throw new Error("418 I'm a teapot");
+    if (query === "21200") return { lat: 47.0, lon: 4 };
+    return { lat: 48, lon: 2 };
   }
 }

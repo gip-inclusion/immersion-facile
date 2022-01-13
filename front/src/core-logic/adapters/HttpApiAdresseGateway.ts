@@ -1,4 +1,5 @@
 import axios from "axios";
+import { LatLonDto } from "src/shared/SearchImmersionDto";
 import {
   AddressWithCoordinates,
   ApiAdresseGateway,
@@ -37,6 +38,36 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
     } catch (e) {
       console.error(e);
       return [];
+    }
+  }
+
+  public async lookupPostCode(query: string): Promise<LatLonDto | null> {
+    try {
+      const response = await axios.get(
+        "https://api-adresse.data.gouv.fr/search/",
+        {
+          params: {
+            q: query,
+            type: "municipality",
+          },
+        },
+      );
+
+      const validFeatures = (response.data.features as unknown[]).filter(
+        keepOnlyValidFeatures,
+      );
+      if (validFeatures.length > 0) {
+        const feature = validFeatures[0];
+        return {
+          lat: feature.geometry.coordinates[1],
+          lon: feature.geometry.coordinates[0],
+        };
+      } else {
+        return null;
+      }
+    } catch (e) {
+      console.error(e);
+      return null;
     }
   }
 }
