@@ -28,7 +28,11 @@ describe("PgLaBonneBoiteRequestRepository", () => {
   test("Insert LBB request", async () => {
     const entity: LaBonneBoiteRequestEntity = {
       params: { rome: "F1111", distance_km: 30, lon: 3.1, lat: 88.1 },
-      result: { error: null, number0fEstablishments: 6 },
+      result: {
+        error: null,
+        number0fEstablishments: 6,
+        numberOfRelevantEstablishments: 9,
+      },
       requestedAt: new Date(2024),
     };
     await repo.insertLaBonneBoiteRequest(entity);

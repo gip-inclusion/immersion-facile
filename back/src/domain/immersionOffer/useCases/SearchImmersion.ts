@@ -1,6 +1,5 @@
 import { addDays } from "date-fns";
 import promClient from "prom-client";
-import { distanceMetersBetweenCoordinates } from "../../../adapters/secondary/immersionOffer/distanceBetweenCoordinates";
 import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   SearchImmersionRequestDto,
@@ -106,7 +105,7 @@ export class SearchImmersion extends UseCase<
       return resultsFromStorage;
     }
 
-    const { requestEntity, companies } = await this.requestLaBonneBoite(
+    const { requestEntity, relevantCompanies } = await this.requestLaBonneBoite(
       searchMade,
     );
 
@@ -114,7 +113,8 @@ export class SearchImmersion extends UseCase<
       requestEntity,
     );
 
-    if (companies) await this.insertCompaniesInRepositories(companies);
+    if (relevantCompanies)
+      await this.insertRelevantCompaniesInRepositories(relevantCompanies);
 
     return this.immersionOfferRepository.getFromSearch(
       searchMade,
@@ -124,7 +124,7 @@ export class SearchImmersion extends UseCase<
 
   private async requestLaBonneBoite(searchMade: SearchMade): Promise<{
     requestEntity: LaBonneBoiteRequestEntity;
-    companies?: LaBonneBoiteCompanyVO[];
+    relevantCompanies?: LaBonneBoiteCompanyVO[];
   }> {
     const requestParams: LaBonneBoiteRequestParams = {
       lon: searchMade.lon,
@@ -138,14 +138,19 @@ export class SearchImmersion extends UseCase<
       const laBonneBoiteCompanies = await this.laBonneBoiteAPI.searchCompanies(
         requestParams,
       );
+      const laBonneBoiteRelevantCompanies = laBonneBoiteCompanies.filter(
+        (company) => company.isCompanyRelevant(),
+      );
       return {
-        companies: laBonneBoiteCompanies,
+        relevantCompanies: laBonneBoiteRelevantCompanies,
         requestEntity: {
           requestedAt: this.clock.now(),
           params: requestParams,
           result: {
             error: null,
             number0fEstablishments: laBonneBoiteCompanies.length,
+            numberOfRelevantEstablishments:
+              laBonneBoiteRelevantCompanies.length,
           },
         },
       };
@@ -159,12 +164,13 @@ export class SearchImmersion extends UseCase<
           result: {
             error: e?.message ?? "erorr without message",
             number0fEstablishments: null,
+            numberOfRelevantEstablishments: null,
           },
         },
       };
     }
   }
-  private async insertCompaniesInRepositories(
+  private async insertRelevantCompaniesInRepositories(
     companies: LaBonneBoiteCompanyVO[],
   ) {
     const llbResultsConvertedToEstablishmentAggregates = companies.map(

@@ -29,7 +29,6 @@ import {
   LaBonneBoiteCompanyProps,
   LaBonneBoiteCompanyVO,
 } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
-import { distanceMetersBetweenCoordinates } from "../../../adapters/secondary/immersionOffer/distanceBetweenCoordinates";
 
 type PrepareSearchableDataProps = {
   withLBBSearchOnFetch?: boolean;
@@ -307,9 +306,9 @@ describe("SearchImmersionUseCase", () => {
           distance_km: 30,
         };
 
-        const nextDate = new Date(2022);
+        const nextDate = new Date("2022-01-01");
 
-        test("Should add the reqeuest entity to the repository", async () => {
+        test("Should add the request entity to the repository", async () => {
           // Prepare
           const {
             searchImmersion,
@@ -336,7 +335,11 @@ describe("SearchImmersionUseCase", () => {
               lat: searchImmersionDto.location.lat,
               distance_km: 50, // LBB_DISTANCE_KM_REQUEST_PARAM
             },
-            result: { error: null, number0fEstablishments: 0 },
+            result: {
+              error: null,
+              number0fEstablishments: 0,
+              numberOfRelevantEstablishments: 0,
+            },
             requestedAt: nextDate,
           };
 
@@ -344,14 +347,28 @@ describe("SearchImmersionUseCase", () => {
             expectedRequestEntity,
           );
         });
-        test("Should insert as many establishment and offers in repositories as LBB responded", async () => {
+        test("Should insert as many 'relevant' establishment and offers in repositories as LBB responded", async () => {
           // Prepare
           const { searchImmersion, laBonneBoiteAPI, immersionOfferRepository } =
             await prepareSearchableDataWithFeatureFlagON();
           immersionOfferRepository.establishmentAggregates = [];
+
+          const ignoredNafRomeCombination = {
+            matched_rome_code: "D1202",
+            naf: "8411",
+          };
           laBonneBoiteAPI.setNextResults([
-            new LaBonneBoiteCompanyVO({} as LaBonneBoiteCompanyProps),
-            new LaBonneBoiteCompanyVO({} as LaBonneBoiteCompanyProps),
+            new LaBonneBoiteCompanyVO({
+              matched_rome_code: "AAAAA",
+              naf: "",
+            } as LaBonneBoiteCompanyProps),
+            new LaBonneBoiteCompanyVO({
+              matched_rome_code: "BBBBB",
+              naf: "",
+            } as LaBonneBoiteCompanyProps),
+            new LaBonneBoiteCompanyVO(
+              ignoredNafRomeCombination as LaBonneBoiteCompanyProps,
+            ),
           ]);
 
           // Act
