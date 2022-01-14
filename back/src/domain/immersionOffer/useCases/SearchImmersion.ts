@@ -113,8 +113,12 @@ export class SearchImmersion extends UseCase<
       ...params.location,
     });
 
+    const laBonneBoiteRelevantCompanies = resultsFromLaBonneBoite.filter(
+      (company) => company.isCompanyRelevant(),
+    );
+
     const llbResultsConvertedToEstablishmentAggregates =
-      resultsFromLaBonneBoite.map((lbbCompanyVO) =>
+      laBonneBoiteRelevantCompanies.map((lbbCompanyVO) =>
         lbbCompanyVO.toEstablishmentAggregate(this.uuidGenerator),
       );
 

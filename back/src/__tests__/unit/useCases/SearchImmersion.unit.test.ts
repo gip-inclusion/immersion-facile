@@ -26,9 +26,13 @@ type PrepareSearchableDataProps = {
   withLBBSearchOnFetch?: boolean;
 };
 
+type PrepareParams = {
+  storedEstablishmentNaf?: string;
+};
+
 const prepareSearchableData =
   ({ withLBBSearchOnFetch }: PrepareSearchableDataProps) =>
-  async () => {
+  async (params: PrepareParams | void) => {
     const immersionOfferRepository = new InMemoryImmersionOfferRepository();
     const searchMadeRepository = new InMemorySearchMadeRepository();
     const laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
@@ -58,7 +62,7 @@ const prepareSearchableData =
       .withSiret(siret)
       .withContactMode("EMAIL")
       .withAddress("55 Rue du Faubourg Saint-Honoré")
-      .withNaf("8539A")
+      .withNaf(params?.storedEstablishmentNaf ?? "8539A")
       .build();
     const immersionOffer = new ImmersionOfferEntityV2Builder()
       .withId(immersionOfferId)
@@ -80,6 +84,7 @@ const prepareSearchableData =
       searchMadeRepository,
       immersionOfferRepository,
       uuidGenerator,
+      laBonneBoiteAPI,
     };
   };
 
@@ -229,6 +234,70 @@ describe("SearchImmersionUseCase", () => {
           },
         ]);
         expect(unauthenticatedResponse[1].contactDetails).toBeUndefined();
+      });
+
+      test("Search immersion, and ignore irrelevant companies", async () => {
+        // Prepare
+        const {
+          searchImmersion,
+          immersionOfferId,
+          uuidGenerator,
+          laBonneBoiteAPI,
+        } = await prepareSearchableDataWithFeatureFlagON({
+          storedEstablishmentNaf: "78201",
+        });
+        const generatedOfferId: ImmersionOfferId =
+          "generated-immersion-offer-id";
+        const irrelevantLbbCompanyId: ImmersionOfferId =
+          "irrelevant-immersion-offer-id";
+        uuidGenerator.setNextUuids([
+          "searchMadeUuid",
+          generatedOfferId,
+          irrelevantLbbCompanyId,
+        ]);
+
+        const lbbCompany = new LaBonneBoiteCompanyBuilder()
+          .withRome("M1607")
+          .withSiret("11112222333344")
+          .withNaf("78200")
+          .build();
+        const irrelevantLbbCompany = new LaBonneBoiteCompanyBuilder()
+          .withRome("M1607")
+          .withSiret("11112222333355")
+          .withNaf("7820Z") // "this is interim Naf, which should be ignored"
+          .build();
+        laBonneBoiteAPI.setNextResults([lbbCompany, irrelevantLbbCompany]);
+
+        // Act
+        const unauthenticatedResponse = await searchImmersion.execute({
+          ...searchSecretariatInMetzParams,
+          nafDivision: "78",
+        });
+
+        // Assert
+        expect(unauthenticatedResponse).toHaveLength(2);
+        expectSearchResponseToMatch(unauthenticatedResponse, [
+          {
+            id: immersionOfferId,
+            rome: "M1607",
+            naf: "78201",
+            siret: "78000403200019",
+            name: "Company inside repository",
+            voluntaryToImmersion: false,
+            location: TEST_POSITION,
+            address: "55 Rue du Faubourg Saint-Honoré",
+            contactMode: "EMAIL",
+            distance_m: 606885,
+            city: TEST_CITY,
+            nafLabel: TEST_NAF_LABEL,
+            romeLabel: TEST_ROME_LABEL,
+          },
+          {
+            id: generatedOfferId,
+            rome: "M1607",
+            siret: "11112222333344",
+          },
+        ]);
       });
     });
   });
