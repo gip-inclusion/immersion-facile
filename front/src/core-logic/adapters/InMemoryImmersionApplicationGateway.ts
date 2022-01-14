@@ -11,6 +11,7 @@ import {
   UpdateImmersionApplicationStatusResponseDto,
   signApplicationDtoWithRole,
 } from "src/shared/ImmersionApplicationDto";
+import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
@@ -214,7 +215,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     throw new Error("500 Not Implemented In InMemory Gateway");
   }
 
-  public async listAgencies(): Promise<AgencyDto[]> {
+  public async listAgencies(position: LatLonDto): Promise<AgencyDto[]> {
     const agencies = Object.values(this._agencies);
     console.log("InMemoryImmersionApplicationGateway.listAgencies: ", agencies);
     await sleep(SIMULATED_LATENCY_MS);

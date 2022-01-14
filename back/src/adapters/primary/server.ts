@@ -161,10 +161,11 @@ export const createApp = async (
 
   router.route(`/${agenciesRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () =>
-      callUseCase({
-        useCase: deps.useCases.listAgencies,
-        validationSchema: listAgenciesRequestSchema,
-        useCaseParams: req.params,
+      deps.useCases.listAgencies.execute({
+        position: {
+          lat: parseFloat(req.query.lat as any),
+          lon: parseFloat(req.query.lon as any),
+        } as any,
       }),
     ),
   );

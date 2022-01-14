@@ -25,6 +25,7 @@ import {
   signApplicationRoute,
   rejectSigningApplicationRoute,
 } from "src/shared/routes";
+import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { AgencyId } from "./../../shared/agencies";
@@ -174,9 +175,12 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
     );
   }
 
-  public async listAgencies(): Promise<AgencyDto[]> {
-    const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`);
+  public async listAgencies(position: LatLonDto): Promise<AgencyDto[]> {
+    const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
+      params: position,
+    });
     const response = listAgenciesResponseSchema.parse(httpResponse.data);
+    console.log(response);
     return response;
   }
 }

@@ -11,7 +11,7 @@ describe("/agencies route", () => {
   });
 
   test("returns agency list", async () => {
-    await request.get(`/agencies`).expect(200, [
+    await request.get(`/agencies?lat=10.123&lon=10.123`).expect(200, [
       {
         id: "test-agency-1-back",
         name: "Test Agency 1 (back)",

@@ -7,6 +7,7 @@ import {
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
 } from "src/shared/ImmersionApplicationDto";
+import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 
@@ -57,11 +58,11 @@ export abstract class ImmersionApplicationGateway {
     linkFormat: string,
   ): Promise<void>;
 
-  abstract listAgencies(): Promise<AgencyDto[]>;
+  abstract listAgencies(position: LatLonDto): Promise<AgencyDto[]>;
 
   public async debugPopulateDB(count: number): Promise<Array<string>> {
     const initialArray = Array(count).fill(null);
-    const agencies = await this.listAgencies();
+    const agencies = await this.listAgencies({ lat: 0, lon: 0 });
     return Promise.all(
       initialArray.map((_, i) => this.add(generateApplication(i, agencies))),
     );

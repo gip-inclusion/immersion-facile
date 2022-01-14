@@ -2,6 +2,14 @@ import { useField } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/dependencies";
 import { AgencyDto, AgencyId } from "src/shared/agencies";
+import { LatLonDto } from "src/shared/SearchImmersionDto";
+import { PostcodeAutocomplete } from "./PostcodeAutocomplete";
+
+const placeholderAgency: AgencyDto = {
+  id: "",
+  name: "Veuillez indiquer un code postale",
+  position: { lat: 0, lon: 0 },
+};
 
 type AgencySelectorProps = {
   label: string;
@@ -22,12 +30,8 @@ export const AgencySelector = ({
 
   const [loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-  const [agencies, setAgencies] = useState([
-    {
-      id: "",
-      name: "Chargement en cours...",
-    },
-  ] as AgencyDto[]);
+  const [position, setPosition] = useState<LatLonDto | null>(null);
+  const [agencies, setAgencies] = useState([placeholderAgency]);
 
   const onChangeHandler = (evt: ChangeEvent) => {
     const target = evt.currentTarget as HTMLSelectElement;
@@ -35,8 +39,12 @@ export const AgencySelector = ({
   };
 
   useEffect(() => {
+    if (!position) {
+      return;
+    }
+
     immersionApplicationGateway
-      .listAgencies()
+      .listAgencies(position)
       .then((agencies) => {
         setAgencies([
           {
@@ -59,7 +67,7 @@ export const AgencySelector = ({
         setLoaded(false);
         setLoadingError(true);
       });
-  }, []);
+  }, [position]);
 
   const userError = touched && error;
   const showError = userError || loadingError;
@@ -68,6 +76,27 @@ export const AgencySelector = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
+      {!disabled && (
+        <>
+          <label className="fr-label" htmlFor={name}>
+            Votre code postale *
+          </label>
+
+          <PostcodeAutocomplete
+            inputStyle={{
+              paddingLeft: "48px",
+              background: `white no-repeat scroll 11px 8px`,
+            }}
+            onFound={(lat, lon) => {
+              setPosition({ lat, lon });
+            }}
+          />
+          <span className="fr-hint-text" id="select-hint-desc-hint">
+            Veuillez indiquer votre code postale
+          </span>
+        </>
+      )}
+
       <label className="fr-label" htmlFor={name}>
         {label}
       </label>
@@ -84,7 +113,7 @@ export const AgencySelector = ({
         onChange={onChangeHandler}
         onBlur={onBlur}
         aria-describedby={`agency-code-{name}-error-desc-error`}
-        disabled={disabled || !loaded}
+        disabled={disabled || !loaded || !position}
       >
         {agencies.map(({ id, name }) => {
           return (
