@@ -1,4 +1,5 @@
 import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
+import { LaBonneBoiteRequestParams } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { LaBonneBoiteRequestRepository } from "../../../domain/immersionOffer/ports/LaBonneBoiteRequestRepository";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { distanceMetersBetweenCoordinates } from "./distanceBetweenCoordinates";
@@ -15,26 +16,28 @@ export class InMemoryLaBonneBoiteRequestRepository
   ) {
     this._laBonneBoiteRequests.push(laBonneBoiteRequest);
   }
-  public async getClosestRequestWithThisRomeSince({
+  public async getClosestRequestParamsWithThisRomeSince({
+    since,
     rome: thisRome,
     position: thisPosition,
-    since,
   }: {
     rome: string;
-    position: LatLonDto;
+    position: { lat: number; lon: number };
     since: Date;
-  }): Promise<null | LaBonneBoiteRequestEntity> {
+  }): Promise<{
+    params: LaBonneBoiteRequestParams;
+    distanceToPositionKm: number;
+  } | null> {
     const requestsSinceWithThisRome = this._laBonneBoiteRequests.filter(
       (request) =>
         request.requestedAt >= since && request.params.rome === thisRome,
     );
     if (requestsSinceWithThisRome.length === 0) return null;
 
-    const closestRequestWithThisRome = findGeographicalyClosestRequest(
+    return findGeographicalyClosestRequestParams(
       requestsSinceWithThisRome,
       thisPosition,
     );
-    return closestRequestWithThisRome;
   }
 
   // for test purposes only
@@ -49,23 +52,23 @@ export class InMemoryLaBonneBoiteRequestRepository
   }
 }
 
-const findGeographicalyClosestRequest = (
+const findGeographicalyClosestRequestParams = (
   requests: LaBonneBoiteRequestEntity[],
   toPotision: LatLonDto,
-): LaBonneBoiteRequestEntity =>
-  requests.reduce((previous, current) => {
-    return distanceMetersBetweenCoordinates(
-      previous.params.lat,
-      previous.params.lon,
-      toPotision.lat,
-      toPotision.lon,
-    ) <
-      distanceMetersBetweenCoordinates(
-        current.params.lat,
-        current.params.lon,
-        toPotision.lat,
-        toPotision.lon,
-      )
-      ? previous
-      : current;
-  });
+): { params: LaBonneBoiteRequestParams; distanceToPositionKm: number } =>
+  requests
+    .map((request) => ({
+      params: request.params,
+      distanceToPositionKm:
+        distanceMetersBetweenCoordinates(
+          request.params.lat,
+          request.params.lon,
+          toPotision.lat,
+          toPotision.lon,
+        ) / 1000,
+    }))
+    .reduce((previous, current) => {
+      return previous.distanceToPositionKm < current.distanceToPositionKm
+        ? previous
+        : current;
+    });

@@ -179,25 +179,21 @@ export class SearchImmersion extends UseCase<
   private async laBonneBoiteHasNotBeenRequestedWithThisRomeAndThisAreaInTheLastWeek(
     searchMade: SearchMade,
   ) {
-    const closestSearchMadeWithSameRomeInTheLast7Days: LaBonneBoiteRequestEntity | null =
-      await this.laBonneBoiteRequestRepository.getClosestRequestWithThisRomeSince(
-        {
-          rome: searchMade.rome,
-          position: { lat: searchMade.lat, lon: searchMade.lon },
-          since: addDays(this.clock.now(), -7),
-        },
-      );
+    const closestRequestParamsWithSameRomeInTheLast7Days: {
+      params: LaBonneBoiteRequestParams;
+      distanceToPositionKm: number;
+    } | null = await this.laBonneBoiteRequestRepository.getClosestRequestParamsWithThisRomeSince(
+      {
+        rome: searchMade.rome,
+        position: { lat: searchMade.lat, lon: searchMade.lon },
+        since: addDays(this.clock.now(), -7),
+      },
+    );
 
-    if (closestSearchMadeWithSameRomeInTheLast7Days === null) return true;
+    if (closestRequestParamsWithSameRomeInTheLast7Days === null) return true;
 
     return (
-      distanceMetersBetweenCoordinates(
-        searchMade.lat,
-        searchMade.lon,
-        closestSearchMadeWithSameRomeInTheLast7Days.params.lat,
-        closestSearchMadeWithSameRomeInTheLast7Days.params.lon,
-      ) /
-        1000 >
+      closestRequestParamsWithSameRomeInTheLast7Days.distanceToPositionKm >
       searchMade.distance_km
     );
   }

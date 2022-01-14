@@ -29,6 +29,7 @@ import {
   LaBonneBoiteCompanyProps,
   LaBonneBoiteCompanyVO,
 } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
+import { distanceMetersBetweenCoordinates } from "../../../adapters/secondary/immersionOffer/distanceBetweenCoordinates";
 
 type PrepareSearchableDataProps = {
   withLBBSearchOnFetch?: boolean;

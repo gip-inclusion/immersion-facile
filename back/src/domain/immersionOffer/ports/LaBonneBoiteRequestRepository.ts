@@ -1,14 +1,18 @@
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
+import { LaBonneBoiteRequestParams } from "./LaBonneBoiteAPI";
 
 export interface LaBonneBoiteRequestRepository {
   insertLaBonneBoiteRequest: (
     LaBonneBoiteRequest: LaBonneBoiteRequestEntity,
   ) => Promise<void>;
 
-  getClosestRequestWithThisRomeSince(props: {
+  getClosestRequestParamsWithThisRomeSince(props: {
     rome: string;
     position: LatLonDto;
     since: Date;
-  }): Promise<LaBonneBoiteRequestEntity | null>;
+  }): Promise<{
+    params: LaBonneBoiteRequestParams;
+    distanceToPositionKm: number;
+  } | null>;
 }

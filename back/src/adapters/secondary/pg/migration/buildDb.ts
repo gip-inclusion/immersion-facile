@@ -75,6 +75,13 @@ const buildDb = async () => {
   }
 
   // prettier-ignore
+  const lbbRequestTableAlreadyExists = await checkIfTableExists("lbb_request");
+  if (!lbbRequestTableAlreadyExists) {
+    logger.info("We will thus create the lbb_request table");
+    await buildLaBonneBoiteRequestTable(client);
+  }
+
+  // prettier-ignore
   const immersionApplicationTableAlreadyExists = await checkIfTableExists("immersion_applications");
   if (!immersionApplicationTableAlreadyExists) {
     logger.info("We will thus create the immersion_applications table");
@@ -163,6 +170,13 @@ const buildSearchImmersionDb = async (client: PoolClient) => {
 
 const addSearchMadeId = async (client: PoolClient) => {
   await executeSqlFromFile(__dirname + "/addSearchMadeId.sql", client);
+};
+
+const buildLaBonneBoiteRequestTable = async (client: PoolClient) => {
+  await executeSqlFromFile(
+    __dirname + "/createLaBonneBoiteRequestTable.sql",
+    client,
+  );
 };
 
 const buildOutbox = async (client: PoolClient) => {
