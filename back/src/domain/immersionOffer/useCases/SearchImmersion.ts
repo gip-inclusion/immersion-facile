@@ -9,7 +9,7 @@ import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 import { createLogger } from "../../../utils/logger";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
-import { SearchMade } from "../entities/SearchMadeEntity";
+import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
 import { SearchMadeRepository } from "../ports/SearchMadeRepository";
@@ -68,9 +68,10 @@ export class SearchImmersion extends UseCase<
       lon: params.location.lon,
       distance_km: params.distance_km,
     };
-    const searchMadeEntity = {
+    const searchMadeEntity: SearchMadeEntity = {
       ...searchMade,
       id: this.uuidGenerator.new(),
+      needsToBeSearched: true,
     };
     await this.searchesMadeRepository.insertSearchMade(searchMadeEntity);
     const apiConsumerName = apiConsumer?.consumer;

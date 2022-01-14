@@ -45,6 +45,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
       distance_km: 10.0,
       lat: 10.0,
       lon: 20.0,
+      needsToBeSearched: true,
     };
     searchesMadeRepository.setSearchesMade([search]);
 

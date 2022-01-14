@@ -58,7 +58,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
           throw error;
         }
       }
-      this.searchMadeRepository.markSearchAsProcessed(searchMade.id);
+      await this.searchMadeRepository.markSearchAsProcessed(searchMade.id);
     }
   }
 

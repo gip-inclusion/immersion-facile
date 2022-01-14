@@ -11,4 +11,7 @@ export type SearchMade = {
   siret?: string;
 };
 
-export type SearchMadeEntity = { id: SearchMadeId } & SearchMade;
+export type SearchMadeEntity = {
+  id: SearchMadeId;
+  needsToBeSearched: boolean;
+} & SearchMade;

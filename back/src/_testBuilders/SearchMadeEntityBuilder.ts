@@ -10,6 +10,7 @@ const validSearchMadeEntity: SearchMadeEntity = {
   distance_km: 30,
   lat: 49.119146,
   lon: 6.17602,
+  needsToBeSearched: false,
 };
 
 export class SearchMadeEntityBuilder implements Builder<SearchMadeEntity> {
@@ -21,6 +22,12 @@ export class SearchMadeEntityBuilder implements Builder<SearchMadeEntity> {
     return new SearchMadeEntityBuilder({
       ...this.entity,
       id,
+    });
+  }
+  public withNeedsToBeSearch() {
+    return new SearchMadeEntityBuilder({
+      ...this.entity,
+      needsToBeSearched: true,
     });
   }
   build(): SearchMadeEntity {

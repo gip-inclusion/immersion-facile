@@ -79,7 +79,7 @@ const prepareSearchableData =
     return {
       searchImmersion,
       immersionOfferId,
-      searchesMadeRepository: searchMadeRepository,
+      searchMadeRepository,
       immersionOfferRepository,
       generatedOfferId,
       uuidGenerator,
@@ -113,8 +113,11 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
 
 describe("SearchImmersionUseCase", () => {
   it("stores searches made", async () => {
-    const { searchImmersion, searchesMadeRepository, uuidGenerator } =
-      await prepareSearchableDataWithFeatureFlagON();
+    const {
+      searchImmersion,
+      searchMadeRepository: searchesMadeRepository,
+      uuidGenerator,
+    } = await prepareSearchableDataWithFeatureFlagON();
     uuidGenerator.setNextUuid("searchMadeUuid");
     await searchImmersion.execute(searchSecretariatInMetzParams);
 
@@ -126,6 +129,7 @@ describe("SearchImmersionUseCase", () => {
         lat: 49.119146,
         lon: 6.17602,
         distance_km: 30,
+        needsToBeSearched: true,
       },
     ]);
   });

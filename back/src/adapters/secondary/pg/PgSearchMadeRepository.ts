@@ -35,6 +35,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
       lat: row.lat,
       lon: row.lon,
       rome: row.rome,
+      needsToBeSearched: row.needstobesearched,
     }));
   }
   public async markSearchAsProcessed(

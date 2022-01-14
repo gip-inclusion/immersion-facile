@@ -45,13 +45,14 @@ describe("PgSearchesMadeRepository", () => {
     // Prepare : insert two entities : one already processed, the other not yet processed
     const entityNeedingToBeProcessed = new SearchMadeEntityBuilder()
       .withId("b0a81d02-6f07-11ec-90d6-0242ac120004")
+      .withNeedsToBeSearch()
       .build();
     const entityAlreadyProcessed = new SearchMadeEntityBuilder()
       .withId("ed2ca622-6f06-11ec-90d6-0242ac120006")
       .build();
 
-    await insertEntity(entityNeedingToBeProcessed, true);
-    await insertEntity(entityAlreadyProcessed, false);
+    await insertEntity(entityNeedingToBeProcessed);
+    await insertEntity(entityAlreadyProcessed);
 
     // Act : Retrieve unprocessed entities
     const retrievedSearches =
@@ -69,10 +70,11 @@ describe("PgSearchesMadeRepository", () => {
     const searchMadeId = "ed2ca622-6f06-11ec-90d6-0242ac120006";
     const searchMade = new SearchMadeEntityBuilder()
       .withId(searchMadeId)
+      .withNeedsToBeSearch()
       .build();
-    await insertEntity(searchMade, true);
+    await insertEntity(searchMade);
     // Act : call method
-    pgSearchesMadeRepository.markSearchAsProcessed(searchMadeId);
+    await pgSearchesMadeRepository.markSearchAsProcessed(searchMadeId);
     // Assert flag has been set to False
     const result = await client.query(
       `SELECT needsToBeSearched from searches_made WHERE id='${searchMadeId}';`,
@@ -87,6 +89,7 @@ describe("PgSearchesMadeRepository", () => {
       distance_km: 30,
       lat: 49.119146,
       lon: 6.17602,
+      needsToBeSearched: true,
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "9f6daac0-6f02-11ec-90d6-0242ac120003",
@@ -94,6 +97,7 @@ describe("PgSearchesMadeRepository", () => {
       distance_km: 30,
       lat: 48.119146,
       lon: 6.17602,
+      needsToBeSearched: true,
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "9f6dac00-6f02-11ec-90d6-0242ac120003",
@@ -101,6 +105,7 @@ describe("PgSearchesMadeRepository", () => {
       distance_km: 30,
       lat: 48.119146,
       lon: 5.17602,
+      needsToBeSearched: true,
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
@@ -108,6 +113,7 @@ describe("PgSearchesMadeRepository", () => {
       distance_km: 30,
       lat: 48.119146,
       lon: 4.17602,
+      needsToBeSearched: true,
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "9f6dae4e-6f02-11ec-90d6-0242ac120003",
@@ -115,6 +121,7 @@ describe("PgSearchesMadeRepository", () => {
       distance_km: 30,
       lat: 48.129146,
       lon: 4.17602,
+      needsToBeSearched: true,
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "bee68ce6-6f02-11ec-90d6-0242ac120003",
@@ -122,6 +129,7 @@ describe("PgSearchesMadeRepository", () => {
       distance_km: 30,
       lat: 48.129146,
       lon: 4.17602,
+      needsToBeSearched: true,
     });
   };
 
@@ -133,22 +141,19 @@ describe("PgSearchesMadeRepository", () => {
     return res.rows;
   };
 
-  const insertEntity = async (
-    searchMade: SearchMadeEntity,
-    needsToBeSearched: boolean,
-  ) => {
+  const insertEntity = async (searchMadeEntity: SearchMadeEntity) => {
     await client.query(
       `INSERT INTO searches_made (
        id, ROME, lat, lon, distance, needsToBeSearched, gps
      ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7));`,
       [
-        searchMade.id,
-        searchMade.rome,
-        searchMade.lat,
-        searchMade.lon,
-        searchMade.distance_km,
-        needsToBeSearched,
-        `POINT(${searchMade.lon} ${searchMade.lat})`,
+        searchMadeEntity.id,
+        searchMadeEntity.rome,
+        searchMadeEntity.lat,
+        searchMadeEntity.lon,
+        searchMadeEntity.distance_km,
+        searchMadeEntity.needsToBeSearched,
+        `POINT(${searchMadeEntity.lon} ${searchMadeEntity.lat})`,
       ],
     );
   };
