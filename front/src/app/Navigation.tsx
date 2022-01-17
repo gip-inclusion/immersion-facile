@@ -13,6 +13,7 @@ export const Navigation = () => (
     {featureFlags.enableAdminUi && <a {...routes.admin().link}>Backoffice</a>}
     {featureFlags.enableAdminUi && " - "}
     <a {...routes.formEstablishment().link}>Formulaire Entreprise</a> {" - "}
-    <a {...routes.landingEstablishment().link}>Landing entreprise </a>
+    <a {...routes.landingEstablishment().link}>Landing entreprise </a> {" - "}
+    <a {...routes.search().link}>Recherche</a>
   </nav>
 );

@@ -8,6 +8,7 @@ import {
 } from "src/app/ApplicationForm/createSuccessInfos";
 import { immersionApplicationGateway } from "src/app/dependencies";
 import { routes } from "src/app/routes";
+import { Footer } from "src/components/Footer";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { ENV } from "src/environmentVariables";
@@ -228,6 +229,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
           </Formik>
         </div>
       </div>
+      <Footer />
     </>
   );
 };

@@ -15,6 +15,7 @@ import {
   useSiretRelatedField,
 } from "src/app/Siret/fetchEstablishmentInfoBySiret";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
+import { Footer } from "src/components/Footer";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
@@ -266,6 +267,7 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
           )}
         </Formik>
       </div>
+      <Footer />
     </>
   );
 };

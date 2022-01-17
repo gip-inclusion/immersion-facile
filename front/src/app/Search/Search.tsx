@@ -10,6 +10,7 @@ import distanceSearchIcon from "src/assets/distance-search-icon.svg";
 import locationSearchIcon from "src/assets/location-search-icon.svg";
 import searchButtonIcon from "src/assets/search-button-icon.svg";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
+import { Footer } from "src/components/Footer";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { SuccessFeedback } from "src/components/SuccessFeedback";
 import { ContactMethod } from "src/shared/FormEstablishmentDto";
@@ -184,6 +185,7 @@ export const Search = () => {
             })
           ))}
       </div>
+      <Footer />
 
       <ContactEstablishmentModal
         modalState={modalState}
