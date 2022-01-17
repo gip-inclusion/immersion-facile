@@ -1,4 +1,5 @@
 import React from "react";
+import immersionFacileLogo from "src/assets/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 
 export const MarianneLogo = () => (
   <div className="fr-header__brand-top">
@@ -13,23 +14,21 @@ export const MarianneLogo = () => (
 );
 
 export const MarianneHeader = () => (
-  <>
-    <header role="banner" className="fr-header">
-      <div className="fr-header__body">
-        <div className="fr-container">
-          <div className="fr-header__body-row">
-            <div className="fr-header__brand fr-enlarge-link">
-              <MarianneLogo />
-              <div className="fr-header__service">
-                <p className="fr-header__service-title">Immersion Facile</p>
-                <p className="fr-header__service-tagline">
-                  Faciliter la réalisations des immersions professionnelles
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+  <section
+    className="flex justify-between px-3 "
+    style={{ boxShadow: "0 4px 2px -2px silver" }}
+  >
+    <div>
+      <MarianneLogo />
+      <div className="pb-1 text-xs font-light">
+        Faciliter la réalisation des immersions professionnelles
       </div>
-    </header>
-  </>
+    </div>
+    <div
+      className="flex flex-wrap justify-center"
+      style={{ minWidth: "100px" }}
+    >
+      <img src={immersionFacileLogo} alt="Logo Immersion-Facile" />
+    </div>
+  </section>
 );

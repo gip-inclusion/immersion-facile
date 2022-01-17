@@ -2,24 +2,20 @@ import React from "react";
 import { routes } from "src/app/routes";
 import bubbles from "src/assets/bulles.svg";
 import greatings from "src/assets/greatings.png";
-import immersionFacileLogo from "src/assets/logo-immersion-facile.svg";
 import tandem from "src/assets/tandem.png";
 import { BulletPoint } from "src/components/BulletPoint";
 import { Card } from "src/components/Card";
 import { Colored } from "src/components/Colored";
 import { Footer } from "src/components/Footer";
 import { ImmersionHowTo } from "src/components/ImmersionHowTo";
-import { MarianneLogo } from "src/components/MarianneHeader";
+import { MarianneHeader, MarianneLogo } from "src/components/MarianneHeader";
 import { Statistic } from "src/components/Statistic";
 import { Title } from "src/components/Title";
 
 export const LandingEstablishment = () => (
   <div>
-    <section className="flex justify-between mx-3 sm:mx-20">
-      <MarianneLogo />
-      <img src={immersionFacileLogo} alt="Logo Immersion-Facile" />
-    </section>
-    <section className="flex flex-col items-center w-full py-10 mt-5 bg-gradient-to-b from-immersionBlue-dark via-immersionBlue to-immersionBlue-light relative">
+    <MarianneHeader />
+    <section className="flex flex-col items-center w-full py-10 bg-gradient-to-b from-immersionBlue-dark via-immersionBlue to-immersionBlue-light relative">
       <div
         className="w-48 absolute invisible md:visible sm:left-5 md:left-20 top-10 bottom-0 z-10"
         style={{

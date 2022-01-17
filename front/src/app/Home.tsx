@@ -1,9 +1,8 @@
 import React from "react";
 import { routes } from "src/app/routes";
-import immersionFacileLogo from "src/assets/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 import { Footer } from "src/components/Footer";
 import { ImmersionHowTo } from "src/components/ImmersionHowTo";
-import { MarianneLogo } from "src/components/MarianneHeader";
+import { MarianneHeader } from "src/components/MarianneHeader";
 
 import { ENV } from "src/environmentVariables";
 
@@ -30,19 +29,11 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
       className="absolute left-0 top-0 right-0 bottom-0 "
       style={{ zIndex: -1 }}
     >
-      <div className=" bg-white w-full h-48" />
+      <div className="bg-white w-full h-48" />
       <div className="bg-red-50 w-full h-full bg-gradient-to-b from-gray-100 via-gray-50 to-white" />
     </div>
     {showDebugInfo && <DebugInfo />}
-    <section className="flex justify-left mx-3 sm:mx-20">
-      <MarianneLogo />
-      <div
-        className="flex flex-wrap justify-center"
-        style={{ minWidth: "100px" }}
-      >
-        <img src={immersionFacileLogo} alt="Logo Immersion-Facile" />
-      </div>
-    </section>
+    <MarianneHeader />
     <section className="flex flex-col items-center mt-14">
       <div
         className="flex flex-wrap justify-center "
