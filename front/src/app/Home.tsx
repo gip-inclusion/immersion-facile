@@ -74,7 +74,7 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
             CANDIDAT À UNE IMMERSION
           </div>
           <div className="text-immersionRed-dark font-semibold text-center">
-            Vous voulez essayer un métier <p /> en conditions réelles ?
+            Vous voulez essayer un métier en conditions réelles ?
           </div>
           <a
             {...routes.search().link}

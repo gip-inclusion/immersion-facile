@@ -6,7 +6,7 @@ import {
 } from "../../shared/SearchImmersionDto";
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 
-const SIMULATED_LATENCY_MS = 150;
+const SIMULATED_LATENCY_MS = 500;
 
 const defaultNaf = "MyNaf";
 

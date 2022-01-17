@@ -1,5 +1,6 @@
+import { CircularProgress } from "@mui/material";
 import { Form, Formik, FormikHelpers } from "formik";
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { immersionSearchGateway } from "src/app/dependencies";
 import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
 import {
@@ -43,11 +44,7 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
 
 export const Search = () => {
   const [result, setResult] = useState<SearchImmersionResultDto[] | null>(null);
-  const [successFullyValidated, setSuccessfullyValidated] = useState(false);
-  const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<
-    string | null
-  >(null);
-  const { modalState, dispatch } = useContactEstablishmentModal();
+  const [isSearching, setIsSearching] = useState(false);
 
   return (
     <Layout>
@@ -70,6 +67,7 @@ export const Search = () => {
               values,
               { setSubmitting }: FormikHelpers<Values>,
             ) => {
+              setIsSearching(true);
               immersionSearchGateway
                 .search({
                   rome: values.rome,
@@ -90,6 +88,7 @@ export const Search = () => {
                   console.error(e.toString());
                 })
                 .finally(() => {
+                  setIsSearching(false);
                   setSubmitting(false);
                 });
             }}
@@ -140,7 +139,11 @@ export const Search = () => {
                     />
                   </div>
 
-                  <button type="submit" className="searchButton">
+                  <button
+                    type="submit"
+                    className="searchButton"
+                    disabled={isSearching}
+                  >
                     <img
                       className="searchButtonImage"
                       src={searchButtonIcon}
@@ -154,41 +157,71 @@ export const Search = () => {
           </Formik>
         </div>
         <div className="searchResultContainer sm:flex-1 sm:overflow-y-scroll">
-          {result === null ? (
-            <SearchMessage>Veuillez sélectionner vos critères</SearchMessage>
-          ) : result.length === 0 ? (
-            <SearchMessage>
-              Pas de résultat. Essayez avec un plus grand rayon de recherche...
-            </SearchMessage>
-          ) : (
-            result.map((r) => {
-              const distanceKm = ((r.distance_m ?? 0) / 1000).toFixed(1);
-
-              return (
-                <EnterpriseSearchResult
-                  key={r.id}
-                  title={r.name}
-                  radius={`${distanceKm} km`}
-                  address={r.address}
-                  siret={r.siret}
-                  contactMode={r.contactMode}
-                  onButtonClick={() =>
-                    dispatch({
-                      type: "CLICKED_OPEN",
-                      payload: {
-                        immersionOfferId: r.id,
-                        contactId: r.contactDetails?.id,
-                        contactMethod: r.contactMode,
-                      },
-                    })
-                  }
-                  disableButton={modalState.isValidating}
-                />
-              );
-            })
-          )}
+          <SearchResultPanel searchResults={result} isSearching={isSearching} />
         </div>
       </div>
+    </Layout>
+  );
+};
+
+type SearchResultsProps = {
+  searchResults: SearchImmersionResultDto[] | null;
+  isSearching: boolean;
+};
+
+export const SearchResultPanel = ({
+  searchResults,
+  isSearching,
+}: SearchResultsProps) => {
+  // prettier-ignore
+  const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
+  const [successFullyValidated, setSuccessfullyValidated] = useState(false);
+  const { modalState, dispatch } = useContactEstablishmentModal();
+
+  if (isSearching)
+    return (
+      <SearchInfos>
+        <CircularProgress color="inherit" size="75px" />
+      </SearchInfos>
+    );
+
+  if (searchResults === null)
+    return <SearchInfos>Veuillez sélectionner vos critères</SearchInfos>;
+
+  if (searchResults.length === 0)
+    return (
+      <SearchInfos>
+        Pas de résultat. Essayez avec un plus grand rayon de recherche...
+      </SearchInfos>
+    );
+
+  return (
+    <>
+      {searchResults.map((r) => {
+        const distanceKm = ((r.distance_m ?? 0) / 1000).toFixed(1);
+
+        return (
+          <EnterpriseSearchResult
+            key={r.id}
+            title={r.name}
+            radius={`${distanceKm} km`}
+            address={r.address}
+            siret={r.siret}
+            contactMode={r.contactMode}
+            onButtonClick={() =>
+              dispatch({
+                type: "CLICKED_OPEN",
+                payload: {
+                  immersionOfferId: r.id,
+                  contactId: r.contactDetails?.id,
+                  contactMethod: r.contactMode,
+                },
+              })
+            }
+            disableButton={modalState.isValidating}
+          />
+        );
+      })}
       <ContactEstablishmentModal
         modalState={modalState}
         dispatch={dispatch}
@@ -210,15 +243,15 @@ export const Search = () => {
           {successfulValidationMessage}
         </SuccessFeedback>
       )}
-    </Layout>
+    </>
   );
 };
 
-type SearchMessageProps = {
-  children: string;
+type SearchInfosProps = {
+  children: ReactNode;
 };
 
-const SearchMessage = ({ children }: SearchMessageProps) => (
+const SearchInfos = ({ children }: SearchInfosProps) => (
   <div className="text-white sm:h-full text-2xl font-semibold flex justify-center items-center pb-16">
     <div>{children}</div>
   </div>
