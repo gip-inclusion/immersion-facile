@@ -104,7 +104,11 @@ export const ProfessionAutocomplete = ({
             <label className={`fr-label ${className ?? ""}`} htmlFor={"search"}>
               {title}
             </label>
-            <input {...params.inputProps} className={"fr-input"} />
+            <input
+              {...params.inputProps}
+              className={"fr-input"}
+              placeholder="Boulanger"
+            />
           </div>
         )}
       />

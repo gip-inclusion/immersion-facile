@@ -8,7 +8,7 @@ import { PostcodeAutocomplete } from "./PostcodeAutocomplete";
 
 const placeholderAgency: AgencyDto = {
   id: "",
-  name: "Veuillez indiquer un code postale",
+  name: "Veuillez indiquer un code postal",
   position: { lat: 0, lon: 0 },
 };
 

@@ -1,4 +1,3 @@
-import { Checkbox } from "@mui/material";
 import { Form, Formik, useField } from "formik";
 import React, { useState } from "react";
 import { formEstablishmentGateway } from "src/app/dependencies";
@@ -15,13 +14,12 @@ import {
   useSiretRelatedField,
 } from "src/app/Siret/fetchEstablishmentInfoBySiret";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
-import { Footer } from "src/components/Footer";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
-import { MarianneHeader } from "src/components/MarianneHeader";
+import { Layout } from "src/components/Layout";
 import { ENV } from "src/environmentVariables";
 import {
   ContactMethod,
@@ -156,8 +154,7 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
   }
 
   return (
-    <>
-      <MarianneHeader />
+    <Layout>
       <div
         className="fr-grid-row fr-grid-row--center fr-grid-row--gutters"
         style={{ marginTop: "25px" }}
@@ -267,7 +264,6 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
           )}
         </Formik>
       </div>
-      <Footer />
-    </>
+    </Layout>
   );
 };

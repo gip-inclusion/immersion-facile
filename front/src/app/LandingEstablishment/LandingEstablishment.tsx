@@ -6,15 +6,13 @@ import tandem from "src/assets/tandem.png";
 import { BulletPoint } from "src/components/BulletPoint";
 import { Card } from "src/components/Card";
 import { Colored } from "src/components/Colored";
-import { Footer } from "src/components/Footer";
 import { ImmersionHowTo } from "src/components/ImmersionHowTo";
-import { MarianneHeader, MarianneLogo } from "src/components/MarianneHeader";
+import { Layout } from "src/components/Layout";
 import { Statistic } from "src/components/Statistic";
 import { Title } from "src/components/Title";
 
 export const LandingEstablishment = () => (
-  <div>
-    <MarianneHeader />
+  <Layout>
     <section className="flex flex-col items-center w-full py-10 bg-gradient-to-b from-immersionBlue-dark via-immersionBlue to-immersionBlue-light relative">
       <div
         className="w-48 absolute invisible md:visible sm:left-5 md:left-20 top-10 bottom-0 z-10"
@@ -127,6 +125,5 @@ export const LandingEstablishment = () => (
       </div>
     </section>
     <ImmersionHowTo videoUrl="https://www.powtoon.com/embed/e1lglPbeknD/" />
-    <Footer />
-  </div>
+  </Layout>
 );

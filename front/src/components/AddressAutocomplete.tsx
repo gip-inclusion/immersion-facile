@@ -99,6 +99,7 @@ export const AddressAutocomplete = ({
             style={inputStyle}
             disabled={disabled}
             className={"fr-input"}
+            placeholder="Rouen"
           />
         </div>
       )}

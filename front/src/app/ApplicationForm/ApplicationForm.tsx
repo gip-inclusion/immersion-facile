@@ -8,9 +8,8 @@ import {
 } from "src/app/ApplicationForm/createSuccessInfos";
 import { immersionApplicationGateway } from "src/app/dependencies";
 import { routes } from "src/app/routes";
-import { Footer } from "src/components/Footer";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
-import { MarianneHeader } from "src/components/MarianneHeader";
+import { Layout } from "src/components/Layout";
 import { Title } from "src/components/Title";
 import { ENV } from "src/environmentVariables";
 import {
@@ -160,9 +159,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const isFrozen = isDemandeImmersionFrozen(initialValues);
 
   return (
-    <>
-      <MarianneHeader />
-
+    <Layout>
       <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
         <div className="fr-col-lg-8 fr-p-2w">
           <div className="flex justify-center">
@@ -232,7 +229,6 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
           </Formik>
         </div>
       </div>
-      <Footer />
-    </>
+    </Layout>
   );
 };

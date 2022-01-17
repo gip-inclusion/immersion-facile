@@ -45,7 +45,7 @@ export const PostcodeAutocomplete = ({
       setError(null);
       setSearchTerm(postCode);
     } else {
-      setError("Veuillez indiquer un code postale valide");
+      setError("Veuillez indiquer un code postal valide");
     }
   };
 
@@ -55,7 +55,7 @@ export const PostcodeAutocomplete = ({
         style={inputStyle}
         disabled={disabled}
         className={"fr-input"}
-        placeholder="Code postale"
+        placeholder="Votre code postal"
         onChange={onChange}
       />
       {error && (
