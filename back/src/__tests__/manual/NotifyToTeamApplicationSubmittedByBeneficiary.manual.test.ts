@@ -12,7 +12,7 @@ import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApp
 // Requires the following environment variables to be set for the tests to pass:
 // - SENDINBLUE_API_KEY
 
-const validDemandeImmersion = new ImmersionApplicationDtoBuilder()
+const validImmersionApplication = new ImmersionApplicationDtoBuilder()
   .withEmail("jean-francois.macresy@beta.gouv.fr")
   .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
   .build();
@@ -36,11 +36,12 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   });
 
   test("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
-    validDemandeImmersion.mentorEmail = "jeanfrancois.macresy@gmail.com";
-    validDemandeImmersion.email = "jeanfrancois.macresy+beneficiary@gmail.com";
+    validImmersionApplication.mentorEmail = "jeanfrancois.macresy@gmail.com";
+    validImmersionApplication.email =
+      "jeanfrancois.macresy+beneficiary@gmail.com";
 
     await notifyToTeamApplicationSubmittedByBeneficiary.execute(
-      validDemandeImmersion,
+      validImmersionApplication,
     );
   });
 });

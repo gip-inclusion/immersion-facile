@@ -31,7 +31,10 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmitted extends UseCa
       logger.info(`Skipping sending non-signature beneficiary confirmation`);
       return;
     }
-    logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
+    logger.info(
+      { immersionApplicationId: id },
+      `------------- Entering execute`,
+    );
 
     await this.emailFilter.withAllowedRecipients(
       [email],

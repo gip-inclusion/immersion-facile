@@ -40,7 +40,10 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignatu
 
     const { id, email, firstName, lastName, businessName } = application;
 
-    logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
+    logger.info(
+      { immersionApplicationId: id },
+      `------------- Entering execute`,
+    );
 
     await this.emailFilter.withAllowedRecipients(
       [email],

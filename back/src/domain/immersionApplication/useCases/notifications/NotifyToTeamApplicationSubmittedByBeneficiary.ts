@@ -33,7 +33,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary extends UseCase<Immer
   }: ImmersionApplicationDto): Promise<void> {
     logger.info(
       {
-        demandeImmersionId: id,
+        immersionApplicationId: id,
       },
       "------------- Entering execute.",
     );

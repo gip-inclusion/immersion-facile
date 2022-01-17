@@ -17,7 +17,7 @@ import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApp
 // Requires the following environment variables to be set for the tests to pass:
 // - SENDINBLUE_API_KEY
 
-const validDemandeImmersion: ImmersionApplicationDto =
+const validImmersionApplication: ImmersionApplicationDto =
   new ImmersionApplicationDtoBuilder()
     .withEmail("jean-francois.macresy@beta.gouv.fr")
     .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
@@ -40,7 +40,9 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       "jeanfrancois.macresy+beneficiary@gmail.com",
     ];
 
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
+    agencyConfig = AgencyConfigBuilder.create(
+      validImmersionApplication.agencyId,
+    )
       .withCounsellorEmails(counsellorEmails)
       .build();
     const inMemoryAgencyRepository = new InMemoryAgencyRepository([
@@ -51,7 +53,7 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       inMemoryAgencyRepository,
       generateMagicLinkFn,
     );
-    await notifyNewApplicationNeedsReview.execute(validDemandeImmersion);
+    await notifyNewApplicationNeedsReview.execute(validImmersionApplication);
   });
 
   // TODO(jfmac)
@@ -62,11 +64,13 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       "jean-francois.macresy@beta.gouv.fr",
     ];
 
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
+    agencyConfig = AgencyConfigBuilder.create(
+      validImmersionApplication.agencyId,
+    )
       .withCounsellorEmails(counsellorEmails)
       .build();
 
-    validDemandeImmersion.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
+    validImmersionApplication.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
     const inMemoryAgencyRepository = new InMemoryAgencyRepository([
       agencyConfig,
     ]);
@@ -75,7 +79,7 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       inMemoryAgencyRepository,
       generateMagicLinkFn,
     );
-    await notifyNewApplicationNeedsReview.execute(validDemandeImmersion);
+    await notifyNewApplicationNeedsReview.execute(validImmersionApplication);
   });
 
   xtest("Sends notification mails to check Immersion Application validation  with a real working immersion", async () => {
@@ -84,10 +88,12 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       "jean-francois.macresy@beta.gouv.fr",
     ];
 
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
+    agencyConfig = AgencyConfigBuilder.create(
+      validImmersionApplication.agencyId,
+    )
       .withValidatorEmails(validationEmails)
       .build();
-    validDemandeImmersion.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
+    validImmersionApplication.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
     const inMemoryAgencyRepository = new InMemoryAgencyRepository([
       agencyConfig,
     ]);
@@ -96,6 +102,6 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
       inMemoryAgencyRepository,
       generateMagicLinkFn,
     );
-    await notifyNewApplicationNeedsReview.execute(validDemandeImmersion);
+    await notifyNewApplicationNeedsReview.execute(validImmersionApplication);
   });
 });

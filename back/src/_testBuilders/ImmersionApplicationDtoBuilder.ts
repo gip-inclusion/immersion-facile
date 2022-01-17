@@ -23,7 +23,7 @@ export const VALID_PHONES = [
   "+41800001853",
 ];
 
-const validDemandeImmersion: ImmersionApplicationDto = {
+const validImmersionApplication: ImmersionApplicationDto = {
   id: DEMANDE_IMMERSION_ID,
   status: "DRAFT",
   source: "GENERIC",
@@ -56,7 +56,9 @@ const validDemandeImmersion: ImmersionApplicationDto = {
 export class ImmersionApplicationDtoBuilder
   implements Builder<ImmersionApplicationDto>
 {
-  constructor(private dto: ImmersionApplicationDto = validDemandeImmersion) {}
+  constructor(
+    private dto: ImmersionApplicationDto = validImmersionApplication,
+  ) {}
 
   public withEmail(email: string): ImmersionApplicationDtoBuilder {
     return new ImmersionApplicationDtoBuilder({ ...this.dto, email });

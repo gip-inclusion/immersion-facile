@@ -23,7 +23,7 @@ export type InMemoryRepositories = {
   immersionOffer: InMemoryImmersionOfferRepository;
   agency: InMemoryAgencyRepository;
   formEstablishment: InMemoryFormEstablishmentRepository;
-  demandeImmersion: InMemoryImmersionApplicationRepository;
+  immersionApplication: InMemoryImmersionApplicationRepository;
   searchesMade: InMemorySearchMadeRepository;
   rome: InMemoryRomeGateway;
   email: InMemoryEmailGateway;

@@ -39,7 +39,10 @@ export class ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature ex
     const { id, mentorEmail, firstName, lastName, businessName, mentor } =
       application;
 
-    logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
+    logger.info(
+      { immersionApplicationId: id },
+      `------------- Entering execute`,
+    );
 
     await this.emailFilter.withAllowedRecipients(
       [mentorEmail],

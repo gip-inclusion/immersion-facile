@@ -37,14 +37,14 @@ export class InMemoryImmersionApplicationRepository
   }
 
   public async updateImmersionApplication(
-    demandeImmersion: ImmersionApplicationEntity,
+    immersionApplication: ImmersionApplicationEntity,
   ) {
-    logger.info({ demandeImmersion }, "updateDemandeImmersion");
-    const id = demandeImmersion.id;
+    logger.info({ immersionApplication }, "updateDemandeImmersion");
+    const id = immersionApplication.id;
     if (!this._immersionApplications[id]) {
       return undefined;
     }
-    this._immersionApplications[id] = demandeImmersion;
+    this._immersionApplications[id] = immersionApplication;
     return id;
   }
 

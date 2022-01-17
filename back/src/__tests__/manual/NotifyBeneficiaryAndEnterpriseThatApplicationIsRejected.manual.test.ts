@@ -15,7 +15,7 @@ import { AllowListEmailFilter } from "./../../adapters/secondary/core/EmailFilte
 // Requires the following environment variables to be set for the tests to pass:
 // - SENDINBLUE_API_KEY
 
-const validDemandeImmersion = new ImmersionApplicationDtoBuilder()
+const validImmersionApplication = new ImmersionApplicationDtoBuilder()
   .withEmail("jean-francois.macresy@beta.gouv.fr")
   .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
   .build();
@@ -31,21 +31,22 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
     const config = AppConfig.createFromEnv();
     emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
     agencyRepository = new InMemoryAgencyRepository([
-      AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
+      AgencyConfigBuilder.create(validImmersionApplication.agencyId)
         .withCounsellorEmails([counsellorEmail])
         .build(),
     ]);
-    validDemandeImmersion.status = applicationStatusFromString("REJECTED");
-    validDemandeImmersion.rejectionJustification = rejectionJustification;
+    validImmersionApplication.status = applicationStatusFromString("REJECTED");
+    validImmersionApplication.rejectionJustification = rejectionJustification;
   });
 
   test("Sends rejection email", async () => {
-    validDemandeImmersion.mentorEmail = "jeanfrancois.macresy@gmail.com";
-    validDemandeImmersion.email = "jeanfrancois.macresy+beneficiary@gmail.com";
+    validImmersionApplication.mentorEmail = "jeanfrancois.macresy@gmail.com";
+    validImmersionApplication.email =
+      "jeanfrancois.macresy+beneficiary@gmail.com";
 
     const emailFilter = new AllowListEmailFilter([
-      validDemandeImmersion.mentorEmail,
-      validDemandeImmersion.email,
+      validImmersionApplication.mentorEmail,
+      validImmersionApplication.email,
       counsellorEmail,
     ]);
 
@@ -57,7 +58,7 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
       );
 
     await notifyBeneficiaryAndEnterpriseThatApplicationIsRejected.execute(
-      validDemandeImmersion,
+      validImmersionApplication,
     );
   });
 });

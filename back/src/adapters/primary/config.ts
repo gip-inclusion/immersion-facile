@@ -175,7 +175,7 @@ export const createRepositories = async (
   });
 
   return {
-    demandeImmersion:
+    immersionApplication:
       config.repositories === "PG"
         ? new PgImmersionApplicationRepository(await getPgPoolFn().connect())
         : new InMemoryImmersionApplicationRepository(),
@@ -352,44 +352,44 @@ const createUseCases = (
   const adresseAPI = new HttpAdresseAPI(noRateLimit, noRetries);
 
   return {
-    addDemandeImmersion: new AddImmersionApplication(
-      repositories.demandeImmersion,
+    addImmersionApplication: new AddImmersionApplication(
+      repositories.immersionApplication,
       createNewEvent,
       repositories.outbox,
       getSiret,
       config.featureFlags,
     ),
-    getDemandeImmersion: new GetImmersionApplication(
-      repositories.demandeImmersion,
+    getImmersionApplication: new GetImmersionApplication(
+      repositories.immersionApplication,
     ),
-    listDemandeImmersion: new ListImmersionApplication(
-      repositories.demandeImmersion,
+    listImmersionApplication: new ListImmersionApplication(
+      repositories.immersionApplication,
     ),
-    updateDemandeImmersion: new UpdateImmersionApplication(
+    updateImmersionApplication: new UpdateImmersionApplication(
       createNewEvent,
       repositories.outbox,
-      repositories.demandeImmersion,
+      repositories.immersionApplication,
       config.featureFlags,
     ),
-    validateDemandeImmersion: new ValidateImmersionApplication(
-      repositories.demandeImmersion,
+    validateImmersionApplication: new ValidateImmersionApplication(
+      repositories.immersionApplication,
       createNewEvent,
       repositories.outbox,
     ),
     updateImmersionApplicationStatus: new UpdateImmersionApplicationStatus(
-      repositories.demandeImmersion,
+      repositories.immersionApplication,
       createNewEvent,
       repositories.outbox,
       config.featureFlags,
     ),
     signImmersionApplication: new SignImmersionApplication(
-      repositories.demandeImmersion,
+      repositories.immersionApplication,
       createNewEvent,
       repositories.outbox,
     ),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewMagicLink: new RenewMagicLink(
-      repositories.demandeImmersion,
+      repositories.immersionApplication,
       createNewEvent,
       repositories.outbox,
       repositories.agency,

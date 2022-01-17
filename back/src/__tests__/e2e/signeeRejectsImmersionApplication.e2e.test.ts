@@ -43,7 +43,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
   let addImmersionApplication: AddImmersionApplication;
   let updateImmersionApplication: UpdateImmersionApplication;
   let updateImmersionApplicationStatus: UpdateImmersionApplicationStatus;
-  let validateDemandeImmersion: ValidateImmersionApplication;
+  let validateImmersionApplication: ValidateImmersionApplication;
   let applicationRepository: InMemoryImmersionApplicationRepository;
   let sireneRepository: InMemorySireneRepository;
   let outboxRepository: OutboxRepository;
@@ -55,7 +55,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
   let confirmToMentorRequestSignature: ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature;
   let notifyApplicationNeedsModif: NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification;
   let notifyToTeam: NotifyToTeamApplicationSubmittedByBeneficiary;
-  let validDemandeImmersion: ImmersionApplicationDto;
+  let validImmersionApplication: ImmersionApplicationDto;
   let eventBus: EventBus;
   let eventCrawler: BasicEventCrawler;
   let emailFilter: EmailFilter;
@@ -71,7 +71,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     emailGw = new InMemoryEmailGateway();
-    validDemandeImmersion = new ImmersionApplicationDtoBuilder()
+    validImmersionApplication = new ImmersionApplicationDtoBuilder()
       .withStatus("READY_TO_SIGN")
       .build();
     eventBus = new InMemoryEventBus();
@@ -89,7 +89,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       getSiret,
       featureFlags,
     );
-    validateDemandeImmersion = new ValidateImmersionApplication(
+    validateImmersionApplication = new ValidateImmersionApplication(
       applicationRepository,
       createNewEvent,
       outboxRepository,
@@ -103,7 +103,9 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
     emailFilter = new AlwaysAllowEmailFilter();
 
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
+    agencyConfig = AgencyConfigBuilder.create(
+      validImmersionApplication.agencyId,
+    )
       .withName("TEST-name")
       .withAdminEmails([adminEmail])
       .withQuestionnaireUrl("TEST-questionnaireUrl")
@@ -142,7 +144,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       );
   });
 
-  // Creates a DemandeImmersion, check it is saved properly and that event had been triggered (thanks to subscription),
+  // Creates a ImmersionApplication, check it is saved properly and that event had been triggered (thanks to subscription),
   // then check mails have been sent trough the inmemory mail gateway
   test("saves valid applications in the repository", async () => {
     await eventCrawler.processEvents();
@@ -179,8 +181,10 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     );
 
     // We expect this execute to trigger an event on ImmersionApplicationSubmittedByBeneficiary topic
-    const result = await addImmersionApplication.execute(validDemandeImmersion);
-    expect(result).toEqual({ id: validDemandeImmersion.id });
+    const result = await addImmersionApplication.execute(
+      validImmersionApplication,
+    );
+    expect(result).toEqual({ id: validImmersionApplication.id });
 
     // the following line triggers the eventCrawler (in prod it would be triggered every 10sec or so)
     await eventCrawler.processEvents();
@@ -194,9 +198,9 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
     // Ignoring iat, exp fields for the purpose of this test
     const beneficiaryMLPayload = createMagicLinkPayload(
-      validDemandeImmersion.id,
+      validImmersionApplication.id,
       "beneficiary",
-      validDemandeImmersion.email,
+      validImmersionApplication.email,
     );
     const resultRequestModif = await updateImmersionApplicationStatus.execute(
       { justification: "test justification", status: "DRAFT" },
@@ -211,20 +215,23 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     expect(sentEmails).toHaveLength(5);
 
     const updatedImmersion = await applicationRepository.getById(
-      validDemandeImmersion.id,
+      validImmersionApplication.id,
     );
     expect(updatedImmersion.status === "DRAFT");
 
     // Now the enterprise goes ahead and implements requested changes and sends back for signatures:
     const mentorMLPayload = createMagicLinkPayload(
-      validDemandeImmersion.id,
+      validImmersionApplication.id,
       "establishment",
-      validDemandeImmersion.mentorEmail,
+      validImmersionApplication.mentorEmail,
     );
     await updateImmersionApplication.execute(
       {
-        demandeImmersion: { ...validDemandeImmersion, status: "READY_TO_SIGN" },
-        id: validDemandeImmersion.id,
+        immersionApplication: {
+          ...validImmersionApplication,
+          status: "READY_TO_SIGN",
+        },
+        id: validImmersionApplication.id,
       },
       mentorMLPayload,
     );

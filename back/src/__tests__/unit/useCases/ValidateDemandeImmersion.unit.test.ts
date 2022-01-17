@@ -21,7 +21,7 @@ import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 
 describe("Validate immersionApplication", () => {
-  let validateDemandeImmersion: ValidateImmersionApplication;
+  let validateImmersionApplication: ValidateImmersionApplication;
   let outboxRepository: OutboxRepository;
   let repository: InMemoryImmersionApplicationRepository;
   let createNewEvent: CreateNewEvent;
@@ -35,7 +35,7 @@ describe("Validate immersionApplication", () => {
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-    validateDemandeImmersion = new ValidateImmersionApplication(
+    validateImmersionApplication = new ValidateImmersionApplication(
       repository,
       createNewEvent,
       outboxRepository,
@@ -44,30 +44,31 @@ describe("Validate immersionApplication", () => {
 
   describe("When the immersionApplication is valid", () => {
     test("validates the immersionApplication in the repository", async () => {
-      const demandesImmersion: ImmersionApplications = {};
-      const demandeImmersionEntity = ImmersionApplicationEntity.create(
+      const immersionApplication: ImmersionApplications = {};
+      const immersionApplicationEntity = ImmersionApplicationEntity.create(
         new ImmersionApplicationDtoBuilder().withStatus("IN_REVIEW").build(),
       );
-      demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
-      repository.setDemandesImmersion(demandesImmersion);
+      immersionApplication[immersionApplicationEntity.id] =
+        immersionApplicationEntity;
+      repository.setDemandesImmersion(immersionApplication);
 
-      const { id } = await validateDemandeImmersion.execute(
-        demandeImmersionEntity.id,
+      const { id } = await validateImmersionApplication.execute(
+        immersionApplicationEntity.id,
       );
-      const expectedDemandeImmersion: ImmersionApplicationDto = {
-        ...demandeImmersionEntity.toDto(),
+      const expectedImmersionApplication: ImmersionApplicationDto = {
+        ...immersionApplicationEntity.toDto(),
         status: "VALIDATED",
       };
 
       expectEventSavedInOutbox(outboxRepository, {
         topic: "FinalImmersionApplicationValidationByAdmin",
-        payload: expectedDemandeImmersion,
+        payload: expectedImmersionApplication,
       });
-      expect(id).toEqual(demandeImmersionEntity.id);
+      expect(id).toEqual(immersionApplicationEntity.id);
 
       const storedInRepo = await repository.getAll();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        expectedDemandeImmersion,
+        expectedImmersionApplication,
       ]);
     });
   });
@@ -81,7 +82,7 @@ describe("Validate immersionApplication", () => {
       repository.setDemandesImmersion(demandesImmersion);
 
       await expectPromiseToFailWithError(
-        validateDemandeImmersion.execute(demandeImmersionEntity.id),
+        validateImmersionApplication.execute(demandeImmersionEntity.id),
         new BadRequestError(demandeImmersionEntity.id),
       );
 
@@ -96,7 +97,7 @@ describe("Validate immersionApplication", () => {
   describe("When no immersionApplication with id exists", () => {
     it("throws NotFoundError", async () => {
       await expectPromiseToFailWithError(
-        validateDemandeImmersion.execute("unknown_demande_immersion_id"),
+        validateImmersionApplication.execute("unknown_demande_immersion_id"),
         new NotFoundError("unknown_demande_immersion_id"),
       );
     });

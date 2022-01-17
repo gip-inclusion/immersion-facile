@@ -30,7 +30,7 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
 
   public async _execute(dto: ImmersionApplicationDto): Promise<void> {
     logger.info(
-      { demandeImmersionid: dto.id },
+      { immersionApplicationId: dto.id },
       "------------- Entering execute.",
     );
 

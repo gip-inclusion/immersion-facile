@@ -30,8 +30,8 @@ interface ApplicationFormProps {
 }
 
 const isDemandeImmersionFrozen = (
-  demandeImmersion: Partial<ImmersionApplicationDto>,
-): boolean => !demandeImmersion.status || demandeImmersion.status !== "DRAFT";
+  immersionApplication: Partial<ImmersionApplicationDto>,
+): boolean => !immersionApplication.status || immersionApplication.status !== "DRAFT";
 
 const { featureFlags, dev } = ENV;
 

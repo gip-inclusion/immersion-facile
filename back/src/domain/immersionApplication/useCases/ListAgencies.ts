@@ -2,16 +2,12 @@ import {
   AgencyDto,
   ListAgenciesRequestDto,
   listAgenciesRequestSchema,
-  ListAgenciesResponseDto,
 } from "../../../shared/agencies";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { UseCase } from "../../core/UseCase";
 import { AgencyConfig, AgencyRepository } from "../ports/AgencyRepository";
 
-export class ListAgencies extends UseCase<
-  ListAgenciesRequestDto,
-  ListAgenciesResponseDto
-> {
+export class ListAgencies extends UseCase<ListAgenciesRequestDto, AgencyDto[]> {
   constructor(readonly agencyRepository: AgencyRepository) {
     super();
   }

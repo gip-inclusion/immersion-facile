@@ -22,7 +22,7 @@ export class ValidateImmersionApplication extends UseCase<
   ValidateImmersionApplicationResponseDto
 > {
   constructor(
-    private readonly demandeImmersionRepository: ImmersionApplicationRepository,
+    private readonly immersionApplicationRepository: ImmersionApplicationRepository,
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
   ) {
@@ -34,20 +34,20 @@ export class ValidateImmersionApplication extends UseCase<
   public async _execute(
     id: ImmersionApplicationId,
   ): Promise<ValidateImmersionApplicationResponseDto> {
-    const demandeImmersionEntity =
-      await this.demandeImmersionRepository.getById(id);
-    if (!demandeImmersionEntity) throw new NotFoundError(id);
+    const immersionApplicationEntity =
+      await this.immersionApplicationRepository.getById(id);
+    if (!immersionApplicationEntity) throw new NotFoundError(id);
 
-    if (demandeImmersionEntity.toDto().status !== "IN_REVIEW")
+    if (immersionApplicationEntity.toDto().status !== "IN_REVIEW")
       throw new BadRequestError(id);
 
     const validatedEntity = ImmersionApplicationEntity.create({
-      ...demandeImmersionEntity.toDto(),
+      ...immersionApplicationEntity.toDto(),
       status: "VALIDATED",
     });
 
     const updatedId =
-      await this.demandeImmersionRepository.updateImmersionApplication(
+      await this.immersionApplicationRepository.updateImmersionApplication(
         validatedEntity,
       );
     if (!updatedId) throw new NotFoundError(updatedId);

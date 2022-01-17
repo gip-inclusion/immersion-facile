@@ -31,7 +31,10 @@ export class NotifyApplicationPartiallySigned extends UseCase<ImmersionApplicati
     logger.error("Not implemented yet!!!");
     return;
 
-    logger.info({ demandeImmersionid: id }, `------------- Entering execute`);
+    logger.info(
+      { immersionApplicationId: id },
+      `------------- Entering execute`,
+    );
 
     if (beneficiaryAccepted) {
       // Notify

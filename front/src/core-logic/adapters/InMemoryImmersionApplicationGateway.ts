@@ -94,12 +94,15 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   }
 
   public async add(
-    demandeImmersion: ImmersionApplicationDto,
+    immersionApplication: ImmersionApplicationDto,
   ): Promise<ImmersionApplicationId> {
-    console.log("InMemoryImmersionApplicationGateway.add: ", demandeImmersion);
+    console.log(
+      "InMemoryImmersionApplicationGateway.add: ",
+      immersionApplication,
+    );
     await sleep(SIMULATED_LATENCY_MS);
-    this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
-    return demandeImmersion.id;
+    this._demandesImmersion[immersionApplication.id] = immersionApplication;
+    return immersionApplication.id;
   }
 
   public async backofficeGet(
@@ -131,30 +134,30 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   }
 
   public async update(
-    demandeImmersion: ImmersionApplicationDto,
+    immersionApplication: ImmersionApplicationDto,
   ): Promise<ImmersionApplicationId> {
     console.log(
       "InMemoryImmersionApplicationGateway.update: ",
-      demandeImmersion,
+      immersionApplication,
     );
     await sleep(SIMULATED_LATENCY_MS);
-    this._demandesImmersion[demandeImmersion.id] = demandeImmersion;
-    return demandeImmersion.id;
+    this._demandesImmersion[immersionApplication.id] = immersionApplication;
+    return immersionApplication.id;
   }
 
   public async updateML(
-    demandeImmersion: ImmersionApplicationDto,
+    immersionApplication: ImmersionApplicationDto,
     jwt: string,
   ): Promise<string> {
     console.log(
       "InMemoryImmersionApplicationGateway.updateML: ",
-      demandeImmersion,
+      immersionApplication,
     );
     const payload = decodeJwt(jwt);
 
     await sleep(SIMULATED_LATENCY_MS);
-    this._demandesImmersion[payload.applicationId] = demandeImmersion;
-    return demandeImmersion.id;
+    this._demandesImmersion[payload.applicationId] = immersionApplication;
+    return immersionApplication.id;
   }
 
   public async updateStatus(

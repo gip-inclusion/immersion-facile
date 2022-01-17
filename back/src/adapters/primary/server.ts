@@ -54,7 +54,7 @@ export const createApp = async (
     .route(`/${immersionApplicationsRoute}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.addDemandeImmersion.execute(req.body),
+        deps.useCases.addImmersionApplication.execute(req.body),
       ),
     )
     .get(async (req, res) =>
@@ -72,7 +72,7 @@ export const createApp = async (
       sendHttpResponse(
         req,
         res,
-        () => deps.useCases.validateDemandeImmersion.execute(req.params.id),
+        () => deps.useCases.validateImmersionApplication.execute(req.params.id),
         deps.authChecker,
       ),
     );
@@ -109,7 +109,7 @@ export const createApp = async (
       sendHttpResponse(
         req,
         res,
-        () => deps.useCases.getDemandeImmersion.execute(req.params),
+        () => deps.useCases.getImmersionApplication.execute(req.params),
         deps.authChecker,
       ),
     );

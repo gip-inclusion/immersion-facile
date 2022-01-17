@@ -27,7 +27,7 @@ import {
 } from "../../../shared/ImmersionApplicationDto";
 
 describe("Update immersionApplication", () => {
-  let updateDemandeImmersion: UpdateImmersionApplication;
+  let updateImmersionApplication: UpdateImmersionApplication;
   let immersionApplicationRepository: InMemoryImmersionApplicationRepository;
   let featureFlags: FeatureFlags;
   let outboxRepository: OutboxRepository;
@@ -43,7 +43,7 @@ describe("Update immersionApplication", () => {
     });
     featureFlags = FeatureFlagsBuilder.allOff().build();
 
-    updateDemandeImmersion = new UpdateImmersionApplication(
+    updateImmersionApplication = new UpdateImmersionApplication(
       createNewEvent,
       outboxRepository,
       immersionApplicationRepository,
@@ -63,9 +63,9 @@ describe("Update immersionApplication", () => {
         .withEmail("new@email.fr")
         .build();
 
-      const { id } = await updateDemandeImmersion.execute({
+      const { id } = await updateImmersionApplication.execute({
         id: updatedDemandeImmersion.id,
-        demandeImmersion: updatedDemandeImmersion,
+        immersionApplication: updatedDemandeImmersion,
       });
       expect(id).toEqual(updatedDemandeImmersion.id);
 
@@ -84,9 +84,9 @@ describe("Update immersionApplication", () => {
         .build();
 
       await expectPromiseToFailWithError(
-        updateDemandeImmersion.execute({
+        updateImmersionApplication.execute({
           id,
-          demandeImmersion: validImmersionApplication,
+          immersionApplication: validImmersionApplication,
         }),
         new NotFoundError(id),
       );
@@ -101,9 +101,9 @@ describe("Update immersionApplication", () => {
         .build();
 
       await expectPromiseToFailWithError(
-        updateDemandeImmersion.execute({
+        updateImmersionApplication.execute({
           id: updatedDemandeImmersion.id,
-          demandeImmersion: updatedDemandeImmersion,
+          immersionApplication: updatedDemandeImmersion,
         }),
         new BadRequestError(updatedDemandeImmersion.id),
       );
@@ -128,8 +128,8 @@ describe("Update immersionApplication", () => {
         .build();
 
       expect(
-        await updateDemandeImmersion.execute({
-          demandeImmersion: validImmersionApplication,
+        await updateImmersionApplication.execute({
+          immersionApplication: validImmersionApplication,
           id: validImmersionApplication.id,
         }),
       ).toEqual({
@@ -145,8 +145,8 @@ describe("Update immersionApplication", () => {
         .build();
 
       expect(
-        await updateDemandeImmersion.execute({
-          demandeImmersion: inReviewImmersionApplication,
+        await updateImmersionApplication.execute({
+          immersionApplication: inReviewImmersionApplication,
           id: inReviewImmersionApplication.id,
         }),
       ).toEqual({
@@ -165,8 +165,8 @@ describe("Update immersionApplication", () => {
           .withId(id)
           .build();
         await expectPromiseToFailWithError(
-          updateDemandeImmersion.execute({
-            demandeImmersion: immersionApplication,
+          updateImmersionApplication.execute({
+            immersionApplication,
             id: immersionApplication.id,
           }),
           new ForbiddenError(),

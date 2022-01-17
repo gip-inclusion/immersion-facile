@@ -38,14 +38,14 @@ export class UpdateImmersionApplication extends UseCase<
       ? "READY_TO_SIGN"
       : "IN_REVIEW";
     if (
-      params.demandeImmersion.status != "DRAFT" &&
-      params.demandeImmersion.status != minimalValidStatus
+      params.immersionApplication.status != "DRAFT" &&
+      params.immersionApplication.status != minimalValidStatus
     ) {
       throw new ForbiddenError();
     }
 
     const immersionApplicationEntity = ImmersionApplicationEntity.create(
-      params.demandeImmersion,
+      params.immersionApplication,
     );
 
     const currentApplication =
@@ -60,11 +60,11 @@ export class UpdateImmersionApplication extends UseCase<
       );
     if (!id) throw new NotFoundError(params.id);
 
-    if (params.demandeImmersion.status === minimalValidStatus) {
+    if (params.immersionApplication.status === minimalValidStatus) {
       // So far we are in the case where a beneficiary made an update on an Immersion Application, and we just need to review it for eligibility
       const event = this.createNewEvent({
         topic: "ImmersionApplicationSubmittedByBeneficiary",
-        payload: params.demandeImmersion,
+        payload: params.immersionApplication,
       });
 
       await this.outboxRepository.save(event);

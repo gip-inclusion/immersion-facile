@@ -74,7 +74,7 @@ export const applicationSourceFromString = (s: string): ApplicationSource => {
 const scheduleSchema: z.ZodSchema<ScheduleDto> = z.any();
 const legacyScheduleSchema: z.ZodSchema<LegacyScheduleDto> = z.any();
 
-export type ImmersionApplicationId = Flavor<string, "DemandeImmersionId">;
+export type ImmersionApplicationId = Flavor<string, "ImmersionApplicationId">;
 const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
   zTrimmedString;
 
@@ -162,27 +162,29 @@ export const immersionApplicationArraySchema = z.array(
   immersionApplicationSchema,
 );
 
-const idInObject = z.object({
+const withImmersionApplicationIdSchema = z.object({
   id: immersionApplicationIdSchema,
 });
 
 // prettier-ignore
 export type AddImmersionApplicationResponseDto = z.infer<typeof addImmersionApplicationResponseDtoSchema>;
-export const addImmersionApplicationResponseDtoSchema = idInObject;
+export const addImmersionApplicationResponseDtoSchema =
+  withImmersionApplicationIdSchema;
 
 // prettier-ignore
 export type GetImmersionApplicationRequestDto = z.infer<typeof getImmersionApplicationRequestDtoSchema>;
-export const getImmersionApplicationRequestDtoSchema = idInObject;
+export const getImmersionApplicationRequestDtoSchema =
+  withImmersionApplicationIdSchema;
 
 // prettier-ignore
 export type UpdateImmersionApplicationRequestDto = z.infer<typeof updateImmersionApplicationRequestDtoSchema>;
 export const updateImmersionApplicationRequestDtoSchema = z
   .object({
-    demandeImmersion: immersionApplicationSchema,
+    immersionApplication: immersionApplicationSchema,
     id: immersionApplicationIdSchema,
   })
   .refine(
-    ({ demandeImmersion, id }) => id === demandeImmersion.id,
+    ({ immersionApplication, id }) => id === immersionApplication.id,
     "The ID in the URL path must match the ID in the request body.",
   );
 
@@ -195,7 +197,8 @@ export const listImmersionApplicationRequestDtoSchema = z.object({
 
 // prettier-ignore
 export type UpdateImmersionApplicationResponseDto = z.infer<typeof updateImmersionApplicationResponseDtoSchema>;
-export const updateImmersionApplicationResponseDtoSchema = idInObject;
+export const updateImmersionApplicationResponseDtoSchema =
+  withImmersionApplicationIdSchema;
 
 // prettier-ignore
 export type ValidateImmersionApplicationRequestDto = z.infer<typeof validateImmersionApplicationRequestDtoSchema>;
@@ -204,7 +207,8 @@ export const validateImmersionApplicationRequestDtoSchema =
 
 // prettier-ignore
 export type ValidateImmersionApplicationResponseDto = z.infer<typeof validateImmersionApplicationResponseDtoSchema>;
-export const validateImmersionApplicationResponseDtoSchema = idInObject;
+export const validateImmersionApplicationResponseDtoSchema =
+  withImmersionApplicationIdSchema;
 
 // prettier-ignore
 export type UpdateImmersionApplicationStatusRequestDto = z.infer<typeof updateImmersionApplicationStatusRequestSchema>;
@@ -215,7 +219,8 @@ export const updateImmersionApplicationStatusRequestSchema = z.object({
 
 // prettier-ignore
 export type UpdateImmersionApplicationStatusResponseDto = z.infer<typeof updateImmersionApplicationStatusResponseSchema>;
-export const updateImmersionApplicationStatusResponseSchema = idInObject;
+export const updateImmersionApplicationStatusResponseSchema =
+  withImmersionApplicationIdSchema;
 
 export type SignImmersionApplicationRequestDto = z.infer<
   typeof signImmersionApplicationRequestSchema
@@ -225,7 +230,8 @@ export const signImmersionApplicationRequestSchema = z.object({});
 export type SignImmersionApplicationResponseDto = z.infer<
   typeof signImmersionApplicationResponseSchema
 >;
-export const signImmersionApplicationResponseSchema = idInObject;
+export const signImmersionApplicationResponseSchema =
+  withImmersionApplicationIdSchema;
 
 // prettier-ignore
 export type GenerateMagicLinkRequestDto = z.infer<typeof generateMagicLinkRequestSchema>;

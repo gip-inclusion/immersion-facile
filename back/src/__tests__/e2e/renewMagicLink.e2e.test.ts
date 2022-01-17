@@ -43,7 +43,7 @@ describe("Magic link renewal flow", () => {
   let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
   let emailGw: InMemoryEmailGateway;
-  let validDemandeImmersion: ImmersionApplicationDto;
+  let validImmersionApplication: ImmersionApplicationDto;
   let eventBus: EventBus;
   let eventCrawler: BasicEventCrawler;
   let emailFilter: EmailFilter;
@@ -62,13 +62,15 @@ describe("Magic link renewal flow", () => {
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     emailGw = new InMemoryEmailGateway();
-    validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
+    validImmersionApplication = new ImmersionApplicationDtoBuilder().build();
     eventBus = new InMemoryEventBus();
     eventCrawler = new BasicEventCrawler(eventBus, outboxRepository);
 
     emailFilter = new AlwaysAllowEmailFilter();
 
-    agencyConfig = AgencyConfigBuilder.create(validDemandeImmersion.agencyId)
+    agencyConfig = AgencyConfigBuilder.create(
+      validImmersionApplication.agencyId,
+    )
       .withName("TEST-name")
       .withAdminEmails([adminEmail])
       .withQuestionnaireUrl("TEST-questionnaireUrl")
@@ -101,9 +103,9 @@ describe("Magic link renewal flow", () => {
     );
 
     const payload = createMagicLinkPayload(
-      validDemandeImmersion.id,
+      validImmersionApplication.id,
       "beneficiary",
-      validDemandeImmersion.email,
+      validImmersionApplication.email,
     );
 
     const request: RenewMagicLinkRequestDto = {
@@ -119,7 +121,7 @@ describe("Magic link renewal flow", () => {
     expect(sentEmails).toHaveLength(1);
 
     expect(sentEmails[0].type).toEqual("MAGIC_LINK_RENEWAL");
-    expect(sentEmails[0].recipients).toEqual([validDemandeImmersion.email]);
+    expect(sentEmails[0].recipients).toEqual([validImmersionApplication.email]);
 
     const ml = sentEmails[0].params.magicLink as string;
     expect(ml.startsWith("immersionfacile.fr/"));
