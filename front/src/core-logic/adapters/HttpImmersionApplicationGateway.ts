@@ -1,6 +1,10 @@
 import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import { AgencyDto, listAgenciesResponseSchema } from "src/shared/agencies";
+import {
+  AgencyDto,
+  ListAgenciesRequestDto,
+  listAgenciesResponseSchema,
+} from "src/shared/agencies";
 import {
   AddImmersionApplicationResponseDto,
   addImmersionApplicationResponseDtoSchema,

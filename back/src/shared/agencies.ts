@@ -18,7 +18,4 @@ export const listAgenciesRequestSchema = z.object({
   position: latLonSchema.optional(),
 });
 
-export type ListAgenciesResponseDto = z.infer<
-  typeof listAgenciesResponseSchema
->;
 export const listAgenciesResponseSchema = z.array(agencySchema);

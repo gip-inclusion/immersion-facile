@@ -20,14 +20,14 @@ export class ListAgencies extends UseCase<
 
   public async _execute({
     position,
-  }: ListAgenciesRequestDto): Promise<ListAgenciesResponseDto> {
-    let configs = null;
-    if (position) {
-      configs = await this.agencyRepository.getNearby(position);
-    } else {
-      configs = await this.agencyRepository.getAll();
-    }
-    return configs.map(agencyConfigToAgencyDto);
+  }: ListAgenciesRequestDto): Promise<AgencyDto[]> {
+    const agencyConfigs = await this.getAgenciesConfig(position);
+    return agencyConfigs.map(agencyConfigToAgencyDto);
+  }
+
+  private getAgenciesConfig(position?: LatLonDto): Promise<AgencyConfig[]> {
+    if (position) return this.agencyRepository.getNearby(position);
+    return this.agencyRepository.getAll();
   }
 }
 

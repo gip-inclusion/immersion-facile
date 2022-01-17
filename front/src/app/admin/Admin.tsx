@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { immersionApplicationGateway } from "src/app/dependencies";
 import { routes } from "src/app/routes";
 import { FormAccordion } from "src/components/admin/FormAccordion";
