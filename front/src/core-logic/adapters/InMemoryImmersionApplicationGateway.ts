@@ -217,8 +217,9 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
 
   public async listAgencies(position: LatLonDto): Promise<AgencyDto[]> {
     const agencies = Object.values(this._agencies);
-    console.log("InMemoryImmersionApplicationGateway.listAgencies: ", agencies);
     await sleep(SIMULATED_LATENCY_MS);
+    console.log("InMemoryImmersionApplicationGateway.listAgencies: ", agencies);
+    return [];
     return agencies;
   }
 

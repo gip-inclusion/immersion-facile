@@ -1,3 +1,4 @@
+import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/dependencies";
@@ -28,21 +29,17 @@ export const AgencySelector = ({
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>({ name });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
   const [position, setPosition] = useState<LatLonDto | null>(null);
   const [agencies, setAgencies] = useState([placeholderAgency]);
 
-  const onChangeHandler = (evt: ChangeEvent) => {
-    const target = evt.currentTarget as HTMLSelectElement;
-    setValue(target.value);
-  };
-
   useEffect(() => {
     if (!position) {
       return;
     }
-
+    setIsLoading(true);
     immersionApplicationGateway
       .listAgencies(position)
       .then((agencies) => {
@@ -66,6 +63,9 @@ export const AgencySelector = ({
         setAgencies([]);
         setLoaded(false);
         setLoadingError(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [position]);
 
@@ -79,25 +79,14 @@ export const AgencySelector = ({
       {!disabled && (
         <>
           <label className="fr-label" htmlFor={name}>
-            Votre code postale *
+            Votre code postal *
           </label>
 
-          <PostcodeAutocomplete
-            inputStyle={{
-              paddingLeft: "48px",
-              background: `white no-repeat scroll 11px 8px`,
-            }}
-            onFound={(lat, lon) => {
-              setPosition({ lat, lon });
-            }}
-          />
-          <span className="fr-hint-text" id="select-hint-desc-hint">
-            Veuillez indiquer votre code postale
-          </span>
+          <PostcodeAutocomplete onFound={setPosition} />
         </>
       )}
 
-      <label className="fr-label" htmlFor={name}>
+      <label className="fr-label pt-4" htmlFor={name}>
         {label}
       </label>
       {description && (
@@ -105,24 +94,27 @@ export const AgencySelector = ({
           {description}
         </span>
       )}
-      <select
-        className="fr-select"
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChangeHandler}
-        onBlur={onBlur}
-        aria-describedby={`agency-code-{name}-error-desc-error`}
-        disabled={disabled || !loaded || !position}
-      >
-        {agencies.map(({ id, name }) => {
-          return (
-            <option value={id} key={id} label={name}>
-              {name}
-            </option>
-          );
-        })}
-      </select>
+      <div className="flex">
+        {isLoading && (
+          <div className="flex justify-center items-center pr-2">
+            <CircularProgress size="20px" />{" "}
+          </div>
+        )}
+        <select
+          className="fr-select"
+          id={name}
+          name={name}
+          value={value}
+          onChange={(evt) => {
+            setValue(evt.currentTarget.value);
+          }}
+          onBlur={onBlur}
+          aria-describedby={`agency-code-{name}-error-desc-error`}
+          disabled={disabled || !loaded || !position}
+        >
+          <Agencies agencies={agencies} />
+        </select>
+      </div>
       {showError && (
         <p id={`agency-code-{name}-error-desc-error`} className="fr-error-text">
           {loadingError
@@ -132,5 +124,21 @@ export const AgencySelector = ({
         </p>
       )}
     </div>
+  );
+};
+
+type AgenciesProps = {
+  agencies: AgencyDto[];
+};
+
+const Agencies = ({ agencies }: AgenciesProps) => {
+  return (
+    <>
+      {agencies.map(({ id, name }) => (
+        <option value={id} key={id} label={name}>
+          {name}
+        </option>
+      ))}
+    </>
   );
 };

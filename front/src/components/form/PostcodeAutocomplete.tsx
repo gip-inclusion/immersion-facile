@@ -6,7 +6,7 @@ export type PostcodeAutocompleteProps = {
   initialSearchTerm?: string;
   disabled?: boolean;
   inputStyle?: React.CSSProperties;
-  onFound: (lat: number, lon: number) => void;
+  onFound: (position: LatLonDto) => void;
 };
 
 export const PostcodeAutocomplete = ({
@@ -24,11 +24,11 @@ export const PostcodeAutocomplete = ({
     const sanitizedTerm = term.trim();
     if (!sanitizedTerm) return null;
     try {
-      const coords = await apiAdresseGateway.lookupPostCode(sanitizedTerm);
-      if (coords) {
-        onFound(coords.lat, coords.lon);
+      const position = await apiAdresseGateway.lookupPostCode(sanitizedTerm);
+      if (position) {
+        onFound(position);
       }
-      return coords;
+      return position;
     } catch (e: any) {
       setError(e);
       return null;
