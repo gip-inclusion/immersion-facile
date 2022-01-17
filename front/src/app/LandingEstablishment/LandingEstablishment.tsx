@@ -31,7 +31,6 @@ export const LandingEstablishment = () => (
       <a
         {...routes.formEstablishment().link}
         className="no-underline shadow-none bg-white py-3 px-8 rounded-md text-immersionBlue-dark"
-        target="_blank"
       >
         Référencer votre entreprise
       </a>
@@ -88,7 +87,6 @@ export const LandingEstablishment = () => (
       <a
         {...routes.formEstablishment().link}
         className="no-underline shadow-none bg-immersionBlue py-3 px-8 rounded-md text-white font-semibold my-3"
-        target="_blank"
       >
         Référencer votre entreprise
       </a>
@@ -120,7 +118,7 @@ export const LandingEstablishment = () => (
             Le bénéficiaire <Colored>conserve son statut initial</Colored> et
             est couvert par un prescripteur (Pôle emploi, Cap Emploi, Mission
             Locale, etc) grâce à la{" "}
-            <a {...routes.immersionApplication().link} target="_blank">
+            <a {...routes.immersionApplication().link}>
               signature d'une convention
             </a>
             .

@@ -11,6 +11,7 @@ import { routes } from "src/app/routes";
 import { Footer } from "src/components/Footer";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { MarianneHeader } from "src/components/MarianneHeader";
+import { Title } from "src/components/Title";
 import { ENV } from "src/environmentVariables";
 import {
   ApplicationSource,
@@ -164,10 +165,12 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
 
       <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
         <div className="fr-col-lg-8 fr-p-2w">
-          <h2>
-            Formulaire pour conventionner une période de mise en situation
-            professionnelle (PMSMP)
-          </h2>
+          <div className="flex justify-center">
+            <Title red>
+              Formulaire pour conventionner une période de mise en situation
+              professionnelle (PMSMP)
+            </Title>
+          </div>
           <div className="fr-text">
             Bravo ! <br />
             Vous avez trouvé une entreprise pour vous accueillir en immersion.{" "}
@@ -177,7 +180,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             En quelques minutes, complétez ce formulaire avec l'entreprise qui
             vous accueillera. <br />
             <p className="fr-text--xs">
-              Ce formulaire vaut équivalence de la signature du CERFA 13912 * 03
+              Ce formulaire vaut équivalence du CERFA 13912 * 03
             </p>
           </div>
 

@@ -93,8 +93,7 @@ export const SignForm = ({ route }: SignFormProps) => {
                   Relisez la bien et si cela vous convient, signez la avec le
                   bouton "je signe cette demande" <br />
                   <p className="fr-text--xs">
-                    Ce formulaire vaut équivalence de la signature du CERFA
-                    13912 * 03
+                    Ce formulaire vaut équivalence du CERFA 13912 * 03
                   </p>
                 </div>
 

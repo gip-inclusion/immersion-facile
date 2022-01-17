@@ -3,6 +3,7 @@ import { routes } from "src/app/routes";
 import { Footer } from "src/components/Footer";
 import { ImmersionHowTo } from "src/components/ImmersionHowTo";
 import { MarianneHeader } from "src/components/MarianneHeader";
+import SearchIcon from "@mui/icons-material/Search";
 
 import { ENV } from "src/environmentVariables";
 
@@ -55,7 +56,6 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
           <a
             {...routes.formEstablishment().link}
             className="no-underline shadow-none bg-immersionBlue py-3 px-2 rounded-md text-white font-semibold w-full text-center  h-15 text-sm "
-            target="_blank"
           >
             Référencer votre entreprise
           </a>
@@ -63,9 +63,7 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
             className="text-immersionBlue-dark font-sans text-center"
             style={{ maxWidth: "16rem" }}
           >
-            <a {...routes.landingEstablishment().link} target="_blank">
-              En savoir plus
-            </a>
+            <a {...routes.landingEstablishment().link}>En savoir plus</a>
           </div>
         </div>
         <div
@@ -79,11 +77,18 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
             Vous voulez essayer un métier <p /> en conditions réelles ?
           </div>
           <a
+            {...routes.search().link}
+            className="no-underline shadow-none bg-immersionRed py-3 px-2 mt-1 mb-2 rounded-md text-white font-semibold  w-full text-center h-15 text-sm "
+          >
+            Trouver une entreprise accueillante <SearchIcon />
+          </a>
+          <a
             {...routes.immersionApplication().link}
             className="no-underline shadow-none bg-immersionRed py-3 px-2 rounded-md text-white font-semibold  w-full text-center h-15 text-sm "
-            target="_blank"
           >
-            Faire une demande d'immersion professionnelle
+            J'ai trouvé mon immersion,
+            <br />
+            Initier une demande de convention
           </a>
         </div>
       </div>
