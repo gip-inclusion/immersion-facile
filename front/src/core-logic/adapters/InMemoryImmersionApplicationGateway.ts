@@ -219,7 +219,6 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     const agencies = Object.values(this._agencies);
     await sleep(SIMULATED_LATENCY_MS);
     console.log("InMemoryImmersionApplicationGateway.listAgencies: ", agencies);
-    return [];
     return agencies;
   }
 

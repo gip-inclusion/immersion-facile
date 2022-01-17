@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React from "react";
-import { Profession } from "src/app/FormEstablishment/Profession";
+import { FormEstablishmentProfession } from "src/app/FormEstablishment/FormEstablishmentProfession";
 import { ButtonAdd } from "src/components/ButtonAdd";
 import { ProfessionDto } from "src/shared/rome";
 import { removeAtIndex } from "src/shared/utils";
@@ -27,7 +27,7 @@ export const ProfessionList = ({ name, title }: ProfessionListProps) => {
       <div className="w-full">
         {title && <h5 className="text-lg font-semibold mt-6">{title}</h5>}
         {professions.map(({ description }, index) => (
-          <Profession
+          <FormEstablishmentProfession
             name={`${name}[${index}]`}
             label={description}
             onDelete={() => onDelete(index)}

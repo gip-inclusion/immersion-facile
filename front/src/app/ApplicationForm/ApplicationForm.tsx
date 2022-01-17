@@ -111,7 +111,7 @@ const createInitialApplication = (
 
     // Immersion
     immersionObjective: "",
-    immersionProfession: "Chef d'atelier",
+    immersionProfession: "Boulangerie - viennoiserie",
     immersionActivities: "Superviser",
     immersionSkills: "Attention au détail",
 

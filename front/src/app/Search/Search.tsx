@@ -1,7 +1,7 @@
 import { Form, Formik, FormikHelpers } from "formik";
 import React, { useState } from "react";
 import { immersionSearchGateway } from "src/app/dependencies";
-import { ProfessionAutocomplete } from "src/app/FormEstablishment/ProfessionAutocomplete";
+import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
 import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,

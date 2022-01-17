@@ -22,6 +22,7 @@ import type {
   ApplicationStatus,
   ImmersionApplicationDto,
 } from "src/shared/ImmersionApplicationDto";
+import { ApplicationFormProfession } from "./ApplicationFormProfession";
 
 const { featureFlags, dev } = ENV;
 
@@ -269,13 +270,9 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
       />
 
-      <TextInput
+      <ApplicationFormProfession
         label="Intitulé du poste / métier observé pendant l'immersion *"
-        name="immersionProfession"
-        type="text"
-        placeholder=""
         description="Ex : employé libre service, web développeur, boulanger …"
-        disabled={isFrozen}
       />
 
       <TextInput

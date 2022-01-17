@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React from "react";
-import { ProfessionAutocomplete } from "src/app/FormEstablishment/ProfessionAutocomplete";
+import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
 import { DeleteButton } from "src/components/DeleteButton";
 import { ProfessionDto } from "src/shared/rome";
 
@@ -10,7 +10,11 @@ type ProfessionProps = {
   onDelete: () => void;
 };
 
-export const Profession = ({ name, label, onDelete }: ProfessionProps) => {
+export const FormEstablishmentProfession = ({
+  name,
+  label,
+  onDelete,
+}: ProfessionProps) => {
   const [{ value }, _, { setValue }] = useField<ProfessionDto>(name);
 
   return (

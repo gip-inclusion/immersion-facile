@@ -21,7 +21,9 @@ const tryToConnect = async (
   if (tryNumber >= 10)
     throw new Error(`Tried to connect ${tryNumber} times without success`);
   try {
-    logger.info(`Trying to connect to DB : ${connectionString} try number : ${tryNumber}`);
+    logger.info(
+      `Trying to connect to DB : ${connectionString} try number : ${tryNumber}`,
+    );
     const pool = new Pool({ connectionString });
     const client = await pool.connect();
     logger.info("Successfully connected");
