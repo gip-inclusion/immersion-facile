@@ -54,9 +54,10 @@ const SignOnlyMessage = ({ isAlreadySigned }: SignOnlyMessageProps) => (
           : "Cette demande d'immersion est prête à être signée."}
       </p>
       <p>
-        {"Cette demande d'immersion n'est plus modifiable. " + isAlreadySigned
-          ? "Vous avez déjà signé cette demande d'immersion."
-          : "Veuillez la signer ou la renvoyer pour modification."}
+        {"Cette demande d'immersion n'est plus modifiable. " +
+          (isAlreadySigned
+            ? "Vous avez déjà signé cette demande d'immersion."
+            : "Veuillez la signer ou la renvoyer pour modification.")}
       </p>
     </div>
     <br />
@@ -351,8 +352,9 @@ export const ApplicationFormFields = ({
 
       {isSignatureMode && (
         <>
-          {alreadySubmitted && <p>Vous avez signé la convention.</p>}
-          {!alreadySubmitted && (
+          {alreadySubmitted ? (
+            <p>Vous avez signé la convention.</p>
+          ) : (
             <>
               <BoolCheckboxGroup
                 name={
