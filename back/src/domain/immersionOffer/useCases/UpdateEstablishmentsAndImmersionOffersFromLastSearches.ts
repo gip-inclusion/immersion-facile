@@ -179,17 +179,17 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     const sireneAnswer = await this.sireneRepository.get(
       laBonneBoiteCompany.siret,
     );
-    if (!sireneAnswer) {
+    if (!sireneAnswer || sireneAnswer.etablissements.length === 0) {
       logger.warn(
         { siret: laBonneBoiteCompany.siret },
         "Company from LaBonneBoite API not found in SIRENE",
       );
       return;
     }
+    const sireneEstablishment = sireneAnswer.etablissements[0];
 
-    const naf = inferNafFromSireneAnswer(sireneAnswer);
-    const numberEmployeesRange =
-      inferNumberEmployeesRangeFromSireneAnswer(sireneAnswer);
+    const naf = sireneEstablishment.naf;
+    const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
 
     return laBonneBoiteCompany.toEstablishmentAggregate(this.uuidGenerator, {
       naf,
@@ -197,22 +197,6 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     });
   }
 }
-
-// Those will probably be shared in a utils/helpers folder
-const inferNafFromSireneAnswer = (sireneRepoAnswer: SireneRepositoryAnswer) =>
-  sireneRepoAnswer.etablissements[0].uniteLegale.activitePrincipaleUniteLegale?.replace(
-    ".",
-    "",
-  );
-
-const inferNumberEmployeesRangeFromSireneAnswer = (
-  sireneRepoAnswer: SireneRepositoryAnswer,
-): TefenCode => {
-  const tefenCode =
-    sireneRepoAnswer.etablissements[0].uniteLegale.trancheEffectifsUniteLegale;
-
-  return !tefenCode || tefenCode == "NN" ? -1 : <TefenCode>+tefenCode;
-};
 
 const countOffers = (aggregates: EstablishmentAggregate[]) =>
   aggregates.reduce(

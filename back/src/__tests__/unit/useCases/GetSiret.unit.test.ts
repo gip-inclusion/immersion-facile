@@ -2,9 +2,9 @@ import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpRespons
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { SireneEstablishment } from "./../../../domain/sirene/ports/SireneRepository";
+import { SireneEstablishmentVO } from "./../../../domain/sirene/ports/SireneRepository";
 
-const validEstablishment: SireneEstablishment = {
+const validEstablishment = new SireneEstablishmentVO({
   siret: "12345678901234",
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE",
@@ -19,7 +19,7 @@ const validEstablishment: SireneEstablishment = {
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
-};
+});
 
 describe("GetSiret", () => {
   let repository: InMemorySireneRepository;
@@ -31,11 +31,13 @@ describe("GetSiret", () => {
   });
 
   describe("Checking for business being opened", () => {
-    const closedEstablishment = {
-      ...validEstablishment,
+    const closedEstablishment = new SireneEstablishmentVO({
+      ...validEstablishment.props,
       siret: "11111111111111",
-      etatAdministratifUniteLegale: "F",
-    };
+      uniteLegale: {
+        etatAdministratifUniteLegale: "F",
+      },
+    });
 
     beforeEach(() => {
       repository.setEstablishment(validEstablishment);
@@ -51,7 +53,7 @@ describe("GetSiret", () => {
         siret: "12345678901234",
         businessName: "MA P'TITE BOITE",
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-        naf: { code: "78.3Z", nomenclature: "Ref2" },
+        naf: { code: "783Z", nomenclature: "Ref2" },
         isOpen: true,
       });
     });
@@ -73,19 +75,21 @@ describe("GetSiret", () => {
       siret: "12345678901234",
       businessName: "MA P'TITE BOITE",
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-      naf: { code: "78.3Z", nomenclature: "Ref2" },
+      naf: { code: "783Z", nomenclature: "Ref2" },
       isOpen: true,
     });
   });
 
   test("populates businessName from nom/prenom when denomination not available", async () => {
-    repository.setEstablishment({
-      ...validEstablishment,
-      uniteLegale: {
-        prenomUsuelUniteLegale: "ALAIN",
-        nomUniteLegale: "PROST",
-      },
-    });
+    repository.setEstablishment(
+      new SireneEstablishmentVO({
+        ...validEstablishment.props,
+        uniteLegale: {
+          prenomUsuelUniteLegale: "ALAIN",
+          nomUniteLegale: "PROST",
+        },
+      }),
+    );
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
     });
@@ -93,16 +97,18 @@ describe("GetSiret", () => {
   });
 
   test("skips missing parts of adresseEtablissment", async () => {
-    repository.setEstablishment({
-      ...validEstablishment,
-      adresseEtablissement: {
-        // No numeroVoieEtablissement
-        typeVoieEtablissement: "L'ESPLANADE",
-        // No libelleVoieEtablissement
-        codePostalEtablissement: "30430",
-        libelleCommuneEtablissement: "BARJAC",
-      },
-    });
+    repository.setEstablishment(
+      new SireneEstablishmentVO({
+        ...validEstablishment.props,
+        adresseEtablissement: {
+          // No numeroVoieEtablissement
+          typeVoieEtablissement: "L'ESPLANADE",
+          // No libelleVoieEtablissement
+          codePostalEtablissement: "30430",
+          libelleCommuneEtablissement: "BARJAC",
+        },
+      }),
+    );
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
     });
@@ -110,14 +116,16 @@ describe("GetSiret", () => {
   });
 
   test("skips naf when not available", async () => {
-    repository.setEstablishment({
-      ...validEstablishment,
-      uniteLegale: {
-        denominationUniteLegale: "MA P'TITE BOITE",
-        // no activitePrincipaleUniteLegale
-        // no nomenclatureActivitePrincipaleUniteLegale
-      },
-    });
+    repository.setEstablishment(
+      new SireneEstablishmentVO({
+        ...validEstablishment.props,
+        uniteLegale: {
+          denominationUniteLegale: "MA P'TITE BOITE",
+          // no activitePrincipaleUniteLegale
+          // no nomenclatureActivitePrincipaleUniteLegale
+        },
+      }),
+    );
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
     });

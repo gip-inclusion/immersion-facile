@@ -1,8 +1,9 @@
 import { createLogger } from "./../../utils/logger";
 import {
-  SireneEstablishment,
+  SireneEstablishmentProps,
   SireneRepositoryAnswer,
   SireneRepository,
+  SireneEstablishmentVO,
 } from "../../domain/sirene/ports/SireneRepository";
 import { SiretDto } from "../../shared/siret";
 
@@ -14,7 +15,7 @@ export const TEST_ESTABLISHMENT3_SIRET = "77561959600155";
 export const TEST_ESTABLISHMENT4_SIRET = "24570135400111";
 export const TEST_ESTABLISHMENT5_SIRET = "01234567890123";
 
-export const TEST_ESTABLISHMENT1: SireneEstablishment = {
+export const TEST_ESTABLISHMENT1 = new SireneEstablishmentVO({
   siret: TEST_ESTABLISHMENT1_SIRET,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE",
@@ -30,9 +31,9 @@ export const TEST_ESTABLISHMENT1: SireneEstablishment = {
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
-};
+});
 
-export const TEST_ESTABLISHMENT2: SireneEstablishment = {
+export const TEST_ESTABLISHMENT2 = new SireneEstablishmentVO({
   siret: TEST_ESTABLISHMENT2_SIRET,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE 2",
@@ -47,9 +48,9 @@ export const TEST_ESTABLISHMENT2: SireneEstablishment = {
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
-};
+});
 
-export const TEST_ESTABLISHMENT3: SireneEstablishment = {
+export const TEST_ESTABLISHMENT3 = new SireneEstablishmentVO({
   siret: TEST_ESTABLISHMENT3_SIRET,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE 2",
@@ -64,8 +65,9 @@ export const TEST_ESTABLISHMENT3: SireneEstablishment = {
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
-};
-export const TEST_ESTABLISHMENT4: SireneEstablishment = {
+});
+
+export const TEST_ESTABLISHMENT4 = new SireneEstablishmentVO({
   siret: TEST_ESTABLISHMENT4_SIRET,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE 2",
@@ -80,9 +82,9 @@ export const TEST_ESTABLISHMENT4: SireneEstablishment = {
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
-};
+});
 
-type EstablishmentBySiret = { [siret: string]: SireneEstablishment };
+type EstablishmentBySiret = { [siret: string]: SireneEstablishmentVO };
 
 export class InMemorySireneRepository implements SireneRepository {
   private readonly _repo: EstablishmentBySiret = {
@@ -122,7 +124,7 @@ export class InMemorySireneRepository implements SireneRepository {
   }
 
   // Visible for testing
-  public setEstablishment(establishment: SireneEstablishment) {
+  public setEstablishment(establishment: SireneEstablishmentVO) {
     this._repo[establishment.siret] = establishment;
   }
 }

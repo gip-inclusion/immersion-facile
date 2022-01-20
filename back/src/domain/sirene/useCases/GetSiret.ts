@@ -1,5 +1,4 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { NafDto } from "../../../shared/naf";
 import {
   GetSiretRequestDto,
   getSiretRequestSchema,
@@ -7,7 +6,7 @@ import {
 } from "../../../shared/siret";
 import { UseCase } from "../../core/UseCase";
 import {
-  SireneEstablishment,
+  SireneEstablishmentVO,
   SireneRepository,
 } from "../ports/SireneRepository";
 
@@ -35,54 +34,12 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
   }
 }
 
-const getBusinessName = (etablissement: SireneEstablishment): string => {
-  const denomination = etablissement.uniteLegale.denominationUniteLegale;
-  if (denomination) return denomination;
-
-  return [
-    etablissement.uniteLegale.prenomUsuelUniteLegale,
-    etablissement.uniteLegale.nomUniteLegale,
-  ]
-    .filter((el) => !!el)
-    .join(" ");
-};
-
-const getBusinessAddress = (etablissement: SireneEstablishment): string =>
-  [
-    etablissement.adresseEtablissement.numeroVoieEtablissement,
-    etablissement.adresseEtablissement.typeVoieEtablissement,
-    etablissement.adresseEtablissement.libelleVoieEtablissement,
-    etablissement.adresseEtablissement.codePostalEtablissement,
-    etablissement.adresseEtablissement.libelleCommuneEtablissement,
-  ]
-    .filter((el) => !!el)
-    .join(" ");
-
-const getNaf = (etablissement: SireneEstablishment): NafDto | undefined => {
-  if (
-    !etablissement.uniteLegale.activitePrincipaleUniteLegale ||
-    !etablissement.uniteLegale.nomenclatureActivitePrincipaleUniteLegale
-  )
-    return undefined;
-
-  return {
-    code: etablissement.uniteLegale.activitePrincipaleUniteLegale,
-    nomenclature:
-      etablissement.uniteLegale.nomenclatureActivitePrincipaleUniteLegale,
-  };
-};
-
-const checkOpenForBusiness = (etablissement: SireneEstablishment): boolean => {
-  // The etatAdministratifUniteLegale is "C" for closed establishments, "A" for active ones.
-  return etablissement.uniteLegale.etatAdministratifUniteLegale === "A";
-};
-
 export const convertEtablissementToResponse = async (
-  establishment: SireneEstablishment,
+  sireneEstablishment: SireneEstablishmentVO,
 ): Promise<GetSiretResponseDto> => ({
-  siret: establishment.siret,
-  businessName: getBusinessName(establishment),
-  businessAddress: getBusinessAddress(establishment),
-  naf: getNaf(establishment),
-  isOpen: checkOpenForBusiness(establishment),
+  siret: sireneEstablishment.siret,
+  businessName: sireneEstablishment.businessName,
+  businessAddress: sireneEstablishment.formatedAddress,
+  naf: sireneEstablishment.nafAndNomenclature,
+  isOpen: sireneEstablishment.isActive,
 });

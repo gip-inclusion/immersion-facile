@@ -5,7 +5,7 @@ import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGat
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
 import { TransformFormEstablishmentIntoSearchData } from "../../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
-import { SireneEstablishment } from "../../../domain/sirene/ports/SireneRepository";
+import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../../../shared/rome";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
@@ -26,21 +26,22 @@ const expectedNaf = "8559A";
 
 const getEstablishmentFromSireneApi = (
   formEstablishment: FormEstablishmentDto,
-): SireneEstablishment => ({
-  siret: formEstablishment.siret,
-  uniteLegale: {
-    denominationUniteLegale: formEstablishment.businessName,
-    activitePrincipaleUniteLegale: fakeActivitePrincipaleUniteLegale,
-    trancheEffectifsUniteLegale: "01",
-  },
-  adresseEtablissement: {
-    numeroVoieEtablissement: formEstablishment.businessAddress,
-    typeVoieEtablissement: formEstablishment.businessAddress,
-    libelleVoieEtablissement: formEstablishment.businessAddress,
-    codePostalEtablissement: formEstablishment.businessAddress,
-    libelleCommuneEtablissement: formEstablishment.businessAddress,
-  },
-});
+): SireneEstablishmentVO =>
+  new SireneEstablishmentVO({
+    siret: formEstablishment.siret,
+    uniteLegale: {
+      denominationUniteLegale: formEstablishment.businessName,
+      activitePrincipaleUniteLegale: fakeActivitePrincipaleUniteLegale,
+      trancheEffectifsUniteLegale: "01",
+    },
+    adresseEtablissement: {
+      numeroVoieEtablissement: formEstablishment.businessAddress,
+      typeVoieEtablissement: formEstablishment.businessAddress,
+      libelleVoieEtablissement: formEstablishment.businessAddress,
+      codePostalEtablissement: formEstablishment.businessAddress,
+      libelleCommuneEtablissement: formEstablishment.businessAddress,
+    },
+  });
 
 describe("Transform FormEstablishment into search data", () => {
   let inMemorySireneRepository: InMemorySireneRepository;
@@ -137,13 +138,15 @@ describe("Transform FormEstablishment into search data", () => {
     const establishmentFromApi =
       getEstablishmentFromSireneApi(formEstablishment);
 
-    inMemorySireneRepository.setEstablishment({
-      ...establishmentFromApi,
-      uniteLegale: {
-        ...establishmentFromApi.uniteLegale,
-        trancheEffectifsUniteLegale: "00",
-      },
-    });
+    inMemorySireneRepository.setEstablishment(
+      new SireneEstablishmentVO({
+        ...establishmentFromApi.props,
+        uniteLegale: {
+          ...establishmentFromApi.uniteLegale,
+          trancheEffectifsUniteLegale: "00",
+        },
+      }),
+    );
 
     await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
 

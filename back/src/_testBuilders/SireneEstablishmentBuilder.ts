@@ -1,7 +1,10 @@
-import { SireneEstablishment } from "../domain/sirene/ports/SireneRepository";
+import {
+  SireneEstablishmentVO,
+  SireneEstablishmentProps,
+} from "../domain/sirene/ports/SireneRepository";
 import { Builder } from "./Builder";
 
-const validSireneEstablishment: SireneEstablishment = {
+const validSireneEstablishmentProps: SireneEstablishmentProps = {
   siret: "20006765000016",
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE 2",
@@ -18,20 +21,20 @@ const validSireneEstablishment: SireneEstablishment = {
   },
 };
 
-export class SireneEstablishmentBuilder
-  implements Builder<SireneEstablishment>
+export class SireneEstablishmentVOBuilder
+  implements Builder<SireneEstablishmentVO>
 {
-  constructor(
-    private readonly entity: SireneEstablishment = validSireneEstablishment,
+  public constructor(
+    private props: SireneEstablishmentProps = validSireneEstablishmentProps,
   ) {}
 
-  public withSiret(siret: string): SireneEstablishmentBuilder {
-    return new SireneEstablishmentBuilder({
-      ...this.entity,
+  public withSiret(siret: string): SireneEstablishmentVOBuilder {
+    return new SireneEstablishmentVOBuilder({
+      ...this.props,
       siret,
     });
   }
-  build(): SireneEstablishment {
-    return this.entity;
+  build(): SireneEstablishmentVO {
+    return new SireneEstablishmentVO(this.props);
   }
 }

@@ -30,7 +30,7 @@ describe("Add immersionApplication", () => {
   const validImmersionApplication =
     new ImmersionApplicationDtoBuilder().build();
   let stubGetSiret: StubGetSiret;
-  let featureFlags = FeatureFlagsBuilder.allOff().build();
+  const featureFlags = FeatureFlagsBuilder.allOff().build();
 
   beforeEach(() => {
     applicationRepository = new InMemoryImmersionApplicationRepository();

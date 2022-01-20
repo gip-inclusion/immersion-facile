@@ -6,7 +6,7 @@ import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySi
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
-import { SireneEstablishmentBuilder } from "../../../_testBuilders/SireneEstablishmentBuilder";
+import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentBuilder";
 
 describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let testUuidGenerator: TestUuidGenerator;
@@ -147,10 +147,10 @@ describe("Update establishments and offers based on searches made during the day
           ]);
 
           sireneRepository.setEstablishment(
-            new SireneEstablishmentBuilder().withSiret("siretLBB1").build(),
+            new SireneEstablishmentVOBuilder().withSiret("siretLBB1").build(),
           );
           sireneRepository.setEstablishment(
-            new SireneEstablishmentBuilder().withSiret("siretLBB2").build(),
+            new SireneEstablishmentVOBuilder().withSiret("siretLBB2").build(),
           );
           testUuidGenerator.setNextUuids(["uuidLBB1", "uuidLBB2"]);
           // Act
