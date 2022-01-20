@@ -36,7 +36,7 @@ export const AgencySelector = ({
   const [agencies, setAgencies] = useState([placeholderAgency]);
 
   useEffect(() => {
-    if (disabled || !position) return;
+    if (!position) return;
 
     setIsLoading(true);
     immersionApplicationGateway
@@ -53,7 +53,7 @@ export const AgencySelector = ({
           },
           ...agencies,
         ]);
-        if (setInitialValue) setValue(agencies[0].id);
+        if (!disabled && setInitialValue) setValue(agencies[0].id);
         setLoaded(true);
         setLoadingError(false);
       })

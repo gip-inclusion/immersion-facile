@@ -121,6 +121,9 @@ const buildDb = async () => {
     await buildAndInsertNafClasses(client);
   }
 
+  logger.info("adding postal code to immersion application if needed...");
+  await addPostalCodeToImmersionApplication(client);
+
   client.release();
   await pool.end();
 };
@@ -189,6 +192,13 @@ const alterFormEstablishment = async (client: PoolClient) => {
 
 const alterAgencies = async (client: PoolClient) => {
   await executeSqlFromFile(__dirname + "/alterAgenciesTable.sql", client);
+};
+
+const addPostalCodeToImmersionApplication = async (client: PoolClient) => {
+  await executeSqlFromFile(
+    __dirname + "/addPostalCodeToImmersionApplicationTable.sql",
+    client,
+  );
 };
 
 const buildAgencies = async (client: PoolClient) => {

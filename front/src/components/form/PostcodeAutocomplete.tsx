@@ -28,6 +28,7 @@ export const PostcodeAutocomplete = ({
         const position = await apiAdresseGateway.lookupPostCode(sanitizedTerm);
         if (position) {
           onFound(position);
+          setError(null);
         } else {
           setError("Code postal inconnu");
         }

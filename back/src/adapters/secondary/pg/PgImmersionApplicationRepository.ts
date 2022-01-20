@@ -39,16 +39,16 @@ export class PgImmersionApplicationRepository
     immersionApplicationEntity: ImmersionApplicationEntity,
   ): Promise<ImmersionApplicationId | undefined> {
     // prettier-ignore
-    const { id, status, email, firstName, lastName, phone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionProfession, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted } =
+    const { id, status, email, firstName, lastName, phone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionProfession, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode } =
       immersionApplicationEntity.toDto();
 
     const query = `INSERT INTO immersion_applications(
         id, status, email, first_name, last_name, phone, agency_id, date_submission, date_start, date_end, siret, business_name, mentor, mentor_phone, mentor_email, schedule, individual_protection,
-        sanitary_prevention, sanitary_prevention_description, immersion_address, immersion_objective, immersion_profession, immersion_activities, immersion_skills, beneficiary_accepted, enterprise_accepted
-      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)`;
+        sanitary_prevention, sanitary_prevention_description, immersion_address, immersion_objective, immersion_profession, immersion_activities, immersion_skills, beneficiary_accepted, enterprise_accepted, postal_code
+      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)`;
 
     // prettier-ignore
-    await this.client.query(query, [id, status, email, firstName, lastName, phone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionProfession, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted]);
+    await this.client.query(query, [id, status, email, firstName, lastName, phone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionProfession, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode]);
     return immersionApplicationEntity.id;
   }
 
@@ -79,6 +79,7 @@ export class PgImmersionApplicationRepository
       firstName: params.first_name,
       lastName: params.last_name,
       phone: params.phone ?? undefined,
+      postalCode: params.postal_code,
       agencyId: params.agency_id,
       dateSubmission: toDateString(params.date_submission),
       dateStart: toDateString(params.date_start),

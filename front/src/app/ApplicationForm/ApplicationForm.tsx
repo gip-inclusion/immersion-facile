@@ -95,6 +95,7 @@ const createInitialApplication = (
     firstName: "Sylvanie",
     lastName: "Durand",
     phone: "0612345678",
+    postalCode: "75001",
 
     // Enterprise
     siret: "1234567890123",
@@ -112,7 +113,7 @@ const createInitialApplication = (
 
     // Immersion
     immersionObjective: "",
-    immersionProfession: "Boulangerie - viennoiserie",
+    immersionProfession: "Boulanger / Boulangère",
     immersionActivities: "Superviser",
     immersionSkills: "Attention au détail",
 
