@@ -1,38 +1,50 @@
-import React from "react";
-import distanceSearchIcon from "src/assets/distance-search-icon.svg";
+import React, { ReactNode } from "react";
 import "./search.css";
-import { ContactMethod } from "src/shared/FormEstablishmentDto";
+import { DistanceIcon } from "src/assets/DistanceIcon";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 
 type EnterpriseSearchResultProps = {
-  title: string;
-  radius: string;
-  address: string;
-  siret: string;
-  contactMode?: ContactMethod;
+  searchResult: SearchImmersionResultDto;
   onButtonClick: () => void;
   disableButton?: boolean;
 };
 
+type SearchResultInfoProps = {
+  icon: ReactNode;
+  children: ReactNode;
+};
+
+const SearchResultInfo = ({ children, icon }: SearchResultInfoProps) => (
+  <div className="flex">
+    {icon}
+    <div className="pl-2 w-full text-justify">{children}</div>
+  </div>
+);
+
+const iconColor = "#FF9575";
+
 export const EnterpriseSearchResult = ({
-  title,
-  radius,
-  address,
-  siret,
-  contactMode,
   onButtonClick,
   disableButton,
+  searchResult,
 }: EnterpriseSearchResultProps) => {
+  const { name, distance_m, address, contactMode, numberOfEmployeeRange } =
+    searchResult;
+  const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
+
   return (
     <div className="searchResult">
-      <h2 className="searchResultTitle">{title}</h2>
-      <span className="text-xs">siret: {siret}</span>
-      <p>{address.toLocaleLowerCase()}</p>
-      <div className="searchResultDistanceCompanySizeContainer">
-        <p className="distanceIconLabelContainer">
-          <img src={distanceSearchIcon} alt="" />
-          {radius}
-        </p>
-      </div>
+      <h2 className="searchResultTitle">{name}</h2>
+      <SearchResultInfo icon={<DistanceIcon sx={{ color: iconColor }} />}>
+        <div className="flex justify-between w-full">
+          <div>{distanceKm + " km"}</div>
+          {numberOfEmployeeRange && <div>{numberOfEmployeeRange} salariés</div>}
+        </div>
+      </SearchResultInfo>
+      <SearchResultInfo icon={<LocationOnIcon sx={{ color: iconColor }} />}>
+        {address.toLocaleLowerCase()}
+      </SearchResultInfo>
       <div className="searchDetailsSeparator" />
       <button
         className="expandResultDetailsButton"

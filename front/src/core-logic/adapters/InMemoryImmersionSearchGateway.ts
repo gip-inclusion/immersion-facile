@@ -26,7 +26,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         name: "Super Corp",
         voluntaryToImmersion: true,
         location: { lat: 48.8666, lon: 2.3333 },
-        address: "55 rue du Faubourg Saint-Honoré",
+        address: "55 rue du Faubourg Saint-Honoré, 75017 Paris",
         contactMode: "EMAIL",
         romeLabel: "xxxx",
         nafLabel: "xxxx",
@@ -45,6 +45,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         romeLabel: "xxxx",
         nafLabel: "xxxx",
         city: "xxxx",
+        numberOfEmployeeRange: "11-49",
       },
       {
         id: "search_result_id3",

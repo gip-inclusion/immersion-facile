@@ -197,31 +197,23 @@ export const SearchResultPanel = ({
 
   return (
     <>
-      {searchResults.map((r) => {
-        const distanceKm = ((r.distance_m ?? 0) / 1000).toFixed(1);
-
-        return (
-          <EnterpriseSearchResult
-            key={r.id}
-            title={r.name}
-            radius={`${distanceKm} km`}
-            address={r.address}
-            siret={r.siret}
-            contactMode={r.contactMode}
-            onButtonClick={() =>
-              dispatch({
-                type: "CLICKED_OPEN",
-                payload: {
-                  immersionOfferId: r.id,
-                  contactId: r.contactDetails?.id,
-                  contactMethod: r.contactMode,
-                },
-              })
-            }
-            disableButton={modalState.isValidating}
-          />
-        );
-      })}
+      {searchResults.map((searchResult) => (
+        <EnterpriseSearchResult
+          key={searchResult.id}
+          searchResult={searchResult}
+          onButtonClick={() =>
+            dispatch({
+              type: "CLICKED_OPEN",
+              payload: {
+                immersionOfferId: searchResult.id,
+                contactId: searchResult.contactDetails?.id,
+                contactMethod: searchResult.contactMode,
+              },
+            })
+          }
+          disableButton={modalState.isValidating}
+        />
+      ))}
       <ContactEstablishmentModal
         modalState={modalState}
         dispatch={dispatch}

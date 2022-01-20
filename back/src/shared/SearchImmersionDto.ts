@@ -73,6 +73,7 @@ export const searchImmersionResultSchema = z.object({
   contactMode: preferredContactMethodSchema.optional(),
   distance_m: z.number().optional(),
   contactDetails: contactSchema.optional(),
+  numberOfEmployeeRange: z.string().optional(),
 });
 
 export const searchImmersionResponseSchema = z.array(
