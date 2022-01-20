@@ -5,6 +5,7 @@ import { immersionApplicationGateway } from "src/app/dependencies";
 import { AgencyDto, AgencyId } from "src/shared/agencies";
 import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { PostcodeAutocomplete } from "./PostcodeAutocomplete";
+import type { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 
 const placeholderAgency: AgencyDto = {
   id: "",
@@ -14,18 +15,17 @@ const placeholderAgency: AgencyDto = {
 
 type AgencySelectorProps = {
   label: string;
-  name: string;
   description?: string;
   disabled?: boolean;
   setInitialValue?: boolean;
 };
 export const AgencySelector = ({
   label,
-  name,
   description,
   disabled,
   setInitialValue,
 }: AgencySelectorProps) => {
+  const name: keyof ImmersionApplicationDto = "agencyId";
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>({ name });
 
@@ -36,9 +36,8 @@ export const AgencySelector = ({
   const [agencies, setAgencies] = useState([placeholderAgency]);
 
   useEffect(() => {
-    if (!position) {
-      return;
-    }
+    if (disabled || !position) return;
+
     setIsLoading(true);
     immersionApplicationGateway
       .listAgencies(position)
@@ -76,16 +75,7 @@ export const AgencySelector = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      {!disabled && (
-        <>
-          <label className="fr-label" htmlFor={name}>
-            Votre code postal *
-          </label>
-
-          <PostcodeAutocomplete onFound={setPosition} />
-        </>
-      )}
-
+      <PostcodeAutocomplete onFound={setPosition} disabled={disabled} />
       <label className="fr-label pt-4" htmlFor={name}>
         {label}
       </label>

@@ -21,6 +21,7 @@ import {
   addressWithPostalCodeSchema,
   NotEmptyArray,
   phoneRegExp,
+  stringOfNumbers,
 } from "./utils";
 import { zBoolean, zEmail, zString, zTrimmedString } from "./zodUtils";
 
@@ -91,6 +92,11 @@ export const immersionApplicationSchema = z
     phone: z
       .string()
       .regex(phoneRegExp, "Numero de téléphone incorrect")
+      .optional(),
+    postalCode: z
+      .string()
+      .regex(stringOfNumbers)
+      .length(5, "5 chiffres sont nécessaires pour le code postal")
       .optional(),
     agencyId: agencyIdSchema,
     dateSubmission: zString.regex(
@@ -250,6 +256,7 @@ export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   phone: "+33012345678",
   firstName: "Esteban",
   lastName: "Ocon",
+  postalCode: "75000",
   agencyId: "fake-agency-id",
   dateSubmission: "2021-07-01",
   dateStart: "2021-08-01",

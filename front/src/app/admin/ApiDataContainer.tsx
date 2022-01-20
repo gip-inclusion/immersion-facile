@@ -4,15 +4,15 @@ import { random } from "src/shared/utils";
 
 // Inspired by https://itnext.io/centralizing-api-error-handling-in-react-apps-810b2be1d39d
 interface UseApiCallProps<T> {
-  apiCall: () => Promise<T>;
+  callApi: () => Promise<T>;
 }
 
-function useApiCall<T>({ apiCall }: UseApiCallProps<T>) {
+function useApiCall<T>({ callApi }: UseApiCallProps<T>) {
   const [error, setError] = useState<any | null>(null);
   const [apiData, setApiData] = useState<T | null>(null);
 
   useEffect(() => {
-    apiCall()
+    callApi()
       .then((apiData) => {
         console.log(apiData);
         setApiData(apiData);
@@ -20,7 +20,7 @@ function useApiCall<T>({ apiCall }: UseApiCallProps<T>) {
       .catch((e) => {
         setError(e);
       });
-  }, [apiCall]);
+  }, []);
 
   return { data: apiData, error };
 }
@@ -36,7 +36,7 @@ export function ApiDataContainer<T>({
   children,
   jwt,
 }: ApiDataContainerProps<T>): React.ReactElement {
-  const { data, error } = useApiCall({ apiCall });
+  const { data, error } = useApiCall({ callApi: apiCall });
 
   if (error) {
     if (error.response) {

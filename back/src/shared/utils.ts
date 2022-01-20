@@ -2,6 +2,7 @@ import { z } from "zod";
 
 // TODO: find the standard for gouv.fr phone verification
 export const phoneRegExp = /^\+?[0-9]+$/;
+export const stringOfNumbers = /^\+?[0-9]+$/;
 
 export type SleepFn = typeof sleep;
 export const sleep = (ms: number): Promise<number> => {

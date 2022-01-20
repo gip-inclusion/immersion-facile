@@ -150,7 +150,6 @@ export const ApplicationFormFields = ({
       />
 
       <AgencySelector
-        name="agencyId"
         label="Votre structure d'accompagnement *"
         disabled={isFrozen}
         setInitialValue={dev}
@@ -273,6 +272,7 @@ export const ApplicationFormFields = ({
       <ApplicationFormProfession
         label="Intitulé du poste / métier observé pendant l'immersion *"
         description="Ex : employé libre service, web développeur, boulanger …"
+        disabled={isFrozen}
       />
 
       <TextInput

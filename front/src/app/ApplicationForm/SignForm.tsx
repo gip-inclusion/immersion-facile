@@ -1,5 +1,5 @@
-import { Formik, useFormikContext } from "formik";
-import React, { useEffect, useState } from "react";
+import { Formik } from "formik";
+import React, { useState } from "react";
 import { ApplicationFormFields } from "src/app/ApplicationForm/ApplicationFormFields";
 import { SuccessInfos } from "src/app/ApplicationForm/createSuccessInfos";
 import { immersionApplicationGateway } from "src/app/dependencies";
@@ -62,11 +62,8 @@ export const SignForm = ({ route }: SignFormProps) => {
         apiCall={() => immersionApplicationGateway.getML(route.params.jwt)}
         jwt={route.params.jwt}
       >
-        {(data) => {
-          if (!data) {
-            return <p>Chargement en cours</p>;
-          }
-          const response = data;
+        {(response) => {
+          if (!response) return <p>Chargement en cours...</p>;
 
           const [role, name] = extractRoleAndName(route.params.jwt, response);
           setSigneeName(name);

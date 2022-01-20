@@ -1,20 +1,23 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
+import { TextInput } from "src/components/form/TextInput";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { ProfessionDto } from "src/shared/rome";
 
 type ApplicationFormProfessionProps = {
   label: string;
   description?: string;
+  disabled?: boolean;
 };
 
 export const ApplicationFormProfession = ({
   label,
   description,
+  disabled,
 }: ApplicationFormProfessionProps) => {
   const name: keyof ImmersionApplicationDto = "immersionProfession";
-  const [__, _, { setValue }] =
+  const [{ value }, _, { setValue }] =
     useField<ImmersionApplicationDto["immersionProfession"]>(name);
 
   const [profession, setProfession] = useState<ProfessionDto>({
@@ -23,8 +26,10 @@ export const ApplicationFormProfession = ({
   });
 
   useEffect(() => {
-    setValue(profession.description);
+    setValue(profession.description || value);
   }, [profession]);
+
+  if (disabled) return <TextInput label={label} name={name} disabled />;
 
   return (
     <>
