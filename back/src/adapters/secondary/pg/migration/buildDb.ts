@@ -131,6 +131,9 @@ const buildDb = async () => {
   logger.info("adding postal code to immersion application if needed...");
   await addPostalCodeToImmersionApplication(client);
 
+  logger.info("change outbox occurred_at to timestamp with timezone");
+  await changeOutboxOccurredAtToTimestampWithTZ(client);
+
   client.release();
   await pool.end();
 };
@@ -211,6 +214,13 @@ const alterAgencies = async (client: PoolClient) => {
 const addPostalCodeToImmersionApplication = async (client: PoolClient) => {
   await executeSqlFromFile(
     __dirname + "/addPostalCodeToImmersionApplicationTable.sql",
+    client,
+  );
+};
+
+const changeOutboxOccurredAtToTimestampWithTZ = async (client: PoolClient) => {
+  await executeSqlFromFile(
+    __dirname + "/changeOutboxOccurredAtToTimestampWithTZ.sql",
     client,
   );
 };

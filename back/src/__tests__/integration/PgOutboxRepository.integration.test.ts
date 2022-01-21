@@ -5,8 +5,8 @@ import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxReposito
 import { DomainEvent } from "../../domain/core/eventBus/events";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { makeCreateNewEvent } from "./../../domain/core/eventBus/EventBus";
-import { DomainTopic } from "./../../domain/core/eventBus/events";
+import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
+import { DomainTopic } from "../../domain/core/eventBus/events";
 
 describe("PgOutboxRepository", () => {
   let pool: Pool;
