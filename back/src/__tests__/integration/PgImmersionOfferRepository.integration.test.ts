@@ -34,61 +34,63 @@ describe("Postgres implementation of immersion offer repository", () => {
 
   describe("insertEstablishmentAggregates", () => {
     test("Insert immersions and retrieves them back if establishment is active", async () => {
+      const closedEstablishmentAggregate = new EstablishmentAggregateBuilder()
+        .withEstablishment({
+          address: "fake address establishment 1 12345 some city",
+          name: "Company from la bonne boite for search",
+          voluntaryToImmersion: false,
+          siret: "78000403200029",
+          dataSource: "api_labonneboite",
+          numberEmployeesRange: 12,
+          position: { lat: 49, lon: 6 },
+          naf: "8520A",
+          contactMethod: "EMAIL",
+          isActive: false,
+          updatedAt: new Date("2022-03-07T19:10:00.000"),
+        })
+        .withImmersionOffers([
+          {
+            id: "13df03a5-a2a5-430a-b558-111111111122",
+            rome: "M1808",
+            score: 4.5,
+          },
+        ])
+        .build();
+      const activeEstablishmentAggregate = new EstablishmentAggregateBuilder()
+        .withEstablishment({
+          address: "fake address establishment 2 12345 some city",
+          name: "Company from FORM for search",
+          voluntaryToImmersion: false,
+          siret: "78000403200040",
+          dataSource: "form",
+          numberEmployeesRange: 1,
+          position: { lat: 49.05, lon: 6.05 },
+          naf: "8520A",
+          contactMethod: "PHONE",
+          isActive: true,
+          updatedAt: new Date("2022-03-07T19:10:00.000"),
+        })
+        .withContacts([
+          {
+            id: "93144fe8-56a7-4807-8990-726badc6332b",
+            lastName: "Doe",
+            firstName: "John",
+            email: "joe@mail.com",
+            job: "super job",
+            phone: "0640404040",
+          },
+        ])
+        .withImmersionOffers([
+          {
+            id: "13df03a5-a2a5-430a-b558-333333333344",
+            rome: "M1808",
+            score: 4.5,
+          },
+        ])
+        .build();
       await pgImmersionOfferRepository.insertEstablishmentAggregates([
-        new EstablishmentAggregateBuilder()
-          .withEstablishment({
-            address: "fake address establishment 1 12345 some city",
-            name: "Company from la bonne boite for search",
-            voluntaryToImmersion: false,
-            siret: "78000403200029",
-            dataSource: "api_labonneboite",
-            numberEmployeesRange: 12,
-            position: { lat: 49, lon: 6 },
-            naf: "8520A",
-            contactMethod: "EMAIL",
-            isActive: false,
-            updatedAt: new Date("2022-03-07T19:10:00.000Z"),
-          })
-          .withImmersionOffers([
-            {
-              id: "13df03a5-a2a5-430a-b558-111111111122",
-              rome: "M1808",
-              score: 4.5,
-            },
-          ])
-          .build(),
-        new EstablishmentAggregateBuilder()
-          .withEstablishment({
-            address: "fake address establishment 2 12345 some city",
-            name: "Company from FORM for search",
-            voluntaryToImmersion: false,
-            siret: "78000403200040",
-            dataSource: "form",
-            numberEmployeesRange: 1,
-            position: { lat: 49.05, lon: 6.05 },
-            naf: "8520A",
-            contactMethod: "PHONE",
-            isActive: true,
-            updatedAt: new Date("2022-03-07T19:10:00.000Z"),
-          })
-          .withContacts([
-            {
-              id: "93144fe8-56a7-4807-8990-726badc6332b",
-              lastName: "Doe",
-              firstName: "John",
-              email: "joe@mail.com",
-              job: "super job",
-              phone: "0640404040",
-            },
-          ])
-          .withImmersionOffers([
-            {
-              id: "13df03a5-a2a5-430a-b558-333333333344",
-              rome: "M1808",
-              score: 4.5,
-            },
-          ])
-          .build(),
+        closedEstablishmentAggregate,
+        activeEstablishmentAggregate,
       ]);
 
       const searchResult = await pgImmersionOfferRepository.getFromSearch({
@@ -101,20 +103,21 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(searchResult).toHaveLength(1);
 
       const expectedResult: SearchImmersionResultDto = {
-        id: "13df03a5-a2a5-430a-b558-111111111122",
-        address: "fake address establishment 1 12345 some city",
+        id: activeEstablishmentAggregate.immersionOffers[0].id,
+        address: activeEstablishmentAggregate.establishment.address,
         city: "some city",
-        name: "Company from la bonne boite for search",
-        voluntaryToImmersion: false,
+        name: activeEstablishmentAggregate.establishment.name,
+        voluntaryToImmersion:
+          activeEstablishmentAggregate.establishment.voluntaryToImmersion,
         rome: "M1808",
         romeLabel: "Information géographique",
-        siret: "78000403200029",
-        location: { lat: 49, lon: 6 },
-        distance_m: 13308,
-        naf: "8520A",
+        siret: activeEstablishmentAggregate.establishment.siret,
+        location: activeEstablishmentAggregate.establishment.position,
+        distance_m: 6653,
+        naf: activeEstablishmentAggregate.establishment.naf,
         nafLabel: "Enseignement primaire",
-        contactMode: "EMAIL",
-        numberOfEmployeeRange: "20-49",
+        contactMode: activeEstablishmentAggregate.establishment.contactMethod,
+        numberOfEmployeeRange: "1-2",
       };
 
       expect(searchResult).toMatchObject([expectedResult]);

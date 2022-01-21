@@ -16,7 +16,7 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   position: { lat: 35, lon: 50 },
   naf: "8539A",
   numberEmployeesRange: 11,
-  updatedAt: new Date("2022-01-05T00:00:00.000Z"),
+  updatedAt: new Date("2022-01-05T00:00:00.000"),
   isActive: true,
 };
 

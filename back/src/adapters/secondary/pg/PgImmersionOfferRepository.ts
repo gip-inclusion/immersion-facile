@@ -74,7 +74,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       contactModeMap[establishment.contactMethod as KnownContactMethod] || null,
       establishment.dataSource,
       convertPositionToStGeography(establishment.position),
-      establishment.updatedAt,
+      establishment.updatedAt.toISOString(),
       establishment.isActive,
     ]);
 
@@ -83,15 +83,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     try {
       const query = buildUpsertEstablishmentsQuery(establishmentFields);
       await this.client.query(query);
-      const rowsAfterUpsert = (
-        await this.client.query("SELECT * FROM establishments; ")
-      ).rows;
-      console.log(
-        "rowsAfterUpsert ",
-        rowsAfterUpsert,
-        " updateAt was ",
-        aggregates[0].establishment.updatedAt.toISOString(),
-      );
     } catch (e: any) {
       logger.error(e, "Error inserting establishments");
       throw e;

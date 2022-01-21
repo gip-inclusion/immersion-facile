@@ -78,6 +78,9 @@ const buildDb = async () => {
   logger.info("We create is_active column if not exists ");
   await addIsActive(client);
 
+  logger.info("change establishment timestamps to timestamps with timezone");
+  await changeEstablishmentTimestampWithTZ(client);
+
   // prettier-ignore
   const lbbRequestTableAlreadyExists = await checkIfTableExists("lbb_requests");
   if (!lbbRequestTableAlreadyExists) {
@@ -182,6 +185,13 @@ const addSearchMadeId = async (client: PoolClient) => {
 const addIsActive = async (client: PoolClient) => {
   await executeSqlFromFile(
     __dirname + "/addIsActiveToTableEstablishments.sql",
+    client,
+  );
+};
+
+const changeEstablishmentTimestampWithTZ = async (client: PoolClient) => {
+  await executeSqlFromFile(
+    __dirname + "/changeEstablishmentTimestampWithTZ.sql",
     client,
   );
 };

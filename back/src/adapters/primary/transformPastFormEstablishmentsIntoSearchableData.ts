@@ -80,6 +80,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       poleEmploiGateway,
       sequenceRunner,
       new UuidV4Generator(),
+      new RealClock(),
     );
   const allIdsResult = await clientOrigin.query(
     "WITH siretInFormEstablishment AS ( \
