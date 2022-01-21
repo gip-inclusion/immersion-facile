@@ -80,6 +80,7 @@ export const sendHttpResponse = async (
       }
       res.status(error.httpCode);
     } else {
+      console.error("Uncaught error : ", error);
       res.status(500);
     }
 

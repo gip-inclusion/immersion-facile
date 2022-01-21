@@ -78,8 +78,8 @@ export class PgImmersionApplicationRepository
       email: params.email,
       firstName: params.first_name,
       lastName: params.last_name,
-      phone: params.phone ?? undefined,
-      postalCode: params.postal_code,
+      phone: optional(params.phone),
+      postalCode: optional(params.postal_code),
       agencyId: params.agency_id,
       dateSubmission: toDateString(params.date_submission),
       dateStart: toDateString(params.date_start),
@@ -92,15 +92,17 @@ export class PgImmersionApplicationRepository
       schedule: params.schedule,
       individualProtection: params.individual_protection,
       sanitaryPrevention: params.sanitary_prevention,
-      sanitaryPreventionDescription:
-        params.sanitary_prevention_description ?? undefined,
-      immersionAddress: params.immersion_address ?? undefined,
+      // prettier-ignore
+      sanitaryPreventionDescription: optional(params.sanitary_prevention_description),
+      immersionAddress: optional(params.immersion_address),
       immersionObjective: params.immersion_objective,
       immersionProfession: params.immersion_profession,
       immersionActivities: params.immersion_activities,
-      immersionSkills: params.immersion_skills ?? undefined,
+      immersionSkills: optional(params.immersion_skills),
       beneficiaryAccepted: params.beneficiary_accepted,
       enterpriseAccepted: params.enterprise_accepted,
     });
   }
 }
+
+const optional = <T>(v: T | null) => v ?? undefined;
