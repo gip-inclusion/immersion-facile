@@ -6,6 +6,7 @@ import {
   employeeRangeByTefenCode,
   EstablishmentAggregate,
   TefenCode,
+  EstablishmentEntityV2,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -331,6 +332,50 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       isActive: true,
       updatedAt: row.establishments_update_date,
     };
+  }
+  public async getActiveEstablishmentSiretsNotUpdatedSince(
+    since: Date,
+  ): Promise<string[]> {
+    const query = `
+      SELECT siret FROM establishments
+      WHERE is_active AND update_date < '${since.toISOString()}'`;
+    const pgResult = await this.client.query(query);
+    return pgResult.rows.map((row) => row.siret);
+  }
+
+  public async updateEstablishment(
+    siret: string,
+    update: Partial<
+      Pick<
+        EstablishmentEntityV2,
+        "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"
+      >
+    > & { updatedAt: Date },
+  ): Promise<void> {
+    const updateQuery = `UPDATE establishments
+                   SET update_date = '${update.updatedAt.toISOString()}' 
+                   ${
+                     update.isActive !== undefined
+                       ? `, is_active = ${update.isActive}`
+                       : ""
+                   }
+                   ${!!update.naf ? `, naf = '${update.naf}'` : ""}
+                   ${
+                     !!update.numberEmployeesRange
+                       ? `, number_employees = ${update.numberEmployeesRange}`
+                       : ""
+                   }
+                   ${
+                     update.address && update.position // Update address and position together.
+                       ? `, address = '${
+                           update.address
+                         }', gps = ${convertPositionToStGeography(
+                           update.position,
+                         )}`
+                       : ""
+                   }
+                   WHERE siret='${siret}';`;
+    await this.client.query(updateQuery);
   }
 
   async getContactByImmersionOfferId(

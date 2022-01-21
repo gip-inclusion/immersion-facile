@@ -6,6 +6,7 @@ import { ContactEntityV2 } from "../entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
   EstablishmentAggregate,
+  EstablishmentEntityV2,
 } from "../entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
@@ -31,4 +32,18 @@ export interface ImmersionOfferRepository {
     searchMade: SearchMade,
     withContactDetails?: boolean,
   ) => Promise<SearchImmersionResultDto[]>;
+
+  getActiveEstablishmentSiretsNotUpdatedSince: (
+    since: Date,
+  ) => Promise<string[]>;
+
+  updateEstablishment: (
+    siret: string,
+    update: Partial<
+      Pick<
+        EstablishmentEntityV2,
+        "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"
+      >
+    > & { updatedAt: Date },
+  ) => Promise<void>;
 }

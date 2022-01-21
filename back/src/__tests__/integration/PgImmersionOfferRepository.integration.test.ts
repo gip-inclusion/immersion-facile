@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
 import {
+  LatLonDto,
   SearchContact,
   SearchImmersionResultDto,
 } from "../../shared/SearchImmersionDto";
@@ -341,3 +342,200 @@ describe("Postgres implementation of immersion offer repository", () => {
       .query("SELECT * FROM establishments WHERE siret=$1", [siret])
       .then((res) => res.rows);
 });
+
+const _truncateTables = async (client: PoolClient) => {
+  await client.query("TRUNCATE immersion_contacts CASCADE");
+  await client.query("TRUNCATE establishments CASCADE");
+  await client.query("TRUNCATE immersion_offers CASCADE");
+};
+const prepareClientAndPgImmersionOfferRepository = async () => {
+  const pool = getTestPgPool();
+  const client = await pool.connect();
+  await _truncateTables(client);
+  const repo = new PgImmersionOfferRepository(client);
+  return { pool, client, repo };
+};
+
+const cleanupConnectionPool = async ({
+  client,
+  pool,
+}: {
+  client: PoolClient;
+  pool: Pool;
+}) => {
+  client.release();
+  await pool.end();
+};
+
+describe("Pg implementation of method getActiveEstablishmentSiretsNotUpdatedSince", () => {
+  it("Returns a siret list of establishments having field `update_date` < parameter `since` ", async () => {
+    // Prepare
+    const { repo, pool, client } =
+      await prepareClientAndPgImmersionOfferRepository();
+    const since = new Date("2020-05-05T12:00:00.000");
+    const siretOfClosedEstablishmentNotUpdatedSince = "78000403200021";
+    const siretOfActiveEstablishmentNotUpdatedSince = "78000403200022";
+    const siretOfActiveEstablishmentUpdatedSince = "78000403200023";
+
+    const beforeSince = new Date("2020-04-14T12:00:00.000");
+    const afterSince = new Date("2020-05-15T12:00:00.000");
+
+    await insertEstablishment({
+      client,
+      siret: siretOfClosedEstablishmentNotUpdatedSince,
+      updatedAt: beforeSince,
+      isActive: false,
+    });
+    await insertEstablishment({
+      client,
+      siret: siretOfActiveEstablishmentNotUpdatedSince,
+      updatedAt: beforeSince,
+      isActive: true,
+    });
+    await insertEstablishment({
+      client,
+      siret: siretOfActiveEstablishmentUpdatedSince,
+      updatedAt: afterSince,
+      isActive: true,
+    });
+
+    // Act
+    const actualResult = await repo.getActiveEstablishmentSiretsNotUpdatedSince(
+      since,
+    );
+
+    // Assert
+    const expectedResult: string[] = [
+      siretOfActiveEstablishmentNotUpdatedSince,
+    ];
+    expect(actualResult).toEqual(expectedResult);
+
+    // Cleanup
+    await cleanupConnectionPool({ pool, client });
+  });
+});
+
+describe("Pg implementation of method updateEstablishment", () => {
+  it("Updates the parameter `updatedAt` and `isActive if given", async () => {
+    // Prepare
+    const { repo, pool, client } =
+      await prepareClientAndPgImmersionOfferRepository();
+    const siretOfEstablishmentToUpdate = "78000403200021";
+
+    await insertEstablishment({
+      client,
+      siret: siretOfEstablishmentToUpdate,
+      updatedAt: new Date("2020-04-14T12:00:00.000"),
+      isActive: true,
+    });
+
+    // Act
+    const updatedAt = new Date("2020-05-15T12:00:00.000");
+    await repo.updateEstablishment(siretOfEstablishmentToUpdate, {
+      isActive: false,
+      updatedAt,
+    });
+
+    // Assert
+    const establishmentRowInDB = await retrieveEstablishmentWithSiret(
+      client,
+      siretOfEstablishmentToUpdate,
+    );
+    expect(establishmentRowInDB).toMatchObject({
+      is_active: false,
+      update_date: updatedAt,
+    });
+
+    // Cleanup
+    await cleanupConnectionPool({ pool, client });
+  });
+  it("Updates parameters `naf`, `nb of employe`, `adress` and `position` if given and `updatedAt`", async () => {
+    // Prepare
+    const { repo, pool, client } =
+      await prepareClientAndPgImmersionOfferRepository();
+    const siretOfEstablishmentToUpdate = "78000403200021";
+
+    const updateProps = {
+      naf: "8722B",
+      numberEmployees: 5,
+      position: { lon: 21, lat: 23 },
+      address: "4 rue de Bitche 44000 Nantes",
+    };
+    await insertEstablishment({
+      client,
+      siret: siretOfEstablishmentToUpdate,
+      updatedAt: new Date("2020-04-14T12:00:00.000"),
+      isActive: true,
+      ...updateProps,
+    });
+
+    // Act
+    const updatedAt = new Date("2020-05-15T12:00:00.000");
+    await repo.updateEstablishment(siretOfEstablishmentToUpdate, {
+      ...updateProps,
+      updatedAt,
+    });
+
+    // Assert
+    const actualEstablishmentRowInDB = await retrieveEstablishmentWithSiret(
+      client,
+      siretOfEstablishmentToUpdate,
+    );
+    const partialExpectedEstablishmentRowInDB: PartialEstablishmentPGRow = {
+      update_date: updatedAt,
+      naf: updateProps.naf,
+      number_employees: updateProps.numberEmployees,
+      address: updateProps.address,
+      longitude: updateProps.position.lon,
+      latitude: updateProps.position.lat,
+    };
+    expect(actualEstablishmentRowInDB).toMatchObject(
+      partialExpectedEstablishmentRowInDB,
+    );
+
+    // Cleanup
+    await cleanupConnectionPool({ pool, client });
+  });
+});
+
+const insertEstablishment = async (props: {
+  client: PoolClient;
+  siret: string;
+  updatedAt: Date;
+  isActive: boolean;
+  naf?: string;
+  numberEmployees?: number;
+  adress?: string;
+  position?: LatLonDto;
+}) => {
+  const insertQuery = `INSERT INTO establishments (
+    siret, name, address, number_employees, naf, contact_mode, data_source, gps, update_date, is_active
+  ) VALUES ('${props.siret}', '', '${props.adress ?? ""}', ${
+    props.numberEmployees ?? null
+  }, '${props.naf ?? "8622B"}', null, 'api_labonneboite', ${
+    props.position
+      ? `ST_GeographyFromText('POINT(${props.position.lon} ${props.position.lat})')`
+      : null
+  }, '${props.updatedAt.toISOString()}', ${props.isActive} )`;
+  await props.client.query(insertQuery);
+};
+
+type PartialEstablishmentPGRow = {
+  update_date: Date;
+  naf: string;
+  number_employees: number;
+  address: string;
+  longitude: number;
+  latitude: number;
+};
+
+const retrieveEstablishmentWithSiret = async (
+  client: PoolClient,
+  siret: string,
+): Promise<PartialEstablishmentPGRow | undefined> => {
+  const pgResult = await client.query(
+    `SELECT update_date, is_active, naf, number_employees, address, ST_X(gps::geometry) AS longitude, ST_Y(gps::geometry) AS latitude 
+     FROM establishments WHERE siret='${siret}' LIMIT 1;`,
+  );
+  return pgResult.rows[0] ?? (pgResult.rows[0] as PartialEstablishmentPGRow);
+};

@@ -34,6 +34,22 @@ export class SireneEstablishmentVOBuilder
       siret,
     });
   }
+  public withUniteLegale(
+    uniteLegale: SireneEstablishmentProps["uniteLegale"],
+  ): SireneEstablishmentVOBuilder {
+    return new SireneEstablishmentVOBuilder({
+      ...this.props,
+      uniteLegale,
+    });
+  }
+  public withAdresseEtablissement(
+    adresseEtablissement: SireneEstablishmentProps["adresseEtablissement"],
+  ): SireneEstablishmentVOBuilder {
+    return new SireneEstablishmentVOBuilder({
+      ...this.props,
+      adresseEtablissement,
+    });
+  }
   build(): SireneEstablishmentVO {
     return new SireneEstablishmentVO(this.props);
   }

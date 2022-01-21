@@ -1,6 +1,5 @@
 import { createLogger } from "./../../utils/logger";
 import {
-  SireneEstablishmentProps,
   SireneRepositoryAnswer,
   SireneRepository,
   SireneEstablishmentVO,
