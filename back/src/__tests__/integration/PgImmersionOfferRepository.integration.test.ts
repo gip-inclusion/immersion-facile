@@ -42,7 +42,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             voluntaryToImmersion: false,
             siret: "78000403200029",
             dataSource: "api_labonneboite",
-            numberEmployeesRange: 1,
+            numberEmployeesRange: 12,
             position: { lat: 49, lon: 6 },
             naf: "8520A",
             contactMethod: "EMAIL",
@@ -109,6 +109,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         romeLabel: "Information géographique",
         siret: "78000403200040",
         distance_m: 6653,
+        numberOfEmployeeRange: "1-2",
       };
       const expectedResult2: SearchImmersionResultDto = {
         id: "13df03a5-a2a5-430a-b558-111111111122",
@@ -124,6 +125,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         naf: "8520A",
         nafLabel: "Enseignement primaire",
         contactMode: "EMAIL",
+        numberOfEmployeeRange: "20-49",
       };
 
       expect(searchResult).toMatchObject([expectedResult1, expectedResult2]);

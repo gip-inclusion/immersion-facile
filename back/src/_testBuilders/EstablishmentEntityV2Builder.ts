@@ -1,6 +1,7 @@
 import {
   DataSource,
   EstablishmentEntityV2,
+  TefenCode,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ContactMethod } from "../shared/FormEstablishmentDto";
 import { Builder } from "./Builder";
@@ -37,6 +38,12 @@ export class EstablishmentEntityV2Builder
   }
   withNaf(naf: string) {
     return new EstablishmentEntityV2Builder({ ...this.entity, naf });
+  }
+  withNumberOfEmployeeRange(tefenCode: TefenCode) {
+    return new EstablishmentEntityV2Builder({
+      ...this.entity,
+      numberEmployeesRange: tefenCode,
+    });
   }
   build() {
     return this.entity;

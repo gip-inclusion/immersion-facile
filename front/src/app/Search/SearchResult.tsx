@@ -29,17 +29,31 @@ export const EnterpriseSearchResult = ({
   disableButton,
   searchResult,
 }: EnterpriseSearchResultProps) => {
-  const { name, distance_m, address, contactMode, numberOfEmployeeRange } =
-    searchResult;
+  const {
+    name,
+    distance_m,
+    address,
+    contactMode,
+    numberOfEmployeeRange,
+    nafLabel,
+  } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
 
   return (
     <div className="searchResult">
-      <h2 className="searchResultTitle">{name}</h2>
+      <div>
+        <h2 className="searchResultTitle">{name}</h2>
+        {nafLabel && <div>{nafLabel}</div>}
+      </div>
       <SearchResultInfo icon={<DistanceIcon sx={{ color: iconColor }} />}>
         <div className="flex justify-between w-full">
           <div>{distanceKm + " km"}</div>
-          {numberOfEmployeeRange && <div>{numberOfEmployeeRange} salariés</div>}
+          {numberOfEmployeeRange && (
+            <div>
+              {numberOfEmployeeRange}{" "}
+              {numberOfEmployeeRange === "0" ? "salarié" : "salariés"}
+            </div>
+          )}
         </div>
       </SearchResultInfo>
       <SearchResultInfo icon={<LocationOnIcon sx={{ color: iconColor }} />}>

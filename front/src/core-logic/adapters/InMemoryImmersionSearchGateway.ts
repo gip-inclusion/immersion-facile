@@ -29,7 +29,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         address: "55 rue du Faubourg Saint-Honoré, 75017 Paris",
         contactMode: "EMAIL",
         romeLabel: "xxxx",
-        nafLabel: "xxxx",
+        nafLabel: "Métallurgie",
         city: "xxxx",
       },
       {
@@ -43,7 +43,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         address: "55 rue du Faubourg Saint-Honoré",
         contactMode: "PHONE",
         romeLabel: "xxxx",
-        nafLabel: "xxxx",
+        nafLabel: "Accueil et Restauration",
         city: "xxxx",
         numberOfEmployeeRange: "11-49",
       },
@@ -58,7 +58,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         address: "55 rue du Faubourg Saint-Honoré",
         contactMode: "IN_PERSON",
         romeLabel: "xxxx",
-        nafLabel: "xxxx",
+        nafLabel: "",
         city: "xxxx",
       },
       {
@@ -72,7 +72,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         address: "55 rue du Faubourg Saint-Honoré",
         contactMode: "UNKNOWN",
         romeLabel: "xxxx",
-        nafLabel: "xxxx",
+        nafLabel: "",
         city: "xxxx",
       },
     ];

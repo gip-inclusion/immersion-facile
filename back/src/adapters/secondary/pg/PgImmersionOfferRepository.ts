@@ -3,7 +3,9 @@ import format from "pg-format";
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
+  employeeRangeByTefenCode,
   EstablishmentAggregate,
+  TefenCode,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -190,6 +192,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
             establishments.contact_mode AS establishment_contact_mode,
             establishments.address AS establishment_address,
             establishments.naf AS establishment_naf,
+            establishments.number_employees AS number_employees,
             ST_Distance(immersion_offers.gps, ST_GeographyFromText($2)) AS distance_m,
             ST_AsGeoJSON(immersion_offers.gps) AS position
         FROM
@@ -255,6 +258,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         result.establishment_contact_mode &&
         parseContactMethod(result.establishment_contact_mode),
       location: result.position && parseGeoJson(result.position),
+      numberOfEmployeeRange:
+        employeeRangeByTefenCode[result.number_employees as TefenCode],
       distance_m: Math.round(result.distance_m),
       ...(withContactDetails &&
         immersionContact && { contactDetails: immersionContact }),

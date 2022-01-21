@@ -77,6 +77,7 @@ const prepareSearchableData =
       .withContactMode("EMAIL")
       .withAddress("55 Rue du Faubourg Saint-Honoré")
       .withNaf(params?.storedEstablishmentNaf ?? "8539A")
+      .withNumberOfEmployeeRange(12)
       .build();
     const immersionOffer = new ImmersionOfferEntityV2Builder()
       .withId(immersionOfferId)
@@ -186,6 +187,7 @@ describe("SearchImmersionUseCase", () => {
               role: "le big boss",
               phone: "0612345678",
             },
+            numberOfEmployeeRange: "20-49",
           },
           {
             id: generatedOfferId,
