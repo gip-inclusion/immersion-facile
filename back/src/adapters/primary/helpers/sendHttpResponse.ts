@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import { AuthChecker } from "../../../domain/auth/AuthChecker";
+import { createLogger } from "../../../utils/logger";
+
+const logger = createLogger(__filename);
 
 export abstract class HttpError extends Error {
   abstract httpCode: number;
@@ -80,7 +83,7 @@ export const sendHttpResponse = async (
       }
       res.status(error.httpCode);
     } else {
-      console.error("Uncaught error : ", error);
+      logger.error(error, "Uncaught error");
       res.status(500);
     }
 
