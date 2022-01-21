@@ -2,8 +2,6 @@ import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import PinoHttp from "pino-http";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
-import { listImmersionApplicationRequestDtoSchema } from "../../shared/ImmersionApplicationDto";
-import { romeSearchRequestSchema } from "../../shared/rome";
 import {
   agenciesRoute,
   contactEstablishmentRoute,
@@ -15,17 +13,14 @@ import {
   siretRoute,
   validateDemandeRoute,
 } from "../../shared/routes";
-import { getSiretRequestSchema } from "../../shared/siret";
 import { createLogger } from "../../utils/logger";
 import { createApiKeyAuthRouter } from "./ApiKeyAuthRouter";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies, Repositories } from "./config";
-import { callUseCase } from "./helpers/callUseCase";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
-import { listAgenciesRequestSchema } from "../../shared/agencies";
 
 const logger = createLogger(__filename);
 
@@ -62,30 +57,27 @@ export const createApp = async (
         deps.useCases.addDemandeImmersion.execute(req.body),
       ),
     )
-    .get(async (req, res) => {
+    .get(async (req, res) =>
       sendHttpResponse(
         req,
         res,
-        () =>
-          callUseCase({
-            useCase: deps.useCases.listDemandeImmersion,
-            validationSchema: listImmersionApplicationRequestDtoSchema,
-            useCaseParams: req.query,
-          }),
+        () => deps.useCases.listDemandeImmersion.execute(req.query),
         deps.authChecker,
-      );
-    });
-
-  router.route(`/${validateDemandeRoute}/:id`).get(async (req, res) => {
-    sendHttpResponse(
-      req,
-      res,
-      () => deps.useCases.validateDemandeImmersion.execute(req.params.id),
-      deps.authChecker,
+      ),
     );
-  });
 
-  router.route(`/admin/${generateMagicLinkRoute}`).get(async (req, res) => {
+  router
+    .route(`/${validateDemandeRoute}/:id`)
+    .get(async (req, res) =>
+      sendHttpResponse(
+        req,
+        res,
+        () => deps.useCases.validateDemandeImmersion.execute(req.params.id),
+        deps.authChecker,
+      ),
+    );
+
+  router.route(`/admin/${generateMagicLinkRoute}`).get(async (req, res) =>
     sendHttpResponse(
       req,
       res,
@@ -96,17 +88,17 @@ export const createApp = async (
           expired: req.query.expired === "true",
         } as any),
       deps.authChecker,
-    );
-  });
+    ),
+  );
 
-  router.route(`/${renewMagicLinkRoute}`).get(async (req, res) => {
+  router.route(`/${renewMagicLinkRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, () =>
       deps.useCases.renewMagicLink.execute({
         expiredJwt: req.query.expiredJwt,
         linkFormat: req.query.linkFormat,
       } as any),
-    );
-  });
+    ),
+  );
 
   const demandeImmersionRouter = Router({ mergeParams: true });
   router.use(`/admin`, demandeImmersionRouter);
@@ -138,26 +130,20 @@ export const createApp = async (
       ),
     );
 
-  router.route(`/${romeRoute}`).get(async (req, res) => {
+  router.route(`/${romeRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
       logger.info(req);
-      return callUseCase({
-        useCase: deps.useCases.romeSearch,
-        validationSchema: romeSearchRequestSchema,
-        useCaseParams: req.query.searchText,
-      });
-    });
-  });
-
-  router.route(`/${siretRoute}/:siret`).get(async (req, res) =>
-    sendHttpResponse(req, res, async () =>
-      callUseCase({
-        useCase: deps.useCases.getSiret,
-        validationSchema: getSiretRequestSchema,
-        useCaseParams: req.params,
-      }),
-    ),
+      return deps.useCases.romeSearch.execute(req.query.searchText as any);
+    }),
   );
+
+  router
+    .route(`/${siretRoute}/:siret`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.getSiret.execute(req.params),
+      ),
+    );
 
   router.route(`/${agenciesRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () =>
