@@ -75,9 +75,9 @@ const buildDb = async () => {
   }
 
   // prettier-ignore
-  const lbbRequestTableAlreadyExists = await checkIfTableExists("lbb_request");
+  const lbbRequestTableAlreadyExists = await checkIfTableExists("lbb_requests");
   if (!lbbRequestTableAlreadyExists) {
-    logger.info("We will thus create the lbb_request table");
+    logger.info("We will thus create the lbb_requests table");
     await buildLaBonneBoiteRequestTable(client);
   }
 

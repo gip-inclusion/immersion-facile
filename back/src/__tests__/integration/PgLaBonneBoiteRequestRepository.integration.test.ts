@@ -16,7 +16,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE lbb_request CASCADE");
+    await client.query("TRUNCATE lbb_requests CASCADE");
     repo = new PgLaBonneBoiteRequestRepository(client);
   });
 
@@ -118,7 +118,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
   });
 
   const getAllRows = async () =>
-    (await client.query("SELECT * FROM lbb_request")).rows;
+    (await client.query("SELECT * FROM lbb_requests")).rows;
 
   const insertEntity = async (
     requestedAt: Date,
@@ -126,7 +126,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
     position: LatLonDto,
   ) => {
     await client.query(
-      `INSERT INTO lbb_request (
+      `INSERT INTO lbb_requests (
        requested_at, rome, lat, lon, distance_km, result) VALUES ($1, $2, $3, $4, $5, $6)`,
       [requestedAt.toISOString(), rome, position.lat, position.lon, 10, {}],
     );

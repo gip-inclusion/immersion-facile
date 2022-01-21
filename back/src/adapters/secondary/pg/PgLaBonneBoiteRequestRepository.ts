@@ -13,7 +13,7 @@ export class PgLaBonneBoiteRequestRepository
     laBonneBoiteRequest: LaBonneBoiteRequestEntity,
   ) {
     await this.client.query(
-      `INSERT INTO lbb_request (
+      `INSERT INTO lbb_requests (
          requested_at, rome, lat, lon, distance_km, result
        ) VALUES ($1, $2, $3, $4, $5, $6) `,
       [
@@ -44,7 +44,7 @@ export class PgLaBonneBoiteRequestRepository
       ST_DistanceSphere(ST_MakePoint(${thisPosition.lon}, ${
       thisPosition.lat
     }), ST_MakePoint(lon, lat)) AS distance_to_position_meters
-    FROM lbb_request
+    FROM lbb_requests
     WHERE rome = '${thisRome}' AND  requested_at >= '${since.toISOString()}'
       ORDER BY distance_to_position_meters ASC
       LIMIT 1;`;
