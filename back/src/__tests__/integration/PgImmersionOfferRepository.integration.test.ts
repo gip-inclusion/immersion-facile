@@ -33,7 +33,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("insertEstablishmentAggregates", () => {
-    test("Insert immersions and retrieves them back", async () => {
+    test("Insert immersions and retrieves them back if establishment is active", async () => {
       await pgImmersionOfferRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishment({
@@ -46,6 +46,8 @@ describe("Postgres implementation of immersion offer repository", () => {
             position: { lat: 49, lon: 6 },
             naf: "8520A",
             contactMethod: "EMAIL",
+            isActive: false,
+            updatedAt: new Date("2022-03-07T19:10:00.000Z"),
           })
           .withImmersionOffers([
             {
@@ -66,6 +68,8 @@ describe("Postgres implementation of immersion offer repository", () => {
             position: { lat: 49.05, lon: 6.05 },
             naf: "8520A",
             contactMethod: "PHONE",
+            isActive: true,
+            updatedAt: new Date("2022-03-07T19:10:00.000Z"),
           })
           .withContacts([
             {
@@ -94,24 +98,9 @@ describe("Postgres implementation of immersion offer repository", () => {
         lon: 6.1,
         nafDivision: "85",
       });
-      expect(searchResult).toHaveLength(2);
-      const expectedResult1: SearchImmersionResultDto = {
-        id: "13df03a5-a2a5-430a-b558-333333333344",
-        address: "fake address establishment 2 12345 some city",
-        city: "some city",
-        name: "Company from FORM for search",
-        naf: "8520A",
-        nafLabel: "Enseignement primaire",
-        contactMode: "PHONE",
-        location: { lat: 49.05, lon: 6.05 },
-        voluntaryToImmersion: false,
-        rome: "M1808",
-        romeLabel: "Information géographique",
-        siret: "78000403200040",
-        distance_m: 6653,
-        numberOfEmployeeRange: "1-2",
-      };
-      const expectedResult2: SearchImmersionResultDto = {
+      expect(searchResult).toHaveLength(1);
+
+      const expectedResult: SearchImmersionResultDto = {
         id: "13df03a5-a2a5-430a-b558-111111111122",
         address: "fake address establishment 1 12345 some city",
         city: "some city",
@@ -128,9 +117,9 @@ describe("Postgres implementation of immersion offer repository", () => {
         numberOfEmployeeRange: "20-49",
       };
 
-      expect(searchResult).toMatchObject([expectedResult1, expectedResult2]);
+      expect(searchResult).toMatchObject([expectedResult]);
 
-      const searchResuts = await pgImmersionOfferRepository.getFromSearch({
+      const searchResults = await pgImmersionOfferRepository.getFromSearch({
         rome: "M1808",
         distance_km: 30,
         lat: 49.1,
@@ -138,9 +127,9 @@ describe("Postgres implementation of immersion offer repository", () => {
         nafDivision: "85",
         siret: "78000403200040",
       });
-      expect(searchResuts).toHaveLength(1);
-      expect(searchResuts[0].siret).toBe("78000403200040");
-      expect(searchResuts[0].contactDetails).toBeUndefined();
+      expect(searchResults).toHaveLength(1);
+      expect(searchResults[0].siret).toBe("78000403200040");
+      expect(searchResults[0].contactDetails).toBeUndefined();
 
       const searchResultsWithDetails =
         await pgImmersionOfferRepository.getFromSearch(

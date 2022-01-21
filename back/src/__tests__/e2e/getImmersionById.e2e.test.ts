@@ -23,7 +23,7 @@ const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
 const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03512d";
 
 describe("/get-immersion-by-id route", () => {
-  let clock = new RealClock();
+  const clock = new RealClock();
 
   let request: SuperTest<Test>;
   let reposAndGateways: InMemoryRepositories;

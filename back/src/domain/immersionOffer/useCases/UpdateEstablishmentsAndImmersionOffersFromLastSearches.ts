@@ -6,6 +6,7 @@ import {
 import { distanceBetweenCoordinates } from "../../../utils/distanceBetweenCoordinates";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
+import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import {
   SireneRepository,
@@ -32,6 +33,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
 
   constructor(
     private readonly uuidGenerator: UuidGenerator,
+    private readonly clock: Clock,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly sireneRepository: SireneRepository,
     private readonly searchMadeRepository: SearchMadeRepository,
@@ -191,10 +193,14 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     const naf = sireneEstablishment.naf;
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
 
-    return laBonneBoiteCompany.toEstablishmentAggregate(this.uuidGenerator, {
-      naf,
-      numberEmployeesRange,
-    });
+    return laBonneBoiteCompany.toEstablishmentAggregate(
+      this.uuidGenerator,
+      this.clock,
+      {
+        naf,
+        numberEmployeesRange,
+      },
+    );
   }
 }
 

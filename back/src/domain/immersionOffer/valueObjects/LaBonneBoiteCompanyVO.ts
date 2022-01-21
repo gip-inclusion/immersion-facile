@@ -1,4 +1,5 @@
 import { createLogger } from "../../../utils/logger";
+import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import {
   EstablishmentAggregate,
@@ -30,6 +31,7 @@ export class LaBonneBoiteCompanyVO {
 
   public toEstablishmentAggregate(
     uuidGenerator: UuidGenerator,
+    clock: Clock,
     extraData?: { naf?: string; numberEmployeesRange?: TefenCode },
   ): EstablishmentAggregate {
     const establishment: EstablishmentEntityV2 = {
@@ -44,6 +46,8 @@ export class LaBonneBoiteCompanyVO {
       siret: this.props.siret,
       voluntaryToImmersion: false,
       numberEmployeesRange: extraData?.numberEmployeesRange ?? -1,
+      updatedAt: clock.now(),
+      isActive: true,
     };
 
     return {

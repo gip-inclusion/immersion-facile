@@ -77,6 +77,7 @@ const main = async () => {
   const updateEstablishmentsAndImmersionOffersFromLastSearches =
     new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
       new UuidV4Generator(),
+      new RealClock(),
       laBonneBoiteAPI,
       sireneGateway,
       repositories.searchesMade,

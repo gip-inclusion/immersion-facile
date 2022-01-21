@@ -37,6 +37,8 @@ export type EstablishmentEntityV2 = {
   position: LatLonDto;
   naf: string;
   numberEmployeesRange: TefenCode;
+  updatedAt: Date;
+  isActive: boolean;
 };
 
 export type AnnotatedEstablishmentEntityV2 = EstablishmentEntityV2 & {

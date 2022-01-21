@@ -16,6 +16,8 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   position: { lat: 35, lon: 50 },
   naf: "8539A",
   numberEmployeesRange: 11,
+  updatedAt: new Date("2022-01-05T00:00:00.000Z"),
+  isActive: true,
 };
 
 export class EstablishmentEntityV2Builder
@@ -44,6 +46,15 @@ export class EstablishmentEntityV2Builder
       ...this.entity,
       numberEmployeesRange: tefenCode,
     });
+  }
+  notActive() {
+    return new EstablishmentEntityV2Builder({
+      ...this.entity,
+      isActive: false,
+    });
+  }
+  withUpdatedAt(updatedAt: Date) {
+    return new EstablishmentEntityV2Builder({ ...this.entity, updatedAt });
   }
   build() {
     return this.entity;

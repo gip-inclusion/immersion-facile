@@ -426,6 +426,7 @@ const createUseCases = (
         repositories.rome,
         sequenceRunner,
         uuidGenerator,
+        clock,
       ),
 
     contactEstablishment: new ContactEstablishment(

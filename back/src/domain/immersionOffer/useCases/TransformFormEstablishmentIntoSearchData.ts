@@ -3,6 +3,7 @@ import {
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
 import { createLogger } from "../../../utils/logger";
+import { Clock } from "../../core/ports/Clock";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
@@ -36,6 +37,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
     private readonly romeGateway: RomeGateway,
     private readonly sequenceRunner: SequenceRunner,
     private readonly uuidGenerator: UuidGenerator,
+    private readonly clock: Clock,
   ) {
     super();
   }
@@ -119,6 +121,8 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
       position,
       numberEmployeesRange,
       contactMethod: formEstablishment.preferredContactMethods[0],
+      isActive: true,
+      updatedAt: this.clock.now(),
     };
 
     const establishmentAggregate: EstablishmentAggregate = {

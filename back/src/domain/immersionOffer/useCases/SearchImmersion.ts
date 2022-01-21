@@ -174,7 +174,8 @@ export class SearchImmersion extends UseCase<
     companies: LaBonneBoiteCompanyVO[],
   ) {
     const llbResultsConvertedToEstablishmentAggregates = companies.map(
-      (company) => company.toEstablishmentAggregate(this.uuidGenerator),
+      (company) =>
+        company.toEstablishmentAggregate(this.uuidGenerator, this.clock),
     );
 
     await this.immersionOfferRepository.insertEstablishmentAggregates(

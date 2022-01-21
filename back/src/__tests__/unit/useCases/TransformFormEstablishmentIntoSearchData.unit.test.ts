@@ -1,3 +1,4 @@
+import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
@@ -65,6 +66,7 @@ describe("Transform FormEstablishment into search data", () => {
         inMemoryRomeGateway,
         sequencerRunner,
         uuidGenerator,
+        new CustomClock(),
       );
   });
 
