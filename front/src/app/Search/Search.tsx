@@ -16,7 +16,7 @@ import { SuccessFeedback } from "src/components/SuccessFeedback";
 import { ContactMethod } from "src/shared/FormEstablishmentDto";
 import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
-import { EnterpriseSearchResult } from "./SearchResult";
+import { EnterpriseSearchResult } from "./EnterpriseSearchResult";
 import SearchIcon from "@mui/icons-material/Search";
 
 interface Values {
