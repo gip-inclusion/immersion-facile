@@ -78,8 +78,14 @@ const buildDb = async () => {
   logger.info("We create is_active column if not exists ");
   await addIsActive(client);
 
-  logger.info("change establishment timestamps to timestamps with timezone");
-  await changeEstablishmentTimestampWithTZ(client);
+  const establishmentsTimestampHaveTz =
+    await checkIfEstablishmentsTimestampHaveTz(client);
+  if (!establishmentsTimestampHaveTz) {
+    logger.info("change establishment timestamps to timestamps with timezone");
+    await changeEstablishmentTimestampWithTZ(client);
+  } else {
+    logger.info("establishment timestamps already have timezone");
+  }
 
   // prettier-ignore
   const lbbRequestTableAlreadyExists = await checkIfTableExists("lbb_requests");
@@ -173,6 +179,23 @@ const makeIsQuerySuccessful =
       return false;
     }
   };
+
+const checkIfEstablishmentsTimestampHaveTz = async (client: PoolClient) => {
+  const makeQuery = (
+    columnName: string,
+  ) => `SELECT column_name, data_type FROM information_schema.columns WHERE
+  table_name = 'establishments' AND column_name = '${columnName}'`;
+
+  const update_result = await client.query(makeQuery("update_date"));
+  const creation_result = await client.query(makeQuery("creation_date"));
+
+  const update_date_has_tz =
+    update_result.rows[0].data_type === "timestamp without time zone";
+  const creation_data_has_tz =
+    creation_result.rows[0].data_type === "timestamp without time zone";
+
+  return update_date_has_tz && creation_data_has_tz;
+};
 
 const buildSearchImmersionDb = async (client: PoolClient) => {
   await executeSqlFromFile(__dirname + "/database.sql", client);
