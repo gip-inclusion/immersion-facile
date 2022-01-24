@@ -39,7 +39,7 @@ export interface ImmersionOfferRepository {
 
   updateEstablishment: (
     siret: string,
-    update: Partial<
+    propertiesToUpdate: Partial<
       Pick<
         EstablishmentEntityV2,
         "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"

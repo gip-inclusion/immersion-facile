@@ -131,7 +131,7 @@ export class InMemoryImmersionOfferRepository
 
   public async updateEstablishment(
     siret: string,
-    update: Partial<
+    propertiesToUpdate: Partial<
       Pick<
         EstablishmentEntityV2,
         "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"
@@ -145,17 +145,20 @@ export class InMemoryImmersionOfferRepository
               ...aggregate,
               establishment: {
                 ...aggregate.establishment,
-                address: update?.address || aggregate.establishment.address,
-                position: update?.position || aggregate.establishment.position,
-                naf: update?.naf || aggregate.establishment.naf,
+                address:
+                  propertiesToUpdate.address || aggregate.establishment.address,
+                position:
+                  propertiesToUpdate.position ||
+                  aggregate.establishment.position,
+                naf: propertiesToUpdate.naf || aggregate.establishment.naf,
                 numberEmployeesRange:
-                  update?.numberEmployeesRange ||
+                  propertiesToUpdate.numberEmployeesRange ||
                   aggregate.establishment.numberEmployeesRange,
                 isActive:
-                  update.isActive !== undefined
-                    ? update.isActive
+                  propertiesToUpdate.isActive !== undefined
+                    ? propertiesToUpdate.isActive
                     : aggregate.establishment.isActive,
-                updatedAt: update.updatedAt,
+                updatedAt: propertiesToUpdate.updatedAt,
               },
             }
           : aggregate,

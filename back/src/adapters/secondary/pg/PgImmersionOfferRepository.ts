@@ -345,7 +345,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
   public async updateEstablishment(
     siret: string,
-    update: Partial<
+    propertiesToUpdate: Partial<
       Pick<
         EstablishmentEntityV2,
         "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"
@@ -353,24 +353,28 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     > & { updatedAt: Date },
   ): Promise<void> {
     const updateQuery = `UPDATE establishments
-                   SET update_date = '${update.updatedAt.toISOString()}' 
+                   SET update_date = '${propertiesToUpdate.updatedAt.toISOString()}'
                    ${
-                     update.isActive !== undefined
-                       ? `, is_active = ${update.isActive}`
-                       : ""
-                   }
-                   ${!!update.naf ? `, naf = '${update.naf}'` : ""}
-                   ${
-                     !!update.numberEmployeesRange
-                       ? `, number_employees = ${update.numberEmployeesRange}`
+                     propertiesToUpdate.isActive !== undefined
+                       ? `, is_active = ${propertiesToUpdate.isActive}`
                        : ""
                    }
                    ${
-                     update.address && update.position // Update address and position together.
+                     !!propertiesToUpdate.naf
+                       ? `, naf = '${propertiesToUpdate.naf}'`
+                       : ""
+                   }
+                   ${
+                     !!propertiesToUpdate.numberEmployeesRange
+                       ? `, number_employees = ${propertiesToUpdate.numberEmployeesRange}`
+                       : ""
+                   }
+                   ${
+                     propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
                        ? `, address = '${
-                           update.address
+                           propertiesToUpdate.address
                          }', gps = ${convertPositionToStGeography(
-                           update.position,
+                           propertiesToUpdate.position,
                          )}`
                        : ""
                    }
