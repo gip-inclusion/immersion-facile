@@ -9,15 +9,15 @@ import {
 } from "src/app/Search/ContactEstablishmentModal";
 import distanceSearchIcon from "src/assets/distance-search-icon.svg";
 import locationSearchIcon from "src/assets/location-search-icon.svg";
-import searchButtonIcon from "src/assets/search-button-icon.svg";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { Layout } from "src/components/Layout";
+import { SearchButton } from "src/components/SearchButton";
 import { SuccessFeedback } from "src/components/SuccessFeedback";
 import { ContactMethod } from "src/shared/FormEstablishmentDto";
 import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
-import "./search.css";
 import { EnterpriseSearchResult } from "./SearchResult";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface Values {
   rome: string;
@@ -48,9 +48,9 @@ export const Search = () => {
 
   return (
     <Layout>
-      <div className="sm:flex sm:items-center redGradiant">
-        <div className="mainContainer flex-1">
-          <h1 className="headerText">
+      <div className="sm:flex sm:items-center bg-gradient-to-b from-immersionRed-dark to-immersionRed-light">
+        <div className="h-[672px] flex-1 flex flex-col items-center p-10">
+          <h1 className="text-2xl text-white text-center font-bold">
             Trouvez une entreprise accueillante pour réaliser une immersion
             facile
           </h1>
@@ -95,7 +95,7 @@ export const Search = () => {
           >
             {({ setFieldValue }) => (
               <Form>
-                <div className="formContentsContainer">
+                <div className="gap-5 flex flex-col">
                   <div>
                     <ProfessionAutocomplete
                       title="Métier recherché"
@@ -138,25 +138,21 @@ export const Search = () => {
                       options={radiusOptions.map((n) => `${n} km`)}
                     />
                   </div>
-
-                  <button
-                    type="submit"
-                    className="searchButton"
+                  <SearchButton
+                    className="mt-12"
+                    dark
                     disabled={isSearching}
+                    type="submit"
                   >
-                    <img
-                      className="searchButtonImage"
-                      src={searchButtonIcon}
-                      alt=""
-                    />
-                    Rechercher
-                  </button>
+                    <SearchIcon />
+                    <div>Rechercher</div>
+                  </SearchButton>
                 </div>
               </Form>
             )}
           </Formik>
         </div>
-        <div className="searchResultContainer sm:flex-1 sm:overflow-y-scroll">
+        <div className="flex flex-col items-center sm:h-[670px] sm:flex-1 sm:overflow-y-scroll">
           <SearchResultPanel searchResults={result} isSearching={isSearching} />
         </div>
       </div>

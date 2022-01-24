@@ -12,6 +12,7 @@ module.exports = {
         immersionRed: {
           light: "#ce614a",
           dark: "#ad4847",
+          veryDark: "#823434",
           DEFAULT: "#be5449",
         },
         immersionGrey: {

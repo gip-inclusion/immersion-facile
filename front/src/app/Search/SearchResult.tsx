@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
-import "./search.css";
 import { DistanceIcon } from "src/assets/DistanceIcon";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import { SearchButton } from "src/components/SearchButton";
 import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 
 type EnterpriseSearchResultProps = {
@@ -40,9 +40,11 @@ export const EnterpriseSearchResult = ({
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
 
   return (
-    <div className="searchResult">
-      <div>
-        <h2 className="searchResultTitle">{name}</h2>
+    <div className="flex flex-col items-stretch p-4 w-[80%] bg-white my-4 rounded border-solid border-gray-400 border gap-4">
+      <div className="pb-2">
+        <div className="font-bold text-xl leading-6 text-immersionRed-light pb-1">
+          {name}
+        </div>
         {nafLabel && <div>{nafLabel}</div>}
       </div>
       <SearchResultInfo icon={<DistanceIcon sx={{ color: iconColor }} />}>
@@ -59,18 +61,14 @@ export const EnterpriseSearchResult = ({
       <SearchResultInfo icon={<LocationOnIcon sx={{ color: iconColor }} />}>
         {address.toLocaleLowerCase()}
       </SearchResultInfo>
-      <div className="searchDetailsSeparator" />
-      <button
-        className="expandResultDetailsButton"
-        onClick={onButtonClick}
-        disabled={disableButton}
-      >
+      <hr className="pb-2" />
+      <SearchButton onClick={onButtonClick} disabled={disableButton}>
         {contactMode === "PHONE" ||
         contactMode === "EMAIL" ||
         contactMode === "IN_PERSON"
           ? "Contacter l'entreprise"
           : "Tentez votre chance"}
-      </button>
+      </SearchButton>
     </div>
   );
 };
