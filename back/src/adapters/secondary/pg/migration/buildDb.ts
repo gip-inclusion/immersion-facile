@@ -144,8 +144,11 @@ const buildDb = async () => {
   logger.info("adding postal code to immersion application if needed...");
   await addPostalCodeToImmersionApplication(client);
 
-  logger.info("change outbox occurred_at to timestamp with timezone");
-  await changeOutboxOccurredAtToTimestampWithTZ(client);
+  const outboxHasTz = await checkOutboxOccurredAtHasTz(client);
+  if (!outboxHasTz) {
+    logger.info("change outbox occurred_at to timestamp with timezone");
+    await changeOutboxOccurredAtToTimestampWithTZ(client);
+  }
 
   client.release();
   await pool.end();
@@ -195,6 +198,13 @@ const checkIfEstablishmentsTimestampHaveTz = async (client: PoolClient) => {
     creation_result.rows[0].data_type === "timestamp without time zone";
 
   return update_date_has_tz && creation_data_has_tz;
+};
+
+const checkOutboxOccurredAtHasTz = async (client: PoolClient) => {
+  const occurred_at_result = await client.query(
+    "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'outbox' AND column_name = 'occurred_at'",
+  );
+  return occurred_at_result.rows[0].data_type === "timestamp with time zone";
 };
 
 const buildSearchImmersionDb = async (client: PoolClient) => {
