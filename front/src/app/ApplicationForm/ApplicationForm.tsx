@@ -171,6 +171,17 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             </Title>
           </div>
           <div className="fr-text">
+            <span className="font-bold">
+              Attention, le formulaire de demande de convention est en cours de
+              test dans quelques départements ou villes.
+            </span>
+            <br />
+            Il ne peut être utilisé que si votre conseiller ou votre
+            agence/mission locale/espace solidarité apparaît dans la liste. Si
+            ce n'est pas le cas, contactez votre conseiller. Il établira la
+            convention avec vous et l'entreprise qui va vous accueillir.
+          </div>
+          <div className="fr-text">
             Bravo ! <br />
             Vous avez trouvé une entreprise pour vous accueillir en immersion.{" "}
             <br />
