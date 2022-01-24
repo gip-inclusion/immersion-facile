@@ -2,7 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { AgencyConfigBuilder } from "./../../_testBuilders/AgencyConfigBuilder";
+import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 
 const agency1 = AgencyConfigBuilder.create(
   "11111111-1111-1111-1111-111111111111",

@@ -36,7 +36,7 @@ describe("List Immersion Applications", () => {
   describe("When a immersionApplication is stored", () => {
     test("returns the immersionApplication", async () => {
       const entity = new ImmersionApplicationEntityBuilder().build();
-      repository.setDemandesImmersion({ form_id: entity });
+      repository.setImmersionApplications({ form_id: entity });
 
       const ImmersionApplications = await listImmersionApplication.execute({
         status: undefined,
@@ -68,7 +68,7 @@ describe("List Immersion Applications", () => {
         });
       });
 
-      repository.setDemandesImmersion(
+      repository.setImmersionApplications(
         entities.reduce(
           (dict, entity) => ({ ...dict, [entity.id as string]: entity }),
           {},

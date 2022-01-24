@@ -39,10 +39,10 @@ describe("Add immersionApplication", () => {
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     stubGetSiret = new StubGetSiret();
-    addImmersionApplication = createAddDemandeImmersionUseCase();
+    addImmersionApplication = createAddImmersionApplicationUseCase();
   });
 
-  const createAddDemandeImmersionUseCase = () =>
+  const createAddImmersionApplicationUseCase = () =>
     new AddImmersionApplication(
       applicationRepository,
       createNewEvent,

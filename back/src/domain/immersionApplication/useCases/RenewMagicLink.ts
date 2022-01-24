@@ -1,14 +1,14 @@
-import { ImmersionApplicationId } from "./../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationId } from "../../../shared/ImmersionApplicationDto";
 import jwt from "jsonwebtoken";
 import {
   emailHashForMagicLink,
   MagicLinkPayload,
   Role,
-} from "./../../../shared/tokens/MagicLinkPayload";
+} from "../../../shared/tokens/MagicLinkPayload";
 import {
   BadRequestError,
   ForbiddenError,
-} from "./../../../adapters/primary/helpers/sendHttpResponse";
+} from "../../../adapters/primary/helpers/sendHttpResponse";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   RenewMagicLinkRequestDto,

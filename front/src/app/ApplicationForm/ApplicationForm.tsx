@@ -29,9 +29,10 @@ interface ApplicationFormProps {
   route: ApplicationFormRoute;
 }
 
-const isDemandeImmersionFrozen = (
+const isImmersionApplicationFrozen = (
   immersionApplication: Partial<ImmersionApplicationDto>,
-): boolean => !immersionApplication.status || immersionApplication.status !== "DRAFT";
+): boolean =>
+  !immersionApplication.status || immersionApplication.status !== "DRAFT";
 
 const { featureFlags, dev } = ENV;
 
@@ -157,7 +158,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
       });
   }, []);
 
-  const isFrozen = isDemandeImmersionFrozen(initialValues);
+  const isFrozen = isImmersionApplicationFrozen(initialValues);
 
   return (
     <Layout>

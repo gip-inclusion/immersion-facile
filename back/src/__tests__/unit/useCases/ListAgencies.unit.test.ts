@@ -1,6 +1,6 @@
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
-import { InMemoryAgencyRepository } from "./../../../adapters/secondary/InMemoryAgencyRepository";
-import { ListAgencies } from "./../../../domain/immersionApplication/useCases/ListAgencies";
+import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { ListAgencies } from "../../../domain/immersionApplication/useCases/ListAgencies";
 
 const agency1 = AgencyConfigBuilder.empty()
   .withId("11111111-1111-1111-1111-111111111111")

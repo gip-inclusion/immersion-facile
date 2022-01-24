@@ -3,7 +3,7 @@ import { useField } from "formik";
 import { useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/dependencies";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
-import { siretSchema } from "./../../shared/siret";
+import { siretSchema } from "../../shared/siret";
 
 export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
   fieldFromInfo: K,

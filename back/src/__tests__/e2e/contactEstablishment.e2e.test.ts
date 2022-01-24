@@ -8,8 +8,8 @@ import {
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { expectArraysToMatch } from "../../_testBuilders/test.helpers";
-import { ContactEntityV2Builder } from "./../../_testBuilders/ContactEntityV2Builder";
-import { ImmersionOfferEntityV2Builder } from "./../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 const immersionOfferId = "61649067-cd6a-4aa3-8866-d1f3d61292b4";
 const validRequest: ContactEstablishmentRequestDto = {

@@ -15,15 +15,15 @@ export class InMemoryImmersionApplicationRepository
   private _immersionApplications: ImmersionApplications = {};
 
   public async save(
-    demandeImmersionEntity: ImmersionApplicationEntity,
+    immersionApplicationEntity: ImmersionApplicationEntity,
   ): Promise<ImmersionApplicationId | undefined> {
-    logger.info({ demandeImmersionEntity }, "save");
-    if (this._immersionApplications[demandeImmersionEntity.id]) {
+    logger.info({ immersionApplicationEntity }, "save");
+    if (this._immersionApplications[immersionApplicationEntity.id]) {
       return undefined;
     }
-    this._immersionApplications[demandeImmersionEntity.id] =
-      demandeImmersionEntity;
-    return demandeImmersionEntity.id;
+    this._immersionApplications[immersionApplicationEntity.id] =
+      immersionApplicationEntity;
+    return immersionApplicationEntity.id;
   }
 
   public async getAll() {
@@ -39,7 +39,7 @@ export class InMemoryImmersionApplicationRepository
   public async updateImmersionApplication(
     immersionApplication: ImmersionApplicationEntity,
   ) {
-    logger.info({ immersionApplication }, "updateDemandeImmersion");
+    logger.info({ immersionApplication }, "updateImmersionApplication");
     const id = immersionApplication.id;
     if (!this._immersionApplications[id]) {
       return undefined;
@@ -50,7 +50,7 @@ export class InMemoryImmersionApplicationRepository
 
   // Visible for testing.
   // TODO: Rename to setImmersionApplication.
-  setDemandesImmersion(demandesImmersion: ImmersionApplications) {
-    this._immersionApplications = demandesImmersion;
+  setImmersionApplications(immersionApplications: ImmersionApplications) {
+    this._immersionApplications = immersionApplications;
   }
 }

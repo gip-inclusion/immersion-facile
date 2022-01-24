@@ -11,7 +11,7 @@ import {
   renewMagicLinkRoute,
   romeRoute,
   siretRoute,
-  validateDemandeRoute,
+  validateImmersionApplicationRoute,
 } from "../../shared/routes";
 import { createLogger } from "../../utils/logger";
 import { createApiKeyAuthRouter } from "./ApiKeyAuthRouter";
@@ -61,13 +61,13 @@ export const createApp = async (
       sendHttpResponse(
         req,
         res,
-        () => deps.useCases.listDemandeImmersion.execute(req.query),
+        () => deps.useCases.listImmersionApplication.execute(req.query),
         deps.authChecker,
       ),
     );
 
   router
-    .route(`/${validateDemandeRoute}/:id`)
+    .route(`/${validateImmersionApplicationRoute}/:id`)
     .get(async (req, res) =>
       sendHttpResponse(
         req,
@@ -100,10 +100,10 @@ export const createApp = async (
     ),
   );
 
-  const demandeImmersionRouter = Router({ mergeParams: true });
-  router.use(`/admin`, demandeImmersionRouter);
+  const immersionApplicationRouter = Router({ mergeParams: true });
+  router.use(`/admin`, immersionApplicationRouter);
 
-  demandeImmersionRouter
+  immersionApplicationRouter
     .route(`/${immersionApplicationsRoute}/:id`)
     .get(async (req, res) =>
       sendHttpResponse(

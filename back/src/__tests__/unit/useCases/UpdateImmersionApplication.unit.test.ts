@@ -53,25 +53,28 @@ describe("Update immersionApplication", () => {
 
   describe("When the immersionApplication is valid", () => {
     test("updates the immersionApplication in the repository", async () => {
-      const demandesImmersion: ImmersionApplications = {};
-      const demandeImmersionEntity =
+      const immersionApplications: ImmersionApplications = {};
+      const immersionApplicationEntity =
         new ImmersionApplicationEntityBuilder().build();
-      demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
-      immersionApplicationRepository.setDemandesImmersion(demandesImmersion);
+      immersionApplications[immersionApplicationEntity.id] =
+        immersionApplicationEntity;
+      immersionApplicationRepository.setImmersionApplications(
+        immersionApplications,
+      );
 
-      const updatedDemandeImmersion = new ImmersionApplicationDtoBuilder()
+      const updatedImmersionApplication = new ImmersionApplicationDtoBuilder()
         .withEmail("new@email.fr")
         .build();
 
       const { id } = await updateImmersionApplication.execute({
-        id: updatedDemandeImmersion.id,
-        immersionApplication: updatedDemandeImmersion,
+        id: updatedImmersionApplication.id,
+        immersionApplication: updatedImmersionApplication,
       });
-      expect(id).toEqual(updatedDemandeImmersion.id);
+      expect(id).toEqual(updatedImmersionApplication.id);
 
       const storedInRepo = await immersionApplicationRepository.getAll();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        updatedDemandeImmersion,
+        updatedImmersionApplication,
       ]);
     });
   });
@@ -96,16 +99,16 @@ describe("Update immersionApplication", () => {
   describe("When previous state is not draft (testing with In_review)", () => {
     it("throws Bad request", async () => {
       //we would expect IN_REVIEW to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
-      const updatedDemandeImmersion = new ImmersionApplicationDtoBuilder()
+      const updatedImmersionApplication = new ImmersionApplicationDtoBuilder()
         .withStatus("IN_REVIEW")
         .build();
 
       await expectPromiseToFailWithError(
         updateImmersionApplication.execute({
-          id: updatedDemandeImmersion.id,
-          immersionApplication: updatedDemandeImmersion,
+          id: updatedImmersionApplication.id,
+          immersionApplication: updatedImmersionApplication,
         }),
-        new BadRequestError(updatedDemandeImmersion.id),
+        new BadRequestError(updatedImmersionApplication.id),
       );
     });
   });
@@ -113,12 +116,15 @@ describe("Update immersionApplication", () => {
   describe("Status validation", () => {
     let id: ImmersionApplicationId;
     beforeEach(() => {
-      const demandesImmersion: ImmersionApplications = {};
-      const demandeImmersionEntity =
+      const immersionApplications: ImmersionApplications = {};
+      const immersionApplicationEntity =
         new ImmersionApplicationEntityBuilder().build();
-      demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
-      immersionApplicationRepository.setDemandesImmersion(demandesImmersion);
-      id = demandeImmersionEntity.id;
+      immersionApplications[immersionApplicationEntity.id] =
+        immersionApplicationEntity;
+      immersionApplicationRepository.setImmersionApplications(
+        immersionApplications,
+      );
+      id = immersionApplicationEntity.id;
     });
 
     // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021

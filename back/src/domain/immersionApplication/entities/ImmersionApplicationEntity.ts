@@ -27,9 +27,3 @@ export class ImmersionApplicationEntity {
     return this.properties.source;
   }
 }
-
-export const isDemandeImmersionEntity = (
-  entity: ImmersionApplicationEntity | undefined,
-): entity is ImmersionApplicationEntity => {
-  return !!entity;
-};

@@ -1,6 +1,6 @@
 import { RomeGateway } from "../../../domain/rome/ports/RomeGateway";
-import { InMemoryRomeGateway } from "./../../../adapters/secondary/InMemoryRomeGateway";
-import { RomeSearch } from "./../../../domain/rome/useCases/RomeSearch";
+import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGateway";
+import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 
 describe("RomeSearch", () => {
   let gateway: RomeGateway;

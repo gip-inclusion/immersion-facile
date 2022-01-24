@@ -16,8 +16,8 @@ import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Build
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { RealClock } from "./../../adapters/secondary/core/ClockImplementations";
-import { GenerateApiConsumerJtw } from "./../../domain/auth/jwt";
+import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
+import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 
 const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
 const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03512d";

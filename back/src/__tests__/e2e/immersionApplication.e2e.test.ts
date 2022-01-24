@@ -1,7 +1,7 @@
 import {
   currentJwtVersion,
   emailHashForMagicLink,
-} from "./../../shared/tokens/MagicLinkPayload";
+} from "../../shared/tokens/MagicLinkPayload";
 import supertest, { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../adapters/primary/appConfig";
 import { createApp } from "../../adapters/primary/server";
@@ -9,7 +9,7 @@ import { makeGenerateJwt } from "../../domain/auth/jwt";
 import {
   immersionApplicationsRoute,
   updateApplicationStatusRoute,
-  validateDemandeRoute,
+  validateImmersionApplicationRoute,
 } from "../../shared/routes";
 import {
   createMagicLinkPayload,
@@ -50,7 +50,9 @@ describe("/demandes-immersion route", () => {
       it("Validating an existing application succeeds, with auth", async () => {
         // Validating an application with existing id succeeds (with auth).
         await request
-          .get(`/${validateDemandeRoute}/${immersionApplication.id}`)
+          .get(
+            `/${validateImmersionApplicationRoute}/${immersionApplication.id}`,
+          )
           .auth("e2e_tests", "e2e")
           .expect(200, { id: immersionApplication.id });
 
@@ -70,7 +72,9 @@ describe("/demandes-immersion route", () => {
 
       it("Validating applications without credentials fails with 401 Unauthorized", async () => {
         await request
-          .get(`/${validateDemandeRoute}/${immersionApplication.id}`)
+          .get(
+            `/${validateImmersionApplicationRoute}/${immersionApplication.id}`,
+          )
           .expect(401);
 
         // Getting the application succeeds and shows that it's NOT validated.
@@ -84,7 +88,9 @@ describe("/demandes-immersion route", () => {
 
       it("Validating applications with invalid credentials fails with 403 Forbidden", async () => {
         await request
-          .get(`/${validateDemandeRoute}/${immersionApplication.id}`)
+          .get(
+            `/${validateImmersionApplicationRoute}/${immersionApplication.id}`,
+          )
           .auth("not real user", "not real password")
           .expect(403);
 
@@ -99,7 +105,9 @@ describe("/demandes-immersion route", () => {
 
       it("Validating non-existent application with valid credentials fails with 404", async () => {
         await request
-          .get(`/${validateDemandeRoute}/unknown-demande-immersion-id`)
+          .get(
+            `/${validateImmersionApplicationRoute}/unknown-demande-immersion-id`,
+          )
           .auth("e2e_tests", "e2e")
           .expect(404);
 

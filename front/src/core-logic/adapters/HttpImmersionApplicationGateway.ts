@@ -25,30 +25,32 @@ import {
   immersionApplicationsRoute,
   siretRoute,
   updateApplicationStatusRoute,
-  validateDemandeRoute,
+  validateImmersionApplicationRoute,
   signApplicationRoute,
   rejectSigningApplicationRoute,
 } from "src/shared/routes";
 import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
-import { AgencyId } from "./../../shared/agencies";
+import { AgencyId } from "../../shared/agencies";
 
 const prefix = "api";
 
 export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway {
   public async add(
-    demandeImmersionDto: ImmersionApplicationDto,
+    immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<string> {
-    immersionApplicationSchema.parse(demandeImmersionDto);
+    immersionApplicationSchema.parse(immersionApplicationDto);
     const httpResponse = await axios.post(
       `/${prefix}/${immersionApplicationsRoute}`,
-      demandeImmersionDto,
+      immersionApplicationDto,
     );
-    const addDemandeImmersionResponse: AddImmersionApplicationResponseDto =
+    const addImmersionApplicationResponse: AddImmersionApplicationResponseDto =
       httpResponse.data;
-    addImmersionApplicationResponseDtoSchema.parse(addDemandeImmersionResponse);
-    return addDemandeImmersionResponse.id;
+    addImmersionApplicationResponseDtoSchema.parse(
+      addImmersionApplicationResponse,
+    );
+    return addImmersionApplicationResponse.id;
   }
 
   public async backofficeGet(id: string): Promise<ImmersionApplicationDto> {
@@ -85,36 +87,36 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
   }
 
   public async update(
-    demandeImmersionDto: ImmersionApplicationDto,
+    immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<string> {
-    immersionApplicationSchema.parse(demandeImmersionDto);
+    immersionApplicationSchema.parse(immersionApplicationDto);
     const httpResponse = await axios.post(
-      `/${prefix}/${immersionApplicationsRoute}/${demandeImmersionDto.id}`,
-      demandeImmersionDto,
+      `/${prefix}/${immersionApplicationsRoute}/${immersionApplicationDto.id}`,
+      immersionApplicationDto,
     );
-    const updateDemandeImmersionResponse: UpdateImmersionApplicationResponseDto =
+    const updateImmersionApplicationResponse: UpdateImmersionApplicationResponseDto =
       httpResponse.data;
     updateImmersionApplicationResponseDtoSchema.parse(
-      updateDemandeImmersionResponse,
+      updateImmersionApplicationResponse,
     );
-    return updateDemandeImmersionResponse.id;
+    return updateImmersionApplicationResponse.id;
   }
 
   public async updateML(
-    demandeImmersionDto: ImmersionApplicationDto,
+    immersionApplicationDto: ImmersionApplicationDto,
     jwt: string,
   ): Promise<string> {
-    await immersionApplicationSchema.parse(demandeImmersionDto);
+    immersionApplicationSchema.parse(immersionApplicationDto);
     const httpResponse = await axios.post(
       `/${prefix}/auth/${immersionApplicationsRoute}/${jwt}`,
-      demandeImmersionDto,
+      immersionApplicationDto,
     );
-    const updateDemandeImmersionResponse: UpdateImmersionApplicationResponseDto =
+    const updateImmersionApplicationResponse: UpdateImmersionApplicationResponseDto =
       httpResponse.data;
     await updateImmersionApplicationResponseDtoSchema.parse(
-      updateDemandeImmersionResponse,
+      updateImmersionApplicationResponse,
     );
-    return updateDemandeImmersionResponse.id;
+    return updateImmersionApplicationResponse.id;
   }
 
   public async updateStatus(
@@ -147,7 +149,7 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
 
   public async validate(id: ImmersionApplicationId): Promise<string> {
     const { data } = await axios.get(
-      `/${prefix}/${validateDemandeRoute}/${id}`,
+      `/${prefix}/${validateImmersionApplicationRoute}/${id}`,
     );
     return data.id;
   }

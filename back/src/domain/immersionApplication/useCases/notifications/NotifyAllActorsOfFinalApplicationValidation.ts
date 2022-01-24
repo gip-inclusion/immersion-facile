@@ -14,7 +14,7 @@ import {
   EmailGateway,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../ports/EmailGateway";
-import { EmailFilter } from "./../../../core/ports/EmailFilter";
+import { EmailFilter } from "../../../core/ports/EmailFilter";
 
 const logger = createLogger(__filename);
 export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<ImmersionApplicationDto> {

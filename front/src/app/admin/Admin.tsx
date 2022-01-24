@@ -20,7 +20,7 @@ interface AdminProps {
 }
 
 export const Admin = ({ route }: AdminProps) => {
-  const [demandesImmersion, setDemandesImmersion] = useState<
+  const [immersionApplications, setImmersionApplications] = useState<
     ImmersionApplicationDto[]
   >([]);
 
@@ -34,7 +34,7 @@ export const Admin = ({ route }: AdminProps) => {
       : undefined;
 
   const filterChanged = (selectedIndex: number, selectedLabel: string) => {
-    setDemandesImmersion([]);
+    setImmersionApplications([]);
     setStatusFilter(validApplicationStatus[selectedIndex]);
   };
 
@@ -52,7 +52,7 @@ export const Admin = ({ route }: AdminProps) => {
             {(data) => {
               if (!data) return <p />;
 
-              const demandesImmersion = data as ImmersionApplicationDto[];
+              const immersionApplications = data as ImmersionApplicationDto[];
               return (
                 <>
                   <h2>Backoffice</h2>
@@ -78,7 +78,7 @@ export const Admin = ({ route }: AdminProps) => {
                   </div>
 
                   <ul className="fr-accordions-group">
-                    {demandesImmersion.map((item) => (
+                    {immersionApplications.map((item) => (
                       <li key={item.id}>
                         <FormAccordion immersionApplication={item} />
                         {route.name === "admin" && (

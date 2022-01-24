@@ -4,7 +4,7 @@ import { GetImmersionApplication } from "../../../domain/immersionApplication/us
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
-describe("Get DemandeImmersion", () => {
+describe("Get ImmersionApplication", () => {
   let getImmersionApplication: GetImmersionApplication;
   let repository: InMemoryImmersionApplicationRepository;
 
@@ -13,7 +13,7 @@ describe("Get DemandeImmersion", () => {
     getImmersionApplication = new GetImmersionApplication(repository);
   });
 
-  describe("When the DemandeImmersion does not exist", () => {
+  describe("When the ImmersionApplication does not exist", () => {
     it("throws NotFoundError", async () => {
       expectPromiseToFailWithError(
         getImmersionApplication.execute({ id: "unknown_demande_immersion_id" }),
@@ -22,15 +22,15 @@ describe("Get DemandeImmersion", () => {
     });
   });
 
-  describe("When a DemandeImmersion is stored", () => {
-    it("returns the DemandeImmersion", async () => {
+  describe("When a ImmersionApplication is stored", () => {
+    it("returns the ImmersionApplication", async () => {
       const entity = new ImmersionApplicationEntityBuilder().build();
-      repository.setDemandesImmersion({ [entity.id]: entity });
+      repository.setImmersionApplications({ [entity.id]: entity });
 
-      const demandeImmersion = await getImmersionApplication.execute({
+      const immersionApplication = await getImmersionApplication.execute({
         id: entity.id,
       });
-      expect(demandeImmersion).toEqual(entity.toDto());
+      expect(immersionApplication).toEqual(entity.toDto());
     });
   });
 });

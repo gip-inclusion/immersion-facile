@@ -15,7 +15,7 @@ import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
-import { AgencyId } from "./../../shared/agencies";
+import { AgencyId } from "../../shared/agencies";
 
 const TEST_AGENCIES: AgencyDto[] = [
   {
@@ -65,7 +65,8 @@ const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
 
 const SIMULATED_LATENCY_MS = 2000;
 export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGateway {
-  private _demandesImmersion: { [id: string]: ImmersionApplicationDto } = {};
+  private _immersionApplications: { [id: string]: ImmersionApplicationDto } =
+    {};
   private _establishments: { [siret: string]: GetSiretResponseDto } = {};
   private _agencies: { [id: string]: AgencyDto } = {};
 
@@ -101,7 +102,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
       immersionApplication,
     );
     await sleep(SIMULATED_LATENCY_MS);
-    this._demandesImmersion[immersionApplication.id] = immersionApplication;
+    this._immersionApplications[immersionApplication.id] = immersionApplication;
     return immersionApplication.id;
   }
 
@@ -110,7 +111,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   ): Promise<ImmersionApplicationDto> {
     console.log("InMemoryImmersionApplicationGateway.get: ", id);
     await sleep(SIMULATED_LATENCY_MS);
-    return this._demandesImmersion[id];
+    return this._immersionApplications[id];
   }
 
   // Same as GET above, but using a magic link
@@ -118,7 +119,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     await sleep(SIMULATED_LATENCY_MS);
 
     const payload = decodeJwt(jwt);
-    return this._demandesImmersion[payload.applicationId];
+    return this._immersionApplications[payload.applicationId];
   }
 
   public async getAll(
@@ -128,9 +129,9 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     console.log("InMemoryImmersionApplicationGateway.getAll: ", agency, status);
     await sleep(SIMULATED_LATENCY_MS);
 
-    return Object.values(this._demandesImmersion)
-      .filter((demande) => !agency || demande.agencyId === agency)
-      .filter((demande) => !status || demande.status === status);
+    return Object.values(this._immersionApplications)
+      .filter((application) => !agency || application.agencyId === agency)
+      .filter((application) => !status || application.status === status);
   }
 
   public async update(
@@ -141,7 +142,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
       immersionApplication,
     );
     await sleep(SIMULATED_LATENCY_MS);
-    this._demandesImmersion[immersionApplication.id] = immersionApplication;
+    this._immersionApplications[immersionApplication.id] = immersionApplication;
     return immersionApplication.id;
   }
 
@@ -156,7 +157,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     const payload = decodeJwt(jwt);
 
     await sleep(SIMULATED_LATENCY_MS);
-    this._demandesImmersion[payload.applicationId] = immersionApplication;
+    this._immersionApplications[payload.applicationId] = immersionApplication;
     return immersionApplication.id;
   }
 
@@ -166,8 +167,8 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   ): Promise<UpdateImmersionApplicationStatusResponseDto> {
     const payload = decodeJwt(jwt);
     await sleep(SIMULATED_LATENCY_MS);
-    this._demandesImmersion[payload.applicationId] = {
-      ...this._demandesImmersion[payload.applicationId],
+    this._immersionApplications[payload.applicationId] = {
+      ...this._immersionApplications[payload.applicationId],
       status,
     };
     return { id: payload.applicationId };
@@ -178,21 +179,19 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   ): Promise<UpdateImmersionApplicationStatusResponseDto> {
     await sleep(SIMULATED_LATENCY_MS);
     const payload = decodeJwt(jwt);
-    const application = this._demandesImmersion[payload.applicationId];
-    this._demandesImmersion[payload.applicationId] = signApplicationDtoWithRole(
-      application,
-      payload.role,
-    );
+    const application = this._immersionApplications[payload.applicationId];
+    this._immersionApplications[payload.applicationId] =
+      signApplicationDtoWithRole(application, payload.role);
     return { id: payload.applicationId };
   }
 
   public async validate(id: ImmersionApplicationId): Promise<string> {
     console.log("InMemoryImmersionApplicationGateway.validate: ", id);
     await sleep(SIMULATED_LATENCY_MS);
-    let form = { ...this._demandesImmersion[id] };
+    let form = { ...this._immersionApplications[id] };
     if (form.status === "IN_REVIEW") {
       form.status = "VALIDATED";
-      this._demandesImmersion[id] = form;
+      this._immersionApplications[id] = form;
     } else {
       throw new Error("400 Bad Request");
     }

@@ -4,7 +4,7 @@ import {
 } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { createLogger } from "../../../utils/logger";
-import { eventToDebugInfo } from "./../../../domain/core/eventBus/events";
+import { eventToDebugInfo } from "../../../domain/core/eventBus/events";
 
 const logger = createLogger(__filename);
 

@@ -2,8 +2,8 @@ import { AppConfig } from "../../adapters/primary/appConfig";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
-import { HttpsSireneRepository } from "./../../adapters/secondary/HttpsSireneRepository";
-import { SireneRepository } from "./../../domain/sirene/ports/SireneRepository";
+import { HttpsSireneRepository } from "../../adapters/secondary/HttpsSireneRepository";
+import { SireneRepository } from "../../domain/sirene/ports/SireneRepository";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota

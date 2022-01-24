@@ -10,7 +10,7 @@ import {
   EmailGateway,
   RejectedApplicationNotificationParams,
 } from "../../ports/EmailGateway";
-import { AgencyConfig } from "./../../ports/AgencyRepository";
+import { AgencyConfig } from "../../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
 export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends UseCase<ImmersionApplicationDto> {

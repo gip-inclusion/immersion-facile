@@ -1,4 +1,4 @@
-import { BadRequestError } from "./../../../adapters/primary/helpers/sendHttpResponse";
+import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   ImmersionApplications,
@@ -50,7 +50,7 @@ describe("Validate immersionApplication", () => {
       );
       immersionApplication[immersionApplicationEntity.id] =
         immersionApplicationEntity;
-      repository.setDemandesImmersion(immersionApplication);
+      repository.setImmersionApplications(immersionApplication);
 
       const { id } = await validateImmersionApplication.execute(
         immersionApplicationEntity.id,
@@ -75,21 +75,22 @@ describe("Validate immersionApplication", () => {
 
   describe("When the immersionApplication is still draft", () => {
     test("throws bad request error", async () => {
-      const demandesImmersion: ImmersionApplications = {};
-      const demandeImmersionEntity =
+      const immersionApplications: ImmersionApplications = {};
+      const immersionApplicationEntity =
         new ImmersionApplicationEntityBuilder().build();
-      demandesImmersion[demandeImmersionEntity.id] = demandeImmersionEntity;
-      repository.setDemandesImmersion(demandesImmersion);
+      immersionApplications[immersionApplicationEntity.id] =
+        immersionApplicationEntity;
+      repository.setImmersionApplications(immersionApplications);
 
       await expectPromiseToFailWithError(
-        validateImmersionApplication.execute(demandeImmersionEntity.id),
-        new BadRequestError(demandeImmersionEntity.id),
+        validateImmersionApplication.execute(immersionApplicationEntity.id),
+        new BadRequestError(immersionApplicationEntity.id),
       );
 
-      // And the demande is still DRAFT
+      // And the immersion application is still DRAFT
       const storedInRepo = await repository.getAll();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        demandeImmersionEntity.toDto(),
+        immersionApplicationEntity.toDto(),
       ]);
     });
   });
@@ -97,8 +98,10 @@ describe("Validate immersionApplication", () => {
   describe("When no immersionApplication with id exists", () => {
     it("throws NotFoundError", async () => {
       await expectPromiseToFailWithError(
-        validateImmersionApplication.execute("unknown_demande_immersion_id"),
-        new NotFoundError("unknown_demande_immersion_id"),
+        validateImmersionApplication.execute(
+          "unknown_immersion_application_id",
+        ),
+        new NotFoundError("unknown_immersion_application_id"),
       );
     });
   });

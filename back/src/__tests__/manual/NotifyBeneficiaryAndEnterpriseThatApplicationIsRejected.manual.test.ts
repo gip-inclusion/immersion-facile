@@ -6,7 +6,7 @@ import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../d
 import { applicationStatusFromString } from "../../shared/ImmersionApplicationDto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { AllowListEmailFilter } from "./../../adapters/secondary/core/EmailFilterImplementations";
+import { AllowListEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota

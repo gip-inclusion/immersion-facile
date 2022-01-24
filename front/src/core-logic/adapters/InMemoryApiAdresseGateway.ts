@@ -3,7 +3,7 @@ import { sleep } from "src/shared/utils";
 import {
   AddressWithCoordinates,
   ApiAdresseGateway,
-} from "./../ports/ApiAdresseGateway";
+} from "../ports/ApiAdresseGateway";
 
 const SIMULATED_LATENCY_MS = 150;
 

@@ -1,5 +1,5 @@
-import { makeGenerateJwt, makeVerifyJwt } from "./../../domain/auth/jwt";
-import { DeliverRenewedMagicLink } from "./../../domain/immersionApplication/useCases/notifications/DeliverRenewedMagicLink";
+import { makeGenerateJwt, makeVerifyJwt } from "../../domain/auth/jwt";
+import { DeliverRenewedMagicLink } from "../../domain/immersionApplication/useCases/notifications/DeliverRenewedMagicLink";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
@@ -94,7 +94,7 @@ describe("Magic link renewal flow", () => {
     deliverRenewedMagicLink = new DeliverRenewedMagicLink(emailFilter, emailGw);
 
     const entity = new ImmersionApplicationEntityBuilder().build();
-    applicationRepository.setDemandesImmersion({ [entity.id]: entity });
+    applicationRepository.setImmersionApplications({ [entity.id]: entity });
   });
 
   test("sends the updated magic link", async () => {

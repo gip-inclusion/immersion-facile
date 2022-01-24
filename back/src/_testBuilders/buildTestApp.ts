@@ -46,9 +46,10 @@ export const buildTestApp = async (
   appConfigOverrides?: AppConfig,
 ): Promise<TestAppAndDeps> => {
   const adminEmail = "admin@email.fr";
-  const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
+  const validImmersionApplication =
+    new ImmersionApplicationDtoBuilder().build();
   const agencyConfig = AgencyConfigBuilder.create(
-    validDemandeImmersion.agencyId,
+    validImmersionApplication.agencyId,
   )
     .withName("TEST-name")
     .withAdminEmails([adminEmail])

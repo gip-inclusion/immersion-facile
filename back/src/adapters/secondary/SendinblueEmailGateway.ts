@@ -19,7 +19,7 @@ import type {
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
 import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
-import { createLogger } from "./../../utils/logger";
+import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 

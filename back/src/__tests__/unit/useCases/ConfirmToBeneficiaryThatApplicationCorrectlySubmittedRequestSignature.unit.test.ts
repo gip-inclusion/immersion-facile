@@ -1,4 +1,4 @@
-import { expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication } from "./../../../_testBuilders/emailAssertions";
+import { expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { FeatureFlags } from "../../../shared/featureFlags";

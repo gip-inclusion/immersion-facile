@@ -2,7 +2,7 @@ import { AgencyRepository } from "../../domain/immersionApplication/ports/Agency
 import { AgencyDto, AgencyId } from "../../shared/agencies";
 import { LatLonDto } from "../../shared/SearchImmersionDto";
 import { createLogger } from "../../utils/logger";
-import { AgencyConfig } from "./../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { distanceMetersBetweenCoordinates } from "./immersionOffer/distanceBetweenCoordinates";
 
 const logger = createLogger(__filename);

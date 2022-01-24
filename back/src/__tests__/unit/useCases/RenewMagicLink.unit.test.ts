@@ -1,5 +1,5 @@
-import { makeGenerateJwt, makeVerifyJwt } from "./../../../domain/auth/jwt";
-import { AppConfig } from "./../../../adapters/primary/appConfig";
+import { makeGenerateJwt, makeVerifyJwt } from "../../../domain/auth/jwt";
+import { AppConfig } from "../../../adapters/primary/appConfig";
 import {
   BadRequestError,
   NotFoundError,
@@ -18,12 +18,12 @@ import { createMagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload"
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { InMemoryOutboxRepository } from "./../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "./../../../domain/core/eventBus/EventBus";
-import { RenewMagicLink } from "./../../../domain/immersionApplication/useCases/RenewMagicLink";
+} from "../../../domain/core/eventBus/EventBus";
+import { RenewMagicLink } from "../../../domain/immersionApplication/useCases/RenewMagicLink";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
 import jwt from "jsonwebtoken";
 import { RenewMagicLinkPayload } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
@@ -59,7 +59,7 @@ describe("RenewMagicLink use case", () => {
     agencyRepository = new InMemoryAgencyRepository([agencyConfig]);
 
     const entity = new ImmersionApplicationEntityBuilder().build();
-    applicationRepository.setDemandesImmersion({ [entity.id]: entity });
+    applicationRepository.setImmersionApplications({ [entity.id]: entity });
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
     generateJwtFn = makeGenerateJwt(config);
@@ -105,7 +105,7 @@ describe("RenewMagicLink use case", () => {
     const entity = new ImmersionApplicationEntityBuilder()
       .withAgencyId(storedUnknownId)
       .build();
-    applicationRepository.setDemandesImmersion({ [entity.id]: entity });
+    applicationRepository.setImmersionApplications({ [entity.id]: entity });
 
     const payload = createMagicLinkPayload(
       validImmersionApplication.id,

@@ -9,7 +9,7 @@ import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/Immers
 import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,
-} from "./../../../adapters/secondary/core/EmailFilterImplementations";
+} from "../../../adapters/secondary/core/EmailFilterImplementations";
 
 const validImmersionApplication: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();

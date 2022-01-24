@@ -16,16 +16,16 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     .route(`/${immersionApplicationsRoute}/:jwt`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getDemandeImmersion.execute({
+        deps.useCases.getImmersionApplication.execute({
           id: req.jwtPayload.applicationId,
         }),
       ),
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.updateDemandeImmersion.execute({
+        deps.useCases.updateImmersionApplication.execute({
           id: req.jwtPayload.applicationId,
-          demandeImmersion: req.body,
+          immersionApplication: req.body,
         }),
       ),
     );

@@ -7,13 +7,13 @@ import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder"
 import { expectEmailAdminNotificationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
-import { AgencyConfig } from "./../../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
 
 const adminEmail = "admin@email.fr";
-const validDemandeImmersion = new ImmersionApplicationDtoBuilder().build();
+const validImmersionApplication = new ImmersionApplicationDtoBuilder().build();
 
 const defaultAgencyConfig = AgencyConfigBuilder.create(
-  validDemandeImmersion.agencyId,
+  validImmersionApplication.agencyId,
 )
   .withName("test-agency-name")
   .build();
@@ -36,7 +36,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   };
 
   test("Sends no mail when contact Email is not set", async () => {
-    await createUseCase().execute(validDemandeImmersion);
+    await createUseCase().execute(validImmersionApplication);
     const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(0);
   });
@@ -46,7 +46,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
       .withAdminEmails([adminEmail])
       .build();
 
-    await createUseCase().execute(validDemandeImmersion);
+    await createUseCase().execute(validImmersionApplication);
 
     const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);
@@ -54,16 +54,16 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
     expectEmailAdminNotificationMatchingImmersionApplication(sentEmails[0], {
       recipient: adminEmail,
       immersionApplication: {
-        ...validDemandeImmersion,
-        dateStart: parseISO(validDemandeImmersion.dateStart).toLocaleDateString(
-          "fr",
-        ),
-        dateEnd: parseISO(validDemandeImmersion.dateEnd).toLocaleDateString(
+        ...validImmersionApplication,
+        dateStart: parseISO(
+          validImmersionApplication.dateStart,
+        ).toLocaleDateString("fr"),
+        dateEnd: parseISO(validImmersionApplication.dateEnd).toLocaleDateString(
           "fr",
         ),
       },
       magicLink: fakeGenerateMagicLinkUrlFn(
-        validDemandeImmersion.id,
+        validImmersionApplication.id,
         "admin",
         frontRoutes.immersionApplicationsToValidate,
         "admin@if.fr",

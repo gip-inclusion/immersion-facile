@@ -17,7 +17,7 @@ import { addDays } from "../../_testBuilders/test.helpers";
 describe("immersionApplicationDtoSchema", () => {
   test("accepts valid immersionApplication", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder().build();
-    expectDemandeImmersionDtoToBeValid(immersionApplication);
+    expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
 
   test("rejects equal applicant and mentor emails", () => {
@@ -125,7 +125,7 @@ describe("immersionApplicationDtoSchema", () => {
       .withDateEnd("2021-10-30")
       .build();
 
-    expectDemandeImmersionDtoToBeValid(immersionApplication);
+    expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
 
   test("rejects end dates that are more than 28 days after the start date", () => {
@@ -143,7 +143,7 @@ describe("immersionApplicationDtoSchema", () => {
       .withDateEnd(addDays(DATE_START, 28))
       .build();
 
-    expectDemandeImmersionDtoToBeValid(immersionApplication);
+    expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
 
   test("accepts start dates that are >= 2 days after the submission date", () => {
@@ -152,7 +152,7 @@ describe("immersionApplicationDtoSchema", () => {
       .withDateStart(addDays(DATE_SUBMISSION, 2))
       .build();
 
-    expectDemandeImmersionDtoToBeValid(immersionApplication);
+    expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
 
   test("rejects start dates that are < 2 days after the submission date", () => {
@@ -214,15 +214,15 @@ const expectApplicationSourceToBe = (
   expected: ApplicationSource,
 ) => expect(actual).toBe(expected);
 
-const expectDemandeImmersionDtoToBeValid = (
-  validDemandeImmersionDto: ImmersionApplicationDto,
+const expectImmersionApplicationDtoToBeValid = (
+  validImmersionApplicationDto: ImmersionApplicationDto,
 ) => {
   expect(() =>
-    immersionApplicationSchema.parse(validDemandeImmersionDto),
+    immersionApplicationSchema.parse(validImmersionApplicationDto),
   ).not.toThrow();
 
   expect(
-    immersionApplicationSchema.parse(validDemandeImmersionDto),
+    immersionApplicationSchema.parse(validImmersionApplicationDto),
   ).toBeTruthy();
 };
 

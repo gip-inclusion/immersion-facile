@@ -19,28 +19,28 @@ describe("ImmersionApplicationIdEntity", () => {
     });
 
     it("rejects invalid parameters", () => {
-      const invalidDemandeImmersion = new ImmersionApplicationDtoBuilder()
+      const invalidImmersionApplication = new ImmersionApplicationDtoBuilder()
         .withEmail("not_a_valid_email")
         .build();
 
-      expectDemandeImmersionEntityToBeInvalidWithParams(
-        invalidDemandeImmersion,
+      expectImmersionApplicationEntityToBeInvalidWithParams(
+        invalidImmersionApplication,
       );
     });
   });
 
-  describe("DemandeImmersionEntity.toDto()", () => {
+  describe("ImmersionApplicationEntity.toDto()", () => {
     it("converts entities to DTOs", () => {
-      const demandeImmersion = new ImmersionApplicationDtoBuilder().build();
-      const entity = ImmersionApplicationEntity.create(demandeImmersion);
-      expect(entity.toDto()).toEqual(demandeImmersion);
+      const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+      const entity = ImmersionApplicationEntity.create(immersionApplication);
+      expect(entity.toDto()).toEqual(immersionApplication);
     });
   });
 });
 
-const expectDemandeImmersionEntityToBeInvalidWithParams = (
-  demandeImmersionDto: ImmersionApplicationDto,
+const expectImmersionApplicationEntityToBeInvalidWithParams = (
+  immersionApplicationDto: ImmersionApplicationDto,
 ) =>
   expect(() =>
-    ImmersionApplicationEntity.create(demandeImmersionDto),
+    ImmersionApplicationEntity.create(immersionApplicationDto),
   ).toThrow();

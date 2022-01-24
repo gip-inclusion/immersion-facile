@@ -1,6 +1,6 @@
 export const immersionApplicationsRoute = "demandes-immersion";
 export const immersionOffersRoute = "immersion-offers";
-export const validateDemandeRoute = "validate-demande";
+export const validateImmersionApplicationRoute = "validate-demande";
 export const generateMagicLinkRoute = "generate-magic-link";
 export const renewMagicLinkRoute = "renew-magic-link";
 export const siretRoute = "siret";
