@@ -20,7 +20,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
     return [
       {
         id: "search_result_id",
-        rome: searchParams.rome,
+        rome: searchParams.rome!,
         naf: searchParams.nafDivision ?? defaultNaf,
         siret: "12345678901234",
         name: "Super Corp",
@@ -34,7 +34,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
       },
       {
         id: "search_result_id2",
-        rome: searchParams.rome,
+        rome: searchParams.rome!,
         naf: searchParams.nafDivision ?? defaultNaf,
         siret: "12345678901234",
         name: "Mega Corp",
@@ -49,7 +49,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
       },
       {
         id: "search_result_id3",
-        rome: searchParams.rome,
+        rome: searchParams.rome!,
         naf: searchParams.nafDivision ?? defaultNaf,
         siret: "12345678901234",
         name: "Hyper Corp",
@@ -63,7 +63,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
       },
       {
         id: "search_result_id4",
-        rome: searchParams.rome,
+        rome: searchParams.rome!,
         naf: searchParams.nafDivision ?? defaultNaf,
         siret: "12345678901235",
         name: "Giga Corp",

@@ -94,6 +94,14 @@ describe("Postgres implementation of immersion offer repository", () => {
         activeEstablishmentAggregate,
       ]);
 
+      const searchWithNoRomeResult =
+        await pgImmersionOfferRepository.getFromSearch({
+          distance_km: 30,
+          lat: 49.1,
+          lon: 6.1,
+        });
+      expect(searchWithNoRomeResult).toHaveLength(1);
+
       const searchResult = await pgImmersionOfferRepository.getFromSearch({
         rome: "M1808",
         distance_km: 30,

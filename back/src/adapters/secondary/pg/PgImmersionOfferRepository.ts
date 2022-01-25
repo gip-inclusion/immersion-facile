@@ -163,10 +163,15 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
     const parameters = [
-      searchMade.rome,
       `POINT(${searchMade.lon} ${searchMade.lat})`,
       searchMade.distance_km * 1000,
     ];
+
+    let romeFilter = "";
+    if (searchMade.rome) {
+      parameters.push(searchMade.rome);
+      romeFilter = `WHERE rome = $${parameters.length}`;
+    }
 
     let nafDivisionFilter = "";
     if (searchMade.nafDivision) {
@@ -203,10 +208,10 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               voluntary_to_immersion, 
               rome AS offer_rome, 
               gps AS offer_gps,
-              ST_Distance(gps, ST_GeographyFromText($2)) AS distance_m,
+              ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
               ST_AsGeoJSON(gps) AS offer_position
             FROM immersion_offers 
-            WHERE rome = $1
+            ${romeFilter}
             )
         SELECT
             filtered_immersion_offers.*,
@@ -232,7 +237,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         LEFT OUTER JOIN romes_public_data
           ON (offer_rome = romes_public_data.code_rome)
         WHERE 
-          ST_DWithin(offer_gps, ST_GeographyFromText($2), $3) 
+          ST_DWithin(offer_gps, ST_GeographyFromText($1), $2) 
           ${nafDivisionFilter}
           ${siretFilter}
         ORDER BY
