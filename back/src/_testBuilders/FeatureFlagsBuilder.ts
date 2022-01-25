@@ -16,13 +16,6 @@ export class FeatureFlagsBuilder implements Builder<FeatureFlags> {
     });
   }
 
-  public enableLBBFetchOnSearch() {
-    return new FeatureFlagsBuilder({
-      ...this.featureFlags,
-      enableLBBFetchOnSearch: true,
-    });
-  }
-
   public build() {
     return this.featureFlags;
   }

@@ -406,7 +406,6 @@ const createUseCases = (
       repositories.laBonneBoiteAPI,
       uuidGenerator,
       clock,
-      config.featureFlags,
     ),
     getImmersionOfferById: new GetImmersionOfferById(
       repositories.immersionOffer,

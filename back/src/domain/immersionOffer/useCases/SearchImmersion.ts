@@ -58,7 +58,6 @@ export class SearchImmersion extends UseCase<
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
-    private readonly featureFlags: FeatureFlags,
   ) {
     super();
   }
@@ -92,8 +91,6 @@ export class SearchImmersion extends UseCase<
       );
 
     histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);
-
-    if (!this.featureFlags.enableLBBFetchOnSearch) return resultsFromStorage;
 
     const shouldCallLaBonneBoite: boolean =
       await this.laBonneBoiteHasNotBeenRequestedWithThisRomeAndThisAreaInTheLastWeek(
