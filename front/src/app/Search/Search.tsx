@@ -21,7 +21,7 @@ import SearchIcon from "@mui/icons-material/Search";
 
 interface Values {
   rome: string;
-  nafDivision: string;
+  nafDivision?: string;
   lat: number;
   lon: number;
   radiusKm: number;
@@ -57,11 +57,11 @@ export const Search = () => {
           <span style={{ height: "30px" }} />
           <Formik
             initialValues={{
-              rome: "M1607",
-              nafDivision: "85",
-              lat: 48.8666,
-              lon: 2.3333,
-              radiusKm: 12,
+              rome: "",
+              // nafDivision: undefined,
+              lat: 0,
+              lon: 0,
+              radiusKm: 10,
             }}
             onSubmit={async (
               values,
@@ -76,10 +76,7 @@ export const Search = () => {
                     lon: values.lon,
                   },
                   distance_km: values.radiusKm,
-                  nafDivision:
-                    values.nafDivision.length === 0
-                      ? values.nafDivision
-                      : undefined,
+                  nafDivision: values.nafDivision,
                 })
                 .then((response) => {
                   setResult(response);
