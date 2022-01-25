@@ -104,7 +104,10 @@ export class InMemoryImmersionOfferRepository
       )
       .flatMap((aggregate) =>
         aggregate.immersionOffers
-          .filter((immersionOffer) => immersionOffer.rome === searchMade.rome)
+          .filter(
+            (immersionOffer) =>
+              !searchMade.rome || immersionOffer.rome === searchMade.rome,
+          )
           .map((immersionOffer) =>
             buildSearchImmersionResultDto(
               immersionOffer,

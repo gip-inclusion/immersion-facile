@@ -103,6 +103,14 @@ const searchSecretariatInMetzParams = {
   },
 };
 
+const searchInMetzParams = {
+  distance_km: 30,
+  location: {
+    lat: 49.119146,
+    lon: 6.17602,
+  },
+};
+
 const authenticatedApiConsumerPayload: ApiConsumer = {
   consumer: "passeEmploi",
   id: "my-valid-apikey-id",
@@ -130,8 +138,39 @@ describe("SearchImmersionUseCase", () => {
     ]);
   });
 
+  it("gets all results around if no rome are provided", async () => {
+    const { searchImmersion, immersionOfferId, uuidGenerator } =
+      await prepareSearchableData();
+    const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
+    uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
+
+    const response = await searchImmersion.execute(searchInMetzParams);
+    expectSearchResponseToMatch(response, [
+      {
+        id: immersionOfferId,
+        rome: "M1607",
+        naf: "8539A",
+        siret: "78000403200019",
+        name: "Company inside repository",
+        voluntaryToImmersion: false,
+        location: TEST_POSITION,
+        address: "55 Rue du Faubourg Saint-Honoré",
+        contactMode: "EMAIL",
+        distance_m: 606885,
+        city: TEST_CITY,
+        nafLabel: TEST_NAF_LABEL,
+        romeLabel: TEST_ROME_LABEL,
+      },
+      {
+        id: generatedOfferId,
+        rome: "M1607",
+        siret: "11112222333344",
+      },
+    ]);
+  });
+
   describe("authenticated with api key", () => {
-    test("Search immersion, and provide contact details", async () => {
+    it("Search immersion, and provide contact details", async () => {
       const { searchImmersion, immersionOfferId, uuidGenerator } =
         await prepareSearchableData();
       const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
@@ -178,7 +217,7 @@ describe("SearchImmersionUseCase", () => {
   });
 
   describe("Not authenticated with api key", () => {
-    test("Search immersion, and do NOT provide contact details", async () => {
+    it("Search immersion, and do NOT provide contact details", async () => {
       const { searchImmersion, immersionOfferId, uuidGenerator } =
         await prepareSearchableData();
       const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
@@ -212,7 +251,7 @@ describe("SearchImmersionUseCase", () => {
       expect(unauthenticatedResponse[1].contactDetails).toBeUndefined();
     });
 
-    test("Search immersion, and ignore irrelevant companies", async () => {
+    it("Search immersion, and ignore irrelevant companies", async () => {
       // Prepare
       const {
         searchImmersion,
@@ -286,7 +325,7 @@ describe("SearchImmersionUseCase", () => {
 
       const nextDate = new Date("2022-01-01");
 
-      test("Should add the request entity to the repository", async () => {
+      it("Should add the request entity to the repository", async () => {
         // Prepare
         const {
           searchImmersion,
@@ -308,7 +347,7 @@ describe("SearchImmersionUseCase", () => {
 
         const expectedRequestEntity: LaBonneBoiteRequestEntity = {
           params: {
-            rome: searchImmersionDto.rome,
+            rome: searchImmersionDto.rome!,
             lon: searchImmersionDto.location.lon,
             lat: searchImmersionDto.location.lat,
             distance_km: 50, // LBB_DISTANCE_KM_REQUEST_PARAM
@@ -325,7 +364,7 @@ describe("SearchImmersionUseCase", () => {
           expectedRequestEntity,
         );
       });
-      test("Should insert as many 'relevant' establishment and offers in repositories as LBB responded", async () => {
+      it("Should insert as many 'relevant' establishment and offers in repositories as LBB responded", async () => {
         // Prepare
         const { searchImmersion, laBonneBoiteAPI, immersionOfferRepository } =
           await prepareSearchableData();
@@ -379,7 +418,7 @@ describe("SearchImmersionUseCase", () => {
           requestedAt: new Date("2021-01-01"),
         } as LaBonneBoiteRequestEntity;
 
-        test("Should not request LBB if the request has been made in the last 7 days", async () => {
+        it("Should not request LBB if the request has been made in the last 7 days", async () => {
           // Prepare
           const { searchImmersion, laBonneBoiteRequestRepository, clock } =
             await prepareSearchableData();
@@ -402,7 +441,7 @@ describe("SearchImmersionUseCase", () => {
           ).toHaveLength(1);
         });
 
-        test("Should request LBB if the request was made more than 7 days ago", async () => {
+        it("Should request LBB if the request was made more than 7 days ago", async () => {
           // Prepare
           const { searchImmersion, laBonneBoiteRequestRepository, clock } =
             await prepareSearchableData();

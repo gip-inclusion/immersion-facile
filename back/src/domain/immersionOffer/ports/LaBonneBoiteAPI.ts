@@ -1,7 +1,7 @@
 import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 export type LaBonneBoiteRequestParams = {
-  rome: string;
+  rome?: string;
   distance_km: number;
   lat: number;
   lon: number;

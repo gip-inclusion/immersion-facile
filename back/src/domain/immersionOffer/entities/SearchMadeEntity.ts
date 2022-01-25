@@ -3,7 +3,7 @@ import { Flavor } from "../../../shared/typeFlavors";
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
 export type SearchMade = {
-  rome: string;
+  rome?: string;
   distance_km: number;
   lat: number;
   lon: number;

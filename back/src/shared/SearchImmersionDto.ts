@@ -33,7 +33,7 @@ export type SearchImmersionRequestDto = z.infer<
   typeof searchImmersionRequestSchema
 >;
 export const searchImmersionRequestSchema = z.object({
-  rome: romeCodeMetierSchema,
+  rome: romeCodeMetierSchema.optional(),
   nafDivision: nafDivisionSchema.optional(),
   siret: siretSchema.optional(),
   location: latLonSchema,

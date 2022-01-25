@@ -51,7 +51,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
                 distance: searchParams.distance_km,
                 longitude: searchParams.lon,
                 latitude: searchParams.lat,
-                rome_codes: searchParams.rome,
+                ...(searchParams.rome ? { rome_codes: searchParams.rome } : {}),
               },
             },
           );

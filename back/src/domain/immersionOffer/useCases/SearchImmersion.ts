@@ -1,6 +1,5 @@
 import { addDays } from "date-fns";
 import promClient from "prom-client";
-import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   SearchImmersionRequestDto,
   searchImmersionRequestSchema,
@@ -11,15 +10,15 @@ import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
-import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
+import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
-import { SearchMadeRepository } from "../ports/SearchMadeRepository";
 import {
   LaBonneBoiteAPI,
   LaBonneBoiteRequestParams,
 } from "../ports/LaBonneBoiteAPI";
 import { LaBonneBoiteRequestRepository } from "../ports/LaBonneBoiteRequestRepository";
+import { SearchMadeRepository } from "../ports/SearchMadeRepository";
 import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 const logger = createLogger(__filename);
@@ -102,12 +101,11 @@ export class SearchImmersion extends UseCase<
       return resultsFromStorage;
     }
 
-    const { requestEntity, relevantCompanies } = await this.requestLaBonneBoite(
-      searchMade,
-    );
+    const { lbbRequestEntity, relevantCompanies } =
+      await this.requestLaBonneBoite(searchMade);
 
     await this.laBonneBoiteRequestRepository.insertLaBonneBoiteRequest(
-      requestEntity,
+      lbbRequestEntity,
     );
 
     if (relevantCompanies)
@@ -120,7 +118,7 @@ export class SearchImmersion extends UseCase<
   }
 
   private async requestLaBonneBoite(searchMade: SearchMade): Promise<{
-    requestEntity: LaBonneBoiteRequestEntity;
+    lbbRequestEntity: LaBonneBoiteRequestEntity;
     relevantCompanies?: LaBonneBoiteCompanyVO[];
   }> {
     const requestParams: LaBonneBoiteRequestParams = {
@@ -140,7 +138,7 @@ export class SearchImmersion extends UseCase<
       );
       return {
         relevantCompanies: laBonneBoiteRelevantCompanies,
-        requestEntity: {
+        lbbRequestEntity: {
           requestedAt: this.clock.now(),
           params: requestParams,
           result: {
@@ -155,7 +153,7 @@ export class SearchImmersion extends UseCase<
       logger.warn(e, "LBB fetch error");
       counterSearchImmersionLBBRequestsError.inc();
       return {
-        requestEntity: {
+        lbbRequestEntity: {
           requestedAt: this.clock.now(),
           params: requestParams,
           result: {
@@ -186,13 +184,15 @@ export class SearchImmersion extends UseCase<
     const closestRequestParamsWithSameRomeInTheLast7Days: {
       params: LaBonneBoiteRequestParams;
       distanceToPositionKm: number;
-    } | null = await this.laBonneBoiteRequestRepository.getClosestRequestParamsWithThisRomeSince(
-      {
-        rome: searchMade.rome,
-        position: { lat: searchMade.lat, lon: searchMade.lon },
-        since: addDays(this.clock.now(), -7),
-      },
-    );
+    } | null = !searchMade.rome
+      ? null
+      : await this.laBonneBoiteRequestRepository.getClosestRequestParamsWithThisRomeSince(
+          {
+            rome: searchMade.rome,
+            position: { lat: searchMade.lat, lon: searchMade.lon },
+            since: addDays(this.clock.now(), -7),
+          },
+        );
 
     if (closestRequestParamsWithSameRomeInTheLast7Days === null) return true;
 
