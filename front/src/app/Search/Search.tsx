@@ -20,7 +20,7 @@ import { EnterpriseSearchResult } from "./EnterpriseSearchResult";
 import SearchIcon from "@mui/icons-material/Search";
 
 interface Values {
-  rome: string;
+  rome?: string;
   nafDivision?: string;
   lat: number;
   lon: number;
@@ -57,8 +57,6 @@ export const Search = () => {
           <span style={{ height: "30px" }} />
           <Formik
             initialValues={{
-              rome: "",
-              // nafDivision: undefined,
               lat: 0,
               lon: 0,
               radiusKm: 10,

@@ -150,6 +150,9 @@ const buildDb = async () => {
     await changeOutboxOccurredAtToTimestampWithTZ(client);
   }
 
+  logger.info("remove rome not null constraint on lbbRequests");
+  await removeSearchesMadeAndLbbRequestsRomeNotNullConstraint(client);
+
   client.release();
   await pool.end();
 };
@@ -275,6 +278,15 @@ const addPostalCodeToImmersionApplication = async (client: PoolClient) => {
 const changeOutboxOccurredAtToTimestampWithTZ = async (client: PoolClient) => {
   await executeSqlFromFile(
     __dirname + "/changeOutboxOccurredAtToTimestampWithTZ.sql",
+    client,
+  );
+};
+
+const removeSearchesMadeAndLbbRequestsRomeNotNullConstraint = async (
+  client: PoolClient,
+) => {
+  await executeSqlFromFile(
+    __dirname + "/removeSearchesMadeAndLbbRequestsRomeNotNullConstraint.sql",
     client,
   );
 };
