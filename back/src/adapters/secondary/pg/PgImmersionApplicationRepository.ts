@@ -3,6 +3,7 @@ import { PoolClient } from "pg";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../../../domain/immersionApplication/ports/ImmersionApplicationRepository";
 import { ImmersionApplicationId } from "../../../shared/ImmersionApplicationDto";
+import { optional } from "./pgUtils";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
@@ -104,5 +105,3 @@ export class PgImmersionApplicationRepository
     });
   }
 }
-
-const optional = <T>(v: T | null) => v ?? undefined;

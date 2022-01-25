@@ -20,6 +20,7 @@ import {
 } from "../../../shared/SearchImmersionDto";
 import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { createLogger } from "../../../utils/logger";
+import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
@@ -269,10 +270,11 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
             address: result.establishment_address,
             city: extractCityFromAddress(result.establishment_address),
             contactMode:
-              result.establishment_contact_mode &&
+              optional(result.establishment_contact_mode) &&
               parseContactMethod(result.establishment_contact_mode),
             location:
-              result.offer_position && parseGeoJson(result.offer_position),
+              optional(result.offer_position) &&
+              parseGeoJson(result.offer_position),
             distance_m: Math.round(result.distance_m),
             ...(withContactDetails &&
               immersionContact && { contactDetails: immersionContact }),
