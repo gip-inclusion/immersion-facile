@@ -14,7 +14,10 @@ import { Layout } from "src/components/Layout";
 import { SearchButton } from "src/components/SearchButton";
 import { SuccessFeedback } from "src/components/SuccessFeedback";
 import { ContactMethod } from "src/shared/FormEstablishmentDto";
-import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
+import {
+  SearchImmersionRequestDto,
+  SearchImmersionResultDto,
+} from "src/shared/SearchImmersionDto";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import { EnterpriseSearchResult } from "./EnterpriseSearchResult";
 import SearchIcon from "@mui/icons-material/Search";
@@ -66,16 +69,17 @@ export const Search = () => {
               { setSubmitting }: FormikHelpers<Values>,
             ) => {
               setIsSearching(true);
+              const searchImmersionRequestDto: SearchImmersionRequestDto = {
+                rome: values.rome === "" ? undefined : values.rome,
+                location: {
+                  lat: values.lat,
+                  lon: values.lon,
+                },
+                distance_km: values.radiusKm,
+                nafDivision: values.nafDivision,
+              };
               immersionSearchGateway
-                .search({
-                  rome: values.rome,
-                  location: {
-                    lat: values.lat,
-                    lon: values.lon,
-                  },
-                  distance_km: values.radiusKm,
-                  nafDivision: values.nafDivision,
-                })
+                .search(searchImmersionRequestDto)
                 .then((response) => {
                   setResult(response);
                 })
