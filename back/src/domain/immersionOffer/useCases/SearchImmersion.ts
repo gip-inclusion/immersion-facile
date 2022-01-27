@@ -91,6 +91,10 @@ export class SearchImmersion extends UseCase<
 
     histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);
 
+    if (!searchMade.rome) {
+      return resultsFromStorage;
+    }
+
     const shouldCallLaBonneBoite: boolean =
       await this.laBonneBoiteHasNotBeenRequestedWithThisRomeAndThisAreaInTheLastWeek(
         searchMade,
@@ -102,7 +106,10 @@ export class SearchImmersion extends UseCase<
     }
 
     const { lbbRequestEntity, relevantCompanies } =
-      await this.requestLaBonneBoite(searchMade);
+      await this.requestLaBonneBoite({
+        ...searchMade,
+        rome: searchMade.rome,
+      });
 
     await this.laBonneBoiteRequestRepository.insertLaBonneBoiteRequest(
       lbbRequestEntity,
@@ -110,14 +117,15 @@ export class SearchImmersion extends UseCase<
 
     if (relevantCompanies)
       await this.insertRelevantCompaniesInRepositories(relevantCompanies);
-
     return this.immersionOfferRepository.getFromSearch(
       searchMade,
       /* withContactDetails= */ apiConsumerName !== undefined,
     );
   }
 
-  private async requestLaBonneBoite(searchMade: SearchMade): Promise<{
+  private async requestLaBonneBoite(
+    searchMade: SearchMade & { rome: string },
+  ): Promise<{
     lbbRequestEntity: LaBonneBoiteRequestEntity;
     relevantCompanies?: LaBonneBoiteCompanyVO[];
   }> {

@@ -129,6 +129,14 @@ describe("PgSearchesMadeRepository", () => {
       lon: 4.17602,
       needsToBeSearched: true,
     });
+    // Search made without rome !
+    await pgSearchesMadeRepository.insertSearchMade({
+      id: "daa68ce6-6f02-11ec-90d6-0242ac120003",
+      distance_km: 30,
+      lat: 48.129146,
+      lon: 4.17602,
+      needsToBeSearched: true,
+    });
   };
 
   const lookupSearcheMade = async (searchMade: SearchMade) => {

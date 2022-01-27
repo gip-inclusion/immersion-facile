@@ -138,11 +138,8 @@ describe("SearchImmersionUseCase", () => {
     ]);
   });
 
-  it("gets all results around if no rome are provided", async () => {
-    const { searchImmersion, immersionOfferId, uuidGenerator } =
-      await prepareSearchableData();
-    const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
-    uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
+  it("gets all results around if no rome is provided", async () => {
+    const { searchImmersion, immersionOfferId } = await prepareSearchableData();
 
     const response = await searchImmersion.execute(searchInMetzParams);
     expectSearchResponseToMatch(response, [
@@ -160,11 +157,6 @@ describe("SearchImmersionUseCase", () => {
         city: TEST_CITY,
         nafLabel: TEST_NAF_LABEL,
         romeLabel: TEST_ROME_LABEL,
-      },
-      {
-        id: generatedOfferId,
-        rome: "M1607",
-        siret: "11112222333344",
       },
     ]);
   });

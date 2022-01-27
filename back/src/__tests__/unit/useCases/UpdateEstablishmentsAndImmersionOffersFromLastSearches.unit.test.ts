@@ -133,7 +133,7 @@ describe("Update establishments and offers based on searches made during the day
           } = prepareUseCase();
 
           searchesMadeRepository.setSearchesMade([
-            { id: "searchMadeId" } as SearchMadeEntity,
+            { id: "searchMadeId", rome: "AAAAA" } as SearchMadeEntity,
           ]);
           const matchedRomeCode = "A1201";
           laBonneBoiteAPI.setNextResults([
@@ -183,7 +183,7 @@ describe("Update establishments and offers based on searches made during the day
           ]);
         });
       });
-      describe("LBB offer is irrevent ", () => {
+      describe("LBB offer is irelevant ", () => {
         it.skip("Should be ignored ", () => {
           return; // TODO : test method `isCompanyRelevant` from LaBonneBoiteCompanyVO.
         });
@@ -236,7 +236,7 @@ describe("Update establishments and offers based on searches made during the day
           prepareUseCase();
 
         searchesMadeRepository.setSearchesMade([
-          { id: "searchMadeId" } as SearchMadeEntity,
+          { id: "searchMadeId", rome: "AAAAA" } as SearchMadeEntity,
         ]);
         laBonneBoiteAPI.setError(Error("La Bonne Boite API is down :("));
 

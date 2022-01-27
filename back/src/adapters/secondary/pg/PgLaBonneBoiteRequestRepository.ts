@@ -31,25 +31,29 @@ export class PgLaBonneBoiteRequestRepository
     position: thisPosition,
     since,
   }: {
-    rome: string;
+    rome?: string;
     position: LatLonDto;
     since: Date;
   }): Promise<null | {
     params: LaBonneBoiteRequestParams;
     distanceToPositionKm: number;
   }> {
+    // TODO : Do not inject those parameters, use $ instead.
     const sql = `
-    SELECT 
-      lon, lat, rome,
-      ST_DistanceSphere(ST_MakePoint(${thisPosition.lon}, ${
-      thisPosition.lat
-    }), ST_MakePoint(lon, lat)) AS distance_to_position_meters
+    SELECT
+      lon, lat, rome, distance_km,
+      ST_DistanceSphere(ST_MakePoint($1, $2), ST_MakePoint(lon, lat)) AS distance_to_position_meters
     FROM lbb_requests
-    WHERE rome = '${thisRome}' AND  requested_at >= '${since.toISOString()}'
+    WHERE rome = $3 AND  requested_at >= $4
       ORDER BY distance_to_position_meters ASC
       LIMIT 1;`;
 
-    const result = await this.client.query(sql);
+    const result = await this.client.query(sql, [
+      thisPosition.lon,
+      thisPosition.lat,
+      thisRome,
+      since.toISOString(),
+    ]);
     if (result.rowCount === 0) return null;
     const row = result.rows[0];
     return {
@@ -57,7 +61,7 @@ export class PgLaBonneBoiteRequestRepository
         distance_km: row.distance_km,
         lon: row.lon,
         lat: row.lat,
-        rome: row.rome,
+        rome: row.rome == null ? undefined : row.rome,
       },
       distanceToPositionKm: row.distance_to_position_meters / 1000,
     };

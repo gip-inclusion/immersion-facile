@@ -23,7 +23,7 @@ export type LaBonneBoiteCompanyProps = {
 
 // Careful, value objects should be immutable
 export class LaBonneBoiteCompanyVO {
-  constructor(private readonly props: LaBonneBoiteCompanyProps) {}
+  constructor(public readonly props: LaBonneBoiteCompanyProps) {}
 
   public get siret() {
     return this.props.siret;

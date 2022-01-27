@@ -150,8 +150,8 @@ const buildDb = async () => {
     await changeOutboxOccurredAtToTimestampWithTZ(client);
   }
 
-  logger.info("remove rome not null constraint on lbbRequests");
-  await removeSearchesMadeAndLbbRequestsRomeNotNullConstraint(client);
+  logger.info("remove rome not null constraint on searches_made");
+  await removeSearchesMadeRomeNotNullConstraint(client);
 
   client.release();
   await pool.end();
@@ -282,11 +282,9 @@ const changeOutboxOccurredAtToTimestampWithTZ = async (client: PoolClient) => {
   );
 };
 
-const removeSearchesMadeAndLbbRequestsRomeNotNullConstraint = async (
-  client: PoolClient,
-) => {
+const removeSearchesMadeRomeNotNullConstraint = async (client: PoolClient) => {
   await executeSqlFromFile(
-    __dirname + "/removeSearchesMadeAndLbbRequestsRomeNotNullConstraint.sql",
+    __dirname + "/removeSearchesMadeRomeNotNullConstraint.sql",
     client,
   );
 };

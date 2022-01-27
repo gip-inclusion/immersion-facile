@@ -25,7 +25,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
     await pool.end();
   });
 
-  test("Insert LBB request", async () => {
+  test("Insert LBB request with defined rome", async () => {
     const entity: LaBonneBoiteRequestEntity = {
       params: { rome: "F1111", distance_km: 30, lon: 3.1, lat: 88.1 },
       result: {
@@ -39,13 +39,11 @@ describe("PgLaBonneBoiteRequestRepository", () => {
 
     const allRows = await getAllRows();
     expect(allRows).toHaveLength(1);
-    expect(allRows[0]).toEqual(
-      expect.objectContaining({
-        ...entity.params,
-        result: entity.result,
-        requested_at: entity.requestedAt,
-      }),
-    );
+    expect(allRows[0]).toEqual({
+      ...entity.params,
+      result: entity.result,
+      requested_at: entity.requestedAt,
+    });
   });
 
   // Some LatLon DTO
@@ -79,7 +77,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
     test("Should return null if the given rome has not been requested since the given date", async () => {
       // Prepare
       const dateBefore = getDateBefore();
-      insertEntity(dateBefore, thisRome, paris17);
+      insertEntity(dateBefore, paris17, thisRome);
       // Act
       const closestRequestAndDistance =
         await repo.getClosestRequestParamsWithThisRomeSince({
@@ -90,12 +88,13 @@ describe("PgLaBonneBoiteRequestRepository", () => {
       // Assert
       expect(closestRequestAndDistance).toBeNull();
     });
+
     test("Should return closest (geographicaly) made request with the  given rome since the given date", async () => {
       // Prepare
-      insertEntity(getDateAfter("08"), thisRome, paris10); // Same rome, 6km away (our match !)
-      insertEntity(getDateAfter("09"), "F2222", paris17); //  Not same rome, 0km away
-      insertEntity(getDateAfter("10"), thisRome, evry); // Same rome, 31km away
-      insertEntity(getDateBefore(), thisRome, paris17); //  Same rome, 0km away, but before the given date
+      insertEntity(getDateAfter("08"), paris10, thisRome, 100); // Same rome, 6km away (our match !)
+      insertEntity(getDateAfter("09"), paris17, "F2222"); //  Not same rome, 0km away
+      insertEntity(getDateAfter("10"), evry, thisRome); // Same rome, 31km away
+      insertEntity(getDateBefore(), paris17, thisRome); //  Same rome, 0km away, but before the given date
 
       // Act
       const closestRequestAndDistance =
@@ -104,31 +103,37 @@ describe("PgLaBonneBoiteRequestRepository", () => {
           position: thisPosition,
           since: thisDate,
         });
-      const expectedPartialParams: Partial<LaBonneBoiteRequestParams> = {
+      const expectedPartialParams: LaBonneBoiteRequestParams = {
         lon: paris10.lon,
         lat: paris10.lat,
         rome: thisRome,
+        distance_km: 100,
       };
       expect(closestRequestAndDistance).not.toBeNull();
-      expect(closestRequestAndDistance?.params).toMatchObject(
-        expectedPartialParams,
-      );
+      expect(closestRequestAndDistance?.params).toEqual(expectedPartialParams);
       expect(closestRequestAndDistance?.distanceToPositionKm).toBeCloseTo(6, 0);
     });
   });
-
   const getAllRows = async () =>
     (await client.query("SELECT * FROM lbb_requests")).rows;
 
   const insertEntity = async (
     requestedAt: Date,
-    rome: string,
     position: LatLonDto,
+    rome?: string,
+    distanceKm = 10,
   ) => {
     await client.query(
       `INSERT INTO lbb_requests (
        requested_at, rome, lat, lon, distance_km, result) VALUES ($1, $2, $3, $4, $5, $6)`,
-      [requestedAt.toISOString(), rome, position.lat, position.lon, 10, {}],
+      [
+        requestedAt.toISOString(),
+        rome,
+        position.lat,
+        position.lon,
+        distanceKm,
+        {},
+      ],
     );
   };
 });

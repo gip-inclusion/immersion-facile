@@ -8,14 +8,8 @@ import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import {
-  SireneRepository,
-  SireneRepositoryAnswer,
-} from "../../sirene/ports/SireneRepository";
-import {
-  EstablishmentAggregate,
-  TefenCode,
-} from "../entities/EstablishmentEntity";
+import { SireneRepository } from "../../sirene/ports/SireneRepository";
+import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
@@ -147,13 +141,18 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   ): Promise<EstablishmentAggregate[]> {
     this.stats.incCounter("search-total");
 
-    const laBonneBoiteSearchResults = await this.searchLaBonneBoite(searchMade);
+    if (!searchMade.rome) return [];
+
+    const laBonneBoiteSearchResults = await this.searchLaBonneBoite({
+      ...searchMade,
+      rome: searchMade.rome,
+    });
 
     return laBonneBoiteSearchResults;
   }
 
   private async searchLaBonneBoite(
-    searchMade: SearchMade,
+    searchMade: SearchMade & { rome: string },
   ): Promise<EstablishmentAggregate[]> {
     try {
       const laBonneBoiteCompanies = await this.laBonneBoiteAPI.searchCompanies(
