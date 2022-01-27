@@ -176,9 +176,10 @@ export class SearchImmersion extends UseCase<
   private async insertRelevantCompaniesInRepositories(
     companies: LaBonneBoiteCompanyVO[],
   ) {
+    const updatedAt = undefined;
     const llbResultsConvertedToEstablishmentAggregates = companies.map(
       (company) =>
-        company.toEstablishmentAggregate(this.uuidGenerator, this.clock),
+        company.toEstablishmentAggregate(this.uuidGenerator, updatedAt),
     );
 
     await this.immersionOfferRepository.insertEstablishmentAggregates(

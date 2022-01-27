@@ -31,8 +31,11 @@ export class LaBonneBoiteCompanyVO {
 
   public toEstablishmentAggregate(
     uuidGenerator: UuidGenerator,
-    clock: Clock,
-    extraData?: { naf?: string; numberEmployeesRange?: TefenCode },
+    updatedAt?: Date,
+    extraData?: {
+      naf?: string;
+      numberEmployeesRange?: TefenCode;
+    },
   ): EstablishmentAggregate {
     const establishment: EstablishmentEntityV2 = {
       address: this.props.address,
@@ -46,8 +49,8 @@ export class LaBonneBoiteCompanyVO {
       siret: this.props.siret,
       voluntaryToImmersion: false,
       numberEmployeesRange: extraData?.numberEmployeesRange ?? -1,
-      updatedAt: clock.now(),
       isActive: true,
+      updatedAt,
     };
 
     return {

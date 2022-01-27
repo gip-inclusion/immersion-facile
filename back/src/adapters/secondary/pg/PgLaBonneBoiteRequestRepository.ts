@@ -31,7 +31,7 @@ export class PgLaBonneBoiteRequestRepository
     position: thisPosition,
     since,
   }: {
-    rome?: string;
+    rome: string;
     position: LatLonDto;
     since: Date;
   }): Promise<null | {
@@ -61,7 +61,7 @@ export class PgLaBonneBoiteRequestRepository
         distance_km: row.distance_km,
         lon: row.lon,
         lat: row.lat,
-        rome: row.rome == null ? undefined : row.rome,
+        rome: row.rome,
       },
       distanceToPositionKm: row.distance_to_position_meters / 1000,
     };

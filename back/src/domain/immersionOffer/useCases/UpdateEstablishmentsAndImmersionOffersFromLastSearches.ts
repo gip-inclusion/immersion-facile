@@ -196,10 +196,11 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
 
     const naf = sireneEstablishment.naf;
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
+    const updatedAt = this.clock.now();
 
     return laBonneBoiteCompany.toEstablishmentAggregate(
       this.uuidGenerator,
-      this.clock,
+      updatedAt,
       {
         naf,
         numberEmployeesRange,

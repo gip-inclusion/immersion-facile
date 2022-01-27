@@ -27,11 +27,17 @@ export class UpdateEstablishmentsFromSireneAPI {
         since,
       );
 
-    await Promise.all(
-      establishmentSiretsToUpdate.map(async (siret) =>
-        this.updateEstablishmentWithSiret(siret),
-      ),
-    );
+    // TODO parallelize this using Promise.all once we know it works :)
+    for (const siret of establishmentSiretsToUpdate) {
+      try {
+        await this.updateEstablishmentWithSiret(siret);
+      } catch (error) {
+        console.log(
+          "Accountered an error when updating establishment with siret ",
+          siret,
+        );
+      }
+    }
   }
   private async updateEstablishmentWithSiret(siret: string) {
     const includeClosedEstablishments = false;

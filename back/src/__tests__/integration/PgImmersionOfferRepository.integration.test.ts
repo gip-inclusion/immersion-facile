@@ -1,5 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
+import { EstablishmentEntityV2 } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   LatLonDto,
   SearchContact,
@@ -389,6 +390,24 @@ describe("Postgres implementation of immersion offer repository", () => {
       ];
       expect(actualResult).toEqual(expectedResult);
     });
+    it("Returns a siret list of all establishmetns having same `update_date` and `create_date` (which means they have never been updated !) ", async () => {
+      // Prepare
+      const neverUpdatedEstablishmentSiret = "88000403200022";
+      await insertEstablishment({
+        client,
+        siret: neverUpdatedEstablishmentSiret,
+        isActive: true,
+      });
+      // Act
+      const actualResult =
+        await pgImmersionOfferRepository.getActiveEstablishmentSiretsNotUpdatedSince(
+          new Date("2020-04-14T12:00:00.000"), // whatever date
+        );
+
+      // Assert
+      const expectedResult: string[] = [neverUpdatedEstablishmentSiret];
+      expect(actualResult).toEqual(expectedResult);
+    });
   });
 
   describe("Pg implementation of method updateEstablishment", () => {
@@ -428,18 +447,22 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Prepare
       const siretOfEstablishmentToUpdate = "78000403200021";
 
-      const updateProps = {
+      const updateProps: Partial<
+        Pick<
+          EstablishmentEntityV2,
+          "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"
+        >
+      > = {
         naf: "8722B",
-        numberEmployees: 5,
+        numberEmployeesRange: 1,
         position: { lon: 21, lat: 23 },
-        address: "4 rue de Bitche 44000 Nantes",
+        address: "4 rue de l'île de Bitche 44000 Nantes",
       };
       await insertEstablishment({
         client,
         siret: siretOfEstablishmentToUpdate,
         updatedAt: new Date("2020-04-14T12:00:00.000"),
         isActive: true,
-        ...updateProps,
       });
 
       // Act
@@ -459,11 +482,11 @@ describe("Postgres implementation of immersion offer repository", () => {
       );
       const partialExpectedEstablishmentRowInDB: PartialEstablishmentPGRow = {
         update_date: updatedAt,
-        naf: updateProps.naf,
-        number_employees: updateProps.numberEmployees,
+        naf: updateProps?.naf,
+        number_employees: updateProps.numberEmployeesRange,
         address: updateProps.address,
-        longitude: updateProps.position.lon,
-        latitude: updateProps.position.lat,
+        longitude: updateProps?.position?.lon,
+        latitude: updateProps?.position?.lat,
       };
       expect(actualEstablishmentRowInDB).toMatchObject(
         partialExpectedEstablishmentRowInDB,
@@ -480,32 +503,34 @@ describe("Postgres implementation of immersion offer repository", () => {
 const insertEstablishment = async (props: {
   client: PoolClient;
   siret: string;
-  updatedAt: Date;
+  updatedAt?: Date;
   isActive: boolean;
   naf?: string;
-  numberEmployees?: number;
+  numberEmployeesRange?: number;
   address?: string;
   position?: LatLonDto;
 }) => {
   const insertQuery = `INSERT INTO establishments (
     siret, name, address, number_employees, naf, contact_mode, data_source, gps, update_date, is_active
   ) VALUES ('${props.siret}', '', '${props.address ?? ""}', ${
-    props.numberEmployees ?? null
+    props.numberEmployeesRange ?? null
   }, '${props.naf ?? "8622B"}', null, 'api_labonneboite', ${
     props.position
       ? `ST_GeographyFromText('POINT(${props.position.lon} ${props.position.lat})')`
       : null
-  }, '${props.updatedAt.toISOString()}', ${props.isActive} )`;
+  }, ${props.updatedAt ? `'${props.updatedAt.toISOString()}'` : "null"}, ${
+    props.isActive
+  } )`;
   await props.client.query(insertQuery);
 };
 
 type PartialEstablishmentPGRow = {
-  update_date: Date;
-  naf: string;
-  number_employees: number;
-  address: string;
-  longitude: number;
-  latitude: number;
+  update_date?: Date;
+  naf?: string;
+  number_employees?: number;
+  address?: string;
+  longitude?: number;
+  latitude?: number;
 };
 
 const retrieveEstablishmentWithSiret = async (

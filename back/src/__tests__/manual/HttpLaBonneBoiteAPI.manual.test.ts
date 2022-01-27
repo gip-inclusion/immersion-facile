@@ -45,7 +45,6 @@ describe("HttpLaBonneBoiteAPI", () => {
         searchLonLat.lon,
       ),
     }));
-    console.log("processedResponse ", processedResponse);
 
     expect(processedResponse.every(({ distance }) => distance <= 100000)).toBe(
       true,

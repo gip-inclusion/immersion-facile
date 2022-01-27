@@ -120,7 +120,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
   const insertEntity = async (
     requestedAt: Date,
     position: LatLonDto,
-    rome?: string,
+    rome: string,
     distanceKm = 10,
   ) => {
     await client.query(

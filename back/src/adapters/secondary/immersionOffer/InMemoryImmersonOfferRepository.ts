@@ -127,7 +127,9 @@ export class InMemoryImmersionOfferRepository
       .filter(
         (aggregate) =>
           aggregate.establishment.isActive &&
-          aggregate.establishment.updatedAt <= since,
+          (aggregate.establishment.updatedAt
+            ? aggregate.establishment.updatedAt <= since
+            : true),
       )
       .map((aggregate) => aggregate.establishment.siret);
   }

@@ -356,7 +356,7 @@ describe("SearchImmersionUseCase", () => {
           expectedRequestEntity,
         );
       });
-      it("Should insert as many 'relevant' establishment and offers in repositories as LBB responded", async () => {
+      it("Should insert as many 'relevant' establishments and offers in repositories as LBB responded with undefined field `updatedAt`", async () => {
         // Prepare
         const { searchImmersion, laBonneBoiteAPI, immersionOfferRepository } =
           await prepareSearchableData();
@@ -387,6 +387,10 @@ describe("SearchImmersionUseCase", () => {
         expect(immersionOfferRepository.establishmentAggregates).toHaveLength(
           2,
         );
+        expect(
+          immersionOfferRepository.establishmentAggregates[0].establishment
+            .updatedAt,
+        ).not.toBeDefined();
       });
     }),
       describe("LBB has been requested for this rome code and this geographic area", () => {

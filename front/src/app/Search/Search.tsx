@@ -70,7 +70,7 @@ export const Search = () => {
             ) => {
               setIsSearching(true);
               const searchImmersionRequestDto: SearchImmersionRequestDto = {
-                rome: values.rome === "" ? undefined : values.rome,
+                rome: values.rome || undefined,
                 location: {
                   lat: values.lat,
                   lon: values.lon,

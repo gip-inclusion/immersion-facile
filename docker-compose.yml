@@ -27,6 +27,7 @@ services:
       - LOGDIR=/var/lib/pipelines/log
       - CRONFILE=/var/lib/pipelines/crontab
       - ESTABLISHMENT_BACKFILL_SCHEDULE
+      - ESTABLISHMENT_UPDATE_FROM_SIRENE
     volumes:
       - ./docker-data/pipelines:/var/lib/pipelines
       - ./.env:/app/.env

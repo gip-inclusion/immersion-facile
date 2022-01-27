@@ -76,7 +76,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       contactModeMap[establishment.contactMethod as KnownContactMethod] || null,
       establishment.dataSource,
       convertPositionToStGeography(establishment.position),
-      establishment.updatedAt.toISOString(),
+      establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
       establishment.isActive,
     ]);
 
@@ -345,8 +345,10 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   ): Promise<string[]> {
     const query = `
       SELECT siret FROM establishments
-      WHERE is_active AND update_date < '${since.toISOString()}'`;
-    const pgResult = await this.client.query(query);
+      WHERE is_active AND 
+      (update_date IS NULL OR 
+       update_date < $1)`;
+    const pgResult = await this.client.query(query, [since.toISOString()]);
     return pgResult.rows.map((row) => row.siret);
   }
 
@@ -360,33 +362,37 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     > & { updatedAt: Date },
   ): Promise<void> {
     const updateQuery = `UPDATE establishments
-                   SET update_date = '${propertiesToUpdate.updatedAt.toISOString()}'
+                   SET update_date = %1$L
                    ${
                      propertiesToUpdate.isActive !== undefined
-                       ? `, is_active = ${propertiesToUpdate.isActive}`
+                       ? ", is_active=%2$L"
                        : ""
                    }
-                   ${
-                     !!propertiesToUpdate.naf
-                       ? `, naf = '${propertiesToUpdate.naf}'`
-                       : ""
-                   }
+                   ${!!propertiesToUpdate.naf ? ", naf=%3$L" : ""}
                    ${
                      !!propertiesToUpdate.numberEmployeesRange
-                       ? `, number_employees = ${propertiesToUpdate.numberEmployeesRange}`
+                       ? ", number_employees=%4$L"
                        : ""
                    }
                    ${
                      propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
-                       ? `, address = '${
-                           propertiesToUpdate.address
-                         }', gps = ${convertPositionToStGeography(
-                           propertiesToUpdate.position,
-                         )}`
+                       ? ", address=%5$L, gps=ST_GeographyFromText(%6$L)"
                        : ""
                    }
-                   WHERE siret='${siret}';`;
-    await this.client.query(updateQuery);
+                   WHERE siret=%7$L;`;
+    const queryArgs = [
+      propertiesToUpdate.updatedAt.toISOString(),
+      propertiesToUpdate.isActive,
+      propertiesToUpdate.naf,
+      propertiesToUpdate.numberEmployeesRange,
+      propertiesToUpdate.address,
+      propertiesToUpdate.position
+        ? `POINT(${propertiesToUpdate.position.lon} ${propertiesToUpdate.position.lat})`
+        : undefined,
+      siret,
+    ];
+    const formatedQuery = format(updateQuery, ...queryArgs);
+    await this.client.query(formatedQuery);
   }
 
   async getContactByImmersionOfferId(
