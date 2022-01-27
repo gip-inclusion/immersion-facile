@@ -118,7 +118,7 @@ export class InMemorySireneRepository implements SireneRepository {
         debut: 1,
         nombre: 1,
       },
-      etablissements: [establishment],
+      etablissements: [establishment.props],
     };
   }
 

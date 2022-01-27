@@ -8,7 +8,10 @@ import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { SireneRepository } from "../../sirene/ports/SireneRepository";
+import {
+  SireneEstablishmentVO,
+  SireneRepository,
+} from "../../sirene/ports/SireneRepository";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
@@ -187,7 +190,9 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       );
       return;
     }
-    const sireneEstablishment = sireneAnswer.etablissements[0];
+    const sireneEstablishment = new SireneEstablishmentVO(
+      sireneAnswer.etablissements[0],
+    );
 
     const naf = sireneEstablishment.naf;
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;

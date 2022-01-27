@@ -91,7 +91,7 @@ export type SireneRepositoryAnswer = {
     debut: number;
     nombre: number;
   };
-  etablissements: SireneEstablishmentVO[];
+  etablissements: SireneEstablishmentProps[];
 };
 
 export interface SireneRepository {

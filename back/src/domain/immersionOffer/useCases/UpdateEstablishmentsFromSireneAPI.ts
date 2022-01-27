@@ -1,7 +1,10 @@
 import { addDays } from "date-fns";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
-import { SireneRepository } from "../../sirene/ports/SireneRepository";
+import {
+  SireneEstablishmentVO,
+  SireneRepository,
+} from "../../sirene/ports/SireneRepository";
 import { AdresseAPI } from "../ports/AdresseAPI";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 
@@ -45,8 +48,10 @@ export class UpdateEstablishmentsFromSireneAPI {
       return;
     }
 
-    const sireneEstablishment = sireneAnswer.etablissements[0];
-
+    const sireneEstablishmentProps = sireneAnswer.etablissements[0];
+    const sireneEstablishment = new SireneEstablishmentVO(
+      sireneEstablishmentProps,
+    );
     const naf = sireneEstablishment.naf;
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
     const address = sireneEstablishment.formatedAddress;

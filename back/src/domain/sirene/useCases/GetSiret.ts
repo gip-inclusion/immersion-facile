@@ -30,7 +30,9 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
     if (!response || response.etablissements.length < 1) {
       throw new NotFoundError(siret);
     }
-    return convertEtablissementToResponse(response.etablissements[0]);
+    return convertEtablissementToResponse(
+      new SireneEstablishmentVO(response.etablissements[0]),
+    );
   }
 }
 
