@@ -27,14 +27,25 @@ export class UpdateEstablishmentsFromSireneAPI {
         since,
       );
 
+    logger.info(
+      `Found ${
+        establishmentSiretsToUpdate.length
+      } establishment to update with siret ${establishmentSiretsToUpdate.join(
+        ", ",
+      )}`,
+    );
+
     // TODO parallelize this using Promise.all once we know it works :)
     for (const siret of establishmentSiretsToUpdate) {
       try {
+        logger.info(`Updating establishment with siret ${siret}...`);
         await this.updateEstablishmentWithSiret(siret);
+        logger.info(`Successfuly updated establishment with siret ${siret} !`);
       } catch (error) {
-        console.log(
-          "Accountered an error when updating establishment with siret ",
+        logger.warn(
+          "Accountered an error when updating establishment with siret :",
           siret,
+          error,
         );
       }
     }

@@ -15,7 +15,7 @@ import { AppConfig } from "./appConfig";
 import { createGetPgPoolFn, createRepositories } from "./config";
 
 const logger = createLogger(__filename);
-const MAX_QPS_SIRENE__AND_ADDRESS_API = 5;
+const MAX_QPS_SIRENE__AND_ADDRESS_API = 0.49;
 
 const stats: PipelineStats = new PipelineStats(
   "startUpdateEstablishmentsFromSirene",
