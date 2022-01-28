@@ -55,32 +55,36 @@ const createInitialApplication = (
     dateSubmission: toDateString(startOfToday()),
 
     // Participant
-    email: "",
-    firstName: "",
-    lastName: "",
-    phone: "",
-    dateStart: toDateString(addDays(startOfToday(), 2)),
-    dateEnd: toDateString(addDays(startOfToday(), 3)),
+    email: route.params.email ?? "",
+    firstName: route.params.firstName ?? "",
+    lastName: route.params.lastName ?? "",
+    phone: route.params.phone ?? "",
+    postalCode: route.params.postalCode ?? "",
+    dateStart:
+      route.params.dateStart ?? toDateString(addDays(startOfToday(), 2)),
+    dateEnd: route.params.dateEnd ?? toDateString(addDays(startOfToday(), 3)),
 
     // Enterprise
-    siret: "",
-    businessName: "",
-    mentor: "",
-    mentorPhone: "",
-    mentorEmail: "",
-    schedule: reasonableSchedule,
-    immersionAddress: "",
+    siret: route.params.siret ?? "",
+    businessName: route.params.businessName ?? "",
+    mentor: route.params.mentor ?? "",
+    mentorPhone: route.params.mentorPhone ?? "",
+    mentorEmail: route.params.mentorEmail ?? "",
+    schedule: route.params.schedule ?? reasonableSchedule,
+    immersionAddress: route.params.immersionAddress ?? "",
+    agencyId: route.params.agencyId ?? undefined,
 
     // Covid
-    individualProtection: undefined,
-    sanitaryPrevention: undefined,
-    sanitaryPreventionDescription: "",
+    individualProtection: route.params.individualProtection ?? undefined,
+    sanitaryPrevention: route.params.sanitaryPrevention ?? undefined,
+    sanitaryPreventionDescription:
+      route.params.sanitaryPreventionDescription ?? "",
 
     // Immersion
-    immersionObjective: "",
-    immersionProfession: "",
-    immersionActivities: "",
-    immersionSkills: "",
+    immersionObjective: route.params.immersionObjective ?? "",
+    immersionProfession: route.params.immersionProfession ?? "",
+    immersionActivities: route.params.immersionActivities ?? "",
+    immersionSkills: route.params.immersionSkills ?? "",
 
     // Signatures
     beneficiaryAccepted: false,
@@ -92,31 +96,35 @@ const createInitialApplication = (
     ...emptyForm,
 
     // Participant
-    email: "sylvanie@monemail.fr",
-    firstName: "Sylvanie",
-    lastName: "Durand",
-    phone: "0612345678",
-    postalCode: "75001",
+    email: emptyForm.email || "sylvanie@monemail.fr",
+    firstName: emptyForm.firstName || "Sylvanie",
+    lastName: emptyForm.lastName || "Durand",
+    phone: emptyForm.phone || "0612345678",
+    postalCode: emptyForm.postalCode || "75001",
 
     // Enterprise
-    siret: "1234567890123",
-    businessName: "Futuroscope",
-    mentor: "Le Mentor du futur",
-    mentorPhone: "0101100110",
-    mentorEmail: "mentor@supermentor.fr",
+    siret: emptyForm.siret || "1234567890123",
+    businessName: emptyForm.businessName || "Futuroscope",
+    mentor: emptyForm.mentor || "Le Mentor du futur",
+    mentorPhone: emptyForm.mentorPhone || "0101100110",
+    mentorEmail: emptyForm.mentorEmail || "mentor@supermentor.fr",
     immersionAddress:
+      emptyForm.immersionAddress ||
       "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
+    agencyId: emptyForm.agencyId || "test-agency-1-front",
 
     // Covid
-    individualProtection: true,
-    sanitaryPrevention: true,
-    sanitaryPreventionDescription: "Aucunes",
+    individualProtection: emptyForm.individualProtection ?? true,
+    sanitaryPrevention: emptyForm.sanitaryPrevention ?? true,
+    sanitaryPreventionDescription:
+      emptyForm.sanitaryPreventionDescription || "Aucunes",
 
     // Immersion
-    immersionObjective: "",
-    immersionProfession: "Boulanger / Boulangère",
-    immersionActivities: "Superviser",
-    immersionSkills: "Attention au détail",
+    immersionObjective: emptyForm.immersionObjective || "",
+    immersionProfession:
+      emptyForm.immersionProfession || "Boulanger / Boulangère",
+    immersionActivities: emptyForm.immersionActivities || "Superviser",
+    immersionSkills: emptyForm.immersionSkills || "Attention au détail",
 
     // Signatures
     beneficiaryAccepted: false,

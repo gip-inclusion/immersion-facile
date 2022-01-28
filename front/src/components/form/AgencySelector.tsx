@@ -1,6 +1,6 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/dependencies";
 import { AgencyDto, AgencyId } from "src/shared/agencies";
 import { LatLonDto } from "src/shared/SearchImmersionDto";
@@ -17,13 +17,13 @@ type AgencySelectorProps = {
   label: string;
   description?: string;
   disabled?: boolean;
-  setInitialValue?: boolean;
+  defaultAgencyId?: string;
 };
 export const AgencySelector = ({
   label,
   description,
   disabled,
-  setInitialValue,
+  defaultAgencyId,
 }: AgencySelectorProps) => {
   const name: keyof ImmersionApplicationDto = "agencyId";
   const [{ value, onBlur }, { touched, error }, { setValue }] =
@@ -53,7 +53,12 @@ export const AgencySelector = ({
           },
           ...agencies,
         ]);
-        if (!disabled && setInitialValue) setValue(agencies[0].id);
+        if (
+          !disabled &&
+          defaultAgencyId &&
+          agencies.map((agency) => agency.id).includes(defaultAgencyId)
+        )
+          setValue(defaultAgencyId);
         setLoaded(true);
         setLoadingError(false);
       })

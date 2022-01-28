@@ -1,5 +1,5 @@
 import { useField, useFormikContext } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { SuccessInfos } from "src/app/ApplicationForm/createSuccessInfos";
 import { BoolRadioGroup, RadioGroup } from "src/app/RadioGroup";
 import {
@@ -22,6 +22,7 @@ import type {
   ApplicationStatus,
   ImmersionApplicationDto,
 } from "src/shared/ImmersionApplicationDto";
+import { routes, useRoute } from "../routes";
 import { ApplicationFormProfession } from "./ApplicationFormProfession";
 
 const { featureFlags, dev } = ENV;
@@ -85,8 +86,14 @@ export const ApplicationFormFields = ({
   alreadySubmitted,
   onRejectForm,
 }: ApplicationFieldsProps) => {
-  const { errors, submitCount, setFieldValue, isSubmitting, submitForm } =
-    useFormikContext<ImmersionApplicationDto>();
+  const {
+    errors,
+    submitCount,
+    setFieldValue,
+    isSubmitting,
+    submitForm,
+    values,
+  } = useFormikContext<ImmersionApplicationDto>();
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField(
@@ -94,6 +101,18 @@ export const ApplicationFormFields = ({
     establishmentInfo,
     "immersionAddress",
   );
+
+  const watchedValues = makeValuesToWatchInUrl(values);
+  const { schedule, ...watchedValuesExceptSchedule } = watchedValues;
+
+  const route = useRoute();
+  useEffect(() => {
+    if (route.name !== "immersionApplication" || !!route.params.jwt) return;
+    routes.immersionApplication(watchedValues).replace();
+  }, [
+    ...Object.values(watchedValuesExceptSchedule),
+    JSON.stringify(values.schedule),
+  ]);
 
   let errorMessage = submitError?.message;
   if (
@@ -153,7 +172,7 @@ export const ApplicationFormFields = ({
       <AgencySelector
         label="Votre structure d'accompagnement *"
         disabled={isFrozen}
-        setInitialValue={dev}
+        defaultAgencyId={values.agencyId}
       />
 
       <DateInput
@@ -451,4 +470,28 @@ export const RequestModificationButton = ({
         : "Annuler les signatures et demander des modifications"}
     </button>
   );
+};
+
+const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
+  const keysToWatch: (keyof ImmersionApplicationDto)[] = [
+    "email",
+    "firstName",
+    "lastName",
+    "phone",
+    "postalCode",
+    "dateStart",
+    "dateEnd",
+    "siret",
+    "businessName",
+    "mentor",
+    "mentorEmail",
+    "mentorPhone",
+    "agencyId",
+    "schedule",
+  ];
+  const watchedValuesObject = keysToWatch.reduce(
+    (acc, watchedKey) => ({ ...acc, [watchedKey]: values[watchedKey] }),
+    {} as Partial<ImmersionApplicationDto>,
+  );
+  return watchedValuesObject;
 };
