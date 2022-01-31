@@ -11,6 +11,8 @@ import { parseGeoJson } from "./PgImmersionOfferRepository";
 
 const logger = createLogger(__filename);
 
+const MAX_NEARBY_DISTANCE = 100_000; // = 100km
+
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private client: PoolClient) {}
 
@@ -22,14 +24,23 @@ export class PgAgencyRepository implements AgencyRepository {
     return pgResult.rows.map(pgToEntity);
   }
 
-  public async getNearby(position: LatLonDto): Promise<AgencyConfig[]> {
+  public async getNearby(searchPosition: LatLonDto): Promise<AgencyConfig[]> {
     const pgResult = await this.client.query(
       `SELECT id, name, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position,
-      ST_Distance(${STPointStringFromPosition(position)}, position) as dist
+        ST_Distance(${STPointStringFromPosition(
+          searchPosition,
+        )}, position) as dist
+        
       FROM public.agencies
+      
+      WHERE ST_Distance(${STPointStringFromPosition(
+        searchPosition,
+      )}, position) <= ${MAX_NEARBY_DISTANCE}
+      
       ORDER BY dist
       LIMIT 20`,
     );
+
     return pgResult.rows.map(pgToEntity);
   }
 
@@ -67,7 +78,7 @@ export class PgAgencyRepository implements AgencyRepository {
 }
 
 const STPointStringFromPosition = (position: LatLonDto) =>
-  `public.st_geographyfromtext('POINT(${position.lat} ${position.lon})'::text)`;
+  `public.st_geographyfromtext('POINT(${position.lon} ${position.lat})'::text)`;
 
 const entityToPgArray = (config: AgencyConfig): any[] => [
   config.id,
