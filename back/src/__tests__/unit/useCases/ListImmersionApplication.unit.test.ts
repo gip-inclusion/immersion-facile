@@ -2,9 +2,7 @@ import { InMemoryImmersionApplicationRepository } from "../../../adapters/second
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ListImmersionApplication } from "../../../domain/immersionApplication/useCases/ListImmersionApplication";
 import { AgencyId } from "../../../shared/agencies";
-import { FeatureFlags } from "../../../shared/featureFlags";
 import { validApplicationStatus } from "../../../shared/ImmersionApplicationDto";
-import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 
@@ -25,11 +23,11 @@ describe("List Immersion Applications", () => {
 
   describe("When the repository is empty", () => {
     test("returns empty list", async () => {
-      const ImmersionApplications = await listImmersionApplication.execute({
+      const immersionApplications = await listImmersionApplication.execute({
         status: undefined,
         agencyId: undefined,
       });
-      expect(ImmersionApplications).toEqual([]);
+      expect(immersionApplications).toEqual([]);
     });
   });
 
@@ -38,11 +36,11 @@ describe("List Immersion Applications", () => {
       const entity = new ImmersionApplicationEntityBuilder().build();
       repository.setImmersionApplications({ form_id: entity });
 
-      const ImmersionApplications = await listImmersionApplication.execute({
+      const immersionApplications = await listImmersionApplication.execute({
         status: undefined,
         agencyId: undefined,
       });
-      expect(ImmersionApplications).toEqual([entity.toDto()]);
+      expect(immersionApplications).toEqual([entity.toDto()]);
     });
   });
 

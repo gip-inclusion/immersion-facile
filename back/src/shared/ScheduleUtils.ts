@@ -1,4 +1,4 @@
-import { LegacyScheduleDto } from "../shared/ScheduleSchema";
+import { LegacyScheduleDto } from "./ScheduleSchema";
 import {
   ComplexScheduleDto,
   ScheduleDto,
@@ -42,39 +42,39 @@ export const calculateHours = (schedule: ScheduleDto) => {
 
 export const maxPermittedHoursPerWeek = 35;
 
-export const periodStringToHoursMinutes = (s: string) => {
-  let [hour, minute] = s.split(":").map(Number);
+const periodStringToHoursMinutes = (s: string) => {
+  const [hour, minute] = s.split(":").map(Number);
   return [hour, minute];
 };
 
-export const timePeriodDuration = (period: TimePeriodDto) => {
-  let [startHour, startMinute] = periodStringToHoursMinutes(period.start);
-  let [endHour, endMinute] = periodStringToHoursMinutes(period.end);
+const timePeriodDuration = (period: TimePeriodDto) => {
+  const [startHour, startMinute] = periodStringToHoursMinutes(period.start);
+  const [endHour, endMinute] = periodStringToHoursMinutes(period.end);
   return Math.max(0, (endHour - startHour) * 60 + endMinute - startMinute);
 };
 
-export const checkTimePeriodPositive = (period: TimePeriodDto) => {
-  let [startHour, startMinute] = periodStringToHoursMinutes(period.start);
-  let [endHour, endMinute] = periodStringToHoursMinutes(period.end);
+const checkTimePeriodPositive = (period: TimePeriodDto) => {
+  const [startHour, startMinute] = periodStringToHoursMinutes(period.start);
+  const [endHour, endMinute] = periodStringToHoursMinutes(period.end);
   const duration = (endHour - startHour) * 60 + endMinute - startMinute;
 
   return duration > 0;
 };
 
-export const periodStringToMinutesFromMidnight = (s: string) => {
-  let [hr, min] = periodStringToHoursMinutes(s);
+const periodStringToMinutesFromMidnight = (s: string) => {
+  const [hr, min] = periodStringToHoursMinutes(s);
   return hr * 60 + min;
 };
 
 // Returns true if the two periods overlap (for at least one minute).
-export const checkTimePeriodsOverlap = (
+const checkTimePeriodsOverlap = (
   period1: TimePeriodDto,
   period2: TimePeriodDto,
 ): boolean => {
-  let period1Start = periodStringToMinutesFromMidnight(period1.start);
-  let period1End = periodStringToMinutesFromMidnight(period1.end);
-  let period2Start = periodStringToMinutesFromMidnight(period2.start);
-  let period2End = periodStringToMinutesFromMidnight(period2.end);
+  const period1Start = periodStringToMinutesFromMidnight(period1.start);
+  const period1End = periodStringToMinutesFromMidnight(period1.end);
+  const period2Start = periodStringToMinutesFromMidnight(period2.start);
+  const period2End = periodStringToMinutesFromMidnight(period2.end);
 
   // Force ordering
   if (period1Start > period2Start) {
@@ -94,7 +94,7 @@ export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
     periodIndex < schedule.hours.length;
     periodIndex++
   ) {
-    let period = schedule.hours[periodIndex];
+    const period = schedule.hours[periodIndex];
     if (!checkTimePeriodPositive(period)) {
       return (
         "La plage horaire " +
@@ -107,7 +107,7 @@ export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
   }
 
   // Check if all periods are positive.
-  schedule.hours.forEach((period: TimePeriodDto, index: Number) => {
+  schedule.hours.forEach((period: TimePeriodDto, index: number) => {
     if (!checkTimePeriodPositive(period)) {
       return "La plage horaire " + index.toString() + " est incorrecte !";
     }
@@ -116,8 +116,8 @@ export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
   // Check if any periods overlap.
   for (let i = 0; i < schedule.hours.length; i++) {
     for (let j = i + 1; j < schedule.hours.length; j++) {
-      let period1 = schedule.hours[i];
-      let period2 = schedule.hours[j];
+      const period1 = schedule.hours[i];
+      const period2 = schedule.hours[j];
       if (checkTimePeriodsOverlap(schedule.hours[i], schedule.hours[j])) {
         return (
           "Les plages horaires " +
@@ -132,7 +132,7 @@ export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
 };
 
 // Generates a string in format: "(09:00 - 13:00)"
-export const periodToHumanReadableString = (period: TimePeriodDto): string => {
+const periodToHumanReadableString = (period: TimePeriodDto): string => {
   return "(" + period.start + " - " + period.end + ")";
 };
 
@@ -140,7 +140,7 @@ export const checkComplexSchedule = (schedule: ComplexScheduleDto) => {
   for (let dayIndex = 0; dayIndex < schedule.length; dayIndex++) {
     const day = schedule[dayIndex];
     for (let periodIndex = 0; periodIndex < day.length; periodIndex++) {
-      let period = day[periodIndex];
+      const period = day[periodIndex];
       // Check if all periods are positive.
       if (!checkTimePeriodPositive(period)) {
         return (
@@ -156,7 +156,7 @@ export const checkComplexSchedule = (schedule: ComplexScheduleDto) => {
 
       // Check for overlap with other periods
       for (let j = periodIndex + 1; j < day.length; j++) {
-        let otherPeriod = day[j];
+        const otherPeriod = day[j];
         if (checkTimePeriodsOverlap(period, otherPeriod)) {
           return (
             "Les plages horaires " +
@@ -201,9 +201,7 @@ const convertSimpleToComplexSchedule = (
 
 // Converts an array of TimePeriodDto to a readable schedule, e.g.
 // "08:00-12:00, 14:00-17:00". Empty arrays get converted to "libre".
-export const prettyPrintDaySchedule = (
-  timePeriods: TimePeriodDto[],
-): string => {
+const prettyPrintDaySchedule = (timePeriods: TimePeriodDto[]): string => {
   if (timePeriods.length == 0) {
     return "libre";
   }

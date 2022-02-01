@@ -1,9 +1,6 @@
 import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import {
-  ImmersionApplications,
-  InMemoryImmersionApplicationRepository,
-} from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ValidateImmersionApplication } from "../../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
@@ -44,7 +41,8 @@ describe("Validate immersionApplication", () => {
 
   describe("When the immersionApplication is valid", () => {
     test("validates the immersionApplication in the repository", async () => {
-      const immersionApplication: ImmersionApplications = {};
+      const immersionApplication: Record<string, ImmersionApplicationEntity> =
+        {};
       const immersionApplicationEntity = ImmersionApplicationEntity.create(
         new ImmersionApplicationDtoBuilder().withStatus("IN_REVIEW").build(),
       );
@@ -75,7 +73,8 @@ describe("Validate immersionApplication", () => {
 
   describe("When the immersionApplication is still draft", () => {
     test("throws bad request error", async () => {
-      const immersionApplications: ImmersionApplications = {};
+      const immersionApplications: Record<string, ImmersionApplicationEntity> =
+        {};
       const immersionApplicationEntity =
         new ImmersionApplicationEntityBuilder().build();
       immersionApplications[immersionApplicationEntity.id] =

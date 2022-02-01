@@ -55,3 +55,7 @@ export const expectArraysToMatch = <T>(actual: T[], expected: Partial<T>[]) => {
 export const expectArraysToEqual = <T>(actual: T[], expected: T[]) => {
   expect(actual).toEqual(expected);
 };
+
+export const expectTypeToMatchAndEqual = <T>(actual: T, expected: T) => {
+  expect(actual).toStrictEqual(expected);
+};

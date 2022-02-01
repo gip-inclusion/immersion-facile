@@ -5,14 +5,11 @@ import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 
-export type ImmersionApplications = {
-  [id: string]: ImmersionApplicationEntity;
-};
-
 export class InMemoryImmersionApplicationRepository
   implements ImmersionApplicationRepository
 {
-  private _immersionApplications: ImmersionApplications = {};
+  private _immersionApplications: Record<string, ImmersionApplicationEntity> =
+    {};
 
   public async save(
     immersionApplicationEntity: ImmersionApplicationEntity,
@@ -50,7 +47,9 @@ export class InMemoryImmersionApplicationRepository
 
   // Visible for testing.
   // TODO: Rename to setImmersionApplication.
-  setImmersionApplications(immersionApplications: ImmersionApplications) {
+  setImmersionApplications(
+    immersionApplications: Record<string, ImmersionApplicationEntity>,
+  ) {
     this._immersionApplications = immersionApplications;
   }
 }

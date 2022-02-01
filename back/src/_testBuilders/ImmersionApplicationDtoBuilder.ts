@@ -8,6 +8,7 @@ import {
 import {
   LegacyScheduleDto,
   reasonableSchedule,
+  ScheduleDto,
 } from "../shared/ScheduleSchema";
 import { Builder } from "./Builder";
 
@@ -146,6 +147,13 @@ export class ImmersionApplicationDtoBuilder
     return new ImmersionApplicationDtoBuilder({
       ...this.dto,
       legacySchedule,
+    });
+  }
+
+  public withSchedule(schedule: ScheduleDto) {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      schedule,
     });
   }
 

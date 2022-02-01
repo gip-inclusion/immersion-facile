@@ -6,10 +6,7 @@ import {
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import {
-  ImmersionApplications,
-  InMemoryImmersionApplicationRepository,
-} from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -25,6 +22,7 @@ import {
   ImmersionApplicationId,
   validApplicationStatus,
 } from "../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 
 describe("Update immersionApplication", () => {
   let updateImmersionApplication: UpdateImmersionApplication;
@@ -53,7 +51,8 @@ describe("Update immersionApplication", () => {
 
   describe("When the immersionApplication is valid", () => {
     test("updates the immersionApplication in the repository", async () => {
-      const immersionApplications: ImmersionApplications = {};
+      const immersionApplications: Record<string, ImmersionApplicationEntity> =
+        {};
       const immersionApplicationEntity =
         new ImmersionApplicationEntityBuilder().build();
       immersionApplications[immersionApplicationEntity.id] =
@@ -116,7 +115,8 @@ describe("Update immersionApplication", () => {
   describe("Status validation", () => {
     let id: ImmersionApplicationId;
     beforeEach(() => {
-      const immersionApplications: ImmersionApplications = {};
+      const immersionApplications: Record<string, ImmersionApplicationEntity> =
+        {};
       const immersionApplicationEntity =
         new ImmersionApplicationEntityBuilder().build();
       immersionApplications[immersionApplicationEntity.id] =

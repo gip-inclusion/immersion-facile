@@ -3,6 +3,7 @@ import { ImmersionApplicationEntity } from "../domain/immersionApplication/entit
 import { ImmersionApplicationId } from "../shared/ImmersionApplicationDto";
 import { Builder } from "./Builder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
+import { ScheduleDto } from "../shared/ScheduleSchema";
 
 export class ImmersionApplicationEntityBuilder
   implements Builder<ImmersionApplicationEntity>
@@ -16,7 +17,9 @@ export class ImmersionApplicationEntityBuilder
   public withId(id: ImmersionApplicationId) {
     return new ImmersionApplicationEntityBuilder(
       ImmersionApplicationEntity.create(
-        new ImmersionApplicationDtoBuilder().withId(id).build(),
+        new ImmersionApplicationDtoBuilder(this.entity.toDto())
+          .withId(id)
+          .build(),
       ),
     );
   }
@@ -24,7 +27,19 @@ export class ImmersionApplicationEntityBuilder
   public withAgencyId(id: AgencyId) {
     return new ImmersionApplicationEntityBuilder(
       ImmersionApplicationEntity.create(
-        new ImmersionApplicationDtoBuilder().withAgencyId(id).build(),
+        new ImmersionApplicationDtoBuilder(this.entity.toDto())
+          .withAgencyId(id)
+          .build(),
+      ),
+    );
+  }
+
+  public withSchedule(schedule: ScheduleDto) {
+    return new ImmersionApplicationEntityBuilder(
+      ImmersionApplicationEntity.create(
+        new ImmersionApplicationDtoBuilder(this.entity.toDto())
+          .withSchedule(schedule)
+          .build(),
       ),
     );
   }

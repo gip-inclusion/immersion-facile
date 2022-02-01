@@ -273,6 +273,9 @@ export const createInMemoryUow = (repositories?: Repositories) => ({
   immersionOfferRepo:
     (repositories?.immersionOffer as InMemoryImmersionOfferRepository) ??
     new InMemoryImmersionOfferRepository(),
+  immersionApplicationRepo:
+    (repositories?.immersionApplication as InMemoryImmersionApplicationRepository) ??
+    new InMemoryImmersionApplicationRepository(),
 });
 
 // following function is for type check only, it is verifies InMemoryUnitOfWork is assignable to UnitOfWork
@@ -285,6 +288,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   outboxRepo: new PgOutboxRepository(client),
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
   immersionOfferRepo: new PgImmersionOfferRepository(client),
+  immersionApplicationRepo: new PgImmersionApplicationRepository(client),
 });
 
 const createUowPerformer = (
