@@ -1,0 +1,33 @@
+FROM ubuntu:bionic
+
+ENV LANG=fr_FR.UTF-8
+
+RUN apt-get update && \
+    export DEBIAN_FRONTEND=noninteractive; \
+    apt-get -y install vim language-pack-fr rsyslog cron logrotate tzdata && \
+    echo "LANG=\"$LANG\"\nLANGUAGE=\"$LANG\"\nLC_NUMERIC=\"$LANG\"\nLC_TIME=\"$LANG\"\nLC_MONETARY=\"$LANG\"\nLC_PAPER=\"$LANG\"\nLC_IDENTIFICATION=\"$LANG\"\nLC_NAME=\"$LANG\"\nLC_ADDRESS=\"$LANG\"\nLC_TELEPHONE=\"$LANG\"\nLC_MEASUREMENT=\"$LANG\"" >>/etc/default/locale;
+
+#Pour logrotate
+RUN echo -e '#!/bin/sh\nexit 0' > /usr/sbin/policy-rc.d;
+
+# Mise à l'heure française
+ARG TIMEZONE=${TIMEZONE:-Europe/Paris}
+ENV TZ $TIMEZONE
+RUN echo "$TIMEZONE" >/etc/timezone; \
+    ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime; \
+    dpkg-reconfigure -f noninteractive tzdata;
+
+RUN apt-get update && \
+    apt-get -y install tar bzip2 wget pbzip2
+
+ARG ENV_TYPE=${ENV_TYPE:-production}
+ENV ENV_TYPE=$ENV_TYPE
+
+RUN [ "$ENV_TYPE" != "production" ] && COMMENT="#"; \
+    echo "${COMMENT}30 3 * * * root bash /home/backup/BACKUP.sh >>/home/backup/backup.log" >/etc/cron.d/backup;
+
+WORKDIR /home/backup
+
+CMD service rsyslog start && \
+    service cron start && \
+    sleep infinity;

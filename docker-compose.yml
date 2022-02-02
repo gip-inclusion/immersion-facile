@@ -63,3 +63,18 @@ services:
 
   adminer:
     image: adminer
+
+  backup:
+    restart: always
+    hostname: backup
+    build:
+      context: "./backup"
+      dockerfile: Dockerfile.backup
+      args:
+        - ENV_TYPE=${ENV_TYPE:-develop}
+        - TIMEZONE=${TIMEZONE:-Europe/Paris}
+    volumes:
+      - ./backup/home/backup:/home/backup
+      - ./:/home/docker
+      - ${MNT:-/mnt}:/mnt
+

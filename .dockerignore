@@ -13,3 +13,5 @@ front/dist-ssr
 .gitlab-ci.yml
 
 docker-data
+
+backup/
