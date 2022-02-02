@@ -419,6 +419,7 @@ const createUseCases = (
       uowPerformer,
       createNewEvent,
       getSiret,
+      config.featureFlags,
     ),
 
     transformFormEstablishmentToSearchData:

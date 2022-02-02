@@ -124,7 +124,10 @@ const SiretRelatedInputs = () => {
         placeholder="362 521 879 00034"
         disabled={isFetchingSiret}
       />
-      <TextInput {...getLabelAndName("businessName")} disabled={true} />
+      <TextInput
+        {...getLabelAndName("businessName")}
+        disabled={!ENV.featureFlags.enableByPassInseeApi}
+      />
       <TextInput
         {...getLabelAndName("businessNameCustomized")}
         disabled={isFetchingSiret}

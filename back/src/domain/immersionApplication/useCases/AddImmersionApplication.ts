@@ -52,10 +52,12 @@ export class AddImmersionApplication extends UseCase<
       immersionApplicationDto,
     );
 
-    await rejectsSiretIfNotAnOpenCompany(
-      this.getSiret,
-      immersionApplicationDto.siret,
-    );
+    if (!this.featureFlags.enableByPassInseeApi) {
+      await rejectsSiretIfNotAnOpenCompany(
+        this.getSiret,
+        immersionApplicationDto.siret,
+      );
+    }
 
     const id = await this.applicationRepository.save(applicationEntity);
     if (!id) throw new ConflictError(applicationEntity.id);

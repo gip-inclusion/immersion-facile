@@ -2,6 +2,7 @@ import type { AxiosError } from "axios";
 import { useField } from "formik";
 import { useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/dependencies";
+import { ENV } from "src/environmentVariables";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { siretSchema } from "../../shared/siret";
 
@@ -34,6 +35,7 @@ export const useSiretFetcher = () => {
   });
 
   useEffect(() => {
+    if (ENV.featureFlags.enableByPassInseeApi) return;
     let validatedSiret: SiretDto;
     try {
       validatedSiret = siretSchema.parse(field.value);

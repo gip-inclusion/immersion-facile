@@ -34,6 +34,7 @@ const getUseCasesByTopics = (
         useCases.notifyToTeamApplicationSubmittedByBeneficiary,
         useCases.notifyNewApplicationNeedsReview,
       ];
+
   return {
     // "Happy case" for immersion application.
     ImmersionApplicationSubmittedByBeneficiary: onSubmitEvents,

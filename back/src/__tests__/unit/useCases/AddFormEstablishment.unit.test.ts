@@ -1,3 +1,4 @@
+import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config";
 import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
@@ -11,6 +12,7 @@ import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/Ad
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { FeatureFlags } from "../../../shared/featureFlags";
 
 describe("Add FormEstablishment", () => {
   let addFormEstablishment: AddFormEstablishment;
@@ -18,6 +20,7 @@ describe("Add FormEstablishment", () => {
   let outboxRepo: InMemoryOutboxRepository;
   let stubGetSiret: StubGetSiret;
   let uowPerformer: UnitOfWorkPerformer;
+  let featureFlags: FeatureFlags;
 
   beforeEach(() => {
     stubGetSiret = new StubGetSiret();
@@ -32,11 +35,13 @@ describe("Add FormEstablishment", () => {
     const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    featureFlags = FeatureFlagsBuilder.allOff().build();
 
     addFormEstablishment = new AddFormEstablishment(
       uowPerformer,
       createNewEvent,
       stubGetSiret,
+      featureFlags,
     );
   });
 
@@ -81,6 +86,24 @@ describe("Add FormEstablishment", () => {
 
   describe("SIRET validation", () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
+
+    describe("when feature flag to skip siret validation is on", () => {
+      it("accepts formEstablishment with SIRETs that don't correspond to active businesses", async () => {
+        featureFlags.enableByPassInseeApi = true;
+
+        stubGetSiret.setNextResponse({
+          siret: formEstablishment.siret,
+          businessName: "INACTIVE BUSINESS",
+          businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+          naf: { code: "78.3Z", nomenclature: "Ref2" },
+          isOpen: false,
+        });
+
+        expect(await addFormEstablishment.execute(formEstablishment)).toBe(
+          formEstablishment.id,
+        );
+      });
+    });
 
     it("rejects formEstablishment with SIRETs that don't correspond to active businesses", async () => {
       stubGetSiret.setNextResponse({

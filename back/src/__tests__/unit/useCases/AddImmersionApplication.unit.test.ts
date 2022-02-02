@@ -18,6 +18,7 @@ import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
+import { FeatureFlags } from "../../../shared/featureFlags";
 import { validApplicationStatus } from "../../../shared/ImmersionApplicationDto";
 
 describe("Add immersionApplication", () => {
@@ -30,9 +31,10 @@ describe("Add immersionApplication", () => {
   const validImmersionApplication =
     new ImmersionApplicationDtoBuilder().build();
   let stubGetSiret: StubGetSiret;
-  const featureFlags = FeatureFlagsBuilder.allOff().build();
+  let featureFlags: FeatureFlags;
 
   beforeEach(() => {
+    featureFlags = FeatureFlagsBuilder.allOff().build();
     applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
@@ -129,6 +131,25 @@ describe("Add immersionApplication", () => {
   });
 
   describe("SIRET validation", () => {
+    describe("if feature flag to skip siret validation is ON", () => {
+      it("accepts applications with SIRETs that don't correspond to active businesses", async () => {
+        featureFlags.enableByPassInseeApi = true;
+        stubGetSiret.setNextResponse({
+          siret: validImmersionApplication.siret,
+          businessName: "INACTIVE BUSINESS",
+          businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+          naf: { code: "78.3Z", nomenclature: "Ref2" },
+          isOpen: false,
+        });
+
+        expect(
+          await addImmersionApplication.execute(validImmersionApplication),
+        ).toEqual({
+          id: validImmersionApplication.id,
+        });
+      });
+    });
+
     it("rejects applications with SIRETs that don't correspond to active businesses", async () => {
       stubGetSiret.setNextResponse({
         siret: validImmersionApplication.siret,

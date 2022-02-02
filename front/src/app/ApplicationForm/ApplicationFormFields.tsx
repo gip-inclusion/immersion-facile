@@ -209,7 +209,7 @@ export const ApplicationFormFields = ({
         type="text"
         placeholder=""
         description=""
-        disabled={true}
+        disabled={!ENV.featureFlags.enableByPassInseeApi}
       />
 
       <TextInput

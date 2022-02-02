@@ -13,6 +13,7 @@ export const getFeatureFlags = (processEnv: ProcessEnv) => {
     enableEnterpriseSignature: getBooleanVariable(
       "ENABLE_ENTERPRISE_SIGNATURE",
     ),
+    enableByPassInseeApi: getBooleanVariable("ENABLE_BY_PASS_INSEE_API"),
     // enableLBBFetchOnSearch: getBooleanVariable("ENABLE_LBB_FETCH_ON_SEARCH"),
   };
 };

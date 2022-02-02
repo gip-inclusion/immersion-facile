@@ -9,6 +9,7 @@ export const rejectsSiretIfNotAnOpenCompany = async (
     siret,
     includeClosedEstablishments: true,
   });
+
   if (!siretLookupRes.isOpen) {
     throw new BadRequestError(
       `Ce SIRET (${siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,

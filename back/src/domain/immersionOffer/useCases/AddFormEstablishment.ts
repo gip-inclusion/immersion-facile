@@ -1,4 +1,5 @@
 import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   AddFormEstablishmentResponseDto,
   FormEstablishmentDto,
@@ -21,6 +22,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
     private readonly getSiret: GetSiretUseCase,
+    private readonly featureFlags: FeatureFlags,
   ) {
     super(uowPerformer);
   }
@@ -31,7 +33,9 @@ export class AddFormEstablishment extends TransactionalUseCase<
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<AddFormEstablishmentResponseDto> {
-    await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
+    if (!this.featureFlags.enableByPassInseeApi) {
+      await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
+    }
 
     const id = await uow.formEstablishmentRepo.save(dto);
     if (!id) throw new ConflictError("empty");

@@ -16,6 +16,13 @@ export class FeatureFlagsBuilder implements Builder<FeatureFlags> {
     });
   }
 
+  public enableByPassInseeApi() {
+    return new FeatureFlagsBuilder({
+      ...this.featureFlags,
+      enableByPassInseeApi: true,
+    });
+  }
+
   public build() {
     return this.featureFlags;
   }
