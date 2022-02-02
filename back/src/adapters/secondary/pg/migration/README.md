@@ -7,7 +7,7 @@ This directory contains the scripts to generate the initial version of immersion
    ```sh
    NODE_ENV=local
    REPOSTIORIES=PG
-   PG_URL="postgresql://immersion:pg-password@postgres:5432/immersion-db"
+   PG_URL="postgresql://immersion:pg_password@postgres:5432/immersion-db"
    ```
 
 2. Purge any existing database and bring up the docker-compose setup:
@@ -25,7 +25,7 @@ This directory contains the scripts to generate the initial version of immersion
    - System: `PostgreSQL`
    - Server: `postgres:5432`
    - Username: `immersion`
-   - Password: `pg-password`
+   - Password: `pg_password`
    - Database: `immersion-db`
 
 3. To bring up only postgres and adminer with postgres port open for e.g. running `build-initial-db`:
