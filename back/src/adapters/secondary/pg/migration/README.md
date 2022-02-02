@@ -28,7 +28,7 @@ This directory contains the scripts to generate the initial version of immersion
    - Password: `pg_password`
    - Database: `immersion-db`
 
-3. To bring up only postgres and adminer with postgres port open for e.g. running `build-initial-db`:
+3. To bring up only postgres and adminer with postgres port open for e.g. running `npm run migrate up`:
 
    ```sh
       immersion-facile$ docker-compose -f docker-compose.resources.yml up --build
@@ -38,5 +38,5 @@ This directory contains the scripts to generate the initial version of immersion
 
    ```sh
       immersion-facile$ cd back
-      back$ npm run build-initial-db
+      back$ npm run migrate up
    ```

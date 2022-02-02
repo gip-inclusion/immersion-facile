@@ -41,7 +41,7 @@ Integration tests :
      Observe the log output to ensure the database has been properly initialized.
   1. Run DB migration : 
     ```sh
-    npm run build-initial-db
+    npm run migrate up
     ```
   1. Execute the integration tests in a separate shell"
      ```

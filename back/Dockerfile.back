@@ -3,4 +3,6 @@ COPY package.json package-lock.json /app/
 WORKDIR /app
 RUN npm ci
 COPY . /app
-CMD npm run build-initial-db && npm run start-prod
+CMD npm run start-prod
+# Soon :
+#CMD npm run migrate up && npm run start-prod

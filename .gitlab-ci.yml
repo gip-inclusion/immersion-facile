@@ -37,7 +37,8 @@ back:
     - cd back
     - npm ci
     - npm run includecheck
-    - NODE_ENV=test npm run build-initial-db $PG_TEST_URL
+    - echo $PG_TEST_URL
+    - NODE_ENV=test DATABASE_URL=$PG_TEST_URL npm run migrate up
     - PG_URL=$PG_TEST_URL npm run test:all
     - npm run typecheck
 
