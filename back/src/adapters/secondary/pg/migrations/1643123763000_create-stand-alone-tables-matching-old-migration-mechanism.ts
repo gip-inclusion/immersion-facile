@@ -1,14 +1,4 @@
 import type { MigrationBuilder } from "node-pg-migrate";
-import {
-  agencies,
-  appellations_public_data,
-  outbox,
-  romes_public_data,
-  textsearchLibelleAppelation,
-  textsearchLibelleAppelationLike,
-  textsearchLibelleRome,
-  textsearchLibelleRomeLike,
-} from "../staticData/0_table_names";
 
 const timestampNullable = (pgm: MigrationBuilder) => ({
   type: "timestamp",
@@ -16,7 +6,7 @@ const timestampNullable = (pgm: MigrationBuilder) => ({
 });
 
 export const up = (pgm: MigrationBuilder) => {
-  pgm.createTable(outbox, {
+  pgm.createTable("outbox", {
     id: { type: "uuid", primaryKey: true },
     occurred_at: { type: "timestamptz", notNull: true },
     was_published: { type: "bool", default: false },
@@ -25,7 +15,7 @@ export const up = (pgm: MigrationBuilder) => {
     payload: { type: "jsonb", notNull: true },
   });
 
-  pgm.createTable(agencies, {
+  pgm.createTable("agencies", {
     id: { type: "uuid", primaryKey: true },
     name: { type: "varchar(255)", notNull: true },
     counsellor_emails: { type: "jsonb", notNull: true },
@@ -43,13 +33,13 @@ export const up = (pgm: MigrationBuilder) => {
     updated_at: timestampNullable(pgm),
   });
 
-  pgm.createTable(romes_public_data, {
+  pgm.createTable("romes_public_data", {
     code_rome: { type: "char(5)", primaryKey: true },
     libelle_rome: { type: "varchar(255)", notNull: true },
     libelle_rome_tsvector: { type: "tsvector" },
   });
 
-  pgm.createTable(appellations_public_data, {
+  pgm.createTable("appellations_public_data", {
     ogr_appellation: "id",
     code_rome: { type: "varchar(5)", notNull: true },
     libelle_appellation_long: { type: "varchar(255)", notNull: true },
@@ -65,54 +55,58 @@ const createRomeAndAppellationIndexesAndConstraints = (
 ) => {
   pgm.createExtension("pg_trgm", { ifNotExists: true, schema: "pg_catalog" });
 
-  pgm.createIndex(romes_public_data, "libelle_rome_tsvector", {
-    name: textsearchLibelleRome,
+  pgm.createIndex("romes_public_data", "libelle_rome_tsvector", {
+    name: "textsearch_libelle_rome",
     method: "gin",
   });
-  pgm.createIndex(romes_public_data, "libelle_rome gin_trgm_ops", {
-    name: textsearchLibelleRomeLike,
+  pgm.createIndex("romes_public_data", "libelle_rome gin_trgm_ops", {
+    name: "textsearch_libelle_rome_like",
     method: "gin",
   });
   pgm.createIndex(
-    appellations_public_data,
+    "appellations_public_data",
     "libelle_appellation_long_tsvector",
     {
-      name: textsearchLibelleAppelation,
+      name: "textsearch_libelle_appellation_long",
       method: "gin",
     },
   );
   pgm.createIndex(
-    appellations_public_data,
+    "appellations_public_data",
     "libelle_appellation_long gin_trgm_ops",
     {
-      name: textsearchLibelleAppelationLike,
+      name: "textsearch_libelle_appellation_long_like",
       method: "gin",
     },
   );
 
-  pgm.addConstraint(appellations_public_data, "fk_rome_code", {
+  pgm.addConstraint("appellations_public_data", "fk_rome_code", {
     foreignKeys: {
       columns: "code_rome",
-      references: `${romes_public_data}(code_rome)`,
+      references: `romes_public_data(code_rome)`,
     },
   });
 };
 
 export const down = (pgm: MigrationBuilder) => {
-  pgm.dropTable(outbox);
-  pgm.dropTable(agencies);
-  pgm.dropIndex(appellations_public_data, "libelle_appellation_long_tsvector", {
-    name: textsearchLibelleAppelation,
+  pgm.dropTable("outbox");
+  pgm.dropTable("agencies");
+  pgm.dropIndex(
+    "appellations_public_data",
+    "libelle_appellation_long_tsvector",
+    {
+      name: "textsearch_libelle_appellation_long",
+    },
+  );
+  pgm.dropIndex("appellations_public_data", "libelle_appellation_long", {
+    name: "textsearch_libelle_appellation_long_like",
   });
-  pgm.dropIndex(appellations_public_data, "libelle_appellation_long", {
-    name: textsearchLibelleAppelationLike,
+  pgm.dropTable("appellations_public_data");
+  pgm.dropIndex("romes_public_data", "libelle_rome_tsvector", {
+    name: "textsearch_libelle_rome",
   });
-  pgm.dropTable(appellations_public_data);
-  pgm.dropIndex(romes_public_data, "libelle_rome_tsvector", {
-    name: textsearchLibelleRome,
+  pgm.dropIndex("romes_public_data", "libelle_rome", {
+    name: "textsearch_libelle_rome_like",
   });
-  pgm.dropIndex(romes_public_data, "libelle_rome", {
-    name: textsearchLibelleRomeLike,
-  });
-  pgm.dropTable(romes_public_data);
+  pgm.dropTable("romes_public_data");
 };

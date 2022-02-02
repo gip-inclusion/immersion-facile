@@ -1,5 +1,4 @@
 import type { MigrationBuilder } from "node-pg-migrate";
-import { immersion_applications } from "../staticData/0_table_names";
 
 const timestamp = (pgm: MigrationBuilder) => ({
   type: "timestamp",
@@ -7,7 +6,7 @@ const timestamp = (pgm: MigrationBuilder) => ({
 });
 
 export const up = (pgm: MigrationBuilder) => {
-  pgm.createTable(immersion_applications, {
+  pgm.createTable("immersion_applications", {
     id: { type: "uuid", primaryKey: true },
     created_at: timestamp(pgm),
     updated_at: timestamp(pgm),
@@ -41,5 +40,5 @@ export const up = (pgm: MigrationBuilder) => {
 };
 
 export const down = (pgm: MigrationBuilder) => {
-  pgm.dropTable(immersion_applications);
+  pgm.dropTable("immersion_applications");
 };

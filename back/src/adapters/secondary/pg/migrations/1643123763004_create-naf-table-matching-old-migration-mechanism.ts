@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { MigrationBuilder } from "node-pg-migrate";
-import { naf_classes_2008 } from "../staticData/0_table_names";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.createTable(naf_classes_2008, {
+  pgm.createTable("naf_classes_2008", {
     class_id: { type: "char(5)", primaryKey: true },
     class_label: { type: "varchar(255)", notNull: true },
     group_id: { type: "char(4)", notNull: true },
@@ -17,11 +16,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropTable(naf_classes_2008);
+  pgm.dropTable("naf_classes_2008");
 }
 
 const insertNafData = (pgm: MigrationBuilder) => {
-  pgm.sql(`INSERT INTO ${naf_classes_2008}
+  pgm.sql(`INSERT INTO naf_classes_2008
   ("class_id", "class_label", "group_id", "group_label", "division_id", "division_label", "section_id", "section_label")
  VALUES
   ('01.11', 'Culture de céréales (à l''exception du riz), de légumineuses et de graines oléagineuses', '01.1', 'Cultures non permanentes', '01', 'Culture et production animale, chasse et services annexes', 'A', 'Agriculture, sylviculture et pêche'),

@@ -1,11 +1,4 @@
 import type { MigrationBuilder } from "node-pg-migrate";
-import {
-  contactMode,
-  dataSource,
-  establishments,
-  immersion_contacts,
-  immersion_offers,
-} from "../staticData/0_table_names";
 
 const timestamp = (pgm: MigrationBuilder) => ({
   type: "timestamp",
@@ -38,17 +31,17 @@ const makeAddForeighKey =
 export const up = (pgm: MigrationBuilder) => {
   const addForeignKey = makeAddForeighKey(pgm);
   // prettier-ignore
-  pgm.createType(dataSource, ["form", "api_sirene", "api_labonneboite", "api_laplateformedelinclusion"]);
-  pgm.createType(contactMode, ["phone", "mail", "in_person"]);
+  pgm.createType("data_source", ["form", "api_sirene", "api_labonneboite", "api_laplateformedelinclusion"]);
+  pgm.createType("contact_mode", ["phone", "mail", "in_person"]);
 
-  pgm.createTable(establishments, {
+  pgm.createTable("establishments", {
     siret: { type: "int8", primaryKey: true },
     name: { type: "text" },
     address: { type: "text" },
     number_employees: { type: "int4" },
     naf: { type: "char(5)" },
-    contact_mode: { type: contactMode },
-    data_source: { type: dataSource },
+    contact_mode: { type: "contact_mode" },
+    data_source: { type: "data_source" },
     gps: {
       type: "geography",
       notNull: true,
@@ -59,7 +52,7 @@ export const up = (pgm: MigrationBuilder) => {
     update_date: { type: "timestamp" },
   });
 
-  pgm.createTable(immersion_contacts, {
+  pgm.createTable("immersion_contacts", {
     uuid: { type: "uuid", primaryKey: true },
     name: { type: "varchar(255)" },
     firstname: { type: "varchar(255)" },
@@ -69,13 +62,13 @@ export const up = (pgm: MigrationBuilder) => {
     phone: { type: "varchar(255)" },
   });
   addForeignKey({
-    table: immersion_contacts,
+    table: "immersion_contacts",
     fieldInTable: "siret_establishment",
-    referencedTable: establishments,
+    referencedTable: "establishments",
     fieldInReferencedTable: "siret",
   });
 
-  pgm.createTable(immersion_offers, {
+  pgm.createTable("immersion_offers", {
     uuid: { type: "uuid", unique: true },
     rome: { type: "char(5)", primaryKey: true },
     naf_division: { type: "char(2)", primaryKey: true },
@@ -86,7 +79,7 @@ export const up = (pgm: MigrationBuilder) => {
     number_connections: { type: "int4", default: 0 },
     number_immersions: { type: "int4", default: 0 },
     voluntary_to_immersion: { type: "bool", default: false },
-    data_source: { type: dataSource },
+    data_source: { type: "data_source" },
     contact_in_establishment_uuid: { type: "uuid" },
     creation_date: timestamp(pgm),
     update_date: timestamp(pgm),
@@ -97,23 +90,23 @@ export const up = (pgm: MigrationBuilder) => {
     },
   });
   addForeignKey({
-    table: immersion_offers,
+    table: "immersion_offers",
     fieldInTable: "contact_in_establishment_uuid",
-    referencedTable: immersion_contacts,
+    referencedTable: "immersion_contacts",
     fieldInReferencedTable: "uuid",
   });
   addForeignKey({
-    table: immersion_offers,
+    table: "immersion_offers",
     fieldInTable: "siret",
-    referencedTable: establishments,
+    referencedTable: "establishments",
     fieldInReferencedTable: "siret",
   });
 };
 
 export const down = (pgm: MigrationBuilder) => {
-  pgm.dropTable(immersion_offers);
-  pgm.dropTable(immersion_contacts);
-  pgm.dropTable(establishments);
-  pgm.dropType(contactMode);
-  pgm.dropType(dataSource);
+  pgm.dropTable("immersion_offers");
+  pgm.dropTable("immersion_contacts");
+  pgm.dropTable("establishments");
+  pgm.dropType("contact_mode");
+  pgm.dropType("data_source");
 };
