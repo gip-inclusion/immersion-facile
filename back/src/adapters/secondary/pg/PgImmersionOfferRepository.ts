@@ -62,6 +62,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     await this._upsertEstablishmentsFromAggregates(aggregates);
     await this._insertContactsFromAggregates(aggregates);
     await this._upsertImmersionOffersFromAggregates(aggregates);
+
+    return;
   }
 
   private async _upsertEstablishmentsFromAggregates(
@@ -501,7 +503,7 @@ const buildUpsertImmersionOffersQuery = (immersionOfferFields: any[][]) => {
       contact_in_establishment_uuid, score, gps
     ) VALUES %L
     ON CONFLICT
-      ON CONSTRAINT pk_immersion_offers
+      ON CONSTRAINT immersion_offers_pkey
         DO UPDATE
           SET
             naf=EXCLUDED.naf,

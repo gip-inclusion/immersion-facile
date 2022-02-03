@@ -157,6 +157,10 @@ const buildDb = async () => {
     await renameEstablishmentPrimaryKey(client);
   }
 
+  if (await offerPkNeedsRename(client)) {
+    await renameOfferPrimaryKey(client);
+  }
+
   client.release();
   await pool.end();
 };
@@ -216,6 +220,16 @@ const establishmentPkNeedsRename = async (client: PoolClient) => {
   );
 
   return occurred_at_result.rows[0].constraint_name === "pk_establishments";
+};
+
+const offerPkNeedsRename = async (client: PoolClient) => {
+  const occurred_at_result = await client.query(
+    "SELECT constraint_name, column_name FROM information_schema.key_column_usage WHERE table_name = 'immersion_offers'",
+  );
+  const constraints = occurred_at_result.rows.map((r) => r.constraint_name);
+  logger.info("offers pk name : " + constraints.join(" , "));
+
+  return constraints.includes("pk_immersion_offers");
 };
 
 const checkOutboxOccurredAtHasTz = async (client: PoolClient) => {
@@ -309,6 +323,9 @@ const renameEstablishmentPrimaryKey = async (client: PoolClient) => {
     __dirname + "/renameEstablishmentPrimaryKey.sql",
     client,
   );
+};
+const renameOfferPrimaryKey = async (client: PoolClient) => {
+  await executeSqlFromFile(__dirname + "/renameOfferPrimaryKey.sql", client);
 };
 
 const buildAgencies = async (client: PoolClient) => {

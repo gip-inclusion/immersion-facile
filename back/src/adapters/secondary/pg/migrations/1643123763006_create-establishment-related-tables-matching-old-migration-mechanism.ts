@@ -6,6 +6,12 @@ const timestamp = (pgm: MigrationBuilder) => ({
   default: pgm.func("now()"),
 });
 
+const timestampTz = (pgm: MigrationBuilder) => ({
+  type: "timestamptz",
+  notNull: true,
+  default: pgm.func("now()"),
+});
+
 type WithForeighKeyProps = {
   table: string;
   fieldInTable: string;
@@ -48,8 +54,8 @@ export const up = (pgm: MigrationBuilder) => {
       default: pgm.func("st_geographyfromtext('POINT(0.00 0.00)'::text)"),
     },
     is_active: { type: "bool", notNull: true, default: true },
-    creation_date: timestamp(pgm),
-    update_date: { type: "timestamp" },
+    creation_date: timestampTz(pgm),
+    update_date: { type: "timestamptz" },
   });
 
   pgm.createTable("immersion_contacts", {
