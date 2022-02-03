@@ -464,7 +464,7 @@ const buildUpsertEstablishmentsQuery = (establishmentFields: any[][]) => {
       siret, name, address, number_employees, naf, contact_mode, data_source, gps, update_date, is_active
     ) VALUES %L
     ON CONFLICT
-      ON CONSTRAINT pk_establishments
+      ON CONSTRAINT establishments_pkey
         DO UPDATE
           SET
             name=EXCLUDED.name,

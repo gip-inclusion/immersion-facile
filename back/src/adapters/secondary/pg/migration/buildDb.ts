@@ -153,6 +153,10 @@ const buildDb = async () => {
   logger.info("remove rome not null constraint on searches_made");
   await removeSearchesMadeRomeNotNullConstraint(client);
 
+  if (await establishmentPkNeedsRename(client)) {
+    await renameEstablishmentPrimaryKey(client);
+  }
+
   client.release();
   await pool.end();
 };
@@ -196,11 +200,22 @@ const checkIfEstablishmentsTimestampHaveTz = async (client: PoolClient) => {
   const creation_result = await client.query(makeQuery("creation_date"));
 
   const update_date_has_tz =
-    update_result.rows[0].data_type === "timestamp without time zone";
+    update_result.rows[0].data_type === "timestamp with time zone";
   const creation_data_has_tz =
-    creation_result.rows[0].data_type === "timestamp without time zone";
+    creation_result.rows[0].data_type === "timestamp with time zone";
 
   return update_date_has_tz && creation_data_has_tz;
+};
+
+const establishmentPkNeedsRename = async (client: PoolClient) => {
+  const occurred_at_result = await client.query(
+    "SELECT constraint_name, column_name FROM information_schema.key_column_usage WHERE table_name = 'establishments'",
+  );
+  logger.info(
+    "establishment pk name : " + occurred_at_result.rows[0].constraint_name,
+  );
+
+  return occurred_at_result.rows[0].constraint_name === "pk_establishments";
 };
 
 const checkOutboxOccurredAtHasTz = async (client: PoolClient) => {
@@ -285,6 +300,13 @@ const changeOutboxOccurredAtToTimestampWithTZ = async (client: PoolClient) => {
 const removeSearchesMadeRomeNotNullConstraint = async (client: PoolClient) => {
   await executeSqlFromFile(
     __dirname + "/removeSearchesMadeRomeNotNullConstraint.sql",
+    client,
+  );
+};
+
+const renameEstablishmentPrimaryKey = async (client: PoolClient) => {
+  await executeSqlFromFile(
+    __dirname + "/renameEstablishmentPrimaryKey.sql",
     client,
   );
 };

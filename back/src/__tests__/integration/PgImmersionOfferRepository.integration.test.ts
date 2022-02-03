@@ -346,6 +346,10 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
+  const position: LatLonDto = {
+    lat: 0,
+    lon: 0,
+  };
   describe("Pg implementation of method getActiveEstablishmentSiretsNotUpdatedSince", () => {
     it("Returns a siret list of establishments having field `update_date` < parameter `since` ", async () => {
       // Prepare
@@ -363,18 +367,21 @@ describe("Postgres implementation of immersion offer repository", () => {
           siret: siretOfClosedEstablishmentNotUpdatedSince,
           updatedAt: beforeSince,
           isActive: false,
+          position,
         }),
         insertEstablishment({
           client,
           siret: siretOfActiveEstablishmentNotUpdatedSince,
           updatedAt: beforeSince,
           isActive: true,
+          position,
         }),
         insertEstablishment({
           client,
           siret: siretOfActiveEstablishmentUpdatedSince,
           updatedAt: afterSince,
           isActive: true,
+          position,
         }),
       ]);
 
@@ -397,6 +404,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         client,
         siret: neverUpdatedEstablishmentSiret,
         isActive: true,
+        position,
       });
       // Act
       const actualResult =
@@ -420,6 +428,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: siretOfEstablishmentToUpdate,
         updatedAt: new Date("2020-04-14T12:00:00.000"),
         isActive: true,
+        position,
       });
 
       // Act
@@ -463,6 +472,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: siretOfEstablishmentToUpdate,
         updatedAt: new Date("2020-04-14T12:00:00.000"),
         isActive: true,
+        position,
       });
 
       // Act
@@ -508,19 +518,17 @@ const insertEstablishment = async (props: {
   naf?: string;
   numberEmployeesRange?: number;
   address?: string;
-  position?: LatLonDto;
+  position: LatLonDto;
 }) => {
   const insertQuery = `INSERT INTO establishments (
     siret, name, address, number_employees, naf, contact_mode, data_source, gps, update_date, is_active
   ) VALUES ('${props.siret}', '', '${props.address ?? ""}', ${
     props.numberEmployeesRange ?? null
-  }, '${props.naf ?? "8622B"}', null, 'api_labonneboite', ${
-    props.position
-      ? `ST_GeographyFromText('POINT(${props.position.lon} ${props.position.lat})')`
-      : null
-  }, ${props.updatedAt ? `'${props.updatedAt.toISOString()}'` : "null"}, ${
-    props.isActive
-  } )`;
+  }, '${
+    props.naf ?? "8622B"
+  }', null, 'api_labonneboite', ${`ST_GeographyFromText('POINT(${props.position.lon} ${props.position.lat})')`}, ${
+    props.updatedAt ? `'${props.updatedAt.toISOString()}'` : "null"
+  }, ${props.isActive} )`;
   await props.client.query(insertQuery);
 };
 
