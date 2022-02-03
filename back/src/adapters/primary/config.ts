@@ -97,6 +97,7 @@ import {
   createApiKeyAuthMiddleware,
   createJwtAuthMiddleware,
 } from "./authMiddleware";
+import { ListImmersionApplicationsWithComputedWeeklyHours } from "../../domain/immersionApplication/useCases/ListImmersionApplicationsWithComputedWeeklyHours";
 
 const logger = createLogger(__filename);
 
@@ -369,6 +370,8 @@ const createUseCases = (
     listImmersionApplication: new ListImmersionApplication(
       repositories.immersionApplication,
     ),
+    listImmersionApplicationWithComputedWeeklyHours:
+      new ListImmersionApplicationsWithComputedWeeklyHours(uowPerformer),
     updateImmersionApplication: new UpdateImmersionApplication(
       createNewEvent,
       repositories.outbox,

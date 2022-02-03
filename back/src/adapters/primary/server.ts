@@ -5,6 +5,7 @@ import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import {
   agenciesRoute,
   contactEstablishmentRoute,
+  extractImmersionApplicationsExcelRoute,
   generateMagicLinkRoute,
   immersionApplicationsRoute,
   immersionOffersRoute,
@@ -49,6 +50,21 @@ export const createApp = async (
   });
 
   const deps = await createAppDependencies(config);
+
+  router
+    .route(`/${extractImmersionApplicationsExcelRoute}`)
+    .get(async (req, res) => {
+      sendHttpResponse(
+        req,
+        res,
+        async () => {
+          const listOfData =
+            await deps.useCases.listImmersionApplicationWithComputedWeeklyHours.execute();
+          return listOfData;
+        },
+        deps.authChecker,
+      );
+    });
 
   router
     .route(`/${immersionApplicationsRoute}`)
