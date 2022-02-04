@@ -10,6 +10,7 @@ import { ImmersionHowTo } from "src/components/ImmersionHowTo";
 import { Layout } from "src/components/Layout";
 import { Statistic } from "src/components/Statistic";
 import { Title } from "src/components/Title";
+import establishmentVideoImage from "src/assets/establishment_video_image.png";
 
 export const LandingEstablishment = () => (
   <Layout>
@@ -124,6 +125,9 @@ export const LandingEstablishment = () => (
         </div>
       </div>
     </section>
-    <ImmersionHowTo videoUrl="https://www.powtoon.com/embed/e1lglPbeknD/" />
+    <ImmersionHowTo
+      videoUrl="https://www.powtoon.com/embed/e1lglPbeknD/"
+      videoImage={establishmentVideoImage}
+    />
   </Layout>
 );

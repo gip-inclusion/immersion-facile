@@ -5,9 +5,13 @@ import { SubTitle, Title } from "./Title";
 
 type ImmersionHowToProps = {
   videoUrl: string;
+  videoImage: string;
 };
 
-export const ImmersionHowTo = ({ videoUrl }: ImmersionHowToProps) => (
+export const ImmersionHowTo = ({
+  videoUrl,
+  videoImage,
+}: ImmersionHowToProps) => (
   <section className="flex flex-col items-center">
     <Title red>L'immersion facilitée, comment ça fonctionne ?</Title>
     <div className="flex max-w-7xl flex-wrap justify-center items-center">
@@ -38,13 +42,9 @@ export const ImmersionHowTo = ({ videoUrl }: ImmersionHowToProps) => (
       >
         <SubTitle red>L'immersion professionnelle, mode d'emploi</SubTitle>
         <div className="border-blue-200 border border-solid">
-          <iframe
-            width="480"
-            height="270"
-            src={videoUrl}
-            frameBorder="0"
-            allowFullScreen
-          />
+          <a href={videoUrl} target="_blank">
+            <img src={videoImage} width="480" height="270" alt="video_img" />
+          </a>
         </div>
       </div>
     </div>
