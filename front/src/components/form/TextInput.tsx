@@ -9,6 +9,7 @@ type TextInputProps = {
   description?: string;
   disabled?: boolean;
   multiline?: boolean;
+  className?: string;
 };
 
 export const TextInput = ({
@@ -19,6 +20,7 @@ export const TextInput = ({
   description,
   disabled,
   multiline,
+  className,
 }: TextInputProps) => {
   const [field, meta] = useField<string>({ name });
 
@@ -27,7 +29,7 @@ export const TextInput = ({
       <div
         className={`fr-input-group${
           meta.touched && meta.error ? " fr-input-group--error" : ""
-        }`}
+        } ${className}`}
       >
         <label className="fr-label" htmlFor={name}>
           {label}

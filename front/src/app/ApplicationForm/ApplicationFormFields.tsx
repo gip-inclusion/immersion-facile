@@ -17,6 +17,7 @@ import {
 } from "src/components/form/SchedulePicker/SchedulePicker";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
+import { FormSectionTitle } from "src/components/FormSectionTitle";
 import { ENV } from "src/environmentVariables";
 import type {
   ApplicationStatus,
@@ -133,6 +134,8 @@ export const ApplicationFormFields = ({
         <SignOnlyMessage isAlreadySigned={alreadySubmitted ?? false} />
       )}
 
+      <FormSectionTitle>1. Coordonnées du bénéficiaire</FormSectionTitle>
+
       <TextInput
         label="Email *"
         name="email"
@@ -175,22 +178,9 @@ export const ApplicationFormFields = ({
         defaultAgencyId={values.agencyId}
       />
 
-      <DateInput
-        label="Date de début de l'immersion *"
-        name="dateStart"
-        type="date"
-        disabled={isFrozen}
-      />
-      <br />
-      <DateInput
-        label="Date de fin de l'immersion *"
-        name="dateEnd"
-        type="date"
-        disabled={isFrozen}
-      />
+      <FormSectionTitle>2. Coordonnées de l'entreprise</FormSectionTitle>
 
       <h4>
-        <br />
         Les questions suivantes doivent être complétées avec la personne qui
         vous accueillera pendant votre immersion
       </h4>
@@ -237,7 +227,27 @@ export const ApplicationFormFields = ({
         placeholder="nom@exemple.com"
         description="pour envoyer la validation de la convention"
         disabled={isFrozen}
+        className="!mb-1"
       />
+
+      <FormSectionTitle>
+        3. Conditions d’accueil de l’immersion professionnelle
+      </FormSectionTitle>
+
+      <DateInput
+        label="Date de début de l'immersion *"
+        name="dateStart"
+        type="date"
+        disabled={isFrozen}
+      />
+      <br />
+      <DateInput
+        label="Date de fin de l'immersion *"
+        name="dateEnd"
+        type="date"
+        disabled={isFrozen}
+      />
+      <br />
 
       <SchedulePicker
         name="schedule"
@@ -363,7 +373,13 @@ export const ApplicationFormFields = ({
         </SuccessMessage>
       )}
 
-      <p />
+      <p className="font-bold">
+        Une fois le formulaire envoyé, vous allez recevoir une demande de
+        validation par mail et l'entreprise également.
+      </p>
+      <p className="font-bold">Surveillez vos mails !</p>
+
+      <br />
 
       {!isFrozen && !isSignatureMode && (
         <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
