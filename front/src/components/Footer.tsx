@@ -62,6 +62,15 @@ export const Footer = () => (
                 Nous contacter
               </a>
             </li>
+            <li className="fr-footer__bottom-item">
+              <a
+                className="fr-footer__bottom-link"
+                href="https://immersion-facile-1.gitbook.io/la-page-stats-de-immersion-facilitee/mXyCG0khRml5mCWUU0Pe/la-mesure-de-limpact-dimmersion-facilitee"
+                target="_blank"
+              >
+                Statistiques
+              </a>
+            </li>
           </ul>
           <div className="fr-footer__bottom-copy">
             <p>
