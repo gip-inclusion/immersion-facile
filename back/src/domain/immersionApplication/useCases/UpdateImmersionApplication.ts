@@ -34,9 +34,8 @@ export class UpdateImmersionApplication extends UseCase<
   public async _execute(
     params: UpdateImmersionApplicationRequestDto,
   ): Promise<UpdateImmersionApplicationResponseDto> {
-    const minimalValidStatus = this.featureFlags.enableEnterpriseSignature
-      ? "READY_TO_SIGN"
-      : "IN_REVIEW";
+    const minimalValidStatus: ApplicationStatus = "READY_TO_SIGN";
+
     if (
       params.immersionApplication.status != "DRAFT" &&
       params.immersionApplication.status != minimalValidStatus

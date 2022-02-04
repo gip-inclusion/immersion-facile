@@ -97,9 +97,9 @@ describe("Update immersionApplication", () => {
 
   describe("When previous state is not draft (testing with In_review)", () => {
     it("throws Bad request", async () => {
-      //we would expect IN_REVIEW to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
+      //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedImmersionApplication = new ImmersionApplicationDtoBuilder()
-        .withStatus("IN_REVIEW")
+        .withStatus("READY_TO_SIGN")
         .build();
 
       await expectPromiseToFailWithError(
@@ -143,10 +143,9 @@ describe("Update immersionApplication", () => {
       });
     });
 
-    // Replace IN_REVIEW with READY_TO_SIGN when enabling ENABLE_ENTERPRISE_SIGNATURE by default.
-    it("allows applications submitted as IN_REVIEW", async () => {
+    it("allows applications submitted as READY_TO_SIGN", async () => {
       const inReviewImmersionApplication = new ImmersionApplicationDtoBuilder()
-        .withStatus("IN_REVIEW")
+        .withStatus("READY_TO_SIGN")
         .withId(id)
         .build();
 
@@ -162,8 +161,7 @@ describe("Update immersionApplication", () => {
 
     it("rejects applications if the status is not DRAFT or IN_REVIEW", async () => {
       for (const status of validApplicationStatus) {
-        // With ENABLE_ENTERPRISE_SIGNATURE flag, replace IN_REVIEW with READY_TO_SIGN
-        if (status === "DRAFT" || status === "IN_REVIEW") {
+        if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;
         }
         const immersionApplication = new ImmersionApplicationDtoBuilder()

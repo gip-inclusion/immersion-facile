@@ -30,6 +30,7 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
     const agencyConfig = await this.agencyRepository.getById(
       immersionApplicationDto.agencyId,
     );
+
     if (!agencyConfig) {
       logger.error(
         { agencyId: immersionApplicationDto.agencyId },

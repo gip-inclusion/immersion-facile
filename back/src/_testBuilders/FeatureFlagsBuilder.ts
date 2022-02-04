@@ -9,13 +9,6 @@ export class FeatureFlagsBuilder implements Builder<FeatureFlags> {
     return new FeatureFlagsBuilder();
   }
 
-  public enableEnterpriseSignatures() {
-    return new FeatureFlagsBuilder({
-      ...this.featureFlags,
-      enableEnterpriseSignature: true,
-    });
-  }
-
   public enableByPassInseeApi() {
     return new FeatureFlagsBuilder({
       ...this.featureFlags,

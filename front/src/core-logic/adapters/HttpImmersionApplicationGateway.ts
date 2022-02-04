@@ -111,11 +111,8 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
       `/${prefix}/auth/${immersionApplicationsRoute}/${jwt}`,
       immersionApplicationDto,
     );
-    const updateImmersionApplicationResponse: UpdateImmersionApplicationResponseDto =
-      httpResponse.data;
-    await updateImmersionApplicationResponseDtoSchema.parse(
-      updateImmersionApplicationResponse,
-    );
+    const updateImmersionApplicationResponse =
+      updateImmersionApplicationResponseDtoSchema.parse(httpResponse.data);
     return updateImmersionApplicationResponse.id;
   }
 
@@ -128,10 +125,9 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
       params,
     );
 
-    const response = updateImmersionApplicationStatusResponseSchema.parse(
+    return updateImmersionApplicationStatusResponseSchema.parse(
       httpResponse.data,
     );
-    return response;
   }
 
   public async signApplication(
@@ -141,10 +137,9 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
       `/${prefix}/auth/${signApplicationRoute}/${jwt}`,
     );
 
-    const response = updateImmersionApplicationStatusResponseSchema.parse(
+    return updateImmersionApplicationStatusResponseSchema.parse(
       httpResponse.data,
     );
-    return response;
   }
 
   public async validate(id: ImmersionApplicationId): Promise<string> {

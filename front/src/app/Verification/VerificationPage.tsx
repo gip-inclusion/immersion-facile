@@ -4,23 +4,13 @@ import { VerificationActionButton } from "src/app/Verification/VerificationActio
 import { FormAccordion } from "src/components/admin/FormAccordion";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
-import {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-} from "src/shared/ImmersionApplicationDto";
-import {
-  statusTransitionConfigsLegacy,
-  statusTransitionConfigsEnterpriseSign,
-} from "src/shared/immersionApplicationStatusTransitions";
-import { frontRoutes } from "src/shared/routes";
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
+import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
+import { statusTransitionConfigsEnterpriseSign } from "src/shared/immersionApplicationStatusTransitions";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
-import { ENV } from "src/environmentVariables";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { immersionApplicationGateway } from "../dependencies";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
-
-const { featureFlags, dev } = ENV;
+import { immersionApplicationGateway } from "../dependencies";
 
 type VerificationPageProps = {
   route: Route<typeof routes.immersionApplicationsToValidate>;
@@ -31,10 +21,7 @@ const isAllowedTransition = (
   targetStatus: ApplicationStatus,
   actingRole: Role,
 ) => {
-  const statusTransitionConfigs = featureFlags.enableEnterpriseSignature
-    ? statusTransitionConfigsEnterpriseSign
-    : statusTransitionConfigsLegacy;
-  const transitionConfig = statusTransitionConfigs[targetStatus];
+  const transitionConfig = statusTransitionConfigsEnterpriseSign[targetStatus];
   if (!transitionConfig) return false;
   if (
     transitionConfig.validInitialStatuses.filter(

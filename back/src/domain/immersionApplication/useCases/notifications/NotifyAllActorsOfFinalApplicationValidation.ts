@@ -45,7 +45,9 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
       dto.email,
       dto.mentorEmail,
       ...agencyConfig.counsellorEmails,
+      ...agencyConfig.validatorEmails,
     ];
+
     await this.emailFilter.withAllowedRecipients(
       recipients,
       (recipients) =>

@@ -38,10 +38,6 @@ const extractRoleAndName = (
 };
 
 export const SignForm = ({ route }: SignFormProps) => {
-  if (!featureFlags.enableEnterpriseSignature) {
-    return <div>Feature not implemented</div>;
-  }
-
   if (!route.params.jwt) {
     return <p>Lien non valide</p>;
   }

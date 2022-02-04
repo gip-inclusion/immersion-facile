@@ -20,9 +20,7 @@ import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/Ge
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
 import { ListAgencies } from "../../domain/immersionApplication/useCases/ListAgencies";
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
-import { ConfirmToBeneficiaryThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmitted";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
-import { ConfirmToMentorThatApplicationCorrectlySubmitted } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmitted";
 import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../domain/immersionApplication/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
@@ -387,7 +385,6 @@ const createUseCases = (
       repositories.immersionApplication,
       createNewEvent,
       repositories.outbox,
-      config.featureFlags,
     ),
     signImmersionApplication: new SignImmersionApplication(
       repositories.immersionApplication,
@@ -451,33 +448,17 @@ const createUseCases = (
     listAgencies: new ListAgencies(repositories.agency),
 
     // notifications
-    confirmToBeneficiaryThatApplicationCorrectlySubmitted:
-      new ConfirmToBeneficiaryThatApplicationCorrectlySubmitted(
-        emailFilter,
-        repositories.email,
-        config.featureFlags,
-      ),
-    confirmToMentorThatApplicationCorrectlySubmitted:
-      new ConfirmToMentorThatApplicationCorrectlySubmitted(
-        emailFilter,
-        repositories.email,
-        config.featureFlags,
-      ),
-
-    // notifications
     confirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature:
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
         emailFilter,
         repositories.email,
         generateMagicLinkFn,
-        config.featureFlags,
       ),
     confirmToMentorThatApplicationCorrectlySubmittedRequestSignature:
       new ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature(
         emailFilter,
         repositories.email,
         generateMagicLinkFn,
-        config.featureFlags,
       ),
     notifyAllActorsOfFinalApplicationValidation:
       new NotifyAllActorsOfFinalApplicationValidation(

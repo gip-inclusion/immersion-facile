@@ -13,12 +13,8 @@ import {
 import {
   StatusTransitionConfig,
   statusTransitionConfigsEnterpriseSign,
-  statusTransitionConfigsLegacy,
 } from "../../../shared/immersionApplicationStatusTransitions";
-import {
-  MagicLinkPayload,
-  Role,
-} from "../../../shared/tokens/MagicLinkPayload";
+import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
@@ -47,13 +43,9 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     private readonly immersionApplicationRepository: ImmersionApplicationRepository,
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
-    private readonly featureFlags: FeatureFlags,
   ) {
     super();
-
-    this.statusTransitionConfigs = featureFlags.enableEnterpriseSignature
-      ? statusTransitionConfigsEnterpriseSign
-      : statusTransitionConfigsLegacy;
+    this.statusTransitionConfigs = statusTransitionConfigsEnterpriseSign;
   }
 
   private statusTransitionConfigs: Partial<
@@ -109,15 +101,12 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     if (domainTopic) {
       let event = undefined;
       if (domainTopic === "ImmersionApplicationRequiresModification") {
-        const whoToNotify: Role[] = this.featureFlags.enableEnterpriseSignature
-          ? ["beneficiary", "establishment"]
-          : ["beneficiary"];
         event = this.createNewEvent({
           topic: domainTopic,
           payload: {
             application: updatedEntity.toDto(),
             reason: justification ?? "",
-            roles: whoToNotify,
+            roles: ["beneficiary", "establishment"],
           },
         });
       } else {

@@ -78,9 +78,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     eventCrawler = new BasicEventCrawler(eventBus, outboxRepository);
     sireneRepository = new InMemorySireneRepository();
     getSiret = new GetSiret(sireneRepository);
-    featureFlags = FeatureFlagsBuilder.allOff()
-      .enableEnterpriseSignatures()
-      .build();
+    featureFlags = FeatureFlagsBuilder.allOff().build();
 
     addImmersionApplication = new AddImmersionApplication(
       applicationRepository,
@@ -98,7 +96,6 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       applicationRepository,
       createNewEvent,
       outboxRepository,
-      featureFlags,
     );
 
     emailFilter = new AlwaysAllowEmailFilter();
@@ -118,7 +115,6 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
         emailFilter,
         emailGw,
         fakeGenerateMagicLinkUrlFn,
-        featureFlags,
       );
 
     confirmToMentorRequestSignature =
@@ -126,7 +122,6 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
         emailFilter,
         emailGw,
         fakeGenerateMagicLinkUrlFn,
-        featureFlags,
       );
 
     notifyToTeam = new NotifyToTeamApplicationSubmittedByBeneficiary(

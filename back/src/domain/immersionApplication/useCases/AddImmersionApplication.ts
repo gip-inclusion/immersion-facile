@@ -4,6 +4,7 @@ import {
 } from "../../../adapters/primary/helpers/sendHttpResponse";
 import {
   AddImmersionApplicationResponseDto,
+  ApplicationStatus,
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "../../../shared/ImmersionApplicationDto";
@@ -38,9 +39,8 @@ export class AddImmersionApplication extends UseCase<
   public async _execute(
     immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<AddImmersionApplicationResponseDto> {
-    const minimalValidStatus = this.featureFlags.enableEnterpriseSignature
-      ? "READY_TO_SIGN"
-      : "IN_REVIEW";
+    const minimalValidStatus: ApplicationStatus = "READY_TO_SIGN";
+
     if (
       immersionApplicationDto.status != "DRAFT" &&
       immersionApplicationDto.status != minimalValidStatus

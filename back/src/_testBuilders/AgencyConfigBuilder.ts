@@ -20,11 +20,10 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
   // Initializes all feature flags to be off.
   public constructor(readonly config: AgencyConfig) {}
 
-  // TODO(nwettstein): make id required once we've removed agency codes.
-  public static create(id: AgencyId | undefined) {
+  public static create(id: AgencyId) {
     return new AgencyConfigBuilder({
       ...emptyConfig,
-      ...(id ? { id } : {}),
+      id,
     });
   }
 

@@ -50,7 +50,7 @@ const testAgencies: AgencyConfig[] = [
 ];
 
 export class InMemoryAgencyRepository implements AgencyRepository {
-  private readonly agencies: { [id: string]: AgencyConfig } = {};
+  private agencies: { [id: string]: AgencyConfig } = {};
 
   constructor(agencyList: AgencyConfig[] = testAgencies) {
     agencyList.forEach((agency) => {
@@ -96,5 +96,13 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     if (this.agencies[config.id]) return undefined;
     this.agencies[config.id] = config;
     return config.id;
+  }
+
+  // test purpose only
+  setAgencies(agencyList: AgencyConfig[]) {
+    this.agencies = {};
+    agencyList.forEach((agency) => {
+      this.agencies[agency.id] = agency;
+    });
   }
 }

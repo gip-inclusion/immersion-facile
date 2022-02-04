@@ -22,20 +22,19 @@ export const generateApplication = (
     ];
   let beneficiaryAccepted = true;
   let enterpriseAccepted = true;
-  if (featureFlags.enableEnterpriseSignature) {
-    // Configure signatures depending on the status
-    if (status === "DRAFT" || status === "READY_TO_SIGN") {
+
+  // Configure signatures depending on the status
+  if (status === "DRAFT" || status === "READY_TO_SIGN") {
+    beneficiaryAccepted = false;
+    enterpriseAccepted = false;
+  } else if (status === "PARTIALLY_SIGNED") {
+    if (Math.random() > 0.5) {
       beneficiaryAccepted = false;
+    } else {
       enterpriseAccepted = false;
-    } else if (status === "PARTIALLY_SIGNED") {
-      if (Math.random() > 0.5) {
-        beneficiaryAccepted = false;
-      } else {
-        enterpriseAccepted = false;
-      }
     }
-    // Otherwise it's signed by both beneficiary and enterprise.
   }
+  // Otherwise it's signed by both beneficiary and enterprise.
 
   // Created up to, days
   const creationMaxDelay = 14;

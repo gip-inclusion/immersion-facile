@@ -13,7 +13,10 @@ import {
 import { Builder } from "./Builder";
 
 export const DEMANDE_IMMERSION_ID = "40400000000000404";
-export const VALID_EMAILS = ["valid@email.fr", "name@example.com"];
+export const VALID_EMAILS = [
+  "beneficiary@email.fr",
+  "establishment@example.com",
+];
 export const DATE_SUBMISSION = "2021-01-04";
 export const DATE_START = "2021-01-06";
 export const DATE_END = "2021-01-15";
@@ -161,6 +164,14 @@ export class ImmersionApplicationDtoBuilder
     return new ImmersionApplicationDtoBuilder({
       ...this.dto,
       rejectionJustification,
+    });
+  }
+
+  public notSigned() {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      beneficiaryAccepted: false,
+      enterpriseAccepted: false,
     });
   }
 

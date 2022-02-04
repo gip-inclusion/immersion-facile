@@ -31,10 +31,9 @@ export const Router = () => {
       {route.name === "immersionApplicationsToValidate" && (
         <VerificationPage route={route} />
       )}
-      {featureFlags.enableEnterpriseSignature &&
-        route.name === "immersionApplicationsToSign" && (
-          <SignForm route={route} />
-        )}
+      {route.name === "immersionApplicationsToSign" && (
+        <SignForm route={route} />
+      )}
       {route.name === "immersionApplication" && (
         <ApplicationForm route={route} />
       )}

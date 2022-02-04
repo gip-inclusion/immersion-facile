@@ -1,9 +1,7 @@
 import { expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
-import { FeatureFlags } from "../../../shared/featureFlags";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
-import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {
   AllowListEmailFilter,
@@ -18,22 +16,17 @@ const validImmersionApplication: ImmersionApplicationDto =
 describe("Add immersionApplication Notifications", () => {
   let emailGw: InMemoryEmailGateway;
   let emailFilter: EmailFilter;
-  let featureFlags: FeatureFlags;
 
   const createUseCase = () =>
     new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
       emailFilter,
       emailGw,
       fakeGenerateMagicLinkUrlFn,
-      featureFlags,
     );
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
     emailFilter = new AlwaysAllowEmailFilter();
-    featureFlags = FeatureFlagsBuilder.allOff()
-      .enableEnterpriseSignatures()
-      .build();
   });
 
   test("Sends no emails when allowList empty", async () => {

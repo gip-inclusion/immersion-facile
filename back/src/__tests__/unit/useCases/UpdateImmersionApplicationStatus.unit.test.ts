@@ -17,7 +17,6 @@ import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
-import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -26,7 +25,6 @@ import {
   createMagicLinkPayload,
   Role,
 } from "../../../shared/tokens/MagicLinkPayload";
-import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
@@ -34,7 +32,6 @@ describe("UpdateImmersionApplicationStatus", () => {
   let updateImmersionApplicationStatus: UpdateImmersionApplicationStatus;
   let outboxRepository: OutboxRepository;
   let immersionApplicationRepository: InMemoryImmersionApplicationRepository;
-  let featureFlags: FeatureFlags;
 
   let createNewEvent: CreateNewEvent;
 
@@ -46,13 +43,11 @@ describe("UpdateImmersionApplicationStatus", () => {
       clock: new CustomClock(),
       uuidGenerator: new TestUuidGenerator(),
     });
-    featureFlags = FeatureFlagsBuilder.allOff().build();
 
     updateImmersionApplicationStatus = new UpdateImmersionApplicationStatus(
       immersionApplicationRepository,
       createNewEvent,
       outboxRepository,
-      featureFlags,
     );
   });
 
@@ -99,12 +94,12 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("* -> DRAFT transition", () => {
-    const validOldStatuses = [
+    const validOldStatuses: ApplicationStatus[] = [
       "IN_REVIEW",
       "ACCEPTED_BY_VALIDATOR",
       "ACCEPTED_BY_COUNSELLOR",
-    ] as Array<ApplicationStatus>;
-    const validRoles = ["counsellor", "validator", "admin"] as Array<Role>;
+    ];
+    const validRoles: Role[] = ["counsellor", "validator", "admin"];
 
     for (const status of validOldStatuses) {
       for (const role of validRoles) {
@@ -383,7 +378,7 @@ describe("UpdateImmersionApplicationStatus", () => {
       payload: {
         application: expectedImmersionApplication,
         reason: "test-modification-justification",
-        roles: ["beneficiary"],
+        roles: ["beneficiary", "establishment"],
       },
     });
   };

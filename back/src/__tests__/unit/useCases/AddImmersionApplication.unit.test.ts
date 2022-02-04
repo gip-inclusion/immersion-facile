@@ -101,12 +101,11 @@ describe("Add immersionApplication", () => {
       });
     });
 
-    // Replace IN_REVIEW with READY_TO_SIGN when enabling ENABLE_ENTERPRISE_SIGNATURE by default.
     it("allows applications submitted as IN_REVIEW", async () => {
       expect(
         await addImmersionApplication.execute({
           ...validImmersionApplication,
-          status: "IN_REVIEW",
+          status: "READY_TO_SIGN",
         }),
       ).toEqual({
         id: validImmersionApplication.id,
@@ -115,8 +114,7 @@ describe("Add immersionApplication", () => {
 
     it("rejects applications if the status is not DRAFT or IN_REVIEW", async () => {
       for (const status of validApplicationStatus) {
-        // With ENABLE_ENTERPRISE_SIGNATURE flag, replace IN_REVIEW with READY_TO_SIGN
-        if (status === "DRAFT" || status === "IN_REVIEW") {
+        if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;
         }
         await expectPromiseToFailWithError(

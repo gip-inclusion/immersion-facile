@@ -125,7 +125,7 @@ export const ApplicationFormFields = ({
     errorMessage = submitError["response"]["data"]["errors"];
   }
 
-  const isSignatureMode = featureFlags.enableEnterpriseSignature && isSignOnly;
+  const isSignatureMode = isSignOnly;
 
   return (
     <>
@@ -324,30 +324,6 @@ export const ApplicationFormFields = ({
       />
 
       <p />
-      {!featureFlags.enableEnterpriseSignature && (
-        <>
-          <BoolCheckboxGroup
-            name="beneficiaryAccepted"
-            label={
-              "Je (bénéficiaire de l'immersion) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"
-            }
-            description="Avant de répondre, consultez ces dispositions ici"
-            descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-            disabled={isFrozen}
-          />
-
-          <BoolCheckboxGroup
-            name="enterpriseAccepted"
-            label={
-              "Je (représentant de la structure d'accueil ) m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *"
-            }
-            description="Avant de répondre, consultez ces dispositions ici"
-            descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-            disabled={isFrozen}
-          />
-        </>
-      )}
-
       <p />
 
       {!isSignatureMode &&
@@ -442,9 +418,7 @@ const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
   const [_, __, { setValue }] = useField<ApplicationStatus>({ name: "status" });
 
   const makeInReviewAndSubmit = () => {
-    setValue(
-      featureFlags.enableEnterpriseSignature ? "READY_TO_SIGN" : "IN_REVIEW",
-    );
+    setValue("READY_TO_SIGN");
     return onSubmit();
   };
 

@@ -36,7 +36,7 @@ export type InMemoryRepositories = {
 // prettier-ignore
 const isAssignable = (inMemoryRepos: InMemoryRepositories): Repositories => inMemoryRepos;
 
-type TestAppAndDeps = {
+export type TestAppAndDeps = {
   request: supertest.SuperTest<supertest.Test>;
   reposAndGateways: InMemoryRepositories;
   eventCrawler: BasicEventCrawler;

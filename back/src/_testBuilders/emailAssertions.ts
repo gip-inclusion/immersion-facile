@@ -43,24 +43,6 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
   });
 };
 
-// Remove when enableEnterpriseSignatures is default
-export const expectEmailBeneficiaryConfirmationMatchingImmersionApplication = (
-  templatedEmail: TemplatedEmail,
-  immersionApplication: ImmersionApplicationDto,
-) => {
-  const { email, id, firstName, lastName } = immersionApplication;
-
-  expectTemplatedEmailToEqual(templatedEmail, {
-    type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
-    recipients: [email],
-    params: {
-      demandeId: id,
-      firstName,
-      lastName,
-    },
-  });
-};
-
 export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication =
   (
     templatedEmail: TemplatedEmail,
@@ -80,51 +62,6 @@ export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersion
           "beneficiary",
           frontRoutes.immersionApplicationsToSign,
           email,
-        ),
-        businessName,
-      },
-    });
-  };
-
-// Remove when enableEnterpriseSignatures is default
-export const expectEmailMentorConfirmationMatchingImmersionApplication = (
-  templatedEmail: TemplatedEmail,
-  immersionApplication: ImmersionApplicationDto,
-) => {
-  const { id, mentor, mentorEmail, firstName, lastName } = immersionApplication;
-
-  expectTemplatedEmailToEqual(templatedEmail, {
-    type: "NEW_APPLICATION_MENTOR_CONFIRMATION",
-    recipients: [mentorEmail],
-    params: {
-      demandeId: id,
-      mentorName: mentor,
-      beneficiaryFirstName: firstName,
-      beneficiaryLastName: lastName,
-    },
-  });
-};
-
-export const expectEmailMentorConfirmationSignatureRequesMatchingImmersionApplication =
-  (
-    templatedEmail: TemplatedEmail,
-    immersionApplication: ImmersionApplicationDto,
-  ) => {
-    const { id, mentor, mentorEmail, firstName, lastName, businessName } =
-      immersionApplication;
-
-    expectTemplatedEmailToEqual(templatedEmail, {
-      type: "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
-      recipients: [mentorEmail],
-      params: {
-        mentorName: mentor,
-        beneficiaryFirstName: firstName,
-        beneficiaryLastName: lastName,
-        magicLink: fakeGenerateMagicLinkUrlFn(
-          id,
-          "establishment",
-          frontRoutes.immersionApplicationsToSign,
-          mentorEmail,
         ),
         businessName,
       },

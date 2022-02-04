@@ -17,7 +17,6 @@ export class ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature ex
     private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
-    private readonly featureFlags: FeatureFlags,
   ) {
     super();
   }
@@ -25,10 +24,6 @@ export class ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature ex
   inputSchema = immersionApplicationSchema;
 
   public async _execute(application: ImmersionApplicationDto): Promise<void> {
-    if (!this.featureFlags.enableEnterpriseSignature) {
-      logger.info(`Skipping sending signature-requesting mentor confirmation`);
-      return;
-    }
     if (application.status === "PARTIALLY_SIGNED") {
       logger.info(
         `Skipping sending signature-requiring mentor confirmation as application is already partially signed`,

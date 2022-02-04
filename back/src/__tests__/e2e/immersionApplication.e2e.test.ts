@@ -1,3 +1,6 @@
+import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
+import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import {
   currentJwtVersion,
   emailHashForMagicLink,
@@ -22,8 +25,23 @@ import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 let request: SuperTest<Test>;
 let generateJwt: GenerateMagicLinkJwt;
 
-const initializeSystemUnderTest = async (config: AppConfig) => {
-  const { app } = await createApp(config);
+const immersionApplication = new ImmersionApplicationDtoBuilder()
+  .withStatus("IN_REVIEW")
+  .build();
+
+const applicationId = immersionApplication.id;
+
+const initializeSystemUnderTest = async (
+  config: AppConfig,
+  { withImmersionStored }: { withImmersionStored: boolean },
+) => {
+  const { app, repositories } = await createApp(config);
+  if (withImmersionStored) {
+    const entity = ImmersionApplicationEntity.create(immersionApplication);
+    const immersionApplicationRepo =
+      repositories.immersionApplication as InMemoryImmersionApplicationRepository;
+    immersionApplicationRepo.setImmersionApplications({ [entity.id]: entity });
+  }
   request = supertest(app);
   generateJwt = makeGenerateJwt(config);
 };
@@ -31,22 +49,11 @@ const initializeSystemUnderTest = async (config: AppConfig) => {
 describe("/demandes-immersion route", () => {
   describe("Backoffice", () => {
     beforeEach(async () => {
-      await initializeSystemUnderTest(new AppConfigBuilder().build());
-    });
-
-    describe("Application validation", () => {
-      const immersionApplication = new ImmersionApplicationDtoBuilder()
-        .withStatus("IN_REVIEW")
-        .build();
-
-      beforeEach(async () => {
-        // POST a valid application.
-        await request
-          .post(`/${immersionApplicationsRoute}`)
-          .send(immersionApplication)
-          .expect(200, { id: immersionApplication.id });
+      await initializeSystemUnderTest(new AppConfigBuilder().build(), {
+        withImmersionStored: true,
       });
-
+    });
+    describe("Application validation", () => {
       it("Validating an existing application succeeds, with auth", async () => {
         // Validating an application with existing id succeeds (with auth).
         await request
@@ -124,7 +131,9 @@ describe("/demandes-immersion route", () => {
 
   describe("DEV environment", () => {
     beforeEach(async () => {
-      await initializeSystemUnderTest(new AppConfigBuilder().build());
+      await initializeSystemUnderTest(new AppConfigBuilder().build(), {
+        withImmersionStored: false,
+      });
     });
 
     it("Creating an invalid application fails", async () => {
@@ -322,70 +331,17 @@ describe("/demandes-immersion route", () => {
 
 describe("/update-application-status route", () => {
   beforeEach(async () => {
-    await initializeSystemUnderTest(new AppConfigBuilder().build());
-  });
-
-  test("Succeeds for fully validated applications", async () => {
-    // A beneficiary creates a new application in state IN_REVIEW.
-    const application = new ImmersionApplicationDtoBuilder()
-      .withStatus("IN_REVIEW")
-      .build();
-    await request
-      .post(`/${immersionApplicationsRoute}`)
-      .send(application)
-      .expect(200);
-
-    // A counsellor accepts the application.
-    const counsellorJwt = generateJwt(
-      createMagicLinkPayload(
-        application.id,
-        "counsellor",
-        "councellor@poleemploi.fr",
-      ),
-    );
-    await request
-      .post(`/auth/${updateApplicationStatusRoute}/${counsellorJwt}`)
-      .send({ status: "ACCEPTED_BY_COUNSELLOR" })
-      .expect(200);
-
-    // A validator accepts the application.
-    const validatorJwt = generateJwt(
-      createMagicLinkPayload(
-        application.id,
-        "validator",
-        "validator@poleemploi.fr",
-      ),
-    );
-    await request
-      .post(`/auth/${updateApplicationStatusRoute}/${validatorJwt}`)
-      .send({ status: "ACCEPTED_BY_VALIDATOR" })
-      .expect(200);
-
-    // An admin validates the application.
-    const adminJwt = generateJwt(
-      createMagicLinkPayload(application.id, "admin", "admin@if.fr"),
-    );
-    await request
-      .post(`/auth/${updateApplicationStatusRoute}/${adminJwt}`)
-      .send({ status: "VALIDATED" })
-      .expect(200);
+    await initializeSystemUnderTest(new AppConfigBuilder().build(), {
+      withImmersionStored: true,
+    });
   });
 
   test("Succeeds for rejected application", async () => {
-    // A beneficiary creates a new application in state IN_REVIEW.
-    const application = new ImmersionApplicationDtoBuilder()
-      .withStatus("IN_REVIEW")
-      .build();
-    await request
-      .post(`/${immersionApplicationsRoute}`)
-      .send(application)
-      .expect(200);
-
     // A counsellor rejects the application.
     const counsellorJwt = generateJwt(
-      createMagicLinkPayload(application.id, "counsellor", "counsellor@pe.fr"),
+      createMagicLinkPayload(applicationId, "counsellor", "counsellor@pe.fr"),
     );
-    await request
+    const result = await request
       .post(`/auth/${updateApplicationStatusRoute}/${counsellorJwt}`)
       .send({ status: "REJECTED", justification: "test-justification" })
       .expect(200);
@@ -393,21 +349,12 @@ describe("/update-application-status route", () => {
 
   // Skip: Currently no configuration returns 400. Reenable this test if one is added.
   xtest("Returns error 400 for invalid requests", async () => {
-    // A beneficiary creates a new application in state IN_REVIEW.
-    const application = new ImmersionApplicationDtoBuilder()
-      .withStatus("IN_REVIEW")
-      .build();
-    await request
-      .post(`/${immersionApplicationsRoute}`)
-      .send(application)
-      .expect(200);
-
     // An establishment tries to change it to DRAFT but fails.
     const establishmentJwt = generateJwt(
       createMagicLinkPayload(
-        application.id,
+        applicationId,
         "establishment",
-        application.mentorEmail,
+        immersionApplication.mentorEmail,
       ),
     );
     await request
@@ -417,7 +364,7 @@ describe("/update-application-status route", () => {
 
     // An admin tries to change it to VALIDATED but fails.
     const adminJwt = generateJwt(
-      createMagicLinkPayload(application.id, "admin", "admin@if.fr"),
+      createMagicLinkPayload(applicationId, "admin", "admin@if.fr"),
     );
     await request
       .post(`/auth/${updateApplicationStatusRoute}/${adminJwt}`)
@@ -426,21 +373,12 @@ describe("/update-application-status route", () => {
   });
 
   test("Returns error 403 for unauthorized requests", async () => {
-    // A beneficiary creates a new application in state IN_REVIEW.
-    const application = new ImmersionApplicationDtoBuilder()
-      .withStatus("IN_REVIEW")
-      .build();
-    await request
-      .post(`/${immersionApplicationsRoute}`)
-      .send(application)
-      .expect(200);
-
     // An establishment tries to validate the application, but fails.
     const establishmentJwt = generateJwt(
       createMagicLinkPayload(
-        application.id,
+        applicationId,
         "establishment",
-        application.mentorEmail,
+        immersionApplication.mentorEmail,
       ),
     );
     await request
