@@ -95,7 +95,7 @@ describe("Update immersionApplication", () => {
     });
   });
 
-  describe("When previous state is not draft (testing with In_review)", () => {
+  describe("When previous state is not draft (testing with READY_TO_SIGN)", () => {
     it("throws Bad request", async () => {
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedImmersionApplication = new ImmersionApplicationDtoBuilder()
@@ -159,7 +159,7 @@ describe("Update immersionApplication", () => {
       });
     });
 
-    it("rejects applications if the status is not DRAFT or IN_REVIEW", async () => {
+    it("rejects applications if the status is not DRAFT or READY_TO_SIGN", async () => {
       for (const status of validApplicationStatus) {
         if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;

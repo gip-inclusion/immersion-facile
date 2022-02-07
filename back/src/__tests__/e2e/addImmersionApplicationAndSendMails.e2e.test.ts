@@ -142,7 +142,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     .send(immersionApplication)
     .expect(200);
 
-  expectImmersionOnlyOneImmersionThatIsEqual(
+  expectOnlyOneImmersionThatIsEqual(
     await reposAndGateways.immersionApplication.getAll(),
     immersionApplication,
   );
@@ -182,7 +182,7 @@ const beneficiarySignsApplication = async (
     .post(`/auth/${signApplicationRoute}/${beneficiarySignJwt}`)
     .expect(200);
 
-  expectImmersionOnlyOneImmersionThatIsEqual(
+  expectOnlyOneImmersionThatIsEqual(
     await reposAndGateways.immersionApplication.getAll(),
     {
       ...initialImmersionApplication,
@@ -202,7 +202,7 @@ const establishmentSignsApplication = async (
     .post(`/auth/${signApplicationRoute}/${establishmentSignJwt}`)
     .expect(200);
 
-  expectImmersionOnlyOneImmersionThatIsEqual(
+  expectOnlyOneImmersionThatIsEqual(
     await reposAndGateways.immersionApplication.getAll(),
     {
       ...initialImmersionApplication,
@@ -236,7 +236,7 @@ const counsellorValidatesApplication = async (
     .send(params)
     .expect(200);
 
-  expectImmersionOnlyOneImmersionThatIsEqual(
+  expectOnlyOneImmersionThatIsEqual(
     await reposAndGateways.immersionApplication.getAll(),
     {
       ...initialImmersionApplication,
@@ -273,7 +273,7 @@ const adminSendConvention = async (
     .send(params)
     .expect(200);
 
-  expectImmersionOnlyOneImmersionThatIsEqual(
+  expectOnlyOneImmersionThatIsEqual(
     await reposAndGateways.immersionApplication.getAll(),
     {
       ...initialImmersionApplication,
@@ -295,7 +295,7 @@ const adminSendConvention = async (
   ]);
 };
 
-const expectImmersionOnlyOneImmersionThatIsEqual = (
+const expectOnlyOneImmersionThatIsEqual = (
   actualEntities: ImmersionApplicationEntity[],
   expectedDto: ImmersionApplicationDto,
 ) => {

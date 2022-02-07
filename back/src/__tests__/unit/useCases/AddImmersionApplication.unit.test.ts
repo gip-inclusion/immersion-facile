@@ -101,7 +101,7 @@ describe("Add immersionApplication", () => {
       });
     });
 
-    it("allows applications submitted as IN_REVIEW", async () => {
+    it("allows applications submitted as READY_TO_SIGN", async () => {
       expect(
         await addImmersionApplication.execute({
           ...validImmersionApplication,
@@ -112,7 +112,7 @@ describe("Add immersionApplication", () => {
       });
     });
 
-    it("rejects applications if the status is not DRAFT or IN_REVIEW", async () => {
+    it("rejects applications if the status is not DRAFT or READY_TO_SIGN", async () => {
       for (const status of validApplicationStatus) {
         if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;
