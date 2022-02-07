@@ -91,7 +91,7 @@ export class PgImmersionApplicationRepository
       mentorPhone: params.mentor_phone,
       mentorEmail: params.mentor_email,
       schedule: params.schedule,
-      workConditions: params.work_conditions ?? undefined,
+      workConditions: optional(params.work_conditions),
       individualProtection: params.individual_protection,
       sanitaryPrevention: params.sanitary_prevention,
       // prettier-ignore

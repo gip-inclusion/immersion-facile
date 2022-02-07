@@ -166,12 +166,10 @@ export class ImmersionApplicationDtoBuilder
       rejectionJustification,
     });
   }
-  public withWorkConditions(
-    workConditions?: string,
-  ): ImmersionApplicationDtoBuilder {
+  public withoutWorkCondition(): ImmersionApplicationDtoBuilder {
     return new ImmersionApplicationDtoBuilder({
       ...this.dto,
-      workConditions,
+      workConditions: undefined,
     });
   }
 

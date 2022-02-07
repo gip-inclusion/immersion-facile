@@ -141,7 +141,7 @@ const currentJWT = (route: ApplicationFormRoute) => {
 };
 
 const undefinedIfEmptyString = (text?: string): string | undefined =>
-  text === "" ? undefined : text;
+  text || undefined;
 
 export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const [initialValues, setInitialValues] = useState(

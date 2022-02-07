@@ -43,11 +43,11 @@ export class ImmersionApplicationEntityBuilder
       ),
     );
   }
-  public withWorkConditions(workConditions?: string) {
+  public withoutWorkCondition() {
     return new ImmersionApplicationEntityBuilder(
       ImmersionApplicationEntity.create(
         new ImmersionApplicationDtoBuilder(this.entity.toDto())
-          .withWorkConditions(workConditions)
+          .withoutWorkCondition()
           .build(),
       ),
     );
