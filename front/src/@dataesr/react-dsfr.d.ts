@@ -62,4 +62,55 @@ declare module "@dataesr/react-dsfr" {
     className?: ModalCloseClassName;
   }
   const ModalClose: React.FC<ModalCloseProps>;
+
+  export type AccordionAs = "div" | "section";
+  export type AccordionSize = "sm" | "md" | "lg";
+  export type AccordionChildren = React.ReactNode[] | React.ReactNode;
+  export type AccordionClassName = string | Object | any[];
+  export interface AccordionProps {
+    /**
+     * Html tag to render accordion wrapper.
+     */
+    as?: AccordionAs;
+    size?: AccordionSize;
+    keepOpen?: boolean;
+    color?: string;
+    children: AccordionChildren;
+    className?: AccordionClassName;
+  }
+  const Accordion: React.FC<AccordionProps>;
+
+  export type AccordionItemTitleAs = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  export type AccordionItemSize = "sm" | "md" | "lg";
+  export type AccordionItemTitle = string | React.ReactElement<any>;
+  export type AccordionItemChildren =
+    | React.ReactNode[]
+    | React.ReactNode
+    | string;
+
+  export type AccordionItemClassName = string | Object | any[];
+  export interface AccordionItemProps {
+    /**
+     * Html tag to render in accordion title.
+     */
+    titleAs?: AccordionItemTitleAs;
+    /**
+     * @ignore
+     */
+    initExpand?: boolean;
+    onClick?: (...args: any[]) => any;
+    /**
+     * @ignore
+     */
+    expandedItems?: number[];
+    size?: AccordionItemSize;
+    id?: number;
+    color?: string;
+    title: AccordionItemTitle;
+    keepOpen?: boolean;
+    children: AccordionItemChildren;
+    className?: AccordionItemClassName;
+  }
+
+  const AccordionItem: React.FC<AccordionItemProps>;
 }
