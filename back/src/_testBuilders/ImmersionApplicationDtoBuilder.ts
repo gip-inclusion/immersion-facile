@@ -12,7 +12,7 @@ import {
 } from "../shared/ScheduleSchema";
 import { Builder } from "./Builder";
 
-export const DEMANDE_IMMERSION_ID = "40400000000000404";
+export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 export const VALID_EMAILS = [
   "beneficiary@email.fr",
   "establishment@example.com",
@@ -164,6 +164,14 @@ export class ImmersionApplicationDtoBuilder
     return new ImmersionApplicationDtoBuilder({
       ...this.dto,
       rejectionJustification,
+    });
+  }
+  public withWorkConditions(
+    workConditions?: string,
+  ): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      workConditions,
     });
   }
 

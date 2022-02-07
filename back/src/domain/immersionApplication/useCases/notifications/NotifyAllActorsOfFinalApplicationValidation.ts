@@ -85,5 +85,6 @@ export const getValidatedApplicationFinalConfirmationParams = (
     individualProtection: dto.individualProtection ? "oui" : "non",
     questionnaireUrl: agencyConfig.questionnaireUrl,
     signature: agencyConfig.signature,
+    workConditions: dto.workConditions,
   };
 };

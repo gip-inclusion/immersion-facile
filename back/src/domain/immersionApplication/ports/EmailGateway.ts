@@ -39,6 +39,7 @@ export type ValidatedApplicationFinalConfirmationParams = {
   individualProtection: string;
   questionnaireUrl: string;
   signature: string;
+  workConditions?: string;
 };
 
 export type RejectedApplicationNotificationParams = {

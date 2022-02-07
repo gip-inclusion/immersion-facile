@@ -40,6 +40,7 @@ const immersionFields: FieldsToLabel = {
   schedule: "Horaires",
   individualProtection: "Protection individuelle",
   sanitaryPrevention: "Mesures de prévention sanitaire",
+  workConditions: "Conditions de travail particulières",
 };
 
 type FieldsAndTitle = { listTitle: string; fields: FieldsToLabel };
@@ -74,13 +75,16 @@ export const FormDetails = ({ immersionApplication }: FormAccordionProps) => {
     <div className="static-application-container">
       {allFields.map(({ listTitle, fields }, index) => (
         <Accordion title={listTitle} key={listTitle}>
-          {keys(fields).map((field) => (
-            <TextCell
-              title={fields[field]!}
-              contents={buildContent(field)}
-              key={field}
-            />
-          ))}
+          {keys(fields).map(
+            (field) =>
+              immersionApplication[field] && (
+                <TextCell
+                  title={fields[field]!}
+                  contents={buildContent(field)}
+                  key={field}
+                />
+              ),
+          )}
         </Accordion>
       ))}
     </div>

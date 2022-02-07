@@ -27,6 +27,7 @@ const defaultImmersionApplicationValues = {
   immersionActivities: param.query.optional.string,
   immersionSkills: param.query.optional.string,
   sanitaryPreventionDescription: param.query.optional.string,
+  workConditions: param.query.optional.string,
 
   sanitaryPrevention: param.query.optional.boolean,
   individualProtection: param.query.optional.boolean,
@@ -36,6 +37,9 @@ const defaultImmersionApplicationValues = {
 
   schedule: param.query.optional.ofType(scheduleSerializer),
 };
+
+export type ApplicationFormKeysInUrl =
+  keyof typeof defaultImmersionApplicationValues;
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   home: defineRoute("/"),

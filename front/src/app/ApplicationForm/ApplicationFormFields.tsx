@@ -24,6 +24,7 @@ import type {
   ImmersionApplicationDto,
 } from "src/shared/ImmersionApplicationDto";
 import { routes, useRoute } from "../routes";
+import type { ApplicationFormKeysInUrl } from "../routes";
 import { ApplicationFormProfession } from "./ApplicationFormProfession";
 
 const { featureFlags, dev } = ENV;
@@ -258,13 +259,21 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
       />
 
+      <br />
+
+      <TextInput
+        label="Conditions de travail, propres  au métier observé pendant l’immersion. "
+        name="workConditions"
+        description="Ex : transport de marchandises longue distance - pas de retour au domicile pendant 2 jours"
+      />
+      <br />
       <AddressAutocomplete
         initialSearchTerm={establishmentInfo?.businessAddress}
         label="Adresse du lieu où se fera l'immersion * "
         setFormValue={({ label }) => setFieldValue("immersionAddress", label)}
         disabled={isFrozen || isFetchingSiret}
       />
-
+      <br />
       <BoolRadioGroup
         name="individualProtection"
         label="Un équipement de protection individuelle est-il fourni pour l’immersion ? *"
@@ -463,7 +472,7 @@ export const RequestModificationButton = ({
 };
 
 const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
-  const keysToWatch: (keyof ImmersionApplicationDto)[] = [
+  const keysToWatch: ApplicationFormKeysInUrl[] = [
     "email",
     "firstName",
     "lastName",
@@ -478,6 +487,7 @@ const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
     "mentorPhone",
     "agencyId",
     "schedule",
+    "workConditions",
   ];
   const watchedValuesObject = keysToWatch.reduce(
     (acc, watchedKey) => ({ ...acc, [watchedKey]: values[watchedKey] }),

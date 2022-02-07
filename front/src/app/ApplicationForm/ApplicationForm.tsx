@@ -73,6 +73,7 @@ const createInitialApplication = (
     schedule: route.params.schedule ?? reasonableSchedule,
     immersionAddress: route.params.immersionAddress ?? "",
     agencyId: route.params.agencyId ?? undefined,
+    workConditions: route.params.workConditions ?? "",
 
     // Covid
     individualProtection: route.params.individualProtection ?? undefined,
@@ -138,6 +139,9 @@ const currentJWT = (route: ApplicationFormRoute) => {
   }
   return route.params.jwt ?? "";
 };
+
+const undefinedIfEmptyString = (text?: string): string | undefined =>
+  text === "" ? undefined : text;
 
 export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const [initialValues, setInitialValues] = useState(
@@ -210,9 +214,14 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             )}
             onSubmit={async (values, { setSubmitting }) => {
               try {
-                const immersionApplication =
+                const immersionApplicationParsed: ImmersionApplicationDto =
                   immersionApplicationSchema.parse(values);
-
+                const immersionApplication: ImmersionApplicationDto = {
+                  ...immersionApplicationParsed,
+                  workConditions: undefinedIfEmptyString(
+                    immersionApplicationParsed.workConditions,
+                  ),
+                };
                 const shouldUpdateExistingImmersionApplication =
                   currentJWT(route).length > 0;
                 if (shouldUpdateExistingImmersionApplication) {

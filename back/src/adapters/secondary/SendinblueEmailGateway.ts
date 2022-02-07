@@ -189,6 +189,7 @@ export class SendinblueEmailGateway implements EmailGateway {
         INDIVIDUAL_PROTECTION: params.individualProtection,
         QUESTIONNAIRE_URL: params.questionnaireUrl,
         SIGNATURE: params.signature,
+        WORK_CONDITIONS: params.workConditions,
       },
     );
   }
