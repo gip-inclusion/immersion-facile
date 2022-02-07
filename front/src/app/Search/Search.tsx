@@ -1,26 +1,20 @@
-import { CircularProgress } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik, FormikHelpers } from "formik";
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 import { immersionSearchGateway } from "src/app/dependencies";
 import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
-import {
-  ContactEstablishmentModal,
-  useContactEstablishmentModal,
-} from "src/app/Search/ContactEstablishmentModal";
+import { SearchAdvise } from "src/app/Search/SearchAdvise";
+import { SearchResultPanel } from "src/app/Search/SearchResultPanel";
 import distanceSearchIcon from "src/assets/distance-search-icon.svg";
 import locationSearchIcon from "src/assets/location-search-icon.svg";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { Layout } from "src/components/Layout";
 import { SearchButton } from "src/components/SearchButton";
-import { SuccessFeedback } from "src/components/SuccessFeedback";
-import { ContactMethod } from "src/shared/FormEstablishmentDto";
 import {
   SearchImmersionRequestDto,
   SearchImmersionResultDto,
 } from "src/shared/SearchImmersionDto";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
-import { EnterpriseSearchResult } from "./EnterpriseSearchResult";
-import SearchIcon from "@mui/icons-material/Search";
 
 interface Values {
   rome?: string;
@@ -32,18 +26,6 @@ interface Values {
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initialySelectedIndex = 3; // to get 10 km radius by default
-
-const getFeedBackMessage = (contactMethod?: ContactMethod) => {
-  switch (contactMethod) {
-    case "EMAIL":
-      return "L'entreprise a été contactée avec succès.";
-    case "PHONE":
-    case "IN_PERSON":
-      return "Un email vient de vous être envoyé.";
-    default:
-      return null;
-  }
-};
 
 export const Search = () => {
   const [result, setResult] = useState<SearchImmersionResultDto[] | null>(null);
@@ -155,91 +137,7 @@ export const Search = () => {
           <SearchResultPanel searchResults={result} isSearching={isSearching} />
         </div>
       </div>
+      <SearchAdvise />
     </Layout>
   );
 };
-
-type SearchResultsProps = {
-  searchResults: SearchImmersionResultDto[] | null;
-  isSearching: boolean;
-};
-
-export const SearchResultPanel = ({
-  searchResults,
-  isSearching,
-}: SearchResultsProps) => {
-  // prettier-ignore
-  const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
-  const [successFullyValidated, setSuccessfullyValidated] = useState(false);
-  const { modalState, dispatch } = useContactEstablishmentModal();
-
-  if (isSearching)
-    return (
-      <SearchInfos>
-        <CircularProgress color="inherit" size="75px" />
-      </SearchInfos>
-    );
-
-  if (searchResults === null)
-    return <SearchInfos>Veuillez sélectionner vos critères</SearchInfos>;
-
-  if (searchResults.length === 0)
-    return (
-      <SearchInfos>
-        Pas de résultat. Essayez avec un plus grand rayon de recherche...
-      </SearchInfos>
-    );
-
-  return (
-    <>
-      {searchResults.map((searchResult) => (
-        <EnterpriseSearchResult
-          key={searchResult.id}
-          searchResult={searchResult}
-          onButtonClick={() =>
-            dispatch({
-              type: "CLICKED_OPEN",
-              payload: {
-                immersionOfferId: searchResult.id,
-                contactId: searchResult.contactDetails?.id,
-                contactMethod: searchResult.contactMode,
-              },
-            })
-          }
-          disableButton={modalState.isValidating}
-        />
-      ))}
-      <ContactEstablishmentModal
-        modalState={modalState}
-        dispatch={dispatch}
-        onSuccess={() => {
-          setSuccessfulValidatedMessage(
-            getFeedBackMessage(modalState.contactMethod),
-          );
-          setSuccessfullyValidated(true);
-        }}
-      />
-      {successfulValidationMessage && (
-        <SuccessFeedback
-          open={successFullyValidated}
-          handleClose={() => {
-            setSuccessfulValidatedMessage(null);
-            setSuccessfullyValidated(false);
-          }}
-        >
-          {successfulValidationMessage}
-        </SuccessFeedback>
-      )}
-    </>
-  );
-};
-
-type SearchInfosProps = {
-  children: ReactNode;
-};
-
-const SearchInfos = ({ children }: SearchInfosProps) => (
-  <div className="text-white sm:h-full text-2xl font-semibold flex justify-center items-center pb-16">
-    <div>{children}</div>
-  </div>
-);
