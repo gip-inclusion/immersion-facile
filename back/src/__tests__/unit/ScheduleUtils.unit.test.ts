@@ -64,7 +64,8 @@ describe("ScheduleUtils", () => {
         "jeudi : 01:00-02:00, 03:00-04:00",
         "vendredi : libre",
         "samedi : libre",
-        "dimanche : 01:00-02:00, 03:00-04:00, 05:00-06:00",
+        "dimanche : 01:00-02:00, 03:00-04:00,",
+        "05:00-06:00",
       ]);
     });
 

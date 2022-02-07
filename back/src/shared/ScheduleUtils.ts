@@ -205,7 +205,15 @@ const prettyPrintDaySchedule = (timePeriods: TimePeriodDto[]): string => {
   if (timePeriods.length == 0) {
     return "libre";
   }
-  return timePeriods.map(({ start, end }) => `${start}-${end}`).join(", ");
+  return timePeriods
+    .slice(1)
+    .reduce(
+      (acc, { start, end }, timePeriodIndex) =>
+        timePeriodIndex % 2
+          ? `${acc},\n${start}-${end}`
+          : `${acc}, ${start}-${end}`,
+      `${timePeriods[0].start}-${timePeriods[0].end}`,
+    );
 };
 
 // Converts a SimpleScheduleDto into a readable schdeule of the form:
