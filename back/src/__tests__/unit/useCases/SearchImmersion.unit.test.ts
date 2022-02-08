@@ -414,7 +414,7 @@ describe("SearchImmersionUseCase", () => {
           requestedAt: new Date("2021-01-01"),
         } as LaBonneBoiteRequestEntity;
 
-        it("Should not request LBB if the request has been made in the last 7 days", async () => {
+        it("Should not request LBB if the request has been made in the last month", async () => {
           // Prepare
           const { searchImmersion, laBonneBoiteRequestRepository, clock } =
             await prepareSearchableData();
@@ -422,7 +422,7 @@ describe("SearchImmersionUseCase", () => {
           laBonneBoiteRequestRepository.laBonneBoiteRequests = [
             previousSimilarRequestEntity,
           ];
-          clock.setNextDate(new Date("2021-01-08"));
+          clock.setNextDate(new Date("2021-01-30"));
 
           // Act
           await searchImmersion.execute({
@@ -437,7 +437,7 @@ describe("SearchImmersionUseCase", () => {
           ).toHaveLength(1);
         });
 
-        it("Should request LBB if the request was made more than 7 days ago", async () => {
+        it("Should request LBB if the request was made more than a month ago", async () => {
           // Prepare
           const { searchImmersion, laBonneBoiteRequestRepository, clock } =
             await prepareSearchableData();
@@ -445,7 +445,7 @@ describe("SearchImmersionUseCase", () => {
           laBonneBoiteRequestRepository.laBonneBoiteRequests = [
             previousSimilarRequestEntity,
           ];
-          clock.setNextDate(new Date("2021-01-09"));
+          clock.setNextDate(new Date("2021-02-01"));
 
           // Act
           await searchImmersion.execute({

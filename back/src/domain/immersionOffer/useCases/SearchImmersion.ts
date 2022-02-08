@@ -96,7 +96,7 @@ export class SearchImmersion extends UseCase<
     }
 
     const shouldCallLaBonneBoite: boolean =
-      await this.laBonneBoiteHasNotBeenRequestedWithThisRomeAndThisAreaInTheLastWeek(
+      await this.laBonneBoiteHasNotBeenRequestedWithThisRomeAndThisAreaInTheLastMonth(
         searchMade,
       );
 
@@ -187,10 +187,10 @@ export class SearchImmersion extends UseCase<
     );
   }
 
-  private async laBonneBoiteHasNotBeenRequestedWithThisRomeAndThisAreaInTheLastWeek(
+  private async laBonneBoiteHasNotBeenRequestedWithThisRomeAndThisAreaInTheLastMonth(
     searchMade: SearchMade,
   ) {
-    const closestRequestParamsWithSameRomeInTheLast7Days: {
+    const closestRequestParamsWithSameRomeInTheMonth: {
       params: LaBonneBoiteRequestParams;
       distanceToPositionKm: number;
     } | null = !searchMade.rome
@@ -199,14 +199,14 @@ export class SearchImmersion extends UseCase<
           {
             rome: searchMade.rome,
             position: { lat: searchMade.lat, lon: searchMade.lon },
-            since: addDays(this.clock.now(), -7),
+            since: addDays(this.clock.now(), -30),
           },
         );
 
-    if (closestRequestParamsWithSameRomeInTheLast7Days === null) return true;
+    if (closestRequestParamsWithSameRomeInTheMonth === null) return true;
 
     return (
-      closestRequestParamsWithSameRomeInTheLast7Days.distanceToPositionKm >
+      closestRequestParamsWithSameRomeInTheMonth.distanceToPositionKm >
       searchMade.distance_km
     );
   }
