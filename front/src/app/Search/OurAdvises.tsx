@@ -1,22 +1,8 @@
 import { Accordion, AccordionItem } from "@dataesr/react-dsfr";
 import React from "react";
-import homeVideoImage from "src/assets/home_video_image.jpg";
-import { ImmersionHowTo } from "src/components/ImmersionHowTo";
 import { SubTitle, Title } from "src/components/Title";
 
-export const SearchAdvise = () => {
-  return (
-    <div>
-      <OurAdvises />
-      <ImmersionHowTo
-        videoUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/"
-        videoImage={homeVideoImage}
-      />
-    </div>
-  );
-};
-
-const OurAdvises = () => (
+export const OurAdvises = () => (
   <div className="flex justify-center items-center flex-col">
     <Title>Nos conseils pour décrocher une immersion</Title>
     <Accordion keepOpen={true} className="w-full max-w-3xl ">

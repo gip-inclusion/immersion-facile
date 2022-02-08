@@ -1,4 +1,6 @@
 import React from "react";
+import establishmentVideoImage from "src/assets/establishment_video_image.png";
+import homeVideoImage from "src/assets/home_video_image.jpg";
 import { BulletPoint } from "./BulletPoint";
 import { Colored } from "./Colored";
 import { SubTitle, Title } from "./Title";
@@ -8,10 +10,7 @@ type ImmersionHowToProps = {
   videoImage: string;
 };
 
-export const ImmersionHowTo = ({
-  videoUrl,
-  videoImage,
-}: ImmersionHowToProps) => (
+const ImmersionHowTo = ({ videoUrl, videoImage }: ImmersionHowToProps) => (
   <section className="flex flex-col items-center">
     <Title red>L'immersion facilitée, comment ça fonctionne ?</Title>
     <div className="flex max-w-7xl flex-wrap justify-center items-center">
@@ -49,4 +48,18 @@ export const ImmersionHowTo = ({
       </div>
     </div>
   </section>
+);
+
+export const HomeImmersionHowTo = () => (
+  <ImmersionHowTo
+    videoUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/"
+    videoImage={homeVideoImage}
+  />
+);
+
+export const EstablishmentImmersionHowTo = () => (
+  <ImmersionHowTo
+    videoUrl="https://www.powtoon.com/embed/e1lglPbeknD/"
+    videoImage={establishmentVideoImage}
+  />
 );

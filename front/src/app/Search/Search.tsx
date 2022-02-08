@@ -3,11 +3,12 @@ import { Form, Formik, FormikHelpers } from "formik";
 import React, { useState } from "react";
 import { immersionSearchGateway } from "src/app/dependencies";
 import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
-import { SearchAdvise } from "src/app/Search/SearchAdvise";
+import { OurAdvises } from "src/app/Search/OurAdvises";
 import { SearchResultPanel } from "src/app/Search/SearchResultPanel";
 import distanceSearchIcon from "src/assets/distance-search-icon.svg";
 import locationSearchIcon from "src/assets/location-search-icon.svg";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
+import { HomeImmersionHowTo } from "src/components/ImmersionHowTo";
 import { Layout } from "src/components/Layout";
 import { SearchButton } from "src/components/SearchButton";
 import {
@@ -137,7 +138,10 @@ export const Search = () => {
           <SearchResultPanel searchResults={result} isSearching={isSearching} />
         </div>
       </div>
-      <SearchAdvise />
+      <div>
+        <OurAdvises />
+        <HomeImmersionHowTo />
+      </div>
     </Layout>
   );
 };

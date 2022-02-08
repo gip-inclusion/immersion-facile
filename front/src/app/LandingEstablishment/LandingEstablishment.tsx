@@ -6,11 +6,10 @@ import tandem from "src/assets/tandem.png";
 import { BulletPoint } from "src/components/BulletPoint";
 import { Card } from "src/components/Card";
 import { Colored } from "src/components/Colored";
-import { ImmersionHowTo } from "src/components/ImmersionHowTo";
+import { EstablishmentImmersionHowTo } from "src/components/ImmersionHowTo";
 import { Layout } from "src/components/Layout";
 import { Statistic } from "src/components/Statistic";
 import { Title } from "src/components/Title";
-import establishmentVideoImage from "src/assets/establishment_video_image.png";
 
 export const LandingEstablishment = () => (
   <Layout>
@@ -125,9 +124,6 @@ export const LandingEstablishment = () => (
         </div>
       </div>
     </section>
-    <ImmersionHowTo
-      videoUrl="https://www.powtoon.com/embed/e1lglPbeknD/"
-      videoImage={establishmentVideoImage}
-    />
+    <EstablishmentImmersionHowTo />
   </Layout>
 );

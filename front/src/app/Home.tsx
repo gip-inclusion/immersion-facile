@@ -1,10 +1,9 @@
 import React from "react";
 import { routes } from "src/app/routes";
 import { Footer } from "src/components/Footer";
-import { ImmersionHowTo } from "src/components/ImmersionHowTo";
+import { HomeImmersionHowTo } from "src/components/ImmersionHowTo";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import SearchIcon from "@mui/icons-material/Search";
-import homeVideoImage from "src/assets/home_video_image.jpg";
 
 import { ENV } from "src/environmentVariables";
 
@@ -94,10 +93,7 @@ export const Home = ({ showDebugInfo }: HomeProps) => (
         </div>
       </div>
     </section>
-    <ImmersionHowTo
-      videoUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/"
-      videoImage={homeVideoImage}
-    />
+    <HomeImmersionHowTo />
     <Footer />
   </div>
 );
