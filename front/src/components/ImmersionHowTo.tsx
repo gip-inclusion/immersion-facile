@@ -17,8 +17,7 @@ const ImmersionHowTo = ({ videoUrl, videoImage }: ImmersionHowToProps) => (
       <div className="max-w-xs" style={{ minWidth: "250px" }}>
         <BulletPoint red num={1}>
           <Colored red>Sélectionnez les métiers</Colored> pour lesquels chaque
-          établissement peut accueillir en immersion et préciser un contact
-          "référent immersion professionnelle".
+          établissement peut accueillir en immersion.
         </BulletPoint>
         <BulletPoint red num={2}>
           <Colored red>Recevez les demandes</Colored> des candidats à la

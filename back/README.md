@@ -89,6 +89,12 @@ You can then copy-paste the variable contents into `.env`, or export it:
 export JWT_PRIVATE_KEY=$(cat ./private.ec.key) JWT_PUBLIC_KEY=$(cat ./public.pem)
 ```
 
+### Rotation of JWT keys
+
+If the JWT keys need to be changed, it should be done by :
+- setting the old keys in the variables `JWT_PREVIOUS_PUBLIC_KEY` and `JWT_PREVIOUS_PRIVATE_KEY`,
+- creating a new pair of keys (like explained just before), and putting them in the variables : `JWT_PUBLIC_KEY` and `JWT_PRIVATE_KEY` 
+
 
 ### Specifying environment variables
 

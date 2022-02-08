@@ -5,6 +5,11 @@ import { SubTitle, Title } from "src/components/Title";
 export const OurAdvises = () => (
   <div className="flex justify-center items-center flex-col">
     <Title>Nos conseils pour décrocher une immersion</Title>
+    <p className="max-w-3xl pb-4">
+      Nous vous proposons de vous mettre directement en relation avec les
+      entreprises signalées comme “entreprises accueillantes”. Pour les autres,
+      voici nos conseils :
+    </p>
     <Accordion keepOpen={true} className="w-full max-w-3xl ">
       <AccordionItem
         title={

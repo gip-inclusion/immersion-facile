@@ -265,6 +265,7 @@ export const ApplicationFormFields = ({
         label="Conditions de travail, propres  au métier observé pendant l’immersion. "
         name="workConditions"
         description="Ex : transport de marchandises longue distance - pas de retour au domicile pendant 2 jours"
+        disabled={isFrozen}
       />
       <br />
       <AddressAutocomplete
@@ -358,10 +359,12 @@ export const ApplicationFormFields = ({
         </SuccessMessage>
       )}
 
-      <p className="font-bold">
-        Une fois le formulaire envoyé, vous allez recevoir une demande de
-        validation par mail et l'entreprise également.
-      </p>
+      {!isFrozen && (
+        <p className="font-bold">
+          Une fois le formulaire envoyé, vous allez recevoir une demande de
+          validation par mail et l'entreprise également.
+        </p>
+      )}
       <p className="font-bold">Surveillez vos mails !</p>
 
       <br />
