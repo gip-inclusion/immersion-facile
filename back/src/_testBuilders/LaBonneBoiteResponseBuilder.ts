@@ -15,6 +15,13 @@ const validEstablishmentFromLaBonneBoite: LaBonneBoiteCompanyProps = {
   name: "BLANCHISSERIE LA FENSCH",
   siret: "77561959600155",
   stars: 4.5,
+  url: "",
+  headcount_text: "",
+  distance: 10,
+  alternance: false,
+  contact_mode: "phone",
+  raison_sociale: "",
+  naf_text: "",
 };
 
 export class LaBonneBoiteCompanyBuilder

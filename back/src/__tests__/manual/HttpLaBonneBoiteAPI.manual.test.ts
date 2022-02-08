@@ -1,8 +1,10 @@
+import axios, { AxiosResponse } from "axios";
 import { AppConfig } from "../../adapters/primary/appConfig";
 import { HttpLaBonneBoiteAPI } from "../../adapters/secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { PoleEmploiAccessTokenGateway } from "../../adapters/secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
+import { LaBonneBoiteRequestParams } from "../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { distanceBetweenCoordinates } from "../../utils/distanceBetweenCoordinates";
 
 const config = AppConfig.createFromEnv();
@@ -21,33 +23,91 @@ const getAPI = () =>
   );
 
 const benodetLonLat = { lat: 47.8667, lon: -4.1167 };
+const parisLonLat = { lat: 50.49, lon: 2.43 };
 const boulangerRome = "D1102";
 
-describe("HttpLaBonneBoiteAPI", () => {
-  test("Should return at the most 20 establishments of given rome located within the geographical area", async () => {
-    const api = getAPI();
-    const searchLonLat = benodetLonLat;
-    const response = await api.searchCompanies({
-      rome: boulangerRome,
-      lon: searchLonLat.lon,
-      lat: searchLonLat.lat,
-      distance_km: 100,
-    });
-    expect(response.length).toBeLessThanOrEqual(20);
+const searchParamsBoulanger100KmAroundBenodet: LaBonneBoiteRequestParams = {
+  rome: boulangerRome,
+  lon: benodetLonLat.lon,
+  lat: benodetLonLat.lat,
+  distance_km: 100,
+};
 
-    const processedResponse = response.map((lBBCompanny) => ({
+const searchParamsBoulanger50KmAroundParis: LaBonneBoiteRequestParams = {
+  rome: boulangerRome,
+  lon: parisLonLat.lon,
+  lat: parisLonLat.lat,
+  distance_km: 50,
+};
+
+type HttpGetLaBonneBoiteCompanyCountResponse = {
+  companies_count: number;
+  rome_code: string;
+  rome_label: string;
+  url: string;
+};
+
+const getCompaniesCountFromAPI = async (
+  searchParams: LaBonneBoiteRequestParams,
+) => {
+  const accessToken = await accessTokenGateway.getAccessToken(
+    `application_${config.poleEmploiClientId} api_labonneboitev1`,
+  );
+  const countResponse: AxiosResponse<HttpGetLaBonneBoiteCompanyCountResponse> =
+    await axios.get(
+      "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/count",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken.access_token}`,
+        },
+        params: {
+          distance: searchParams.distance_km,
+          longitude: searchParams.lon,
+          latitude: searchParams.lat,
+          rome_codes: searchParams.rome,
+        },
+      },
+    );
+  return countResponse.data.companies_count;
+};
+describe("HttpLaBonneBoiteAPI", () => {
+  test("Should return all `companies` susceptible to offer immerison of given rome located within the geographical area", async () => {
+    const api = getAPI();
+    const searchParams = searchParamsBoulanger100KmAroundBenodet;
+    const actualSearchedCompanies = await api.searchCompanies(searchParams);
+    const expectedSearchedCompaniesCount = await getCompaniesCountFromAPI(
+      searchParams,
+    );
+
+    expect(actualSearchedCompanies.length).toEqual(
+      expectedSearchedCompaniesCount,
+    );
+
+    const processedResponse = actualSearchedCompanies.map((lBBCompanny) => ({
       siret: lBBCompanny.siret,
       rome: lBBCompanny.props.matched_rome_code,
       distance: distanceBetweenCoordinates(
         lBBCompanny.props.lat,
         lBBCompanny.props.lon,
-        searchLonLat.lat,
-        searchLonLat.lon,
+        searchParams.lat,
+        searchParams.lon,
       ),
     }));
 
     expect(processedResponse.every(({ distance }) => distance <= 100000)).toBe(
       true,
     );
+  });
+
+  test("Should not last more than 3 seconds even for search with many results", async () => {
+    const api = getAPI();
+
+    const startTime = new Date();
+    const actualSearchedCompanies = await api.searchCompanies(
+      searchParamsBoulanger50KmAroundParis,
+    );
+    const executionDurationMs = new Date().getTime() - startTime.getTime();
+    expect(actualSearchedCompanies.length).toBeGreaterThan(500);
+    expect(executionDurationMs).toBeLessThan(3000);
   });
 });

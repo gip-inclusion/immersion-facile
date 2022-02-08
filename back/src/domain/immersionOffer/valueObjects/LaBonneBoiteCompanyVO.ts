@@ -1,5 +1,4 @@
 import { createLogger } from "../../../utils/logger";
-import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import {
   EstablishmentAggregate,
@@ -16,9 +15,16 @@ export type LaBonneBoiteCompanyProps = {
   lon: number;
   matched_rome_code: string;
   naf: string;
+  naf_text: string;
   name: string;
   siret: string;
   stars: number;
+  raison_sociale: string;
+  url: string; // URL to the company reference page on LaBonneBoite
+  headcount_text: string; // Libelle of nb of employees
+  distance: number; // Distance to searched geographical position
+  alternance: boolean; // Whether or not the company accepts alternance contracts
+  contact_mode: string; // | "Envoyez votre candidature par mail" | "Se présenter spontanément" | "Postulez via le site internet de l'entreprise" |  "Envoyer un CV et une lettre de motivation"
 };
 
 // Careful, value objects should be immutable
