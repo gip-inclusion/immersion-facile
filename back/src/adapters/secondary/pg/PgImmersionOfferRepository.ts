@@ -160,7 +160,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     }
   }
 
-  async getFromSearch(
+  async getSearchImmersionResultDtoFromSearchMade(
     searchMade: SearchMade,
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
@@ -179,12 +179,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     if (searchMade.nafDivision) {
       parameters.push(searchMade.nafDivision);
       nafDivisionFilter = `AND offer_naf_division = $${parameters.length}`;
-    }
-
-    let siretFilter = "";
-    if (searchMade.siret) {
-      parameters.push(searchMade.siret);
-      siretFilter = `AND offer_siret = $${parameters.length}`;
     }
 
     const query = `
@@ -241,7 +235,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         WHERE 
           ST_DWithin(offer_gps, ST_GeographyFromText($1), $2) 
           ${nafDivisionFilter}
-          ${siretFilter}
         ORDER BY
           offer_data_source ASC,
           distance_m;`;

@@ -8,7 +8,6 @@ export type SearchMade = {
   lat: number;
   lon: number;
   nafDivision?: string;
-  siret?: string;
 };
 
 export type SearchMadeEntity = {

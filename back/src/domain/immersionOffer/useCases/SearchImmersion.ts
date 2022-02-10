@@ -70,7 +70,6 @@ export class SearchImmersion extends UseCase<
     const searchMade: SearchMade = {
       rome: params.rome,
       nafDivision: params.nafDivision,
-      siret: params.siret,
       lat: params.location.lat,
       lon: params.location.lon,
       distance_km: params.distance_km,
@@ -84,7 +83,7 @@ export class SearchImmersion extends UseCase<
     const apiConsumerName = apiConsumer?.consumer;
 
     const resultsFromStorage =
-      await this.immersionOfferRepository.getFromSearch(
+      await this.immersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
         searchMade,
         /* withContactDetails= */ apiConsumerName !== undefined,
       );
@@ -117,7 +116,7 @@ export class SearchImmersion extends UseCase<
 
     if (relevantCompanies)
       await this.insertRelevantCompaniesInRepositories(relevantCompanies);
-    return this.immersionOfferRepository.getFromSearch(
+    return this.immersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
       searchMade,
       /* withContactDetails= */ apiConsumerName !== undefined,
     );

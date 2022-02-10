@@ -28,7 +28,7 @@ export interface ImmersionOfferRepository {
     immersionOfferId: ImmersionOfferId,
   ) => Promise<ContactEntityV2 | undefined>;
 
-  getFromSearch: (
+  getSearchImmersionResultDtoFromSearchMade: (
     searchMade: SearchMade,
     withContactDetails?: boolean,
   ) => Promise<SearchImmersionResultDto[]>;

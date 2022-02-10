@@ -35,7 +35,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("insertEstablishmentAggregates", () => {
-    test("Insert immersions and retrieves them back if establishment is active", async () => {
+    test("Inserts immersions and retrieves them back if establishment is active", async () => {
       const closedEstablishmentAggregate = new EstablishmentAggregateBuilder()
         .withEstablishment({
           address: "fake address establishment 1 12345 some city",
@@ -96,20 +96,25 @@ describe("Postgres implementation of immersion offer repository", () => {
       ]);
 
       const searchWithNoRomeResult =
-        await pgImmersionOfferRepository.getFromSearch({
-          distance_km: 30,
-          lat: 49.1,
-          lon: 6.1,
-        });
+        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+          {
+            distance_km: 30,
+            lat: 49.1,
+            lon: 6.1,
+          },
+        );
       expect(searchWithNoRomeResult).toHaveLength(1);
 
-      const searchResult = await pgImmersionOfferRepository.getFromSearch({
-        rome: "M1808",
-        distance_km: 30,
-        lat: 49.1,
-        lon: 6.1,
-        nafDivision: "85",
-      });
+      const searchResult =
+        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+          {
+            rome: "M1808",
+            distance_km: 30,
+            lat: 49.1,
+            lon: 6.1,
+            nafDivision: "85",
+          },
+        );
       expect(searchResult).toHaveLength(1);
 
       const expectedResult: SearchImmersionResultDto = {
@@ -131,47 +136,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       };
 
       expect(searchResult).toMatchObject([expectedResult]);
-
-      const searchResults = await pgImmersionOfferRepository.getFromSearch({
-        rome: "M1808",
-        distance_km: 30,
-        lat: 49.1,
-        lon: 6.1,
-        nafDivision: "85",
-        siret: "78000403200040",
-      });
-      expect(searchResults).toHaveLength(1);
-      expect(searchResults[0].siret).toBe("78000403200040");
-      expect(searchResults[0].contactDetails).toBeUndefined();
-
-      const searchResultsWithDetails =
-        await pgImmersionOfferRepository.getFromSearch(
-          {
-            rome: "M1808",
-            distance_km: 30,
-            lat: 49.1,
-            lon: 6.1,
-            nafDivision: "85",
-            siret: "78000403200040",
-          },
-          true,
-        );
-      expect(searchResultsWithDetails).toHaveLength(1);
-      expect(searchResultsWithDetails[0].siret).toBe("78000403200040");
-
-      const expectedContactDetails: SearchContact = {
-        id: "93144fe8-56a7-4807-8990-726badc6332b",
-        lastName: "Doe",
-        firstName: "John",
-        email: "joe@mail.com",
-        role: "super job",
-        phone: "0640404040",
-      };
-      expect(searchResultsWithDetails[0].contactDetails).toEqual(
-        expectedContactDetails,
-      );
     });
-
     test("Insert immersion does not crash if empty array is provided", async () => {
       await pgImmersionOfferRepository.insertEstablishmentAggregates([]);
     });

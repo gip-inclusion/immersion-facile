@@ -86,7 +86,7 @@ export class InMemoryImmersionOfferRepository
       };
   }
 
-  public async getFromSearch(
+  public async getSearchImmersionResultDtoFromSearchMade(
     searchMade: SearchMade,
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
@@ -96,11 +96,6 @@ export class InMemoryImmersionOfferRepository
         (aggregate) =>
           !searchMade.nafDivision ||
           aggregate.establishment.naf.startsWith(searchMade.nafDivision),
-      )
-      .filter(
-        (aggregate) =>
-          !searchMade.siret ||
-          aggregate.establishment.siret === searchMade.siret,
       )
       .flatMap((aggregate) =>
         aggregate.immersionOffers

@@ -1,5 +1,4 @@
 import {
-  SearchMade,
   SearchMadeEntity,
   SearchMadeId,
 } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -33,7 +32,6 @@ export class InMemorySearchMadeRepository implements SearchMadeRepository {
       lat: searchMadeEntity.lat,
       lon: searchMadeEntity.lon,
       rome: searchMadeEntity.rome,
-      siret: searchMadeEntity.siret,
       nafDivision: searchMadeEntity.nafDivision,
     }));
   }
