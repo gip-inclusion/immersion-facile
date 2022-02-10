@@ -60,6 +60,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pg_password}
     volumes:
       - ./docker-data/postgresql:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   adminer:
     image: adminer
