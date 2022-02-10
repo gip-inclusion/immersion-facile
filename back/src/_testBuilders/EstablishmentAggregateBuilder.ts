@@ -43,6 +43,21 @@ export class EstablishmentAggregateBuilder
     });
   }
 
+  public withEstablishmentSiret(siret: string) {
+    return new EstablishmentAggregateBuilder({
+      ...this.entity,
+      establishment: new EstablishmentEntityV2Builder()
+        .withSiret(siret)
+        .build(),
+    });
+  }
+  public withContactId(id: string) {
+    return new EstablishmentAggregateBuilder({
+      ...this.entity,
+      contacts: [new ContactEntityV2Builder().withId(id).build()],
+    });
+  }
+
   build() {
     return this.entity;
   }

@@ -15,6 +15,9 @@ export class ContactEntityV2Builder implements Builder<ContactEntityV2> {
     private readonly entity: ContactEntityV2 = validContactEntityV2,
   ) {}
 
+  withId(id: string) {
+    return new ContactEntityV2Builder({ ...this.entity, id });
+  }
   build() {
     return this.entity;
   }

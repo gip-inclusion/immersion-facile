@@ -24,7 +24,9 @@ import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
-type PgContactMethod = "phone" | "mail" | "in_person";
+export type PgContactMethod = "phone" | "mail" | "in_person";
+export type PgDataSource = "api_labonneboite" | "form";
+
 type KnownContactMethod = Exclude<ContactMethod, "UNKNOWN">;
 const contactModeMap: Record<KnownContactMethod, PgContactMethod> = {
   PHONE: "phone",
@@ -140,7 +142,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
     if (immersionOfferFields.length === 0) return;
 
-    //Deduplication in case we have multiple times the same SIRET + ROMES, this due to the fact that different appellations can be transformed in the same ROME
+    // Deduplication in case we have multiple times the same SIRET + ROMES, this due to the fact that different appellations can be transformed in the same ROME
     const deduplicatedArrayOfImmersionOffers: any[][] =
       immersionOfferFields.reduce((acc, cur) => {
         const alreadyExist = acc.some(
@@ -276,8 +278,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         });
       })
       .catch((e) => {
-        logger.error(e);
-        return [];
+        logger.error("Error in Pg implementation of getFromSearch", e);
+        return [{} as SearchImmersionResultDto];
       });
   }
 
@@ -512,7 +514,8 @@ const buildUpsertImmersionOffersQuery = (immersionOfferFields: any[][]) => {
 };
 
 // Extract the NAF division (e.g. 84) from a NAF code (e.g. 8413Z)
-const extractNafDivision = (naf: string) => parseInt(naf.substring(0, 2));
+const extractNafDivision = (naf: string) =>
+  parseInt(naf.substring(0, 2)).toString();
 
 const convertPositionToStGeography = ({ lat, lon }: LatLonDto) =>
   `ST_GeographyFromText('POINT(${lon} ${lat})')`;

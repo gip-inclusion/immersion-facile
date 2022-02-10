@@ -1,9 +1,16 @@
 import { Pool, PoolClient } from "pg";
-import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
-import { EstablishmentEntityV2 } from "../../domain/immersionOffer/entities/EstablishmentEntity";
+import {
+  PgContactMethod,
+  PgDataSource,
+  PgImmersionOfferRepository,
+} from "../../adapters/secondary/pg/PgImmersionOfferRepository";
+import {
+  DataSource,
+  EstablishmentEntityV2,
+} from "../../domain/immersionOffer/entities/EstablishmentEntity";
+import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
 import {
   LatLonDto,
-  SearchContact,
   SearchImmersionResultDto,
 } from "../../shared/SearchImmersionDto";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
@@ -11,6 +18,11 @@ import { EstablishmentAggregateBuilder } from "../../_testBuilders/Establishment
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
+
+const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
+const testUid2 = "22222222-a2a5-430a-b558-ed3e2f03512d";
+const testUid3 = "33333333-a2a5-430a-b558-ed3e2f03512d";
+const testUid4 = "44444444-a2a5-430a-b558-ed3e2f03512d";
 
 describe("Postgres implementation of immersion offer repository", () => {
   let pool: Pool;
@@ -34,167 +46,177 @@ describe("Postgres implementation of immersion offer repository", () => {
     await pool.end();
   });
 
-  describe("insertEstablishmentAggregates", () => {
-    test("Inserts immersions and retrieves them back if establishment is active", async () => {
-      const closedEstablishmentAggregate = new EstablishmentAggregateBuilder()
-        .withEstablishment({
-          address: "fake address establishment 1 12345 some city",
-          name: "Company from la bonne boite for search",
-          voluntaryToImmersion: false,
-          siret: "78000403200029",
-          dataSource: "api_labonneboite",
-          numberEmployeesRange: 12,
-          position: { lat: 49, lon: 6 },
-          naf: "8520A",
-          contactMethod: "EMAIL",
-          isActive: false,
-          updatedAt: new Date("2022-03-07T19:10:00.000"),
-        })
-        .withImmersionOffers([
-          {
-            id: "13df03a5-a2a5-430a-b558-111111111122",
-            rome: "M1808",
-            score: 4.5,
-          },
-        ])
-        .build();
-      const activeEstablishmentAggregate = new EstablishmentAggregateBuilder()
-        .withEstablishment({
-          address: "fake address establishment 2 12345 some city",
-          name: "Company from FORM for search",
-          voluntaryToImmersion: false,
-          siret: "78000403200040",
-          dataSource: "form",
-          numberEmployeesRange: 1,
-          position: { lat: 49.05, lon: 6.05 },
-          naf: "8520A",
-          contactMethod: "PHONE",
-          isActive: true,
-          updatedAt: new Date("2022-03-07T19:10:00.000"),
-        })
-        .withContacts([
-          {
-            id: "93144fe8-56a7-4807-8990-726badc6332b",
-            lastName: "Doe",
-            firstName: "John",
-            email: "joe@mail.com",
-            job: "super job",
-            phone: "0640404040",
-          },
-        ])
-        .withImmersionOffers([
-          {
-            id: "13df03a5-a2a5-430a-b558-333333333344",
-            rome: "M1808",
-            score: 4.5,
-          },
-        ])
-        .build();
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([
-        closedEstablishmentAggregate,
-        activeEstablishmentAggregate,
-      ]);
-
+  describe("Pg implementation of method getSearchImmersionResultDtoFromSearchMade", () => {
+    const searchedRome = "M1808";
+    const searchedPosition = { lat: 49, lon: 6 };
+    const notMatchingRome = "A1111";
+    const farFromSearchedPosition = { lat: 32, lon: 89 };
+    const searchMade: SearchMade = {
+      rome: searchedRome,
+      ...searchedPosition,
+      distance_km: 30,
+    };
+    test("Returns empty list when repo is empty", async () => {
+      // Act
       const searchWithNoRomeResult =
         await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
-          {
-            distance_km: 30,
-            lat: 49.1,
-            lon: 6.1,
-          },
+          searchMade,
         );
-      expect(searchWithNoRomeResult).toHaveLength(1);
+      // Assert
+      expect(searchWithNoRomeResult).toHaveLength(0);
+    });
+    test("Returns only active establishments only ", async () => {
+      // Prepare : establishment in geographical area but not active
+      const notActiveSiret = "78000403200029";
 
-      const searchResult =
+      await insertEstablishment({
+        siret: notActiveSiret,
+        isActive: false,
+        position: searchedPosition,
+      });
+      await insertImmersionOffer({
+        uuid: testUid1,
+        rome: searchedRome,
+        siret: notActiveSiret,
+      });
+
+      // Act
+      const searchWithNoRomeResult =
         await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
-          {
-            rome: "M1808",
-            distance_km: 30,
-            lat: 49.1,
-            lon: 6.1,
-          },
+          searchMade,
         );
+      // Assert
+      expect(searchWithNoRomeResult).toHaveLength(0);
+    });
+    const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
+      offerUid: string,
+      siret: string,
+      rome: string,
+      establishmentPosition: LatLonDto,
+      offerPosition: LatLonDto,
+      offerContactUid?: string,
+    ) => {
+      await insertEstablishment({
+        siret,
+        isActive: true,
+        position: establishmentPosition,
+      });
+      if (offerContactUid) {
+        await insertImmersionContact({
+          uuid: offerContactUid,
+          siret_establishment: siret,
+        });
+      }
+      await insertImmersionOffer({
+        uuid: offerUid,
+        siret,
+        rome,
+        position: offerPosition,
+        contactUid: offerContactUid,
+      });
+    };
+    test("Returns establishments with offers of given rome code and located within given geographical area", async () => {
+      // Prepare
+      /// Establishment with offer inside geographical area with searched rome
+      const siretMatchingToSearch = "78000403200029";
+      const immersionOfferIdMatchingSearch = testUid1;
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        immersionOfferIdMatchingSearch,
+        siretMatchingToSearch,
+        searchedRome, // Matching
+        farFromSearchedPosition, // Establishment position not matching (but no importance ! )
+        searchedPosition, // Offer position matching
+      );
+      const contactUid = testUid1;
+      await insertImmersionContact({
+        uuid: contactUid,
+        siret_establishment: siretMatchingToSearch,
+      });
+
+      /// Establishment located inside geo area but its offer ouside geo area with searched rome
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        testUid2,
+        "77000403200029",
+        searchedRome, // Matching
+        searchedPosition, // Offer position not matching
+        farFromSearchedPosition, // Establishment position not matching (but no importance !)
+      );
+      /// Establishment with offer inside geographical area but an other rome
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        testUid3,
+        "88000403200029",
+        notMatchingRome, // Not matching
+        searchedPosition,
+        searchedPosition,
+      );
+
+      /// Establishment with offer with searched rome but oustide geographical area
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        testUid4,
+        "99000403200029",
+        searchedRome,
+        farFromSearchedPosition,
+        farFromSearchedPosition, // Not matching
+      );
+
+      // Act
+      const searchResult: SearchImmersionResultDto[] =
+        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+          searchMade,
+        );
+
+      // Assert : one match and defined contact details
       expect(searchResult).toHaveLength(1);
 
-      const expectedResult: SearchImmersionResultDto = {
-        id: activeEstablishmentAggregate.immersionOffers[0].id,
-        address: activeEstablishmentAggregate.establishment.address,
-        city: "some city",
-        name: activeEstablishmentAggregate.establishment.name,
-        voluntaryToImmersion:
-          activeEstablishmentAggregate.establishment.voluntaryToImmersion,
-        rome: "M1808",
+      const expectedResult: Partial<SearchImmersionResultDto> = {
+        id: immersionOfferIdMatchingSearch,
+        rome: searchedRome,
         romeLabel: "Information géographique",
-        siret: activeEstablishmentAggregate.establishment.siret,
-        location: activeEstablishmentAggregate.establishment.position,
-        distance_m: 6653,
-        naf: activeEstablishmentAggregate.establishment.naf,
-        nafLabel: "Enseignement primaire",
-        contactMode: activeEstablishmentAggregate.establishment.contactMethod,
-        numberOfEmployeeRange: "1-2",
+        siret: siretMatchingToSearch,
+        distance_m: 0,
       };
 
       expect(searchResult).toMatchObject([expectedResult]);
     });
-    test("Insert immersion does not crash if empty array is provided", async () => {
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([]);
-    });
+    test("Returns also contact details if offer has contact uuid and flag is True", async () => {
+      // Prepare
+      /// Establishment with offer inside geographical area with searched rome
+      const siretMatchingToSearch = "78000403200029";
+      const contactUidOfOfferMatchingSearch = testUid1;
 
-    test("Favours establishment information from form over La Bonne Boite", async () => {
-      const siret = "99999999999999";
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        testUid1,
+        siretMatchingToSearch,
+        searchedRome, // Matching
+        farFromSearchedPosition, // Establishment position not matching (but no importance ! )
+        searchedPosition, // Offer position matching
+        contactUidOfOfferMatchingSearch,
+      );
 
-      const outOfDateEstablishmentFromLaBonneBoite =
-        new EstablishmentEntityV2Builder()
-          .withSiret(siret)
-          .withAddress("old address")
-          .withDataSource("api_labonneboite")
-          .build();
-      const upToDateEstablishmentFromForm = new EstablishmentEntityV2Builder(
-        outOfDateEstablishmentFromLaBonneBoite,
-      )
-        .withAddress("new address")
-        .withDataSource("form")
-        .build();
+      // Act
+      const searchResult: SearchImmersionResultDto[] =
+        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+          searchMade,
+          true, // withContactDetails
+        );
 
-      // 1. Insert establishment with outdated info from La Bonne Boite.
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(outOfDateEstablishmentFromLaBonneBoite)
-          .build(),
-      ]);
-
-      // 2. Update the establishment with newer data from the form.
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(upToDateEstablishmentFromForm)
-          .build(),
-      ]);
-
-      // The data has been updated.
-      let establishments = await getEstablishmentsBySiret(siret);
-      expect(establishments).toHaveLength(1);
-      expect(establishments[0].address).toEqual("new address");
-
-      // 3. Attempt to revert to the outdated info.
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(outOfDateEstablishmentFromLaBonneBoite)
-          .build(),
-      ]);
-
-      // The data has not been reverted.
-      establishments = await getEstablishmentsBySiret(siret);
-      expect(establishments).toHaveLength(1);
-      expect(establishments[0].address).toEqual("new address");
+      // Assert : one match and defined contact details
+      expect(searchResult).toHaveLength(1);
+      expect(searchResult[0].contactDetails?.id).toEqual(
+        contactUidOfOfferMatchingSearch,
+      );
     });
   });
 
   describe("getEstablishmentByImmersionOfferId", () => {
     test("fetches existing establishment", async () => {
+      // Prepare
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
       const storedEstablishment = new EstablishmentEntityV2Builder()
         .withNaf("8520A")
         .build();
+
+      // Act
       await pgImmersionOfferRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishment(storedEstablishment)
@@ -205,6 +227,8 @@ describe("Postgres implementation of immersion offer repository", () => {
           ])
           .build(),
       ]);
+
+      // Assert
       const establishment =
         await pgImmersionOfferRepository.getAnnotatedEstablishmentByImmersionOfferId(
           immersionOfferId,
@@ -311,8 +335,8 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   const position: LatLonDto = {
-    lat: 0,
-    lon: 0,
+    lat: 20,
+    lon: 3,
   };
   describe("Pg implementation of method getActiveEstablishmentSiretsNotUpdatedSince", () => {
     it("Returns a siret list of establishments having field `update_date` < parameter `since` ", async () => {
@@ -327,21 +351,18 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       await Promise.all([
         insertEstablishment({
-          client,
           siret: siretOfClosedEstablishmentNotUpdatedSince,
           updatedAt: beforeSince,
           isActive: false,
           position,
         }),
         insertEstablishment({
-          client,
           siret: siretOfActiveEstablishmentNotUpdatedSince,
           updatedAt: beforeSince,
           isActive: true,
           position,
         }),
         insertEstablishment({
-          client,
           siret: siretOfActiveEstablishmentUpdatedSince,
           updatedAt: afterSince,
           isActive: true,
@@ -365,7 +386,6 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Prepare
       const neverUpdatedEstablishmentSiret = "88000403200022";
       await insertEstablishment({
-        client,
         siret: neverUpdatedEstablishmentSiret,
         isActive: true,
         position,
@@ -388,7 +408,6 @@ describe("Postgres implementation of immersion offer repository", () => {
       const siretOfEstablishmentToUpdate = "78000403200021";
 
       await insertEstablishment({
-        client,
         siret: siretOfEstablishmentToUpdate,
         updatedAt: new Date("2020-04-14T12:00:00.000"),
         isActive: true,
@@ -407,7 +426,6 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Assert
       const establishmentRowInDB = await retrieveEstablishmentWithSiret(
-        client,
         siretOfEstablishmentToUpdate,
       );
       expect(establishmentRowInDB).toMatchObject({
@@ -420,11 +438,9 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Prepare
       const siretOfEstablishmentToUpdate = "78000403200021";
 
-      const updateProps: Partial<
-        Pick<
-          EstablishmentEntityV2,
-          "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"
-        >
+      const updateProps: Pick<
+        EstablishmentEntityV2,
+        "address" | "position" | "naf" | "numberEmployeesRange"
       > = {
         naf: "8722B",
         numberEmployeesRange: 1,
@@ -432,7 +448,6 @@ describe("Postgres implementation of immersion offer repository", () => {
         address: "4 rue de l'île de Bitche 44000 Nantes",
       };
       await insertEstablishment({
-        client,
         siret: siretOfEstablishmentToUpdate,
         updatedAt: new Date("2020-04-14T12:00:00.000"),
         isActive: true,
@@ -451,67 +466,430 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Assert
       const actualEstablishmentRowInDB = await retrieveEstablishmentWithSiret(
-        client,
         siretOfEstablishmentToUpdate,
       );
-      const partialExpectedEstablishmentRowInDB: PartialEstablishmentPGRow = {
-        update_date: updatedAt,
-        naf: updateProps?.naf,
-        number_employees: updateProps.numberEmployeesRange,
-        address: updateProps.address,
-        longitude: updateProps?.position?.lon,
-        latitude: updateProps?.position?.lat,
-      };
+      const partialExpectedEstablishmentRowInDB: Partial<PgEstablishmentRowWithGeo> =
+        {
+          update_date: updatedAt,
+          naf: updateProps.naf,
+          number_employees: updateProps.numberEmployeesRange,
+          address: updateProps.address,
+          longitude: updateProps?.position?.lon,
+          latitude: updateProps?.position?.lat,
+        };
       expect(actualEstablishmentRowInDB).toMatchObject(
         partialExpectedEstablishmentRowInDB,
       );
     });
   });
 
-  const getEstablishmentsBySiret = (siret: string) =>
+  describe("Pg implementation of method insertEstablishmentAggregates", () => {
+    const siret1 = "11111111111111";
+    const siret2 = "22222222222222";
+    describe("Create new establishments", () => {
+      it("does nothing if empty list given", async () => {
+        await pgImmersionOfferRepository.insertEstablishmentAggregates([]);
+        expect(await getAllEstablishmentsRows()).toHaveLength(0);
+      });
+      it("adds the establishment values in `establishments` table when one new establishment is given", async () => {
+        // Prepare
+        const establishmentToInsert = new EstablishmentEntityV2Builder()
+          .withContactMode("EMAIL")
+          .build();
+
+        // Act
+        await pgImmersionOfferRepository.insertEstablishmentAggregates([
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(establishmentToInsert)
+            .build(),
+        ]);
+
+        // Assert
+        const expectedEstablishmentRow: Partial<PgEstablishmentRow> = {
+          siret: establishmentToInsert.siret,
+          name: establishmentToInsert.name,
+          address: establishmentToInsert.address,
+          number_employees: establishmentToInsert.numberEmployeesRange,
+          naf: establishmentToInsert.naf,
+          contact_mode: "mail",
+          data_source: establishmentToInsert.dataSource,
+          update_date: establishmentToInsert.updatedAt,
+          is_active: establishmentToInsert.isActive,
+        };
+        const actualEstablishmentRows = await getAllEstablishmentsRows();
+        expect(actualEstablishmentRows).toHaveLength(1);
+        expect(actualEstablishmentRows[0]).toMatchObject(
+          expectedEstablishmentRow,
+        );
+      });
+      it("adds one new row per establishment in `establishments` table when multiple establishments are given", async () => {
+        // Act
+        await pgImmersionOfferRepository.insertEstablishmentAggregates([
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(siret1)
+            .build(),
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(siret2)
+            .build(),
+        ]);
+        // Assert
+        const establishmentsRows = await getAllEstablishmentsRows();
+        expect(establishmentsRows).toHaveLength(2);
+        expect(establishmentsRows.map((row) => row.siret)).toEqual([
+          siret1,
+          siret2,
+        ]);
+      });
+      it("adds a new row in contact table with first contact referencing the establishment siret, if multiple contacts are given", async () => {
+        // Prepare
+        const firstContactId = "3ca6e619-d654-4d0d-8fa6-2febefbe953d";
+        const firstContact = new ContactEntityV2Builder()
+          .withId(firstContactId)
+          .build();
+
+        // Act
+        await pgImmersionOfferRepository.insertEstablishmentAggregates([
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(siret1)
+            .withContacts([firstContact])
+            .build(),
+        ]);
+
+        // Assert
+        const actualImmersionContactRows = await getAllImmersionContactsRows();
+        expect(actualImmersionContactRows).toHaveLength(1);
+        const expectedImmersionContactRow: PgImmersionContactRow = {
+          uuid: firstContact.id,
+          email: firstContact.email,
+          phone: firstContact.phone,
+          name: firstContact.lastName,
+          firstname: firstContact.firstName,
+          role: firstContact.job,
+          siret_establishment: siret1,
+        };
+        expect(actualImmersionContactRows[0]).toEqual(
+          expectedImmersionContactRow,
+        );
+      });
+      it("adds as many row as immersion offers in table `immersion_offers`, each referencing the establishment siret and the contact uuid", async () => {
+        // Act
+        const offer1 = new ImmersionOfferEntityV2Builder()
+          .withId("11111111-a2a5-430a-b558-ed3e2f03512d")
+          .withRome("A1111")
+          .build();
+        const offer2 = new ImmersionOfferEntityV2Builder()
+          .withId("22222222-a2a5-430a-b558-ed3e2f03512d")
+          .withRome("A2222")
+          .build();
+
+        const contactId = "3ca6e619-d654-4d0d-8fa6-2febefbe953d";
+        const establishmentAggregateToInsert =
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(siret1)
+            .withImmersionOffers([offer1, offer2])
+            .withContactId(contactId)
+            .build();
+
+        await pgImmersionOfferRepository.insertEstablishmentAggregates([
+          establishmentAggregateToInsert,
+        ]);
+
+        // Assert
+        const actualImmersionOfferRows = await getAllImmersionOfferRows();
+        expect(actualImmersionOfferRows).toHaveLength(2);
+
+        const expectedFirstImmersionOfferRow: Partial<PgImmersionOfferRow> = {
+          uuid: offer1.id,
+          rome: offer1.rome,
+          score: offer1.score,
+
+          siret: siret1,
+
+          naf: establishmentAggregateToInsert.establishment.naf,
+          naf_division: establishmentAggregateToInsert.establishment.naf.slice(
+            0,
+            2,
+          ),
+          name: establishmentAggregateToInsert.establishment.name,
+          voluntary_to_immersion:
+            establishmentAggregateToInsert.establishment.voluntaryToImmersion,
+          data_source: establishmentAggregateToInsert.establishment.dataSource,
+          contact_in_establishment_uuid: contactId,
+        };
+        expect(actualImmersionOfferRows[0]).toMatchObject(
+          expectedFirstImmersionOfferRow,
+        );
+      });
+    });
+    describe("When the establishment siret already exists and active ", () => {
+      const existingSiret = "88888888888888";
+      const existingUpdateAt = new Date("2021-01-01T10:10:00.000Z");
+      const existingEstablishmentAddress = "7 rue guillaume tell, 75017 Paris";
+      const insertExistingEstablishmentWithDataSource = async (
+        dataSource: DataSource,
+      ) => {
+        await insertEstablishment({
+          siret: existingSiret,
+          isActive: true,
+          position: { lat: 88, lon: 3 },
+          address: existingEstablishmentAddress,
+          naf: "A1111",
+          numberEmployeesRange: 1,
+          updatedAt: existingUpdateAt,
+          dataSource,
+        });
+      };
+      describe("Existing establishment's data source is `form` and new data source is `api_labonneboite`", () => {
+        it("adds a new offer with source `api_labonneboite` and contact_uid null (even if an offer with same rome and siret already exists)", async () => {
+          // Prepare : this establishment has once been inserted with an offer through source `form`
+          const offerRome = "A1111";
+          const existingSiret = "88888888888888";
+          const updatedAt = new Date("2021-01-01T10:10:00.000Z");
+          await insertExistingEstablishmentWithDataSource("form");
+          await insertImmersionOffer({
+            uuid: testUid1,
+            rome: offerRome,
+            siret: existingSiret,
+            dataSource: "form",
+            voluntaryToImmersion: true,
+          });
+
+          // Act : An aggregate with same siret and rome offer needs to be inserted from source `api_labonneboite`
+          await pgImmersionOfferRepository.insertEstablishmentAggregates([
+            new EstablishmentAggregateBuilder()
+              .withEstablishment(
+                new EstablishmentEntityV2Builder()
+                  .withSiret(existingSiret)
+                  .withDataSource("api_labonneboite")
+                  .withAddress("LBB address should be ignored")
+                  .build(),
+              )
+              .build(),
+          ]);
+          // Assert : establishment is not updated, but
+          /// Update date and address should not have changed
+          const actualEstablishmentRowInDB = await getEstablishmentsRowsBySiret(
+            existingSiret,
+          );
+          expect(actualEstablishmentRowInDB?.update_date).toEqual(updatedAt);
+          expect(actualEstablishmentRowInDB?.address).toEqual(
+            existingEstablishmentAddress,
+          );
+
+          /// Offer should have been added
+          const actualImmersionOfferRows = await getAllImmersionOfferRows();
+          expect(actualImmersionOfferRows).toHaveLength(2);
+          expect(actualImmersionOfferRows[0]?.data_source).toEqual("form");
+          expect(actualImmersionOfferRows[1]?.data_source).toEqual(
+            "api_labonneboite",
+          );
+
+          // /// Contact should not have been added
+          // expect(await getAllImmersionContactsRows()).toHaveLength(0); // TODO : fix me ?
+        });
+      });
+      describe("Existing establishment's data source is `api_labonneboite` and new data source is also `api_labonneboite`", () => {
+        it("updates the data in the establishments table", async () => {
+          // Prepare
+          await insertExistingEstablishmentWithDataSource("api_labonneboite");
+
+          // Act
+          const newAddress = "New establishment address, 44000 Nantes";
+          await pgImmersionOfferRepository.insertEstablishmentAggregates([
+            new EstablishmentAggregateBuilder()
+              .withEstablishment(
+                new EstablishmentEntityV2Builder()
+                  .withSiret(existingSiret)
+                  .withAddress(newAddress)
+                  .withDataSource("api_labonneboite")
+                  .build(),
+              )
+              .withImmersionOffers([
+                new ImmersionOfferEntityV2Builder().build(),
+              ])
+              .build(),
+          ]);
+          // Assert
+          /// Address (amongst other fields) should have been updated
+          expect(
+            (await getEstablishmentsRowsBySiret(existingSiret))?.address,
+          ).toEqual(newAddress);
+          /// Offer should have been added
+          expect(await getAllImmersionOfferRows()).toHaveLength(1);
+        });
+      });
+      describe("Existing establishment's data source is `api_labonneboite` and new data source is `form`", () => {
+        it("updates the data in the establishments table (dataSource, ...), contact table and adds the offers (no matter if same rome, siret already has offer) .", async () => {
+          // Prepare : an establishment with offer rome A1111 and no contact has previously been inserted by source La Bonne Boite
+          const offerRome = "A1111";
+          await insertExistingEstablishmentWithDataSource("api_labonneboite");
+          await insertImmersionOffer({
+            uuid: "22222222-a2a5-430a-b558-ed3e2f03512d",
+            rome: offerRome,
+            siret: existingSiret,
+            dataSource: "api_labonneboite",
+            voluntaryToImmersion: false,
+            contactUid: undefined,
+          });
+          // Act : an establishment aggregate with this siret is inserted by source Form
+          await pgImmersionOfferRepository.insertEstablishmentAggregates([
+            new EstablishmentAggregateBuilder()
+              .withEstablishment(
+                new EstablishmentEntityV2Builder()
+                  .withSiret(existingSiret)
+                  .withDataSource("form")
+                  .build(),
+              )
+              .withImmersionOffers([
+                new ImmersionOfferEntityV2Builder().build(),
+              ])
+              .build(),
+          ]);
+          // Assert
+          /// Data Source (amongst other fields) should have been updated
+          expect(
+            (await getEstablishmentsRowsBySiret(existingSiret))?.data_source,
+          ).toEqual("form");
+          /// Offer should have been added
+          const allImmersionOffeRows = await getAllImmersionOfferRows();
+          expect(allImmersionOffeRows).toHaveLength(2);
+          /// Offer added from source La Bonne Boite remains unchanged (eg. no contact uuid associated)
+          expect(
+            allImmersionOffeRows[0].contact_in_establishment_uuid,
+          ).toBeNull();
+        });
+      });
+    });
+  });
+
+  type PgEstablishmentRow = {
+    siret: string;
+    name: string;
+    address: string;
+    number_employees: number;
+    naf: string;
+    contact_mode?: PgContactMethod;
+    data_source: string;
+    gps: string;
+    update_date?: Date;
+    is_active: boolean;
+  };
+
+  const getAllEstablishmentsRows = (): Promise<PgEstablishmentRow[]> =>
+    client.query("SELECT * FROM establishments").then((res) => res.rows);
+
+  const getEstablishmentsRowsBySiret = (
+    siret: string,
+  ): Promise<PgEstablishmentRow | undefined> =>
     client
       .query("SELECT * FROM establishments WHERE siret=$1", [siret])
-      .then((res) => res.rows);
+      .then((res) => res.rows[0]);
+
+  type PgImmersionContactRow = {
+    uuid: string;
+    name: string;
+    firstname: string;
+    role: string;
+    email: string;
+    phone: string;
+    siret_establishment: string;
+  };
+
+  const getAllImmersionContactsRows = (): Promise<PgImmersionContactRow[]> =>
+    client.query("SELECT * FROM immersion_contacts").then((res) => res.rows);
+
+  type PgImmersionOfferRow = {
+    uuid: string;
+    rome: string;
+    naf_division: string;
+    siret: string;
+    naf: string;
+    name: string;
+    voluntary_to_immersion: boolean;
+    data_source: PgDataSource;
+    contact_in_establishment_uuid: string;
+    score: number;
+    gps: string;
+  };
+
+  const getAllImmersionOfferRows = (): Promise<PgImmersionOfferRow[]> =>
+    client.query("SELECT * FROM immersion_offers").then((res) => res.rows);
+
+  type PgEstablishmentRowWithGeo = PgEstablishmentRow & {
+    longitude: number;
+    latitude: number;
+  };
+
+  const retrieveEstablishmentWithSiret = async (
+    siret: string,
+  ): Promise<PgEstablishmentRowWithGeo | undefined> => {
+    const pgResult = await client.query(
+      `SELECT *, ST_X(gps::geometry) AS longitude, ST_Y(gps::geometry) AS latitude 
+       FROM establishments WHERE siret='${siret}' LIMIT 1;`,
+    );
+    return pgResult.rows[0] ?? (pgResult.rows[0] as PgEstablishmentRowWithGeo);
+  };
+  const insertEstablishment = async (props: {
+    siret: string;
+    updatedAt?: Date;
+    isActive: boolean;
+    naf?: string;
+    numberEmployeesRange?: number;
+    address?: string;
+    position: LatLonDto;
+    dataSource?: DataSource;
+  }) => {
+    const insertQuery = `INSERT INTO establishments (
+      siret, name, address, number_employees, naf, contact_mode, data_source, update_date, is_active, gps
+    ) VALUES ($1, '', $2, $3, $4, null,  $5, $6, $7, ST_GeographyFromText('POINT(${props.position.lon} ${props.position.lat})'))`;
+    await client.query(insertQuery, [
+      props.siret,
+      props.address ?? "7 rue guillaume tell, 75017 Paris",
+      props.numberEmployeesRange ?? null,
+      props.naf ?? "8622B",
+      props.dataSource ?? "api_labonneboite",
+      props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
+      props.isActive,
+    ]);
+  };
+  const insertImmersionOffer = async (props: {
+    uuid: string;
+    rome: string;
+    siret: string;
+    contactUid?: string;
+    dataSource?: DataSource;
+    voluntaryToImmersion?: boolean;
+    position?: LatLonDto;
+  }) => {
+    const position = props.position ?? { lon: 3, lat: 99 };
+    const insertQuery = `INSERT INTO immersion_offers (
+      uuid, rome, siret, data_source, voluntary_to_immersion, contact_in_establishment_uuid, naf, naf_division, name, score, gps
+    ) VALUES
+     ($1, $2, $3, $4,  $5, $6, '8520A', '85', '', 4,  ST_GeographyFromText('POINT(${
+       position.lon ?? 3
+     } ${position.lat ?? 44})'))`;
+    await client.query(insertQuery, [
+      props.uuid,
+      props.rome,
+      props.siret,
+      props.dataSource ?? "api_labonneboite",
+      props.voluntaryToImmersion ?? false,
+      props.contactUid ?? null,
+    ]);
+  };
+  const insertImmersionContact = async (props: {
+    uuid: string;
+    name?: string;
+    siret_establishment: string;
+  }) => {
+    const insertQuery = `INSERT INTO immersion_contacts (
+      uuid, name, siret_establishment, firstname, role, email, phone
+    ) VALUES
+     ($1, $2, $3, '', '', '', '')`;
+    await client.query(insertQuery, [
+      props.uuid,
+      props.name ?? "Jacques",
+      props.siret_establishment,
+    ]);
+  };
 });
-
-const insertEstablishment = async (props: {
-  client: PoolClient;
-  siret: string;
-  updatedAt?: Date;
-  isActive: boolean;
-  naf?: string;
-  numberEmployeesRange?: number;
-  address?: string;
-  position: LatLonDto;
-}) => {
-  const insertQuery = `INSERT INTO establishments (
-    siret, name, address, number_employees, naf, contact_mode, data_source, gps, update_date, is_active
-  ) VALUES ('${props.siret}', '', '${props.address ?? ""}', ${
-    props.numberEmployeesRange ?? null
-  }, '${
-    props.naf ?? "8622B"
-  }', null, 'api_labonneboite', ${`ST_GeographyFromText('POINT(${props.position.lon} ${props.position.lat})')`}, ${
-    props.updatedAt ? `'${props.updatedAt.toISOString()}'` : "null"
-  }, ${props.isActive} )`;
-  await props.client.query(insertQuery);
-};
-
-type PartialEstablishmentPGRow = {
-  update_date?: Date;
-  naf?: string;
-  number_employees?: number;
-  address?: string;
-  longitude?: number;
-  latitude?: number;
-};
-
-const retrieveEstablishmentWithSiret = async (
-  client: PoolClient,
-  siret: string,
-): Promise<PartialEstablishmentPGRow | undefined> => {
-  const pgResult = await client.query(
-    `SELECT update_date, is_active, naf, number_employees, address, ST_X(gps::geometry) AS longitude, ST_Y(gps::geometry) AS latitude 
-     FROM establishments WHERE siret='${siret}' LIMIT 1;`,
-  );
-  return pgResult.rows[0] ?? (pgResult.rows[0] as PartialEstablishmentPGRow);
-};
