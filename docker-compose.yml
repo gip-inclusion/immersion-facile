@@ -61,7 +61,7 @@ services:
     volumes:
       - ./docker-data/postgresql:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${PG_EXPOSED_PORT:-5432}:5432"
 
   adminer:
     image: adminer
