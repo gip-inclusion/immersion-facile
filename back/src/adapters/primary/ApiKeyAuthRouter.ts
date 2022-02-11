@@ -11,13 +11,14 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
 
   authenticatedRouter.use(deps.apiKeyAuthMiddleware);
 
-  authenticatedRouter
-    .route(`/${searchImmersionRoute}`)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.searchImmersion.execute(req.body, req.apiConsumer),
-      ),
-    );
+  authenticatedRouter.route(`/${searchImmersionRoute}`).post(async (req, res) =>
+    sendHttpResponse(req, res, async () => {
+      await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
+        req.body,
+      );
+      return deps.useCases.searchImmersion.execute(req.body, req.apiConsumer);
+    }),
+  );
 
   authenticatedRouter
     .route(`/${getImmersionOfferByIdRoute}/:id`)

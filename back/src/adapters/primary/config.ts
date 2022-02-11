@@ -96,6 +96,7 @@ import {
   createJwtAuthMiddleware,
 } from "./authMiddleware";
 import { ListImmersionApplicationsWithComputedWeeklyHours } from "../../domain/immersionApplication/useCases/ListImmersionApplicationsWithComputedWeeklyHours";
+import { CallLaBonneBoiteAndUpdateRepositories } from "../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 
 const logger = createLogger(__filename);
 
@@ -406,10 +407,7 @@ const createUseCases = (
     searchImmersion: new SearchImmersion(
       repositories.searchesMade,
       repositories.immersionOffer,
-      repositories.laBonneBoiteRequest,
-      repositories.laBonneBoiteAPI,
       uuidGenerator,
-      clock,
     ),
     getImmersionOfferById: new GetImmersionOfferById(
       repositories.immersionOffer,
@@ -438,6 +436,14 @@ const createUseCases = (
       createNewEvent,
     ),
 
+    callLaBonneBoiteAndUpdateRepositories:
+      new CallLaBonneBoiteAndUpdateRepositories(
+        repositories.immersionOffer,
+        repositories.laBonneBoiteRequest,
+        repositories.laBonneBoiteAPI,
+        uuidGenerator,
+        clock,
+      ),
     // siret
     getSiret,
 
