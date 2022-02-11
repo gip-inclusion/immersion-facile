@@ -7,7 +7,6 @@ export type SearchMade = {
   distance_km: number;
   lat: number;
   lon: number;
-  nafDivision?: string;
 };
 
 export type SearchMadeEntity = {

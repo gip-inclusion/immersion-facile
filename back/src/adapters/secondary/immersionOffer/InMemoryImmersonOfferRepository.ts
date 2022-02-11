@@ -91,28 +91,22 @@ export class InMemoryImmersionOfferRepository
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
     logger.info({ searchMade, withContactDetails }, "getFromSearch");
-    return this._establishmentAggregates
-      .filter(
-        (aggregate) =>
-          !searchMade.nafDivision ||
-          aggregate.establishment.naf.startsWith(searchMade.nafDivision),
-      )
-      .flatMap((aggregate) =>
-        aggregate.immersionOffers
-          .filter(
-            (immersionOffer) =>
-              !searchMade.rome || immersionOffer.rome === searchMade.rome,
-          )
-          .map((immersionOffer) =>
-            buildSearchImmersionResultDto(
-              immersionOffer,
-              aggregate.establishment,
-              aggregate.contacts[0],
-              searchMade,
-              withContactDetails,
-            ),
+    return this._establishmentAggregates.flatMap((aggregate) =>
+      aggregate.immersionOffers
+        .filter(
+          (immersionOffer) =>
+            !searchMade.rome || immersionOffer.rome === searchMade.rome,
+        )
+        .map((immersionOffer) =>
+          buildSearchImmersionResultDto(
+            immersionOffer,
+            aggregate.establishment,
+            aggregate.contacts[0],
+            searchMade,
+            withContactDetails,
           ),
-      );
+        ),
+    );
   }
 
   public async getActiveEstablishmentSiretsNotUpdatedSince(

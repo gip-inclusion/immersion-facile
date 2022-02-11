@@ -175,12 +175,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       romeFilter = `WHERE rome = $${parameters.length}`;
     }
 
-    let nafDivisionFilter = "";
-    if (searchMade.nafDivision) {
-      parameters.push(searchMade.nafDivision);
-      nafDivisionFilter = `AND offer_naf_division = $${parameters.length}`;
-    }
-
     const query = `
         WITH 
           active_establishments AS (
@@ -234,7 +228,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           ON (offer_rome = romes_public_data.code_rome)
         WHERE 
           ST_DWithin(offer_gps, ST_GeographyFromText($1), $2) 
-          ${nafDivisionFilter}
         ORDER BY
           offer_data_source ASC,
           distance_m;`;

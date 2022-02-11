@@ -9,7 +9,10 @@ import {
 } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
-import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
+import {
+  SearchMade,
+  SearchMadeEntity,
+} from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import {
   ImmersionOfferId,
@@ -93,9 +96,8 @@ const prepareSearchableData = async (params: PrepareParams | void) => {
   };
 };
 
-const searchSecretariatInMetzParams = {
+const searchSecretariatInMetzRequestDto: SearchImmersionRequestDto = {
   rome: "M1607",
-  nafDivision: "85",
   distance_km: 30,
   location: {
     lat: 49.119146,
@@ -123,13 +125,12 @@ describe("SearchImmersionUseCase", () => {
     const { searchImmersion, searchMadeRepository, uuidGenerator } =
       await prepareSearchableData();
     uuidGenerator.setNextUuid("searchMadeUuid");
-    await searchImmersion.execute(searchSecretariatInMetzParams);
+    await searchImmersion.execute(searchSecretariatInMetzRequestDto);
 
     expectSearchesStoredToEqual(searchMadeRepository.searchesMade, [
       {
         id: "searchMadeUuid",
         rome: "M1607",
-        nafDivision: "85",
         lat: 49.119146,
         lon: 6.17602,
         distance_km: 30,
@@ -169,7 +170,7 @@ describe("SearchImmersionUseCase", () => {
       uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
 
       const authenticatedResponse = await searchImmersion.execute(
-        searchSecretariatInMetzParams,
+        searchSecretariatInMetzRequestDto,
         authenticatedApiConsumerPayload,
       );
 
@@ -215,7 +216,7 @@ describe("SearchImmersionUseCase", () => {
       const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
       uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
       const unauthenticatedResponse = await searchImmersion.execute(
-        searchSecretariatInMetzParams,
+        searchSecretariatInMetzRequestDto,
       );
 
       expectSearchResponseToMatch(unauthenticatedResponse, [
@@ -276,8 +277,7 @@ describe("SearchImmersionUseCase", () => {
 
       // Act
       const unauthenticatedResponse = await searchImmersion.execute({
-        ...searchSecretariatInMetzParams,
-        nafDivision: "78",
+        ...searchSecretariatInMetzRequestDto,
       });
 
       // Assert

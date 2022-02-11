@@ -69,7 +69,6 @@ export class SearchImmersion extends UseCase<
   ): Promise<SearchImmersionResultDto[]> {
     const searchMade: SearchMade = {
       rome: params.rome,
-      nafDivision: params.nafDivision,
       lat: params.location.lat,
       lon: params.location.lon,
       distance_km: params.distance_km,

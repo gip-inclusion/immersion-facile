@@ -112,7 +112,6 @@ describe("Postgres implementation of immersion offer repository", () => {
             distance_km: 30,
             lat: 49.1,
             lon: 6.1,
-            nafDivision: "85",
           },
         );
       expect(searchResult).toHaveLength(1);

@@ -32,7 +32,6 @@ export class InMemorySearchMadeRepository implements SearchMadeRepository {
       lat: searchMadeEntity.lat,
       lon: searchMadeEntity.lon,
       rome: searchMadeEntity.rome,
-      nafDivision: searchMadeEntity.nafDivision,
     }));
   }
   public async retrievePendingSearches(): Promise<SearchMadeEntity[]> {
