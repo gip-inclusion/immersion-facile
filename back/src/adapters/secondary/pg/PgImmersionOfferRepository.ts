@@ -87,7 +87,33 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     if (establishmentFields.length === 0) return;
 
     try {
-      const query = buildUpsertEstablishmentsQuery(establishmentFields);
+      const query = fixStGeographyEscapingInQuery(
+        format(
+          `INSERT INTO establishments (
+          siret, name, address, number_employees, naf, contact_mode, data_source, gps, update_date, is_active
+        ) VALUES %L
+        ON CONFLICT
+          ON CONSTRAINT establishments_pkey
+            DO UPDATE
+              SET
+                name=EXCLUDED.name,
+                address=EXCLUDED.address,
+                number_employees=EXCLUDED.number_employees,
+                naf=EXCLUDED.naf,
+                contact_mode=EXCLUDED.contact_mode,
+                data_source=EXCLUDED.data_source
+              WHERE
+                EXCLUDED.data_source='form'
+                OR (
+                  establishments.data_source != 'form'
+                  AND (
+                    establishments.data_source = 'api_labonneboite'
+                  )
+                )`,
+          establishmentFields,
+        ),
+      );
+      console.log("query ", query);
       await this.client.query(query);
     } catch (e: any) {
       logger.error(e, "Error inserting establishments");
@@ -113,7 +139,12 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     if (contactFields.length === 0) return;
 
     try {
-      const query = buildInsertContactsQuery(contactFields);
+      const query = format(
+        `INSERT INTO immersion_contacts (
+        uuid, name, firstname, email, role, siret_establishment, phone
+      ) VALUES %L`,
+        contactFields,
+      );
       await this.client.query(query);
     } catch (e: any) {
       logger.error(e, "Error inserting contacts");
@@ -153,9 +184,34 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       }, []);
 
     try {
-      const query = buildUpsertImmersionOffersQuery(
-        deduplicatedArrayOfImmersionOffers,
+      const query = fixStGeographyEscapingInQuery(
+        format(
+          `INSERT INTO immersion_offers (
+          uuid, rome, naf_division, siret, naf,  name, voluntary_to_immersion, data_source,
+          contact_in_establishment_uuid, score, gps
+        ) VALUES %L
+        ON CONFLICT
+          ON CONSTRAINT immersion_offers_pkey
+            DO UPDATE
+              SET
+                naf=EXCLUDED.naf,
+                name=EXCLUDED.name,
+                voluntary_to_immersion=EXCLUDED.voluntary_to_immersion,
+                data_source=EXCLUDED.data_source,
+                score=EXCLUDED.score,
+                update_date=NOW()
+              WHERE
+                EXCLUDED.data_source='form'
+                OR (
+                  immersion_offers.data_source != 'form'
+                  AND (
+                    immersion_offers.data_source = 'api_labonneboite'
+                  )
+                )`,
+          deduplicatedArrayOfImmersionOffers,
+        ),
       );
+
       await this.client.query(query);
     } catch (e: any) {
       logger.error(e, "Error inserting immersion offers");
@@ -166,17 +222,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     searchMade: SearchMade,
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
-    const parameters = [
-      `POINT(${searchMade.lon} ${searchMade.lat})`,
-      searchMade.distance_km * 1000,
-    ];
-
-    let romeFilter = "";
-    if (searchMade.rome) {
-      parameters.push(searchMade.rome);
-      romeFilter = `WHERE rome = $${parameters.length}`;
-    }
-
     const query = `
         WITH 
           active_establishments AS (
@@ -203,7 +248,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
               ST_AsGeoJSON(gps) AS offer_position
             FROM immersion_offers 
-            ${romeFilter}
+            ${searchMade.rome ? "WHERE rome = %1$L" : ""}
             )
         SELECT
             filtered_immersion_offers.*,
@@ -233,9 +278,12 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         ORDER BY
           offer_data_source ASC,
           distance_m;`;
-
+    const formatedQuery = format(query, searchMade.rome); // Formats optional litterals %1$L and %2$L
     return this.client
-      .query(query, parameters)
+      .query(formatedQuery, [
+        `POINT(${searchMade.lon} ${searchMade.lat})`,
+        searchMade.distance_km * 1000, // Formats parameters $1, $2
+      ])
       .then((res) => {
         return res.rows.map((result) => {
           const immersionContact: SearchContact | null =
@@ -279,7 +327,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       })
       .catch((e) => {
         logger.error("Error in Pg implementation of getFromSearch", e);
-        return [{} as SearchImmersionResultDto];
+        return [];
       });
   }
 
@@ -448,71 +496,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   }
 }
 
-const buildUpsertEstablishmentsQuery = (establishmentFields: any[][]) => {
-  const query = format(
-    `INSERT INTO establishments (
-      siret, name, address, number_employees, naf, contact_mode, data_source, gps, update_date, is_active
-    ) VALUES %L
-    ON CONFLICT
-      ON CONSTRAINT establishments_pkey
-        DO UPDATE
-          SET
-            name=EXCLUDED.name,
-            address=EXCLUDED.address,
-            number_employees=EXCLUDED.number_employees,
-            naf=EXCLUDED.naf,
-            contact_mode=EXCLUDED.contact_mode,
-            data_source=EXCLUDED.data_source
-          WHERE
-            EXCLUDED.data_source='form'
-            OR (
-              establishments.data_source != 'form'
-              AND (
-                establishments.data_source = 'api_labonneboite'
-              )
-            )`,
-    establishmentFields,
-  );
-  return fixStGeographyEscapingInQuery(query);
-};
-
-const buildInsertContactsQuery = (contactFields: any[][]) =>
-  format(
-    `INSERT INTO immersion_contacts (
-    uuid, name, firstname, email, role, siret_establishment, phone
-  ) VALUES %L`,
-    contactFields,
-  );
-
-const buildUpsertImmersionOffersQuery = (immersionOfferFields: any[][]) => {
-  const query = format(
-    `INSERT INTO immersion_offers (
-      uuid, rome, naf_division, siret, naf,  name, voluntary_to_immersion, data_source,
-      contact_in_establishment_uuid, score, gps
-    ) VALUES %L
-    ON CONFLICT
-      ON CONSTRAINT immersion_offers_pkey
-        DO UPDATE
-          SET
-            naf=EXCLUDED.naf,
-            name=EXCLUDED.name,
-            voluntary_to_immersion=EXCLUDED.voluntary_to_immersion,
-            data_source=EXCLUDED.data_source,
-            score=EXCLUDED.score,
-            update_date=NOW()
-          WHERE
-            EXCLUDED.data_source='form'
-            OR (
-              immersion_offers.data_source != 'form'
-              AND (
-                immersion_offers.data_source = 'api_labonneboite'
-              )
-            )`,
-    immersionOfferFields,
-  );
-  return fixStGeographyEscapingInQuery(query);
-};
-
 // Extract the NAF division (e.g. 84) from a NAF code (e.g. 8413Z)
 const extractNafDivision = (naf: string) =>
   parseInt(naf.substring(0, 2)).toString();
@@ -524,5 +507,6 @@ const reStGeographyFromText =
   /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
 
 // Remove any repeated single quotes ('') inside ST_GeographyFromText.
+// TODO : find a better way than that : This is due to the Literal formatting that turns all simple quote into double quote.
 const fixStGeographyEscapingInQuery = (query: string) =>
   query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");
