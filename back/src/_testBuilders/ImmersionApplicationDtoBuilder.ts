@@ -1,6 +1,5 @@
 import { AgencyId } from "../shared/agencies";
 import {
-  ApplicationSource,
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
@@ -30,7 +29,6 @@ export const VALID_PHONES = [
 const validImmersionApplication: ImmersionApplicationDto = {
   id: DEMANDE_IMMERSION_ID,
   status: "DRAFT",
-  source: "GENERIC",
   postalCode: "75001",
   agencyId: "a025666a-22d7-4752-86eb-d07e27a5766a",
   email: VALID_EMAILS[0],
@@ -96,10 +94,6 @@ export class ImmersionApplicationDtoBuilder
 
   public withId(id: ImmersionApplicationId): ImmersionApplicationDtoBuilder {
     return new ImmersionApplicationDtoBuilder({ ...this.dto, id });
-  }
-
-  public withSource(source: ApplicationSource): ImmersionApplicationDtoBuilder {
-    return new ImmersionApplicationDtoBuilder({ ...this.dto, source });
   }
 
   public withAgencyId(agencyId: AgencyId): ImmersionApplicationDtoBuilder {

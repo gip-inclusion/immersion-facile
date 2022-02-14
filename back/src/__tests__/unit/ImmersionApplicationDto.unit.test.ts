@@ -1,7 +1,5 @@
 import type { ZodError } from "zod";
 import {
-  ApplicationSource,
-  applicationSourceFromString,
   ApplicationStatus,
   applicationStatusFromString,
   ImmersionApplicationDto,
@@ -186,32 +184,6 @@ describe("applicationStatusFromString", () => {
 const expectApplicationStatusToBe = (
   actual: ApplicationStatus,
   expected: ApplicationStatus,
-) => expect(actual).toBe(expected);
-
-describe("applicationSourceFromString", () => {
-  test("accepts valid enum values", () => {
-    expectApplicationSourceToBe(
-      applicationSourceFromString("GENERIC"),
-      "GENERIC",
-    );
-    expectApplicationSourceToBe(
-      applicationSourceFromString("BOULOGNE_SUR_MER"),
-      "BOULOGNE_SUR_MER",
-    );
-  });
-
-  test("converts invalid enum values to UNKNOWN", () => {
-    expectApplicationSourceToBe(applicationSourceFromString(""), "UNKNOWN");
-    expectApplicationSourceToBe(
-      applicationSourceFromString("UNKNOWN_VALUE"),
-      "UNKNOWN",
-    );
-  });
-});
-
-const expectApplicationSourceToBe = (
-  actual: ApplicationSource,
-  expected: ApplicationSource,
 ) => expect(actual).toBe(expected);
 
 const expectImmersionApplicationDtoToBeValid = (

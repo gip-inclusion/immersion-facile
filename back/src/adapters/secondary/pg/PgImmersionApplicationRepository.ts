@@ -74,7 +74,6 @@ export class PgImmersionApplicationRepository
   pgToEntity(params: Record<any, any>): ImmersionApplicationEntity {
     return ImmersionApplicationEntity.create({
       id: params.id,
-      source: "GENERIC",
       status: params.status,
       email: params.email,
       firstName: params.first_name,

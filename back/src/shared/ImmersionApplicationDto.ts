@@ -55,22 +55,6 @@ export const applicationStatusFromString = (s: string): ApplicationStatus => {
   return "UNKNOWN";
 };
 
-export type ApplicationSource =
-  | "UNKNOWN"
-  | "GENERIC"
-  | "BOULOGNE_SUR_MER"
-  | "NARBONNE";
-const validApplicationSources: NotEmptyArray<ApplicationSource> = [
-  "GENERIC",
-  "BOULOGNE_SUR_MER",
-  "NARBONNE",
-];
-export const applicationSourceFromString = (s: string): ApplicationSource => {
-  const source = s as ApplicationSource;
-  if (validApplicationSources.includes(source)) return source;
-  return "UNKNOWN";
-};
-
 const scheduleSchema: z.ZodSchema<ScheduleDto> = z.any();
 const legacyScheduleSchema: z.ZodSchema<LegacyScheduleDto> = z.any();
 
@@ -85,7 +69,6 @@ export const immersionApplicationSchema = z
     id: immersionApplicationIdSchema,
     status: z.enum(validApplicationStatus),
     rejectionJustification: z.string().optional(),
-    source: z.enum(validApplicationSources),
     email: zEmail,
     firstName: zTrimmedString,
     lastName: zTrimmedString,
@@ -258,7 +241,6 @@ export const renewMagicLinkRequestSchema = z.object({
 export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   id: "fake-test-id",
   status: "DRAFT",
-  source: "GENERIC",
   email: "esteban@ocon.fr",
   phone: "+33012345678",
   firstName: "Esteban",

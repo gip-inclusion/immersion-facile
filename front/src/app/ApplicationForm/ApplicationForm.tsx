@@ -13,7 +13,6 @@ import { Layout } from "src/components/Layout";
 import { Title } from "src/components/Title";
 import { ENV } from "src/environmentVariables";
 import {
-  ApplicationSource,
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "src/shared/ImmersionApplicationDto";
@@ -36,22 +35,12 @@ const isImmersionApplicationFrozen = (
 
 const { featureFlags, dev } = ENV;
 
-const getApplicationSourceForRoute = (
-  route: ApplicationFormRoute,
-): ApplicationSource => {
-  switch (route.name) {
-    default:
-      return "GENERIC";
-  }
-};
-
 const createInitialApplication = (
   route: ApplicationFormRoute,
 ): Partial<ImmersionApplicationDto> => {
   const emptyForm: Partial<ImmersionApplicationDto> = {
     id: uuidV4(),
     status: "DRAFT",
-    source: getApplicationSourceForRoute(route),
     dateSubmission: toDateString(startOfToday()),
 
     // Participant
