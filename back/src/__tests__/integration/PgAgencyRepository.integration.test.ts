@@ -60,13 +60,13 @@ describe("PgAgencyRepository", () => {
     it("returns existing agency", async () => {
       await agencyRepository.insert(agency1);
 
-      const config = await agencyRepository.getById(agency1.id);
-      expect(config).toEqual(agency1);
+      const agency = await agencyRepository.getById(agency1.id);
+      expect(agency).toEqual(agency1);
     });
 
     it("returns undefined for missing agency", async () => {
-      const config = await agencyRepository.getById(agency1.id);
-      expect(config).toBeUndefined();
+      const agency = await agencyRepository.getById(agency1.id);
+      expect(agency).toBeUndefined();
     });
   });
 
@@ -79,8 +79,8 @@ describe("PgAgencyRepository", () => {
     });
 
     it("returns empty list for empty table", async () => {
-      const configs = await agencyRepository.getAllActive();
-      expect(configs).toEqual([]);
+      const agencies = await agencyRepository.getAllActive();
+      expect(agencies).toEqual([]);
     });
     it("returns all agencies", async () => {
       await Promise.all([
@@ -89,8 +89,8 @@ describe("PgAgencyRepository", () => {
         agencyRepository.insert(inactiveAgency),
       ]);
 
-      const configs = await agencyRepository.getAllActive();
-      expect(sortById(configs)).toEqual([agency1, agency2]);
+      const agencies = await agencyRepository.getAllActive();
+      expect(sortById(agencies)).toEqual([agency1, agency2]);
     });
   });
 
@@ -169,5 +169,5 @@ describe("PgAgencyRepository", () => {
   });
 });
 
-const sortById = (configs: AgencyConfig[]): AgencyConfig[] =>
-  [...configs].sort((a, b) => (a.id < b.id ? -1 : 1));
+const sortById = (agencies: AgencyConfig[]): AgencyConfig[] =>
+  [...agencies].sort((a, b) => (a.id < b.id ? -1 : 1));

@@ -59,12 +59,12 @@ export class PgAgencyRepository implements AgencyRepository {
     return pgToEntity(pgConfig);
   }
 
-  public async insert(config: AgencyConfig): Promise<AgencyId | undefined> {
+  public async insert(agency: AgencyConfig): Promise<AgencyId | undefined> {
     const query = `INSERT INTO public.agencies(
       id, name, status, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, position
     ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %s)`;
     try {
-      await this.client.query(format(query, ...entityToPgArray(config)));
+      await this.client.query(format(query, ...entityToPgArray(agency)));
     } catch (error: any) {
       // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
       // See https://www.postgresql.org/docs/10/errcodes-appendix.html
@@ -74,24 +74,24 @@ export class PgAgencyRepository implements AgencyRepository {
       }
       throw error;
     }
-    return config.id;
+    return agency.id;
   }
 }
 
 const STPointStringFromPosition = (position: LatLonDto) =>
   `public.st_geographyfromtext('POINT(${position.lon} ${position.lat})'::text)`;
 
-const entityToPgArray = (config: AgencyConfig): any[] => [
-  config.id,
-  config.name,
-  config.status,
-  config.address,
-  JSON.stringify(config.counsellorEmails),
-  JSON.stringify(config.validatorEmails),
-  JSON.stringify(config.adminEmails),
-  config.questionnaireUrl || null,
-  config.signature,
-  STPointStringFromPosition(config.position),
+const entityToPgArray = (agency: AgencyConfig): any[] => [
+  agency.id,
+  agency.name,
+  agency.status,
+  agency.address,
+  JSON.stringify(agency.counsellorEmails),
+  JSON.stringify(agency.validatorEmails),
+  JSON.stringify(agency.adminEmails),
+  agency.questionnaireUrl || null,
+  agency.signature,
+  STPointStringFromPosition(agency.position),
 ];
 
 const pgToEntity = (params: Record<any, any>): AgencyConfig => ({

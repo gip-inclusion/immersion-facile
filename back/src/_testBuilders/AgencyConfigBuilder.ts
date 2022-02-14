@@ -5,7 +5,7 @@ import {
 import { AgencyId } from "../shared/agencies";
 import { Builder } from "./Builder";
 
-const emptyConfig: AgencyConfig = {
+const emptyAgency: AgencyConfig = {
   id: "empty-id",
   name: "empty-name",
   status: "active",
@@ -23,81 +23,81 @@ const emptyConfig: AgencyConfig = {
 
 export class AgencyConfigBuilder implements Builder<AgencyConfig> {
   // Initializes all feature flags to be off.
-  public constructor(readonly config: AgencyConfig) {}
+  public constructor(readonly agency: AgencyConfig) {}
 
   public static create(id: AgencyId) {
     return new AgencyConfigBuilder({
-      ...emptyConfig,
+      ...emptyAgency,
       id,
     });
   }
 
   public static empty() {
-    return new AgencyConfigBuilder({ ...emptyConfig });
+    return new AgencyConfigBuilder({ ...emptyAgency });
   }
 
   public withId(id: AgencyId) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       id,
     });
   }
 
   public withName(name: string) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       name,
     });
   }
 
   public withStatus(status: AgencyStatus) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       status,
     });
   }
 
   public withAddress(address: string) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       address,
     });
   }
 
   public withCounsellorEmails(counsellorEmails: string[]) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       counsellorEmails,
     });
   }
   public withValidatorEmails(validatorEmails: string[]) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       validatorEmails,
     });
   }
   public withAdminEmails(adminEmails: string[]) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       adminEmails,
     });
   }
   public withQuestionnaireUrl(questionnaireUrl: string) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       questionnaireUrl,
     });
   }
   public withSignature(signature: string) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       signature,
     });
   }
 
   public withPosition(lat: number, lon: number) {
     return new AgencyConfigBuilder({
-      ...this.config,
+      ...this.agency,
       position: {
         lat,
         lon,
@@ -106,6 +106,6 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
   }
 
   public build() {
-    return this.config;
+    return this.agency;
   }
 }

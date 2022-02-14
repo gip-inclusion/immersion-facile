@@ -7,7 +7,7 @@ import { distanceMetersBetweenCoordinates } from "./immersionOffer/distanceBetwe
 
 const logger = createLogger(__filename);
 
-export const testAgencies: AgencyConfig[] = [
+const testAgencies: AgencyConfig[] = [
   {
     id: "test-agency-1-back",
     name: "Test Agency 1 (back)",

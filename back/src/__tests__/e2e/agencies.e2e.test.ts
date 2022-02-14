@@ -1,7 +1,6 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { testAgencies } from "../../adapters/secondary/InMemoryAgencyRepository";
 
 describe("/agencies route", () => {
   let request: SuperTest<Test>;
