@@ -14,10 +14,10 @@ const timestamp = (pgm: MigrationBuilder) => ({
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.addColumn("agencies", {
-    status: { type: "varchar(255)", default: "needsReview" },
+    status: { type: "varchar(255)" },
   });
 
-  await pgm.sql("UPDATE agencies SET status = 'active' WHERE status = NULL");
+  await pgm.sql("UPDATE agencies SET status = 'active' WHERE status IS NULL");
 
   pgm.alterColumn("agencies", "status", {
     type: "varchar(255)",
