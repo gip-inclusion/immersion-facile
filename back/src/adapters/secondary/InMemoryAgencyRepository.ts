@@ -73,8 +73,9 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   public async getNearby(position: LatLonDto): Promise<AgencyConfig[]> {
     logger.info({ position, configs: this.agencies }, "getNearby");
     return Object.values(this.agencies)
-      .sort(function (a: AgencyDto, b: AgencyDto) {
-        return (
+      .filter((agency) => agency.status === "active")
+      .sort(
+        (a: AgencyDto, b: AgencyDto) =>
           distanceMetersBetweenCoordinates(
             a.position.lat,
             a.position.lon,
@@ -86,15 +87,16 @@ export class InMemoryAgencyRepository implements AgencyRepository {
             b.position.lon,
             position.lat,
             position.lon,
-          )
-        );
-      })
+          ),
+      )
       .slice(0, 20);
   }
 
-  public async getAll(): Promise<AgencyConfig[]> {
+  public async getAllActive(): Promise<AgencyConfig[]> {
     logger.info({ configs: this.agencies }, "getAll");
-    return Object.values(this.agencies);
+    return Object.values(this.agencies).filter(
+      (agency) => agency.status === "active",
+    );
   }
 
   public async insert(config: AgencyConfig): Promise<AgencyId | undefined> {

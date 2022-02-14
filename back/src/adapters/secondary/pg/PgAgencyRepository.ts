@@ -16,10 +16,11 @@ const MAX_NEARBY_DISTANCE = 100_000; // = 100km
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private client: PoolClient) {}
 
-  public async getAll(): Promise<AgencyConfig[]> {
+  public async getAllActive(): Promise<AgencyConfig[]> {
     const pgResult = await this.client.query(
       "SELECT id, name, status, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position\
-       FROM public.agencies",
+       FROM public.agencies\
+       WHERE status = 'active'",
     );
     return pgResult.rows.map(pgToEntity);
   }
@@ -33,7 +34,7 @@ export class PgAgencyRepository implements AgencyRepository {
         
       FROM public.agencies
       
-      WHERE ST_Distance(${STPointStringFromPosition(
+      WHERE status = 'active' AND ST_Distance(${STPointStringFromPosition(
         searchPosition,
       )}, position) <= ${MAX_NEARBY_DISTANCE}
       

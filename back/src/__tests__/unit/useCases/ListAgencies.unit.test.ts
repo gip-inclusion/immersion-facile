@@ -13,6 +13,13 @@ const agency2 = AgencyConfigBuilder.empty()
   .withPosition(10, 10)
   .build();
 
+const agencyInReview = AgencyConfigBuilder.empty()
+  .withId("33333333-3333-3333-3333-333333333333")
+  .withName("agency3")
+  .withStatus("needsReview")
+  .withPosition(11, 10)
+  .build();
+
 describe("ListAgencies", () => {
   test("returns empty list when the repository is empty", async () => {
     const repository = new InMemoryAgencyRepository([]);
@@ -22,8 +29,12 @@ describe("ListAgencies", () => {
     expect(agencies).toEqual([]);
   });
 
-  test("resturns stored agencies", async () => {
-    const repository = new InMemoryAgencyRepository([agency1, agency2]);
+  test("returns active stored agencies", async () => {
+    const repository = new InMemoryAgencyRepository([
+      agency1,
+      agency2,
+      agencyInReview,
+    ]);
     const listAgencies = new ListAgencies(repository);
 
     const agencies = await listAgencies.execute({});

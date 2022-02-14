@@ -23,7 +23,7 @@ export class ListAgencies extends UseCase<ListAgenciesRequestDto, AgencyDto[]> {
 
   private getAgenciesConfig(position?: LatLonDto): Promise<AgencyConfig[]> {
     if (position) return this.agencyRepository.getNearby(position);
-    return this.agencyRepository.getAll();
+    return this.agencyRepository.getAllActive();
   }
 }
 

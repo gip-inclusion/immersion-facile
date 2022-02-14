@@ -27,6 +27,13 @@ const agency2builder = AgencyConfigBuilder.create(
   .withQuestionnaireUrl("http://questionnaire.agency2.fr")
   .withSignature("The team of agency2");
 
+const inactiveAgency = AgencyConfigBuilder.create(
+  "55555555-5555-5555-5555-555555555555",
+)
+  .withStatus("needsReview")
+  .withPosition(48.7, 6.2)
+  .build();
+
 describe("PgAgencyRepository", () => {
   let pool: Pool;
   let client: PoolClient;
@@ -43,7 +50,7 @@ describe("PgAgencyRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE agencies");
+    await client.query("TRUNCATE agencies CASCADE");
     agencyRepository = new PgAgencyRepository(client);
   });
 
@@ -72,14 +79,17 @@ describe("PgAgencyRepository", () => {
     });
 
     it("returns empty list for empty table", async () => {
-      const configs = await agencyRepository.getAll();
+      const configs = await agencyRepository.getAllActive();
       expect(configs).toEqual([]);
     });
     it("returns all agencies", async () => {
-      await agencyRepository.insert(agency1);
-      await agencyRepository.insert(agency2);
+      await Promise.all([
+        agencyRepository.insert(agency1),
+        agencyRepository.insert(agency2),
+        agencyRepository.insert(inactiveAgency),
+      ]);
 
-      const configs = await agencyRepository.getAll();
+      const configs = await agencyRepository.getAllActive();
       expect(sortById(configs)).toEqual([agency1, agency2]);
     });
   });
@@ -112,13 +122,14 @@ describe("PgAgencyRepository", () => {
         agencyRepository.insert(nancyAgency),
         agencyRepository.insert(epinalAgency),
         agencyRepository.insert(dijonAgency),
+        agencyRepository.insert(inactiveAgency),
       ]);
 
       // Act
-      const configs = await agencyRepository.getNearby(placeStanislasPosition);
+      const agencies = await agencyRepository.getNearby(placeStanislasPosition);
 
       // Assert
-      expect(configs).toEqual([nancyAgency, epinalAgency]);
+      expect(agencies).toEqual([nancyAgency, epinalAgency]);
     });
   });
 
@@ -130,13 +141,13 @@ describe("PgAgencyRepository", () => {
       agency2 = agency2builder.build();
     });
     it("inserts unknown entities", async () => {
-      expect(await agencyRepository.getAll()).toHaveLength(0);
+      expect(await agencyRepository.getAllActive()).toHaveLength(0);
 
       await agencyRepository.insert(agency1);
-      expect(await agencyRepository.getAll()).toHaveLength(1);
+      expect(await agencyRepository.getAllActive()).toHaveLength(1);
 
       await agencyRepository.insert(agency2);
-      expect(await agencyRepository.getAll()).toHaveLength(2);
+      expect(await agencyRepository.getAllActive()).toHaveLength(2);
     });
   });
 
@@ -145,10 +156,10 @@ describe("PgAgencyRepository", () => {
 
     const agency1b = agency1builder.withName("agency1b").build();
 
-    expect(await agencyRepository.getAll()).toHaveLength(0);
+    expect(await agencyRepository.getAllActive()).toHaveLength(0);
 
     await agencyRepository.insert(agency1a);
-    expect(await agencyRepository.getAll()).toHaveLength(1);
+    expect(await agencyRepository.getAllActive()).toHaveLength(1);
 
     const id1b = await agencyRepository.insert(agency1b);
     expect(id1b).toBeUndefined();
