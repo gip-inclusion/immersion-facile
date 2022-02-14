@@ -1,7 +1,10 @@
 import { AgencyId, CreateAgencyConfig } from "../../../shared/agencies";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 
+export type AgencyStatus = "active" | "closed" | "needsReview";
+
 export type AgencyConfig = CreateAgencyConfig & {
+  status: AgencyStatus;
   adminEmails: string[];
 };
 

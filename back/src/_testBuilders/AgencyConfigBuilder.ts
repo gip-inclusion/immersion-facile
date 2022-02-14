@@ -1,10 +1,14 @@
-import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyRepository";
+import {
+  AgencyConfig,
+  AgencyStatus,
+} from "../domain/immersionApplication/ports/AgencyRepository";
 import { AgencyId } from "../shared/agencies";
 import { Builder } from "./Builder";
 
 const emptyConfig: AgencyConfig = {
   id: "empty-id",
   name: "empty-name",
+  status: "active",
   counsellorEmails: [],
   validatorEmails: [],
   adminEmails: [],
@@ -43,6 +47,13 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
     return new AgencyConfigBuilder({
       ...this.config,
       name,
+    });
+  }
+
+  public withStatus(status: AgencyStatus) {
+    return new AgencyConfigBuilder({
+      ...this.config,
+      status,
     });
   }
 

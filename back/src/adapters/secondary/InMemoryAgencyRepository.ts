@@ -11,6 +11,7 @@ export const testAgencies: AgencyConfig[] = [
   {
     id: "test-agency-1-back",
     name: "Test Agency 1 (back)",
+    status: "active",
     counsellorEmails: ["counsellor@agency1.fr"],
     validatorEmails: ["validator@agency1.fr"],
     adminEmails: ["admin@agency1.fr"],
@@ -25,6 +26,7 @@ export const testAgencies: AgencyConfig[] = [
   {
     id: "test-agency-2-back",
     name: "Test Agency 2 (back)",
+    status: "active",
     counsellorEmails: ["counsellor1@agency2.fr", "counsellor2@agency2.fr"],
     validatorEmails: ["validator1@agency2.fr", "validator2@agency2.fr"],
     adminEmails: ["admin1@agency2.fr", "admin2@agency2.fr"],
@@ -39,6 +41,7 @@ export const testAgencies: AgencyConfig[] = [
   {
     id: "test-agency-3-back",
     name: "Test Agency 3 (back)",
+    status: "active",
     counsellorEmails: [], // no counsellors
     validatorEmails: ["validator@agency3.fr"],
     adminEmails: ["admin@agency3.fr"],

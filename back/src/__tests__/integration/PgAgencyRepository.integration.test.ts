@@ -51,7 +51,6 @@ describe("PgAgencyRepository", () => {
     const agency1 = agency1builder.build();
 
     it("returns existing agency", async () => {
-      console.log("agency1 : ", agency1);
       await agencyRepository.insert(agency1);
 
       const config = await agencyRepository.getById(agency1.id);
