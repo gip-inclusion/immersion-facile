@@ -9,6 +9,7 @@ const agency1builder = AgencyConfigBuilder.create(
   "11111111-1111-1111-1111-111111111111",
 )
   .withName("agency1")
+  .withAddress("Agency 1 address")
   .withCounsellorEmails(["counsellorA@agency1.fr", "counsellorB@agency1.fr"])
   .withValidatorEmails(["validatorA@agency1.fr", "validatorB@agency1.fr"])
   .withAdminEmails(["adminA@agency1.fr", "adminB@agency1.fr"])
@@ -19,6 +20,7 @@ const agency2builder = AgencyConfigBuilder.create(
   "22222222-2222-2222-2222-222222222222",
 )
   .withName("agency2")
+  .withAddress("Agency 2 address")
   .withCounsellorEmails(["counsellorA@agency2.fr", "counsellorB@agency2.fr"])
   .withValidatorEmails([]) // no validators
   .withAdminEmails(["adminA@agency2.fr", "adminB@agency2.fr"])
@@ -49,6 +51,7 @@ describe("PgAgencyRepository", () => {
     const agency1 = agency1builder.build();
 
     it("returns existing agency", async () => {
+      console.log("agency1 : ", agency1);
       await agencyRepository.insert(agency1);
 
       const config = await agencyRepository.getById(agency1.id);

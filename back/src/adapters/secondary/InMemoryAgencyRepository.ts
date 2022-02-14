@@ -7,7 +7,7 @@ import { distanceMetersBetweenCoordinates } from "./immersionOffer/distanceBetwe
 
 const logger = createLogger(__filename);
 
-const testAgencies: AgencyConfig[] = [
+export const testAgencies: AgencyConfig[] = [
   {
     id: "test-agency-1-back",
     name: "Test Agency 1 (back)",
@@ -16,6 +16,7 @@ const testAgencies: AgencyConfig[] = [
     adminEmails: ["admin@agency1.fr"],
     questionnaireUrl: "http://questionnaire.agency1.fr",
     signature: "Signature of Test Agency 1",
+    address: "Agency 1 address",
     position: {
       lat: 1,
       lon: 2,
@@ -29,6 +30,7 @@ const testAgencies: AgencyConfig[] = [
     adminEmails: ["admin1@agency2.fr", "admin2@agency2.fr"],
     questionnaireUrl: "http://questionnaire.agency2.fr",
     signature: "Signature of Test Agency 2",
+    address: "Agency 2 address",
     position: {
       lat: 40,
       lon: 50,
@@ -42,6 +44,7 @@ const testAgencies: AgencyConfig[] = [
     adminEmails: ["admin@agency3.fr"],
     questionnaireUrl: "http://questionnaire.agency3.fr",
     signature: "Signature of Test Agency 3",
+    address: "Agency 3 address",
     position: {
       lat: 88,
       lon: 89.9999,

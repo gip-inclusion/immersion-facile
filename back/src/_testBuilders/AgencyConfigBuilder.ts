@@ -10,6 +10,7 @@ const emptyConfig: AgencyConfig = {
   adminEmails: [],
   questionnaireUrl: "empty-questionnaire-url",
   signature: "empty-signature",
+  address: "empty-address",
   position: {
     lat: 0,
     lon: 0,
@@ -42,6 +43,13 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
     return new AgencyConfigBuilder({
       ...this.config,
       name,
+    });
+  }
+
+  public withAddress(address: string) {
+    return new AgencyConfigBuilder({
+      ...this.config,
+      address,
     });
   }
 

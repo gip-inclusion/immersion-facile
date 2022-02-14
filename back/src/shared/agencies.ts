@@ -1,7 +1,7 @@
 import { z } from "../../node_modules/zod";
-import { latLonSchema } from "./SearchImmersionDto";
+import { LatLonDto, latLonSchema } from "./SearchImmersionDto";
 import { Flavor } from "./typeFlavors";
-import { zTrimmedString } from "./zodUtils";
+import { zEmail, zString, zTrimmedString } from "./zodUtils";
 
 export type AgencyId = Flavor<string, "AgencyId">;
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
@@ -19,3 +19,27 @@ export const listAgenciesRequestSchema = z.object({
 });
 
 export const listAgenciesResponseSchema = z.array(agencySchema);
+
+export type CreateAgencyConfig = {
+  id: AgencyId;
+  name: string;
+  address: string;
+  position: LatLonDto;
+  counsellorEmails: string[];
+  validatorEmails: string[];
+  // adminEmails: string[];
+  questionnaireUrl: string;
+  signature: string;
+};
+
+export const agencyConfigSchema: z.ZodSchema<CreateAgencyConfig> = z.object({
+  id: agencyIdSchema,
+  name: zString,
+  address: zString,
+  position: latLonSchema,
+  counsellorEmails: z.array(zEmail),
+  validatorEmails: z.array(zEmail),
+  // adminEmails: z.array(zEmail),
+  questionnaireUrl: zString,
+  signature: zString,
+});

@@ -1,15 +1,8 @@
-import { AgencyId } from "../../../shared/agencies";
+import { AgencyId, CreateAgencyConfig } from "../../../shared/agencies";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 
-export type AgencyConfig = {
-  id: AgencyId;
-  name: string;
-  counsellorEmails: string[];
-  validatorEmails: string[];
+export type AgencyConfig = CreateAgencyConfig & {
   adminEmails: string[];
-  questionnaireUrl: string;
-  signature: string;
-  position: LatLonDto;
 };
 
 export interface AgencyRepository {
