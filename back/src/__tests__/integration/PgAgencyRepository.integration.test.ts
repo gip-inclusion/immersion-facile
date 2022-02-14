@@ -6,7 +6,7 @@ import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { LatLonDto } from "../../shared/SearchImmersionDto";
 
 const agency1builder = AgencyConfigBuilder.create(
-  "11111111-1111-1111-1111-111111111111",
+  "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
 )
   .withName("agency1")
   .withAddress("Agency 1 address")
@@ -90,7 +90,7 @@ describe("PgAgencyRepository", () => {
       ]);
 
       const agencies = await agencyRepository.getAllActive();
-      expect(sortById(agencies)).toEqual([agency1, agency2]);
+      expect(sortById(agencies)).toEqual([agency2, agency1]);
     });
   });
 

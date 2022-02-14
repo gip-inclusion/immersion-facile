@@ -30,7 +30,7 @@ const validImmersionApplication: ImmersionApplicationDto = {
   id: DEMANDE_IMMERSION_ID,
   status: "DRAFT",
   postalCode: "75001",
-  agencyId: "a025666a-22d7-4752-86eb-d07e27a5766a",
+  agencyId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   email: VALID_EMAILS[0],
   phone: VALID_PHONES[0],
   firstName: "Esteban",

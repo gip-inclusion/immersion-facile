@@ -6,7 +6,7 @@ import { AgencyId } from "../shared/agencies";
 import { Builder } from "./Builder";
 
 const emptyAgency: AgencyConfig = {
-  id: "empty-id",
+  id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   name: "empty-name",
   status: "active",
   counsellorEmails: [],
@@ -25,10 +25,10 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
   // Initializes all feature flags to be off.
   public constructor(readonly agency: AgencyConfig) {}
 
-  public static create(id: AgencyId) {
+  public static create(id?: AgencyId) {
     return new AgencyConfigBuilder({
       ...emptyAgency,
-      id,
+      ...(id ? { id } : {}),
     });
   }
 

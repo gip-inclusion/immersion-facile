@@ -1,4 +1,6 @@
 import { Pool, PoolClient } from "pg";
+import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
+import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
@@ -14,6 +16,8 @@ describe("PgImmersionApplicationRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
+    const agencyRepository = new PgAgencyRepository(client);
+    await agencyRepository.insert(AgencyConfigBuilder.create().build());
   });
 
   afterAll(async () => {
