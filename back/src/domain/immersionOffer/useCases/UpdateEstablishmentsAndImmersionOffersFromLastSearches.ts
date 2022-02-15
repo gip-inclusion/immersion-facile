@@ -1,5 +1,5 @@
+import { groupBy } from "ramda";
 import {
-  groupBy,
   removeUndefinedElements,
   replaceArrayElement,
 } from "../../../shared/utils";
@@ -219,8 +219,8 @@ const dedupeEstablishmentAggregates = (
   aggregates: EstablishmentAggregate[],
 ) => {
   const aggregatesBySiret = groupBy(
-    aggregates,
     (aggregate) => aggregate.establishment.siret,
+    aggregates,
   );
 
   // Keep only the first aggregate for each siret.

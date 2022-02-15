@@ -1,13 +1,12 @@
-import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { z } from "zod";
-import { Workbook } from "../../generic/excel/port/Workbook";
-import {
-  groupExportsByAgencyName,
-  ImmersionApplicationReadyForExportVO,
-} from "../valueObjects/ImmersionApplicationReadyForExportVO";
 import { Column } from "exceljs";
+import { map, prop, groupBy } from "ramda";
+import { z } from "zod";
+import { pipeWithValue } from "../../../shared/pipeWithValue";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { Archive } from "../../generic/archive/port/Archive";
+import { Workbook } from "../../generic/excel/port/Workbook";
+import { ImmersionApplicationReadyForExportVO } from "../valueObjects/ImmersionApplicationReadyForExportVO";
 
 export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseCase<string> {
   inputSchema = z.string();
@@ -20,28 +19,22 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
     archivePath: string,
     uow: UnitOfWork,
   ): Promise<void> {
-    const immersionApplicationsRawBeforeExport =
-      await uow.immersionApplicationExportRepo.getAllApplicationsForExport();
-
-    const immersionApplicationsReadyForExport =
-      immersionApplicationsRawBeforeExport.map((i) =>
-        i.toImmersionApplicationReadyForExportVO(),
-      );
-
-    const immersionApplicationsGroupedByAgencies = groupExportsByAgencyName(
-      immersionApplicationsReadyForExport,
-    );
-
-    const workbookTitles = Object.keys(immersionApplicationsGroupedByAgencies);
-
     const workbookColumnsOptions =
       this.immersionApplicationExportColumnsOptions();
 
-    const createdFilePaths = await Promise.all<string>(
+    const immersionApplicationExportByAgency = pipeWithValue(
+      await uow.immersionApplicationExportRepo.getAllApplicationsForExport(),
+      map((i) => i.toImmersionApplicationReadyForExportVO()),
+      groupBy(prop("agencyName")),
+    );
+
+    const workbookTitles = Object.keys(immersionApplicationExportByAgency);
+
+    const createdFilePaths = await Promise.all(
       workbookTitles.map((agencyId: string) =>
         this.toWorkbook(
           agencyId,
-          immersionApplicationsGroupedByAgencies[agencyId],
+          immersionApplicationExportByAgency[agencyId],
           workbookColumnsOptions,
         ).toXlsx(),
       ),

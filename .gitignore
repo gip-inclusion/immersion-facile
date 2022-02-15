@@ -6,3 +6,5 @@ docker-data
 .vscode
 nginx/etc/letsencrypt
 backup/**/*.bz2
+exportAgencies.zip
+agency name from agencyId.xlsx

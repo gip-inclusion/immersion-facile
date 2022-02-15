@@ -54,24 +54,6 @@ export const removeUndefinedElements = <T>(
   unfilteredList: (T | undefined)[],
 ): T[] => unfilteredList.filter((el) => !!el) as T[];
 
-// Generates a dictionary with keys generated using keyFn and a list of all
-// array elements with that key.
-//
-// Example:
-//   groupBy(["Amy", "Bob", "Al"], (name) => name.charAt(0))
-// returns:
-//   { "A": ["Amy", "Al"], "B": ["Bob"] }
-export const groupBy = <T>(
-  arr: T[],
-  keyFn: (el: T) => string,
-): { [key: string]: T[] } =>
-  arr.reduce((acc, el) => {
-    const key = keyFn(el);
-    const values = acc[key] || [];
-    acc[key] = [...values, el];
-    return acc;
-  }, {} as { [key: string]: T[] });
-
 export const replaceArrayElement = <T extends any>(
   original: Array<T>,
   replaceAt: number,
