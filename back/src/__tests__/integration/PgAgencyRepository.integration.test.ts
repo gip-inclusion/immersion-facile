@@ -9,6 +9,7 @@ const agency1builder = AgencyConfigBuilder.create(
   "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
 )
   .withName("agency1")
+  .withKind("pole-emploi")
   .withAddress("Agency 1 address")
   .withCounsellorEmails(["counsellorA@agency1.fr", "counsellorB@agency1.fr"])
   .withValidatorEmails(["validatorA@agency1.fr", "validatorB@agency1.fr"])
@@ -20,6 +21,7 @@ const agency2builder = AgencyConfigBuilder.create(
   "22222222-2222-2222-2222-222222222222",
 )
   .withName("agency2")
+  .withKind("mission-locale")
   .withAddress("Agency 2 address")
   .withCounsellorEmails(["counsellorA@agency2.fr", "counsellorB@agency2.fr"])
   .withValidatorEmails([]) // no validators

@@ -1,6 +1,7 @@
 import { z } from "../../node_modules/zod";
 import { LatLonDto, latLonSchema } from "./SearchImmersionDto";
 import { Flavor } from "./typeFlavors";
+import { NotEmptyArray } from "./utils";
 import { zEmail, zString, zTrimmedString } from "./zodUtils";
 
 export type AgencyId = Flavor<string, "AgencyId">;
@@ -20,8 +21,18 @@ export const listAgenciesRequestSchema = z.object({
 
 export const listAgenciesResponseSchema = z.array(agencySchema);
 
+export type AgencyKind =
+  | "mission-locale"
+  | "pole-emploi"
+  | "cap-emploi"
+  | "conseil-départemental"
+  | "prépa-apprentissage"
+  | "structure-IAE"
+  | "autre";
+
 export type CreateAgencyConfig = {
   id: AgencyId;
+  kind: AgencyKind;
   name: string;
   address: string;
   position: LatLonDto;
@@ -32,14 +43,25 @@ export type CreateAgencyConfig = {
   signature: string;
 };
 
+const agencyKindList: NotEmptyArray<AgencyKind> = [
+  "mission-locale",
+  "pole-emploi",
+  "cap-emploi",
+  "conseil-départemental",
+  "prépa-apprentissage",
+  "structure-IAE",
+  "autre",
+];
+const agencyKindSchema = z.enum(agencyKindList);
+
 export const agencyConfigSchema: z.ZodSchema<CreateAgencyConfig> = z.object({
   id: agencyIdSchema,
   name: zString,
+  kind: agencyKindSchema,
   address: zString,
   position: latLonSchema,
   counsellorEmails: z.array(zEmail),
   validatorEmails: z.array(zEmail),
-  // adminEmails: z.array(zEmail),
   questionnaireUrl: zString,
   signature: zString,
 });

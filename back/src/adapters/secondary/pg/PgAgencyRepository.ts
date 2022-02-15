@@ -18,7 +18,7 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getAllActive(): Promise<AgencyConfig[]> {
     const pgResult = await this.client.query(
-      "SELECT id, name, status, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position\
+      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position\
        FROM public.agencies\
        WHERE status = 'active'",
     );
@@ -27,7 +27,7 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getNearby(searchPosition: LatLonDto): Promise<AgencyConfig[]> {
     const pgResult = await this.client.query(
-      `SELECT id, name, status, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position,
+      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position,
         ST_Distance(${STPointStringFromPosition(
           searchPosition,
         )}, position) as dist
@@ -47,22 +47,22 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getById(id: AgencyId): Promise<AgencyConfig | undefined> {
     const pgResult = await this.client.query(
-      "SELECT id, name, status, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position\
+      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position\
       FROM public.agencies\
       WHERE id = $1",
       [id],
     );
 
-    const pgConfig = pgResult.rows[0];
-    if (!pgConfig) return;
+    const pgAgency = pgResult.rows[0];
+    if (!pgAgency) return;
 
-    return pgToEntity(pgConfig);
+    return pgToEntity(pgAgency);
   }
 
   public async insert(agency: AgencyConfig): Promise<AgencyId | undefined> {
     const query = `INSERT INTO public.agencies(
-      id, name, status, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, position
-    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %s)`;
+      id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, position
+    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s)`;
     try {
       await this.client.query(format(query, ...entityToPgArray(agency)));
     } catch (error: any) {
@@ -85,6 +85,7 @@ const entityToPgArray = (agency: AgencyConfig): any[] => [
   agency.id,
   agency.name,
   agency.status,
+  agency.kind,
   agency.address,
   JSON.stringify(agency.counsellorEmails),
   JSON.stringify(agency.validatorEmails),
@@ -98,6 +99,7 @@ const pgToEntity = (params: Record<any, any>): AgencyConfig => ({
   id: params.id,
   name: params.name,
   status: params.status,
+  kind: params.kind,
   address: params.address,
   counsellorEmails: params.counsellor_emails,
   validatorEmails: params.validator_emails,

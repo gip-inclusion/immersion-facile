@@ -12,6 +12,7 @@ const testAgencies: AgencyConfig[] = [
     id: "test-agency-1-back",
     name: "Test Agency 1 (back)",
     status: "active",
+    kind: "pole-emploi",
     counsellorEmails: ["counsellor@agency1.fr"],
     validatorEmails: ["validator@agency1.fr"],
     adminEmails: ["admin@agency1.fr"],
@@ -27,6 +28,7 @@ const testAgencies: AgencyConfig[] = [
     id: "test-agency-2-back",
     name: "Test Agency 2 (back)",
     status: "active",
+    kind: "mission-locale",
     counsellorEmails: ["counsellor1@agency2.fr", "counsellor2@agency2.fr"],
     validatorEmails: ["validator1@agency2.fr", "validator2@agency2.fr"],
     adminEmails: ["admin1@agency2.fr", "admin2@agency2.fr"],
@@ -42,6 +44,7 @@ const testAgencies: AgencyConfig[] = [
     id: "test-agency-3-back",
     name: "Test Agency 3 (back)",
     status: "active",
+    kind: "pole-emploi",
     counsellorEmails: [], // no counsellors
     validatorEmails: ["validator@agency3.fr"],
     adminEmails: ["admin@agency3.fr"],
@@ -73,30 +76,14 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   public async getNearby(position: LatLonDto): Promise<AgencyConfig[]> {
     logger.info({ position, configs: this.agencies }, "getNearby");
     return Object.values(this.agencies)
-      .filter((agency) => agency.status === "active")
-      .sort(
-        (a: AgencyDto, b: AgencyDto) =>
-          distanceMetersBetweenCoordinates(
-            a.position.lat,
-            a.position.lon,
-            position.lat,
-            position.lon,
-          ) -
-          distanceMetersBetweenCoordinates(
-            b.position.lat,
-            b.position.lon,
-            position.lat,
-            position.lon,
-          ),
-      )
+      .filter(isAgencyActive)
+      .sort(sortByNearestFrom(position))
       .slice(0, 20);
   }
 
   public async getAllActive(): Promise<AgencyConfig[]> {
     logger.info({ configs: this.agencies }, "getAll");
-    return Object.values(this.agencies).filter(
-      (agency) => agency.status === "active",
-    );
+    return Object.values(this.agencies).filter(isAgencyActive);
   }
 
   public async insert(config: AgencyConfig): Promise<AgencyId | undefined> {
@@ -114,3 +101,20 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     });
   }
 }
+
+const isAgencyActive = (agency: AgencyConfig) => agency.status === "active";
+
+const sortByNearestFrom =
+  (position: LatLonDto) => (a: AgencyDto, b: AgencyDto) =>
+    distanceMetersBetweenCoordinates(
+      a.position.lat,
+      a.position.lon,
+      position.lat,
+      position.lon,
+    ) -
+    distanceMetersBetweenCoordinates(
+      b.position.lat,
+      b.position.lon,
+      position.lat,
+      position.lon,
+    );

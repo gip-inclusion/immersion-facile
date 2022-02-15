@@ -2,13 +2,14 @@ import {
   AgencyConfig,
   AgencyStatus,
 } from "../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyId } from "../shared/agencies";
+import { AgencyId, AgencyKind } from "../shared/agencies";
 import { Builder } from "./Builder";
 
 const emptyAgency: AgencyConfig = {
   id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   name: "empty-name",
   status: "active",
+  kind: "autre",
   counsellorEmails: [],
   validatorEmails: [],
   adminEmails: [],
@@ -47,6 +48,13 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
     return new AgencyConfigBuilder({
       ...this.agency,
       name,
+    });
+  }
+
+  public withKind(kind: AgencyKind) {
+    return new AgencyConfigBuilder({
+      ...this.agency,
+      kind,
     });
   }
 
