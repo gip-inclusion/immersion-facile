@@ -1,5 +1,4 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { FeatureFlags } from "../../../shared/featureFlags";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   ApplicationStatus,
   SignImmersionApplicationRequestDto,

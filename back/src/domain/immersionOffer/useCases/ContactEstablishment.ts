@@ -1,7 +1,7 @@
 import {
   BadRequestError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/sendHttpResponse";
+} from "../../../adapters/primary/helpers/httpErrors";
 import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,

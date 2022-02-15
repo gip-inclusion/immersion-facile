@@ -2,7 +2,7 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/sendHttpResponse";
+} from "../../../adapters/primary/helpers/httpErrors";
 import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   ApplicationStatus,

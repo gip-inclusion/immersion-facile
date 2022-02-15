@@ -1,4 +1,4 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { GetImmersionApplication } from "../../../domain/immersionApplication/useCases/GetImmersionApplication";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";

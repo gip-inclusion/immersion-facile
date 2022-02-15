@@ -29,6 +29,10 @@ export const removeAtIndex = <T>(array: T[], indexToRemove: number): T[] => [
 ];
 
 export type NotEmptyArray<T> = [T, ...T[]];
+export type OmitFromExistingKeys<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+> = Omit<T, K>;
 
 export const keys = <T extends string | number | symbol>(
   obj: Partial<Record<T, unknown>>,
@@ -54,7 +58,7 @@ export const removeUndefinedElements = <T>(
 // array elements with that key.
 //
 // Example:
-//   keyBy(["Amy", "Bob", "Al"], (name) => name.charAt(0))
+//   groupBy(["Amy", "Bob", "Al"], (name) => name.charAt(0))
 // returns:
 //   { "A": ["Amy", "Al"], "B": ["Bob"] }
 export const groupBy = <T>(

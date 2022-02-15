@@ -1,5 +1,5 @@
 import express from "express";
-import { ForbiddenError } from "../../adapters/primary/helpers/sendHttpResponse";
+import { ForbiddenError } from "../../adapters/primary/helpers/httpErrors";
 
 export interface AuthChecker {
   checkAuth: (request: express.Request) => void;

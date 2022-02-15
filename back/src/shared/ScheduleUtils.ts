@@ -23,7 +23,7 @@ export const calculateHoursOfComplexSchedule = (
   ) / 60;
 
 // Calculate total hours per week for a given schedule.
-export const calculateHours = (schedule: ScheduleDto) => {
+export const calculateWeeklyHoursFromSchedule = (schedule: ScheduleDto) => {
   if (schedule.isSimple) {
     let numberOfDays = 0;
     for (const period of schedule.simpleSchedule.dayPeriods) {

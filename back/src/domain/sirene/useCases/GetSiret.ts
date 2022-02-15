@@ -1,4 +1,4 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   GetSiretRequestDto,
   getSiretRequestSchema,

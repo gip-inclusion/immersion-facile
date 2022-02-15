@@ -17,6 +17,7 @@ import { InMemorySireneRepository } from "../adapters/secondary/InMemorySireneRe
 import { AgencyConfigBuilder } from "./AgencyConfigBuilder";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationExportQueries } from "../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
 
 export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
@@ -24,6 +25,7 @@ export type InMemoryRepositories = {
   agency: InMemoryAgencyRepository;
   formEstablishment: InMemoryFormEstablishmentRepository;
   immersionApplication: InMemoryImmersionApplicationRepository;
+  immersionApplicationExport: ImmersionApplicationExportQueries;
   searchesMade: InMemorySearchMadeRepository;
   rome: InMemoryRomeGateway;
   email: InMemoryEmailGateway;

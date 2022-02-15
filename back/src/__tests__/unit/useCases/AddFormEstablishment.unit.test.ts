@@ -1,6 +1,6 @@
 import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config";
-import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";

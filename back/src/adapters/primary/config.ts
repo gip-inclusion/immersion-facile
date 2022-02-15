@@ -95,7 +95,9 @@ import {
   createApiKeyAuthMiddleware,
   createJwtAuthMiddleware,
 } from "./authMiddleware";
-import { ListImmersionApplicationsWithComputedWeeklyHours } from "../../domain/immersionApplication/useCases/ListImmersionApplicationsWithComputedWeeklyHours";
+import { ExportImmersionApplicationsAsExcelArchive } from "../../domain/immersionApplication/useCases/ExportImmersionApplicationsAsExcelArchive";
+import { StubImmersionApplicationExportQueries } from "../secondary/StubImmersionApplicationExportQueries";
+import { PgImmersionApplicationExportQueries } from "../secondary/pg/PgImmersionApplicationExportQueries";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 
 const logger = createLogger(__filename);
@@ -179,6 +181,12 @@ export const createRepositories = async (
       config.repositories === "PG"
         ? new PgImmersionApplicationRepository(await getPgPoolFn().connect())
         : new InMemoryImmersionApplicationRepository(),
+
+    immersionApplicationExport:
+      config.repositories === "PG"
+        ? new PgImmersionApplicationExportQueries(await getPgPoolFn().connect())
+        : StubImmersionApplicationExportQueries,
+
     formEstablishment:
       config.repositories === "PG"
         ? new PgFormEstablishmentRepository(await getPgPoolFn().connect())
@@ -276,6 +284,9 @@ export const createInMemoryUow = (repositories?: Repositories) => ({
   immersionApplicationRepo:
     (repositories?.immersionApplication as InMemoryImmersionApplicationRepository) ??
     new InMemoryImmersionApplicationRepository(),
+  immersionApplicationExportRepo:
+    repositories?.immersionApplicationExport ??
+    StubImmersionApplicationExportQueries,
 });
 
 // following function is for type check only, it is verifies InMemoryUnitOfWork is assignable to UnitOfWork
@@ -289,6 +300,9 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
   immersionOfferRepo: new PgImmersionOfferRepository(client),
   immersionApplicationRepo: new PgImmersionApplicationRepository(client),
+  immersionApplicationExportRepo: new PgImmersionApplicationExportQueries(
+    client,
+  ),
 });
 
 const createUowPerformer = (
@@ -369,8 +383,8 @@ const createUseCases = (
     listImmersionApplication: new ListImmersionApplication(
       repositories.immersionApplication,
     ),
-    listImmersionApplicationWithComputedWeeklyHours:
-      new ListImmersionApplicationsWithComputedWeeklyHours(uowPerformer),
+    exportImmersionApplicationsAsExcelArchive:
+      new ExportImmersionApplicationsAsExcelArchive(uowPerformer),
     updateImmersionApplication: new UpdateImmersionApplication(
       createNewEvent,
       repositories.outbox,

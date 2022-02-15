@@ -1,4 +1,4 @@
-import { BadRequestError } from "../../adapters/primary/helpers/sendHttpResponse";
+import { BadRequestError } from "../../adapters/primary/helpers/httpErrors";
 import { GetSiretUseCase } from "./useCases/GetSiret";
 
 export const rejectsSiretIfNotAnOpenCompany = async (

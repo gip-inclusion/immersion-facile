@@ -1,7 +1,7 @@
 import {
   ConflictError,
   ForbiddenError,
-} from "../../../adapters/primary/helpers/sendHttpResponse";
+} from "../../../adapters/primary/helpers/httpErrors";
 import {
   AddImmersionApplicationResponseDto,
   ApplicationStatus,

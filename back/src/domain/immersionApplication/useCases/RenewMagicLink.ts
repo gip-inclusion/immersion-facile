@@ -8,8 +8,8 @@ import {
 import {
   BadRequestError,
   ForbiddenError,
-} from "../../../adapters/primary/helpers/sendHttpResponse";
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import {
   RenewMagicLinkRequestDto,
   renewMagicLinkRequestSchema,

@@ -1,4 +1,3 @@
-import { ConflictError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   AddFormEstablishmentResponseDto,
@@ -11,6 +10,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
+import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 

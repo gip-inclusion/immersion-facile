@@ -18,19 +18,19 @@ Instead, you need to create a new migration with the new changes.
    ```
 
 2. Generate a new migration file :
+
    ```sh
    back$ npm run migrate create the-name-of-your-migration
    ```
 
 3. Edit the created file
 
-4. You can then : 
+4. You can then :
    - run all migration which have never ran: `npm run migrate up`
    - rollback the last migration: `npm run migrate down`
    - rollback n last migration: `npm run migrate down 4` # or any number
    - redo n last migration : `npm run migrate redo 4` # or any number
    - (redo is equivalent to : `npm run migrate down 4; npm run migrate up;`)
-
 
 # Testing schema changes locally
 
@@ -44,7 +44,7 @@ Instead, you need to create a new migration with the new changes.
    DATABASE_URL="postgresql://immersion:pg_password@postgres:5432/immersion-db"
    ```
 
-3. Purge any existing database and bring up the docker-compose setup:
+2. Purge any existing database and bring up the docker-compose setup:
 
    ```sh
    immersion-facile$ docker-compose down --volumes
@@ -62,7 +62,7 @@ Instead, you need to create a new migration with the new changes.
    - Password: `pg_password`
    - Database: `immersion-db`
 
-4. To bring up only postgres and adminer with postgres port, and then migrate:
+3. To bring up only postgres and adminer with postgres port, and then migrate:
 
    ```sh
       immersion-facile$ docker-compose -f docker-compose.resources.yml up --build

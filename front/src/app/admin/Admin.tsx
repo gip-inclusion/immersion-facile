@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { immersionApplicationGateway } from "src/app/dependencies";
+import {
+  immersionApplicationGateway,
+  immersionSearchGateway,
+} from "src/app/dependencies";
+
+import { extractImmersionApplicationsExcelRoute } from "../../shared/routes";
+
 import { routes } from "src/app/routes";
 import { FormAccordion } from "src/components/admin/FormAccordion";
 import { FormMagicLinks } from "src/components/admin/FormMagicLinks";
@@ -14,6 +20,8 @@ import {
 } from "src/shared/ImmersionApplicationDto";
 import { ArrayDropdown } from "src/components/admin/ArrayDropdown";
 import { ApiDataContainer } from "./ApiDataContainer";
+import { FormikHelpers } from "formik";
+import axios from "axios";
 
 interface AdminProps {
   route: Route<typeof routes.admin> | Route<typeof routes.agencyAdmin>;
@@ -44,21 +52,42 @@ export const Admin = ({ route }: AdminProps) => {
 
       <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
         <div className="fr-col-lg-8 fr-p-2w" style={{ width: "95%" }}>
-          <ApiDataContainer
-            apiCall={() =>
-              immersionApplicationGateway.getAll(agency, statusFilter)
-            }
-          >
-            {(data) => {
-              if (!data) return <p />;
+          <div>
+            <div
+              style={{
+                fontWeight: "600",
+                fontSize: "36px",
+                marginBottom: "30px",
+              }}
+            >
+              Export de données
+            </div>
+            <a className="fr-link" href="/api/extract-demande-immersion-excel" target="_blank">
+              Exporter les demandes d'immersion par agences
+            </a>
+          </div>
 
-              const immersionApplications = data as ImmersionApplicationDto[];
-              return (
-                <>
-                  <h2>Backoffice</h2>
-                  <div className="fr-text">
-                    Bienvenue dans le backoffice ! <br />
-                    Veuillez autentifier pour acceder aux donnes. <br />
+          <div>
+            <div
+              style={{
+                fontWeight: "600",
+                fontSize: "36px",
+                marginBottom: "30px",
+              }}
+            >
+              Demandes d'immersions à traiter
+            </div>
+            <ApiDataContainer
+              apiCall={() =>
+                immersionApplicationGateway.getAll(agency, statusFilter)
+              }
+            >
+              {(data) => {
+                if (!data) return <p />;
+
+                const immersionApplications = data as ImmersionApplicationDto[];
+                return (
+                  <>
                     <div
                       style={{
                         display: "flex",
@@ -75,23 +104,23 @@ export const Admin = ({ route }: AdminProps) => {
                         didPick={filterChanged}
                       />
                     </div>
-                  </div>
 
-                  <ul className="fr-accordions-group">
-                    {immersionApplications.map((item) => (
-                      <li key={item.id}>
-                        <FormAccordion immersionApplication={item} />
-                        {route.name === "admin" && (
-                          <FormMagicLinks immersionApplication={item} />
-                        )}
-                        <hr />
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              );
-            }}
-          </ApiDataContainer>
+                    <ul className="fr-accordions-group">
+                      {immersionApplications.map((item) => (
+                        <li key={item.id}>
+                          <FormAccordion immersionApplication={item} />
+                          {route.name === "admin" && (
+                            <FormMagicLinks immersionApplication={item} />
+                          )}
+                          <hr />
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                );
+              }}
+            </ApiDataContainer>
+          </div>
         </div>
       </div>
     </>

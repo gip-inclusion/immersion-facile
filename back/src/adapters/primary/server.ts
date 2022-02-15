@@ -18,7 +18,7 @@ import { createLogger } from "../../utils/logger";
 import { createApiKeyAuthRouter } from "./ApiKeyAuthRouter";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies, Repositories } from "./config";
-import { sendHttpResponse } from "./helpers/sendHttpResponse";
+import { sendHttpResponse, sendZipResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
@@ -54,13 +54,15 @@ export const createApp = async (
   router
     .route(`/${extractImmersionApplicationsExcelRoute}`)
     .get(async (req, res) => {
-      sendHttpResponse(
+      sendZipResponse(
         req,
         res,
         async () => {
-          const listOfData =
-            await deps.useCases.listImmersionApplicationWithComputedWeeklyHours.execute();
-          return listOfData;
+          const archivePath = "./exportAgencies.zip";
+          await deps.useCases.exportImmersionApplicationsAsExcelArchive.execute(
+            archivePath,
+          );
+          return archivePath;
         },
         deps.authChecker,
       );

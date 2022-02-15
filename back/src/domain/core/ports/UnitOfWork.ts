@@ -2,12 +2,14 @@ import { FormEstablishmentRepository } from "../../immersionOffer/ports/FormEsta
 import { ImmersionOfferRepository } from "../../immersionOffer/ports/ImmersionOfferRepository";
 import { OutboxRepository } from "./OutboxRepository";
 import { ImmersionApplicationRepository } from "../../immersionApplication/ports/ImmersionApplicationRepository";
+import { ImmersionApplicationExportQueries } from "../../immersionApplication/ports/ImmersionApplicationExportQueries";
 
 export type UnitOfWork = {
   outboxRepo: OutboxRepository;
   formEstablishmentRepo: FormEstablishmentRepository;
   immersionOfferRepo: ImmersionOfferRepository;
   immersionApplicationRepo: ImmersionApplicationRepository;
+  immersionApplicationExportRepo: ImmersionApplicationExportQueries;
 };
 
 export interface UnitOfWorkPerformer {

@@ -1,8 +1,8 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 
 const validEstablishment = new SireneEstablishmentVO({
   siret: "12345678901234",

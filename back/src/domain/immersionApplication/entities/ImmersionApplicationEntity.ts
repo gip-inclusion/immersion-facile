@@ -4,7 +4,7 @@ import {
 } from "../../../shared/ImmersionApplicationDto";
 
 export class ImmersionApplicationEntity {
-  private constructor(private readonly properties: ImmersionApplicationDto) {}
+  private constructor(public readonly properties: ImmersionApplicationDto) {}
 
   public static create(dto: ImmersionApplicationDto) {
     immersionApplicationSchema.parse(dto);
@@ -17,6 +17,10 @@ export class ImmersionApplicationEntity {
 
   public get id() {
     return this.properties.id;
+  }
+
+  public get agencyId() {
+    return this.properties.agencyId;
   }
 
   public get status() {

@@ -3,7 +3,7 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
-} from "../../../adapters/primary/helpers/sendHttpResponse";
+} from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";

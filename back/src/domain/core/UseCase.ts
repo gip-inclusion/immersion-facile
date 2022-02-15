@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BadRequestError } from "../../adapters/primary/helpers/sendHttpResponse";
+import { BadRequestError } from "../../adapters/primary/helpers/httpErrors";
 import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 

@@ -1,5 +1,7 @@
-import { BadRequestError } from "../../../adapters/primary/helpers/sendHttpResponse";
-import { NotFoundError } from "../../../adapters/primary/helpers/sendHttpResponse";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ValidateImmersionApplication } from "../../../domain/immersionApplication/useCases/ValidateImmersionApplication";

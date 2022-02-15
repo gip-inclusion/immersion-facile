@@ -3,7 +3,7 @@ import { AppConfig } from "../../../adapters/primary/appConfig";
 import {
   BadRequestError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/sendHttpResponse";
+} from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";

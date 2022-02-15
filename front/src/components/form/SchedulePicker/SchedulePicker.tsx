@@ -2,7 +2,7 @@ import { FieldHookConfig, useField } from "formik";
 import React from "react";
 import { ScheduleDto } from "src/shared/ScheduleSchema";
 import {
-  calculateHours,
+  calculateWeeklyHoursFromSchedule,
   checkSchedule,
   maxPermittedHoursPerWeek,
 } from "src/shared/ScheduleUtils";
@@ -14,7 +14,7 @@ import { TotalHoursIndicator } from "./TotalHoursIndicator";
 
 // Function that can be used as `validate` in Formik.
 export function scheduleValidator(value: ScheduleDto): string | void {
-  let totalHours = calculateHours(value);
+  let totalHours = calculateWeeklyHoursFromSchedule(value);
 
   if (totalHours > maxPermittedHoursPerWeek) {
     return "Veuillez saisir moins de 35h par semaine.";
@@ -60,7 +60,9 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
           {meta.error}
         </div>
       )}
-      <TotalHoursIndicator totalHours={calculateHours(field.value)} />
+      <TotalHoursIndicator
+        totalHours={calculateWeeklyHoursFromSchedule(field.value)}
+      />
 
       {!field.value.isSimple && (
         <ComplexSchedulePicker

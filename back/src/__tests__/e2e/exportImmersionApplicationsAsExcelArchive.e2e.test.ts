@@ -1,6 +1,7 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { extractImmersionApplicationsExcelRoute } from "../../shared/routes";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 
 describe("/extract-demande-immersion-excel", () => {
   it("fails with 401 without authentication", async () => {
@@ -10,8 +11,12 @@ describe("/extract-demande-immersion-excel", () => {
 
   it("works when authenticated", async () => {
     const { request, reposAndGateways } = await buildTestApp();
-    const immersionApplicationEntity =
-      new ImmersionApplicationEntityBuilder().build();
+    const linkedAgency: AgencyConfig = (
+      await reposAndGateways.agency.getAll()
+    )[0];
+    const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
+      .withAgencyId(linkedAgency.id)
+      .build();
 
     reposAndGateways.immersionApplication.setImmersionApplications({
       [immersionApplicationEntity.id]: immersionApplicationEntity,
@@ -22,11 +27,9 @@ describe("/extract-demande-immersion-excel", () => {
       .auth("e2e_tests", "e2e");
 
     expect(result.status).toBe(200);
-    expect(result.body).toEqual([
-      {
-        ...immersionApplicationEntity.toDto(),
-        weeklyHours: 35,
-      },
-    ]);
+    expect(result.headers).toMatchObject({
+      "content-disposition": 'attachment; filename="exportAgencies.zip"',
+      "content-type": "application/zip",
+    });
   });
 });

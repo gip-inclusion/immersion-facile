@@ -2,7 +2,7 @@ import { AuthChecker } from "./AuthChecker";
 import {
   ForbiddenError,
   UnauthorizedError,
-} from "../../adapters/primary/helpers/sendHttpResponse";
+} from "../../adapters/primary/helpers/httpErrors";
 import express from "express";
 
 export class InMemoryAuthChecker implements AuthChecker {
