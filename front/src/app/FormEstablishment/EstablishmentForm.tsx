@@ -172,7 +172,10 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
               setSubmitError(null);
 
               formEstablishmentSchema.parse(data);
-              await formEstablishmentGateway.addFormEstablishment(data);
+              await formEstablishmentGateway.addFormEstablishment({
+                ...data,
+                id: uuidV4(),
+              });
 
               setIsSuccess(true);
               setSubmitError(null);

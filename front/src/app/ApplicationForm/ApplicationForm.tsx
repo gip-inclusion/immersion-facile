@@ -39,7 +39,6 @@ const createInitialApplication = (
   route: ApplicationFormRoute,
 ): Partial<ImmersionApplicationDto> => {
   const emptyForm: Partial<ImmersionApplicationDto> = {
-    id: uuidV4(),
     status: "DRAFT",
     dateSubmission: toDateString(startOfToday()),
 
@@ -204,7 +203,10 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             onSubmit={async (values, { setSubmitting }) => {
               try {
                 const immersionApplicationParsed: ImmersionApplicationDto =
-                  immersionApplicationSchema.parse(values);
+                  immersionApplicationSchema.parse({
+                    ...values,
+                    id: values.id ?? uuidV4(),
+                  });
                 const immersionApplication: ImmersionApplicationDto = {
                   ...immersionApplicationParsed,
                   workConditions: undefinedIfEmptyString(
