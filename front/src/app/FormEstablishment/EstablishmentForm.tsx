@@ -30,7 +30,9 @@ import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
 type EstablishmentFormProps = {
-  route: Route<typeof routes.formEstablishment>;
+  route: Route<
+    typeof routes.formEstablishment | typeof routes.formEstablishmentForIframes
+  >;
 };
 
 const initialValues: FormEstablishmentDto = ENV.dev

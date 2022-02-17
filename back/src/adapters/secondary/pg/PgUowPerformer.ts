@@ -13,6 +13,7 @@ export class PgUowPerformer implements UnitOfWorkPerformer {
   public async perform<T>(cb: (uow: UnitOfWork) => Promise<T>): Promise<T> {
     const client = await this.pool.connect();
     const uow = this.createPgUow(client);
+    console.log("IN PG UOW Performer");
 
     try {
       await client.query("BEGIN");

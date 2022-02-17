@@ -28,6 +28,9 @@ export const Router = () => {
       {route.name === "formEstablishment" && (
         <EstablishmentForm route={route} />
       )}
+      {route.name === "formEstablishmentForIframes" && (
+        <EstablishmentForm route={route} />
+      )}
       {route.name === "immersionApplicationsToValidate" && (
         <VerificationPage route={route} />
       )}

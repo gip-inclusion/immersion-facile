@@ -41,16 +41,19 @@ export abstract class TransactionalUseCase<Input, Output = void> {
     params: Input,
     jwtPayload?: MagicLinkPayload,
   ): Promise<Output> {
+    console.log("\n \n IN TRANSACTIONNAL USE CASE");
     let validParams: Input;
     try {
       validParams = this.inputSchema.parse(params);
     } catch (e) {
+      console.log("\n \n ERROR in TRANSACTIONNAL");
       throw new BadRequestError(e);
     }
 
-    return this.uowPerformer.perform((uow) =>
-      this._execute(validParams, uow, jwtPayload),
-    );
+    return this.uowPerformer.perform((uow) => {
+      console.log("In uow performer");
+      return this._execute(validParams, uow, jwtPayload);
+    });
   }
 
   protected abstract _execute(

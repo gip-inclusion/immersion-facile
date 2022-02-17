@@ -70,6 +70,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     "/immersion-offer" /* old name, still redirected*/,
   ]),
 
+  formEstablishmentForIframes: defineRoute(
+    { consumer: param.path.string },
+    (p) => `/etablissement/${p.consumer}`,
+  ),
+
   renewMagicLink: defineRoute(
     {
       expiredJwt: param.query.string,
