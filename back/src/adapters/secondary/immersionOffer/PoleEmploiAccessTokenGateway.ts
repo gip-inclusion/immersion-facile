@@ -26,7 +26,7 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
   ) {}
 
   public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
-    const dataAcessToken = querystring.stringify({
+    const dataAccessToken = querystring.stringify({
       grant_type: "client_credentials",
       client_id: this.config.clientId,
       client_secret: this.config.clientSecret,
@@ -41,7 +41,7 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
         const response = await this.rateLimiter.whenReady(() =>
           createAxiosInstance(logger).post(
             "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Fpartenaire",
-            dataAcessToken,
+            dataAccessToken,
             { headers, timeout: secondsToMilliseconds(10) },
           ),
         );

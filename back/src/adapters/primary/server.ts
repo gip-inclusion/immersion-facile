@@ -6,9 +6,12 @@ import {
   agenciesRoute,
   contactEstablishmentRoute,
   extractImmersionApplicationsExcelRoute,
+  frontRoutes,
   generateMagicLinkRoute,
   getFeatureFlags,
   immersionApplicationsRoute,
+  loginPeConnect,
+  peConnect,
   renewMagicLinkRoute,
   romeRoute,
   siretRoute,
@@ -18,11 +21,19 @@ import { createLogger } from "../../utils/logger";
 import { createApiKeyAuthRouter } from "./ApiKeyAuthRouter";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies, Repositories } from "./config";
-import { sendHttpResponse, sendZipResponse } from "./helpers/sendHttpResponse";
+import {
+  sendHttpResponse,
+  sendRedirectResponse,
+  sendZipResponse,
+} from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
 import { temporaryStoragePath } from "../../utils/filesystemUtils";
+import {
+  PeConnectUserInfo,
+  PoleEmploiConnect,
+} from "../secondary/immersionOffer/PoleEmploiConnect";
 
 const logger = createLogger(__filename);
 
@@ -172,6 +183,50 @@ export const createApp = async (
     .get(async (req, res) =>
       sendHttpResponse(req, res, deps.repositories.getFeatureFlags),
     );
+
+  // TODO Exploratory feature
+  router.route(`/${loginPeConnect}`).get(async (req, res) =>
+    sendRedirectResponse(
+      req,
+      res,
+      async (): Promise<string> => {
+        const poleEmploiConnectIndividuGateway = new PoleEmploiConnect(
+          config.poleEmploiAccessTokenConfig,
+        );
+        return poleEmploiConnectIndividuGateway.getAuthorizationCodeRedirectUrl();
+      },
+      deps.authChecker, //TODO Remove when behavior is validated
+    ),
+  );
+
+  // TODO Exploratory feature
+  router.route(`/${peConnect}`).get(async (req, res) =>
+    sendRedirectResponse(req, res, async (): Promise<string> => {
+      const poleEmploiConnectIndividu = new PoleEmploiConnect(
+        config.poleEmploiAccessTokenConfig,
+      );
+
+      // Récupérer l'access token
+      const accessTokenResponse =
+        await poleEmploiConnectIndividu.getAccessToken(
+          req.query.code as string,
+        );
+
+      //console.log(accessTokenResponse);
+      // Récupérer les infos de l'utilisateur
+      const userInfo: PeConnectUserInfo =
+        await poleEmploiConnectIndividu.getUserInfo(
+          accessTokenResponse.access_token,
+        );
+
+      // Retourner sur le formulaire avec la full querystring (rajouter champ hidden pour le sub )
+      return `../${frontRoutes.immersionApplicationsRoute}?email=${encodeURI(
+        userInfo.email,
+      )}&firstName=${encodeURI(userInfo.family_name)}&lastName=${encodeURI(
+        userInfo.given_name,
+      )}&peExternalId=${encodeURI(userInfo.idIdentiteExterne)}`;
+    }),
+  );
 
   app.use(router);
   app.use("/auth", createMagicLinkRouter(deps));

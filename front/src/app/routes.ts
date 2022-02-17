@@ -8,6 +8,7 @@ const scheduleSerializer: ValueSerializer<ScheduleDto> = {
 };
 
 const defaultImmersionApplicationValues = {
+  peExternalId: param.query.optional.string,
   email: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,

@@ -65,6 +65,33 @@ export const Admin = ({ route }: AdminProps) => {
             </a>
           </div>
 
+          <>
+            Préremplir le formulaire de demande d'immersion avec Pole Emploi
+            Connect :
+          </>
+          <div className="pe-connect flex justify-center">
+            <a
+              href="/api/login-pe-connect"
+              className="button-pe-connect"
+              title=""
+            >
+              <img
+                className="icon-pe-connect"
+                src="src/assets/pe-connect-barre-nav-b.svg"
+                alt=""
+                width="300"
+                height="75"
+              />
+              <img
+                className="icon-pe-connect-hover"
+                src="src/assets/pe-connect-barre-nav-b-o.svg"
+                alt=""
+                width="300"
+                height="75"
+              />
+            </a>
+          </div>
+
           {featureFlags.enableAdminUi && (
             <div>
               <div

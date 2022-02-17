@@ -52,6 +52,24 @@ export const sendHttpResponse = async (
   }
 };
 
+export const sendRedirectResponse = async (
+  req: Request,
+  res: Response,
+  callback: () => Promise<string>,
+  authChecker?: AuthChecker,
+) => {
+  try {
+    authenticationCheck(req, authChecker);
+
+    const redirectUrl = await callback();
+    res.status(302);
+
+    return res.redirect(redirectUrl);
+  } catch (error: any) {
+    handleResponseError(res, error);
+  }
+};
+
 export const sendZipResponse = async (
   req: Request,
   res: Response,

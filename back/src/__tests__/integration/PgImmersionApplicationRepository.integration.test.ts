@@ -44,6 +44,7 @@ describe("PgImmersionApplicationRepository", () => {
       immersionApplicationEntity,
     );
   });
+
   it("Adds a new ImmersionApplicationEntity with field workConditions undefined ", async () => {
     const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
       .withoutWorkCondition()

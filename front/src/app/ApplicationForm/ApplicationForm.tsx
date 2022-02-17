@@ -51,6 +51,7 @@ const createInitialApplication = (
     dateStart:
       route.params.dateStart ?? toDateString(addDays(startOfToday(), 2)),
     dateEnd: route.params.dateEnd ?? toDateString(addDays(startOfToday(), 3)),
+    peExternalId: route.params.peExternalId ?? undefined,
 
     // Enterprise
     siret: route.params.siret ?? "",
@@ -90,6 +91,7 @@ const createInitialApplication = (
     lastName: emptyForm.lastName || "Durand",
     phone: emptyForm.phone || "0612345678",
     postalCode: emptyForm.postalCode || "75001",
+    peExternalId: emptyForm.peExternalId || undefined,
 
     // Enterprise
     siret: emptyForm.siret || "1234567890123",

@@ -16,6 +16,9 @@ export const agenciesRoute = "agencies";
 export const contactEstablishmentRoute = "contact-establishment";
 export const getFeatureFlags = "feature-flags";
 
+export const peConnect = "pe-connect";
+export const loginPeConnect = "login-pe-connect";
+
 export const frontRoutes = {
   immersionApplicationsToValidate: "verification",
   immersionApplicationsToSign: "verifier-et-signer",

@@ -269,6 +269,7 @@ export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
   beneficiaryAccepted: true,
   enterpriseAccepted: true,
+  peExternalId: undefined,
 };
 
 // Returns an application signed by provided roles.
