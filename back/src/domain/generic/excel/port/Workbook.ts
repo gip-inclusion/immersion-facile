@@ -56,8 +56,9 @@ export class Workbook<T extends Record<string, unknown>> extends excel.Workbook 
     return this;
   }
 
-  public async toXlsx(): Promise<string> {
-    const path: string = `./${this.title}.xlsx`;
+  public async toXlsx(pathMapper?: (path: string) => string): Promise<string> {
+    const fileName = `${this.title}.xlsx`;
+    const path: string = pathMapper ? pathMapper(fileName) : `./${fileName}`;
     const stream = fse.createWriteStream(path);
     await this.xlsx.write(stream);
     return path;

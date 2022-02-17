@@ -3,3 +3,4 @@ coverage
 .idea
 data-test.json
 .env
+storage/tmp/

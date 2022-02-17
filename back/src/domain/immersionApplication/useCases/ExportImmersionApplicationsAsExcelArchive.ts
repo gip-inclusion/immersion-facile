@@ -7,6 +7,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { Archive } from "../../generic/archive/port/Archive";
 import { Workbook } from "../../generic/excel/port/Workbook";
 import { ImmersionApplicationReadyForExportVO } from "../valueObjects/ImmersionApplicationReadyForExportVO";
+import { temporaryStoragePath } from "../../../utils/filesystemUtils";
 
 export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseCase<string> {
   inputSchema = z.string();
@@ -30,18 +31,18 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
 
     const workbookTitles = Object.keys(immersionApplicationExportByAgency);
 
-    const createdFilePaths = await Promise.all(
+    const createdFilenames = await Promise.all(
       workbookTitles.map((agencyId: string) =>
         this.toWorkbook(
           agencyId,
           immersionApplicationExportByAgency[agencyId],
           workbookColumnsOptions,
-        ).toXlsx(),
+        ).toXlsx(temporaryStoragePath),
       ),
     );
 
     const zipArchive = new Archive(archivePath);
-    await zipArchive.addFiles(createdFilePaths);
+    await zipArchive.addFiles(createdFilenames, { removeOriginal: true });
   }
 
   private immersionApplicationExportColumnsOptions() {

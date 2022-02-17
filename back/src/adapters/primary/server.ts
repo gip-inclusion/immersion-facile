@@ -22,6 +22,7 @@ import { sendHttpResponse, sendZipResponse } from "./helpers/sendHttpResponse";
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
+import { temporaryStoragePath } from "../../utils/filesystemUtils";
 
 const logger = createLogger(__filename);
 
@@ -58,7 +59,7 @@ export const createApp = async (
         req,
         res,
         async () => {
-          const archivePath = "./exportAgencies.zip";
+          const archivePath = temporaryStoragePath("exportAgencies.zip");
           await deps.useCases.exportImmersionApplicationsAsExcelArchive.execute(
             archivePath,
           );

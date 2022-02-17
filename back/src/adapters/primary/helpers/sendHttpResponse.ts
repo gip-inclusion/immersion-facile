@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { AuthChecker } from "../../../domain/auth/AuthChecker";
 import { createLogger } from "../../../utils/logger";
-import * as fse from "fs-extra";
-import { Workbook } from "../../../domain/generic/excel/port/Workbook";
 import { HttpError, UnauthorizedError } from "./httpErrors";
+import { deleteFile } from "../../../utils/filesystemUtils";
 
 const logger = createLogger(__filename);
 
@@ -62,12 +61,14 @@ export const sendZipResponse = async (
   try {
     authenticationCheck(req, authChecker);
 
-    const archiveName = await callback();
+    const archivePath = await callback();
 
     res.status(200);
     res.setHeader("content-type", "application/zip");
 
-    return res.download(archiveName);
+    return res.download(archivePath, () => {
+      deleteFile(archivePath);
+    });
   } catch (error: any) {
     handleResponseError(res, error);
   }
