@@ -5,7 +5,7 @@ import { makePgGetApiConsumerById } from "../../adapters/secondary/pg/pgGetApiCo
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
 import { ApiConsumer } from "../../domain/core/valueObjects/ApiConsumer";
 
-describe("PG GetAuthorizedApiConsumerIds", () => {
+describe("PG GetApiConsumerById", () => {
   let pool: Pool;
   let client: PoolClient;
   let getAuthorizedApiConsumersIds: GetApiConsumerById;
@@ -22,7 +22,7 @@ describe("PG GetAuthorizedApiConsumerIds", () => {
     await pool.end();
   });
 
-  it("gets the ids off all the authorized api consumers", async () => {
+  it("gets the ApiConsumer from it's ID", async () => {
     const apiConsumer: ApiConsumer = {
       id: "11111111-1111-1111-1111-111111111111",
       consumer: "testConsumer",

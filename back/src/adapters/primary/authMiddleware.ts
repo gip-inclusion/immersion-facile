@@ -34,6 +34,7 @@ type TotalCountProps = {
     | "unauthorisedId"
     | "incorrectJwt"
     | "expiredToken"
+    | "consumerNotFound"
     | "unauthenticated";
 };
 
@@ -47,7 +48,48 @@ const createIncTotalCountForRequest =
       authorisationStatus,
     });
 
-export const createApiKeyAuthMiddleware = (
+export const createApiKeyAuthMiddleware = (config: AppConfig) => {
+  const verifyJwt = makeVerifyJwt<ApiConsumer>(config.jwtPublicKey);
+  const authorizedIds = config.authorizedApiKeyIds;
+
+  return (req: Request, res: Response, next: NextFunction) => {
+    const incTotalCountForRequest = createIncTotalCountForRequest(req);
+
+    if (!req.headers.authorization) {
+      incTotalCountForRequest({ authorisationStatus: "unauthenticated" });
+      return next();
+    }
+
+    try {
+      const apiConsumerPayload = verifyJwt(req.headers.authorization as string);
+
+      // todo: consider notifying the caller that he cannot access privileged fields (due to possible compromised key)
+      if (!authorizedIds.includes(apiConsumerPayload.id)) {
+        incTotalCountForRequest({
+          authorisationStatus: "unauthorisedId",
+          consumerName: apiConsumerPayload.consumer,
+        });
+        return next();
+      }
+
+      // only if the user is known, and the id authorized, we add apiConsumer payload to the request:
+      incTotalCountForRequest({
+        consumerName: apiConsumerPayload.consumer,
+        authorisationStatus: "authorised",
+      });
+
+      req.apiConsumer = apiConsumerPayload;
+      return next();
+    } catch (err) {
+      incTotalCountForRequest({
+        authorisationStatus: "incorrectJwt",
+      });
+      return next();
+    }
+  };
+};
+
+export const createApiKeyAuthMiddleware_WILL_REPLACE_THE_OTHER_ONE_SOON = (
   getApiConsumerById: GetApiConsumerById,
   clock: Clock,
   config: AppConfig,
@@ -65,6 +107,12 @@ export const createApiKeyAuthMiddleware = (
     try {
       const { id } = verifyJwt(req.headers.authorization as string);
       const apiConsumer = await getApiConsumerById(id);
+      if (!apiConsumer) {
+        incTotalCountForRequest({
+          authorisationStatus: "consumerNotFound",
+        });
+        return next();
+      }
 
       // todo: consider notifying the caller that he cannot access privileged fields (due to possible compromised key)
       if (!apiConsumer.isAuthorized) {

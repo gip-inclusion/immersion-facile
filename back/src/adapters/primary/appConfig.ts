@@ -191,6 +191,11 @@ export class AppConfig {
     ) as DomainTopic[];
   }
 
+  // == Api Keys ==
+  public get authorizedApiKeyIds() {
+    return parseStringList(this.env.AUTHORIZED_API_KEY_IDS);
+  }
+
   // Visible for testing.
   public get configParams() {
     return this.env;

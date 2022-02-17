@@ -16,6 +16,7 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../domain/core/ports/UnitOfWork";
+import { ApiConsumer } from "../../domain/core/valueObjects/ApiConsumer";
 import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
@@ -83,6 +84,7 @@ import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository"
 import { InMemoryUowPerformer } from "../secondary/InMemoryUowPerformer";
 import { PgAgencyRepository } from "../secondary/pg/PgAgencyRepository";
 import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
+import { makePgGetApiConsumerById } from "../secondary/pg/pgGetApiConsumerById";
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgLaBonneBoiteRequestRepository } from "../secondary/pg/PgLaBonneBoiteRequestRepository";
@@ -118,17 +120,6 @@ export const createAppDependencies = async (config: AppConfig) => {
     ? new AlwaysAllowEmailFilter()
     : new AllowListEmailFilter(config.emailAllowList);
 
-  const fake: GetApiConsumerById = async (id: string) => ({
-    id,
-    consumer: "testConsumer",
-    expirationDate: clock.now(),
-    createdAt: clock.now(),
-    isAuthorized: true,
-  });
-
-  const getAuthorizedApiConsumerIds: GetApiConsumerById =
-    config.repositories === "PG" ? fake : fake;
-
   return {
     useCases: createUseCases(
       config,
@@ -142,8 +133,8 @@ export const createAppDependencies = async (config: AppConfig) => {
     authChecker: createAuthChecker(config),
     jwtAuthMiddleware: createJwtAuthMiddleware(config),
     apiKeyAuthMiddleware: await createApiKeyAuthMiddleware(
-      getAuthorizedApiConsumerIds,
-      clock,
+      // getAuthorizedApiConsumerIds,
+      // clock,
       config,
     ),
     generateJwtFn,
@@ -271,6 +262,16 @@ export const createRepositories = async (
             noRetries,
           )
         : new InMemoryLaBonneBoiteAPI(),
+    getApiConsumerById:
+      config.repositories === "PG"
+        ? makePgGetApiConsumerById(await getPgPoolFn().connect())
+        : async (id: string): Promise<ApiConsumer> => ({
+            id,
+            consumer: "testConsumer",
+            expirationDate: clock.now(),
+            createdAt: clock.now(),
+            isAuthorized: true,
+          }),
   };
 };
 
