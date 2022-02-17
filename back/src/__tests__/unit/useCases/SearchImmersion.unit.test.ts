@@ -7,17 +7,14 @@ import {
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
-import {
-  SearchMade,
-  SearchMadeEntity,
-} from "../../../domain/immersionOffer/entities/SearchMadeEntity";
+import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
+import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import {
   ImmersionOfferId,
   SearchImmersionRequestDto,
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
-import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
@@ -102,10 +99,11 @@ const searchSecretariatInMetzRequestDto: SearchImmersionRequestDto = {
 };
 
 const authenticatedApiConsumerPayload: ApiConsumer = {
-  consumer: "passeEmploi",
   id: "my-valid-apikey-id",
-  exp: new Date("2022-01-01").getTime(),
-  iat: new Date("2021-12-20").getTime(),
+  consumer: "passeEmploi",
+  createdAt: new Date("2021-12-20"),
+  expirationDate: new Date("2022-01-01"),
+  isAuthorized: true,
 };
 
 describe("SearchImmersionUseCase", () => {

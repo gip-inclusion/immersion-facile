@@ -5,9 +5,9 @@ import {
   SearchContact,
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
-import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { UseCase } from "../../core/UseCase";
+import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 
 export class GetImmersionOfferById extends UseCase<

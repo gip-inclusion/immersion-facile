@@ -100,9 +100,6 @@ describe("/get-immersion-by-id route", () => {
 
     const authToken = generateJwt({
       id: authorizedApiKeyId,
-      consumer: "testConsumer",
-      iat: getUnixTime(clock.now()),
-      exp: getUnixTime(clock.now()) + 600,
     });
 
     await request

@@ -1,14 +1,14 @@
 import jwt from "jsonwebtoken";
 import { AppConfig } from "../../adapters/primary/appConfig";
-import { ApiConsumer } from "../../shared/tokens/ApiConsumer";
 import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
+import { WithApiConsumerId } from "../core/valueObjects/ApiConsumer";
 
 const algo = "ES256";
 
 type AnyObject = Record<string, unknown>;
 
 export type GenerateMagicLinkJwt = GenerateJwtFn<MagicLinkPayload>;
-export type GenerateApiConsumerJtw = GenerateJwtFn<ApiConsumer>;
+export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
 
 // prettier-ignore
 type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload) => string;

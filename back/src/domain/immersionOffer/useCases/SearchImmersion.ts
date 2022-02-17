@@ -4,9 +4,9 @@ import {
   searchImmersionRequestSchema,
   SearchImmersionResultDto,
 } from "../../../shared/SearchImmersionDto";
-import { ApiConsumer } from "../../../shared/tokens/ApiConsumer";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
+import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 import { SearchMadeRepository } from "../ports/SearchMadeRepository";

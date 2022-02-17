@@ -8,6 +8,7 @@ import {
 } from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
+import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
@@ -117,6 +118,17 @@ export const createAppDependencies = async (config: AppConfig) => {
     ? new AlwaysAllowEmailFilter()
     : new AllowListEmailFilter(config.emailAllowList);
 
+  const fake: GetApiConsumerById = async (id: string) => ({
+    id,
+    consumer: "testConsumer",
+    expirationDate: clock.now(),
+    createdAt: clock.now(),
+    isAuthorized: true,
+  });
+
+  const getAuthorizedApiConsumerIds: GetApiConsumerById =
+    config.repositories === "PG" ? fake : fake;
+
   return {
     useCases: createUseCases(
       config,
@@ -129,7 +141,11 @@ export const createAppDependencies = async (config: AppConfig) => {
     repositories,
     authChecker: createAuthChecker(config),
     jwtAuthMiddleware: createJwtAuthMiddleware(config),
-    apiKeyAuthMiddleware: createApiKeyAuthMiddleware(config),
+    apiKeyAuthMiddleware: await createApiKeyAuthMiddleware(
+      getAuthorizedApiConsumerIds,
+      clock,
+      config,
+    ),
     generateJwtFn,
     eventBus,
     eventCrawler: createEventCrawler(config, repositories.outbox, eventBus),

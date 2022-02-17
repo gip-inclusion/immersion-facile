@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
+import { Clock } from "../../domain/core/ports/Clock";
+import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
+import {
+  ApiConsumer,
+  ApiConsumerName,
+} from "../../domain/core/valueObjects/ApiConsumer";
 import {
   currentJwtVersion,
   MagicLinkPayload,
@@ -8,7 +14,6 @@ import { createLogger } from "../../utils/logger";
 import { makeVerifyJwt } from "../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
 import jwt from "jsonwebtoken";
-import { ApiConsumer } from "../../shared/tokens/ApiConsumer";
 import promClient from "prom-client";
 
 const logger = createLogger(__filename);
@@ -23,11 +28,12 @@ const convertRouteToLog = (originalUrl: string) =>
   "/" + originalUrl.split("/")[1];
 
 type TotalCountProps = {
-  consumerName?: ApiConsumer["consumer"];
+  consumerName?: ApiConsumerName;
   authorisationStatus:
     | "authorised"
     | "unauthorisedId"
     | "incorrectJwt"
+    | "expiredToken"
     | "unauthenticated";
 };
 
@@ -41,11 +47,14 @@ const createIncTotalCountForRequest =
       authorisationStatus,
     });
 
-export const createApiKeyAuthMiddleware = (config: AppConfig) => {
+export const createApiKeyAuthMiddleware = (
+  getApiConsumerById: GetApiConsumerById,
+  clock: Clock,
+  config: AppConfig,
+) => {
   const verifyJwt = makeVerifyJwt<ApiConsumer>(config.jwtPublicKey);
-  const authorizedIds = config.authorizedApiKeyIds;
 
-  return (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
 
     if (!req.headers.authorization) {
@@ -54,24 +63,33 @@ export const createApiKeyAuthMiddleware = (config: AppConfig) => {
     }
 
     try {
-      const apiConsumerPayload = verifyJwt(req.headers.authorization as string);
+      const { id } = verifyJwt(req.headers.authorization as string);
+      const apiConsumer = await getApiConsumerById(id);
 
       // todo: consider notifying the caller that he cannot access privileged fields (due to possible compromised key)
-      if (!authorizedIds.includes(apiConsumerPayload.id)) {
+      if (!apiConsumer.isAuthorized) {
         incTotalCountForRequest({
           authorisationStatus: "unauthorisedId",
-          consumerName: apiConsumerPayload.consumer,
+          consumerName: apiConsumer.consumer,
         });
         return next();
       }
 
-      // only if the user is known, and the id authorized, we add apiConsumer payload to the request:
+      if (apiConsumer.expirationDate > clock.now()) {
+        incTotalCountForRequest({
+          authorisationStatus: "expiredToken",
+          consumerName: apiConsumer.consumer,
+        });
+        return next();
+      }
+
+      // only if the user is known, and the id authorized, and not expired we add apiConsumer payload to the request:
       incTotalCountForRequest({
-        consumerName: apiConsumerPayload.consumer,
+        consumerName: apiConsumer.consumer,
         authorisationStatus: "authorised",
       });
 
-      req.apiConsumer = apiConsumerPayload;
+      req.apiConsumer = apiConsumer;
       return next();
     } catch (err) {
       incTotalCountForRequest({
