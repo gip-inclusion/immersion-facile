@@ -12,7 +12,7 @@ describe("/extract-demande-immersion-excel", () => {
   it("works when authenticated", async () => {
     const { request, reposAndGateways } = await buildTestApp();
     const linkedAgency: AgencyConfig = (
-      await reposAndGateways.agency.getAll()
+      await reposAndGateways.agency.getAllActive()
     )[0];
     const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
       .withAgencyId(linkedAgency.id)

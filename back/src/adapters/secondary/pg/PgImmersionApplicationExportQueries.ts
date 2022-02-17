@@ -10,7 +10,7 @@ export class PgImmersionApplicationExportQueries
     ImmersionApplicationRawBeforeExportVO[]
   > {
     const pgResult = await this.client.query(`
-      SELECT *
+      SELECT *, immersion_applications.status as immersion_applications_status, agencies.status as agency_status
       FROM immersion_applications
       LEFT JOIN agencies ON agencies.id = immersion_applications.agency_id
       `);
@@ -18,7 +18,7 @@ export class PgImmersionApplicationExportQueries
       (row) =>
         new ImmersionApplicationRawBeforeExportVO({
           agencyName: row.name,
-          status: row.status,
+          status: row.immersion_applications_status,
           postalCode: row.postal_code,
           email: row.email,
           phone: row.phone,

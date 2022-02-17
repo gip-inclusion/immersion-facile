@@ -81,26 +81,5 @@ describe("Pg implementation of ImmersionApplicationExportRepository", () => {
         })._props,
       );
     });
-
-    // This should be deleted when immersion_application.agencyId is a true foreign key
-    it.skip("Retrieves also application referencing agencies not in tables.", async () => {
-      // Prepare
-      const applicationWithOrphanAgency: ImmersionApplicationEntity =
-        ImmersionApplicationEntity.create(
-          new ImmersionApplicationDtoBuilder()
-            .withDateStart(new Date("2021-01-15").toISOString())
-            .withDateEnd(new Date("2021-01-20").toISOString())
-            .withDateSubmission(new Date("2021-01-10").toISOString())
-            .build(),
-        );
-      await immersionApplicationRepo.save(applicationWithOrphanAgency);
-
-      // Act
-      const actualExport = await exportRepo.getAllApplicationsForExport();
-
-      // Assert
-      expect(actualExport).toHaveLength(1);
-      expect(actualExport[0]._props.agencyName).toBeUndefined();
-    });
   });
 });
