@@ -1,4 +1,3 @@
-import { ContactMethod } from "../../../shared/FormEstablishmentDto";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2 } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
@@ -33,7 +32,6 @@ export type EstablishmentEntityV2 = {
   address: string;
   voluntaryToImmersion: boolean;
   dataSource: DataSource;
-  contactMethod?: ContactMethod;
   position: LatLonDto;
   naf: string;
   numberEmployeesRange: TefenCode;
@@ -48,5 +46,5 @@ export type AnnotatedEstablishmentEntityV2 = EstablishmentEntityV2 & {
 export type EstablishmentAggregate = {
   establishment: EstablishmentEntityV2;
   immersionOffers: ImmersionOfferEntityV2[];
-  contacts: ContactEntityV2[];
+  contact?: ContactEntityV2;
 };

@@ -12,7 +12,7 @@ import { ImmersionOfferEntityV2Builder } from "./ImmersionOfferEntityV2Builder";
 const validEstablishmentAggregate: EstablishmentAggregate = {
   establishment: new EstablishmentEntityV2Builder().build(),
   immersionOffers: [new ImmersionOfferEntityV2Builder().build()],
-  contacts: [new ContactEntityV2Builder().build()],
+  contact: new ContactEntityV2Builder().build(),
 };
 
 export class EstablishmentAggregateBuilder
@@ -36,10 +36,16 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withContacts(contacts: ContactEntityV2[]) {
+  public withContact(contact: ContactEntityV2) {
     return new EstablishmentAggregateBuilder({
       ...this.entity,
-      contacts,
+      contact,
+    });
+  }
+  public withoutContact() {
+    return new EstablishmentAggregateBuilder({
+      ...this.entity,
+      contact: undefined,
     });
   }
 
@@ -54,7 +60,7 @@ export class EstablishmentAggregateBuilder
   public withContactId(id: string) {
     return new EstablishmentAggregateBuilder({
       ...this.entity,
-      contacts: [new ContactEntityV2Builder().withId(id).build()],
+      contact: new ContactEntityV2Builder().withId(id).build(),
     });
   }
 

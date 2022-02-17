@@ -65,10 +65,10 @@ export class InMemoryImmersionOfferRepository
     const establishment =
       await this.getAnnotatedEstablishmentByImmersionOfferId(immersionOfferId);
     if (!establishment) return;
-    const contacts = this._establishmentAggregates.find(
+    const contact = this._establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret == establishment?.siret,
-    )?.contacts;
-    return contacts && contacts[0];
+    )?.contact;
+    return contact;
   }
 
   async getAnnotatedImmersionOfferById(
@@ -101,7 +101,7 @@ export class InMemoryImmersionOfferRepository
           buildSearchImmersionResultDto(
             immersionOffer,
             aggregate.establishment,
-            aggregate.contacts[0],
+            aggregate.contact,
             searchMade,
             withContactDetails,
           ),
@@ -186,7 +186,7 @@ const buildSearchImmersionResultDto = (
   romeLabel: TEST_ROME_LABEL,
   siret: establishment.siret,
   voluntaryToImmersion: establishment.voluntaryToImmersion,
-  contactMode: establishment.contactMethod,
+  contactMode: contact?.contactMethod,
   numberOfEmployeeRange:
     employeeRangeByTefenCode[establishment.numberEmployeesRange],
   distance_m: distanceMetersBetweenCoordinates(

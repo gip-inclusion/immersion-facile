@@ -65,7 +65,7 @@ export class GetImmersionOfferById extends UseCase<
       name: annotatedEstablishment.name,
       siret: annotatedEstablishment.siret,
       voluntaryToImmersion: annotatedEstablishment.voluntaryToImmersion,
-      contactMode: annotatedEstablishment.contactMethod,
+      contactMode: contact?.contactMethod,
 
       // Offer information
       rome: annotatedOffer.rome,

@@ -47,7 +47,7 @@ export class ContactEstablishment extends TransactionalUseCase<
       );
     if (!annotatedEstablishment) throw new NotFoundError(immersionOfferId);
 
-    if (contactMode !== annotatedEstablishment.contactMethod)
+    if (contactMode !== contact.contactMethod)
       throw new BadRequestError(
         `Contact mode mismatch: IN_PERSON in immersion offer: ${immersionOfferId}`,
       );

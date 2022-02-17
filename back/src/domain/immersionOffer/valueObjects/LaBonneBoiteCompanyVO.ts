@@ -68,7 +68,6 @@ export class LaBonneBoiteCompanyVO {
           score: this.props.stars,
         },
       ],
-      contacts: [],
     };
   }
 

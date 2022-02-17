@@ -17,7 +17,6 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/Establishm
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 
-const contact = new ContactEntityV2Builder().build();
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 
 const payload: ContactEstablishmentRequestDto = {
@@ -28,6 +27,8 @@ const payload: ContactEstablishmentRequestDto = {
   potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
 };
 
+const allowedContactEmail = "toto@gmail.com";
+
 describe("NotifyContactRequest", () => {
   let immersionOfferRepository: InMemoryImmersionOfferRepository;
   let emailGw: InMemoryEmailGateway;
@@ -37,7 +38,7 @@ describe("NotifyContactRequest", () => {
     immersionOfferRepository = new InMemoryImmersionOfferRepository();
     emailGw = new InMemoryEmailGateway();
     emailFilter = new AllowListEmailFilter([
-      contact.email,
+      allowedContactEmail,
       payload.potentialBeneficiaryEmail,
     ]);
   });
@@ -56,14 +57,15 @@ describe("NotifyContactRequest", () => {
       contactMode: "EMAIL",
       message: "message_to_send",
     };
-    const establishment = new EstablishmentEntityV2Builder()
-      .withContactMode("EMAIL")
+    const establishment = new EstablishmentEntityV2Builder().build();
+    const contact = new ContactEntityV2Builder()
+      .withContactMethod("EMAIL")
+      .withEmail(allowedContactEmail)
       .build();
-
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
-        .withContacts([contact])
+        .withContact(contact)
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);
@@ -91,13 +93,14 @@ describe("NotifyContactRequest", () => {
       ...payload,
       contactMode: "PHONE",
     };
-    const establishment = new EstablishmentEntityV2Builder()
-      .withContactMode("PHONE")
+    const establishment = new EstablishmentEntityV2Builder().build();
+    const contact = new ContactEntityV2Builder()
+      .withContactMethod("PHONE")
       .build();
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
-        .withContacts([contact])
+        .withContact(contact)
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);
@@ -121,13 +124,14 @@ describe("NotifyContactRequest", () => {
       ...payload,
       contactMode: "IN_PERSON",
     };
-    const establishment = new EstablishmentEntityV2Builder()
-      .withContactMode("IN_PERSON")
+    const establishment = new EstablishmentEntityV2Builder().build();
+    const contact = new ContactEntityV2Builder()
+      .withContactMethod("IN_PERSON")
       .build();
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
-        .withContacts([contact])
+        .withContact(contact)
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);
@@ -153,13 +157,13 @@ describe("NotifyContactRequest", () => {
       ...payload,
       contactMode: "IN_PERSON",
     };
-    const establishment = new EstablishmentEntityV2Builder()
-      .withContactMode("IN_PERSON")
-      .build();
+    const establishment = new EstablishmentEntityV2Builder().build();
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
-        .withContacts([contact])
+        .withContact(
+          new ContactEntityV2Builder().withContactMethod("IN_PERSON").build(),
+        )
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);

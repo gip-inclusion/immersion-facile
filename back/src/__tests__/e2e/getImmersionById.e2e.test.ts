@@ -19,6 +19,7 @@ import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 
 const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
 const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03512d";
+const immersionOfferRome = "B1805";
 
 describe("/get-immersion-by-id route", () => {
   let request: SuperTest<Test>;
@@ -37,13 +38,18 @@ describe("/get-immersion-by-id route", () => {
       new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityV2Builder()
-            .withContactMode("EMAIL")
+
             .withAddress("55 rue de Faubourg Sante Honoré 75008 Paris")
             .build(),
         )
-        .withContacts([new ContactEntityV2Builder().build()])
+        .withContact(
+          new ContactEntityV2Builder().withContactMethod("EMAIL").build(),
+        )
         .withImmersionOffers([
-          new ImmersionOfferEntityV2Builder().withId(immersionOfferId).build(),
+          new ImmersionOfferEntityV2Builder()
+            .withId(immersionOfferId)
+            .withRome(immersionOfferRome)
+            .build(),
         ])
         .build(),
     ]);
@@ -51,12 +57,13 @@ describe("/get-immersion-by-id route", () => {
 
   test("accepts valid unauthenticated requests", async () => {
     const expectedResult: SearchImmersionResultDto = {
+      // /!\ Those fields come from Builder (should probably not.)
       id: immersionOfferId,
-      rome: "M1907",
+      rome: immersionOfferRome,
       naf: "8539A",
       siret: "78000403200019",
       name: "Company inside repository",
-      voluntaryToImmersion: false,
+      voluntaryToImmersion: true,
       location: TEST_POSITION,
       address: "55 rue de Faubourg Sante Honoré 75008 Paris",
       contactMode: "EMAIL",
@@ -66,18 +73,19 @@ describe("/get-immersion-by-id route", () => {
     };
 
     await request
-      .get("/get-immersion-by-id/13df03a5-a2a5-430a-b558-ed3e2f03512d")
+      .get(`/get-immersion-by-id/${immersionOfferId}`)
       .expect(200, expectedResult);
   });
 
   test("accepts valid authenticated requests", async () => {
+    // /!\ Those fields come from Builder (should probably not.)
     const expectedResult: SearchImmersionResultDto = {
       id: "13df03a5-a2a5-430a-b558-ed3e2f03512d",
-      rome: "M1907",
+      rome: immersionOfferRome,
       naf: "8539A",
       siret: "78000403200019",
       name: "Company inside repository",
-      voluntaryToImmersion: false,
+      voluntaryToImmersion: true,
       location: TEST_POSITION,
       address: "55 rue de Faubourg Sante Honoré 75008 Paris",
       contactMode: "EMAIL",
@@ -99,7 +107,7 @@ describe("/get-immersion-by-id route", () => {
     });
 
     await request
-      .get("/get-immersion-by-id/13df03a5-a2a5-430a-b558-ed3e2f03512d")
+      .get(`/get-immersion-by-id/${immersionOfferId}`)
       .set("Authorization", authToken)
       .expect(200, expectedResult);
   });

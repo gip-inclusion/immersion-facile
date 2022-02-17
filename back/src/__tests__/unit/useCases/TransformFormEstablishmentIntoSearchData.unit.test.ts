@@ -121,8 +121,8 @@ describe("Transform FormEstablishment into search data", () => {
     expect(repoEstablishmentAggregate.establishment.dataSource).toEqual("form");
 
     // Contact
-    expect(repoEstablishmentAggregate.contacts).toHaveLength(1);
-    expect(repoEstablishmentAggregate.contacts[0].email).toEqual(
+    expect(repoEstablishmentAggregate.contact).toBeDefined();
+    expect(repoEstablishmentAggregate.contact?.email).toEqual(
       expected.contactEmail,
     );
 

@@ -61,10 +61,10 @@ describe("ContactEstablishment", () => {
   test("schedules event for valid contact request", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityV2Builder().withContactMode("EMAIL").build(),
+        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withContact(
+          new ContactEntityV2Builder().withContactMethod("EMAIL").build(),
         )
-        .withContacts([contact])
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);
@@ -97,10 +97,10 @@ describe("ContactEstablishment", () => {
   test("schedules event for valid PHONE contact request", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityV2Builder().withContactMode("PHONE").build(),
+        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withContact(
+          new ContactEntityV2Builder().withContactMethod("PHONE").build(),
         )
-        .withContacts([contact])
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);
@@ -132,12 +132,10 @@ describe("ContactEstablishment", () => {
   test("schedules event for valid IN_PERSON contact requests", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityV2Builder()
-            .withContactMode("IN_PERSON")
-            .build(),
+        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withContact(
+          new ContactEntityV2Builder().withContactMethod("IN_PERSON").build(),
         )
-        .withContacts([contact])
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);
@@ -182,10 +180,10 @@ describe("ContactEstablishment", () => {
   test("throws BadRequestError for contact mode mismatch", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityV2Builder().withContactMode("EMAIL").build(),
+        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withContact(
+          new ContactEntityV2Builder().withContactMethod("EMAIL").build(),
         )
-        .withContacts([contact])
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);
@@ -204,10 +202,8 @@ describe("ContactEstablishment", () => {
   test("throws BadRequestError immersion offer without contact id", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityV2Builder().withContactMode("PHONE").build(),
-        )
-        .withContacts([]) // no contact
+        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withoutContact() // no contact
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);

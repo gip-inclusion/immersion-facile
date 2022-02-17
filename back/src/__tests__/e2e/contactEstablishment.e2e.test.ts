@@ -31,10 +31,10 @@ describe("/contact-establishment route", () => {
   });
 
   test("sends email for valid request", async () => {
-    const establishment = new EstablishmentEntityV2Builder()
-      .withContactMode("EMAIL")
+    const establishment = new EstablishmentEntityV2Builder().build();
+    const contact = new ContactEntityV2Builder()
+      .withContactMethod("EMAIL")
       .build();
-    const contact = new ContactEntityV2Builder().build();
     const immersionOffer = new ImmersionOfferEntityV2Builder()
       .withId(immersionOfferId)
       .build();
@@ -42,7 +42,7 @@ describe("/contact-establishment route", () => {
     await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
-        .withContacts([contact])
+        .withContact(contact)
         .withImmersionOffers([immersionOffer])
         .build(),
     ]);

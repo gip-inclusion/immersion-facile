@@ -49,10 +49,10 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
       throw new Error(
         `Missing establishment: immersionOffer.id=${annotatedImmersionOffer.id}`,
       );
-    if (annotatedEstablishment.contactMethod !== payload.contactMode) {
+    if (contact.contactMethod !== payload.contactMode) {
       throw new Error(
         `Contact mode mismatch: immersionOffer.id=${annotatedImmersionOffer.id}, ` +
-          `establishment.contactMethod=${annotatedEstablishment.contactMethod}, ` +
+          `establishment.contactMethod=${contact.contactMethod}, ` +
           `payload.contactMode=${payload.contactMode}`,
       );
     }

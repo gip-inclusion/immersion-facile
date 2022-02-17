@@ -79,6 +79,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
       email: formEstablishment.businessContacts[0].email,
       phone: formEstablishment.businessContacts[0].phone,
       job: formEstablishment.businessContacts[0].job,
+      contactMethod: formEstablishment.preferredContactMethods[0],
     };
 
     const immersionOffers: ImmersionOfferEntityV2[] = (
@@ -120,14 +121,13 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
       naf,
       position,
       numberEmployeesRange,
-      contactMethod: formEstablishment.preferredContactMethods[0],
       isActive: true,
       updatedAt: this.clock.now(),
     };
 
     const establishmentAggregate: EstablishmentAggregate = {
       establishment,
-      contacts: [contact],
+      contact: contact,
       immersionOffers,
     };
     await this.immersionOfferRepository

@@ -82,9 +82,9 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
     expect(
       establishmentAggregateFromLaBonneBoiteInRepo.immersionOffers,
     ).toHaveLength(1);
-    expect(establishmentAggregateFromLaBonneBoiteInRepo.contacts).toHaveLength(
-      0,
-    );
+    expect(
+      establishmentAggregateFromLaBonneBoiteInRepo.contact,
+    ).toBeUndefined();
   });
 });
 

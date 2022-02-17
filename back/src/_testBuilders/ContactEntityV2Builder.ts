@@ -1,4 +1,5 @@
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
+import { ContactMethod } from "../shared/FormEstablishmentDto";
 import { Builder } from "./Builder";
 
 const validContactEntityV2: ContactEntityV2 = {
@@ -8,6 +9,7 @@ const validContactEntityV2: ContactEntityV2 = {
   email: "alain.prost@email.fr",
   job: "le big boss",
   phone: "0612345678",
+  contactMethod: "EMAIL",
 };
 
 export class ContactEntityV2Builder implements Builder<ContactEntityV2> {
@@ -17,6 +19,14 @@ export class ContactEntityV2Builder implements Builder<ContactEntityV2> {
 
   withId(id: string) {
     return new ContactEntityV2Builder({ ...this.entity, id });
+  }
+
+  withContactMethod(contactMethod: ContactMethod) {
+    return new ContactEntityV2Builder({ ...this.entity, contactMethod });
+  }
+
+  withEmail(email: string) {
+    return new ContactEntityV2Builder({ ...this.entity, email });
   }
   build() {
     return this.entity;

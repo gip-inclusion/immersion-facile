@@ -48,8 +48,8 @@ const prepareSearchableData = async () => {
 
   const establishment = new EstablishmentEntityV2Builder()
     .withSiret(siret)
-    .withContactMode("EMAIL")
     .withAddress("55 Rue du Faubourg Saint-Honoré")
+    .withDataSource("api_labonneboite")
     .withNumberOfEmployeeRange(12)
     .build();
 
@@ -63,19 +63,21 @@ const prepareSearchableData = async () => {
     .withRome(boulangerRome)
     .build();
 
-  const contact = new ContactEntityV2Builder().build();
+  const contact = new ContactEntityV2Builder()
+    .withContactMethod("EMAIL")
+    .build();
 
   const establishmentAggregateInMetzForSecretariat =
     new EstablishmentAggregateBuilder()
       .withEstablishment(establishment)
-      .withContacts([contact])
+      .withContact(contact)
       .withImmersionOffers([secretariatImmersionOffer])
       .build();
 
   const establishmentAggregateInMetzForBoulanger =
     new EstablishmentAggregateBuilder()
       .withEstablishment(establishment)
-      .withContacts([contact])
+      .withContact(contact)
       .withImmersionOffers([boulangerInMetzImmersionOffer])
       .build();
 

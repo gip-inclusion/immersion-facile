@@ -77,7 +77,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       establishment.address,
       establishment.numberEmployeesRange,
       establishment.naf,
-      contactModeMap[establishment.contactMethod as KnownContactMethod] || null,
       establishment.dataSource,
       convertPositionToStGeography(establishment.position),
       establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
@@ -90,7 +89,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, address, number_employees, naf, contact_mode, data_source, gps, update_date, is_active
+          siret, name, address, number_employees, naf, data_source, gps, update_date, is_active
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -100,7 +99,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
                 address=EXCLUDED.address,
                 number_employees=EXCLUDED.number_employees,
                 naf=EXCLUDED.naf,
-                contact_mode=EXCLUDED.contact_mode,
                 data_source=EXCLUDED.data_source
               WHERE
                 EXCLUDED.data_source='form'
@@ -123,28 +121,43 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   private async _insertContactsFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
-    const contactFields = aggregates.flatMap(({ establishment, contacts }) =>
-      contacts.map((contact) => [
+    const aggregatesWithContact = aggregates.filter(({ contact }) => !!contact);
+
+    if (aggregatesWithContact.length === 0) return;
+
+    const contactFields = aggregatesWithContact.map((aggregate) => {
+      const contact = aggregate.contact!;
+      return [
         contact.id,
         contact.lastName,
         contact.firstName,
         contact.email,
         contact.job,
-        establishment.siret,
         contact.phone,
-      ]),
+        contactModeMap[contact.contactMethod as KnownContactMethod],
+      ];
+    });
+
+    const establishmentContactFields = aggregatesWithContact.map(
+      ({ establishment, contact }) => [establishment.siret, contact!.id],
     );
 
-    if (contactFields.length === 0) return;
-
     try {
-      const query = format(
+      const insertContactsQuery = format(
         `INSERT INTO immersion_contacts (
-        uuid, name, firstname, email, role, siret_establishment, phone
+        uuid, lastname, firstname, email, role, phone, contact_mode
       ) VALUES %L`,
         contactFields,
       );
-      await this.client.query(query);
+
+      const insertEstablishmentsContactsQuery = format(
+        `INSERT INTO establishments__immersion_contacts (
+        establishment_siret, contact_uuid) VALUES %L`,
+        establishmentContactFields,
+      );
+
+      await this.client.query(insertContactsQuery);
+      await this.client.query(insertEstablishmentsContactsQuery);
     } catch (e: any) {
       logger.error(e, "Error inserting contacts");
     }
@@ -154,19 +167,12 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     aggregates: EstablishmentAggregate[],
   ) {
     const immersionOfferFields: any[][] = aggregates.flatMap(
-      ({ establishment, contacts, immersionOffers }) =>
+      ({ establishment, immersionOffers }) =>
         immersionOffers.map((immersionOffer) => [
           immersionOffer.id,
           immersionOffer.rome,
-          extractNafDivision(establishment.naf),
           establishment.siret,
-          establishment.naf,
-          establishment.name,
-          establishment.voluntaryToImmersion,
-          establishment.dataSource,
-          contacts[0]?.id,
           immersionOffer.score,
-          convertPositionToStGeography(establishment.position),
         ]),
     );
 
@@ -183,34 +189,13 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       }, []);
 
     try {
-      const query = fixStGeographyEscapingInQuery(
-        format(
-          `INSERT INTO immersion_offers (
-          uuid, rome, naf_division, siret, naf,  name, voluntary_to_immersion, data_source,
-          contact_in_establishment_uuid, score, gps
-        ) VALUES %L
-        ON CONFLICT
-          ON CONSTRAINT immersion_offers_pkey
-            DO UPDATE
-              SET
-                naf=EXCLUDED.naf,
-                name=EXCLUDED.name,
-                voluntary_to_immersion=EXCLUDED.voluntary_to_immersion,
-                data_source=EXCLUDED.data_source,
-                score=EXCLUDED.score,
-                update_date=NOW()
-              WHERE
-                EXCLUDED.data_source='form'
-                OR (
-                  immersion_offers.data_source != 'form'
-                  AND (
-                    immersion_offers.data_source = 'api_labonneboite'
-                  )
-                )`,
-          deduplicatedArrayOfImmersionOffers,
-        ),
+      const query = format(
+        `INSERT INTO immersion_offers (
+          uuid, rome, siret, score
+        ) VALUES %L`,
+        deduplicatedArrayOfImmersionOffers,
       );
-
+      console.log("immersion offer query ", query);
       await this.client.query(query);
     } catch (e: any) {
       logger.error(e, "Error inserting immersion offers");
@@ -368,7 +353,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       address: row.address,
       voluntaryToImmersion: row.voluntary_to_immersion,
       dataSource: row.data_source,
-      contactMethod: row.contact_mode && parseContactMethod(row.contact_mode),
       position: row.position && parseGeoJson(row.position),
       naf: row.naf,
       nafLabel: row.naf_label,
@@ -439,15 +423,19 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     const query = format(
       `SELECT
         immersion_contacts.uuid,
-        immersion_contacts.name,
+        immersion_contacts.lastname,
         immersion_contacts.firstname,
         immersion_contacts.email,
         immersion_contacts.role,
-        immersion_contacts.phone
+        immersion_contacts.phone,
+        immersion_contacts.contact_mode
       FROM
         immersion_contacts
-        JOIN immersion_offers
-          ON (immersion_offers.siret = immersion_contacts.siret_establishment)
+        JOIN establishments__immersion_contacts
+          ON (establishments__immersion_contacts.contact_uuid = immersion_contacts.uuid)
+        JOIN establishments
+          ON (immersion_offers.siret = establishments__immersion_contacts.siret)
+
       WHERE
         immersion_offers.uuid = %L`,
       immersionOfferId,
@@ -458,11 +446,12 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     if (!row) return;
     return {
       id: row.uuid,
-      lastName: row.name,
+      lastName: row.lastname,
       firstName: row.firstname,
       email: row.email,
       job: row.role,
       phone: row.phone,
+      contactMethod: row.contact_mode,
     };
   }
 

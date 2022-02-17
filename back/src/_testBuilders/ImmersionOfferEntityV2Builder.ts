@@ -4,7 +4,7 @@ import { Builder } from "./Builder";
 
 const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {
   id: "13df03a5-a2a5-430a-b558-ed3e2f03512d",
-  rome: "M1907",
+  rome: "B1805",
   score: 4.5,
 };
 
