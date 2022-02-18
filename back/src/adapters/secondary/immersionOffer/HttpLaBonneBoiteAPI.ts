@@ -49,6 +49,16 @@ type HttpGetLaBonneBoiteCompanyResponse = {
   rome_label: string;
 };
 
+const deduplicateLaBonneBoiteCompanies = (
+  companies: LaBonneBoiteCompanyProps[],
+): LaBonneBoiteCompanyProps[] => {
+  const companieSirets = companies.map((company) => company.siret);
+  return companies.filter(
+    (company, companyIndex) =>
+      companieSirets.indexOf(company.siret) !== companyIndex,
+  );
+};
+
 const MAX_PAGE_SIZE = 100;
 export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
   private urlGetCompany =
@@ -76,7 +86,12 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
       requestParams,
       [],
     );
-    return allCompaniesProps.map(
+    const deduplicatedCompaniesProps =
+      deduplicateLaBonneBoiteCompanies(allCompaniesProps);
+    logger.info(
+      `LBB fetched ${allCompaniesProps.length} companies, amongst which ${deduplicatedCompaniesProps.length} only are different.`,
+    );
+    return deduplicatedCompaniesProps.map(
       (props: LaBonneBoiteCompanyProps) => new LaBonneBoiteCompanyVO(props),
     );
   }
