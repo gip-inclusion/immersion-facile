@@ -8,7 +8,6 @@ import {
 } from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
-import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
@@ -162,7 +161,7 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
     if (!pgPool) {
       const { host, pathname } = new URL(config.pgImmersionDbUrl);
       logger.info({ host, pathname }, "creating postgresql connection pool");
-      pgPool = new Pool({ connectionString: config.pgImmersionDbUrl });
+      pgPool = new Pool({ connectionString: config.pgImmersionDbUrl, max: 12 });
     }
     return pgPool;
   };
