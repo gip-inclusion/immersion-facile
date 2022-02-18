@@ -1,7 +1,6 @@
 import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import PinoHttp from "pino-http";
-import promClient from "prom-client";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import {
   agenciesRoute,
@@ -9,7 +8,6 @@ import {
   extractImmersionApplicationsExcelRoute,
   generateMagicLinkRoute,
   immersionApplicationsRoute,
-  immersionOffersRoute,
   renewMagicLinkRoute,
   romeRoute,
   siretRoute,
@@ -30,12 +28,6 @@ const logger = createLogger(__filename);
 const metrics = expressPrometheusMiddleware({
   metricsPath: "/__metrics",
   collectDefaultMetrics: true,
-});
-
-const counterFormEstablishmentCaller = new promClient.Counter({
-  name: "form_establishment_callers_counter",
-  help: "The total count form establishment adds, broken down by referer.",
-  labelNames: ["referer"],
 });
 
 export const createApp = async (
@@ -139,16 +131,6 @@ export const createApp = async (
         deps.authChecker,
       ),
     );
-
-  router.route(`/${immersionOffersRoute}`).post(async (req, res) => {
-    counterFormEstablishmentCaller.inc({
-      referer: req.get("Referrer"),
-    });
-
-    return sendHttpResponse(req, res, () =>
-      deps.useCases.addFormEstablishment.execute(req.body),
-    );
-  });
 
   router
     .route(`/${contactEstablishmentRoute}`)

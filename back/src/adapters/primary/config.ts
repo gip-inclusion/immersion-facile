@@ -132,8 +132,8 @@ export const createAppDependencies = async (config: AppConfig) => {
     authChecker: createAuthChecker(config),
     jwtAuthMiddleware: createJwtAuthMiddleware(config),
     apiKeyAuthMiddleware: await createApiKeyAuthMiddleware(
-      // getAuthorizedApiConsumerIds,
-      // clock,
+      repositories.getApiConsumerById,
+      clock,
       config,
     ),
     generateJwtFn,

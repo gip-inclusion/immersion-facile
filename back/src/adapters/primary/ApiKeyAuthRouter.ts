@@ -1,10 +1,18 @@
 import { Router } from "express";
+import promClient from "prom-client";
 import {
   getImmersionOfferByIdRoute,
+  immersionOffersRoute,
   searchImmersionRoute,
 } from "../../shared/routes";
 import { AppDependencies } from "./config";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
+
+const counterFormEstablishmentCaller = new promClient.Counter({
+  name: "form_establishment_callers_counter",
+  help: "The total count form establishment adds, broken down by referer.",
+  labelNames: ["referer"],
+});
 
 export const createApiKeyAuthRouter = (deps: AppDependencies) => {
   const authenticatedRouter = Router({ mergeParams: true });
@@ -30,6 +38,18 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
         ),
       ),
     );
+
+  authenticatedRouter
+    .route(`/${immersionOffersRoute}`)
+    .post(async (req, res) => {
+      counterFormEstablishmentCaller.inc({
+        referer: req.get("Referrer"),
+      });
+
+      return sendHttpResponse(req, res, () =>
+        deps.useCases.addFormEstablishment.execute(req.body),
+      );
+    });
 
   return authenticatedRouter;
 };
