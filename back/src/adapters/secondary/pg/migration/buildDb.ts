@@ -344,7 +344,6 @@ const buildRomesAppellations = async (client: PoolClient) => {
     __dirname + "/createAppellationAndRomePublicDataTables.sql",
     client,
   );
-  console.log("created rome");
 };
 
 const insertRomesAppellations = async (client: PoolClient) => {

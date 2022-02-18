@@ -2,6 +2,16 @@
 import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
+  // Drop contacts that are not attached to an immersion offer
+  await pgm.sql(`
+  DELETE FROM immersion_contacts 
+  WHERE  uuid not IN 
+       (
+       SELECT  contact_in_establishment_uuid 
+       FROM    immersion_offers 
+       WHERE   contact_in_establishment_uuid is not null
+       )`);
+
   pgm.dropColumns("immersion_offers", [
     "naf",
     "naf_division",

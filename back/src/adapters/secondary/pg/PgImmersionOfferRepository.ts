@@ -195,7 +195,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         ) VALUES %L`,
         deduplicatedArrayOfImmersionOffers,
       );
-      console.log("immersion offer query ", query);
       await this.client.query(query);
     } catch (e: any) {
       logger.error(e, "Error inserting immersion offers");
@@ -207,61 +206,60 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     withContactDetails = false,
   ): Promise<SearchImmersionResultDto[]> {
     const query = `
-        WITH 
-          active_establishments AS (
-            SELECT 
-              establishments.name as establishment_name,
-              contact_mode AS establishment_contact_mode,
-              number_employees AS establishment_tefen_code, 
-              address AS establishment_address,
-              naf AS establishment_naf,
-              siret AS establishment_siret
-            FROM establishments 
-            WHERE is_active
-            ),
-          filtered_immersion_offers AS (
-            SELECT 
-              uuid as offer_uuid, 
-              siret as offer_siret, 
-              naf_division as offer_naf_division, 
-              data_source as offer_data_source,
-              contact_in_establishment_uuid, 
-              voluntary_to_immersion, 
-              rome AS offer_rome, 
-              gps AS offer_gps,
-              ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
-              ST_AsGeoJSON(gps) AS offer_position
-            FROM immersion_offers 
-            ${searchMade.rome ? "WHERE rome = %1$L" : ""}
-            )
-        SELECT
-            filtered_immersion_offers.*,
-            active_establishments.*,
-            immersion_contacts.uuid AS contact_uuid,
-            immersion_contacts.name AS contact_name,
-            immersion_contacts.firstname AS contact_firstname,
-            immersion_contacts.email AS contact_email,
-            immersion_contacts.role AS contact_role,
-            immersion_contacts.siret_establishment AS contact_siret_establishment,
-            immersion_contacts.phone AS contact_phone,
-            naf_classes_2008.class_label,
-            libelle_rome
-        FROM
-          filtered_immersion_offers
-        RIGHT JOIN active_establishments
-          ON (offer_siret = establishment_siret)
-        LEFT JOIN immersion_contacts
-          ON (contact_in_establishment_uuid = immersion_contacts.uuid)
-        LEFT OUTER JOIN naf_classes_2008
-          ON (naf_classes_2008.class_id =
-              REGEXP_REPLACE(establishment_naf,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-        LEFT OUTER JOIN romes_public_data
-          ON (offer_rome = romes_public_data.code_rome)
+        WITH active_establishments_with_contact_uuid AS (
+          SELECT 
+            establishments.name as establishment_name,
+            number_employees AS establishment_tefen_code, 
+            address,
+            naf,
+            data_source,
+            siret AS establishment_siret,
+            contact_uuid as contact_in_establishment_uuid,
+            gps,
+            ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
+            ST_AsGeoJSON(gps) AS establishment_position
+          FROM establishments 
+          LEFT JOIN establishments__immersion_contacts e_ic ON e_ic.establishment_siret = establishments.siret
+          WHERE is_active
+          ),
+        filtered_immersion_offers AS (
+          SELECT 
+            uuid as offer_uuid, 
+            siret as offer_siret, 
+            rome
+          FROM immersion_offers 
+          ${searchMade.rome ? "WHERE rome = %1$L" : ""}
+          )
+      SELECT
+          filtered_immersion_offers.*,
+          active_establishments_with_contact_uuid.*,
+          immersion_contacts.uuid AS contact_uuid,
+          immersion_contacts.lastname,
+          immersion_contacts.firstname,
+          immersion_contacts.contact_mode,
+          immersion_contacts.email,
+          immersion_contacts.role,
+          immersion_contacts.phone AS contact_phone,
+          naf_classes_2008.class_label,
+          libelle_rome
+      FROM
+        filtered_immersion_offers
+      RIGHT JOIN active_establishments_with_contact_uuid
+        ON (offer_siret = establishment_siret)
+      LEFT JOIN immersion_contacts
+        ON (contact_in_establishment_uuid = immersion_contacts.uuid)
+      LEFT OUTER JOIN naf_classes_2008
+        ON (naf_classes_2008.class_id =
+            REGEXP_REPLACE(naf,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+      LEFT OUTER JOIN romes_public_data
+        ON (rome = romes_public_data.code_rome)
         WHERE 
-          ST_DWithin(offer_gps, ST_GeographyFromText($1), $2) 
-        ORDER BY
-          offer_data_source ASC,
-          distance_m;`;
+        offer_uuid IS NOT NULL AND
+        ST_DWithin(gps, ST_GeographyFromText($1), $2) 
+      ORDER BY
+        data_source ASC,
+        distance_m;
+          `;
     const formatedQuery = format(query, searchMade.rome); // Formats optional litterals %1$L and %2$L
     return this.client
       .query(formatedQuery, [
@@ -283,25 +281,25 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               : null;
           const searchImmersionResultDto: SearchImmersionResultDto = {
             id: result.offer_uuid,
-            rome: result.offer_rome,
+            rome: result.rome,
             romeLabel: result.libelle_rome,
-            naf: result.establishment_naf,
+            naf: result.naf,
             nafLabel: result.class_label,
             siret: result.establishment_siret,
             name: result.establishment_name,
-            voluntaryToImmersion: result.voluntary_to_immersion,
+            voluntaryToImmersion: result.data_source == "form",
             numberOfEmployeeRange:
               employeeRangeByTefenCode[
                 result.establishment_tefen_code as TefenCode
               ],
-            address: result.establishment_address,
-            city: extractCityFromAddress(result.establishment_address),
+            address: result.address,
+            city: extractCityFromAddress(result.address),
             contactMode:
-              optional(result.establishment_contact_mode) &&
-              parseContactMethod(result.establishment_contact_mode),
+              optional(result.contact_mode) &&
+              parseContactMethod(result.contact_mode),
             location:
-              optional(result.offer_position) &&
-              parseGeoJson(result.offer_position),
+              optional(result.establishment_position) &&
+              parseGeoJson(result.establishment_position),
             distance_m: Math.round(result.distance_m),
             ...(withContactDetails &&
               immersionContact && { contactDetails: immersionContact }),
@@ -323,18 +321,21 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         establishments.siret,
         establishments.name,
         establishments.address,
-        immersion_offers.voluntary_to_immersion,
         establishments.data_source,
-        establishments.contact_mode,
         ST_AsGeoJSON(establishments.gps) AS position,
         establishments.naf,
         naf_classes_2008.class_label AS naf_label,
         establishments.number_employees,
-        establishments.update_date as establishments_update_date
+        establishments.update_date as establishments_update_date,
+        contact_mode
       FROM
         establishments
         JOIN immersion_offers
           ON (immersion_offers.siret = establishments.siret)
+        LEFT JOIN establishments__immersion_contacts e_ic
+          ON e_ic.establishment_siret = establishments.siret
+        LEFT JOIN immersion_contacts ic
+          ON ic.uuid = e_ic.contact_uuid
         LEFT OUTER JOIN naf_classes_2008
           ON (naf_classes_2008.class_id =
               REGEXP_REPLACE(establishments.naf,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
@@ -351,7 +352,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       siret: row.siret,
       name: row.name,
       address: row.address,
-      voluntaryToImmersion: row.voluntary_to_immersion,
+      voluntaryToImmersion: row.data_source == "form",
       dataSource: row.data_source,
       position: row.position && parseGeoJson(row.position),
       naf: row.naf,
@@ -421,23 +422,25 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     immersionOfferId: ImmersionOfferId,
   ): Promise<ContactEntityV2 | undefined> {
     const query = format(
-      `SELECT
-        immersion_contacts.uuid,
-        immersion_contacts.lastname,
-        immersion_contacts.firstname,
-        immersion_contacts.email,
-        immersion_contacts.role,
-        immersion_contacts.phone,
-        immersion_contacts.contact_mode
-      FROM
-        immersion_contacts
-        JOIN establishments__immersion_contacts
-          ON (establishments__immersion_contacts.contact_uuid = immersion_contacts.uuid)
-        JOIN establishments
-          ON (immersion_offers.siret = establishments__immersion_contacts.siret)
+      `WITH filtered_offers as (SELECT siret from immersion_offers WHERE uuid = %L)    
+      SELECT
+              immersion_contacts.uuid,
+              immersion_contacts.lastname,
+              immersion_contacts.firstname,
+              immersion_contacts.email,
+              immersion_contacts.role,
+              immersion_contacts.phone,
+              immersion_contacts.contact_mode,
+              establishment_siret
+            FROM
+              immersion_contacts
+              RIGHT JOIN establishments__immersion_contacts
+                ON (establishments__immersion_contacts.contact_uuid = immersion_contacts.uuid)
+              RIGHT JOIN filtered_offers 
+                ON (filtered_offers.siret = establishment_siret)
+            WHERE immersion_contacts.uuid IS NOT NULL 
+            LIMIT 1`,
 
-      WHERE
-        immersion_offers.uuid = %L`,
       immersionOfferId,
     );
     const pgResult = await this.client.query(query);
@@ -451,7 +454,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       email: row.email,
       job: row.role,
       phone: row.phone,
-      contactMethod: row.contact_mode,
+      contactMethod: parseContactMethod(row.contact_mode),
     };
   }
 
