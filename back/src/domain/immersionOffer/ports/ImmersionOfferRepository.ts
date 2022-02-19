@@ -33,7 +33,7 @@ export interface ImmersionOfferRepository {
     withContactDetails?: boolean,
   ) => Promise<SearchImmersionResultDto[]>;
 
-  getActiveEstablishmentSiretsNotUpdatedSince: (
+  getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince: (
     since: Date,
   ) => Promise<string[]>;
 

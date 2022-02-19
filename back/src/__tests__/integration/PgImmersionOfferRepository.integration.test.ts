@@ -345,34 +345,49 @@ describe("Postgres implementation of immersion offer repository", () => {
       const siretOfClosedEstablishmentNotUpdatedSince = "78000403200021";
       const siretOfActiveEstablishmentNotUpdatedSince = "78000403200022";
       const siretOfActiveEstablishmentUpdatedSince = "78000403200023";
+      const siretOfActiveFormEstablishmentUpdatedSince = "78000403200024";
 
       const beforeSince = new Date("2020-04-14T12:00:00.000");
       const afterSince = new Date("2020-05-15T12:00:00.000");
 
       await Promise.all([
+        // Should NOT update because not active
         insertEstablishment({
           siret: siretOfClosedEstablishmentNotUpdatedSince,
           updatedAt: beforeSince,
           isActive: false,
           position,
+          dataSource: "api_labonneboite",
         }),
         insertEstablishment({
+          // Should update because from LBB, before the date and active
           siret: siretOfActiveEstablishmentNotUpdatedSince,
           updatedAt: beforeSince,
           isActive: true,
           position,
+          dataSource: "api_labonneboite",
         }),
         insertEstablishment({
+          // Should NOT update because from form
+          siret: siretOfActiveFormEstablishmentUpdatedSince,
+          updatedAt: beforeSince,
+          isActive: true,
+          position,
+          dataSource: "form",
+        }),
+        insertEstablishment({
+          // Should NOT update because already updated since date
           siret: siretOfActiveEstablishmentUpdatedSince,
           updatedAt: afterSince,
           isActive: true,
           position,
+          dataSource: "api_labonneboite",
         }),
       ]);
 
       // Act
       const actualResult =
-        await pgImmersionOfferRepository.getActiveEstablishmentSiretsNotUpdatedSince(
+        await pgImmersionOfferRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
           since,
         );
 
@@ -392,7 +407,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       // Act
       const actualResult =
-        await pgImmersionOfferRepository.getActiveEstablishmentSiretsNotUpdatedSince(
+        await pgImmersionOfferRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
           new Date("2020-04-14T12:00:00.000"), // whatever date
         );
 

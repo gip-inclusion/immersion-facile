@@ -377,12 +377,13 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       updatedAt: row.establishments_update_date,
     };
   }
-  public async getActiveEstablishmentSiretsNotUpdatedSince(
+  public async getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
     since: Date,
   ): Promise<string[]> {
     const query = `
       SELECT siret FROM establishments
       WHERE is_active AND 
+      data_source = 'api_labonneboite' AND
       (update_date IS NULL OR 
        update_date < $1)`;
     const pgResult = await this.client.query(query, [since.toISOString()]);

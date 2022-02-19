@@ -23,7 +23,7 @@ export class UpdateEstablishmentsFromSireneAPI {
   public async execute() {
     const since = addDays(this.clock.now(), -SIRENE_NB_DAYS_BEFORE_REFRESH);
     const establishmentSiretsToUpdate =
-      await this.immersionOfferRepository.getActiveEstablishmentSiretsNotUpdatedSince(
+      await this.immersionOfferRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
         since,
       );
 

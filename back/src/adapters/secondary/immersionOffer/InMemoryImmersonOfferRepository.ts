@@ -109,7 +109,7 @@ export class InMemoryImmersionOfferRepository
     );
   }
 
-  public async getActiveEstablishmentSiretsNotUpdatedSince(
+  public async getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
     since: Date,
   ): Promise<string[]> {
     return this._establishmentAggregates
