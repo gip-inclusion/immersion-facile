@@ -62,7 +62,7 @@ describe("GetSiret", () => {
   test("throws NotFoundError wher siret not found", async () => {
     await expectPromiseToFailWithError(
       getSiret.execute({ siret: "40440440440400" }),
-      new NotFoundError("Did not found siret : 40440440440400"),
+      new NotFoundError("Did not find siret : 40440440440400"),
     );
   });
 
