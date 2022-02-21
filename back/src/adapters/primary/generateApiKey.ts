@@ -14,7 +14,9 @@ const logger = createLogger(__filename);
 const uuidGenerator = new UuidV4Generator();
 const clock = new RealClock();
 const appConfig = AppConfig.createFromEnv();
-const generateJwt = makeGenerateJwt<WithApiConsumerId>(appConfig);
+const generateApiKeyJwt = makeGenerateJwt<WithApiConsumerId>(
+  appConfig.jwtPrivateKey,
+);
 
 const createdAt = clock.now();
 const expirationDate = addYears(createdAt, 2);
@@ -46,4 +48,4 @@ console.log(
   makeSqlQueryToAddConsumer(apiConsumer),
   "\n ----- \n",
 );
-console.log("\n JWT : ", generateJwt({ id: apiConsumer.id }));
+console.log("\n JWT : ", generateApiKeyJwt({ id: apiConsumer.id }));

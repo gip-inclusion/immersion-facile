@@ -35,7 +35,7 @@ describe("/get-immersion-by-id route", () => {
       .withAuthorizedApiKeyIds([authorizedApiKeyId])
       .build();
     ({ request, reposAndGateways } = await buildTestApp(config));
-    generateJwt = makeGenerateJwt(config);
+    generateJwt = makeGenerateJwt(config.jwtPrivateKey);
 
     await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()

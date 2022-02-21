@@ -113,7 +113,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const repositories = await createRepositories(config, getPgPoolFn);
   const uowPerformer = createUowPerformer(config, getPgPoolFn, repositories);
   const eventBus = createEventBus();
-  const generateJwtFn = makeGenerateJwt(config);
+  const generateJwtFn = makeGenerateJwt(config.jwtPrivateKey);
   const generateMagicLinkFn = createGenerateVerificationMagicLink(config);
   const emailFilter = config.skipEmailAllowlist
     ? new AlwaysAllowEmailFilter()
@@ -346,7 +346,7 @@ export type GenerateVerificationMagicLink = ReturnType<
 >;
 // Visible for testing.
 export const createGenerateVerificationMagicLink = (config: AppConfig) => {
-  const generateJwt = makeGenerateJwt(config);
+  const generateJwt = makeGenerateJwt(config.jwtPrivateKey);
 
   return (
     id: ImmersionApplicationId,

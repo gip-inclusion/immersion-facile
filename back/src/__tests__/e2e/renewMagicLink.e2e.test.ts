@@ -79,7 +79,7 @@ describe("Magic link renewal flow", () => {
     const agencyRepository = new InMemoryAgencyRepository([agencyConfig]);
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
-    generateJwtFn = makeGenerateJwt(config);
+    generateJwtFn = makeGenerateJwt(config.jwtPrivateKey);
 
     renewMagicLink = new RenewMagicLink(
       applicationRepository,

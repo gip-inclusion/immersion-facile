@@ -13,9 +13,9 @@ export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
 // prettier-ignore
 type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload) => string;
 export const makeGenerateJwt =
-  <P extends AnyObject>(config: AppConfig): GenerateJwtFn<P> =>
+  <P extends AnyObject>(privateKey: string): GenerateJwtFn<P> =>
   (payload) =>
-    jwt.sign(payload, config.jwtPrivateKey, {
+    jwt.sign(payload, privateKey, {
       algorithm: algo,
       noTimestamp: true,
     });

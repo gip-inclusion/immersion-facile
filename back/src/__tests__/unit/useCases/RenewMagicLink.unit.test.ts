@@ -62,7 +62,7 @@ describe("RenewMagicLink use case", () => {
     applicationRepository.setImmersionApplications({ [entity.id]: entity });
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
-    generateJwtFn = makeGenerateJwt(config);
+    generateJwtFn = makeGenerateJwt(config.jwtPrivateKey);
     // This is the JWT function that was used with the V0 magic links
     generateLegacyV0JwtFn = (payload: any) =>
       jwt.sign(payload, config.jwtPreviousPrivateKey as string, {
