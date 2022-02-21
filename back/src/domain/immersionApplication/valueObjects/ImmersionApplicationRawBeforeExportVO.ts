@@ -1,6 +1,7 @@
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { calculateWeeklyHoursFromSchedule } from "../../../shared/ScheduleUtils";
 import type { ImmersionApplicationReadyForExportVO } from "./ImmersionApplicationReadyForExportVO";
+import slugify from "slugify";
 
 type KeysForExport =
   | "status"
@@ -41,6 +42,7 @@ export class ImmersionApplicationRawBeforeExportVO {
 
   private toTranslatedImmersionApplication = () => ({
     ...this._props,
+    agencyName: slugify(this._props.agencyName),
     status: translateStatus[this._props.status],
     beneficiaryAccepted: this.translateBoolean(this._props.beneficiaryAccepted),
     enterpriseAccepted: this.translateBoolean(this._props.enterpriseAccepted),
