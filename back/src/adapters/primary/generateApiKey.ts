@@ -15,7 +15,7 @@ const uuidGenerator = new UuidV4Generator();
 const clock = new RealClock();
 const appConfig = AppConfig.createFromEnv();
 const generateApiKeyJwt = makeGenerateJwt<WithApiConsumerId>(
-  appConfig.jwtPrivateKey,
+  appConfig.apiJwtPrivateKey,
 );
 
 const createdAt = clock.now();

@@ -145,6 +145,14 @@ export class AppConfig {
     return domain === "localhost" ? domain : `https://${domain}`;
   }
 
+  public get apiJwtPublicKey() {
+    return this.throwIfNotDefined("API_JWT_PUBLIC_KEY");
+  }
+
+  public get apiJwtPrivateKey() {
+    return this.throwIfNotDefined("API_JWT_PRIVATE_KEY");
+  }
+
   public get jwtPublicKey() {
     return this.throwIfNotDefined("JWT_PUBLIC_KEY");
   }

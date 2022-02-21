@@ -3,8 +3,8 @@ import { TokenExpiredError } from "jsonwebtoken";
 import { Clock } from "../../domain/core/ports/Clock";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
 import {
-  ApiConsumer,
   ApiConsumerName,
+  WithApiConsumerId,
 } from "../../domain/core/valueObjects/ApiConsumer";
 import {
   currentJwtVersion,
@@ -53,7 +53,7 @@ export const createApiKeyAuthMiddleware = (
   clock: Clock,
   config: AppConfig,
 ) => {
-  const verifyJwt = makeVerifyJwt<ApiConsumer>(config.jwtPublicKey);
+  const verifyJwt = makeVerifyJwt<WithApiConsumerId>(config.apiJwtPublicKey);
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
@@ -64,7 +64,7 @@ export const createApiKeyAuthMiddleware = (
     }
 
     try {
-      const { id } = verifyJwt(req.headers.authorization as string);
+      const { id } = verifyJwt(req.headers.authorization);
       const apiConsumer = await getApiConsumerById(id);
       if (!apiConsumer) {
         incTotalCountForRequest({
