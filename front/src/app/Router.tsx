@@ -40,12 +40,7 @@ export const Router = () => {
       {route.name === "immersionApplication" && (
         <ApplicationForm route={route} />
       )}
-      {route.name === "admin" &&
-        (featureFlags.enableAdminUi ? (
-          <Admin route={route} />
-        ) : (
-          <NotAvailable />
-        ))}
+      {route.name === "admin" && <Admin route={route} /> }
       {route.name === "adminVerification" &&
         (featureFlags.enableAdminUi ? (
           <AdminVerification route={route} />
