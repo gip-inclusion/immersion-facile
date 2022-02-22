@@ -370,7 +370,6 @@ export const ApplicationFormFields = ({
           validation par mail et l'entreprise également.
         </p>
       )}
-      <p className="font-bold">Surveillez vos mails !</p>
 
       <br />
 

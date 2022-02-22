@@ -109,7 +109,9 @@ export const AdminVerification = ({ route }: AdminVerificationProps) => {
             </button>
           )}
           {successMessage && (
-            <SuccessMessage title="Succès">{successMessage}</SuccessMessage>
+            <SuccessMessage title="Succès">
+              <p>{successMessage}</p>
+            </SuccessMessage>
           )}
         </>
       )}
