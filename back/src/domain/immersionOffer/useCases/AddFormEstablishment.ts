@@ -1,7 +1,7 @@
 import { FeatureFlags } from "../../../shared/featureFlags";
 import {
-  AddFormEstablishmentResponseDto,
   FormEstablishmentDto,
+  FormEstablishmentId,
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
 import { createLogger } from "../../../utils/logger";
@@ -16,7 +16,7 @@ const logger = createLogger(__filename);
 
 export class AddFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,
-  AddFormEstablishmentResponseDto
+  FormEstablishmentId
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -32,7 +32,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
   public async _execute(
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
-  ): Promise<AddFormEstablishmentResponseDto> {
+  ): Promise<FormEstablishmentId> {
     if (!this.featureFlags.enableByPassInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
     }

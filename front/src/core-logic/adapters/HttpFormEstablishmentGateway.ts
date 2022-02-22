@@ -1,10 +1,9 @@
 import axios from "axios";
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
 import {
-  AddFormEstablishmentResponseDto,
   FormEstablishmentDto,
   FormEstablishmentId,
-  addFormEstablishmentResponseSchema,
+  formEstablishmentIdSchema,
 } from "src/shared/FormEstablishmentDto";
 import { RomeSearchMatchDto, romeSearchResponseSchema } from "src/shared/rome";
 import { immersionOffersRoute, romeRoute } from "src/shared/routes";
@@ -19,9 +18,8 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
       `/${prefix}/${immersionOffersRoute}`,
       establishment,
     );
-    const responseDto: AddFormEstablishmentResponseDto = httpResponse.data;
-    addFormEstablishmentResponseSchema.parse(responseDto);
-    return responseDto;
+
+    return formEstablishmentIdSchema.parse(httpResponse.data);
   }
 
   public async searchProfession(
@@ -30,8 +28,7 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
     const httpResponse = await axios.get(`/${prefix}/${romeRoute}`, {
       params: { searchText },
     });
-    const responseDto: RomeSearchMatchDto[] = httpResponse.data;
-    romeSearchResponseSchema.parse(responseDto);
-    return responseDto;
+
+    return romeSearchResponseSchema.parse(httpResponse.data);
   }
 }

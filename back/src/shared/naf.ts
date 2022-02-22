@@ -31,13 +31,15 @@ export const validNafSectorCodes = keys(nafSectorLabels).filter(
   (val) => val !== "0",
 );
 
-export type NafDto = z.infer<typeof nafSchema>;
-export const nafSchema = z
-  .object({
-    code: z.string(),
-    nomenclature: z.string(),
-  })
-  .optional();
+export type NafDto = {
+  code: string;
+  nomenclature: string;
+};
+
+export const nafSchema: z.Schema<NafDto> = z.object({
+  code: z.string(),
+  nomenclature: z.string(),
+});
 
 const nafDivisionRegex = /\d{2}/;
 export const nafDivisionSchema = z

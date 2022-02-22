@@ -15,30 +15,37 @@ const romeCodeAppellationSchema = z
   .string()
   .regex(romeCodeAppellationRegex, "Code ROME incorrect");
 
-export type ProfessionDto = z.infer<typeof professionSchema>;
-export const professionSchema = z.object({
+export type ProfessionDto = {
+  romeCodeMetier: string; // 5 characters respecting regex : /[A-N]\d{4}/
+  romeCodeAppellation?: string; // 5 digits (regex : /\d{5}/  )
+  description: string;
+};
+export const professionSchema: z.Schema<ProfessionDto> = z.object({
   romeCodeMetier: romeCodeMetierSchema,
   romeCodeAppellation: romeCodeAppellationSchema.optional(),
   description: zTrimmedString,
 });
 
-export type MatchRangeDto = z.infer<typeof matchRangeSchema>;
-const matchRangeSchema = z.object({
+export type MatchRangeDto = {
+  startIndexInclusive: number;
+  endIndexExclusive: number;
+};
+const matchRangeSchema: z.Schema<MatchRangeDto> = z.object({
   startIndexInclusive: z.number({ required_error: "Obligatoire" }).min(0).int(),
   endIndexExclusive: z.number({ required_error: "Obligatoire" }).min(0).int(),
 });
 
-export type RomeSearchMatchDto = z.infer<typeof romeSearchMatchSchema>;
-export const romeSearchMatchSchema = z.object(
+export type RomeSearchMatchDto = {
+  profession: ProfessionDto;
+  matchRanges: MatchRangeDto[];
+};
+export const romeSearchMatchSchema: z.Schema<RomeSearchMatchDto> = z.object(
   {
     profession: professionSchema,
     matchRanges: z.array(matchRangeSchema),
   },
   { required_error: "Obligatoire" },
 );
-
-export type RomeSearchRequestDto = z.infer<typeof romeSearchRequestSchema>;
-export const romeSearchRequestSchema = zTrimmedString;
 
 export const romeSearchResponseSchema = z.array(romeSearchMatchSchema, {
   required_error: "Obligatoire",
