@@ -1,6 +1,7 @@
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
+  DataSource,
   employeeRangeByTefenCode,
   EstablishmentAggregate,
   EstablishmentEntityV2,
@@ -129,7 +130,18 @@ export class InMemoryImmersionOfferRepository
       )
       .map((aggregate) => aggregate.establishment.siret);
   }
-
+  public async getEstablishmentDataSourceFromSiret(
+    siret: string,
+  ): Promise<DataSource | undefined> {
+    return this._establishmentAggregates.find(
+      (aggregate) => aggregate.establishment.siret === siret,
+    )?.establishment?.dataSource;
+  }
+  public async getSiretOfEstablishmentsFromFormSource(): Promise<string[]> {
+    return this._establishmentAggregates
+      .filter((aggregate) => aggregate.establishment.dataSource === "form")
+      .map((aggregate) => aggregate.establishment.siret);
+  }
   public async updateEstablishment(
     siret: string,
     propertiesToUpdate: Partial<
@@ -185,6 +197,13 @@ export class InMemoryImmersionOfferRepository
     );
   }
 
+  public async removeEstablishmentAndOffersWithSiret(
+    siret: string,
+  ): Promise<void> {
+    this.establishmentAggregates = this._establishmentAggregates.filter(
+      (aggregate) => aggregate.establishment.siret !== siret,
+    );
+  }
   // for test purposes only :
   get establishmentAggregates() {
     return this._establishmentAggregates;

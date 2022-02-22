@@ -7,6 +7,7 @@ import {
   EstablishmentAggregate,
   TefenCode,
   EstablishmentEntityV2,
+  DataSource,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -380,6 +381,30 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       (update_date IS NULL OR 
        update_date < $1)`;
     const pgResult = await this.client.query(query, [since.toISOString()]);
+    return pgResult.rows.map((row) => row.siret);
+  }
+  public async getEstablishmentDataSourceFromSiret(
+    siret: string,
+  ): Promise<DataSource | undefined> {
+    const query = `
+      SELECT data_source FROM establishments
+      WHERE siret = $1`;
+    const pgResult = await this.client.query(query, [siret]);
+    return pgResult.rows[0]?.data_source;
+  }
+  public async removeEstablishmentAndOffersWithSiret(
+    siret: string,
+  ): Promise<void> {
+    const query = `
+      DELETE FROM establishments WHERE siret = $1;`;
+    await this.client.query(query, [siret]);
+  }
+
+  public async getSiretOfEstablishmentsFromFormSource(): Promise<string[]> {
+    const query = `
+      SELECT siret FROM establishments
+      WHERE data_source = 'form'`;
+    const pgResult = await this.client.query(query);
     return pgResult.rows.map((row) => row.siret);
   }
 

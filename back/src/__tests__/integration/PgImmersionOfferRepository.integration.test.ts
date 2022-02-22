@@ -49,7 +49,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   describe("Pg implementation of method getSearchImmersionResultDtoFromSearchMade", () => {
     const searchedRome = "M1808";
     const searchedPosition = { lat: 49, lon: 6 };
-    const notMatchingRome = "A1101";
+    const notMatchingRome = "B1805";
     const farFromSearchedPosition = { lat: 32, lon: 89 };
     const searchMadeWithRome: SearchMade = {
       rome: searchedRome,
@@ -428,11 +428,8 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
-  const position: LatLonDto = {
-    lat: 20,
-    lon: 3,
-  };
   describe("Pg implementation of method getActiveEstablishmentSiretsNotUpdatedSince", () => {
+    const position = { lon: 2, lat: 3 };
     it("Returns a siret list of establishments having field `update_date` < parameter `since` ", async () => {
       // Prepare
       const since = new Date("2020-05-05T12:00:00.000");
@@ -512,6 +509,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("Pg implementation of method updateEstablishment", () => {
+    const position = { lon: 2, lat: 3 };
     it("Updates the parameter `updatedAt` and `isActive if given", async () => {
       // Prepare
       const siretOfEstablishmentToUpdate = "78000403200021";
@@ -915,6 +913,101 @@ describe("Postgres implementation of immersion offer repository", () => {
       ).toBe(true);
     });
   });
+  describe("Pg implementation of method getEstablishmentDataSourceFromSiret", () => {
+    const siret = "12345678901234";
+    it("Returns undefined when there is no establishment in db with this siret", async () => {
+      const establishmentDataSource =
+        await pgImmersionOfferRepository.getEstablishmentDataSourceFromSiret(
+          siret,
+        );
+      expect(establishmentDataSource).toBeUndefined();
+    });
+    it("Returns undefined when there is no establishment in db with this siret", async () => {
+      // Prepare
+      await insertEstablishment({
+        siret,
+        dataSource: "form",
+      });
+      // Act
+      const establishmentDataSource =
+        await pgImmersionOfferRepository.getEstablishmentDataSourceFromSiret(
+          siret,
+        );
+      // Assert
+      expect(establishmentDataSource).toEqual("form");
+    });
+  });
+  describe("Pg implementation of method getSiretOfEstablishmentsFromFormSource", () => {
+    it("Returns a list of sirets of establishments with `form` data source", async () => {
+      // Prepare
+      const siretFromForm1 = "11111111111111";
+      const siretFromForm2 = "22222222222222";
+      const siretFromLBB = "33333333333333";
+
+      await insertEstablishment({
+        siret: siretFromForm1,
+        dataSource: "form",
+      });
+      await insertEstablishment({
+        siret: siretFromForm2,
+        dataSource: "form",
+      });
+      await insertEstablishment({
+        siret: siretFromLBB,
+        dataSource: "api_labonneboite",
+      });
+      // Act
+      const actualSiretOfEstablishmentsFromFormSource =
+        await pgImmersionOfferRepository.getSiretOfEstablishmentsFromFormSource();
+      // Assert
+      expect(actualSiretOfEstablishmentsFromFormSource).toEqual([
+        siretFromForm1,
+        siretFromForm2,
+      ]);
+    });
+  });
+  describe("Pg implementation of method removeEstablishmentAndOffersWithSiret", () => {
+    it("Removes only establishment with given siret and its offers", async () => {
+      // Prepare
+      const siretToRemove = "11111111111111";
+      const siretToKeep = "22222222222222";
+
+      await insertEstablishment({
+        siret: siretToRemove,
+      });
+      await insertEstablishment({
+        siret: siretToKeep,
+      });
+      await insertImmersionOffer({
+        uuid: testUid1,
+        rome: "A1401",
+        siret: siretToRemove,
+      });
+      await insertImmersionOffer({
+        uuid: testUid2,
+        rome: "A1405",
+        siret: siretToRemove,
+      });
+      await insertImmersionOffer({
+        uuid: testUid3,
+        rome: "A1405",
+        siret: siretToKeep,
+      });
+      // Act
+      await pgImmersionOfferRepository.removeEstablishmentAndOffersWithSiret(
+        siretToRemove,
+      );
+      // Assert
+      //   Establishment has been removed
+      expect(await getEstablishmentsRowsBySiret(siretToRemove)).toBeUndefined();
+      expect(await getEstablishmentsRowsBySiret(siretToKeep)).toBeDefined();
+      //   Offers of this establishment have been removed
+      const immersionOfferRows = await getAllImmersionOfferRows();
+      expect(immersionOfferRows).toHaveLength(1);
+      expect(immersionOfferRows[0].siret).toEqual(siretToKeep);
+    });
+  });
+
   type PgEstablishmentRow = {
     siret: string;
     name: string;
@@ -993,8 +1086,8 @@ describe("Postgres implementation of immersion offer repository", () => {
     nafCode?: string;
     numberEmployeesRange?: number;
     address?: string;
-    position?: LatLonDto;
     dataSource?: DataSource;
+    position?: LatLonDto;
   }) => {
     const defaultPosition = { lon: 12.2, lat: 2.1 };
     const insertQuery = `

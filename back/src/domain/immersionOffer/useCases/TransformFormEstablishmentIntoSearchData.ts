@@ -7,8 +7,9 @@ import { createLogger } from "../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { Clock } from "../../core/ports/Clock";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { UseCase } from "../../core/UseCase";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { RomeGateway } from "../../rome/ports/RomeGateway";
 import {
   SireneEstablishmentVO,
@@ -29,28 +30,44 @@ const logger = createLogger(__filename);
 
 const offerFromFormScore = 10; // 10/10 if voluntaryToImmersion=true (consider removing this field)
 
-export class TransformFormEstablishmentIntoSearchData extends UseCase<
+// TODO Rename : InsertNewEstablishmentFromFormToRepositories
+export class TransformFormEstablishmentIntoSearchData extends TransactionalUseCase<
   FormEstablishmentDto,
   void
 > {
   constructor(
-    private readonly immersionOfferRepository: ImmersionOfferRepository,
     private readonly adresseAPI: AdresseAPI,
     private readonly sireneRepository: SireneRepository,
     private readonly romeGateway: RomeGateway,
     private readonly sequenceRunner: SequenceRunner,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
+    uowPerformer: UnitOfWorkPerformer,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = formEstablishmentSchema;
 
   public async _execute(
     formEstablishment: FormEstablishmentDto,
+    uow: UnitOfWork,
   ): Promise<void> {
     const establishmentSiret = formEstablishment.siret;
+
+    const establishmentDataSource =
+      await uow.immersionOfferRepo.getEstablishmentDataSourceFromSiret(
+        establishmentSiret,
+      );
+    if (establishmentDataSource === "form") {
+      throw new Error(
+        `Cannot insert establishment from form with siret ${establishmentSiret} since it already exists.`,
+      );
+    } else if (establishmentDataSource === "api_labonneboite") {
+      await uow.immersionOfferRepo.removeEstablishmentAndOffersWithSiret(
+        establishmentSiret,
+      );
+    }
 
     const position = await this.adresseAPI.getPositionFromAddress(
       formEstablishment.businessAddress,
@@ -126,7 +143,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
       contact: contact,
       immersionOffers,
     };
-    await this.immersionOfferRepository
+    await uow.immersionOfferRepo
       .insertEstablishmentAggregates([establishmentAggregate])
       .catch((err) => {
         notifyAndThrowErrorDiscord(

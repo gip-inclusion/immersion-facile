@@ -1,9 +1,12 @@
+import { createInMemoryUow } from "../../../adapters/primary/config";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
 import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
 import { TransformFormEstablishmentIntoSearchData } from "../../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
@@ -12,7 +15,10 @@ import { NafDto } from "../../../shared/naf";
 import { ProfessionDto } from "../../../shared/rome";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 class TestSequenceRunner implements SequenceRunner {
   public run<Input, Output>(array: Input[], cb: (a: Input) => Promise<Output>) {
@@ -55,28 +61,34 @@ const getEstablishmentFromSireneApi = (
 
 describe("Transform FormEstablishment into search data", () => {
   let inMemorySireneRepository: InMemorySireneRepository;
-  let inMemoryImmersionOfferRepository: InMemoryImmersionOfferRepository;
+  let immersionOfferRepo: InMemoryImmersionOfferRepository;
   let inMemoryAdresseAPI: InMemoryAdresseAPI;
-  let transformFormEstablishmentIntoSearchData: TransformFormEstablishmentIntoSearchData;
+  let useCase: TransformFormEstablishmentIntoSearchData;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
     inMemorySireneRepository = new InMemorySireneRepository();
-    inMemoryImmersionOfferRepository = new InMemoryImmersionOfferRepository();
+    immersionOfferRepo = new InMemoryImmersionOfferRepository();
     inMemoryAdresseAPI = new InMemoryAdresseAPI(fakePosition);
     uuidGenerator = new TestUuidGenerator();
     const inMemoryRomeGateway = new InMemoryRomeGateway();
     const sequencerRunner = new TestSequenceRunner();
-    transformFormEstablishmentIntoSearchData =
-      new TransformFormEstablishmentIntoSearchData(
-        inMemoryImmersionOfferRepository,
-        inMemoryAdresseAPI,
-        inMemorySireneRepository,
-        inMemoryRomeGateway,
-        sequencerRunner,
-        uuidGenerator,
-        new CustomClock(),
-      );
+    const outboxRepository = new InMemoryOutboxRepository();
+    const uowPerformer = new InMemoryUowPerformer({
+      ...createInMemoryUow(),
+      outboxRepo: outboxRepository,
+      immersionOfferRepo: immersionOfferRepo,
+    });
+
+    useCase = new TransformFormEstablishmentIntoSearchData(
+      inMemoryAdresseAPI,
+      inMemorySireneRepository,
+      inMemoryRomeGateway,
+      sequencerRunner,
+      uuidGenerator,
+      new CustomClock(),
+      uowPerformer,
+    );
   });
 
   it("converts Form Establishment in search format", async () => {
@@ -103,7 +115,7 @@ describe("Transform FormEstablishment into search data", () => {
     inMemorySireneRepository.setEstablishment(establishmentFromApi);
 
     // Act
-    await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
+    await useCase.execute(formEstablishment);
 
     // Assert
     await expectEstablishmentAggregateInRepo({
@@ -124,7 +136,7 @@ describe("Transform FormEstablishment into search data", () => {
     offerRomeCodesAndAppellations: { code: string; appellation?: number }[];
   }) => {
     const repoEstablishmentAggregate =
-      inMemoryImmersionOfferRepository.establishmentAggregates[0];
+      immersionOfferRepo.establishmentAggregates[0];
 
     expect(repoEstablishmentAggregate).toBeDefined();
     expect(repoEstablishmentAggregate.establishment.siret).toEqual(
@@ -168,16 +180,62 @@ describe("Transform FormEstablishment into search data", () => {
       }),
     );
 
-    await transformFormEstablishmentIntoSearchData.execute(formEstablishment);
+    await useCase.execute(formEstablishment);
 
     const establishmentAggregate =
-      inMemoryImmersionOfferRepository.establishmentAggregates[0];
+      immersionOfferRepo.establishmentAggregates[0];
     expect(establishmentAggregate).toBeDefined();
     expect(establishmentAggregate.establishment.siret).toEqual(
       formEstablishment.siret,
     );
     expect(establishmentAggregate.establishment.numberEmployeesRange).toEqual(
       0,
+    );
+  });
+  it("Removes (and replaces) establishment and offers with same siret from La Bonne Boite if exists", async () => {
+    const siret = "12345678911234";
+    // Prepare : insert an establishment aggregate from LBB with siret
+    immersionOfferRepo.establishmentAggregates = [
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityV2Builder()
+            .withSiret(siret)
+            .withDataSource("api_labonneboite")
+            .build(),
+        )
+        .withImmersionOffers([new ImmersionOfferEntityV2Builder().build()])
+        .build(),
+    ];
+    // Act : execute use-case with same siret
+    const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withSiret(siret)
+      .build();
+    await useCase.execute(formEstablishment);
+
+    // Assert
+    expect(immersionOfferRepo.establishmentAggregates).toHaveLength(0);
+  });
+  it("Raises an error if an establishment from form with same siret already exists - Should not happen.", async () => {
+    const siret = "12345678911234";
+    // Prepare : insert an establishment aggregate from LBB with siret
+    immersionOfferRepo.establishmentAggregates = [
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityV2Builder()
+            .withSiret(siret)
+            .withDataSource("form")
+            .build(),
+        )
+        .withImmersionOffers([new ImmersionOfferEntityV2Builder().build()])
+        .build(),
+    ];
+    // Act and assert : execute use-case with same siret from form should raise
+    const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withSiret(siret)
+      .build();
+
+    await expect(useCase.execute(formEstablishment)).rejects.toThrow(
+      "Cannot insert establishment from form with siret 12345678911234 since it already exists.",
     );
   });
 });

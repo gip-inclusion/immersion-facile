@@ -506,13 +506,13 @@ const createUseCases = (
 
     transformFormEstablishmentToSearchData:
       new TransformFormEstablishmentIntoSearchData(
-        repositories.immersionOffer,
         adresseAPI,
         repositories.sirene,
         repositories.rome,
         sequenceRunner,
         uuidGenerator,
         clock,
+        uowPerformer,
       ),
 
     contactEstablishment: new ContactEstablishment(

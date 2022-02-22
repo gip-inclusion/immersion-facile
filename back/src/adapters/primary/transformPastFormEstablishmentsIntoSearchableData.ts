@@ -18,7 +18,9 @@ import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
+import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { AppConfig } from "./appConfig";
+import { createPgUow } from "./config";
 
 const maxQpsApiAdresse = 5;
 const maxQpsSireneApi = 0.25;
@@ -38,7 +40,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     "starting to convert form establishement to searchable data",
   );
 
-  //We create the use case transformFormEstablishementIntoSearchData
+  // We create the use case transformFormEstablishementIntoSearchData
   const poolOrigin = new Pool({ connectionString: originPgConnectionString });
   const clientOrigin = await poolOrigin.connect();
 
@@ -74,6 +76,8 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   );
   const poleEmploiGateway = new PgRomeGateway(clientOrigin);
 
+  const uow = new PgUowPerformer(getPgPoolFn(), createPgUow);
+
   const transformFormEstablishmentIntoSearchData =
     new TransformFormEstablishmentIntoSearchData(
       immersionOfferRepository,
@@ -83,6 +87,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       sequenceRunner,
       new UuidV4Generator(),
       new RealClock(),
+      uow,
     );
   const missingFormEstablishmentRows = (
     await clientOrigin.query(
@@ -95,7 +100,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   );
 
   let succeed = 0;
-  let failedSiret = [];
+  const failedSiret = [];
   for (const row of missingFormEstablishmentRows) {
     const formEstablishmentDto: FormEstablishmentDto = {
       source: row.source,
@@ -138,3 +143,6 @@ transformPastFormEstablishmentsIntoSearchableData(
   config.pgImmersionDbUrl,
   config.pgImmersionDbUrl,
 );
+function getPgPoolFn(): Pool {
+  throw new Error("Function not implemented.");
+}

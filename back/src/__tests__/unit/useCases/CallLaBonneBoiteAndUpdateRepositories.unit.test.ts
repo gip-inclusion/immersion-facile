@@ -10,6 +10,8 @@ import {
   LaBonneBoiteCompanyVO,
 } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 import { SearchImmersionRequestDto } from "../../../shared/SearchImmersionDto";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
 
 const prepareUseCase = async () => {
@@ -119,12 +121,12 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       };
       laBonneBoiteAPI.setNextResults([
         new LaBonneBoiteCompanyVO({
-          matched_rome_code: "AAAAA",
-          naf: "",
+          matched_rome_code: "A1101",
+          naf: "8500A",
         } as LaBonneBoiteCompanyProps),
         new LaBonneBoiteCompanyVO({
-          matched_rome_code: "BBBBB",
-          naf: "",
+          matched_rome_code: "A1201",
+          naf: "8500B",
         } as LaBonneBoiteCompanyProps),
         new LaBonneBoiteCompanyVO(
           ignoredNafRomeCombination as LaBonneBoiteCompanyProps,
@@ -140,6 +142,37 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
         immersionOfferRepository.establishmentAggregates[0].establishment
           .updatedAt,
       ).not.toBeDefined();
+    });
+    it("Should ignore establishments that have been inserted with `form` dataSource", async () => {
+      const conflictSiret = "12345678901234";
+      // Prepare : an establishment already inserted from form
+      const { useCase, laBonneBoiteAPI, immersionOfferRepository } =
+        await prepareUseCase();
+      const alreadyExistingAggregateFromForm =
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityV2Builder()
+              .withSiret(conflictSiret)
+              .withDataSource("form")
+              .build(),
+          )
+          .build();
+
+      immersionOfferRepository.establishmentAggregates = [
+        alreadyExistingAggregateFromForm,
+      ];
+
+      laBonneBoiteAPI.setNextResults([
+        new LaBonneBoiteCompanyBuilder().withSiret(conflictSiret).build(),
+      ]);
+
+      // Act : this establishment is referenced in LBB
+      await useCase.execute(dto);
+
+      // Assert : Should have skiped this establishment
+      expect(immersionOfferRepository.establishmentAggregates).toEqual([
+        alreadyExistingAggregateFromForm,
+      ]);
     });
   }),
     describe("LBB has been requested for this rome code and this geographic area", () => {

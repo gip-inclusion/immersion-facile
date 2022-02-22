@@ -81,8 +81,16 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
     await this.laBonneBoiteRequestRepository.insertLaBonneBoiteRequest(
       lbbRequestEntity,
     );
-    if (relevantCompanies)
-      await this.insertRelevantCompaniesInRepositories(relevantCompanies);
+    if (relevantCompanies) {
+      const existingFormEstablishmentsSirets =
+        await this.immersionOfferRepository.getSiretOfEstablishmentsFromFormSource();
+
+      const newRelevantCompanies = relevantCompanies.filter(
+        (company) => !existingFormEstablishmentsSirets.includes(company.siret),
+      );
+
+      await this.insertRelevantCompaniesInRepositories(newRelevantCompanies);
+    }
   }
 
   private async requestLaBonneBoite(

@@ -5,6 +5,7 @@ import {
 import { ContactEntityV2 } from "../entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
+  DataSource,
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../entities/EstablishmentEntity";
@@ -40,6 +41,12 @@ export interface ImmersionOfferRepository {
     since: Date,
   ) => Promise<string[]>;
 
+  getEstablishmentDataSourceFromSiret: (
+    siret: string,
+  ) => Promise<DataSource | undefined>;
+
+  getSiretOfEstablishmentsFromFormSource: () => Promise<string[]>;
+
   updateEstablishment: (
     siret: string,
     propertiesToUpdate: Partial<
@@ -49,4 +56,6 @@ export interface ImmersionOfferRepository {
       >
     > & { updatedAt: Date },
   ) => Promise<void>;
+
+  removeEstablishmentAndOffersWithSiret: (siret: string) => Promise<void>;
 }
