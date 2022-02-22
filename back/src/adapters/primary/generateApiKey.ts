@@ -2,6 +2,7 @@ import { addYears } from "date-fns";
 import { makeGenerateJwt } from "../../domain/auth/jwt";
 import {
   ApiConsumer,
+  ApiConsumerName,
   WithApiConsumerId,
 } from "../../domain/core/valueObjects/ApiConsumer";
 import { createLogger } from "../../utils/logger";
@@ -21,13 +22,29 @@ const generateApiKeyJwt = makeGenerateJwt<WithApiConsumerId>(
 const createdAt = clock.now();
 const expirationDate = addYears(createdAt, 2);
 
+const authorisedNames: ApiConsumerName[] = [
+  "passeEmploi",
+  "unJeuneUneSolution",
+];
+
+const getNameOrThrow = (name: string): ApiConsumerName => {
+  if (!name) throw new Error("please provide consumerName");
+  const consumerName = name as ApiConsumerName;
+  if (authorisedNames.includes(consumerName)) return consumerName;
+  throw new Error(
+    `Name must be one of ${authorisedNames.join(", ")}, got : ${consumerName}`,
+  );
+};
+
+const consumerName: ApiConsumerName = getNameOrThrow(process.argv[2]);
+
 const apiConsumer: ApiConsumer = {
   id: uuidGenerator.new(),
-  consumer: "passeEmploi",
-  description: "some",
+  consumer: consumerName,
   isAuthorized: true,
   createdAt,
   expirationDate,
+  description: "",
 };
 
 const makeSqlQueryToAddConsumer = ({

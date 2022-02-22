@@ -82,7 +82,7 @@ export const createApiKeyAuthMiddleware = (
         return next();
       }
 
-      if (apiConsumer.expirationDate > clock.now()) {
+      if (apiConsumer.expirationDate < clock.now()) {
         incTotalCountForRequest({
           authorisationStatus: "expiredToken",
           consumerName: apiConsumer.consumer,
