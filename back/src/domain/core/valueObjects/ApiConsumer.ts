@@ -6,7 +6,10 @@ export type WithApiConsumerId = {
   id: ApiConsumerId;
 };
 
-export type ApiConsumerName = "passeEmploi" | "testConsumer";
+export type ApiConsumerName =
+  | "passeEmploi"
+  | "unJeuneUneSolution"
+  | "testConsumer";
 
 export type ApiConsumer = {
   id: ApiConsumerId;
