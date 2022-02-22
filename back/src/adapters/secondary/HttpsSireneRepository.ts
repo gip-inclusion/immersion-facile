@@ -58,7 +58,7 @@ export class HttpsSireneRepository implements SireneRepository {
         );
         return response.data;
       } catch (error: any) {
-        if (error.response.status == 404) {
+        if (error.response?.status === 404) {
           return undefined;
         }
         if (isRetriableError(logger, error)) throw new RetriableError(error);
