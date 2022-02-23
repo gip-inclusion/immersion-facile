@@ -1,6 +1,7 @@
 import { Form, Formik, useField } from "formik";
 import React, { useState } from "react";
 import { formEstablishmentGateway } from "src/app/dependencies";
+import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { BusinessContactList } from "src/app/FormEstablishment/BusinessContactList";
 import {
   fieldsToLabel,
@@ -115,6 +116,7 @@ const SiretRelatedInputs = () => {
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField("businessAddress", establishmentInfo);
   useSiretRelatedField("naf", establishmentInfo);
+  const featureFlags = useFeatureFlagsContext();
 
   const businessLabelAndName = getLabelAndName("businessAddress");
   const [_, __, { setValue }] = useField<string>(businessLabelAndName.name);
@@ -128,7 +130,7 @@ const SiretRelatedInputs = () => {
       />
       <TextInput
         {...getLabelAndName("businessName")}
-        disabled={!ENV.featureFlags.enableByPassInseeApi}
+        disabled={!featureFlags.enableByPassInseeApi}
       />
       <TextInput
         {...getLabelAndName("businessNameCustomized")}

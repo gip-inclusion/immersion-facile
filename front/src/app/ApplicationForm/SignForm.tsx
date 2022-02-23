@@ -7,7 +7,6 @@ import { routes } from "src/app/routes";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { ENV } from "src/environmentVariables";
 import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
@@ -21,8 +20,6 @@ type SignFormRoute = Route<typeof routes.immersionApplicationsToSign>;
 interface SignFormProps {
   route: SignFormRoute;
 }
-
-const { featureFlags, dev } = ENV;
 
 const extractRoleAndName = (
   jwt: string,

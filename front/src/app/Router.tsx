@@ -1,5 +1,6 @@
 import React from "react";
 import { Admin } from "src/app/admin/Admin";
+import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { LandingEstablishment } from "src/app/LandingEstablishment/LandingEstablishment";
 import { VerificationPage } from "src/app/Verification/VerificationPage";
 import { ApplicationForm } from "src/app/ApplicationForm/ApplicationForm";
@@ -14,12 +15,13 @@ import { RenewExpiredLink } from "../helpers/RenewExpiredLink";
 import { Search } from "./Search/Search";
 import { SignForm } from "./ApplicationForm/SignForm";
 
-const { dev, featureFlags } = ENV;
+const { dev } = ENV;
 
 const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
 
 export const Router = () => {
   const route = useRoute();
+  const featureFlags = useFeatureFlagsContext();
 
   return (
     <>
@@ -40,7 +42,7 @@ export const Router = () => {
       {route.name === "immersionApplication" && (
         <ApplicationForm route={route} />
       )}
-      {route.name === "admin" && <Admin route={route} /> }
+      {route.name === "admin" && <Admin route={route} />}
       {route.name === "adminVerification" &&
         (featureFlags.enableAdminUi ? (
           <AdminVerification route={route} />

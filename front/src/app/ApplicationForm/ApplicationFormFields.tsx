@@ -1,6 +1,10 @@
 import { useField, useFormikContext } from "formik";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { SuccessInfos } from "src/app/ApplicationForm/createSuccessInfos";
+import {
+  FeatureFlagsContext,
+  useFeatureFlagsContext,
+} from "src/app/FeatureFlagContext";
 import { BoolRadioGroup, RadioGroup } from "src/app/RadioGroup";
 import {
   useSiretFetcher,
@@ -27,7 +31,7 @@ import { routes, useRoute } from "../routes";
 import type { ApplicationFormKeysInUrl } from "../routes";
 import { ApplicationFormProfession } from "./ApplicationFormProfession";
 
-const { featureFlags, dev } = ENV;
+const { dev } = ENV;
 
 const FrozenMessage = () => (
   <>
@@ -96,6 +100,7 @@ export const ApplicationFormFields = ({
     submitForm,
     values,
   } = useFormikContext<ImmersionApplicationDto>();
+  const featureFlags = useFeatureFlagsContext();
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField(
@@ -200,7 +205,7 @@ export const ApplicationFormFields = ({
         type="text"
         placeholder=""
         description=""
-        disabled={!ENV.featureFlags.enableByPassInseeApi}
+        disabled={!featureFlags.enableByPassInseeApi}
       />
 
       <TextInput

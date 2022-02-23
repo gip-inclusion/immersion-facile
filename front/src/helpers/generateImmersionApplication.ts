@@ -8,8 +8,6 @@ import {
   validApplicationStatus,
 } from "src/shared/ImmersionApplicationDto";
 
-const { featureFlags } = ENV;
-
 export const generateApplication = (
   i: number,
   agencies: AgencyDto[],

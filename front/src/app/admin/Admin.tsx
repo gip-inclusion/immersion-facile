@@ -1,28 +1,27 @@
 import React, { useState } from "react";
 import { immersionApplicationGateway } from "src/app/dependencies";
-
+import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { routes } from "src/app/routes";
+import { ArrayDropdown } from "src/components/admin/ArrayDropdown";
 import { FormAccordion } from "src/components/admin/FormAccordion";
 import { FormMagicLinks } from "src/components/admin/FormMagicLinks";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { AgencyId } from "src/shared/agencies";
-import { Route } from "type-route";
-import "./Admin.css";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
   validApplicationStatus,
 } from "src/shared/ImmersionApplicationDto";
-import { ArrayDropdown } from "src/components/admin/ArrayDropdown";
+import { Route } from "type-route";
+import "./Admin.css";
 import { ApiDataContainer } from "./ApiDataContainer";
-import { ENV } from "../../environmentVariables";
 
 interface AdminProps {
   route: Route<typeof routes.admin> | Route<typeof routes.agencyAdmin>;
 }
-const { featureFlags } = ENV;
 
 export const Admin = ({ route }: AdminProps) => {
+  const featureFlags = useFeatureFlagsContext();
   const [immersionApplications, setImmersionApplications] = useState<
     ImmersionApplicationDto[]
   >([]);

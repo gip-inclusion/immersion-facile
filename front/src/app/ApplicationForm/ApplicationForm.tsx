@@ -33,7 +33,7 @@ const isImmersionApplicationFrozen = (
 ): boolean =>
   !immersionApplication.status || immersionApplication.status !== "DRAFT";
 
-const { featureFlags, dev } = ENV;
+const { dev } = ENV;
 
 const createInitialApplication = (
   route: ApplicationFormRoute,

@@ -1,7 +1,6 @@
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { AgencyDto } from "src/shared/agencies";
-import { FeatureFlags } from "src/shared/featureFlags";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -70,7 +69,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   private _establishments: { [siret: string]: GetSiretResponseDto } = {};
   private _agencies: { [id: string]: AgencyDto } = {};
 
-  public constructor(readonly featureFlags: FeatureFlags) {
+  public constructor() {
     super();
     TEST_AGENCIES.forEach((agency) => (this._agencies[agency.id] = agency));
     this.add({

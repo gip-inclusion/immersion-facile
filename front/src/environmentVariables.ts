@@ -1,5 +1,4 @@
 import { throwIfNotInArray } from "src/shared/envHelpers";
-import { getFeatureFlags } from "src/shared/featureFlags";
 
 const windowEnv = (window as any)._env_;
 
@@ -12,5 +11,4 @@ const gateway = throwIfNotInArray({
 export const ENV = {
   dev: import.meta.env.DEV,
   gateway,
-  featureFlags: getFeatureFlags(windowEnv),
 };
