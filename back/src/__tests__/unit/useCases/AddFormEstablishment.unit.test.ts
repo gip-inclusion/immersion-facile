@@ -1,6 +1,9 @@
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import {
+  expectObjectsToMatch,
+  expectPromiseToFailWithError,
+} from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
@@ -90,7 +93,7 @@ describe("Add FormEstablishment", () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
 
     describe("when feature flag to skip siret validation is on", () => {
-      it("accepts formEstablishment with SIRETs that don't correspond to active businesses", async () => {
+      it("accepts formEstablishment with SIRETs that don't correspond to active businesses and quarantines events", async () => {
         const getFeatureFlagsWithInseeByPass = makeStubGetFeatureFlags({
           enableAdminUi: false,
           enableByPassInseeApi: true,
@@ -106,9 +109,15 @@ describe("Add FormEstablishment", () => {
           isOpen: false,
         });
 
-        expect(await addFormEstablishment.execute(formEstablishment)).toBe(
-          formEstablishment.id,
-        );
+        const response = await addFormEstablishment.execute(formEstablishment);
+
+        expect(response).toBe(formEstablishment.id);
+        expect(outboxRepo.events).toHaveLength(1);
+        expectObjectsToMatch(outboxRepo.events[0], {
+          topic: "FormEstablishmentAdded",
+          wasPublished: false,
+          wasQuarantined: true,
+        });
       });
     });
 

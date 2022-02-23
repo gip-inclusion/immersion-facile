@@ -1,4 +1,4 @@
-import { FeatureFlags } from "../../../shared/featureFlags";
+import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   FormEstablishmentDto,
   FormEstablishmentId,
@@ -6,12 +6,10 @@ import {
 } from "../../../shared/FormEstablishmentDto";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { GetFeatureFlags } from "../../core/ports/GetFeatureFlags";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
-import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
@@ -45,6 +43,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
     const event = this.createNewEvent({
       topic: "FormEstablishmentAdded",
       payload: dto,
+      ...(featureFlags.enableByPassInseeApi ? { wasQuarantined: true } : {}),
     });
 
     await uow.outboxRepo.save(event);

@@ -28,6 +28,7 @@ export type CreateNewEvent = <T extends DomainTopic>(params: {
   topic: T;
   payload: NarrowEvent<T>["payload"];
   wasPublished?: boolean;
+  wasQuarantined?: boolean;
 }) => NarrowEvent<T>;
 
 export const makeCreateNewEvent = ({
