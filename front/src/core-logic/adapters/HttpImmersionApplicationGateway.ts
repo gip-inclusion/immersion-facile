@@ -1,10 +1,6 @@
 import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import {
-  AgencyDto,
-  ListAgenciesRequestDto,
-  listAgenciesResponseSchema,
-} from "src/shared/agencies";
+import { AgencyDto, listAgenciesResponseSchema } from "src/shared/agencies";
 import {
   AddImmersionApplicationResponseDto,
   addImmersionApplicationResponseDtoSchema,
@@ -21,13 +17,12 @@ import {
 import {
   agenciesRoute,
   generateMagicLinkRoute,
-  renewMagicLinkRoute,
   immersionApplicationsRoute,
+  renewMagicLinkRoute,
+  signApplicationRoute,
   siretRoute,
   updateApplicationStatusRoute,
   validateImmersionApplicationRoute,
-  signApplicationRoute,
-  rejectSigningApplicationRoute,
 } from "src/shared/routes";
 import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";

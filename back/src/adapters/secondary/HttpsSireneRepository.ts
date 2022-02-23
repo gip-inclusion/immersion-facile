@@ -2,7 +2,7 @@ import { formatISO, secondsToMilliseconds } from "date-fns";
 import { Clock } from "../../domain/core/ports/Clock";
 import { RateLimiter } from "../../domain/core/ports/RateLimiter";
 import {
-  RetriableError,
+  RetryableError,
   RetryStrategy,
 } from "../../domain/core/ports/RetryStrategy";
 import {
@@ -12,11 +12,12 @@ import {
 import { SiretDto } from "../../shared/siret";
 import {
   createAxiosInstance,
-  isRetriableError,
+  isRetryableError,
   logAxiosError,
 } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
 import { AxiosConfig } from "../primary/appConfig";
+import { UnavailableApiError } from "../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
@@ -56,14 +57,14 @@ export class HttpsSireneRepository implements SireneRepository {
             ),
           }),
         );
-        return response.data;
+        return response?.data;
       } catch (error: any) {
         if (error.response?.status === 404) {
           return undefined;
         }
-        if (isRetriableError(logger, error)) throw new RetriableError(error);
+        if (isRetryableError(logger, error)) throw new RetryableError(error);
         logAxiosError(logger, error);
-        throw error;
+        throw new UnavailableApiError("Sirene API");
       }
     });
   }
@@ -76,8 +77,8 @@ export class HttpsSireneRepository implements SireneRepository {
       q: `siret:${siret}`,
     };
 
-    // According to API SIRENE documentation:
-    // etatAdministratifEtablissement:
+    // According to API SIRENE documentation :
+    // etatAdministratifEtablissement :
     //   État de l'établissement pendant la période :
     //     A= établissement actif
     //     F= établissement fermé

@@ -1,14 +1,14 @@
 import { secondsToMilliseconds } from "date-fns";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
-  RetriableError,
+  RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import {
   createAxiosInstance,
-  isRetriableError,
+  isRetryableError,
   logAxiosError,
 } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
@@ -46,7 +46,7 @@ export class HttpAdresseAPI implements AdresseAPI {
           lon: response.data.features[0].geometry.coordinates[0],
         };
       } catch (error: any) {
-        if (isRetriableError(logger, error)) throw new RetriableError(error);
+        if (isRetryableError(logger, error)) throw new RetryableError(error);
         logAxiosError(logger, error);
         return;
       }
@@ -68,7 +68,7 @@ export class HttpAdresseAPI implements AdresseAPI {
         );
         return response.data.features[0]?.properties?.citycode;
       } catch (error: any) {
-        if (isRetriableError(logger, error)) throw new RetriableError(error);
+        if (isRetryableError(logger, error)) throw new RetryableError(error);
         logAxiosError(logger, error);
         return;
       }

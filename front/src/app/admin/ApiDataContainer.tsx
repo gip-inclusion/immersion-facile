@@ -53,7 +53,7 @@ export function ApiDataContainer<T>({
         return <h1>403 Accès refusé</h1>;
       }
 
-      if (error.response.status === 404) {
+      if (error.response?.status === 404) {
         return <h1>404 Page non trouvé</h1>;
       }
     }

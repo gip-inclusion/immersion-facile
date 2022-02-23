@@ -5,7 +5,7 @@ import {
 } from "date-fns";
 import { Clock } from "../../../domain/core/ports/Clock";
 import {
-  RetriableError,
+  RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import { RandomFn, SleepFn } from "../../../shared/utils";
@@ -39,9 +39,9 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
       try {
         return await cb();
       } catch (error: any) {
-        if (!(error instanceof RetriableError)) throw error;
+        if (!(error instanceof RetryableError)) throw error;
 
-        // Callback failed with retriable error, wait and retry.
+        // Callback failed with retryable error, wait and retry.
 
         const backoffDurationMs =
           secondsToMilliseconds(backoffDurationS) + this.randomFn(1000);

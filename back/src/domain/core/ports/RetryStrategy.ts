@@ -1,7 +1,7 @@
-export class RetriableError extends Error {
+export class RetryableError extends Error {
   constructor(readonly cause: Error) {
     super();
-    Object.setPrototypeOf(this, RetriableError.prototype);
+    Object.setPrototypeOf(this, RetryableError.prototype);
   }
 }
 
@@ -14,7 +14,7 @@ export const noRetries: RetryStrategy = {
     try {
       return cb();
     } catch (error: any) {
-      throw error instanceof RetriableError ? error.cause : error;
+      throw error instanceof RetryableError ? error.cause : error;
     }
   },
 };

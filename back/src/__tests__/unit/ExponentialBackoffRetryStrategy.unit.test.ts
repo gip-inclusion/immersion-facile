@@ -1,10 +1,10 @@
 import { ExponentialBackoffRetryStrategy } from "../../adapters/secondary/core/ExponentialBackoffRetryStrategy";
-import { RetriableError } from "../../domain/core/ports/RetryStrategy";
+import { RetryableError } from "../../domain/core/ports/RetryStrategy";
 import { expectPromiseToFailWithError } from "../../_testBuilders/test.helpers";
 
 const dummyCallbackResult = { some: "value" };
-const throwRetriableError = () => {
-  throw new RetriableError(new Error("429: Too many requests"));
+const throwRetryableError = () => {
+  throw new RetryableError(new Error("429: Too many requests"));
 };
 const maxBackoffPeriodMs = 10_000;
 const deadlineMs = 100_000;
@@ -44,27 +44,27 @@ describe("ExponentialBackoffRetryStrategy", () => {
     expect(mockSleep).not.toHaveBeenCalled();
   });
 
-  test("no retry of non-retriable error", async () => {
-    const nonRetriableError = new Error("404: Not found");
+  test("no retry of non-retryable error", async () => {
+    const nonRetryableError = new Error("404: Not found");
     mockCallback.mockImplementationOnce(() => {
-      throw nonRetriableError;
+      throw nonRetryableError;
     });
 
     await expectPromiseToFailWithError(
       retryStrategy.apply(mockCallback),
-      nonRetriableError,
+      nonRetryableError,
     );
 
     expect(mockCallback).toHaveBeenCalledTimes(1);
     expect(mockSleep).not.toHaveBeenCalled();
   });
 
-  test("exponential backoff on retriable errors", async () => {
+  test("exponential backoff on retryable errors", async () => {
     mockCallback
-      .mockImplementationOnce(throwRetriableError)
-      .mockImplementationOnce(throwRetriableError)
-      .mockImplementationOnce(throwRetriableError)
-      .mockImplementationOnce(throwRetriableError)
+      .mockImplementationOnce(throwRetryableError)
+      .mockImplementationOnce(throwRetryableError)
+      .mockImplementationOnce(throwRetryableError)
+      .mockImplementationOnce(throwRetryableError)
       .mockResolvedValueOnce(dummyCallbackResult);
 
     mockRandom
@@ -87,13 +87,13 @@ describe("ExponentialBackoffRetryStrategy", () => {
   test("exponential backoff period is truncated at maxbackoffPeriodMs", async () => {
     mockRandom.mockReturnValue(0);
     mockCallback
-      .mockImplementationOnce(throwRetriableError)
-      .mockImplementationOnce(throwRetriableError) // 1. backoff: 1000ms
-      .mockImplementationOnce(throwRetriableError) // 2. backoff: 2000ms
-      .mockImplementationOnce(throwRetriableError) // 3. backoff: 4000ms
-      .mockImplementationOnce(throwRetriableError) // 4. backoff: 8000ms
-      .mockImplementationOnce(throwRetriableError) // 5. backoff: 16000ms
-      .mockImplementationOnce(throwRetriableError) // 6. backoff: 32000ms
+      .mockImplementationOnce(throwRetryableError)
+      .mockImplementationOnce(throwRetryableError) // 1. backoff: 1000ms
+      .mockImplementationOnce(throwRetryableError) // 2. backoff: 2000ms
+      .mockImplementationOnce(throwRetryableError) // 3. backoff: 4000ms
+      .mockImplementationOnce(throwRetryableError) // 4. backoff: 8000ms
+      .mockImplementationOnce(throwRetryableError) // 5. backoff: 16000ms
+      .mockImplementationOnce(throwRetryableError) // 6. backoff: 32000ms
       .mockResolvedValue(dummyCallbackResult); // 7. backoff: 64000ms
 
     await retryStrategy.apply(mockCallback);
@@ -104,11 +104,11 @@ describe("ExponentialBackoffRetryStrategy", () => {
   });
 
   test("aborts after timeout exceeded", async () => {
-    const retriableError = new RetriableError(
+    const retryableError = new RetryableError(
       new Error("429: Too many requests"),
     );
     mockCallback.mockImplementation(() => {
-      throw retriableError;
+      throw retryableError;
     });
     mockRandom.mockReturnValue(0);
 
@@ -120,7 +120,7 @@ describe("ExponentialBackoffRetryStrategy", () => {
 
     await expectPromiseToFailWithError(
       retryStrategy.apply(mockCallback),
-      retriableError.cause,
+      retryableError.cause,
     );
 
     expect(mockCallback).toHaveBeenCalledTimes(3);

@@ -31,7 +31,7 @@ export const createAxiosInstance = (
 const QUOTA_EXEEDED_STATUSES = new Set([429, 503]);
 const TIMEOUT_CODES = new Set(["ETIMEDOUT", "ECONNABORTED"]);
 
-export const isRetriableError = (logger: Logger, error: any): boolean => {
+export const isRetryableError = (logger: Logger, error: any): boolean => {
   if (QUOTA_EXEEDED_STATUSES.has(error.response?.status)) {
     logger.warn("Request quota exceeded: " + error);
     return true;
@@ -64,5 +64,5 @@ const extractPartialResponse = (response: AxiosResponse) => ({
   status: response.status,
   statusText: response.statusText,
   data: response.data,
-  request: extractPartialRequest(response.config),
+  request: extractPartialRequest(response.config ?? response.request),
 });

@@ -3,7 +3,7 @@ import { secondsToMilliseconds } from "date-fns";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
-  RetriableError,
+  RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import {
@@ -16,7 +16,7 @@ import {
 } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 import {
   createAxiosInstance,
-  isRetriableError,
+  isRetryableError,
   logAxiosError,
 } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
@@ -115,7 +115,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
         });
         return response;
       } catch (error: any) {
-        if (isRetriableError(logger, error)) throw new RetriableError(error);
+        if (isRetryableError(logger, error)) throw new RetryableError(error);
         logAxiosError(logger, error);
         throw error;
       }

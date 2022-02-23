@@ -31,7 +31,7 @@ export const useSiretFetcher = () => {
     GetSiretResponseDto | undefined
   >();
 
-  const [field, _, { setValue, setError }] = useField<string>({
+  const [field, _, { setValue, setError, setTouched }] = useField<string>({
     name: "siret",
   });
 
@@ -46,6 +46,7 @@ export const useSiretFetcher = () => {
     }
 
     setIsFetchingSiret(true);
+    setTouched(true);
     immersionApplicationGateway
       .getSiretInfo(validatedSiret)
       .then((response) => {
@@ -58,7 +59,7 @@ export const useSiretFetcher = () => {
             "Ce SIRET n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.",
           );
         } else {
-          setError(err.message);
+          setError(err.response?.data.errors ?? err.message);
         }
       })
       .finally(() => setIsFetchingSiret(false));
