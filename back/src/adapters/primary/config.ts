@@ -272,6 +272,10 @@ export const createRepositories = async (
             createdAt: clock.now(),
             isAuthorized: true,
           }),
+    getFeatureFlags:
+      config.repositories === "PG"
+        ? makePgGetFeatureFlags(await getPgPoolFn().connect())
+        : makeStubGetFeatureFlags(),
   };
 };
 

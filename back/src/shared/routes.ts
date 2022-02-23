@@ -14,6 +14,7 @@ export const searchImmersionRoute = "search-immersion";
 export const getImmersionOfferByIdRoute = "get-immersion-by-id";
 export const agenciesRoute = "agencies";
 export const contactEstablishmentRoute = "contact-establishment";
+export const getFeatureFlags = "feature-flags";
 
 export const frontRoutes = {
   immersionApplicationsToValidate: "verification",

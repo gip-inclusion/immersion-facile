@@ -15,6 +15,7 @@ import type { InMemoryImmersionApplicationRepository } from "../adapters/seconda
 import { InMemoryRomeGateway } from "../adapters/secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../adapters/secondary/InMemorySireneRepository";
 import { GetApiConsumerById } from "../domain/core/ports/GetApiConsumerById";
+import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
 import { AgencyConfigBuilder } from "./AgencyConfigBuilder";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
@@ -34,6 +35,7 @@ export type InMemoryRepositories = {
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;
   getApiConsumerById: GetApiConsumerById;
+  getFeatureFlags: GetFeatureFlags;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :

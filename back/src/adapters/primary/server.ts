@@ -7,6 +7,7 @@ import {
   contactEstablishmentRoute,
   extractImmersionApplicationsExcelRoute,
   generateMagicLinkRoute,
+  getFeatureFlags,
   immersionApplicationsRoute,
   renewMagicLinkRoute,
   romeRoute,
@@ -165,6 +166,12 @@ export const createApp = async (
       }),
     ),
   );
+
+  router
+    .route(`/${getFeatureFlags}`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, deps.repositories.getFeatureFlags),
+    );
 
   app.use(router);
   app.use("/auth", createMagicLinkRouter(deps));

@@ -1,4 +1,5 @@
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
+import { HttpFeatureFlagGateway } from "src/core-logic/adapters/HttpFeatureFlagGateway";
 import { HttpFormEstablishmentGateway } from "src/core-logic/adapters/HttpFormEstablishmentGateway";
 import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
@@ -35,4 +36,6 @@ export const apiAdresseGateway: ApiAdresseGateway =
     : new InMemoryApiAdresseGateway();
 
 export const featureFlagsGateway: FeatureFlagsGateway =
-  new InMemoryFeatureFlagGateway();
+  ENV.gateway === "HTTP"
+    ? new HttpFeatureFlagGateway()
+    : new InMemoryFeatureFlagGateway();
