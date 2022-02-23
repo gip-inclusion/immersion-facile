@@ -10,34 +10,31 @@ import {
 } from "../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { UseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
-import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
-import { FeatureFlags } from "../../../shared/featureFlags";
 
 const logger = createLogger(__filename);
 
-export class AddImmersionApplication extends UseCase<
+export class AddImmersionApplication extends TransactionalUseCase<
   ImmersionApplicationDto,
   AddImmersionApplicationResponseDto
 > {
   constructor(
-    private readonly applicationRepository: ImmersionApplicationRepository,
+    uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly outboxRepository: OutboxRepository,
     private readonly getSiret: GetSiretUseCase,
-    private readonly featureFlags: FeatureFlags,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = immersionApplicationSchema;
 
   public async _execute(
     immersionApplicationDto: ImmersionApplicationDto,
+    uow: UnitOfWork,
   ): Promise<AddImmersionApplicationResponseDto> {
     const minimalValidStatus: ApplicationStatus = "READY_TO_SIGN";
 
@@ -52,14 +49,15 @@ export class AddImmersionApplication extends UseCase<
       immersionApplicationDto,
     );
 
-    if (!this.featureFlags.enableByPassInseeApi) {
+    const featureFlags = await uow.getFeatureFlags();
+    if (!featureFlags.enableByPassInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(
         this.getSiret,
         immersionApplicationDto.siret,
       );
     }
 
-    const id = await this.applicationRepository.save(applicationEntity);
+    const id = await uow.immersionApplicationRepo.save(applicationEntity);
     if (!id) throw new ConflictError(applicationEntity.id);
 
     const event = this.createNewEvent({
@@ -67,7 +65,7 @@ export class AddImmersionApplication extends UseCase<
       payload: immersionApplicationDto,
     });
 
-    await this.outboxRepository.save(event);
+    await uow.outboxRepo.save(event);
 
     return { id };
   }

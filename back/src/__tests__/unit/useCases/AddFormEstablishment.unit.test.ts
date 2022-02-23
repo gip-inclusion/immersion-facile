@@ -1,4 +1,6 @@
-import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
+import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
+import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
@@ -6,42 +8,42 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { makeStubGetFeatureFlags } from "../../../adapters/secondary/makeStubGetFeatureFlags";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
+import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
-import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
-import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { FeatureFlags } from "../../../shared/featureFlags";
 
 describe("Add FormEstablishment", () => {
   let addFormEstablishment: AddFormEstablishment;
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let stubGetSiret: StubGetSiret;
-  let uowPerformer: UnitOfWorkPerformer;
-  let featureFlags: FeatureFlags;
+  let uowPerformer: InMemoryUowPerformer;
+  let getFeatureFlags: GetFeatureFlags;
 
   beforeEach(() => {
     stubGetSiret = new StubGetSiret();
     formEstablishmentRepo = new InMemoryFormEstablishmentRepository();
     outboxRepo = new InMemoryOutboxRepository();
+    getFeatureFlags = makeStubGetFeatureFlags({
+      enableAdminUi: false,
+      enableByPassInseeApi: false,
+    });
 
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
       outboxRepo,
       formEstablishmentRepo,
+      getFeatureFlags,
     });
     const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
-    featureFlags = FeatureFlagsBuilder.allOff().build();
 
     addFormEstablishment = new AddFormEstablishment(
       uowPerformer,
       createNewEvent,
       stubGetSiret,
-      featureFlags,
     );
   });
 
@@ -89,8 +91,13 @@ describe("Add FormEstablishment", () => {
 
     describe("when feature flag to skip siret validation is on", () => {
       it("accepts formEstablishment with SIRETs that don't correspond to active businesses", async () => {
-        featureFlags.enableByPassInseeApi = true;
-
+        const getFeatureFlagsWithInseeByPass = makeStubGetFeatureFlags({
+          enableAdminUi: false,
+          enableByPassInseeApi: true,
+        });
+        uowPerformer.setUow({
+          getFeatureFlags: getFeatureFlagsWithInseeByPass,
+        });
         stubGetSiret.setNextResponse({
           siret: formEstablishment.siret,
           businessName: "INACTIVE BUSINESS",

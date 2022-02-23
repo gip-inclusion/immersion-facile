@@ -1,3 +1,4 @@
+import { createInMemoryUow } from "../../../adapters/primary/config";
 import {
   BadRequestError,
   ForbiddenError,
@@ -7,17 +8,18 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { makeStubGetFeatureFlags } from "../../../adapters/secondary/makeStubGetFeatureFlags";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
+import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { UpdateImmersionApplication } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplication";
-import { FeatureFlags } from "../../../shared/featureFlags";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
 import {
   ImmersionApplicationId,
   validApplicationStatus,
@@ -26,26 +28,34 @@ import { ImmersionApplicationEntity } from "../../../domain/immersionApplication
 
 describe("Update immersionApplication", () => {
   let updateImmersionApplication: UpdateImmersionApplication;
-  let immersionApplicationRepository: InMemoryImmersionApplicationRepository;
-  let featureFlags: FeatureFlags;
-  let outboxRepository: OutboxRepository;
+  let immersionApplicationRepo: InMemoryImmersionApplicationRepository;
+  let outboxRepo: OutboxRepository;
   let createNewEvent: CreateNewEvent;
+  let getFeatureFlags: GetFeatureFlags;
+  let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
-    immersionApplicationRepository =
-      new InMemoryImmersionApplicationRepository();
-    outboxRepository = new InMemoryOutboxRepository();
+    immersionApplicationRepo = new InMemoryImmersionApplicationRepository();
+    outboxRepo = new InMemoryOutboxRepository();
     createNewEvent = makeCreateNewEvent({
       clock: new CustomClock(),
       uuidGenerator: new TestUuidGenerator(),
     });
-    featureFlags = FeatureFlagsBuilder.allOff().build();
+    getFeatureFlags = makeStubGetFeatureFlags({
+      enableAdminUi: false,
+      enableByPassInseeApi: false,
+    });
+
+    uowPerformer = new InMemoryUowPerformer({
+      ...createInMemoryUow(),
+      outboxRepo,
+      immersionApplicationRepo,
+      getFeatureFlags,
+    });
 
     updateImmersionApplication = new UpdateImmersionApplication(
+      uowPerformer,
       createNewEvent,
-      outboxRepository,
-      immersionApplicationRepository,
-      featureFlags,
     );
   });
 
@@ -57,9 +67,7 @@ describe("Update immersionApplication", () => {
         new ImmersionApplicationEntityBuilder().build();
       immersionApplications[immersionApplicationEntity.id] =
         immersionApplicationEntity;
-      immersionApplicationRepository.setImmersionApplications(
-        immersionApplications,
-      );
+      immersionApplicationRepo.setImmersionApplications(immersionApplications);
 
       const updatedImmersionApplication = new ImmersionApplicationDtoBuilder()
         .withEmail("new@email.fr")
@@ -71,7 +79,7 @@ describe("Update immersionApplication", () => {
       });
       expect(id).toEqual(updatedImmersionApplication.id);
 
-      const storedInRepo = await immersionApplicationRepository.getAll();
+      const storedInRepo = await immersionApplicationRepo.getAll();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
         updatedImmersionApplication,
       ]);
@@ -121,9 +129,7 @@ describe("Update immersionApplication", () => {
         new ImmersionApplicationEntityBuilder().build();
       immersionApplications[immersionApplicationEntity.id] =
         immersionApplicationEntity;
-      immersionApplicationRepository.setImmersionApplications(
-        immersionApplications,
-      );
+      immersionApplicationRepo.setImmersionApplications(immersionApplications);
       id = immersionApplicationEntity.id;
     });
 

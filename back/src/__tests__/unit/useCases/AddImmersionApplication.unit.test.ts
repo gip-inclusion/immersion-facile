@@ -1,6 +1,7 @@
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../../adapters/primary/config";
 import {
   BadRequestError,
   ConflictError,
@@ -10,15 +11,16 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { makeStubGetFeatureFlags } from "../../../adapters/secondary/makeStubGetFeatureFlags";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
+import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
-import { FeatureFlagsBuilder } from "../../../_testBuilders/FeatureFlagsBuilder";
-import { FeatureFlags } from "../../../shared/featureFlags";
 import { validApplicationStatus } from "../../../shared/ImmersionApplicationDto";
 
 describe("Add immersionApplication", () => {
@@ -31,27 +33,32 @@ describe("Add immersionApplication", () => {
   const validImmersionApplication =
     new ImmersionApplicationDtoBuilder().build();
   let stubGetSiret: StubGetSiret;
-  let featureFlags: FeatureFlags;
+  let getFeatureFlags: GetFeatureFlags;
+  let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
-    featureFlags = FeatureFlagsBuilder.allOff().build();
+    getFeatureFlags = makeStubGetFeatureFlags({
+      enableAdminUi: false,
+      enableByPassInseeApi: false,
+    });
     applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     stubGetSiret = new StubGetSiret();
-    addImmersionApplication = createAddImmersionApplicationUseCase();
-  });
-
-  const createAddImmersionApplicationUseCase = () =>
-    new AddImmersionApplication(
-      applicationRepository,
+    uowPerformer = new InMemoryUowPerformer({
+      ...createInMemoryUow(),
+      outboxRepo: outboxRepository,
+      immersionApplicationRepo: applicationRepository,
+      getFeatureFlags,
+    });
+    addImmersionApplication = new AddImmersionApplication(
+      uowPerformer,
       createNewEvent,
-      outboxRepository,
       stubGetSiret,
-      featureFlags,
     );
+  });
 
   test("saves valid applications in the repository", async () => {
     const occurredAt = new Date("2021-10-15T15:00");
@@ -131,7 +138,13 @@ describe("Add immersionApplication", () => {
   describe("SIRET validation", () => {
     describe("if feature flag to skip siret validation is ON", () => {
       it("accepts applications with SIRETs that don't correspond to active businesses", async () => {
-        featureFlags.enableByPassInseeApi = true;
+        const getFeatureFlagsWithInseeByPass = makeStubGetFeatureFlags({
+          enableAdminUi: false,
+          enableByPassInseeApi: true,
+        });
+        uowPerformer.setUow({
+          getFeatureFlags: getFeatureFlagsWithInseeByPass,
+        });
         stubGetSiret.setNextResponse({
           siret: validImmersionApplication.siret,
           businessName: "INACTIVE BUSINESS",

@@ -66,6 +66,7 @@ import { InMemoryEventBus } from "../secondary/core/InMemoryEventBus";
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
+import { makeStubGetFeatureFlags } from "../secondary/makeStubGetFeatureFlags";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
@@ -81,9 +82,10 @@ import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImm
 import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../secondary/InMemoryUowPerformer";
+import { makePgGetFeatureFlags } from "../secondary/pg/makePgGetFeatureFlags";
 import { PgAgencyRepository } from "../secondary/pg/PgAgencyRepository";
 import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
-import { makePgGetApiConsumerById } from "../secondary/pg/pgGetApiConsumerById";
+import { makePgGetApiConsumerById } from "../secondary/pg/makePgGetApiConsumerById";
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgLaBonneBoiteRequestRepository } from "../secondary/pg/PgLaBonneBoiteRequestRepository";
@@ -139,7 +141,6 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateJwtFn,
     eventBus,
     eventCrawler: createEventCrawler(config, repositories.outbox, eventBus),
-    featureFlags: config.featureFlags,
   };
 };
 
@@ -303,6 +304,7 @@ export const createInMemoryUow = (repositories?: Repositories) => ({
   immersionApplicationExportRepo:
     repositories?.immersionApplicationExport ??
     StubImmersionApplicationExportQueries,
+  getFeatureFlags: makeStubGetFeatureFlags(),
 });
 
 // following function is for type check only, it is verifies InMemoryUnitOfWork is assignable to UnitOfWork
@@ -319,6 +321,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   immersionApplicationExportRepo: new PgImmersionApplicationExportQueries(
     client,
   ),
+  getFeatureFlags: makePgGetFeatureFlags(client),
 });
 
 const createUowPerformer = (
@@ -387,11 +390,9 @@ const createUseCases = (
 
   return {
     addImmersionApplication: new AddImmersionApplication(
-      repositories.immersionApplication,
+      uowPerformer,
       createNewEvent,
-      repositories.outbox,
       getSiret,
-      config.featureFlags,
     ),
     getImmersionApplication: new GetImmersionApplication(
       repositories.immersionApplication,
@@ -402,10 +403,8 @@ const createUseCases = (
     exportImmersionApplicationsAsExcelArchive:
       new ExportImmersionApplicationsAsExcelArchive(uowPerformer),
     updateImmersionApplication: new UpdateImmersionApplication(
+      uowPerformer,
       createNewEvent,
-      repositories.outbox,
-      repositories.immersionApplication,
-      config.featureFlags,
     ),
     validateImmersionApplication: new ValidateImmersionApplication(
       repositories.immersionApplication,
@@ -447,7 +446,6 @@ const createUseCases = (
       uowPerformer,
       createNewEvent,
       getSiret,
-      config.featureFlags,
     ),
 
     transformFormEstablishmentToSearchData:

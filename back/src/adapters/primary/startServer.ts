@@ -7,7 +7,6 @@ const logger = createLogger(__filename);
 const port = 1234;
 
 const appConfig = AppConfig.createFromEnv();
-logger.info({ featureFlags: appConfig.featureFlags });
 
 createApp(appConfig).then(({ app }) => {
   app.listen(port, () => {

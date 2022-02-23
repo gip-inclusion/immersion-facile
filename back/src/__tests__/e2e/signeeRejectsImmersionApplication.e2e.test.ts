@@ -1,7 +1,7 @@
-import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
-import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
-import { InMemorySireneRepository } from "../../adapters/secondary/InMemorySireneRepository";
-import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
+import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../adapters/primary/config";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
@@ -14,36 +14,35 @@ import {
   TemplatedEmail,
 } from "../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemorySireneRepository } from "../../adapters/secondary/InMemorySireneRepository";
+import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
+import { makeStubGetFeatureFlags } from "../../adapters/secondary/makeStubGetFeatureFlags";
 import {
   CreateNewEvent,
   EventBus,
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
+import { GetFeatureFlags } from "../../domain/core/ports/GetFeatureFlags";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
-import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
-import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
-import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
-import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { fakeGenerateMagicLinkUrlFn } from "../../_testBuilders/test.helpers";
-import { FeatureFlags } from "../../shared/featureFlags";
-import { FeatureFlagsBuilder } from "../../_testBuilders/FeatureFlagsBuilder";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
+import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
-import { createMagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
+import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
+import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
+import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
+import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
+import { createMagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 
 const adminEmail = "admin@email.fr";
 
-// Only tests w/ enableEnterpriseSignatures flag.
 describe("Add immersionApplication Notifications, then checks the mails are sent (trigerred by events)", () => {
   let addImmersionApplication: AddImmersionApplication;
   let updateImmersionApplication: UpdateImmersionApplication;
   let updateImmersionApplicationStatus: UpdateImmersionApplicationStatus;
-  let validateImmersionApplication: ValidateImmersionApplication;
   let applicationRepository: InMemoryImmersionApplicationRepository;
   let sireneRepository: InMemorySireneRepository;
   let outboxRepository: OutboxRepository;
@@ -62,7 +61,8 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
   let sentEmails: TemplatedEmail[];
   let agencyConfig: AgencyConfig;
   let getSiret: GetSiret;
-  let featureFlags: FeatureFlags;
+  let getFeatureFlags: GetFeatureFlags;
+  let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
     applicationRepository = new InMemoryImmersionApplicationRepository();
@@ -78,19 +78,22 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     eventCrawler = new BasicEventCrawler(eventBus, outboxRepository);
     sireneRepository = new InMemorySireneRepository();
     getSiret = new GetSiret(sireneRepository);
-    featureFlags = FeatureFlagsBuilder.allOff().build();
+    getFeatureFlags = makeStubGetFeatureFlags({
+      enableAdminUi: false,
+      enableByPassInseeApi: false,
+    });
+
+    uowPerformer = new InMemoryUowPerformer({
+      ...createInMemoryUow(),
+      immersionApplicationRepo: applicationRepository,
+      outboxRepo: outboxRepository,
+      getFeatureFlags,
+    });
 
     addImmersionApplication = new AddImmersionApplication(
-      applicationRepository,
+      uowPerformer,
       createNewEvent,
-      outboxRepository,
       getSiret,
-      featureFlags,
-    );
-    validateImmersionApplication = new ValidateImmersionApplication(
-      applicationRepository,
-      createNewEvent,
-      outboxRepository,
     );
     updateImmersionApplicationStatus = new UpdateImmersionApplicationStatus(
       applicationRepository,
@@ -145,18 +148,14 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     await eventCrawler.processEvents();
 
     addImmersionApplication = new AddImmersionApplication(
-      applicationRepository,
+      uowPerformer,
       createNewEvent,
-      outboxRepository,
       getSiret,
-      featureFlags,
     );
 
     updateImmersionApplication = new UpdateImmersionApplication(
+      uowPerformer,
       createNewEvent,
-      outboxRepository,
-      applicationRepository,
-      featureFlags,
     );
 
     eventBus.subscribe("ImmersionApplicationSubmittedByBeneficiary", (event) =>
@@ -180,7 +179,8 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       validImmersionApplication,
     );
     expect(result).toEqual({ id: validImmersionApplication.id });
-
+    const applicationsInRepo = await applicationRepository.getAll();
+    expect(applicationsInRepo).toHaveLength(1);
     // the following line triggers the eventCrawler (in prod it would be triggered every 10sec or so)
     await eventCrawler.processEvents();
 

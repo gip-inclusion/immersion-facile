@@ -6,7 +6,6 @@ import {
   ProcessEnv,
   throwIfNotInArray,
 } from "../../shared/envHelpers";
-import { getFeatureFlags } from "../../shared/featureFlags";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -25,7 +24,6 @@ export type AxiosConfig = {
 export class AppConfig {
   private readonly throwIfNotDefined;
   private readonly getBooleanVariable;
-  public readonly featureFlags;
 
   public static createFromEnv(
     readDotEnv = true,
@@ -38,7 +36,6 @@ export class AppConfig {
   private constructor(private readonly env: ProcessEnv) {
     this.throwIfNotDefined = makeThrowIfNotDefined(env);
     this.getBooleanVariable = makeGetBooleanVariable(env);
-    this.featureFlags = getFeatureFlags(env);
   }
 
   public get nodeEnv() {
@@ -197,11 +194,6 @@ export class AppConfig {
     return parseStringList(this.env.QUARANTINED_TOPICS).filter(
       (el) => !!el,
     ) as DomainTopic[];
-  }
-
-  // == Api Keys ==
-  public get authorizedApiKeyIds() {
-    return parseStringList(this.env.AUTHORIZED_API_KEY_IDS);
   }
 
   // Visible for testing.

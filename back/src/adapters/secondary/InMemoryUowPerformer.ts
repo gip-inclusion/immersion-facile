@@ -9,4 +9,9 @@ export class InMemoryUowPerformer implements UnitOfWorkPerformer {
   public async perform<T>(cb: (uow: UnitOfWork) => Promise<T>): Promise<T> {
     return cb(this.uow);
   }
+
+  // for test only
+  setUow(newUow: Partial<UnitOfWork>) {
+    this.uow = { ...this.uow, ...newUow };
+  }
 }

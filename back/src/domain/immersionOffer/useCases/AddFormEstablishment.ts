@@ -6,6 +6,7 @@ import {
 } from "../../../shared/FormEstablishmentDto";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { GetFeatureFlags } from "../../core/ports/GetFeatureFlags";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
@@ -22,7 +23,6 @@ export class AddFormEstablishment extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
     private readonly getSiret: GetSiretUseCase,
-    private readonly featureFlags: FeatureFlags,
   ) {
     super(uowPerformer);
   }
@@ -33,7 +33,9 @@ export class AddFormEstablishment extends TransactionalUseCase<
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<FormEstablishmentId> {
-    if (!this.featureFlags.enableByPassInseeApi) {
+    const featureFlags = await uow.getFeatureFlags();
+
+    if (!featureFlags.enableByPassInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
     }
 

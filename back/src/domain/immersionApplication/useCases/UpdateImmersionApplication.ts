@@ -12,27 +12,27 @@ import {
 } from "../../../shared/ImmersionApplicationDto";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { UseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase, UseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
 
-export class UpdateImmersionApplication extends UseCase<
+export class UpdateImmersionApplication extends TransactionalUseCase<
   UpdateImmersionApplicationRequestDto,
   UpdateImmersionApplicationResponseDto
 > {
   constructor(
+    uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly outboxRepository: OutboxRepository,
-    private readonly immersionApplicationRepository: ImmersionApplicationRepository,
-    private readonly featureFlags: FeatureFlags,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = updateImmersionApplicationRequestDtoSchema;
 
   public async _execute(
     params: UpdateImmersionApplicationRequestDto,
+    uow: UnitOfWork,
   ): Promise<UpdateImmersionApplicationResponseDto> {
     const minimalValidStatus: ApplicationStatus = "READY_TO_SIGN";
 
@@ -47,16 +47,16 @@ export class UpdateImmersionApplication extends UseCase<
       params.immersionApplication,
     );
 
-    const currentApplication =
-      await this.immersionApplicationRepository.getById(params.id);
+    const currentApplication = await uow.immersionApplicationRepo.getById(
+      params.id,
+    );
     if (!currentApplication) throw new NotFoundError(params.id);
     if (currentApplication.status != "DRAFT") {
       throw new BadRequestError(currentApplication.status);
     }
-    const id =
-      await this.immersionApplicationRepository.updateImmersionApplication(
-        immersionApplicationEntity,
-      );
+    const id = await uow.immersionApplicationRepo.updateImmersionApplication(
+      immersionApplicationEntity,
+    );
     if (!id) throw new NotFoundError(params.id);
 
     if (params.immersionApplication.status === minimalValidStatus) {
@@ -66,7 +66,7 @@ export class UpdateImmersionApplication extends UseCase<
         payload: params.immersionApplication,
       });
 
-      await this.outboxRepository.save(event);
+      await uow.outboxRepo.save(event);
     }
 
     return { id };
