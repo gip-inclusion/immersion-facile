@@ -28,11 +28,11 @@ export interface ImmersionOfferRepository {
     immersionOfferId: ImmersionOfferId,
   ) => Promise<ContactEntityV2 | undefined>;
 
-  getSearchImmersionResultDtoFromSearchMade: (
-    searchMade: SearchMade,
-    withContactDetails?: boolean,
-    maxResults?: number,
-  ) => Promise<SearchImmersionResultDto[]>;
+  getSearchImmersionResultDtoFromSearchMade: (props: {
+    searchMade: SearchMade;
+    withContactDetails?: boolean;
+    maxResults?: number;
+  }) => Promise<SearchImmersionResultDto[]>;
 
   getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince: (
     since: Date,

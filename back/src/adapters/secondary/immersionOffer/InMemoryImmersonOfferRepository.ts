@@ -86,11 +86,15 @@ export class InMemoryImmersionOfferRepository
       };
   }
 
-  public async getSearchImmersionResultDtoFromSearchMade(
-    searchMade: SearchMade,
+  public async getSearchImmersionResultDtoFromSearchMade({
+    searchMade,
     withContactDetails = false,
-    maxResults = 100,
-  ): Promise<SearchImmersionResultDto[]> {
+    maxResults,
+  }: {
+    searchMade: SearchMade;
+    withContactDetails?: boolean;
+    maxResults?: number;
+  }): Promise<SearchImmersionResultDto[]> {
     logger.info({ searchMade, withContactDetails }, "getFromSearch");
     return this._establishmentAggregates
       .flatMap((aggregate) =>

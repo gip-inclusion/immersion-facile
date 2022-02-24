@@ -52,9 +52,11 @@ export class SearchImmersion extends UseCase<
 
     const resultsFromStorage =
       await this.immersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
-        searchMade,
-        /* withContactDetails= */ apiConsumerName !== undefined,
-        /* maxResults= */ 100,
+        {
+          searchMade,
+          withContactDetails: apiConsumerName !== undefined,
+          maxResults: 100,
+        },
       );
 
     histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);

@@ -201,11 +201,15 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     }
   }
 
-  async getSearchImmersionResultDtoFromSearchMade(
-    searchMade: SearchMade,
+  async getSearchImmersionResultDtoFromSearchMade({
+    searchMade,
     withContactDetails = false,
-    maxResults = 100,
-  ): Promise<SearchImmersionResultDto[]> {
+    maxResults,
+  }: {
+    searchMade: SearchMade;
+    withContactDetails?: boolean;
+    maxResults?: number;
+  }): Promise<SearchImmersionResultDto[]> {
     const query = `
         WITH active_establishments_with_contact_uuid AS (
           SELECT 
@@ -260,14 +264,13 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       ORDER BY
         data_source ASC,
         distance_m
-      LIMIT $3; 
-          `;
+      LIMIT $3;`;
     const formatedQuery = format(query, searchMade.rome); // Formats optional litterals %1$L and %2$L
     return this.client
       .query(formatedQuery, [
         `POINT(${searchMade.lon} ${searchMade.lat})`,
         searchMade.distance_km * 1000, // Formats parameters $1, $2
-        maxResults || "ALL",
+        maxResults,
       ])
       .then((res) => {
         return res.rows.map((result) => {
