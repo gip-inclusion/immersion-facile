@@ -24,7 +24,6 @@ import {
 } from "../entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { AdresseAPI } from "../ports/AdresseAPI";
-import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
 
 const logger = createLogger(__filename);
 
@@ -76,7 +75,7 @@ export class TransformFormEstablishmentIntoSearchData extends TransactionalUseCa
       establishmentSiret,
     );
     if (!sireneRepoAnswer) {
-      notifyAndThrowErrorDiscord(
+      await notifyAndThrowErrorDiscord(
         new Error(
           `Could not get siret ${establishmentSiret} from siren gateway`,
         ),

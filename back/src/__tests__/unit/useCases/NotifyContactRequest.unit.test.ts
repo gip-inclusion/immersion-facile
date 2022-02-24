@@ -2,7 +2,7 @@ import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilt
 import {
   InMemoryImmersionOfferRepository,
   TEST_ROME_LABEL,
-} from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+} from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";

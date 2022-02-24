@@ -3,9 +3,12 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
 import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGateway";
-import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
+import {
+  InMemorySireneRepository,
+  TEST_ESTABLISHMENT1_SIRET,
+} from "../../../adapters/secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
 import { TransformFormEstablishmentIntoSearchData } from "../../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
@@ -193,7 +196,7 @@ describe("Transform FormEstablishment into search data", () => {
     );
   });
   it("Removes (and replaces) establishment and offers with same siret from La Bonne Boite if exists", async () => {
-    const siret = "12345678911234";
+    const siret = TEST_ESTABLISHMENT1_SIRET; // Siret exists in In Memory Sirene API
     // Prepare : insert an establishment aggregate from LBB with siret
     immersionOfferRepo.establishmentAggregates = [
       new EstablishmentAggregateBuilder()
@@ -213,7 +216,10 @@ describe("Transform FormEstablishment into search data", () => {
     await useCase.execute(formEstablishment);
 
     // Assert
-    expect(immersionOfferRepo.establishmentAggregates).toHaveLength(0);
+    expect(immersionOfferRepo.establishmentAggregates).toHaveLength(1);
+    expect(
+      immersionOfferRepo.establishmentAggregates[0].establishment.dataSource,
+    ).toEqual("form");
   });
   it("Raises an error if an establishment from form with same siret already exists - Should not happen.", async () => {
     const siret = "12345678911234";

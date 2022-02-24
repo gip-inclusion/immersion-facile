@@ -16,7 +16,6 @@ import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunn
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
-import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { AppConfig } from "./appConfig";
@@ -48,9 +47,6 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     connectionString: destinationPgConnectionString,
   });
   const clientDestination = await poolDestination.connect();
-  const immersionOfferRepository = new PgImmersionOfferRepository(
-    clientDestination,
-  );
   const adresseAPI = new HttpAdresseAPI(
     new QpsRateLimiter(maxQpsApiAdresse, clock, sleep),
     new ExponentialBackoffRetryStrategy(
@@ -80,7 +76,6 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
 
   const transformFormEstablishmentIntoSearchData =
     new TransformFormEstablishmentIntoSearchData(
-      immersionOfferRepository,
       adresseAPI,
       sireneRepository,
       poleEmploiGateway,
@@ -114,7 +109,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       preferredContactMethods: row.preferred_contact_methods,
     };
     try {
-      await transformFormEstablishmentIntoSearchData._execute(
+      await transformFormEstablishmentIntoSearchData.execute(
         formEstablishmentDto,
       );
       logger.info(

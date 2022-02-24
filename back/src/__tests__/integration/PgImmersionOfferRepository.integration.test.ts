@@ -980,17 +980,17 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       await insertImmersionOffer({
         uuid: testUid1,
-        rome: "A1401",
+        romeCode: "A1401",
         siret: siretToRemove,
       });
       await insertImmersionOffer({
         uuid: testUid2,
-        rome: "A1405",
+        romeCode: "A1405",
         siret: siretToRemove,
       });
       await insertImmersionOffer({
         uuid: testUid3,
-        rome: "A1405",
+        romeCode: "A1405",
         siret: siretToKeep,
       });
       // Act

@@ -5,7 +5,7 @@ import {
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
-} from "../../../adapters/secondary/immersionOffer/InMemoryImmersonOfferRepository";
+} from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
 import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
