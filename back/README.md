@@ -75,7 +75,7 @@ The back-end will be accessible on `http://localhost:1234`. The default behaviou
 
 ### Generating JWT keys
 
-A pair of assymmetric keys is used for signing JWTs. These are kept in JWT_PRIVATE_KEY and JWT_PUBLIC_KEY env variables (see below). You can use the following command to generate them:
+A pair of asymmetric keys is used for signing JWTs. These are kept in JWT_PRIVATE_KEY and JWT_PUBLIC_KEY env variables (see below). You can use the following command to generate them:
 
 ```
 openssl ecparam -name prime256v1 -genkey -noout -out private.ec.key && openssl ec -in private.ec.key -pubout -out public.pem

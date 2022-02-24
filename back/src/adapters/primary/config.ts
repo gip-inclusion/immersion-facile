@@ -15,7 +15,6 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../domain/core/ports/UnitOfWork";
-import { ApiConsumer } from "../../domain/core/valueObjects/ApiConsumer";
 import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
@@ -66,6 +65,7 @@ import { InMemoryEventBus } from "../secondary/core/InMemoryEventBus";
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
+import { makeStubGetApiConsumerById } from "../secondary/makeStubGetApiConsumerById";
 import { makeStubGetFeatureFlags } from "../secondary/makeStubGetFeatureFlags";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
@@ -265,13 +265,7 @@ export const createRepositories = async (
     getApiConsumerById:
       config.repositories === "PG"
         ? makePgGetApiConsumerById(await getPgPoolFn().connect())
-        : async (id: string): Promise<ApiConsumer> => ({
-            id,
-            consumer: "testConsumer",
-            expirationDate: clock.now(),
-            createdAt: clock.now(),
-            isAuthorized: true,
-          }),
+        : makeStubGetApiConsumerById({ clock }),
     getFeatureFlags:
       config.repositories === "PG"
         ? makePgGetFeatureFlags(await getPgPoolFn().connect())

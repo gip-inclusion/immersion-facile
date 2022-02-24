@@ -1,4 +1,3 @@
-import { getUnixTime } from "date-fns";
 import { SuperTest, Test } from "supertest";
 import {
   TEST_NAF_LABEL,
@@ -16,18 +15,15 @@ import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Build
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 
 const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
 const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03512d";
 
 describe("/get-immersion-by-id route", () => {
-  const clock = new RealClock();
-
   let request: SuperTest<Test>;
   let reposAndGateways: InMemoryRepositories;
-  let generateJwt: GenerateApiConsumerJtw;
+  let generateApiJwt: GenerateApiConsumerJtw;
 
   beforeEach(async () => {
     const config = new AppConfigBuilder()
@@ -35,7 +31,7 @@ describe("/get-immersion-by-id route", () => {
       .withAuthorizedApiKeyIds([authorizedApiKeyId])
       .build();
     ({ request, reposAndGateways } = await buildTestApp(config));
-    generateJwt = makeGenerateJwt(config.jwtPrivateKey);
+    generateApiJwt = makeGenerateJwt(config.apiJwtPrivateKey);
 
     await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
@@ -98,7 +94,7 @@ describe("/get-immersion-by-id route", () => {
       city: "Paris",
     };
 
-    const authToken = generateJwt({
+    const authToken = generateApiJwt({
       id: authorizedApiKeyId,
     });
 
