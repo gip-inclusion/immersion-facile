@@ -763,10 +763,6 @@ describe("Postgres implementation of immersion offer repository", () => {
           /// Offer should have been added
           const allImmersionOffeRows = await getAllImmersionOfferRows();
           expect(allImmersionOffeRows).toHaveLength(2);
-          /// Offer added from source La Bonne Boite remains unchanged (eg. no contact uuid associated)
-          //   expect(
-          //     allImmersionOffeRows[0].contact_in_establishment_uuid,
-          //   ).toBeNull();
         });
       });
     });

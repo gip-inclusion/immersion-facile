@@ -6,9 +6,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     contact_mode: { type: "contact_mode", notNull: false },
   });
 
+  // Migrates column `contact_mode` from table `establishments` to table `immersion_contacts` for all establishments where data_source=form
+  // NB : we need to use 'COALESCE' since esatblishments.contact_mode is nullable (indeed, establishments may not have any contact),
+  // It should not happened, but if an establishment with data_source=form had no contact_mode specified, it would be set to 'mail'.
   await pgm.sql(`
-      with establishments_from_form as 
-      (SELECT siret, contact_mode FROM establishments WHERE data_source = 'form')
+      WITH establishments_from_form AS 
+        (SELECT siret, contact_mode FROM establishments WHERE data_source = 'form')
       UPDATE immersion_contacts
       SET contact_mode = COALESCE(establishments_from_form.contact_mode, 'mail') FROM establishments_from_form
       WHERE immersion_contacts.siret_establishment = establishments_from_form.siret`);

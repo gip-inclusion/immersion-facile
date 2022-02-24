@@ -23,6 +23,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     foreignKeys: {
       columns: "siret",
       references: "establishments(siret)",
+      onDelete: "CASCADE", // If an establishment is deleted, will delete the offers referencing the siret
     },
   });
 }

@@ -14,6 +14,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       foreignKeys: {
         columns: "establishment_siret",
         references: "establishments(siret)",
+        onDelete: "CASCADE", // If an establishment is deleted, will delete the rows referencing the siret
       },
     },
   );
@@ -21,6 +22,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     foreignKeys: {
       columns: "contact_uuid",
       references: "immersion_contacts(uuid)",
+      onDelete: "CASCADE", // If a contact is deleted, will delete the rows referencing the contact_uuid
     },
   });
   // Migrate data from immersion_contacts table
