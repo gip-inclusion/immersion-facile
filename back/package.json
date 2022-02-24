@@ -9,6 +9,7 @@
     "start-prod": "NODE_ENV=production ts-node src/adapters/primary/startServer.ts",
     "start-establishment-backfill": "ts-node src/adapters/primary/startEstablishmentBackfill.ts",
     "start-update-establishments-from-sirene": "ts-node src/adapters/primary/startUpdateEstablishmentsFromSirene.ts",
+    "free-quarantined-form-establishments-with-correct-siret": "ts-node src/adapters/primary/freeQuarantinedFormEstablishmentsWithCorrectSiret.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts --runInBand",
     "test:e2e": "jest --runInBand --watchAll --testRegex=.e2e.test.ts",
     "test:integration": "jest --runInBand --testRegex=.integration.test.ts",
