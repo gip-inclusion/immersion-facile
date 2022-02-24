@@ -80,6 +80,11 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
         width: widthExport.phone,
       },
       {
+        header: "Identifiant Externe Pole Emploi",
+        key: "peExternalId",
+        width: widthExport.peExternalId,
+      },
+      {
         header: "Date de Début",
         key: "dateStart",
         width: widthExport.dateStart,
@@ -127,9 +132,44 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
         width: widthExport.dateSubmission,
       },
       {
-        header: "AUTRE FEUILLE : Jours et horaires (?)",
-        key: "schedule",
-        width: 400,
+        header: "Horaires Lundi",
+        key: "monday",
+        width: widthExport.day,
+      },
+      {
+        header: "Horaires Mardi",
+        key: "tuesday",
+        width: widthExport.day,
+      },
+      {
+        header: "Horaires Mercredi",
+        key: "wednesday",
+        width: widthExport.day,
+      },
+      {
+        header: "Horaires Jeudi",
+        key: "thursday",
+        width: widthExport.day,
+      },
+      {
+        header: "Horaires Vendredi",
+        key: "friday",
+        width: widthExport.day,
+      },
+      {
+        header: "Horaires Samedi",
+        key: "saturday",
+        width: widthExport.day,
+      },
+      {
+        header: "Horaires Dimanche",
+        key: "sunday",
+        width: widthExport.day,
+      },
+      {
+        header: "Conditions de travail particulières",
+        key: "workConditions",
+        width: widthExport.freeform,
       },
     ];
     return businessColumnMappingRules;
@@ -192,6 +232,9 @@ const columnSizeByDataType = {
   objective: 40,
   businessName: 25,
   siret: 25,
+  uuid: 30,
+  scheduleDay: 30,
+  freeform: 100,
 };
 
 const widthExport: { [key: string]: number } = {
@@ -214,4 +257,7 @@ const widthExport: { [key: string]: number } = {
   mentorPhone: columnSizeByDataType.phone,
   mentorEmail: columnSizeByDataType.email,
   dateSubmission: columnSizeByDataType.date,
+  peExternalId: columnSizeByDataType.uuid,
+  day: columnSizeByDataType.scheduleDay,
+  workConditions: columnSizeByDataType.freeform,
 };

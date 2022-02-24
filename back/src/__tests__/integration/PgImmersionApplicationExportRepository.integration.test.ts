@@ -52,6 +52,8 @@ describe("Pg implementation of ImmersionApplicationExportRepository", () => {
             .withDateEnd(new Date("2021-01-20").toISOString())
             .withDateSubmission(new Date("2021-01-10").toISOString())
             .withAgencyId(appleAgencyId)
+            .withoutWorkCondition()
+            .withoutPeExternalId()
             .build(),
         );
 
@@ -78,6 +80,9 @@ describe("Pg implementation of ImmersionApplicationExportRepository", () => {
           ...filteredProperties,
           agencyName: appleAgency.name,
           status: immersionApplicationEntity.status,
+          dateEnd: "20/01/2021",
+          dateStart: "15/01/2021",
+          dateSubmission: "10/01/2021",
         })._props,
       );
     });

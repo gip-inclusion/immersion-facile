@@ -1,6 +1,8 @@
 import { PoolClient } from "pg";
 import { ImmersionApplicationExportQueries } from "../../../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
 import { ImmersionApplicationRawBeforeExportVO } from "../../../domain/immersionApplication/valueObjects/ImmersionApplicationRawBeforeExportVO";
+import { format } from "date-fns";
+import { optional } from "./pgUtils";
 
 export class PgImmersionApplicationExportQueries
   implements ImmersionApplicationExportQueries
@@ -24,9 +26,9 @@ export class PgImmersionApplicationExportQueries
           phone: row.phone,
           firstName: row.first_name,
           lastName: row.last_name,
-          dateSubmission: row.date_submission.toISOString(),
-          dateStart: row.date_start.toISOString(),
-          dateEnd: row.date_end.toISOString(),
+          dateSubmission: format(row.date_submission, "dd/MM/yyyy"),
+          dateStart: format(row.date_start, "dd/MM/yyyy"),
+          dateEnd: format(row.date_end, "dd/MM/yyyy"),
           businessName: row.business_name,
           mentor: row.mentor,
           mentorPhone: row.mentor_phone,
@@ -37,6 +39,8 @@ export class PgImmersionApplicationExportQueries
           enterpriseAccepted: row.enterprise_accepted,
           schedule: row.schedule,
           siret: row.siret,
+          peExternalId: optional(row.pe_external_id),
+          workConditions: optional(row.work_conditions),
         }),
     );
   }

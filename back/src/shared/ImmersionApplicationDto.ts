@@ -110,6 +110,7 @@ export const immersionApplicationSchema = z
     immersionSkills: z.string().optional(),
     beneficiaryAccepted: zBoolean,
     enterpriseAccepted: zBoolean,
+    peExternalId: z.string().optional(),
   })
   .refine(submissionAndStartDatesConstraints, {
     message:

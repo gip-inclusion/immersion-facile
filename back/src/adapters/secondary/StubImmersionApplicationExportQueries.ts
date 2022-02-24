@@ -59,6 +59,9 @@ export const StubImmersionApplicationExportQueries: ImmersionApplicationExportQu
         immersionProfession: "Boulanger / Boulangère",
         beneficiaryAccepted: false,
         enterpriseAccepted: false,
+        peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
+        workConditions:
+          "Conditions de travail particulière : repas non fournis",
       }),
     ],
   };

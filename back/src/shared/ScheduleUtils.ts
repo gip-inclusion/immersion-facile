@@ -263,3 +263,8 @@ export const convertToFrenchNamedDays = (aSchedule: ScheduleDto) => {
 
 export const isArrayOfWeekdays = (value: any): boolean =>
   Array.isArray(value) && value.every((el) => weekdays.includes(el));
+
+export const prettyPrintDayFromSchedule = (schedule: ScheduleDto, dayIndex: number): string => {
+  const complexSchedule = schedule.isSimple ? convertSimpleToComplexSchedule(schedule.simpleSchedule) : schedule.complexSchedule;
+  return prettyPrintDaySchedule(complexSchedule[dayIndex]);
+}
