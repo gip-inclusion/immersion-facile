@@ -10,18 +10,32 @@ describe("/search-immersion route", () => {
     request = supertest(app);
   });
 
-  test("accepts valid requests", async () => {
-    await request
-      .post(`/search-immersion`)
-      .send({
-        rome: "A1000",
-        location: {
-          lat: 48.8531,
-          lon: 2.34999,
-        },
-        distance_km: 30,
-      })
-      .expect(200, []);
+  describe("accepts valid requests", () => {
+    test("with given rome and location", async () => {
+      await request
+        .post(`/search-immersion`)
+        .send({
+          rome: "A1000",
+          location: {
+            lat: 48.8531,
+            lon: 2.34999,
+          },
+          distance_km: 30,
+        })
+        .expect(200, []);
+    });
+    test("with no specified rome", async () => {
+      await request
+        .post(`/search-immersion`)
+        .send({
+          location: {
+            lat: 48.8531,
+            lon: 2.34999,
+          },
+          distance_km: 30,
+        })
+        .expect(200, []);
+    });
   });
 
   // TODO add test which actually recovers data (and one with token, one without)

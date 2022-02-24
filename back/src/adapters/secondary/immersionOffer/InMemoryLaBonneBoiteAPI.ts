@@ -15,6 +15,8 @@ export class InMemoryLaBonneBoiteAPI implements LaBonneBoiteAPI {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     searchParams: LaBonneBoiteRequestParams,
   ): Promise<LaBonneBoiteCompanyVO[]> {
+    if (!searchParams.rome)
+      throw "Parameter rome is required to request LaBonneBoite";
     this.nbOfCalls = this.nbOfCalls + 1;
     if (this._error) throw this._error;
     return this._results;

@@ -21,6 +21,7 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
 
   authenticatedRouter.route(`/${searchImmersionRoute}`).post(async (req, res) =>
     sendHttpResponse(req, res, async () => {
+      console.log("Post on ", searchImmersionRoute, " with body ", req.body);
       await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
         req.body,
       );

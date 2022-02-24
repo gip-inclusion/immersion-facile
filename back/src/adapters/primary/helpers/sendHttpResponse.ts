@@ -41,6 +41,7 @@ export const sendHttpResponse = async (
   authChecker?: AuthChecker,
 ) => {
   try {
+    console.log("in sendHttpResponse ", req.body);
     authenticationCheck(req, authChecker);
 
     const response = await callback();

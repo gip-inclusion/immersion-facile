@@ -53,6 +53,10 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
   public async _execute(
     searchImmersionRequestDto: SearchImmersionRequestDto,
   ): Promise<void> {
+    console.log(
+      "\n\nExecute CallLaBonneBoiteAndUpdateRepositories with ",
+      searchImmersionRequestDto,
+    );
     if (!searchImmersionRequestDto.rome) return;
 
     const requestParams: LaBonneBoiteRequestParams = {

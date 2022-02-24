@@ -52,8 +52,12 @@ describe("Postgres implementation of immersion offer repository", () => {
     const searchedPosition = { lat: 49, lon: 6 };
     const notMatchingRome = "A1101";
     const farFromSearchedPosition = { lat: 32, lon: 89 };
-    const searchMade: SearchMade = {
+    const searchMadeWithRome: SearchMade = {
       rome: searchedRome,
+      ...searchedPosition,
+      distance_km: 30,
+    };
+    const searchMadeWithoutRome: SearchMade = {
       ...searchedPosition,
       distance_km: 30,
     };
@@ -61,34 +65,12 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Act
       const searchWithNoRomeResult =
         await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
-          searchMade,
+          searchMadeWithRome,
         );
       // Assert
       expect(searchWithNoRomeResult).toHaveLength(0);
     });
-    test("Returns only active establishments only ", async () => {
-      // Prepare : establishment in geographical area but not active
-      const notActiveSiret = "78000403200029";
 
-      await insertEstablishment({
-        siret: notActiveSiret,
-        isActive: false,
-        position: searchedPosition,
-      });
-      await insertImmersionOffer({
-        uuid: testUid1,
-        rome: searchedRome,
-        siret: notActiveSiret,
-      });
-
-      // Act
-      const searchWithNoRomeResult =
-        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
-          searchMade,
-        );
-      // Assert
-      expect(searchWithNoRomeResult).toHaveLength(0);
-    });
     const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
       offerUid: string,
       siret: string,
@@ -121,6 +103,86 @@ describe("Postgres implementation of immersion offer repository", () => {
         rome,
       });
     };
+
+    describe("If no rome code is given", () => {
+      test("Returns all establishments within geographical area", async () => {
+        // Prepare
+        /// Two establishments with offer inside geographical area
+        await insertActiveEstablishmentAndOfferAndEventuallyContact(
+          testUid1,
+          "78000403200029",
+          "A1101", // Whatever
+          searchedPosition, // Offer position matching
+          searchedPosition, // Establishment position matching
+        );
+        await insertActiveEstablishmentAndOfferAndEventuallyContact(
+          testUid2,
+          "79000403200029",
+          "A1201", // Whatever
+          searchedPosition, // Offer position matching
+          searchedPosition, // Establishment position matching
+        );
+        /// Establishment oustide geographical area
+        await insertActiveEstablishmentAndOfferAndEventuallyContact(
+          testUid3,
+          "99000403200029",
+          "A1101", // Whatever
+          farFromSearchedPosition,
+          farFromSearchedPosition, // Not matching
+        );
+
+        // Act
+        const searchResult: SearchImmersionResultDto[] =
+          await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+            searchMadeWithoutRome,
+          );
+
+        // Assert : one match and defined contact details
+        expect(searchResult).toHaveLength(2);
+
+        const expectedResult: Partial<SearchImmersionResultDto>[] = [
+          {
+            id: testUid1,
+            rome: "A1101",
+            siret: "78000403200029",
+            distance_m: 0,
+          },
+          {
+            id: testUid2,
+            rome: "A1201",
+            siret: "79000403200029",
+            distance_m: 0,
+          },
+        ];
+
+        expect(searchResult).toMatchObject(expectedResult);
+      });
+    });
+
+    test("Returns active establishments only ", async () => {
+      // Prepare : establishment in geographical area but not active
+      const notActiveSiret = "78000403200029";
+
+      await insertEstablishment({
+        siret: notActiveSiret,
+        isActive: false,
+        position: searchedPosition,
+      });
+      await insertImmersionOffer({
+        uuid: testUid1,
+        rome: searchedRome,
+        siret: notActiveSiret,
+      });
+
+      // Act
+      const searchWithNoRomeResult =
+        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+          searchMadeWithRome,
+        );
+      // Assert
+      expect(searchWithNoRomeResult).toHaveLength(0);
+    });
+
     test("Returns establishments with offers of given rome code and located within given geographical area", async () => {
       // Prepare
       /// Establishment with offer inside geographical area with searched rome
@@ -161,7 +223,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Act
       const searchResult: SearchImmersionResultDto[] =
         await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
-          searchMade,
+          searchMadeWithRome,
         );
 
       // Assert : one match and defined contact details
@@ -202,7 +264,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Act
       const searchResult: SearchImmersionResultDto[] =
         await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
-          searchMade,
+          searchMadeWithRome,
           true, // withContactDetails
         );
 

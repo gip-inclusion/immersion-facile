@@ -113,6 +113,7 @@ const sequenceRunner = new ThrottledSequenceRunner(1500, 3);
 export const createAppDependencies = async (config: AppConfig) => {
   const getPgPoolFn = createGetPgPoolFn(config);
   const repositories = await createRepositories(config, getPgPoolFn);
+
   const uowPerformer = createUowPerformer(config, getPgPoolFn, repositories);
   const eventBus = createEventBus();
   const generateJwtFn = makeGenerateJwt(config.jwtPrivateKey);
