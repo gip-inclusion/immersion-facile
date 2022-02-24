@@ -2,10 +2,6 @@ import { addDays, format, startOfToday } from "date-fns";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { ApplicationFormFields } from "src/app/ApplicationForm/ApplicationFormFields";
-import {
-  createSuccessInfos,
-  SuccessInfos,
-} from "src/app/ApplicationForm/createSuccessInfos";
 import { immersionApplicationGateway } from "src/app/dependencies";
 import { routes } from "src/app/routes";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
@@ -19,6 +15,9 @@ import {
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
+import { SuccessMessage } from "../../components/form/SuccessMessage";
+import { ErrorMessage } from "../../components/form/ErrorMessage";
+import { SubmitFeedback, SuccessFeedbackKind } from "./SubmitFeedback";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
@@ -136,8 +135,9 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
   const [initialValues, setInitialValues] = useState(
     createInitialApplication(route),
   );
-  const [submitError, setSubmitError] = useState<Error | null>(null);
-  const [successInfos, setSuccessInfos] = useState<SuccessInfos | null>(null);
+  const [submitFeedback, setSubmitFeedback] = useState<
+    SuccessFeedbackKind | Error | null
+  >(null);
 
   useEffect(() => {
     if (!("demandeId" in route.params) && !("jwt" in route.params)) return;
@@ -154,8 +154,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
       })
       .catch((e) => {
         console.log(e);
-        setSubmitError(e);
-        setSuccessInfos(null);
+        setSubmitFeedback(e);
       });
   }, []);
 
@@ -222,29 +221,28 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
                   await immersionApplicationGateway.add(immersionApplication);
                 }
                 setInitialValues(immersionApplication);
-
-                setSuccessInfos(createSuccessInfos(undefined));
-                setSubmitError(null);
+                setSubmitFeedback("justSubmitted");
               } catch (e: any) {
                 console.log(e);
-                setSubmitError(e);
-                setSuccessInfos(null);
+                setSubmitFeedback(e);
               }
               setSubmitting(false);
             }}
           >
-            {(props) => (
-              <div>
-                {console.log(props.errors)}
-                <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-                  <ApplicationFormFields
-                    isFrozen={isFrozen}
-                    submitError={submitError}
-                    successInfos={successInfos}
-                  />
-                </form>
-              </div>
-            )}
+            {(props) => {
+              return (
+                <div>
+                  {console.log(props.errors)}
+                  <form
+                    onReset={props.handleReset}
+                    onSubmit={props.handleSubmit}
+                  >
+                    <ApplicationFormFields isFrozen={isFrozen} />
+                    <SubmitFeedback submitFeedback={submitFeedback} />
+                  </form>
+                </div>
+              );
+            }}
           </Formik>
         </div>
       </div>

@@ -1,10 +1,6 @@
 import { useField, useFormikContext } from "formik";
-import React, { useContext, useEffect } from "react";
-import { SuccessInfos } from "src/app/ApplicationForm/createSuccessInfos";
-import {
-  FeatureFlagsContext,
-  useFeatureFlagsContext,
-} from "src/app/FeatureFlagContext";
+import React, { useEffect } from "react";
+import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { BoolRadioGroup, RadioGroup } from "src/app/RadioGroup";
 import {
   useSiretFetcher,
@@ -14,15 +10,12 @@ import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { AgencySelector } from "src/components/form/AgencySelector";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { DateInput } from "src/components/form/DateInput";
-import { ErrorMessage } from "src/components/form/ErrorMessage";
 import {
   SchedulePicker,
   scheduleValidator,
 } from "src/components/form/SchedulePicker/SchedulePicker";
-import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { FormSectionTitle } from "src/components/FormSectionTitle";
-import { ENV } from "src/environmentVariables";
 import type {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -30,8 +23,6 @@ import type {
 import { routes, useRoute } from "../routes";
 import type { ApplicationFormKeysInUrl } from "../routes";
 import { ApplicationFormProfession } from "./ApplicationFormProfession";
-
-const { dev } = ENV;
 
 const FrozenMessage = () => (
   <>
@@ -73,8 +64,6 @@ const SignOnlyMessage = ({ isAlreadySigned }: SignOnlyMessageProps) => (
 
 type ApplicationFieldsProps = {
   isFrozen?: boolean;
-  submitError: Error | null;
-  successInfos: SuccessInfos | null;
   isSignOnly?: boolean;
   isSignatureEnterprise?: boolean; //< Ignored if !isSignOnly. Determines who's signing (enterprise or beneficiary)
   signeeName?: string; //< Ignored if !isSignOnly. Name of the person signing.
@@ -84,8 +73,6 @@ type ApplicationFieldsProps = {
 
 export const ApplicationFormFields = ({
   isFrozen,
-  submitError,
-  successInfos,
   isSignOnly,
   isSignatureEnterprise,
   signeeName,
@@ -120,16 +107,6 @@ export const ApplicationFormFields = ({
     ...Object.values(watchedValuesExceptSchedule),
     JSON.stringify(values.schedule),
   ]);
-
-  let errorMessage = submitError?.message;
-  if (
-    submitError &&
-    "response" in submitError &&
-    "data" in submitError["response"] &&
-    "errors" in submitError["response"]["data"]
-  ) {
-    errorMessage = submitError["response"]["data"]["errors"];
-  }
 
   const isSignatureMode = isSignOnly;
 
@@ -348,21 +325,6 @@ export const ApplicationFormFields = ({
             Veuillez corriger les champs erronés
           </div>
         )}
-
-      {errorMessage && (
-        <ErrorMessage title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement">
-          {errorMessage}
-        </ErrorMessage>
-      )}
-
-      {successInfos && (
-        <SuccessMessage title="Succès de l'envoi">
-          {successInfos.message}
-          {successInfos.link && (
-            <a href={successInfos.link}>{successInfos.link}</a>
-          )}
-        </SuccessMessage>
-      )}
 
       {!isFrozen && (
         <p className="font-bold">

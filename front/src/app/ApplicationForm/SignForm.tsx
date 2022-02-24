@@ -1,7 +1,6 @@
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { ApplicationFormFields } from "src/app/ApplicationForm/ApplicationFormFields";
-import { SuccessInfos } from "src/app/ApplicationForm/createSuccessInfos";
 import { immersionApplicationGateway } from "src/app/dependencies";
 import { routes } from "src/app/routes";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
@@ -14,6 +13,7 @@ import {
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
+import { SubmitFeedback, SuccessFeedbackKind } from "./SubmitFeedback";
 
 type SignFormRoute = Route<typeof routes.immersionApplicationsToSign>;
 
@@ -63,11 +63,13 @@ type SignFormSpecificProps = {
 const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
   const [initialValues, setInitialValues] =
     useState<Partial<ImmersionApplicationDto> | null>(null);
-  const [submitError, setSubmitError] = useState<Error | null>(null);
-  const [successInfos, setSuccessInfos] = useState<SuccessInfos | null>(null);
   const [signeeName, setSigneeName] = useState<string | undefined>();
   const [signeeRole, setSigneeRole] = useState<Role | undefined>();
   const [alreadySigned, setAlreadySigned] = useState(false);
+
+  const [submitFeedback, setSubmitFeedback] = useState<
+    SuccessFeedbackKind | Error | null
+  >(null);
 
   useEffect(() => {
     if (!response) return;
@@ -134,16 +136,12 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
 
                   await immersionApplicationGateway.signApplication(jwt);
 
-                  setSuccessInfos({
-                    message: "Votre accord a été enregistré.",
-                    link: undefined,
-                  });
-                  setSubmitError(null);
+                  setSubmitFeedback("signedSuccessfully");
+
                   setAlreadySigned(true);
                 } catch (e: any) {
                   console.log(e);
-                  setSubmitError(e);
-                  setSuccessInfos(null);
+                  setSubmitFeedback(e);
                 } finally {
                   setSubmitting(false);
                 }
@@ -157,8 +155,6 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
                   >
                     <ApplicationFormFields
                       isFrozen={true}
-                      submitError={submitError}
-                      successInfos={successInfos}
                       isSignOnly={true}
                       isSignatureEnterprise={signeeRole === "establishment"}
                       signeeName={signeeName}
@@ -173,19 +169,15 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
                             { status: "DRAFT", justification },
                             jwt,
                           );
-                          setSuccessInfos({
-                            message:
-                              "Vous avez renvoyé la demande pour modification. ",
-                            link: undefined,
-                          });
-                          setSubmitError(null);
+                          setSubmitFeedback("modificationsAsked");
                         } catch (e: any) {
                           console.log(e);
-                          setSubmitError(e);
-                          setSuccessInfos(null);
+                          setSubmitFeedback(e);
                         }
                       }}
                     />
+
+                    <SubmitFeedback submitFeedback={submitFeedback} />
                   </form>
                 </div>
               )}
