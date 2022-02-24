@@ -204,6 +204,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   async getSearchImmersionResultDtoFromSearchMade(
     searchMade: SearchMade,
     withContactDetails = false,
+    maxResults = 100,
   ): Promise<SearchImmersionResultDto[]> {
     const query = `
         WITH active_establishments_with_contact_uuid AS (
@@ -258,13 +259,15 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         ST_DWithin(gps, ST_GeographyFromText($1), $2) 
       ORDER BY
         data_source ASC,
-        distance_m;
+        distance_m
+      LIMIT $3; 
           `;
     const formatedQuery = format(query, searchMade.rome); // Formats optional litterals %1$L and %2$L
     return this.client
       .query(formatedQuery, [
         `POINT(${searchMade.lon} ${searchMade.lat})`,
         searchMade.distance_km * 1000, // Formats parameters $1, $2
+        maxResults || "ALL",
       ])
       .then((res) => {
         return res.rows.map((result) => {

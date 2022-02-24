@@ -31,6 +31,7 @@ export interface ImmersionOfferRepository {
   getSearchImmersionResultDtoFromSearchMade: (
     searchMade: SearchMade,
     withContactDetails?: boolean,
+    maxResults?: number,
   ) => Promise<SearchImmersionResultDto[]>;
 
   getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince: (

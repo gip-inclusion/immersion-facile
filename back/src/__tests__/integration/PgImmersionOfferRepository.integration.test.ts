@@ -103,7 +103,35 @@ describe("Postgres implementation of immersion offer repository", () => {
         rome,
       });
     };
+    describe("If parameter `maxResults` is given", () => {
+      test("Returns at most `maxResults` establishments ", async () => {
+        // Prepare
+        /// Two establishments match
+        await insertActiveEstablishmentAndOfferAndEventuallyContact(
+          testUid1,
+          "78000403200029",
+          "A1101", // Whatever
+          searchedPosition, // Position matching
+        );
+        await insertActiveEstablishmentAndOfferAndEventuallyContact(
+          testUid2,
+          "79000403200029",
+          "A1201", // Whatever
+          searchedPosition, // Position matching
+        );
 
+        // Act
+        const searchResult: SearchImmersionResultDto[] =
+          await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+            searchMadeWithoutRome,
+            false,
+            1, // maxResults
+          );
+
+        // Assert : one match and defined contact details
+        expect(searchResult).toHaveLength(1);
+      });
+    });
     describe("If no rome code is given", () => {
       test("Returns all establishments within geographical area", async () => {
         // Prepare
@@ -112,23 +140,20 @@ describe("Postgres implementation of immersion offer repository", () => {
           testUid1,
           "78000403200029",
           "A1101", // Whatever
-          searchedPosition, // Offer position matching
-          searchedPosition, // Establishment position matching
+          searchedPosition, // Position matching
         );
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
           testUid2,
           "79000403200029",
           "A1201", // Whatever
-          searchedPosition, // Offer position matching
-          searchedPosition, // Establishment position matching
+          searchedPosition, // Position matching
         );
         /// Establishment oustide geographical area
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
           testUid3,
           "99000403200029",
           "A1101", // Whatever
-          farFromSearchedPosition,
-          farFromSearchedPosition, // Not matching
+          farFromSearchedPosition, // Position not matching
         );
 
         // Act

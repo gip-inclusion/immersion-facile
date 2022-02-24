@@ -89,24 +89,27 @@ export class InMemoryImmersionOfferRepository
   public async getSearchImmersionResultDtoFromSearchMade(
     searchMade: SearchMade,
     withContactDetails = false,
+    maxResults = 100,
   ): Promise<SearchImmersionResultDto[]> {
     logger.info({ searchMade, withContactDetails }, "getFromSearch");
-    return this._establishmentAggregates.flatMap((aggregate) =>
-      aggregate.immersionOffers
-        .filter(
-          (immersionOffer) =>
-            !searchMade.rome || immersionOffer.rome === searchMade.rome,
-        )
-        .map((immersionOffer) =>
-          buildSearchImmersionResultDto(
-            immersionOffer,
-            aggregate.establishment,
-            aggregate.contact,
-            searchMade,
-            withContactDetails,
+    return this._establishmentAggregates
+      .flatMap((aggregate) =>
+        aggregate.immersionOffers
+          .filter(
+            (immersionOffer) =>
+              !searchMade.rome || immersionOffer.rome === searchMade.rome,
+          )
+          .map((immersionOffer) =>
+            buildSearchImmersionResultDto(
+              immersionOffer,
+              aggregate.establishment,
+              aggregate.contact,
+              searchMade,
+              withContactDetails,
+            ),
           ),
-        ),
-    );
+      )
+      .slice(0, maxResults);
   }
 
   public async getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
