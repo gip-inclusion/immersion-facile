@@ -1,9 +1,4 @@
-import {
-  Modal,
-  ModalClose,
-  ModalContent,
-  ModalTitle,
-} from "@dataesr/react-dsfr";
+import { Modal, ModalClose, ModalContent } from "@dataesr/react-dsfr";
 import React, { ReactNode, useReducer } from "react";
 import { ContactByEmail } from "src/app/Search/ContactByEmail";
 import { ContactByPhone } from "src/app/Search/ContactByPhone";
