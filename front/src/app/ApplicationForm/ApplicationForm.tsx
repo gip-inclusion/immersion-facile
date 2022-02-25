@@ -15,8 +15,6 @@ import {
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
-import { SuccessMessage } from "../../components/form/SuccessMessage";
-import { ErrorMessage } from "../../components/form/ErrorMessage";
 import { SubmitFeedback, SuccessFeedbackKind } from "./SubmitFeedback";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");

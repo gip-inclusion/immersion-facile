@@ -37,11 +37,11 @@ const InitialSubmitSuccessMessage = () => (
     <ul>
       <li>
         Vous devez maintenant confirmer et signer cette demande (un mail avec
-        lien de confirmation vous à été envoyé).
+        lien de confirmation vous a été envoyé).
       </li>
       <li>
         Votre tuteur doit confirmer et signer cette demande (un mail avec lien
-        de confirmation lui à été envoyé).
+        de confirmation lui a été envoyé).
       </li>
     </ul>
     <br />
