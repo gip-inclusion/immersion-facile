@@ -149,9 +149,14 @@ export type EmailType =
   | "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE"
   | "CONTACT_BY_EMAIL_REQUEST"
   | "CONTACT_BY_PHONE_INSTRUCTIONS"
-  | "CONTACT_IN_PERSON_INSTRUCTIONS";
+  | "CONTACT_IN_PERSON_INSTRUCTIONS"
+  | "EDIT_FORM_ESTABLISHMENT_LINK";
 
 export interface EmailGateway {
+  sendEditFormEstablishmentLink: (
+    recipient: string,
+    params: { editFrontUrl: string },
+  ) => Promise<void>;
   sendNewApplicationBeneficiaryConfirmation: (
     recipient: string,
     params: NewApplicationBeneficiaryConfirmationParams,

@@ -10,7 +10,7 @@ const logger = createLogger(__filename);
 export class InMemoryFormEstablishmentRepository
   implements FormEstablishmentRepository
 {
-  private immersionOffers: FormEstablishmentDto[] = [];
+  private formEstablishments: FormEstablishmentDto[] = [];
 
   public async save(
     dto: FormEstablishmentDto,
@@ -20,18 +20,18 @@ export class InMemoryFormEstablishmentRepository
       return;
     }
     logger.debug({ immersionOffer: dto }, "Saving a new Immersion Offer");
-    this.immersionOffers.push(dto);
+    this.formEstablishments.push(dto);
     return dto.id;
   }
 
   public async getAll() {
-    return this.immersionOffers;
+    return this.formEstablishments;
   }
 
   public async getById(
     id: FormEstablishmentId,
   ): Promise<FormEstablishmentDto | undefined> {
-    return this.immersionOffers.find(
+    return this.formEstablishments.find(
       (immersionOffer) => immersionOffer.id === id,
     );
   }

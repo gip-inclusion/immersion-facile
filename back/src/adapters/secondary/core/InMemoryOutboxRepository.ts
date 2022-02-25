@@ -5,6 +5,7 @@ import {
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { createLogger } from "../../../utils/logger";
 import { eventToDebugInfo } from "../../../domain/core/eventBus/events";
+import { EditFormEstablishementPayload } from "../../../shared/tokens/MagicLinkPayload";
 
 const logger = createLogger(__filename);
 
@@ -54,6 +55,15 @@ export class InMemoryOutboxRepository implements OutboxRepository {
         );
       }
     });
+  }
+  public async getLastPayloadOfFormEstablishmentEditLinkSentWithSiret(
+    siret: string,
+  ): Promise<EditFormEstablishementPayload | undefined> {
+    return this._events.find((event) => {
+      if (event.topic !== "FormEstablishmentEditLinkSent") return false;
+      const payload = event.payload as EditFormEstablishementPayload;
+      return payload.siret === siret;
+    })?.payload as EditFormEstablishementPayload;
   }
 
   //test purposes

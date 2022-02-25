@@ -6,9 +6,16 @@ import {
 import { RomeSearchMatchDto } from "src/shared/rome";
 import { sleep } from "src/shared/utils";
 
+const SIMULATED_LATENCY_MS = 1000;
+
 export class InMemoryFormEstablishmentGateway
   implements FormEstablishmentGateway
 {
+  private _existingEstablishmentSirets: string[] = [];
+
+  public constructor(existingEstablishmentSirets: string[] = []) {
+    this._existingEstablishmentSirets = existingEstablishmentSirets;
+  }
   public async addFormEstablishment(
     immersionOffer: FormEstablishmentDto,
   ): Promise<FormEstablishmentId> {
@@ -67,5 +74,12 @@ export class InMemoryFormEstablishmentGateway
         matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 7 }],
       },
     ];
+  }
+  public async getSiretAlreadyExists(siret: string): Promise<boolean> {
+    return this._existingEstablishmentSirets.includes(siret);
+  }
+
+  public async requestEmailToEditForm(siret: string): Promise<void> {
+    return;
   }
 }

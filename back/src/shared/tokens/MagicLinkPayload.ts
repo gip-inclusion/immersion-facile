@@ -30,7 +30,7 @@ export type MagicLinkPayload = {
 export const emailHashForMagicLink = (str: string) =>
   crypto.createHash("md5").update(str).digest("hex");
 
-export function createMagicLinkPayload(
+export const createMagicLinkPayload = (
   applicationId: string,
   role: Role,
   email: string,
@@ -39,13 +39,17 @@ export function createMagicLinkPayload(
   iat: number = Math.round(nowFn() / 1000),
   exp: number = iat + durationDays * 24 * 3600,
   version = currentJwtVersion,
-) {
-  return {
-    version,
-    applicationId,
-    role,
-    iat,
-    exp,
-    emailHash: emailHashForMagicLink(email),
-  };
-}
+) => ({
+  version,
+  applicationId,
+  role,
+  iat,
+  exp,
+  emailHash: emailHashForMagicLink(email),
+});
+
+export type EditFormEstablishementPayload = {
+  siret: string;
+  issuedAt: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
+  expiredAt: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
+};

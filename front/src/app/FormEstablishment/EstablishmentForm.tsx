@@ -1,5 +1,5 @@
 import { Form, Formik, useField } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { formEstablishmentGateway } from "src/app/dependencies";
 import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { BusinessContactList } from "src/app/FormEstablishment/BusinessContactList";
@@ -15,8 +15,10 @@ import {
   useSiretRelatedField,
 } from "src/app/Siret/fetchEstablishmentInfoBySiret";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
+import { Button } from "src/components/Button";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
+import { InfoMessage } from "src/components/form/InfoMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
@@ -112,14 +114,24 @@ const getLabelAndName = (field: FieldsWithLabel) => ({
 });
 
 const SiretRelatedInputs = () => {
-  const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
+  const { siret, establishmentInfo, isFetchingSiret, siretAlreadyExists } =
+    useSiretFetcher();
+
+  const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
+    useState(false);
+
+  const [requestEmailToEditFormError, setRequestEmailToEditFormError] =
+    useState<string | null>(null);
+
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField("businessAddress", establishmentInfo);
   useSiretRelatedField("naf", establishmentInfo);
   const featureFlags = useFeatureFlagsContext();
 
   const businessLabelAndName = getLabelAndName("businessAddress");
-  const [_, __, { setValue }] = useField<string>(businessLabelAndName.name);
+  const { setValue: setAddressValue } = useField<string>(
+    businessLabelAndName.name,
+  )[2];
 
   return (
     <>
@@ -128,6 +140,42 @@ const SiretRelatedInputs = () => {
         placeholder="362 521 879 00034"
         disabled={isFetchingSiret}
       />
+      {siretAlreadyExists && !requestEmailToEditFormSucceed && (
+        <div>
+          Cette entreprise a déjà été référencée.
+          <Button
+            disable={requestEmailToEditFormSucceed}
+            onSubmit={() => {
+              formEstablishmentGateway
+                .requestEmailToEditForm(siret)
+                .then(() => {
+                  setRequestEmailToEditFormSucceed(true);
+                })
+                .catch((err) => {
+                  setRequestEmailToEditFormError(err.response.data.errors);
+                });
+            }}
+          >
+            Demande de modification du formulaire de référencement
+          </Button>
+        </div>
+      )}
+      {requestEmailToEditFormSucceed && (
+        <SuccessMessage title="Succès de la demande">
+          Succès. Un mail a été envoyé au référent de cet établissement avec un
+          lien permettant la mise à jour des informations.
+        </SuccessMessage>
+      )}
+      {requestEmailToEditFormError && (
+        <>
+          <InfoMessage
+            title="La demande de modification n'a pas aboutie."
+            text={requestEmailToEditFormError}
+          />
+          <br />
+        </>
+      )}
+
       <TextInput
         {...getLabelAndName("businessName")}
         disabled={!featureFlags.enableByPassInseeApi}
@@ -139,7 +187,7 @@ const SiretRelatedInputs = () => {
       <AddressAutocomplete
         initialSearchTerm={establishmentInfo?.businessAddress}
         label={businessLabelAndName.label}
-        setFormValue={(address) => setValue(address.label)}
+        setFormValue={(address) => setAddressValue(address.label)}
         disabled={isFetchingSiret}
       />
     </>
@@ -215,7 +263,7 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
                   description=""
                   descriptionLink=""
                   disabled={false}
-                />{" "}
+                />
                 <ProfessionList
                   name="professions"
                   title={`${fieldsToLabel["professions"]} *`}

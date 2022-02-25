@@ -492,6 +492,33 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       score: row.score,
     };
   }
+  public async getContactEmailFromSiret(
+    siret: string,
+  ): Promise<string | undefined> {
+    const query = format(
+      `SELECT
+        immersion_contacts.email
+      FROM
+        immersion_contacts
+      RIGHT JOIN establishments__immersion_contacts
+        ON (establishments__immersion_contacts.contact_uuid = immersion_contacts.uuid)
+      WHERE establishments__immersion_contacts.establishment_siret = %L`,
+      siret,
+    );
+    const pgResult = await this.client.query(query);
+    const row = pgResult.rows[0];
+    if (!row) return;
+    return row.email;
+  }
+  public async hasEstablishmentFromFormWithSiret(
+    siret: string,
+  ): Promise<boolean> {
+    const pgResult = await this.client.query(
+      `SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1 AND data_source='form');`,
+      [siret],
+    );
+    return pgResult.rows[0].exists;
+  }
 }
 
 // Extract the NAF division (e.g. 84) from a NAF code (e.g. 8413Z)

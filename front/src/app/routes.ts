@@ -76,6 +76,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     (p) => `/etablissement/${p.consumer}`,
   ),
 
+  editFormEstablishment: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.editFormEstablishmentRoute}`,
+  ),
+
   renewMagicLink: defineRoute(
     {
       expiredJwt: param.query.string,

@@ -11,5 +11,6 @@ export interface FormEstablishmentRepository {
   getById: (
     id: FormEstablishmentId,
   ) => Promise<FormEstablishmentDto | undefined>;
+
   getAll: () => Promise<FormEstablishmentDto[]>;
 }

@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
-import { AppConfig } from "../../adapters/primary/appConfig";
-import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
+import {
+  MagicLinkPayload,
+  EditFormEstablishementPayload,
+} from "../../shared/tokens/MagicLinkPayload";
 import { WithApiConsumerId } from "../core/valueObjects/ApiConsumer";
 
 const algo = "ES256";
@@ -8,6 +10,9 @@ const algo = "ES256";
 type AnyObject = Record<string, unknown>;
 
 export type GenerateMagicLinkJwt = GenerateJwtFn<MagicLinkPayload>;
+export type GenerateEditFormEstablishmentUrl =
+  GenerateJwtFn<EditFormEstablishementPayload>;
+
 export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
 
 // prettier-ignore

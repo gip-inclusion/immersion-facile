@@ -6,6 +6,7 @@ import {
   agenciesRoute,
   contactEstablishmentRoute,
   extractImmersionApplicationsExcelRoute,
+  formAlreadyExistsRoute,
   frontRoutes,
   generateMagicLinkRoute,
   getFeatureFlags,
@@ -13,6 +14,8 @@ import {
   loginPeConnect,
   peConnect,
   renewMagicLinkRoute,
+  requestEmailToUpdateFormRoute as requestEditFormEstablishmentRoute,
+  requestEmailToUpdateFormRoute,
   romeRoute,
   siretRoute,
   validateImmersionApplicationRoute,
@@ -177,6 +180,26 @@ export const createApp = async (
       }),
     ),
   );
+
+  router.route(`/${formAlreadyExistsRoute}/:siret`).get(async (req, res) => {
+    console.log(
+      "in route formAlreadyExistsRoute with siret ",
+      req.params.siret,
+    );
+    return sendHttpResponse(req, res, async () =>
+      deps.repositories.immersionOffer.hasEstablishmentFromFormWithSiret(
+        req.params.siret,
+      ),
+    );
+  });
+
+  router
+    .route(`/${requestEmailToUpdateFormRoute}/:siret`)
+    .get(async (req, res) => {
+      return sendHttpResponse(req, res, async () =>
+        deps.useCases.requestEditFormEstablishment.execute(req.params.siret),
+      );
+    });
 
   router
     .route(`/${getFeatureFlags}`)

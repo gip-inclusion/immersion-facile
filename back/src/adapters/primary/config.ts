@@ -1,7 +1,11 @@
 import { Pool, PoolClient } from "pg";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
-import { GenerateMagicLinkJwt, makeGenerateJwt } from "../../domain/auth/jwt";
+import {
+  GenerateEditFormEstablishmentUrl,
+  GenerateMagicLinkJwt,
+  makeGenerateJwt,
+} from "../../domain/auth/jwt";
 import {
   EventBus,
   makeCreateNewEvent,
@@ -48,6 +52,7 @@ import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../shared/routes";
 import {
   createMagicLinkPayload,
+  EditFormEstablishementPayload,
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
@@ -103,6 +108,7 @@ import { ExportImmersionApplicationsAsExcelArchive } from "../../domain/immersio
 import { StubImmersionApplicationExportQueries } from "../secondary/StubImmersionApplicationExportQueries";
 import { PgImmersionApplicationExportQueries } from "../secondary/pg/PgImmersionApplicationExportQueries";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
+import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
 
 const logger = createLogger(__filename);
 
@@ -166,6 +172,18 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
       pgPool = new Pool({ connectionString: config.pgImmersionDbUrl, max: 20 });
     }
     return pgPool;
+  };
+};
+
+export const makeGenerateEditFormEstablishmentUrl = (
+  config: AppConfig,
+): GenerateEditFormEstablishmentUrl => {
+  const generateJwt = makeGenerateJwt<EditFormEstablishementPayload>(
+    config.jwtPrivateKey,
+  );
+  return (payload: EditFormEstablishementPayload) => {
+    const editJwt = generateJwt(payload);
+    return `${config.immersionFacileBaseUrl}/${frontRoutes.editFormEstablishmentRoute}?jwt=${editJwt}`;
   };
 };
 
@@ -471,6 +489,14 @@ const createUseCases = (
         uuidGenerator,
         clock,
       ),
+    requestEditFormEstablishment: new RequestEditFormEstablishment(
+      uowPerformer,
+      repositories.email,
+      clock,
+      makeGenerateEditFormEstablishmentUrl(config),
+      createNewEvent,
+    ),
+
     // siret
     getSiret,
 

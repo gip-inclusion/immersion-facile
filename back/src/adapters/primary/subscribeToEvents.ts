@@ -56,6 +56,9 @@ const getUseCasesByTopics = (
 
   // Magic link renewal.
   MagicLinkRenewalRequested: [useCases.deliverRenewedMagicLink],
+
+  // Edit establishment form
+  FormEstablishmentEditLinkSent: [],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

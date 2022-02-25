@@ -66,7 +66,7 @@ export class InMemoryImmersionOfferRepository
       await this.getAnnotatedEstablishmentByImmersionOfferId(immersionOfferId);
     if (!establishment) return;
     const contact = this._establishmentAggregates.find(
-      (aggregate) => aggregate.establishment.siret == establishment?.siret,
+      (aggregate) => aggregate.establishment.siret === establishment?.siret,
     )?.contact;
     return contact;
   }
@@ -163,6 +163,24 @@ export class InMemoryImmersionOfferRepository
               },
             }
           : aggregate,
+    );
+  }
+
+  public async getContactEmailFromSiret(
+    siret: string,
+  ): Promise<string | undefined> {
+    return this._establishmentAggregates.find(
+      (aggregate) => aggregate.establishment.siret === siret,
+    )?.contact?.email;
+  }
+
+  public async hasEstablishmentFromFormWithSiret(
+    siret: string,
+  ): Promise<boolean> {
+    return !!this._establishmentAggregates.find(
+      (aggregate) =>
+        aggregate.establishment.siret === siret &&
+        aggregate.establishment.dataSource === "form",
     );
   }
 

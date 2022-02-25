@@ -18,7 +18,7 @@ import { ENV } from "src/environmentVariables";
 export const formEstablishmentGateway: FormEstablishmentGateway =
   ENV.gateway === "HTTP"
     ? new HttpFormEstablishmentGateway()
-    : new InMemoryFormEstablishmentGateway();
+    : new InMemoryFormEstablishmentGateway(["12345678901238"]);
 
 export const immersionApplicationGateway: ImmersionApplicationGateway =
   ENV.gateway === "HTTP"

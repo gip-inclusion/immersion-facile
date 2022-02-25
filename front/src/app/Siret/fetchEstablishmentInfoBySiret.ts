@@ -1,7 +1,10 @@
 import type { AxiosError } from "axios";
 import { useField } from "formik";
-import { useEffect, useState } from "react";
-import { immersionApplicationGateway } from "src/app/dependencies";
+import { useEffect, useRef, useState } from "react";
+import {
+  immersionApplicationGateway,
+  formEstablishmentGateway,
+} from "src/app/dependencies";
 import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { siretSchema } from "../../shared/siret";
@@ -27,6 +30,7 @@ export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
 export const useSiretFetcher = () => {
   const featureFlags = useFeatureFlagsContext();
   const [isFetchingSiret, setIsFetchingSiret] = useState(false);
+  const [siretAlreadyExists, setSiretAlreadyExists] = useState(false);
   const [establishmentInfo, setEstablishmentInfo] = useState<
     GetSiretResponseDto | undefined
   >();
@@ -34,26 +38,37 @@ export const useSiretFetcher = () => {
   const [field, _, { setValue, setError, setTouched }] = useField<string>({
     name: "siret",
   });
+  const validatedSiret = useRef<SiretDto>(field.value);
 
   useEffect(() => {
-    if (featureFlags.enableByPassInseeApi) return;
-    let validatedSiret: SiretDto;
-    try {
-      validatedSiret = siretSchema.parse(field.value);
-    } catch (e: any) {
-      // Not a valid siret, not ready for lookup.
-      return;
-    }
+    (async () => {
+      try {
+        validatedSiret.current = siretSchema.parse(field.value);
+      } catch (e: any) {
+        return;
+      }
+      setIsFetchingSiret(true);
+      setTouched(true);
+      // Does siret already exist in our form repository ?
+      const siretAlreadyExists =
+        await formEstablishmentGateway.getSiretAlreadyExists(
+          validatedSiret.current,
+        );
+      setSiretAlreadyExists(siretAlreadyExists);
+      if (siretAlreadyExists) {
+        setIsFetchingSiret(false);
+        return;
+      }
 
-    setIsFetchingSiret(true);
-    setTouched(true);
-    immersionApplicationGateway
-      .getSiretInfo(validatedSiret)
-      .then((response) => {
-        setValue(validatedSiret);
+      // Does siret exist in Sirene API ?
+      if (featureFlags.enableByPassInseeApi) return;
+
+      try {
+        const response = await immersionApplicationGateway.getSiretInfo(
+          validatedSiret.current,
+        );
         setEstablishmentInfo(response);
-      })
-      .catch((err: AxiosError) => {
+      } catch (err: any) {
         if (err.isAxiosError && err.response && err.response.status === 404) {
           setError(
             "Ce SIRET n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.",
@@ -61,9 +76,15 @@ export const useSiretFetcher = () => {
         } else {
           setError(err.response?.data.errors ?? err.message);
         }
-      })
-      .finally(() => setIsFetchingSiret(false));
+        setIsFetchingSiret(false);
+      }
+    })();
   }, [field.value]);
 
-  return { establishmentInfo, isFetchingSiret };
+  return {
+    establishmentInfo,
+    siretAlreadyExists,
+    isFetchingSiret,
+    siret: validatedSiret.current,
+  };
 };

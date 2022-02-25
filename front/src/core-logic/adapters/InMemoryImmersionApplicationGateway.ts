@@ -66,8 +66,8 @@ const SIMULATED_LATENCY_MS = 2000;
 export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGateway {
   private _immersionApplications: { [id: string]: ImmersionApplicationDto } =
     {};
-  private _establishments: { [siret: string]: GetSiretResponseDto } = {};
   private _agencies: { [id: string]: AgencyInListDto } = {};
+  private _sireneEstablishments: { [siret: string]: GetSiretResponseDto } = {};
 
   public constructor() {
     super();
@@ -89,7 +89,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
 
     TEST_ESTABLISHMENTS.forEach(
       (establishment) =>
-        (this._establishments[establishment.siret] = establishment),
+        (this._sireneEstablishments[establishment.siret] = establishment),
     );
   }
 
@@ -229,7 +229,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     );
     await sleep(SIMULATED_LATENCY_MS);
 
-    const establishment = this._establishments[siret];
+    const establishment = this._sireneEstablishments[siret];
     console.log(
       "InMemoryImmersionApplicationGateway.getSiretInfo returned: ",
       establishment,

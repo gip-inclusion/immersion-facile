@@ -86,6 +86,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/22/message-setup
   CONTACT_IN_PERSON_INSTRUCTIONS: 22,
+
+  // https://my.sendinblue.com/camp/template/25/message-setup
+  EDIT_FORM_ESTABLISHMENT_LINK: 25, // TODO
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -100,6 +103,15 @@ export class SendinblueEmailGateway implements EmailGateway {
       apiKey,
     );
     return new SendinblueEmailGateway(apiInstance);
+  }
+
+  public async sendEditFormEstablishmentLink(
+    recipient: string,
+    params: { editFrontUrl: string },
+  ): Promise<void> {
+    await this.sendTransacEmail("EDIT_FORM_ESTABLISHMENT_LINK", [recipient], {
+      EDIT_FRONT_LINK: params.editFrontUrl,
+    });
   }
 
   public async sendNewEstablismentContactConfirmation(

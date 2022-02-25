@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg";
+import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   PgContactMethod,
   PgImmersionOfferRepository,
@@ -855,6 +856,62 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
+  describe("Pg implementation of method getContactEmailFromSiret", () => {
+    const siret = "12345678901234";
+    it("Returns undefined if no establishment contact with this siret", async () => {
+      // Act
+      const actualContactEmail =
+        await pgImmersionOfferRepository.getContactEmailFromSiret(siret);
+      // Assert
+      expect(actualContactEmail).toBeUndefined();
+    });
+    it("Returns the first contact if exist", async () => {
+      // Prepare
+      await insertEstablishment({
+        siret,
+      });
+      const contactEmail = "antoine@yahoo.fr";
+      await insertImmersionContact({
+        uuid: testUid1,
+        email: contactEmail,
+        siret_establishment: siret,
+      });
+      // Act
+      const actualContactEmail =
+        await pgImmersionOfferRepository.getContactEmailFromSiret(siret);
+      // Assert
+      expect(actualContactEmail).toEqual(contactEmail);
+    });
+  });
+  describe("Pg implementation of method hasEstablishmentFromFormWithSiret", () => {
+    const siret = "12345678901234";
+    it("Returns false if no establishment from form with given siret exists", async () => {
+      // Prepare
+      await insertEstablishment({
+        siret,
+        dataSource: "api_labonneboite",
+      });
+      // Act and assert
+      expect(
+        await pgImmersionOfferRepository.hasEstablishmentFromFormWithSiret(
+          siret,
+        ),
+      ).toBe(false);
+    });
+    it("Returns true if an establishment from form with given siret exists", async () => {
+      // Prepare
+      await insertEstablishment({
+        siret,
+        dataSource: "form",
+      });
+      // Act and assert
+      expect(
+        await pgImmersionOfferRepository.hasEstablishmentFromFormWithSiret(
+          siret,
+        ),
+      ).toBe(true);
+    });
+  });
   type PgEstablishmentRow = {
     siret: string;
     name: string;
@@ -925,17 +982,20 @@ describe("Postgres implementation of immersion offer repository", () => {
   const insertEstablishment = async (props: {
     siret: string;
     updatedAt?: Date;
-    isActive: boolean;
+    isActive?: boolean;
     naf?: string;
     numberEmployeesRange?: number;
     address?: string;
-    position: LatLonDto;
+    position?: LatLonDto;
     dataSource?: DataSource;
   }) => {
+    const defaultPosition = { lon: 12.2, lat: 2.1 };
     const insertQuery = `
     INSERT INTO establishments (
       siret, name, address, number_employees, naf, data_source, update_date, is_active, gps
-    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, ST_GeographyFromText('POINT(${props.position.lon} ${props.position.lat})'))`;
+    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, ST_GeographyFromText('POINT(${
+      props.position?.lon ?? defaultPosition.lon
+    } ${props.position?.lat ?? defaultPosition.lat})'))`;
     await client.query(insertQuery, [
       props.siret,
       props.address ?? "7 rue guillaume tell, 75017 Paris",
@@ -943,7 +1003,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.naf ?? "8622B",
       props.dataSource ?? "api_labonneboite",
       props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
-      props.isActive,
+      props.isActive ?? true,
     ]);
   };
   const insertImmersionOffer = async (props: {
@@ -960,6 +1020,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   const insertImmersionContact = async (props: {
     uuid: string;
     lastName?: string;
+    email?: string;
     siret_establishment: string;
   }) => {
     await client.query(
@@ -967,8 +1028,12 @@ describe("Postgres implementation of immersion offer repository", () => {
     INSERT INTO immersion_contacts (
     uuid, lastname, firstname, role, email, phone, contact_mode
   ) VALUES
-   ($1, $2, '', '', '', '', 'mail');`,
-      [props.uuid, props.lastName ?? "Jacques"],
+   ($1, $2, '', '', $3, '', 'mail');`,
+      [
+        props.uuid,
+        props.lastName ?? "Jacques",
+        props.email ?? "jacques@gmail.com",
+      ],
     );
 
     await client.query(

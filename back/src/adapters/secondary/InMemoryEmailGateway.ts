@@ -29,7 +29,17 @@ export type TemplatedEmail = {
 
 export class InMemoryEmailGateway implements EmailGateway {
   private readonly sentEmails: TemplatedEmail[] = [];
-
+  public async sendEditFormEstablishmentLink(
+    recipient: string,
+    params: { editFrontUrl: string },
+  ) {
+    logger.info({ recipient, params }, "sendEditFormEstablishmentLink");
+    this.sentEmails.push({
+      type: "EDIT_FORM_ESTABLISHMENT_LINK",
+      recipients: [recipient],
+      params,
+    });
+  }
   public async sendNewEstablismentContactConfirmation(
     recipient: string,
     formEstablishmentDto: FormEstablishmentDto,

@@ -7,6 +7,8 @@ export const generateMagicLinkRoute = "generate-magic-link";
 export const renewMagicLinkRoute = "renew-magic-link";
 export const siretRoute = "siret";
 export const romeRoute = "rome";
+export const formAlreadyExistsRoute = "form-already-exists";
+export const requestEmailToUpdateFormRoute = "request-email-to-update-form";
 export const updateApplicationStatusRoute = "update-application-status";
 export const signApplicationRoute = "sign-application";
 export const rejectSigningApplicationRoute = "reject-application";
@@ -23,5 +25,6 @@ export const frontRoutes = {
   immersionApplicationsToValidate: "verification",
   immersionApplicationsToSign: "verifier-et-signer",
   immersionApplicationsRoute: "demande-immersion",
+  editFormEstablishmentRoute: "edition-etablissement",
   magicLinkRenewal: "refraichir-lien",
 };
