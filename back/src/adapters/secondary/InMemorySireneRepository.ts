@@ -85,22 +85,26 @@ export const TEST_ESTABLISHMENT4 = new SireneEstablishmentVO({
 
 type EstablishmentBySiret = { [siret: string]: SireneEstablishmentVO };
 
-export class InMemorySireneRepository implements SireneRepository {
+export class InMemorySireneRepository extends SireneRepository {
+  private _error: any = null;
+
   private readonly _repo: EstablishmentBySiret = {
     [TEST_ESTABLISHMENT1.siret]: TEST_ESTABLISHMENT1,
   };
 
   public constructor() {
+    super();
     this._repo[TEST_ESTABLISHMENT1_SIRET] = TEST_ESTABLISHMENT1;
     this._repo[TEST_ESTABLISHMENT2_SIRET] = TEST_ESTABLISHMENT2;
     this._repo[TEST_ESTABLISHMENT3_SIRET] = TEST_ESTABLISHMENT3;
     this._repo[TEST_ESTABLISHMENT4_SIRET] = TEST_ESTABLISHMENT4;
   }
 
-  public async get(
+  public async _get(
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SireneRepositoryAnswer | undefined> {
+    if (this._error) throw this._error;
     logger.info({ siret, includeClosedEstablishments }, "get");
     const establishment = this._repo[siret];
     if (!establishment) return undefined;
@@ -125,5 +129,9 @@ export class InMemorySireneRepository implements SireneRepository {
   // Visible for testing
   public setEstablishment(establishment: SireneEstablishmentVO) {
     this._repo[establishment.siret] = establishment;
+  }
+
+  public setError(error: any) {
+    this._error = error;
   }
 }

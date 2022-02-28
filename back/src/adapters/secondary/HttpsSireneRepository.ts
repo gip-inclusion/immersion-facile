@@ -17,17 +17,18 @@ import {
 } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
 import { AxiosConfig } from "../primary/appConfig";
-import { UnavailableApiError } from "../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
-export class HttpsSireneRepository implements SireneRepository {
+export class HttpsSireneRepository extends SireneRepository {
   public constructor(
     private readonly axiosConfig: AxiosConfig,
     private readonly clock: Clock,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
-  ) {}
+  ) {
+    super();
+  }
 
   private createAxiosInstance() {
     return createAxiosInstance(logger, {
@@ -40,7 +41,7 @@ export class HttpsSireneRepository implements SireneRepository {
     });
   }
 
-  public async get(
+  public async _get(
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SireneRepositoryAnswer | undefined> {
@@ -64,7 +65,7 @@ export class HttpsSireneRepository implements SireneRepository {
         }
         if (isRetryableError(logger, error)) throw new RetryableError(error);
         logAxiosError(logger, error);
-        throw new UnavailableApiError("Sirene API");
+        throw error;
       }
     });
   }

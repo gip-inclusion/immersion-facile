@@ -1,6 +1,10 @@
+import { UnavailableApiError } from "../../../adapters/primary/helpers/httpErrors";
 import { NafDto } from "../../../shared/naf";
 import { SiretDto } from "../../../shared/siret";
+import { createLogger } from "../../../utils/logger";
 import { TefenCode } from "../../immersionOffer/entities/EstablishmentEntity";
+
+const logger = createLogger(__filename);
 
 export type SireneEstablishmentProps = {
   siret: string;
@@ -94,9 +98,19 @@ export type SireneRepositoryAnswer = {
   etablissements: SireneEstablishmentProps[];
 };
 
-export interface SireneRepository {
-  get: (
+export abstract class SireneRepository {
+  public get(
     siret: SiretDto,
     includeClosedEstablishments?: boolean,
-  ) => Promise<SireneRepositoryAnswer | undefined>;
+  ): Promise<SireneRepositoryAnswer | undefined> {
+    return this._get(siret, includeClosedEstablishments).catch((error) => {
+      logger.error({ siret, error }, "Error fetching siret");
+      throw new UnavailableApiError("Sirene API");
+    });
+  }
+
+  abstract _get(
+    siret: SiretDto,
+    includeClosedEstablishments?: boolean,
+  ): Promise<SireneRepositoryAnswer | undefined>;
 }

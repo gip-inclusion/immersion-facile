@@ -43,9 +43,9 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
         return await cb();
       } catch (error: any) {
         if (!(error instanceof RetryableError)) throw error;
+        logger.warn("Will retry error :", error.cause.message);
 
         // Callback failed with retryable error, wait and retry.
-
         const backoffDurationMs =
           secondsToMilliseconds(backoffDurationS) + this.randomFn(1000);
         const truncatedBackoffDurationMs = Math.min(
@@ -61,10 +61,7 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
         );
 
         if (msSinceStart >= this.retryDeadlineMs) {
-          logger.warn(
-            { msSinceStart, retryDeadlineMs: this.retryDeadlineMs },
-            "Retried sooner than deadline",
-          );
+          logger.warn("Retry deadline exceeded");
           throw error.cause;
         }
 

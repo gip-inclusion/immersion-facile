@@ -2,7 +2,10 @@ import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySi
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  NotFoundError,
+  UnavailableApiError,
+} from "../../../adapters/primary/helpers/httpErrors";
 
 const validEstablishment = new SireneEstablishmentVO({
   siret: "12345678901234",
@@ -59,14 +62,14 @@ describe("GetSiret", () => {
     });
   });
 
-  test("throws NotFoundError wher siret not found", async () => {
+  it("throws NotFoundError where siret not found", async () => {
     await expectPromiseToFailWithError(
       getSiret.execute({ siret: "40440440440400" }),
       new NotFoundError("Did not find siret : 40440440440400"),
     );
   });
 
-  test("returns the parsed info when siret found", async () => {
+  it("returns the parsed info when siret found", async () => {
     repository.setEstablishment(validEstablishment);
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
@@ -80,7 +83,7 @@ describe("GetSiret", () => {
     });
   });
 
-  test("populates businessName from nom/prenom when denomination not available", async () => {
+  it("populates businessName from nom/prenom when denomination not available", async () => {
     repository.setEstablishment(
       new SireneEstablishmentVO({
         ...validEstablishment.props,
@@ -96,7 +99,7 @@ describe("GetSiret", () => {
     expect(response.businessName).toEqual("ALAIN PROST");
   });
 
-  test("skips missing parts of adresseEtablissment", async () => {
+  it("skips missing parts of adresseEtablissment", async () => {
     repository.setEstablishment(
       new SireneEstablishmentVO({
         ...validEstablishment.props,
@@ -115,7 +118,7 @@ describe("GetSiret", () => {
     expect(response.businessAddress).toEqual("L'ESPLANADE 30430 BARJAC");
   });
 
-  test("skips naf when not available", async () => {
+  it("skips naf when not available", async () => {
     repository.setEstablishment(
       new SireneEstablishmentVO({
         ...validEstablishment.props,
@@ -130,5 +133,13 @@ describe("GetSiret", () => {
       siret: validEstablishment.siret,
     });
     expect(response.naf).toBeUndefined();
+  });
+
+  it("returns unavailable Api error if it gets a 429 from API", async () => {
+    repository.setError({ response: { status: 429, data: "some error" } });
+    await expectPromiseToFailWithError(
+      getSiret.execute({ siret: "42942942942900" }),
+      new UnavailableApiError("Sirene API"),
+    );
   });
 });
