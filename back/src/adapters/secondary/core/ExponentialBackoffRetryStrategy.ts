@@ -9,9 +9,12 @@ import {
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import { RandomFn, SleepFn } from "../../../shared/utils";
+import { createLogger } from "../../../utils/logger";
 
 export const defaultMaxBackoffPeriodMs = minutesToMilliseconds(1);
 export const defaultRetryDeadlineMs = minutesToMilliseconds(5);
+
+const logger = createLogger(__filename);
 
 // Simple truncated exponential backoff retry strategy implementation:
 // - the 1st try is done immediately
@@ -52,10 +55,16 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
 
         await this.sleepFn(truncatedBackoffDurationMs);
 
-        if (
-          differenceInMilliseconds(this.clock.now(), startTime) >=
-          this.retryDeadlineMs
-        ) {
+        const msSinceStart = differenceInMilliseconds(
+          this.clock.now(),
+          startTime,
+        );
+
+        if (msSinceStart >= this.retryDeadlineMs) {
+          logger.warn(
+            { msSinceStart, retryDeadlineMs: this.retryDeadlineMs },
+            "Retried sooner than deadline",
+          );
           throw error.cause;
         }
 
