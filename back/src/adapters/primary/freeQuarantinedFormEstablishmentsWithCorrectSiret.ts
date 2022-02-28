@@ -44,7 +44,7 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
   );
 
   const quarantinedFormEstablishmentAddedResult = await client.query(
-    "SELECT id, payload FROM outbox WHERE topic='FormEstablishmentAdded' AND was_quarantined LIMIT 20",
+    "SELECT id, payload FROM outbox WHERE topic='FormEstablishmentAdded' AND was_quarantined LIMIT 300",
   );
   logger.info(
     `Found ${quarantinedFormEstablishmentAddedResult.rowCount} events with topic 'FormEstablishmentAdded' in quarantined.`,
