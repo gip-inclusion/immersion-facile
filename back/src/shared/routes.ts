@@ -17,6 +17,7 @@ export const getImmersionOfferByIdRoute = "get-immersion-by-id";
 export const agenciesRoute = "agencies";
 export const contactEstablishmentRoute = "contact-establishment";
 export const getFeatureFlags = "feature-flags";
+export const immersionApplicationShareRoute = "share-immersion-demand";
 
 export const peConnect = "pe-connect";
 export const loginPeConnect = "login-pe-connect";

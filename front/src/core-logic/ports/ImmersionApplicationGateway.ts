@@ -67,4 +67,10 @@ export abstract class ImmersionApplicationGateway {
       initialArray.map((_, i) => this.add(generateApplication(i, agencies))),
     );
   }
+
+  abstract shareByEmail(
+    email: string,
+    details: string,
+    immersionApplicationLink: string,
+  ): Promise<boolean>;
 }

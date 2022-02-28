@@ -9,12 +9,14 @@ import {
   UpdateImmersionApplicationStatusRequestDto,
   UpdateImmersionApplicationStatusResponseDto,
   signApplicationDtoWithRole,
+  immersionApplicationSchema,
 } from "src/shared/ImmersionApplicationDto";
 import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
 import { AgencyId } from "../../shared/agencies";
+import axios from "axios";
 
 const TEST_AGENCIES: AgencyInListDto[] = [
   {
@@ -240,5 +242,20 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     }
 
     return establishment;
+  }
+
+  public async shareByEmail(
+    email: string,
+    details: string,
+    immersionApplicationLink: string,
+  ): Promise<boolean> {
+    console.log(
+      "InMemoryImmersionApplicationGateway.shareByEmail",
+      email,
+      details,
+      immersionApplicationLink,
+    );
+
+    return true;
   }
 }

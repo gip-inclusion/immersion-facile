@@ -45,6 +45,7 @@ export const sendHttpResponse = async (
 
     const response = await callback();
     res.status(200);
+
     return res.json(response ?? { success: true });
   } catch (error: any) {
     handleResponseError(res, error);

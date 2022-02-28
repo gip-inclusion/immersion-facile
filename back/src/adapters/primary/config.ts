@@ -109,6 +109,7 @@ import { StubImmersionApplicationExportQueries } from "../secondary/StubImmersio
 import { PgImmersionApplicationExportQueries } from "../secondary/pg/PgImmersionApplicationExportQueries";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
+import { ShareApplicationLinkByEmail } from "../../domain/immersionApplication/useCases/ShareApplicationLinkByEmail";
 
 const logger = createLogger(__filename);
 
@@ -570,6 +571,10 @@ const createUseCases = (
         repositories.agency,
         generateMagicLinkFn,
       ),
+
+    shareApplicationByEmail: new ShareApplicationLinkByEmail(
+      repositories.email,
+    ),
   };
 };
 

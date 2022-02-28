@@ -1,16 +1,18 @@
-import React from "react";
-import ShareIcon from "@mui/icons-material/Share";
-import { IconButton, Tooltip } from "@mui/material";
-import {
-  ElementModalContainer,
-  useElementContainerModal,
-} from "./FormModal/ElementModalContainer";
-import {ShareForm} from "../app/ApplicationForm/ShareForm";
+import React, { Children, ReactChild, ReactChildren } from "react";
 
-type FormSectionTitleProps = { children: string };
+type FormSectionTitleProps = {
+  children: any;
+};
 
-export const FormSectionTitle = ({ children }: FormSectionTitleProps) => {
-  const { modalState, dispatch } = useElementContainerModal();
+export const FormSectionTitle = ({
+  children,
+}: FormSectionTitleProps) => {
+  const content = Children.toArray(children).filter(
+    (child) => typeof child === "string",
+  );
+  const actions = Children.toArray(children).filter((child) =>
+    typeof child != "string" && React.isValidElement(child)
+  );
   return (
     <>
       <div className="h-6" />
@@ -19,24 +21,8 @@ export const FormSectionTitle = ({ children }: FormSectionTitleProps) => {
           "sticky top-0 text-immersionBlue-dark font-semibold p-2 mb-1 bg-white border-b text-lg z-10 flex justify-between"
         }
       >
-        <div>{children}</div>
-        <Tooltip title={"Partager le formulaire"}>
-          <IconButton onClick={() => dispatch({ type: "CLICKED_OPEN" })}>
-            <ShareIcon sx={{ color: "#3458a2" }} />
-          </IconButton>
-        </Tooltip>
-
-        <ElementModalContainer
-          modalState={modalState}
-          dispatch={dispatch}
-        >
-          <ShareForm
-            onSuccess={() => {
-              dispatch({ type: "CLICKED_CLOSE" });
-              console.log("ShareForm success");
-            }}
-          />
-        </ElementModalContainer>
+        <div>{content}</div>
+        {actions && <div>{ actions?.map((action) => action )} </div>}
       </div>
     </>
   );

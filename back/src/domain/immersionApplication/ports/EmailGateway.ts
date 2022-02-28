@@ -134,6 +134,12 @@ export type ContactInPersonInstructionsParams = {
   potentialBeneficiaryLastName: string; //< POTENTIAL_BENEFICIARY_LASTNAME
 };
 
+// SHARE_DRAFT_APPLICATION_BY_LINK
+export type ShareDraftApplicationByLinkParams = {
+  additional_details: string; //< ADDITIONAL_DETAILS
+  application_form_url: string; //< APPLICATION_FORM_LINK
+};
+
 export type EmailType =
   | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
   | "NEW_APPLICATION_MENTOR_CONFIRMATION"
@@ -150,7 +156,8 @@ export type EmailType =
   | "CONTACT_BY_EMAIL_REQUEST"
   | "CONTACT_BY_PHONE_INSTRUCTIONS"
   | "CONTACT_IN_PERSON_INSTRUCTIONS"
-  | "EDIT_FORM_ESTABLISHMENT_LINK";
+  | "EDIT_FORM_ESTABLISHMENT_LINK"
+  | "SHARE_DRAFT_APPLICATION_BY_LINK";
 
 export interface EmailGateway {
   sendEditFormEstablishmentLink: (
@@ -216,5 +223,9 @@ export interface EmailGateway {
   sendContactInPersonInstructions: (
     recipient: string,
     params: ContactInPersonInstructionsParams,
+  ) => Promise<void>;
+  sendShareDraftApplicationByLink: (
+    recipient: string,
+    params: ShareDraftApplicationByLinkParams,
   ) => Promise<void>;
 }

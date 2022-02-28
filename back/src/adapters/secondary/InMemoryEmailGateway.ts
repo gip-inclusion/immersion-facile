@@ -15,7 +15,10 @@ import type {
   SignedByOtherPartyNotificationParams,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
-import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
+import {
+  EmailGateway,
+  ShareDraftApplicationByLinkParams,
+} from "../../domain/immersionApplication/ports/EmailGateway";
 import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
 import { createLogger } from "../../utils/logger";
 
@@ -236,6 +239,18 @@ export class InMemoryEmailGateway implements EmailGateway {
     logger.info({ recipient, params }, "sendContactInPersonInstructions");
     this.sentEmails.push({
       type: "CONTACT_IN_PERSON_INSTRUCTIONS",
+      recipients: [recipient],
+      params: params,
+    });
+  }
+
+  public async sendShareDraftApplicationByLink(
+    recipient: string,
+    params: ShareDraftApplicationByLinkParams,
+  ): Promise<void> {
+    logger.info({ recipient, params }, "sendShareDraftApplicationByLinkParams");
+    this.sentEmails.push({
+      type: "SHARE_DRAFT_APPLICATION_BY_LINK",
       recipients: [recipient],
       params: params,
     });

@@ -20,6 +20,7 @@ import {
 import {
   agenciesRoute,
   generateMagicLinkRoute,
+  immersionApplicationShareRoute,
   immersionApplicationsRoute,
   renewMagicLinkRoute,
   signApplicationRoute,
@@ -181,5 +182,22 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
     const response = listAgenciesResponseSchema.parse(httpResponse.data);
     console.log(response);
     return response;
+  }
+
+  public async shareByEmail(
+    email: string,
+    details: string,
+    immersionApplicationLink: string,
+  ): Promise<boolean> {
+    const httpResponse = await axios.post(
+      `/${prefix}/${immersionApplicationShareRoute}`,
+      {
+        email,
+        details,
+        immersionApplicationLink: immersionApplicationLink,
+      },
+    );
+
+    return httpResponse.data;
   }
 }

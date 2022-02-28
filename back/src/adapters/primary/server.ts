@@ -10,6 +10,7 @@ import {
   frontRoutes,
   generateMagicLinkRoute,
   getFeatureFlags,
+  immersionApplicationShareRoute,
   immersionApplicationsRoute,
   loginPeConnect,
   peConnect,
@@ -82,6 +83,12 @@ export const createApp = async (
         deps.authChecker,
       );
     });
+
+  router.route(`/${immersionApplicationShareRoute}`).post(async (req, res) =>
+    sendHttpResponse(req, res, (): Promise<boolean> => {
+      return deps.useCases.shareApplicationByEmail.execute(req.body);
+    }),
+  );
 
   router
     .route(`/${immersionApplicationsRoute}`)

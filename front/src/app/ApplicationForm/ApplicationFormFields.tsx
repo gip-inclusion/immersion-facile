@@ -1,5 +1,5 @@
 import { useField, useFormikContext } from "formik";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { BoolRadioGroup, RadioGroupForField } from "src/app/RadioGroup";
 import {
@@ -23,6 +23,8 @@ import type {
 import { routes, useRoute } from "../routes";
 import type { ApplicationFormKeysInUrl } from "../routes";
 import { ApplicationFormProfession } from "./ApplicationFormProfession";
+import { CopyLink } from "./CopyLink";
+import { ShareLinkByEmail } from "./ShareLinkByEmail";
 
 const FrozenMessage = () => (
   <>
@@ -119,8 +121,11 @@ export const ApplicationFormFields = ({
 
       <input type="hidden" name="peExternalIdentity" />
 
-      <FormSectionTitle>1. Coordonnées du bénéficiaire</FormSectionTitle>
-
+      <FormSectionTitle>
+        1. Coordonnées du bénéficiaire
+        <CopyLink />
+        <ShareLinkByEmail />
+      </FormSectionTitle>
       <TextInput
         label="Email *"
         name="email"
@@ -163,7 +168,11 @@ export const ApplicationFormFields = ({
         defaultAgencyId={values.agencyId}
       />
 
-      <FormSectionTitle>2. Coordonnées de l'entreprise</FormSectionTitle>
+      <FormSectionTitle>
+        2. Coordonnées de l'entreprise
+        <CopyLink />
+        <ShareLinkByEmail />
+      </FormSectionTitle>
 
       <h4>
         Les questions suivantes doivent être complétées avec la personne qui
@@ -217,6 +226,8 @@ export const ApplicationFormFields = ({
 
       <FormSectionTitle>
         3. Conditions d’accueil de l’immersion professionnelle
+        <CopyLink />
+        <ShareLinkByEmail />
       </FormSectionTitle>
 
       <DateInput

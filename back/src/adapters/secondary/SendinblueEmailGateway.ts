@@ -17,7 +17,10 @@ import type {
   SignedByOtherPartyNotificationParams,
   ValidatedApplicationFinalConfirmationParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
-import { EmailGateway } from "../../domain/immersionApplication/ports/EmailGateway";
+import {
+  EmailGateway,
+  ShareDraftApplicationByLinkParams,
+} from "../../domain/immersionApplication/ports/EmailGateway";
 import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
 import { createLogger } from "../../utils/logger";
 
@@ -87,8 +90,11 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/22/message-setup
   CONTACT_IN_PERSON_INSTRUCTIONS: 22,
 
+  // https://my.sendinblue.com/camp/template/24/message-setup
+  SHARE_DRAFT_APPLICATION_BY_LINK: 24,
+
   // https://my.sendinblue.com/camp/template/25/message-setup
-  EDIT_FORM_ESTABLISHMENT_LINK: 25, // TODO
+  EDIT_FORM_ESTABLISHMENT_LINK: 25,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -362,6 +368,20 @@ export class SendinblueEmailGateway implements EmailGateway {
       POTENTIAL_BENEFICIARY_FIRSTNAME: params.potentialBeneficiaryFirstName,
       POTENTIAL_BENEFICIARY_LASTNAME: params.potentialBeneficiaryLastName,
     });
+  }
+
+  public async sendShareDraftApplicationByLink(
+    recipient: string,
+    params: ShareDraftApplicationByLinkParams,
+  ): Promise<void> {
+    await this.sendTransacEmail(
+      "SHARE_DRAFT_APPLICATION_BY_LINK",
+      [recipient],
+      {
+        ADDITIONAL_DETAILS: params.additional_details,
+        APPLICATION_FORM_LINK: params.application_form_url,
+      },
+    );
   }
 
   private async sendTransacEmail(
