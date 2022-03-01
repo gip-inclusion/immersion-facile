@@ -1,5 +1,5 @@
 import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyDto, AgencyId } from "../../shared/agencies";
+import { AgencyInListDto, AgencyId } from "../../shared/agencies";
 import { LatLonDto } from "../../shared/SearchImmersionDto";
 import { createLogger } from "../../utils/logger";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
@@ -105,7 +105,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
 const isAgencyActive = (agency: AgencyConfig) => agency.status === "active";
 
 const sortByNearestFrom =
-  (position: LatLonDto) => (a: AgencyDto, b: AgencyDto) =>
+  (position: LatLonDto) => (a: AgencyInListDto, b: AgencyInListDto) =>
     distanceMetersBetweenCoordinates(
       a.position.lat,
       a.position.lon,

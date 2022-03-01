@@ -2,12 +2,12 @@ import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/dependencies";
-import { AgencyDto, AgencyId } from "src/shared/agencies";
+import { AgencyInListDto, AgencyId } from "src/shared/agencies";
 import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { PostcodeAutocomplete } from "./PostcodeAutocomplete";
 import type { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 
-const placeholderAgency: AgencyDto = {
+const placeholderAgency: AgencyInListDto = {
   id: "",
   name: "Veuillez indiquer un code postal",
   position: { lat: 0, lon: 0 },
@@ -123,7 +123,7 @@ export const AgencySelector = ({
 };
 
 type AgenciesProps = {
-  agencies: AgencyDto[];
+  agencies: AgencyInListDto[];
 };
 
 const Agencies = ({ agencies }: AgenciesProps) => {

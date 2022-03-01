@@ -5,90 +5,33 @@ import { CheckboxGroupProps } from "src/components/form/CheckboxGroup";
 type BoolRadioProps = {
   name: string;
   label: string;
-  hideNoOption: boolean;
   disabled?: boolean;
 };
 
 // Like MyRadioGroup, but backs a boolean value.
-// Has default "oui/non" options.
-export const BoolRadioGroup = ({
-  name,
-  label,
-  hideNoOption,
-  disabled,
-}: BoolRadioProps) => {
+export const BoolRadioGroup = ({ name, label, disabled }: BoolRadioProps) => {
   const [field, meta, { setValue }] = useField<boolean>({ name });
   const error = meta.touched && meta.error;
-  const htmlName = error ? "radio" : "radio-error";
 
   return (
-    <>
-      <div className="fr-form-group">
-        <fieldset
-          className={error ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
-          aria-labelledby={
-            error ? "radio-error-legend radio-error-desc-error" : ""
-          }
-          role="group"
-        >
-          <legend
-            className="fr-fieldset__legend fr-text--regular"
-            id={error ? "radio-error-legend" : "radio-legend"}
-          >
-            {label}
-          </legend>
-          <div className="fr-fieldset__content">
-            <div className="fr-radio-group" key={htmlName + name + "_oui"}>
-              <input
-                {...field}
-                checked={field.value === undefined ? false : field.value}
-                value={field.value?.toString()}
-                type="radio"
-                id={htmlName}
-                disabled={disabled}
-              />
-              <label
-                className="fr-label"
-                htmlFor={htmlName + "oui"}
-                onClick={() => !disabled && setValue(true)}
-              >
-                oui{" "}
-              </label>
-            </div>
-            {!hideNoOption && (
-              <div className="fr-radio-group" key={htmlName + name + "_non"}>
-                <input
-                  {...field}
-                  type="radio"
-                  id={htmlName}
-                  value={field.value?.toString()}
-                  checked={field.value === undefined ? false : !field.value}
-                  disabled={disabled}
-                />
-                <label
-                  className="fr-label"
-                  htmlFor={htmlName + "non"}
-                  onClick={() => !disabled && setValue(false)}
-                >
-                  non
-                </label>
-              </div>
-            )}
-          </div>
-          {error && (
-            <p id="radio-error-desc-error" className="fr-error-text">
-              {error}
-            </p>
-          )}
-        </fieldset>
-      </div>
-    </>
+    <RadioGroup
+      id={name}
+      currentValue={field.value}
+      setCurrentValue={setValue}
+      groupLabel={label}
+      error={error}
+      disabled={disabled}
+      options={[
+        { label: "Oui", value: true },
+        { label: "Non", value: false },
+      ]}
+    />
   );
 };
 
-export const RadioGroup = ({
+export const RadioGroupForField = ({
   name,
-  label: groupLabel,
+  label,
   options,
   disabled,
 }: CheckboxGroupProps) => {
@@ -96,52 +39,98 @@ export const RadioGroup = ({
   const error = meta.touched && meta.error;
 
   return (
-    <>
-      <div className="fr-form-group mt-10">
-        <fieldset
-          className={error ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
-          aria-labelledby={
-            error ? "radio-error-legend radio-error-desc-error" : ""
-          }
-          role="group"
-        >
-          <legend
-            className="fr-fieldset__legend fr-text--regular"
-            id={error ? "radio-error-legend" : "radio-legend"}
-          >
-            {groupLabel}
-          </legend>
-          <div className="fr-fieldset__content">
-            {options.map(({ value, label }) => {
-              const htmlName = error ? "radio" : "radio-error";
-              const strValue = typeof value === "string" ? value : value[0];
-              const currentFieldStrValue =
-                typeof field.value === "string" ? field.value : field.value[0];
-
-              return (
-                <div className="fr-radio-group" key={strValue}>
-                  <input
-                    type="radio"
-                    id={htmlName + strValue}
-                    disabled={disabled}
-                    value={value}
-                    checked={strValue === currentFieldStrValue}
-                    onChange={() => !disabled && setValue(value)}
-                  />
-                  <label className="fr-label" htmlFor={htmlName + strValue}>
-                    {label ?? strValue}
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-          {error && (
-            <p id="radio-error-desc-error" className="fr-error-text">
-              {meta.error}
-            </p>
-          )}
-        </fieldset>
-      </div>
-    </>
+    <RadioGroup
+      id={name}
+      groupLabel={label}
+      options={options}
+      currentValue={field.value}
+      error={error}
+      setCurrentValue={setValue}
+      disabled={disabled}
+    />
   );
+};
+
+type ValueAndLabel<T> = {
+  value: T;
+  label?: string;
+};
+
+type RadioGroupProps<T> = {
+  id: string;
+  currentValue: T;
+  setCurrentValue: (newValue: T) => void;
+  groupLabel: string;
+  options: ValueAndLabel<T>[];
+  error?: false | string;
+  disabled?: boolean;
+};
+
+export const RadioGroup = <T extends string | number | string[] | boolean>({
+  id,
+  currentValue,
+  setCurrentValue,
+  groupLabel,
+  options,
+  error,
+  disabled,
+}: RadioGroupProps<T>) => (
+  <>
+    <div className="fr-form-group mt-10">
+      <fieldset
+        className={error ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
+        aria-labelledby={
+          error ? "radio-error-legend radio-error-desc-error" : ""
+        }
+        role="group"
+      >
+        <legend
+          className="fr-fieldset__legend fr-text--regular"
+          id={error ? "radio-error-legend" : "radio-legend"}
+        >
+          {groupLabel}
+        </legend>
+        <div className="fr-fieldset__content">
+          {options.map(({ value, label }) => {
+            const inputValue = getInputValue(value);
+            const optionId = id + makeOptionId(value);
+
+            return (
+              <div className="fr-radio-group" key={optionId}>
+                <input
+                  id={optionId}
+                  type="radio"
+                  disabled={disabled}
+                  value={inputValue}
+                  checked={value === currentValue}
+                  onChange={() => setCurrentValue(value)}
+                />
+                <label className="fr-label" htmlFor={optionId}>
+                  {label ?? value}
+                </label>
+              </div>
+            );
+          })}
+        </div>
+        {error && (
+          <p id="radio-error-desc-error" className="fr-error-text">
+            {error}
+          </p>
+        )}
+      </fieldset>
+    </div>
+  </>
+);
+
+const makeOptionId = (value: string | boolean | number | string[]): string => {
+  if (value instanceof Array) return value[0].toString();
+  return value.toString();
+};
+
+const getInputValue = (
+  value: string | boolean | number | string[],
+): string | number | string[] => {
+  if (value instanceof Array) return value[0].toString();
+  if (typeof value === "boolean") return value.toString();
+  return value;
 };

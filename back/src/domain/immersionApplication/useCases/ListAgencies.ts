@@ -1,5 +1,5 @@
 import {
-  AgencyDto,
+  AgencyInListDto,
   ListAgenciesRequestDto,
   listAgenciesRequestSchema,
 } from "../../../shared/agencies";
@@ -7,7 +7,10 @@ import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { UseCase } from "../../core/UseCase";
 import { AgencyConfig, AgencyRepository } from "../ports/AgencyRepository";
 
-export class ListAgencies extends UseCase<ListAgenciesRequestDto, AgencyDto[]> {
+export class ListAgencies extends UseCase<
+  ListAgenciesRequestDto,
+  AgencyInListDto[]
+> {
   constructor(readonly agencyRepository: AgencyRepository) {
     super();
   }
@@ -16,7 +19,7 @@ export class ListAgencies extends UseCase<ListAgenciesRequestDto, AgencyDto[]> {
 
   public async _execute({
     position,
-  }: ListAgenciesRequestDto): Promise<AgencyDto[]> {
+  }: ListAgenciesRequestDto): Promise<AgencyInListDto[]> {
     const agencyConfigs = await this.getAgenciesConfig(position);
     return agencyConfigs.map(agencyConfigToAgencyDto);
   }
@@ -27,7 +30,7 @@ export class ListAgencies extends UseCase<ListAgenciesRequestDto, AgencyDto[]> {
   }
 }
 
-const agencyConfigToAgencyDto = (config: AgencyConfig): AgencyDto => ({
+const agencyConfigToAgencyDto = (config: AgencyConfig): AgencyInListDto => ({
   id: config.id,
   name: config.name,
   position: {

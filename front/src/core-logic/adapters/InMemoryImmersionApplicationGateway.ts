@@ -1,6 +1,6 @@
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import { AgencyDto } from "src/shared/agencies";
+import { AgencyInListDto } from "src/shared/agencies";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -16,7 +16,7 @@ import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
 import { AgencyId } from "../../shared/agencies";
 
-const TEST_AGENCIES: AgencyDto[] = [
+const TEST_AGENCIES: AgencyInListDto[] = [
   {
     id: "test-agency-1-front",
     name: "Test Agency 1 (front)",
@@ -67,7 +67,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
   private _immersionApplications: { [id: string]: ImmersionApplicationDto } =
     {};
   private _establishments: { [siret: string]: GetSiretResponseDto } = {};
-  private _agencies: { [id: string]: AgencyDto } = {};
+  private _agencies: { [id: string]: AgencyInListDto } = {};
 
   public constructor() {
     super();
@@ -216,7 +216,7 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     throw new Error("500 Not Implemented In InMemory Gateway");
   }
 
-  public async listAgencies(position: LatLonDto): Promise<AgencyDto[]> {
+  public async listAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
     const agencies = Object.values(this._agencies);
     await sleep(SIMULATED_LATENCY_MS);
     console.log("InMemoryImmersionApplicationGateway.listAgencies: ", agencies);

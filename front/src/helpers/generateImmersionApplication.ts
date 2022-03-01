@@ -1,7 +1,7 @@
 import { addDays, format } from "date-fns";
 import { ENV } from "src/environmentVariables";
 import { frenchFirstNames } from "src/helpers/namesList";
-import { AgencyDto } from "src/shared/agencies";
+import { AgencyInListDto } from "src/shared/agencies";
 import {
   ImmersionApplicationDto,
   IMMERSION_APPLICATION_TEMPLATE,
@@ -10,7 +10,7 @@ import {
 
 export const generateApplication = (
   i: number,
-  agencies: AgencyDto[],
+  agencies: AgencyInListDto[],
 ): ImmersionApplicationDto => {
   const firstName =
     frenchFirstNames[Math.floor(Math.random() * frenchFirstNames.length)];

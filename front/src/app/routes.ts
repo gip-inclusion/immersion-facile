@@ -90,4 +90,5 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   searchDebug: defineRoute("/debug/search"),
   search: defineRoute("/recherche"),
+  addAgency: defineRoute("/ajouter-prescripteur"),
 });

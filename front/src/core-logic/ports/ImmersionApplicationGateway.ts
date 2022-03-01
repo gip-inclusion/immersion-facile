@@ -1,5 +1,5 @@
 import { generateApplication } from "src/helpers/generateImmersionApplication";
-import { AgencyDto, AgencyId } from "src/shared/agencies";
+import { AgencyInListDto, AgencyId } from "src/shared/agencies";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -58,7 +58,7 @@ export abstract class ImmersionApplicationGateway {
     linkFormat: string,
   ): Promise<void>;
 
-  abstract listAgencies(position: LatLonDto): Promise<AgencyDto[]>;
+  abstract listAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
 
   public async debugPopulateDB(count: number): Promise<Array<string>> {
     const initialArray = Array(count).fill(null);

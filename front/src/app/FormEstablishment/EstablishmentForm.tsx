@@ -8,7 +8,7 @@ import {
   FieldsWithLabel,
 } from "src/app/FormEstablishment/fieldsToLabels";
 import { ProfessionList } from "src/app/FormEstablishment/ProfessionList";
-import { RadioGroup } from "src/app/RadioGroup";
+import { RadioGroupForField } from "src/app/RadioGroup";
 import { routes } from "src/app/routes";
 import {
   useSiretFetcher,
@@ -221,7 +221,7 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
                   title={`${fieldsToLabel["professions"]} *`}
                 />
                 <BusinessContactList />
-                <RadioGroup
+                <RadioGroupForField
                   {...getLabelAndName("preferredContactMethods")}
                   options={preferredContactMethodOptions}
                 />

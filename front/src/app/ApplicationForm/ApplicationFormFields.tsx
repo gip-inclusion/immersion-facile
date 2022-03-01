@@ -1,7 +1,7 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect } from "react";
 import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
-import { BoolRadioGroup, RadioGroup } from "src/app/RadioGroup";
+import { BoolRadioGroup, RadioGroupForField } from "src/app/RadioGroup";
 import {
   useSiretFetcher,
   useSiretRelatedField,
@@ -262,14 +262,12 @@ export const ApplicationFormFields = ({
       <BoolRadioGroup
         name="individualProtection"
         label="Un équipement de protection individuelle est-il fourni pour l’immersion ? *"
-        hideNoOption={false}
         disabled={isFrozen}
       />
 
       <BoolRadioGroup
         name="sanitaryPrevention"
         label="Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ? *"
-        hideNoOption={false}
         disabled={isFrozen}
       />
 
@@ -282,7 +280,7 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
       />
 
-      <RadioGroup
+      <RadioGroupForField
         name="immersionObjective"
         label="Objet de la période de mise en situation en milieu professionnel"
         options={[

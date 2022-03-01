@@ -7,8 +7,19 @@ import { zEmail, zString, zTrimmedString } from "./zodUtils";
 export type AgencyId = Flavor<string, "AgencyId">;
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
 
-export type AgencyDto = z.infer<typeof agencySchema>;
-export const agencySchema = z.object({
+export const agencyKindList: NotEmptyArray<AgencyKind> = [
+  "pole-emploi",
+  "mission-locale",
+  "cap-emploi",
+  "conseil-departemental",
+  "prepa-apprentissage",
+  "structure-IAE",
+  "autre",
+];
+const agencyKindSchema = z.enum(agencyKindList);
+
+export type AgencyInListDto = z.infer<typeof agencyInListSchema>;
+export const agencyInListSchema = z.object({
   id: agencyIdSchema,
   name: z.string(),
   position: latLonSchema,
@@ -19,14 +30,14 @@ export const listAgenciesRequestSchema = z.object({
   position: latLonSchema.optional(),
 });
 
-export const listAgenciesResponseSchema = z.array(agencySchema);
+export const listAgenciesResponseSchema = z.array(agencyInListSchema);
 
 export type AgencyKind =
-  | "mission-locale"
   | "pole-emploi"
+  | "mission-locale"
   | "cap-emploi"
-  | "conseil-départemental"
-  | "prépa-apprentissage"
+  | "conseil-departemental"
+  | "prepa-apprentissage"
   | "structure-IAE"
   | "autre";
 
@@ -43,17 +54,6 @@ export type CreateAgencyConfig = {
   signature: string;
 };
 
-const agencyKindList: NotEmptyArray<AgencyKind> = [
-  "mission-locale",
-  "pole-emploi",
-  "cap-emploi",
-  "conseil-départemental",
-  "prépa-apprentissage",
-  "structure-IAE",
-  "autre",
-];
-const agencyKindSchema = z.enum(agencyKindList);
-
 export const agencyConfigSchema: z.ZodSchema<CreateAgencyConfig> = z.object({
   id: agencyIdSchema,
   name: zString,
@@ -61,7 +61,7 @@ export const agencyConfigSchema: z.ZodSchema<CreateAgencyConfig> = z.object({
   address: zString,
   position: latLonSchema,
   counsellorEmails: z.array(zEmail),
-  validatorEmails: z.array(zEmail),
+  validatorEmails: z.array(zEmail).min(1),
   questionnaireUrl: zString,
   signature: zString,
 });

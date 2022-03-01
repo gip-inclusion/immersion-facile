@@ -1,6 +1,9 @@
 import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import { AgencyDto, listAgenciesResponseSchema } from "src/shared/agencies";
+import {
+  AgencyInListDto,
+  listAgenciesResponseSchema,
+} from "src/shared/agencies";
 import {
   AddImmersionApplicationResponseDto,
   addImmersionApplicationResponseDtoSchema,
@@ -171,7 +174,7 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
     );
   }
 
-  public async listAgencies(position: LatLonDto): Promise<AgencyDto[]> {
+  public async listAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
     const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
       params: position,
     });

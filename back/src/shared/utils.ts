@@ -1,3 +1,4 @@
+import { complement, equals, not, pipe } from "ramda";
 import { z } from "zod";
 
 // TODO: find the standard for gouv.fr phone verification
@@ -17,7 +18,7 @@ export const random = (max: number): number => {
   return Math.floor(Math.random() * max);
 };
 
-// Matches strings that contain at least one 5-digit number.
+// Matches string that contain at least one 5-digit number.
 const postalCodeRegex = /(^|\s|,)\d{5}(\s|$|,)/;
 export const addressWithPostalCodeSchema = z
   .string()
@@ -65,3 +66,5 @@ export const replaceArrayElement = <T extends any>(
     ...original.slice(replaceAt + 1),
   ];
 };
+
+export const notEqual = <V>(v: V) => complement(equals(v));

@@ -1,4 +1,5 @@
 import React from "react";
+import { AddAgencyForm } from "src/app/AddAgency/AddAgencyForm";
 import { Admin } from "src/app/admin/Admin";
 import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { LandingEstablishment } from "src/app/LandingEstablishment/LandingEstablishment";
@@ -59,6 +60,7 @@ export const Router = () => {
       {dev && route.name === "debugPopulateDB" && <PopulateDB route={route} />}
       {dev && route.name === "searchDebug" && <SearchDebug />}
       {route.name === "search" && <Search />}
+      {route.name === "addAgency" && <AddAgencyForm />}
       {route.name === false && <NotAvailable />}
     </>
   );
