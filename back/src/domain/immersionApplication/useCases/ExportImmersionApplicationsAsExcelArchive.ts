@@ -1,5 +1,5 @@
 import { Column } from "exceljs";
-import { groupBy, map, prop } from "ramda";
+import { groupBy, map, prop, reduceBy, uniq } from "ramda";
 import { z } from "zod";
 import { pipeWithValue } from "../../../shared/pipeWithValue";
 import { temporaryStoragePath } from "../../../utils/filesystemUtils";
@@ -8,6 +8,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { Archive } from "../../generic/archive/port/Archive";
 import { Workbook } from "../../generic/excel/port/Workbook";
 import { ImmersionApplicationReadyForExportVO } from "../valueObjects/ImmersionApplicationReadyForExportVO";
+import { EstablishmentRawProps } from "../../establishment/valueObjects/EstablishmentRawBeforeExportVO";
 
 export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseCase<string> {
   inputSchema = z.string();
@@ -24,7 +25,7 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
       this.immersionApplicationExportColumnsOptions();
 
     const immersionApplicationExportByAgency = pipeWithValue(
-      await uow.immersionApplicationExportRepo.getAllApplicationsForExport(),
+      await uow.immersionApplicationExportQueries.getAllApplicationsForExport(),
       map((i) => i.toImmersionApplicationReadyForExportVO()),
       groupBy(prop("agencyName")),
     );

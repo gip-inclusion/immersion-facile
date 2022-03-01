@@ -28,6 +28,19 @@ export class ContactEntityV2Builder implements Builder<ContactEntityV2> {
   withEmail(email: string) {
     return new ContactEntityV2Builder({ ...this.entity, email });
   }
+
+  withFirstname(firstName: string) {
+    return new ContactEntityV2Builder({ ...this.entity, firstName });
+  }
+
+  withLastname(lastName: string) {
+    return new ContactEntityV2Builder({ ...this.entity, lastName });
+  }
+
+  withPhone(phone: string) {
+    return new ContactEntityV2Builder({ ...this.entity, phone });
+  }
+
   build() {
     return this.entity;
   }

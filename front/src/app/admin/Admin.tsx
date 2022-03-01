@@ -58,10 +58,38 @@ export const Admin = ({ route }: AdminProps) => {
             </div>
             <a
               className="fr-link"
-              href="/api/extract-demande-immersion-excel"
+              href="/api/export-demande-immersions-excel"
               target="_blank"
             >
               Exporter les demandes d'immersion par agences
+            </a>
+            <a
+              className="fr-link"
+              href="/api/export-establishments?groupBy=region&aggregateProfession=true"
+              target="_blank"
+            >
+              Exporter les entreprises référencées par région avec aggrégation des métiers
+            </a>
+            <a
+              className="fr-link"
+              href="/api/export-establishments?groupBy=department&aggregateProfession=true"
+              target="_blank"
+            >
+              Exporter les entreprises référencées par département avec aggrégation des métiers
+            </a>
+            <a
+              className="fr-link"
+              href="/api/export-establishments?groupBy=region&aggregateProfession=false"
+              target="_blank"
+            >
+              Exporter les entreprises référencées par région sans aggrégation des métiers
+            </a>
+            <a
+              className="fr-link"
+              href="/api/export-establishments?groupBy=department&aggregateProfession=false"
+              target="_blank"
+            >
+              Exporter les entreprises référencées par département sans aggrégation des métiers
             </a>
           </div>
 

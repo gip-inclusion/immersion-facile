@@ -9,10 +9,10 @@ import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationRawBeforeExportVO } from "../../domain/immersionApplication/valueObjects/ImmersionApplicationRawBeforeExportVO";
 
-describe("Pg implementation of ImmersionApplicationExportRepository", () => {
+describe("Pg implementation of ImmersionApplicationExportQueries", () => {
   let pool: Pool;
   let client: PoolClient;
-  let exportRepo: PgImmersionApplicationExportQueries;
+  let exportQueries: PgImmersionApplicationExportQueries;
   let agencyRepo: PgAgencyRepository;
   let immersionApplicationRepo: PgImmersionApplicationRepository;
 
@@ -24,7 +24,7 @@ describe("Pg implementation of ImmersionApplicationExportRepository", () => {
   beforeEach(async () => {
     await client.query("TRUNCATE immersion_applications CASCADE; ");
     await client.query("TRUNCATE agencies CASCADE; ");
-    exportRepo = new PgImmersionApplicationExportQueries(client);
+    exportQueries = new PgImmersionApplicationExportQueries(client);
     agencyRepo = new PgAgencyRepository(client);
     immersionApplicationRepo = new PgImmersionApplicationRepository(client);
   });
@@ -62,7 +62,7 @@ describe("Pg implementation of ImmersionApplicationExportRepository", () => {
 
       // Act
       const actualExport: ImmersionApplicationRawBeforeExportVO[] =
-        await exportRepo.getAllApplicationsForExport();
+        await exportQueries.getAllApplicationsForExport();
 
       const {
         agencyId,

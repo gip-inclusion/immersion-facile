@@ -1,4 +1,5 @@
-import { addressWithPostalCodeSchema, uniqBy } from "../../shared/utils";
+import { uniqBy } from "../../shared/utils";
+import { addressWithPostalCodeSchema } from "../../shared/postalCode";
 
 describe("utils", () => {
   describe("addressWithPostalCodeSchema", () => {

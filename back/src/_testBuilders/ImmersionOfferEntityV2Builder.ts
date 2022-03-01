@@ -15,15 +15,25 @@ export class ImmersionOfferEntityV2Builder
   constructor(
     private readonly entity: ImmersionOfferEntityV2 = validImmersionOfferEntityV2,
   ) {}
+
   withId(id: ImmersionOfferId) {
     return new ImmersionOfferEntityV2Builder({ ...this.entity, id });
   }
+
   withRome(rome: RomeCodeMetierDto) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
       romeCode: rome,
     });
   }
+
+  withRomeAppellation(romeAppellation: number) {
+    return new ImmersionOfferEntityV2Builder({
+      ...this.entity,
+      romeAppellation: romeAppellation,
+    });
+  }
+
   build() {
     return this.entity;
   }

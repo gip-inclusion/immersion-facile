@@ -306,7 +306,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Prepare
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
       const storedEstablishment = new EstablishmentEntityV2Builder()
-        .withNafCode("8520A")
+        .withNafDto({ code: "8520A", nomenclature: "" })
         .withDataSource("form")
         .build();
 

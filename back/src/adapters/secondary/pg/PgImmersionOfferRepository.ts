@@ -199,6 +199,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         ) VALUES %L`,
         deduplicatedArrayOfImmersionOffers,
       );
+
       await this.client.query(query);
     } catch (e: any) {
       logger.error(e, "Error inserting immersion offers");
