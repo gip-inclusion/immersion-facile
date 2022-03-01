@@ -7,6 +7,7 @@ import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffe
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentBuilder";
+import { pathEq } from "../../../shared/path";
 
 const prepareUseCase = () => {
   const sireneRepo = new InMemorySireneRepository();
@@ -38,7 +39,7 @@ const findEstablishmentEntityGivenSiret = (
   siret: string,
 ): EstablishmentEntityV2 | undefined =>
   immersionRepo.establishmentAggregates.find(
-    (aggregate) => aggregate.establishment.siret === siret,
+    pathEq("establishment.siret", siret),
   )?.establishment;
 
 describe("Update establishments from Sirene API", () => {
