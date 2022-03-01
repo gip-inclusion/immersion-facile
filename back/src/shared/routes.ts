@@ -1,6 +1,7 @@
 export const immersionApplicationsRoute = "demandes-immersion";
-export const extractImmersionApplicationsExcelRoute =
-  "extract-demande-immersion-excel";
+export const exportImmersionApplicationsExcelRoute =
+  "export-demande-immersions-excel";
+export const exportEstablismentsExcelRoute = "export-establishments";
 export const immersionOffersApiAuthRoute = "immersion-offers";
 export const immersionOffersFromFrontRoute = "immersion-offers-from-front";
 export const validateImmersionApplicationRoute = "validate-demande";

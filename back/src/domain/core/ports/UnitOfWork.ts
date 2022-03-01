@@ -5,6 +5,8 @@ import { GetFeatureFlags } from "./GetFeatureFlags";
 import { OutboxRepository } from "./OutboxRepository";
 import { ImmersionApplicationRepository } from "../../immersionApplication/ports/ImmersionApplicationRepository";
 import { ImmersionApplicationExportQueries } from "../../immersionApplication/ports/ImmersionApplicationExportQueries";
+import { EstablishmentExportQueries } from "../../establishment/ports/EstablishmentExportQueries";
+import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
 
 export type UnitOfWork = {
   outboxRepo: OutboxRepository;
@@ -12,7 +14,9 @@ export type UnitOfWork = {
   formEstablishmentRepo: FormEstablishmentRepository;
   immersionOfferRepo: ImmersionOfferRepository;
   immersionApplicationRepo: ImmersionApplicationRepository;
-  immersionApplicationExportRepo: ImmersionApplicationExportQueries;
+  establishmentExportQueries: EstablishmentExportQueries;
+  immersionApplicationExportQueries: ImmersionApplicationExportQueries;
+  postalCodeDepartmentRegionQueries: PostalCodeDepartmentRegionQueries;
   getFeatureFlags: GetFeatureFlags;
 };
 

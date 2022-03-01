@@ -14,13 +14,13 @@ import { createLogger } from "../../utils/logger";
 import {
   codeDepartmentToDepartmentName,
   codeRegionToRegionName,
-  GeoAPI,
+  GeoApi,
   RegionAndDepartment,
-} from "../../domain/generic/geo/ports/GeoAPI";
+} from "../../domain/generic/geo/ports/GeoApi";
 
 const logger = createLogger(__filename);
 
-export class HttpGeoAPI implements GeoAPI {
+export class HttpGeoAPI implements GeoApi {
   public constructor(
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,

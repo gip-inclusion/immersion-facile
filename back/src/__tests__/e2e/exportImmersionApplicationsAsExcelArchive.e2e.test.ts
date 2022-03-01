@@ -1,14 +1,14 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { extractImmersionApplicationsExcelRoute } from "../../shared/routes";
+import { exportImmersionApplicationsExcelRoute } from "../../shared/routes";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import * as fse from "fs-extra";
 import { temporaryStoragePath } from "../../utils/filesystemUtils";
 
-describe("/extract-demande-immersion-excel", () => {
+describe("/export-demande-immersions-excel", () => {
   it("fails with 401 without authentication", async () => {
     const { request } = await buildTestApp();
-    await request.get(`/${extractImmersionApplicationsExcelRoute}`).expect(401);
+    await request.get(`/${exportImmersionApplicationsExcelRoute}`).expect(401);
   });
 
   it("works when authenticated", async () => {
@@ -25,7 +25,7 @@ describe("/extract-demande-immersion-excel", () => {
     });
 
     const result = await request
-      .get(`/${extractImmersionApplicationsExcelRoute}`)
+      .get(`/${exportImmersionApplicationsExcelRoute}`)
       .auth("e2e_tests", "e2e");
 
     expect(result.status).toBe(200);

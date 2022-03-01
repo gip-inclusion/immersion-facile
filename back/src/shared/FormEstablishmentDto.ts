@@ -3,12 +3,9 @@ import { NafDto, nafSchema } from "./naf";
 import { ProfessionDto, professionSchema } from "./rome";
 import { SiretDto, siretSchema } from "./siret";
 import { Flavor } from "./typeFlavors";
-import {
-  addressWithPostalCodeSchema,
-  NotEmptyArray,
-  phoneRegExp,
-} from "./utils";
+import { NotEmptyArray, phoneRegExp } from "./utils";
 import { zBoolean, zEmail, zString, zTrimmedString } from "./zodUtils";
+import { addressWithPostalCodeSchema } from "./postalCode";
 
 // prettier-ignore
 export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;

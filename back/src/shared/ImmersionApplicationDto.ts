@@ -17,13 +17,9 @@ import {
 import { SiretDto, siretSchema } from "./siret";
 import { allRoles, Role } from "./tokens/MagicLinkPayload";
 import { Flavor } from "./typeFlavors";
-import {
-  addressWithPostalCodeSchema,
-  NotEmptyArray,
-  phoneRegExp,
-  stringOfNumbers,
-} from "./utils";
+import { NotEmptyArray, phoneRegExp, stringOfNumbers } from "./utils";
 import { zBoolean, zEmail, zString, zTrimmedString } from "./zodUtils";
+import { addressWithPostalCodeSchema } from "./postalCode";
 
 // Matches valid dates of the format 'yyyy-mm-dd'.
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;

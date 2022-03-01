@@ -3,7 +3,7 @@ export type RegionAndDepartment = {
   department: string;
 };
 
-export interface GeoAPI {
+export interface GeoApi {
   getRegionAndDepartmentFromCodePostal: (
     codePostal: string[5],
   ) => Promise<RegionAndDepartment | undefined>;

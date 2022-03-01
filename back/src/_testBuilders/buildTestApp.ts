@@ -21,6 +21,8 @@ import { AppConfigBuilder } from "./AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationExportQueries } from "../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
 import { GenerateApiConsumerJtw } from "../domain/auth/jwt";
+import { EstablishmentExportQueries } from "../domain/establishment/ports/EstablishmentExportQueries";
+import { PostalCodeDepartmentRegionQueries } from "../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 
 export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
@@ -28,13 +30,15 @@ export type InMemoryRepositories = {
   agency: InMemoryAgencyRepository;
   formEstablishment: InMemoryFormEstablishmentRepository;
   immersionApplication: InMemoryImmersionApplicationRepository;
-  immersionApplicationExport: ImmersionApplicationExportQueries;
   searchesMade: InMemorySearchMadeRepository;
   rome: InMemoryRomeGateway;
   email: InMemoryEmailGateway;
   sirene: InMemorySireneRepository;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;
+  immersionApplicationExport: ImmersionApplicationExportQueries;
+  establishmentExport: EstablishmentExportQueries;
+  postalCodeDepartmentRegion: PostalCodeDepartmentRegionQueries;
   getApiConsumerById: GetApiConsumerById;
   getFeatureFlags: GetFeatureFlags;
 };

@@ -5,14 +5,14 @@ import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import {
   agenciesRoute,
   contactEstablishmentRoute,
-  extractImmersionApplicationsExcelRoute,
+  exportEstablismentsExcelRoute,
+  exportImmersionApplicationsExcelRoute,
   formAlreadyExistsRoute,
   frontRoutes,
   generateMagicLinkRoute,
   getFeatureFlags,
   immersionApplicationShareRoute,
   immersionApplicationsRoute,
-  immersionOffersApiAuthRoute,
   immersionOffersFromFrontRoute,
   loginPeConnect,
   peConnect,
@@ -40,6 +40,7 @@ import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
+import { capitalize } from "../../shared/utils/string";
 
 const logger = createLogger(__filename);
 
@@ -71,7 +72,7 @@ export const createApp = async (
   const deps = await createAppDependencies(config);
 
   router
-    .route(`/${extractImmersionApplicationsExcelRoute}`)
+    .route(`/${exportImmersionApplicationsExcelRoute}`)
     .get(async (req, res) => {
       sendZipResponse(
         req,
@@ -86,6 +87,32 @@ export const createApp = async (
         deps.authChecker,
       );
     });
+
+  router.route(`/${exportEstablismentsExcelRoute}`).get(async (req, res) => {
+    sendZipResponse(
+      req,
+      res,
+      async () => {
+        const groupBy =
+          req.query.groupBy === "region" ? "region" : "department";
+        const aggregateProfession = req.query.aggregateProfession === "true";
+        const archivePath = temporaryStoragePath(
+          `exportEstablishmentsBy${capitalize(groupBy)}${
+            aggregateProfession ? "AggregatedProfessions" : ""
+          }.zip`,
+        );
+
+        await deps.useCases.exportEstablishmentsAsExcelArchive.execute({
+          archivePath,
+          groupBy,
+          aggregateProfession,
+        });
+
+        return archivePath;
+      },
+      deps.authChecker,
+    );
+  });
 
   router
     .route(`/${immersionApplicationShareRoute}`)

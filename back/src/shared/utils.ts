@@ -17,12 +17,6 @@ export const random = (max: number): number => {
   return Math.floor(Math.random() * max);
 };
 
-// Matches string that contain at least one 5-digit number.
-const postalCodeRegex = /(^|\s|,)\d{5}(\s|$|,)/;
-export const addressWithPostalCodeSchema = z
-  .string()
-  .regex(postalCodeRegex, "Veuillez spécifier un code postal dans l'adresse.");
-
 export const removeAtIndex = <T>(array: T[], indexToRemove: number): T[] => [
   ...array.slice(0, indexToRemove),
   ...array.slice(indexToRemove + 1),

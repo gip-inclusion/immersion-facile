@@ -111,6 +111,14 @@ import { PgImmersionApplicationExportQueries } from "../secondary/pg/PgImmersion
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
 import { ShareApplicationLinkByEmail } from "../../domain/immersionApplication/useCases/ShareApplicationLinkByEmail";
+import { StubEstablishmentExportQueries } from "../secondary/StubEstablishmentExportQueries";
+import { PgEstablishmentExportQueries } from "../secondary/pg/PgEstablishmentExportQueries";
+import { ImmersionApplicationExportQueries } from "../../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
+import { EstablishmentExportQueries } from "../../domain/establishment/ports/EstablishmentExportQueries";
+import { PgPostalCodeDepartmentRegionQueries } from "../secondary/pg/PgPostalCodeDepartmentRegionQueries";
+import { PostalCodeDepartmentRegionQueries } from "../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
+import { StubPostalCodeDepartmentRegionQueries } from "../secondary/StubPostalCodeDepartmentRegionQueries";
+import { ExportEstablishmentAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentAsExcelArchive";
 
 const logger = createLogger(__filename);
 
@@ -217,6 +225,11 @@ export const createRepositories = async (
         ? new PgImmersionApplicationExportQueries(await getPgPoolFn().connect())
         : StubImmersionApplicationExportQueries,
 
+    establishmentExport:
+      config.repositories === "PG"
+        ? new PgEstablishmentExportQueries(await getPgPoolFn().connect())
+        : StubEstablishmentExportQueries,
+
     formEstablishment:
       config.repositories === "PG"
         ? new PgFormEstablishmentRepository(await getPgPoolFn().connect())
@@ -285,6 +298,12 @@ export const createRepositories = async (
             noRetries,
           )
         : new InMemoryLaBonneBoiteAPI(),
+
+    postalCodeDepartmentRegion:
+      config.repositories === "PG"
+        ? new PgPostalCodeDepartmentRegionQueries(await getPgPoolFn().connect())
+        : StubPostalCodeDepartmentRegionQueries,
+
     getApiConsumerById:
       config.repositories === "PG"
         ? makePgGetApiConsumerById(await getPgPoolFn().connect())
@@ -322,9 +341,15 @@ export const createInMemoryUow = (repositories?: Repositories) => ({
   immersionApplicationRepo:
     (repositories?.immersionApplication as InMemoryImmersionApplicationRepository) ??
     new InMemoryImmersionApplicationRepository(),
-  immersionApplicationExportRepo:
-    repositories?.immersionApplicationExport ??
+  establishmentExportQueries:
+    (repositories?.establishmentExport as EstablishmentExportQueries) ??
+    StubEstablishmentExportQueries,
+  immersionApplicationExportQueries:
+    (repositories?.immersionApplicationExport as ImmersionApplicationExportQueries) ??
     StubImmersionApplicationExportQueries,
+  postalCodeDepartmentRegionQueries:
+    (repositories?.postalCodeDepartmentRegion as PostalCodeDepartmentRegionQueries) ??
+    StubPostalCodeDepartmentRegionQueries,
   getFeatureFlags: makeStubGetFeatureFlags(),
   agencyRepo:
     (repositories?.agency as InMemoryAgencyRepository) ??
@@ -340,7 +365,11 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
   immersionOfferRepo: new PgImmersionOfferRepository(client),
   immersionApplicationRepo: new PgImmersionApplicationRepository(client),
-  immersionApplicationExportRepo: new PgImmersionApplicationExportQueries(
+  establishmentExportQueries: new PgEstablishmentExportQueries(client),
+  immersionApplicationExportQueries: new PgImmersionApplicationExportQueries(
+    client,
+  ),
+  postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
     client,
   ),
   getFeatureFlags: makePgGetFeatureFlags(client),
@@ -424,6 +453,11 @@ const createUseCases = (
     ),
     exportImmersionApplicationsAsExcelArchive:
       new ExportImmersionApplicationsAsExcelArchive(uowPerformer),
+
+    exportEstablishmentsAsExcelArchive: new ExportEstablishmentAsExcelArchive(
+      uowPerformer,
+    ),
+
     updateImmersionApplication: new UpdateImmersionApplication(
       uowPerformer,
       createNewEvent,

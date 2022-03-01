@@ -27,11 +27,17 @@ export class EstablishmentEntityV2Builder
   constructor(
     private readonly entity: EstablishmentEntityV2 = validEstablishmentEntityV2,
   ) {}
+
   withSiret(siret: string) {
     return new EstablishmentEntityV2Builder({ ...this.entity, siret });
   }
+
   withAddress(address: string) {
     return new EstablishmentEntityV2Builder({ ...this.entity, address });
+  }
+
+  withName(name: string) {
+    return new EstablishmentEntityV2Builder({ ...this.entity, name });
   }
 
   withDataSource(dataSource: DataSource) {
@@ -41,27 +47,32 @@ export class EstablishmentEntityV2Builder
       voluntaryToImmersion: dataSource == "form",
     });
   }
+
   withNafDto(nafDto: NafDto) {
     return new EstablishmentEntityV2Builder({ ...this.entity, nafDto });
   }
-  withNafCode(code: string) {
-    return new EstablishmentEntityV2Builder({
-      ...this.entity,
-      nafDto: { code, nomenclature: this.entity.nafDto.nomenclature },
-    });
-  }
+
   withNumberOfEmployeeRange(tefenCode: TefenCode) {
     return new EstablishmentEntityV2Builder({
       ...this.entity,
       numberEmployeesRange: tefenCode,
     });
   }
+
+  withIsCommited(isCommited: boolean) {
+    return new EstablishmentEntityV2Builder({
+      ...this.entity,
+      isCommited: isCommited,
+    });
+  }
+
   notActive() {
     return new EstablishmentEntityV2Builder({
       ...this.entity,
       isActive: false,
     });
   }
+
   withUpdatedAt(updatedAt: Date) {
     return new EstablishmentEntityV2Builder({ ...this.entity, updatedAt });
   }
