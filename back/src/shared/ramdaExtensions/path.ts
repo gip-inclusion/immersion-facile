@@ -32,6 +32,18 @@ export function pathEq<Path extends string, Obj>(strPath: Path, value: GetFieldT
 export function pathEq<Path extends string, Obj>(strPath: Path, value: GetFieldType<Obj, Path>, obj?: Obj): any {
   const f = (obj: Obj) => value === path(strPath, obj);
 
-  if (!obj) return f;
+  if(typeof obj === "undefined") return f
+  return f(obj)
+}
+
+// prettier-ignore
+export function pathNotEq<Path extends string, Obj>(strPath: Path, value: GetFieldType<Obj, Path>, obj: Obj): boolean
+// prettier-ignore
+export function pathNotEq<Path extends string, Obj>(strPath: Path, value: GetFieldType<Obj, Path>): (obj: Obj) => boolean
+// prettier-ignore
+export function pathNotEq<Path extends string, Obj>(strPath: Path, value: GetFieldType<Obj, Path>, obj?: Obj): any {
+  const f = (obj: Obj) => value !== path(strPath, obj);
+
+  if(typeof obj === "undefined") return f
   return f(obj)
 }

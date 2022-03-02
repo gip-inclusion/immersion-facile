@@ -1,4 +1,3 @@
-import { complement, equals, not, pipe } from "ramda";
 import { z } from "zod";
 
 // TODO: find the standard for gouv.fr phone verification
@@ -66,5 +65,3 @@ export const replaceArrayElement = <T extends any>(
     ...original.slice(replaceAt + 1),
   ];
 };
-
-export const notEqual = <V>(v: V) => complement(equals(v));

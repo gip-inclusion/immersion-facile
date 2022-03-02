@@ -3,7 +3,8 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "src/components/Button";
 import { ImmersionTextField } from "src/components/form/ImmersionTextField";
-import { notEqual, OmitFromExistingKeys } from "src/shared/utils";
+import { notEqual } from "src/shared/ramdaExtensions/notEqual";
+import { OmitFromExistingKeys } from "src/shared/utils";
 import { z } from "zod";
 
 export const FillableList = (
