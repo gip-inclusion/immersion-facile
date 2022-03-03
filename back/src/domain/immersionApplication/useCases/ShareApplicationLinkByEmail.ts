@@ -1,15 +1,12 @@
 import { UseCase } from "../../core/UseCase";
 import { EmailGateway } from "../ports/EmailGateway";
-import { shareLinkByEmailSchema } from "../../../shared/ShareLinkByEmailDTO";
-
-type ShareApplicationByEmailParams = {
-  immersionApplicationLink: string;
-  email: string;
-  details?: string;
-};
+import {
+  ShareLinkByEmailDTO,
+  shareLinkByEmailSchema,
+} from "../../../shared/ShareLinkByEmailDTO";
 
 export class ShareApplicationLinkByEmail extends UseCase<
-  ShareApplicationByEmailParams,
+  ShareLinkByEmailDTO,
   boolean
 > {
   constructor(private readonly emailGateway: EmailGateway) {
@@ -17,12 +14,10 @@ export class ShareApplicationLinkByEmail extends UseCase<
   }
   inputSchema = shareLinkByEmailSchema;
 
-  public async _execute(
-    params: ShareApplicationByEmailParams,
-  ): Promise<boolean> {
+  public async _execute(params: ShareLinkByEmailDTO): Promise<boolean> {
     try {
       await this.emailGateway.sendShareDraftApplicationByLink(params.email, {
-        additional_details: toFormattedDetails(params.immersionApplicationLink),
+        additional_details: toFormattedDetails(params?.details),
         application_form_url: params.immersionApplicationLink,
       });
 
@@ -34,5 +29,5 @@ export class ShareApplicationLinkByEmail extends UseCase<
 }
 
 const toFormattedDetails = (details: string | undefined): string => {
-  return details ? `Détails additionels : ${details}` : "";
+  return details ? `Détails additionnels : ${details}` : "";
 };

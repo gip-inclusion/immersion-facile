@@ -43,13 +43,13 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
         <Form>
           <input type="hidden" name="immersionApplicationLink" />
           <TextInput
-            label="A quel email voulez-vous partager ?"
+            label="Adresse mail à qui partager la demande"
             name="email"
             type="email"
             placeholder="nom@exemple.com"
           />
           <TextInput
-            label="Message à rajouter au corps du mail"
+            label="Votre message (pour expliquer ce qui reste à compléter)"
             name="details"
             multiline={true}
           />

@@ -14,7 +14,7 @@ const iconColor = "#3458a2";
 export const ShareLinkByEmail = () => {
   const { modalState, dispatch } = useElementContainerModal();
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
-  const shareLinkByEmail = "Partager le formulaire pré-remplit par email";
+  const shareLinkByEmail = "Partagez cette demande de convention par e-mail";
   return (
     <>
       <Tooltip title={shareLinkByEmail}>
@@ -49,7 +49,7 @@ export const ShareLinkByEmail = () => {
             sx={{ width: "100%" }}
           >
             {emailSent
-              ? "Le lien du formulaire à bien été envoyé par email."
+              ? "Cette demande de convention a bien été partagée par mail."
               : "Erreur lors de l'envoi de l'email"}
           </Alert>
         </Snackbar>
