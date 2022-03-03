@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import { TextInput } from "../../components/form/TextInput";
 import { immersionApplicationGateway } from "../dependencies";
 import { toFormikValidationSchema } from "../../components/form/zodValidate";
-import { z } from "zod";
+import { shareLinkByEmailSchema } from "../../shared/ShareLinkByEmailDTO";
 
 type ShareFormProps = {
   onSuccess: () => void;
@@ -19,11 +19,11 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
     email: string;
     details: string;
   }) => {
-    const result = await immersionApplicationGateway.shareByEmail(
+    const result = await immersionApplicationGateway.shareLinkByEmail({
       email,
       details,
-      window.location.href,
-    );
+      immersionApplicationLink: window.location.href,
+    });
     result ? onSuccess() : onError();
   };
 
@@ -34,17 +34,14 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
       initialValues={{
         email: field.value,
         details: "",
+        immersionApplicationLink: window.location.href,
       }}
-      validationSchema={toFormikValidationSchema(
-        z.object({
-          email: z.string().email(),
-          details: z.string().optional(),
-        }),
-      )}
+      validationSchema={toFormikValidationSchema(shareLinkByEmailSchema)}
       onSubmit={submit}
     >
       {() => (
         <Form>
+          <input type="hidden" name="immersionApplicationLink" />
           <TextInput
             label="A quel email voulez-vous partager ?"
             name="email"

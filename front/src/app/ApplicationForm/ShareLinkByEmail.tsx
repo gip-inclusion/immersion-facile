@@ -13,11 +13,11 @@ const iconColor = "#3458a2";
 
 export const ShareLinkByEmail = () => {
   const { modalState, dispatch } = useElementContainerModal();
-  const [emailSent, successfullySent] = useState<boolean | null>(null);
-  const shareByEmail ="Partager le formulaire pré-remplit par email";
+  const [emailSent, setEmailSent] = useState<boolean | null>(null);
+  const shareLinkByEmail = "Partager le formulaire pré-remplit par email";
   return (
     <>
-      <Tooltip title={shareByEmail}>
+      <Tooltip title={shareLinkByEmail}>
         <IconButton onClick={() => dispatch({ type: "CLICKED_OPEN" })}>
           <EmailOutlinedIcon sx={{ color: iconColor }} />
         </IconButton>
@@ -25,16 +25,16 @@ export const ShareLinkByEmail = () => {
       <ElementModalContainer
         modalState={modalState}
         dispatch={dispatch}
-        title={shareByEmail}
+        title={shareLinkByEmail}
       >
         <ShareForm
           onSuccess={() => {
             dispatch({ type: "CLICKED_CLOSE" });
-            successfullySent(true);
+            setEmailSent(true);
           }}
           onError={() => {
             dispatch({ type: "CLICKED_CLOSE" });
-            successfullySent(false);
+            setEmailSent(false);
           }}
         />
       </ElementModalContainer>

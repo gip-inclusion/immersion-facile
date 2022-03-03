@@ -1,6 +1,6 @@
 import { UseCase } from "../../core/UseCase";
 import { EmailGateway } from "../ports/EmailGateway";
-import { z } from "zod";
+import { shareLinkByEmailSchema } from "../../../shared/ShareLinkByEmailDTO";
 
 type ShareApplicationByEmailParams = {
   immersionApplicationLink: string;
@@ -15,11 +15,7 @@ export class ShareApplicationLinkByEmail extends UseCase<
   constructor(private readonly emailGateway: EmailGateway) {
     super();
   }
-  inputSchema = z.object({
-    email: z.string(),
-    details: z.string().optional(),
-    immersionApplicationLink: z.string(),
-  });
+  inputSchema = shareLinkByEmailSchema;
 
   public async _execute(
     params: ShareApplicationByEmailParams,

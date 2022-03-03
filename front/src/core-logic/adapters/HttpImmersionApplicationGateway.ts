@@ -32,6 +32,7 @@ import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { AgencyId } from "../../shared/agencies";
+import { ShareLinkByEmailDTO } from "../../shared/ShareLinkByEmailDTO";
 
 const prefix = "api";
 
@@ -184,18 +185,12 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
     return response;
   }
 
-  public async shareByEmail(
-    email: string,
-    details: string,
-    immersionApplicationLink: string,
+  public async shareLinkByEmail(
+    immersionApplicationDTO: ShareLinkByEmailDTO,
   ): Promise<boolean> {
     const httpResponse = await axios.post(
       `/${prefix}/${immersionApplicationShareRoute}`,
-      {
-        email,
-        details,
-        immersionApplicationLink: immersionApplicationLink,
-      },
+      immersionApplicationDTO,
     );
 
     return httpResponse.data;

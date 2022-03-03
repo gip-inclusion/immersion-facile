@@ -10,6 +10,7 @@ import {
 import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
+import { ShareLinkByEmailDTO } from "../../shared/ShareLinkByEmailDTO";
 
 export abstract class ImmersionApplicationGateway {
   abstract add(
@@ -68,9 +69,15 @@ export abstract class ImmersionApplicationGateway {
     );
   }
 
-  abstract shareByEmail(
+  // shareLinkByEmailDTO
+
+  abstract shareLinkByEmail(
+    shareLinkByEmailDTO: ShareLinkByEmailDTO,
+  ): Promise<boolean>;
+
+  /*abstract shareLinkByEmail(
     email: string,
     details: string,
     immersionApplicationLink: string,
-  ): Promise<boolean>;
+  ): Promise<boolean>;*/
 }

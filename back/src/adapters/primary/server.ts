@@ -84,11 +84,13 @@ export const createApp = async (
       );
     });
 
-  router.route(`/${immersionApplicationShareRoute}`).post(async (req, res) =>
-    sendHttpResponse(req, res, (): Promise<boolean> => {
-      return deps.useCases.shareApplicationByEmail.execute(req.body);
-    }),
-  );
+  router
+    .route(`/${immersionApplicationShareRoute}`)
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.shareApplicationByEmail.execute(req.body),
+      ),
+    );
 
   router
     .route(`/${immersionApplicationsRoute}`)

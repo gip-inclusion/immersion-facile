@@ -1,17 +1,15 @@
-import React, { Children, ReactChild, ReactChildren } from "react";
+import React, { Children, ReactNode } from "react";
 
 type FormSectionTitleProps = {
-  children: any;
+  children: ReactNode;
 };
 
-export const FormSectionTitle = ({
-  children,
-}: FormSectionTitleProps) => {
+export const FormSectionTitle = ({ children }: FormSectionTitleProps) => {
   const content = Children.toArray(children).filter(
     (child) => typeof child === "string",
   );
-  const actions = Children.toArray(children).filter((child) =>
-    typeof child != "string" && React.isValidElement(child)
+  const actions = Children.toArray(children).filter(
+    (child) => typeof child != "string" && React.isValidElement(child),
   );
   return (
     <>
@@ -22,7 +20,7 @@ export const FormSectionTitle = ({
         }
       >
         <div>{content}</div>
-        {actions && <div>{ actions?.map((action) => action )} </div>}
+        {actions && <div>{actions}</div>}
       </div>
     </>
   );
