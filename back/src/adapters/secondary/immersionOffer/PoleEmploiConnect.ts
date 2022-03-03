@@ -43,7 +43,7 @@ export class PoleEmploiConnect {
       client_id: this.config.clientId,
       client_secret: this.config.clientSecret,
       redirect_uri: encodeURI(
-        "https://immersion-facile.beta.gouv.fr/pe-connect",
+        "https://immersion-facile.beta.gouv.fr/api/pe-connect",
       ),
     });
     const headers = {
