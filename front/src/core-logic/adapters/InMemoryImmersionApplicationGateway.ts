@@ -244,12 +244,14 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     return establishment;
   }
 
-  shareLinkByEmail(shareLinkByEmailDTO: ShareLinkByEmailDTO): Promise<boolean> {
+  async shareLinkByEmail(
+    shareLinkByEmailDTO: ShareLinkByEmailDTO,
+  ): Promise<boolean> {
     console.log(
       "InMemoryImmersionApplicationGateway.shareLinkByEmail",
       shareLinkByEmailDTO,
     );
 
-    return Promise.resolve(true);
+    return true;
   }
 }

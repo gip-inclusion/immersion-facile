@@ -193,6 +193,6 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
       immersionApplicationDTO,
     );
 
-    return httpResponse.data;
+    return httpResponse.status === 200;
   }
 }

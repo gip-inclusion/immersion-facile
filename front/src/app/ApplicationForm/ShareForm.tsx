@@ -12,28 +12,27 @@ type ShareFormProps = {
 };
 
 export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
-  const submit = async ({
-    email,
-    details,
-  }: {
-    email: string;
-    details: string;
-  }) => {
+  const submit = async (values: { email: string; details: string }) => {
     const result = await immersionApplicationGateway.shareLinkByEmail({
-      email,
-      details,
+      ...values,
       immersionApplicationLink: window.location.href,
     });
     result ? onSuccess() : onError();
   };
 
-  const [field] = useField<string>({ name: "mentorEmail" });
+  const [mentorEmail] = useField<string>({ name: "mentorEmail" });
+  const [firstName] = useField<string>({ name: "firstName" });
+  const [lastName] = useField<string>({ name: "lastName" });
+
+  console.log(firstName);
+  console.log(lastName);
 
   return (
     <Formik
       initialValues={{
-        email: field.value,
-        details: "",
+        email: mentorEmail.value,
+        details:
+          `${firstName.value || "Prénom" } ${lastName.value || "Nom" } vous invite à prendre connaissance de cette demande de convention d’immersion déjà partiellement remplie afin que vous la complétiez.  Merci !`,
         immersionApplicationLink: window.location.href,
       }}
       validationSchema={toFormikValidationSchema(shareLinkByEmailSchema)}

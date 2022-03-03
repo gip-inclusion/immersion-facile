@@ -1,16 +1,12 @@
-import React, { Children, ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 type FormSectionTitleProps = {
-  children: ReactNode;
+  children: ReactNode[] | ReactNode;
 };
 
 export const FormSectionTitle = ({ children }: FormSectionTitleProps) => {
-  const content = Children.toArray(children).filter(
-    (child) => typeof child === "string",
-  );
-  const actions = Children.toArray(children).filter(
-    (child) => typeof child != "string" && React.isValidElement(child),
-  );
+  const [title, ...actions] = Array.isArray(children) ? children : [children];
+
   return (
     <>
       <div className="h-6" />
@@ -19,8 +15,8 @@ export const FormSectionTitle = ({ children }: FormSectionTitleProps) => {
           "sticky top-0 text-immersionBlue-dark font-semibold p-2 mb-1 bg-white border-b text-lg z-10 flex justify-between"
         }
       >
-        <div>{content}</div>
-        {actions && <div>{actions}</div>}
+        <div>{title}</div>
+        {actions.length !== 0 && <div>{actions}</div>}
       </div>
     </>
   );

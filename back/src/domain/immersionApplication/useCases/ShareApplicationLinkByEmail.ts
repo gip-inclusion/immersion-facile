@@ -1,33 +1,27 @@
 import { UseCase } from "../../core/UseCase";
 import { EmailGateway } from "../ports/EmailGateway";
-import {
-  ShareLinkByEmailDTO,
-  shareLinkByEmailSchema,
-} from "../../../shared/ShareLinkByEmailDTO";
+import { z } from "zod";
 
-export class ShareApplicationLinkByEmail extends UseCase<
-  ShareLinkByEmailDTO,
-  boolean
-> {
+type ShareApplicationByEmailParams = {
+  immersionApplicationLink: string;
+  email: string;
+  details: string;
+};
+
+export class ShareApplicationLinkByEmail extends UseCase<ShareApplicationByEmailParams> {
   constructor(private readonly emailGateway: EmailGateway) {
     super();
   }
-  inputSchema = shareLinkByEmailSchema;
+  inputSchema = z.object({
+    email: z.string(),
+    details: z.string(),
+    immersionApplicationLink: z.string(),
+  });
 
-  public async _execute(params: ShareLinkByEmailDTO): Promise<boolean> {
-    try {
-      await this.emailGateway.sendShareDraftApplicationByLink(params.email, {
-        additional_details: toFormattedDetails(params?.details),
-        application_form_url: params.immersionApplicationLink,
-      });
-
-      return true;
-    } catch (e: any) {
-      return false;
-    }
+  public async _execute(params: ShareApplicationByEmailParams): Promise<void> {
+    await this.emailGateway.sendShareDraftApplicationByLink(params.email, {
+      additional_details: params.details,
+      application_form_url: params.immersionApplicationLink,
+    });
   }
 }
-
-const toFormattedDetails = (details: string | undefined): string => {
-  return details ? `Détails additionnels : ${details}` : "";
-};

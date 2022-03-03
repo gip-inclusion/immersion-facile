@@ -74,10 +74,4 @@ export abstract class ImmersionApplicationGateway {
   abstract shareLinkByEmail(
     shareLinkByEmailDTO: ShareLinkByEmailDTO,
   ): Promise<boolean>;
-
-  /*abstract shareLinkByEmail(
-    email: string,
-    details: string,
-    immersionApplicationLink: string,
-  ): Promise<boolean>;*/
 }

@@ -123,8 +123,6 @@ export const ApplicationFormFields = ({
 
       <FormSectionTitle>
         1. Coordonnées du bénéficiaire
-        <CopyLink />
-        <ShareLinkByEmail />
       </FormSectionTitle>
       <TextInput
         label="Email *"
