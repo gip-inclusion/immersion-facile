@@ -4,6 +4,12 @@ export const exportImmersionApplicationsExcelRoute =
 export const exportEstablismentsExcelRoute = "export-establishments";
 export const immersionOffersApiAuthRoute = "immersion-offers";
 export const immersionOffersFromFrontRoute = "immersion-offers-from-front";
+export const extractImmersionApplicationsExcelRoute =
+  "extract-demande-immersion-excel";
+export const addEstablishmentFormRouteWithoutApiKey =
+  "immersion-offers-from-front";
+export const addEstablishmentFormRouteWithApiKey = "add-establishment-form";
+export const editEstablishmentFormRouteWithApiKey = "edit-establishment-form";
 export const validateImmersionApplicationRoute = "validate-demande";
 export const generateMagicLinkRoute = "generate-magic-link";
 export const renewMagicLinkRoute = "renew-magic-link";

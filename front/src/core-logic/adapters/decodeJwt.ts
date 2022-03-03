@@ -1,8 +1,15 @@
-import type { MagicLinkPayload } from "src/shared/tokens/MagicLinkPayload";
+import type {
+  MagicLinkPayload,
+  EditFormEstablishmentPayload,
+} from "src/shared/tokens/MagicLinkPayload";
 
 // jwt decode logic comming from : https://github.com/gustavo0197/react-jwt/blob/master/src/jwt/index.ts
 
-export const decodeJwt = (jwtToken: string): MagicLinkPayload => {
+export const decodeJwt = <
+  T extends MagicLinkPayload | EditFormEstablishmentPayload,
+>(
+  jwtToken: string,
+): T => {
   try {
     const payload: string = jwtToken.split(".")[1];
     // handle unicode parsing issues between atob and JWT base64 format

@@ -1,6 +1,6 @@
 import { addHours } from "date-fns";
 import { SuperTest, Test } from "supertest";
-import { EditFormEstablishementPayload } from "../../shared/tokens/MagicLinkPayload";
+import { EditFormEstablishmentPayload } from "../../shared/tokens/MagicLinkPayload";
 import {
   buildTestApp,
   InMemoryRepositories,
@@ -18,7 +18,7 @@ describe("Route to generate an establishment edition link", () => {
   it("Returns 500 with an error message if previous edit link for this siret has not yet expired", async () => {
     // Prepare
     const now = new Date();
-    const lastPayload: EditFormEstablishementPayload = {
+    const lastPayload: EditFormEstablishmentPayload = {
       siret: "11111111111111",
       issuedAt: now.getTime(),
       expiredAt: addHours(now, 24).getTime(),

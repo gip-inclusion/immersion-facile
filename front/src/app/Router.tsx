@@ -7,11 +7,14 @@ import { Home } from "src/app/Home";
 import { LandingEstablishment } from "src/app/LandingEstablishment/LandingEstablishment";
 import { useRoute } from "src/app/routes";
 import { VerificationPage } from "src/app/Verification/VerificationPage";
-import { Layout } from "src/components/Layout";
 import { ENV } from "src/environmentVariables";
 import { RenewExpiredLink } from "../helpers/RenewExpiredLink";
 import { AdminVerification } from "./admin/AdminVerification";
 import { SignForm } from "./ApplicationForm/SignForm";
+import {
+  EstablishmentCreationForm,
+  EstablishmentEditionForm,
+} from "./FormEstablishment/EstablishmentForm";
 import { SearchDebug } from "./Debug/SearchDebug";
 import { Search } from "./Search/Search";
 import { EstablishmentFormImmersionFacile } from "./FormEstablishment/EstablishmentFormImmersionFacile";
@@ -34,6 +37,9 @@ export const Router = () => {
       )}
       {route.name === "formEstablishmentForExternals" && (
         <EstablishmentFormForExternals route={route} />
+      )}
+      {route.name === "editFormEstablishment" && (
+        <EstablishmentEditionForm route={route} />
       )}
       {route.name === "immersionApplicationsToValidate" && (
         <VerificationPage route={route} />

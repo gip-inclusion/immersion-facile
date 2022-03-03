@@ -5,11 +5,13 @@ import {
 import { ContactEntityV2 } from "../entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
-  DataSource,
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../entities/EstablishmentEntity";
-import { AnnotatedImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
+import {
+  AnnotatedImmersionOfferEntityV2,
+  ImmersionOfferEntityV2,
+} from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 
 export interface ImmersionOfferRepository {
@@ -41,10 +43,6 @@ export interface ImmersionOfferRepository {
     since: Date,
   ) => Promise<string[]>;
 
-  getEstablishmentDataSourceFromSiret: (
-    siret: string,
-  ) => Promise<DataSource | undefined>;
-
   getSiretOfEstablishmentsFromFormSource: () => Promise<string[]>;
 
   updateEstablishment: (
@@ -57,5 +55,17 @@ export interface ImmersionOfferRepository {
     > & { updatedAt: Date },
   ) => Promise<void>;
 
-  removeEstablishmentAndOffersWithSiret: (siret: string) => Promise<void>;
+  removeEstablishmentAndOffersAndContactWithSiret: (
+    siret: string,
+  ) => Promise<void>;
+
+  getEstablishmentBySiret: (
+    siret: string,
+  ) => Promise<EstablishmentEntityV2 | undefined>;
+  getContactByEstablishmentSiret: (
+    siret: string,
+  ) => Promise<ContactEntityV2 | undefined>;
+  getOffersByEstablishmentSiret: (
+    siret: string,
+  ) => Promise<ImmersionOfferEntityV2[]>;
 }

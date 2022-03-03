@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
+import { UpsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpsertEstablishmentAggregateFromFormEstablishement";
 import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
 
 import { random, sleep } from "../../shared/utils";
@@ -72,18 +72,17 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   );
   const poleEmploiGateway = new PgRomeGateway(clientOrigin);
 
-  const uow = new PgUowPerformer(getPgPoolFn(), createPgUow);
+  const pgUowPerformer = new PgUowPerformer(getPgPoolFn(), createPgUow);
 
-  const transformFormEstablishmentIntoSearchData =
-    new TransformFormEstablishmentIntoSearchData(
-      adresseAPI,
-      sireneRepository,
-      poleEmploiGateway,
-      sequenceRunner,
-      new UuidV4Generator(),
-      new RealClock(),
-      uow,
-    );
+  const upsertAggregateFromForm = new UpsertEstablishmentAggregateFromForm(
+    pgUowPerformer,
+    sireneRepository,
+    adresseAPI,
+    poleEmploiGateway,
+    sequenceRunner,
+    new UuidV4Generator(),
+    new RealClock(),
+  );
   const missingFormEstablishmentRows = (
     await clientOrigin.query(
       `select * from form_establishments where siret not in 
@@ -109,9 +108,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       preferredContactMethods: row.preferred_contact_methods,
     };
     try {
-      await transformFormEstablishmentIntoSearchData.execute(
-        formEstablishmentDto,
-      );
+      await upsertAggregateFromForm.execute(formEstablishmentDto);
       logger.info(
         `Successfully added form with siret ${row.siret} to aggregate tables.`,
       );

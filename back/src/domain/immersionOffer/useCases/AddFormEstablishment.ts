@@ -1,4 +1,3 @@
-import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   FormEstablishmentDto,
   formEstablishmentSchema,
@@ -11,6 +10,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logger = createLogger(__filename);
 
 export class AddFormEstablishment extends TransactionalUseCase<
@@ -37,8 +37,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
       await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
     }
 
-    const id = await uow.formEstablishmentRepo.save(dto);
-    if (!id) throw new ConflictError("empty");
+    await uow.formEstablishmentRepo.create(dto);
 
     const event = this.createNewEvent({
       topic: "FormEstablishmentAdded",
@@ -47,6 +46,6 @@ export class AddFormEstablishment extends TransactionalUseCase<
     });
 
     await uow.outboxRepo.save(event);
-    return id;
+    return dto.siret;
   }
 }

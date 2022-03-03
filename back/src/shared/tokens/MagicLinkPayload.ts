@@ -48,7 +48,7 @@ export const createMagicLinkPayload = (
   emailHash: emailHashForMagicLink(email),
 });
 
-export type EditFormEstablishementPayload = {
+export type EditFormEstablishmentPayload = {
   siret: string;
   issuedAt: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
   expiredAt: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds

@@ -3,6 +3,7 @@ import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishment
 import { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
 import { RomeSearchMatchDto, romeSearchResponseSchema } from "src/shared/rome";
 import {
+  editEstablishmentFormRoute,
   formAlreadyExistsRoute,
   immersionOffersFromFrontRoute,
   requestEmailToUpdateFormRoute,
@@ -42,5 +43,15 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
   }
   public async requestEmailToEditForm(siret: SiretDto): Promise<void> {
     await axios.get(`/${prefix}/${requestEmailToUpdateFormRoute}/${siret}`);
+  }
+  public async getFormEstablishmentFromJwt(
+    siret: string,
+  ): Promise<FormEstablishmentDto> {
+    throw "not implemented";
+  }
+  public async updateFormEstablishment(
+    establishment: FormEstablishmentDto,
+  ): Promise<void> {
+    await axios.post(`/${prefix}/${editEstablishmentFormRoute}`, establishment);
   }
 }

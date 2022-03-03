@@ -45,7 +45,7 @@ import { GetImmersionOfferById } from "../../domain/immersionOffer/useCases/GetI
 import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
-import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
+import { UpsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpsertEstablishmentAggregateFromFormEstablishement";
 import { RomeGateway } from "../../domain/rome/ports/RomeGateway";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
@@ -53,7 +53,7 @@ import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../shared/routes";
 import {
   createMagicLinkPayload,
-  EditFormEstablishementPayload,
+  EditFormEstablishmentPayload,
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
@@ -119,6 +119,7 @@ import { PgPostalCodeDepartmentRegionQueries } from "../secondary/pg/PgPostalCod
 import { PostalCodeDepartmentRegionQueries } from "../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { StubPostalCodeDepartmentRegionQueries } from "../secondary/StubPostalCodeDepartmentRegionQueries";
 import { ExportEstablishmentAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentAsExcelArchive";
+import { EditFormEstablishment } from "../../domain/immersionOffer/useCases/EditFormEstablishment";
 
 const logger = createLogger(__filename);
 
@@ -190,10 +191,10 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
 export const makeGenerateEditFormEstablishmentUrl = (
   config: AppConfig,
 ): GenerateEditFormEstablishmentUrl => {
-  const generateJwt = makeGenerateJwt<EditFormEstablishementPayload>(
+  const generateJwt = makeGenerateJwt<EditFormEstablishmentPayload>(
     config.magicLinkJwtPrivateKey,
   );
-  return (payload: EditFormEstablishementPayload) => {
+  return (payload: EditFormEstablishmentPayload) => {
     const editJwt = generateJwt(payload);
     return `${config.immersionFacileBaseUrl}/${frontRoutes.editFormEstablishmentRoute}?jwt=${editJwt}`;
   };
@@ -504,15 +505,20 @@ const createUseCases = (
       getSiret,
     ),
 
-    transformFormEstablishmentToSearchData:
-      new TransformFormEstablishmentIntoSearchData(
-        adresseAPI,
+    editFormEstablishment: new EditFormEstablishment(
+      uowPerformer,
+      createNewEvent,
+    ),
+
+    upsertEstablishmentAggregateFromForm:
+      new UpsertEstablishmentAggregateFromForm(
+        uowPerformer,
         repositories.sirene,
+        adresseAPI,
         repositories.rome,
         sequenceRunner,
         uuidGenerator,
         clock,
-        uowPerformer,
       ),
 
     contactEstablishment: new ContactEstablishment(

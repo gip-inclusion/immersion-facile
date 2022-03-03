@@ -9,7 +9,10 @@ import {
   EstablishmentEntityV2,
   DataSource,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import {
+  AnnotatedImmersionOfferEntityV2,
+  ImmersionOfferEntityV2,
+} from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
@@ -408,6 +411,14 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     return pgResult.rows.map((row) => row.siret);
   }
 
+  public async removeEstablishmentAndOffersAndContactWithSiret(
+    siret: string,
+  ): Promise<void> {
+    const query = `
+      DELETE FROM establishments WHERE siret = $1;;`;
+    await this.client.query(query, [siret]);
+  }
+
   public async updateEstablishment(
     siret: string,
     propertiesToUpdate: Partial<
@@ -551,6 +562,21 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       [siret],
     );
     return pgResult.rows[0].exists;
+  }
+  public async getEstablishmentBySiret(
+    siret: string,
+  ): Promise<EstablishmentEntityV2 | undefined> {
+    throw "not implemented";
+  }
+  public async getContactByEstablishmentSiret(
+    siret: string,
+  ): Promise<ContactEntityV2 | undefined> {
+    throw "not implemented";
+  }
+  public async getOffersByEstablishmentSiret(
+    siret: string,
+  ): Promise<ImmersionOfferEntityV2[]> {
+    throw "not implemented";
   }
 }
 

@@ -38,9 +38,7 @@ describe("PgUowPerformer", () => {
 
   it("saves everything when all goes fine", async () => {
     uuidGenerator.setNextUuid("11111111-1111-1111-1111-111111111111");
-    const savedSiret = await pgUowPerformer.perform(useCaseUnderTest);
-    expect(savedSiret).toBe(someSiret);
-
+    await pgUowPerformer.perform(useCaseUnderTest);
     await expectLengthOfRepos({ formEstablishmentLength: 1, outboxLength: 1 });
   });
 
@@ -63,14 +61,13 @@ describe("PgUowPerformer", () => {
       .withSiret(someSiret)
       .build();
 
-    const siret = await uow.formEstablishmentRepo.save(formEstablishment)!;
+    await uow.formEstablishmentRepo.create(formEstablishment)!;
 
     const event = createNewEvent({
       topic: "FormEstablishmentAdded",
       payload: formEstablishment,
     });
     await uow.outboxRepo.save(event);
-    return siret;
   };
 
   const expectLengthOfRepos = async ({

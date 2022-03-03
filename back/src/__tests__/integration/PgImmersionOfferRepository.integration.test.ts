@@ -1049,8 +1049,8 @@ describe("Postgres implementation of immersion offer repository", () => {
   > =>
     client
       .query(
-        `SELECT * FROM immersion_contacts LEFT JOIN establishments__immersion_contacts
-         ON establishments__immersion_contacts.contact_uuid = immersion_contacts.uuid`,
+        `SELECT * FROM immersion_contacts ic JOIN establishments__immersion_contacts eic
+         ON ic.uuid = eic.contact_uuid WHERE contact_uuid IS NOT NULL`,
       )
       .then((res) => res.rows);
 

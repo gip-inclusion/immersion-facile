@@ -2,8 +2,9 @@ import { Router } from "express";
 import promClient from "prom-client";
 import {
   getImmersionOfferByIdRoute,
-  immersionOffersApiAuthRoute,
+  addEstablishmentFormRouteWithApiKey,
   searchImmersionRoute,
+  editEstablishmentFormRouteWithApiKey,
 } from "../../shared/routes";
 import { AppDependencies } from "./config";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
@@ -41,7 +42,7 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
     );
 
   authenticatedRouter
-    .route(`/${immersionOffersApiAuthRoute}`)
+    .route(`/${addEstablishmentFormRouteWithApiKey}`)
     .post(async (req, res) => {
       counterFormEstablishmentCaller.inc({
         referer: req.get("Referrer"),
@@ -54,6 +55,14 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
           source: req.apiConsumer!.consumer,
         });
       });
+    });
+
+  authenticatedRouter
+    .route(`/${editEstablishmentFormRouteWithApiKey}`)
+    .post(async (req, res) => {
+      return sendHttpResponse(req, res, () =>
+        deps.useCases.editFormEstablishment.execute(req.body),
+      );
     });
 
   return authenticatedRouter;

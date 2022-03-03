@@ -1,5 +1,5 @@
 import { SiretDto, siretSchema } from "../../../shared/siret";
-import { EditFormEstablishementPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EditFormEstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { GenerateEditFormEstablishmentUrl } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
@@ -50,7 +50,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<
 
     const expDate = addHours(now, 24);
 
-    const payload: EditFormEstablishementPayload = {
+    const payload: EditFormEstablishmentPayload = {
       siret,
       issuedAt: now.getTime(),
       expiredAt: expDate.getTime(),

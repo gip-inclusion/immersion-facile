@@ -11,7 +11,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
-import { EditFormEstablishementPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EditFormEstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 const siret = "12345678912345";
@@ -41,7 +41,7 @@ const prepareUseCase = () => {
   });
 
   const generateEditFormEstablishmentUrl = (
-    payload: EditFormEstablishementPayload,
+    payload: EditFormEstablishmentPayload,
   ) => `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
 
   const useCase = new RequestEditFormEstablishment(

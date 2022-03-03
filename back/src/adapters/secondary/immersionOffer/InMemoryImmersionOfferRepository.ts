@@ -1,7 +1,6 @@
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
-  DataSource,
   employeeRangeByTefenCode,
   EstablishmentAggregate,
   EstablishmentEntityV2,
@@ -12,6 +11,8 @@ import {
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { path, pathEq } from "../../../shared/ramdaExtensions/path";
+import { propEq } from "../../../shared/ramdaExtensions/propEq";
 import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
@@ -130,13 +131,7 @@ export class InMemoryImmersionOfferRepository
       )
       .map((aggregate) => aggregate.establishment.siret);
   }
-  public async getEstablishmentDataSourceFromSiret(
-    siret: string,
-  ): Promise<DataSource | undefined> {
-    return this._establishmentAggregates.find(
-      (aggregate) => aggregate.establishment.siret === siret,
-    )?.establishment?.dataSource;
-  }
+
   public async getSiretOfEstablishmentsFromFormSource(): Promise<string[]> {
     return this._establishmentAggregates
       .filter((aggregate) => aggregate.establishment.dataSource === "form")
@@ -197,11 +192,36 @@ export class InMemoryImmersionOfferRepository
     );
   }
 
-  public async removeEstablishmentAndOffersWithSiret(
+  public async removeEstablishmentAndOffersAndContactWithSiret(
     siret: string,
   ): Promise<void> {
     this.establishmentAggregates = this._establishmentAggregates.filter(
       (aggregate) => aggregate.establishment.siret !== siret,
+    );
+  }
+
+  public async getEstablishmentBySiret(
+    siret: string,
+  ): Promise<EstablishmentEntityV2 | undefined> {
+    return this.establishmentAggregates
+      .map(path("establishment"))
+      .find(propEq("siret", siret));
+  }
+
+  public async getContactByEstablishmentSiret(
+    siret: string,
+  ): Promise<ContactEntityV2 | undefined> {
+    return this.establishmentAggregates.find(
+      pathEq("establishment.siret", siret),
+    )?.contact;
+  }
+
+  public async getOffersByEstablishmentSiret(
+    siret: string,
+  ): Promise<ImmersionOfferEntityV2[]> {
+    return (
+      this.establishmentAggregates.find(pathEq("establishment.siret", siret))
+        ?.immersionOffers ?? []
     );
   }
   // for test purposes only :
@@ -214,6 +234,10 @@ export class InMemoryImmersionOfferRepository
     this._establishmentAggregates = establishmentAggregates;
   }
 }
+
+// getEstablishmentBySiret,
+//   getContactByEstablishmentSiret,
+//   getOffersByEstablishmentSiret;
 
 const buildSearchImmersionResultDto = (
   immersionOffer: ImmersionOfferEntityV2,

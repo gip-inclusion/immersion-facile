@@ -3,8 +3,7 @@ import { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
 import { RomeSearchMatchDto } from "src/shared/rome";
 import { SiretDto } from "src/shared/siret";
 import { sleep } from "src/shared/utils";
-
-const SIMULATED_LATENCY_MS = 1000;
+import { v4 as uuidV4 } from "uuid";
 
 export class InMemoryFormEstablishmentGateway
   implements FormEstablishmentGateway
@@ -79,5 +78,50 @@ export class InMemoryFormEstablishmentGateway
 
   public async requestEmailToEditForm(siret: SiretDto): Promise<void> {
     return;
+  }
+  public async getFormEstablishmentFromJwt(
+    jwt: string,
+  ): Promise<FormEstablishmentDto> {
+    return {
+      siret: "12345678901234",
+      source: "immersion-facile",
+      businessName: `My business name, retrieved from jwt ${jwt}`,
+      businessNameCustomized: `My business customized name, retrieved from jwt ${jwt}`,
+      businessAddress: "5 Rue de la Huchette 75005 Paris",
+      isEngagedEnterprise: true,
+      professions: [
+        {
+          romeCodeAppellation: "11573",
+          romeCodeMetier: "D1102",
+          description: "Boulanger",
+        },
+        {
+          description: "Boucher / Bouchère",
+          romeCodeAppellation: "11564",
+          romeCodeMetier: "D1101",
+        },
+      ],
+      businessContacts: [
+        {
+          firstName: "John",
+          lastName: "Doe",
+          job: "super job",
+          phone: "02837",
+          email: "joe@mail.com",
+        },
+      ],
+      preferredContactMethods: ["EMAIL"],
+    };
+  }
+  public async updateFormEstablishment(
+    formEstablishmentDto: FormEstablishmentDto,
+  ): Promise<void> {
+    console.log(
+      "Would update form establishment with siret ",
+      formEstablishmentDto.siret,
+    );
+    await sleep(1000);
+    if (formEstablishmentDto.businessName === "givemeanerrorplease")
+      throw new Error("418 I'm a teapot");
   }
 }

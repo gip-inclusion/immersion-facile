@@ -29,19 +29,18 @@ const logger = createLogger(__filename);
 
 const offerFromFormScore = 10; // 10/10 if voluntaryToImmersion=true (consider removing this field)
 
-// TODO Rename : InsertNewEstablishmentFromFormToRepositories
-export class TransformFormEstablishmentIntoSearchData extends TransactionalUseCase<
+export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
   void
 > {
   constructor(
-    private readonly adresseAPI: AdresseAPI,
+    uowPerformer: UnitOfWorkPerformer,
     private readonly sireneRepository: SireneRepository,
+    private readonly adresseAPI: AdresseAPI,
     private readonly romeGateway: RomeGateway,
     private readonly sequenceRunner: SequenceRunner,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
-    uowPerformer: UnitOfWorkPerformer,
   ) {
     super(uowPerformer);
   }
@@ -53,17 +52,19 @@ export class TransformFormEstablishmentIntoSearchData extends TransactionalUseCa
     uow: UnitOfWork,
   ): Promise<void> {
     const establishmentSiret = formEstablishment.siret;
+    await uow.immersionOfferRepo.removeEstablishmentAndOffersAndContactWithSiret(
+      establishmentSiret,
+    );
 
-    const establishmentDataSource =
-      await uow.immersionOfferRepo.getEstablishmentDataSourceFromSiret(
-        establishmentSiret,
-      );
+    const establishmentDataSource = (
+      await uow.immersionOfferRepo.getEstablishmentBySiret(establishmentSiret)
+    )?.dataSource;
     if (establishmentDataSource === "form") {
       throw new Error(
         `Cannot insert establishment from form with siret ${establishmentSiret} since it already exists.`,
       );
     } else if (establishmentDataSource === "api_labonneboite") {
-      await uow.immersionOfferRepo.removeEstablishmentAndOffersWithSiret(
+      await uow.immersionOfferRepo.removeEstablishmentAndOffersAndContactWithSiret(
         establishmentSiret,
       );
     }
@@ -144,7 +145,7 @@ export class TransformFormEstablishmentIntoSearchData extends TransactionalUseCa
     };
     await uow.immersionOfferRepo
       .insertEstablishmentAggregates([establishmentAggregate])
-      .catch((err) => {
+      .catch((err: any) => {
         notifyAndThrowErrorDiscord(
           new Error(
             `Error when adding establishment aggregate with siret ${establishmentSiret} due to ${err}`,

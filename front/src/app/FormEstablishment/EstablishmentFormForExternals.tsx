@@ -1,7 +1,7 @@
 import { Route } from "type-route";
 import { routes } from "../routes";
 import { Layout } from "../../components/Layout";
-import { EstablishmentForm } from "./EstablishmentForm";
+import { EstablishmentCreationForm } from "./EstablishmentForm";
 import React from "react";
 import { FormEstablishmentSource } from "../../shared/FormEstablishmentDto";
 
@@ -41,11 +41,12 @@ export const EstablishmentFormForExternals = ({
       </Layout>
     );
 
-  if (consumerConfig.isIframe) return <EstablishmentForm source={consumer} />;
+  if (consumerConfig.isIframe)
+    return <EstablishmentCreationForm source={consumer} />;
 
   return (
     <Layout>
-      <EstablishmentForm source={consumer} />
+      <EstablishmentCreationForm source={consumer} />
     </Layout>
   );
 };

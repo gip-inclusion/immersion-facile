@@ -2,6 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
 import { PgFormEstablishmentRepository } from "../../adapters/secondary/pg/PgFormEstablishmentRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import { expectPromiseToFailWith } from "../../_testBuilders/test.helpers";
 
 describe("PgFormEstablishmentRepository", () => {
   let pool: Pool;
@@ -29,7 +30,7 @@ describe("PgFormEstablishmentRepository", () => {
       .withSiret("88888888888888")
       .build();
 
-    await formEstablishmentRepository.save(formEstablishment);
+    await formEstablishmentRepository.create(formEstablishment);
 
     const result = await client.query("SELECT * FROM form_establishments");
 
@@ -50,13 +51,36 @@ describe("PgFormEstablishmentRepository", () => {
       .withSiret(siretB)
       .build();
 
-    await formEstablishmentRepository.save(formEstablishmentA);
-    await formEstablishmentRepository.save(formEstablishmentB);
+    await formEstablishmentRepository.create(formEstablishmentA);
+    await formEstablishmentRepository.create(formEstablishmentB);
 
     const resultA = await formEstablishmentRepository.getBySiret(siretA);
     expect(resultA).toEqual(formEstablishmentA);
 
     const resultAll = await formEstablishmentRepository.getAll();
     expect(resultAll).toEqual([formEstablishmentA, formEstablishmentB]);
+  });
+
+  describe("Pg implementation of 'edit' method ", () => {
+    it("Edits all fields if establishment indeed exists", async () => {
+      // Prepare
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withSiret("88888888888888")
+        .withBusinessName("oldName")
+        .build();
+
+      await formEstablishmentRepository.create(formEstablishment);
+
+      // Act
+      await formEstablishmentRepository.edit({
+        ...formEstablishment,
+        businessName: "newName",
+      });
+
+      // Assert
+      const result = await client.query("SELECT * FROM form_establishments");
+      expect(result.rows).toHaveLength(1);
+      expect(result.rows[0].business_name).toEqual("newName");
+    });
   });
 });

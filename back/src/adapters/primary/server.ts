@@ -13,7 +13,7 @@ import {
   getFeatureFlags,
   immersionApplicationShareRoute,
   immersionApplicationsRoute,
-  immersionOffersFromFrontRoute,
+  addEstablishmentFormRouteWithoutApiKey,
   loginPeConnect,
   peConnect,
   renewMagicLinkRoute,
@@ -228,10 +228,6 @@ export const createApp = async (
     );
 
   router.route(`/${formAlreadyExistsRoute}/:siret`).get(async (req, res) => {
-    console.log(
-      "in route formAlreadyExistsRoute with siret ",
-      req.params.siret,
-    );
     return sendHttpResponse(req, res, async () =>
       deps.repositories.immersionOffer.hasEstablishmentFromFormWithSiret(
         req.params.siret,
@@ -254,7 +250,7 @@ export const createApp = async (
     );
 
   router
-    .route(`/${immersionOffersFromFrontRoute}`)
+    .route(`/${addEstablishmentFormRouteWithoutApiKey}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.addFormEstablishment.execute(req.body),

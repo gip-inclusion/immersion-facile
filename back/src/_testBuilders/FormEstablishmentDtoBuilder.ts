@@ -79,6 +79,9 @@ export class FormEstablishmentDtoBuilder
   public withSiret(siret: SiretDto) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, siret });
   }
+  public withBusinessName(businessName: string) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, businessName });
+  }
   public withProfessions(professions: ProfessionDto[]) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, professions });
   }

@@ -2,9 +2,8 @@ import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import { SiretDto } from "../../../shared/siret";
 
 export interface FormEstablishmentRepository {
-  save: (
-    formEstablishmentDto: FormEstablishmentDto,
-  ) => Promise<SiretDto | undefined>;
+  create: (formEstablishmentDto: FormEstablishmentDto) => Promise<void>;
+  edit: (formEstablishmentDto: FormEstablishmentDto) => Promise<void>;
 
   getBySiret: (siret: SiretDto) => Promise<FormEstablishmentDto | undefined>;
 
