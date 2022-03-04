@@ -46,6 +46,7 @@ export type TestAppAndDeps = {
   request: supertest.SuperTest<supertest.Test>;
   reposAndGateways: InMemoryRepositories;
   eventCrawler: BasicEventCrawler;
+  appConfig: AppConfig;
 };
 
 export const buildTestApp = async (
@@ -95,6 +96,7 @@ export const buildTestApp = async (
     request,
     reposAndGateways,
     eventCrawler,
+    appConfig,
   };
 };
 

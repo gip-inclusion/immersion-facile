@@ -1,11 +1,11 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { immersionApplicationGateway } from "src/app/dependencies";
-import { AgencyInListDto, AgencyId } from "src/shared/agencies";
+import { agencyGateway } from "src/app/dependencies";
+import { AgencyId, AgencyInListDto } from "src/shared/agencies";
+import type { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { PostcodeAutocomplete } from "./PostcodeAutocomplete";
-import type { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
 
 const placeholderAgency: AgencyInListDto = {
   id: "",
@@ -39,7 +39,7 @@ export const AgencySelector = ({
     if (!position) return;
 
     setIsLoading(true);
-    immersionApplicationGateway
+    agencyGateway
       .listAgencies(position)
       .then((agencies) => {
         setAgencies([

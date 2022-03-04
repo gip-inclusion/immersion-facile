@@ -18,33 +18,6 @@ import { sleep } from "src/shared/utils";
 import { AgencyId } from "../../shared/agencies";
 import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
 
-const TEST_AGENCIES: AgencyInListDto[] = [
-  {
-    id: "test-agency-1-front",
-    name: "Test Agency 1 (front)",
-    position: {
-      lat: 1.0,
-      lon: 2.0,
-    },
-  },
-  {
-    id: "test-agency-2-front",
-    name: "Test Agency 2 (front)",
-    position: {
-      lat: 30.0,
-      lon: 20.0,
-    },
-  },
-  {
-    id: "test-agency-3-front",
-    name: "Test Agency 3 (front)",
-    position: {
-      lat: 74.0,
-      lon: 2.0,
-    },
-  },
-];
-
 const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
   {
     siret: "12345678901234",
@@ -65,30 +38,15 @@ const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
 ];
 
 const SIMULATED_LATENCY_MS = 2000;
-export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGateway {
+export class InMemoryImmersionApplicationGateway
+  implements ImmersionApplicationGateway
+{
   private _immersionApplications: { [id: string]: ImmersionApplicationDto } =
     {};
   private _agencies: { [id: string]: AgencyInListDto } = {};
   private _sireneEstablishments: { [siret: string]: GetSiretResponseDto } = {};
 
   public constructor() {
-    super();
-    TEST_AGENCIES.forEach((agency) => (this._agencies[agency.id] = agency));
-    this.add({
-      ...IMMERSION_APPLICATION_TEMPLATE,
-      id: "valid_draft",
-      status: "DRAFT",
-      email: "DRAFT.esteban@ocon.fr",
-      agencyId: TEST_AGENCIES[0].id,
-    });
-    this.add({
-      ...IMMERSION_APPLICATION_TEMPLATE,
-      id: "valid_in_review",
-      status: "IN_REVIEW",
-      email: "IN_REVIEW.esteban@ocon.fr",
-      agencyId: TEST_AGENCIES[1].id,
-    });
-
     TEST_ESTABLISHMENTS.forEach(
       (establishment) =>
         (this._sireneEstablishments[establishment.siret] = establishment),
@@ -216,13 +174,6 @@ export class InMemoryImmersionApplicationGateway extends ImmersionApplicationGat
     // Since this operation makes no sense for local development, the implementation here is left empty.
     await sleep(SIMULATED_LATENCY_MS);
     throw new Error("500 Not Implemented In InMemory Gateway");
-  }
-
-  public async listAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
-    const agencies = Object.values(this._agencies);
-    await sleep(SIMULATED_LATENCY_MS);
-    console.log("InMemoryImmersionApplicationGateway.listAgencies: ", agencies);
-    return agencies;
   }
 
   public async getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto> {

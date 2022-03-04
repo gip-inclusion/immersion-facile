@@ -4,6 +4,7 @@ import { LatLonDto } from "../../shared/SearchImmersionDto";
 import { createLogger } from "../../utils/logger";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { distanceMetersBetweenCoordinates } from "./immersionOffer/distanceBetweenCoordinates";
+import { values } from "ramda";
 
 const logger = createLogger(__filename);
 
@@ -59,45 +60,50 @@ const testAgencies: AgencyConfig[] = [
 ];
 
 export class InMemoryAgencyRepository implements AgencyRepository {
-  private agencies: { [id: string]: AgencyConfig } = {};
+  private _agencies: { [id: string]: AgencyConfig } = {};
 
   constructor(agencyList: AgencyConfig[] = testAgencies) {
     agencyList.forEach((agency) => {
-      this.agencies[agency.id] = agency;
+      this._agencies[agency.id] = agency;
     });
-    logger.info(this.agencies);
+    logger.info(this._agencies);
   }
 
   public async getById(id: AgencyId): Promise<AgencyConfig | undefined> {
-    logger.info({ id, configs: this.agencies }, "getById");
-    return this.agencies[id];
+    logger.info({ id, configs: this._agencies }, "getById");
+    return this._agencies[id];
   }
 
   public async getNearby(position: LatLonDto): Promise<AgencyConfig[]> {
-    logger.info({ position, configs: this.agencies }, "getNearby");
-    return Object.values(this.agencies)
+    logger.info({ position, configs: this._agencies }, "getNearby");
+    return Object.values(this._agencies)
       .filter(isAgencyActive)
       .sort(sortByNearestFrom(position))
       .slice(0, 20);
   }
 
   public async getAllActive(): Promise<AgencyConfig[]> {
-    logger.info({ configs: this.agencies }, "getAll");
-    return Object.values(this.agencies).filter(isAgencyActive);
+    logger.info({ configs: this._agencies }, "getAll");
+    return Object.values(this._agencies).filter(isAgencyActive);
   }
 
   public async insert(config: AgencyConfig): Promise<AgencyId | undefined> {
-    logger.info({ config, configs: this.agencies }, "insert");
-    if (this.agencies[config.id]) return undefined;
-    this.agencies[config.id] = config;
+    logger.info({ config, configs: this._agencies }, "insert");
+    if (this._agencies[config.id]) return undefined;
+    this._agencies[config.id] = config;
     return config.id;
   }
 
   // test purpose only
+
+  get agencies(): AgencyConfig[] {
+    return values(this._agencies);
+  }
+
   setAgencies(agencyList: AgencyConfig[]) {
-    this.agencies = {};
+    this._agencies = {};
     agencyList.forEach((agency) => {
-      this.agencies[agency.id] = agency;
+      this._agencies[agency.id] = agency;
     });
   }
 }

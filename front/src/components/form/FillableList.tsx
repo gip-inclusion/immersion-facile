@@ -1,4 +1,5 @@
-import { Chip } from "@mui/material";
+import MuiChip from "@mui/material/Chip";
+import { styled } from "@mui/material/styles";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "src/components/Button";
@@ -6,6 +7,15 @@ import { ImmersionTextField } from "src/components/form/ImmersionTextField";
 import { notEqual } from "src/shared/ramdaExtensions/notEqual";
 import { OmitFromExistingKeys } from "src/shared/utils";
 import { z } from "zod";
+
+const immersionBlue = "#3458a2";
+
+const Chip = styled(MuiChip)({
+  borderColor: immersionBlue,
+  color: immersionBlue,
+  fontWeight: "bold",
+  backgroundColor: "white",
+});
 
 export const FillableList = (
   props: OmitFromExistingKeys<AddToListProps, "onAdd"> & {
@@ -88,6 +98,7 @@ const AddToList = ({
       <ImmersionTextField
         type="text"
         description={description}
+        className="w-[620px]"
         label={label}
         placeholder={placeholder}
         name={name}
@@ -118,7 +129,11 @@ const ListOfChip = ({ values, onDelete }: ListOfChipProps) => {
     <div className="pb-4">
       {values.map((value) => (
         <span key={value} className="px-1">
-          <Chip label={value} onDelete={() => onDelete(value)} />
+          <Chip
+            variant="outlined"
+            label={value}
+            onDelete={() => onDelete(value)}
+          />
         </span>
       ))}
     </div>

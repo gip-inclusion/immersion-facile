@@ -38,6 +38,7 @@ import { SignImmersionApplication } from "../../domain/immersionApplication/useC
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
+import { AddAgency } from "../../domain/immersionOffer/useCases/AddAgency";
 import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { ContactEstablishment } from "../../domain/immersionOffer/useCases/ContactEstablishment";
 import { GetImmersionOfferById } from "../../domain/immersionOffer/useCases/GetImmersionOfferById";
@@ -323,16 +324,17 @@ export const createInMemoryUow = (repositories?: Repositories) => ({
     repositories?.immersionApplicationExport ??
     StubImmersionApplicationExportQueries,
   getFeatureFlags: makeStubGetFeatureFlags(),
+  agencyRepo:
+    (repositories?.agency as InMemoryAgencyRepository) ??
+    new InMemoryAgencyRepository(),
 });
 
 // following function is for type check only, it is verifies InMemoryUnitOfWork is assignable to UnitOfWork
-const isAssignable = (): UnitOfWork => {
-  const inMemory = null as unknown as InMemoryUnitOfWork;
-  return inMemory;
-};
+const isAssignable = (inMemory: InMemoryUnitOfWork): UnitOfWork => inMemory;
 
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
   outboxRepo: new PgOutboxRepository(client),
+  agencyRepo: new PgAgencyRepository(client),
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
   immersionOfferRepo: new PgImmersionOfferRepository(client),
   immersionApplicationRepo: new PgImmersionApplicationRepository(client),
@@ -571,9 +573,13 @@ const createUseCases = (
         repositories.agency,
         generateMagicLinkFn,
       ),
-
     shareApplicationByEmail: new ShareApplicationLinkByEmail(
       repositories.email,
+    ),
+    addAgency: new AddAgency(
+      uowPerformer,
+      createNewEvent,
+      config.defaultAdminEmail,
     ),
   };
 };

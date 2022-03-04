@@ -18,6 +18,7 @@ const defaultConfigParams = {
 
   BACKOFFICE_USERNAME: "e2e_tests",
   BACKOFFICE_PASSWORD: "e2e",
+  ADMIN_EMAIL: "myAdmin@mail.com",
 };
 
 // See "Working with AppConfig" in back/README.md for more details.

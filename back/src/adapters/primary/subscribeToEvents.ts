@@ -59,6 +59,9 @@ const getUseCasesByTopics = (
 
   // Edit establishment form
   FormEstablishmentEditLinkSent: [],
+
+  // Agency related :
+  NewAgencyAdded: [],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

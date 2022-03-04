@@ -1,10 +1,6 @@
 import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import {
-  AgencyInListDto,
-  listAgenciesResponseSchema,
-} from "src/shared/agencies";
-import {
   AddImmersionApplicationResponseDto,
   addImmersionApplicationResponseDtoSchema,
   ApplicationStatus,
@@ -18,7 +14,6 @@ import {
   updateImmersionApplicationStatusResponseSchema,
 } from "src/shared/ImmersionApplicationDto";
 import {
-  agenciesRoute,
   generateMagicLinkRoute,
   immersionApplicationShareRoute,
   immersionApplicationsRoute,
@@ -28,7 +23,6 @@ import {
   updateApplicationStatusRoute,
   validateImmersionApplicationRoute,
 } from "src/shared/routes";
-import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { AgencyId } from "../../shared/agencies";
@@ -36,7 +30,9 @@ import { ShareLinkByEmailDTO } from "../../shared/ShareLinkByEmailDTO";
 
 const prefix = "api";
 
-export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway {
+export class HttpImmersionApplicationGateway
+  implements ImmersionApplicationGateway
+{
   public async add(
     immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<string> {
@@ -174,15 +170,6 @@ export class HttpImmersionApplicationGateway extends ImmersionApplicationGateway
         linkFormat,
       )}`,
     );
-  }
-
-  public async listAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
-    const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
-      params: position,
-    });
-    const response = listAgenciesResponseSchema.parse(httpResponse.data);
-    console.log(response);
-    return response;
   }
 
   public async shareLinkByEmail(

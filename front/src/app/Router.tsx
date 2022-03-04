@@ -1,20 +1,19 @@
 import React from "react";
 import { AddAgencyForm } from "src/app/AddAgency/AddAgencyForm";
 import { Admin } from "src/app/admin/Admin";
-import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
-import { LandingEstablishment } from "src/app/LandingEstablishment/LandingEstablishment";
-import { VerificationPage } from "src/app/Verification/VerificationPage";
 import { ApplicationForm } from "src/app/ApplicationForm/ApplicationForm";
+import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { Home } from "src/app/Home";
+import { LandingEstablishment } from "src/app/LandingEstablishment/LandingEstablishment";
 import { useRoute } from "src/app/routes";
+import { VerificationPage } from "src/app/Verification/VerificationPage";
 import { ENV } from "src/environmentVariables";
-import { AdminVerification } from "./admin/AdminVerification";
-import { EstablishmentForm } from "./FormEstablishment/EstablishmentForm";
-import { PopulateDB } from "./Debug/PopulateDB";
-import { SearchDebug } from "./Debug/SearchDebug";
 import { RenewExpiredLink } from "../helpers/RenewExpiredLink";
-import { Search } from "./Search/Search";
+import { AdminVerification } from "./admin/AdminVerification";
 import { SignForm } from "./ApplicationForm/SignForm";
+import { SearchDebug } from "./Debug/SearchDebug";
+import { EstablishmentForm } from "./FormEstablishment/EstablishmentForm";
+import { Search } from "./Search/Search";
 
 const { dev } = ENV;
 
@@ -57,7 +56,6 @@ export const Router = () => {
           <NotAvailable />
         ))}
       {route.name === "renewMagicLink" && <RenewExpiredLink route={route} />}
-      {dev && route.name === "debugPopulateDB" && <PopulateDB route={route} />}
       {dev && route.name === "searchDebug" && <SearchDebug />}
       {route.name === "search" && <Search />}
       {route.name === "addAgency" && <AddAgencyForm />}

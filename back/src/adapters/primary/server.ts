@@ -15,13 +15,17 @@ import {
   loginPeConnect,
   peConnect,
   renewMagicLinkRoute,
-  requestEmailToUpdateFormRoute as requestEditFormEstablishmentRoute,
   requestEmailToUpdateFormRoute,
   romeRoute,
   siretRoute,
   validateImmersionApplicationRoute,
 } from "../../shared/routes";
+import { temporaryStoragePath } from "../../utils/filesystemUtils";
 import { createLogger } from "../../utils/logger";
+import {
+  PeConnectUserInfo,
+  PoleEmploiConnect,
+} from "../secondary/immersionOffer/PoleEmploiConnect";
 import { createApiKeyAuthRouter } from "./ApiKeyAuthRouter";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies, Repositories } from "./config";
@@ -33,11 +37,6 @@ import {
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
-import { temporaryStoragePath } from "../../utils/filesystemUtils";
-import {
-  PeConnectUserInfo,
-  PoleEmploiConnect,
-} from "../secondary/immersionOffer/PoleEmploiConnect";
 
 const logger = createLogger(__filename);
 
@@ -179,16 +178,23 @@ export const createApp = async (
       ),
     );
 
-  router.route(`/${agenciesRoute}`).get(async (req, res) =>
-    sendHttpResponse(req, res, async () =>
-      deps.useCases.listAgencies.execute({
-        position: {
-          lat: parseFloat(req.query.lat as any),
-          lon: parseFloat(req.query.lon as any),
-        } as any,
-      }),
-    ),
-  );
+  router
+    .route(`/${agenciesRoute}`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.listAgencies.execute({
+          position: {
+            lat: parseFloat(req.query.lat as any),
+            lon: parseFloat(req.query.lon as any),
+          } as any,
+        }),
+      ),
+    )
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.addAgency.execute(req.body),
+      ),
+    );
 
   router.route(`/${formAlreadyExistsRoute}/:siret`).get(async (req, res) => {
     console.log(

@@ -5,7 +5,8 @@ import React from "react";
 export type SuccessFeedbackKind =
   | "justSubmitted"
   | "signedSuccessfully"
-  | "modificationsAsked";
+  | "modificationsAsked"
+  | "agencyAdded";
 
 type SubmitFeedbackProps = {
   submitFeedback: SuccessFeedbackKind | Error | null;
@@ -64,6 +65,9 @@ const messageByKind: Record<SuccessFeedbackKind, React.ReactNode> = {
   justSubmitted: <InitialSubmitSuccessMessage />,
   modificationsAsked: "Vous avez renvoyé la demande pour modification.",
   signedSuccessfully: "Votre accord a été enregistré.",
+  agencyAdded:
+    "L'agence a été ajoutée avec succès. Vous devez attendre qu'elle soit validée " +
+    "avant qu'elle ne soit effectivement disponible pour conventionner des immersions",
 };
 
 const getErrorMessage = (submitError: Error) => {

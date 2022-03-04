@@ -2,6 +2,7 @@ import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablish
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import type { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { EditFormEstablishementPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { AgencyConfig } from "../../immersionApplication/ports/AgencyRepository";
 import {
   ImmersionApplicationRequiresModificationPayload,
   RenewMagicLinkPayload,
@@ -46,7 +47,10 @@ export type DomainEvent =
   // prettier-ignore
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentRequestDto>
   // prettier-ignore
-  | GenericEvent<"FormEstablishmentEditLinkSent", EditFormEstablishementPayload>;
+  | GenericEvent<"FormEstablishmentEditLinkSent", EditFormEstablishementPayload>
+
+  // AGENCY RELATED
+  | GenericEvent<"NewAgencyAdded", AgencyConfig>;
 
 export type DomainTopic = DomainEvent["topic"];
 

@@ -181,6 +181,10 @@ export class AppConfig {
     return parseStringList(this.env.EMAIL_ALLOW_LIST);
   }
 
+  public get defaultAdminEmail() {
+    return this.throwIfNotDefined("ADMIN_EMAIL");
+  }
+
   public get skipEmailAllowlist() {
     return this.getBooleanVariable("SKIP_EMAIL_ALLOW_LIST");
   }
