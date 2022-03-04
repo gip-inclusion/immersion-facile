@@ -245,7 +245,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           immersion_contacts.email,
           immersion_contacts.role,
           immersion_contacts.phone AS contact_phone,
-          naf_classes_2008.class_label,
+          public_naf_classes_2008.class_label,
           libelle_rome
       FROM
         filtered_immersion_offers
@@ -253,11 +253,11 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         ON (offer_siret = establishment_siret)
       LEFT JOIN immersion_contacts
         ON (contact_in_establishment_uuid = immersion_contacts.uuid)
-      LEFT OUTER JOIN naf_classes_2008
-        ON (naf_classes_2008.class_id =
+      LEFT OUTER JOIN public_naf_classes_2008
+        ON (public_naf_classes_2008.class_id =
             REGEXP_REPLACE(naf,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      LEFT OUTER JOIN romes_public_data
-        ON (rome = romes_public_data.code_rome)
+      LEFT OUTER JOIN public_romes_data
+        ON (rome = public_romes_data.code_rome)
         WHERE 
         offer_uuid IS NOT NULL AND
         ST_DWithin(gps, ST_GeographyFromText($1), $2) 
@@ -330,7 +330,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         establishments.data_source,
         ST_AsGeoJSON(establishments.gps) AS position,
         establishments.naf,
-        naf_classes_2008.class_label AS naf_label,
+        public_naf_classes_2008.class_label AS naf_label,
         establishments.number_employees,
         establishments.update_date as establishments_update_date,
         contact_mode
@@ -342,8 +342,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           ON e_ic.establishment_siret = establishments.siret
         LEFT JOIN immersion_contacts ic
           ON ic.uuid = e_ic.contact_uuid
-        LEFT OUTER JOIN naf_classes_2008
-          ON (naf_classes_2008.class_id =
+        LEFT OUTER JOIN public_naf_classes_2008
+          ON (public_naf_classes_2008.class_id =
               REGEXP_REPLACE(establishments.naf,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       WHERE
         establishments.is_active
@@ -471,12 +471,12 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       `SELECT
         immersion_offers.uuid,
         immersion_offers.rome,
-        romes_public_data.libelle_rome,
+        public_romes_data.libelle_rome,
         immersion_offers.score
       FROM
         immersion_offers
-        LEFT OUTER JOIN romes_public_data
-          ON (immersion_offers.rome = romes_public_data.code_rome)
+        LEFT OUTER JOIN public_romes_data
+          ON (immersion_offers.rome = public_romes_data.code_rome)
       WHERE uuid = %L`,
       immersionOfferId,
     );

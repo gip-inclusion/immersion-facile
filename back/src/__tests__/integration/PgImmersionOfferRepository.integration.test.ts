@@ -1,5 +1,4 @@
 import { Pool, PoolClient } from "pg";
-import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   PgContactMethod,
   PgImmersionOfferRepository,

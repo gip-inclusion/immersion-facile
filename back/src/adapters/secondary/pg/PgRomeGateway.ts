@@ -17,7 +17,7 @@ export class PgRomeGateway implements RomeGateway {
     return this.client
       .query(
         `SELECT code_rome
-        FROM appellations_public_data
+        FROM public_appelations_data
         WHERE ogr_appellation=$1`,
         [romeCodeAppellation],
       )
@@ -43,7 +43,7 @@ export class PgRomeGateway implements RomeGateway {
     return this.client
       .query(
         `SELECT code_rome, libelle_rome
-        FROM romes_public_data
+        FROM public_romes_data
         WHERE
           libelle_rome_tsvector@@to_tsquery('french', $1)
           OR libelle_rome ILIKE $2`,
@@ -74,7 +74,7 @@ export class PgRomeGateway implements RomeGateway {
     return await this.client
       .query(
         `SELECT ogr_appellation, libelle_appellation_court, code_rome
-        FROM appellations_public_data
+        FROM public_appelations_data
         WHERE
            (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long ILIKE $3)
            OR (libelle_appellation_long ILIKE $2 AND libelle_appellation_long ILIKE $3)
