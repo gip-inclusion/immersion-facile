@@ -54,7 +54,7 @@ describe("Add FormEstablishment", () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
 
     expect(await addFormEstablishment.execute(formEstablishment)).toEqual(
-      formEstablishment.id,
+      formEstablishment.siret,
     );
 
     const storedInRepo = await formEstablishmentRepo.getAll();
@@ -76,9 +76,9 @@ describe("Add FormEstablishment", () => {
     ).rejects.toThrow();
   });
 
-  test("reject when trying to save Form Establishment in the repository with null ID", async () => {
+  test("reject when trying to save Form Establishment in the repository with null siret", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withId("")
+      .withSiret("")
       .build();
 
     try {
@@ -111,7 +111,7 @@ describe("Add FormEstablishment", () => {
 
         const response = await addFormEstablishment.execute(formEstablishment);
 
-        expect(response).toBe(formEstablishment.id);
+        expect(response).toBe(formEstablishment.siret);
         expect(outboxRepo.events).toHaveLength(1);
         expectObjectsToMatch(outboxRepo.events[0], {
           topic: "FormEstablishmentAdded",
@@ -148,7 +148,7 @@ describe("Add FormEstablishment", () => {
       });
 
       expect(await addFormEstablishment.execute(formEstablishment)).toBe(
-        formEstablishment.id,
+        formEstablishment.siret,
       );
     });
 

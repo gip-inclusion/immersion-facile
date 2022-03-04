@@ -1,10 +1,6 @@
 import axios from "axios";
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
-import {
-  FormEstablishmentDto,
-  FormEstablishmentId,
-  formEstablishmentIdSchema,
-} from "src/shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
 import { RomeSearchMatchDto, romeSearchResponseSchema } from "src/shared/rome";
 import {
   formAlreadyExistsRoute,
@@ -12,19 +8,20 @@ import {
   requestEmailToUpdateFormRoute,
   romeRoute,
 } from "src/shared/routes";
+import { zString } from "src/shared/zodUtils";
 
 const prefix = "api";
 
 export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
   public async addFormEstablishment(
     establishment: FormEstablishmentDto,
-  ): Promise<FormEstablishmentId> {
+  ): Promise<string> {
     const httpResponse = await axios.post(
       `/${prefix}/${immersionOffersRoute}`,
       establishment,
     );
 
-    return formEstablishmentIdSchema.parse(httpResponse.data);
+    return zString.parse(httpResponse.data);
   }
 
   public async searchProfession(

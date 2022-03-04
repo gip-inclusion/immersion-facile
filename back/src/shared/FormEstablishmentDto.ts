@@ -10,10 +10,6 @@ import {
 } from "./utils";
 import { zBoolean, zEmail, zString, zTrimmedString } from "./zodUtils";
 
-export type FormEstablishmentId = Flavor<string, "FormEstablishmentId">;
-export const formEstablishmentIdSchema: z.ZodSchema<FormEstablishmentId> =
-  zTrimmedString;
-
 // prettier-ignore
 export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =
@@ -46,7 +42,6 @@ export const preferInPersonContactSchema = z.literal("IN_PERSON");
 export const preferredContactMethodSchema = z.enum(validContactMethods);
 
 export type FormEstablishmentDto = {
-  id: FormEstablishmentId;
   siret: SiretDto; // 14 characters string
   businessName: string;
   businessNameCustomized?: string;
@@ -60,7 +55,6 @@ export type FormEstablishmentDto = {
 
 export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
   {
-    id: formEstablishmentIdSchema,
     siret: siretSchema,
     businessName: zTrimmedString,
     businessNameCustomized: zTrimmedString.optional(),

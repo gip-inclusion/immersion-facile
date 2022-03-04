@@ -1,7 +1,6 @@
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   FormEstablishmentDto,
-  FormEstablishmentId,
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
 import { createLogger } from "../../../utils/logger";
@@ -15,7 +14,7 @@ const logger = createLogger(__filename);
 
 export class AddFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,
-  FormEstablishmentId
+  string
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -30,7 +29,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
   public async _execute(
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
-  ): Promise<FormEstablishmentId> {
+  ): Promise<string> {
     const featureFlags = await uow.getFeatureFlags();
 
     if (!featureFlags.enableByPassInseeApi) {

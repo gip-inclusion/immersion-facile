@@ -4,7 +4,6 @@ import { ProfessionDto } from "../shared/rome";
 import { Builder } from "./Builder";
 
 const validFormEstablishment: FormEstablishmentDto = {
-  id: "test_demande_immersion_id",
   businessAddress: "1 Rue du Moulin 12345 Quelque Part",
   businessContacts: [
     {
@@ -39,7 +38,6 @@ const validFormEstablishment: FormEstablishmentDto = {
 };
 
 const emptyFormEstablishment: FormEstablishmentDto = {
-  id: "",
   businessAddress: "",
   naf: { code: "", nomenclature: "" },
   preferredContactMethods: [],
@@ -67,10 +65,6 @@ export class FormEstablishmentDtoBuilder
       ...this.dto,
       businessContacts: [{ ...this.dto.businessContacts[0], email }],
     });
-  }
-
-  public withId(id: string) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, id });
   }
 
   public withSiret(siret: string) {

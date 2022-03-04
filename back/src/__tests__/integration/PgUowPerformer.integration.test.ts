@@ -8,7 +8,7 @@ import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorIm
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { UnitOfWork } from "../../domain/core/ports/UnitOfWork";
 
-const someUuid = "11111111-1111-1111-1111-111111111111";
+const someSiret = "12345678901234";
 
 describe("PgUowPerformer", () => {
   let pool: Pool;
@@ -36,18 +36,16 @@ describe("PgUowPerformer", () => {
     await pool.end();
   });
 
-  it("saves every thing when all goes fine", async () => {
-    uuidGenerator.setNextUuid(someUuid);
-
-    const savedUuid = await pgUowPerformer.perform(useCaseUnderTest);
-    expect(savedUuid).toBe(someUuid);
+  it("saves everything when all goes fine", async () => {
+    uuidGenerator.setNextUuid("11111111-1111-1111-1111-111111111111");
+    const savedSiret = await pgUowPerformer.perform(useCaseUnderTest);
+    expect(savedSiret).toBe(someSiret);
 
     await expectLengthOfRepos({ formEstablishmentLength: 1, outboxLength: 1 });
   });
 
   it("keeps modifications atomic when something goes wrong", async () => {
     uuidGenerator.setNextUuid("a failing uuid");
-
     try {
       await pgUowPerformer.perform(useCaseUnderTest);
       expect("Should not be reached").toBe("");
@@ -62,17 +60,17 @@ describe("PgUowPerformer", () => {
 
   const useCaseUnderTest = async (uow: UnitOfWork) => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withId(someUuid)
+      .withSiret(someSiret)
       .build();
 
-    const uuid = await uow.formEstablishmentRepo.save(formEstablishment)!;
+    const siret = await uow.formEstablishmentRepo.save(formEstablishment)!;
 
     const event = createNewEvent({
       topic: "FormEstablishmentAdded",
       payload: formEstablishment,
     });
     await uow.outboxRepo.save(event);
-    return uuid;
+    return siret;
   };
 
   const expectLengthOfRepos = async ({

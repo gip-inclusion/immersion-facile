@@ -15,7 +15,7 @@ describe("Route to post FormEstablishments", () => {
       .send(formEstablishment);
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(formEstablishment.id);
+    expect(response.body).toEqual(formEstablishment.siret);
 
     const inRepo = await reposAndGateways.formEstablishment.getAll();
     expect(inRepo).toEqual([formEstablishment]);

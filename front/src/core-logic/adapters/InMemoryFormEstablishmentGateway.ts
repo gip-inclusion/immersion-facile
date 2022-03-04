@@ -1,8 +1,5 @@
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
-import {
-  FormEstablishmentDto,
-  FormEstablishmentId,
-} from "src/shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
 import { RomeSearchMatchDto } from "src/shared/rome";
 import { sleep } from "src/shared/utils";
 
@@ -18,12 +15,12 @@ export class InMemoryFormEstablishmentGateway
   }
   public async addFormEstablishment(
     immersionOffer: FormEstablishmentDto,
-  ): Promise<FormEstablishmentId> {
+  ): Promise<string> {
     console.log(immersionOffer);
     await sleep(2000);
     if (immersionOffer.businessName === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
-    return immersionOffer.id;
+    return immersionOffer.siret;
   }
 
   public async searchProfession(

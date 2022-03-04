@@ -1,7 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
 import { PgFormEstablishmentRepository } from "../../adapters/secondary/pg/PgFormEstablishmentRepository";
-import { FormEstablishmentId } from "../../shared/FormEstablishmentDto";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 
 describe("PgFormEstablishmentRepository", () => {
@@ -26,7 +25,7 @@ describe("PgFormEstablishmentRepository", () => {
 
   it("Adds a new FormEstablishment", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
+      .withSiret("88888888888888")
       .build();
 
     await formEstablishmentRepository.save(formEstablishment);
@@ -39,20 +38,20 @@ describe("PgFormEstablishmentRepository", () => {
   });
 
   it("Gets saved Form Establishment", async () => {
-    const idA: FormEstablishmentId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
+    const siretA = "11111111111111";
     const formEstablishmentA = FormEstablishmentDtoBuilder.valid()
-      .withId(idA)
+      .withSiret(siretA)
       .build();
 
-    const idB: FormEstablishmentId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+    const siretB = "22222222222222";
     const formEstablishmentB = FormEstablishmentDtoBuilder.valid()
-      .withId(idB)
+      .withSiret(siretB)
       .build();
 
     await formEstablishmentRepository.save(formEstablishmentA);
     await formEstablishmentRepository.save(formEstablishmentB);
 
-    const resultA = await formEstablishmentRepository.getById(idA);
+    const resultA = await formEstablishmentRepository.getBySiret(siretA);
     expect(resultA).toEqual(formEstablishmentA);
 
     const resultAll = await formEstablishmentRepository.getAll();

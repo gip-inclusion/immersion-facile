@@ -1,7 +1,4 @@
-import {
-  FormEstablishmentId,
-  FormEstablishmentDto,
-} from "../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
 import { FormEstablishmentRepository } from "../../domain/immersionOffer/ports/FormEstablishmentRepository";
 import { createLogger } from "../../utils/logger";
 
@@ -12,27 +9,25 @@ export class InMemoryFormEstablishmentRepository
 {
   private formEstablishments: FormEstablishmentDto[] = [];
 
-  public async save(
-    dto: FormEstablishmentDto,
-  ): Promise<FormEstablishmentId | undefined> {
-    if (await this.getById(dto.id)) {
+  public async save(dto: FormEstablishmentDto): Promise<string | undefined> {
+    if (await this.getBySiret(dto.siret)) {
       logger.info({ dto: dto }, "Immersion DTO is already in the list");
       return;
     }
     logger.debug({ immersionOffer: dto }, "Saving a new Immersion Offer");
     this.formEstablishments.push(dto);
-    return dto.id;
+    return dto.siret;
   }
 
   public async getAll() {
     return this.formEstablishments;
   }
 
-  public async getById(
-    id: FormEstablishmentId,
+  public async getBySiret(
+    siret: string,
   ): Promise<FormEstablishmentDto | undefined> {
     return this.formEstablishments.find(
-      (immersionOffer) => immersionOffer.id === id,
+      (immersionOffer) => immersionOffer.siret === siret,
     );
   }
 }

@@ -40,7 +40,6 @@ type EstablishmentFormProps = {
 
 const initialValues: FormEstablishmentDto = ENV.dev
   ? {
-      id: uuidV4(),
       siret: "1234567890123",
       businessName: "My business name, replaced by result from API",
       businessNameCustomized:
@@ -71,7 +70,6 @@ const initialValues: FormEstablishmentDto = ENV.dev
       preferredContactMethods: ["EMAIL"],
     }
   : {
-      id: uuidV4(),
       siret: "",
       businessName: "",
       businessAddress: "",
@@ -222,11 +220,8 @@ export const EstablishmentForm = ({ route }: EstablishmentFormProps) => {
             setIsSuccess(false);
             setSubmitError(null);
 
-            formEstablishmentSchema.parse(data);
-            await formEstablishmentGateway.addFormEstablishment({
-              ...data,
-              id: uuidV4(),
-            });
+              formEstablishmentSchema.parse(data);
+              await formEstablishmentGateway.addFormEstablishment(data);
 
             setIsSuccess(true);
             setSubmitError(null);
