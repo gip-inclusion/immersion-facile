@@ -194,7 +194,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       sireneAnswer.etablissements[0],
     );
 
-    const naf = sireneEstablishment.naf;
+    const nafDto = sireneEstablishment.nafAndNomenclature;
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
     const updatedAt = this.clock.now();
 
@@ -202,7 +202,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       this.uuidGenerator,
       updatedAt,
       {
-        naf,
+        nafDto,
         numberEmployeesRange,
       },
     );

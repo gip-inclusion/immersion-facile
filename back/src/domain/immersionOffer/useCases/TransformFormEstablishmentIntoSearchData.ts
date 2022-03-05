@@ -2,6 +2,7 @@ import {
   FormEstablishmentDto,
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
+import { NafDto } from "../../../shared/naf";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
@@ -9,6 +10,7 @@ import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
 import { RomeGateway } from "../../rome/ports/RomeGateway";
 import {
+  SireneEstablishmentVO,
   SireneRepository,
   SireneRepositoryAnswer,
 } from "../../sirene/ports/SireneRepository";
@@ -61,11 +63,11 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
       );
       return;
     }
-    const naf = inferNafFromSireneAnswer(sireneRepoAnswer);
+    const nafDto = inferNafDtoFromSireneAnswer(sireneRepoAnswer);
     const numberEmployeesRange =
       inferNumberEmployeesRangeFromSireneAnswer(sireneRepoAnswer);
 
-    if (!naf || !position || numberEmployeesRange === undefined) {
+    if (!nafDto || !position || numberEmployeesRange === undefined) {
       logger.error(
         `Some field from siren gateway are missing for establishment with siret ${establishmentSiret}`,
       );
@@ -92,7 +94,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
           if (romeCodeMetier) {
             return {
               id: this.uuidGenerator.new(),
-              rome: romeCodeMetier,
+              romeCode: romeCodeMetier,
               score: offerFromFormScore,
             };
           } else if (romeCodeAppellation) {
@@ -104,7 +106,7 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
             if (correspondingRome)
               return {
                 id: this.uuidGenerator.new(),
-                rome: correspondingRome,
+                romeCode: correspondingRome,
                 score: offerFromFormScore,
               };
           }
@@ -115,10 +117,12 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
     const establishment: EstablishmentEntityV2 = {
       siret: establishmentSiret,
       name: formEstablishment.businessName,
+      customizedName: formEstablishment.businessNameCustomized,
+      isCommited: formEstablishment.isEngagedEnterprise,
       address: formEstablishment.businessAddress,
       voluntaryToImmersion: true,
       dataSource: "form",
-      naf,
+      nafDto,
       position,
       numberEmployeesRange,
       isActive: true,
@@ -142,11 +146,13 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
 }
 
 // Those will probably be shared in a utils/helpers folder
-const inferNafFromSireneAnswer = (sireneRepoAnswer: SireneRepositoryAnswer) =>
-  sireneRepoAnswer.etablissements[0].uniteLegale.activitePrincipaleUniteLegale?.replace(
-    ".",
-    "",
-  );
+const inferNafDtoFromSireneAnswer = (
+  sireneRepoAnswer: SireneRepositoryAnswer,
+): NafDto | undefined => {
+  const establishmentProps = sireneRepoAnswer.etablissements[0];
+  if (!establishmentProps) return;
+  return new SireneEstablishmentVO(establishmentProps).nafAndNomenclature;
+};
 
 const inferNumberEmployeesRangeFromSireneAnswer = (
   sireneRepoAnswer: SireneRepositoryAnswer,

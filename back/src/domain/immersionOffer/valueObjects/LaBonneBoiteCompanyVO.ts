@@ -1,3 +1,4 @@
+import { NafDto } from "../../../shared/naf";
 import { createLogger } from "../../../utils/logger";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import {
@@ -39,7 +40,7 @@ export class LaBonneBoiteCompanyVO {
     uuidGenerator: UuidGenerator,
     updatedAt?: Date,
     extraData?: {
-      naf?: string;
+      nafDto?: NafDto;
       numberEmployeesRange?: TefenCode;
     },
   ): EstablishmentAggregate {
@@ -49,7 +50,7 @@ export class LaBonneBoiteCompanyVO {
         lat: this.props.lat,
         lon: this.props.lon,
       },
-      naf: this.props.naf ?? extraData?.naf,
+      nafDto: extraData?.nafDto ?? { code: this.props.naf, nomenclature: "" }, // Unknown nomenclature (would required to call sirene API)
       dataSource: "api_labonneboite",
       name: this.props.name,
       siret: this.props.siret,
@@ -64,7 +65,7 @@ export class LaBonneBoiteCompanyVO {
       immersionOffers: [
         {
           id: uuidGenerator.new(),
-          rome: this.props.matched_rome_code,
+          romeCode: this.props.matched_rome_code,
           score: this.props.stars,
         },
       ],

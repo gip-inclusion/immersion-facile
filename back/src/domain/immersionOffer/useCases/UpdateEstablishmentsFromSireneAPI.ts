@@ -69,7 +69,7 @@ export class UpdateEstablishmentsFromSireneAPI {
     const sireneEstablishment = new SireneEstablishmentVO(
       sireneEstablishmentProps,
     );
-    const naf = sireneEstablishment.naf;
+    const nafDto = sireneEstablishment.nafAndNomenclature;
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
     const address = sireneEstablishment.formatedAddress;
 
@@ -82,7 +82,7 @@ export class UpdateEstablishmentsFromSireneAPI {
     }
     await this.immersionOfferRepository.updateEstablishment(siret, {
       updatedAt: this.clock.now(),
-      naf,
+      nafDto,
       numberEmployeesRange,
       address: position ? address : undefined,
       position,

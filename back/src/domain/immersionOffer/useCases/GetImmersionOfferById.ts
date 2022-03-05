@@ -60,7 +60,7 @@ export class GetImmersionOfferById extends UseCase<
       // Establishment informations
       address: annotatedEstablishment.address,
       location: annotatedEstablishment.position,
-      naf: annotatedEstablishment.naf,
+      naf: annotatedEstablishment.nafDto.code,
       nafLabel: annotatedEstablishment.nafLabel,
       name: annotatedEstablishment.name,
       siret: annotatedEstablishment.siret,
@@ -68,7 +68,7 @@ export class GetImmersionOfferById extends UseCase<
       contactMode: contact?.contactMethod,
 
       // Offer information
-      rome: annotatedOffer.rome,
+      rome: annotatedOffer.romeCode,
       romeLabel: annotatedOffer.romeLabel,
 
       // Contact informations

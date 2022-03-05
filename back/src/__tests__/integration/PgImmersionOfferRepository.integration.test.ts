@@ -78,7 +78,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       offerContactUid?: string,
       dataSource: DataSource = "form",
       address?: string,
-      naf?: string,
+      nafCode?: string,
       numberEmployeesRange?: number,
     ) => {
       await insertEstablishment({
@@ -87,7 +87,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         position: establishmentPosition,
         dataSource: dataSource,
         address: address,
-        naf,
+        nafCode,
         numberEmployeesRange,
       });
       if (offerContactUid) {
@@ -99,7 +99,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       await insertImmersionOffer({
         uuid: offerUid,
         siret,
-        rome,
+        romeCode: rome,
       });
     };
     describe("If parameter `maxResults` is given", () => {
@@ -196,7 +196,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       await insertImmersionOffer({
         uuid: testUid1,
-        rome: searchedRome,
+        romeCode: searchedRome,
         siret: notActiveSiret,
       });
 
@@ -306,7 +306,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Prepare
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
       const storedEstablishment = new EstablishmentEntityV2Builder()
-        .withNaf("8520A")
+        .withNafCode("8520A")
         .withDataSource("form")
         .build();
 
@@ -543,15 +543,15 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
     });
 
-    it("Updates parameters `naf`, `nb of employe`, `adress` and `position` if given and `updatedAt`", async () => {
+    it("Updates parameters `nafDto`, `nb of employe`, `adress` and `position` if given and `updatedAt`", async () => {
       // Prepare
       const siretOfEstablishmentToUpdate = "78000403200021";
 
       const updateProps: Pick<
         EstablishmentEntityV2,
-        "address" | "position" | "naf" | "numberEmployeesRange"
+        "address" | "position" | "nafDto" | "numberEmployeesRange"
       > = {
-        naf: "8722B",
+        nafDto: { code: "8722B", nomenclature: "nomenc" },
         numberEmployeesRange: 1,
         position: { lon: 21, lat: 23 },
         address: "4 rue de l'île de Bitche 44000 Nantes",
@@ -580,7 +580,8 @@ describe("Postgres implementation of immersion offer repository", () => {
       const partialExpectedEstablishmentRowInDB: Partial<PgEstablishmentRowWithGeo> =
         {
           update_date: updatedAt,
-          naf: updateProps.naf,
+          naf_code: updateProps.nafDto.code,
+          naf_nomenclature: updateProps.nafDto.nomenclature,
           number_employees: updateProps.numberEmployeesRange,
           address: updateProps.address,
           longitude: updateProps?.position?.lon,
@@ -616,9 +617,12 @@ describe("Postgres implementation of immersion offer repository", () => {
         const expectedEstablishmentRow: Partial<PgEstablishmentRow> = {
           siret: establishmentToInsert.siret,
           name: establishmentToInsert.name,
+          customized_name: establishmentToInsert.customizedName,
+          is_commited: establishmentToInsert.isCommited,
           address: establishmentToInsert.address,
           number_employees: establishmentToInsert.numberEmployeesRange,
-          naf: establishmentToInsert.naf,
+          naf_code: establishmentToInsert.nafDto.code,
+          naf_nomenclature: establishmentToInsert.nafDto.nomenclature,
           data_source: establishmentToInsert.dataSource,
           update_date: establishmentToInsert.updatedAt,
           is_active: establishmentToInsert.isActive,
@@ -709,7 +713,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
         const expectedFirstImmersionOfferRow: Partial<PgImmersionOfferRow> = {
           uuid: offer1.id,
-          rome: offer1.rome,
+          rome_code: offer1.romeCode,
           score: offer1.score,
           siret: siret1,
         };
@@ -730,7 +734,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           isActive: true,
           position: { lat: 88, lon: 3 },
           address: existingEstablishmentAddress,
-          naf: "1032Z",
+          nafCode: "1032Z",
           numberEmployeesRange: 1,
           updatedAt: existingUpdateAt,
           dataSource,
@@ -743,7 +747,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           await insertExistingEstablishmentWithDataSource("form");
           await insertImmersionOffer({
             uuid: testUid1,
-            rome: offer1Rome,
+            romeCode: offer1Rome,
             siret: existingSiret,
           });
 
@@ -781,8 +785,8 @@ describe("Postgres implementation of immersion offer repository", () => {
           /// Offer should have been added
           const actualImmersionOfferRows = await getAllImmersionOfferRows();
           expect(actualImmersionOfferRows).toHaveLength(2);
-          expect(actualImmersionOfferRows[0]?.rome).toEqual(offer1Rome);
-          expect(actualImmersionOfferRows[1]?.rome).toEqual(offer2Rome);
+          expect(actualImmersionOfferRows[0]?.rome_code).toEqual(offer1Rome);
+          expect(actualImmersionOfferRows[1]?.rome_code).toEqual(offer2Rome);
 
           // /// Contact should not have been added
           // expect(await getAllImmersionContactsRows()).toHaveLength(0); // TODO : fix me ?
@@ -825,7 +829,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           await insertExistingEstablishmentWithDataSource("api_labonneboite");
           await insertImmersionOffer({
             uuid: "22222222-a2a5-430a-b558-ed3e2f03512d",
-            rome: offerRome,
+            romeCode: offerRome,
             siret: existingSiret,
           });
           // Act : an establishment aggregate with this siret is inserted by source Form
@@ -914,13 +918,16 @@ describe("Postgres implementation of immersion offer repository", () => {
   type PgEstablishmentRow = {
     siret: string;
     name: string;
+    customized_name?: string;
     address: string;
     number_employees: number;
-    naf: string;
+    naf_code: string;
+    naf_nomenclature: string;
     data_source: string;
     gps: string;
     update_date?: Date;
     is_active: boolean;
+    is_commited?: boolean;
   };
 
   const getAllEstablishmentsRows = (): Promise<PgEstablishmentRow[]> =>
@@ -956,7 +963,8 @@ describe("Postgres implementation of immersion offer repository", () => {
 
   type PgImmersionOfferRow = {
     uuid: string;
-    rome: string;
+    rome_code: string;
+    rome_nomenclature: number;
     siret: string;
     score: number;
   };
@@ -982,7 +990,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     siret: string;
     updatedAt?: Date;
     isActive?: boolean;
-    naf?: string;
+    nafCode?: string;
     numberEmployeesRange?: number;
     address?: string;
     position?: LatLonDto;
@@ -991,7 +999,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     const defaultPosition = { lon: 12.2, lat: 2.1 };
     const insertQuery = `
     INSERT INTO establishments (
-      siret, name, address, number_employees, naf, data_source, update_date, is_active, gps
+      siret, name, address, number_employees, naf_code, data_source, update_date, is_active, gps
     ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, ST_GeographyFromText('POINT(${
       props.position?.lon ?? defaultPosition.lon
     } ${props.position?.lat ?? defaultPosition.lat})'))`;
@@ -999,7 +1007,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.siret,
       props.address ?? "7 rue guillaume tell, 75017 Paris",
       props.numberEmployeesRange ?? null,
-      props.naf ?? "8622B",
+      props.nafCode ?? "8622B",
       props.dataSource ?? "api_labonneboite",
       props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
       props.isActive ?? true,
@@ -1007,14 +1015,23 @@ describe("Postgres implementation of immersion offer repository", () => {
   };
   const insertImmersionOffer = async (props: {
     uuid: string;
-    rome: string;
+    romeCode: string;
     siret: string;
   }) => {
     const insertQuery = `INSERT INTO immersion_offers (
-      uuid, rome, siret, score
+      uuid, rome_code, siret, score, rome_appellation
     ) VALUES
-     ($1, $2, $3, 4)`;
-    await client.query(insertQuery, [props.uuid, props.rome, props.siret]);
+     ($1, $2, $3, $4, $5)`;
+    const defaultScore = 4;
+    const defaultCodeAppelation = 16067;
+
+    await client.query(insertQuery, [
+      props.uuid,
+      props.romeCode,
+      props.siret,
+      defaultScore,
+      defaultCodeAppelation,
+    ]);
   };
   const insertImmersionContact = async (props: {
     uuid: string;

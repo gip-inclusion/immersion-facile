@@ -3,6 +3,7 @@ import {
   EstablishmentEntityV2,
   TefenCode,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
+import { NafDto } from "../shared/naf";
 import { Builder } from "./Builder";
 
 export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
@@ -12,10 +13,12 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   dataSource: "form",
   voluntaryToImmersion: true,
   position: { lat: 35, lon: 50 },
-  naf: "8539A",
+  nafDto: { code: "8539A", nomenclature: "NAFRev2" },
   numberEmployeesRange: 11,
   updatedAt: new Date("2022-01-05T00:00:00.000"),
   isActive: true,
+  isCommited: false,
+  customizedName: "Custom name",
 };
 
 export class EstablishmentEntityV2Builder
@@ -38,8 +41,14 @@ export class EstablishmentEntityV2Builder
       voluntaryToImmersion: dataSource == "form",
     });
   }
-  withNaf(naf: string) {
-    return new EstablishmentEntityV2Builder({ ...this.entity, naf });
+  withNafDto(nafDto: NafDto) {
+    return new EstablishmentEntityV2Builder({ ...this.entity, nafDto });
+  }
+  withNafCode(code: string) {
+    return new EstablishmentEntityV2Builder({
+      ...this.entity,
+      nafDto: { code, nomenclature: this.entity.nafDto.nomenclature },
+    });
   }
   withNumberOfEmployeeRange(tefenCode: TefenCode) {
     return new EstablishmentEntityV2Builder({

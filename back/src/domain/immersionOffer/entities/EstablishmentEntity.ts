@@ -1,3 +1,4 @@
+import { NafDto } from "../../../shared/naf";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2 } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
@@ -29,14 +30,16 @@ export const employeeRangeByTefenCode: Record<TefenCode, string> = {
 export type EstablishmentEntityV2 = {
   siret: string;
   name: string;
+  customizedName?: string;
   address: string;
   voluntaryToImmersion: boolean;
   dataSource: DataSource;
   position: LatLonDto;
-  naf: string;
+  nafDto: NafDto;
   numberEmployeesRange: TefenCode;
   updatedAt?: Date;
   isActive: boolean;
+  isCommited?: boolean;
 };
 
 export type AnnotatedEstablishmentEntityV2 = EstablishmentEntityV2 & {

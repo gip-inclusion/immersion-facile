@@ -101,7 +101,7 @@ export class InMemoryImmersionOfferRepository
         aggregate.immersionOffers
           .filter(
             (immersionOffer) =>
-              !searchMade.rome || immersionOffer.rome === searchMade.rome,
+              !searchMade.rome || immersionOffer.romeCode === searchMade.rome,
           )
           .map((immersionOffer) =>
             buildSearchImmersionResultDto(
@@ -135,7 +135,7 @@ export class InMemoryImmersionOfferRepository
     propertiesToUpdate: Partial<
       Pick<
         EstablishmentEntityV2,
-        "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"
+        "address" | "position" | "nafDto" | "numberEmployeesRange" | "isActive"
       >
     > & { updatedAt: Date },
   ): Promise<void> {
@@ -151,7 +151,8 @@ export class InMemoryImmersionOfferRepository
                 position:
                   propertiesToUpdate.position ||
                   aggregate.establishment.position,
-                naf: propertiesToUpdate.naf || aggregate.establishment.naf,
+                nafDto:
+                  propertiesToUpdate.nafDto || aggregate.establishment.nafDto,
                 numberEmployeesRange:
                   propertiesToUpdate.numberEmployeesRange ||
                   aggregate.establishment.numberEmployeesRange,
@@ -204,10 +205,10 @@ const buildSearchImmersionResultDto = (
 ): SearchImmersionResultDto => ({
   id: immersionOffer.id,
   address: establishment.address,
-  naf: establishment.naf,
+  naf: establishment.nafDto.code,
   nafLabel: TEST_NAF_LABEL,
   name: establishment.name,
-  rome: immersionOffer.rome,
+  rome: immersionOffer.romeCode,
   romeLabel: TEST_ROME_LABEL,
   siret: establishment.siret,
   voluntaryToImmersion: establishment.voluntaryToImmersion,

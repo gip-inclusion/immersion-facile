@@ -168,7 +168,7 @@ describe("Update establishments and offers based on searches made during the day
           ).toEqual([
             {
               id: "uuidLBB1",
-              rome: matchedRomeCode,
+              romeCode: matchedRomeCode,
               score: 1,
             },
           ]);
@@ -177,7 +177,7 @@ describe("Update establishments and offers based on searches made during the day
           ).toEqual([
             {
               id: "uuidLBB2",
-              rome: matchedRomeCode,
+              romeCode: matchedRomeCode,
               score: 2,
             },
           ]);

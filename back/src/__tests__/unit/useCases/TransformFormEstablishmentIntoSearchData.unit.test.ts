@@ -8,6 +8,7 @@ import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
 import { TransformFormEstablishmentIntoSearchData } from "../../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
 import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
+import { NafDto } from "../../../shared/naf";
 import { ProfessionDto } from "../../../shared/rome";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
@@ -23,7 +24,7 @@ const fakePosition: LatLonDto = { lat: 49.119146, lon: 6.17602 };
 const fakeActivitePrincipaleUniteLegale = "85.59A";
 const fakeBusinessContact = new ContactEntityV2Builder().build();
 
-const expectedNaf = "8559A";
+const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
 
 const getEstablishmentFromSireneApi = (
   formEstablishment: FormEstablishmentDto,
@@ -34,6 +35,7 @@ const getEstablishmentFromSireneApi = (
       denominationUniteLegale: formEstablishment.businessName,
       activitePrincipaleUniteLegale: fakeActivitePrincipaleUniteLegale,
       trancheEffectifsUniteLegale: "01",
+      nomenclatureActivitePrincipaleUniteLegale: "nomencl",
     },
     adresseEtablissement: {
       numeroVoieEtablissement: formEstablishment.businessAddress,
@@ -98,7 +100,7 @@ describe("Transform FormEstablishment into search data", () => {
     // Assert
     await expectEstablishmentAggregateInRepo({
       siret: fakeSiret,
-      naf: expectedNaf,
+      nafDto: expectedNafDto,
       offerRomes: ["A1101", "A1102"],
       contactEmail: fakeBusinessContact.email,
     });
@@ -106,7 +108,7 @@ describe("Transform FormEstablishment into search data", () => {
 
   const expectEstablishmentAggregateInRepo = async (expected: {
     siret: string;
-    naf: string;
+    nafDto: NafDto;
     contactEmail: string;
     offerRomes: string[];
   }) => {
@@ -117,7 +119,9 @@ describe("Transform FormEstablishment into search data", () => {
     expect(repoEstablishmentAggregate.establishment.siret).toEqual(
       expected.siret,
     );
-    expect(repoEstablishmentAggregate.establishment.naf).toEqual(expected.naf);
+    expect(repoEstablishmentAggregate.establishment.nafDto).toEqual(
+      expected.nafDto,
+    );
     expect(repoEstablishmentAggregate.establishment.dataSource).toEqual("form");
 
     // Contact
@@ -131,7 +135,7 @@ describe("Transform FormEstablishment into search data", () => {
       expected.offerRomes.length,
     );
     expect(
-      repoEstablishmentAggregate.immersionOffers.map((offer) => offer.rome),
+      repoEstablishmentAggregate.immersionOffers.map((offer) => offer.romeCode),
     ).toEqual(expected.offerRomes);
   };
 

@@ -45,7 +45,7 @@ export interface ImmersionOfferRepository {
     propertiesToUpdate: Partial<
       Pick<
         EstablishmentEntityV2,
-        "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"
+        "address" | "position" | "nafDto" | "numberEmployeesRange" | "isActive"
       >
     > & { updatedAt: Date },
   ) => Promise<void>;

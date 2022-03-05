@@ -74,13 +74,16 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     const establishmentFields = aggregates.map(({ establishment }) => [
       establishment.siret,
       establishment.name,
+      establishment.customizedName,
       establishment.address,
       establishment.numberEmployeesRange,
-      establishment.naf,
+      establishment.nafDto.code,
+      establishment.nafDto.nomenclature,
       establishment.dataSource,
       convertPositionToStGeography(establishment.position),
       establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
       establishment.isActive,
+      establishment.isCommited,
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -89,7 +92,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, address, number_employees, naf, data_source, gps, update_date, is_active
+          siret, name, customized_name, address, number_employees, naf_code, naf_nomenclature, data_source, gps, update_date, is_active, is_commited
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -98,7 +101,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
                 name=EXCLUDED.name,
                 address=EXCLUDED.address,
                 number_employees=EXCLUDED.number_employees,
-                naf=EXCLUDED.naf,
+                naf_code=EXCLUDED.naf_code,
                 data_source=EXCLUDED.data_source
               WHERE
                 EXCLUDED.data_source='form'
@@ -170,7 +173,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       ({ establishment, immersionOffers }) =>
         immersionOffers.map((immersionOffer) => [
           immersionOffer.id,
-          immersionOffer.rome,
+          immersionOffer.romeCode,
+          immersionOffer.romeAppellation,
           establishment.siret,
           immersionOffer.score,
         ]),
@@ -191,7 +195,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     try {
       const query = format(
         `INSERT INTO immersion_offers (
-          uuid, rome, siret, score
+          uuid, rome_code, rome_appellation, siret, score
         ) VALUES %L`,
         deduplicatedArrayOfImmersionOffers,
       );
@@ -216,7 +220,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
             establishments.name as establishment_name,
             number_employees AS establishment_tefen_code, 
             address,
-            naf,
+            naf_code,
             data_source,
             siret AS establishment_siret,
             contact_uuid as contact_in_establishment_uuid,
@@ -231,9 +235,9 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           SELECT 
             uuid as offer_uuid, 
             siret as offer_siret, 
-            rome
+            rome_code
           FROM immersion_offers 
-          ${searchMade.rome ? "WHERE rome = %1$L" : ""}
+          ${searchMade.rome ? "WHERE rome_code = %1$L" : ""} 
           )
       SELECT
           filtered_immersion_offers.*,
@@ -255,9 +259,9 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         ON (contact_in_establishment_uuid = immersion_contacts.uuid)
       LEFT OUTER JOIN public_naf_classes_2008
         ON (public_naf_classes_2008.class_id =
-            REGEXP_REPLACE(naf,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+            REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       LEFT OUTER JOIN public_romes_data
-        ON (rome = public_romes_data.code_rome)
+        ON (rome_code = public_romes_data.code_rome)
         WHERE 
         offer_uuid IS NOT NULL AND
         ST_DWithin(gps, ST_GeographyFromText($1), $2) 
@@ -287,9 +291,9 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               : null;
           const searchImmersionResultDto: SearchImmersionResultDto = {
             id: result.offer_uuid,
-            rome: result.rome,
+            rome: result.rome_code,
             romeLabel: result.libelle_rome,
-            naf: result.naf,
+            naf: result.naf_code,
             nafLabel: result.class_label,
             siret: result.establishment_siret,
             name: result.establishment_name,
@@ -315,7 +319,9 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       })
       .catch((e) => {
         logger.error("Error in Pg implementation of getFromSearch", e);
-        return [];
+        console.log(e);
+        throw e;
+        //return [];
       });
   }
 
@@ -326,10 +332,13 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       `SELECT
         establishments.siret,
         establishments.name,
+        establishments.customized_name,
+        establishments.is_commited,
         establishments.address,
         establishments.data_source,
         ST_AsGeoJSON(establishments.gps) AS position,
-        establishments.naf,
+        establishments.naf_code,
+        establishments.naf_nomenclature,
         public_naf_classes_2008.class_label AS naf_label,
         establishments.number_employees,
         establishments.update_date as establishments_update_date,
@@ -344,7 +353,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
           ON ic.uuid = e_ic.contact_uuid
         LEFT OUTER JOIN public_naf_classes_2008
           ON (public_naf_classes_2008.class_id =
-              REGEXP_REPLACE(establishments.naf,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+              REGEXP_REPLACE(establishments.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       WHERE
         establishments.is_active
         AND immersion_offers.uuid = %L`,
@@ -357,14 +366,16 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     return {
       siret: row.siret,
       name: row.name,
+      customizedName: row.customized_name,
       address: row.address,
       voluntaryToImmersion: row.data_source == "form",
       dataSource: row.data_source,
       position: row.position && parseGeoJson(row.position),
-      naf: row.naf,
+      nafDto: { code: row.naf_code, nomenclature: row.naf_nomenclature },
       nafLabel: row.naf_label,
       numberEmployeesRange: row.number_employees,
       isActive: true,
+      isCommited: row.is_commited,
       updatedAt: row.establishments_update_date,
     };
   }
@@ -386,7 +397,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     propertiesToUpdate: Partial<
       Pick<
         EstablishmentEntityV2,
-        "address" | "position" | "naf" | "numberEmployeesRange" | "isActive"
+        "address" | "position" | "nafDto" | "numberEmployeesRange" | "isActive"
       >
     > & { updatedAt: Date },
   ): Promise<void> {
@@ -397,22 +408,28 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
                        ? ", is_active=%2$L"
                        : ""
                    }
-                   ${!!propertiesToUpdate.naf ? ", naf=%3$L" : ""}
+                   ${!!propertiesToUpdate.nafDto ? ", naf_code=%3$L" : ""}
+                   ${
+                     !!propertiesToUpdate.nafDto
+                       ? ", naf_nomenclature=%4$L"
+                       : ""
+                   }
                    ${
                      !!propertiesToUpdate.numberEmployeesRange
-                       ? ", number_employees=%4$L"
+                       ? ", number_employees=%5$L"
                        : ""
                    }
                    ${
                      propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
-                       ? ", address=%5$L, gps=ST_GeographyFromText(%6$L)"
+                       ? ", address=%6$L, gps=ST_GeographyFromText(%7$L)"
                        : ""
                    }
-                   WHERE siret=%7$L;`;
+                   WHERE siret=%8$L;`;
     const queryArgs = [
       propertiesToUpdate.updatedAt.toISOString(),
       propertiesToUpdate.isActive,
-      propertiesToUpdate.naf,
+      propertiesToUpdate.nafDto?.code,
+      propertiesToUpdate.nafDto?.nomenclature,
       propertiesToUpdate.numberEmployeesRange,
       propertiesToUpdate.address,
       propertiesToUpdate.position
@@ -470,13 +487,13 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     const query = format(
       `SELECT
         immersion_offers.uuid,
-        immersion_offers.rome,
+        immersion_offers.rome_code,
         public_romes_data.libelle_rome,
         immersion_offers.score
       FROM
         immersion_offers
         LEFT OUTER JOIN public_romes_data
-          ON (immersion_offers.rome = public_romes_data.code_rome)
+          ON (immersion_offers.rome_code = public_romes_data.code_rome)
       WHERE uuid = %L`,
       immersionOfferId,
     );
@@ -487,7 +504,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     if (!row) return;
     return {
       id: row.uuid,
-      rome: row.rome,
+      romeCode: row.rome_code,
       romeLabel: row.libelle_rome,
       score: row.score,
     };

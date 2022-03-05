@@ -107,6 +107,7 @@ describe("Update establishments from Sirene API", () => {
         .withUniteLegale({
           activitePrincipaleUniteLegale: "85.59A",
           trancheEffectifsUniteLegale: "01",
+          nomenclatureActivitePrincipaleUniteLegale: "nafNom",
         })
         .build(),
     );
@@ -119,7 +120,11 @@ describe("Update establishments from Sirene API", () => {
     // Assert
     expectEstablishmentToMatch(
       findEstablishmentEntityGivenSiret(immersionRepo, "establishmentToUpdate"),
-      { updatedAt: now, naf: "8559A", numberEmployeesRange: 1 },
+      {
+        updatedAt: now,
+        nafDto: { code: "8559A", nomenclature: "nafNom" },
+        numberEmployeesRange: 1,
+      },
     );
   });
 

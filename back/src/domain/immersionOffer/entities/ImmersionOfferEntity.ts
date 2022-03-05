@@ -2,8 +2,9 @@ import { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 
 export type ImmersionOfferEntityV2 = {
   id: ImmersionOfferId;
-  rome: string;
+  romeCode: string;
   score: number;
+  romeAppellation?: number; // TODO : make it mandatory
 };
 
 export type AnnotatedImmersionOfferEntityV2 = ImmersionOfferEntityV2 & {
