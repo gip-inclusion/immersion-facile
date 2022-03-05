@@ -45,7 +45,10 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     .route(`/${signApplicationRoute}/:jwt`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.signImmersionApplication.execute({}, req.jwtPayload),
+        deps.useCases.signImmersionApplication.execute(
+          undefined,
+          req.jwtPayload,
+        ),
       ),
     );
 

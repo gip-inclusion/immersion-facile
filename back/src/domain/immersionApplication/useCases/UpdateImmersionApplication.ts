@@ -8,7 +8,7 @@ import {
   ApplicationStatus,
   UpdateImmersionApplicationRequestDto,
   updateImmersionApplicationRequestDtoSchema,
-  UpdateImmersionApplicationResponseDto,
+  WithImmersionApplicationId,
 } from "../../../shared/ImmersionApplicationDto";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
@@ -19,7 +19,7 @@ import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRep
 
 export class UpdateImmersionApplication extends TransactionalUseCase<
   UpdateImmersionApplicationRequestDto,
-  UpdateImmersionApplicationResponseDto
+  WithImmersionApplicationId
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -33,7 +33,7 @@ export class UpdateImmersionApplication extends TransactionalUseCase<
   public async _execute(
     params: UpdateImmersionApplicationRequestDto,
     uow: UnitOfWork,
-  ): Promise<UpdateImmersionApplicationResponseDto> {
+  ): Promise<WithImmersionApplicationId> {
     const minimalValidStatus: ApplicationStatus = "READY_TO_SIGN";
 
     if (

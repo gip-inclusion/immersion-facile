@@ -31,8 +31,9 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
     <Formik
       initialValues={{
         email: mentorEmail.value,
-        details:
-          `${firstName.value || "Prénom" } ${lastName.value || "Nom" } vous invite à prendre connaissance de cette demande de convention d’immersion déjà partiellement remplie afin que vous la complétiez.  Merci !`,
+        details: `${firstName.value || "Prénom"} ${
+          lastName.value || "Nom"
+        } vous invite à prendre connaissance de cette demande de convention d’immersion déjà partiellement remplie afin que vous la complétiez.  Merci !`,
         immersionApplicationLink: window.location.href,
       }}
       validationSchema={toFormikValidationSchema(shareLinkByEmailSchema)}

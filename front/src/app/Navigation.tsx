@@ -16,7 +16,7 @@ export const Navigation = () => {
       <a {...routes.formEstablishment().link}>Formulaire Entreprise</a> {" - "}
       <a {...routes.landingEstablishment().link}>Landing entreprise </a> {" - "}
       <a {...routes.search().link}>Recherche</a> {" - "}
-    <a {...routes.addAgency().link}>Ajouter agence</a>
-  </nav>
+      <a {...routes.addAgency().link}>Ajouter agence</a>
+    </nav>
   );
 };

@@ -59,7 +59,7 @@ const scheduleSchema: z.ZodSchema<ScheduleDto> = z.any();
 const legacyScheduleSchema: z.ZodSchema<LegacyScheduleDto> = z.any();
 
 export type ImmersionApplicationId = Flavor<string, "ImmersionApplicationId">;
-const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
+export const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
   zTrimmedString;
 
 // prettier-ignore
@@ -147,19 +147,13 @@ export const immersionApplicationArraySchema = z.array(
   immersionApplicationSchema,
 );
 
-const withImmersionApplicationIdSchema = z.object({
-  id: immersionApplicationIdSchema,
-});
-
-// prettier-ignore
-export type AddImmersionApplicationResponseDto = z.infer<typeof addImmersionApplicationResponseDtoSchema>;
-export const addImmersionApplicationResponseDtoSchema =
-  withImmersionApplicationIdSchema;
-
-// prettier-ignore
-export type GetImmersionApplicationRequestDto = z.infer<typeof getImmersionApplicationRequestDtoSchema>;
-export const getImmersionApplicationRequestDtoSchema =
-  withImmersionApplicationIdSchema;
+export type WithImmersionApplicationId = {
+  id: ImmersionApplicationId;
+};
+export const withImmersionApplicationIdSchema: z.Schema<WithImmersionApplicationId> =
+  z.object({
+    id: immersionApplicationIdSchema,
+  });
 
 // prettier-ignore
 export type UpdateImmersionApplicationRequestDto = z.infer<typeof updateImmersionApplicationRequestDtoSchema>;
@@ -181,42 +175,11 @@ export const listImmersionApplicationRequestDtoSchema = z.object({
 });
 
 // prettier-ignore
-export type UpdateImmersionApplicationResponseDto = z.infer<typeof updateImmersionApplicationResponseDtoSchema>;
-export const updateImmersionApplicationResponseDtoSchema =
-  withImmersionApplicationIdSchema;
-
-// prettier-ignore
-export type ValidateImmersionApplicationRequestDto = z.infer<typeof validateImmersionApplicationRequestDtoSchema>;
-export const validateImmersionApplicationRequestDtoSchema =
-  immersionApplicationIdSchema;
-
-// prettier-ignore
-export type ValidateImmersionApplicationResponseDto = z.infer<typeof validateImmersionApplicationResponseDtoSchema>;
-export const validateImmersionApplicationResponseDtoSchema =
-  withImmersionApplicationIdSchema;
-
-// prettier-ignore
 export type UpdateImmersionApplicationStatusRequestDto = z.infer<typeof updateImmersionApplicationStatusRequestSchema>;
 export const updateImmersionApplicationStatusRequestSchema = z.object({
   status: z.enum(validApplicationStatus),
   justification: z.string().optional(),
 });
-
-// prettier-ignore
-export type UpdateImmersionApplicationStatusResponseDto = z.infer<typeof updateImmersionApplicationStatusResponseSchema>;
-export const updateImmersionApplicationStatusResponseSchema =
-  withImmersionApplicationIdSchema;
-
-export type SignImmersionApplicationRequestDto = z.infer<
-  typeof signImmersionApplicationRequestSchema
->;
-export const signImmersionApplicationRequestSchema = z.object({});
-
-export type SignImmersionApplicationResponseDto = z.infer<
-  typeof signImmersionApplicationResponseSchema
->;
-export const signImmersionApplicationResponseSchema =
-  withImmersionApplicationIdSchema;
 
 // prettier-ignore
 export type GenerateMagicLinkRequestDto = z.infer<typeof generateMagicLinkRequestSchema>;
@@ -272,11 +235,24 @@ export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   peExternalId: undefined,
 };
 
+const getNewStatus = (
+  enterpriseAccepted: boolean,
+  beneficiaryAccepted: boolean,
+): ApplicationStatus => {
+  if (enterpriseAccepted && beneficiaryAccepted) return "IN_REVIEW";
+  if (
+    (enterpriseAccepted && !beneficiaryAccepted) ||
+    (!enterpriseAccepted && beneficiaryAccepted)
+  )
+    return "PARTIALLY_SIGNED";
+  return "READY_TO_SIGN";
+};
+
 // Returns an application signed by provided roles.
 export const signApplicationDtoWithRole = (
   application: ImmersionApplicationDto,
   role: Role,
-) => {
+): ImmersionApplicationDto => {
   if (
     !["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(application.status)
   ) {
@@ -289,17 +265,9 @@ export const signApplicationDtoWithRole = (
     role === "establishment" ? true : application.enterpriseAccepted;
   const beneficiaryAccepted =
     role === "beneficiary" ? true : application.beneficiaryAccepted;
-  let status: ApplicationStatus = "READY_TO_SIGN";
-  // if beneficiaryAccepted XOR enterpise accepted
-  if (
-    (enterpriseAccepted && !beneficiaryAccepted) ||
-    (!enterpriseAccepted && beneficiaryAccepted)
-  ) {
-    status = "PARTIALLY_SIGNED";
-  }
-  if (enterpriseAccepted && beneficiaryAccepted) {
-    status = "IN_REVIEW";
-  }
+
+  const status = getNewStatus(enterpriseAccepted, beneficiaryAccepted);
+
   return {
     ...application,
     beneficiaryAccepted,

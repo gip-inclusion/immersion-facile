@@ -1,17 +1,13 @@
 import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import {
-  AddImmersionApplicationResponseDto,
-  addImmersionApplicationResponseDtoSchema,
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
   immersionApplicationSchema,
-  UpdateImmersionApplicationResponseDto,
-  updateImmersionApplicationResponseDtoSchema,
+  WithImmersionApplicationId,
   UpdateImmersionApplicationStatusRequestDto,
-  UpdateImmersionApplicationStatusResponseDto,
-  updateImmersionApplicationStatusResponseSchema,
+  withImmersionApplicationIdSchema,
 } from "src/shared/ImmersionApplicationDto";
 import {
   generateMagicLinkRoute,
@@ -41,11 +37,9 @@ export class HttpImmersionApplicationGateway
       `/${prefix}/${immersionApplicationsRoute}`,
       immersionApplicationDto,
     );
-    const addImmersionApplicationResponse: AddImmersionApplicationResponseDto =
+    const addImmersionApplicationResponse: WithImmersionApplicationId =
       httpResponse.data;
-    addImmersionApplicationResponseDtoSchema.parse(
-      addImmersionApplicationResponse,
-    );
+    withImmersionApplicationIdSchema.parse(addImmersionApplicationResponse);
     return addImmersionApplicationResponse.id;
   }
 
@@ -90,11 +84,9 @@ export class HttpImmersionApplicationGateway
       `/${prefix}/${immersionApplicationsRoute}/${immersionApplicationDto.id}`,
       immersionApplicationDto,
     );
-    const updateImmersionApplicationResponse: UpdateImmersionApplicationResponseDto =
+    const updateImmersionApplicationResponse: WithImmersionApplicationId =
       httpResponse.data;
-    updateImmersionApplicationResponseDtoSchema.parse(
-      updateImmersionApplicationResponse,
-    );
+    withImmersionApplicationIdSchema.parse(updateImmersionApplicationResponse);
     return updateImmersionApplicationResponse.id;
   }
 
@@ -108,34 +100,30 @@ export class HttpImmersionApplicationGateway
       immersionApplicationDto,
     );
     const updateImmersionApplicationResponse =
-      updateImmersionApplicationResponseDtoSchema.parse(httpResponse.data);
+      withImmersionApplicationIdSchema.parse(httpResponse.data);
     return updateImmersionApplicationResponse.id;
   }
 
   public async updateStatus(
     params: UpdateImmersionApplicationStatusRequestDto,
     jwt: string,
-  ): Promise<UpdateImmersionApplicationStatusResponseDto> {
+  ): Promise<WithImmersionApplicationId> {
     const httpResponse = await axios.post(
       `/${prefix}/auth/${updateApplicationStatusRoute}/${jwt}`,
       params,
     );
 
-    return updateImmersionApplicationStatusResponseSchema.parse(
-      httpResponse.data,
-    );
+    return withImmersionApplicationIdSchema.parse(httpResponse.data);
   }
 
   public async signApplication(
     jwt: string,
-  ): Promise<UpdateImmersionApplicationStatusResponseDto> {
+  ): Promise<WithImmersionApplicationId> {
     const httpResponse = await axios.post(
       `/${prefix}/auth/${signApplicationRoute}/${jwt}`,
     );
 
-    return updateImmersionApplicationStatusResponseSchema.parse(
-      httpResponse.data,
-    );
+    return withImmersionApplicationIdSchema.parse(httpResponse.data);
   }
 
   public async validate(id: ImmersionApplicationId): Promise<string> {

@@ -1,14 +1,14 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   ImmersionApplicationDto,
-  GetImmersionApplicationRequestDto,
-  getImmersionApplicationRequestDtoSchema,
+  WithImmersionApplicationId,
+  withImmersionApplicationIdSchema,
 } from "../../../shared/ImmersionApplicationDto";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
 
 export class GetImmersionApplication extends UseCase<
-  GetImmersionApplicationRequestDto,
+  WithImmersionApplicationId,
   ImmersionApplicationDto
 > {
   constructor(
@@ -17,11 +17,11 @@ export class GetImmersionApplication extends UseCase<
     super();
   }
 
-  inputSchema = getImmersionApplicationRequestDtoSchema;
+  inputSchema = withImmersionApplicationIdSchema;
 
   public async _execute({
     id,
-  }: GetImmersionApplicationRequestDto): Promise<ImmersionApplicationDto> {
+  }: WithImmersionApplicationId): Promise<ImmersionApplicationDto> {
     const immersionApplicationEntity =
       await this.immersionApplicationRepository.getById(id);
     if (!immersionApplicationEntity) throw new NotFoundError(id);

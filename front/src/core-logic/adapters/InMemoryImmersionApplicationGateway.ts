@@ -7,7 +7,7 @@ import {
   ImmersionApplicationId,
   IMMERSION_APPLICATION_TEMPLATE,
   UpdateImmersionApplicationStatusRequestDto,
-  UpdateImmersionApplicationStatusResponseDto,
+  WithImmersionApplicationId,
   signApplicationDtoWithRole,
   immersionApplicationSchema,
 } from "src/shared/ImmersionApplicationDto";
@@ -123,7 +123,7 @@ export class InMemoryImmersionApplicationGateway
   public async updateStatus(
     { status, justification }: UpdateImmersionApplicationStatusRequestDto,
     jwt: string,
-  ): Promise<UpdateImmersionApplicationStatusResponseDto> {
+  ): Promise<WithImmersionApplicationId> {
     const payload = decodeJwt(jwt);
     await sleep(SIMULATED_LATENCY_MS);
     this._immersionApplications[payload.applicationId] = {
@@ -135,7 +135,7 @@ export class InMemoryImmersionApplicationGateway
 
   public async signApplication(
     jwt: string,
-  ): Promise<UpdateImmersionApplicationStatusResponseDto> {
+  ): Promise<WithImmersionApplicationId> {
     await sleep(SIMULATED_LATENCY_MS);
     const payload = decodeJwt(jwt);
     const application = this._immersionApplications[payload.applicationId];

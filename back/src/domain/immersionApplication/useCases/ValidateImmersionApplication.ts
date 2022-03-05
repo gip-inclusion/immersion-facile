@@ -4,9 +4,8 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import {
   ImmersionApplicationId,
-  ValidateImmersionApplicationRequestDto,
-  validateImmersionApplicationRequestDtoSchema,
-  ValidateImmersionApplicationResponseDto,
+  immersionApplicationIdSchema,
+  WithImmersionApplicationId,
 } from "../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
@@ -18,8 +17,8 @@ import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRep
 const logger = createLogger(__filename);
 
 export class ValidateImmersionApplication extends UseCase<
-  ValidateImmersionApplicationRequestDto,
-  ValidateImmersionApplicationResponseDto
+  ImmersionApplicationId,
+  WithImmersionApplicationId
 > {
   constructor(
     private readonly immersionApplicationRepository: ImmersionApplicationRepository,
@@ -29,11 +28,11 @@ export class ValidateImmersionApplication extends UseCase<
     super();
   }
 
-  inputSchema = validateImmersionApplicationRequestDtoSchema;
+  inputSchema = immersionApplicationIdSchema;
 
   public async _execute(
     id: ImmersionApplicationId,
-  ): Promise<ValidateImmersionApplicationResponseDto> {
+  ): Promise<WithImmersionApplicationId> {
     const immersionApplicationEntity =
       await this.immersionApplicationRepository.getById(id);
     if (!immersionApplicationEntity) throw new NotFoundError(id);

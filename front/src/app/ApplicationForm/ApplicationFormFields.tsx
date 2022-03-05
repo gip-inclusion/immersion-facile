@@ -121,9 +121,7 @@ export const ApplicationFormFields = ({
 
       <input type="hidden" name="peExternalIdentity" />
 
-      <FormSectionTitle>
-        1. Coordonnées du bénéficiaire
-      </FormSectionTitle>
+      <FormSectionTitle>1. Coordonnées du bénéficiaire</FormSectionTitle>
       <TextInput
         label="Email *"
         name="email"

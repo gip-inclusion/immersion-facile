@@ -3,7 +3,7 @@ import {
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import {
-  AddImmersionApplicationResponseDto,
+  WithImmersionApplicationId,
   ApplicationStatus,
   ImmersionApplicationDto,
   immersionApplicationSchema,
@@ -20,7 +20,7 @@ const logger = createLogger(__filename);
 
 export class AddImmersionApplication extends TransactionalUseCase<
   ImmersionApplicationDto,
-  AddImmersionApplicationResponseDto
+  WithImmersionApplicationId
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -35,7 +35,7 @@ export class AddImmersionApplication extends TransactionalUseCase<
   public async _execute(
     immersionApplicationDto: ImmersionApplicationDto,
     uow: UnitOfWork,
-  ): Promise<AddImmersionApplicationResponseDto> {
+  ): Promise<WithImmersionApplicationId> {
     const minimalValidStatus: ApplicationStatus = "READY_TO_SIGN";
 
     if (

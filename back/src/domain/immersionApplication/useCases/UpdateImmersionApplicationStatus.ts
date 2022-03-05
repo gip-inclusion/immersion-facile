@@ -7,7 +7,7 @@ import {
   ApplicationStatus,
   UpdateImmersionApplicationStatusRequestDto,
   updateImmersionApplicationStatusRequestSchema,
-  UpdateImmersionApplicationStatusResponseDto,
+  WithImmersionApplicationId,
 } from "../../../shared/ImmersionApplicationDto";
 import {
   StatusTransitionConfig,
@@ -36,7 +36,7 @@ const domainTopicByTargetStatusMap: Partial<
 
 export class UpdateImmersionApplicationStatus extends UseCase<
   UpdateImmersionApplicationStatusRequestDto,
-  UpdateImmersionApplicationStatusResponseDto
+  WithImmersionApplicationId
 > {
   constructor(
     private readonly immersionApplicationRepository: ImmersionApplicationRepository,
@@ -56,7 +56,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
   public async _execute(
     { status, justification }: UpdateImmersionApplicationStatusRequestDto,
     { applicationId, role }: MagicLinkPayload,
-  ): Promise<UpdateImmersionApplicationStatusResponseDto> {
+  ): Promise<WithImmersionApplicationId> {
     logger.debug({ status, applicationId, role });
     const statusTransitionConfig = this.statusTransitionConfigs[status];
     if (!statusTransitionConfig) throw new BadRequestError(status);

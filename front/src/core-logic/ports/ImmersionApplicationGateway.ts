@@ -5,7 +5,7 @@ import {
   ImmersionApplicationDto,
   ImmersionApplicationId,
   UpdateImmersionApplicationStatusRequestDto,
-  UpdateImmersionApplicationStatusResponseDto,
+  WithImmersionApplicationId,
 } from "src/shared/ImmersionApplicationDto";
 import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
@@ -30,11 +30,9 @@ export interface ImmersionApplicationGateway {
   updateStatus(
     params: UpdateImmersionApplicationStatusRequestDto,
     jwt: string,
-  ): Promise<UpdateImmersionApplicationStatusResponseDto>;
+  ): Promise<WithImmersionApplicationId>;
 
-  signApplication(
-    jwt: string,
-  ): Promise<UpdateImmersionApplicationStatusResponseDto>;
+  signApplication(jwt: string): Promise<WithImmersionApplicationId>;
 
   getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto>;
   getAll(

@@ -1,10 +1,9 @@
+import { z } from "zod";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   ApplicationStatus,
-  SignImmersionApplicationRequestDto,
-  signImmersionApplicationRequestSchema,
-  SignImmersionApplicationResponseDto,
   signApplicationDtoWithRole,
+  WithImmersionApplicationId,
 } from "../../../shared/ImmersionApplicationDto";
 import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
@@ -25,8 +24,8 @@ const domainTopicByTargetStatusMap: Partial<
 };
 
 export class SignImmersionApplication extends UseCase<
-  SignImmersionApplicationRequestDto,
-  SignImmersionApplicationResponseDto
+  void,
+  WithImmersionApplicationId
 > {
   constructor(
     private readonly immersionApplicationRepository: ImmersionApplicationRepository,
@@ -36,12 +35,12 @@ export class SignImmersionApplication extends UseCase<
     super();
   }
 
-  inputSchema = signImmersionApplicationRequestSchema;
+  inputSchema = z.void();
 
   public async _execute(
-    params: any,
+    _: void,
     { applicationId, role }: MagicLinkPayload,
-  ): Promise<SignImmersionApplicationResponseDto> {
+  ): Promise<WithImmersionApplicationId> {
     logger.debug({ applicationId, role });
 
     const applicationEntity = await this.immersionApplicationRepository.getById(
