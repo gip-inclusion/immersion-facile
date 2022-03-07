@@ -3,6 +3,7 @@ import {
   FormEstablishmentDto,
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
+import { SiretDto } from "../../../shared/siret";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -14,7 +15,7 @@ const logger = createLogger(__filename);
 
 export class AddFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,
-  string
+  SiretDto
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -29,7 +30,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
   public async _execute(
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
-  ): Promise<string> {
+  ): Promise<SiretDto> {
     const featureFlags = await uow.getFeatureFlags();
 
     if (!featureFlags.enableByPassInseeApi) {

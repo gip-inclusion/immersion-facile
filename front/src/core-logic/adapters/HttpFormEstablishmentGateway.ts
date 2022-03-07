@@ -8,6 +8,7 @@ import {
   requestEmailToUpdateFormRoute,
   romeRoute,
 } from "src/shared/routes";
+import { SiretDto } from "src/shared/siret";
 import { zString } from "src/shared/zodUtils";
 
 const prefix = "api";
@@ -15,7 +16,7 @@ const prefix = "api";
 export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
   public async addFormEstablishment(
     establishment: FormEstablishmentDto,
-  ): Promise<string> {
+  ): Promise<SiretDto> {
     const httpResponse = await axios.post(
       `/${prefix}/${immersionOffersRoute}`,
       establishment,
@@ -33,13 +34,13 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
 
     return romeSearchResponseSchema.parse(httpResponse.data);
   }
-  public async getSiretAlreadyExists(siret: string): Promise<boolean> {
+  public async getSiretAlreadyExists(siret: SiretDto): Promise<boolean> {
     const httpResponse = await axios.get(
       `/${prefix}/${formAlreadyExistsRoute}/${siret}`,
     );
     return httpResponse.data;
   }
-  public async requestEmailToEditForm(siret: string): Promise<void> {
+  public async requestEmailToEditForm(siret: SiretDto): Promise<void> {
     await axios.get(`/${prefix}/${requestEmailToUpdateFormRoute}/${siret}`);
   }
 }

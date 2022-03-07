@@ -6,7 +6,10 @@ export function propEq<K extends keyof Obj, Obj>(name: K, val: Obj[K], obj: Obj,
 export function propEq<K extends keyof Obj, Obj>(name: K, val: Obj[K]): (obj: Obj) => boolean;
 // prettier-ignore
 export function propEq<K extends keyof Obj, Obj>(name: K, val: Obj[K], obj?: Record<K, any>): any {
-  return ramdaPropEq(name as any, val, obj as any)
+  const f = ramdaPropEq(name as any, val);
+
+  if(typeof obj === "undefined") return f
+  return f(obj)
 }
 
 // prettier-ignore

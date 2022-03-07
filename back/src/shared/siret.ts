@@ -1,13 +1,14 @@
 import { z } from "../../node_modules/zod";
 import { nafSchema } from "./naf";
+import { Flavor } from "./typeFlavors";
 
 const normalizeSiret = (siret: string): string => siret.replace(/\s/g, "");
 
 // Matches strings containing exactly 14 digits with any number of interspersed whitespaces.
 const siretRegex = /^(?:\s*\d){14}\s*$/;
 
-export type SiretDto = z.infer<typeof siretSchema>;
-export const siretSchema = z
+export type SiretDto = Flavor<string, "SiretDto">;
+export const siretSchema: z.Schema<SiretDto> = z
   .string()
   .regex(siretRegex, "SIRET doit étre composé de 14 chiffres")
   .transform(normalizeSiret);

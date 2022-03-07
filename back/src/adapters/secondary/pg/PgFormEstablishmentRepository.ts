@@ -1,6 +1,7 @@
 import { PoolClient } from "pg";
 import { FormEstablishmentRepository } from "../../../domain/immersionOffer/ports/FormEstablishmentRepository";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
+import { SiretDto } from "../../../shared/siret";
 
 export class PgFormEstablishmentRepository
   implements FormEstablishmentRepository
@@ -17,7 +18,7 @@ export class PgFormEstablishmentRepository
   }
 
   public async getBySiret(
-    siret: string,
+    siret: SiretDto,
   ): Promise<FormEstablishmentDto | undefined> {
     const pgResult = await this.client.query(
       `SELECT * FROM form_establishments
@@ -33,7 +34,7 @@ export class PgFormEstablishmentRepository
 
   public async save(
     formEstablishmentDto: FormEstablishmentDto,
-  ): Promise<string | undefined> {
+  ): Promise<SiretDto | undefined> {
     // prettier-ignore
     const {  siret, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise, naf, professions, businessContacts, preferredContactMethods } =
       formEstablishmentDto

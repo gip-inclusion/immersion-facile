@@ -1,6 +1,7 @@
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../shared/rome";
+import { SiretDto } from "../shared/siret";
 import { Builder } from "./Builder";
 
 const validFormEstablishment: FormEstablishmentDto = {
@@ -67,7 +68,7 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
-  public withSiret(siret: string) {
+  public withSiret(siret: SiretDto) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, siret });
   }
   public withProfessions(professions: ProfessionDto[]) {

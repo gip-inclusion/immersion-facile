@@ -1,6 +1,7 @@
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
 import { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
 import { RomeSearchMatchDto } from "src/shared/rome";
+import { SiretDto } from "src/shared/siret";
 import { sleep } from "src/shared/utils";
 
 const SIMULATED_LATENCY_MS = 1000;
@@ -8,14 +9,14 @@ const SIMULATED_LATENCY_MS = 1000;
 export class InMemoryFormEstablishmentGateway
   implements FormEstablishmentGateway
 {
-  private _existingEstablishmentSirets: string[] = [];
+  private _existingEstablishmentSirets: SiretDto[] = [];
 
-  public constructor(existingEstablishmentSirets: string[] = []) {
+  public constructor(existingEstablishmentSirets: SiretDto[] = []) {
     this._existingEstablishmentSirets = existingEstablishmentSirets;
   }
   public async addFormEstablishment(
     immersionOffer: FormEstablishmentDto,
-  ): Promise<string> {
+  ): Promise<SiretDto> {
     console.log(immersionOffer);
     await sleep(2000);
     if (immersionOffer.businessName === "givemeanerrorplease")
@@ -72,11 +73,11 @@ export class InMemoryFormEstablishmentGateway
       },
     ];
   }
-  public async getSiretAlreadyExists(siret: string): Promise<boolean> {
+  public async getSiretAlreadyExists(siret: SiretDto): Promise<boolean> {
     return this._existingEstablishmentSirets.includes(siret);
   }
 
-  public async requestEmailToEditForm(siret: string): Promise<void> {
+  public async requestEmailToEditForm(siret: SiretDto): Promise<void> {
     return;
   }
 }
