@@ -109,13 +109,14 @@ const determineRecipients = (
   const hasCounsellorEmails = agencyConfig.counsellorEmails.length > 0;
   const hasValidatorEmails = agencyConfig.validatorEmails.length > 0;
   const hasAdminEmails = agencyConfig.adminEmails.length > 0;
+
   switch (status) {
     case "IN_REVIEW": {
       if (hasCounsellorEmails)
         return { role: "counsellor", emails: agencyConfig.counsellorEmails };
       if (hasValidatorEmails)
         return { role: "validator", emails: agencyConfig.validatorEmails };
-      return undefined;
+      return;
     }
     case "ACCEPTED_BY_COUNSELLOR":
       return hasValidatorEmails
@@ -128,6 +129,6 @@ const determineRecipients = (
     default:
       // This notification may fire when using the /debug/populate route, with
       // statuses not included in the above list. Ignore this case.
-      return undefined;
+      return;
   }
 };

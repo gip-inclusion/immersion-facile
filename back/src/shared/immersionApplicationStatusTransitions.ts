@@ -6,8 +6,9 @@ export type StatusTransitionConfig = {
   validRoles: Role[];
 };
 
-export const statusTransitionConfigsEnterpriseSign: Partial<
-  Record<ApplicationStatus, StatusTransitionConfig>
+export const statusTransitionConfigs: Record<
+  ApplicationStatus,
+  StatusTransitionConfig
 > = {
   READY_TO_SIGN: {
     validInitialStatuses: ["DRAFT"],

@@ -26,17 +26,17 @@ function useApiCall<T>({ callApi }: UseApiCallProps<T>) {
 }
 
 interface ApiDataContainerProps<T> {
-  apiCall: () => Promise<T>;
-  children: (data: any) => React.ReactElement;
+  callApi: () => Promise<T>;
+  children: (data: T | null) => React.ReactElement;
   jwt?: string;
 }
 
 export function ApiDataContainer<T>({
-  apiCall,
+  callApi,
   children,
   jwt,
 }: ApiDataContainerProps<T>): React.ReactElement {
-  const { data, error } = useApiCall({ callApi: apiCall });
+  const { data, error } = useApiCall({ callApi });
 
   if (error) {
     if (error.response) {

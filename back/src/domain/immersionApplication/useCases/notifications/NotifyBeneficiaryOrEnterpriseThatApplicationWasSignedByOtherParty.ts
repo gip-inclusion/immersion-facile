@@ -1,7 +1,5 @@
-import { z } from "zod";
 import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import {
-  applicationStatusFromString,
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "../../../../shared/ImmersionApplicationDto";
@@ -10,11 +8,8 @@ import { Role } from "../../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
-import { AgencyConfig, AgencyRepository } from "../../ports/AgencyRepository";
-import {
-  EmailGateway,
-  ModificationRequestApplicationNotificationParams,
-} from "../../ports/EmailGateway";
+import { AgencyRepository } from "../../ports/AgencyRepository";
+import { EmailGateway } from "../../ports/EmailGateway";
 
 const logger = createLogger(__filename);
 

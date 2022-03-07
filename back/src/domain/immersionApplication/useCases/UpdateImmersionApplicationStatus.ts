@@ -11,7 +11,7 @@ import {
 } from "../../../shared/ImmersionApplicationDto";
 import {
   StatusTransitionConfig,
-  statusTransitionConfigsEnterpriseSign,
+  statusTransitionConfigs,
 } from "../../../shared/immersionApplicationStatusTransitions";
 import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
@@ -44,12 +44,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     private readonly outboxRepository: OutboxRepository,
   ) {
     super();
-    this.statusTransitionConfigs = statusTransitionConfigsEnterpriseSign;
   }
-
-  private statusTransitionConfigs: Partial<
-    Record<ApplicationStatus, StatusTransitionConfig>
-  >;
 
   inputSchema = updateImmersionApplicationStatusRequestSchema;
 
@@ -58,8 +53,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     { applicationId, role }: MagicLinkPayload,
   ): Promise<WithImmersionApplicationId> {
     logger.debug({ status, applicationId, role });
-    const statusTransitionConfig = this.statusTransitionConfigs[status];
-    if (!statusTransitionConfig) throw new BadRequestError(status);
+    const statusTransitionConfig = statusTransitionConfigs[status];
 
     if (!statusTransitionConfig.validRoles.includes(role))
       throw new ForbiddenError();

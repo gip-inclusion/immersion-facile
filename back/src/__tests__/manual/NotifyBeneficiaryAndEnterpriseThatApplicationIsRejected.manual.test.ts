@@ -3,7 +3,6 @@ import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgenc
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
-import { applicationStatusFromString } from "../../shared/ImmersionApplicationDto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { AllowListEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
@@ -35,7 +34,7 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
         .withCounsellorEmails([counsellorEmail])
         .build(),
     ]);
-    validImmersionApplication.status = applicationStatusFromString("REJECTED");
+    validImmersionApplication.status = "REJECTED";
     validImmersionApplication.rejectionJustification = rejectionJustification;
   });
 

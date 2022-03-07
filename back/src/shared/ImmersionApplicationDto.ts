@@ -1,5 +1,5 @@
 import { z } from "../../node_modules/zod";
-import { agencyIdSchema } from "./agencies";
+import { AgencyId, agencyIdSchema } from "./agencies";
 import {
   emailAndMentorEmailAreDifferent,
   enoughWorkedDaysToReviewFromSubmitDate,
@@ -14,7 +14,7 @@ import {
   reasonableSchedule,
   ScheduleDto,
 } from "./ScheduleSchema";
-import { siretSchema } from "./siret";
+import { SiretDto, siretSchema } from "./siret";
 import { allRoles, Role } from "./tokens/MagicLinkPayload";
 import { Flavor } from "./typeFlavors";
 import {
@@ -29,7 +29,6 @@ import { zBoolean, zEmail, zString, zTrimmedString } from "./zodUtils";
 const dateRegExp = /\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])/;
 
 export type ApplicationStatus =
-  | "UNKNOWN"
   | "DRAFT"
   | "READY_TO_SIGN"
   | "PARTIALLY_SIGNED"
@@ -49,12 +48,6 @@ export const validApplicationStatus: NotEmptyArray<ApplicationStatus> = [
   "REJECTED",
 ];
 
-export const applicationStatusFromString = (s: string): ApplicationStatus => {
-  const status = s as ApplicationStatus;
-  if (validApplicationStatus.includes(status)) return status;
-  return "UNKNOWN";
-};
-
 const scheduleSchema: z.ZodSchema<ScheduleDto> = z.any();
 const legacyScheduleSchema: z.ZodSchema<LegacyScheduleDto> = z.any();
 
@@ -62,9 +55,41 @@ export type ImmersionApplicationId = Flavor<string, "ImmersionApplicationId">;
 export const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
   zTrimmedString;
 
-// prettier-ignore
-export type ImmersionApplicationDto = z.infer<typeof immersionApplicationSchema>;
-export const immersionApplicationSchema = z
+export type ImmersionApplicationDto = {
+  id: ImmersionApplicationId;
+  status: ApplicationStatus;
+  rejectionJustification?: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  postalCode?: string;
+  agencyId: AgencyId;
+  dateSubmission: string; // Date iso string
+  dateStart: string; // Date iso string
+  dateEnd: string; // Date iso string
+  siret: SiretDto;
+  businessName: string;
+  mentor: string;
+  mentorPhone: string;
+  mentorEmail: string;
+  schedule: ScheduleDto;
+  legacySchedule?: LegacyScheduleDto;
+  workConditions?: string;
+  individualProtection: boolean;
+  sanitaryPrevention: boolean;
+  sanitaryPreventionDescription?: string;
+  immersionAddress?: string;
+  immersionObjective?: string;
+  immersionProfession: string;
+  immersionActivities: string;
+  immersionSkills?: string;
+  beneficiaryAccepted: boolean;
+  enterpriseAccepted: boolean;
+  peExternalId?: string;
+};
+
+export const immersionApplicationSchema: z.Schema<ImmersionApplicationDto> = z
   .object({
     id: immersionApplicationIdSchema,
     status: z.enum(validApplicationStatus),

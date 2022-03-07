@@ -44,7 +44,7 @@ export const SignForm = ({ route }: SignFormProps) => {
       <MarianneHeader />
 
       <ApiDataContainer
-        apiCall={() => immersionApplicationGateway.getML(route.params.jwt)}
+        callApi={() => immersionApplicationGateway.getML(route.params.jwt)}
         jwt={route.params.jwt}
       >
         {(response) => (

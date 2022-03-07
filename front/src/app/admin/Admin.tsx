@@ -104,15 +104,13 @@ export const Admin = ({ route }: AdminProps) => {
                 Demandes d'immersions à traiter
               </div>
               <ApiDataContainer
-                apiCall={() =>
+                callApi={() =>
                   immersionApplicationGateway.getAll(agency, statusFilter)
                 }
               >
-                {(data) => {
-                  if (!data) return <p />;
+                {(immersionApplications) => {
+                  if (!immersionApplications) return <p />;
 
-                  const immersionApplications =
-                    data as ImmersionApplicationDto[];
                   return (
                     <>
                       <div

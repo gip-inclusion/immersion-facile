@@ -6,7 +6,7 @@ import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
-import { statusTransitionConfigsEnterpriseSign } from "src/shared/immersionApplicationStatusTransitions";
+import { statusTransitionConfigs } from "src/shared/immersionApplicationStatusTransitions";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
@@ -17,73 +17,37 @@ type VerificationPageProps = {
 };
 
 const isAllowedTransition = (
-  initialStatus: ApplicationStatus | undefined,
+  initialStatus: ApplicationStatus,
   targetStatus: ApplicationStatus,
   actingRole: Role,
 ) => {
-  const transitionConfig = statusTransitionConfigsEnterpriseSign[targetStatus];
-  if (!transitionConfig) return false;
-  if (
-    transitionConfig.validInitialStatuses.filter(
-      (status) => status === initialStatus,
-    ).length === 0
-  )
-    return false;
-  if (
-    transitionConfig.validRoles.filter((role) => role === actingRole).length ===
-    0
-  )
-    return false;
-  return true;
-};
+  const transitionConfig = statusTransitionConfigs[targetStatus];
 
-export const successMessageByStatus = {
-  REJECTED:
-    "Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise.",
-  ACCEPTED_BY_COUNSELLOR:
-    "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la convention.",
-  ACCEPTED_BY_VALIDATOR:
-    "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail au bénéficiaire et à l'entreprise.",
-  VALIDATED:
-    "Succès. La confirmation de cette validation est bien envoyée par mail au bénéficiaire et à l'entreprise.",
-  UNKNOWN:
-    "Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement",
-  DRAFT:
-    "Succès. Cette demande de modification va être communiquée par mail au bénéficiaire et à l'entreprise",
-  READY_TO_SIGN:
-    "Attention! Cette demande d'immersion est à statut 'Prête à ëtre Signée', donc vous ne devriez pas encore pouvoir la visualiser. Veuillez consulter l'équipe Immérsion Facilitée",
-  PARTIALLY_SIGNED:
-    "Attention! Cette demande d'immersion est à statut 'Signée Partiellement', donc vous ne devriez pas encore pouvoir la visualiser. Veuillez consulter l'équipe Immérsion Facilitée",
-  IN_REVIEW:
-    "Attention! Cette demande d'immersion est à statut 'En cours de revue', l'opération que vous venez d'effectuer ne semble pas avoir été appliquée. Veuillez réésayer ou consulter l'équipe Immérsion Facilitée",
+  return (
+    transitionConfig.validInitialStatuses.includes(initialStatus) &&
+    transitionConfig.validRoles.includes(actingRole)
+  );
 };
 
 export const VerificationPage = ({ route }: VerificationPageProps) => {
   const jwt = route.params.jwt;
-  const { role, applicationId } = decodeJwt(jwt);
+  const { role } = decodeJwt(jwt);
 
   const [successMessage, setSuccessMessage] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const disabled = !!successMessage;
 
-  const sentForModificationSuccessfully =
-    "La demande d'immersion a bien été renvoyée pour modification";
-  const validatedSuccessfully =
-    "La confirmation de l'immersion a bien été programmée pour envoi";
-
   return (
     <ApiDataContainer
-      apiCall={() => immersionApplicationGateway.getML(jwt)}
+      callApi={() => immersionApplicationGateway.getML(jwt)}
       jwt={jwt}
     >
-      {(data) => {
-        if (!data) {
+      {(immersionApplication) => {
+        if (!immersionApplication) {
           return <p>"Chargement en cours"</p>;
         }
 
-        const immersionApplication = data;
-        const currentStatus =
-          immersionApplication?.status ?? ("UNKNOWN" as ApplicationStatus);
+        const currentStatus = immersionApplication.status;
 
         const buttonProps = {
           disabled,
@@ -92,6 +56,8 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
           onSuccess: setSuccessMessage,
           onError: setErrorMessage,
         };
+        const { status } = immersionApplication;
+
         return (
           <div
             style={{
@@ -100,17 +66,9 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
               flexDirection: "column",
             }}
           >
-            {immersionApplication ? (
-              <FormAccordion immersionApplication={immersionApplication} />
-            ) : (
-              "Chargement en cours..."
-            )}
+            <FormAccordion immersionApplication={immersionApplication} />
             <div>
-              {isAllowedTransition(
-                immersionApplication?.status,
-                "REJECTED",
-                role,
-              ) && (
+              {isAllowedTransition(status, "REJECTED", role) && (
                 <VerificationActionButton
                   {...buttonProps}
                   newStatus="REJECTED"
@@ -120,11 +78,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
                 </VerificationActionButton>
               )}
 
-              {isAllowedTransition(
-                immersionApplication?.status,
-                "DRAFT",
-                role,
-              ) && (
+              {isAllowedTransition(status, "DRAFT", role) && (
                 <VerificationActionButton
                   {...buttonProps}
                   newStatus="DRAFT"
@@ -135,11 +89,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
                   Renvoyer au bénéficiaire pour modification
                 </VerificationActionButton>
               )}
-              {isAllowedTransition(
-                immersionApplication?.status,
-                "ACCEPTED_BY_COUNSELLOR",
-                role,
-              ) && (
+              {isAllowedTransition(status, "ACCEPTED_BY_COUNSELLOR", role) && (
                 <VerificationActionButton
                   {...buttonProps}
                   newStatus="ACCEPTED_BY_COUNSELLOR"
@@ -153,11 +103,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
                     : "Marquer la demande comme éligible"}
                 </VerificationActionButton>
               )}
-              {isAllowedTransition(
-                immersionApplication?.status,
-                "ACCEPTED_BY_VALIDATOR",
-                role,
-              ) && (
+              {isAllowedTransition(status, "ACCEPTED_BY_VALIDATOR", role) && (
                 <VerificationActionButton
                   {...buttonProps}
                   newStatus="ACCEPTED_BY_VALIDATOR"
@@ -175,11 +121,7 @@ export const VerificationPage = ({ route }: VerificationPageProps) => {
                     : "Valider la demande"}
                 </VerificationActionButton>
               )}
-              {isAllowedTransition(
-                immersionApplication?.status,
-                "VALIDATED",
-                role,
-              ) && (
+              {isAllowedTransition(status, "VALIDATED", role) && (
                 <VerificationActionButton
                   {...buttonProps}
                   newStatus="VALIDATED"

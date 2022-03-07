@@ -1,7 +1,5 @@
 import type { ZodError } from "zod";
 import {
-  ApplicationStatus,
-  applicationStatusFromString,
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "../../shared/ImmersionApplicationDto";
@@ -162,29 +160,6 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 });
-
-describe("applicationStatusFromString", () => {
-  test("accepts valid enum values", () => {
-    expectApplicationStatusToBe(applicationStatusFromString("DRAFT"), "DRAFT");
-    expectApplicationStatusToBe(
-      applicationStatusFromString("IN_REVIEW"),
-      "IN_REVIEW",
-    );
-  });
-
-  test("converts invalid enum values to UNKNOWN", () => {
-    expectApplicationStatusToBe(applicationStatusFromString(""), "UNKNOWN");
-    expectApplicationStatusToBe(
-      applicationStatusFromString("UNKNOWN_VALUE"),
-      "UNKNOWN",
-    );
-  });
-});
-
-const expectApplicationStatusToBe = (
-  actual: ApplicationStatus,
-  expected: ApplicationStatus,
-) => expect(actual).toBe(expected);
 
 const expectImmersionApplicationDtoToBeValid = (
   validImmersionApplicationDto: ImmersionApplicationDto,
