@@ -39,6 +39,7 @@ export const EnterpriseSearchResult = ({
     contactMode,
     numberOfEmployeeRange,
     nafLabel,
+    romeLabel,
     voluntaryToImmersion,
   } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
@@ -50,7 +51,8 @@ export const EnterpriseSearchResult = ({
           <div className="font-bold text-xl leading-6 text-immersionRed-light pb-1">
             {name}
           </div>
-          {nafLabel && <div>{nafLabel}</div>}
+          {nafLabel && <div className="font-bold">{nafLabel}</div>}
+          <div>{romeLabel}</div>
         </div>
         <InfoLabel
           className=""
