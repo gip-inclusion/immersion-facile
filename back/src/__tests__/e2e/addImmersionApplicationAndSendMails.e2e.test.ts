@@ -97,15 +97,9 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       initialImmersionApplication,
     );
 
-    const { triggerConventionJwt } = await counsellorValidatesApplication(
+    await validatorValidatesApplicationWhichTriggersConventionToBeSent(
       appAndDeps,
       validatorReviewJwt,
-      initialImmersionApplication,
-    );
-
-    await adminSendConvention(
-      appAndDeps,
-      triggerConventionJwt,
       initialImmersionApplication,
     );
   });
@@ -223,7 +217,7 @@ const establishmentSignsApplication = async (
   };
 };
 
-const counsellorValidatesApplication = async (
+const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
   validatorReviewJwt: string,
   initialImmersionApplication: ImmersionApplicationDto,
@@ -251,44 +245,11 @@ const counsellorValidatesApplication = async (
   const sentEmails = reposAndGateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(5);
   const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
-  expect(needsToTriggerConventionSentEmail.recipients).toEqual([adminEmail]);
-
-  return {
-    triggerConventionJwt: getJwtFromMagicLink(
-      needsToTriggerConventionSentEmail.params.magicLink,
-    ),
-  };
-};
-
-const adminSendConvention = async (
-  { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
-  triggerConventionJwt: string,
-  initialImmersionApplication: ImmersionApplicationDto,
-) => {
-  const params: UpdateImmersionApplicationStatusRequestDto = {
-    status: "VALIDATED",
-  };
-  await request
-    .post(`/auth/${updateApplicationStatusRoute}/${triggerConventionJwt}`)
-    .send(params)
-    .expect(200);
-
-  expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.immersionApplication.getAll(),
-    {
-      ...initialImmersionApplication,
-      status: "VALIDATED",
-      beneficiaryAccepted: true,
-      enterpriseAccepted: true,
-      rejectionJustification: undefined,
-    },
+  expectTypeToMatchAndEqual(
+    needsToTriggerConventionSentEmail.type,
+    "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
   );
-
-  await eventCrawler.processEvents();
-  const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(6);
-  const conventionEmail = sentEmails[sentEmails.length - 1];
-  expectTypeToMatchAndEqual(conventionEmail.recipients, [
+  expect(needsToTriggerConventionSentEmail.recipients).toEqual([
     "beneficiary@email.fr",
     "establishment@example.com",
     validatorEmail,

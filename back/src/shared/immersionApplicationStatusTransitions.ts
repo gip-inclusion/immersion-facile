@@ -44,8 +44,8 @@ export const statusTransitionConfigs: Record<
   REJECTED: {
     validInitialStatuses: [
       "IN_REVIEW",
-      "ACCEPTED_BY_VALIDATOR",
       "ACCEPTED_BY_COUNSELLOR",
+      "ACCEPTED_BY_VALIDATOR",
     ],
     validRoles: ["counsellor", "validator", "admin"],
   },
@@ -55,11 +55,11 @@ export const statusTransitionConfigs: Record<
   // Also enables the company/beneficiary to request modifications and revoke signatures
   DRAFT: {
     validInitialStatuses: [
-      "IN_REVIEW",
-      "ACCEPTED_BY_VALIDATOR",
-      "ACCEPTED_BY_COUNSELLOR",
       "READY_TO_SIGN",
       "PARTIALLY_SIGNED",
+      "IN_REVIEW",
+      "ACCEPTED_BY_COUNSELLOR",
+      "ACCEPTED_BY_VALIDATOR",
     ],
     validRoles: [
       "counsellor",

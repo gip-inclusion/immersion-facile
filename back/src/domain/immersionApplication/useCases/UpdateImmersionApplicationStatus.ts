@@ -9,10 +9,7 @@ import {
   updateImmersionApplicationStatusRequestSchema,
   WithImmersionApplicationId,
 } from "../../../shared/ImmersionApplicationDto";
-import {
-  StatusTransitionConfig,
-  statusTransitionConfigs,
-} from "../../../shared/immersionApplicationStatusTransitions";
+import { statusTransitionConfigs } from "../../../shared/immersionApplicationStatusTransitions";
 import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
@@ -61,6 +58,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     const immersionApplication =
       await this.immersionApplicationRepository.getById(applicationId);
     if (!immersionApplication) throw new NotFoundError(applicationId);
+
     if (
       !statusTransitionConfig.validInitialStatuses.includes(
         immersionApplication.status,

@@ -33,7 +33,7 @@ const getUseCasesByTopics = (
     useCases.notifyNewApplicationNeedsReview,
   ],
   ImmersionApplicationAcceptedByValidator: [
-    useCases.notifyNewApplicationNeedsReview,
+    useCases.notifyAllActorsOfFinalApplicationValidation,
   ],
   FinalImmersionApplicationValidationByAdmin: [
     useCases.notifyAllActorsOfFinalApplicationValidation,
