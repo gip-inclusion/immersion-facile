@@ -7,6 +7,7 @@ import { Home } from "src/app/Home";
 import { LandingEstablishment } from "src/app/LandingEstablishment/LandingEstablishment";
 import { useRoute } from "src/app/routes";
 import { VerificationPage } from "src/app/Verification/VerificationPage";
+import { Layout } from "src/components/Layout";
 import { ENV } from "src/environmentVariables";
 import { RenewExpiredLink } from "../helpers/RenewExpiredLink";
 import { AdminVerification } from "./admin/AdminVerification";
@@ -28,7 +29,9 @@ export const Router = () => {
       {route.name === "home" && <Home showDebugInfo={dev} />}
       {route.name === "landingEstablishment" && <LandingEstablishment />}
       {route.name === "formEstablishment" && (
-        <EstablishmentForm route={route} />
+        <Layout>
+          <EstablishmentForm route={route} />
+        </Layout>
       )}
       {route.name === "formEstablishmentForIframes" && (
         <EstablishmentForm route={route} />
