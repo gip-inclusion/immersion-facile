@@ -268,7 +268,19 @@ const SiretRelatedInputs = () => {
         disabled={isFetchingSiret}
       />
       {siretAlreadyExists && !requestEmailToEditFormSucceed && (
-        <div>
+        <div role="alert" className="fr-alert fr-alert--error">
+          <p className="fr-alert__title">
+            Cette entreprise a déjà été référencée.
+          </p>
+          <p>
+            Vous aurez bientôt la possibilité de modifier celle-ci, grâce à un
+            lien envoyé au responsable s'étant inscrit initialement.
+          </p>
+          <p>
+            Dans l'immédiat, veuillez contacter l'équipe Immersion Facilitée.
+          </p>
+        </div>
+        /*<div>
           Cette entreprise a déjà été référencée.
           <Button
             disable={requestEmailToEditFormSucceed}
@@ -285,7 +297,7 @@ const SiretRelatedInputs = () => {
           >
             Demande de modification du formulaire de référencement
           </Button>
-        </div>
+        </div>*/
       )}
       {requestEmailToEditFormSucceed && (
         <SuccessMessage title="Succès de la demande">
