@@ -189,6 +189,11 @@ export class AppConfig {
     return this.getBooleanVariable("SKIP_EMAIL_ALLOW_LIST");
   }
 
+  // == Discord notifications ==
+  public get discordWebhookUrl() {
+    return this.env.DISCORD_WEBHOOK_URL;
+  }
+
   // == Event Bus ==
   public get eventCrawlerPeriodMs() {
     return parseInteger(this.env.EVENT_CRAWLER_PERIOD_MS, 0);
