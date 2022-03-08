@@ -33,8 +33,8 @@ export const EstablishmentFormForExternals = ({
           className="fr-alert fr-alert--info w-5/6 m-auto mt-10"
         >
           <p className="fr-alert__title">
-            La source '{consumer}' n'est pas référencée, êtes-vous certain que
-            le chemin de l'url est correct ?
+            La source '{consumer}' n'est pas référencée. Êtes vous certain
+            d’avoir la bonne url ?
           </p>
           <p>Veuillez contacter immersion facile pour être référencé.</p>
         </div>
