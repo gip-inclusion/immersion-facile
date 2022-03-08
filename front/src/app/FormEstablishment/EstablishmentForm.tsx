@@ -26,9 +26,15 @@ import {
   ContactMethod,
   FormEstablishmentDto,
   formEstablishmentSchema,
+  FormEstablishmentSource,
 } from "src/shared/FormEstablishmentDto";
+import { OmitFromExistingKeys } from "../../shared/utils";
 
-export const EstablishmentForm = () => {
+type EstablishmentFormProps = {
+  source: FormEstablishmentSource;
+};
+
+export const EstablishmentForm = ({ source }: EstablishmentFormProps) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<Error | null>(null);
 
@@ -41,6 +47,11 @@ export const EstablishmentForm = () => {
   ) {
     errorMessage = submitError["response"]["data"]["errors"];
   }
+
+  const initialValues: FormEstablishmentDto = {
+    ...initialValuesWithoutSource,
+    source,
+  };
 
   return (
     <div
@@ -153,8 +164,27 @@ export const EstablishmentForm = () => {
   );
 };
 
-const initialValues: FormEstablishmentDto = ENV.dev
+const initialValuesWithoutSource: OmitFromExistingKeys<
+  FormEstablishmentDto,
+  "source"
+> = !ENV.dev
   ? {
+      siret: "",
+      businessName: "",
+      businessAddress: "",
+      professions: [],
+      businessContacts: [
+        {
+          firstName: "",
+          lastName: "",
+          job: "",
+          phone: "",
+          email: "",
+        },
+      ],
+      preferredContactMethods: [],
+    }
+  : {
       siret: "1234567890123",
       businessName: "My business name, replaced by result from API",
       businessNameCustomized:
@@ -183,22 +213,6 @@ const initialValues: FormEstablishmentDto = ENV.dev
         },
       ],
       preferredContactMethods: ["EMAIL"],
-    }
-  : {
-      siret: "",
-      businessName: "",
-      businessAddress: "",
-      professions: [],
-      businessContacts: [
-        {
-          firstName: "",
-          lastName: "",
-          job: "",
-          phone: "",
-          email: "",
-        },
-      ],
-      preferredContactMethods: [],
     };
 
 const preferredContactMethodOptions: Array<{

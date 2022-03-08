@@ -4,6 +4,6 @@ import React from "react";
 
 export const EstablishmentFormImmersionFacile = () => (
   <Layout>
-    <EstablishmentForm />
+    <EstablishmentForm source="immersion-facile" />
   </Layout>
 );

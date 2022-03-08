@@ -13,10 +13,9 @@ import { RenewExpiredLink } from "../helpers/RenewExpiredLink";
 import { AdminVerification } from "./admin/AdminVerification";
 import { SignForm } from "./ApplicationForm/SignForm";
 import { SearchDebug } from "./Debug/SearchDebug";
-import { EstablishmentForm } from "./FormEstablishment/EstablishmentForm";
 import { Search } from "./Search/Search";
 import { EstablishmentFormImmersionFacile } from "./FormEstablishment/EstablishmentFormImmersionFacile";
-import {EstablishmentFormForExternals} from "./FormEstablishment/EstablishmentFormForExternals";
+import { EstablishmentFormForExternals } from "./FormEstablishment/EstablishmentFormForExternals";
 
 const { dev } = ENV;
 

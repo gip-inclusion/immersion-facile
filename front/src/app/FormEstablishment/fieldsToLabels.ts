@@ -2,7 +2,7 @@ import type { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
 
 export type FieldsWithLabel = Exclude<
   keyof FormEstablishmentDto,
-  "id" | "naf" | "businessContacts"
+  "id" | "naf" | "businessContacts" | "source"
 >;
 
 export const fieldsToLabel: Record<FieldsWithLabel, string> = {

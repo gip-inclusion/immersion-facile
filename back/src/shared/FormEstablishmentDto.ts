@@ -41,7 +41,21 @@ export const preferPhoneContactSchema = z.literal("PHONE");
 export const preferInPersonContactSchema = z.literal("IN_PERSON");
 export const preferredContactMethodSchema = z.enum(validContactMethods);
 
+export type FormEstablishmentSource =
+  | "immersion-facile"
+  | "cci"
+  | "cma"
+  | "lesentreprises-sengagent";
+
+const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
+  "immersion-facile",
+  "cci",
+  "cma",
+  "lesentreprises-sengagent",
+];
+
 export type FormEstablishmentDto = {
+  source: FormEstablishmentSource;
   siret: SiretDto; // 14 characters string
   businessName: string;
   businessNameCustomized?: string;
@@ -55,6 +69,7 @@ export type FormEstablishmentDto = {
 
 export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
   {
+    source: z.enum(formEstablishmentSources),
     siret: siretSchema,
     businessName: zTrimmedString,
     businessNameCustomized: zTrimmedString.optional(),
