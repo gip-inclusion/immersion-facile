@@ -1,9 +1,13 @@
 import { AgencyId, CreateAgencyConfig } from "../../../shared/agencies";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
+import { RequireField } from "../../../shared/utils";
 
 export type AgencyStatus = "active" | "closed" | "needsReview";
 
-export type AgencyConfig = CreateAgencyConfig & {
+export type AgencyConfig = RequireField<
+  CreateAgencyConfig,
+  "questionnaireUrl"
+> & {
   status: AgencyStatus;
   adminEmails: string[];
 };

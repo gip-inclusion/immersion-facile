@@ -7,7 +7,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AgencyConfig } from "../../immersionApplication/ports/AgencyRepository";
 
-export const poleEmploiQuestionnaireUrl =
+export const defaultQuestionnaireUrl =
   "https://docs.google.com/document/d/1pjsCZbu0CarBCR0GVJ1AmIgwkxGIsD6T/edit";
 
 export class AddAgency extends TransactionalUseCase<CreateAgencyConfig, void> {
@@ -29,10 +29,7 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyConfig, void> {
       ...params,
       adminEmails: [this.defaultAdminEmail],
       status: "needsReview",
-      questionnaireUrl:
-        params.kind === "pole-emploi"
-          ? poleEmploiQuestionnaireUrl
-          : params.questionnaireUrl,
+      questionnaireUrl: params.questionnaireUrl || defaultQuestionnaireUrl,
     };
 
     const newAgencyAddEvent = this.createNewEvent({

@@ -90,7 +90,7 @@ const entityToPgArray = (agency: AgencyConfig): any[] => [
   JSON.stringify(agency.counsellorEmails),
   JSON.stringify(agency.validatorEmails),
   JSON.stringify(agency.adminEmails),
-  agency.questionnaireUrl || null,
+  agency.questionnaireUrl,
   agency.signature,
   STPointStringFromPosition(agency.position),
 ];

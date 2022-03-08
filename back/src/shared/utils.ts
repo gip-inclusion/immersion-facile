@@ -34,6 +34,8 @@ export type OmitFromExistingKeys<
   K extends keyof T,
 > = Omit<T, K>;
 
+export type RequireField<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
 export const keys = <T extends string | number | symbol>(
   obj: Partial<Record<T, unknown>>,
 ): T[] => Object.keys(obj) as T[];

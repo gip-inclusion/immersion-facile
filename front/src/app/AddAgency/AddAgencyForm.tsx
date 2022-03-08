@@ -41,8 +41,6 @@ const initialValues: CreateAgencyConfig = {
   signature: "",
 };
 
-const poleEmploiQuestionnaireUrl = "pole-emploi-questionnaire-url";
-
 type KeysExceptId = Exclude<keyof CreateAgencyConfig, "id">;
 
 const getName = (name: keyof CreateAgencyConfig) => name;
@@ -67,7 +65,11 @@ export const AddAgencyForm = () => {
           validationSchema={toFormikValidationSchema(agencyConfigSchema)}
           onSubmit={(values) =>
             agencyGateway
-              .addAgency(values)
+              .addAgency({
+                ...values,
+                questionnaireUrl:
+                  values.kind === "pole-emploi" ? "" : values.questionnaireUrl,
+              })
               .then(() => setSubmitFeedback("agencyAdded"))
               .catch((e) => {
                 console.log(e);
@@ -80,18 +82,6 @@ export const AddAgencyForm = () => {
             const [validationSteps, setValidationSteps] = useState<
               "oneStep" | "twoSteps"
             >("oneStep");
-
-            useEffect(() => {
-              if (values.kind === "pole-emploi") {
-                return typedSetField(
-                  "questionnaireUrl",
-                  poleEmploiQuestionnaireUrl,
-                );
-              }
-
-              if (values.questionnaireUrl === poleEmploiQuestionnaireUrl)
-                return typedSetField("questionnaireUrl", "");
-            }, [values.kind === "pole-emploi"]);
 
             return (
               <Form className="m-5 max-w-6xl">

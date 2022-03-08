@@ -11,7 +11,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import {
   AddAgency,
-  poleEmploiQuestionnaireUrl,
+  defaultQuestionnaireUrl,
 } from "../../../domain/immersionOffer/useCases/AddAgency";
 import { CreateAgencyConfig } from "../../../shared/agencies";
 
@@ -69,30 +69,29 @@ describe("AddAgency use case", () => {
       topic: "NewAgencyAdded",
       payload: {
         ...parisMissionLocaleParams,
+        questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
         adminEmails: [defaultAdminEmail],
         status: "needsReview",
       },
     });
   });
 
-  describe("when the agency kind is pole-emploi", () => {
-    it("has always the default pole-emploi questionnaire url", async () => {
-      const poleEmploiParis: CreateAgencyConfig = {
-        ...parisMissionLocaleParams,
-        kind: "pole-emploi",
-      };
+  it("uses default questionnaire url when none is provided", async () => {
+    const poleEmploiParis: CreateAgencyConfig = {
+      ...parisMissionLocaleParams,
+      questionnaireUrl: "",
+    };
 
-      agencyRepo.setAgencies([]);
-      await addAgency.execute(poleEmploiParis);
+    agencyRepo.setAgencies([]);
+    await addAgency.execute(poleEmploiParis);
 
-      expectTypeToMatchAndEqual(agencyRepo.agencies, [
-        {
-          ...poleEmploiParis,
-          adminEmails: [defaultAdminEmail],
-          status: "needsReview",
-          questionnaireUrl: poleEmploiQuestionnaireUrl,
-        },
-      ]);
-    });
+    expectTypeToMatchAndEqual(agencyRepo.agencies, [
+      {
+        ...poleEmploiParis,
+        adminEmails: [defaultAdminEmail],
+        status: "needsReview",
+        questionnaireUrl: defaultQuestionnaireUrl,
+      },
+    ]);
   });
 });

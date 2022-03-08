@@ -50,7 +50,7 @@ export type CreateAgencyConfig = {
   counsellorEmails: string[];
   validatorEmails: string[];
   // adminEmails: string[];
-  questionnaireUrl: string;
+  questionnaireUrl?: string;
   signature: string;
 };
 
@@ -62,6 +62,6 @@ export const agencyConfigSchema: z.ZodSchema<CreateAgencyConfig> = z.object({
   position: latLonSchema,
   counsellorEmails: z.array(zEmail),
   validatorEmails: z.array(zEmail).min(1),
-  questionnaireUrl: zString,
+  questionnaireUrl: z.string().optional(),
   signature: zString,
 });
