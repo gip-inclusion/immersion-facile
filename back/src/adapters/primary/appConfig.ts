@@ -150,19 +150,19 @@ export class AppConfig {
     return this.throwIfNotDefined("API_JWT_PRIVATE_KEY");
   }
 
-  public get jwtPublicKey() {
+  public get magicLinkJwtPublicKey() {
     return this.throwIfNotDefined("JWT_PUBLIC_KEY");
   }
 
-  public get jwtPrivateKey() {
+  public get magicLinkJwtPrivateKey() {
     return this.throwIfNotDefined("JWT_PRIVATE_KEY");
   }
 
-  public get jwtPreviousPublicKey() {
+  public get magicLinkJwtPreviousPublicKey() {
     return this.env.JWT_PREVIOUS_PUBLIC_KEY;
   }
 
-  public get jwtPreviousPrivateKey() {
+  public get magicLinkJwtPreviousPrivateKey() {
     return this.env.JWT_PREVIOUS_PRIVATE_KEY;
   }
 

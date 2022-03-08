@@ -79,7 +79,7 @@ describe("Magic link renewal flow", () => {
     const agencyRepository = new InMemoryAgencyRepository([agencyConfig]);
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
-    generateJwtFn = makeGenerateJwt(config.jwtPrivateKey);
+    generateJwtFn = makeGenerateJwt(config.magicLinkJwtPrivateKey);
 
     renewMagicLink = new RenewMagicLink(
       applicationRepository,
@@ -127,7 +127,7 @@ describe("Magic link renewal flow", () => {
     expect(ml.startsWith("immersionfacile.fr/"));
     const jwt = ml.replace("immersionfacile.fr/", "");
 
-    const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
+    const verifyJwt = makeVerifyJwt(config.magicLinkJwtPublicKey);
     expect(verifyJwt(jwt)).not.toBeUndefined();
   });
 });

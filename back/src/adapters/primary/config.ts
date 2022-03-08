@@ -124,7 +124,8 @@ export const createAppDependencies = async (config: AppConfig) => {
 
   const uowPerformer = createUowPerformer(config, getPgPoolFn, repositories);
   const eventBus = createEventBus();
-  const generateJwtFn = makeGenerateJwt(config.jwtPrivateKey);
+  const generateApiJwt = makeGenerateJwt(config.apiJwtPrivateKey);
+  const generateMagicLinkJwt = makeGenerateJwt(config.magicLinkJwtPrivateKey);
   const generateMagicLinkFn = createGenerateVerificationMagicLink(config);
   const emailFilter = config.skipEmailAllowlist
     ? new AlwaysAllowEmailFilter()
@@ -134,7 +135,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     useCases: createUseCases(
       config,
       repositories,
-      generateJwtFn,
+      generateMagicLinkJwt,
       generateMagicLinkFn,
       emailFilter,
       uowPerformer,
@@ -147,7 +148,8 @@ export const createAppDependencies = async (config: AppConfig) => {
       clock,
       config,
     ),
-    generateJwtFn,
+    generateMagicLinkJwt,
+    generateApiJwt,
     eventBus,
     eventCrawler: createEventCrawler(config, repositories.outbox, eventBus),
   };
@@ -181,7 +183,7 @@ export const makeGenerateEditFormEstablishmentUrl = (
   config: AppConfig,
 ): GenerateEditFormEstablishmentUrl => {
   const generateJwt = makeGenerateJwt<EditFormEstablishementPayload>(
-    config.jwtPrivateKey,
+    config.magicLinkJwtPrivateKey,
   );
   return (payload: EditFormEstablishementPayload) => {
     const editJwt = generateJwt(payload);
@@ -369,7 +371,7 @@ export type GenerateVerificationMagicLink = ReturnType<
 >;
 // Visible for testing.
 export const createGenerateVerificationMagicLink = (config: AppConfig) => {
-  const generateJwt = makeGenerateJwt(config.jwtPrivateKey);
+  const generateJwt = makeGenerateJwt(config.magicLinkJwtPrivateKey);
 
   return (
     id: ImmersionApplicationId,

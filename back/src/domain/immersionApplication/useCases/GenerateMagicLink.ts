@@ -12,7 +12,7 @@ export class GenerateMagicLink extends UseCase<
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto
 > {
-  constructor(private readonly generateJwtFn: GenerateMagicLinkJwt) {
+  constructor(private readonly generateMagicLinkJwt: GenerateMagicLinkJwt) {
     super();
   }
 
@@ -37,7 +37,7 @@ export class GenerateMagicLink extends UseCase<
         )
       : createMagicLinkPayload(applicationId, role, "backoffice administrator");
     return {
-      jwt: this.generateJwtFn(payload),
+      jwt: this.generateMagicLinkJwt(payload),
     };
   }
 }

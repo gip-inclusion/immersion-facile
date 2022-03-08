@@ -41,17 +41,29 @@ export const preferPhoneContactSchema = z.literal("PHONE");
 export const preferInPersonContactSchema = z.literal("IN_PERSON");
 export const preferredContactMethodSchema = z.enum(validContactMethods);
 
-export type FormEstablishmentSource =
+export type FormEstablishmentSourceInUrl =
   | "immersion-facile"
   | "cci"
   | "cma"
-  | "lesentreprises-sengagent";
+  | "lesentreprises-sengagent"
+  | "unJeuneUneSolution"
+  | "testConsumer";
+
+export type FormEstablishmentSourceFromApi =
+  | "unJeuneUneSolution"
+  | "testConsumer";
+
+export type FormEstablishmentSource =
+  | FormEstablishmentSourceInUrl
+  | FormEstablishmentSourceFromApi;
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "immersion-facile",
   "cci",
   "cma",
   "lesentreprises-sengagent",
+  "unJeuneUneSolution",
+  "testConsumer",
 ];
 
 export type FormEstablishmentDto = {

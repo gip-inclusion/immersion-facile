@@ -167,10 +167,12 @@ const sendNeedsRenewedLinkError = (res: Response, err: Error) => {
   });
 };
 export function verifyJwtConfig(config: AppConfig) {
-  const verifyJwt = makeVerifyJwt<MagicLinkPayload>(config.jwtPublicKey);
+  const verifyJwt = makeVerifyJwt<MagicLinkPayload>(
+    config.magicLinkJwtPublicKey,
+  );
 
-  const verifyDeprecatedJwt = config.jwtPreviousPublicKey
-    ? makeVerifyJwt<MagicLinkPayload>(config.jwtPreviousPublicKey)
+  const verifyDeprecatedJwt = config.magicLinkJwtPreviousPublicKey
+    ? makeVerifyJwt<MagicLinkPayload>(config.magicLinkJwtPreviousPublicKey)
     : () => {
         throw new Error("No deprecated JWT private key provided");
       };

@@ -4,7 +4,7 @@ import { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
 import { RomeSearchMatchDto, romeSearchResponseSchema } from "src/shared/rome";
 import {
   formAlreadyExistsRoute,
-  immersionOffersRoute,
+  immersionOffersFromFrontRoute,
   requestEmailToUpdateFormRoute,
   romeRoute,
 } from "src/shared/routes";
@@ -18,7 +18,7 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
     establishment: FormEstablishmentDto,
   ): Promise<SiretDto> {
     const httpResponse = await axios.post(
-      `/${prefix}/${immersionOffersRoute}`,
+      `/${prefix}/${immersionOffersFromFrontRoute}`,
       establishment,
     );
 

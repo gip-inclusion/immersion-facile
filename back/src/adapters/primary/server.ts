@@ -12,6 +12,8 @@ import {
   getFeatureFlags,
   immersionApplicationShareRoute,
   immersionApplicationsRoute,
+  immersionOffersApiAuthRoute,
+  immersionOffersFromFrontRoute,
   loginPeConnect,
   peConnect,
   renewMagicLinkRoute,
@@ -37,6 +39,7 @@ import {
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
+import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 
 const logger = createLogger(__filename);
 
@@ -51,6 +54,7 @@ export const createApp = async (
   app: Express;
   repositories: Repositories;
   eventCrawler: EventCrawler;
+  generateApiJwt: GenerateApiConsumerJtw;
 }> => {
   const app = express();
   const router = Router();
@@ -222,6 +226,14 @@ export const createApp = async (
       sendHttpResponse(req, res, deps.repositories.getFeatureFlags),
     );
 
+  router
+    .route(`/${immersionOffersFromFrontRoute}`)
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.addFormEstablishment.execute(req.body),
+      ),
+    );
+
   // TODO Exploratory feature
   router.route(`/${loginPeConnect}`).get(async (req, res) =>
     sendRedirectResponse(
@@ -278,5 +290,6 @@ export const createApp = async (
     app,
     repositories: deps.repositories,
     eventCrawler: deps.eventCrawler,
+    generateApiJwt: deps.generateApiJwt,
   };
 };

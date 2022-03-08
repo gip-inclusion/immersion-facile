@@ -63,7 +63,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     private readonly createNewEvent: CreateNewEvent,
     private readonly outboxRepository: OutboxRepository,
     private readonly agencyRepository: AgencyRepository,
-    private readonly generateJwtFn: GenerateMagicLinkJwt,
+    private readonly generateMagicLinkJwt: GenerateMagicLinkJwt,
     private readonly config: AppConfig,
     private readonly clock: Clock,
   ) {
@@ -151,7 +151,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     for (const email of emails) {
       if (!emailHash || emailHashForMagicLink(email) === emailHash) {
         foundHit = true;
-        const jwt = this.generateJwtFn(
+        const jwt = this.generateMagicLinkJwt(
           createMagicLinkPayload(
             applicationId,
             role,

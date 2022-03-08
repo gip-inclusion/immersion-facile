@@ -1,7 +1,8 @@
 export const immersionApplicationsRoute = "demandes-immersion";
 export const extractImmersionApplicationsExcelRoute =
   "extract-demande-immersion-excel";
-export const immersionOffersRoute = "immersion-offers";
+export const immersionOffersApiAuthRoute = "immersion-offers";
+export const immersionOffersFromFrontRoute = "immersion-offers-from-front";
 export const validateImmersionApplicationRoute = "validate-demande";
 export const generateMagicLinkRoute = "generate-magic-link";
 export const renewMagicLinkRoute = "renew-magic-link";

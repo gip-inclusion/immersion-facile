@@ -43,7 +43,7 @@ const initializeSystemUnderTest = async (
     immersionApplicationRepo.setImmersionApplications({ [entity.id]: entity });
   }
   request = supertest(app);
-  generateJwt = makeGenerateJwt(config.jwtPrivateKey);
+  generateJwt = makeGenerateJwt(config.magicLinkJwtPrivateKey);
 };
 
 describe("/demandes-immersion route", () => {

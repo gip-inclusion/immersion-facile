@@ -62,10 +62,10 @@ describe("RenewMagicLink use case", () => {
     applicationRepository.setImmersionApplications({ [entity.id]: entity });
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
-    generateJwtFn = makeGenerateJwt(config.jwtPrivateKey);
+    generateJwtFn = makeGenerateJwt(config.magicLinkJwtPrivateKey);
     // This is the JWT function that was used with the V0 magic links
     generateLegacyV0JwtFn = (payload: any) =>
-      jwt.sign(payload, config.jwtPreviousPrivateKey as string, {
+      jwt.sign(payload, config.magicLinkJwtPreviousPrivateKey as string, {
         algorithm: "ES256",
       });
   });
@@ -194,7 +194,7 @@ describe("RenewMagicLink use case", () => {
     expect(ml.startsWith("immersionfacile.fr/"));
     const jwt = ml.replace("immersionfacile.fr/", "");
 
-    const verifyJwt = makeVerifyJwt(config.jwtPublicKey);
+    const verifyJwt = makeVerifyJwt(config.magicLinkJwtPublicKey);
     expect(verifyJwt(jwt)).not.toBeUndefined();
   });
 });
