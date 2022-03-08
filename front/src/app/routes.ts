@@ -71,7 +71,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     "/immersion-offer" /* old name, still redirected*/,
   ]),
 
-  formEstablishmentForIframes: defineRoute(
+  formEstablishmentForExternals: defineRoute(
     { consumer: param.path.string },
     (p) => `/etablissement/${p.consumer}`,
   ),

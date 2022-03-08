@@ -15,6 +15,8 @@ import { SignForm } from "./ApplicationForm/SignForm";
 import { SearchDebug } from "./Debug/SearchDebug";
 import { EstablishmentForm } from "./FormEstablishment/EstablishmentForm";
 import { Search } from "./Search/Search";
+import { EstablishmentFormImmersionFacile } from "./FormEstablishment/EstablishmentFormImmersionFacile";
+import {EstablishmentFormForExternals} from "./FormEstablishment/EstablishmentFormForExternals";
 
 const { dev } = ENV;
 
@@ -29,12 +31,10 @@ export const Router = () => {
       {route.name === "home" && <Home showDebugInfo={dev} />}
       {route.name === "landingEstablishment" && <LandingEstablishment />}
       {route.name === "formEstablishment" && (
-        <Layout>
-          <EstablishmentForm route={route} />
-        </Layout>
+        <EstablishmentFormImmersionFacile />
       )}
-      {route.name === "formEstablishmentForIframes" && (
-        <EstablishmentForm route={route} />
+      {route.name === "formEstablishmentForExternals" && (
+        <EstablishmentFormForExternals route={route} />
       )}
       {route.name === "immersionApplicationsToValidate" && (
         <VerificationPage route={route} />
