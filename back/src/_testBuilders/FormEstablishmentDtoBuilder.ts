@@ -1,10 +1,14 @@
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
-import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
+import {
+  FormEstablishmentDto,
+  FormEstablishmentSource,
+} from "../shared/FormEstablishmentDto";
 import { ProfessionDto } from "../shared/rome";
 import { SiretDto } from "../shared/siret";
 import { Builder } from "./Builder";
 
 const validFormEstablishment: FormEstablishmentDto = {
+  source: "immersion-facile",
   businessAddress: "1 Rue du Moulin 12345 Quelque Part",
   businessContacts: [
     {
@@ -39,6 +43,7 @@ const validFormEstablishment: FormEstablishmentDto = {
 };
 
 const emptyFormEstablishment: FormEstablishmentDto = {
+  source: "immersion-facile",
   businessAddress: "",
   naf: { code: "", nomenclature: "" },
   preferredContactMethods: [],
@@ -68,6 +73,9 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
+  public withSource(source: FormEstablishmentSource) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, source });
+  }
   public withSiret(siret: SiretDto) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, siret });
   }

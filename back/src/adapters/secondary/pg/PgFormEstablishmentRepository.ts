@@ -36,21 +36,22 @@ export class PgFormEstablishmentRepository
     formEstablishmentDto: FormEstablishmentDto,
   ): Promise<SiretDto | undefined> {
     // prettier-ignore
-    const {  siret, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise, naf, professions, businessContacts, preferredContactMethods } =
+    const {  siret, source, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise, naf, professions, businessContacts, preferredContactMethods } =
       formEstablishmentDto
 
     const query = `INSERT INTO form_establishments(
-        siret, business_name, business_Name_Customized, business_address, is_engaged_enterprise ,naf, professions, business_contacts, preferred_contact_methods
-      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
+        siret, source, business_name, business_Name_Customized, business_address, is_engaged_enterprise ,naf, professions, business_contacts, preferred_contact_methods
+      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
 
     // prettier-ignore
-    await this.client.query(query, [siret, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise ,naf, JSON.stringify(professions), JSON.stringify(businessContacts), JSON.stringify(preferredContactMethods)]);
+    await this.client.query(query, [siret, source, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise ,naf, JSON.stringify(professions), JSON.stringify(businessContacts), JSON.stringify(preferredContactMethods)]);
     return formEstablishmentDto.siret;
   }
 
   pgToEntity(params: Record<any, any>): FormEstablishmentDto {
     return {
       siret: params.siret,
+      source: params.source,
       businessName: params.business_name,
       businessNameCustomized: params.business_name_customized,
       businessAddress: params.business_address,

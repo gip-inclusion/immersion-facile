@@ -94,6 +94,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   for (const row of allIdsResult.rows) {
     const formEstablishmentDto = {
       id: row.id,
+      source: row.source,
       siret: row.siret,
       businessName: row.business_name,
       businessAddress: row.business_address,

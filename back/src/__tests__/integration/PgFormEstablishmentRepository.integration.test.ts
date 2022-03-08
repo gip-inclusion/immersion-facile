@@ -25,6 +25,7 @@ describe("PgFormEstablishmentRepository", () => {
 
   it("Adds a new FormEstablishment", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withSource("lesentreprises-sengagent")
       .withSiret("88888888888888")
       .build();
 
@@ -40,6 +41,7 @@ describe("PgFormEstablishmentRepository", () => {
   it("Gets saved Form Establishment", async () => {
     const siretA = "11111111111111";
     const formEstablishmentA = FormEstablishmentDtoBuilder.valid()
+      .withSource("lesentreprises-sengagent")
       .withSiret(siretA)
       .build();
 
