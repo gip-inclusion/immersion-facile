@@ -27,12 +27,18 @@ export const notifyDiscord = (content: string) => {
 };
 
 export const notifyErrorDiscord = <T extends Error>(error: T) => {
-  const mappedErrorProperties = Object.getOwnPropertyNames(error)
+  notifyDiscord(`\`\`\`${toMappedErrorPropertiesString(error)}\`\`\``);
+};
+
+export const notifyAndThrowErrorDiscord = <T extends Error>(error: T) => {
+  notifyDiscord(`\`\`\`${toMappedErrorPropertiesString(error)}\`\`\``);
+  throw error;
+};
+
+const toMappedErrorPropertiesString = <T extends Error>(error: T): string =>
+  Object.getOwnPropertyNames(error)
     .sort()
     .map((property: string) => {
       return `${property}: ${error[property as keyof T]}`;
     })
     .join("\n\n");
-
-  notifyDiscord(`\`\`\`${mappedErrorProperties}\`\`\``);
-};
