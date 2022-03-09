@@ -1,7 +1,7 @@
 import axios from "axios";
 import { AppConfig } from "../adapters/primary/appConfig";
 
-const discordSizeLimit = 2000;
+const discordSizeLimit = 1999;
 
 export const notifyDiscord = (content: string) => {
   const discordWebhookUrl: string | undefined =
@@ -24,4 +24,15 @@ export const notifyDiscord = (content: string) => {
       },
     },
   );
+};
+
+export const notifyErrorDiscord = <T extends Error>(error: T) => {
+  const mappedErrorProperties = Object.getOwnPropertyNames(error)
+    .sort()
+    .map((property: string) => {
+      return `${property}: ${error[property as keyof T]}`;
+    })
+    .join("\n\n");
+
+  notifyDiscord(`\`\`\`${mappedErrorProperties}\`\`\``);
 };
