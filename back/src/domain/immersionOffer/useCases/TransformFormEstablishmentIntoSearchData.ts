@@ -4,6 +4,7 @@ import {
 } from "../../../shared/FormEstablishmentDto";
 import { NafDto } from "../../../shared/naf";
 import { createLogger } from "../../../utils/logger";
+import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { Clock } from "../../core/ports/Clock";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -58,8 +59,10 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
       establishmentSiret,
     );
     if (!sireneRepoAnswer) {
-      logger.error(
-        `Could not get siret ${establishmentSiret} from siren gateway`,
+      notifyAndThrowErrorDiscord(
+        new Error(
+          `Could not get siret ${establishmentSiret} from siren gateway`,
+        ),
       );
       return;
     }
@@ -68,8 +71,10 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
       inferNumberEmployeesRangeFromSireneAnswer(sireneRepoAnswer);
 
     if (!nafDto || !position || numberEmployeesRange === undefined) {
-      logger.error(
-        `Some field from siren gateway are missing for establishment with siret ${establishmentSiret}`,
+      notifyAndThrowErrorDiscord(
+        new Error(
+          `Some field from siren gateway are missing for establishment with siret ${establishmentSiret}`,
+        ),
       );
       return;
     }
@@ -137,9 +142,10 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
     await this.immersionOfferRepository
       .insertEstablishmentAggregates([establishmentAggregate])
       .catch((err) => {
-        logger.error(
-          { error: err, siret: establishmentSiret },
-          "Error when adding establishment aggregate ",
+        notifyAndThrowErrorDiscord(
+          new Error(
+            `Error when adding establishment aggregate with siret ${establishmentSiret} due to ${err}`,
+          ),
         );
       });
   }

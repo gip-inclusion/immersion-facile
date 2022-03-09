@@ -1,8 +1,10 @@
 import { Pool } from "pg";
 import { TransformFormEstablishmentIntoSearchData } from "../../domain/immersionOffer/useCases/TransformFormEstablishmentIntoSearchData";
+import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
 
 import { random, sleep } from "../../shared/utils";
 import { createLogger } from "../../utils/logger";
+import { notifyDiscord } from "../../utils/notifyDiscord";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
@@ -19,7 +21,7 @@ import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
 import { AppConfig } from "./appConfig";
 
 const maxQpsApiAdresse = 5;
-const maxQpsSireneApi = 5;
+const maxQpsSireneApi = 0.25;
 
 const logger = createLogger(__filename);
 
@@ -82,31 +84,50 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       new UuidV4Generator(),
       new RealClock(),
     );
-  const allIdsResult = await clientOrigin.query(
-    "WITH siretInFormEstablishment AS ( \
-    SELECT DISTINCT siret::text \
-      FROM   form_establishments\
-    ), \
-    siretFromFormInImmersionOffer AS (SELECT DISTINCT siret::text from immersion_offers where data_source = 'form') \
-    SELECT * FROM public.form_establishments WHERE siret IN \
-    ((SELECT siret FROM siretInFormEstablishment) EXCEPT (SELECT siret FROM siretFromFormInImmersionOffer))",
+  const missingFormEstablishmentRows = (
+    await clientOrigin.query(
+      `select * from form_establishments where siret not in 
+    (select siret from establishments where data_source = 'form')`,
+    )
+  ).rows;
+  logger.info(
+    `Found ${missingFormEstablishmentRows.length} in form tables that are not in establishments`,
   );
-  for (const row of allIdsResult.rows) {
-    const formEstablishmentDto = {
-      id: row.id,
+
+  let succeed = 0;
+  let failedSiret = [];
+  for (const row of missingFormEstablishmentRows) {
+    const formEstablishmentDto: FormEstablishmentDto = {
       source: row.source,
       siret: row.siret,
       businessName: row.business_name,
+      businessNameCustomized: row.business_name_customized,
       businessAddress: row.business_address,
       naf: row.naf,
       professions: row.professions,
       businessContacts: row.business_contacts,
       preferredContactMethods: row.preferred_contact_methods,
     };
-    await transformFormEstablishmentIntoSearchData._execute(
-      formEstablishmentDto,
-    );
+    try {
+      await transformFormEstablishmentIntoSearchData._execute(
+        formEstablishmentDto,
+      );
+      logger.info(
+        `Successfully added form with siret ${row.siret} to aggregate tables.`,
+      );
+      succeed += 1;
+    } catch (error) {
+      logger.warn(
+        `Could not add form with siret ${row.siret} to aggregate tables.`,
+      );
+      failedSiret.push(row.siret);
+    }
   }
+  notifyDiscord(
+    `Script summary: Succeed: ${succeed}; Failed: ${
+      failedSiret.length
+    }\nFailing siret were: ${failedSiret.join(", ")}`,
+  );
   clientOrigin.release();
   await poolOrigin.end();
   clientDestination.release();
