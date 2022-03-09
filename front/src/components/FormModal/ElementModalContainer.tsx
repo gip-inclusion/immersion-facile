@@ -2,8 +2,8 @@ import {
   Modal,
   ModalClose,
   ModalContent,
-  ModalTitle,
 } from "@dataesr/react-dsfr";
+import ModalTitle from "../../app/ApplicationForm/ModalTitleOverride";
 import React, { useReducer } from "react";
 
 type ModalState = {
