@@ -1,5 +1,6 @@
 import { UnavailableApiError } from "../../../adapters/primary/helpers/httpErrors";
 import { NafDto } from "../../../shared/naf";
+import { propEq } from "../../../shared/ramdaExtensions/propEq";
 import { SiretDto } from "../../../shared/siret";
 import { createLogger } from "../../../utils/logger";
 import { TefenCode } from "../../immersionOffer/entities/EstablishmentEntity";
@@ -24,6 +25,13 @@ export type SireneEstablishmentProps = {
     codePostalEtablissement?: string;
     libelleCommuneEtablissement?: string;
   }>;
+  periodesEtablissement: Array<
+    Partial<{
+      dateFin: string | null;
+      dateDebut: string | null;
+      etatAdministratifEtablissement: "A" | "F";
+    }>
+  >;
 };
 
 export class SireneEstablishmentVO {
@@ -82,8 +90,15 @@ export class SireneEstablishmentVO {
     return !tefenCode || tefenCode == "NN" ? -1 : <TefenCode>+tefenCode;
   }
   public get isActive(): boolean {
+    const lastPeriod = this.props.periodesEtablissement.find(
+      propEq("dateFin", null),
+    );
+    if (!lastPeriod) return false;
     // The etatAdministratifUniteLegale is "C" for closed establishments, "A" for active ones.
-    return this.uniteLegale.etatAdministratifUniteLegale === "A";
+    return (
+      this.uniteLegale.etatAdministratifUniteLegale === "A" &&
+      lastPeriod.etatAdministratifEtablissement === "A"
+    );
   }
 }
 

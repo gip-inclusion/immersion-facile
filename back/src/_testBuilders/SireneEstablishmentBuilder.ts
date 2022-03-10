@@ -19,6 +19,13 @@ const validSireneEstablishmentProps: SireneEstablishmentProps = {
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
+  periodesEtablissement: [
+    {
+      dateFin: null,
+      dateDebut: "2022-01-01",
+      etatAdministratifEtablissement: "A",
+    },
+  ],
 };
 
 export class SireneEstablishmentVOBuilder

@@ -30,6 +30,13 @@ export const TEST_ESTABLISHMENT1 = new SireneEstablishmentVO({
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
+  periodesEtablissement: [
+    {
+      dateFin: null,
+      dateDebut: "2022-01-01",
+      etatAdministratifEtablissement: "A",
+    },
+  ],
 });
 
 export const TEST_ESTABLISHMENT2 = new SireneEstablishmentVO({
@@ -39,6 +46,7 @@ export const TEST_ESTABLISHMENT2 = new SireneEstablishmentVO({
     activitePrincipaleUniteLegale: "85.59A",
     nomenclatureActivitePrincipaleUniteLegale: "Ref2",
     trancheEffectifsUniteLegale: "01",
+    etatAdministratifUniteLegale: "A",
   },
   adresseEtablissement: {
     numeroVoieEtablissement: "20",
@@ -47,6 +55,13 @@ export const TEST_ESTABLISHMENT2 = new SireneEstablishmentVO({
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
+  periodesEtablissement: [
+    {
+      dateFin: null,
+      dateDebut: "2022-01-01",
+      etatAdministratifEtablissement: "F",
+    },
+  ],
 });
 
 export const TEST_ESTABLISHMENT3 = new SireneEstablishmentVO({
@@ -64,6 +79,13 @@ export const TEST_ESTABLISHMENT3 = new SireneEstablishmentVO({
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
+  periodesEtablissement: [
+    {
+      dateFin: null,
+      dateDebut: "2022-01-01",
+      etatAdministratifEtablissement: "A",
+    },
+  ],
 });
 
 export const TEST_ESTABLISHMENT4 = new SireneEstablishmentVO({
@@ -81,6 +103,13 @@ export const TEST_ESTABLISHMENT4 = new SireneEstablishmentVO({
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
+  periodesEtablissement: [
+    {
+      dateFin: null,
+      dateDebut: "2022-01-01",
+      etatAdministratifEtablissement: "A",
+    },
+  ],
 });
 
 type EstablishmentBySiret = { [siret: string]: SireneEstablishmentVO };

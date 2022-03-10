@@ -44,6 +44,13 @@ const getEstablishmentFromSireneApi = (
       codePostalEtablissement: formEstablishment.businessAddress,
       libelleCommuneEtablissement: formEstablishment.businessAddress,
     },
+    periodesEtablissement: [
+      {
+        dateFin: null,
+        dateDebut: "2022-01-01",
+        etatAdministratifEtablissement: "A",
+      },
+    ],
   });
 
 describe("Transform FormEstablishment into search data", () => {

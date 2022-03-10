@@ -22,6 +22,13 @@ const validEstablishment = new SireneEstablishmentVO({
     codePostalEtablissement: "75007",
     libelleCommuneEtablissement: "PARIS 7",
   },
+  periodesEtablissement: [
+    {
+      dateFin: null,
+      dateDebut: "2022-01-01",
+      etatAdministratifEtablissement: "A",
+    },
+  ],
 });
 
 describe("GetSiret", () => {
@@ -141,5 +148,24 @@ describe("GetSiret", () => {
       getSiret.execute({ siret: "42942942942900" }),
       new UnavailableApiError("Sirene API"),
     );
+  });
+
+  it("returns establishment as not Open if it is not at the current period", async () => {
+    repository.setEstablishment(
+      new SireneEstablishmentVO({
+        ...validEstablishment.props,
+        periodesEtablissement: [
+          {
+            dateFin: null,
+            dateDebut: "2022-01-01",
+            etatAdministratifEtablissement: "F",
+          },
+        ],
+      }),
+    );
+    const response = await getSiret.execute({
+      siret: validEstablishment.siret,
+    });
+    expect(response).toMatchObject({ isOpen: false });
   });
 });
