@@ -19,9 +19,8 @@ export const FormEstablishmentProfession = ({
 
   return (
     <div
+      className={"relative"}
       style={{
-        display: "flex",
-        justifyContent: "space-evenly",
         margin: "15px 20px",
       }}
     >
@@ -30,7 +29,7 @@ export const FormEstablishmentProfession = ({
         initialValue={value}
         setFormValue={setValue}
       />
-      <DeleteButton onClick={onDelete} />
+      <DeleteButton onClick={onDelete} classname={"absolute top-1 right-1"} />
     </div>
   );
 };
