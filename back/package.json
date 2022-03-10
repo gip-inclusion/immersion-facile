@@ -10,7 +10,6 @@
     "start-establishment-backfill": "ts-node src/adapters/primary/startEstablishmentBackfill.ts",
     "start-update-establishments-from-sirene": "ts-node src/adapters/primary/startUpdateEstablishmentsFromSirene.ts",
     "free-quarantined-form-establishments-with-correct-siret": "ts-node src/adapters/primary/freeQuarantinedFormEstablishmentsWithCorrectSiret.ts",
-    "add-source-to-quarantined-events": "ts-node src/adapters/primary/addSourceToQuarantinedEvents.ts",
     "transform-past-form-establishments-into-searchable-data": "ts-node src/adapters/primary/transformPastFormEstablishmentsIntoSearchableData.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts --runInBand",
     "test:e2e": "jest --runInBand --watchAll --testRegex=.e2e.test.ts",

@@ -78,15 +78,6 @@ describe("Postgres implementation of Rome Gateway", () => {
           codeMetier: "G1206",
         },
       ]);
-      expect(
-        await pgRomeGateway.searchAppellation("vendeur en habillement"),
-      ).toEqual([
-        {
-          codeAppellation: 999001,
-          libelle: "Vendeur / Vendeuse en habillement",
-          codeMetier: "D1214",
-        },
-      ]);
     });
   });
 });
