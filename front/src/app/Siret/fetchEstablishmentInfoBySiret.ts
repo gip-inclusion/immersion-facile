@@ -27,7 +27,11 @@ export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
   }, [establishmentInfos]);
 };
 
-export const useSiretFetcher = () => {
+type SiretFetcherOptions = {
+  fetchSirenApiEvenAlreadyInDb: boolean;
+};
+
+export const useSiretFetcher = (options: SiretFetcherOptions) => {
   const featureFlags = useFeatureFlagsContext();
   const [isFetchingSiret, setIsFetchingSiret] = useState(false);
   const [siretAlreadyExists, setSiretAlreadyExists] = useState(false);
@@ -55,13 +59,16 @@ export const useSiretFetcher = () => {
           validatedSiret.current,
         );
       setSiretAlreadyExists(siretAlreadyExists);
-      if (siretAlreadyExists) {
+      if (siretAlreadyExists && !options.fetchSirenApiEvenAlreadyInDb) {
         setIsFetchingSiret(false);
         return;
       }
 
       // Does siret exist in Sirene API ?
-      if (featureFlags.enableByPassInseeApi) return;
+      if (featureFlags.enableByPassInseeApi) {
+        setIsFetchingSiret(false);
+        return;
+      }
 
       try {
         const response = await immersionApplicationGateway.getSiretInfo(
@@ -76,6 +83,7 @@ export const useSiretFetcher = () => {
         } else {
           setError(err.response?.data.errors ?? err.message);
         }
+      } finally {
         setIsFetchingSiret(false);
       }
     })();

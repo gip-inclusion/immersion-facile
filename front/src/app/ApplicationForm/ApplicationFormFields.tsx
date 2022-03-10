@@ -90,7 +90,9 @@ export const ApplicationFormFields = ({
     values,
   } = useFormikContext<ImmersionApplicationDto>();
   const featureFlags = useFeatureFlagsContext();
-  const { establishmentInfo, isFetchingSiret } = useSiretFetcher();
+  const { establishmentInfo, isFetchingSiret } = useSiretFetcher({
+    fetchSirenApiEvenAlreadyInDb: true,
+  });
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField(
     "businessAddress",
