@@ -32,7 +32,7 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
       params: { searchText },
     });
 
-    return romeSearchResponseSchema.parse(httpResponse.data);
+    return httpResponse.data;
   }
   public async getSiretAlreadyExists(siret: SiretDto): Promise<boolean> {
     const httpResponse = await axios.get(

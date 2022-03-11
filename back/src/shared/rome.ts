@@ -10,7 +10,7 @@ export const romeCodeMetierSchema = z
   .regex(romeCodeMetierRegex, "Code ROME incorrect");
 
 export type RomeCodeAppellationDto = z.infer<typeof romeCodeAppellationSchema>;
-const romeCodeAppellationRegex = /^\d{5}$/;
+const romeCodeAppellationRegex = /^\d{5}\d?$/; // 5 or 6 digits
 const romeCodeAppellationSchema = z
   .string()
   .regex(romeCodeAppellationRegex, "Code ROME incorrect");
