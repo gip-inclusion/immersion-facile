@@ -107,7 +107,7 @@ export const ProfessionAutocomplete = ({
             <input
               {...params.inputProps}
               className={"fr-input"}
-              placeholder="Boulanger"
+              placeholder="Prêt à porter"
             />
           </div>
         )}
