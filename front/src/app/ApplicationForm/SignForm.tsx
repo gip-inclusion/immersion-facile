@@ -147,40 +147,48 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
                 }
               }}
             >
-              {(props) => (
-                <div>
-                  <form
-                    onReset={props.handleReset}
-                    onSubmit={props.handleSubmit}
-                  >
-                    <ApplicationFormFields
-                      isFrozen={true}
-                      isSignOnly={true}
-                      isSignatureEnterprise={signeeRole === "establishment"}
-                      signeeName={signeeName}
-                      alreadySubmitted={alreadySigned}
-                      onRejectForm={async () => {
-                        const justification =
-                          prompt(
-                            "Precisez la raison et la modification nécessaire",
-                          ) ?? undefined;
-                        try {
-                          await immersionApplicationGateway.updateStatus(
-                            { status: "DRAFT", justification },
-                            jwt,
-                          );
-                          setSubmitFeedback("modificationsAsked");
-                        } catch (e: any) {
-                          console.log(e);
-                          setSubmitFeedback(e);
-                        }
-                      }}
-                    />
+              {(props) => {
+                const rejectWithMessageForm = async (): Promise<void> => {
+                  const justification = prompt(
+                    "Précisez la raison et la modification nécessaire *",
+                  );
 
-                    <SubmitFeedback submitFeedback={submitFeedback} />
-                  </form>
-                </div>
-              )}
+                  if (justification === null) return;
+                  if (justification === "")
+                    return await rejectWithMessageForm();
+
+                  try {
+                    await immersionApplicationGateway.updateStatus(
+                      { status: "DRAFT", justification },
+                      jwt,
+                    );
+                    setSubmitFeedback("modificationsAsked");
+                  } catch (e: any) {
+                    console.log(e);
+                    setSubmitFeedback(e);
+                  }
+                };
+
+                return (
+                  <div>
+                    <form
+                      onReset={props.handleReset}
+                      onSubmit={props.handleSubmit}
+                    >
+                      <ApplicationFormFields
+                        isFrozen={true}
+                        isSignOnly={true}
+                        isSignatureEnterprise={signeeRole === "establishment"}
+                        signeeName={signeeName}
+                        alreadySubmitted={alreadySigned}
+                        onRejectForm={rejectWithMessageForm}
+                      />
+
+                      <SubmitFeedback submitFeedback={submitFeedback} />
+                    </form>
+                  </div>
+                );
+              }}
             </Formik>
           </>
         )}

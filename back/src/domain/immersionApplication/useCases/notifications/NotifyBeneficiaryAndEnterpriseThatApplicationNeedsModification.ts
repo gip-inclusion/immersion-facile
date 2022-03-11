@@ -6,7 +6,7 @@ import {
 } from "../../../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../../../shared/routes";
 import { allRoles } from "../../../../shared/tokens/MagicLinkPayload";
-import { zString } from "../../../../shared/zodUtils";
+import { zTrimmedString } from "../../../../shared/zodUtils";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
@@ -22,7 +22,7 @@ const logger = createLogger(__filename);
 export type ImmersionApplicationRequiresModificationPayload = z.infer<typeof immersionApplicationRequiresModificationSchema>
 const immersionApplicationRequiresModificationSchema = z.object({
   application: immersionApplicationSchema,
-  reason: zString,
+  reason: zTrimmedString,
   roles: z.array(z.enum(allRoles)),
 });
 
