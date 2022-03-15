@@ -12,15 +12,19 @@ import { siretSchema } from "../../shared/siret";
 export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
   fieldFromInfo: K,
   establishmentInfos: GetSiretResponseDto | undefined,
-  fieldToUpdate?: string,
+  options?: {
+    fieldToUpdate?: string;
+    disabled?: boolean;
+  },
 ) => {
   const [{ value }, { touched }, { setValue }] = useField<
     GetSiretResponseDto[K]
   >({
-    name: fieldToUpdate ?? fieldFromInfo,
+    name: options?.fieldToUpdate ?? fieldFromInfo,
   });
 
   useEffect(() => {
+    if (options?.disabled) return;
     if (!establishmentInfos) return;
     if (!touched)
       setValue(establishmentInfos && establishmentInfos[fieldFromInfo]);
@@ -29,6 +33,7 @@ export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
 
 type SiretFetcherOptions = {
   fetchSirenApiEvenAlreadyInDb: boolean;
+  disabled: boolean;
 };
 
 export const useSiretFetcher = (options: SiretFetcherOptions) => {
@@ -45,6 +50,8 @@ export const useSiretFetcher = (options: SiretFetcherOptions) => {
   const validatedSiret = useRef<SiretDto>(field.value);
 
   useEffect(() => {
+    if (options.disabled) return;
+
     (async () => {
       try {
         validatedSiret.current = siretSchema.parse(field.value);

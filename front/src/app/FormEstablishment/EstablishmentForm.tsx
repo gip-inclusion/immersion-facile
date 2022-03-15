@@ -242,7 +242,7 @@ const getLabelAndName = (field: FieldsWithLabel) => ({
 
 const SiretRelatedInputs = () => {
   const { siret, establishmentInfo, isFetchingSiret, siretAlreadyExists } =
-    useSiretFetcher({ fetchSirenApiEvenAlreadyInDb: false });
+    useSiretFetcher({ fetchSirenApiEvenAlreadyInDb: false, disabled: false });
 
   const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
     useState(false);

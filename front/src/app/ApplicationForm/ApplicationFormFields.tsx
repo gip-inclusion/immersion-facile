@@ -90,15 +90,18 @@ export const ApplicationFormFields = ({
     values,
   } = useFormikContext<ImmersionApplicationDto>();
   const featureFlags = useFeatureFlagsContext();
+  const isSiretFetcherDisabled = values.status !== "DRAFT";
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher({
     fetchSirenApiEvenAlreadyInDb: true,
+    disabled: isSiretFetcherDisabled,
   });
-  useSiretRelatedField("businessName", establishmentInfo);
-  useSiretRelatedField(
-    "businessAddress",
-    establishmentInfo,
-    "immersionAddress",
-  );
+  useSiretRelatedField("businessName", establishmentInfo, {
+    disabled: isSiretFetcherDisabled,
+  });
+  useSiretRelatedField("businessAddress", establishmentInfo, {
+    fieldToUpdate: "immersionAddress",
+    disabled: isSiretFetcherDisabled,
+  });
 
   const watchedValues = makeValuesToWatchInUrl(values);
   const { schedule, ...watchedValuesExceptSchedule } = watchedValues;
@@ -262,7 +265,9 @@ export const ApplicationFormFields = ({
       />
       <br />
       <AddressAutocomplete
-        initialSearchTerm={establishmentInfo?.businessAddress}
+        initialSearchTerm={
+          establishmentInfo?.businessAddress ?? values.immersionAddress
+        }
         label="Adresse du lieu où se fera l'immersion * "
         setFormValue={({ label }) => setFieldValue("immersionAddress", label)}
         disabled={isFrozen || isFetchingSiret}
