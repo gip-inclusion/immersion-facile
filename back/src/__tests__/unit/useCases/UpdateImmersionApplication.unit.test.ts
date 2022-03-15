@@ -60,7 +60,7 @@ describe("Update immersionApplication", () => {
   });
 
   describe("When the immersionApplication is valid", () => {
-    test("updates the immersionApplication in the repository", async () => {
+    it("updates the immersionApplication in the repository", async () => {
       const immersionApplications: Record<string, ImmersionApplicationEntity> =
         {};
       const immersionApplicationEntity =
@@ -167,6 +167,7 @@ describe("Update immersionApplication", () => {
 
     it("rejects applications if the status is not DRAFT or READY_TO_SIGN", async () => {
       for (const status of validApplicationStatus) {
+        // eslint-disable-next-line jest/no-if
         if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;
         }

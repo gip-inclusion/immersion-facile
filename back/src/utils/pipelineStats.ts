@@ -68,7 +68,6 @@ export class PipelineStats {
   }
 
   private readTimers() {
-    const now = new Date();
     return Object.fromEntries(
       Object.entries(this.timers).map(([name, timer]) => [
         name,

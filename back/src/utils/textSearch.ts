@@ -1,7 +1,4 @@
 import { MatchRangeDto } from "../shared/rome";
-import { createLogger } from "./logger";
-
-const logger = createLogger(__filename);
 
 export const normalize = (s: string): string =>
   s

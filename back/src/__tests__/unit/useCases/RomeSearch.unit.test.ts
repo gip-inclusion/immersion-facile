@@ -13,7 +13,7 @@ describe("RomeSearch", () => {
     return new RomeSearch(gateway);
   };
 
-  test("returns the list of found matches with ranges", async () => {
+  it("returns the list of found matches with ranges", async () => {
     const response = await createUseCase().execute("lapins");
     expect(response).toEqual([
       {
@@ -34,7 +34,7 @@ describe("RomeSearch", () => {
     ]);
   });
 
-  test("issues no queries for short search texts", async () => {
+  it("issues no queries for short search texts", async () => {
     const mockSearchMetierFn = jest.fn();
     const mockSearchAppellationFn = jest.fn();
     const mockAppellationToCodeMetier = jest.fn();
@@ -50,7 +50,7 @@ describe("RomeSearch", () => {
     expect(response).toEqual([]);
   });
 
-  test("returns empty list when no match is found ", async () => {
+  it("returns empty list when no match is found", async () => {
     expect(await createUseCase().execute("unknown_search_term")).toEqual([]);
   });
 });

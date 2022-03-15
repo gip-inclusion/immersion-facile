@@ -72,21 +72,21 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("IN_REVIEW -> ACCEPTED_BY_COUNSELLOR transition", () => {
-    test("accepted from counsellor", () =>
+    it("accepted from counsellor", () =>
       testAcceptsStatusUpdate({
         role: "counsellor",
         oldStatus: "IN_REVIEW",
         newStatus: "ACCEPTED_BY_COUNSELLOR",
         expectedDomainTopic: "ImmersionApplicationAcceptedByCounsellor",
       }));
-    test("rejected from validator", () =>
+    it("rejected from validator", () =>
       testRejectsStatusUpdate({
         role: "validator",
         oldStatus: "IN_REVIEW",
         newStatus: "ACCEPTED_BY_COUNSELLOR",
         expectedError: new ForbiddenError(),
       }));
-    test("rejected from admin", () =>
+    it("rejected from admin", () =>
       testRejectsStatusUpdate({
         role: "admin",
         oldStatus: "IN_REVIEW",
@@ -96,17 +96,17 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("IN_REVIEW -> REJECTED transition", () => {
-    test("accepted from counsellor", () =>
+    it("accepted from counsellor", () =>
       testAcceptsStatusUpdateToRejected({
         role: "counsellor",
         oldStatus: "IN_REVIEW",
       }));
-    test("accepted from validator", () =>
+    it("accepted from validator", () =>
       testAcceptsStatusUpdateToRejected({
         role: "validator",
         oldStatus: "IN_REVIEW",
       }));
-    test("accepted from admin", () =>
+    it("accepted from admin", () =>
       testAcceptsStatusUpdateToRejected({
         role: "admin",
         oldStatus: "IN_REVIEW",
@@ -123,7 +123,7 @@ describe("UpdateImmersionApplicationStatus", () => {
 
     for (const status of validOldStatuses) {
       for (const role of validRoles) {
-        test("accepted from " + role, () =>
+        it("accepted from " + role, () =>
           testAcceptsStatusUpdateToDraftAndInvalidatesSignatures({
             role: role,
             oldStatus: status,
@@ -134,21 +134,21 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("ACCEPTED_BY_COUNSELLOR -> ACCEPTED_BY_VALIDATOR transition", () => {
-    test("rejected from counsellor", () =>
+    it("rejected from counsellor", () =>
       testRejectsStatusUpdate({
         role: "counsellor",
         oldStatus: "ACCEPTED_BY_COUNSELLOR",
         newStatus: "ACCEPTED_BY_VALIDATOR",
         expectedError: new ForbiddenError(),
       }));
-    test("accepted from validator", () =>
+    it("accepted from validator", () =>
       testAcceptsStatusUpdate({
         role: "validator",
         oldStatus: "ACCEPTED_BY_COUNSELLOR",
         newStatus: "ACCEPTED_BY_VALIDATOR",
         expectedDomainTopic: "ImmersionApplicationAcceptedByValidator",
       }));
-    test("rejected from admin", () =>
+    it("rejected from admin", () =>
       testRejectsStatusUpdate({
         role: "admin",
         oldStatus: "ACCEPTED_BY_COUNSELLOR",
@@ -158,17 +158,17 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("ACCEPTED_BY_COUNSELLOR -> REJECTED transition", () => {
-    test("accepted from counsellor", () =>
+    it("accepted from counsellor", () =>
       testAcceptsStatusUpdateToRejected({
         role: "counsellor",
         oldStatus: "ACCEPTED_BY_COUNSELLOR",
       }));
-    test("accepted from validator", () =>
+    it("accepted from validator", () =>
       testAcceptsStatusUpdateToRejected({
         role: "validator",
         oldStatus: "ACCEPTED_BY_COUNSELLOR",
       }));
-    test("accepted from admin", () =>
+    it("accepted from admin", () =>
       testAcceptsStatusUpdateToRejected({
         role: "admin",
         oldStatus: "ACCEPTED_BY_COUNSELLOR",
@@ -176,21 +176,21 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("ACCEPTED_BY_VALIDATOR -> VALIDATED transition", () => {
-    test("rejected from counsellor", () =>
+    it("rejected from counsellor", () =>
       testRejectsStatusUpdate({
         role: "counsellor",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
         newStatus: "VALIDATED",
         expectedError: new ForbiddenError(),
       }));
-    test("rejected from validator", () =>
+    it("rejected from validator", () =>
       testRejectsStatusUpdate({
         role: "validator",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
         newStatus: "VALIDATED",
         expectedError: new ForbiddenError(),
       }));
-    test("accepted from admin", () =>
+    it("accepted from admin", () =>
       testAcceptsStatusUpdate({
         role: "admin",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
@@ -200,24 +200,24 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("ACCEPTED_BY_VALIDATOR -> REJECTED transition", () => {
-    test("accepted from counsellor", () =>
+    it("accepted from counsellor", () =>
       testAcceptsStatusUpdateToRejected({
         role: "counsellor",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
       }));
-    test("accepted from validator", () =>
+    it("accepted from validator", () =>
       testAcceptsStatusUpdateToRejected({
         role: "validator",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
       }));
-    test("accepted from admin", () =>
+    it("accepted from admin", () =>
       testAcceptsStatusUpdateToRejected({
         role: "admin",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
       }));
   });
 
-  test("rejects invalid transition source status", () =>
+  it("rejects invalid transition source status", () =>
     testRejectsStatusUpdate({
       role: "counsellor",
       oldStatus: "VALIDATED",
@@ -226,7 +226,7 @@ describe("UpdateImmersionApplicationStatus", () => {
         "Cannot go from status 'VALIDATED' to 'ACCEPTED_BY_COUNSELLOR'",
       ),
     }));
-  test("rejects invalid transition target status", () =>
+  it("rejects invalid transition target status", () =>
     testRejectsStatusUpdate({
       role: "counsellor",
       oldStatus: "ACCEPTED_BY_VALIDATOR",
@@ -235,7 +235,7 @@ describe("UpdateImmersionApplicationStatus", () => {
         "Cannot go from status 'ACCEPTED_BY_VALIDATOR' to 'ACCEPTED_BY_COUNSELLOR'",
       ),
     }));
-  test("fails for unknown application ids", () =>
+  it("fails for unknown application ids", () =>
     expectPromiseToFailWithError(
       executeUseCase({
         applicationId: "unknown_application_id",
@@ -432,7 +432,7 @@ describe("UpdateImmersionApplicationStatus", () => {
   };
 
   const expectNewEvent = async <T extends DomainTopic>(
-    topic: T,
+    _topic: T,
     expectedEvent: Partial<NarrowEvent<T>>,
   ) => {
     const allEvents = await outboxRepository.getAllUnpublishedEvents();

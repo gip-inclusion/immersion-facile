@@ -44,7 +44,6 @@ import {
   GenerateApiConsumerJtw,
   GenerateMagicLinkJwt,
 } from "../../domain/auth/jwt";
-import { UnauthorizedError } from "./helpers/httpErrors";
 import { createEstablishmentRouter } from "./EstablishmentRouter";
 
 const logger = createLogger(__filename);
@@ -71,7 +70,7 @@ export const createApp = async (
 
   app.use(bodyParser.json());
 
-  router.route("/").get((req, res) => {
+  router.route("/").get((_req, res) => {
     return res.json({ message: "Hello World !" });
   });
 

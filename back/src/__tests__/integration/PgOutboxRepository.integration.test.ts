@@ -76,7 +76,7 @@ describe("PgOutboxRepository", () => {
     // assert
     const eventsStored = await getAllEventsStored();
     expect(eventsStored).toHaveLength(1);
-    const { occurredAt, wasPublished, wasQuarantined, ...rest } = event;
+    const { occurredAt, wasPublished, wasQuarantined: _, ...rest } = event;
     expect(eventsStored[0]).toEqual({
       ...rest,
       occurred_at: new Date(occurredAt),

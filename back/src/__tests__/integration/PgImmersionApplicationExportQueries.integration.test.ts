@@ -33,8 +33,8 @@ describe("Pg implementation of ImmersionApplicationExportQueries", () => {
     client.release();
     await pool.end();
   });
-  describe("Get for export ", () => {
-    it("Retrieves all immersion applications exports", async () => {
+  describe("get for export", () => {
+    it("retrieves all immersion applications exports", async () => {
       // Prepare
       const appleAgencyId = "11111111-1111-1111-1111-111111111111";
       const appleAgency = AgencyConfigBuilder.create(appleAgencyId)

@@ -25,7 +25,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
     await pool.end();
   });
 
-  test("Insert LBB request with defined rome", async () => {
+  it("Insert LBB request with defined rome", async () => {
     const entity: LaBonneBoiteRequestEntity = {
       params: { rome: "F1111", distance_km: 30, lon: 3.1, lat: 88.1 },
       result: {
@@ -74,7 +74,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
     const getDateBefore = (time = "00") => new Date(`2020-01-06T${time}:00:00`);
     const getDateAfter = (time = "00") => new Date(`2020-01-08T${time}:00:00`);
 
-    test("Should return null if the given rome has not been requested since the given date", async () => {
+    it("Should return null if the given rome has not been requested since the given date", async () => {
       // Prepare
       const dateBefore = getDateBefore();
       insertEntity(dateBefore, paris17, thisRome);
@@ -89,7 +89,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
       expect(closestRequestAndDistance).toBeNull();
     });
 
-    test("Should return closest (geographicaly) made request with the  given rome since the given date", async () => {
+    it("Should return closest (geographicaly) made request with the  given rome since the given date", async () => {
       // Prepare
       insertEntity(getDateAfter("08"), paris10, thisRome, 100); // Same rome, 6km away (our match !)
       insertEntity(getDateAfter("09"), paris17, "F2222"); //  Not same rome, 0km away

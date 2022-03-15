@@ -9,12 +9,12 @@ import { ImmersionApplicationDto } from "../../shared/ImmersionApplication/Immer
 import { immersionApplicationSchema } from "../../shared/ImmersionApplication/immersionApplication.schema";
 
 describe("immersionApplicationDtoSchema", () => {
-  test("accepts valid immersionApplication", () => {
+  it("accepts valid immersionApplication", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder().build();
     expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
 
-  test("rejects equal applicant and mentor emails", () => {
+  it("rejects equal applicant and mentor emails", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withEmail("demandeur@mail.fr")
       .withMentorEmail("demandeur@mail.fr")
@@ -23,7 +23,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 
-  test("rejects when string with spaces are provided", () => {
+  it("rejects when string with spaces are provided", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withId("  ")
       .build();
@@ -31,7 +31,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 
-  test("rejects when phone is not a valid number", () => {
+  it("rejects when phone is not a valid number", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withPhone("wrong")
       .build();
@@ -45,7 +45,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication2);
   });
 
-  test("rejects when mentorPhone is not a valid number", () => {
+  it("rejects when mentorPhone is not a valid number", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withMentorPhone("wrong")
       .build();
@@ -53,7 +53,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 
-  test("rejects misformatted submission dates", () => {
+  it("rejects misformatted submission dates", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateSubmission("not-a-date")
       .build();
@@ -61,7 +61,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 
-  test("rejects misformatted start dates", () => {
+  it("rejects misformatted start dates", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateStart("not-a-date")
       .build();
@@ -69,7 +69,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 
-  test("rejects misformatted end dates", () => {
+  it("rejects misformatted end dates", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateEnd("not-a-date")
       .build();
@@ -77,7 +77,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 
-  test("rejects start dates that are after the end date", () => {
+  it("rejects start dates that are after the end date", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateStart("2021-01-10")
       .withDateEnd("2021-01-03")
@@ -86,7 +86,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 
-  test("rejects start dates that are monday if submiting on previous friday", () => {
+  it("rejects start dates that are monday if submiting on previous friday", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateSubmission("2021-10-15") // which is a friday
       .withDateStart("2021-10-18") // which is the following monday
@@ -99,7 +99,7 @@ describe("immersionApplicationDtoSchema", () => {
     );
   });
 
-  test("rejects start dates that are sunday if submiting on previous friday", () => {
+  it("rejects start dates that are sunday if submiting on previous friday", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateSubmission("2021-10-15") // which is a friday
       .withDateStart("2021-10-17") // which is the following sunday
@@ -112,7 +112,7 @@ describe("immersionApplicationDtoSchema", () => {
     );
   });
 
-  test("accept start dates that are tuesday if submiting on previous friday", () => {
+  it("accept start dates that are tuesday if submiting on previous friday", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateSubmission("2021-10-15") // which is a friday
       .withDateStart("2021-10-19") // which is the following tuesday
@@ -122,7 +122,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
 
-  test("rejects end dates that are more than 28 days after the start date", () => {
+  it("rejects end dates that are more than 28 days after the start date", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateStart(DATE_START)
       .withDateEnd(addDays(DATE_START, 29))
@@ -131,7 +131,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 
-  test("accepts end dates that are <= 28 days after the start date", () => {
+  it("accepts end dates that are <= 28 days after the start date", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateStart(DATE_START)
       .withDateEnd(addDays(DATE_START, 28))
@@ -140,7 +140,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
 
-  test("accepts start dates that are >= 2 days after the submission date", () => {
+  it("accepts start dates that are >= 2 days after the submission date", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateSubmission(DATE_SUBMISSION)
       .withDateStart(addDays(DATE_SUBMISSION, 2))
@@ -149,7 +149,7 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
 
-  test("rejects start dates that are < 2 days after the submission date", () => {
+  it("rejects start dates that are < 2 days after the submission date", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateSubmission(DATE_SUBMISSION)
       .withDateStart(addDays(DATE_SUBMISSION, 1))

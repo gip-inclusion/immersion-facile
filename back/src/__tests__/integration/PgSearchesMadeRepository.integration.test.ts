@@ -27,7 +27,7 @@ describe("PgSearchesMadeRepository", () => {
     await pool.end();
   });
 
-  test("Insert search", async () => {
+  it("Insert search", async () => {
     await populateWithImmersionSearches();
 
     expect(
@@ -41,7 +41,7 @@ describe("PgSearchesMadeRepository", () => {
       )[0].rome,
     ).toBe("M1607");
   });
-  test("Retrieve pending searches", async () => {
+  it("Retrieve pending searches", async () => {
     // Prepare : insert two entities : one already processed, the other not yet processed
     const entityNeedingToBeProcessed = new SearchMadeEntityBuilder()
       .withId("b0a81d02-6f07-11ec-90d6-0242ac120004")
@@ -63,7 +63,7 @@ describe("PgSearchesMadeRepository", () => {
     expect(retrievedSearches[0]).toMatchObject(entityNeedingToBeProcessed);
   });
 
-  test("Mark search as processed", async () => {
+  it("Mark search as processed", async () => {
     // Prepare : insert entity with needToBeProcessed flag to false
     const searchMadeId = "ed2ca622-6f06-11ec-90d6-0242ac120006";
     const searchMade = new SearchMadeEntityBuilder()

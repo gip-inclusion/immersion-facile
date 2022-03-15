@@ -46,7 +46,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         .build();
     });
 
-    test("Nominal case: Sends notification email to councellor, with 2 existing councellors", async () => {
+    it("Nominal case: Sends notification email to councellor, with 2 existing councellors", async () => {
       const counsellorEmails = [
         "aCouncellor@unmail.com",
         "anotherCouncellor@unmail.com",
@@ -77,7 +77,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       }
     });
 
-    test("No counsellors available: we fall back to validators: Sends notification email to those validators (using 2 of them)", async () => {
+    it("No counsellors available: we fall back to validators: Sends notification email to those validators (using 2 of them)", async () => {
       const validatorEmails = [
         "aValidator@unmail.com",
         "anotherValidator@unmail.com",
@@ -108,13 +108,13 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       }
     });
 
-    test("No counsellors available, neither validators => ensure no mail is sent", async () => {
+    it("No counsellors available, neither validators => ensure no mail is sent", async () => {
       await createUseCase().execute(validImmersionApplication);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
 
-    test("No counsellors available, neither validators, still we got admins => ensure no mail is sent", async () => {
+    it("No counsellors available, neither validators, still we got admins => ensure no mail is sent", async () => {
       const adminEmail = ["aValidator@unmail.com"];
       agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
         .withAdminEmails(adminEmail)
@@ -135,7 +135,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         .build();
     });
 
-    test("Nominal case: Sends notification email to validators", async () => {
+    it("Nominal case: Sends notification email to validators", async () => {
       const validatorEmails = [
         "aValidator@unmail.com",
         "anotherValidator@unmail.com",
@@ -166,13 +166,13 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       }
     });
 
-    test("No validators available => ensure no mail is sent", async () => {
+    it("No validators available => ensure no mail is sent", async () => {
       await createUseCase().execute(validImmersionApplication);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
 
-    test("No validators available, still we got admins => ensure no mail is sent", async () => {
+    it("No validators available, still we got admins => ensure no mail is sent", async () => {
       const adminEmail = ["anAdmin@unmail.com"];
       agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
         .withAdminEmails(adminEmail)
@@ -191,7 +191,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         .build();
     });
 
-    test("Nominal case: Sends notification email to admins", async () => {
+    it("Nominal case: Sends notification email to admins", async () => {
       const adminEmail = "anAdmin@unmail.com";
       agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
         .withAdminEmails([adminEmail])
@@ -216,7 +216,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       );
     });
 
-    test("No admin available => ensure no mail is sent", async () => {
+    it("No admin available => ensure no mail is sent", async () => {
       await createUseCase().execute(validImmersionApplication);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);

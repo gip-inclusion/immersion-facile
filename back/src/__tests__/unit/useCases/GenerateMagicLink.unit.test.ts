@@ -19,7 +19,7 @@ describe("Generate magic links", () => {
       generateMagicLink = new GenerateMagicLink(generateJwtFn);
     });
 
-    test("Generates magic links with its fn", async () => {
+    it("Generates magic links with its fn", async () => {
       const id = "123";
       const role = "validator" as Role;
       const email = "foo@bar.com";

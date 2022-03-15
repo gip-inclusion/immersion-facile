@@ -38,7 +38,8 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
     validImmersionApplication.rejectionJustification = rejectionJustification;
   });
 
-  test("Sends rejection email", async () => {
+  //eslint-disable-next-line jest/expect-expect
+  it("Sends rejection email", async () => {
     validImmersionApplication.mentorEmail = "jeanfrancois.macresy@gmail.com";
     validImmersionApplication.email =
       "jeanfrancois.macresy+beneficiary@gmail.com";

@@ -33,9 +33,6 @@ export class NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty e
       );
     }
 
-    const whoSigned: Role = application.beneficiaryAccepted
-      ? "beneficiary"
-      : "establishment";
     const recipientRole: Role = application.beneficiaryAccepted
       ? "establishment"
       : "beneficiary";

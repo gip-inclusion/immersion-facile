@@ -74,7 +74,6 @@ const checkTimePeriodsOverlap = (
   const period1Start = periodStringToMinutesFromMidnight(period1.start);
   const period1End = periodStringToMinutesFromMidnight(period1.end);
   const period2Start = periodStringToMinutesFromMidnight(period2.start);
-  const period2End = periodStringToMinutesFromMidnight(period2.end);
 
   // Force ordering
   if (period1Start > period2Start) {

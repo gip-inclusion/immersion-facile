@@ -1,7 +1,6 @@
 import fs from "fs";
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { createLogger } from "../../../../utils/logger";
 
 const makeQueryArray = (filePath: string) => {
   const orginialCsv = fs.readFileSync(filePath, "utf-8");

@@ -25,7 +25,6 @@ import {
   RenewMagicLinkRequestDto,
 } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
-import { expectEmailMatchingLinkRenewalEmail } from "../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
@@ -97,7 +96,7 @@ describe("Magic link renewal flow", () => {
     applicationRepository.setImmersionApplications({ [entity.id]: entity });
   });
 
-  test("sends the updated magic link", async () => {
+  it("sends the updated magic link", async () => {
     eventBus.subscribe("MagicLinkRenewalRequested", (event) =>
       deliverRenewedMagicLink.execute(event.payload),
     );
@@ -120,14 +119,14 @@ describe("Magic link renewal flow", () => {
 
     expect(sentEmails).toHaveLength(1);
 
-    expect(sentEmails[0].type).toEqual("MAGIC_LINK_RENEWAL");
+    expect(sentEmails[0].type).toBe("MAGIC_LINK_RENEWAL");
     expect(sentEmails[0].recipients).toEqual([validImmersionApplication.email]);
 
     const ml = sentEmails[0].params.magicLink as string;
-    expect(ml.startsWith("immersionfacile.fr/"));
+    expect(ml.startsWith("immersionfacile.fr/")).toBeTruthy();
     const jwt = ml.replace("immersionfacile.fr/", "");
 
     const verifyJwt = makeVerifyJwt(config.magicLinkJwtPublicKey);
-    expect(verifyJwt(jwt)).not.toBeUndefined();
+    expect(verifyJwt(jwt)).toBeDefined();
   });
 });

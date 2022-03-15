@@ -25,13 +25,13 @@ describe("HttpsSireneRepository", () => {
     );
   });
 
-  test("returns open establishments", async () => {
+  it("returns open establishments", async () => {
     // ETABLISSEMENT PUBLIC DU MUSEE DU LOUVRE (should be active)
     const response = await sireneRepository.get("18004623700012");
     expect(response?.etablissements).toHaveLength(1);
   });
 
-  test("filters out closed establishments", async () => {
+  it("filters out closed establishments", async () => {
     // SOCIETE TEXTILE D'HENIN LIETARD, closed in 1966.
     const response = await sireneRepository.get("38961161700017");
     expect(response).toBeUndefined();

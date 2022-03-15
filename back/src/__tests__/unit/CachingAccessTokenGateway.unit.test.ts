@@ -13,7 +13,7 @@ const testResponse2: GetAccessTokenResponse = {
 };
 
 describe("CachingAccessTokenGateway", () => {
-  let mockGetAccessTokenFn: jest.Mock<any, any>;
+  let mockGetAccessTokenFn: jest.Mock;
   let fakeClock: CustomClock;
   let cachedAccessTokenGateway: CachingAccessTokenGateway;
 
@@ -28,16 +28,16 @@ describe("CachingAccessTokenGateway", () => {
     );
   });
 
-  test("fetches a new token if none is cached", async () => {
+  it("fetches a new token if none is cached", async () => {
     mockGetAccessTokenFn.mockReturnValueOnce(testResponse1);
 
     const response = await cachedAccessTokenGateway.getAccessToken("scope");
     expect(mockGetAccessTokenFn.mock.calls).toHaveLength(1);
-    expect(mockGetAccessTokenFn.mock.calls[0][0]).toEqual("scope");
+    expect(mockGetAccessTokenFn.mock.calls[0][0]).toBe("scope");
     expect(response).toEqual(testResponse1);
   });
 
-  test("returns the cached token while it's not expired", async () => {
+  it("returns the cached token while it's not expired", async () => {
     mockGetAccessTokenFn.mockReturnValueOnce(testResponse1);
 
     // Initial call caches the token.
@@ -53,7 +53,7 @@ describe("CachingAccessTokenGateway", () => {
     expect(response2).toEqual(testResponse1);
   });
 
-  test("refreshes the cached token when it's expired", async () => {
+  it("refreshes the cached token when it's expired", async () => {
     mockGetAccessTokenFn
       .mockReturnValueOnce(testResponse1)
       .mockReturnValueOnce(testResponse2);
@@ -77,7 +77,7 @@ describe("CachingAccessTokenGateway", () => {
     expect(response3).toEqual(testResponse2);
   });
 
-  test("tokens with less than 30 sec until expiry are considered expired", async () => {
+  it("tokens with less than 30 sec until expiry are considered expired", async () => {
     mockGetAccessTokenFn
       .mockReturnValueOnce(testResponse1)
       .mockReturnValueOnce(testResponse2);
@@ -99,7 +99,7 @@ describe("CachingAccessTokenGateway", () => {
     expect(response3).toEqual(testResponse2);
   });
 
-  test("multiple requests wait the same token while it is being refreshed", async () => {
+  it("multiple requests wait the same token while it is being refreshed", async () => {
     mockGetAccessTokenFn.mockReturnValue(testResponse1);
 
     const responses = await Promise.all([

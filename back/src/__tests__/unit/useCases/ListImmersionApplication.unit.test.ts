@@ -22,7 +22,7 @@ describe("List Immersion Applications", () => {
   });
 
   describe("When the repository is empty", () => {
-    test("returns empty list", async () => {
+    it("returns empty list", async () => {
       const immersionApplications = await listImmersionApplication.execute({
         status: undefined,
         agencyId: undefined,
@@ -32,7 +32,7 @@ describe("List Immersion Applications", () => {
   });
 
   describe("When a immersionApplication is stored", () => {
-    test("returns the immersionApplication", async () => {
+    it("returns the immersionApplication", async () => {
       const entity = new ImmersionApplicationEntityBuilder().build();
       repository.setImmersionApplications({ form_id: entity });
 
@@ -45,6 +45,7 @@ describe("List Immersion Applications", () => {
   });
 
   describe("filters", () => {
+    // eslint-disable-next-line jest/require-hook
     let applicationCount = 0;
 
     // Populate the DB with 1 record of with all possible statuses and a set of agency ids.
@@ -74,7 +75,7 @@ describe("List Immersion Applications", () => {
       );
     });
 
-    test("without filters returns all applications", async () => {
+    it("without filters returns all applications", async () => {
       const immersionApplications = await listImmersionApplication.execute({
         status: undefined,
         agencyId: undefined,
@@ -82,7 +83,7 @@ describe("List Immersion Applications", () => {
       expect(immersionApplications).toHaveLength(applicationCount);
     });
 
-    test("with agency filter returns all applications of the agency", async () => {
+    it("with agency filter returns all applications of the agency", async () => {
       const immersionApplications = await listImmersionApplication.execute({
         status: undefined,
         agencyId: agencyIds[0],
@@ -93,7 +94,7 @@ describe("List Immersion Applications", () => {
       });
     });
 
-    test("with status filter returns all applications with a given status", async () => {
+    it("with status filter returns all applications with a given status", async () => {
       const immersionApplications = await listImmersionApplication.execute({
         status: validApplicationStatus[0],
         agencyId: undefined,
@@ -104,7 +105,7 @@ describe("List Immersion Applications", () => {
       });
     });
 
-    test("with multiple filters, applies all filters as logical AND", async () => {
+    it("with multiple filters, applies all filters as logical AND", async () => {
       const immersionApplications = await listImmersionApplication.execute({
         status: validApplicationStatus[0],
         agencyId: agencyIds[0],

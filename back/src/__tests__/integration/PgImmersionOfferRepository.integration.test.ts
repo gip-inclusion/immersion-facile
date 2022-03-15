@@ -47,7 +47,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     await pool.end();
   });
 
-  describe("Pg implementation of method getSearchImmersionResultDtoFromSearchMade", () => {
+  describe("pg implementation of method getSearchImmersionResultDtoFromSearchMade", () => {
     const searchedRome = "M1808";
     const searchedPosition = { lat: 49, lon: 6 };
     const notMatchingRome = "B1805";
@@ -61,7 +61,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       ...searchedPosition,
       distance_km: 30,
     };
-    test("Returns empty list when repo is empty", async () => {
+    it("returns empty list when repo is empty", async () => {
       // Act
       const searchWithNoRomeResult =
         await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
@@ -103,8 +103,8 @@ describe("Postgres implementation of immersion offer repository", () => {
         romeCode: rome,
       });
     };
-    describe("If parameter `maxResults` is given", () => {
-      test("Returns at most `maxResults` establishments ", async () => {
+    describe("if parameter `maxResults` is given", () => {
+      it("returns at most `maxResults` establishments", async () => {
         // Prepare
         /// Two establishments match
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
@@ -134,8 +134,8 @@ describe("Postgres implementation of immersion offer repository", () => {
         expect(searchResult).toHaveLength(1);
       });
     });
-    describe("If no rome code is given", () => {
-      test("Returns all establishments within geographical area", async () => {
+    describe("if no rome code is given", () => {
+      it("returns all establishments within geographical area", async () => {
         // Prepare
         /// Two establishments with offer inside geographical area
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
@@ -186,7 +186,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
     });
 
-    test("Returns active establishments only ", async () => {
+    it("returns active establishments only", async () => {
       // Prepare : establishment in geographical area but not active
       const notActiveSiret = "78000403200029";
 
@@ -210,7 +210,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(searchWithNoRomeResult).toHaveLength(0);
     });
 
-    test("Returns establishments with offers of given rome code and located within given geographical area", async () => {
+    it("returns establishments with offers of given rome code and located within given geographical area", async () => {
       // Prepare
       /// Establishment with offer inside geographical area with searched rome
       const siretMatchingToSearch = "78000403200029";
@@ -274,7 +274,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       expect(searchResult).toMatchObject([expectedResult]);
     });
-    test("Returns also contact details if offer has contact uuid and flag is True", async () => {
+    it("returns also contact details if offer has contact uuid and flag is True", async () => {
       // Prepare
       /// Establishment with offer inside geographical area with searched rome
       const siretMatchingToSearch = "78000403200029";
@@ -303,7 +303,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("getEstablishmentByImmersionOfferId", () => {
-    test("fetches existing establishment", async () => {
+    it("fetches existing establishment", async () => {
       // Prepare
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
       const storedEstablishment = new EstablishmentEntityV2Builder()
@@ -334,7 +334,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
     });
 
-    test("returns undefined for missing establishment", async () => {
+    it("returns undefined for missing establishment", async () => {
       const missingOfferId = "82e37a80-eb0b-4de6-a531-68d30af7887a";
       expect(
         await pgImmersionOfferRepository.getAnnotatedEstablishmentByImmersionOfferId(
@@ -345,7 +345,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("getContactByImmersionOfferId", () => {
-    test("fetches existing contact", async () => {
+    it("fetches existing contact", async () => {
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
       const storedContact = new ContactEntityV2Builder().build();
       await pgImmersionOfferRepository.insertEstablishmentAggregates([
@@ -366,7 +366,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(contact).toEqual(storedContact);
     });
 
-    test("returns undefined for offer without contact", async () => {
+    it("returns undefined for offer without contact", async () => {
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
       await pgImmersionOfferRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
@@ -386,7 +386,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       ).toBeUndefined();
     });
 
-    test("returns undefined for missing offer", async () => {
+    it("returns undefined for missing offer", async () => {
       const missingOfferId = "82e37a80-eb0b-4de6-a531-68d30af7887a";
       expect(
         await pgImmersionOfferRepository.getContactByImmersionOfferId(
@@ -397,7 +397,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("getImmersionOfferById", () => {
-    test("fetches existing offer", async () => {
+    it("fetches existing offer", async () => {
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
       const storedImmersionOffer = new ImmersionOfferEntityV2Builder()
         .withId(immersionOfferId)
@@ -419,7 +419,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
     });
 
-    test("returns undefined for missing offer", async () => {
+    it("returns undefined for missing offer", async () => {
       const missingOfferId = "82e37a80-eb0b-4de6-a531-68d30af7887a";
       expect(
         await pgImmersionOfferRepository.getAnnotatedImmersionOfferById(
@@ -431,7 +431,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
   describe("Pg implementation of method getActiveEstablishmentSiretsNotUpdatedSince", () => {
     const position = { lon: 2, lat: 3 };
-    it("Returns a siret list of establishments having field `update_date` < parameter `since` ", async () => {
+    it("returns a siret list of establishments having field `update_date` < parameter `since`", async () => {
       // Prepare
       const since = new Date("2020-05-05T12:00:00.000");
       const siretOfClosedEstablishmentNotUpdatedSince = "78000403200021";
@@ -489,7 +489,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       ];
       expect(actualResult).toEqual(expectedResult);
     });
-    it("Returns a siret list of all establishmetns having same `update_date` and `create_date` (which means they have never been updated !) ", async () => {
+    it("returns a siret list of all establishmetns having same `update_date` and `create_date` (which means they have never been updated !)", async () => {
       // Prepare
       const neverUpdatedEstablishmentSiret = "88000403200022";
       await insertEstablishment({
@@ -542,13 +542,13 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
     });
 
-    it("Updates parameters `nafDto`, `nb of employe`, `adress` and `position` if given and `updatedAt`", async () => {
+    it("updates parameters `nafDto`, `nb of employe`, `adress` and `position` if given and `updatedAt`", async () => {
       // Prepare
       const siretOfEstablishmentToUpdate = "78000403200021";
 
       const updateProps: Pick<
         EstablishmentEntityV2,
-        "address" | "position" | "nafDto" | "numberEmployeesRange"
+        "address" | "nafDto" | "numberEmployeesRange" | "position"
       > = {
         nafDto: { code: "8722B", nomenclature: "nomenc" },
         numberEmployeesRange: 1,
@@ -583,8 +583,8 @@ describe("Postgres implementation of immersion offer repository", () => {
           naf_nomenclature: updateProps.nafDto.nomenclature,
           number_employees: updateProps.numberEmployeesRange,
           address: updateProps.address,
-          longitude: updateProps?.position?.lon,
-          latitude: updateProps?.position?.lat,
+          longitude: updateProps.position.lon,
+          latitude: updateProps.position.lat,
         };
       expect(actualEstablishmentRowInDB).toMatchObject(
         partialExpectedEstablishmentRowInDB,
@@ -592,10 +592,10 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
-  describe("Pg implementation of method insertEstablishmentAggregates", () => {
+  describe("pg implementation of method insertEstablishmentAggregates", () => {
     const siret1 = "11111111111111";
     const siret2 = "22222222222222";
-    describe("Create new establishments", () => {
+    describe("create new establishments", () => {
       it("does nothing if empty list given", async () => {
         await pgImmersionOfferRepository.insertEstablishmentAggregates([]);
         expect(await getAllEstablishmentsRows()).toHaveLength(0);
@@ -721,7 +721,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         );
       });
     });
-    describe("When the establishment siret already exists and active ", () => {
+    describe("when the establishment siret already exists and active", () => {
       const existingSiret = "88888888888888";
       const existingUpdateAt = new Date("2021-01-01T10:10:00.000Z");
       const existingEstablishmentAddress = "7 rue guillaume tell, 75017 Paris";
@@ -739,7 +739,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           dataSource,
         });
       };
-      describe("Existing establishment's data source is `form` and new data source is `api_labonneboite`", () => {
+      describe("existing establishment's data source is `form` and new data source is `api_labonneboite`", () => {
         it("adds a new offer with source `api_labonneboite` and contact_uid null (even if an offer with same rome and siret already exists)", async () => {
           // Prepare : this establishment has once been inserted with an offer through source `form`
           const offer1Rome = "A1101";
@@ -791,7 +791,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           // expect(await getAllImmersionContactsRows()).toHaveLength(0); // TODO : fix me ?
         });
       });
-      describe("Existing establishment's data source is `api_labonneboite` and new data source is also `api_labonneboite`", () => {
+      describe("existing establishment's data source is `api_labonneboite` and new data source is also `api_labonneboite`", () => {
         it("updates the data in the establishments table", async () => {
           // Prepare
           await insertExistingEstablishmentWithDataSource("api_labonneboite");
@@ -821,7 +821,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           expect(await getAllImmersionOfferRows()).toHaveLength(1);
         });
       });
-      describe("Existing establishment's data source is `api_labonneboite` and new data source is `form`", () => {
+      describe("existing establishment's data source is `api_labonneboite` and new data source is `form`", () => {
         it("updates the data in the establishments table (dataSource, ...), contact table and adds the offers (no matter if same rome, siret already has offer) .", async () => {
           // Prepare : an establishment with offer rome A1101 and no contact has previously been inserted by source La Bonne Boite
           const offerRome = "A1101";
@@ -849,7 +849,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           /// Data Source (amongst other fields) should have been updated
           expect(
             (await getEstablishmentsRowsBySiret(existingSiret))?.data_source,
-          ).toEqual("form");
+          ).toBe("form");
           /// Offer should have been added
           const allImmersionOffeRows = await getAllImmersionOfferRows();
           expect(allImmersionOffeRows).toHaveLength(2);
@@ -858,16 +858,16 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
-  describe("Pg implementation of method getContactEmailFromSiret", () => {
+  describe("pg implementation of method getContactEmailFromSiret", () => {
     const siret = "12345678901234";
-    it("Returns undefined if no establishment contact with this siret", async () => {
+    it("returns undefined if no establishment contact with this siret", async () => {
       // Act
       const actualContactEmail =
         await pgImmersionOfferRepository.getContactEmailFromSiret(siret);
       // Assert
       expect(actualContactEmail).toBeUndefined();
     });
-    it("Returns the first contact if exist", async () => {
+    it("returns the first contact if exist", async () => {
       // Prepare
       await insertEstablishment({
         siret,
@@ -885,9 +885,9 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(actualContactEmail).toEqual(contactEmail);
     });
   });
-  describe("Pg implementation of method hasEstablishmentFromFormWithSiret", () => {
+  describe("pg implementation of method hasEstablishmentFromFormWithSiret", () => {
     const siret = "12345678901234";
-    it("Returns false if no establishment from form with given siret exists", async () => {
+    it("returns false if no establishment from form with given siret exists", async () => {
       // Prepare
       await insertEstablishment({
         siret,
@@ -900,7 +900,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         ),
       ).toBe(false);
     });
-    it("Returns true if an establishment from form with given siret exists", async () => {
+    it("returns true if an establishment from form with given siret exists", async () => {
       // Prepare
       await insertEstablishment({
         siret,
@@ -1131,10 +1131,10 @@ describe("Postgres implementation of immersion offer repository", () => {
     is_commited?: boolean;
   };
 
-  const getAllEstablishmentsRows = (): Promise<PgEstablishmentRow[]> =>
+  const getAllEstablishmentsRows = async (): Promise<PgEstablishmentRow[]> =>
     client.query("SELECT * FROM establishments").then((res) => res.rows);
 
-  const getEstablishmentsRowsBySiret = (
+  const getEstablishmentsRowsBySiret = async (
     siret: string,
   ): Promise<PgEstablishmentRow | undefined> =>
     client
@@ -1150,9 +1150,9 @@ describe("Postgres implementation of immersion offer repository", () => {
     phone: string;
     establishment_siret: string;
     contact_mode: PgContactMethod;
-  };
+  }
 
-  const getAllImmersionContactsRows = (): Promise<
+  const getAllImmersionContactsRows = async (): Promise<
     PgImmersionContactWithSiretRow[]
   > =>
     client
@@ -1170,7 +1170,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     score: number;
   };
 
-  const getAllImmersionOfferRows = (): Promise<PgImmersionOfferRow[]> =>
+  const getAllImmersionOfferRows = async (): Promise<PgImmersionOfferRow[]> =>
     client.query("SELECT * FROM immersion_offers").then((res) => res.rows);
 
   type PgEstablishmentRowWithGeo = PgEstablishmentRow & {

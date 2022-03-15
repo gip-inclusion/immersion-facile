@@ -70,7 +70,7 @@ describe("RequestUpdateFormEstablishment", () => {
   });
 
   describe("If no email has been sent yet.", () => {
-    it("Sends an email to the contact of the establishment ", async () => {
+    it("Sends an email to the contact of the establishment", async () => {
       // Prepare
       const { useCase, emailGateway } = prepareUseCase();
 

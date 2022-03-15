@@ -60,7 +60,7 @@ describe("Add immersionApplication", () => {
     );
   });
 
-  test("saves valid applications in the repository", async () => {
+  it("saves valid applications in the repository", async () => {
     const occurredAt = new Date("2021-10-15T15:00");
     const id = "eventId";
     clock.setNextDate(occurredAt);
@@ -73,7 +73,7 @@ describe("Add immersionApplication", () => {
     });
 
     const storedInRepo = await applicationRepository.getAll();
-    expect(storedInRepo.length).toBe(1);
+    expect(storedInRepo).toHaveLength(1);
     expect(storedInRepo[0].toDto()).toEqual(validImmersionApplication);
     expectDomainEventsToBeInOutbox([
       {
@@ -87,7 +87,7 @@ describe("Add immersionApplication", () => {
     ]);
   });
 
-  test("rejects applications where the ID is already in use", async () => {
+  it("rejects applications where the ID is already in use", async () => {
     await applicationRepository.save(
       ImmersionApplicationEntity.create(validImmersionApplication),
     );
@@ -121,6 +121,7 @@ describe("Add immersionApplication", () => {
 
     it("rejects applications if the status is not DRAFT or READY_TO_SIGN", async () => {
       for (const status of validApplicationStatus) {
+        // eslint-disable-next-line jest/no-if
         if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;
         }

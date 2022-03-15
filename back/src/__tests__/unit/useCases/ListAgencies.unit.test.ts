@@ -21,7 +21,7 @@ const agencyInReview = AgencyConfigBuilder.empty()
   .build();
 
 describe("ListAgencies", () => {
-  test("returns empty list when the repository is empty", async () => {
+  it("returns empty list when the repository is empty", async () => {
     const repository = new InMemoryAgencyRepository([]);
     const listAgencies = new ListAgencies(repository);
 
@@ -29,7 +29,7 @@ describe("ListAgencies", () => {
     expect(agencies).toEqual([]);
   });
 
-  test("returns active stored agencies", async () => {
+  it("returns active stored agencies", async () => {
     const repository = new InMemoryAgencyRepository([
       agency1,
       agency2,
@@ -58,7 +58,7 @@ describe("ListAgencies", () => {
     ]);
   });
 
-  test("returns 20 nearest agencies", async () => {
+  it("returns 20 nearest agencies", async () => {
     const agencies = [];
     for (let i = 0; i < 100; i++) {
       agencies.push(
@@ -77,6 +77,6 @@ describe("ListAgencies", () => {
       position: { lat: 20, lon: 20 },
     });
     expect(nearestAgencies).toHaveLength(20);
-    expect(nearestAgencies[0].id).toEqual("20");
+    expect(nearestAgencies[0].id).toBe("20");
   });
 });

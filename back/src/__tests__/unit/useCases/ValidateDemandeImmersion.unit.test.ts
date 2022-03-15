@@ -42,7 +42,7 @@ describe("Validate immersionApplication", () => {
   });
 
   describe("When the immersionApplication is valid", () => {
-    test("validates the immersionApplication in the repository", async () => {
+    it("validates the immersionApplication in the repository", async () => {
       const immersionApplication: Record<string, ImmersionApplicationEntity> =
         {};
       const immersionApplicationEntity = ImmersionApplicationEntity.create(
@@ -74,7 +74,7 @@ describe("Validate immersionApplication", () => {
   });
 
   describe("When the immersionApplication is still draft", () => {
-    test("throws bad request error", async () => {
+    it("throws bad request error", async () => {
       const immersionApplications: Record<string, ImmersionApplicationEntity> =
         {};
       const immersionApplicationEntity =

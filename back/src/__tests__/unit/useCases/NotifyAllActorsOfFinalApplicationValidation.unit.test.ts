@@ -51,13 +51,13 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     );
   };
 
-  test("Sends no emails when allowList is enforced and empty", async () => {
+  it("Sends no emails when allowList is enforced and empty", async () => {
     emailFilter = new AllowListEmailFilter([]);
     await createUseCase().execute(validImmersionApplication);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
 
-  test("Sends confirmation email to beneficiary when on allowList", async () => {
+  it("Sends confirmation email to beneficiary when on allowList", async () => {
     emailFilter = new AllowListEmailFilter([validImmersionApplication.email]);
 
     await createUseCase().execute(validImmersionApplication);
@@ -73,7 +73,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     );
   });
 
-  test("Sends confirmation email to mentor when on allowList", async () => {
+  it("Sends confirmation email to mentor when on allowList", async () => {
     emailFilter = new AllowListEmailFilter([
       validImmersionApplication.mentorEmail,
     ]);
@@ -91,7 +91,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     );
   });
 
-  test("Sends confirmation email to counsellor when on allowList", async () => {
+  it("Sends confirmation email to counsellor when on allowList", async () => {
     agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
       .withCounsellorEmails([counsellorEmail])
       .build();
@@ -110,7 +110,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     );
   });
 
-  test("Sends confirmation email to beneficiary, mentor, and counsellor when on allowList", async () => {
+  it("Sends confirmation email to beneficiary, mentor, and counsellor when on allowList", async () => {
     agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
       .withCounsellorEmails([counsellorEmail])
       .build();
@@ -137,7 +137,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     );
   });
 
-  test("Sends confirmation email to beneficiary, mentor, and counsellor when unrestricted email sending is allowed", async () => {
+  it("Sends confirmation email to beneficiary, mentor, and counsellor when unrestricted email sending is allowed", async () => {
     agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
       .withCounsellorEmails([counsellorEmail])
       .build();
@@ -165,7 +165,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     .withSignature("testSignature")
     .build();
 
-  test("simple application", () => {
+  it("simple application", () => {
     const application = new ImmersionApplicationDtoBuilder()
       .withImmersionAddress("immersionAddress")
       .withSanitaryPrevention(true)
@@ -195,7 +195,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     ).toEqual(expectedParams);
   });
 
-  test("prioritizes legacy schedule when available", () => {
+  it("prioritizes legacy schedule when available", () => {
     const legacySchedule: LegacyScheduleDto = {
       workdays: ["lundi"],
       description: "legacyScheduleDescription",
@@ -214,7 +214,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     );
   });
 
-  test("prints correct sanitaryPreventionMessage when missing", () => {
+  it("prints correct sanitaryPreventionMessage when missing", () => {
     const application = new ImmersionApplicationDtoBuilder()
       .withSanitaryPrevention(false)
       .build();
@@ -224,10 +224,10 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       application,
     );
 
-    expect(actualParms.sanitaryPrevention).toEqual("non");
+    expect(actualParms.sanitaryPrevention).toBe("non");
   });
 
-  test("prints correct individualProtection when missing", () => {
+  it("prints correct individualProtection when missing", () => {
     const application = new ImmersionApplicationDtoBuilder()
       .withIndividualProtection(false)
       .build();
@@ -237,6 +237,6 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       application,
     );
 
-    expect(actualParms.individualProtection).toEqual("non");
+    expect(actualParms.individualProtection).toBe("non");
   });
 });

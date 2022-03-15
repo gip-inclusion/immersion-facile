@@ -1,14 +1,14 @@
 import { professionSchema } from "../../shared/rome";
 
 describe("professionSchema", () => {
-  test("must include rome code and can inculde appellation", () => {
+  it("must include rome code and can inculde appellation", () => {
     expect(() =>
       professionSchema.parse({
         romeCodeMetier: "A0000",
         romeCodeAppellation: undefined,
         description: "description",
       }),
-    ).not.toThrowError();
+    ).not.toThrow();
 
     expect(() =>
       professionSchema.parse({
@@ -16,7 +16,7 @@ describe("professionSchema", () => {
         romeCodeAppellation: "00000",
         description: "description",
       }),
-    ).toThrowError();
+    ).toThrow();
 
     expect(() =>
       professionSchema.parse({
@@ -24,7 +24,7 @@ describe("professionSchema", () => {
         romeCodeAppellation: "00000",
         description: "description",
       }),
-    ).not.toThrowError();
+    ).not.toThrow();
 
     expect(() =>
       professionSchema.parse({
@@ -32,6 +32,6 @@ describe("professionSchema", () => {
         romeCodeAppellation: undefined,
         description: "description",
       }),
-    ).toThrowError();
+    ).toThrow();
   });
 });

@@ -125,12 +125,15 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
   private async _insertContactsFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
-    const aggregatesWithContact = aggregates.filter(({ contact }) => !!contact);
+    const aggregatesWithContact = aggregates.filter(
+      (establishment): establishment is Required<EstablishmentAggregate> =>
+        !!establishment.contact,
+    );
 
     if (aggregatesWithContact.length === 0) return;
 
     const contactFields = aggregatesWithContact.map((aggregate) => {
-      const contact = aggregate.contact!;
+      const contact = aggregate.contact;
       return [
         contact.id,
         contact.lastName,
@@ -143,7 +146,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     });
 
     const establishmentContactFields = aggregatesWithContact.map(
-      ({ establishment, contact }) => [establishment.siret, contact!.id],
+      ({ establishment, contact }) => [establishment.siret, contact.id],
     );
 
     try {
@@ -432,14 +435,10 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
                        ? ", is_active=%2$L"
                        : ""
                    }
-                   ${!!propertiesToUpdate.nafDto ? ", naf_code=%3$L" : ""}
+                   ${propertiesToUpdate.nafDto ? ", naf_code=%3$L" : ""}
+                   ${propertiesToUpdate.nafDto ? ", naf_nomenclature=%4$L" : ""}
                    ${
-                     !!propertiesToUpdate.nafDto
-                       ? ", naf_nomenclature=%4$L"
-                       : ""
-                   }
-                   ${
-                     !!propertiesToUpdate.numberEmployeesRange
+                     propertiesToUpdate.numberEmployeesRange
                        ? ", number_employees=%5$L"
                        : ""
                    }
@@ -632,10 +631,6 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     }));
   }
 }
-
-// Extract the NAF division (e.g. 84) from a NAF code (e.g. 8413Z)
-const extractNafDivision = (naf: string) =>
-  parseInt(naf.substring(0, 2)).toString();
 
 const convertPositionToStGeography = ({ lat, lon }: LatLonDto) =>
   `ST_GeographyFromText('POINT(${lon} ${lat})')`;

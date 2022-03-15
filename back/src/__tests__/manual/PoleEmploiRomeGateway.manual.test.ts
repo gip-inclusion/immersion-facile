@@ -20,7 +20,7 @@ describe("PoleEmploiRomeGateway", () => {
     );
   });
 
-  test("returns open establishments", async () => {
+  it("returns open establishments", async () => {
     const response = await poleEmploiRomeGateway.appellationToCodeMetier(
       "11158",
     );

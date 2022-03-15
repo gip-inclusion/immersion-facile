@@ -1,17 +1,58 @@
 module.exports = {
-  parser: "@typescript-eslint/parser", // Specifies the ESLint parser
-  parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: "module",
+  root: true,
+  env: {
+    browser: true,
+    es6: true,
+    node: true,
   },
-  extends: [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
+  overrides: [
+    {
+      extends: [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        //'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        //'plugin:rxjs/recommended',
+        "prettier",
+      ],
+      files: ["**/*.ts"],
+      parser: "@typescript-eslint/parser",
+      parserOptions: {
+        tsconfigRootDir: __dirname,
+        project: ["./tsconfig.json"],
+        ecmaVersion: 2020,
+        sourceType: "module",
+      },
+      plugins: ["@typescript-eslint" /*'rxjs'*/],
+      rules: {
+        //...require("./.eslint/eslint.rules"),
+        ...require("./.eslint/typescript-eslint.rules"),
+        //...require('./.eslint/eslint.rules'),
+        //...require('./.eslint/typescript-eslint.rules'),
+        //...require('./.eslint/angular-eslint.rules'),
+        //...require('./.eslint/rxjs-eslint.rules'),
+        //...require('./.eslint/rxjs-angular-eslint.rules')
+      },
+    },
+    {
+      env: {
+        "jest/globals": true,
+      },
+      extends: ["plugin:jest/recommended", "plugin:jest/style"],
+      files: ["**/*.test.ts"],
+      plugins: ["jest"],
+      rules: {
+        //...require("./.eslint/eslint-test.rules"),
+        ...require("./.eslint/typescript-eslint-test.rules"),
+        ...require("./.eslint/jest-eslint.rules"),
+      },
+    },
+    /*{
+      files: ['*.html'],
+      parser: '@angular-eslint/template-parser',
+      plugins: ['@angular-eslint/template'],
+      rules: {
+        ...require('./.eslint/angular-template-eslint.rules')
+      }
+    }*/
   ],
-  rules: {
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "comma-dangle": ["error", "always-multiline"],
-  },
 };

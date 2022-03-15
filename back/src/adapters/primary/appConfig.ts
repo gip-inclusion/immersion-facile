@@ -6,9 +6,6 @@ import {
   ProcessEnv,
   throwIfNotInArray,
 } from "../../shared/envHelpers";
-import { createLogger } from "../../utils/logger";
-
-const logger = createLogger(__filename);
 
 export type AccessTokenConfig = {
   clientId: string;

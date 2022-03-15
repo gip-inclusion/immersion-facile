@@ -11,7 +11,7 @@ describe("/siret route", () => {
     request = supertest(app);
   });
 
-  test("processes valid requests", async () => {
+  it("processes valid requests", async () => {
     await request.get(`/siret/${TEST_ESTABLISHMENT1.siret}`).expect(200, {
       siret: "12345678901234",
       businessName: "MA P'TITE BOITE",
@@ -21,11 +21,11 @@ describe("/siret route", () => {
     });
   });
 
-  test("returns 400 Bad Request for invalid request", async () => {
+  it("returns 400 Bad Request for invalid request", async () => {
     await request.get("/siret/not_a_valid_siret").expect(400);
   });
 
-  test("returns 404 Not Found for unknown siret", async () => {
+  it("returns 404 Not Found for unknown siret", async () => {
     await request.get("/siret/40400000000404").expect(404);
   });
 });

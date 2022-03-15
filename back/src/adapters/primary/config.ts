@@ -212,6 +212,7 @@ export const makeGenerateEditFormEstablishmentUrl = (
 export type Repositories = ReturnType<typeof createRepositories> extends Promise<infer T>
   ? T
   : never;
+
 export const createRepositories = async (
   config: AppConfig,
   getPgPoolFn: GetPgPoolFn,
@@ -366,7 +367,7 @@ export const createInMemoryUow = (repositories?: Repositories) => ({
 });
 
 // following function is for type check only, it is verifies InMemoryUnitOfWork is assignable to UnitOfWork
-const isAssignable = (inMemory: InMemoryUnitOfWork): UnitOfWork => inMemory;
+const _isAssignable = (inMemory: InMemoryUnitOfWork): UnitOfWork => inMemory;
 
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
   outboxRepo: new PgOutboxRepository(client),

@@ -21,7 +21,6 @@ import {
 } from "../../../domain/core/eventBus/EventBus";
 import { RenewMagicLink } from "../../../domain/immersionApplication/useCases/RenewMagicLink";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
-import jwt from "jsonwebtoken";
 import { RenewMagicLinkPayload } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import {
   ImmersionApplicationDto,
@@ -46,7 +45,6 @@ describe("RenewMagicLink use case", () => {
   let config: AppConfig;
 
   let generateJwtFn: GenerateMagicLinkJwt;
-  let generateLegacyV0JwtFn: (payload: any) => string;
 
   beforeEach(() => {
     agencyConfig = defaultAgencyConfig;
@@ -63,11 +61,6 @@ describe("RenewMagicLink use case", () => {
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
     generateJwtFn = makeGenerateJwt(config.magicLinkJwtPrivateKey);
-    // This is the JWT function that was used with the V0 magic links
-    generateLegacyV0JwtFn = (payload: any) =>
-      jwt.sign(payload, config.magicLinkJwtPreviousPrivateKey as string, {
-        algorithm: "ES256",
-      });
   });
 
   const createUseCase = () => {
@@ -175,26 +168,18 @@ describe("RenewMagicLink use case", () => {
 
     await createUseCase().execute(request);
 
-    const expectedJWT = generateJwtFn(
-      createMagicLinkPayload(
-        validImmersionApplication.id,
-        "beneficiary",
-        validImmersionApplication.email,
-      ),
-    );
-
     expect(outboxRepository.events).toHaveLength(1);
     const renewalEvent = outboxRepository.events[0];
-    expect(renewalEvent.topic).toEqual("MagicLinkRenewalRequested");
+    expect(renewalEvent.topic).toBe("MagicLinkRenewalRequested");
     const dispatchedPayload = renewalEvent.payload as RenewMagicLinkPayload;
     expect(dispatchedPayload["emails"]).toEqual([
       validImmersionApplication.email,
     ]);
     const ml = dispatchedPayload.magicLink;
-    expect(ml.startsWith("immersionfacile.fr/"));
+    expect(ml.startsWith("immersionfacile.fr/")).toBeTruthy();
     const jwt = ml.replace("immersionfacile.fr/", "");
 
     const verifyJwt = makeVerifyJwt(config.magicLinkJwtPublicKey);
-    expect(verifyJwt(jwt)).not.toBeUndefined();
+    expect(verifyJwt(jwt)).toBeDefined();
   });
 });

@@ -21,7 +21,7 @@ const handleResponseError = (res: Response, error: any) => {
   let errors: any;
   try {
     errors = JSON.parse(error.message);
-  } catch (e) {
+  } catch (_) {
     errors = error.message;
   }
 

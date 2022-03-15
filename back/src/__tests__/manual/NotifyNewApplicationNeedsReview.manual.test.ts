@@ -23,7 +23,7 @@ const validImmersionApplication: ImmersionApplicationDto =
     .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
     .build();
 
-describe("Notify To 2 Counsellors that an application is available ", () => {
+describe("Notify To 2 Counsellors that an application is available", () => {
   let emailGw: SendinblueEmailGateway;
   let generateMagicLinkFn: GenerateVerificationMagicLink;
   let agencyConfig;
@@ -34,7 +34,8 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
     generateMagicLinkFn = createGenerateVerificationMagicLink(config);
   });
 
-  test("Sends notification mails to check Immersion Application eligibility", async () => {
+  //eslint-disable-next-line jest/expect-expect
+  it("Sends notification mails to check Immersion Application eligibility", async () => {
     const counsellorEmails = [
       "jeanfrancois.macresy@gmail.com",
       "jeanfrancois.macresy+beneficiary@gmail.com",
@@ -58,7 +59,8 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
 
   // TODO(jfmac)
   // Needs to be re-done with real db
-  xtest("Sends notification mails to check Immersion Application eligibility with a real working immersion", async () => {
+  //eslint-disable-next-line jest/expect-expect
+  it("Sends notification mails to check Immersion Application eligibility with a real working immersion", async () => {
     const counsellorEmails = [
       "jeanfrancois.macresy@gmail.com",
       "jean-francois.macresy@beta.gouv.fr",
@@ -82,7 +84,8 @@ describe("Notify To 2 Counsellors that an application is available ", () => {
     await notifyNewApplicationNeedsReview.execute(validImmersionApplication);
   });
 
-  xtest("Sends notification mails to check Immersion Application validation  with a real working immersion", async () => {
+  //eslint-disable-next-line jest/no-conditional-expect, jest/expect-expect
+  it("Sends notification mails to check Immersion Application validation  with a real working immersion", async () => {
     const validationEmails = [
       "jeanfrancois.macresy@gmail.com",
       "jean-francois.macresy@beta.gouv.fr",

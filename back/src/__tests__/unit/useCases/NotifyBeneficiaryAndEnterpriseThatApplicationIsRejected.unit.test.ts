@@ -45,7 +45,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     );
   };
 
-  test("Sends rejection email to beneficiary, mentor, and counsellor", async () => {
+  it("Sends rejection email to beneficiary, mentor, and counsellor", async () => {
     await createUseCase().execute(rejectedImmersionApplication);
 
     const sentEmails = emailGw.getSentEmails();
@@ -63,7 +63,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     );
   });
 
-  test("Sends no emails when allowList is enforced and empty", async () => {
+  it("Sends no emails when allowList is enforced and empty", async () => {
     emailFilter = new AllowListEmailFilter([]);
     await createUseCase().execute(rejectedImmersionApplication);
 
@@ -71,7 +71,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     expect(sentEmails).toHaveLength(0);
   });
 
-  test("Sends rejection email to beneficiary, mentor, and counsellor when on allowList", async () => {
+  it("Sends rejection email to beneficiary, mentor, and counsellor when on allowList", async () => {
     emailFilter = new AllowListEmailFilter([
       rejectedImmersionApplication.email,
       rejectedImmersionApplication.mentorEmail,

@@ -26,7 +26,7 @@ const adminEmail = "admin@email.fr";
 const validatorEmail = "validator@mail.com";
 
 describe("Add immersionApplication Notifications, then checks the mails are sent (trigerred by events)", () => {
-  test("saves valid app in repository with full express app", async () => {
+  it("saves valid app in repository with full express app", async () => {
     const validImmersionApplication =
       new ImmersionApplicationDtoBuilder().build();
     const { request, reposAndGateways, eventCrawler } = await buildTestApp();
@@ -65,7 +65,8 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     ]);
   });
 
-  test("Scenario: application submitted, then signed, then validated", async () => {
+  // eslint-disable-next-line jest/expect-expect
+  it("Scenario: application submitted, then signed, then validated", async () => {
     const initialImmersionApplication = new ImmersionApplicationDtoBuilder()
       .notSigned()
       .withStatus("READY_TO_SIGN")
@@ -75,8 +76,11 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     const agency = await appAndDeps.reposAndGateways.agency.getById(
       initialImmersionApplication.agencyId,
     );
+
+    if (!agency) throw new Error("Test agency not found with this id");
+
     appAndDeps.reposAndGateways.agency.setAgencies([
-      { ...agency!, validatorEmails: ["validator@mail.com"] },
+      { ...agency, validatorEmails: ["validator@mail.com"] },
     ]);
 
     const { beneficiarySignJwt, establishmentSignJwt } =
@@ -102,6 +106,8 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       validatorReviewJwt,
       initialImmersionApplication,
     );
+
+    // REVIEW : RAJOUTER EXPECT A FAIRE !!!
   });
 
   const expectSentEmails = (

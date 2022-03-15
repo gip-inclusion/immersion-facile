@@ -29,13 +29,13 @@ describe("Add immersionApplication Notifications", () => {
     emailFilter = new AlwaysAllowEmailFilter();
   });
 
-  test("Sends no emails when allowList empty", async () => {
+  it("Sends no emails when allowList empty", async () => {
     emailFilter = new AllowListEmailFilter([]);
     await createUseCase().execute(validImmersionApplication);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
 
-  test("Sends confirmation email to beneficiary when on allowList", async () => {
+  it("Sends confirmation email to beneficiary when on allowList", async () => {
     emailFilter = new AllowListEmailFilter([validImmersionApplication.email]);
 
     await createUseCase().execute(validImmersionApplication);
@@ -49,7 +49,7 @@ describe("Add immersionApplication Notifications", () => {
     );
   });
 
-  test("Sends confirmation email when unrestricted email sending is enabled", async () => {
+  it("Sends confirmation email when unrestricted email sending is enabled", async () => {
     await createUseCase().execute(validImmersionApplication);
 
     const sentEmails = emailGw.getSentEmails();

@@ -10,7 +10,7 @@ import {
 } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase, UseCase } from "../../core/UseCase";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { updateImmersionApplicationRequestDtoSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
 

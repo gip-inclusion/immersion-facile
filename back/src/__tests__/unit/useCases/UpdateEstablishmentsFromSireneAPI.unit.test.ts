@@ -47,7 +47,7 @@ describe("Update establishments from Sirene API", () => {
   const lessThanAWeekAgo = new Date("2020-01-07T00:00:00");
   const moreThanAWeekAgo = new Date("2020-01-06T00:00:00");
 
-  test("Should update modification date of establishments that have not been modified since one week", async () => {
+  it("Should update modification date of establishments that have not been modified since one week", async () => {
     const { clock, sireneRepo, immersionRepo, useCase } = prepareUseCase();
     // Prepare
     immersionRepo.establishmentAggregates = [
@@ -72,7 +72,7 @@ describe("Update establishments from Sirene API", () => {
     ).toEqual(lessThanAWeekAgo);
   });
 
-  test("Should close establishments that are not longer referenced in Sirene API", async () => {
+  it("Should close establishments that are not longer referenced in Sirene API", async () => {
     // Prepare
     const { clock, immersionRepo, useCase } = prepareUseCase();
     immersionRepo.establishmentAggregates = [
@@ -95,7 +95,7 @@ describe("Update establishments from Sirene API", () => {
       { isActive: false, updatedAt: now },
     );
   });
-  test("Should update naf code and number of employee range of establishment based on Sirene answer", async () => {
+  it("Should update naf code and number of employee range of establishment based on Sirene answer", async () => {
     // Prepare
     const { clock, sireneRepo, immersionRepo, useCase } = prepareUseCase();
     immersionRepo.establishmentAggregates = [
@@ -129,7 +129,7 @@ describe("Update establishments from Sirene API", () => {
   });
 
   describe("Should update establishment address and position based on sirene and address API", () => {
-    test("If adresse API succeeds, it should update adresse and coordinates ", async () => {
+    it("If adresse API succeeds, it should update adresse and coordinates", async () => {
       // Prepare
       const { clock, sireneRepo, immersionRepo, adresseAPI, useCase } =
         prepareUseCase();
@@ -171,7 +171,7 @@ describe("Update establishments from Sirene API", () => {
         },
       );
     });
-    test("If adresse API fails, it should not change the address and position", async () => {
+    it("If adresse API fails, it should not change the address and position", async () => {
       // Prepare
       const { clock, sireneRepo, immersionRepo, adresseAPI, useCase } =
         prepareUseCase();

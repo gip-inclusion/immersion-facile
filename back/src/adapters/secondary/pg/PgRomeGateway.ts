@@ -24,7 +24,7 @@ export class PgRomeGateway implements RomeGateway {
       .then((res) => {
         try {
           return res.rows[0].code_rome;
-        } catch (e) {
+        } catch (_) {
           logger.error(
             { romeCodeAppellation, resultFromQuery: res },
             "could not fetch rome code with given appellation",

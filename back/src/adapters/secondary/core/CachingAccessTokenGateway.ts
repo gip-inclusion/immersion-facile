@@ -5,10 +5,7 @@ import {
   GetAccessTokenResponse,
 } from "../../../domain/core/ports/AccessTokenGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
-import { createLogger } from "../../../utils/logger";
 import { RealClock } from "./ClockImplementations";
-
-const logger = createLogger(__filename);
 
 type Scope = string;
 type CacheEntry = {

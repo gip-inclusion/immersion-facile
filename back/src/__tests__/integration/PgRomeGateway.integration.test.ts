@@ -21,7 +21,7 @@ describe("Postgres implementation of Rome Gateway", () => {
   });
 
   describe("appellationToCodeMetier", () => {
-    test("Conversion of appellation to ROME works", async () => {
+    it("Conversion of appellation to ROME works", async () => {
       expect(await pgRomeGateway.appellationToCodeMetier("10868")).toBe(
         "D1102",
       );
@@ -29,13 +29,13 @@ describe("Postgres implementation of Rome Gateway", () => {
   });
 
   describe("searchMetier", () => {
-    test("Search of metier works", async () => {
+    it("Search of metier works", async () => {
       expect(await pgRomeGateway.searchMetier("boulangère")).toEqual([
         { codeMetier: "D1102", libelle: "Boulangerie - viennoiserie" },
       ]);
     });
 
-    test("Correctly handles search queries with multiple words", async () => {
+    it("Correctly handles search queries with multiple words", async () => {
       expect(await pgRomeGateway.searchMetier("recherche en sciences")).toEqual(
         [
           {
@@ -53,7 +53,7 @@ describe("Postgres implementation of Rome Gateway", () => {
   });
 
   describe("searchAppellation", () => {
-    test("Conversion of appellation to ROME works", async () => {
+    it("Conversion of appellation to ROME works", async () => {
       expect(await pgRomeGateway.searchAppellation("boulang")).toHaveLength(13);
 
       expect(await pgRomeGateway.searchAppellation("Aide-boulanger")).toEqual([
@@ -65,7 +65,7 @@ describe("Postgres implementation of Rome Gateway", () => {
       ]);
     });
 
-    test("Correctly handles search queries with multiple words", async () => {
+    it("Correctly handles search queries with multiple words", async () => {
       expect(await pgRomeGateway.searchAppellation("Chef de boule")).toEqual([
         {
           codeAppellation: 12071,

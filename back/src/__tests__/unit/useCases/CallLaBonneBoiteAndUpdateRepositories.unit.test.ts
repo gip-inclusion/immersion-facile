@@ -49,7 +49,7 @@ const prepareUseCase = async () => {
 };
 
 describe("Eventually requests LBB and adds offers and partial establishments in repositories", () => {
-  it("Should not request LBB if no rome code is provided", async () => {
+  it("should not request LBB if no rome code is provided", async () => {
     // Prepare
     const { useCase, laBonneBoiteRequestRepository, laBonneBoiteAPI } =
       await prepareUseCase();
@@ -62,11 +62,11 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
     });
 
     // Assert
-    expect(laBonneBoiteAPI.nbOfCalls).toEqual(0);
+    expect(laBonneBoiteAPI.nbOfCalls).toBe(0);
     expect(laBonneBoiteRequestRepository.laBonneBoiteRequests).toHaveLength(0);
   });
 
-  describe("LBB has not been requested for this rome code", () => {
+  describe("lBB has not been requested for this rome code", () => {
     const dto: SearchImmersionRequestDto = {
       rome: "M1607",
       location: { lon: 10, lat: 9 },
@@ -75,7 +75,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
 
     const nextDate = new Date("2022-01-01");
 
-    it("Should add the request entity to the repository", async () => {
+    it("should add the request entity to the repository", async () => {
       // Prepare
       const { useCase, laBonneBoiteRequestRepository, laBonneBoiteAPI, clock } =
         await prepareUseCase();
@@ -109,7 +109,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
         expectedRequestEntity,
       );
     });
-    it("Should insert as many 'relevant' establishments and offers in repositories as LBB responded with undefined field `updatedAt`", async () => {
+    it("should insert as many 'relevant' establishments and offers in repositories as LBB responded with undefined field `updatedAt`", async () => {
       // Prepare
       const { useCase, laBonneBoiteAPI, immersionOfferRepository } =
         await prepareUseCase();
@@ -141,7 +141,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       expect(
         immersionOfferRepository.establishmentAggregates[0].establishment
           .updatedAt,
-      ).not.toBeDefined();
+      ).toBeUndefined();
     });
     it("Should ignore establishments that have been inserted with `form` dataSource", async () => {
       const conflictSiret = "12345678901234";
@@ -175,7 +175,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       ]);
     });
   }),
-    describe("LBB has been requested for this rome code and this geographic area", () => {
+    describe("lBB has been requested for this rome code and this geographic area", () => {
       const userSearchedRome = "M1234";
       const userSearchedLocationInParis17 = {
         lat: 48.862725, // 7 rue guillaume Tell, 75017 Paris
@@ -196,7 +196,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
         requestedAt: new Date("2021-01-01"),
       } as LaBonneBoiteRequestEntity;
 
-      it("Should not request LBB if the request has been made in the last month", async () => {
+      it("should not request LBB if the request has been made in the last month", async () => {
         // Prepare
         const {
           useCase,
@@ -218,13 +218,13 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
         });
 
         // Assert
-        expect(laBonneBoiteAPI.nbOfCalls).toEqual(0);
+        expect(laBonneBoiteAPI.nbOfCalls).toBe(0);
         expect(laBonneBoiteRequestRepository.laBonneBoiteRequests).toHaveLength(
           1,
         );
       });
 
-      it("Should request LBB if the request was made more than a month ago", async () => {
+      it("should request LBB if the request was made more than a month ago", async () => {
         // Prepare
         const { useCase, laBonneBoiteRequestRepository, clock } =
           await prepareUseCase();

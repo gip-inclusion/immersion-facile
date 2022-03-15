@@ -17,7 +17,7 @@ export function pipeWithValue<A, B, C, D, E, F, G, H>(a: A, ab: (a: A) => B, bc:
 // prettier-ignore
 export function pipeWithValue<A, B, C, D, E, F, G, H, I>(a: A, ab: (a: A) => B, bc: (b: B) => C, cd: (c: C) => D, de: (d: D) => E, ef: (e: E) => F, fg: (f: F) => G, gh: (g: G) => H, hi: (h: H) => I): I;
 // prettier-ignore
-// eslint-disable-next-line @typescript-eslint/ban-types
+/* eslint-disable */
 export function pipeWithValue(a: unknown, ab?: Function, bc?: Function, cd?: Function, de?: Function, ef?: Function, fg?: Function, gh?: Function, hi?: Function): unknown {
   switch (arguments.length) {
     case 1:
@@ -44,4 +44,4 @@ export function pipeWithValue(a: unknown, ab?: Function, bc?: Function, cd?: Fun
       );
   }
 }
-// eslint-enable @typescript-eslint/ban-types
+/* eslint-enable */

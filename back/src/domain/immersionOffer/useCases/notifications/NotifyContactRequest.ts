@@ -74,7 +74,7 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
                 potentialBeneficiaryLastName:
                   payload.potentialBeneficiaryLastName,
                 potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
-                message: payload.message!,
+                message: payload.message,
               },
             ),
           logger,

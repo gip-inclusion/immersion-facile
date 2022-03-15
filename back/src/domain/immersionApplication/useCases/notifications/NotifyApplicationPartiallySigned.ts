@@ -22,8 +22,6 @@ export class NotifyApplicationPartiallySigned extends UseCase<ImmersionApplicati
     email,
     firstName,
     lastName,
-    mentorEmail,
-    mentor,
     beneficiaryAccepted,
   }: ImmersionApplicationDto): Promise<void> {
     logger.error("Not implemented yet!!!");

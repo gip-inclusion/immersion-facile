@@ -30,7 +30,7 @@ describe("/contact-establishment route", () => {
     ({ request, reposAndGateways, eventCrawler } = await buildTestApp());
   });
 
-  test("sends email for valid request", async () => {
+  it("sends email for valid request", async () => {
     const establishment = new EstablishmentEntityV2Builder().build();
     const contact = new ContactEntityV2Builder()
       .withContactMethod("EMAIL")
@@ -66,12 +66,12 @@ describe("/contact-establishment route", () => {
 
     await eventCrawler.processEvents();
     expect(reposAndGateways.email.getSentEmails()).toHaveLength(1);
-    expect(reposAndGateways.email.getSentEmails()[0].type).toEqual(
+    expect(reposAndGateways.email.getSentEmails()[0].type).toBe(
       "CONTACT_BY_EMAIL_REQUEST",
     );
   });
 
-  test("fails with 404 for unknown immersion offers", async () => {
+  it("fails with 404 for unknown immersion offers", async () => {
     await request
       .post(`/contact-establishment`)
       .send({
@@ -81,7 +81,7 @@ describe("/contact-establishment route", () => {
       .expect(404);
   });
 
-  test("fails with 400 for invalid requests", async () => {
+  it("fails with 400 for invalid requests", async () => {
     await request
       .post(`/contact-establishment`)
       .send({ not_a: "valid_request" })

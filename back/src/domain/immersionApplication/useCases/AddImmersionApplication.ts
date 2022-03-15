@@ -2,7 +2,6 @@ import {
   ConflictError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -15,8 +14,6 @@ import {
   WithImmersionApplicationId,
 } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
-
-const logger = createLogger(__filename);
 
 export class AddImmersionApplication extends TransactionalUseCase<
   ImmersionApplicationDto,

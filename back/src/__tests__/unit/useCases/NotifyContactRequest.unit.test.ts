@@ -51,7 +51,7 @@ describe("NotifyContactRequest", () => {
     );
   };
 
-  test("Sends ContactByEmailRequest email to establishment", async () => {
+  it("Sends ContactByEmailRequest email to establishment", async () => {
     const validEmailPayload: ContactEstablishmentRequestDto = {
       ...payload,
       contactMode: "EMAIL",
@@ -88,7 +88,7 @@ describe("NotifyContactRequest", () => {
     );
   });
 
-  test("Sends ContactByPhoneRequest email to potential beneficiary", async () => {
+  it("Sends ContactByPhoneRequest email to potential beneficiary", async () => {
     const validPhonePayload: ContactEstablishmentRequestDto = {
       ...payload,
       contactMode: "PHONE",
@@ -119,7 +119,7 @@ describe("NotifyContactRequest", () => {
     );
   });
 
-  test("Sends ContactInPersonRequest email to potential beneficiary", async () => {
+  it("Sends ContactInPersonRequest email to potential beneficiary", async () => {
     const validInPersonPayload: ContactEstablishmentRequestDto = {
       ...payload,
       contactMode: "IN_PERSON",
@@ -150,7 +150,7 @@ describe("NotifyContactRequest", () => {
     );
   });
 
-  test("Sends no email when allowList is enforced and empty", async () => {
+  it("Sends no email when allowList is enforced and empty", async () => {
     emailFilter = new AllowListEmailFilter([]);
 
     const validInPersonPayload: ContactEstablishmentRequestDto = {

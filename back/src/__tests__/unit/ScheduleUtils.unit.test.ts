@@ -41,7 +41,7 @@ const simpleSchedule = new ScheduleDtoBuilder()
 
 describe("ScheduleUtils", () => {
   describe("prettyPrintSchedule", () => {
-    test("prints complex schedules", () => {
+    it("prints complex schedules", () => {
       expect(
         prettyPrintSchedule(
           new ScheduleDtoBuilder().withEmptySimpleSchedule().build(),
@@ -69,7 +69,7 @@ describe("ScheduleUtils", () => {
       ]);
     });
 
-    test("prints simple schedules", () => {
+    it("prints simple schedules", () => {
       expect(
         prettyPrintSchedule(
           new ScheduleDtoBuilder().withEmptySimpleSchedule().build(),
@@ -98,7 +98,7 @@ describe("ScheduleUtils", () => {
   });
 
   describe("convertToFrenchNamedDays", () => {
-    test("converts complex schedule", () => {
+    it("converts complex schedule", () => {
       expect(
         convertToFrenchNamedDays(
           new ScheduleDtoBuilder().withEmptyComplexSchedule().build(),
@@ -111,7 +111,7 @@ describe("ScheduleUtils", () => {
       ]);
     });
 
-    test("converts simple schedule", () => {
+    it("converts simple schedule", () => {
       expect(
         convertToFrenchNamedDays(
           new ScheduleDtoBuilder().withEmptySimpleSchedule().build(),
@@ -127,18 +127,18 @@ describe("ScheduleUtils", () => {
   });
 
   describe("isArrayOfWeekdays", () => {
-    test("accepts valid arrays", () => {
-      expect(isArrayOfWeekdays([])).toEqual(true);
-      expect(isArrayOfWeekdays(["lundi", "jeudi", "samedi"])).toEqual(true);
-      expect(isArrayOfWeekdays(weekdays)).toEqual(true);
+    it("accepts valid arrays", () => {
+      expect(isArrayOfWeekdays([])).toBe(true);
+      expect(isArrayOfWeekdays(["lundi", "jeudi", "samedi"])).toBe(true);
+      expect(isArrayOfWeekdays(weekdays)).toBe(true);
     });
-    test("rejects invalid arrays", () => {
-      expect(isArrayOfWeekdays(undefined)).toEqual(false);
-      expect(isArrayOfWeekdays("hello world")).toEqual(false);
-      expect(isArrayOfWeekdays(12345)).toEqual(false);
-      expect(isArrayOfWeekdays([1, 2, 3])).toEqual(false);
-      expect(isArrayOfWeekdays(["Lundi"])).toEqual(false);
-      expect(isArrayOfWeekdays(["lundi", "MARDI"])).toEqual(false);
+    it("rejects invalid arrays", () => {
+      expect(isArrayOfWeekdays(undefined)).toBe(false);
+      expect(isArrayOfWeekdays("hello world")).toBe(false);
+      expect(isArrayOfWeekdays(12345)).toBe(false);
+      expect(isArrayOfWeekdays([1, 2, 3])).toBe(false);
+      expect(isArrayOfWeekdays(["Lundi"])).toBe(false);
+      expect(isArrayOfWeekdays(["lundi", "MARDI"])).toBe(false);
     });
   });
 });

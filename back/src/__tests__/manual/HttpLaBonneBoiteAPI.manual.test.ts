@@ -5,7 +5,7 @@ import { PoleEmploiAccessTokenGateway } from "../../adapters/secondary/immersion
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
 import { LaBonneBoiteRequestParams } from "../../domain/immersionOffer/ports/LaBonneBoiteAPI";
-import { distanceBetweenCoordinates } from "../../utils/distanceBetweenCoordinates";
+import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
 
 const config = AppConfig.createFromEnv();
 const accessTokenGateway = new PoleEmploiAccessTokenGateway(
@@ -71,7 +71,7 @@ const getCompaniesCountFromAPI = async (
   return countResponse.data.companies_count;
 };
 describe("HttpLaBonneBoiteAPI", () => {
-  test("Should return all `companies` susceptible to offer immerison of given rome located within the geographical area", async () => {
+  it("Should return all `companies` susceptible to offer immerison of given rome located within the geographical area", async () => {
     const api = getAPI();
     const searchParams = searchParamsBoulanger100KmAroundBenodet;
     const actualSearchedCompanies = await api.searchCompanies(searchParams);
@@ -79,14 +79,14 @@ describe("HttpLaBonneBoiteAPI", () => {
       searchParams,
     );
 
-    expect(actualSearchedCompanies.length).toEqual(
+    expect(actualSearchedCompanies).toHaveLength(
       expectedSearchedCompaniesCount,
     );
 
     const processedResponse = actualSearchedCompanies.map((lBBCompanny) => ({
       siret: lBBCompanny.siret,
       rome: lBBCompanny.props.matched_rome_code,
-      distance: distanceBetweenCoordinates(
+      distance: distanceBetweenCoordinatesInMeters(
         lBBCompanny.props.lat,
         lBBCompanny.props.lon,
         searchParams.lat,
@@ -99,7 +99,7 @@ describe("HttpLaBonneBoiteAPI", () => {
     );
   });
 
-  test("Should not last more than 3 seconds even for search with many results", async () => {
+  it("Should not last more than 3 seconds even for search with many results", async () => {
     const api = getAPI();
 
     const startTime = new Date();

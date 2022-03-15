@@ -42,9 +42,9 @@ const reasonableHours = [
 export const reasonableSchedule: ScheduleDto = {
   isSimple: true,
   selectedIndex: 0,
-  complexSchedule: Array.from({ length: 5 }, (e) => [
-    ...reasonableHours,
-  ]).concat([[], []]),
+  complexSchedule: Array.from({ length: 5 }, () => [...reasonableHours]).concat(
+    [[], []],
+  ),
   simpleSchedule: {
     dayPeriods: [[0, 4]],
     hours: [...reasonableHours],

@@ -2,7 +2,7 @@ import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entiti
 import { LaBonneBoiteRequestParams } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { LaBonneBoiteRequestRepository } from "../../../domain/immersionOffer/ports/LaBonneBoiteRequestRepository";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
-import { distanceMetersBetweenCoordinates } from "./distanceBetweenCoordinates";
+import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 
 export class InMemoryLaBonneBoiteRequestRepository
   implements LaBonneBoiteRequestRepository
@@ -60,7 +60,7 @@ const findGeographicalyClosestRequestParams = (
     .map((request) => ({
       params: request.params,
       distanceToPositionKm:
-        distanceMetersBetweenCoordinates(
+        distanceBetweenCoordinatesInMeters(
           request.params.lat,
           request.params.lon,
           toPotision.lat,

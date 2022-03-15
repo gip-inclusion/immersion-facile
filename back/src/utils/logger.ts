@@ -1,6 +1,5 @@
 import path = require("path");
 import pino, { Logger } from "pino";
-import { PrettyOptions } from "pino-pretty";
 
 const getLogLevel = () => {
   // Allow command-line overrides of the log level.

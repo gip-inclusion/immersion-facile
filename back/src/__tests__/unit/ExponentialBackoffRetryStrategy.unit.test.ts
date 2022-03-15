@@ -34,7 +34,7 @@ describe("ExponentialBackoffRetryStrategy", () => {
     );
   });
 
-  test("no retry on callback success", async () => {
+  it("no retry on callback success", async () => {
     mockCallback.mockResolvedValueOnce(dummyCallbackResult);
     const result = await retryStrategy.apply(mockCallback);
 
@@ -44,7 +44,7 @@ describe("ExponentialBackoffRetryStrategy", () => {
     expect(mockSleep).not.toHaveBeenCalled();
   });
 
-  test("no retry of non-retryable error", async () => {
+  it("no retry of non-retryable error", async () => {
     const nonRetryableError = new Error("404: Not found");
     mockCallback.mockImplementationOnce(() => {
       throw nonRetryableError;
@@ -59,7 +59,7 @@ describe("ExponentialBackoffRetryStrategy", () => {
     expect(mockSleep).not.toHaveBeenCalled();
   });
 
-  test("exponential backoff on retryable errors", async () => {
+  it("exponential backoff on retryable errors", async () => {
     mockCallback
       .mockImplementationOnce(throwRetryableError)
       .mockImplementationOnce(throwRetryableError)
@@ -84,7 +84,7 @@ describe("ExponentialBackoffRetryStrategy", () => {
     expect(mockSleep).toHaveBeenNthCalledWith(4, 8008);
   });
 
-  test("exponential backoff period is truncated at maxbackoffPeriodMs", async () => {
+  it("exponential backoff period is truncated at maxbackoffPeriodMs", async () => {
     mockRandom.mockReturnValue(0);
     mockCallback
       .mockImplementationOnce(throwRetryableError)
@@ -103,7 +103,7 @@ describe("ExponentialBackoffRetryStrategy", () => {
     expect(mockSleep).toHaveBeenNthCalledWith(7, maxBackoffPeriodMs);
   });
 
-  test("aborts after timeout exceeded", async () => {
+  it("aborts after timeout exceeded", async () => {
     const retryableError = new RetryableError(
       new Error("429: Too many requests"),
     );

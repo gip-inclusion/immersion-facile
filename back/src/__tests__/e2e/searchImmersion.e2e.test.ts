@@ -11,7 +11,7 @@ describe("/search-immersion route", () => {
   });
 
   describe("accepts valid requests", () => {
-    test("with given rome and location", async () => {
+    it("with given rome and location", async () => {
       await request
         .post(`/search-immersion`)
         .send({
@@ -24,7 +24,7 @@ describe("/search-immersion route", () => {
         })
         .expect(200, []);
     });
-    test("with no specified rome", async () => {
+    it("with no specified rome", async () => {
       await request
         .post(`/search-immersion`)
         .send({
@@ -40,7 +40,7 @@ describe("/search-immersion route", () => {
 
   // TODO add test which actually recovers data (and one with token, one without)
 
-  test("rejects invalid requests with error code 400", async () => {
+  it("rejects invalid requests with error code 400", async () => {
     await request
       .post(`/search-immersion`)
       .send({
@@ -49,6 +49,7 @@ describe("/search-immersion route", () => {
           lat: 48.8531,
           lon: 2.34999,
         },
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         distance_km: 30,
       })
       .expect(400, /Code ROME incorrect/);

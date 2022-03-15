@@ -33,7 +33,7 @@ describe("QpsRateLimiter", () => {
     rateLimiter = new QpsRateLimiter(10, fakeClock, mockSleep);
   });
 
-  test("no rate limit for duration = 100ms", async () => {
+  it("no rate limit for duration = 100ms", async () => {
     await rateLimiter.whenReady(mockCallback);
     expectNotThrottled();
 
@@ -42,7 +42,7 @@ describe("QpsRateLimiter", () => {
     expectNotThrottled();
   });
 
-  test("no rate limit for duration > 100ms", async () => {
+  it("no rate limit for duration > 100ms", async () => {
     await rateLimiter.whenReady(mockCallback);
     expectNotThrottled();
 
@@ -51,7 +51,7 @@ describe("QpsRateLimiter", () => {
     expectNotThrottled();
   });
 
-  test("rate limit for duration < 100ms", async () => {
+  it("rate limit for duration < 100ms", async () => {
     await rateLimiter.whenReady(mockCallback);
     expectNotThrottled();
 

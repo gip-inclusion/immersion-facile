@@ -114,7 +114,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
         `Successfully added form with siret ${row.siret} to aggregate tables.`,
       );
       succeed += 1;
-    } catch (error) {
+    } catch (_) {
       logger.warn(
         `Could not add form with siret ${row.siret} to aggregate tables.`,
       );

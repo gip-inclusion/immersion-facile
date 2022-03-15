@@ -3,7 +3,6 @@ import {
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
 import { NafDto } from "../../../shared/naf";
-import { createLogger } from "../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { Clock } from "../../core/ports/Clock";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
@@ -24,8 +23,6 @@ import {
 } from "../entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { AdresseAPI } from "../ports/AdresseAPI";
-
-const logger = createLogger(__filename);
 
 const offerFromFormScore = 10; // 10/10 if voluntaryToImmersion=true (consider removing this field)
 

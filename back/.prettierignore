@@ -1,0 +1,7 @@
+/dist
+coverage/
+node_modules/
+src/assets/
+.git/
+.idea/
+.angular/

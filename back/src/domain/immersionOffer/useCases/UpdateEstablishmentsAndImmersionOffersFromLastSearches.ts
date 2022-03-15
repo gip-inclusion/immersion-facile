@@ -3,7 +3,7 @@ import {
   removeUndefinedElements,
   replaceArrayElement,
 } from "../../../shared/utils";
-import { distanceBetweenCoordinates } from "../../../utils/distanceBetweenCoordinates";
+import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { Clock } from "../../core/ports/Clock";
@@ -268,7 +268,7 @@ const findFirstBelongingGroupIndex = (
 ): number =>
   groups.findIndex((group) => {
     const distanceBetweenSearchesKm =
-      distanceBetweenCoordinates(
+      distanceBetweenCoordinatesInMeters(
         group[0].lon,
         group[0].lat,
         searchMade.lon,

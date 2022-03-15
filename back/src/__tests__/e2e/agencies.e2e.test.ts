@@ -10,7 +10,7 @@ describe("/agencies route", () => {
     request = supertest(app);
   });
 
-  test("returns agency list", async () => {
+  it("returns agency list", async () => {
     await request.get(`/agencies?lat=10.123&lon=10.123`).expect(200, [
       {
         id: "test-agency-1-back",

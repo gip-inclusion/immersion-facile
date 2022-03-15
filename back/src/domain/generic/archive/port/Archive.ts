@@ -23,7 +23,7 @@ export class Archive {
     filepaths: string[],
     options: AddFilesOptions,
   ): Promise<void> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       filepaths.map((filepath: string) =>
         this.archive.file(filepath, { name: path.basename(filepath) }),
       );
@@ -35,7 +35,7 @@ export class Archive {
       });
       this.outputFile.on("error", reject);
 
-      await this.archive.finalize();
+      this.archive.finalize();
     });
   }
 }

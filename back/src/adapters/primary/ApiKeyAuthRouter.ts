@@ -51,7 +51,7 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
         if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
         return deps.useCases.addFormEstablishment.execute({
           ...req.body,
-          source: req.apiConsumer!.consumer,
+          source: req.apiConsumer.consumer,
         });
       });
     });

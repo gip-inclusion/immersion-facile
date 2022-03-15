@@ -48,7 +48,7 @@ export type InMemoryRepositories = {
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
 // prettier-ignore
-const isAssignable = (inMemoryRepos: InMemoryRepositories): Repositories => inMemoryRepos;
+const _isAssignable = (inMemoryRepos: InMemoryRepositories): Repositories => inMemoryRepos;
 
 export type TestAppAndDeps = {
   request: supertest.SuperTest<supertest.Test>;

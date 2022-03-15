@@ -69,6 +69,7 @@ describe("AddAgency use case", () => {
       topic: "NewAgencyAdded",
       payload: {
         ...parisMissionLocaleParams,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
         adminEmails: [defaultAdminEmail],
         status: "needsReview",

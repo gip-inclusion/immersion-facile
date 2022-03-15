@@ -56,7 +56,7 @@ describe("Route to get immersion offer by id", () => {
     ]);
   });
 
-  test("accepts valid unauthenticated requests", async () => {
+  it("accepts valid unauthenticated requests", async () => {
     const expectedResult: SearchImmersionResultDto = {
       // /!\ Those fields come from Builder (should probably not.)
       id: immersionOfferId,
@@ -78,7 +78,7 @@ describe("Route to get immersion offer by id", () => {
       .expect(200, expectedResult);
   });
 
-  test("accepts valid authenticated requests", async () => {
+  it("accepts valid authenticated requests", async () => {
     // /!\ Those fields come from Builder (should probably not.)
     const expectedResult: SearchImmersionResultDto = {
       id: "13df03a5-a2a5-430a-b558-ed3e2f03512d",
@@ -113,7 +113,7 @@ describe("Route to get immersion offer by id", () => {
       .expect(200, expectedResult);
   });
 
-  test("rejects requests with wrong format id", async () => {
+  it("rejects requests with wrong format id", async () => {
     const authToken = generateApiJwt({
       id: authorizedApiKeyId,
     });

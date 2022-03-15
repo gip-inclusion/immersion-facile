@@ -4,7 +4,7 @@ const createAppConfig = (configParams: any): AppConfig =>
   AppConfig.createFromEnv(/* readDotEnv= */ false, configParams);
 
 describe("appConfig", () => {
-  test("quarantinedTopics", () => {
+  it("quarantinedTopics", () => {
     expect(createAppConfig({}).quarantinedTopics).toEqual([]);
     expect(
       createAppConfig({ QUARANTINED_TOPICS: "" }).quarantinedTopics,

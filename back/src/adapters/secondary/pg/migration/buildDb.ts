@@ -188,7 +188,7 @@ const makeIsQuerySuccessful =
       await client.query(query);
       logger.info({ query }, "Query succeeded");
       return true;
-    } catch (e: any) {
+    } catch (_) {
       logger.info({ query }, "Query failed");
       return false;
     }

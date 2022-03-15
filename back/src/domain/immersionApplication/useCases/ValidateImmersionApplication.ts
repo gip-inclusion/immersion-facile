@@ -6,15 +6,12 @@ import {
   ImmersionApplicationId,
   WithImmersionApplicationId,
 } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
 import { immersionApplicationIdSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
-
-const logger = createLogger(__filename);
 
 export class ValidateImmersionApplication extends UseCase<
   ImmersionApplicationId,

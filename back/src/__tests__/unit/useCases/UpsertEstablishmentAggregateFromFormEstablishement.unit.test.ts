@@ -144,7 +144,7 @@ describe("Upsert Establishment aggregate from form data", () => {
     expect(repoEstablishmentAggregate.establishment.nafDto).toEqual(
       expected.nafDto,
     );
-    expect(repoEstablishmentAggregate.establishment.dataSource).toEqual("form");
+    expect(repoEstablishmentAggregate.establishment.dataSource).toBe("form");
 
     // Contact
     expect(repoEstablishmentAggregate.contact).toBeDefined();
@@ -187,9 +187,7 @@ describe("Upsert Establishment aggregate from form data", () => {
     expect(establishmentAggregate.establishment.siret).toEqual(
       formEstablishment.siret,
     );
-    expect(establishmentAggregate.establishment.numberEmployeesRange).toEqual(
-      0,
-    );
+    expect(establishmentAggregate.establishment.numberEmployeesRange).toBe(0);
   });
   it("Removes (and replaces) establishment and offers with same siret if exists", async () => {
     const siret = "12345678911234";

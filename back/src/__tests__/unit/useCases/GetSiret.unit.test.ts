@@ -40,7 +40,7 @@ describe("GetSiret", () => {
     getSiret = new GetSiret(repository);
   });
 
-  describe("Checking for business being opened", () => {
+  describe("checking for business being opened", () => {
     const closedEstablishment = new SireneEstablishmentVO({
       ...validEstablishment.props,
       siret: "11111111111111",
@@ -103,7 +103,7 @@ describe("GetSiret", () => {
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
     });
-    expect(response.businessName).toEqual("ALAIN PROST");
+    expect(response.businessName).toBe("ALAIN PROST");
   });
 
   it("skips missing parts of adresseEtablissment", async () => {
@@ -122,7 +122,7 @@ describe("GetSiret", () => {
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
     });
-    expect(response.businessAddress).toEqual("L'ESPLANADE 30430 BARJAC");
+    expect(response.businessAddress).toBe("L'ESPLANADE 30430 BARJAC");
   });
 
   it("skips naf when not available", async () => {

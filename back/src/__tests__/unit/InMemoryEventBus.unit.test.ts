@@ -18,7 +18,7 @@ describe("InMemoryEventBus", () => {
   });
 
   describe("Publish to an existing topic", () => {
-    test("Publishes to a new topic and check we have only one spyed", () => {
+    it("Publishes to a new topic and check we have only one spyed", () => {
       const publishedEvents = spyOnTopic(
         anEventBus,
         "ImmersionApplicationSubmittedByBeneficiary",
@@ -28,7 +28,7 @@ describe("InMemoryEventBus", () => {
     });
   });
 
-  test("Publish to the same topic and check that 2 subscribers get the message", () => {
+  it("Publish to the same topic and check that 2 subscribers get the message", () => {
     const eventsOnFirstHandler = spyOnTopic(
       anEventBus,
       "ImmersionApplicationSubmittedByBeneficiary",

@@ -50,7 +50,7 @@ describe("Add FormEstablishment", () => {
     );
   });
 
-  test("saves an establishment in the repository", async () => {
+  it("saves an establishment in the repository", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
 
     expect(await addFormEstablishment.execute(formEstablishment)).toEqual(
@@ -58,7 +58,7 @@ describe("Add FormEstablishment", () => {
     );
 
     const storedInRepo = await formEstablishmentRepo.getAll();
-    expect(storedInRepo.length).toBe(1);
+    expect(storedInRepo).toHaveLength(1);
     expect(storedInRepo[0]).toEqual(formEstablishment);
     expect(outboxRepo.events).toHaveLength(1);
     expect(outboxRepo.events[0]).toMatchObject({
@@ -67,7 +67,7 @@ describe("Add FormEstablishment", () => {
     });
   });
 
-  test("reject when trying to save Form Establishment in the repository with null values", async () => {
+  it("reject when trying to save Form Establishment in the repository with null values", async () => {
     const formEstablishment =
       FormEstablishmentDtoBuilder.allEmptyFields().build();
 
@@ -76,15 +76,16 @@ describe("Add FormEstablishment", () => {
     ).rejects.toThrow();
   });
 
-  test("reject when trying to save Form Establishment in the repository with null siret", async () => {
+  it("reject when trying to save Form Establishment in the repository with null siret", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret("")
       .build();
 
     try {
       await addFormEstablishment.execute(formEstablishment);
-      expect("error").toBe("Should not have been reached");
+      throw new Error("Should not have been reached");
     } catch (e) {
+      // eslint-disable-next-line jest/no-conditional-expect
       expect(e).toBeInstanceOf(BadRequestError);
     }
   });

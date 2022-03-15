@@ -4,15 +4,11 @@ import { LatLonDto } from "../../../shared/SearchImmersionDto";
 export class InMemoryAdresseAPI implements AdresseAPI {
   constructor(private _position?: LatLonDto, private _cityCode?: number) {}
 
-  public async getPositionFromAddress(
-    _address: string,
-  ): Promise<LatLonDto | undefined> {
+  public async getPositionFromAddress(): Promise<LatLonDto | undefined> {
     return this._position;
   }
 
-  public async getCityCodeFromPosition(
-    position: LatLonDto,
-  ): Promise<number | undefined> {
+  public async getCityCodeFromPosition(): Promise<number | undefined> {
     return this._cityCode;
   }
 
@@ -21,6 +17,7 @@ export class InMemoryAdresseAPI implements AdresseAPI {
     this._position = position;
   }
 
+  // eslint-disable-next-line
   public setNextCityCode(cityCode: number | undefined) {
     this._cityCode = cityCode;
   }

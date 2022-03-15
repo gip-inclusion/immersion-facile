@@ -16,7 +16,7 @@ import { propEq } from "../../../shared/ramdaExtensions/propEq";
 import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
-import { distanceMetersBetweenCoordinates } from "./distanceBetweenCoordinates";
+import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 
 const logger = createLogger(__filename);
 
@@ -259,7 +259,7 @@ const buildSearchImmersionResultDto = (
   contactMode: contact?.contactMethod,
   numberOfEmployeeRange:
     employeeRangeByTefenCode[establishment.numberEmployeesRange],
-  distance_m: distanceMetersBetweenCoordinates(
+  distance_m: distanceBetweenCoordinatesInMeters(
     TEST_POSITION.lat,
     TEST_POSITION.lon,
     searchMade.lat,

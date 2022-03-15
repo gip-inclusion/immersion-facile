@@ -38,6 +38,8 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
     const startTime = this.clock.now();
     let backoffDurationS = 1;
 
+    // TODO Faire une fonction récursive
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       try {
         return await cb();

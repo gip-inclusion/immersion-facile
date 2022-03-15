@@ -3,8 +3,8 @@ import { AgencyInListDto, AgencyId } from "../../shared/agencies";
 import { LatLonDto } from "../../shared/SearchImmersionDto";
 import { createLogger } from "../../utils/logger";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
-import { distanceMetersBetweenCoordinates } from "./immersionOffer/distanceBetweenCoordinates";
 import { values } from "ramda";
+import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
 
 const logger = createLogger(__filename);
 
@@ -112,13 +112,13 @@ const isAgencyActive = (agency: AgencyConfig) => agency.status === "active";
 
 const sortByNearestFrom =
   (position: LatLonDto) => (a: AgencyInListDto, b: AgencyInListDto) =>
-    distanceMetersBetweenCoordinates(
+    distanceBetweenCoordinatesInMeters(
       a.position.lat,
       a.position.lon,
       position.lat,
       position.lon,
     ) -
-    distanceMetersBetweenCoordinates(
+    distanceBetweenCoordinatesInMeters(
       b.position.lat,
       b.position.lon,
       position.lat,

@@ -78,6 +78,7 @@ export class InMemoryEventBus implements EventBus {
     }
 
     if (callback) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.subscriptions[domainTopic]!.push(callback as any);
     }
   }

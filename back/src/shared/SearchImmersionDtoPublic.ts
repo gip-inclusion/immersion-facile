@@ -31,6 +31,7 @@ type SearchImmersionResultPublic = {
   contactDetails?: ContactDetailsPublic; // only if authenticated with api key
 };
 
-// Funtion for typecheck only: to make sure our type matches the public type:
+// Function for type check only: to make sure our type matches the public type
+// If a mapper is created between  SearchImmersionResultPublic (public external interface) and SearchImmersionResultDto (domain) this can be safely deleted
 // prettier-ignore
-const typecheck = (result: SearchImmersionResultDto): SearchImmersionResultPublic => result;
+const _isAssignable = (result: SearchImmersionResultDto): SearchImmersionResultPublic => result;

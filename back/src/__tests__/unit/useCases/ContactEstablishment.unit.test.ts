@@ -21,7 +21,6 @@ import {
   expectPromiseToFailWithError,
 } from "../../../_testBuilders/test.helpers";
 
-const contact = new ContactEntityV2Builder().build();
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 
 const validRequest: ContactEstablishmentRequestDto = {
@@ -58,7 +57,7 @@ describe("ContactEstablishment", () => {
     );
   });
 
-  test("schedules event for valid contact request", async () => {
+  it("schedules event for valid contact request", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())
@@ -94,7 +93,7 @@ describe("ContactEstablishment", () => {
     ]);
   });
 
-  test("schedules event for valid PHONE contact request", async () => {
+  it("schedules event for valid PHONE contact request", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())
@@ -129,7 +128,7 @@ describe("ContactEstablishment", () => {
     ]);
   });
 
-  test("schedules event for valid IN_PERSON contact requests", async () => {
+  it("schedules event for valid IN_PERSON contact requests", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())
@@ -164,7 +163,7 @@ describe("ContactEstablishment", () => {
     ]);
   });
 
-  test("throws NotFoundError for missing immersion offer", async () => {
+  it("throws NotFoundError for missing immersion offer", async () => {
     // No immersion offer
 
     await expectPromiseToFailWithError(
@@ -177,7 +176,7 @@ describe("ContactEstablishment", () => {
     );
   });
 
-  test("throws BadRequestError for contact mode mismatch", async () => {
+  it("throws BadRequestError for contact mode mismatch", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())
@@ -199,7 +198,7 @@ describe("ContactEstablishment", () => {
     );
   });
 
-  test("throws BadRequestError immersion offer without contact id", async () => {
+  it("throws BadRequestError immersion offer without contact id", async () => {
     await immersionOfferRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())

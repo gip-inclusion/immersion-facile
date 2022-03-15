@@ -1,21 +1,21 @@
 import { findMatchRanges, normalize } from "../../utils/textSearch";
 
 describe("normalize", () => {
-  test("removes accents", () => {
-    expect(normalize("à")).toEqual("a");
-    expect(normalize("é")).toEqual("e");
-    expect(normalize("ï")).toEqual("i");
-    expect(normalize("ô")).toEqual("o");
-    expect(normalize("ü")).toEqual("u");
+  it("removes accents", () => {
+    expect(normalize("à")).toBe("a");
+    expect(normalize("é")).toBe("e");
+    expect(normalize("ï")).toBe("i");
+    expect(normalize("ô")).toBe("o");
+    expect(normalize("ü")).toBe("u");
   });
 
-  test("converts to lower case", () => {
-    expect(normalize("AaBbCc")).toEqual("aabbcc");
+  it("converts to lower case", () => {
+    expect(normalize("AaBbCc")).toBe("aabbcc");
   });
 });
 
 describe("findMatchRanges", () => {
-  test("single term matches", () => {
+  it("single term matches", () => {
     expect(findMatchRanges("a", "")).toEqual([]);
     expect(findMatchRanges("a", "a")).toEqual([
       {
@@ -45,7 +45,7 @@ describe("findMatchRanges", () => {
     ]);
   });
 
-  test("multiple term matches", () => {
+  it("multiple term matches", () => {
     expect(findMatchRanges("a b", "a")).toEqual([
       {
         startIndexInclusive: 0,
@@ -70,7 +70,7 @@ describe("findMatchRanges", () => {
     ]);
   });
 
-  test("normalized matches", () => {
+  it("normalized matches", () => {
     expect(findMatchRanges("A", "âáàä")).toEqual([
       {
         startIndexInclusive: 0,

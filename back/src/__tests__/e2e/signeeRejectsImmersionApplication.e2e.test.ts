@@ -144,7 +144,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
   // Creates a ImmersionApplication, check it is saved properly and that event had been triggered (thanks to subscription),
   // then check mails have been sent trough the inmemory mail gateway
-  test("saves valid applications in the repository", async () => {
+  it("saves valid applications in the repository", async () => {
     await eventCrawler.processEvents();
 
     addImmersionApplication = new AddImmersionApplication(
@@ -197,10 +197,12 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       "beneficiary",
       validImmersionApplication.email,
     );
-    const resultRequestModif = await updateImmersionApplicationStatus.execute(
+
+    await updateImmersionApplicationStatus.execute(
       { justification: "test justification", status: "DRAFT" },
       beneficiaryMLPayload,
     );
+
     await eventCrawler.processEvents();
 
     uuidGenerator.setNextUuid("UUID 3");
@@ -212,7 +214,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     const updatedImmersion = await applicationRepository.getById(
       validImmersionApplication.id,
     );
-    expect(updatedImmersion.status === "DRAFT");
+    expect(updatedImmersion.status).toBe("DRAFT");
 
     // Now the enterprise goes ahead and implements requested changes and sends back for signatures:
     const mentorMLPayload = createMagicLinkPayload(

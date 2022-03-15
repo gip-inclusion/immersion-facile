@@ -17,8 +17,6 @@ const validImmersionApplication = new ImmersionApplicationDtoBuilder()
   .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
   .build();
 
-const counsellorEmail = "jean-francois.macresy@beta.gouv.fr";
-
 describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
   let emailGw: SendinblueEmailGateway;
   let notifyToTeamApplicationSubmittedByBeneficiary: NotifyToTeamApplicationSubmittedByBeneficiary;
@@ -35,7 +33,8 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
       );
   });
 
-  test("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
+  // eslint-disable-next-line jest/expect-expect
+  it("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
     validImmersionApplication.mentorEmail = "jeanfrancois.macresy@gmail.com";
     validImmersionApplication.email =
       "jeanfrancois.macresy+beneficiary@gmail.com";

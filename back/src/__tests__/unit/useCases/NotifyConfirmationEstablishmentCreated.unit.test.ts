@@ -22,7 +22,7 @@ describe("NotifyConfirmationEstablismentCreated", () => {
   };
 
   describe("When establishment is valid", () => {
-    test("Nominal case: Sends notification email to Establisment contact", async () => {
+    it("Nominal case: Sends notification email to Establisment contact", async () => {
       await createUseCase().execute(validEstablishment);
 
       const sentEmails = emailGw.getSentEmails();
@@ -35,7 +35,7 @@ describe("NotifyConfirmationEstablismentCreated", () => {
     });
   });
 
-  test("Sends no emails when allowList is enforced and empty", async () => {
+  it("Sends no emails when allowList is enforced and empty", async () => {
     emailFilter = new AllowListEmailFilter([]);
     await createUseCase().execute(validEstablishment);
 

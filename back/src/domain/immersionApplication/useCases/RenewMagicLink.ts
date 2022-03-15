@@ -93,7 +93,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
           // the remaining data from the database to prevent a hacker from getting magic links
           // for any application form.
           payloadToExtract = jwt.decode(expiredJwt);
-        } catch (deprecatedError: any) {
+        } catch (_) {
           // We don't want to renew this JWT.
           throw new ForbiddenError();
         }

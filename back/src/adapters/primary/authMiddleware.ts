@@ -58,7 +58,7 @@ export const createApiKeyAuthMiddleware = (
 ) => {
   const verifyJwt = makeVerifyJwt<WithApiConsumerId>(config.apiJwtPublicKey);
 
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
 
     if (!req.headers.authorization) {
@@ -101,7 +101,7 @@ export const createApiKeyAuthMiddleware = (
 
       req.apiConsumer = apiConsumer;
       return next();
-    } catch (err) {
+    } catch (_) {
       incTotalCountForRequest({
         authorisationStatus: "incorrectJwt",
       });

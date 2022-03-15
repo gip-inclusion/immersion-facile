@@ -334,7 +334,7 @@ describe("/update-application-status route", () => {
     });
   });
 
-  test("Succeeds for rejected application", async () => {
+  it("Succeeds for rejected application", async () => {
     // A counsellor rejects the application.
     const counsellorJwt = generateJwt(
       createMagicLinkPayload(applicationId, "counsellor", "counsellor@pe.fr"),
@@ -346,7 +346,8 @@ describe("/update-application-status route", () => {
   });
 
   // Skip: Currently no configuration returns 400. Reenable this test if one is added.
-  xtest("Returns error 400 for invalid requests", async () => {
+  // eslint-disable-next-line jest/no-disabled-tests
+  it.skip("Returns error 400 for invalid requests", async () => {
     // An establishment tries to change it to DRAFT but fails.
     const establishmentJwt = generateJwt(
       createMagicLinkPayload(
@@ -370,7 +371,7 @@ describe("/update-application-status route", () => {
       .expect(400);
   });
 
-  test("Returns error 403 for unauthorized requests", async () => {
+  it("Returns error 403 for unauthorized requests", async () => {
     // An establishment tries to validate the application, but fails.
     const establishmentJwt = generateJwt(
       createMagicLinkPayload(
@@ -385,7 +386,7 @@ describe("/update-application-status route", () => {
       .expect(403);
   });
 
-  test("Returns error 404 for unknown application ids", async () => {
+  it("Returns error 404 for unknown application ids", async () => {
     const jwt = generateJwt(
       createMagicLinkPayload(
         "unknown_application_id",

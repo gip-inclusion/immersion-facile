@@ -3,15 +3,11 @@ import {
   formEstablishmentSchema,
 } from "../../../shared/FormEstablishmentDto";
 import { SiretDto } from "../../../shared/siret";
-import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const logger = createLogger(__filename);
 
 export class AddFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,

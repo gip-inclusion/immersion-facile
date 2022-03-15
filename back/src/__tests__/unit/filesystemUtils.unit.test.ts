@@ -10,7 +10,7 @@ describe("Filesystem utils", () => {
   });
 
   it("should return the filepath located temporary storage directory", () => {
-    const filename: string = "myfile";
+    const filename = "myfile";
     const pathResult = temporaryStoragePath(filename);
     fse.writeFileSync(pathResult, "Hey there!");
 

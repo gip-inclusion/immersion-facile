@@ -35,13 +35,13 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
     );
   };
 
-  test("Sends no mail when contact Email is not set", async () => {
+  it("Sends no mail when contact Email is not set", async () => {
     await createUseCase().execute(validImmersionApplication);
     const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(0);
   });
 
-  test("Sends admin notification email to immersion facile team when contact Email is set", async () => {
+  it("Sends admin notification email to immersion facile team when contact Email is set", async () => {
     agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
       .withAdminEmails([adminEmail])
       .build();

@@ -21,7 +21,7 @@ export class ThrottledSequenceRunner implements SequenceRunner {
     let processed: Output;
     try {
       processed = await cb(toProcessNow);
-    } catch (e) {
+    } catch (_) {
       if (errorCount && errorCount >= this.maxNumberOfError) {
         logger.warn(
           `Tried ${errorCount} times with no success, will return undefined`,

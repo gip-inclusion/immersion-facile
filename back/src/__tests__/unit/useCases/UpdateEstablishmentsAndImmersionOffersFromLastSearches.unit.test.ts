@@ -183,9 +183,13 @@ describe("Update establishments and offers based on searches made during the day
           ]);
         });
       });
-      describe("LBB offer is irelevant ", () => {
-        it.skip("Should be ignored ", () => {
-          return; // TODO : test method `isCompanyRelevant` from LaBonneBoiteCompanyVO.
+
+      // REVIEW ON PEUT JETER NON ?
+      describe("LBB offer is irelevant", () => {
+        // eslint-disable-next-line jest/no-disabled-tests
+        it.skip("Should be ignored", () => {
+          expect(false).toBeTruthy();
+          // TODO : test method `isCompanyRelevant` from LaBonneBoiteCompanyVO.
         });
       });
       describe("LBB establishments siren don't exist", () => {
@@ -230,7 +234,7 @@ describe("Update establishments and offers based on searches made during the day
       });
     });
     describe("when LBB API has an error", () => {
-      it("Should  leave the search made flag `needs to be processed` to True ", async () => {
+      it("Should  leave the search made flag `needs to be processed` to True", async () => {
         // Prepare
         const { laBonneBoiteAPI, searchesMadeRepository, useCase } =
           prepareUseCase();

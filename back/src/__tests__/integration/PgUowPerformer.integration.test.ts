@@ -48,6 +48,7 @@ describe("PgUowPerformer", () => {
       await pgUowPerformer.perform(useCaseUnderTest);
       expect("Should not be reached").toBe("");
     } catch (error: any) {
+      // eslint-disable-next-line jest/no-conditional-expect
       expect(error.message).toBe(
         'invalid input syntax for type uuid: "a failing uuid"',
       );
