@@ -6,14 +6,12 @@ import { routes } from "src/app/routes";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { MarianneHeader } from "src/components/MarianneHeader";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import {
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "src/shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { SubmitFeedback, SuccessFeedbackKind } from "./SubmitFeedback";
+import { immersionApplicationSchema } from "../../shared/ImmersionApplication/immersionApplication.schema";
 
 type SignFormRoute = Route<typeof routes.immersionApplicationsToSign>;
 

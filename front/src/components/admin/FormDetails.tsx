@@ -3,7 +3,7 @@ import { keys } from "src/shared/utils";
 import { Accordion } from "./Accordion";
 import { TextCell } from "./TextCell";
 import { FormAccordionProps } from "./FormAccordion";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { prettyPrintSchedule } from "src/shared/ScheduleUtils";
 
 type ImmersionField = keyof ImmersionApplicationDto;

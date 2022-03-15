@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { zBoolean, zEmail, zString, zTrimmedString } from "../zodUtils";
-import {
-  addressWithPostalCodeSchema,
-  phoneRegExp,
-  stringOfNumbers,
-} from "../utils";
+import { phoneRegExp, stringOfNumbers } from "../utils";
 import { agencyIdSchema } from "../agencies";
 import { siretSchema } from "../siret";
 import {
@@ -31,6 +27,7 @@ import {
 import { LegacyScheduleDto, ScheduleDto } from "../ScheduleSchema";
 import { dateRegExp } from "../utils/date";
 import { allRoles } from "../tokens/MagicLinkPayload";
+import { addressWithPostalCodeSchema } from "../postalCode";
 
 export const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
   zTrimmedString;

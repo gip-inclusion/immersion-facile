@@ -1,8 +1,4 @@
-import {
-  Modal,
-  ModalClose,
-  ModalContent,
-} from "@dataesr/react-dsfr";
+import { Modal, ModalClose, ModalContent } from "@dataesr/react-dsfr";
 import ModalTitle from "../../app/ApplicationForm/ModalTitleOverride";
 import React, { useReducer } from "react";
 

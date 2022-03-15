@@ -2,7 +2,7 @@ import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
 import { TextInput } from "src/components/form/TextInput";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { ProfessionDto } from "src/shared/rome";
 
 type ApplicationFormProfessionProps = {

@@ -5,7 +5,7 @@ import { FormAccordion } from "src/components/admin/FormAccordion";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
+import { ApplicationStatus } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { statusTransitionConfigs } from "src/shared/immersionApplicationStatusTransitions";
 import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";

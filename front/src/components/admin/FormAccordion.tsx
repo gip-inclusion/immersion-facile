@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import type {
   ImmersionApplicationDto,
   ApplicationStatus,
-} from "src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { formatDistance, formatDuration, intervalToDuration } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Accordion } from "./Accordion";

@@ -8,14 +8,12 @@ import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { Layout } from "src/components/Layout";
 import { Title } from "src/components/Title";
 import { ENV } from "src/environmentVariables";
-import {
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "src/shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import { SubmitFeedback, SuccessFeedbackKind } from "./SubmitFeedback";
+import { immersionApplicationSchema } from "../../shared/ImmersionApplication/immersionApplication.schema";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 

@@ -5,17 +5,15 @@ import {
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
-  IMMERSION_APPLICATION_TEMPLATE,
   UpdateImmersionApplicationStatusRequestDto,
   WithImmersionApplicationId,
-  signApplicationDtoWithRole,
-  immersionApplicationSchema,
-} from "src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
 import { AgencyId } from "../../shared/agencies";
 import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
+import { signApplicationDtoWithRole } from "../../shared/ImmersionApplication/immersionApplication";
 
 const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
   {

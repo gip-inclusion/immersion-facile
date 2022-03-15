@@ -18,21 +18,22 @@ import {
   capturePostalCode,
   CapturePostalCodeResult,
 } from "../../../shared/postalCode";
-import {
-  establishmentExportSchemaObj
-} from "../../../shared/establishmentExport/establishmentExport.schema";
+import { establishmentExportSchemaObj } from "../../../shared/establishmentExport/establishmentExport.schema";
 import {
   DepartmentOrRegion,
   EstablishmentExportConfigDto,
 } from "../../../shared/establishmentExport/establishmentExport.dto";
-import {z} from "zod";
+import { z } from "zod";
 
 export type EstablishmentExportConfig = EstablishmentExportConfigDto & {
   archivePath: string;
 };
 
 export class ExportEstablishmentAsExcelArchive extends TransactionalUseCase<EstablishmentExportConfig> {
-  inputSchema = z.object({...establishmentExportSchemaObj, archivePath: z.string()});
+  inputSchema = z.object({
+    ...establishmentExportSchemaObj,
+    archivePath: z.string(),
+  });
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);

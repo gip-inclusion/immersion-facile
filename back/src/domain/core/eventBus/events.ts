@@ -1,6 +1,5 @@
 import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablishment";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
-import type { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { AgencyConfig } from "../../immersionApplication/ports/AgencyRepository";
 import {
@@ -8,6 +7,7 @@ import {
   RenewMagicLinkPayload,
 } from "../../immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import type { DateStr } from "../ports/Clock";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 
 type GenericEvent<T extends string, P> = {
   id: string;

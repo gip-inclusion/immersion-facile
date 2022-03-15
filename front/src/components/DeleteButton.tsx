@@ -20,9 +20,11 @@ export const DeleteButton = ({
     style={{
       color: "#E10600",
       backgroundColor: "transparent",
-      ...style
+      ...style,
     }}
-    className={`fr-fi-close-circle-line ${isHidden ? "hidden" : ""} ${classname}`}
+    className={`fr-fi-close-circle-line ${
+      isHidden ? "hidden" : ""
+    } ${classname}`}
     disabled={disabled}
     onClick={onClick}
   />

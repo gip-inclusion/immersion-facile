@@ -11,7 +11,7 @@ import {
   ApplicationStatus,
   ImmersionApplicationDto,
   validApplicationStatus,
-} from "src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { Route } from "type-route";
 import "./Admin.css";
 import { ApiDataContainer } from "./ApiDataContainer";
@@ -188,7 +188,7 @@ export const Admin = ({ route }: AdminProps) => {
                       >
                         <p>filtres</p>
                         <ArrayDropdown
-                          labels={validApplicationStatus}
+                          labels={[...validApplicationStatus]}
                           didPick={filterChanged}
                         />
                       </div>

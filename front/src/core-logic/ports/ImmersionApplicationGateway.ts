@@ -6,7 +6,7 @@ import {
   ImmersionApplicationId,
   UpdateImmersionApplicationStatusRequestDto,
   WithImmersionApplicationId,
-} from "src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";

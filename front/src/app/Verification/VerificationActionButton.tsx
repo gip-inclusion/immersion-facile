@@ -4,7 +4,7 @@ import { Button } from "src/components/Button";
 import {
   ImmersionApplicationDto,
   ApplicationStatus,
-} from "src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 
 export type VerificationActionButtonProps = {
   immersionApplication?: ImmersionApplicationDto;

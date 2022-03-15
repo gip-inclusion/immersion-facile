@@ -66,8 +66,8 @@ export const up = async (pgm: MigrationBuilder) => {
   INSERT INTO postal_code_department_region(postal_code,department,region) VALUES ('98878', 'Mascate', 'Mascate') ON CONFLICT DO NOTHING;
   INSERT INTO postal_code_department_region(postal_code,department,region) VALUES ('98876', 'Central Luzon', 'Central Luzon') ON CONFLICT DO NOTHING;
   INSERT INTO postal_code_department_region(postal_code,department,region) VALUES ('98877', 'Mascate', 'Mascate') ON CONFLICT DO NOTHING;    
-  `);
+  `,
+  );
 };
 
-export const down = (pgm: MigrationBuilder) => {
-};
+export const down = (pgm: MigrationBuilder) => {};

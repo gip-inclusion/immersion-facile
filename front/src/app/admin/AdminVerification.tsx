@@ -3,7 +3,7 @@ import { immersionApplicationGateway } from "src/app/dependencies";
 import { FormAccordion } from "src/components/admin/FormAccordion";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { Route } from "type-route";
 import { routes } from "../routes";
 import { InfoMessage } from "src/components/form/InfoMessage";

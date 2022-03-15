@@ -19,7 +19,7 @@ import { FormSectionTitle } from "src/components/FormSectionTitle";
 import type {
   ApplicationStatus,
   ImmersionApplicationDto,
-} from "src/shared/ImmersionApplicationDto";
+} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { routes, useRoute } from "../routes";
 import type { ApplicationFormKeysInUrl } from "../routes";
 import { ApplicationFormProfession } from "./ApplicationFormProfession";
