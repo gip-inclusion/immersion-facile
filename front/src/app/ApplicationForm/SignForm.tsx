@@ -151,9 +151,10 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
                 const rejectWithMessageForm = async (): Promise<void> => {
                   const justification = prompt(
                     "Précisez la raison et la modification nécessaire *",
-                  );
+                  )?.trim();
 
-                  if (justification === null) return;
+                  if (justification === null || justification === undefined)
+                    return;
                   if (justification === "")
                     return await rejectWithMessageForm();
 
