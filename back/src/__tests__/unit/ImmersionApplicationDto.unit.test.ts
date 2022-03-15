@@ -1,14 +1,12 @@
 import type { ZodError } from "zod";
 import {
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "../../shared/ImmersionApplicationDto";
-import {
   DATE_START,
   DATE_SUBMISSION,
   ImmersionApplicationDtoBuilder,
 } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { addDays } from "../../_testBuilders/test.helpers";
+import { ImmersionApplicationDto } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "../../shared/ImmersionApplication/immersionApplication.schema";
 
 describe("immersionApplicationDtoSchema", () => {
   test("accepts valid immersionApplication", () => {

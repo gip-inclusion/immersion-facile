@@ -4,11 +4,8 @@ import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { frontRoutes } from "../../../../shared/routes";
 import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import { FeatureFlags } from "../../../../shared/featureFlags";
-import {
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "../../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 

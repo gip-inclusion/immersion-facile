@@ -1,15 +1,15 @@
 import { AgencyId } from "../shared/agencies";
 import {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-  ImmersionApplicationId,
-} from "../shared/ImmersionApplicationDto";
-import {
   LegacyScheduleDto,
   reasonableSchedule,
   ScheduleDto,
 } from "../shared/ScheduleSchema";
 import { Builder } from "./Builder";
+import {
+  ApplicationStatus,
+  ImmersionApplicationDto,
+  ImmersionApplicationId,
+} from "../shared/ImmersionApplication/ImmersionApplication.dto";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 export const VALID_EMAILS = [

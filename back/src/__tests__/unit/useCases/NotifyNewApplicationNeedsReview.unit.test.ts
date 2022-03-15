@@ -2,7 +2,7 @@ import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAg
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
-import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { expectedEmailImmersionApplicationReviewMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";

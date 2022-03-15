@@ -1,7 +1,5 @@
-import {
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
 
 export class ImmersionApplicationEntity {
   private constructor(public readonly properties: ImmersionApplicationDto) {}

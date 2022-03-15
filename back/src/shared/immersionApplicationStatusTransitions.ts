@@ -1,5 +1,5 @@
-import { ApplicationStatus } from "./ImmersionApplicationDto";
 import { Role } from "./tokens/MagicLinkPayload";
+import { ApplicationStatus } from "./ImmersionApplication/ImmersionApplication.dto";
 
 export type StatusTransitionConfig = {
   validInitialStatuses: ApplicationStatus[];

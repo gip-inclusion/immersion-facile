@@ -1,9 +1,6 @@
 import { z } from "zod";
 import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import {
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "../../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "../../../../shared/routes";
 import { allRoles } from "../../../../shared/tokens/MagicLinkPayload";
 import { zTrimmedString } from "../../../../shared/zodUtils";
@@ -15,6 +12,7 @@ import {
   EmailGateway,
   ModificationRequestApplicationNotificationParams,
 } from "../../ports/EmailGateway";
+import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 

@@ -1,9 +1,5 @@
 import { parseISO } from "date-fns";
 import {
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "../../../../shared/ImmersionApplicationDto";
-import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "../../../../shared/ScheduleUtils";
@@ -15,6 +11,8 @@ import {
   ValidatedApplicationFinalConfirmationParams,
 } from "../../ports/EmailGateway";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<ImmersionApplicationDto> {

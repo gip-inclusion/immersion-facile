@@ -34,7 +34,7 @@ import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/imme
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
-import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { createMagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 
 const adminEmail = "admin@email.fr";

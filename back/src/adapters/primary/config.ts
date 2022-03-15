@@ -49,7 +49,6 @@ import { UpsertEstablishmentAggregateFromForm } from "../../domain/immersionOffe
 import { RomeGateway } from "../../domain/rome/ports/RomeGateway";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
-import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../shared/routes";
 import {
   createMagicLinkPayload,
@@ -111,6 +110,7 @@ import { PgImmersionApplicationExportQueries } from "../secondary/pg/PgImmersion
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
 import { ShareApplicationLinkByEmail } from "../../domain/immersionApplication/useCases/ShareApplicationLinkByEmail";
+import { ImmersionApplicationId } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { StubEstablishmentExportQueries } from "../secondary/StubEstablishmentExportQueries";
 import { PgEstablishmentExportQueries } from "../secondary/pg/PgEstablishmentExportQueries";
 import { ImmersionApplicationExportQueries } from "../../domain/immersionApplication/ports/ImmersionApplicationExportQueries";

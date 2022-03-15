@@ -2,14 +2,14 @@ import type { GenerateVerificationMagicLink } from "../../../../adapters/primary
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "../../../../shared/ImmersionApplicationDto";
+} from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "../../../../shared/routes";
 import { Role } from "../../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyConfig, AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
+import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 

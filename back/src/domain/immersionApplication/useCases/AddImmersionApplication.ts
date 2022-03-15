@@ -2,12 +2,6 @@ import {
   ConflictError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import {
-  WithImmersionApplicationId,
-  ApplicationStatus,
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -15,6 +9,12 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
+import {
+  ApplicationStatus,
+  ImmersionApplicationDto,
+  WithImmersionApplicationId,
+} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 

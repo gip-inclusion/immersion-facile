@@ -6,7 +6,7 @@ import {
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
-import { ImmersionApplicationDto } from "../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 

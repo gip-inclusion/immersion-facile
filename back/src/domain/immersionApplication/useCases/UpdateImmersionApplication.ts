@@ -3,19 +3,16 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { FeatureFlags } from "../../../shared/featureFlags";
 import {
   ApplicationStatus,
   UpdateImmersionApplicationRequestDto,
-  updateImmersionApplicationRequestDtoSchema,
   WithImmersionApplicationId,
-} from "../../../shared/ImmersionApplicationDto";
+} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase, UseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
-import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
+import { updateImmersionApplicationRequestDtoSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
 
 export class UpdateImmersionApplication extends TransactionalUseCase<
   UpdateImmersionApplicationRequestDto,

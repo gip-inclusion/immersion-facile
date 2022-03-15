@@ -20,11 +20,11 @@ import { UpdateImmersionApplication } from "../../../domain/immersionApplication
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import {
   ImmersionApplicationId,
   validApplicationStatus,
-} from "../../../shared/ImmersionApplicationDto";
-import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 
 describe("Update immersionApplication", () => {
   let updateImmersionApplication: UpdateImmersionApplication;

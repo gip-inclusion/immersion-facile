@@ -4,7 +4,6 @@ import {
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
-  immersionApplicationSchema,
   WithImmersionApplicationId,
   UpdateImmersionApplicationStatusRequestDto,
   withImmersionApplicationIdSchema,
@@ -23,6 +22,7 @@ import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { AgencyId } from "../../shared/agencies";
 import { ShareLinkByEmailDTO } from "../../shared/ShareLinkByEmailDTO";
+import { immersionApplicationSchema } from "../../shared/ImmersionApplication/immersionApplication.schema";
 
 const prefix = "api";
 

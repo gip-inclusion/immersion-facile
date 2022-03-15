@@ -7,12 +7,12 @@ import {
   ContactEstablishmentInPersonDto,
 } from "../shared/contactEstablishment";
 import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
-import { ImmersionApplicationDto } from "../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../shared/routes";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { ContactEstablishmentByPhoneDto } from "../shared/contactEstablishment";
 import { fakeGenerateMagicLinkUrlFn } from "./test.helpers";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
+import { ImmersionApplicationDto } from "../shared/ImmersionApplication/ImmersionApplication.dto";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,

@@ -1,11 +1,11 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { UseCase } from "../../core/UseCase";
+import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
 import {
   ImmersionApplicationDto,
   WithImmersionApplicationId,
-  withImmersionApplicationIdSchema,
-} from "../../../shared/ImmersionApplicationDto";
-import { UseCase } from "../../core/UseCase";
-import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
+} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { withImmersionApplicationIdSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
 
 export class GetImmersionApplication extends UseCase<
   WithImmersionApplicationId,

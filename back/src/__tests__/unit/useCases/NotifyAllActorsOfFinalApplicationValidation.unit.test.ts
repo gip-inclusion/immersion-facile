@@ -7,7 +7,6 @@ import {
   getValidatedApplicationFinalConfirmationParams,
   NotifyAllActorsOfFinalApplicationValidation,
 } from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { LegacyScheduleDto } from "../../../shared/ScheduleSchema";
 import {
   prettyPrintLegacySchedule,
@@ -22,6 +21,7 @@ import {
   AlwaysAllowEmailFilter,
 } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 
 const validImmersionApplication: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();

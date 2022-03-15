@@ -23,7 +23,7 @@ import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepo
 import {
   ImmersionApplicationDto,
   RenewMagicLinkRequestDto,
-} from "../../shared/ImmersionApplicationDto";
+} from "../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { expectEmailMatchingLinkRenewalEmail } from "../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";

@@ -1,14 +1,12 @@
 import { parseISO } from "date-fns";
 import type { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import {
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "../../../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../../../shared/routes";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 export class NotifyToTeamApplicationSubmittedByBeneficiary extends UseCase<ImmersionApplicationDto> {

@@ -1,7 +1,6 @@
 import { expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
-import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {
   AllowListEmailFilter,
@@ -9,6 +8,7 @@ import {
 } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 
 const validImmersionApplication: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();

@@ -15,7 +15,7 @@ import { ImmersionApplicationEntity } from "../../domain/immersionApplication/en
 import {
   ImmersionApplicationDto,
   UpdateImmersionApplicationStatusRequestDto,
-} from "../../shared/ImmersionApplicationDto";
+} from "../../shared/ImmersionApplication/ImmersionApplication.dto";
 import {
   immersionApplicationsRoute,
   signApplicationRoute,

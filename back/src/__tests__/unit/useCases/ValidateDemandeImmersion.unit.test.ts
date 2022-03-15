@@ -17,7 +17,7 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
-import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 
 describe("Validate immersionApplication", () => {
   let validateImmersionApplication: ValidateImmersionApplication;

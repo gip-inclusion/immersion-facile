@@ -1,7 +1,3 @@
-import {
-  ImmersionApplicationDto,
-  immersionApplicationSchema,
-} from "../../../../shared/ImmersionApplicationDto";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
@@ -11,6 +7,8 @@ import {
   RejectedApplicationNotificationParams,
 } from "../../ports/EmailGateway";
 import { AgencyConfig } from "../../ports/AgencyRepository";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends UseCase<ImmersionApplicationDto> {

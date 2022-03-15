@@ -18,15 +18,15 @@ import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-} from "../../../shared/ImmersionApplicationDto";
-import {
   createMagicLinkPayload,
   Role,
 } from "../../../shared/tokens/MagicLinkPayload";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import {
+  ApplicationStatus,
+  ImmersionApplicationDto,
+} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 
 describe("UpdateImmersionApplicationStatus", () => {
   let updateImmersionApplicationStatus: UpdateImmersionApplicationStatus;

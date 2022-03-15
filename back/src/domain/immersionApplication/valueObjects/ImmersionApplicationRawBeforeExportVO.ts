@@ -1,4 +1,4 @@
-import { ImmersionApplicationDto } from "../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import {
   calculateWeeklyHoursFromSchedule,
   prettyPrintDayFromSchedule,

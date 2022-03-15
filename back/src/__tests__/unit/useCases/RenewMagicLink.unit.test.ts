@@ -10,10 +10,6 @@ import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAg
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
 import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
-import {
-  ImmersionApplicationDto,
-  RenewMagicLinkRequestDto,
-} from "../../../shared/ImmersionApplicationDto";
 import { createMagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
@@ -27,6 +23,10 @@ import { RenewMagicLink } from "../../../domain/immersionApplication/useCases/Re
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
 import jwt from "jsonwebtoken";
 import { RenewMagicLinkPayload } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import {
+  ImmersionApplicationDto,
+  RenewMagicLinkRequestDto,
+} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 
 const validImmersionApplication: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();

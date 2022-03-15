@@ -1,5 +1,5 @@
 import { differenceInDays, isMonday, isSunday } from "date-fns";
-import { ApplicationStatus } from "./ImmersionApplicationDto";
+import { ApplicationStatus } from "./ImmersionApplication/ImmersionApplication.dto";
 
 type DatesInApplication = {
   dateStart: string;

@@ -1,11 +1,11 @@
-import {
-  GenerateMagicLinkRequestDto,
-  generateMagicLinkRequestSchema,
-  GenerateMagicLinkResponseDto,
-} from "../../../shared/ImmersionApplicationDto";
 import { createMagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { GenerateMagicLinkJwt } from "../../auth/jwt";
 import { UseCase } from "../../core/UseCase";
+import {
+  GenerateMagicLinkRequestDto,
+  GenerateMagicLinkResponseDto,
+} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { generateMagicLinkRequestSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
 
 export class GenerateMagicLink extends UseCase<
   GenerateMagicLinkRequestDto,

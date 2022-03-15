@@ -1,4 +1,4 @@
-import { ImmersionApplicationId } from "../../../shared/ImmersionApplicationDto";
+import { ImmersionApplicationId } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import jwt from "jsonwebtoken";
 import {
   emailHashForMagicLink,
@@ -10,10 +10,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import {
-  RenewMagicLinkRequestDto,
-  renewMagicLinkRequestSchema,
-} from "../../../shared/ImmersionApplicationDto";
+import { RenewMagicLinkRequestDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { GenerateMagicLinkJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UseCase } from "../../core/UseCase";
@@ -26,6 +23,7 @@ import { AppConfig } from "../../../adapters/primary/appConfig";
 import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
 import { TokenExpiredError } from "jsonwebtoken";
 import { Clock } from "../../core/ports/Clock";
+import { renewMagicLinkRequestSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 
