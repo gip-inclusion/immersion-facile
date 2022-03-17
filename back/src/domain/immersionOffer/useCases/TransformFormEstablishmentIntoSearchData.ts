@@ -95,27 +95,14 @@ export class TransformFormEstablishmentIntoSearchData extends UseCase<
         async ({
           romeCodeMetier,
           romeCodeAppellation,
-        }): Promise<ImmersionOfferEntityV2 | undefined> => {
-          if (romeCodeMetier) {
-            return {
-              id: this.uuidGenerator.new(),
-              romeCode: romeCodeMetier,
-              score: offerFromFormScore,
-            };
-          } else if (romeCodeAppellation) {
-            const correspondingRome =
-              await this.romeGateway.appellationToCodeMetier(
-                romeCodeAppellation,
-              );
-
-            if (correspondingRome)
-              return {
-                id: this.uuidGenerator.new(),
-                romeCode: correspondingRome,
-                score: offerFromFormScore,
-              };
-          }
-        },
+        }): Promise<ImmersionOfferEntityV2 | undefined> => ({
+          id: this.uuidGenerator.new(),
+          romeCode: romeCodeMetier,
+          romeAppellation: romeCodeAppellation
+            ? Number(romeCodeAppellation)
+            : undefined,
+          score: offerFromFormScore,
+        }),
       )
     ).filter((offer): offer is ImmersionOfferEntityV2 => !!offer);
 
