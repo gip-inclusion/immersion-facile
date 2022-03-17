@@ -26,10 +26,16 @@ export class ImmersionOfferEntityV2Builder
       id: new UuidV4Generator().new(),
     });
   }
-  withRome(rome: RomeCodeMetierDto) {
+  withRomeCode(romeCode: RomeCodeMetierDto) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
-      romeCode: rome,
+      romeCode,
+    });
+  }
+  withRomeAppellation(romeAppellation: number) {
+    return new ImmersionOfferEntityV2Builder({
+      ...this.entity,
+      romeAppellation: romeAppellation,
     });
   }
 

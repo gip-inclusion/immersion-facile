@@ -216,12 +216,16 @@ export class InMemoryImmersionOfferRepository
     )?.contact;
   }
 
-  public async getOffersForEstablishmentSiret(
+  public async getAnnotatedImmersionOffersForEstablishmentSiret(
     siret: string,
-  ): Promise<ImmersionOfferEntityV2[]> {
+  ): Promise<AnnotatedImmersionOfferEntityV2[]> {
     return (
-      this.establishmentAggregates.find(pathEq("establishment.siret", siret))
-        ?.immersionOffers ?? []
+      this.establishmentAggregates
+        .find(pathEq("establishment.siret", siret))
+        ?.immersionOffers.map((offer) => ({
+          ...offer,
+          romeLabel: TEST_ROME_LABEL,
+        })) ?? []
     );
   }
   // for test purposes only :

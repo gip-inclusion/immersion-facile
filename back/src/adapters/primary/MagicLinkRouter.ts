@@ -5,6 +5,7 @@ import {
   updateApplicationStatusRoute,
 } from "../../shared/routes";
 import { AppDependencies } from "./config";
+import { UnauthorizedError } from "./helpers/httpErrors";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
 
 export const createMagicLinkRouter = (deps: AppDependencies) => {
@@ -15,19 +16,21 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   authenticatedRouter
     .route(`/${immersionApplicationsRoute}/:jwt`)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.getImmersionApplication.execute({
+      sendHttpResponse(req, res, () => {
+        if (!req.jwtPayload) throw new UnauthorizedError();
+        return deps.useCases.getImmersionApplication.execute({
           id: req.jwtPayload.applicationId,
-        }),
-      ),
+        });
+      }),
     )
     .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.updateImmersionApplication.execute({
+      sendHttpResponse(req, res, () => {
+        if (!req.jwtPayload) throw new UnauthorizedError();
+        return deps.useCases.updateImmersionApplication.execute({
           id: req.jwtPayload.applicationId,
           immersionApplication: req.body,
-        }),
-      ),
+        });
+      }),
     );
 
   authenticatedRouter

@@ -7,6 +7,7 @@ import {
   DataSource,
   EstablishmentEntityV2,
 } from "../../domain/immersionOffer/entities/EstablishmentEntity";
+import { AnnotatedImmersionOfferEntityV2 } from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
 import {
   LatLonDto,
@@ -400,7 +401,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
       const storedImmersionOffer = new ImmersionOfferEntityV2Builder()
         .withId(immersionOfferId)
-        .withRome("M1808")
+        .withRomeCode("M1808")
         .build();
       await pgImmersionOfferRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
@@ -686,11 +687,11 @@ describe("Postgres implementation of immersion offer repository", () => {
         // Act
         const offer1 = new ImmersionOfferEntityV2Builder()
           .withId("11111111-a2a5-430a-b558-ed3e2f03512d")
-          .withRome("A1101")
+          .withRomeCode("A1101")
           .build();
         const offer2 = new ImmersionOfferEntityV2Builder()
           .withId("22222222-a2a5-430a-b558-ed3e2f03512d")
-          .withRome("A1201")
+          .withRomeCode("A1201")
           .build();
 
         const contactId = "3ca6e619-d654-4d0d-8fa6-2febefbe953d";
@@ -762,7 +763,7 @@ describe("Postgres implementation of immersion offer repository", () => {
               )
               .withImmersionOffers([
                 new ImmersionOfferEntityV2Builder()
-                  .withRome(offer2Rome)
+                  .withRomeCode(offer2Rome)
                   .build(),
               ])
               .build(),
@@ -1018,8 +1019,15 @@ describe("Postgres implementation of immersion offer repository", () => {
       .withEmail("toto@gmail.com")
       .build();
     const offers = [
-      new ImmersionOfferEntityV2Builder().withNewId().withRome("M1808").build(),
-      new ImmersionOfferEntityV2Builder().withNewId().withRome("B1805").build(),
+      new ImmersionOfferEntityV2Builder()
+        .withNewId()
+        .withRomeCode("A1101") // Code only, no appellation
+        .build(),
+      new ImmersionOfferEntityV2Builder()
+        .withNewId()
+        .withRomeCode("A1101")
+        .withRomeAppellation(11987) // Appellation is specified here
+        .build(),
     ];
     beforeEach(async () => {
       const aggregate = new EstablishmentAggregateBuilder()
@@ -1073,17 +1081,27 @@ describe("Postgres implementation of immersion offer repository", () => {
         const siretNotInTable = "11111111111111";
 
         expect(
-          await pgImmersionOfferRepository.getOffersForEstablishmentSiret(
+          await pgImmersionOfferRepository.getAnnotatedImmersionOffersForEstablishmentSiret(
             siretNotInTable,
           ),
         ).toHaveLength(0);
       });
       it("returns a list with offers from establishment of given siret", async () => {
-        expect(
-          await pgImmersionOfferRepository.getOffersForEstablishmentSiret(
+        const expectedAnnotatedOffers: AnnotatedImmersionOfferEntityV2[] = [
+          {
+            ...offers[0],
+            romeLabel: "Conduite d'engins agricoles et forestiers",
+          },
+          {
+            ...offers[1],
+            romeLabel: "Chauffeur / Chauffeuse de machines agricoles",
+          },
+        ];
+        const actualAnnotatedOffers =
+          await pgImmersionOfferRepository.getAnnotatedImmersionOffersForEstablishmentSiret(
             siretInTable,
-          ),
-        ).toEqual(offers);
+          );
+        expect(actualAnnotatedOffers).toEqual(expectedAnnotatedOffers);
       });
     });
   });

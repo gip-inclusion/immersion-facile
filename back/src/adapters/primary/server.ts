@@ -41,6 +41,7 @@ import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 import { capitalize } from "../../shared/utils/string";
+import { UnauthorizedError } from "./helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
@@ -243,6 +244,13 @@ export const createApp = async (
       );
     });
 
+  router.route(`/${"retrieveFormFromJwt"}/:jwt`).get(async (req, res) => {
+    return sendHttpResponse(req, res, async () => {
+      if (!req.jwtEstablishmentPayload) throw new UnauthorizedError();
+
+      return deps.useCases.retrieveFormEstablishmentFromAggregates.execute();
+    });
+  });
   router
     .route(`/${getFeatureFlags}`)
     .get(async (req, res) =>

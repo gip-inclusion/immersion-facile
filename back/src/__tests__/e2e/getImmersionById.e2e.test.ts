@@ -48,7 +48,7 @@ describe("/get-immersion-by-id route", () => {
         .withImmersionOffers([
           new ImmersionOfferEntityV2Builder()
             .withId(immersionOfferId)
-            .withRome(immersionOfferRome)
+            .withRomeCode(immersionOfferRome)
             .build(),
         ])
         .build(),

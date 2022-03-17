@@ -55,12 +55,12 @@ const prepareSearchableData = async () => {
 
   const secretariatImmersionOffer = new ImmersionOfferEntityV2Builder()
     .withId(secretariatInMetzOfferId)
-    .withRome(secretariatRome)
+    .withRomeCode(secretariatRome)
     .build();
 
   const boulangerInMetzImmersionOffer = new ImmersionOfferEntityV2Builder()
     .withId(boulangerInMetzOfferId)
-    .withRome(boulangerRome)
+    .withRomeCode(boulangerRome)
     .build();
 
   const contact = new ContactEntityV2Builder()

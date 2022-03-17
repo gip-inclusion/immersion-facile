@@ -9,10 +9,7 @@ import {
   EstablishmentEntityV2,
   DataSource,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import {
-  AnnotatedImmersionOfferEntityV2,
-  ImmersionOfferEntityV2,
-} from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { ContactMethod } from "../../../shared/FormEstablishmentDto";
@@ -615,11 +612,15 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     };
   }
 
-  public async getOffersForEstablishmentSiret(
+  public async getAnnotatedImmersionOffersForEstablishmentSiret(
     siret: string,
-  ): Promise<ImmersionOfferEntityV2[]> {
+  ): Promise<AnnotatedImmersionOfferEntityV2[]> {
     const pgResult = await this.client.query(
-      `SELECT * FROM immersion_offers WHERE siret = $1;`,
+      `SELECT io.*, libelle_rome, libelle_appellation_long
+       FROM immersion_offers io
+       JOIN public_romes_data prd ON prd.code_rome = io.rome_code 
+       LEFT JOIN public_appelations_data pad on io.rome_appellation = pad.ogr_appellation
+       WHERE siret = $1;`,
       [siret],
     );
     return pgResult.rows.map((row: any) => ({
@@ -627,6 +628,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       romeCode: row.rome_code,
       romeAppellation: optional(row.rome_appellation) && row.rome_appellation,
       score: row.score,
+      romeLabel: row.libelle_appellation_long ?? row.libelle_rome,
     }));
   }
 }

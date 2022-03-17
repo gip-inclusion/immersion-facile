@@ -1,44 +1,53 @@
 import { z } from "zod";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
+import { EditFormEstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
-  string,
-  FormEstablishmentDto
+  void,
+  FormEstablishmentDto,
+  EditFormEstablishmentPayload
 > {
-  inputSchema = z.string();
+  inputSchema = z.void();
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
 
-  protected async _execute(siret: string, uow: UnitOfWork) {
+  protected async _execute(
+    _: void,
+    uow: UnitOfWork,
+    { siret }: EditFormEstablishmentPayload,
+  ) {
     const establishment = await uow.immersionOfferRepo.getEstablishmentForSiret(
       siret,
     );
-    if (!establishment) throw "Not found";
+    if (!establishment || establishment?.dataSource !== "form")
+      throw new Error(
+        `No establishment found with siret ${siret} and form data source. `,
+      );
 
     const contact =
       await uow.immersionOfferRepo.getContactForEstablishmentSiret(siret);
     if (!contact) throw new Error("No contact ");
 
-    const offers = await uow.immersionOfferRepo.getOffersForEstablishmentSiret(
-      siret,
-    );
+    const offers =
+      await uow.immersionOfferRepo.getAnnotatedImmersionOffersForEstablishmentSiret(
+        siret,
+      );
     const retrievedForm: FormEstablishmentDto = {
       siret,
-      source: "immersion-facile", // ??
+      source: "immersion-facile",
       businessName: establishment.name,
       businessNameCustomized: establishment.customizedName,
       businessAddress: establishment.address,
       isEngagedEnterprise: establishment.isCommited,
       naf: establishment?.nafDto,
       professions: offers.map((offer) => ({
-        // immersion_offers : remove rome and add rome_code_appelation instead (from form)
-        description: "???", // Libelle de l'appelation (infered from public_rome_appelation)
-        romeCodeMetier: offer.romeCode, // Also nfered from public_rome_appelation
-        romeCodeAppellation: offer.romeAppellation?.toString(),
+        description: offer.romeLabel, // Libelle de l'appelation ou du code rome
+        romeCodeMetier: offer.romeCode,
+        romeCodeAppellation: offer.romeAppellation?.toString(), // possibly undefined ?
       })),
       businessContacts: [
         {

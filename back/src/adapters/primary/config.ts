@@ -120,6 +120,7 @@ import { PostalCodeDepartmentRegionQueries } from "../../domain/generic/geo/port
 import { StubPostalCodeDepartmentRegionQueries } from "../secondary/StubPostalCodeDepartmentRegionQueries";
 import { ExportEstablishmentAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentAsExcelArchive";
 import { EditFormEstablishment } from "../../domain/immersionOffer/useCases/EditFormEstablishment";
+import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 
 const logger = createLogger(__filename);
 
@@ -509,7 +510,8 @@ const createUseCases = (
       uowPerformer,
       createNewEvent,
     ),
-
+    retrieveFormEstablishmentFromAggregates:
+      new RetrieveFormEstablishmentFromAggregates(uowPerformer),
     upsertEstablishmentAggregateFromForm:
       new UpsertEstablishmentAggregateFromForm(
         uowPerformer,

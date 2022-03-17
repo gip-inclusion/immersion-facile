@@ -65,7 +65,7 @@ export interface ImmersionOfferRepository {
   getContactForEstablishmentSiret: (
     siret: string,
   ) => Promise<ContactEntityV2 | undefined>;
-  getOffersForEstablishmentSiret: (
+  getAnnotatedImmersionOffersForEstablishmentSiret: (
     siret: string,
-  ) => Promise<ImmersionOfferEntityV2[]>;
+  ) => Promise<AnnotatedImmersionOfferEntityV2[]>;
 }

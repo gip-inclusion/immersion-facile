@@ -32,14 +32,18 @@ export abstract class UseCase<
   ): Promise<Output>;
 }
 
-export abstract class TransactionalUseCase<Input, Output = void> {
+export abstract class TransactionalUseCase<
+  Input,
+  Output = void,
+  JWTPayload = MagicLinkPayload,
+> {
   protected abstract inputSchema: z.ZodSchema<Input>;
   protected constructor(private uowPerformer: UnitOfWorkPerformer) {}
 
   // this methode should not be overwritten, implement _execute instead
   public async execute(
     params: Input,
-    jwtPayload?: MagicLinkPayload,
+    jwtPayload?: JWTPayload,
   ): Promise<Output> {
     let validParams: Input;
     try {
@@ -56,6 +60,6 @@ export abstract class TransactionalUseCase<Input, Output = void> {
   protected abstract _execute(
     params: Input,
     uow: UnitOfWork,
-    jwtPayload?: MagicLinkPayload,
+    jwtPayload?: JWTPayload,
   ): Promise<Output>;
 }
