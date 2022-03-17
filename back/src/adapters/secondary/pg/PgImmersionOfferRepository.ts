@@ -504,7 +504,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       email: row.email,
       job: row.role,
       phone: row.phone,
-      contactMethod: parseContactMethod(row.contact_mode),
+      contactMethod:
+        optional(row.contact_mode) && parseContactMethod(row.contact_mode),
     };
   }
 
@@ -563,20 +564,70 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     );
     return pgResult.rows[0].exists;
   }
-  public async getEstablishmentBySiret(
+  public async getEstablishmentForSiret(
     siret: string,
   ): Promise<EstablishmentEntityV2 | undefined> {
-    throw "not implemented";
+    const pgResult = await this.client.query(
+      `SELECT *, ST_AsGeoJSON(gps) AS position FROM establishments WHERE siret = $1;`,
+      [siret],
+    );
+    const row = pgResult.rows[0];
+
+    if (!row) return;
+
+    const establishmentForSiret: EstablishmentEntityV2 = {
+      siret: row.siret,
+      name: row.name,
+      address: row.address,
+      dataSource: row.data_source,
+      isActive: row.is_active,
+      nafDto: { code: row.naf_code, nomenclature: row.naf_nomenclature },
+      position: optional(row.position) && parseGeoJson(row.position),
+      numberEmployeesRange: row.number_employees,
+      voluntaryToImmersion: row.data_source == "form",
+      isCommited: row.is_commited,
+      customizedName: row.customized_name,
+      updatedAt: row.update_date,
+    };
+    return establishmentForSiret;
   }
-  public async getContactByEstablishmentSiret(
+  public async getContactForEstablishmentSiret(
     siret: string,
   ): Promise<ContactEntityV2 | undefined> {
-    throw "not implemented";
+    const pgResult = await this.client.query(
+      `SELECT * FROM immersion_contacts ic
+       JOIN establishments__immersion_contacts eic ON ic.uuid = eic.contact_uuid
+       WHERE establishment_siret = $1;`,
+      [siret],
+    );
+    const row = pgResult.rows[0];
+
+    if (!row) return;
+    return {
+      id: row.uuid,
+      firstName: row.firstname,
+      lastName: row.lastname,
+      email: row.email,
+      phone: optional(row.phone) && row.phone,
+      contactMethod:
+        optional(row.contact_mode) && parseContactMethod(row.contact_mode),
+      job: row.role,
+    };
   }
-  public async getOffersByEstablishmentSiret(
+
+  public async getOffersForEstablishmentSiret(
     siret: string,
   ): Promise<ImmersionOfferEntityV2[]> {
-    throw "not implemented";
+    const pgResult = await this.client.query(
+      `SELECT * FROM immersion_offers WHERE siret = $1;`,
+      [siret],
+    );
+    return pgResult.rows.map((row: any) => ({
+      id: row.uuid,
+      romeCode: row.rome_code,
+      romeAppellation: optional(row.rome_appellation) && row.rome_appellation,
+      score: row.score,
+    }));
   }
 }
 

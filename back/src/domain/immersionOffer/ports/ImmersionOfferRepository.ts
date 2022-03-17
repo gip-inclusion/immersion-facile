@@ -59,13 +59,13 @@ export interface ImmersionOfferRepository {
     siret: string,
   ) => Promise<void>;
 
-  getEstablishmentBySiret: (
+  getEstablishmentForSiret: (
     siret: string,
   ) => Promise<EstablishmentEntityV2 | undefined>;
-  getContactByEstablishmentSiret: (
+  getContactForEstablishmentSiret: (
     siret: string,
   ) => Promise<ContactEntityV2 | undefined>;
-  getOffersByEstablishmentSiret: (
+  getOffersForEstablishmentSiret: (
     siret: string,
   ) => Promise<ImmersionOfferEntityV2[]>;
 }

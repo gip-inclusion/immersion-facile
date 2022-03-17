@@ -14,17 +14,16 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   }
 
   protected async _execute(siret: string, uow: UnitOfWork) {
-    const establishment = await uow.immersionOfferRepo.getEstablishmentBySiret(
+    const establishment = await uow.immersionOfferRepo.getEstablishmentForSiret(
       siret,
     );
     if (!establishment) throw "Not found";
 
-    const contact = await uow.immersionOfferRepo.getContactByEstablishmentSiret(
-      siret,
-    );
+    const contact =
+      await uow.immersionOfferRepo.getContactForEstablishmentSiret(siret);
     if (!contact) throw new Error("No contact ");
 
-    const offers = await uow.immersionOfferRepo.getOffersByEstablishmentSiret(
+    const offers = await uow.immersionOfferRepo.getOffersForEstablishmentSiret(
       siret,
     );
     const retrievedForm: FormEstablishmentDto = {

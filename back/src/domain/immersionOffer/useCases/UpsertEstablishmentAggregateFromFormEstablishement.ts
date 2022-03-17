@@ -57,7 +57,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     );
 
     const establishmentDataSource = (
-      await uow.immersionOfferRepo.getEstablishmentBySiret(establishmentSiret)
+      await uow.immersionOfferRepo.getEstablishmentForSiret(establishmentSiret)
     )?.dataSource;
     if (establishmentDataSource === "form") {
       throw new Error(

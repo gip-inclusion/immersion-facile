@@ -200,7 +200,7 @@ export class InMemoryImmersionOfferRepository
     );
   }
 
-  public async getEstablishmentBySiret(
+  public async getEstablishmentForSiret(
     siret: string,
   ): Promise<EstablishmentEntityV2 | undefined> {
     return this.establishmentAggregates
@@ -208,7 +208,7 @@ export class InMemoryImmersionOfferRepository
       .find(propEq("siret", siret));
   }
 
-  public async getContactByEstablishmentSiret(
+  public async getContactForEstablishmentSiret(
     siret: string,
   ): Promise<ContactEntityV2 | undefined> {
     return this.establishmentAggregates.find(
@@ -216,7 +216,7 @@ export class InMemoryImmersionOfferRepository
     )?.contact;
   }
 
-  public async getOffersByEstablishmentSiret(
+  public async getOffersForEstablishmentSiret(
     siret: string,
   ): Promise<ImmersionOfferEntityV2[]> {
     return (

@@ -1008,6 +1008,86 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
+  describe("Pg implementation of methods getEstablishmentForSiret, getContactsForEstablishmentSiret and getOffersFromEstablishmentSiret", () => {
+    const siretInTable = "12345678901234";
+    const establishment = new EstablishmentEntityV2Builder()
+      .withSiret(siretInTable)
+      .withAddress("7 rue guillaume tell, 75017 Paris")
+      .build();
+    const contact = new ContactEntityV2Builder()
+      .withEmail("toto@gmail.com")
+      .build();
+    const offers = [
+      new ImmersionOfferEntityV2Builder().withNewId().withRome("M1808").build(),
+      new ImmersionOfferEntityV2Builder().withNewId().withRome("B1805").build(),
+    ];
+    beforeEach(async () => {
+      const aggregate = new EstablishmentAggregateBuilder()
+        .withEstablishment(establishment)
+        .withContact(contact)
+        .withImmersionOffers(offers)
+        .build();
+      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        aggregate,
+      ]);
+    });
+    describe("getEstablishmentForSiret", () => {
+      it("returns undefined if no establishment found with this siret", async () => {
+        const siretNotInTable = "11111111111111";
+
+        expect(
+          await pgImmersionOfferRepository.getEstablishmentForSiret(
+            siretNotInTable,
+          ),
+        ).toBeUndefined();
+      });
+      it("returns the establishment entity with given siret", async () => {
+        expect(
+          await pgImmersionOfferRepository.getEstablishmentForSiret(
+            siretInTable,
+          ),
+        ).toEqual(establishment);
+      });
+    });
+    describe("getContactForEstablishmentSiret", () => {
+      it("returns undefined if no establishment found with this siret", async () => {
+        const siretNotInTable = "11111111111111";
+
+        expect(
+          await pgImmersionOfferRepository.getContactForEstablishmentSiret(
+            siretNotInTable,
+          ),
+        ).toBeUndefined();
+      });
+      it("returns the first contact entity attached to establishment of given siret", async () => {
+        expect(
+          await pgImmersionOfferRepository.getContactForEstablishmentSiret(
+            siretInTable,
+          ),
+        ).toEqual(contact);
+      });
+    });
+
+    describe("getOffersForEstablishmentSiret", () => {
+      it("returns an empty list if no establishment found with this siret", async () => {
+        const siretNotInTable = "11111111111111";
+
+        expect(
+          await pgImmersionOfferRepository.getOffersForEstablishmentSiret(
+            siretNotInTable,
+          ),
+        ).toHaveLength(0);
+      });
+      it("returns a list with offers from establishment of given siret", async () => {
+        expect(
+          await pgImmersionOfferRepository.getOffersForEstablishmentSiret(
+            siretInTable,
+          ),
+        ).toEqual(offers);
+      });
+    });
+  });
+
   type PgEstablishmentRow = {
     siret: string;
     name: string;

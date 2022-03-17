@@ -1,3 +1,4 @@
+import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { RomeCodeMetierDto } from "../shared/rome";
 import { ImmersionOfferId } from "../shared/SearchImmersionDto";
@@ -19,7 +20,12 @@ export class ImmersionOfferEntityV2Builder
   withId(id: ImmersionOfferId) {
     return new ImmersionOfferEntityV2Builder({ ...this.entity, id });
   }
-
+  withNewId() {
+    return new ImmersionOfferEntityV2Builder({
+      ...this.entity,
+      id: new UuidV4Generator().new(),
+    });
+  }
   withRome(rome: RomeCodeMetierDto) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
