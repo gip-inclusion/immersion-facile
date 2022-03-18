@@ -106,52 +106,52 @@ export const establishmentsExportByZoneColumnsOptions = (
     {
       header: "Siret",
       key: "siret",
-      width: widthExport.siret,
+      width: 25,
     },
     {
       header: "Raison Sociale",
-      key: "businessName",
-      width: widthExport.businessName,
+      key: "name",
+      width: 35,
     },
     {
       header: "Enseigne",
-      key: "businessNameCustomized",
-      width: widthExport.businessNameCustomized,
+      key: "customizedName",
+      width: 35,
     },
     {
       header: "Adresse",
-      key: "businessAddress",
-      width: widthExport.businessAddress,
+      key: "address",
+      width: 40,
     },
     {
       header: "Département",
       key: "department",
-      width: widthExport.department,
+      width: 30,
     },
     {
       header: "NAF",
-      key: "naf",
-      width: widthExport.naf,
+      key: "nafCode",
+      width: 15,
     },
     {
       header: "Mode de contact",
       key: "preferredContactMethods",
-      width: widthExport.preferredContactMethods,
+      width: 15,
     },
     {
       header: "Date de référencement",
       key: "createdAt",
-      width: widthExport.createdAt,
+      width: 15,
     },
     {
       header: 'Appartenance Réseau "Les Entreprises s\'engagent"',
-      key: "isEngagedEnterprise",
-      width: widthExport.isEngagedEntreprise,
+      key: " isCommited",
+      width: 25,
     },
     {
       header: "Métiers",
       key: "professions",
-      width: widthExport.professions,
+      width: 400,
     },
   ];
 
@@ -238,6 +238,12 @@ export const addZonesDelimiters = (
     establishment.address,
   );
 
+  console.log(
+    capture.postalCode,
+    postalCodeDepartmentRegion[capture.postalCode],
+    postalCodeDepartmentRegion,
+  );
+
   if (!capture.hasPostalCode) {
     return {
       ...establishment,
@@ -311,33 +317,4 @@ const toWorkbook = (
     })
     .withCustomFieldsHeaders(excelColumFormatConfig)
     .withPayload(establishments);
-};
-
-const columnSizeByDataType = {
-  status: 20,
-  yesNo: 20,
-  email: 25,
-  phone: 20,
-  date: 15,
-  profession: 40,
-  businessName: 35,
-  businessAdress: 40,
-  department: 30,
-  siret: 25,
-  naf: 15,
-};
-
-const widthExport: { [key: string]: number } = {
-  businessNameCustomized: columnSizeByDataType.businessName,
-  isEngagedEntreprise: 40,
-  email: columnSizeByDataType.email,
-  createdAt: columnSizeByDataType.date,
-  department: 30,
-  professions: columnSizeByDataType.profession * 10,
-  pre: columnSizeByDataType.profession * 10,
-  businessName: columnSizeByDataType.businessName,
-  businessAddress: columnSizeByDataType.businessName,
-  siret: columnSizeByDataType.siret,
-  preferredContactMethods: 15,
-  naf: columnSizeByDataType.naf,
 };

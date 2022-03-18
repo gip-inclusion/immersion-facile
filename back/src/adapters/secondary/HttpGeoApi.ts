@@ -20,7 +20,7 @@ import {
 
 const logger = createLogger(__filename);
 
-export class HttpGeoAPI implements GeoApi {
+export class HttpGeoApi implements GeoApi {
   public constructor(
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
