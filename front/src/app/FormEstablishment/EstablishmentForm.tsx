@@ -23,7 +23,6 @@ import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { Layout } from "src/components/Layout";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ENV } from "src/environmentVariables";
 import {
   ContactMethod,
@@ -31,7 +30,6 @@ import {
   formEstablishmentSchema,
   FormEstablishmentSource,
 } from "src/shared/FormEstablishmentDto";
-import { EditFormEstablishmentPayload } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 import { OmitFromExistingKeys } from "../../shared/utils";
 
@@ -320,8 +318,6 @@ export const EstablishmentEditionForm = ({
 
   useEffect(() => {
     if (!route.params.jwt) return;
-    const editFormEstablishmentPayload =
-      decodeJwt<EditFormEstablishmentPayload>(route.params.jwt);
     formEstablishmentGateway
       .getFormEstablishmentFromJwt(route.params.jwt)
       .then((retrievedForm) => {

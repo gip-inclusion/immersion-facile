@@ -1,12 +1,12 @@
 import { SiretDto, siretSchema } from "../../../shared/siret";
-import { EditFormEstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { createEstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { GenerateEditFormEstablishmentUrl } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { EmailGateway } from "../../immersionApplication/ports/EmailGateway";
-import { addHours, isAfter } from "date-fns";
+import { isAfter } from "date-fns";
 
 export class RequestEditFormEstablishment extends TransactionalUseCase<
   SiretDto,
@@ -37,9 +37,9 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<
         siret,
       );
     if (lastPayload) {
-      const editLinkIsExpired = isAfter(new Date(lastPayload.expiredAt), now);
+      const editLinkIsExpired = isAfter(new Date(lastPayload.exp), now);
       if (editLinkIsExpired) {
-        const editLinkSentAt = new Date(lastPayload.issuedAt);
+        const editLinkSentAt = new Date(lastPayload.iat);
         throw Error(
           `Un email a déjà été envoyé au contact référent de l'établissement le ${editLinkSentAt.toLocaleDateString(
             "fr-FR",
@@ -48,13 +48,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<
       }
     }
 
-    const expDate = addHours(now, 24);
-
-    const payload: EditFormEstablishmentPayload = {
-      siret,
-      issuedAt: now.getTime(),
-      expiredAt: expDate.getTime(),
-    };
+    const payload = createEstablishmentPayload({ siret, now, durationDays: 2 });
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
     try {

@@ -172,9 +172,11 @@ const beneficiarySignsApplication = async (
   beneficiarySignJwt: string,
   initialImmersionApplication: ImmersionApplicationDto,
 ) => {
-  await request
-    .post(`/auth/${signApplicationRoute}/${beneficiarySignJwt}`)
-    .expect(200);
+  const response = await request.post(
+    `/auth/${signApplicationRoute}/${beneficiarySignJwt}`,
+  );
+
+  expect(response.status).toBe(200);
 
   expectOnlyOneImmersionThatIsEqual(
     await reposAndGateways.immersionApplication.getAll(),

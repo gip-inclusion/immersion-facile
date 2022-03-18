@@ -39,9 +39,13 @@ import {
 import { createMagicLinkRouter } from "./MagicLinkRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
-import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 import { capitalize } from "../../shared/utils/string";
+import {
+  GenerateApiConsumerJtw,
+  GenerateMagicLinkJwt,
+} from "../../domain/auth/jwt";
 import { UnauthorizedError } from "./helpers/httpErrors";
+import { createEstablishmentRouter } from "./EstablishmentRouter";
 
 const logger = createLogger(__filename);
 
@@ -57,6 +61,7 @@ export const createApp = async (
   repositories: Repositories;
   eventCrawler: EventCrawler;
   generateApiJwt: GenerateApiConsumerJtw;
+  generateMagicLinkJwt: GenerateMagicLinkJwt;
 }> => {
   const app = express();
   const router = Router();
@@ -246,7 +251,7 @@ export const createApp = async (
 
   router.route(`/${"retrieveFormFromJwt"}/:jwt`).get(async (req, res) => {
     return sendHttpResponse(req, res, async () => {
-      if (!req.jwtEstablishmentPayload) throw new UnauthorizedError();
+      if (!req.payloads?.application) throw new UnauthorizedError();
 
       return deps.useCases.retrieveFormEstablishmentFromAggregates.execute();
     });
@@ -312,6 +317,7 @@ export const createApp = async (
   app.use(router);
   app.use("/auth", createMagicLinkRouter(deps));
   app.use(createApiKeyAuthRouter(deps));
+  app.use(createEstablishmentRouter(deps));
 
   subscribeToEvents(deps);
 
@@ -322,5 +328,6 @@ export const createApp = async (
     repositories: deps.repositories,
     eventCrawler: deps.eventCrawler,
     generateApiJwt: deps.generateApiJwt,
+    generateMagicLinkJwt: deps.generateMagicLinkJwt,
   };
 };

@@ -16,12 +16,13 @@ import { EstablishmentAggregateBuilder } from "../../_testBuilders/Establishment
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
+import { getImmersionOfferByIdRoute } from "../../shared/routes";
 
 const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
 const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03512d";
 const immersionOfferRome = "B1805";
 
-describe("/get-immersion-by-id route", () => {
+describe("Route to get immersion offer by id", () => {
   let request: SuperTest<Test>;
   let reposAndGateways: InMemoryRepositories;
   let generateApiJwt: GenerateApiConsumerJtw;
@@ -73,7 +74,7 @@ describe("/get-immersion-by-id route", () => {
     };
 
     await request
-      .get(`/get-immersion-by-id/${immersionOfferId}`)
+      .get(`/${getImmersionOfferByIdRoute}/${immersionOfferId}`)
       .expect(200, expectedResult);
   });
 
@@ -107,16 +108,18 @@ describe("/get-immersion-by-id route", () => {
     });
 
     await request
-      .get(`/get-immersion-by-id/${immersionOfferId}`)
+      .get(`/${getImmersionOfferByIdRoute}/${immersionOfferId}`)
       .set("Authorization", authToken)
       .expect(200, expectedResult);
   });
 
-  test("rejects requests with missing id", async () => {
-    await request.get("/get-immersion-by-id/sfdfdsdf").expect(404);
-  });
-
-  test("rejects requests with wrong id", async () => {
-    await request.get("/get-immersion-by-id/").expect(404);
+  test("rejects requests with wrong format id", async () => {
+    const authToken = generateApiJwt({
+      id: authorizedApiKeyId,
+    });
+    await request
+      .get(`/${getImmersionOfferByIdRoute}/sfdfdsdf`)
+      .set("Authorization", authToken)
+      .expect(404);
   });
 });

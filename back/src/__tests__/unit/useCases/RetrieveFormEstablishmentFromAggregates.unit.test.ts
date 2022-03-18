@@ -3,7 +3,7 @@ import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/im
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
-import { EditFormEstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
@@ -22,15 +22,16 @@ const prepareUseCase = () => {
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
   const siret = "12345678901234";
-  const jwtPayload: EditFormEstablishmentPayload = {
+  const jwtPayload: EstablishmentPayload = {
     siret,
-    expiredAt: 2,
-    issuedAt: 1,
+    exp: 2,
+    iat: 1,
+    version: 1,
   };
   it("throws an error if there is no establishment with this siret", async () => {
     const { useCase } = prepareUseCase();
     await expectPromiseToFailWithError(
-      useCase.execute(void 0, jwtPayload),
+      useCase.execute(undefined, jwtPayload),
       new Error(
         "No establishment found with siret 12345678901234 and form data source. ",
       ),
@@ -51,7 +52,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     ]);
     // Act and assert
     await expectPromiseToFailWithError(
-      useCase.execute(void 0, jwtPayload),
+      useCase.execute(undefined, jwtPayload),
       new Error(
         "No establishment found with siret 12345678901234 and form data source. ",
       ),
@@ -79,7 +80,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     // Act
     // TODO : find a way to give the JWT Payload
 
-    const retrievedForm = await useCase.execute(void 0, jwtPayload);
+    const retrievedForm = await useCase.execute(undefined, jwtPayload);
     // Assert
     expect(retrievedForm).toBeDefined();
     const expectedForm: FormEstablishmentDto = {

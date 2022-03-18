@@ -1101,7 +1101,9 @@ describe("Postgres implementation of immersion offer repository", () => {
           await pgImmersionOfferRepository.getAnnotatedImmersionOffersForEstablishmentSiret(
             siretInTable,
           );
-        expect(actualAnnotatedOffers).toEqual(expectedAnnotatedOffers);
+        expect(actualAnnotatedOffers).toEqual(
+          expect.arrayContaining(expectedAnnotatedOffers),
+        );
       });
     });
   });

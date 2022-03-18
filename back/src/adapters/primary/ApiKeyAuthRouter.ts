@@ -4,7 +4,6 @@ import {
   getImmersionOfferByIdRoute,
   addEstablishmentFormRouteWithApiKey,
   searchImmersionRoute,
-  editEstablishmentFormRouteWithApiKey,
 } from "../../shared/routes";
 import { AppDependencies } from "./config";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
@@ -55,14 +54,6 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
           source: req.apiConsumer!.consumer,
         });
       });
-    });
-
-  authenticatedRouter
-    .route(`/${editEstablishmentFormRouteWithApiKey}`)
-    .post(async (req, res) => {
-      return sendHttpResponse(req, res, () =>
-        deps.useCases.editFormEstablishment.execute(req.body),
-      );
     });
 
   return authenticatedRouter;

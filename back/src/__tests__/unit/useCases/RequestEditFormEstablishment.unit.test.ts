@@ -11,7 +11,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
-import { EditFormEstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 const siret = "12345678912345";
@@ -40,9 +40,8 @@ const prepareUseCase = () => {
     outboxRepo,
   });
 
-  const generateEditFormEstablishmentUrl = (
-    payload: EditFormEstablishmentPayload,
-  ) => `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
+  const generateEditFormEstablishmentUrl = (payload: EstablishmentPayload) =>
+    `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
 
   const useCase = new RequestEditFormEstablishment(
     uowPerformer,
@@ -113,8 +112,9 @@ describe("RequestUpdateFormEstablishment", () => {
           siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
         ) => ({
           siret,
-          issuedAt: new Date("2021-01-01T12:00:00.000").getTime(),
-          expiredAt: new Date("2021-01-02T12:00:00.000").getTime(),
+          iat: new Date("2021-01-01T12:00:00.000").getTime(),
+          exp: new Date("2021-01-02T12:00:00.000").getTime(),
+          version: 1,
         });
       clock.setNextDate(new Date("2021-01-01T13:00:00.000")); // The last email's link for this siret has not expired
 
@@ -135,8 +135,9 @@ describe("RequestUpdateFormEstablishment", () => {
       siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
     ) => ({
       siret,
-      issuedAt: new Date("2021-01-01T12:00:00.000").getTime(),
-      expiredAt: new Date("2021-01-02T12:00:00.000").getTime(),
+      iat: new Date("2021-01-01T12:00:00.000").getTime(),
+      exp: new Date("2021-01-02T12:00:00.000").getTime(),
+      version: 1,
     });
     clock.setNextDate(new Date("2021-01-02T13:00:00.000")); // 1 hour after the link of the last email for this siret has expired
 

@@ -1,4 +1,3 @@
-import { currentJwtVersion } from "../../../shared/tokens/MagicLinkPayload";
 import {
   GenerateMagicLinkRequestDto,
   generateMagicLinkRequestSchema,

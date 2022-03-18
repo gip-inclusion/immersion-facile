@@ -7,7 +7,7 @@ import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ApplicationStatus } from "src/shared/ImmersionApplicationDto";
 import { statusTransitionConfigs } from "src/shared/immersionApplicationStatusTransitions";
-import { Role } from "src/shared/tokens/MagicLinkPayload";
+import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { immersionApplicationGateway } from "../dependencies";
@@ -31,7 +31,7 @@ const isAllowedTransition = (
 
 export const VerificationPage = ({ route }: VerificationPageProps) => {
   const jwt = route.params.jwt;
-  const { role } = decodeJwt(jwt);
+  const { role } = decodeJwt<MagicLinkPayload>(jwt);
 
   const [successMessage, setSuccessMessage] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();

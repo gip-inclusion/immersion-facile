@@ -32,12 +32,6 @@ export class ImmersionOfferEntityV2Builder
       romeCode,
     });
   }
-  withRomeAppellation(romeAppellation: number) {
-    return new ImmersionOfferEntityV2Builder({
-      ...this.entity,
-      romeAppellation: romeAppellation,
-    });
-  }
 
   withRomeAppellation(romeAppellation: number) {
     return new ImmersionOfferEntityV2Builder({

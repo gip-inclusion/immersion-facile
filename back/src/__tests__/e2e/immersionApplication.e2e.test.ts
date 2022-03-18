@@ -1,14 +1,12 @@
-import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
 import { InMemoryImmersionApplicationRepository } from "../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import {
-  currentJwtVersion,
+  currentJwtVersions,
   emailHashForMagicLink,
 } from "../../shared/tokens/MagicLinkPayload";
 import supertest, { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../adapters/primary/appConfig";
 import { createApp } from "../../adapters/primary/server";
-import { makeGenerateJwt } from "../../domain/auth/jwt";
 import {
   immersionApplicationsRoute,
   updateApplicationStatusRoute,
@@ -20,7 +18,7 @@ import {
 } from "../../shared/tokens/MagicLinkPayload";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
+import { GenerateMagicLinkJwt, makeGenerateJwt } from "../../domain/auth/jwt";
 
 let request: SuperTest<Test>;
 let generateJwt: GenerateMagicLinkJwt;
@@ -35,7 +33,7 @@ const initializeSystemUnderTest = async (
   config: AppConfig,
   { withImmersionStored }: { withImmersionStored: boolean },
 ) => {
-  const { app, repositories } = await createApp(config);
+  const { app, repositories, generateMagicLinkJwt } = await createApp(config);
   if (withImmersionStored) {
     const entity = ImmersionApplicationEntity.create(immersionApplication);
     const immersionApplicationRepo =
@@ -43,7 +41,7 @@ const initializeSystemUnderTest = async (
     immersionApplicationRepo.setImmersionApplications({ [entity.id]: entity });
   }
   request = supertest(app);
-  generateJwt = makeGenerateJwt(config.magicLinkJwtPrivateKey);
+  generateJwt = generateMagicLinkJwt;
 };
 
 describe("/demandes-immersion route", () => {
@@ -189,7 +187,7 @@ describe("/demandes-immersion route", () => {
           emailHash: emailHashForMagicLink(immersionApplication.email),
           iat: Math.round(Date.now() / 1000),
           exp: Math.round(Date.now() / 1000) + 31 * 24 * 3600,
-          version: currentJwtVersion,
+          version: currentJwtVersions.application,
         };
         const jwt = generateJwt(payload);
 
@@ -236,7 +234,7 @@ describe("/demandes-immersion route", () => {
         email: "new@email.fr",
       };
 
-      const link = generateJwt(
+      const jwt = generateJwt(
         createMagicLinkPayload(
           immersionApplication.id,
           "beneficiary",
@@ -245,7 +243,7 @@ describe("/demandes-immersion route", () => {
       );
 
       await request
-        .post(`/auth/${immersionApplicationsRoute}/${link}`)
+        .post(`/auth/${immersionApplicationsRoute}/${jwt}`)
         .send(updatedImmersionApplication)
         .expect(200);
 
@@ -341,7 +339,7 @@ describe("/update-application-status route", () => {
     const counsellorJwt = generateJwt(
       createMagicLinkPayload(applicationId, "counsellor", "counsellor@pe.fr"),
     );
-    const result = await request
+    await request
       .post(`/auth/${updateApplicationStatusRoute}/${counsellorJwt}`)
       .send({ status: "REJECTED", justification: "test-justification" })
       .expect(200);
@@ -398,6 +396,6 @@ describe("/update-application-status route", () => {
     await request
       .post(`/auth/${updateApplicationStatusRoute}/${jwt}`)
       .send({ status: "ACCEPTED_BY_COUNSELLOR" })
-      .expect(404);
+      .expect(404); // Not found
   });
 });

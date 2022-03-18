@@ -2,11 +2,14 @@ import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
 import { GenerateMagicLink } from "../../../domain/immersionApplication/useCases/GenerateMagicLink";
 import {
   createMagicLinkPayload,
+  MagicLinkPayload,
   Role,
 } from "../../../shared/tokens/MagicLinkPayload";
 
-const generateJwtFn: GenerateMagicLinkJwt = (payload) =>
-  payload.applicationId + ";" + payload.role + ";" + payload.iat;
+const generateJwtFn: GenerateMagicLinkJwt = (payload) => {
+  const { applicationId, role, iat } = payload as MagicLinkPayload;
+  return applicationId + ";" + role + ";" + iat;
+};
 
 describe("Generate magic links", () => {
   let generateMagicLink: GenerateMagicLink;

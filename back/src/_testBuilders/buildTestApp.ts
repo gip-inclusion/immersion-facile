@@ -20,9 +20,12 @@ import { AgencyConfigBuilder } from "./AgencyConfigBuilder";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationExportQueries } from "../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
-import { GenerateApiConsumerJtw } from "../domain/auth/jwt";
 import { EstablishmentExportQueries } from "../domain/establishment/ports/EstablishmentExportQueries";
 import { PostalCodeDepartmentRegionQueries } from "../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
+import {
+  GenerateApiConsumerJtw,
+  GenerateMagicLinkJwt,
+} from "../domain/auth/jwt";
 
 export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
@@ -53,6 +56,7 @@ export type TestAppAndDeps = {
   eventCrawler: BasicEventCrawler;
   appConfig: AppConfig;
   generateApiJwt: GenerateApiConsumerJtw;
+  generateMagicLinkJwt: GenerateMagicLinkJwt;
 };
 
 export const buildTestApp = async (
@@ -91,6 +95,7 @@ export const buildTestApp = async (
     repositories,
     eventCrawler: rawEventCrawler,
     generateApiJwt,
+    generateMagicLinkJwt,
   } = await createApp(appConfig);
 
   const request = supertest(app);
@@ -105,6 +110,7 @@ export const buildTestApp = async (
     eventCrawler,
     appConfig,
     generateApiJwt,
+    generateMagicLinkJwt,
   };
 };
 

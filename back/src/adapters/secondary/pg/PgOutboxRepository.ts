@@ -2,7 +2,7 @@ import { PoolClient } from "pg";
 import promClient from "prom-client";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
-import { EditFormEstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
 
 const counterEventsSaved = new promClient.Counter({
   name: "pg_outbox_repository_events_saved",
@@ -51,7 +51,7 @@ export class PgOutboxRepository implements OutboxRepository {
 
   async getLastPayloadOfFormEstablishmentEditLinkSentWithSiret(
     siret: string,
-  ): Promise<EditFormEstablishmentPayload | undefined> {
+  ): Promise<EstablishmentPayload | undefined> {
     const pgResult = await this.client.query(
       `SELECT payload FROM outbox 
        WHERE topic='FormEstablishmentEditLinkSent' AND payload ->> 'siret' = $1

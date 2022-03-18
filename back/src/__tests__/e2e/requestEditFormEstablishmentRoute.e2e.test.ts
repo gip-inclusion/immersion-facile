@@ -1,6 +1,6 @@
 import { addHours } from "date-fns";
 import { SuperTest, Test } from "supertest";
-import { EditFormEstablishmentPayload } from "../../shared/tokens/MagicLinkPayload";
+import { EstablishmentPayload } from "../../shared/tokens/MagicLinkPayload";
 import {
   buildTestApp,
   InMemoryRepositories,
@@ -18,10 +18,11 @@ describe("Route to generate an establishment edition link", () => {
   it("Returns 500 with an error message if previous edit link for this siret has not yet expired", async () => {
     // Prepare
     const now = new Date();
-    const lastPayload: EditFormEstablishmentPayload = {
+    const lastPayload: EstablishmentPayload = {
       siret: "11111111111111",
-      issuedAt: now.getTime(),
-      expiredAt: addHours(now, 24).getTime(),
+      iat: now.getTime(),
+      exp: addHours(now, 24).getTime(),
+      version: 1,
     };
     reposAndGateways.outbox.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
       async () => lastPayload;
@@ -31,7 +32,7 @@ describe("Route to generate an establishment edition link", () => {
       .get("/request-email-to-update-form/11111111111111")
       .expect(500, {
         errors: `Un email a déjà été envoyé au contact référent de l'établissement le ${new Date(
-          lastPayload.issuedAt,
+          lastPayload.iat,
         ).toLocaleDateString("fr-FR")}`,
       });
   });

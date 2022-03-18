@@ -94,13 +94,11 @@ describe("Edit Form Establishment", () => {
         const { useCase } = prepareUseCase();
         expectPromiseToFailWithError(
           useCase.execute(
-            FormEstablishmentDtoBuilder.valid()
-              .withSiret("01234567890123")
-              .build(),
+            FormEstablishmentDtoBuilder.valid().withSiret(formSiret).build(),
             payload,
           ),
           new ConflictError(
-            "Cannot update form establishlment DTO with siret 01234567890123, since it is not in list.",
+            "Cannot update form establishlment DTO with siret 12345678901234, since it is not in list.",
           ),
         );
       });

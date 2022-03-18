@@ -180,8 +180,9 @@ describe("PgOutboxRepository", () => {
         topic: "FormEstablishmentEditLinkSent",
         payload: {
           siret: siret,
-          issuedAt: new Date("2020-01-01").getTime(),
-          expiredAt: new Date("2020-01-02").getTime(),
+          iat: new Date("2020-01-01").getTime(),
+          exp: new Date("2020-01-02").getTime(),
+          version: 1,
         },
       });
 
@@ -192,8 +193,9 @@ describe("PgOutboxRepository", () => {
         topic: "FormEstablishmentEditLinkSent",
         payload: {
           siret: siret,
-          issuedAt: new Date("2020-01-05").getTime(),
-          expiredAt: new Date("2020-01-06").getTime(),
+          iat: new Date("2020-01-05").getTime(),
+          exp: new Date("2020-01-06").getTime(),
+          version: 1,
         },
       });
 
@@ -202,8 +204,9 @@ describe("PgOutboxRepository", () => {
         topic: "FormEstablishmentEditLinkSent",
         payload: {
           siret: "11111111111111",
-          issuedAt: new Date("2020-01-05").getTime(),
-          expiredAt: new Date("2020-01-06").getTime(),
+          iat: new Date("2020-01-05").getTime(),
+          exp: new Date("2020-01-06").getTime(),
+          version: 1,
         },
       });
       await storeInOutbox([

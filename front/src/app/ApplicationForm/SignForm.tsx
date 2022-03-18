@@ -10,7 +10,7 @@ import {
   ImmersionApplicationDto,
   immersionApplicationSchema,
 } from "src/shared/ImmersionApplicationDto";
-import { Role } from "src/shared/tokens/MagicLinkPayload";
+import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { SubmitFeedback, SuccessFeedbackKind } from "./SubmitFeedback";
@@ -25,7 +25,7 @@ const extractRoleAndName = (
   jwt: string,
   application: ImmersionApplicationDto,
 ): [Role, string] => {
-  const payload = decodeJwt(jwt);
+  const payload = decodeJwt<MagicLinkPayload>(jwt);
   const role = payload.role;
   const name =
     role === "beneficiary"

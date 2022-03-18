@@ -8,6 +8,7 @@ import {
   addEstablishmentFormRouteWithApiKey,
   requestEmailToUpdateFormRoute,
   romeRoute,
+  retrieveEstablishmentFormRouteWithApiKey,
 } from "src/shared/routes";
 import { SiretDto } from "src/shared/siret";
 import { zString } from "src/shared/zodUtils";
@@ -45,9 +46,12 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
     await axios.get(`/${prefix}/${requestEmailToUpdateFormRoute}/${siret}`);
   }
   public async getFormEstablishmentFromJwt(
-    siret: string,
+    jwt: string,
   ): Promise<FormEstablishmentDto> {
-    throw "not implemented";
+    const httpResponse = await axios.get(
+      `/${prefix}/${retrieveEstablishmentFormRouteWithApiKey}/${jwt}`,
+    );
+    return httpResponse.data;
   }
   public async updateFormEstablishment(
     establishment: FormEstablishmentDto,

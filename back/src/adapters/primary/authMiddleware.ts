@@ -7,8 +7,11 @@ import {
   WithApiConsumerId,
 } from "../../domain/core/valueObjects/ApiConsumer";
 import {
-  currentJwtVersion,
+  currentJwtVersions,
+  EstablishmentPayload,
   MagicLinkPayload,
+  PayloadKey,
+  PayloadOption,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
 import { makeVerifyJwt } from "../../domain/auth/jwt";
@@ -107,7 +110,10 @@ export const createApiKeyAuthMiddleware = (
   };
 };
 
-export const createJwtAuthMiddleware = (config: AppConfig) => {
+export const createJwtAuthMiddleware = (
+  config: AppConfig,
+  payloadKey: PayloadKey,
+) => {
   const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(config);
 
   return (req: Request, res: Response, next: NextFunction) => {
@@ -118,19 +124,31 @@ export const createJwtAuthMiddleware = (config: AppConfig) => {
     }
 
     try {
-      const payload = verifyJwt(maybeJwt as string);
+      const payload = verifyJwt(maybeJwt as string); // TODO : check that if exp > now, it throws 401
+      const currentJwtVersion = currentJwtVersions[payloadKey];
 
       if (!payload.version || payload.version < currentJwtVersion) {
         return sendNeedsRenewedLinkError(
           res,
           new TokenExpiredError(
             "Token corresponds to an old version, please renew",
-            new Date(currentJwtVersion),
+            new Date(currentJwtVersions[payloadKey]),
           ),
         );
       }
 
-      req.jwtPayload = payload;
+      switch (payloadKey) {
+        case "application":
+          req.payloads = { application: payload as MagicLinkPayload };
+          break;
+        case "establishment":
+          req.payloads = { establishment: payload as EstablishmentPayload };
+          break;
+        default:
+          const neverAssigned: never = payloadKey;
+          throw new Error("Should not happen.");
+      }
+
       next();
     } catch (err: any) {
       const unsafePayload = jwt.decode(maybeJwt) as MagicLinkPayload;
@@ -166,15 +184,13 @@ const sendNeedsRenewedLinkError = (res: Response, err: Error) => {
     needsNewMagicLink: true,
   });
 };
-export function verifyJwtConfig(config: AppConfig) {
-  const verifyJwt = makeVerifyJwt<MagicLinkPayload>(
-    config.magicLinkJwtPublicKey,
-  );
+export const verifyJwtConfig = (config: AppConfig) => {
+  const verifyJwt = makeVerifyJwt<PayloadOption>(config.magicLinkJwtPublicKey);
 
   const verifyDeprecatedJwt = config.magicLinkJwtPreviousPublicKey
-    ? makeVerifyJwt<MagicLinkPayload>(config.magicLinkJwtPreviousPublicKey)
+    ? makeVerifyJwt<PayloadOption>(config.magicLinkJwtPreviousPublicKey)
     : () => {
         throw new Error("No deprecated JWT private key provided");
       };
   return { verifyJwt, verifyDeprecatedJwt };
-}
+};

@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
-import { EditFormEstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   void,
   FormEstablishmentDto,
-  EditFormEstablishmentPayload
+  EstablishmentPayload
 > {
   inputSchema = z.void();
 
@@ -18,7 +18,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   protected async _execute(
     _: void,
     uow: UnitOfWork,
-    { siret }: EditFormEstablishmentPayload,
+    { siret }: EstablishmentPayload,
   ) {
     const establishment = await uow.immersionOfferRepo.getEstablishmentForSiret(
       siret,

@@ -11,23 +11,23 @@ import { sendHttpResponse } from "./helpers/sendHttpResponse";
 export const createMagicLinkRouter = (deps: AppDependencies) => {
   const authenticatedRouter = Router({ mergeParams: true });
 
-  authenticatedRouter.use("/:jwt", deps.jwtAuthMiddleware);
+  authenticatedRouter.use(deps.applicationJwtAuthMiddleware);
 
   authenticatedRouter
     .route(`/${immersionApplicationsRoute}/:jwt`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req.jwtPayload) throw new UnauthorizedError();
+        if (!req.payloads?.application) throw new UnauthorizedError();
         return deps.useCases.getImmersionApplication.execute({
-          id: req.jwtPayload.applicationId,
+          id: req.payloads.application.applicationId,
         });
       }),
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req.jwtPayload) throw new UnauthorizedError();
+        if (!req.payloads?.application) throw new UnauthorizedError();
         return deps.useCases.updateImmersionApplication.execute({
-          id: req.jwtPayload.applicationId,
+          id: req.payloads.application.applicationId,
           immersionApplication: req.body,
         });
       }),
@@ -36,23 +36,25 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   authenticatedRouter
     .route(`/${updateApplicationStatusRoute}/:jwt`)
     .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.updateImmersionApplicationStatus.execute(
+      sendHttpResponse(req, res, () => {
+        if (!req?.payloads?.application) throw new UnauthorizedError();
+        return deps.useCases.updateImmersionApplicationStatus.execute(
           req.body,
-          req.jwtPayload,
-        ),
-      ),
+          req.payloads.application,
+        );
+      }),
     );
 
   authenticatedRouter
     .route(`/${signApplicationRoute}/:jwt`)
     .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.signImmersionApplication.execute(
+      sendHttpResponse(req, res, () => {
+        if (!req?.payloads?.application) throw new UnauthorizedError();
+        return deps.useCases.signImmersionApplication.execute(
           undefined,
-          req.jwtPayload,
-        ),
-      ),
+          req.payloads.application,
+        );
+      }),
     );
 
   return authenticatedRouter;

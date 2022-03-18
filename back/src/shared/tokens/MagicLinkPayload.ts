@@ -1,7 +1,21 @@
 import { NotEmptyArray } from "../utils";
 import crypto from "crypto";
+import { SiretDto } from "../siret";
 
-export const currentJwtVersion = 1;
+export type JwtPayloads = {
+  application?: MagicLinkPayload;
+  establishment?: EstablishmentPayload;
+};
+
+type ValueOf<T> = T[keyof T];
+
+export type PayloadKey = keyof JwtPayloads;
+export type PayloadOption = ValueOf<Required<JwtPayloads>>;
+
+export const currentJwtVersions: Record<PayloadKey, number> = {
+  application: 1,
+  establishment: 1,
+};
 
 export type Role =
   | "beneficiary"
@@ -38,7 +52,7 @@ export const createMagicLinkPayload = (
   nowFn = Date.now,
   iat: number = Math.round(nowFn() / 1000),
   exp: number = iat + durationDays * 24 * 3600,
-  version = currentJwtVersion,
+  version = currentJwtVersions.application,
 ) => ({
   version,
   applicationId,
@@ -48,8 +62,29 @@ export const createMagicLinkPayload = (
   emailHash: emailHashForMagicLink(email),
 });
 
-export type EditFormEstablishmentPayload = {
+export type EstablishmentPayload = {
   siret: string;
-  issuedAt: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
-  expiredAt: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
+  iat: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
+  exp: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
+  version: number;
+};
+
+export const createEstablishmentPayload = ({
+  siret,
+  durationDays,
+  now,
+}: {
+  siret: SiretDto;
+  durationDays: number;
+  now: Date;
+}): EstablishmentPayload => {
+  const iat = Math.round(now.getTime() / 1000);
+  const exp = iat + durationDays * 24 * 3600;
+
+  return {
+    siret,
+    iat,
+    exp,
+    version: currentJwtVersions.establishment,
+  };
 };

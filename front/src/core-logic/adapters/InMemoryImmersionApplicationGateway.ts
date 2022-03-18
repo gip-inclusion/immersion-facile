@@ -11,9 +11,8 @@ import {
   signApplicationDtoWithRole,
   immersionApplicationSchema,
 } from "src/shared/ImmersionApplicationDto";
-import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
-import { Role } from "src/shared/tokens/MagicLinkPayload";
+import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
 import { AgencyId } from "../../shared/agencies";
 import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
@@ -77,7 +76,7 @@ export class InMemoryImmersionApplicationGateway
   public async getML(jwt: string): Promise<ImmersionApplicationDto> {
     await sleep(SIMULATED_LATENCY_MS);
 
-    const payload = decodeJwt(jwt);
+    const payload = decodeJwt<MagicLinkPayload>(jwt);
     return this._immersionApplications[payload.applicationId];
   }
 
@@ -113,7 +112,7 @@ export class InMemoryImmersionApplicationGateway
       "InMemoryImmersionApplicationGateway.updateML: ",
       immersionApplication,
     );
-    const payload = decodeJwt(jwt);
+    const payload = decodeJwt<MagicLinkPayload>(jwt);
 
     await sleep(SIMULATED_LATENCY_MS);
     this._immersionApplications[payload.applicationId] = immersionApplication;
@@ -124,7 +123,7 @@ export class InMemoryImmersionApplicationGateway
     { status, justification }: UpdateImmersionApplicationStatusRequestDto,
     jwt: string,
   ): Promise<WithImmersionApplicationId> {
-    const payload = decodeJwt(jwt);
+    const payload = decodeJwt<MagicLinkPayload>(jwt);
     await sleep(SIMULATED_LATENCY_MS);
     this._immersionApplications[payload.applicationId] = {
       ...this._immersionApplications[payload.applicationId],
@@ -137,7 +136,7 @@ export class InMemoryImmersionApplicationGateway
     jwt: string,
   ): Promise<WithImmersionApplicationId> {
     await sleep(SIMULATED_LATENCY_MS);
-    const payload = decodeJwt(jwt);
+    const payload = decodeJwt<MagicLinkPayload>(jwt);
     const application = this._immersionApplications[payload.applicationId];
     this._immersionApplications[payload.applicationId] =
       signApplicationDtoWithRole(application, payload.role);

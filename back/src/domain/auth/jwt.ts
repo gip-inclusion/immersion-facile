@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import {
-  MagicLinkPayload,
-  EditFormEstablishmentPayload,
+  EstablishmentPayload,
+  PayloadOption,
 } from "../../shared/tokens/MagicLinkPayload";
 import { WithApiConsumerId } from "../core/valueObjects/ApiConsumer";
 
@@ -9,14 +9,14 @@ const algo = "ES256";
 
 type AnyObject = Record<string, unknown>;
 
-export type GenerateMagicLinkJwt = GenerateJwtFn<MagicLinkPayload>;
+export type GenerateMagicLinkJwt = GenerateJwtFn<PayloadOption>;
 export type GenerateEditFormEstablishmentUrl =
-  GenerateJwtFn<EditFormEstablishmentPayload>;
+  GenerateJwtFn<EstablishmentPayload>;
 
 export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
 
 // prettier-ignore
-type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload) => string;
+export type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload) => string;
 export const makeGenerateJwt =
   <P extends AnyObject>(privateKey: string): GenerateJwtFn<P> =>
   (payload) =>
@@ -31,4 +31,5 @@ export const makeVerifyJwt =
     jwt.verify(jwtString, jwtPublicKey, {
       algorithms: [algo],
       complete: false,
+      ignoreExpiration: false,
     }) as Payload;

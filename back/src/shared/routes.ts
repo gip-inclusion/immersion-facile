@@ -8,6 +8,8 @@ export const extractImmersionApplicationsExcelRoute =
   "extract-demande-immersion-excel";
 export const addEstablishmentFormRouteWithoutApiKey =
   "immersion-offers-from-front";
+export const retrieveEstablishmentFormRouteWithApiKey =
+  "retrieve-establishment-form";
 export const addEstablishmentFormRouteWithApiKey = "add-establishment-form";
 export const editEstablishmentFormRouteWithApiKey = "edit-establishment-form";
 export const validateImmersionApplicationRoute = "validate-demande";

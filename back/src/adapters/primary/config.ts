@@ -53,7 +53,7 @@ import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../shared/routes";
 import {
   createMagicLinkPayload,
-  EditFormEstablishmentPayload,
+  EstablishmentPayload,
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
@@ -152,7 +152,14 @@ export const createAppDependencies = async (config: AppConfig) => {
     ),
     repositories,
     authChecker: createAuthChecker(config),
-    jwtAuthMiddleware: createJwtAuthMiddleware(config),
+    applicationJwtAuthMiddleware: createJwtAuthMiddleware(
+      config,
+      "application",
+    ),
+    establishmentJwtAuthMiddleware: createJwtAuthMiddleware(
+      config,
+      "establishment",
+    ),
     apiKeyAuthMiddleware: await createApiKeyAuthMiddleware(
       repositories.getApiConsumerById,
       clock,
@@ -192,10 +199,10 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
 export const makeGenerateEditFormEstablishmentUrl = (
   config: AppConfig,
 ): GenerateEditFormEstablishmentUrl => {
-  const generateJwt = makeGenerateJwt<EditFormEstablishmentPayload>(
+  const generateJwt = makeGenerateJwt<EstablishmentPayload>(
     config.magicLinkJwtPrivateKey,
   );
-  return (payload: EditFormEstablishmentPayload) => {
+  return (payload: EstablishmentPayload) => {
     const editJwt = generateJwt(payload);
     return `${config.immersionFacileBaseUrl}/${frontRoutes.editFormEstablishmentRoute}?jwt=${editJwt}`;
   };
