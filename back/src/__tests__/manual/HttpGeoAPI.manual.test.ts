@@ -1,10 +1,10 @@
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
-import { HttpGeoAPI } from "../../adapters/secondary/HttpGeoAPI";
+import { HttpGeoApi } from "../../adapters/secondary/HttpGeoApi";
 
 describe("HttpGeoAPI", () => {
   it("Should return a region and department by names from a postal code", async () => {
-    const api = new HttpGeoAPI(noRateLimit, noRetries);
+    const api = new HttpGeoApi(noRateLimit, noRetries);
     const codePostal = "02000";
     const regionAndDepartment = await api.getRegionAndDepartmentFromCodePostal(
       codePostal,

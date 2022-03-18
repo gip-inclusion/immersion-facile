@@ -8,7 +8,6 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { Archive } from "../../generic/archive/port/Archive";
 import { Workbook } from "../../generic/excel/port/Workbook";
 import { ImmersionApplicationReadyForExportVO } from "../valueObjects/ImmersionApplicationReadyForExportVO";
-import { EstablishmentRawProps } from "../../establishment/valueObjects/EstablishmentRawBeforeExportVO";
 
 export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseCase<string> {
   inputSchema = z.string();
@@ -48,129 +47,129 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
 
   private immersionApplicationExportColumnsOptions() {
     const businessColumnMappingRules: Partial<Column>[] = [
-      { header: "Statut", key: "status", width: widthExport.status },
+      { header: "Statut", key: "status", width: 20 },
       {
         header: "Accepté bénéficiaire",
         key: "beneficiaryAccepted",
-        width: widthExport.beneficiaryAccepted,
+        width: 20,
       },
       {
         header: "Accepté entreprise",
         key: "enterpriseAccepted",
-        width: widthExport.enterpriseAccepted,
+        width: 20,
       },
       {
         header: "Nom bénéficiaire",
         key: "lastName",
-        width: widthExport.lastName,
+        width: 20,
       },
       {
         header: "Prénom bénéficiaire",
         key: "firstName",
-        width: widthExport.firstName,
+        width: 20,
       },
       {
         header: "Code Postal",
         key: "postalCode",
-        width: widthExport.postalCode,
+        width: 15,
       },
-      { header: "Email bénéficiaire", key: "email", width: widthExport.email },
+      { header: "Email bénéficiaire", key: "email", width: 25 },
       {
         header: "Téléphone bénéficiaire",
         key: "phone",
-        width: widthExport.phone,
+        width: 20,
       },
       {
         header: "Identifiant Externe Pole Emploi",
         key: "peExternalId",
-        width: widthExport.peExternalId,
+        width: 30,
       },
       {
         header: "Date de Début",
         key: "dateStart",
-        width: widthExport.dateStart,
+        width: 15,
       },
-      { header: "Date de fin", key: "dateEnd", width: widthExport.dateEnd },
+      { header: "Date de fin", key: "dateEnd", width: 15 },
       {
         header: "Heures hebdomadaires",
         key: "weeklyHours",
-        width: widthExport.weeklyHours,
+        width: 22,
       },
       {
         header: "Métier",
         key: "immersionProfession",
-        width: widthExport.immersionProfession,
+        width: 40,
       },
       {
         header: "Objet de l'immersion",
         key: "immersionObjective",
-        width: widthExport.immersionObjective,
+        width: 40,
       },
       {
         header: "Entreprise d'accueil",
         key: "businessName",
-        width: widthExport.businessName,
+        width: 25,
       },
       {
         header: "Siret entreprise d'accueil",
         key: "siret",
-        width: widthExport.siret,
+        width: 25,
       },
-      { header: "Tuteur", key: "mentor", width: widthExport.mentor },
+      { header: "Tuteur", key: "mentor", width: 40 },
       {
         header: "Téléphone tuteur",
         key: "mentorPhone",
-        width: widthExport.mentorPhone,
+        width: 20,
       },
       {
         header: "Email tuteur",
         key: "mentorEmail",
-        width: widthExport.mentorEmail,
+        width: 25,
       },
       {
         header: "Date de Soumission",
         key: "dateSubmission",
-        width: widthExport.dateSubmission,
+        width: 15,
       },
       {
         header: "Horaires Lundi",
         key: "monday",
-        width: widthExport.day,
+        width: 30,
       },
       {
         header: "Horaires Mardi",
         key: "tuesday",
-        width: widthExport.day,
+        width: 30,
       },
       {
         header: "Horaires Mercredi",
         key: "wednesday",
-        width: widthExport.day,
+        width: 30,
       },
       {
         header: "Horaires Jeudi",
         key: "thursday",
-        width: widthExport.day,
+        width: 30,
       },
       {
         header: "Horaires Vendredi",
         key: "friday",
-        width: widthExport.day,
+        width: 30,
       },
       {
         header: "Horaires Samedi",
         key: "saturday",
-        width: widthExport.day,
+        width: 30,
       },
       {
         header: "Horaires Dimanche",
         key: "sunday",
-        width: widthExport.day,
+        width: 30,
       },
       {
         header: "Conditions de travail particulières",
         key: "workConditions",
-        width: widthExport.freeform,
+        width: 150,
       },
     ];
     return businessColumnMappingRules;
@@ -219,46 +218,3 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
       .withPayload(immersionApplications);
   }
 }
-
-const columnSizeByDataType = {
-  status: 20,
-  yesNo: 20,
-  name: 20,
-  postalCode: 15,
-  email: 25,
-  phone: 20,
-  date: 15,
-  weeklyHours: 22,
-  profession: 40,
-  objective: 40,
-  businessName: 25,
-  siret: 25,
-  uuid: 30,
-  scheduleDay: 30,
-  freeform: 100,
-};
-
-const widthExport: { [key: string]: number } = {
-  status: columnSizeByDataType.status,
-  beneficiaryAccepted: columnSizeByDataType.yesNo,
-  enterpriseAccepted: columnSizeByDataType.yesNo,
-  lastName: columnSizeByDataType.name,
-  firstName: columnSizeByDataType.name,
-  postalCode: columnSizeByDataType.postalCode,
-  email: columnSizeByDataType.email,
-  phone: columnSizeByDataType.phone,
-  dateStart: columnSizeByDataType.date,
-  dateEnd: columnSizeByDataType.date,
-  weeklyHours: columnSizeByDataType.weeklyHours,
-  immersionProfession: columnSizeByDataType.profession,
-  immersionObjective: columnSizeByDataType.objective,
-  businessName: columnSizeByDataType.businessName,
-  siret: columnSizeByDataType.siret,
-  mentor: columnSizeByDataType.name * 2,
-  mentorPhone: columnSizeByDataType.phone,
-  mentorEmail: columnSizeByDataType.email,
-  dateSubmission: columnSizeByDataType.date,
-  peExternalId: columnSizeByDataType.uuid,
-  day: columnSizeByDataType.scheduleDay,
-  workConditions: columnSizeByDataType.freeform,
-};

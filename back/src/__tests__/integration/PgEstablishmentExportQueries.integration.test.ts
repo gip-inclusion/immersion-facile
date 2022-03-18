@@ -8,6 +8,7 @@ import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Build
 import { PgEstablishmentExportQueries } from "../../adapters/secondary/pg/PgEstablishmentExportQueries";
 import { groupBy, reduceBy, uniq } from "ramda";
 import { EstablishmentRawProps } from "../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
+import { format } from "date-fns";
 
 describe("PgEstablishmentExportQueries", () => {
   let pool: Pool;
@@ -47,7 +48,7 @@ describe("PgEstablishmentExportQueries", () => {
       expect(establishmentsExportRaw).toStrictEqual([
         {
           address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
-          createdAt: "11/03/2022",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
           customizedName: "Custom name",
           isCommited: true,
           nafCode: "7820Z",
@@ -58,7 +59,7 @@ describe("PgEstablishmentExportQueries", () => {
         },
         {
           address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
-          createdAt: "11/03/2022",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
           customizedName: "Custom name",
           isCommited: true,
           nafCode: "7820Z",
@@ -69,7 +70,7 @@ describe("PgEstablishmentExportQueries", () => {
         },
         {
           address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-          createdAt: "11/03/2022",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
           customizedName: "Custom name",
           isCommited: false,
           nafCode: "9321Z",
@@ -81,7 +82,7 @@ describe("PgEstablishmentExportQueries", () => {
         },
         {
           address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-          createdAt: "11/03/2022",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
           customizedName: "Custom name",
           isCommited: false,
           nafCode: "9321Z",

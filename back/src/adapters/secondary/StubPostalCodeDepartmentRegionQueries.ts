@@ -31,7 +31,9 @@ export const StubPostalCodeDepartmentRegionQueries: PostalCodeDepartmentRegionQu
         ["50000"]: { department: "Manche", region: "Normandie" },
         ["56000"]: { department: "Morbihan", region: "Bretagne" },
         ["61000"]: { department: "Orne", region: "Normandie" },
+        ["69120"]: { department: "Rhône", region: "Auvergne-Rhône-Alpes" },
         ["81000"]: { department: "Tarn", region: "Occitanie" },
+        ["85000"]: { department: "Vendée", region: "Pays de la Loire" },
       });
     },
   };
