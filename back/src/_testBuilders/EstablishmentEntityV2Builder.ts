@@ -62,7 +62,7 @@ export class EstablishmentEntityV2Builder
   withIsCommited(isCommited: boolean) {
     return new EstablishmentEntityV2Builder({
       ...this.entity,
-      isCommited: isCommited,
+      isCommited,
     });
   }
 

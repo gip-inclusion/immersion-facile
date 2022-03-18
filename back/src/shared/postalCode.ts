@@ -9,8 +9,8 @@ export const capturePostalCode = (
   addressString: string,
 ): CapturePostalCodeResult => {
   const capturePostalCodeRegex = /(?<postalCode>[0-9]{5})/u;
-  const capture: RegExpExecArray | null =
-    capturePostalCodeRegex.exec(addressString);
+  const capture = capturePostalCodeRegex.exec(addressString);
+
   return {
     postalCode: capture?.groups?.["postalCode"] ?? "",
     hasPostalCode: capture !== null,

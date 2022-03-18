@@ -182,22 +182,12 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
 
     if (immersionOfferFields.length === 0) return;
 
-    // Deduplication in case we have multiple times the same SIRET + ROMES, this due to the fact that different appellations can be transformed in the same ROME
-    const deduplicatedArrayOfImmersionOffers: any[][] =
-      immersionOfferFields.reduce((acc, cur) => {
-        const alreadyExist = acc.some(
-          (item: any[]) => item[1] == cur[1] && item[3] == cur[3], //ROME is at position 1 and SIRET at position 3
-        );
-        if (alreadyExist) return acc;
-        return [...acc, cur];
-      }, []);
-
     try {
       const query = format(
         `INSERT INTO immersion_offers (
           uuid, rome_code, rome_appellation, siret, score
         ) VALUES %L`,
-        deduplicatedArrayOfImmersionOffers,
+        immersionOfferFields,
       );
 
       await this.client.query(query);

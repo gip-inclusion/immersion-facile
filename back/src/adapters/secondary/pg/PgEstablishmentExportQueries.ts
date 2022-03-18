@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
 import { format } from "date-fns";
-import { boolean, optional } from "./pgUtils";
+import { valueOrFalse, optional } from "./pgUtils";
 import { EstablishmentExportQueries } from "../../../domain/establishment/ports/EstablishmentExportQueries";
 import { EstablishmentRawProps } from "../../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 
@@ -39,7 +39,7 @@ export class PgEstablishmentExportQueries
       address: row.address,
       nafCode: optional(row.naf_code),
       createdAt: format(row.creation_date, "dd/MM/yyyy"),
-      isCommited: boolean(row.is_commited),
+      isCommited: valueOrFalse(row.is_commited),
       professions: `${row.rome_code} - ${row.libelle_appellation_court}`,
       preferredContactMethods: row.contact_mode,
     }));

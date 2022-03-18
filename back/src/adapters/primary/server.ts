@@ -104,7 +104,7 @@ export const createApp = async (
 
         await deps.useCases.exportEstablishmentsAsExcelArchive.execute({
           archivePath,
-          groupBy,
+          groupKey: groupBy,
           aggregateProfession,
         });
 

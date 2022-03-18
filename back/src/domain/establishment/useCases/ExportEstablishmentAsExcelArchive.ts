@@ -1,6 +1,5 @@
 import { Column } from "exceljs";
-import { map, prop, groupBy, uniq, reduceBy } from "ramda";
-import { z } from "zod";
+import { map, prop, groupBy, uniq, reduceBy, values } from "ramda";
 import { pipeWithValue } from "../../../shared/pipeWithValue";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -19,13 +18,21 @@ import {
   capturePostalCode,
   CapturePostalCodeResult,
 } from "../../../shared/postalCode";
+import {
+  establishmentExportSchemaObj
+} from "../../../shared/establishmentExport/establishmentExport.schema";
+import {
+  DepartmentOrRegion,
+  EstablishmentExportConfigDto,
+} from "../../../shared/establishmentExport/establishmentExport.dto";
+import {z} from "zod";
+
+export type EstablishmentExportConfig = EstablishmentExportConfigDto & {
+  archivePath: string;
+};
 
 export class ExportEstablishmentAsExcelArchive extends TransactionalUseCase<EstablishmentExportConfig> {
-  inputSchema = z.object({
-    archivePath: z.string(),
-    groupBy: z.enum(["region", "department"]),
-    aggregateProfession: z.boolean(),
-  });
+  inputSchema = z.object({...establishmentExportSchemaObj, archivePath: z.string()});
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
@@ -48,15 +55,16 @@ export class ExportEstablishmentAsExcelArchive extends TransactionalUseCase<Esta
         config,
         establishmentsWithoutGeoRawBeforeExport,
       ),
-      map((establishment) =>
-        addZonesDelimiters(establishment, postalCodeDepartmentRegion),
-      ),
-      map((establishmentWithGeoProps) =>
-        new EstablishmentRawBeforeExportVO(
+      map((establishment) => {
+        const establishmentWithGeoProps = addZonesDelimiters(
+          establishment,
+          postalCodeDepartmentRegion,
+        );
+        return new EstablishmentRawBeforeExportVO(
           establishmentWithGeoProps,
-        ).toEstablishmentReadyForExportVO(),
-      ),
-      groupBy(prop(config.groupBy)),
+        ).toEstablishmentReadyForExportVO();
+      }),
+      groupBy(prop(config.groupKey)),
     );
 
     const workbooksTitles = Object.keys(establishmentExportByZone);
@@ -64,7 +72,7 @@ export class ExportEstablishmentAsExcelArchive extends TransactionalUseCase<Esta
     notifyProblematicEstablishments(workbooksTitles, establishmentExportByZone);
 
     const workbookColumnsOptions = establishmentsExportByZoneColumnsOptions(
-      config.groupBy,
+      config.groupKey,
     );
 
     const createdFilenames = await Promise.all(
@@ -82,16 +90,8 @@ export class ExportEstablishmentAsExcelArchive extends TransactionalUseCase<Esta
   }
 }
 
-type DepartmentOrRegion = "region" | "department";
-
-export type EstablishmentExportConfig = {
-  archivePath: string;
-  groupBy: DepartmentOrRegion;
-  aggregateProfession: boolean;
-};
-
 export const aggregateProfessionsIfNeeded = (
-  config: EstablishmentExportConfig,
+  config: EstablishmentExportConfigDto,
   establishmentsWithoutGeoRawBeforeExport: EstablishmentRawProps[],
 ) => {
   return config.aggregateProfession
@@ -180,55 +180,53 @@ const notifyProblematicEstablishments = (
     );
 };
 
+const bySiret = (establishment: EstablishmentRawProps) => establishment.siret;
+
+type EstablishmentRawPropsWithProfessionArray = Omit<
+  EstablishmentRawProps,
+  "professions"
+> & { professions: string[] };
+
+const reduceProfessions = (
+  accumulator: EstablishmentRawPropsWithProfessionArray,
+  establishment: EstablishmentRawProps,
+): EstablishmentRawPropsWithProfessionArray => {
+  if (!accumulator.professions) {
+    accumulator = {
+      ...establishment,
+      professions: [establishment.professions],
+    };
+    return accumulator;
+  }
+
+  return {
+    ...accumulator,
+    professions: uniq<string>(
+      accumulator.professions.concat(establishment.professions).sort(),
+    ),
+  };
+};
+
+const concatProfessions = (
+  establishment: EstablishmentRawPropsWithProfessionArray,
+): EstablishmentRawProps => ({
+  ...establishment,
+  professions: establishment.professions.join(" | "),
+});
+
 const reduceByProfessions = (
   establishments: EstablishmentRawProps[],
-): EstablishmentRawProps[] => {
-  type EstablishmentRawPropsWithProfessionArray = Omit<
-    EstablishmentRawProps,
-    "professions"
-  > & { professions: string[] };
-
-  const bySiret = (establishment: EstablishmentRawProps) => establishment.siret;
-
-  const reduceProfessions = (
-    accumulator: EstablishmentRawPropsWithProfessionArray,
-    establishment: EstablishmentRawProps,
-  ): EstablishmentRawPropsWithProfessionArray => {
-    if (!accumulator.professions) {
-      accumulator = {
-        ...establishment,
-        professions: [establishment.professions],
-      };
-      return accumulator;
-    }
-
-    return {
-      ...accumulator,
-      professions: uniq<string>(
-        accumulator.professions.concat(establishment.professions),
-      ),
-    };
-  };
-
-  const groupedBySiretReduceProfession: EstablishmentRawPropsWithProfessionArray[] =
-    Object.values(
-      reduceBy(
-        reduceProfessions,
-        {} as EstablishmentRawPropsWithProfessionArray,
-        bySiret,
-        establishments,
-      ),
-    );
-
-  const concatProfessions = (
-    establishment: EstablishmentRawPropsWithProfessionArray,
-  ): EstablishmentRawProps => ({
-    ...establishment,
-    professions: establishment.professions.join(" | "),
-  });
-
-  return groupedBySiretReduceProfession.map(concatProfessions);
-};
+): EstablishmentRawProps[] =>
+  pipeWithValue(
+    establishments,
+    reduceBy(
+      reduceProfessions,
+      {} as EstablishmentRawPropsWithProfessionArray,
+      bySiret,
+    ),
+    values,
+    map(concatProfessions),
+  );
 
 export const addZonesDelimiters = (
   establishment: EstablishmentRawProps,
@@ -236,12 +234,6 @@ export const addZonesDelimiters = (
 ): EstablishmentRawBeforeExportProps => {
   const capture: CapturePostalCodeResult = capturePostalCode(
     establishment.address,
-  );
-
-  console.log(
-    capture.postalCode,
-    postalCodeDepartmentRegion[capture.postalCode],
-    postalCodeDepartmentRegion,
   );
 
   if (!capture.hasPostalCode) {
@@ -267,21 +259,19 @@ const notifyProblematicPostalCode = (
   message: string,
   problematicEstablishments: EstablishmentReadyForExportVO[],
 ) => {
-  notifyDiscord(
-    `\`\`\`${message}: ${problematicEstablishments
-      .map(
-        (establishment) => `${establishment.siret} | ${establishment.address}`,
-      )
-      .join("\n")}\`\`\``,
-  );
+  const serializedProblematicEstablishments = problematicEstablishments
+    .map((establishment) => `${establishment.siret} | ${establishment.address}`)
+    .join("\n");
+
+  notifyDiscord(`${message}: ${serializedProblematicEstablishments}`);
 };
 
 const toWorkbook = (
   workbookTitle: string,
   establishments: EstablishmentReadyForExportVO[],
   excelColumFormatConfig: Partial<Column>[],
-): Workbook<EstablishmentReadyForExportVO> => {
-  return new Workbook()
+): Workbook<EstablishmentReadyForExportVO> =>
+  new Workbook()
     .withTitle(workbookTitle)
     .withSheet()
     .withConditionalFormatting("main", {
@@ -317,4 +307,3 @@ const toWorkbook = (
     })
     .withCustomFieldsHeaders(excelColumFormatConfig)
     .withPayload(establishments);
-};

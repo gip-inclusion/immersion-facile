@@ -30,7 +30,7 @@ export class ImmersionOfferEntityV2Builder
   withRomeAppellation(romeAppellation: number) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
-      romeAppellation: romeAppellation,
+      romeAppellation,
     });
   }
 

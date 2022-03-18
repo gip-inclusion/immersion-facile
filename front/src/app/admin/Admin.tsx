@@ -15,10 +15,29 @@ import {
 import { Route } from "type-route";
 import "./Admin.css";
 import { ApiDataContainer } from "./ApiDataContainer";
+import {
+  exportEstablismentsExcelRoute,
+  exportImmersionApplicationsExcelRoute,
+} from "../../shared/routes";
+import { EstablishmentExportConfigDto } from "../../shared/establishmentExport/establishmentExport.dto";
+import { keys } from "ramda";
 
 interface AdminProps {
   route: Route<typeof routes.admin> | Route<typeof routes.agencyAdmin>;
 }
+
+const buildExportEstablishmentRoute = (
+  params: EstablishmentExportConfigDto,
+) => {
+  const queryParams = keys(params)
+    .reduce<string[]>((acc, key) => {
+      const value = params[key];
+      return [...acc, `${key}=${value}`];
+    }, [])
+    .join("&");
+
+  return `/api/${exportEstablismentsExcelRoute}?${queryParams}`;
+};
 
 export const Admin = ({ route }: AdminProps) => {
   const featureFlags = useFeatureFlagsContext();
@@ -58,38 +77,54 @@ export const Admin = ({ route }: AdminProps) => {
             </div>
             <a
               className="fr-link"
-              href="/api/export-demande-immersions-excel"
+              href={`/api/${exportImmersionApplicationsExcelRoute}`}
               target="_blank"
             >
               Exporter les demandes d'immersion par agences
             </a>
             <a
               className="fr-link"
-              href="/api/export-establishments?groupBy=region&aggregateProfession=true"
+              href={buildExportEstablishmentRoute({
+                aggregateProfession: true,
+                groupKey: "region",
+              })}
               target="_blank"
             >
-              Exporter les entreprises référencées par région avec aggrégation des métiers
+              Exporter les entreprises référencées par région avec aggrégation
+              des métiers
             </a>
             <a
               className="fr-link"
-              href="/api/export-establishments?groupBy=department&aggregateProfession=true"
+              href={buildExportEstablishmentRoute({
+                aggregateProfession: true,
+                groupKey: "department",
+              })}
               target="_blank"
             >
-              Exporter les entreprises référencées par département avec aggrégation des métiers
+              Exporter les entreprises référencées par département avec
+              aggrégation des métiers
             </a>
             <a
               className="fr-link"
-              href="/api/export-establishments?groupBy=region&aggregateProfession=false"
+              href={buildExportEstablishmentRoute({
+                aggregateProfession: false,
+                groupKey: "region",
+              })}
               target="_blank"
             >
-              Exporter les entreprises référencées par région sans aggrégation des métiers
+              Exporter les entreprises référencées par région sans aggrégation
+              des métiers
             </a>
             <a
               className="fr-link"
-              href="/api/export-establishments?groupBy=department&aggregateProfession=false"
+              href={buildExportEstablishmentRoute({
+                aggregateProfession: false,
+                groupKey: "department",
+              })}
               target="_blank"
             >
-              Exporter les entreprises référencées par département sans aggrégation des métiers
+              Exporter les entreprises référencées par département sans
+              aggrégation des métiers
             </a>
           </div>
 

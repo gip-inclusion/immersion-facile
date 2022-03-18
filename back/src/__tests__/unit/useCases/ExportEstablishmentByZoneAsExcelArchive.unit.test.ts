@@ -10,6 +10,7 @@ import {
 } from "../../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 import { DepartmentAndRegion } from "../../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { StubEstablishmentExportQueries } from "../../../adapters/secondary/StubEstablishmentExportQueries";
+import { format } from "date-fns";
 
 describe("ExportEstablishmentByZoneAsExcelArchive", () => {
   describe("establishmentsExportByZoneColumnsOptions", () => {
@@ -106,7 +107,7 @@ describe("ExportEstablishmentByZoneAsExcelArchive", () => {
       ).toStrictEqual(rawEstablishments);
     });
 
-    it("returns one entity per siret with concatenated professions strings", async () => {
+    it("returns one entity per siret with concatenated and sorted professions strings (rome - appelation)", async () => {
       const config = {
         aggregateProfession: true,
       } as EstablishmentExportConfig;
@@ -117,26 +118,26 @@ describe("ExportEstablishmentByZoneAsExcelArchive", () => {
       const expected: EstablishmentRawProps[] = [
         {
           address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
-          createdAt: "11/03/2022",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
           customizedName: "Custom name",
           isCommited: true,
           nafCode: "7820Z",
           name: "ARTUS INTERIM LA ROCHE SUR YON",
           preferredContactMethods: "phone",
           professions:
-            "M1502 - Chargé / Chargée de recrutement | A1205 - Ouvrier sylviculteur / Ouvrière sylvicutrice",
+            "A1205 - Ouvrier sylviculteur / Ouvrière sylvicutrice | M1502 - Chargé / Chargée de recrutement",
           siret: "79158476600012",
         },
         {
           address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-          createdAt: "11/03/2022",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
           customizedName: "Custom name",
           isCommited: false,
           nafCode: "9321Z",
           name: "MINI WORLD LYON",
           preferredContactMethods: "mail",
           professions:
-            "I1304 - Technicien(ne) de maintenance industrielle polyvalente | G1205 - Agent / Agente d'exploitation des attractions",
+            "G1205 - Agent / Agente d'exploitation des attractions | I1304 - Technicien(ne) de maintenance industrielle polyvalente | I1304 - Technicien(ne) maintenance d'équipnts de parcs d'attractions",
           siret: "79341726200037",
         },
       ];

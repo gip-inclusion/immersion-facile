@@ -88,6 +88,7 @@ describe("Transform FormEstablishment into search data", () => {
       },
       {
         romeCodeMetier: "A1102",
+        romeCodeAppellation: "11717",
         description: "métier B",
       },
     ];
@@ -108,7 +109,10 @@ describe("Transform FormEstablishment into search data", () => {
     await expectEstablishmentAggregateInRepo({
       siret: fakeSiret,
       nafDto: expectedNafDto,
-      offerRomes: ["A1101", "A1102"],
+      offerRomeCodesAndAppellations: [
+        { code: "A1101" },
+        { code: "A1102", appellation: 11717 },
+      ],
       contactEmail: fakeBusinessContact.email,
     });
   });
@@ -117,7 +121,7 @@ describe("Transform FormEstablishment into search data", () => {
     siret: string;
     nafDto: NafDto;
     contactEmail: string;
-    offerRomes: string[];
+    offerRomeCodesAndAppellations: { code: string; appellation?: number }[];
   }) => {
     const repoEstablishmentAggregate =
       inMemoryImmersionOfferRepository.establishmentAggregates[0];
@@ -139,11 +143,14 @@ describe("Transform FormEstablishment into search data", () => {
 
     // Offer
     expect(repoEstablishmentAggregate.immersionOffers).toHaveLength(
-      expected.offerRomes.length,
+      expected.offerRomeCodesAndAppellations.length,
     );
     expect(
-      repoEstablishmentAggregate.immersionOffers.map((offer) => offer.romeCode),
-    ).toEqual(expected.offerRomes);
+      repoEstablishmentAggregate.immersionOffers.map((offer) => ({
+        code: offer.romeCode,
+        appellation: offer.romeAppellation,
+      })),
+    ).toEqual(expected.offerRomeCodesAndAppellations);
   };
 
   it("correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {

@@ -36,7 +36,7 @@ describe("PgEstablishmentExportQueries", () => {
   });
 
   describe("Get for export ", () => {
-    it("Retrieves all establishments exports", async () => {
+    it("Retrieves all establishments exports where source = form", async () => {
       await establishmentAggregateRepository.insertEstablishmentAggregates([
         establishmentAggregateArtusInterim(),
         establishmentAggregateMiniWorldLyon(),
@@ -89,6 +89,29 @@ describe("PgEstablishmentExportQueries", () => {
           name: "MINI WORLD LYON",
           preferredContactMethods: "mail",
           professions: "G1205 - Agent / Agente d'exploitation des attractions",
+          siret: "79341726200037",
+        },
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: "Custom name",
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          preferredContactMethods: "mail",
+          professions: "G1205 - Agent / Agente d'exploitation des attractions",
+          siret: "79341726200037",
+        },
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: "Custom name",
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          preferredContactMethods: "mail",
+          professions:
+            "I1304 - Technicien(ne) maintenance d'équipnts de parcs d'attractions",
           siret: "79341726200037",
         },
       ]);
