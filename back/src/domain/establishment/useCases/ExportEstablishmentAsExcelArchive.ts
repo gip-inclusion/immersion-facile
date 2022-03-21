@@ -169,13 +169,13 @@ const notifyProblematicEstablishments = (
 ) => {
   if (workbookTitles.includes("postal-code-not-in-dataset"))
     notifyProblematicPostalCode(
-      "Postal code not found in dataset",
+      "(Establishment excel export) Postal code not found in dataset",
       establishmentExportByZone["postal-code-not-in-dataset"],
     );
 
   if (workbookTitles.includes("invalid-postal-code-format"))
     notifyProblematicPostalCode(
-      "Invalid postal code format for establishments",
+      "(Establishment excel export) Invalid postal code format for establishments",
       establishmentExportByZone["invalid-postal-code-format"],
     );
 };

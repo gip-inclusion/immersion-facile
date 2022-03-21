@@ -93,18 +93,18 @@ export const createApp = async (
       req,
       res,
       async () => {
-        const groupBy =
-          req.query.groupBy === "region" ? "region" : "department";
+        const groupKey =
+          req.query.groupKey === "region" ? "region" : "department";
         const aggregateProfession = req.query.aggregateProfession === "true";
         const archivePath = temporaryStoragePath(
-          `exportEstablishmentsBy${capitalize(groupBy)}${
+          `exportEstablishmentsBy${capitalize(groupKey)}${
             aggregateProfession ? "AggregatedProfessions" : ""
           }.zip`,
         );
 
         await deps.useCases.exportEstablishmentsAsExcelArchive.execute({
           archivePath,
-          groupKey: groupBy,
+          groupKey,
           aggregateProfession,
         });
 

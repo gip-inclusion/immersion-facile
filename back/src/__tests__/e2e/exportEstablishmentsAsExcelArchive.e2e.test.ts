@@ -14,7 +14,7 @@ describe("/export-establishments", () => {
 
     const result = await request
       .get(
-        `/${exportEstablismentsExcelRoute}?groupBy=region&aggregateProfession=true`,
+        `/${exportEstablismentsExcelRoute}?groupKey=region&aggregateProfession=true`,
       )
       .auth("e2e_tests", "e2e");
 
@@ -32,7 +32,7 @@ describe("/export-establishments", () => {
 
     const result = await request
       .get(
-        `/${exportEstablismentsExcelRoute}?groupBy=department&aggregateProfession=false`,
+        `/${exportEstablismentsExcelRoute}?groupKey=department&aggregateProfession=false`,
       )
       .auth("e2e_tests", "e2e");
 
