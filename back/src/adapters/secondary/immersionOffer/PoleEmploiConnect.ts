@@ -20,7 +20,7 @@ export class PoleEmploiConnect {
     const payload = {
       client_id: this.config.clientId,
       redirect_uri: encodeURI(
-        "https://immersion-facile.beta.gouv.fr/pe-connect",
+        "https://immersion-facile.beta.gouv.fr/api/pe-connect",
       ),
       response_type: "code",
       scope: encodeURI(
