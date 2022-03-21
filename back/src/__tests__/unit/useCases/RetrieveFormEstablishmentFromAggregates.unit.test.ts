@@ -1,9 +1,10 @@
 import { createInMemoryUow } from "../../../adapters/primary/config";
+import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
-import { EstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
@@ -22,7 +23,7 @@ const prepareUseCase = () => {
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
   const siret = "12345678901234";
-  const jwtPayload: EstablishmentPayload = {
+  const jwtPayload: EstablishmentJwtPayload = {
     siret,
     exp: 2,
     iat: 1,
@@ -32,7 +33,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     const { useCase } = prepareUseCase();
     await expectPromiseToFailWithError(
       useCase.execute(undefined, jwtPayload),
-      new Error(
+      new BadRequestError(
         "No establishment found with siret 12345678901234 and form data source. ",
       ),
     );
@@ -53,7 +54,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     // Act and assert
     await expectPromiseToFailWithError(
       useCase.execute(undefined, jwtPayload),
-      new Error(
+      new BadRequestError(
         "No establishment found with siret 12345678901234 and form data source. ",
       ),
     );
@@ -78,9 +79,8 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         .build(),
     ]);
     // Act
-    // TODO : find a way to give the JWT Payload
-
     const retrievedForm = await useCase.execute(undefined, jwtPayload);
+
     // Assert
     expect(retrievedForm).toBeDefined();
     const expectedForm: FormEstablishmentDto = {
@@ -93,7 +93,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       naf: establishment.nafDto,
       professions: [
         {
-          description: "",
+          description: "test_rome_label",
           romeCodeMetier: "A1101",
           romeCodeAppellation: "11987",
         },
@@ -109,5 +109,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       ],
       preferredContactMethods: [contact.contactMethod],
     };
+    expect(retrievedForm).toMatchObject(expectedForm);
   });
 });

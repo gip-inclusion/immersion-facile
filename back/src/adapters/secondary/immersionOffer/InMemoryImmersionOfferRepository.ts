@@ -11,7 +11,7 @@ import {
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
-import { path, pathEq } from "../../../shared/ramdaExtensions/path";
+import { path, pathEq, pathNotEq } from "../../../shared/ramdaExtensions/path";
 import { propEq } from "../../../shared/ramdaExtensions/propEq";
 import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
@@ -134,9 +134,10 @@ export class InMemoryImmersionOfferRepository
 
   public async getSiretOfEstablishmentsFromFormSource(): Promise<string[]> {
     return this._establishmentAggregates
-      .filter((aggregate) => aggregate.establishment.dataSource === "form")
-      .map((aggregate) => aggregate.establishment.siret);
+      .filter(pathEq("establishment.dataSource", "form"))
+      .map(path("establishment.siret"));
   }
+
   public async updateEstablishment(
     siret: string,
     propertiesToUpdate: Partial<
@@ -196,7 +197,7 @@ export class InMemoryImmersionOfferRepository
     siret: string,
   ): Promise<void> {
     this.establishmentAggregates = this._establishmentAggregates.filter(
-      (aggregate) => aggregate.establishment.siret !== siret,
+      pathNotEq("establishment.siret", siret),
     );
   }
 
@@ -238,10 +239,6 @@ export class InMemoryImmersionOfferRepository
     this._establishmentAggregates = establishmentAggregates;
   }
 }
-
-// getEstablishmentBySiret,
-//   getContactByEstablishmentSiret,
-//   getOffersByEstablishmentSiret;
 
 const buildSearchImmersionResultDto = (
   immersionOffer: ImmersionOfferEntityV2,

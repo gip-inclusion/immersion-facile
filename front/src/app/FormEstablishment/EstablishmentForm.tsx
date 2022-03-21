@@ -63,119 +63,115 @@ const EstablishmentForm = ({
   }
 
   return (
-    <Layout>
-      <div
-        className="fr-grid-row fr-grid-row--center fr-grid-row--gutters"
-        style={{ marginTop: "25px" }}
+    <div
+      className="fr-grid-row fr-grid-row--center fr-grid-row--gutters"
+      style={{ marginTop: "25px" }}
+    >
+      <Formik
+        enableReinitialize={true}
+        initialValues={initialValues}
+        validationSchema={toFormikValidationSchema(formEstablishmentSchema)}
+        onSubmit={async (data, { setSubmitting }) => {
+          try {
+            setIsSuccess(false);
+            setSubmitError(null);
+
+            formEstablishmentSchema.parse(data);
+
+            await saveForm(data);
+
+            setIsSuccess(true);
+            setSubmitError(null);
+          } catch (e: any) {
+            console.log(e);
+            setIsSuccess(false);
+            setSubmitError(e);
+          } finally {
+            setSubmitting(false);
+          }
+        }}
       >
-        <Formik
-          enableReinitialize={true}
-          initialValues={initialValues}
-          validationSchema={toFormikValidationSchema(formEstablishmentSchema)}
-          onSubmit={async (data, { setSubmitting }) => {
-            try {
-              setIsSuccess(false);
-              setSubmitError(null);
-
-              formEstablishmentSchema.parse(data);
-
-              await saveForm(data);
-
-              setIsSuccess(true);
-              setSubmitError(null);
-            } catch (e: any) {
-              console.log(e);
-              setIsSuccess(false);
-              setSubmitError(e);
-            } finally {
-              setSubmitting(false);
-            }
-          }}
-        >
-          {({ isSubmitting, submitCount, errors, values }) => (
-            <div style={{ margin: "5px 12px", maxWidth: "600px" }}>
-              <p>
-                Bienvenue sur l'espace de référencement des entreprises
-                volontaires pour l'accueil des immersions professionnelles.
-              </p>
-              <p className="mt-4">
-                Ce formulaire vous permet d'indiquer les métiers de votre
-                établissement ouverts aux immersions. Si votre entreprise
-                comprend plusieurs établissements, il convient de renseigner un
-                formulaire pour chaque établissement (Siret différent).
-              </p>
-              <Form>
-                <span className="py-6 block text-lg font-semibold">
-                  Votre établissement
-                </span>
-                {children}
-                {/* <SiretRelatedInputs /> */}
-                <p className="mt-4" />
-                <BoolCheckboxGroup
-                  {...getLabelAndName("isEngagedEnterprise")}
-                  description=""
-                  descriptionLink=""
-                  disabled={false}
-                />
-                <ProfessionList
-                  name="professions"
-                  title={`${fieldsToLabel["professions"]} *`}
-                />
-                <BusinessContactList />
-                <RadioGroupForField
-                  {...getLabelAndName("preferredContactMethods")}
-                  options={preferredContactMethodOptions}
-                />
-                {submitCount !== 0 && Object.values(errors).length > 0 && (
-                  <div style={{ color: "red" }}>
-                    {console.log(errors)}
-                    Veuillez corriger les champs erronés :
-                    <ul>
-                      {(Object.keys(errors) as FieldsWithLabel[]).map(
-                        (field) => {
-                          const err = errors[field];
-                          return typeof err === "string" ? (
-                            <li key={field}>
-                              {fieldsToLabel[field] || field}: {err}
-                            </li>
-                          ) : null;
-                        },
-                      )}
-                    </ul>
-                  </div>
-                )}
-                <br />
-                {submitError && (
-                  <>
-                    <ErrorMessage title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. ">
-                      {errorMessage}
-                    </ErrorMessage>
-                    <br />
-                  </>
-                )}
-                {isSuccess && (
-                  <SuccessMessage title="Succès de l'envoi">
-                    Succès. Nous avons bien enregistré les informations
-                    concernant votre entreprise.
-                  </SuccessMessage>
-                )}
-                {!isSuccess && (
-                  <button
-                    className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
-                    Enregistrer mes informations
-                  </button>
-                )}
-              </Form>
+        {({ isSubmitting, submitCount, errors, values }) => (
+          <div style={{ margin: "5px 12px", maxWidth: "600px" }}>
+            <p>
+              Bienvenue sur l'espace de référencement des entreprises
+              volontaires pour l'accueil des immersions professionnelles.
+            </p>
+            <p className="mt-4">
+              Ce formulaire vous permet d'indiquer les métiers de votre
+              établissement ouverts aux immersions. Si votre entreprise comprend
+              plusieurs établissements, il convient de renseigner un formulaire
+              pour chaque établissement (Siret différent).
+            </p>
+            <Form>
+              <span className="py-6 block text-lg font-semibold">
+                Votre établissement
+              </span>
+              {children}
+              {/* <SiretRelatedInputs /> */}
+              <p className="mt-4" />
+              <BoolCheckboxGroup
+                {...getLabelAndName("isEngagedEnterprise")}
+                description=""
+                descriptionLink=""
+                disabled={false}
+              />
+              <ProfessionList
+                name="professions"
+                title={`${fieldsToLabel["professions"]} *`}
+              />
+              <BusinessContactList />
+              <RadioGroupForField
+                {...getLabelAndName("preferredContactMethods")}
+                options={preferredContactMethodOptions}
+              />
+              {submitCount !== 0 && Object.values(errors).length > 0 && (
+                <div style={{ color: "red" }}>
+                  {console.log(errors)}
+                  Veuillez corriger les champs erronés :
+                  <ul>
+                    {(Object.keys(errors) as FieldsWithLabel[]).map((field) => {
+                      const err = errors[field];
+                      return typeof err === "string" ? (
+                        <li key={field}>
+                          {fieldsToLabel[field] || field}: {err}
+                        </li>
+                      ) : null;
+                    })}
+                  </ul>
+                </div>
+              )}
               <br />
-              <br />
-            </div>
-          )}
-        </Formik>
-      </div>
-    </Layout>
+              {submitError && (
+                <>
+                  <ErrorMessage title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. ">
+                    {errorMessage}
+                  </ErrorMessage>
+                  <br />
+                </>
+              )}
+              {isSuccess && (
+                <SuccessMessage title="Succès de l'envoi">
+                  Succès. Nous avons bien enregistré les informations concernant
+                  votre entreprise.
+                </SuccessMessage>
+              )}
+              {!isSuccess && (
+                <button
+                  className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  Enregistrer mes informations
+                </button>
+              )}
+            </Form>
+            <br />
+            <br />
+          </div>
+        )}
+      </Formik>
+    </div>
   );
 };
 
@@ -219,9 +215,10 @@ const CreationSiretRelatedInputs = () => {
   const featureFlags = useFeatureFlagsContext();
 
   const businessLabelAndName = getLabelAndName("businessAddress");
-  const { setValue: setAddressValue } = useField<string>(
+
+  const [_, __, { setValue: setAddressValue }] = useField<string>(
     businessLabelAndName.name,
-  )[2];
+  );
 
   return (
     <>
@@ -320,9 +317,7 @@ export const EstablishmentEditionForm = ({
     if (!route.params.jwt) return;
     formEstablishmentGateway
       .getFormEstablishmentFromJwt(route.params.jwt)
-      .then((retrievedForm) => {
-        return setInitialValues(retrievedForm);
-      });
+      .then(setInitialValues);
   }, [route.params.jwt]);
 
   if (!route.params.jwt) {
@@ -333,11 +328,11 @@ export const EstablishmentEditionForm = ({
   return (
     <EstablishmentForm
       initialValues={initialValues}
-      saveForm={async (data) => {
+      saveForm={(data) =>
         formEstablishmentGateway.updateFormEstablishment({
           ...data,
-        });
-      }}
+        })
+      }
     >
       <EditionSiretRelatedInputs
         businessAddress={initialValues.businessAddress}

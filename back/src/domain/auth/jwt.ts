@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import {
-  EstablishmentPayload,
+  EstablishmentJwtPayload,
   PayloadOption,
 } from "../../shared/tokens/MagicLinkPayload";
 import { WithApiConsumerId } from "../core/valueObjects/ApiConsumer";
@@ -11,7 +11,7 @@ type AnyObject = Record<string, unknown>;
 
 export type GenerateMagicLinkJwt = GenerateJwtFn<PayloadOption>;
 export type GenerateEditFormEstablishmentUrl =
-  GenerateJwtFn<EstablishmentPayload>;
+  GenerateJwtFn<EstablishmentJwtPayload>;
 
 export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
 

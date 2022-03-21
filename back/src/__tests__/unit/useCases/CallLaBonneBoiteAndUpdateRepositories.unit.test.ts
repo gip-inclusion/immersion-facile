@@ -169,7 +169,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       // Act : this establishment is referenced in LBB
       await useCase.execute(dto);
 
-      // Assert : Should have skiped this establishment
+      // Assert : Should have skipped this establishment
       expect(immersionOfferRepository.establishmentAggregates).toEqual([
         alreadyExistingAggregateFromForm,
       ]);

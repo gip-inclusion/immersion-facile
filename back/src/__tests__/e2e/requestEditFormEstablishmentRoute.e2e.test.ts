@@ -1,6 +1,6 @@
 import { addHours } from "date-fns";
 import { SuperTest, Test } from "supertest";
-import { EstablishmentPayload } from "../../shared/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "../../shared/tokens/MagicLinkPayload";
 import {
   buildTestApp,
   InMemoryRepositories,
@@ -15,10 +15,10 @@ describe("Route to generate an establishment edition link", () => {
     reposAndGateways.immersionOffer.getContactEmailFromSiret = async () =>
       "erik@gmail.com";
   });
-  it("Returns 500 with an error message if previous edit link for this siret has not yet expired", async () => {
+  it("Returns 400 with an error message if previous edit link for this siret has not yet expired", async () => {
     // Prepare
     const now = new Date();
-    const lastPayload: EstablishmentPayload = {
+    const lastPayload: EstablishmentJwtPayload = {
       siret: "11111111111111",
       iat: now.getTime(),
       exp: addHours(now, 24).getTime(),
@@ -30,7 +30,7 @@ describe("Route to generate an establishment edition link", () => {
     // Act and assert
     await request
       .get("/request-email-to-update-form/11111111111111")
-      .expect(500, {
+      .expect(400, {
         errors: `Un email a déjà été envoyé au contact référent de l'établissement le ${new Date(
           lastPayload.iat,
         ).toLocaleDateString("fr-FR")}`,

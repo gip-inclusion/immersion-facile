@@ -5,6 +5,7 @@ import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
 import { random, sleep } from "../../shared/utils";
 import { createLogger } from "../../utils/logger";
 import { notifyDiscord } from "../../utils/notifyDiscord";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { RealClock } from "../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
@@ -71,8 +72,8 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     ),
   );
   const poleEmploiGateway = new PgRomeGateway(clientOrigin);
-
-  const pgUowPerformer = new PgUowPerformer(getPgPoolFn(), createPgUow);
+  const testPool = getTestPgPool();
+  const pgUowPerformer = new PgUowPerformer(testPool, createPgUow);
 
   const upsertAggregateFromForm = new UpsertEstablishmentAggregateFromForm(
     pgUowPerformer,
@@ -135,6 +136,3 @@ transformPastFormEstablishmentsIntoSearchableData(
   config.pgImmersionDbUrl,
   config.pgImmersionDbUrl,
 );
-function getPgPoolFn(): Pool {
-  throw new Error("Function not implemented.");
-}

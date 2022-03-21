@@ -4,7 +4,7 @@ import { SiretDto } from "../siret";
 
 export type JwtPayloads = {
   application?: MagicLinkPayload;
-  establishment?: EstablishmentPayload;
+  establishment?: EstablishmentJwtPayload;
 };
 
 type ValueOf<T> = T[keyof T];
@@ -62,14 +62,14 @@ export const createMagicLinkPayload = (
   emailHash: emailHashForMagicLink(email),
 });
 
-export type EstablishmentPayload = {
+export type EstablishmentJwtPayload = {
   siret: string;
   iat: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
   exp: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
   version: number;
 };
 
-export const createEstablishmentPayload = ({
+export const createEstablishmentJwtPayload = ({
   siret,
   durationDays,
   now,
@@ -77,7 +77,7 @@ export const createEstablishmentPayload = ({
   siret: SiretDto;
   durationDays: number;
   now: Date;
-}): EstablishmentPayload => {
+}): EstablishmentJwtPayload => {
   const iat = Math.round(now.getTime() / 1000);
   const exp = iat + durationDays * 24 * 3600;
 

@@ -54,7 +54,9 @@ export class PgFormEstablishmentRepository
       throw new ConflictError(`Cannot create form establishment with siret ${formEstablishmentDto.siret}`)
     }
   }
-  public async edit(formEstablishmentDto: FormEstablishmentDto): Promise<void> {
+  public async update(
+    formEstablishmentDto: FormEstablishmentDto,
+  ): Promise<void> {
     const query = `UPDATE form_establishments SET 
                   source=$2,
                   business_name=$3,

@@ -12,7 +12,7 @@ import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
-import { EstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
@@ -43,7 +43,7 @@ describe("Edit Form Establishment", () => {
           FormEstablishmentDtoBuilder.valid()
             .withSiret(siretInFormEstablishment)
             .build(),
-          { siret: siretInJwtPayload } as EstablishmentPayload,
+          { siret: siretInJwtPayload } as EstablishmentJwtPayload,
         ),
         new ForbiddenError(),
       );
@@ -51,7 +51,7 @@ describe("Edit Form Establishment", () => {
   });
   describe("Siret in JWT Payload matches siret in edited establishment DTO", () => {
     const formSiret = "12345678901234";
-    const payload = { siret: formSiret } as EstablishmentPayload;
+    const payload = { siret: formSiret } as EstablishmentJwtPayload;
 
     describe("If establishment form id already exists", () => {
       const existingDto: FormEstablishmentDto =

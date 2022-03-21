@@ -21,7 +21,7 @@ export class InMemoryFormEstablishmentRepository
     logger.debug({ immersionOffer: dto }, "Creating a new Immersion Offer");
     this.formEstablishments.push(dto);
   }
-  public async edit(dto: FormEstablishmentDto): Promise<void> {
+  public async update(dto: FormEstablishmentDto): Promise<void> {
     if (!(await this.getBySiret(dto.siret))) {
       const message = `Cannot update form establishlment DTO with siret ${dto.siret}, since it is not in list.`;
       logger.info({ dto: dto }, message);

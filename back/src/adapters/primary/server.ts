@@ -249,13 +249,6 @@ export const createApp = async (
       );
     });
 
-  router.route(`/${"retrieveFormFromJwt"}/:jwt`).get(async (req, res) => {
-    return sendHttpResponse(req, res, async () => {
-      if (!req.payloads?.application) throw new UnauthorizedError();
-
-      return deps.useCases.retrieveFormEstablishmentFromAggregates.execute();
-    });
-  });
   router
     .route(`/${getFeatureFlags}`)
     .get(async (req, res) =>

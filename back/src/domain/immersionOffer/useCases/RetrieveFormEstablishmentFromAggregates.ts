@@ -1,13 +1,14 @@
 import { z } from "zod";
+import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
-import { EstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   void,
   FormEstablishmentDto,
-  EstablishmentPayload
+  EstablishmentJwtPayload
 > {
   inputSchema = z.void();
 
@@ -18,19 +19,19 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   protected async _execute(
     _: void,
     uow: UnitOfWork,
-    { siret }: EstablishmentPayload,
+    { siret }: EstablishmentJwtPayload,
   ) {
     const establishment = await uow.immersionOfferRepo.getEstablishmentForSiret(
       siret,
     );
     if (!establishment || establishment?.dataSource !== "form")
-      throw new Error(
+      throw new BadRequestError(
         `No establishment found with siret ${siret} and form data source. `,
       );
 
     const contact =
       await uow.immersionOfferRepo.getContactForEstablishmentSiret(siret);
-    if (!contact) throw new Error("No contact ");
+    if (!contact) throw new BadRequestError("No contact ");
 
     const offers =
       await uow.immersionOfferRepo.getAnnotatedImmersionOffersForEstablishmentSiret(

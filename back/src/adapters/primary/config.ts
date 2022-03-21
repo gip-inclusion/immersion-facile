@@ -53,7 +53,7 @@ import { ImmersionApplicationId } from "../../shared/ImmersionApplicationDto";
 import { frontRoutes } from "../../shared/routes";
 import {
   createMagicLinkPayload,
-  EstablishmentPayload,
+  EstablishmentJwtPayload,
   Role,
 } from "../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
@@ -199,10 +199,10 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
 export const makeGenerateEditFormEstablishmentUrl = (
   config: AppConfig,
 ): GenerateEditFormEstablishmentUrl => {
-  const generateJwt = makeGenerateJwt<EstablishmentPayload>(
+  const generateJwt = makeGenerateJwt<EstablishmentJwtPayload>(
     config.magicLinkJwtPrivateKey,
   );
-  return (payload: EstablishmentPayload) => {
+  return (payload: EstablishmentJwtPayload) => {
     const editJwt = generateJwt(payload);
     return `${config.immersionFacileBaseUrl}/${frontRoutes.editFormEstablishmentRoute}?jwt=${editJwt}`;
   };

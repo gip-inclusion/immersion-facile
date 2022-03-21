@@ -5,7 +5,7 @@ import {
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { createLogger } from "../../../utils/logger";
 import { eventToDebugInfo } from "../../../domain/core/eventBus/events";
-import { EstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 
 const logger = createLogger(__filename);
 
@@ -58,12 +58,12 @@ export class InMemoryOutboxRepository implements OutboxRepository {
   }
   public async getLastPayloadOfFormEstablishmentEditLinkSentWithSiret(
     siret: string,
-  ): Promise<EstablishmentPayload | undefined> {
+  ): Promise<EstablishmentJwtPayload | undefined> {
     return this._events.find((event) => {
       if (event.topic !== "FormEstablishmentEditLinkSent") return false;
-      const payload = event.payload as EstablishmentPayload;
+      const payload = event.payload as EstablishmentJwtPayload;
       return payload.siret === siret;
-    })?.payload as EstablishmentPayload;
+    })?.payload as EstablishmentJwtPayload;
   }
 
   //test purposes

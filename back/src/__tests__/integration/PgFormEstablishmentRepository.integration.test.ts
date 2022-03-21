@@ -72,7 +72,7 @@ describe("PgFormEstablishmentRepository", () => {
       await formEstablishmentRepository.create(formEstablishment);
 
       // Act
-      await formEstablishmentRepository.edit({
+      await formEstablishmentRepository.update({
         ...formEstablishment,
         businessName: "newName",
       });

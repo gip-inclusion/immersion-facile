@@ -945,18 +945,21 @@ describe("Postgres implementation of immersion offer repository", () => {
       const siretFromForm2 = "22222222222222";
       const siretFromLBB = "33333333333333";
 
-      await insertEstablishment({
-        siret: siretFromForm1,
-        dataSource: "form",
-      });
-      await insertEstablishment({
-        siret: siretFromForm2,
-        dataSource: "form",
-      });
-      await insertEstablishment({
-        siret: siretFromLBB,
-        dataSource: "api_labonneboite",
-      });
+      await Promise.all([
+        insertEstablishment({
+          siret: siretFromForm1,
+          dataSource: "form",
+        }),
+        insertEstablishment({
+          siret: siretFromForm2,
+          dataSource: "form",
+        }),
+        insertEstablishment({
+          siret: siretFromLBB,
+          dataSource: "api_labonneboite",
+        }),
+      ]);
+
       // Act
       const actualSiretOfEstablishmentsFromFormSource =
         await pgImmersionOfferRepository.getSiretOfEstablishmentsFromFormSource();
@@ -973,27 +976,32 @@ describe("Postgres implementation of immersion offer repository", () => {
       const siretToRemove = "11111111111111";
       const siretToKeep = "22222222222222";
 
-      await insertEstablishment({
-        siret: siretToRemove,
-      });
-      await insertEstablishment({
-        siret: siretToKeep,
-      });
-      await insertImmersionOffer({
-        uuid: testUid1,
-        romeCode: "A1401",
-        siret: siretToRemove,
-      });
-      await insertImmersionOffer({
-        uuid: testUid2,
-        romeCode: "A1405",
-        siret: siretToRemove,
-      });
-      await insertImmersionOffer({
-        uuid: testUid3,
-        romeCode: "A1405",
-        siret: siretToKeep,
-      });
+      await Promise.all([
+        insertEstablishment({
+          siret: siretToRemove,
+        }),
+        insertEstablishment({
+          siret: siretToKeep,
+        }),
+      ]);
+      await Promise.all([
+        insertImmersionOffer({
+          uuid: testUid1,
+          romeCode: "A1401",
+          siret: siretToRemove,
+        }),
+        insertImmersionOffer({
+          uuid: testUid2,
+          romeCode: "A1405",
+          siret: siretToRemove,
+        }),
+        insertImmersionOffer({
+          uuid: testUid3,
+          romeCode: "A1405",
+          siret: siretToKeep,
+        }),
+      ]);
+
       // Act
       await pgImmersionOfferRepository.removeEstablishmentAndOffersWithSiret(
         siretToRemove,
@@ -1149,7 +1157,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   > =>
     client
       .query(
-        `SELECT * FROM immersion_contacts ic JOIN establishments__immersion_contacts eic
+        `SELECT * FROM immersion_contacts AS ic JOIN establishments__immersion_contacts AS eic
          ON ic.uuid = eic.contact_uuid WHERE contact_uuid IS NOT NULL`,
       )
       .then((res) => res.rows);

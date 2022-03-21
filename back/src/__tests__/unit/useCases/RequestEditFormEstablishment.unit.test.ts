@@ -1,4 +1,5 @@
 import { createInMemoryUow } from "../../../adapters/primary/config";
+import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -11,7 +12,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
-import { EstablishmentPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 const siret = "12345678912345";
@@ -40,7 +41,7 @@ const prepareUseCase = () => {
     outboxRepo,
   });
 
-  const generateEditFormEstablishmentUrl = (payload: EstablishmentPayload) =>
+  const generateEditFormEstablishmentUrl = (payload: EstablishmentJwtPayload) =>
     `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
 
   const useCase = new RequestEditFormEstablishment(
@@ -121,7 +122,7 @@ describe("RequestUpdateFormEstablishment", () => {
       // Act and assert
       await expectPromiseToFailWithError(
         useCase.execute(siret),
-        Error(
+        new BadRequestError(
           "Un email a déjà été envoyé au contact référent de l'établissement le 01/01/2021",
         ),
       );

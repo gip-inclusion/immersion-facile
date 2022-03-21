@@ -8,7 +8,7 @@ import {
 } from "../../domain/core/valueObjects/ApiConsumer";
 import {
   currentJwtVersions,
-  EstablishmentPayload,
+  EstablishmentJwtPayload,
   MagicLinkPayload,
   PayloadKey,
   PayloadOption,
@@ -142,7 +142,7 @@ export const createJwtAuthMiddleware = (
           req.payloads = { application: payload as MagicLinkPayload };
           break;
         case "establishment":
-          req.payloads = { establishment: payload as EstablishmentPayload };
+          req.payloads = { establishment: payload as EstablishmentJwtPayload };
           break;
         default:
           const neverAssigned: never = payloadKey;
