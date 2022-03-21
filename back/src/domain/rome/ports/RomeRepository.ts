@@ -14,7 +14,7 @@ export type RomeAppellation = {
   codeMetier: RomeCodeMetierDto;
 };
 
-export interface RomeGateway {
+export interface RomeRepository {
   appellationToCodeMetier(
     romeCodeAppellation: RomeCodeAppellationDto,
   ): Promise<RomeCodeMetierDto | undefined>;

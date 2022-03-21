@@ -1,12 +1,12 @@
-import { RomeGateway } from "../../../domain/rome/ports/RomeGateway";
-import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGateway";
+import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
+import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 
 describe("RomeSearch", () => {
-  let gateway: RomeGateway;
+  let gateway: RomeRepository;
 
   beforeEach(() => {
-    gateway = new InMemoryRomeGateway();
+    gateway = new InMemoryRomeRepository();
   });
 
   const createUseCase = () => {

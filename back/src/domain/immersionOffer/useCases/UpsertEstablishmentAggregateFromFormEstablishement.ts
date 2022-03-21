@@ -9,7 +9,7 @@ import { SequenceRunner } from "../../core/ports/SequenceRunner";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { RomeGateway } from "../../rome/ports/RomeGateway";
+import { RomeRepository } from "../../rome/ports/RomeRepository";
 import {
   SireneEstablishmentVO,
   SireneRepository,
@@ -34,7 +34,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private readonly sireneRepository: SireneRepository,
     private readonly adresseAPI: AdresseAPI,
-    private readonly romeGateway: RomeGateway,
+    private readonly romeRepository: RomeRepository,
     private readonly sequenceRunner: SequenceRunner,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,

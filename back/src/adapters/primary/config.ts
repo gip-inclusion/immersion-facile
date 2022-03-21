@@ -46,7 +46,7 @@ import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOf
 import { NotifyContactRequest } from "../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
 import { UpsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpsertEstablishmentAggregateFromFormEstablishement";
-import { RomeGateway } from "../../domain/rome/ports/RomeGateway";
+import { RomeRepository } from "../../domain/rome/ports/RomeRepository";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { frontRoutes } from "../../shared/routes";
@@ -84,7 +84,7 @@ import { InMemoryAgencyRepository } from "../secondary/InMemoryAgencyRepository"
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
-import { InMemoryRomeGateway } from "../secondary/InMemoryRomeGateway";
+import { InMemoryRomeRepository } from "../secondary/InMemoryRomeRepository";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../secondary/InMemoryUowPerformer";
 import { makePgGetFeatureFlags } from "../secondary/pg/makePgGetFeatureFlags";
@@ -95,7 +95,7 @@ import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApp
 import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
 import { PgLaBonneBoiteRequestRepository } from "../secondary/pg/PgLaBonneBoiteRequestRepository";
 import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
-import { PgRomeGateway } from "../secondary/pg/PgRomeGateway";
+import { PgRomeRepository } from "../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../secondary/pg/PgSearchMadeRepository";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
@@ -182,10 +182,10 @@ export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
   let pgPool: Pool;
   return () => {
-    if (config.repositories !== "PG" && config.romeGateway !== "PG")
+    if (config.repositories !== "PG" && config.romeRepository !== "PG")
       throw new Error(
         `Unexpected pg pool creation: REPOSITORIES=${config.repositories},
-         ROME_GATEWAY=${config.romeGateway}`,
+         ROME_GATEWAY=${config.romeRepository}`,
       );
     if (!pgPool) {
       const { host, pathname } = new URL(config.pgImmersionDbUrl);
@@ -221,7 +221,7 @@ export const createRepositories = async (
     repositories: config.repositories,
     sireneRepository: config.sireneRepository,
     emailGateway: config.emailGateway,
-    romeGateway: config.romeGateway,
+    romeRepository: config.romeRepository,
   });
 
   return {
@@ -285,7 +285,7 @@ export const createRepositories = async (
         ? SendinblueEmailGateway.create(config.sendinblueApiKey)
         : new InMemoryEmailGateway(),
 
-    rome: await createRomeGateway(config, getPgPoolFn),
+    rome: await createRomeRepostiory(config, getPgPoolFn),
 
     outbox:
       config.repositories === "PG"
@@ -325,15 +325,15 @@ export const createRepositories = async (
   };
 };
 
-const createRomeGateway = async (
+const createRomeRepostiory = async (
   config: AppConfig,
   getPgPoolFn: GetPgPoolFn,
-): Promise<RomeGateway> => {
-  switch (config.romeGateway) {
+): Promise<RomeRepository> => {
+  switch (config.romeRepository) {
     case "PG":
-      return new PgRomeGateway(await getPgPoolFn().connect());
+      return new PgRomeRepository(await getPgPoolFn().connect());
     default:
-      return new InMemoryRomeGateway();
+      return new InMemoryRomeRepository();
   }
 };
 

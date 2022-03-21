@@ -112,7 +112,7 @@ export class AppConfig {
 
   // == Rome gateway ==
 
-  public get romeGateway() {
+  public get romeRepository() {
     return throwIfNotInArray({
       processEnv: this.env,
       variableName: "ROME_GATEWAY",

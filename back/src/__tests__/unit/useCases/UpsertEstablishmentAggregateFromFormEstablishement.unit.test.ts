@@ -3,7 +3,7 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
-import { InMemoryRomeGateway } from "../../../adapters/secondary/InMemoryRomeGateway";
+import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
@@ -71,7 +71,7 @@ describe("Upsert Establishment aggregate from form data", () => {
     immersionOfferRepo = new InMemoryImmersionOfferRepository();
     addresseAPI = new InMemoryAdresseAPI(fakePosition);
     uuidGenerator = new TestUuidGenerator();
-    const inMemoryRomeGateway = new InMemoryRomeGateway();
+    const inMemoryRomeRepository = new InMemoryRomeRepository();
     const sequencerRunner = new TestSequenceRunner();
 
     const uowPerformer = new InMemoryUowPerformer({
@@ -83,7 +83,7 @@ describe("Upsert Establishment aggregate from form data", () => {
       uowPerformer,
       sireneRepo,
       addresseAPI,
-      inMemoryRomeGateway,
+      inMemoryRomeRepository,
       sequencerRunner,
       uuidGenerator,
       new CustomClock(),

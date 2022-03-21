@@ -1,14 +1,14 @@
 import { PoolClient } from "pg";
 import {
   RomeAppellation,
-  RomeGateway,
+  RomeRepository,
   RomeMetier,
-} from "../../../domain/rome/ports/RomeGateway";
+} from "../../../domain/rome/ports/RomeRepository";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
-export class PgRomeGateway implements RomeGateway {
+export class PgRomeRepository implements RomeRepository {
   constructor(private client: PoolClient) {}
 
   appellationToCodeMetier(

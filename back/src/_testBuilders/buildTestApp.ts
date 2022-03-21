@@ -12,7 +12,7 @@ import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAge
 import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
 import type { InMemoryImmersionApplicationRepository } from "../adapters/secondary/InMemoryImmersionApplicationRepository";
-import { InMemoryRomeGateway } from "../adapters/secondary/InMemoryRomeGateway";
+import { InMemoryRomeRepository } from "../adapters/secondary/InMemoryRomeRepository";
 import { InMemorySireneRepository } from "../adapters/secondary/InMemorySireneRepository";
 import { GetApiConsumerById } from "../domain/core/ports/GetApiConsumerById";
 import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
@@ -34,7 +34,7 @@ export type InMemoryRepositories = {
   formEstablishment: InMemoryFormEstablishmentRepository;
   immersionApplication: InMemoryImmersionApplicationRepository;
   searchesMade: InMemorySearchMadeRepository;
-  rome: InMemoryRomeGateway;
+  rome: InMemoryRomeRepository;
   email: InMemoryEmailGateway;
   sirene: InMemorySireneRepository;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;

@@ -1,8 +1,8 @@
 import {
   RomeAppellation,
-  RomeGateway,
+  RomeRepository,
   RomeMetier,
-} from "../../domain/rome/ports/RomeGateway";
+} from "../../domain/rome/ports/RomeRepository";
 import { RomeCodeAppellationDto, RomeCodeMetierDto } from "../../shared/rome";
 import { createLogger } from "../../utils/logger";
 import { normalize } from "../../utils/textSearch";
@@ -71,7 +71,7 @@ const appellationsToRome: Array<{
   { codeAppellation: "20714", rome: "B1602" },
 ];
 
-export class InMemoryRomeGateway implements RomeGateway {
+export class InMemoryRomeRepository implements RomeRepository {
   public async appellationToCodeMetier(
     romeCodeAppellation: RomeCodeAppellationDto,
   ): Promise<RomeCodeMetierDto | undefined> {
