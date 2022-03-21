@@ -45,6 +45,7 @@ export const statusTransitionConfigs: Record<
     validInitialStatuses: [
       "IN_REVIEW",
       "READY_TO_SIGN",
+      "PARTIALLY_SIGNED",
       "ACCEPTED_BY_COUNSELLOR",
       "ACCEPTED_BY_VALIDATOR",
     ],

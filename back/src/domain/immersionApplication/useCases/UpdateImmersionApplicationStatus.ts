@@ -64,7 +64,9 @@ export class UpdateImmersionApplicationStatus extends UseCase<
         immersionApplication.status,
       )
     ) {
-      throw new BadRequestError(status);
+      throw new BadRequestError(
+        `Cannot go from status '${immersionApplication.status}' to '${status}'`,
+      );
     }
 
     const updatedEntity = ImmersionApplicationEntity.create({

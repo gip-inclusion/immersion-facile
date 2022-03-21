@@ -61,6 +61,16 @@ describe("UpdateImmersionApplicationStatus", () => {
       }));
   });
 
+  describe("PARTIALLY_SIGNED -> REJECTED transition", () => {
+    test("admin can reject applications that are PARTIALLY_SIGNED", () =>
+      testAcceptsStatusUpdate({
+        role: "admin",
+        oldStatus: "PARTIALLY_SIGNED",
+        newStatus: "REJECTED",
+        expectedDomainTopic: "ImmersionApplicationRejected",
+      }));
+  });
+
   describe("IN_REVIEW -> ACCEPTED_BY_COUNSELLOR transition", () => {
     test("accepted from counsellor", () =>
       testAcceptsStatusUpdate({
@@ -212,14 +222,18 @@ describe("UpdateImmersionApplicationStatus", () => {
       role: "counsellor",
       oldStatus: "VALIDATED",
       newStatus: "ACCEPTED_BY_COUNSELLOR",
-      expectedError: new BadRequestError("ACCEPTED_BY_COUNSELLOR"),
+      expectedError: new BadRequestError(
+        "Cannot go from status 'VALIDATED' to 'ACCEPTED_BY_COUNSELLOR'",
+      ),
     }));
   test("rejects invalid transition target status", () =>
     testRejectsStatusUpdate({
       role: "counsellor",
       oldStatus: "ACCEPTED_BY_VALIDATOR",
       newStatus: "ACCEPTED_BY_COUNSELLOR",
-      expectedError: new BadRequestError("ACCEPTED_BY_COUNSELLOR"),
+      expectedError: new BadRequestError(
+        "Cannot go from status 'ACCEPTED_BY_VALIDATOR' to 'ACCEPTED_BY_COUNSELLOR'",
+      ),
     }));
   test("fails for unknown application ids", () =>
     expectPromiseToFailWithError(
