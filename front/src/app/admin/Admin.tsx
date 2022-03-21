@@ -82,6 +82,7 @@ export const Admin = ({ route }: AdminProps) => {
             >
               Exporter les demandes d'immersion par agences
             </a>
+            <br/>
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
@@ -93,6 +94,7 @@ export const Admin = ({ route }: AdminProps) => {
               Exporter les entreprises référencées par région avec aggrégation
               des métiers
             </a>
+            <br/>
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
@@ -104,6 +106,7 @@ export const Admin = ({ route }: AdminProps) => {
               Exporter les entreprises référencées par département avec
               aggrégation des métiers
             </a>
+            <br/>
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
@@ -115,6 +118,7 @@ export const Admin = ({ route }: AdminProps) => {
               Exporter les entreprises référencées par région sans aggrégation
               des métiers
             </a>
+            <br/>
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({

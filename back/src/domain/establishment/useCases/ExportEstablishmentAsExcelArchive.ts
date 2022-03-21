@@ -146,7 +146,7 @@ export const establishmentsExportByZoneColumnsOptions = (
     },
     {
       header: 'Appartenance Réseau "Les Entreprises s\'engagent"',
-      key: " isCommited",
+      key: "isCommited",
       width: 25,
     },
     {
@@ -276,7 +276,7 @@ const toWorkbook = (
     .withTitle(workbookTitle)
     .withSheet()
     .withConditionalFormatting("main", {
-      ref: `I2:I${establishments.length}`,
+      ref: `H2:I${establishments.length}`,
       rules: [
         {
           priority: 0,

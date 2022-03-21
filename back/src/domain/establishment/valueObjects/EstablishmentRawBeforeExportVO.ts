@@ -41,7 +41,7 @@ const translateBoolean = (value: boolean): string =>
   value ? "Oui" : "Non déclaré";
 
 const translateContactMethod: Record<string, string> = {
-  ["PHONE"]: "Téléphone",
-  ["EMAIL"]: "Email",
-  ["IN_PERSON"]: "En personne",
+  phone: "Téléphone",
+  mail: "Email",
+  in_person: "En personne",
 };
