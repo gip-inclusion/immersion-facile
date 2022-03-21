@@ -51,6 +51,16 @@ describe("UpdateImmersionApplicationStatus", () => {
     );
   });
 
+  describe("READY_TO_SIGN -> REJECTED transition", () => {
+    test("admin can reject applications that are READY_TO_SIGN", () =>
+      testAcceptsStatusUpdate({
+        role: "admin",
+        oldStatus: "READY_TO_SIGN",
+        newStatus: "REJECTED",
+        expectedDomainTopic: "ImmersionApplicationRejected",
+      }));
+  });
+
   describe("IN_REVIEW -> ACCEPTED_BY_COUNSELLOR transition", () => {
     test("accepted from counsellor", () =>
       testAcceptsStatusUpdate({

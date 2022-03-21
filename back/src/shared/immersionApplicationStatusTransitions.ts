@@ -44,6 +44,7 @@ export const statusTransitionConfigs: Record<
   REJECTED: {
     validInitialStatuses: [
       "IN_REVIEW",
+      "READY_TO_SIGN",
       "ACCEPTED_BY_COUNSELLOR",
       "ACCEPTED_BY_VALIDATOR",
     ],
