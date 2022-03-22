@@ -6,8 +6,6 @@ import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentE
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { PgEstablishmentExportQueries } from "../../adapters/secondary/pg/PgEstablishmentExportQueries";
-import { groupBy, reduceBy, uniq } from "ramda";
-import { EstablishmentRawProps } from "../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 import { format } from "date-fns";
 
 describe("PgEstablishmentExportQueries", () => {
@@ -35,7 +33,7 @@ describe("PgEstablishmentExportQueries", () => {
     await pool.end();
   });
 
-  describe("Get for export ", () => {
+  describe("Get for export", () => {
     it("Retrieves all establishments exports where source = form", async () => {
       await establishmentAggregateRepository.insertEstablishmentAggregates([
         establishmentAggregateArtusInterim(),

@@ -52,7 +52,7 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("READY_TO_SIGN -> REJECTED transition", () => {
-    test("admin can reject applications that are READY_TO_SIGN", () =>
+    it("admin can reject applications that are READY_TO_SIGN", () =>
       testAcceptsStatusUpdate({
         role: "admin",
         oldStatus: "READY_TO_SIGN",
@@ -62,7 +62,7 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("PARTIALLY_SIGNED -> REJECTED transition", () => {
-    test("admin can reject applications that are PARTIALLY_SIGNED", () =>
+    it("admin can reject applications that are PARTIALLY_SIGNED", () =>
       testAcceptsStatusUpdate({
         role: "admin",
         oldStatus: "PARTIALLY_SIGNED",

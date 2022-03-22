@@ -17,7 +17,7 @@ import "./Admin.css";
 import { ApiDataContainer } from "./ApiDataContainer";
 import {
   exportEstablismentsExcelRoute,
-  exportImmersionApplicationsExcelRoute,
+  exportImmersionApplicationsExcelRoute, loginPeConnect,
 } from "../../shared/routes";
 import { EstablishmentExportConfigDto } from "../../shared/establishmentExport/establishmentExport.dto";
 import { keys } from "ramda";
@@ -138,7 +138,7 @@ export const Admin = ({ route }: AdminProps) => {
           </>
           <div className="pe-connect flex justify-center">
             <a
-              href="/api/login-pe-connect"
+              href={`/api/${loginPeConnect}`}
               className="button-pe-connect"
               title=""
             >

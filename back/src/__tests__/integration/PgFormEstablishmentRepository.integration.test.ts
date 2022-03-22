@@ -2,7 +2,6 @@ import { Pool, PoolClient } from "pg";
 import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
 import { PgFormEstablishmentRepository } from "../../adapters/secondary/pg/PgFormEstablishmentRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { expectPromiseToFailWith } from "../../_testBuilders/test.helpers";
 
 describe("PgFormEstablishmentRepository", () => {
   let pool: Pool;
@@ -61,7 +60,7 @@ describe("PgFormEstablishmentRepository", () => {
     expect(resultAll).toEqual([formEstablishmentA, formEstablishmentB]);
   });
 
-  describe("Pg implementation of 'edit' method ", () => {
+  describe("Pg implementation of 'edit' method", () => {
     it("Edits all fields if establishment indeed exists", async () => {
       // Prepare
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
@@ -80,7 +79,7 @@ describe("PgFormEstablishmentRepository", () => {
       // Assert
       const result = await client.query("SELECT * FROM form_establishments");
       expect(result.rows).toHaveLength(1);
-      expect(result.rows[0].business_name).toEqual("newName");
+      expect(result.rows[0].business_name).toBe("newName");
     });
   });
 });

@@ -18,7 +18,7 @@ import {
 } from "../../shared/tokens/MagicLinkPayload";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { GenerateMagicLinkJwt, makeGenerateJwt } from "../../domain/auth/jwt";
+import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 
 let request: SuperTest<Test>;
 let generateJwt: GenerateMagicLinkJwt;

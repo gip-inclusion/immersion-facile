@@ -145,7 +145,6 @@ export const createJwtAuthMiddleware = (
           req.payloads = { establishment: payload as EstablishmentJwtPayload };
           break;
         default:
-          const neverAssigned: never = payloadKey;
           throw new Error("Should not happen.");
       }
 

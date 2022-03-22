@@ -8,10 +8,7 @@ import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../entities/EstablishmentEntity";
-import {
-  AnnotatedImmersionOfferEntityV2,
-  ImmersionOfferEntityV2,
-} from "../entities/ImmersionOfferEntity";
+import { AnnotatedImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 
 export interface ImmersionOfferRepository {

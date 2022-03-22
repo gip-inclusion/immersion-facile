@@ -923,7 +923,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         );
       expect(establishmentDataSource).toBeUndefined();
     });
-    it("Returns undefined when there is no establishment in db with this siret", async () => {
+    it("Check the establishment data_source", async () => {
       // Prepare
       await insertEstablishment({
         siret,
@@ -935,7 +935,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           siret,
         );
       // Assert
-      expect(establishmentDataSource).toEqual("form");
+      expect(establishmentDataSource).toBe("form");
     });
   });
   describe("Pg implementation of method getSiretOfEstablishmentsFromFormSource", () => {
@@ -1150,7 +1150,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     phone: string;
     establishment_siret: string;
     contact_mode: PgContactMethod;
-  }
+  };
 
   const getAllImmersionContactsRows = async (): Promise<
     PgImmersionContactWithSiretRow[]

@@ -257,8 +257,8 @@ describe("Upsert Establishment aggregate from form data", () => {
     ).toEqual(newRomeCode);
 
     // Contact match update from form
-    expect(
-      immersionOfferRepo.establishmentAggregates[0].contact?.email,
-    ).toEqual("new.contact@gmail.com");
+    expect(immersionOfferRepo.establishmentAggregates[0].contact?.email).toBe(
+      "new.contact@gmail.com",
+    );
   });
 });
