@@ -45,7 +45,7 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
         return await cb();
       } catch (error: any) {
         if (!(error instanceof RetryableError)) throw error;
-        logger.warn("Will retry error :", error.cause.message);
+        logger.warn("Will retry error :", error.initialError.message);
 
         // Callback failed with retryable error, wait and retry.
         const backoffDurationMs =
@@ -64,7 +64,7 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
 
         if (msSinceStart >= this.retryDeadlineMs) {
           logger.warn("Retry deadline exceeded");
-          throw error.cause;
+          throw error.initialError;
         }
 
         backoffDurationS *= 2;

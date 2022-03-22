@@ -120,7 +120,7 @@ describe("ExponentialBackoffRetryStrategy", () => {
 
     await expectPromiseToFailWithError(
       retryStrategy.apply(mockCallback),
-      retryableError.cause,
+      retryableError.initialError,
     );
 
     expect(mockCallback).toHaveBeenCalledTimes(3);

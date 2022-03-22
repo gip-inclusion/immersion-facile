@@ -64,7 +64,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
         payload,
       });
       await uow.outboxRepo.save(event);
-    } catch (error) {
+    } catch (error: any) {
       notifyErrorDiscord(error);
     }
   }
