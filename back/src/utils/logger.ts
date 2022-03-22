@@ -12,11 +12,14 @@ const getLogLevel = () => {
 
 const rootLogger = pino({
   level: getLogLevel(),
-  prettyPrint: {
-    translateTime: "yyyy-mm-dd HH:MM:ss.l",
-    singleLine: !process.env.LOGGER_MULTI_LINE,
-    colorize: true,
-    ignore: "pid,hostname",
+  transport: {
+    target: "pino-pretty",
+    options: {
+      colorize: true,
+      singleLine: !process.env.LOGGER_MULTI_LINE,
+      translateTime: "yyyy-mm-dd HH:MM:ss.l",
+      ignore: "pid,hostname",
+    },
   },
 });
 
