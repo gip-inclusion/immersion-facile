@@ -102,7 +102,7 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
                   type="radio"
                   disabled={disabled}
                   value={inputValue}
-                  checked={value === currentValue}
+                  checked={isEqual(value, currentValue)}
                   onChange={() => setCurrentValue(value)}
                 />
                 <label className="fr-label" htmlFor={optionId}>
@@ -133,4 +133,12 @@ const getInputValue = (
   if (value instanceof Array) return value[0].toString();
   if (typeof value === "boolean") return value.toString();
   return value;
+};
+
+const isEqual = <T extends unknown>(a: T, b: T): boolean => {
+  if (a instanceof Array && b instanceof Array) {
+    if (a[0] === undefined || b[0] === undefined) return false;
+    return a[0] === b[0];
+  }
+  return a === b;
 };

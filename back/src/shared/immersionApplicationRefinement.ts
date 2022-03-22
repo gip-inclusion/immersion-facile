@@ -57,16 +57,23 @@ export const emailAndMentorEmailAreDifferent = (params: {
   mentorEmail: string;
 }) => params.email !== params.mentorEmail;
 
+const statusesAllowedWithoutSign: ApplicationStatus[] = [
+  "DRAFT",
+  "READY_TO_SIGN",
+  "PARTIALLY_SIGNED",
+  "REJECTED",
+];
+
 export const mustBeSignedByBeneficiaryBeforeReview = (params: {
   beneficiaryAccepted: boolean;
   status: ApplicationStatus;
 }) =>
-  ["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(params.status) ||
+  statusesAllowedWithoutSign.includes(params.status) ||
   params.beneficiaryAccepted;
 
 export const mustBeSignedByEstablishmentBeforeReview = (params: {
   enterpriseAccepted: boolean;
   status: ApplicationStatus;
 }) =>
-  ["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(params.status) ||
+  statusesAllowedWithoutSign.includes(params.status) ||
   params.enterpriseAccepted;

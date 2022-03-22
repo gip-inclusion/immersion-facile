@@ -616,8 +616,8 @@ describe("Postgres implementation of immersion offer repository", () => {
         const expectedEstablishmentRow: Partial<PgEstablishmentRow> = {
           siret: establishmentToInsert.siret,
           name: establishmentToInsert.name,
-          customized_name: establishmentToInsert.customizedName,
-          is_commited: establishmentToInsert.isCommited,
+          customized_name: establishmentToInsert.customizedName ?? null,
+          is_commited: establishmentToInsert.isCommited ?? null,
           address: establishmentToInsert.address,
           number_employees: establishmentToInsert.numberEmployeesRange,
           naf_code: establishmentToInsert.nafDto.code,
@@ -1119,7 +1119,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   type PgEstablishmentRow = {
     siret: string;
     name: string;
-    customized_name?: string;
+    customized_name?: string | null;
     address: string;
     number_employees: number;
     naf_code: string;
@@ -1128,7 +1128,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     gps: string;
     update_date?: Date;
     is_active: boolean;
-    is_commited?: boolean;
+    is_commited?: boolean | null;
   };
 
   const getAllEstablishmentsRows = async (): Promise<PgEstablishmentRow[]> =>

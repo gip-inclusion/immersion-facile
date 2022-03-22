@@ -37,6 +37,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       await uow.immersionOfferRepo.getAnnotatedImmersionOffersForEstablishmentSiret(
         siret,
       );
+
     const retrievedForm: FormEstablishmentDto = {
       siret,
       source: "immersion-facile",

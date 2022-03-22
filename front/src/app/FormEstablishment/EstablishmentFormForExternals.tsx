@@ -1,7 +1,7 @@
+import { EstablishmentCreationForm } from "src/app/FormEstablishment/EstablishmentCreationForm";
 import { Route } from "type-route";
 import { routes } from "../routes";
 import { Layout } from "../../components/Layout";
-import { EstablishmentCreationForm } from "./EstablishmentForm";
 import React from "react";
 import { FormEstablishmentSource } from "../../shared/FormEstablishmentDto";
 

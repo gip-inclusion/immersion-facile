@@ -17,7 +17,8 @@ import "./Admin.css";
 import { ApiDataContainer } from "./ApiDataContainer";
 import {
   exportEstablismentsExcelRoute,
-  exportImmersionApplicationsExcelRoute, loginPeConnect,
+  exportImmersionApplicationsExcelRoute,
+  loginPeConnect,
 } from "../../shared/routes";
 import { EstablishmentExportConfigDto } from "../../shared/establishmentExport/establishmentExport.dto";
 import { keys } from "ramda";
@@ -82,7 +83,7 @@ export const Admin = ({ route }: AdminProps) => {
             >
               Exporter les demandes d'immersion par agences
             </a>
-            <br/>
+            <br />
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
@@ -94,7 +95,7 @@ export const Admin = ({ route }: AdminProps) => {
               Exporter les entreprises référencées par région avec aggrégation
               des métiers
             </a>
-            <br/>
+            <br />
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
@@ -106,7 +107,7 @@ export const Admin = ({ route }: AdminProps) => {
               Exporter les entreprises référencées par département avec
               aggrégation des métiers
             </a>
-            <br/>
+            <br />
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
@@ -118,7 +119,7 @@ export const Admin = ({ route }: AdminProps) => {
               Exporter les entreprises référencées par région sans aggrégation
               des métiers
             </a>
-            <br/>
+            <br />
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({

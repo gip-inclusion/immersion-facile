@@ -12,5 +12,6 @@ export interface FormEstablishmentGateway {
   getFormEstablishmentFromJwt: (jwt: string) => Promise<FormEstablishmentDto>;
   updateFormEstablishment: (
     establishment: FormEstablishmentDto,
+    jwt: string,
   ) => Promise<void>;
 }

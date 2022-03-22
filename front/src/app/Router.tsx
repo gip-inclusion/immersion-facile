@@ -3,6 +3,8 @@ import { AddAgencyForm } from "src/app/AddAgency/AddAgencyForm";
 import { Admin } from "src/app/admin/Admin";
 import { ApplicationForm } from "src/app/ApplicationForm/ApplicationForm";
 import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
+import { EstablishmentCreationForm } from "src/app/FormEstablishment/EstablishmentCreationForm";
+import { EstablishmentEditionForm } from "src/app/FormEstablishment/EstablishmentEditionForm";
 import { Home } from "src/app/Home";
 import { LandingEstablishment } from "src/app/LandingEstablishment/LandingEstablishment";
 import { useRoute } from "src/app/routes";
@@ -11,10 +13,6 @@ import { ENV } from "src/environmentVariables";
 import { RenewExpiredLink } from "../helpers/RenewExpiredLink";
 import { AdminVerification } from "./admin/AdminVerification";
 import { SignForm } from "./ApplicationForm/SignForm";
-import {
-  EstablishmentCreationForm,
-  EstablishmentEditionForm,
-} from "./FormEstablishment/EstablishmentForm";
 import { SearchDebug } from "./Debug/SearchDebug";
 import { Search } from "./Search/Search";
 import { EstablishmentFormImmersionFacile } from "./FormEstablishment/EstablishmentFormImmersionFacile";

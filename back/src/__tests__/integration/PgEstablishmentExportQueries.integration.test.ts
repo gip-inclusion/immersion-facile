@@ -47,7 +47,7 @@ describe("PgEstablishmentExportQueries", () => {
         {
           address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
           createdAt: format(new Date(), "dd/MM/yyyy"),
-          customizedName: "Custom name",
+          customizedName: undefined,
           isCommited: true,
           nafCode: "7820Z",
           name: "ARTUS INTERIM LA ROCHE SUR YON",
@@ -58,7 +58,7 @@ describe("PgEstablishmentExportQueries", () => {
         {
           address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
           createdAt: format(new Date(), "dd/MM/yyyy"),
-          customizedName: "Custom name",
+          customizedName: undefined,
           isCommited: true,
           nafCode: "7820Z",
           name: "ARTUS INTERIM LA ROCHE SUR YON",
@@ -69,7 +69,7 @@ describe("PgEstablishmentExportQueries", () => {
         {
           address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
           createdAt: format(new Date(), "dd/MM/yyyy"),
-          customizedName: "Custom name",
+          customizedName: undefined,
           isCommited: false,
           nafCode: "9321Z",
           name: "MINI WORLD LYON",
@@ -81,7 +81,7 @@ describe("PgEstablishmentExportQueries", () => {
         {
           address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
           createdAt: format(new Date(), "dd/MM/yyyy"),
-          customizedName: "Custom name",
+          customizedName: undefined,
           isCommited: false,
           nafCode: "9321Z",
           name: "MINI WORLD LYON",
@@ -92,7 +92,7 @@ describe("PgEstablishmentExportQueries", () => {
         {
           address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
           createdAt: format(new Date(), "dd/MM/yyyy"),
-          customizedName: "Custom name",
+          customizedName: undefined,
           isCommited: false,
           nafCode: "9321Z",
           name: "MINI WORLD LYON",
@@ -103,7 +103,7 @@ describe("PgEstablishmentExportQueries", () => {
         {
           address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
           createdAt: format(new Date(), "dd/MM/yyyy"),
-          customizedName: "Custom name",
+          customizedName: undefined,
           isCommited: false,
           nafCode: "9321Z",
           name: "MINI WORLD LYON",

@@ -5,10 +5,10 @@ import { RomeSearchMatchDto, romeSearchResponseSchema } from "src/shared/rome";
 import {
   editEstablishmentFormRouteWithApiKey,
   formAlreadyExistsRoute,
-  addEstablishmentFormRouteWithApiKey,
   requestEmailToUpdateFormRoute,
   romeRoute,
   retrieveEstablishmentFormRouteWithApiKey,
+  addEstablishmentFormRouteWithoutApiKey,
 } from "src/shared/routes";
 import { SiretDto } from "src/shared/siret";
 import { zString } from "src/shared/zodUtils";
@@ -20,7 +20,7 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
     establishment: FormEstablishmentDto,
   ): Promise<SiretDto> {
     const httpResponse = await axios.post(
-      `/${prefix}/${addEstablishmentFormRouteWithApiKey}`,
+      `/${prefix}/${addEstablishmentFormRouteWithoutApiKey}`,
       establishment,
     );
 
@@ -55,9 +55,10 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
   }
   public async updateFormEstablishment(
     establishment: FormEstablishmentDto,
+    jwt: string,
   ): Promise<void> {
     await axios.post(
-      `/${prefix}/${editEstablishmentFormRouteWithApiKey}`,
+      `/${prefix}/${editEstablishmentFormRouteWithApiKey}/${jwt}`,
       establishment,
     );
   }

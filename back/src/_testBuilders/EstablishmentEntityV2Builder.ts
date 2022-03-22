@@ -17,8 +17,6 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   numberEmployeesRange: 11,
   updatedAt: new Date("2022-01-05T00:00:00.000"),
   isActive: true,
-  isCommited: false,
-  customizedName: "Custom name",
 };
 
 export class EstablishmentEntityV2Builder

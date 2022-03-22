@@ -1,5 +1,5 @@
+import { EstablishmentCreationForm } from "src/app/FormEstablishment/EstablishmentCreationForm";
 import { Layout } from "../../components/Layout";
-import { EstablishmentCreationForm } from "./EstablishmentForm";
 import React from "react";
 
 export const EstablishmentFormImmersionFacile = () => (

@@ -361,7 +361,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     return {
       siret: row.siret,
       name: row.name,
-      customizedName: row.customized_name,
+      customizedName: optional(row.customized_name),
       address: row.address,
       voluntaryToImmersion: row.data_source == "form",
       dataSource: row.data_source,
@@ -370,7 +370,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       nafLabel: row.naf_label,
       numberEmployeesRange: row.number_employees,
       isActive: true,
-      isCommited: row.is_commited,
+      isCommited: optional(row.is_commited),
       updatedAt: row.establishments_update_date,
     };
   }
@@ -581,8 +581,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       position: optional(row.position) && parseGeoJson(row.position),
       numberEmployeesRange: row.number_employees,
       voluntaryToImmersion: row.data_source == "form",
-      isCommited: row.is_commited,
-      customizedName: row.customized_name,
+      isCommited: optional(row.is_commited),
+      customizedName: optional(row.customized_name),
       updatedAt: row.update_date,
     };
     return establishmentForSiret;
