@@ -188,7 +188,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             En quelques minutes, complétez ce formulaire avec l'entreprise qui
             vous accueillera. <br />
             <p className="fr-text--xs">
-              Ce formulaire vaut équivalence du CERFA 13912 * 03
+              Ce formulaire vaut équivalence du CERFA 13912 * 04
             </p>
           </div>
 

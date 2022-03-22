@@ -145,7 +145,7 @@ export const establishmentsExportByZoneColumnsOptions = (
       width: 15,
     },
     {
-      header: 'Appartenance Réseau "Les Entreprises s\'engagent"',
+      header: "Appartenance Réseau « Les entreprises s'engagent »",
       key: "isCommited",
       width: 25,
     },

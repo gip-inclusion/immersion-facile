@@ -39,8 +39,13 @@ type EstablishmentFormProps = {
   children: React.ReactNode;
 };
 
-const getLabelAndName = (field: FieldsWithLabel) => ({
+const getMandatoryLabelAndName = (field: FieldsWithLabel) => ({
   label: fieldsToLabel[field] + " *",
+  name: field,
+});
+
+const getLabelAndName = (field: FieldsWithLabel) => ({
+  label: fieldsToLabel[field],
   name: field,
 });
 
@@ -97,6 +102,18 @@ const EstablishmentForm = ({
               Bienvenue sur l'espace de référencement des entreprises
               volontaires pour l'accueil des immersions professionnelles.
             </p>
+
+            <p className="mt-4">
+              En référençant votre entreprise vous rejoignez la communauté{" "}
+              <a
+                href={"https://lesentreprises-sengagent.gouv.fr/"}
+                target={"_blank"}
+              >
+                « Les entreprises s'engagent »
+              </a>
+              .
+            </p>
+
             <p className="mt-4">
               Ce formulaire vous permet d'indiquer les métiers de votre
               établissement ouverts aux immersions. Si votre entreprise comprend
@@ -122,7 +139,7 @@ const EstablishmentForm = ({
               />
               <BusinessContactList />
               <RadioGroupForField
-                {...getLabelAndName("preferredContactMethods")}
+                {...getMandatoryLabelAndName("preferredContactMethods")}
                 options={preferredContactMethodOptions}
               />
               {submitCount !== 0 && Object.values(errors).length > 0 && (
@@ -180,16 +197,16 @@ const EditionSiretRelatedInputs = ({
 }: {
   businessAddress: string;
 }) => {
-  const businessLabelAndName = getLabelAndName("businessAddress");
+  const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
   const { setValue: setAddressValue } = useField<string>(
     businessLabelAndName.name,
   )[2];
   return (
     <>
-      <TextInput {...getLabelAndName("siret")} disabled={true} />
+      <TextInput {...getMandatoryLabelAndName("siret")} disabled={true} />
 
-      <TextInput {...getLabelAndName("businessName")} />
-      <TextInput {...getLabelAndName("businessNameCustomized")} />
+      <TextInput {...getMandatoryLabelAndName("businessName")} />
+      <TextInput {...getMandatoryLabelAndName("businessNameCustomized")} />
       <AddressAutocomplete
         initialSearchTerm={businessAddress}
         label={businessLabelAndName.label}
@@ -214,7 +231,7 @@ const CreationSiretRelatedInputs = () => {
   useSiretRelatedField("naf", establishmentInfo);
   const featureFlags = useFeatureFlagsContext();
 
-  const businessLabelAndName = getLabelAndName("businessAddress");
+  const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
 
   const [_, __, { setValue: setAddressValue }] = useField<string>(
     businessLabelAndName.name,
@@ -223,7 +240,7 @@ const CreationSiretRelatedInputs = () => {
   return (
     <>
       <TextInput
-        {...getLabelAndName("siret")}
+        {...getMandatoryLabelAndName("siret")}
         placeholder="362 521 879 00034"
         disabled={isFetchingSiret}
       />
@@ -264,11 +281,11 @@ const CreationSiretRelatedInputs = () => {
       )}
 
       <TextInput
-        {...getLabelAndName("businessName")}
+        {...getMandatoryLabelAndName("businessName")}
         disabled={!featureFlags.enableByPassInseeApi}
       />
       <TextInput
-        {...getLabelAndName("businessNameCustomized")}
+        {...getMandatoryLabelAndName("businessNameCustomized")}
         disabled={isFetchingSiret}
       />
       <AddressAutocomplete

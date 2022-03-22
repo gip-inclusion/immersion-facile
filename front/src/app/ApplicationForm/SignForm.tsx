@@ -98,7 +98,7 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
           Relisez la bien et si cela vous convient, signez la avec le bouton "je
           signe cette demande" <br />
           <p className="fr-text--xs">
-            Ce formulaire vaut équivalence du CERFA 13912 * 03
+            Ce formulaire vaut équivalence du CERFA 13912 * 04
           </p>
         </div>
 

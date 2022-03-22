@@ -74,7 +74,7 @@ export const LandingEstablishment = () => (
           text="en situation professionnelle réelle"
         />
         <Card
-          boldText="Pré-sourcer des profils invisible"
+          boldText="Pré-sourcer des profils invisibles"
           text="en cas de recrutement classique"
         />
         <Card

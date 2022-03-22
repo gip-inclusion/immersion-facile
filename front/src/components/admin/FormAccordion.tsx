@@ -61,10 +61,7 @@ export const FormAccordion = ({ immersionApplication }: FormAccordionProps) => {
   const title =
     `${getPrefix(status)} ` +
     `${lastName.toUpperCase()} ${firstName} chez ${businessName} ` +
-    `${beforeAfterString(dateStart)} (pendant ${durationDays(
-      dateStart,
-      dateEnd,
-    )})`;
+    `${beforeAfterString(dateStart)}`;
 
   return (
     <div style={{ padding: "0.5rem" }}>
