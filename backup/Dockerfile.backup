@@ -8,7 +8,7 @@ RUN apt-get update && \
     echo "LANG=\"$LANG\"\nLANGUAGE=\"$LANG\"\nLC_NUMERIC=\"$LANG\"\nLC_TIME=\"$LANG\"\nLC_MONETARY=\"$LANG\"\nLC_PAPER=\"$LANG\"\nLC_IDENTIFICATION=\"$LANG\"\nLC_NAME=\"$LANG\"\nLC_ADDRESS=\"$LANG\"\nLC_TELEPHONE=\"$LANG\"\nLC_MEASUREMENT=\"$LANG\"" >>/etc/default/locale;
 
 #Pour logrotate
-RUN echo -e '#!/bin/sh\nexit 0' > /usr/sbin/policy-rc.d;
+RUN echo '#!'"/bin/sh\nexit 0" > /usr/sbin/policy-rc.d;
 
 # Mise à l'heure française
 ARG TIMEZONE=${TIMEZONE:-Europe/Paris}
