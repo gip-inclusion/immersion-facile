@@ -47,19 +47,19 @@ const getUseCasesByTopics = (
     useCases.notifyBeneficiaryAndEnterpriseThatApplicationIsRejected,
   ],
 
-  // Establishment form and search related.
+  // Establishment form related
   FormEstablishmentAdded: [
     useCases.upsertEstablishmentAggregateFromForm,
     useCases.notifyConfirmationEstablishmentCreated,
   ],
   FormEstablishmentEdited: [useCases.upsertEstablishmentAggregateFromForm],
+  FormEstablishmentEditLinkSent: [],
+
+  // Search related
   ContactRequestedByBeneficiary: [useCases.notifyContactRequest],
 
   // Magic link renewal.
   MagicLinkRenewalRequested: [useCases.deliverRenewedMagicLink],
-
-  // Edit establishment form
-  FormEstablishmentEditLinkSent: [],
 
   // Agency related :
   NewAgencyAdded: [],

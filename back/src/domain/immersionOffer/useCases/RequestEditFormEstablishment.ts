@@ -9,10 +9,7 @@ import { EmailGateway } from "../../immersionApplication/ports/EmailGateway";
 import { isAfter } from "date-fns";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 
-export class RequestEditFormEstablishment extends TransactionalUseCase<
-  SiretDto,
-  void
-> {
+export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
   inputSchema = siretSchema;
 
   constructor(
@@ -57,7 +54,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
     try {
-      this.emailGateway.sendEditFormEstablishmentLink(contactEmail, {
+      await this.emailGateway.sendEditFormEstablishmentLink(contactEmail, {
         editFrontUrl,
       });
 
