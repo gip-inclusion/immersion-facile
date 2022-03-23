@@ -1,6 +1,7 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { formEstablishmentGateway } from "src/app/dependencies";
+import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { defaultInitialValue } from "src/app/FormEstablishment/EstablishmentCreationForm";
 import {
   EstablishmentForm,
@@ -60,6 +61,7 @@ const EditionSiretRelatedInputs = ({
 }: {
   businessAddress: string;
 }) => {
+  const featureFlags = useFeatureFlagsContext();
   const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
   const [_, __, { setValue: setAddressValue }] = useField<string>(
     businessLabelAndName.name,
@@ -69,7 +71,10 @@ const EditionSiretRelatedInputs = ({
     <>
       <TextInput {...getMandatoryLabelAndName("siret")} disabled={true} />
 
-      <TextInput {...getMandatoryLabelAndName("businessName")} />
+      <TextInput
+        {...getMandatoryLabelAndName("businessName")}
+        disabled={!featureFlags.enableByPassInseeApi}
+      />
       <TextInput {...getLabelAndName("businessNameCustomized")} />
       <AddressAutocomplete
         initialSearchTerm={businessAddress}

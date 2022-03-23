@@ -115,8 +115,9 @@ describe("UpdateImmersionApplicationStatus", () => {
 
   describe("* -> DRAFT transition", () => {
     const validOldStatuses: ApplicationStatus[] = [
+      "READY_TO_SIGN",
+      "PARTIALLY_SIGNED",
       "IN_REVIEW",
-      "ACCEPTED_BY_VALIDATOR",
       "ACCEPTED_BY_COUNSELLOR",
     ];
     const validRoles: Role[] = ["counsellor", "validator", "admin"];
@@ -200,20 +201,32 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("ACCEPTED_BY_VALIDATOR -> REJECTED transition", () => {
-    it("accepted from counsellor", () =>
-      testAcceptsStatusUpdateToRejected({
+    it("refuse from counsellor", () =>
+      testRejectsStatusUpdate({
         role: "counsellor",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
+        newStatus: "REJECTED",
+        expectedError: new BadRequestError(
+          "Cannot go from status 'ACCEPTED_BY_VALIDATOR' to 'REJECTED'",
+        ),
       }));
-    it("accepted from validator", () =>
-      testAcceptsStatusUpdateToRejected({
+    it("refuse from validator", () =>
+      testRejectsStatusUpdate({
         role: "validator",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
+        newStatus: "REJECTED",
+        expectedError: new BadRequestError(
+          "Cannot go from status 'ACCEPTED_BY_VALIDATOR' to 'REJECTED'",
+        ),
       }));
-    it("accepted from admin", () =>
-      testAcceptsStatusUpdateToRejected({
+    it("refuse from admin", () =>
+      testRejectsStatusUpdate({
         role: "admin",
         oldStatus: "ACCEPTED_BY_VALIDATOR",
+        newStatus: "REJECTED",
+        expectedError: new BadRequestError(
+          "Cannot go from status 'ACCEPTED_BY_VALIDATOR' to 'REJECTED'",
+        ),
       }));
   });
 

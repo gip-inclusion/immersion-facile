@@ -47,7 +47,6 @@ export const statusTransitionConfigs: Record<
       "READY_TO_SIGN",
       "PARTIALLY_SIGNED",
       "ACCEPTED_BY_COUNSELLOR",
-      "ACCEPTED_BY_VALIDATOR",
     ],
     validRoles: ["counsellor", "validator", "admin"],
   },
@@ -61,7 +60,6 @@ export const statusTransitionConfigs: Record<
       "PARTIALLY_SIGNED",
       "IN_REVIEW",
       "ACCEPTED_BY_COUNSELLOR",
-      "ACCEPTED_BY_VALIDATOR",
     ],
     validRoles: [
       "counsellor",
