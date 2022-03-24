@@ -8,7 +8,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { EmailGateway } from "../../immersionApplication/ports/EmailGateway";
 import { isAfter } from "date-fns";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { notifyErrorDiscord } from "../../../utils/notifyDiscord";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
   inputSchema = siretSchema;
@@ -65,7 +65,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
       });
       await uow.outboxRepo.save(event);
     } catch (error: any) {
-      notifyErrorDiscord(error);
+      notifyObjectDiscord(error);
     }
   }
 }

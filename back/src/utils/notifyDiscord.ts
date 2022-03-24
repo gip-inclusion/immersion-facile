@@ -34,7 +34,7 @@ export const notifyDiscord = (
 
 const format = (content: string) => `\`\`\`${content}\`\`\``;
 
-export const notifyErrorDiscord = <T extends Error>(error: T) => {
+export const notifyObjectDiscord = <T>(error: T) => {
   notifyDiscord(toPropertiesAsString(error));
 };
 
@@ -49,4 +49,4 @@ const toPropertiesAsString = <T>(obj: T): string =>
     .map((property: string) => {
       return `${property}: ${obj[property as keyof T]}`;
     })
-    .join("\n\n");
+    .join("\n");

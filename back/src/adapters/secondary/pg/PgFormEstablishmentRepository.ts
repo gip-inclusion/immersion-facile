@@ -3,7 +3,6 @@ import { FormEstablishmentRepository } from "../../../domain/immersionOffer/port
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import { SiretDto } from "../../../shared/siret";
 import { createLogger } from "../../../utils/logger";
-import { notifyErrorDiscord } from "../../../utils/notifyDiscord";
 import { ConflictError } from "../../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
@@ -52,10 +51,6 @@ export class PgFormEstablishmentRepository
       await this.client.query(query, [siret, source, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise ,naf, JSON.stringify(professions), JSON.stringify(businessContacts), JSON.stringify(preferredContactMethods)]);
     } catch (error: any) {
       logger.error({error}, "Cannot save form establishment ")
-      notifyErrorDiscord({
-        _message: `Cannot create form establishment with siret ${formEstablishmentDto.siret}`,
-        ...error
-      });
       throw new ConflictError(`Cannot create form establishment with siret ${formEstablishmentDto.siret}.`)
     }
   }

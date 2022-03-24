@@ -75,7 +75,7 @@ export const immersionApplicationSchema: z.Schema<ImmersionApplicationDto> = z
     sanitaryPrevention: zBoolean,
     sanitaryPreventionDescription: z.string().optional(),
     immersionAddress: addressWithPostalCodeSchema.optional(),
-    immersionObjective: z.string().optional(),
+    immersionObjective: zString,
     immersionProfession: zTrimmedString,
     immersionActivities: zTrimmedString,
     immersionSkills: z.string().optional(),

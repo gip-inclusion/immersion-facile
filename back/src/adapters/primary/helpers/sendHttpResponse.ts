@@ -3,6 +3,7 @@ import { AuthChecker } from "../../../domain/auth/AuthChecker";
 import { createLogger } from "../../../utils/logger";
 import { HttpError, UnauthorizedError } from "./httpErrors";
 import { deleteFile } from "../../../utils/filesystemUtils";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 
@@ -14,7 +15,8 @@ const handleResponseError = (res: Response, error: any) => {
     }
     res.status(error.httpCode);
   } else {
-    logger.error(error, "Uncaught error");
+    notifyObjectDiscord({ _message: "Unhandled Error :", ...error });
+    logger.error(error, "Unhandled error");
     res.status(500);
   }
 

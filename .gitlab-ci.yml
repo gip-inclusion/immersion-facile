@@ -37,7 +37,7 @@ back:
   script:
     - cd back
     - npm ci
-    -  npm run lint
+    - npm run lint
     - npm run includecheck
     - echo $PG_TEST_URL
     - NODE_ENV=test DATABASE_URL=$PG_TEST_URL npm run migrate up

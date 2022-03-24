@@ -88,7 +88,7 @@ export const EstablishmentForm = ({
             </p>
 
             <p className="mt-4">
-              En référençant votre entreprise vous rejoignez la communauté{" "}
+              En référençant votre entreprise, vous rejoignez la communauté{" "}
               <a
                 href={"https://lesentreprises-sengagent.gouv.fr/"}
                 target={"_blank"}

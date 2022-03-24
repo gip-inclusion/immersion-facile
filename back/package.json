@@ -21,7 +21,7 @@
     "format:check": "prettier --check src",
     "typecheck": "tsc --noEmit",
     "includecheck": "./check_includes.sh",
-    "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck",
+    "fullcheck": "npm run includecheck && npm run format && npm run lint && npm run test && npm run typecheck",
     "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck",
     "generate-api-key": "ts-node src/adapters/primary/generateApiKey.ts",
     "migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",

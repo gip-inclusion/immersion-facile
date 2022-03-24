@@ -296,7 +296,7 @@ export const ApplicationFormFields = ({
 
       <RadioGroupForField
         name="immersionObjective"
-        label="Objet de la période de mise en situation en milieu professionnel"
+        label="Objet de la période de mise en situation en milieu professionnel *"
         options={[
           { value: "Confirmer un projet professionnel" },
           { value: "Découvrir un métier ou un secteur d'activité" },

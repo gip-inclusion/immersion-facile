@@ -2,7 +2,7 @@
 
 import {
   notifyAndThrowErrorDiscord,
-  notifyErrorDiscord,
+  notifyObjectDiscord,
 } from "../../utils/notifyDiscord";
 
 describe("Notify Discord", () => {
@@ -12,7 +12,7 @@ describe("Notify Discord", () => {
     } catch (e: unknown) {
       //eslint-disable-next-line jest/no-conditional-expect
       expect(e).toBeInstanceOf(SyntaxError);
-      notifyErrorDiscord(e as Error);
+      notifyObjectDiscord(e as Error);
     }
   });
 

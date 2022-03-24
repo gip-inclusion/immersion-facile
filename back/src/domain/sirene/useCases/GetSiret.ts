@@ -27,7 +27,11 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
       siret,
       includeClosedEstablishments,
     );
-    if (!response || response.etablissements.length < 1) {
+    if (
+      !response ||
+      !response.etablissements ||
+      response.etablissements.length < 1
+    ) {
       throw new NotFoundError("Did not find siret : " + siret);
     }
     return convertEtablissementToResponse(
