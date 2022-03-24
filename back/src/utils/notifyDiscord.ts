@@ -34,8 +34,8 @@ export const notifyDiscord = (
 
 const format = (content: string) => `\`\`\`${content}\`\`\``;
 
-export const notifyObjectDiscord = <T>(error: T) => {
-  notifyDiscord(toPropertiesAsString(error));
+export const notifyObjectDiscord = <T>(obj: T) => {
+  notifyDiscord(toPropertiesAsString(obj));
 };
 
 export const notifyAndThrowErrorDiscord = <T extends Error>(error: T) => {
@@ -46,7 +46,5 @@ export const notifyAndThrowErrorDiscord = <T extends Error>(error: T) => {
 const toPropertiesAsString = <T>(obj: T): string =>
   Object.getOwnPropertyNames(obj)
     .sort()
-    .map((property: string) => {
-      return `${property}: ${obj[property as keyof T]}`;
-    })
+    .map((property: string) => `${property}: ${obj[property as keyof T]}`)
     .join("\n");

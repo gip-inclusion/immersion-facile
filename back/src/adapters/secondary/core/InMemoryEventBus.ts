@@ -1,10 +1,19 @@
 import promClient from "prom-client";
+import { keys, prop } from "ramda";
 import {
   EventBus,
   EventCallback,
 } from "../../../domain/core/eventBus/EventBus";
-import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
+import {
+  DomainEvent,
+  DomainTopic,
+  EventFailure,
+  EventPublication,
+  SubscriptionId,
+} from "../../../domain/core/eventBus/events";
+import { Clock } from "../../../domain/core/ports/Clock";
 import { createLogger } from "../../../utils/logger";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 
@@ -26,11 +35,14 @@ const counterPublishedEventsError = new promClient.Counter({
   labelNames: ["topic", "errorType"],
 });
 
+type SubscriptionsForTopic = Record<string, EventCallback<DomainTopic>>;
+
 export class InMemoryEventBus implements EventBus {
-  public subscriptions: Partial<
-    Record<DomainTopic, EventCallback<DomainTopic>[]>
-  >;
-  constructor() {
+  public subscriptions: Partial<Record<DomainTopic, SubscriptionsForTopic>>;
+  constructor(
+    private clock: Clock,
+    private afterPublish: (event: DomainEvent) => Promise<void>,
+  ) {
     this.subscriptions = {};
   }
 
@@ -40,46 +52,128 @@ export class InMemoryEventBus implements EventBus {
     const topic = event.topic;
     counterPublishedEventsTotal.inc({ topic });
 
-    const callbacks = this.subscriptions[topic];
-    if (callbacks === undefined) {
-      logger.info({ eventTopic: event.topic }, "No Callbacks exist for topic.");
-      counterPublishedEventsError.inc({
-        topic,
-        errorType: "no_callback_found",
+    const callbacksById = this.subscriptions[topic];
+    if (callbacksById === undefined) return monitorAbsenceOfCallback(event);
+
+    const subscriptionsIdToPublish = getSubscriptionsIdToPublish(
+      event,
+      callbacksById,
+    );
+
+    if (!subscriptionsIdToPublish.length)
+      return monitorAbsenceOfSubscribers(event);
+
+    const publishedAt = this.clock.now().toISOString();
+
+    const failuresOrUndefined: (EventFailure | void)[] = await Promise.all(
+      subscriptionsIdToPublish.map(
+        async (subscriptionId): Promise<EventFailure | void> => {
+          const cb = callbacksById[subscriptionId];
+          logger.info(
+            { eventId: event.id, topic: event.topic },
+            `Sending an event`,
+          );
+
+          try {
+            await cb(event);
+          } catch (error: any) {
+            monitorErrorInCallback(error, event);
+            return { subscriptionId, errorMessage: error.message };
+          }
+        },
+      ),
+    );
+
+    const failures = failuresOrUndefined.filter(
+      (failure): failure is EventFailure => !!failure,
+    );
+
+    const publications: EventPublication[] = [
+      ...event.publications,
+      {
+        publishedAt,
+        failures,
+      },
+    ];
+
+    if (failures.length === 0) {
+      await this.afterPublish({
+        ...event,
+        publications,
       });
+      counterPublishedEventsSuccess.inc({ topic });
       return;
     }
 
-    try {
-      await Promise.all(
-        callbacks.map(async (cb) => {
-          logger.info(
-            { eventId: event.id },
-            `XXXXXXXXXXXXXXXX  Sending an event`,
-          );
-          await cb(event);
-        }),
-      );
-      counterPublishedEventsSuccess.inc({ topic });
-    } catch (e: any) {
-      logger.error(e, "callback failed");
-      counterPublishedEventsError.inc({ topic, errorType: "callback_failed" });
-      throw e;
+    // Some subscribers have failed :
+    const wasQuarantined = event.publications.length >= 3;
+    if (wasQuarantined) {
+      logger.error({ event }, "Failed to many times, event is Quarantined");
+      notifyObjectDiscord(event);
     }
+
+    await this.afterPublish({
+      ...event,
+      publications,
+      wasQuarantined,
+    });
   }
 
   public subscribe<T extends DomainTopic>(
     domainTopic: T,
+    subscriptionId: SubscriptionId,
     callback: EventCallback<T>,
   ) {
     logger.info({ domainTopic }, "subscribe");
     if (!this.subscriptions[domainTopic]) {
-      this.subscriptions[domainTopic] = [];
+      this.subscriptions[domainTopic] = {};
+    }
+
+    // prettier-ignore
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const subscriptionsForTopic: SubscriptionsForTopic = this.subscriptions[domainTopic]!;
+
+    if (subscriptionsForTopic[subscriptionId]) {
+      logger.warn(
+        { domainTopic, subscriptionId },
+        "Subscription with this id already exists. It will be override",
+      );
     }
 
     if (callback) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.subscriptions[domainTopic]!.push(callback as any);
+      subscriptionsForTopic[subscriptionId] = callback as any;
     }
   }
 }
+
+const getSubscriptionsIdToPublish = (
+  event: DomainEvent,
+  callbacksById: SubscriptionsForTopic,
+): SubscriptionId[] => {
+  const lastPublication = event.publications[event.publications.length - 1];
+  if (!lastPublication) return keys(callbacksById);
+  return lastPublication.failures.map(prop("subscriptionId"));
+};
+
+const monitorAbsenceOfCallback = (event: DomainEvent) => {
+  logger.info({ eventTopic: event.topic }, "No Callbacks exist for topic.");
+  counterPublishedEventsError.inc({
+    topic: event.topic,
+    errorType: "no_callback_found",
+  });
+};
+
+const monitorAbsenceOfSubscribers = (event: DomainEvent) => {
+  logger.warn(
+    { event },
+    "No subscriber to publish to, event was already fully processed (should not happen)",
+  );
+};
+
+const monitorErrorInCallback = (error: any, event: DomainEvent) => {
+  logger.error({ error, event }, "Error when publishing event");
+  counterPublishedEventsError.inc({
+    topic: event.topic,
+    errorType: "callback_failed",
+  });
+};

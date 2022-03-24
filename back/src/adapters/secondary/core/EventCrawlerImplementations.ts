@@ -5,7 +5,7 @@ import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
-export class BasicEventCrawler {
+export class BasicEventCrawler implements EventCrawler {
   constructor(
     private readonly eventBus: EventBus,
     private readonly outboxRepository: OutboxRepository,
@@ -17,13 +17,23 @@ export class BasicEventCrawler {
     );
   }
 
-  public async processEvents() {
+  public async processNewEvents() {
     const events = await this.outboxRepository.getAllUnpublishedEvents();
-    logger.debug({ events: eventsToDebugInfo(events) }, "processEvents");
+    logger.debug(
+      { events: eventsToDebugInfo(events) },
+      "processing new Events",
+    );
     await Promise.all(events.map((event) => this.eventBus.publish(event)));
-    await this.outboxRepository.markEventsAsPublished(events);
+  }
+
+  public async retryFailedEvents() {
+    const events = await this.outboxRepository.getAllFailedEvents();
+    logger.debug({ events: eventsToDebugInfo(events) }, "retrying Events");
+    await Promise.all(events.map((event) => this.eventBus.publish(event)));
   }
 }
+
+const retryErrorsPeriodMs = 90_000;
 
 export class RealEventCrawler
   extends BasicEventCrawler
@@ -42,6 +52,12 @@ export class RealEventCrawler
       { crawlingPeriodMs: this.crawlingPeriodMs },
       "RealEventCrawler.startCrawler: processing events at regular intervals",
     );
-    setInterval(() => this.processEvents(), this.crawlingPeriodMs);
+    setInterval(async () => {
+      await this.processNewEvents();
+    }, this.crawlingPeriodMs);
+
+    setInterval(async () => {
+      await this.retryFailedEvents();
+    }, retryErrorsPeriodMs);
   }
 }

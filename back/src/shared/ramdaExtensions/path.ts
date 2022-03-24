@@ -1,3 +1,4 @@
+// Read this to understand the typings : https://dev.to/tipsy_dev/advanced-typescript-reinventing-lodash-get-4fhe
 // prettier-ignore
 type GetFieldType<Obj, Path> = Path extends `${infer Left}.${infer Right}`
   ? Left extends keyof Obj

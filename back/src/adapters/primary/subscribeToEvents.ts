@@ -24,6 +24,7 @@ const getUseCasesByTopics = (
     useCases.confirmToMentorThatApplicationCorrectlySubmittedRequestSignature,
     useCases.notifyToTeamApplicationSubmittedByBeneficiary,
   ],
+
   ImmersionApplicationPartiallySigned: [
     // Currently there's no need to send this notification. Keep if for later if necessary.
     // useCases.notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty,
@@ -35,6 +36,7 @@ const getUseCasesByTopics = (
   ImmersionApplicationAcceptedByValidator: [
     useCases.notifyAllActorsOfFinalApplicationValidation,
   ],
+
   FinalImmersionApplicationValidationByAdmin: [
     useCases.notifyAllActorsOfFinalApplicationValidation,
   ],
@@ -43,6 +45,7 @@ const getUseCasesByTopics = (
   ImmersionApplicationRequiresModification: [
     useCases.notifyBeneficiaryAndEnterpriseThatApplicationNeedsModifications,
   ],
+
   ImmersionApplicationRejected: [
     useCases.notifyBeneficiaryAndEnterpriseThatApplicationIsRejected,
   ],
@@ -70,10 +73,12 @@ export const subscribeToEvents = (deps: AppDependencies) => {
   keys(useCasesByTopic).forEach((topic) => {
     const useCases = useCasesByTopic[topic];
 
-    useCases.forEach((useCase) =>
-      deps.eventBus.subscribe(topic, async (event) => {
+    useCases.forEach((useCase) => {
+      // the provided key for each use case is needed in order to follow the acknowledgments
+      const subscriptionId = useCase.constructor.name; // careful this is fragile, because the subscription id is stored in DB when failing
+      deps.eventBus.subscribe(topic, subscriptionId, async (event) => {
         await useCase.execute(event.payload as any);
-      }),
-    );
+      });
+    });
   });
 };

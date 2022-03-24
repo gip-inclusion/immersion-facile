@@ -7,5 +7,5 @@ export interface OutboxRepository {
   ) => Promise<EstablishmentJwtPayload | undefined>;
   save: (event: DomainEvent) => Promise<void>;
   getAllUnpublishedEvents: () => Promise<DomainEvent[]>;
-  markEventsAsPublished: (events: DomainEvent[]) => Promise<void>;
+  getAllFailedEvents: () => Promise<DomainEvent[]>;
 }

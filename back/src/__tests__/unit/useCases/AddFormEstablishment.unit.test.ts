@@ -116,7 +116,7 @@ describe("Add FormEstablishment", () => {
         expect(outboxRepo.events).toHaveLength(1);
         expectObjectsToMatch(outboxRepo.events[0], {
           topic: "FormEstablishmentAdded",
-          wasPublished: false,
+          publications: [],
           wasQuarantined: true,
         });
       });

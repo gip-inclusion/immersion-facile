@@ -1,6 +1,11 @@
 import { Clock } from "../ports/Clock";
 import { UuidGenerator } from "../ports/UuidGenerator";
-import type { DomainEvent, DomainTopic } from "./events";
+import type {
+  DomainEvent,
+  DomainTopic,
+  EventPublication,
+  SubscriptionId,
+} from "./events";
 
 export type NarrowEvent<
   T extends DomainTopic,
@@ -14,6 +19,7 @@ export interface EventBus {
   publish: (event: DomainEvent) => Promise<void>;
   subscribe: <T extends DomainTopic>(
     topic: T,
+    subscriptionId: SubscriptionId,
     callBack: EventCallback<T>,
   ) => void;
 }
@@ -27,8 +33,8 @@ type CreateEventDependencies = {
 export type CreateNewEvent = <T extends DomainTopic>(params: {
   topic: T;
   payload: NarrowEvent<T>["payload"];
-  wasPublished?: boolean;
   wasQuarantined?: boolean;
+  publications?: EventPublication[];
 }) => NarrowEvent<T>;
 
 export const makeCreateNewEvent = ({
@@ -40,8 +46,8 @@ export const makeCreateNewEvent = ({
   return (params: any) => ({
     id: uuidGenerator.new(),
     occurredAt: clock.now().toISOString(),
-    wasPublished: false,
     wasQuarantined: quarantinedTopicSet.has(params.topic),
+    publications: [],
     ...params,
   });
 };

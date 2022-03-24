@@ -25,7 +25,7 @@
     "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck",
     "generate-api-key": "ts-node src/adapters/primary/generateApiKey.ts",
     "migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",
-    "lint": "eslint ./src"
+    "lint": "eslint ./src --fix"
   },
   "keywords": [],
   "author": "",

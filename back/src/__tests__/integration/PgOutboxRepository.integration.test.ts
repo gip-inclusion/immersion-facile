@@ -1,12 +1,14 @@
 import { Pool, PoolClient } from "pg";
-import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
-import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
-import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
-import { DomainEvent } from "../../domain/core/eventBus/events";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
+import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
+import {
+  PgOutboxRepository,
+  StoredEventRow,
+} from "../../adapters/secondary/pg/PgOutboxRepository";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
-import { DomainTopic } from "../../domain/core/eventBus/events";
+import { DomainEvent, DomainTopic } from "../../domain/core/eventBus/events";
 
 describe("PgOutboxRepository", () => {
   let pool: Pool;
@@ -33,11 +35,32 @@ describe("PgOutboxRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE outbox");
+    await client.query("TRUNCATE outbox CASCADE");
+    await client.query("TRUNCATE outbox_publications CASCADE");
+    await client.query("TRUNCATE outbox_failures CASCADE");
     outboxRepository = new PgOutboxRepository(client);
   });
 
-  it("saves an event to be processed", async () => {
+  it("saves an event with published data", async () => {
+    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+    clock.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
+    uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
+    const alreadyProcessedEvent = createNewEvent({
+      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      payload: immersionApplication,
+      publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
+    });
+
+    // act
+    await outboxRepository.save(alreadyProcessedEvent);
+
+    // assert
+    const storedEventRows = await getAllEventsStored();
+    expect(storedEventRows).toHaveLength(1);
+    expectStoredRowsToMatchEvent(storedEventRows, alreadyProcessedEvent);
+  });
+
+  it("saves a new event to be processed, then adds a failing publication, then a working one", async () => {
     // prepare
     uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
     const immersionApplication = new ImmersionApplicationDtoBuilder().build();
@@ -46,19 +69,58 @@ describe("PgOutboxRepository", () => {
       payload: immersionApplication,
     });
 
-    // act
+    // act (when event does not exist in db)
     await outboxRepository.save(event);
 
     // assert
-    const eventsStored = await getAllEventsStored();
-    expect(eventsStored).toHaveLength(1);
-    const { occurredAt, wasPublished, wasQuarantined, ...rest } = event;
-    expect(eventsStored[0]).toEqual({
-      ...rest,
-      occurred_at: new Date(occurredAt),
-      was_published: wasPublished,
-      was_quarantined: wasQuarantined,
-    });
+    const storedEventRows = await getAllEventsStored();
+
+    expect(storedEventRows).toHaveLength(1);
+    expectStoredRowsToMatchEvent(storedEventRows, event);
+
+    // prepare
+    const failingPublicationEvent: DomainEvent = {
+      ...event,
+      publications: [
+        {
+          publishedAt: new Date("2022-01-01").toISOString(),
+          failures: [{ subscriptionId: "sub1", errorMessage: "has failed" }],
+        },
+      ],
+    };
+
+    // act (when event already exist, and the publication has failures)
+    await outboxRepository.save(failingPublicationEvent);
+
+    // assert
+    const storedEventRowsAfterFailure = await getAllEventsStored();
+    expect(storedEventRowsAfterFailure).toHaveLength(1);
+    expectStoredRowsToMatchEvent(
+      storedEventRowsAfterFailure,
+      failingPublicationEvent,
+    );
+
+    const successPublicationEvent: DomainEvent = {
+      ...event,
+      publications: [
+        ...failingPublicationEvent.publications,
+        {
+          publishedAt: new Date("2022-01-02").toISOString(),
+          failures: [],
+        },
+      ],
+    };
+
+    // act (when event already exist, and the publication is now successful)
+    await outboxRepository.save(successPublicationEvent);
+
+    // assert
+    const storedEventRowsAfterSuccess = await getAllEventsStored();
+    expect(storedEventRowsAfterSuccess).toHaveLength(2);
+    expectStoredRowsToMatchEvent(
+      storedEventRowsAfterSuccess,
+      successPublicationEvent,
+    );
   });
 
   it("sets was_quarantined for quarantined event types", async () => {
@@ -74,14 +136,11 @@ describe("PgOutboxRepository", () => {
     await outboxRepository.save(event);
 
     // assert
-    const eventsStored = await getAllEventsStored();
-    expect(eventsStored).toHaveLength(1);
-    const { occurredAt, wasPublished, wasQuarantined: _, ...rest } = event;
-    expect(eventsStored[0]).toEqual({
-      ...rest,
-      occurred_at: new Date(occurredAt),
-      was_published: wasPublished,
-      was_quarantined: true,
+    const storedEventRows = await getAllEventsStored();
+    expect(storedEventRows).toHaveLength(1);
+    expectStoredRowsToMatchEvent(storedEventRows, {
+      ...event,
+      wasQuarantined: true,
     });
   });
 
@@ -107,7 +166,7 @@ describe("PgOutboxRepository", () => {
     const alreadyProcessedEvent = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: immersionApplication,
-      wasPublished: true,
+      publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
     });
 
     clock.setNextDate(new Date("2021-11-15T10:03:00.000Z"));
@@ -133,32 +192,85 @@ describe("PgOutboxRepository", () => {
     expect(events[1]).toEqual(event2);
   });
 
-  it("marks given events as published", async () => {
+  it("finds all events that have failed and should be reprocessed", async () => {
     // prepare
     uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
-    const immersionApplication = new ImmersionApplicationDtoBuilder()
-      .withId("event1")
-      .build();
+    clock.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
+    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
     const event1 = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: immersionApplication,
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
-    const event2 = createNewEvent({
+    clock.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
+    const eventFailedToRerun = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: new ImmersionApplicationDtoBuilder().withId("event2").build(),
+      payload: immersionApplication,
+      publications: [
+        {
+          publishedAt: "2021-11-15T08:00:00.000Z",
+          failures: [
+            {
+              subscriptionId: "subscription1",
+              errorMessage: "some error message",
+            },
+            {
+              subscriptionId: "subscription2",
+              errorMessage: "some other error",
+            },
+          ],
+        },
+      ],
     });
 
-    await storeInOutbox([event1, event2]);
+    clock.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
+    uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
+    const withFailureButEventuallySuccessfulEvent = createNewEvent({
+      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      payload: immersionApplication,
+      publications: [
+        {
+          publishedAt: "2021-11-15T06:00:00.000Z",
+          failures: [
+            { subscriptionId: "subscriptionB", errorMessage: "Some failure" },
+          ],
+        },
+        { publishedAt: "2021-11-15T07:00:00.000Z", failures: [] },
+      ],
+    });
+
+    clock.setNextDate(new Date("2021-11-15T10:03:00.000Z"));
+    uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
+    const failedButQuarantinedEvent = createNewEvent({
+      topic: quarantinedTopic,
+      payload: immersionApplication,
+      publications: [
+        {
+          publishedAt: "2021-11-15T09:00:00.000Z",
+          failures: [
+            {
+              subscriptionId: "subscription1",
+              errorMessage: "some error message",
+            },
+          ],
+        },
+      ],
+    });
+
+    await storeInOutbox([
+      eventFailedToRerun,
+      event1,
+      withFailureButEventuallySuccessfulEvent,
+      failedButQuarantinedEvent,
+    ]);
 
     // act
-    await outboxRepository.markEventsAsPublished([event1, event2]);
+    const eventsToRerun = await outboxRepository.getAllFailedEvents();
 
     // assert
-    const publishedEvents = await getAllEventsStored();
-    expect(publishedEvents).toHaveLength(2);
-    publishedEvents.every((event) => expect(event.was_published).toBeTruthy());
+    expect(eventsToRerun).toHaveLength(1);
+    expect(eventsToRerun[0]).toEqual(eventFailedToRerun);
   });
 
   describe("Pg implementation of method getLastDateOfFormEstablishmentEditLinkSentWithSiret", () => {
@@ -229,6 +341,68 @@ describe("PgOutboxRepository", () => {
     await Promise.all(events.map((event) => outboxRepository.save(event)));
   };
 
-  const getAllEventsStored = () =>
-    client.query("SELECT * FROM outbox").then((result) => result.rows);
+  const getAllEventsStored = (): Promise<StoredEventRow[]> =>
+    client
+      .query(
+        `
+        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload,
+          published_at, subscription_id, error_message 
+        FROM outbox  
+        LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
+        LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
+      `,
+      )
+      .then((result) => result.rows);
+
+  //         JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
 });
+
+const expectStoredRowsToMatchEvent = (
+  rows: StoredEventRow[],
+  event: DomainEvent,
+) => {
+  const { occurredAt, wasQuarantined, publications, ...rest } = event;
+
+  const commonStoredEventFields = {
+    ...rest,
+    occurred_at: new Date(occurredAt),
+    was_quarantined: wasQuarantined,
+  };
+
+  if (!publications.length) {
+    expect(rows).toEqual([
+      {
+        ...commonStoredEventFields,
+        published_at: null,
+        subscription_id: null,
+        error_message: null,
+      },
+    ]);
+    return;
+  }
+
+  const expectedRowsForEvent: StoredEventRow[] = publications.flatMap(
+    ({ publishedAt, failures }): StoredEventRow[] => {
+      if (!failures.length)
+        return [
+          {
+            ...commonStoredEventFields,
+            published_at: new Date(publishedAt),
+            subscription_id: null,
+            error_message: null,
+          },
+        ];
+
+      return failures.map(
+        (failure): StoredEventRow => ({
+          ...commonStoredEventFields,
+          published_at: new Date(publishedAt),
+          subscription_id: failure.subscriptionId,
+          error_message: failure.errorMessage,
+        }),
+      );
+    },
+  );
+
+  expect(rows).toEqual(expectedRowsForEvent);
+};

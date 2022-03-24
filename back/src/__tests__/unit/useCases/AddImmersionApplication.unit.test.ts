@@ -81,7 +81,7 @@ describe("Add immersionApplication", () => {
         occurredAt: occurredAt.toISOString(),
         topic: "ImmersionApplicationSubmittedByBeneficiary",
         payload: validImmersionApplication,
-        wasPublished: false,
+        publications: [],
         wasQuarantined: false,
       },
     ]);

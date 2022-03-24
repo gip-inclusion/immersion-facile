@@ -1,6 +1,7 @@
 import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablishment";
 import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
 import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { Flavor } from "../../../shared/typeFlavors";
 import { AgencyConfig } from "../../immersionApplication/ports/AgencyRepository";
 import {
   ImmersionApplicationRequiresModificationPayload,
@@ -9,13 +10,25 @@ import {
 import type { DateStr } from "../ports/Clock";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 
+export type SubscriptionId = Flavor<string, "SubscriptionId">;
+
+export type EventFailure = {
+  subscriptionId: SubscriptionId;
+  errorMessage: string;
+};
+
+export type EventPublication = {
+  publishedAt: DateStr;
+  failures: EventFailure[];
+};
+
 type GenericEvent<T extends string, P> = {
   id: string;
   occurredAt: DateStr;
   topic: T;
   payload: P;
-  wasPublished?: boolean;
-  wasQuarantined?: boolean;
+  publications: EventPublication[];
+  wasQuarantined: boolean;
 };
 
 export type DomainEvent =
@@ -55,11 +68,18 @@ export type DomainEvent =
 
 export type DomainTopic = DomainEvent["topic"];
 
-export const eventToDebugInfo = (event: DomainEvent) => ({
-  event: event.id,
-  topic: event.topic,
-  wasPublished: event.wasPublished,
-  wasQuarantined: event.wasQuarantined,
-});
+export const eventToDebugInfo = (event: DomainEvent) => {
+  const publishCount = event.publications.length;
+  const lastPublication = event.publications[publishCount - 1];
+
+  return {
+    eventId: event.id,
+    topic: event.topic,
+    wasQuarantined: event.wasQuarantined,
+    lastPublishedAt: lastPublication?.publishedAt,
+    failedSubscribers: lastPublication?.failures,
+    publishCount,
+  };
+};
 export const eventsToDebugInfo = (events: DomainEvent[]) =>
   events.map(eventToDebugInfo);

@@ -27,7 +27,7 @@ describe("PgUowPerformer", () => {
 
   beforeEach(async () => {
     await client.query("TRUNCATE form_establishments");
-    await client.query("TRUNCATE outbox");
+    await client.query("TRUNCATE outbox CASCADE");
     pgUowPerformer = new PgUowPerformer(pool, createPgUow);
   });
 

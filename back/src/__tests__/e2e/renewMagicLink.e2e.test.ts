@@ -62,7 +62,7 @@ describe("Magic link renewal flow", () => {
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     emailGw = new InMemoryEmailGateway();
     validImmersionApplication = new ImmersionApplicationDtoBuilder().build();
-    eventBus = new InMemoryEventBus();
+    eventBus = new InMemoryEventBus(clock, (e) => outboxRepository.save(e));
     eventCrawler = new BasicEventCrawler(eventBus, outboxRepository);
 
     emailFilter = new AlwaysAllowEmailFilter();
@@ -97,7 +97,7 @@ describe("Magic link renewal flow", () => {
   });
 
   it("sends the updated magic link", async () => {
-    eventBus.subscribe("MagicLinkRenewalRequested", (event) =>
+    eventBus.subscribe("MagicLinkRenewalRequested", "subscription1", (event) =>
       deliverRenewedMagicLink.execute(event.payload),
     );
 
@@ -113,7 +113,7 @@ describe("Magic link renewal flow", () => {
     };
 
     await renewMagicLink.execute(request);
-    await eventCrawler.processEvents();
+    await eventCrawler.processNewEvents();
 
     sentEmails = emailGw.getSentEmails();
 

@@ -1,11 +1,11 @@
 import { MigrationBuilder, AlterColumnOptions } from "node-pg-migrate";
 
-export const timestamptWithTimezone = (): AlterColumnOptions => ({
+const timestamptWithTimezone = (): AlterColumnOptions => ({
   type: "timestamptz",
   notNull: true,
 });
 
-export const timestamptWithTimezoneWithDefaultNow = (
+const timestamptWithTimezoneWithDefaultNow = (
   pgm: MigrationBuilder,
 ): AlterColumnOptions => ({
   ...timestamptWithTimezone(),

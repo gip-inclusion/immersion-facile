@@ -4,7 +4,10 @@ import {
   ImmersionApplicationDtoBuilder,
   VALID_EMAILS,
 } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
+import {
+  expectTypeToMatchAndEqual,
+  expectJwtInMagicLinkAndGetIt,
+} from "../../_testBuilders/test.helpers";
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import {
   InMemoryEmailGateway,
@@ -43,11 +46,11 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
       {
         topic: "ImmersionApplicationSubmittedByBeneficiary",
         payload: validImmersionApplication,
-        wasPublished: false,
+        publications: [],
       },
     ]);
 
-    await eventCrawler.processEvents();
+    await eventCrawler.processNewEvents();
 
     expectSentEmails(reposAndGateways.email, [
       {
@@ -147,7 +150,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     immersionApplication,
   );
 
-  await eventCrawler.processEvents();
+  await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(3);
@@ -160,10 +163,10 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const beneficiarySignEmail = sentEmails[0];
   const establishmentSignEmail = sentEmails[1];
 
-  const beneficiarySignJwt = getJwtFromMagicLink(
+  const beneficiarySignJwt = expectJwtInMagicLinkAndGetIt(
     beneficiarySignEmail.params.magicLink,
   );
-  const establishmentSignJwt = getJwtFromMagicLink(
+  const establishmentSignJwt = expectJwtInMagicLinkAndGetIt(
     establishmentSignEmail.params.magicLink,
   );
 
@@ -214,14 +217,16 @@ const establishmentSignsApplication = async (
     },
   );
 
-  await eventCrawler.processEvents();
+  await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(4);
   const needsReviewEmail = sentEmails[sentEmails.length - 1];
   expect(needsReviewEmail.recipients).toEqual([validatorEmail]);
   return {
-    validatorReviewJwt: getJwtFromMagicLink(needsReviewEmail.params.magicLink),
+    validatorReviewJwt: expectJwtInMagicLinkAndGetIt(
+      needsReviewEmail.params.magicLink,
+    ),
   };
 };
 
@@ -249,7 +254,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     },
   );
 
-  await eventCrawler.processEvents();
+  await eventCrawler.processNewEvents();
   const sentEmails = reposAndGateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(5);
   const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
@@ -270,12 +275,4 @@ const expectOnlyOneImmersionThatIsEqual = (
 ) => {
   expect(actualEntities).toHaveLength(1);
   expectTypeToMatchAndEqual(actualEntities[0].toDto(), expectedDto);
-};
-
-const getJwtFromMagicLink = (link: string | unknown) => {
-  expect(typeof link).toBe("string");
-  const split = (link as string).split("jwt=");
-  const last = split[split.length - 1];
-  expect(last).toBeTruthy();
-  return last;
 };

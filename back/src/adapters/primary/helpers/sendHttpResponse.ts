@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { AuthChecker } from "../../../domain/auth/AuthChecker";
 import { createLogger } from "../../../utils/logger";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { HttpError, UnauthorizedError } from "./httpErrors";
 import { deleteFile } from "../../../utils/filesystemUtils";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 

@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg";
+import promClient from "prom-client";
 import { ALWAYS_REJECT } from "../../domain/auth/AuthChecker";
 import { InMemoryAuthChecker } from "../../domain/auth/InMemoryAuthChecker";
 import {
@@ -124,6 +125,12 @@ import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionO
 
 const logger = createLogger(__filename);
 
+const counterEventsMarkedAsPublished = new promClient.Counter({
+  name: "pg_outbox_repository_events_marked_as_published",
+  help: "The total count of events marked as published by PgOutboxRepository.",
+  labelNames: ["topic"],
+});
+
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
 const sequenceRunner = new ThrottledSequenceRunner(1500, 3);
@@ -133,7 +140,10 @@ export const createAppDependencies = async (config: AppConfig) => {
   const repositories = await createRepositories(config, getPgPoolFn);
 
   const uowPerformer = createUowPerformer(config, getPgPoolFn, repositories);
-  const eventBus = createEventBus();
+  const eventBus = new InMemoryEventBus(clock, (event) => {
+    counterEventsMarkedAsPublished.inc({ topic: event.topic });
+    return repositories.outbox.save(event);
+  });
   const generateApiJwt = makeGenerateJwt(config.apiJwtPrivateKey);
   const generateMagicLinkJwt = makeGenerateJwt(config.magicLinkJwtPrivateKey);
   const generateMagicLinkFn = createGenerateVerificationMagicLink(config);
@@ -635,8 +645,6 @@ const createUseCases = (
     ),
   };
 };
-
-const createEventBus = () => new InMemoryEventBus();
 
 const createEventCrawler = (
   config: AppConfig,

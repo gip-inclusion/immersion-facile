@@ -64,7 +64,7 @@ describe("/contact-establishment route", () => {
       },
     ]);
 
-    await eventCrawler.processEvents();
+    await eventCrawler.processNewEvents();
     expect(reposAndGateways.email.getSentEmails()).toHaveLength(1);
     expect(reposAndGateways.email.getSentEmails()[0].type).toBe(
       "CONTACT_BY_EMAIL_REQUEST",

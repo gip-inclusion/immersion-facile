@@ -86,9 +86,9 @@ describe("ContactEstablishment", () => {
         id: eventId,
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
-        wasPublished: false,
-        wasQuarantined: false,
         payload: validEmailRequest,
+        publications: [],
+        wasQuarantined: false,
       },
     ]);
   });
@@ -121,9 +121,9 @@ describe("ContactEstablishment", () => {
         id: eventId,
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
-        wasPublished: false,
-        wasQuarantined: false,
         payload: validPhoneRequest,
+        publications: [],
+        wasQuarantined: false,
       },
     ]);
   });
@@ -156,9 +156,9 @@ describe("ContactEstablishment", () => {
         id: eventId,
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
-        wasPublished: false,
-        wasQuarantined: false,
         payload: validInPersonRequest,
+        publications: [],
+        wasQuarantined: false,
       },
     ]);
   });

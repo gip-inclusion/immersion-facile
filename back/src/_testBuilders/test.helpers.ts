@@ -35,9 +35,10 @@ export const addDays = (dateStr: string, amount: number) => {
 export const spyOnTopic = (
   eventBus: EventBus,
   topic: DomainTopic,
+  subscriptionId: string,
 ): DomainEvent[] => {
   const publishedEvents: DomainEvent[] = [];
-  eventBus.subscribe(topic, async (event) => {
+  eventBus.subscribe(topic, subscriptionId, async (event) => {
     publishedEvents.push(event);
   });
   return publishedEvents;
@@ -65,4 +66,12 @@ export const expectObjectsToMatch = <T extends Record<any, unknown>>(
   expected: Partial<T>,
 ) => {
   expect(actual).toMatchObject(expected);
+};
+
+export const expectJwtInMagicLinkAndGetIt = (link: string | unknown) => {
+  expect(typeof link).toBe("string");
+  const split = (link as string).split("jwt=");
+  const last = split[split.length - 1];
+  expect(last).toBeTruthy();
+  return last;
 };
