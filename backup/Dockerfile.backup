@@ -24,7 +24,7 @@ ARG ENV_TYPE=${ENV_TYPE:-production}
 ENV ENV_TYPE=$ENV_TYPE
 
 RUN [ "$ENV_TYPE" != "production" ] && COMMENT="#"; \
-    echo "${COMMENT}30 3 * * * root bash /home/backup/BACKUP.sh >>/home/backup/backup.log" >/etc/cron.d/backup;
+    echo "${COMMENT}30 3 * * * root bash -c \"/home/backup/BACKUP.sh >>/home/backup/backup.log\"" >/etc/cron.d/backup;
 
 WORKDIR /home/backup
 

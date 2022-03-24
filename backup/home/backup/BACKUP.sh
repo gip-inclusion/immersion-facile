@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENV_TYPE=${ENV_TYPE:-develop};
+source /home/docker/.env
 
 if [ "$ENV_TYPE" != "production" ];
 then
