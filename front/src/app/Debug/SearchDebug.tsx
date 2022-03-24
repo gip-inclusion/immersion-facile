@@ -1,9 +1,9 @@
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import React, { useState } from "react";
 import { immersionSearchGateway } from "src/app/dependencies";
-import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
+import { AppellationAutocomplete } from "src/app/Profession/AppellationAutocomplete";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
-import { ProfessionDto } from "src/shared/rome";
+import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 
 interface Values {
@@ -64,10 +64,10 @@ export const SearchDebug = () => {
           <Form>
             <label htmlFor="rome">Rome</label>
             <Field id="rome" name="rome" placeholder="M1607" />
-            <ProfessionAutocomplete
+            <AppellationAutocomplete
               title="Rechercher un métier (ou saissir son code ci-dessus)"
-              setFormValue={(newValue: ProfessionDto) => {
-                setFieldValue("rome", newValue.romeCodeMetier);
+              setFormValue={(newValue: AppellationDto) => {
+                setFieldValue("rome", newValue.romeCode);
               }}
             />
             <br />

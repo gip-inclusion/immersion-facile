@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  preferEmailContactSchema,
-  preferInPersonContactSchema,
-  preferPhoneContactSchema,
-} from "./FormEstablishmentDto";
+
 import { immersionOfferIdSchema } from "./SearchImmersionDto";
 import { zEmail, zTrimmedString } from "./zodUtils";
 
@@ -13,6 +9,10 @@ const commonFields = {
   potentialBeneficiaryLastName: zTrimmedString,
   potentialBeneficiaryEmail: zEmail,
 };
+
+export const preferEmailContactSchema = z.literal("EMAIL");
+export const preferPhoneContactSchema = z.literal("PHONE");
+export const preferInPersonContactSchema = z.literal("IN_PERSON");
 
 // prettier-ignore
 export type ContactEstablishmentByMailDto = z.infer<typeof contactEstablishmentByMailSchema>;

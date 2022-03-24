@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export abstract class HttpError extends Error {
   abstract httpCode: number;
 
@@ -68,3 +70,14 @@ export class UnavailableApiError extends HttpError {
     Object.setPrototypeOf(this, ForbiddenError.prototype);
   }
 }
+
+export const validateAndParseZodSchema = <T>(
+  inputSchema: z.Schema<T>,
+  params: any,
+): T => {
+  try {
+    return inputSchema.parse(params);
+  } catch (e) {
+    throw new BadRequestError(e);
+  }
+};

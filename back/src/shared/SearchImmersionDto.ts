@@ -1,13 +1,14 @@
 import { z } from "zod";
+
+import { nafDivisionSchema } from "./naf";
+import { siretSchema } from "./siret";
+import { romeCodeSchema } from "./rome";
+import { Flavor } from "./typeFlavors";
+import { zTrimmedString } from "./zodUtils";
 import {
   immersionContactInEstablishmentIdSchema,
   preferredContactMethodSchema,
-} from "./FormEstablishmentDto";
-import { nafDivisionSchema } from "./naf";
-import { siretSchema } from "./siret";
-import { romeCodeMetierSchema } from "./rome";
-import { Flavor } from "./typeFlavors";
-import { zTrimmedString } from "./zodUtils";
+} from "./formEstablishment/FormEstablishment.schema";
 
 export type CompanyId = Flavor<string, "CompanyId">;
 
@@ -33,7 +34,7 @@ export type SearchImmersionRequestDto = z.infer<
   typeof searchImmersionRequestSchema
 >;
 export const searchImmersionRequestSchema = z.object({
-  rome: romeCodeMetierSchema.optional(),
+  rome: romeCodeSchema.optional(),
   nafDivision: nafDivisionSchema.optional(),
   siret: siretSchema.optional(),
   location: latLonSchema,

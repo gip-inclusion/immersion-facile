@@ -1,4 +1,4 @@
-import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
 import { SiretDto } from "../../../shared/siret";
 
 export interface FormEstablishmentRepository {

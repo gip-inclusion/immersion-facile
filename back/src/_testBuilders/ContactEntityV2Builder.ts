@@ -1,5 +1,7 @@
-import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
-import { ContactMethod } from "../shared/FormEstablishmentDto";
+import {
+  ContactEntityV2,
+  ContactMethod,
+} from "../domain/immersionOffer/entities/ContactEntity";
 import { Builder } from "./Builder";
 
 const validContactEntityV2: ContactEntityV2 = {

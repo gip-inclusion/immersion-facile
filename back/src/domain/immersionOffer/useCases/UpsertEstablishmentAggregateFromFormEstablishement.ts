@@ -1,7 +1,5 @@
-import {
-  FormEstablishmentDto,
-  formEstablishmentSchema,
-} from "../../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
+import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormEstablishment.schema";
 import { NafDto } from "../../../shared/naf";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { Clock } from "../../core/ports/Clock";
@@ -95,25 +93,20 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     const contact: ContactEntityV2 = {
       id: this.uuidGenerator.new(),
-      firstName: formEstablishment.businessContacts[0].firstName,
-      lastName: formEstablishment.businessContacts[0].lastName,
-      email: formEstablishment.businessContacts[0].email,
-      phone: formEstablishment.businessContacts[0].phone,
-      job: formEstablishment.businessContacts[0].job,
-      contactMethod: formEstablishment.preferredContactMethods[0],
+      ...formEstablishment.businessContact,
     };
 
     const immersionOffers: ImmersionOfferEntityV2[] = (
       await this.sequenceRunner.run(
-        formEstablishment.professions,
+        formEstablishment.appellations,
         async ({
-          romeCodeMetier,
-          romeCodeAppellation,
+          romeCode,
+          appellationCode,
         }): Promise<ImmersionOfferEntityV2 | undefined> => ({
           id: this.uuidGenerator.new(),
-          romeCode: romeCodeMetier,
-          romeAppellation: romeCodeAppellation
-            ? Number(romeCodeAppellation)
+          romeCode: romeCode,
+          romeAppellation: appellationCode
+            ? Number(appellationCode)
             : undefined,
           score: offerFromFormScore,
         }),

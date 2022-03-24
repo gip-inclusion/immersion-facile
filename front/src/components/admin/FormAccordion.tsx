@@ -5,7 +5,6 @@ import type {
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { formatDistance, formatDuration, intervalToDuration } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Accordion } from "./Accordion";
 import { FormDetails } from "./FormDetails";
 
 const beforeAfterString = (date: string) => {

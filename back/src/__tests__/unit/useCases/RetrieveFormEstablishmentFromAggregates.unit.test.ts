@@ -3,7 +3,7 @@ import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
-import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
 import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
@@ -91,23 +91,15 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       businessAddress: establishment.address,
       isEngagedEnterprise: establishment.isCommited,
       naf: establishment.nafDto,
-      professions: [
+      appellations: [
         {
-          description: "test_rome_label",
-          romeCodeMetier: "A1101",
-          romeCodeAppellation: "11987",
+          appellationLabel: "test_appellation_label",
+          romeLabel: "test_rome_label",
+          romeCode: "A1101",
+          appellationCode: "11987",
         },
       ],
-      businessContacts: [
-        {
-          email: contact.email,
-          firstName: contact.firstName,
-          lastName: contact.lastName,
-          job: contact.job,
-          phone: contact.phone,
-        },
-      ],
-      preferredContactMethods: [contact.contactMethod],
+      businessContact: contact,
     };
     expect(retrievedForm).toMatchObject(expectedForm);
   });

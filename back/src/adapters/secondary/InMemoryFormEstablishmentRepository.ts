@@ -1,5 +1,5 @@
-import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
 import { FormEstablishmentRepository } from "../../domain/immersionOffer/ports/FormEstablishmentRepository";
+import { FormEstablishmentDto } from "../../shared/formEstablishment/FormEstablishment.dto";
 import { propEq } from "../../shared/ramdaExtensions/propEq";
 import { SiretDto } from "../../shared/siret";
 import { createLogger } from "../../utils/logger";

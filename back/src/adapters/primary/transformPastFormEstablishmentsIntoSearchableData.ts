@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { UpsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpsertEstablishmentAggregateFromFormEstablishement";
-import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../shared/formEstablishment/FormEstablishment.dto";
 
 import { random, sleep } from "../../shared/utils";
 import { createLogger } from "../../utils/logger";
@@ -104,9 +104,8 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       businessNameCustomized: row.business_name_customized,
       businessAddress: row.business_address,
       naf: row.naf,
-      professions: row.professions,
-      businessContacts: row.business_contacts,
-      preferredContactMethods: row.preferred_contact_methods,
+      appellations: row.professions,
+      businessContact: row.business_contact,
     };
     try {
       await upsertAggregateFromForm.execute(formEstablishmentDto);

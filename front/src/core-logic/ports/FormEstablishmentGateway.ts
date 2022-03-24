@@ -1,12 +1,12 @@
-import { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
-import { RomeSearchMatchDto } from "src/shared/rome";
+import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { AppellationMatchDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "src/shared/siret";
 
 export interface FormEstablishmentGateway {
   addFormEstablishment: (
     establishment: FormEstablishmentDto,
   ) => Promise<SiretDto>;
-  searchProfession: (searchText: string) => Promise<RomeSearchMatchDto[]>;
+  searchAppellation: (searchText: string) => Promise<AppellationMatchDto[]>;
   getSiretAlreadyExists(siret: SiretDto): Promise<boolean>;
   requestEmailToEditForm(siret: SiretDto): Promise<void>;
   getFormEstablishmentFromJwt: (jwt: string) => Promise<FormEstablishmentDto>;

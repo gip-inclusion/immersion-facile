@@ -3,9 +3,9 @@ import { DistanceIcon } from "src/assets/DistanceIcon";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { TrefleIcon } from "src/assets/TrefleIcon";
 import { SearchButton } from "src/components/SearchButton";
-import { ContactMethod } from "src/shared/FormEstablishmentDto";
 import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
+import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;
@@ -111,7 +111,6 @@ const InfoLabel = ({
 
   switch (contactMode) {
     case undefined:
-    case "UNKNOWN":
       return (
         <div className={allStyles}>
           <TrefleIcon /> Tentez votre chance

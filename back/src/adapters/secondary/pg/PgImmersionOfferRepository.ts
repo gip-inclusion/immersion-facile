@@ -1,6 +1,9 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
+import {
+  ContactEntityV2,
+  ContactMethod,
+} from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
   employeeRangeByTefenCode,
@@ -12,7 +15,7 @@ import {
 import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
-import { ContactMethod } from "../../../shared/FormEstablishmentDto";
+import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   ImmersionOfferId,
   LatLonDto,
@@ -44,7 +47,6 @@ const pgContactToContactMethod = Object.fromEntries(
 
 const parseContactMethod = (raw: string): ContactMethod => {
   const pgContactMethod = raw as PgContactMethod;
-  if (pgContactMethod == null) return "UNKNOWN";
   return pgContactToContactMethod[pgContactMethod];
 };
 
@@ -611,11 +613,11 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
     };
   }
 
-  public async getAnnotatedImmersionOffersForEstablishmentSiret(
+  public async getOffersAsAppelationDtoForFormEstablishment(
     siret: string,
-  ): Promise<AnnotatedImmersionOfferEntityV2[]> {
+  ): Promise<AppellationDto[]> {
     const pgResult = await this.client.query(
-      `SELECT io.*, libelle_rome, libelle_appellation_long
+      `SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
        FROM immersion_offers io
        JOIN public_romes_data prd ON prd.code_rome = io.rome_code 
        LEFT JOIN public_appelations_data pad on io.rome_appellation = pad.ogr_appellation
@@ -623,11 +625,11 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       [siret],
     );
     return pgResult.rows.map((row: any) => ({
-      id: row.uuid,
       romeCode: row.rome_code,
-      romeAppellation: optional(row.rome_appellation) && row.rome_appellation,
-      score: row.score,
-      romeLabel: row.libelle_appellation_long ?? row.libelle_rome,
+      appellationCode:
+        optional(row.ogr_appellation) && row.ogr_appellation.toString(),
+      romeLabel: row.libelle_rome,
+      appellationLabel: row.libelle_appellation_long, // libelle_appellation_long should not be undefined
     }));
   }
 }

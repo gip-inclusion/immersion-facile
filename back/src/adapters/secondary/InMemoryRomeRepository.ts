@@ -1,9 +1,9 @@
 import {
-  RomeAppellation,
   RomeRepository,
   RomeMetier,
 } from "../../domain/rome/ports/RomeRepository";
-import { RomeCodeAppellationDto, RomeCodeMetierDto } from "../../shared/rome";
+import { AppellationCode, RomeCode } from "../../shared/rome";
+import { AppellationDto } from "../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { createLogger } from "../../utils/logger";
 import { normalize } from "../../utils/textSearch";
 
@@ -28,38 +28,48 @@ const metiers: RomeMetier[] = [
   { codeMetier: "N4301", libelle: "Conduite sur rails" },
 ];
 
-const appellations: RomeAppellation[] = [
+const appellations: AppellationDto[] = [
   {
-    codeAppellation: "12694",
-    libelle: "Coiffeur / Coiffeuse mixte",
-    codeMetier: "D1202",
+    appellationCode: "12694",
+    appellationLabel: "Coiffeur / Coiffeuse mixte",
+    romeCode: "D1202",
+    romeLabel: "Coiffure",
   },
   {
-    codeAppellation: "14704",
-    libelle: "Éleveur / Éleveuse de lapins angoras",
-    codeMetier: "A1409",
+    appellationCode: "14704",
+    appellationLabel: "Éleveur / Éleveuse de lapins angoras",
+    romeCode: "A1409",
+    romeLabel: "Élevage",
   },
   {
-    codeAppellation: "16067",
-    libelle: "Jardinier / Jardinière",
-    codeMetier: "A1203",
+    appellationCode: "16067",
+    appellationLabel: "Jardinier / Jardinière",
+    romeCode: "A1203",
+    romeLabel: "Jardinage",
   },
   {
-    codeAppellation: "20560",
-    libelle: "Vendeur / Vendeuse en boulangerie-pâtisserie",
-    codeMetier: "D1106",
+    appellationCode: "20560",
+    appellationLabel: "Vendeur / Vendeuse en boulangerie-pâtisserie",
+    romeCode: "D1106",
+    romeLabel: "Vente",
   },
   {
-    codeAppellation: "20567",
-    libelle: "Vendeur / Vendeuse en chocolaterie",
-    codeMetier: "D1106",
+    appellationCode: "20567",
+    appellationLabel: "Vendeur / Vendeuse en chocolaterie",
+    romeCode: "D1106",
+    romeLabel: "Vente",
   },
-  { codeAppellation: "20714", libelle: "Vitrailliste", codeMetier: "B1602" },
+  {
+    appellationCode: "20714",
+    appellationLabel: "Vitrailliste",
+    romeCode: "B1602",
+    romeLabel: "Vitraillerie",
+  },
 ];
 
 const appellationsToRome: Array<{
-  codeAppellation: RomeCodeAppellationDto;
-  rome: RomeCodeMetierDto;
+  codeAppellation: AppellationCode;
+  rome: RomeCode;
 }> = [
   { codeAppellation: "11987", rome: "A1101" },
   { codeAppellation: "12120", rome: "B2200" },
@@ -73,8 +83,8 @@ const appellationsToRome: Array<{
 
 export class InMemoryRomeRepository implements RomeRepository {
   public async appellationToCodeMetier(
-    romeCodeAppellation: RomeCodeAppellationDto,
-  ): Promise<RomeCodeMetierDto | undefined> {
+    romeCodeAppellation: AppellationCode,
+  ): Promise<RomeCode | undefined> {
     return appellationsToRome.find(
       (x) => x.codeAppellation == romeCodeAppellation,
     )?.rome;
@@ -88,12 +98,12 @@ export class InMemoryRomeRepository implements RomeRepository {
     );
   }
 
-  public async searchAppellation(query: string): Promise<RomeAppellation[]> {
+  public async searchAppellation(query: string): Promise<AppellationDto[]> {
     logger.info({ query }, "searchAppellation");
     const normalizedQuery = normalize(query);
     return appellations.filter(
       (appellation) =>
-        normalize(appellation.libelle).indexOf(normalizedQuery) >= 0,
+        normalize(appellation.appellationLabel).indexOf(normalizedQuery) >= 0,
     );
   }
 }

@@ -2,42 +2,47 @@ import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity
 import {
   FormEstablishmentDto,
   FormEstablishmentSource,
-} from "../shared/FormEstablishmentDto";
-import { ProfessionDto } from "../shared/rome";
+} from "../shared/formEstablishment/FormEstablishment.dto";
+import { AppellationDto } from "../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+
 import { SiretDto } from "../shared/siret";
 import { Builder } from "./Builder";
 
 const validFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddress: "1 Rue du Moulin 12345 Quelque Part",
-  businessContacts: [
-    {
-      email: "amil@mail.com",
-      firstName: "Esteban",
-      lastName: "Ocon",
-      phone: "+33012345678",
-      job: "a job",
-    },
-  ],
+  businessContact: {
+    email: "amil@mail.com",
+    firstName: "Esteban",
+    lastName: "Ocon",
+    phone: "+33012345678",
+    job: "a job",
+    contactMethod: "EMAIL",
+  },
+
   naf: { code: "A", nomenclature: "nomenclature code A" },
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
   isEngagedEnterprise: false,
-  preferredContactMethods: ["EMAIL"],
   siret: "01234567890123",
-  professions: [
+  appellations: [
     {
-      romeCodeMetier: "A1111",
-      description: "Boulangerie",
+      romeCode: "A1111",
+      appellationCode: "11111",
+      romeLabel: "Boulangerie",
+      appellationLabel: "Boulanger - Boulangère",
     },
     {
-      romeCodeMetier: "B9112",
-      description: "Patissier",
+      romeCode: "B9112",
+      appellationCode: "22222",
+      romeLabel: "Patissier",
+      appellationLabel: "Patissier - Patissière",
     },
     {
-      romeCodeMetier: "D1103",
-      romeCodeAppellation: "22222",
-      description: "Boucher / Bouchère",
+      romeCode: "D1103",
+      appellationCode: "33333",
+      romeLabel: "Boucherie",
+      appellationLabel: "Boucher / Bouchère",
     },
   ],
 };
@@ -46,11 +51,17 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddress: "",
   naf: { code: "", nomenclature: "" },
-  preferredContactMethods: [],
-  businessContacts: [],
+  businessContact: {
+    contactMethod: "EMAIL",
+    lastName: "",
+    firstName: "",
+    phone: "",
+    email: "",
+    job: "",
+  },
   businessName: "",
   siret: "",
-  professions: [],
+  appellations: [],
 };
 
 export class FormEstablishmentDtoBuilder
@@ -69,7 +80,7 @@ export class FormEstablishmentDtoBuilder
   public withMail(email: string) {
     return new FormEstablishmentDtoBuilder({
       ...this.dto,
-      businessContacts: [{ ...this.dto.businessContacts[0], email }],
+      businessContact: { ...this.dto.businessContact, email },
     });
   }
 
@@ -82,11 +93,14 @@ export class FormEstablishmentDtoBuilder
   public withBusinessName(businessName: string) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, businessName });
   }
-  public withProfessions(professions: ProfessionDto[]) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, professions });
+  public withAppellations(appellations: AppellationDto[]) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.dto,
+      appellations: appellations,
+    });
   }
-  public withBusinessContacts(businessContacts: ContactEntityV2[]) {
-    return new FormEstablishmentDtoBuilder({ ...this.dto, businessContacts });
+  public withBusinessContact(businessContact: ContactEntityV2) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, businessContact });
   }
   public build() {
     return this.dto;

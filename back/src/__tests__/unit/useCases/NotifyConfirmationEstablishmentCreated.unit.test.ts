@@ -13,7 +13,7 @@ describe("NotifyConfirmationEstablismentCreated", () => {
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
     emailFilter = new AllowListEmailFilter([
-      validEstablishment.businessContacts[0].email,
+      validEstablishment.businessContact.email,
     ]);
   });
 

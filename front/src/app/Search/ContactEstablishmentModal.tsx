@@ -6,7 +6,7 @@ import { SubTitle, Title } from "src/components/Title";
 import {
   ContactMethod,
   ImmersionContactInEstablishmentId,
-} from "src/shared/FormEstablishmentDto";
+} from "src/shared/formEstablishment/FormEstablishment.dto";
 import { ImmersionOfferId } from "src/shared/SearchImmersionDto";
 import { ContactInPerson } from "./ContactInPerson";
 

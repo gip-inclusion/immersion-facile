@@ -6,13 +6,13 @@ import {
   ContactEstablishmentByMailDto,
   ContactEstablishmentInPersonDto,
 } from "../shared/contactEstablishment";
-import { FormEstablishmentDto } from "../shared/FormEstablishmentDto";
 import { frontRoutes } from "../shared/routes";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { ContactEstablishmentByPhoneDto } from "../shared/contactEstablishment";
 import { fakeGenerateMagicLinkUrlFn } from "./test.helpers";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import { ImmersionApplicationDto } from "../shared/ImmersionApplication/ImmersionApplication.dto";
+import { FormEstablishmentDto } from "../shared/formEstablishment/FormEstablishment.dto";
 
 export const expectEmailAdminNotificationMatchingImmersionApplication = (
   templatedEmail: TemplatedEmail,
@@ -94,7 +94,7 @@ export const expectedEmailEstablisentCreatedReviewMatchingEstablisment = (
 ) => {
   expectTemplatedEmailToEqual(templatedEmail, {
     type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
-    recipients: [establishmentDto.businessContacts[0].email],
+    recipients: [establishmentDto.businessContact.email],
     params: { establishmentDto },
   });
 };

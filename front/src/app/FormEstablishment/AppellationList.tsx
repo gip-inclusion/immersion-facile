@@ -1,17 +1,17 @@
 import { useField } from "formik";
 import React from "react";
-import { FormEstablishmentProfession } from "src/app/FormEstablishment/FormEstablishmentProfession";
+import { FormEstablishmentAppellation } from "src/app/FormEstablishment/FormEstablishmentAppellation";
 import { ButtonAdd } from "src/components/ButtonAdd";
-import { ProfessionDto } from "src/shared/rome";
+import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { removeAtIndex } from "src/shared/utils";
 
-type ProfessionListProps = {
+type AppellationListProps = {
   name: string;
   title?: string;
 };
 
-export const ProfessionList = ({ name, title }: ProfessionListProps) => {
-  const [field, { touched, error }, { setValue }] = useField<ProfessionDto[]>({
+export const AppellationList = ({ name, title }: AppellationListProps) => {
+  const [field, { touched, error }, { setValue }] = useField<AppellationDto[]>({
     name,
   });
 
@@ -26,10 +26,10 @@ export const ProfessionList = ({ name, title }: ProfessionListProps) => {
     >
       <div className="w-full">
         {title && <h5 className="text-lg font-semibold mt-6">{title}</h5>}
-        {professions.map(({ description }, index) => (
-          <FormEstablishmentProfession
+        {professions.map(({ appellationLabel }, index) => (
+          <FormEstablishmentAppellation
             name={`${name}[${index}]`}
-            label={description}
+            label={appellationLabel}
             onDelete={() => onDelete(index)}
             key={index}
           />
@@ -37,7 +37,15 @@ export const ProfessionList = ({ name, title }: ProfessionListProps) => {
       </div>
       <ButtonAdd
         onClick={() =>
-          setValue([...field.value, { romeCodeMetier: "", description: "" }])
+          setValue([
+            ...field.value,
+            {
+              romeCode: "",
+              appellationCode: "",
+              romeLabel: "",
+              appellationLabel: "",
+            },
+          ])
         }
       >
         Ajouter un métier

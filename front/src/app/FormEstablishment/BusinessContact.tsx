@@ -1,47 +1,42 @@
 import { useField } from "formik";
 import React from "react";
+import { RadioGroupForField } from "src/app/RadioGroup";
 import { DeleteButton } from "src/components/DeleteButton";
 import { TextInput } from "src/components/form/TextInput";
 import {
   BusinessContactDto,
+  ContactMethod,
   FormEstablishmentDto,
-} from "src/shared/FormEstablishmentDto";
+} from "src/shared/formEstablishment/FormEstablishment.dto";
 
-export const BusinessContactList = () => {
-  const name: keyof FormEstablishmentDto = "businessContacts";
-  const [field] = useField<BusinessContactDto[]>({ name });
+const preferredContactMethodOptions: Array<{
+  label?: string;
+  value: ContactMethod;
+}> = [
+  {
+    value: "EMAIL",
+    label:
+      "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
+  },
+  {
+    value: "PHONE",
+    label:
+      "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
+  },
+  {
+    value: "IN_PERSON",
+    label: "Se présenter en personne à votre établissement",
+  },
+];
 
-  const businessContacts = field.value;
-
-  // const onDelete = (index: number) => {
-  //   setValue(removeAtIndex(businessContacts, index));
-  // };
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      {businessContacts.map((_, index) => (
-        <BusinessContact index={index} key={index} /* onDelete={onDelete} */ />
-      ))}
-    </div>
-  );
-};
-
-type BusinessContactProps = {
-  index: number;
-  onDelete?: (indexToDelete: number) => void;
-};
-
-const BusinessContact = ({ index, onDelete }: BusinessContactProps) => {
-  const parentFieldName: keyof FormEstablishmentDto = "businessContacts";
+export const BusinessContact = () => {
+  const parentFieldName: keyof FormEstablishmentDto = "businessContact";
   const makeName = (name: keyof BusinessContactDto) =>
-    `${parentFieldName}[${index}].${name}`;
+    `${parentFieldName}.${name}`;
 
   return (
     <div>
       <div className=" py-2 my-2">
-        {typeof onDelete !== "undefined" && (
-          <DeleteButton onClick={() => onDelete(index)} />
-        )}
         <h4 className="text-lg font-semibold m-0">
           Détails du correspondant immersion :
         </h4>
@@ -55,6 +50,11 @@ const BusinessContact = ({ index, onDelete }: BusinessContactProps) => {
         name={makeName("phone")}
       />
       <TextInput label="Email *" name={makeName("email")} />
+      <RadioGroupForField
+        name={makeName("contactMethod")}
+        label="Comment souhaitez-vous que les candidats vous contactent ?"
+        options={preferredContactMethodOptions}
+      />
     </div>
   );
 };

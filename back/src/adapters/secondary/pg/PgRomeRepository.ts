@@ -1,9 +1,9 @@
 import { PoolClient } from "pg";
 import {
-  RomeAppellation,
   RomeRepository,
   RomeMetier,
 } from "../../../domain/rome/ports/RomeRepository";
+import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -63,7 +63,7 @@ export class PgRomeRepository implements RomeRepository {
       });
   }
 
-  public async searchAppellation(query: string): Promise<RomeAppellation[]> {
+  public async searchAppellation(query: string): Promise<AppellationDto[]> {
     const queryWords = query.split(" ");
     const lastWord = queryWords[queryWords.length - 1];
     const queryBeginning =
@@ -73,8 +73,9 @@ export class PgRomeRepository implements RomeRepository {
 
     return await this.client
       .query(
-        `SELECT ogr_appellation, libelle_appellation_court, code_rome
-        FROM public_appelations_data
+        `SELECT ogr_appellation, libelle_appellation_court, public_appelations_data.code_rome, libelle_rome
+        FROM public_appelations_data 
+        JOIN public_romes_data ON  public_appelations_data.code_rome = public_romes_data.code_rome
         WHERE
            (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long ILIKE $3)
            OR (libelle_appellation_long ILIKE $2 AND libelle_appellation_long ILIKE $3)
@@ -83,10 +84,11 @@ export class PgRomeRepository implements RomeRepository {
       )
       .then((res) =>
         res.rows.map(
-          (row): RomeAppellation => ({
-            codeAppellation: row.ogr_appellation,
-            libelle: row.libelle_appellation_court,
-            codeMetier: row.code_rome,
+          (row): AppellationDto => ({
+            appellationCode: row.ogr_appellation.toString(),
+            romeCode: row.code_rome,
+            appellationLabel: row.libelle_appellation_court,
+            romeLabel: row.libelle_rome,
           }),
         ),
       )

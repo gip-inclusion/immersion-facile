@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
 import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -33,8 +33,8 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       await uow.immersionOfferRepo.getContactForEstablishmentSiret(siret);
     if (!contact) throw new BadRequestError("No contact ");
 
-    const offers =
-      await uow.immersionOfferRepo.getAnnotatedImmersionOffersForEstablishmentSiret(
+    const offersAsAppellationDto =
+      await uow.immersionOfferRepo.getOffersAsAppelationDtoForFormEstablishment(
         siret,
       );
 
@@ -46,21 +46,13 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       businessAddress: establishment.address,
       isEngagedEnterprise: establishment.isCommited,
       naf: establishment?.nafDto,
-      professions: offers.map((offer) => ({
-        description: offer.romeLabel, // Libelle de l'appelation ou du code rome
-        romeCodeMetier: offer.romeCode,
-        romeCodeAppellation: offer.romeAppellation?.toString(), // possibly undefined ?
+      appellations: offersAsAppellationDto.map((offerAsAppellationDto) => ({
+        romeLabel: offerAsAppellationDto.romeLabel,
+        romeCode: offerAsAppellationDto.romeCode,
+        appellationCode: offerAsAppellationDto.appellationCode,
+        appellationLabel: offerAsAppellationDto.appellationLabel,
       })),
-      businessContacts: [
-        {
-          email: contact.email,
-          firstName: contact.firstName,
-          lastName: contact.lastName,
-          job: contact.job,
-          phone: contact.phone,
-        },
-      ],
-      preferredContactMethods: [contact.contactMethod],
+      businessContact: contact,
     };
     return retrievedForm;
   }

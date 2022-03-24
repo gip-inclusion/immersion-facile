@@ -7,8 +7,8 @@ import {
   DataSource,
   EstablishmentEntityV2,
 } from "../../domain/immersionOffer/entities/EstablishmentEntity";
-import { AnnotatedImmersionOfferEntityV2 } from "../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
+import { AppellationDto } from "../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   LatLonDto,
   SearchImmersionResultDto,
@@ -1030,11 +1030,12 @@ describe("Postgres implementation of immersion offer repository", () => {
       new ImmersionOfferEntityV2Builder()
         .withNewId()
         .withRomeCode("A1101") // Code only, no appellation
+        .withRomeAppellation(11987)
         .build(),
       new ImmersionOfferEntityV2Builder()
         .withNewId()
         .withRomeCode("A1101")
-        .withRomeAppellation(11987) // Appellation is specified here
+        .withRomeAppellation(12862)
         .build(),
     ];
     beforeEach(async () => {
@@ -1084,33 +1085,37 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
     });
 
-    describe("getOffersForEstablishmentSiret", () => {
+    describe("getOffersAsAppelationDtoForFormEstablishment", () => {
       it("returns an empty list if no establishment found with this siret", async () => {
         const siretNotInTable = "11111111111111";
 
         expect(
-          await pgImmersionOfferRepository.getAnnotatedImmersionOffersForEstablishmentSiret(
+          await pgImmersionOfferRepository.getOffersAsAppelationDtoForFormEstablishment(
             siretNotInTable,
           ),
         ).toHaveLength(0);
       });
-      it("returns a list with offers from establishment of given siret", async () => {
-        const expectedAnnotatedOffers: AnnotatedImmersionOfferEntityV2[] = [
+      it("returns a list with offers from offers as AppellationDto of given siret", async () => {
+        const expectedOffersAsAppelationDto: AppellationDto[] = [
           {
-            ...offers[0],
+            romeCode: offers[0].romeCode,
             romeLabel: "Conduite d'engins agricoles et forestiers",
+            appellationCode: offers[0].romeAppellation!.toString(),
+            appellationLabel: "Chauffeur / Chauffeuse de machines agricoles",
           },
           {
-            ...offers[1],
-            romeLabel: "Chauffeur / Chauffeuse de machines agricoles",
+            romeCode: offers[1].romeCode,
+            romeLabel: "Conduite d'engins agricoles et forestiers",
+            appellationCode: offers[1].romeAppellation!.toString(),
+            appellationLabel: "Conducteur / Conductrice d'abatteuses",
           },
         ];
-        const actualAnnotatedOffers =
-          await pgImmersionOfferRepository.getAnnotatedImmersionOffersForEstablishmentSiret(
+        const actualOffersAsAppelationDto =
+          await pgImmersionOfferRepository.getOffersAsAppelationDtoForFormEstablishment(
             siretInTable,
           );
-        expect(actualAnnotatedOffers).toEqual(
-          expect.arrayContaining(expectedAnnotatedOffers),
+        expect(actualOffersAsAppelationDto).toEqual(
+          expect.arrayContaining(expectedOffersAsAppelationDto),
         );
       });
     });

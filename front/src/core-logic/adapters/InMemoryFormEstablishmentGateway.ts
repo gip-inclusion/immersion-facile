@@ -1,6 +1,6 @@
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
-import { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
-import { RomeSearchMatchDto } from "src/shared/rome";
+import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { AppellationMatchDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "src/shared/siret";
 import { sleep } from "src/shared/utils";
 import { v4 as uuidV4 } from "uuid";
@@ -23,26 +23,30 @@ export class InMemoryFormEstablishmentGateway
     return immersionOffer.siret;
   }
 
-  public async searchProfession(
+  public async searchAppellation(
     searchText: string,
-  ): Promise<RomeSearchMatchDto[]> {
+  ): Promise<AppellationMatchDto[]> {
     await sleep(700);
     if (searchText === "givemeanemptylistplease") return [];
     if (searchText === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
     return [
       {
-        profession: {
-          description:
+        appellation: {
+          appellationLabel:
             "Agent(e) chargé(e) protection, sauvegarde patrimoine naturel",
-          romeCodeMetier: "A1204",
+          romeCode: "A1204",
+          romeLabel: "Agent",
+          appellationCode: "11204",
         },
         matchRanges: [{ startIndexInclusive: 9, endIndexExclusive: 13 }],
       },
       {
-        profession: {
-          description: "Boulanger",
-          romeCodeMetier: "A1111",
+        appellation: {
+          romeCode: "A1111",
+          appellationCode: "11111",
+          romeLabel: "Boulangerie",
+          appellationLabel: "Boulanger - boulangère",
         },
         matchRanges: [
           { startIndexInclusive: 0, endIndexExclusive: 3 },
@@ -50,23 +54,29 @@ export class InMemoryFormEstablishmentGateway
         ],
       },
       {
-        profession: {
-          description: "Boucher",
-          romeCodeMetier: "B2222",
+        appellation: {
+          romeCode: "B2222",
+          appellationCode: "22222",
+          romeLabel: "Boucherie",
+          appellationLabel: "Boucher - Bouchère",
         },
         matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 3 }],
       },
       {
-        profession: {
-          romeCodeMetier: "C3333",
-          description: "Menuisier",
+        appellation: {
+          romeCode: "C3333",
+          appellationCode: "33333",
+          romeLabel: "Menuiserie",
+          appellationLabel: "Menuisier - Menuisière",
         },
         matchRanges: [],
       },
       {
-        profession: {
-          romeCodeMetier: "D4444",
-          description: "Vendeur",
+        appellation: {
+          romeCode: "D4444",
+          appellationCode: "44444",
+          romeLabel: "Vente",
+          appellationLabel: "Veudeuse - Veudeur",
         },
         matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 7 }],
       },
@@ -89,28 +99,28 @@ export class InMemoryFormEstablishmentGateway
       businessNameCustomized: `My business customized name, retrieved from jwt ${jwt}`,
       businessAddress: "5 Rue de la Huchette 75005 Paris",
       isEngagedEnterprise: true,
-      professions: [
+      appellations: [
         {
-          romeCodeAppellation: "11573",
-          romeCodeMetier: "D1102",
-          description: "Boulanger",
+          appellationCode: "11573",
+          romeCode: "D1102",
+          romeLabel: "Boulanger",
+          appellationLabel: "Boulangerie - viennoiserie",
         },
         {
-          description: "Boucher / Bouchère",
-          romeCodeAppellation: "11564",
-          romeCodeMetier: "D1101",
-        },
-      ],
-      businessContacts: [
-        {
-          firstName: "John",
-          lastName: "Doe",
-          job: "super job",
-          phone: "02837",
-          email: "joe@mail.com",
+          appellationCode: "11564",
+          romeCode: "D1101",
+          romeLabel: "Boucherie",
+          appellationLabel: "Boucher / Bouchère",
         },
       ],
-      preferredContactMethods: ["EMAIL"],
+      businessContact: {
+        firstName: "John",
+        lastName: "Doe",
+        job: "super job",
+        phone: "02837",
+        email: "joe@mail.com",
+        contactMethod: "EMAIL",
+      },
     };
   }
   public async updateFormEstablishment(

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
-import { FormEstablishmentDto } from "src/shared/FormEstablishmentDto";
-import { RomeSearchMatchDto, romeSearchResponseSchema } from "src/shared/rome";
+import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { AppellationMatchDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   editEstablishmentFormRouteWithApiKey,
   formAlreadyExistsRoute,
@@ -27,9 +27,9 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
     return zString.parse(httpResponse.data);
   }
 
-  public async searchProfession(
+  public async searchAppellation(
     searchText: string,
-  ): Promise<RomeSearchMatchDto[]> {
+  ): Promise<AppellationMatchDto[]> {
     const httpResponse = await axios.get(`/${prefix}/${romeRoute}`, {
       params: { searchText },
     });

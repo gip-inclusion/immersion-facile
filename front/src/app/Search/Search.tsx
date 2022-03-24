@@ -2,7 +2,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik, FormikHelpers } from "formik";
 import React, { useState } from "react";
 import { immersionSearchGateway } from "src/app/dependencies";
-import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
+import { AppellationAutocomplete } from "src/app/Profession/AppellationAutocomplete";
 import { OurAdvises } from "src/app/Search/OurAdvises";
 import { SearchResultPanel } from "src/app/Search/SearchResultPanel";
 import distanceSearchIcon from "src/assets/distance-search-icon.svg";
@@ -79,10 +79,10 @@ export const Search = () => {
               <Form>
                 <div className="gap-5 flex flex-col">
                   <div>
-                    <ProfessionAutocomplete
+                    <AppellationAutocomplete
                       title="Métier recherché"
                       setFormValue={(newValue) =>
-                        setFieldValue("rome", newValue.romeCodeMetier)
+                        setFieldValue("rome", newValue.romeCode)
                       }
                       className="searchdropdown-header inputLabel"
                     />

@@ -1,21 +1,18 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { BusinessContactList } from "src/app/FormEstablishment/BusinessContactList";
+import { BusinessContact } from "src/app/FormEstablishment/BusinessContact";
 import {
   fieldsToLabel,
   FieldsWithLabel,
 } from "src/app/FormEstablishment/fieldsToLabels";
-import { ProfessionList } from "src/app/FormEstablishment/ProfessionList";
+import { AppellationList } from "src/app/FormEstablishment/AppellationList";
 import { RadioGroupForField } from "src/app/RadioGroup";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
-import {
-  ContactMethod,
-  FormEstablishmentDto,
-  formEstablishmentSchema,
-} from "src/shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { formEstablishmentSchema } from "src/shared/formEstablishment/FormEstablishment.schema";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -117,15 +114,12 @@ export const EstablishmentForm = ({
                 descriptionLink=""
                 disabled={false}
               />
-              <ProfessionList
-                name="professions"
-                title={`${fieldsToLabel["professions"]} *`}
+              <AppellationList
+                name="appellations"
+                title={`${fieldsToLabel["appellations"]} *`}
               />
-              <BusinessContactList />
-              <RadioGroupForField
-                {...getMandatoryLabelAndName("preferredContactMethods")}
-                options={preferredContactMethodOptions}
-              />
+              <BusinessContact />
+
               {submitCount !== 0 && Object.values(errors).length > 0 && (
                 <div style={{ color: "red" }}>
                   {console.log(errors)}
@@ -175,23 +169,3 @@ export const EstablishmentForm = ({
     </div>
   );
 };
-
-const preferredContactMethodOptions: Array<{
-  label?: string;
-  value: ContactMethod[];
-}> = [
-  {
-    value: ["EMAIL"],
-    label:
-      "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
-  },
-  {
-    value: ["PHONE"],
-    label:
-      "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
-  },
-  {
-    value: ["IN_PERSON"],
-    label: "Se présenter en personne à votre établissement",
-  },
-];

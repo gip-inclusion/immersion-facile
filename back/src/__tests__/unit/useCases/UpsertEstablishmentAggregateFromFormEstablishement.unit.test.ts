@@ -10,9 +10,9 @@ import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UpsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpsertEstablishmentAggregateFromFormEstablishement";
 import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
-import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
 import { NafDto } from "../../../shared/naf";
-import { ProfessionDto } from "../../../shared/rome";
+import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
@@ -92,21 +92,24 @@ describe("Upsert Establishment aggregate from form data", () => {
 
   it("converts Form Establishment in search format", async () => {
     // Prepare
-    const professions: ProfessionDto[] = [
+    const professions: AppellationDto[] = [
       {
-        romeCodeMetier: "A1101",
-        description: "métier A",
+        romeCode: "A1101",
+        appellationCode: "11717",
+        romeLabel: "métier A",
+        appellationLabel: "métier A.1",
       },
       {
-        romeCodeMetier: "A1102",
-        romeCodeAppellation: "11717",
-        description: "métier B",
+        romeCode: "A1102",
+        appellationCode: "11717",
+        romeLabel: "métier B",
+        appellationLabel: "métier B.1",
       },
     ];
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(fakeSiret)
-      .withProfessions(professions)
-      .withBusinessContacts([fakeBusinessContact])
+      .withAppellations(professions)
+      .withBusinessContact(fakeBusinessContact)
       .build();
 
     const establishmentFromApi =
@@ -121,7 +124,7 @@ describe("Upsert Establishment aggregate from form data", () => {
       siret: fakeSiret,
       nafDto: expectedNafDto,
       offerRomeCodesAndAppellations: [
-        { code: "A1101" },
+        { code: "A1101", appellation: 11717 },
         { code: "A1102", appellation: 11717 },
       ],
       contactEmail: fakeBusinessContact.email,
@@ -213,16 +216,17 @@ describe("Upsert Establishment aggregate from form data", () => {
     const newRomeCode = "A1101";
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(siret)
-      .withProfessions([
+      .withAppellations([
         {
-          description: "Boulanger",
-          romeCodeMetier: newRomeCode,
-          romeCodeAppellation: "22222",
+          romeLabel: "Boulangerie",
+          appellationLabel: "Boulanger",
+          romeCode: newRomeCode,
+          appellationCode: "22222",
         },
       ])
-      .withBusinessContacts([
+      .withBusinessContact(
         new ContactEntityV2Builder().withEmail("new.contact@gmail.com").build(),
-      ])
+      )
       .build();
 
     const establishmentFromApi =

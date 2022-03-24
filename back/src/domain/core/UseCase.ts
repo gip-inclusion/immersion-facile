@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { BadRequestError } from "../../adapters/primary/helpers/httpErrors";
+import {
+  BadRequestError,
+  validateAndParseZodSchema,
+} from "../../adapters/primary/helpers/httpErrors";
 import { MagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
@@ -45,12 +48,7 @@ export abstract class TransactionalUseCase<
     params: Input,
     jwtPayload?: JWTPayload,
   ): Promise<Output> {
-    let validParams: Input;
-    try {
-      validParams = this.inputSchema.parse(params);
-    } catch (e) {
-      throw new BadRequestError(e);
-    }
+    const validParams = validateAndParseZodSchema(this.inputSchema, params);
 
     return this.uowPerformer.perform((uow) =>
       this._execute(validParams, uow, jwtPayload),

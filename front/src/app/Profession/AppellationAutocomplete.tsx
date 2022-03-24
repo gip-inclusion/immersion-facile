@@ -6,36 +6,39 @@ import {
   StringWithHighlights,
 } from "src/app/FormEstablishment/StringWithHighlights";
 import { useDebounce } from "src/app/useDebounce";
-import { ProfessionDto, RomeSearchMatchDto } from "src/shared/rome";
+import {
+  AppellationDto,
+  AppellationMatchDto,
+} from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 const romeSearchMatchToProposal = ({
   matchRanges,
-  profession,
-}: RomeSearchMatchDto): Option => ({
-  value: profession,
-  description: profession.description,
+  appellation,
+}: AppellationMatchDto): Option => ({
+  value: appellation,
+  description: appellation.appellationLabel,
   matchRanges,
 });
 
-type ProfessionAutocompleteProps = {
+type AppellationAutocompleteProps = {
   title: string;
-  initialValue?: ProfessionDto | undefined;
-  setFormValue: (p: ProfessionDto) => void;
+  initialValue?: AppellationDto | undefined;
+  setFormValue: (p: AppellationDto) => void;
   className?: string;
 };
 
-type Option = Proposal<ProfessionDto>;
+type Option = Proposal<AppellationDto>;
 
-export const ProfessionAutocomplete = ({
+export const AppellationAutocomplete = ({
   initialValue,
   setFormValue,
   title,
   className,
-}: ProfessionAutocompleteProps) => {
+}: AppellationAutocompleteProps) => {
   const initialOption: Option | null = initialValue
     ? {
         value: initialValue,
-        description: initialValue?.description,
+        description: initialValue.appellationLabel,
         matchRanges: [],
       }
     : null;
@@ -44,7 +47,7 @@ export const ProfessionAutocomplete = ({
     initialOption,
   );
   const [searchTerm, setSearchTerm] = useState<string>(
-    initialValue?.description ?? "",
+    initialValue?.appellationLabel ?? "",
   );
   const [options, setOptions] = useState<Option[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -56,7 +59,8 @@ export const ProfessionAutocomplete = ({
       if (!sanitizedTerm) return [];
       try {
         setIsSearching(true);
-        const romeOptions = await formEstablishmentGateway.searchProfession(
+        // Should be given in props
+        const romeOptions = await formEstablishmentGateway.searchAppellation(
           sanitizedTerm,
         );
         setOptions(romeOptions.map(romeSearchMatchToProposal));
@@ -79,7 +83,7 @@ export const ProfessionAutocomplete = ({
         options={options}
         value={selectedOption}
         noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
-        getOptionLabel={(option: Option) => option.value.description}
+        getOptionLabel={(option: Option) => option.value.appellationLabel}
         renderOption={(props, option) => (
           <li {...props}>
             <StringWithHighlights
@@ -93,7 +97,12 @@ export const ProfessionAutocomplete = ({
           setFormValue(
             selectedOption
               ? selectedOption.value
-              : { description: "", romeCodeMetier: "" },
+              : {
+                  appellationCode: "",
+                  appellationLabel: "",
+                  romeCode: "",
+                  romeLabel: "",
+                },
           );
         }}
         onInputChange={(_, newSearchTerm) => {

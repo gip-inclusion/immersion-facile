@@ -1,8 +1,6 @@
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import {
-  FormEstablishmentDto,
-  formEstablishmentSchema,
-} from "../../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
+import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormEstablishment.schema";
 import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

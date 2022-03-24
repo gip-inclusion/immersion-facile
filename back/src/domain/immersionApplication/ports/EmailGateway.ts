@@ -1,4 +1,4 @@
-import { FormEstablishmentDto } from "../../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
 
 export type NewApplicationAdminNotificationParams = {
   demandeId: string;

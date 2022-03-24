@@ -17,11 +17,11 @@ import { InfoMessage } from "src/components/form/InfoMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";
 import { TextInput } from "src/components/form/TextInput";
 import { ENV } from "src/environmentVariables";
+import { OmitFromExistingKeys } from "src/shared/utils";
 import {
   FormEstablishmentDto,
   FormEstablishmentSource,
-} from "src/shared/FormEstablishmentDto";
-import { OmitFromExistingKeys } from "src/shared/utils";
+} from "src/shared/formEstablishment/FormEstablishment.dto";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;
@@ -135,17 +135,15 @@ export const defaultInitialValue: OmitFromExistingKeys<
   siret: "",
   businessName: "",
   businessAddress: "",
-  professions: [],
-  businessContacts: [
-    {
-      firstName: "",
-      lastName: "",
-      job: "",
-      phone: "",
-      email: "",
-    },
-  ],
-  preferredContactMethods: [],
+  appellations: [],
+  businessContact: {
+    firstName: "",
+    lastName: "",
+    job: "",
+    phone: "",
+    email: "",
+    contactMethod: "EMAIL",
+  },
 };
 
 const creationInitialValuesWithoutSource: OmitFromExistingKeys<
@@ -160,26 +158,26 @@ const creationInitialValuesWithoutSource: OmitFromExistingKeys<
         "My Customized Business name, not replaced by API",
       businessAddress: "My business address, replaced by result from API",
       isEngagedEnterprise: true,
-      professions: [
+      appellations: [
         {
-          romeCodeAppellation: "11573",
-          romeCodeMetier: "D1102",
-          description: "Boulanger",
+          appellationCode: "11573",
+          romeCode: "D1102",
+          romeLabel: "Boulangerie",
+          appellationLabel: "Boulanger - Boulangère",
         },
         {
-          description: "Boucher / Bouchère",
-          romeCodeAppellation: "11564",
-          romeCodeMetier: "D1101",
-        },
-      ],
-      businessContacts: [
-        {
-          firstName: "John",
-          lastName: "Doe",
-          job: "super job",
-          phone: "02837",
-          email: "joe@mail.com",
+          appellationCode: "11564",
+          romeCode: "D1101",
+          romeLabel: "Boucherie",
+          appellationLabel: "Boucher - Bouchère",
         },
       ],
-      preferredContactMethods: ["EMAIL"],
+      businessContact: {
+        firstName: "John",
+        lastName: "Doe",
+        job: "super job",
+        phone: "02837",
+        email: "joe@mail.com",
+        contactMethod: "EMAIL",
+      },
     };

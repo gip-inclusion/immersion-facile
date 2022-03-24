@@ -1,7 +1,5 @@
-import {
-  FormEstablishmentDto,
-  formEstablishmentSchema,
-} from "../../../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../../../shared/formEstablishment/FormEstablishment.dto";
+import { formEstablishmentSchema } from "../../../../shared/formEstablishment/FormEstablishment.schema";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
@@ -22,7 +20,7 @@ export class NotifyConfirmationEstablishmentCreated extends UseCase<FormEstablis
     formEstablishment: FormEstablishmentDto,
   ): Promise<void> {
     await this.emailFilter.withAllowedRecipients(
-      [formEstablishment.businessContacts[0].email],
+      [formEstablishment.businessContact.email],
       ([establishmentContactEmail]) =>
         this.emailGateway.sendNewEstablismentContactConfirmation(
           establishmentContactEmail,

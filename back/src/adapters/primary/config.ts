@@ -48,7 +48,7 @@ import { NotifyContactRequest } from "../../domain/immersionOffer/useCases/notif
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
 import { UpsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpsertEstablishmentAggregateFromFormEstablishement";
 import { RomeRepository } from "../../domain/rome/ports/RomeRepository";
-import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
+import { AppellationSearch } from "../../domain/rome/useCases/AppellationSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
 import { frontRoutes } from "../../shared/routes";
 import {
@@ -566,7 +566,7 @@ const createUseCases = (
     getSiret,
 
     // rome
-    romeSearch: new RomeSearch(repositories.rome),
+    romeSearch: new AppellationSearch(repositories.rome),
 
     // agencies
     listAgencies: new ListAgencies(repositories.agency),

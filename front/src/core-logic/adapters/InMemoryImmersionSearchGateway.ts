@@ -71,7 +71,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
         voluntaryToImmersion: false,
         location: { lat: 48.8666, lon: 2.3333 },
         address: "55 rue du Faubourg Saint-Honoré",
-        contactMode: "UNKNOWN",
+        contactMode: undefined,
         romeLabel: "Giga métier",
         nafLabel: "",
         city: "xxxx",

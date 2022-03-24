@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { PgRomeRepository } from "../../adapters/secondary/pg/PgRomeRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 
 describe("Postgres implementation of Rome Gateway", () => {
   let pool: Pool;
@@ -58,29 +59,34 @@ describe("Postgres implementation of Rome Gateway", () => {
         13,
       );
 
-      expect(
+      expectTypeToMatchAndEqual(
         await pgRomeRepository.searchAppellation("Aide-boulanger"),
-      ).toEqual([
-        {
-          codeAppellation: 10868,
-          libelle: "Aide-boulanger / Aide-boulangère",
-          codeMetier: "D1102",
-        },
-      ]);
+        [
+          {
+            appellationCode: "10868",
+            appellationLabel: "Aide-boulanger / Aide-boulangère",
+            romeCode: "D1102",
+            romeLabel: "Boulangerie - viennoiserie",
+          },
+        ],
+      );
     });
 
     it("Correctly handles search queries with multiple words", async () => {
-      expect(await pgRomeRepository.searchAppellation("Chef de boule")).toEqual(
+      expectTypeToMatchAndEqual(
+        await pgRomeRepository.searchAppellation("Chef de boule"),
         [
           {
-            codeAppellation: 12071,
-            libelle: "Chef de boule",
-            codeMetier: "G1206",
+            appellationCode: "12071",
+            appellationLabel: "Chef de boule",
+            romeCode: "G1206",
+            romeLabel: "Personnel technique des jeux",
           },
           {
-            codeAppellation: 12197,
-            libelle: "Chef de partie de boule",
-            codeMetier: "G1206",
+            appellationCode: "12197",
+            appellationLabel: "Chef de partie de boule",
+            romeCode: "G1206",
+            romeLabel: "Personnel technique des jeux",
           },
         ],
       );

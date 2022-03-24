@@ -1,3 +1,4 @@
+import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   ImmersionOfferId,
   SearchImmersionResultDto,
@@ -62,7 +63,7 @@ export interface ImmersionOfferRepository {
   getContactForEstablishmentSiret: (
     siret: string,
   ) => Promise<ContactEntityV2 | undefined>;
-  getAnnotatedImmersionOffersForEstablishmentSiret: (
+  getOffersAsAppelationDtoForFormEstablishment: (
     siret: string,
-  ) => Promise<AnnotatedImmersionOfferEntityV2[]>;
+  ) => Promise<AppellationDto[]>;
 }

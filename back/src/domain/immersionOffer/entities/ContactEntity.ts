@@ -1,7 +1,6 @@
-import {
-  ContactMethod,
-  ImmersionContactInEstablishmentId,
-} from "../../../shared/FormEstablishmentDto";
+import { ImmersionContactInEstablishmentId } from "../../../shared/formEstablishment/FormEstablishment.dto";
+
+export type ContactMethod = "EMAIL" | "PHONE" | "IN_PERSON";
 
 export type ContactEntityV2 = {
   id: ImmersionContactInEstablishmentId;

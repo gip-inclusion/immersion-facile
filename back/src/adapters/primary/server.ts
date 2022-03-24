@@ -21,6 +21,7 @@ import { createPeConnectRouter } from "./routers/createPeConnectRouter";
 import { createTechnicalRouter } from "./routers/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware = require("express-prometheus-middleware");
+import { createApiKeyAuthRouterV1 } from "./routers/createApiKeyAuthRouter.v1";
 
 const logger = createLogger(__filename);
 
@@ -51,8 +52,11 @@ export const createApp = async (
   const deps = await createAppDependencies(config);
 
   app.use(router);
+  // Those routes must be defined BEFORE the others
   app.use("/auth", createMagicLinkRouter(deps));
   app.use("/admin", createAdminRouter(deps));
+  app.use("/v1", createApiKeyAuthRouterV1(deps));
+  // ----
   app.use(createFormCompletionRouter(deps));
   app.use(createTechnicalRouter(deps));
   app.use(createImmersionApplicationRouter(deps));

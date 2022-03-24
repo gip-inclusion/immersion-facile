@@ -3,7 +3,7 @@ import { Route } from "type-route";
 import { routes } from "../routes";
 import { Layout } from "../../components/Layout";
 import React from "react";
-import { FormEstablishmentSource } from "../../shared/FormEstablishmentDto";
+import { FormEstablishmentSource } from "src/shared/formEstablishment/FormEstablishment.dto";
 
 type EstablishmentFormForExternalsProps = {
   route: Route<typeof routes.formEstablishmentForExternals>;

@@ -1,8 +1,8 @@
 import { useField } from "formik";
 import React from "react";
-import { ProfessionAutocomplete } from "src/app/Profession/ProfessionAutocomplete";
+import { AppellationAutocomplete } from "src/app/Profession/AppellationAutocomplete";
 import { DeleteButton } from "src/components/DeleteButton";
-import { ProfessionDto } from "src/shared/rome";
+import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 type ProfessionProps = {
   name: string;
@@ -10,12 +10,12 @@ type ProfessionProps = {
   onDelete: () => void;
 };
 
-export const FormEstablishmentProfession = ({
+export const FormEstablishmentAppellation = ({
   name,
   label,
   onDelete,
 }: ProfessionProps) => {
-  const [{ value }, _, { setValue }] = useField<ProfessionDto>(name);
+  const [{ value }, _, { setValue }] = useField<AppellationDto>(name);
 
   return (
     <div
@@ -24,7 +24,7 @@ export const FormEstablishmentProfession = ({
         margin: "15px 20px",
       }}
     >
-      <ProfessionAutocomplete
+      <AppellationAutocomplete
         title="Rechercher un métier *"
         initialValue={value}
         setFormValue={setValue}

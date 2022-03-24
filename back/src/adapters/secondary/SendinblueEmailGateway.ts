@@ -21,7 +21,7 @@ import {
   EmailGateway,
   ShareDraftApplicationByLinkParams,
 } from "../../domain/immersionApplication/ports/EmailGateway";
-import { FormEstablishmentDto } from "../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../shared/formEstablishment/FormEstablishment.dto";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -128,8 +128,8 @@ export class SendinblueEmailGateway implements EmailGateway {
       "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
       [recipient],
       {
-        CONTACT_FIRST_NAME: formEstablishmentDto.businessContacts[0].firstName,
-        CONTACT_LAST_NAME: formEstablishmentDto.businessContacts[0].lastName,
+        CONTACT_FIRST_NAME: formEstablishmentDto.businessContact.firstName,
+        CONTACT_LAST_NAME: formEstablishmentDto.businessContact.lastName,
         BUSINESS_NAME: formEstablishmentDto.businessName,
       },
     );

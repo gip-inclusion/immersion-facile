@@ -8,5 +8,6 @@ export type ImmersionOfferEntityV2 = {
 };
 
 export type AnnotatedImmersionOfferEntityV2 = ImmersionOfferEntityV2 & {
-  romeLabel: string; // corresponds to code label or appellation label
+  romeLabel: string;
+  appellationLabel?: string;
 };

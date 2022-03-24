@@ -1,7 +1,5 @@
-import {
-  FormEstablishmentDto,
-  formEstablishmentSchema,
-} from "../../../shared/FormEstablishmentDto";
+import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
+import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormEstablishment.schema";
 import { SiretDto } from "../../../shared/siret";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

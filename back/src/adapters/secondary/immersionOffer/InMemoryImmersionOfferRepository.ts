@@ -17,11 +17,13 @@ import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
 import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
+import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 const logger = createLogger(__filename);
 
 export const TEST_NAF_LABEL = "test_naf_label";
 export const TEST_ROME_LABEL = "test_rome_label";
+export const TEST_APPELLATION_LABEL = "test_appellation_label";
 export const TEST_CITY = "test_city";
 export const TEST_POSITION = { lat: 43.8666, lon: 8.3333 };
 
@@ -217,15 +219,17 @@ export class InMemoryImmersionOfferRepository
     )?.contact;
   }
 
-  public async getAnnotatedImmersionOffersForEstablishmentSiret(
+  public async getOffersAsAppelationDtoForFormEstablishment(
     siret: string,
-  ): Promise<AnnotatedImmersionOfferEntityV2[]> {
+  ): Promise<AppellationDto[]> {
     return (
       this.establishmentAggregates
         .find(pathEq("establishment.siret", siret))
         ?.immersionOffers.map((offer) => ({
-          ...offer,
+          romeCode: offer.romeCode,
+          appellationCode: offer.romeAppellation?.toString() ?? "", // Should not be undefined though
           romeLabel: TEST_ROME_LABEL,
+          appellationLabel: TEST_APPELLATION_LABEL,
         })) ?? []
     );
   }

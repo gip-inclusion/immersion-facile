@@ -6,7 +6,7 @@ import {
 } from "src/app/Search/ContactEstablishmentModal";
 import { EnterpriseSearchResult } from "src/app/Search/EnterpriseSearchResult";
 import { SuccessFeedback } from "src/components/SuccessFeedback";
-import type { ContactMethod } from "src/shared/FormEstablishmentDto";
+import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
 import type { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {

@@ -13,27 +13,16 @@ describe("/rome route", () => {
   it("forwards valid requests", async () => {
     await request.get(`/rome?searchText=rail`).expect(200, [
       {
-        profession: {
-          romeCodeAppellation: "20714",
-          description: "Vitrailliste",
-          romeCodeMetier: "B1602",
+        appellation: {
+          appellationCode: "20714",
+          appellationLabel: "Vitrailliste",
+          romeCode: "B1602",
+          romeLabel: "Vitraillerie",
         },
         matchRanges: [
           {
             startIndexInclusive: 3,
             endIndexExclusive: 7,
-          },
-        ],
-      },
-      {
-        profession: {
-          romeCodeMetier: "N4301",
-          description: "Conduite sur rails",
-        },
-        matchRanges: [
-          {
-            startIndexInclusive: 13,
-            endIndexExclusive: 17,
           },
         ],
       },

@@ -1,36 +1,40 @@
-import { professionSchema } from "../../shared/rome";
+import { appellationDtoSchema } from "../../shared/romeAndAppellationDtos/romeAndAppellation.schema";
 
-describe("professionSchema", () => {
+describe("appel", () => {
   it("must include rome code and can inculde appellation", () => {
     expect(() =>
-      professionSchema.parse({
-        romeCodeMetier: "A0000",
-        romeCodeAppellation: undefined,
-        description: "description",
+      appellationDtoSchema.parse({
+        romeCode: "A0000",
+        appellationCode: "00000",
+        romeLabel: "description",
+        appellationLabel: "description",
       }),
     ).not.toThrow();
 
     expect(() =>
-      professionSchema.parse({
-        romeCodeMetier: undefined,
-        romeCodeAppellation: "00000",
-        description: "description",
+      appellationDtoSchema.parse({
+        romeCode: undefined,
+        appellationCode: "00000",
+        romeLabel: "description",
+        appellationLabel: "description",
       }),
     ).toThrow();
 
     expect(() =>
-      professionSchema.parse({
-        romeCodeMetier: "A0000",
-        romeCodeAppellation: "00000",
-        description: "description",
+      appellationDtoSchema.parse({
+        romeCode: "A0000",
+        appellationCode: "00000",
+        romeLabel: "description",
+        appellationLabel: "description",
       }),
     ).not.toThrow();
 
     expect(() =>
-      professionSchema.parse({
-        romeCodeMetier: undefined,
-        romeCodeAppellation: undefined,
-        description: "description",
+      appellationDtoSchema.parse({
+        romeCode: undefined,
+        appellationCode: undefined,
+        romeLabel: "description",
+        appellationLabel: "description",
       }),
     ).toThrow();
   });

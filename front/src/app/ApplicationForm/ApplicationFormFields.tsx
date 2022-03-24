@@ -1,5 +1,5 @@
 import { useField, useFormikContext } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { BoolRadioGroup, RadioGroupForField } from "src/app/RadioGroup";
 import {
@@ -22,9 +22,9 @@ import type {
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { routes, useRoute } from "../routes";
 import type { ApplicationFormKeysInUrl } from "../routes";
-import { ApplicationFormProfession } from "./ApplicationFormProfession";
 import { CopyLink } from "./CopyLink";
 import { ShareLinkByEmail } from "./ShareLinkByEmail";
+import { ApplicationFormProfession } from "src/app/ApplicationForm/ApplicationFormProfession";
 
 const FrozenMessage = () => (
   <>

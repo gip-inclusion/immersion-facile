@@ -1,23 +1,15 @@
-import {
-  RomeCodeAppellationDto,
-  RomeCodeMetierDto,
-} from "../../../shared/rome";
+import { AppellationCode, RomeCode } from "../../../shared/rome";
+import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type RomeMetier = {
-  codeMetier: RomeCodeMetierDto;
+  codeMetier: RomeCode;
   libelle: string;
-};
-
-export type RomeAppellation = {
-  libelle: string;
-  codeAppellation: RomeCodeAppellationDto;
-  codeMetier: RomeCodeMetierDto;
 };
 
 export interface RomeRepository {
   appellationToCodeMetier(
-    romeCodeAppellation: RomeCodeAppellationDto,
-  ): Promise<RomeCodeMetierDto | undefined>;
+    romeCodeAppellation: AppellationCode,
+  ): Promise<RomeCode | undefined>;
   searchMetier: (query: string) => Promise<RomeMetier[]>;
-  searchAppellation: (query: string) => Promise<RomeAppellation[]>;
+  searchAppellation: (query: string) => Promise<AppellationDto[]>;
 }
