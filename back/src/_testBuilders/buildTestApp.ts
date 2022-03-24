@@ -26,6 +26,7 @@ import {
   GenerateApiConsumerJtw,
   GenerateMagicLinkJwt,
 } from "../domain/auth/jwt";
+import { PeConnectGateway } from "../domain/generic/peConnect/port/PeConnectGateway";
 
 export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
@@ -36,6 +37,7 @@ export type InMemoryRepositories = {
   searchesMade: InMemorySearchMadeRepository;
   rome: InMemoryRomeRepository;
   email: InMemoryEmailGateway;
+  peConnectGateway: PeConnectGateway;
   sirene: InMemorySireneRepository;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;

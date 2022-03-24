@@ -23,7 +23,7 @@ ModalTitle.defaultProps = {
 
 ModalTitle.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
-  __TYPE: "ModalTitle",
+  __TYPE: () => {'ModalTitle'},
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   className: PropTypes.oneOfType([
     PropTypes.string,

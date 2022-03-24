@@ -18,7 +18,6 @@ import { ApiDataContainer } from "./ApiDataContainer";
 import {
   exportEstablismentsExcelRoute,
   exportImmersionApplicationsExcelRoute,
-  loginPeConnect,
 } from "../../shared/routes";
 import { EstablishmentExportConfigDto } from "../../shared/establishmentExport/establishmentExport.dto";
 import { keys } from "ramda";
@@ -130,33 +129,6 @@ export const Admin = ({ route }: AdminProps) => {
             >
               Exporter les entreprises référencées par département sans
               aggrégation des métiers
-            </a>
-          </div>
-
-          <>
-            Préremplir le formulaire de demande d'immersion avec Pole Emploi
-            Connect :
-          </>
-          <div className="pe-connect flex justify-center">
-            <a
-              href={`/api/${loginPeConnect}`}
-              className="button-pe-connect"
-              title=""
-            >
-              <img
-                className="icon-pe-connect"
-                src="src/assets/pe-connect-barre-nav-b.svg"
-                alt=""
-                width="300"
-                height="75"
-              />
-              <img
-                className="icon-pe-connect-hover"
-                src="src/assets/pe-connect-barre-nav-b-o.svg"
-                alt=""
-                width="300"
-                height="75"
-              />
             </a>
           </div>
 

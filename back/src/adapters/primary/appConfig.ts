@@ -106,6 +106,16 @@ export class AppConfig {
     });
   }
 
+  // == PE Connect gateway ==
+  public get peConnectGateway() {
+    return throwIfNotInArray({
+      processEnv: this.env,
+      variableName: "PE_CONNECT_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
   public get sendinblueApiKey() {
     return this.throwIfNotDefined("SENDINBLUE_API_KEY");
   }

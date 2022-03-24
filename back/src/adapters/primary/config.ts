@@ -122,6 +122,9 @@ import { StubPostalCodeDepartmentRegionQueries } from "../secondary/StubPostalCo
 import { ExportEstablishmentAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentAsExcelArchive";
 import { EditFormEstablishment } from "../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
+import { InMemoryPeConnectGateway } from "../secondary/InMemoryPeConnectGateway";
+import { LinkUserPeConnectAccount } from "../../domain/generic/peConnect/useCases/linkUserPeConnectAccount";
+import { HttpPeConnectGateway } from "../secondary/HttpPeConnectGateway";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 
 const logger = createLogger(__filename);
@@ -320,6 +323,11 @@ export const createRepositories = async (
           )
         : new InMemoryLaBonneBoiteAPI(),
 
+    peConnectGateway:
+      config.peConnectGateway === "HTTPS"
+        ? new HttpPeConnectGateway(config.poleEmploiAccessTokenConfig)
+        : new InMemoryPeConnectGateway(),
+
     postalCodeDepartmentRegion:
       config.repositories === "PG"
         ? new PgPostalCodeDepartmentRegionQueries(await getPgPoolFn().connect())
@@ -499,6 +507,9 @@ const createUseCases = (
       repositories.immersionApplication,
       createNewEvent,
       repositories.outbox,
+    ),
+    linkUserPeConnectAccount: new LinkUserPeConnectAccount(
+      repositories.peConnectGateway,
     ),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewMagicLink: new RenewMagicLink(

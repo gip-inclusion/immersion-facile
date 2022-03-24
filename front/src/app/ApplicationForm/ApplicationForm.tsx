@@ -14,6 +14,7 @@ import { Route } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 import { SubmitFeedback, SuccessFeedbackKind } from "./SubmitFeedback";
 import { immersionApplicationSchema } from "../../shared/ImmersionApplication/immersionApplication.schema";
+import { loginPeConnect } from "../../shared/routes";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
@@ -168,6 +169,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
               professionnelle (PMSMP)
             </Title>
           </div>
+
           <div className="fr-text">
             <span className="font-bold">
               Attention, le formulaire de demande de convention est en cours de
@@ -190,6 +192,39 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             <p className="fr-text--xs">
               Ce formulaire vaut équivalence du CERFA 13912 * 04
             </p>
+          </div>
+
+          <div className="fr-text">
+            <p>
+              <b>(Optionnel) Lier mon compte pôle emploi</b>
+            </p>
+            <p>
+              Lier votre identifiant pole emploi permet d'accélérer le
+              traitement du dossier par votre conseiller.
+            </p>
+          </div>
+
+          <div className="pe-connect flex justify-center">
+            <a
+              href={`/api/${loginPeConnect}`}
+              className="button-pe-connect"
+              title=""
+            >
+              <img
+                className="icon-pe-connect"
+                src="src/assets/pe-connect-barre-nav-b.svg"
+                alt=""
+                width="300"
+                height="75"
+              />
+              <img
+                className="icon-pe-connect-hover"
+                src="src/assets/pe-connect-barre-nav-b-o.svg"
+                alt=""
+                width="300"
+                height="75"
+              />
+            </a>
           </div>
 
           <Formik
