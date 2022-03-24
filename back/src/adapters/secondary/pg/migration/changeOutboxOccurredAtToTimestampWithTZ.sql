@@ -1,3 +1,0 @@
-ALTER TABLE public.outbox
-ALTER COLUMN occurred_at TYPE TIMESTAMP WITH TIME ZONE;
-

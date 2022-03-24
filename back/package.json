@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build-initial-db": "ts-node src/adapters/secondary/pg/migration/buildDb.ts",
     "dev": "NODE_ENV=local ts-node-dev src/adapters/primary/startServer.ts",
     "start": "NODE_ENV=local ts-node src/adapters/primary/startServer.ts",
     "start-prod": "NODE_ENV=production ts-node src/adapters/primary/startServer.ts",
