@@ -3,10 +3,10 @@ import {
   immersionApplicationsRoute,
   signApplicationRoute,
   updateApplicationStatusRoute,
-} from "../../shared/routes";
-import { AppDependencies } from "./config";
-import { UnauthorizedError } from "./helpers/httpErrors";
-import { sendHttpResponse } from "./helpers/sendHttpResponse";
+} from "../../../shared/routes";
+import { AppDependencies } from "../config";
+import { UnauthorizedError } from "../helpers/httpErrors";
+import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
 export const createMagicLinkRouter = (deps: AppDependencies) => {
   const authenticatedRouter = Router({ mergeParams: true });

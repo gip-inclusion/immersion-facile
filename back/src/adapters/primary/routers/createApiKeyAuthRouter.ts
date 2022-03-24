@@ -4,10 +4,10 @@ import {
   getImmersionOfferByIdRoute,
   searchImmersionRoute,
   immersionOffersApiAuthRoute,
-} from "../../shared/routes";
-import { AppDependencies } from "./config";
-import { sendHttpResponse } from "./helpers/sendHttpResponse";
-import { ForbiddenError } from "./helpers/httpErrors";
+} from "../../../shared/routes";
+import { AppDependencies } from "../config";
+import { sendHttpResponse } from "../helpers/sendHttpResponse";
+import { ForbiddenError } from "../helpers/httpErrors";
 
 const counterFormEstablishmentCaller = new promClient.Counter({
   name: "form_establishment_callers_counter",
