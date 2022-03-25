@@ -34,6 +34,26 @@ describe("InMemoryEventBus", () => {
   });
 
   describe("Publish to an existing topic", () => {
+    it("Marks event as published even if no-one was subscribed to it", async () => {
+      // Prepare
+      const publishDate = new Date("2022-01-01");
+      clock.setNextDate(publishDate);
+
+      // Act
+      await anEventBus.publish(domainEvt);
+
+      // Assert
+      expect(eventsAfterPublish).toHaveLength(1);
+
+      expectObjectsToMatch(eventsAfterPublish[0], {
+        ...domainEvt,
+        wasQuarantined: false,
+        publications: [
+          { publishedAt: publishDate.toISOString(), failures: [] },
+        ],
+      });
+    });
+
     it("Publishes to a new topic and check we have only one spyed event", async () => {
       // Prepare
       const publishDate = new Date("2022-01-01");

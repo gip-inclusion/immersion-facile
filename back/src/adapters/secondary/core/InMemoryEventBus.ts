@@ -11,7 +11,7 @@ import {
   EventPublication,
   SubscriptionId,
 } from "../../../domain/core/eventBus/events";
-import { Clock } from "../../../domain/core/ports/Clock";
+import { Clock, DateStr } from "../../../domain/core/ports/Clock";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
@@ -52,8 +52,15 @@ export class InMemoryEventBus implements EventBus {
     const topic = event.topic;
     counterPublishedEventsTotal.inc({ topic });
 
+    const publishedAt = this.clock.now().toISOString();
+
     const callbacksById = this.subscriptions[topic];
-    if (callbacksById === undefined) return monitorAbsenceOfCallback(event);
+    if (callbacksById === undefined) {
+      await this.afterPublish(
+        addNewPublicationWithoutFailureToEvent(event, publishedAt),
+      );
+      return monitorAbsenceOfCallback(event);
+    }
 
     const subscriptionsIdToPublish = getSubscriptionsIdToPublish(
       event,
@@ -62,8 +69,6 @@ export class InMemoryEventBus implements EventBus {
 
     if (!subscriptionsIdToPublish.length)
       return monitorAbsenceOfSubscribers(event);
-
-    const publishedAt = this.clock.now().toISOString();
 
     const failuresOrUndefined: (EventFailure | void)[] = await Promise.all(
       subscriptionsIdToPublish.map(
@@ -145,6 +150,14 @@ export class InMemoryEventBus implements EventBus {
     }
   }
 }
+
+const addNewPublicationWithoutFailureToEvent = (
+  event: DomainEvent,
+  publishedAt: DateStr,
+): DomainEvent => ({
+  ...event,
+  publications: [...event.publications, { publishedAt, failures: [] }],
+});
 
 const getSubscriptionsIdToPublish = (
   event: DomainEvent,
