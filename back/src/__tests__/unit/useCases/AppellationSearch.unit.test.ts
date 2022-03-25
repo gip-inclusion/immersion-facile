@@ -35,7 +35,7 @@ describe("AppellationSearch", () => {
     const mockSearchAppellationFn = jest.fn();
     const mockAppellationToCodeMetier = jest.fn();
     gateway = {
-      searchMetier: mockSearchMetierFn,
+      searchRome: mockSearchMetierFn,
       searchAppellation: mockSearchAppellationFn,
       appellationToCodeMetier: mockAppellationToCodeMetier,
     };

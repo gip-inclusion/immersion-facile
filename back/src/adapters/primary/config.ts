@@ -122,6 +122,7 @@ import { StubPostalCodeDepartmentRegionQueries } from "../secondary/StubPostalCo
 import { ExportEstablishmentAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentAsExcelArchive";
 import { EditFormEstablishment } from "../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
+import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 
 const logger = createLogger(__filename);
 
@@ -565,8 +566,9 @@ const createUseCases = (
     // siret
     getSiret,
 
-    // rome
-    romeSearch: new AppellationSearch(repositories.rome),
+    // romes
+    appellationSearch: new AppellationSearch(repositories.rome),
+    romeSearch: new RomeSearch(repositories.rome),
 
     // agencies
     listAgencies: new ListAgencies(repositories.agency),

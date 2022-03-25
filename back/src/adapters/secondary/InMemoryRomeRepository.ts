@@ -1,31 +1,31 @@
-import {
-  RomeRepository,
-  RomeMetier,
-} from "../../domain/rome/ports/RomeRepository";
+import { RomeRepository } from "../../domain/rome/ports/RomeRepository";
 import { AppellationCode, RomeCode } from "../../shared/rome";
-import { AppellationDto } from "../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import {
+  AppellationDto,
+  RomeDto,
+} from "../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { createLogger } from "../../utils/logger";
 import { normalize } from "../../utils/textSearch";
 
 const logger = createLogger(__filename);
 
-const metiers: RomeMetier[] = [
+const romeDtos: RomeDto[] = [
   {
-    codeMetier: "A1203",
-    libelle: "Aménagement et entretien des espaces verts",
+    romeCode: "A1203",
+    romeLabel: "Aménagement et entretien des espaces verts",
   },
-  { codeMetier: "A1409", libelle: "Élevage de lapins et volailles" },
-  { codeMetier: "D1102", libelle: "Boulangerie - viennoiserie" },
-  { codeMetier: "D1103", libelle: "Charcuterie - traiteur" },
-  { codeMetier: "D1106", libelle: "Vente en alimentation" },
+  { romeCode: "A1409", romeLabel: "Élevage de lapins et volailles" },
+  { romeCode: "D1102", romeLabel: "Boulangerie - viennoiserie" },
+  { romeCode: "D1103", romeLabel: "Charcuterie - traiteur" },
+  { romeCode: "D1106", romeLabel: "Vente en alimentation" },
   {
-    codeMetier: "D1201",
-    libelle: "Achat vente d'objets d'art, anciens ou d'occasion",
+    romeCode: "D1201",
+    romeLabel: "Achat vente d'objets d'art, anciens ou d'occasion",
   },
-  { codeMetier: "D1202", libelle: "Coiffure" },
-  { codeMetier: "D1505", libelle: "Personnel de caisse" },
-  { codeMetier: "D1507", libelle: "Mise en rayon libre-service" },
-  { codeMetier: "N4301", libelle: "Conduite sur rails" },
+  { romeCode: "D1202", romeLabel: "Coiffure" },
+  { romeCode: "D1505", romeLabel: "Personnel de caisse" },
+  { romeCode: "D1507", romeLabel: "Mise en rayon libre-service" },
+  { romeCode: "N4301", romeLabel: "Conduite sur rails" },
 ];
 
 const appellations: AppellationDto[] = [
@@ -90,11 +90,11 @@ export class InMemoryRomeRepository implements RomeRepository {
     )?.rome;
   }
 
-  public async searchMetier(query: string): Promise<RomeMetier[]> {
-    logger.info({ query }, "searchMetier");
+  public async searchRome(query: string): Promise<RomeDto[]> {
+    logger.info({ query }, "searchRome");
     const normalizedQuery = normalize(query);
-    return metiers.filter(
-      (metier) => normalize(metier.libelle).indexOf(normalizedQuery) >= 0,
+    return romeDtos.filter(
+      (romeDto) => normalize(romeDto.romeLabel).indexOf(normalizedQuery) >= 0,
     );
   }
 

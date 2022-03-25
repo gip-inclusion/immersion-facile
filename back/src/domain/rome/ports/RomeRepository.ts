@@ -1,15 +1,13 @@
 import { AppellationCode, RomeCode } from "../../../shared/rome";
-import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
-
-export type RomeMetier = {
-  codeMetier: RomeCode;
-  libelle: string;
-};
+import {
+  AppellationDto,
+  RomeDto,
+} from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export interface RomeRepository {
   appellationToCodeMetier(
     romeCodeAppellation: AppellationCode,
   ): Promise<RomeCode | undefined>;
-  searchMetier: (query: string) => Promise<RomeMetier[]>;
+  searchRome: (query: string) => Promise<RomeDto[]>;
   searchAppellation: (query: string) => Promise<AppellationDto[]>;
 }

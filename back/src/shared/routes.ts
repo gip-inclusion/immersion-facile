@@ -16,6 +16,7 @@ export const validateImmersionApplicationRoute = "validate-demande";
 export const generateMagicLinkRoute = "generate-magic-link";
 export const renewMagicLinkRoute = "renew-magic-link";
 export const siretRoute = "siret";
+export const appellationRoute = "appellation";
 export const romeRoute = "rome";
 export const formAlreadyExistsRoute = "form-already-exists";
 export const requestEmailToUpdateFormRoute = "request-email-to-update-form";

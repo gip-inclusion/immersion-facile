@@ -29,25 +29,20 @@ describe("Postgres implementation of Rome Gateway", () => {
     });
   });
 
-  describe("searchMetier", () => {
-    it("Search of metier works", async () => {
-      expect(await pgRomeRepository.searchMetier("boulangère")).toEqual([
-        { codeMetier: "D1102", libelle: "Boulangerie - viennoiserie" },
+  describe("searchRome", () => {
+    it("Searches match in appellation and returns distinct rome", async () => {
+      expect(await pgRomeRepository.searchRome("boulangère")).toEqual([
+        { romeCode: "D1102", romeLabel: "Boulangerie - viennoiserie" },
       ]);
     });
 
     it("Correctly handles search queries with multiple words", async () => {
       expect(
-        await pgRomeRepository.searchMetier("recherche en sciences"),
+        await pgRomeRepository.searchRome("recherche en sciences humaines"),
       ).toEqual([
         {
-          codeMetier: "K2401",
-          libelle: "Recherche en sciences de l'homme et de la société",
-        },
-        {
-          codeMetier: "K2402",
-          libelle:
-            "Recherche en sciences de l'univers, de la matière et du vivant",
+          romeCode: "K2401",
+          romeLabel: "Recherche en sciences de l'homme et de la société",
         },
       ]);
     });

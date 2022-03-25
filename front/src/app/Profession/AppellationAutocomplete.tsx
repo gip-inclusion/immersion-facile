@@ -1,6 +1,6 @@
 import Autocomplete from "@mui/material/Autocomplete";
 import React, { useEffect, useState } from "react";
-import { formEstablishmentGateway } from "src/app/dependencies";
+import { romeAutocompleteGateway } from "src/app/dependencies";
 import {
   Proposal,
   StringWithHighlights,
@@ -59,10 +59,10 @@ export const AppellationAutocomplete = ({
       if (!sanitizedTerm) return [];
       try {
         setIsSearching(true);
-        // Should be given in props
-        const romeOptions = await formEstablishmentGateway.searchAppellation(
-          sanitizedTerm,
-        );
+        const romeOptions =
+          await romeAutocompleteGateway.getAppellationDtoMatching(
+            sanitizedTerm,
+          );
         setOptions(romeOptions.map(romeSearchMatchToProposal));
       } catch (e: any) {
         console.error(e);
@@ -85,6 +85,7 @@ export const AppellationAutocomplete = ({
         noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: Option) => option.value.appellationLabel}
         renderOption={(props, option) => (
+          // <li {...props}>{option.romeLabel}</li>
           <li {...props}>
             <StringWithHighlights
               description={option.description}

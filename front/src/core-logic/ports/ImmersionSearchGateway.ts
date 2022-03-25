@@ -1,4 +1,5 @@
 import { ContactEstablishmentRequestDto } from "src/shared/contactEstablishment";
+import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   SearchImmersionRequestDto,
   SearchImmersionResultDto,
@@ -8,7 +9,6 @@ export interface ImmersionSearchGateway {
   search(
     searchParams: SearchImmersionRequestDto,
   ): Promise<SearchImmersionResultDto[]>;
-
   contactEstablishment: (
     params: ContactEstablishmentRequestDto,
   ) => Promise<void>;

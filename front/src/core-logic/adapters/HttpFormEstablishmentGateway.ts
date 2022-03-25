@@ -1,12 +1,10 @@
 import axios from "axios";
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
 import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
-import { AppellationMatchDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   editEstablishmentFormRouteWithApiKey,
   formAlreadyExistsRoute,
   requestEmailToUpdateFormRoute,
-  romeRoute,
   retrieveEstablishmentFormRouteWithApiKey,
   addEstablishmentFormRouteWithoutApiKey,
 } from "src/shared/routes";
@@ -27,15 +25,6 @@ export class HttpFormEstablishmentGateway implements FormEstablishmentGateway {
     return zString.parse(httpResponse.data);
   }
 
-  public async searchAppellation(
-    searchText: string,
-  ): Promise<AppellationMatchDto[]> {
-    const httpResponse = await axios.get(`/${prefix}/${romeRoute}`, {
-      params: { searchText },
-    });
-
-    return httpResponse.data;
-  }
   public async getSiretAlreadyExists(siret: SiretDto): Promise<boolean> {
     const httpResponse = await axios.get(
       `/${prefix}/${formAlreadyExistsRoute}/${siret}`,

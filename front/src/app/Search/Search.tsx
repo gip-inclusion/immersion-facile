@@ -3,6 +3,7 @@ import { Form, Formik, FormikHelpers } from "formik";
 import React, { useState } from "react";
 import { immersionSearchGateway } from "src/app/dependencies";
 import { AppellationAutocomplete } from "src/app/Profession/AppellationAutocomplete";
+import { RomeAutocomplete } from "src/app/Profession/RomeAutocomplete";
 import { OurAdvises } from "src/app/Search/OurAdvises";
 import { SearchResultPanel } from "src/app/Search/SearchResultPanel";
 import distanceSearchIcon from "src/assets/distance-search-icon.svg";
@@ -79,7 +80,7 @@ export const Search = () => {
               <Form>
                 <div className="gap-5 flex flex-col">
                   <div>
-                    <AppellationAutocomplete
+                    <RomeAutocomplete
                       title="Métier recherché"
                       setFormValue={(newValue) =>
                         setFieldValue("rome", newValue.romeCode)

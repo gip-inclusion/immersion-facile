@@ -1,9 +1,9 @@
 import { PoolClient } from "pg";
+import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import {
-  RomeRepository,
-  RomeMetier,
-} from "../../../domain/rome/ports/RomeRepository";
-import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+  AppellationDto,
+  RomeDto,
+} from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -39,21 +39,30 @@ export class PgRomeRepository implements RomeRepository {
       });
   }
 
-  public async searchMetier(query: string): Promise<RomeMetier[]> {
-    return this.client
+  public async searchRome(query: string): Promise<RomeDto[]> {
+    const queryWords = query.split(" ");
+    const lastWord = queryWords[queryWords.length - 1];
+    const queryBeginning =
+      queryWords.length === 1
+        ? queryWords.join(" ")
+        : queryWords.slice(0, queryWords.length - 1).join(" ");
+
+    return await this.client
       .query(
-        `SELECT code_rome, libelle_rome
-        FROM public_romes_data
+        `SELECT DISTINCT public_appelations_data.code_rome, libelle_rome
+        FROM public_appelations_data 
+        JOIN public_romes_data ON  public_appelations_data.code_rome = public_romes_data.code_rome
         WHERE
-          libelle_rome_tsvector@@to_tsquery('french', $1)
-          OR libelle_rome ILIKE $2`,
-        [toTsQuery(query), `%${query}%`],
+           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long ILIKE $3)
+           OR (libelle_appellation_long ILIKE $2 AND libelle_appellation_long ILIKE $3)
+        LIMIT 80`,
+        [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
       )
       .then((res) =>
         res.rows.map(
-          (row): RomeMetier => ({
-            codeMetier: row.code_rome,
-            libelle: row.libelle_rome,
+          (row): RomeDto => ({
+            romeCode: row.code_rome,
+            romeLabel: row.libelle_rome,
           }),
         ),
       )

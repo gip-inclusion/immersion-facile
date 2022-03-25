@@ -1,3 +1,5 @@
+import { RomeCode } from "src/shared/rome";
+import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { sleep } from "src/shared/utils";
 import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
 import {
