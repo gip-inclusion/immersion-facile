@@ -1,12 +1,12 @@
 import axios from "axios";
 import { AppConfig } from "../adapters/primary/appConfig";
 
-const discordSizeLimit = 1992;
+const discordSizeLimit = 1950;
 
 type DiscordOptions = { skipCodeFormatting: boolean };
 
 export const notifyDiscord = (
-  content: string,
+  rawContent: string,
   options: DiscordOptions = { skipCodeFormatting: false },
 ) => {
   const discordWebhookUrl: string | undefined =
@@ -14,9 +14,8 @@ export const notifyDiscord = (
 
   if (!discordWebhookUrl) return;
 
-  if (content.length > discordSizeLimit)
-    throw new Error("Content string too long to send by notification!");
 
+  const content = rawContent.slice(0, discordSizeLimit);
   // This is intentionaly not awaited following a fire and forget logic.
   axios.post(
     discordWebhookUrl,

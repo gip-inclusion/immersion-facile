@@ -15,8 +15,8 @@ const handleResponseError = (res: Response, error: any) => {
     }
     res.status(error.httpCode);
   } else {
-    notifyObjectDiscord({ _message: "Unhandled Error :", ...error });
     logger.error(error, "Unhandled error");
+    notifyObjectDiscord({ _message: `Unhandled Error : ${error.message}` });
     res.status(500);
   }
 
