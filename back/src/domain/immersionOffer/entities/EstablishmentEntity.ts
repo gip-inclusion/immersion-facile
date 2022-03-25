@@ -1,5 +1,5 @@
+import { LatLonDto } from "../../../shared/latLon";
 import { NafDto } from "../../../shared/naf";
-import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2 } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
 import { FormEstablishmentSource } from "../../../shared/formEstablishment/FormEstablishment.dto";

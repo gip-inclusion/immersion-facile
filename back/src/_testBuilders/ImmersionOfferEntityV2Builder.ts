@@ -1,7 +1,9 @@
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
-import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
+import {
+  ImmersionOfferEntityV2,
+  ImmersionOfferId,
+} from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { RomeCode } from "../shared/rome";
-import { ImmersionOfferId } from "../shared/SearchImmersionDto";
 import { Builder } from "./Builder";
 
 const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {

@@ -1,6 +1,6 @@
 import { z } from "zod";
+import { immersionOfferIdSchema } from "./searchImmersion/SearchImmersionResult.schema";
 
-import { immersionOfferIdSchema } from "./SearchImmersionDto";
 import { zEmail, zTrimmedString } from "./zodUtils";
 
 const commonFields = {

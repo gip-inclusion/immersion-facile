@@ -8,11 +8,9 @@ import {
   EstablishmentEntityV2,
 } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
+import { LatLonDto } from "../../shared/latLon";
 import { AppellationDto } from "../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import {
-  LatLonDto,
-  SearchImmersionResultDto,
-} from "../../shared/SearchImmersionDto";
+import { SearchImmersionResultDto } from "../../shared/searchImmersion/SearchImmersionResult.dto";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
@@ -146,16 +144,26 @@ describe("Postgres implementation of immersion offer repository", () => {
           "78000403200029",
           "A1101", // Whatever
           searchedPosition, // Position matching
+          "20404", // Appellation : Tractoriste agricole; Tractoriste agricole
         );
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
           testUid2,
+          "78000403200029",
+          "A1101", // Whatever
+          searchedPosition, // Position matching
+          "17751", // Appellation : Pilote de machines d'abattage;Pilote de machines d'abattage
+        );
+
+        await insertActiveEstablishmentAndOfferAndEventuallyContact(
+          testUid3,
           "79000403200029",
           "A1201", // Whatever
           searchedPosition, // Position matching
+          undefined, // No appellation given
         );
         /// Establishment oustide geographical area
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
-          testUid3,
+          testUid4,
           "99000403200029",
           "A1101", // Whatever
           farFromSearchedPosition, // Position not matching
@@ -179,6 +187,12 @@ describe("Postgres implementation of immersion offer repository", () => {
           },
           {
             id: testUid2,
+            rome: "A1201",
+            siret: "79000403200029",
+            distance_m: 0,
+          },
+          {
+            id: testUid3,
             rome: "A1201",
             siret: "79000403200029",
             distance_m: 0,
@@ -548,7 +562,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
     });
 
-    it("updates parameters `nafDto`, `nb of employe`, `adress` and `position` if given and `updatedAt`", async () => {
+    it("updates parameters `nafDto`, `nb of employe`, `address` and `position` if given and `updatedAt`", async () => {
       // Prepare
       const siretOfEstablishmentToUpdate = "78000403200021";
 
@@ -1243,6 +1257,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     uuid: string;
     romeCode: string;
     siret: string;
+    romeAppellation?: string;
   }) => {
     const insertQuery = `INSERT INTO immersion_offers (
       uuid, rome_code, siret, score, rome_appellation
@@ -1256,7 +1271,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.romeCode,
       props.siret,
       defaultScore,
-      defaultCodeAppelation,
+      props.romeAppellation ?? defaultCodeAppelation,
     ]);
   };
   const insertImmersionContact = async (props: {

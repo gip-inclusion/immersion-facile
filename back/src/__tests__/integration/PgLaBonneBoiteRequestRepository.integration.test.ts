@@ -2,7 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { PgLaBonneBoiteRequestRepository } from "../../adapters/secondary/pg/PgLaBonneBoiteRequestRepository";
 import { LaBonneBoiteRequestEntity } from "../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
 import { LaBonneBoiteRequestParams } from "../../domain/immersionOffer/ports/LaBonneBoiteAPI";
-import { LatLonDto } from "../../shared/SearchImmersionDto";
+import { LatLonDto } from "../../shared/latLon";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 
 describe("PgLaBonneBoiteRequestRepository", () => {

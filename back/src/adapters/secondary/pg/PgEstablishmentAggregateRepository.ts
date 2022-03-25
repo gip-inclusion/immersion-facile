@@ -12,16 +12,19 @@ import {
   EstablishmentEntityV2,
   DataSource,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import {
+  AnnotatedImmersionOfferEntityV2,
+  ImmersionOfferId,
+} from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
+import { LatLonDto } from "../../../shared/latLon";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
-  ImmersionOfferId,
-  LatLonDto,
-  SearchContact,
+  SearchContactDto,
   SearchImmersionResultDto,
-} from "../../../shared/SearchImmersionDto";
+} from "../../../shared/searchImmersion/SearchImmersionResult.dto";
+
 import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { createLogger } from "../../../utils/logger";
 import { optional } from "./pgUtils";
@@ -278,7 +281,7 @@ export class PgEstablishmentAggregateRepository
       ])
       .then((res) =>
         res.rows.map((result) => {
-          const immersionContact: SearchContact | null =
+          const immersionContact: SearchContactDto | null =
             result.contact_in_establishment_uuid != null
               ? {
                   id: result.contact_in_establishment_uuid,

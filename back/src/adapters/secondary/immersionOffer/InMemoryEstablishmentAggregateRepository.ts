@@ -8,16 +8,16 @@ import {
 import {
   AnnotatedImmersionOfferEntityV2,
   ImmersionOfferEntityV2,
+  ImmersionOfferId,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { path, pathEq, pathNotEq } from "../../../shared/ramdaExtensions/path";
 import { propEq } from "../../../shared/ramdaExtensions/propEq";
-import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
-import { SearchImmersionResultDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
 
 const logger = createLogger(__filename);
 

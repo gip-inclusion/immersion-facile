@@ -3,7 +3,7 @@ import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyReposito
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
-import { LatLonDto } from "../../shared/SearchImmersionDto";
+import { LatLonDto } from "../../shared/latLon";
 
 const agency1builder = AgencyConfigBuilder.create(
   "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",

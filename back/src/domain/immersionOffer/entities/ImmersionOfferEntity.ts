@@ -1,4 +1,6 @@
-import { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
+import { Flavor } from "../../../shared/typeFlavors";
+
+export type ImmersionOfferId = Flavor<string, "ImmersionOfferId">;
 
 export type ImmersionOfferEntityV2 = {
   id: ImmersionOfferId;

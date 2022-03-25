@@ -1,11 +1,11 @@
 import { SuperTest, Test } from "supertest";
 import {
+  TEST_APPELLATION_LABEL,
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { makeGenerateJwt } from "../../domain/auth/jwt";
-import { SearchImmersionResultDto } from "../../shared/SearchImmersionDto";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
@@ -17,6 +17,7 @@ import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentE
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 import { getImmersionOfferByIdRoute } from "../../shared/routes";
+import { SearchImmersionResultDto } from "../../shared/searchImmersion/SearchImmersionResult.dto";
 
 const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
 const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03512d";

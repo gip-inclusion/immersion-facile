@@ -11,9 +11,9 @@ import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/E
 import { UpsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpsertEstablishmentAggregateFromFormEstablishement";
 import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
 import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
+import { LatLonDto } from "../../../shared/latLon";
 import { NafDto } from "../../../shared/naf";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";

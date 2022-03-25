@@ -3,7 +3,7 @@ import {
   ListAgenciesRequestDto,
   listAgenciesRequestSchema,
 } from "../../../shared/agencies";
-import { LatLonDto } from "../../../shared/SearchImmersionDto";
+import { LatLonDto } from "../../../shared/latLon";
 import { UseCase } from "../../core/UseCase";
 import { AgencyConfig, AgencyRepository } from "../ports/AgencyRepository";
 

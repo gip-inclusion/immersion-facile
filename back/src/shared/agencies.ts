@@ -1,5 +1,5 @@
 import { z } from "../../node_modules/zod";
-import { LatLonDto, latLonSchema } from "./SearchImmersionDto";
+import { LatLonDto, latLonSchema } from "./latLon";
 import { Flavor } from "./typeFlavors";
 import { NotEmptyArray } from "./utils";
 import { zEmail, zString, zTrimmedString } from "./zodUtils";

@@ -1,14 +1,14 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import {
-  ImmersionOfferId,
-  immersionOfferIdSchema,
-  SearchContact,
+  SearchContactDto,
   SearchImmersionResultDto,
-} from "../../../shared/SearchImmersionDto";
+} from "../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { immersionOfferIdSchema } from "../../../shared/searchImmersion/SearchImmersionResult.schema";
 import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { UseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
+import { ImmersionOfferId } from "../entities/ImmersionOfferEntity";
 
 export class GetImmersionOfferById extends UseCase<
   ImmersionOfferId,
@@ -43,7 +43,7 @@ export class GetImmersionOfferById extends UseCase<
     if (!annotatedEstablishment || !annotatedOffer)
       throw new NotFoundError(immersionOfferId);
 
-    const contactDetails: SearchContact | undefined =
+    const contactDetails: SearchContactDto | undefined =
       !!contact && !!apiConsumer
         ? {
             id: contact.id,

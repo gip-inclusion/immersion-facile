@@ -1,5 +1,5 @@
 import { AgencyId, CreateAgencyConfig } from "../../../shared/agencies";
-import { LatLonDto } from "../../../shared/SearchImmersionDto";
+import { LatLonDto } from "../../../shared/latLon";
 import { RequireField } from "../../../shared/utils";
 
 export type AgencyStatus = "active" | "closed" | "needsReview";

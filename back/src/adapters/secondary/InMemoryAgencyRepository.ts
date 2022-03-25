@@ -1,10 +1,10 @@
 import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { AgencyInListDto, AgencyId } from "../../shared/agencies";
-import { LatLonDto } from "../../shared/SearchImmersionDto";
 import { createLogger } from "../../utils/logger";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { values } from "ramda";
 import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
+import { LatLonDto } from "../../shared/latLon";
 
 const logger = createLogger(__filename);
 
