@@ -47,19 +47,26 @@ export class InMemoryEventBus implements EventBus {
   }
 
   public async publish(event: DomainEvent) {
+    const publishedAt = this.clock.now().toISOString();
+    const publishedEvent = await this._publish(event, publishedAt);
+    await this.afterPublish(publishedEvent);
+  }
+
+  private async _publish(
+    event: DomainEvent,
+    publishedAt: DateStr,
+  ): Promise<DomainEvent> {
+    // the publication happens here, an event is expected in return,
+    // with the publication added to the event
     logger.info({ event }, "publish");
 
     const topic = event.topic;
     counterPublishedEventsTotal.inc({ topic });
 
-    const publishedAt = this.clock.now().toISOString();
-
     const callbacksById = this.subscriptions[topic];
     if (callbacksById === undefined) {
-      await this.afterPublish(
-        addNewPublicationWithoutFailureToEvent(event, publishedAt),
-      );
-      return monitorAbsenceOfCallback(event);
+      monitorAbsenceOfCallback(event);
+      return addNewPublicationWithoutFailureToEvent(event, publishedAt);
     }
 
     const subscriptionsIdToPublish = getSubscriptionsIdToPublish(
@@ -67,8 +74,11 @@ export class InMemoryEventBus implements EventBus {
       callbacksById,
     );
 
-    if (!subscriptionsIdToPublish.length)
-      return monitorAbsenceOfSubscribers(event);
+    if (!subscriptionsIdToPublish.length) {
+      // this should not happen because the case callbacksById === undefined has been handle before
+      monitorAbsenceOfSubscribers(event);
+      return addNewPublicationWithoutFailureToEvent(event, publishedAt);
+    }
 
     const failuresOrUndefined: (EventFailure | void)[] = await Promise.all(
       subscriptionsIdToPublish.map(
@@ -102,12 +112,11 @@ export class InMemoryEventBus implements EventBus {
     ];
 
     if (failures.length === 0) {
-      await this.afterPublish({
+      counterPublishedEventsSuccess.inc({ topic });
+      return {
         ...event,
         publications,
-      });
-      counterPublishedEventsSuccess.inc({ topic });
-      return;
+      };
     }
 
     // Some subscribers have failed :
@@ -117,11 +126,11 @@ export class InMemoryEventBus implements EventBus {
       notifyObjectDiscord(event);
     }
 
-    await this.afterPublish({
+    return {
       ...event,
       publications,
       wasQuarantined,
-    });
+    };
   }
 
   public subscribe<T extends DomainTopic>(
