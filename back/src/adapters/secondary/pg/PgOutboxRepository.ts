@@ -132,7 +132,17 @@ export class PgOutboxRepository implements OutboxRepository {
     const { id, occurredAt, wasQuarantined, topic, payload } = event;
 
     const eventAlreadyInDb = await this.getEventById(event.id);
-    if (eventAlreadyInDb) return eventAlreadyInDb;
+    if (eventAlreadyInDb) {
+      if (eventAlreadyInDb.wasQuarantined === event.wasQuarantined) {
+        return eventAlreadyInDb;
+      }
+
+      await this.client.query(
+        "UPDATE outbox SET was_quarantined = $2 WHERE id = $1",
+        [id, wasQuarantined],
+      );
+      return { ...eventAlreadyInDb, wasQuarantined: event.wasQuarantined };
+    }
 
     const query = `INSERT INTO outbox(
         id, occurred_at, was_quarantined, topic, payload

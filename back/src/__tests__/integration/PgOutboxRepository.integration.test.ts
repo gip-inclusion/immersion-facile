@@ -144,6 +144,44 @@ describe("PgOutboxRepository", () => {
     });
   });
 
+  it("sets to quarantined event if the event is already in db with publications", async () => {
+    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+    uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
+    clock.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
+    const eventFailedToRerun = createNewEvent({
+      topic: "ImmersionApplicationSubmittedByBeneficiary",
+      payload: immersionApplication,
+      publications: [
+        {
+          publishedAt: "2021-11-15T08:00:00.000Z",
+          failures: [
+            {
+              subscriptionId: "subscription1",
+              errorMessage: "some error message",
+            },
+            {
+              subscriptionId: "subscription2",
+              errorMessage: "some other error",
+            },
+          ],
+        },
+      ],
+    });
+    const quarantinedImmersionApplication = {
+      ...eventFailedToRerun,
+      wasQuarantined: true,
+    };
+    await storeInOutbox([eventFailedToRerun]);
+
+    await outboxRepository.save(quarantinedImmersionApplication);
+    const storedEventRows = await getAllEventsStored();
+    expect(storedEventRows).toHaveLength(2);
+    expectStoredRowsToMatchEvent(
+      storedEventRows,
+      quarantinedImmersionApplication,
+    );
+  });
+
   it("finds all events to be processed", async () => {
     // prepare
     uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
