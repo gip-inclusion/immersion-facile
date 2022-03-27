@@ -184,7 +184,7 @@ export class PgEstablishmentAggregateRepository
         immersionOffers.map((immersionOffer) => [
           immersionOffer.id,
           immersionOffer.romeCode,
-          immersionOffer.romeAppellation,
+          immersionOffer.appellationCode,
           establishment.siret,
           immersionOffer.score,
         ]),

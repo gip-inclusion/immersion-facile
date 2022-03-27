@@ -33,10 +33,10 @@ export class ImmersionOfferEntityV2Builder
     });
   }
 
-  withRomeAppellation(romeAppellation: number) {
+  withAppellationCode(appellationCode: string) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
-      romeAppellation,
+      appellationCode,
     });
   }
 

@@ -227,7 +227,7 @@ export class InMemoryEstablishmentAggregateRepository
         .find(pathEq("establishment.siret", siret))
         ?.immersionOffers.map((offer) => ({
           romeCode: offer.romeCode,
-          appellationCode: offer.romeAppellation?.toString() ?? "", // Should not be undefined though
+          appellationCode: offer.appellationCode?.toString() ?? "", // Should not be undefined though
           romeLabel: TEST_ROME_LABEL,
           appellationLabel: TEST_APPELLATION_LABEL,
         })) ?? []

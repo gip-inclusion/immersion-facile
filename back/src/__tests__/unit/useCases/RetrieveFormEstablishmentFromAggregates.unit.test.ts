@@ -69,7 +69,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     const contact = new ContactEntityV2Builder().build();
     const offer = new ImmersionOfferEntityV2Builder()
       .withRomeCode("A1101")
-      .withRomeAppellation(11987)
+      .withAppellationCode("11987")
       .build();
 
     await establishmentAggregateRepo.insertEstablishmentAggregates([

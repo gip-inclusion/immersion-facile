@@ -48,7 +48,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("pg implementation of method getSearchImmersionResultDtoFromSearchMade", () => {
-    const searchedRome = "M1808";
+    const searchedRome = "M1808"; // "Information géographique"
     const searchedPosition = { lat: 49, lon: 6 };
     const notMatchingRome = "B1805";
     const farFromSearchedPosition = { lat: 32, lon: 89 };
@@ -161,7 +161,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           "79000403200029",
           "A1201", // Whatever
           searchedPosition, // Position matching
-          undefined, // No appellation given
+          undefined,
         );
         /// Establishment oustide geographical area
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
@@ -182,13 +182,11 @@ describe("Postgres implementation of immersion offer repository", () => {
 
         const expectedResult: Partial<SearchImmersionResultDto>[] = [
           {
-            id: testUid1,
             rome: "A1101",
             siret: "78000403200029",
             distance_m: 0,
           },
           {
-            id: testUid2,
             rome: "A1201",
             siret: "78000403200029",
             distance_m: 0,
@@ -218,6 +216,14 @@ describe("Postgres implementation of immersion offer repository", () => {
         uuid: testUid1,
         romeCode: searchedRome,
         siret: notActiveSiret,
+        // romeAppellation: "11704", // Cartographe;Cartographe
+      });
+
+      await insertImmersionOffer({
+        uuid: testUid1,
+        romeCode: searchedRome,
+        siret: notActiveSiret,
+        // romeAppellation: "12240", // Chef de projet en géomatique;Chef de projet en géomatique
       });
 
       // Act
@@ -278,7 +284,6 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(searchResult).toHaveLength(1);
 
       const expectedResult: Partial<SearchImmersionResultDto> = {
-        id: immersionOfferIdMatchingSearch,
         rome: searchedRome,
         romeLabel: "Information géographique",
         siret: siretMatchingToSearch,
@@ -424,6 +429,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       const storedImmersionOffer = new ImmersionOfferEntityV2Builder()
         .withId(immersionOfferId)
         .withRomeCode("M1808")
+        .withAppellationCode("11704") // Cartographe;Cartographe
         .build();
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
@@ -436,8 +442,10 @@ describe("Postgres implementation of immersion offer repository", () => {
           immersionOfferId,
         );
       expect(immersionOffer).toEqual({
-        ...storedImmersionOffer,
+        romeCode: "M1808",
+        score: storedImmersionOffer.score,
         romeLabel: "Information géographique",
+        appellationLabels: ["Cartographe;Cartographe"],
       });
     });
 
@@ -1066,12 +1074,12 @@ describe("Postgres implementation of immersion offer repository", () => {
       new ImmersionOfferEntityV2Builder()
         .withNewId()
         .withRomeCode("A1101") // Code only, no appellation
-        .withRomeAppellation(11987)
+        .withAppellationCode("11987")
         .build(),
       new ImmersionOfferEntityV2Builder()
         .withNewId()
         .withRomeCode("A1101")
-        .withRomeAppellation(12862)
+        .withAppellationCode("12862")
         .build(),
     ];
     beforeEach(async () => {
@@ -1136,13 +1144,13 @@ describe("Postgres implementation of immersion offer repository", () => {
           {
             romeCode: offers[0].romeCode,
             romeLabel: "Conduite d'engins agricoles et forestiers",
-            appellationCode: offers[0].romeAppellation!.toString(),
+            appellationCode: offers[0].appellationCode!.toString(),
             appellationLabel: "Chauffeur / Chauffeuse de machines agricoles",
           },
           {
             romeCode: offers[1].romeCode,
             romeLabel: "Conduite d'engins agricoles et forestiers",
-            appellationCode: offers[1].romeAppellation!.toString(),
+            appellationCode: offers[1].appellationCode!.toString(),
             appellationLabel: "Conducteur / Conductrice d'abatteuses",
           },
         ];

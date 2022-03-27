@@ -107,10 +107,8 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
           appellationCode,
         }): Promise<ImmersionOfferEntityV2 | undefined> => ({
           id: this.uuidGenerator.new(),
-          romeCode,
-          romeAppellation: appellationCode
-            ? Number(appellationCode)
-            : undefined,
+          romeCode: romeCode,
+          appellationCode: appellationCode ? appellationCode : undefined,
           score: offerFromFormScore,
         }),
       )

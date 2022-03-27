@@ -124,8 +124,8 @@ describe("Upsert Establishment aggregate from form data", () => {
       siret: fakeSiret,
       nafDto: expectedNafDto,
       offerRomeCodesAndAppellations: [
-        { code: "A1101", appellation: 11717 },
-        { code: "A1102", appellation: 11717 },
+        { romeCode: "A1101", appellationCode: "11717" },
+        { romeCode: "A1102", appellationCode: "11717" },
       ],
       contactEmail: fakeBusinessContact.email,
     });
@@ -135,7 +135,10 @@ describe("Upsert Establishment aggregate from form data", () => {
     siret: string;
     nafDto: NafDto;
     contactEmail: string;
-    offerRomeCodesAndAppellations: { code: string; appellation?: number }[];
+    offerRomeCodesAndAppellations: {
+      romeCode: string;
+      appellationCode?: string;
+    }[];
   }) => {
     const repoEstablishmentAggregate =
       establishmentAggregateRepo.establishmentAggregates[0];
@@ -159,12 +162,9 @@ describe("Upsert Establishment aggregate from form data", () => {
     expect(repoEstablishmentAggregate.immersionOffers).toHaveLength(
       expected.offerRomeCodesAndAppellations.length,
     );
-    expect(
-      repoEstablishmentAggregate.immersionOffers.map((offer) => ({
-        code: offer.romeCode,
-        appellation: offer.romeAppellation,
-      })),
-    ).toEqual(expected.offerRomeCodesAndAppellations);
+    expect(repoEstablishmentAggregate.immersionOffers).toMatchObject(
+      expected.offerRomeCodesAndAppellations,
+    );
   };
 
   it("correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {
