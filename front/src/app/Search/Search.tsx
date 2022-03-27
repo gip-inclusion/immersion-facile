@@ -1,7 +1,7 @@
 import SearchIcon from "@mui/icons-material/Search";
-import { Form, Formik, FormikHelpers } from "formik";
-import React, { useState } from "react";
-import { immersionSearchGateway } from "src/app/dependencies";
+import { Form, Formik } from "formik";
+import React from "react";
+import { searchEpic } from "src/app/dependencies";
 import { AppellationAutocomplete } from "src/app/Profession/AppellationAutocomplete";
 import { RomeAutocomplete } from "src/app/Profession/RomeAutocomplete";
 import { OurAdvises } from "src/app/Search/OurAdvises";
@@ -12,13 +12,10 @@ import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { HomeImmersionHowTo } from "src/components/ImmersionHowTo";
 import { Layout } from "src/components/Layout";
 import { SearchButton } from "src/components/SearchButton";
-import {
-  SearchImmersionRequestDto,
-  SearchImmersionResultDto,
-} from "src/shared/SearchImmersionDto";
+import { useObservable } from "src/useObservable";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 
-interface Values {
+interface SearchInput {
   rome?: string;
   nafDivision?: string;
   lat: number;
@@ -27,11 +24,11 @@ interface Values {
 }
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
-const initialySelectedIndex = 3; // to get 10 km radius by default
+const initiallySelectedIndex = 3; // to get 10 km radius by default
 
 export const Search = () => {
-  const [result, setResult] = useState<SearchImmersionResultDto[] | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
+  const searchResults = useObservable(searchEpic.views.searchResults$, []);
+  const isSearching = useObservable(searchEpic.views.isSearching$, false);
 
   return (
     <Layout>
@@ -42,18 +39,14 @@ export const Search = () => {
             facile
           </h1>
           <span style={{ height: "30px" }} />
-          <Formik
+          <Formik<SearchInput>
             initialValues={{
               lat: 0,
               lon: 0,
               radiusKm: 10,
             }}
-            onSubmit={async (
-              values,
-              { setSubmitting }: FormikHelpers<Values>,
-            ) => {
-              setIsSearching(true);
-              const searchImmersionRequestDto: SearchImmersionRequestDto = {
+            onSubmit={(values) => {
+              searchEpic.actions.search({
                 rome: values.rome || undefined,
                 location: {
                   lat: values.lat,
@@ -61,19 +54,7 @@ export const Search = () => {
                 },
                 distance_km: values.radiusKm,
                 nafDivision: values.nafDivision,
-              };
-              immersionSearchGateway
-                .search(searchImmersionRequestDto)
-                .then((response) => {
-                  setResult(response);
-                })
-                .catch((e) => {
-                  console.error(e.toString());
-                })
-                .finally(() => {
-                  setIsSearching(false);
-                  setSubmitting(false);
-                });
+              });
             }}
           >
             {({ setFieldValue }) => (
@@ -117,7 +98,7 @@ export const Search = () => {
                       ) => {
                         setFieldValue("radiusKm", radiusOptions[selectedIndex]);
                       }}
-                      defaultSelectedIndex={initialySelectedIndex}
+                      defaultSelectedIndex={initiallySelectedIndex}
                       options={radiusOptions.map((n) => `${n} km`)}
                     />
                   </div>
@@ -136,7 +117,10 @@ export const Search = () => {
           </Formik>
         </div>
         <div className="flex flex-col items-center sm:h-[670px] sm:flex-1 sm:overflow-y-scroll">
-          <SearchResultPanel searchResults={result} isSearching={isSearching} />
+          <SearchResultPanel
+            searchResults={searchResults}
+            isSearching={isSearching}
+          />
         </div>
       </div>
       <div>

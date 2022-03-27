@@ -8,83 +8,106 @@ import {
 } from "../../shared/SearchImmersionDto";
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 
-const SIMULATED_LATENCY_MS = 500;
-
-const defaultNaf = "MyNaf";
+const DEFAULT_SIMULATED_LATENCY_MS = 500;
 
 export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
+  private _results: SearchImmersionResultDto[];
+  private readonly _simulatedLatency: number;
+  private _error: Error | null = null;
+
+  constructor(params?: {
+    simulatedLatency?: number;
+    defaultResults?: SearchImmersionResultDto[];
+  }) {
+    this._simulatedLatency =
+      params?.simulatedLatency ?? DEFAULT_SIMULATED_LATENCY_MS;
+    this._results = params?.defaultResults ?? seedResults;
+  }
+
   public async search(
     searchParams: SearchImmersionRequestDto,
   ): Promise<SearchImmersionResultDto[]> {
-    console.log("search immersion: " + searchParams);
-    await sleep(SIMULATED_LATENCY_MS);
-
-    return [
-      {
-        id: "search_result_id",
-        rome: searchParams.rome!,
-        naf: searchParams.nafDivision ?? defaultNaf,
-        siret: "12345678901234",
-        name: "Super Corp",
-        voluntaryToImmersion: true,
-        location: { lat: 48.8666, lon: 2.3333 },
-        address: "55 rue du Faubourg Saint-Honoré, 75017 Paris",
-        contactMode: "EMAIL",
-        romeLabel: "Super métier",
-        nafLabel: "Métallurgie",
-        city: "xxxx",
-      },
-      {
-        id: "search_result_id2",
-        rome: searchParams.rome!,
-        naf: searchParams.nafDivision ?? defaultNaf,
-        siret: "12345678901234",
-        name: "Mega Corp",
-        voluntaryToImmersion: true,
-        location: { lat: 48.8666, lon: 2.3333 },
-        address: "55 rue du Faubourg Saint-Honoré",
-        contactMode: "PHONE",
-        romeLabel:
-          "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
-        nafLabel: "Accueil et Restauration",
-        city: "xxxx",
-        numberOfEmployeeRange: "11-49",
-      },
-      {
-        id: "search_result_id3",
-        rome: searchParams.rome!,
-        naf: searchParams.nafDivision ?? defaultNaf,
-        siret: "12345678901234",
-        name: "Hyper Corp",
-        voluntaryToImmersion: false,
-        location: { lat: 48.8666, lon: 2.3333 },
-        address: "55 rue du Faubourg Saint-Honoré",
-        contactMode: "IN_PERSON",
-        romeLabel: "Hyper métier",
-        nafLabel: "",
-        city: "xxxx",
-      },
-      {
-        id: "search_result_id4",
-        rome: searchParams.rome!,
-        naf: searchParams.nafDivision ?? defaultNaf,
-        siret: "12345678901235",
-        name: "Giga Corp",
-        voluntaryToImmersion: false,
-        location: { lat: 48.8666, lon: 2.3333 },
-        address: "55 rue du Faubourg Saint-Honoré",
-        contactMode: undefined,
-        romeLabel: "Giga métier",
-        nafLabel: "",
-        city: "xxxx",
-      },
-    ];
+    await sleep(this._simulatedLatency);
+    if (this._error) throw this._error;
+    return this._results;
   }
 
   public async contactEstablishment(
     params: ContactEstablishmentRequestDto,
   ): Promise<void> {
-    await sleep(SIMULATED_LATENCY_MS);
+    await sleep(this._simulatedLatency);
+    if (this._error) throw this._error;
     return;
   }
+
+  // test purpose
+  setNextSearchResult(results: SearchImmersionResultDto[]) {
+    this._results = results;
+  }
+  setError(error: Error) {
+    this._error = error;
+  }
 }
+
+const defaultNaf = "MyNaf";
+
+const seedResults: SearchImmersionResultDto[] = [
+  {
+    id: "search_result_id",
+    rome: "A0000",
+    naf: defaultNaf,
+    siret: "12345678901234",
+    name: "Super Corp",
+    voluntaryToImmersion: true,
+    location: { lat: 48.8666, lon: 2.3333 },
+    address: "55 rue du Faubourg Saint-Honoré, 75017 Paris",
+    contactMode: "EMAIL",
+    romeLabel: "Super métier",
+    nafLabel: "Métallurgie",
+    city: "xxxx",
+  },
+  {
+    id: "search_result_id2",
+    rome: "A0000",
+    naf: defaultNaf,
+    siret: "12345678901234",
+    name: "Mega Corp",
+    voluntaryToImmersion: true,
+    location: { lat: 48.8666, lon: 2.3333 },
+    address: "55 rue du Faubourg Saint-Honoré",
+    contactMode: "PHONE",
+    romeLabel:
+      "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
+    nafLabel: "Accueil et Restauration",
+    city: "xxxx",
+    numberOfEmployeeRange: "11-49",
+  },
+  {
+    id: "search_result_id3",
+    rome: "A0000",
+    naf: defaultNaf,
+    siret: "12345678901234",
+    name: "Hyper Corp",
+    voluntaryToImmersion: false,
+    location: { lat: 48.8666, lon: 2.3333 },
+    address: "55 rue du Faubourg Saint-Honoré",
+    contactMode: "IN_PERSON",
+    romeLabel: "Hyper métier",
+    nafLabel: "",
+    city: "xxxx",
+  },
+  {
+    id: "search_result_id4",
+    rome: "A0000",
+    naf: defaultNaf,
+    siret: "12345678901235",
+    name: "Giga Corp",
+    voluntaryToImmersion: false,
+    location: { lat: 48.8666, lon: 2.3333 },
+    address: "55 rue du Faubourg Saint-Honoré",
+    contactMode: undefined,
+    romeLabel: "Giga métier",
+    nafLabel: "",
+    city: "xxxx",
+  },
+];

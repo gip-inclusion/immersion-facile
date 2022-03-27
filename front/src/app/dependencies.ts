@@ -12,6 +12,7 @@ import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemo
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
+import { createSearchEpic } from "src/core-logic/epics/search.epic";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { FeatureFlagsGateway } from "src/core-logic/ports/FeatureFlagsGateway";
@@ -55,3 +56,5 @@ export const romeAutocompleteGateway: RomeAutocompleteGateway =
   ENV.gateway === "IN_MEMORY"
     ? new InMemoryRomeAutocompleteGateway()
     : new HttpRomeAutocompleteGateway();
+
+export const searchEpic = createSearchEpic({ immersionSearchGateway });
