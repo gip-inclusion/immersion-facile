@@ -40,10 +40,10 @@ export const EnterpriseSearchResult = ({
     numberOfEmployeeRange,
     nafLabel,
     romeLabel,
+    appellationLabels,
     voluntaryToImmersion,
   } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
-
   return (
     <div className="flex flex-col items-stretch p-4 w-[80%] bg-white my-4 rounded border-solid border-gray-400 border gap-4">
       <div className="flex flex-wrap justify-between">
@@ -52,7 +52,11 @@ export const EnterpriseSearchResult = ({
             {name}
           </div>
           {nafLabel && <div className="font-bold">{nafLabel}</div>}
-          <div>{romeLabel}</div>
+          <div>
+            {appellationLabels.length > 0
+              ? appellationLabels.join(", ")
+              : romeLabel}
+          </div>
         </div>
         <InfoLabel
           className=""

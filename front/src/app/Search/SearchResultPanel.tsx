@@ -48,13 +48,14 @@ export const SearchResultPanel = () => {
     <>
       {searchResults.map((searchResult) => (
         <EnterpriseSearchResult
-          key={searchResult.id}
+          key={searchResult.siret + "_" + searchResult.rome} // Should be unique !
           searchResult={searchResult}
           onButtonClick={() =>
             dispatch({
               type: "CLICKED_OPEN",
               payload: {
-                immersionOfferId: searchResult.id,
+                immersionOfferRome: searchResult.rome,
+                immersionOfferSiret: searchResult.siret,
                 contactId: searchResult.contactDetails?.id,
                 contactMethod: searchResult.contactMode,
               },

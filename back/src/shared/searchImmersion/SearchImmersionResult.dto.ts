@@ -1,5 +1,4 @@
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
-import { ImmersionOfferId } from "../ImmersionOfferId";
 import { LatLonDto } from "../latLon";
 import { RomeCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret";
@@ -14,9 +13,9 @@ export type SearchContactDto = {
 };
 
 export type SearchImmersionResultDto = {
-  id: ImmersionOfferId;
   rome: RomeCode;
   romeLabel: string;
+  appellationLabels: string[];
   naf: string;
   nafLabel: string;
   siret: SiretDto;

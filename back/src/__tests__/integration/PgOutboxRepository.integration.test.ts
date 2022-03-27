@@ -9,6 +9,7 @@ import {
 } from "../../adapters/secondary/pg/PgOutboxRepository";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../domain/core/eventBus/events";
+import { expectArraysToEqualIgnoringOrder } from "../../_testBuilders/test.helpers";
 
 describe("PgOutboxRepository", () => {
   let pool: Pool;
@@ -226,9 +227,7 @@ describe("PgOutboxRepository", () => {
     const events = await outboxRepository.getAllUnpublishedEvents();
 
     // assert
-    expect(events).toHaveLength(2);
-    expect(events[0]).toEqual(event1);
-    expect(events[1]).toEqual(event2);
+    expectArraysToEqualIgnoringOrder(events, [event1, event2]);
   });
 
   it("finds all events that have failed and should be reprocessed", async () => {

@@ -23,9 +23,9 @@ export const contactDetailsSchema: z.Schema<SearchContactDto> = z.object({
 
 export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
   z.object({
-    id: immersionOfferIdSchema,
     rome: romeCodeSchema,
     romeLabel: z.string(),
+    appellationLabels: z.array(z.string()),
     naf: z.string(),
     nafLabel: z.string(),
     siret: siretSchema,

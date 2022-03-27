@@ -14,6 +14,7 @@ import {
 import { formEstablishmentDtoPublicV0ToDomain } from "./DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { formEstablishmentSchemaPublicV0 } from "./DtoAndSchemas/v0/input/FormEstablishmentPublicV0.schema";
 import { pipeWithValue } from "../../../shared/pipeWithValue";
+import { domainToSearchImmersionResultPublicV0 } from "./DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 
 const counterFormEstablishmentCaller = new promClient.Counter({
   name: "form_establishment_callers_counter",
@@ -31,17 +32,21 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
       await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
         req.body,
       );
-      return deps.useCases.searchImmersion.execute(req.body, req.apiConsumer);
+      return (
+        await deps.useCases.searchImmersion.execute(req.body, req.apiConsumer)
+      ).map(domainToSearchImmersionResultPublicV0);
     }),
   );
 
   authenticatedRouter
     .route(`/${getImmersionOfferByIdRoute}/:id`)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.getImmersionOfferById.execute(
-          req.params.id,
-          req.apiConsumer,
+      sendHttpResponse(req, res, async () =>
+        domainToSearchImmersionResultPublicV0(
+          await deps.useCases.getImmersionOfferById.execute(
+            req.params.id,
+            req.apiConsumer,
+          ),
         ),
       ),
     );

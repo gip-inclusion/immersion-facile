@@ -6,6 +6,7 @@ import {
 import { NafDto } from "../shared/naf";
 import { Builder } from "./Builder";
 import { FormEstablishmentSource } from "../shared/formEstablishment/FormEstablishment.dto";
+import { LatLonDto } from "../shared/latLon";
 
 export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   siret: "78000403200019",
@@ -37,7 +38,9 @@ export class EstablishmentEntityV2Builder
   withAddress(address: string) {
     return new EstablishmentEntityV2Builder({ ...this.entity, address });
   }
-
+  withPosition(position: LatLonDto) {
+    return new EstablishmentEntityV2Builder({ ...this.entity, position });
+  }
   withName(name: string) {
     return new EstablishmentEntityV2Builder({ ...this.entity, name });
   }

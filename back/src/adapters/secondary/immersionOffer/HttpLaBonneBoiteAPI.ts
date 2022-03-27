@@ -55,7 +55,7 @@ const deduplicateLaBonneBoiteCompanies = (
   const companieSirets = companies.map((company) => company.siret);
   return companies.filter(
     (company, companyIndex) =>
-      companieSirets.indexOf(company.siret) !== companyIndex,
+      companieSirets.indexOf(company.siret) === companyIndex,
   );
 };
 

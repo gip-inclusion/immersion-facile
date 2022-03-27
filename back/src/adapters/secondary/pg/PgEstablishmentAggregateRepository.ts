@@ -218,6 +218,7 @@ export class PgEstablishmentAggregateRepository
     const query = `
         WITH active_establishments_with_contact_uuid AS (
           SELECT 
+            DISTINCT ON (siret)
             establishments.name as establishment_name,
             number_employees AS establishment_tefen_code, 
             address,
@@ -232,14 +233,18 @@ export class PgEstablishmentAggregateRepository
           LEFT JOIN establishments__immersion_contacts e_ic ON e_ic.establishment_siret = establishments.siret
           WHERE is_active
           ),
-        filtered_immersion_offers AS (
-          SELECT 
-            uuid as offer_uuid, 
-            siret as offer_siret, 
-            rome_code
-          FROM immersion_offers 
-          ${searchMade.rome ? "WHERE rome_code = %1$L" : ""} 
-          )
+          filtered_immersion_offers AS (
+            WITH offers_with_appellations AS (
+            SELECT siret, rome_code, libelle_appellation_long
+            FROM immersion_offers 
+            LEFT JOIN public_appellations_data 
+            ON (immersion_offers.rome_appellation = public_appellations_data.ogr_appellation) 
+            ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
+            )
+            SELECT siret AS offer_siret, rome_code, 
+            jsonb_agg(distinct libelle_appellation_long) filter (where libelle_appellation_long is not null) AS appellation_labels
+            FROM offers_with_appellations group by(siret, rome_code)
+            )
       SELECT
           filtered_immersion_offers.*,
           active_establishments_with_contact_uuid.*,
@@ -254,7 +259,7 @@ export class PgEstablishmentAggregateRepository
           libelle_rome
       FROM
         filtered_immersion_offers
-      RIGHT JOIN active_establishments_with_contact_uuid
+      LEFT JOIN active_establishments_with_contact_uuid
         ON (offer_siret = establishment_siret)
       LEFT JOIN immersion_contacts
         ON (contact_in_establishment_uuid = immersion_contacts.uuid)
@@ -263,8 +268,7 @@ export class PgEstablishmentAggregateRepository
             REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       LEFT OUTER JOIN public_romes_data
         ON (rome_code = public_romes_data.code_rome)
-        WHERE 
-        offer_uuid IS NOT NULL AND
+        WHERE rome_code IS NOT NULL AND
         ST_DWithin(gps, ST_GeographyFromText($1), $2) 
       ORDER BY
         data_source ASC,
@@ -291,14 +295,14 @@ export class PgEstablishmentAggregateRepository
                 }
               : null;
           const searchImmersionResultDto: SearchImmersionResultDto = {
-            id: result.offer_uuid,
             rome: result.rome_code,
             romeLabel: result.libelle_rome,
+            appellationLabels: result.appellation_labels ?? [],
             naf: result.naf_code,
             nafLabel: result.class_label,
             siret: result.establishment_siret,
             name: result.establishment_name,
-            voluntaryToImmersion: result.data_source == "form",
+            voluntaryToImmersion: result.data_source === "form",
             numberOfEmployeeRange:
               employeeRangeByTefenCode[
                 result.establishment_tefen_code as TefenCode
@@ -322,7 +326,6 @@ export class PgEstablishmentAggregateRepository
         logger.error("Error in Pg implementation of getFromSearch", e);
         console.log(e);
         throw e;
-        //return [];
       });
   }
 
@@ -520,10 +523,14 @@ export class PgEstablishmentAggregateRepository
       `SELECT
         immersion_offers.uuid,
         immersion_offers.rome_code,
+        immersion_offers.rome_appellation,
         public_romes_data.libelle_rome,
-        immersion_offers.score
+        immersion_offers.score,
+        public_appellations_data.libelle_appellation_long
       FROM
         immersion_offers
+        LEFT JOIN public_appellations_data 
+          ON (immersion_offers.rome_appellation = public_appellations_data.ogr_appellation) 
         LEFT OUTER JOIN public_romes_data
           ON (immersion_offers.rome_code = public_romes_data.code_rome)
       WHERE uuid = %L`,
@@ -539,6 +546,10 @@ export class PgEstablishmentAggregateRepository
       romeCode: row.rome_code,
       romeLabel: row.libelle_rome,
       score: row.score,
+      appellationCode:
+        optional(row.rome_appellation) && row.rome_appellation.toString(),
+      appellationLabel:
+        optional(row.libelle_appellation_long) && row.libelle_appellation_long,
     };
   }
   public async getContactEmailFromSiret(

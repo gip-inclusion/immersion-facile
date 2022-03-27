@@ -1,12 +1,12 @@
-import { ImmersionContactInEstablishmentId } from "../../../../../../shared/formEstablishment/FormEstablishment.dto";
+import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
 import { LatLonDto } from "../../../../../../shared/latLon";
 import { RomeCode } from "../../../../../../shared/rome";
 import { SearchImmersionResultDto } from "../../../../../../shared/searchImmersion/SearchImmersionResult.dto";
 
 import { SiretDto } from "../../../../../../shared/siret";
 
-export type ContactDetailsPublicV0 = {
-  id: ImmersionContactInEstablishmentId;
+export type SearchContactDto = {
+  id: string;
   lastName: string;
   firstName: string;
   email: string;
@@ -14,10 +14,10 @@ export type ContactDetailsPublicV0 = {
   phone: string;
 };
 
-export type SearchImmersionResultPublicV0 = {
-  id: string;
+export type SearchImmersionResultPublicV1 = {
   rome: RomeCode;
   romeLabel: string;
+  appellationLabels: string[];
   naf: string;
   nafLabel: string;
   siret: SiretDto;
@@ -26,15 +26,12 @@ export type SearchImmersionResultPublicV0 = {
   location: LatLonDto;
   address: string;
   city: string;
-  contactMode?: "EMAIL" | "PHONE" | "IN_PERSON";
+  contactMode?: ContactMethod;
   distance_m?: number;
-  contactDetails?: ContactDetailsPublicV0;
+  contactDetails?: SearchContactDto;
   numberOfEmployeeRange?: string;
 };
 
-export const domainToSearchImmersionResultPublicV0 = (
+export const domainToSearchImmersionResultPublicV1 = (
   domain: SearchImmersionResultDto,
-): SearchImmersionResultPublicV0 => {
-  const { appellationLabels, ...domainWithoutAppellationLabels } = domain;
-  return { ...domainWithoutAppellationLabels, id: "" };
-};
+): SearchImmersionResultPublicV1 => domain;

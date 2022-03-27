@@ -45,11 +45,6 @@ export class InMemoryEstablishmentAggregateRepository
   async getAnnotatedEstablishmentByImmersionOfferId(
     immersionOfferId: ImmersionOfferId,
   ): Promise<AnnotatedEstablishmentEntityV2 | undefined> {
-    logger.info(
-      { immersionOfferId },
-      "getAnnotatedEstablishmentByImmersionOfferId",
-    );
-
     const establishment = this._establishmentAggregates.find((aggregate) =>
       aggregate.immersionOffers.some((offer) => offer.id === immersionOfferId),
     )?.establishment;
@@ -87,6 +82,7 @@ export class InMemoryEstablishmentAggregateRepository
       return {
         ...immersionOffer,
         romeLabel: TEST_ROME_LABEL,
+        appellationLabel: TEST_APPELLATION_LABEL,
       };
   }
 
@@ -251,13 +247,13 @@ const buildSearchImmersionResultDto = (
   searchMade: SearchMade,
   withContactDetails: boolean,
 ): SearchImmersionResultDto => ({
-  id: immersionOffer.id,
   address: establishment.address,
   naf: establishment.nafDto.code,
   nafLabel: TEST_NAF_LABEL,
   name: establishment.name,
   rome: immersionOffer.romeCode,
   romeLabel: TEST_ROME_LABEL,
+  appellationLabels: [TEST_APPELLATION_LABEL],
   siret: establishment.siret,
   voluntaryToImmersion: establishment.voluntaryToImmersion,
   contactMode: contact?.contactMethod,

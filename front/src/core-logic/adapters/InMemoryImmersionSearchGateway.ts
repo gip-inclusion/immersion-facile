@@ -50,7 +50,6 @@ const defaultNaf = "MyNaf";
 
 const seedResults: SearchImmersionResultDto[] = [
   {
-    id: "search_result_id",
     rome: "A0000",
     naf: defaultNaf,
     siret: "12345678901234",
@@ -60,11 +59,11 @@ const seedResults: SearchImmersionResultDto[] = [
     address: "55 rue du Faubourg Saint-Honoré, 75017 Paris",
     contactMode: "EMAIL",
     romeLabel: "Super métier",
+    appellationLabels: ["Facteur", "Développeuse"],
     nafLabel: "Métallurgie",
     city: "xxxx",
   },
   {
-    id: "search_result_id2",
     rome: "A0000",
     naf: defaultNaf,
     siret: "12345678901234",
@@ -75,12 +74,12 @@ const seedResults: SearchImmersionResultDto[] = [
     contactMode: "PHONE",
     romeLabel:
       "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
+    appellationLabels: [],
     nafLabel: "Accueil et Restauration",
     city: "xxxx",
     numberOfEmployeeRange: "11-49",
   },
   {
-    id: "search_result_id3",
     rome: "A0000",
     naf: defaultNaf,
     siret: "12345678901234",
@@ -90,11 +89,11 @@ const seedResults: SearchImmersionResultDto[] = [
     address: "55 rue du Faubourg Saint-Honoré",
     contactMode: "IN_PERSON",
     romeLabel: "Hyper métier",
+    appellationLabels: ["Hyper", "Méga"],
     nafLabel: "",
     city: "xxxx",
   },
   {
-    id: "search_result_id4",
     rome: "A0000",
     naf: defaultNaf,
     siret: "12345678901235",
@@ -104,6 +103,7 @@ const seedResults: SearchImmersionResultDto[] = [
     address: "55 rue du Faubourg Saint-Honoré",
     contactMode: undefined,
     romeLabel: "Giga métier",
+    appellationLabels: [],
     nafLabel: "",
     city: "xxxx",
   },

@@ -18,6 +18,7 @@ import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentE
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { FormEstablishmentSource } from "../../shared/formEstablishment/FormEstablishment.dto";
+import { expectArraysToEqualIgnoringOrder } from "../../_testBuilders/test.helpers";
 
 const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
 const testUid2 = "22222222-a2a5-430a-b558-ed3e2f03512d";
@@ -48,12 +49,15 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("pg implementation of method getSearchImmersionResultDtoFromSearchMade", () => {
-    const searchedRome = "M1808"; // "Information géographique"
+    const informationGeographiqueRome = "M1808"; // "Information géographique"
+    const analysteEnGeomatiqueAppellation = "10946";
+    const cartographeAppellation = "11704";
+
     const searchedPosition = { lat: 49, lon: 6 };
     const notMatchingRome = "B1805";
     const farFromSearchedPosition = { lat: 32, lon: 89 };
     const searchMadeWithRome: SearchMade = {
-      rome: searchedRome,
+      rome: informationGeographiqueRome,
       ...searchedPosition,
       distance_km: 30,
     };
@@ -151,7 +155,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         );
         await insertImmersionOffer({
           uuid: testUid2,
-          romeCode: "A1201",
+          romeCode: "A1101", // Same rome and establishment as offer with id testUid2
           siret: "78000403200029",
           romeAppellation: "17751", // Appellation : Pilote de machines d'abattage;Pilote de machines d'abattage
         });
@@ -159,9 +163,9 @@ describe("Postgres implementation of immersion offer repository", () => {
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
           testUid3,
           "79000403200029",
-          "A1201", // Whatever
+          "A1201",
           searchedPosition, // Position matching
-          undefined,
+          undefined, // No appellation given
         );
         /// Establishment oustide geographical area
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
@@ -178,28 +182,29 @@ describe("Postgres implementation of immersion offer repository", () => {
           );
 
         // Assert : one match and defined contact details
-        expect(searchResult).toHaveLength(3);
+        expect(searchResult).toHaveLength(2);
 
         const expectedResult: Partial<SearchImmersionResultDto>[] = [
           {
             rome: "A1101",
             siret: "78000403200029",
             distance_m: 0,
+            appellationLabels: [
+              "Pilote de machines d'abattage",
+              "Tractoriste agricole",
+            ],
           },
           {
-            rome: "A1201",
-            siret: "78000403200029",
-            distance_m: 0,
-          },
-          {
-            id: testUid3,
             rome: "A1201",
             siret: "79000403200029",
             distance_m: 0,
+            appellationLabels: [],
           },
         ];
 
-        expect(sortBy(prop("id"), searchResult)).toMatchObject(expectedResult);
+        expect(sortBy(prop("rome"), searchResult)).toMatchObject(
+          expectedResult,
+        );
       });
     });
 
@@ -214,16 +219,16 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       await insertImmersionOffer({
         uuid: testUid1,
-        romeCode: searchedRome,
+        romeCode: informationGeographiqueRome,
+        romeAppellation: undefined, // Appellation
         siret: notActiveSiret,
-        // romeAppellation: "11704", // Cartographe;Cartographe
       });
 
       await insertImmersionOffer({
-        uuid: testUid1,
-        romeCode: searchedRome,
+        uuid: testUid2,
+        romeCode: informationGeographiqueRome,
+        romeAppellation: undefined, // Appellation
         siret: notActiveSiret,
-        // romeAppellation: "12240", // Chef de projet en géomatique;Chef de projet en géomatique
       });
 
       // Act
@@ -235,7 +240,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(searchWithNoRomeResult).toHaveLength(0);
     });
 
-    it("returns establishments with offers of given rome code and located within given geographical area", async () => {
+    it("returns one search DTO by establishment, with offers matching rome and geographical area", async () => {
       // Prepare
       /// Establishment with offer inside geographical area with searched rome
       const siretMatchingToSearch = "78000403200029";
@@ -247,9 +252,9 @@ describe("Postgres implementation of immersion offer repository", () => {
       await insertActiveEstablishmentAndOfferAndEventuallyContact(
         immersionOfferIdMatchingSearch,
         siretMatchingToSearch,
-        searchedRome, // Matching
+        informationGeographiqueRome, // Matching
         searchedPosition, // Establishment position matching
-        undefined, // No appellation given
+        cartographeAppellation, // No appellation given
         undefined, // no  contact !
         "form", // data source
         "immersion-facile", // source_provider
@@ -257,6 +262,13 @@ describe("Postgres implementation of immersion offer repository", () => {
         matchingNaf,
         matchingNumberOfEmployeeRange,
       );
+
+      await insertImmersionOffer({
+        uuid: testUid2,
+        siret: siretMatchingToSearch,
+        romeCode: informationGeographiqueRome,
+        romeAppellation: analysteEnGeomatiqueAppellation,
+      });
 
       /// Establishment with offer inside geographical area but an other rome
       await insertActiveEstablishmentAndOfferAndEventuallyContact(
@@ -270,7 +282,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       await insertActiveEstablishmentAndOfferAndEventuallyContact(
         testUid4,
         "99000403200029",
-        searchedRome,
+        informationGeographiqueRome,
         farFromSearchedPosition,
       );
 
@@ -284,8 +296,9 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(searchResult).toHaveLength(1);
 
       const expectedResult: Partial<SearchImmersionResultDto> = {
-        rome: searchedRome,
+        rome: informationGeographiqueRome,
         romeLabel: "Information géographique",
+        appellationLabels: ["Analyste en géomatique", "Cartographe"],
         siret: siretMatchingToSearch,
         distance_m: 0,
         voluntaryToImmersion: true,
@@ -309,11 +322,19 @@ describe("Postgres implementation of immersion offer repository", () => {
       await insertActiveEstablishmentAndOfferAndEventuallyContact(
         testUid1,
         siretMatchingToSearch,
-        searchedRome, // Matching
+        informationGeographiqueRome, // Matching
         searchedPosition, // Establishment position matching
         undefined, // No appellation given
         contactUidOfOfferMatchingSearch,
       );
+
+      // With multiple contacts
+      await insertImmersionContact({
+        uuid: testUid2,
+        lastName: "Dupont",
+        email: "jean@dupont",
+        siret_establishment: siretMatchingToSearch,
+      });
 
       // Act
       const searchResult: SearchImmersionResultDto[] =
@@ -429,7 +450,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       const storedImmersionOffer = new ImmersionOfferEntityV2Builder()
         .withId(immersionOfferId)
         .withRomeCode("M1808")
-        .withAppellationCode("11704") // Cartographe;Cartographe
+        .withAppellationCode("11704") // Cartographe
         .build();
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
@@ -442,10 +463,12 @@ describe("Postgres implementation of immersion offer repository", () => {
           immersionOfferId,
         );
       expect(immersionOffer).toEqual({
+        id: immersionOfferId,
         romeCode: "M1808",
         score: storedImmersionOffer.score,
         romeLabel: "Information géographique",
-        appellationLabels: ["Cartographe;Cartographe"],
+        appellationLabel: "Cartographe",
+        appellationCode: "11704",
       });
     });
 
@@ -1158,8 +1181,9 @@ describe("Postgres implementation of immersion offer repository", () => {
           await pgEstablishmentAggregateRepository.getOffersAsAppelationDtoForFormEstablishment(
             siretInTable,
           );
-        expect(actualOffersAsAppelationDto).toEqual(
-          expect.arrayContaining(expectedOffersAsAppelationDto),
+        expectArraysToEqualIgnoringOrder(
+          actualOffersAsAppelationDto,
+          expectedOffersAsAppelationDto,
         );
       });
     });
@@ -1276,14 +1300,13 @@ describe("Postgres implementation of immersion offer repository", () => {
     ) VALUES
      ($1, $2, $3, $4, $5)`;
     const defaultScore = 4;
-    const defaultCodeAppelation = 16067;
 
     await client.query(insertQuery, [
       props.uuid,
       props.romeCode,
       props.siret,
       defaultScore,
-      props.romeAppellation ?? defaultCodeAppelation,
+      props.romeAppellation ?? null,
     ]);
   };
   const insertImmersionContact = async (props: {

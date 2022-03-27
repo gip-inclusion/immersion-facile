@@ -8,6 +8,8 @@ import {
   ImmersionContactInEstablishmentId,
 } from "src/shared/formEstablishment/FormEstablishment.dto";
 import { ImmersionOfferId } from "src/shared/ImmersionOfferId";
+import { RomeCode } from "src/shared/rome";
+import { SiretDto } from "src/shared/siret";
 import { ContactInPerson } from "./ContactInPerson";
 
 type ModalState = {
@@ -22,7 +24,8 @@ type ModalAction =
   | {
       type: "CLICKED_OPEN";
       payload: {
-        immersionOfferId: ImmersionOfferId;
+        immersionOfferRome: RomeCode;
+        immersionOfferSiret: SiretDto;
         contactId?: ImmersionContactInEstablishmentId;
         contactMethod?: ContactMethod;
       };

@@ -56,7 +56,6 @@ export class GetImmersionOfferById extends UseCase<
         : undefined;
 
     const searchImmersionResultDto: SearchImmersionResultDto = {
-      id: immersionOfferId,
       // Establishment informations
       address: annotatedEstablishment.address,
       location: annotatedEstablishment.position,
@@ -70,6 +69,9 @@ export class GetImmersionOfferById extends UseCase<
       // Offer information
       rome: annotatedOffer.romeCode,
       romeLabel: annotatedOffer.romeLabel,
+      appellationLabels: annotatedOffer.appellationLabel
+        ? [annotatedOffer.appellationLabel]
+        : [],
 
       // Contact informations
       contactDetails,

@@ -75,3 +75,11 @@ export const expectJwtInMagicLinkAndGetIt = (link: string | unknown) => {
   expect(last).toBeTruthy();
   return last;
 };
+
+export const expectArraysToEqualIgnoringOrder = <T>(
+  actual: T[],
+  expected: T[],
+) => {
+  expect(actual).toHaveLength(expected.length);
+  expect(actual).toEqual(expect.arrayContaining(expected));
+};

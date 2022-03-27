@@ -15,7 +15,7 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
     searchParams: SearchImmersionRequestDto,
   ): Promise<SearchImmersionResultDto[]> {
     const response = await axios.post(
-      `/${prefix}/${searchImmersionRoute}`,
+      `/${prefix}/v1/${searchImmersionRoute}`,
       searchParams,
     );
 

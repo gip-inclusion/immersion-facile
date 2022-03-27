@@ -1,6 +1,7 @@
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   InMemoryEstablishmentAggregateRepository,
+  TEST_APPELLATION_LABEL,
   TEST_CITY,
   TEST_NAF_LABEL,
   TEST_POSITION,
@@ -126,13 +127,12 @@ describe("SearchImmersionUseCase", () => {
   });
 
   it("gets all results around if no rome is provided", async () => {
-    const { searchImmersion, immersionOfferId } = await prepareSearchableData();
+    const { searchImmersion } = await prepareSearchableData();
 
     const response = await searchImmersion.execute(searchInMetzParams);
 
     expect(response).toHaveLength(2);
     expectSearchImmersionResultDto(response[0], {
-      id: immersionOfferId,
       rome: "M1607",
       naf: "8539A",
       siret: "78000403200019",
@@ -150,8 +150,7 @@ describe("SearchImmersionUseCase", () => {
 
   describe("authenticated with api key", () => {
     it("Search immersion, and provide contact details", async () => {
-      const { searchImmersion, immersionOfferId, uuidGenerator } =
-        await prepareSearchableData();
+      const { searchImmersion, uuidGenerator } = await prepareSearchableData();
       const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
       uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
 
@@ -162,7 +161,6 @@ describe("SearchImmersionUseCase", () => {
 
       expectSearchResponseToMatch(authenticatedResponse, [
         {
-          id: immersionOfferId,
           rome: secretariatRome,
           naf: "8539A",
           siret: "78000403200019",
@@ -175,6 +173,7 @@ describe("SearchImmersionUseCase", () => {
           city: TEST_CITY,
           nafLabel: TEST_NAF_LABEL,
           romeLabel: TEST_ROME_LABEL,
+          appellationLabels: [TEST_APPELLATION_LABEL],
           contactDetails: {
             id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
             firstName: "Alain",
@@ -191,8 +190,7 @@ describe("SearchImmersionUseCase", () => {
 
   describe("Not authenticated with api key", () => {
     it("Search immersion, and do NOT provide contact details", async () => {
-      const { searchImmersion, immersionOfferId, uuidGenerator } =
-        await prepareSearchableData();
+      const { searchImmersion, uuidGenerator } = await prepareSearchableData();
 
       const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
       uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
@@ -202,7 +200,6 @@ describe("SearchImmersionUseCase", () => {
 
       expectSearchResponseToMatch(unauthenticatedResponse, [
         {
-          id: immersionOfferId,
           rome: "M1607",
           naf: "8539A",
           siret: "78000403200019",
@@ -215,6 +212,7 @@ describe("SearchImmersionUseCase", () => {
           city: TEST_CITY,
           nafLabel: TEST_NAF_LABEL,
           romeLabel: TEST_ROME_LABEL,
+          appellationLabels: [TEST_APPELLATION_LABEL],
         },
       ]);
       expect(unauthenticatedResponse[0].contactDetails).toBeUndefined();

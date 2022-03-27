@@ -1,6 +1,9 @@
 import { Router } from "express";
 import promClient from "prom-client";
-import { addEstablishmentFormRouteWithApiKey } from "../../../shared/routes";
+import {
+  addEstablishmentFormRouteWithApiKey,
+  searchImmersionRoute,
+} from "../../../shared/routes";
 import { AppDependencies } from "../config";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 import {
@@ -41,6 +44,15 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
         );
       });
     });
+
+  publicV1Router.route(`/${searchImmersionRoute}`).post(async (req, res) =>
+    sendHttpResponse(req, res, async () => {
+      await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
+        req.body,
+      );
+      return deps.useCases.searchImmersion.execute(req.body, req.apiConsumer);
+    }),
+  );
 
   return publicV1Router;
 };

@@ -2,6 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
 import { PgFormEstablishmentRepository } from "../../adapters/secondary/pg/PgFormEstablishmentRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import { expectArraysToEqualIgnoringOrder } from "../../_testBuilders/test.helpers";
 
 describe("PgFormEstablishmentRepository", () => {
   let pool: Pool;
@@ -57,7 +58,10 @@ describe("PgFormEstablishmentRepository", () => {
     expect(resultA).toEqual(formEstablishmentA);
 
     const resultAll = await formEstablishmentRepository.getAll();
-    expect(resultAll).toEqual([formEstablishmentA, formEstablishmentB]);
+    expectArraysToEqualIgnoringOrder(resultAll, [
+      formEstablishmentA,
+      formEstablishmentB,
+    ]);
   });
 
   describe("Pg implementation of 'edit' method", () => {

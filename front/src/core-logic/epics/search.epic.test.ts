@@ -22,7 +22,6 @@ describe("Search immersions", () => {
   it("triggers the search and recovers some results", (done) => {
     const returnedFromApi: SearchImmersionResultDto[] = [
       {
-        id: "search_result_id3",
         rome: "A0000",
         naf: "someName",
         siret: "12345678901234",
@@ -32,6 +31,7 @@ describe("Search immersions", () => {
         address: "55 rue du Faubourg Saint-Honoré",
         contactMode: "IN_PERSON",
         romeLabel: "Hyper métier",
+        appellationLabels: ["Facteur", "Développeuse"],
         nafLabel: "",
         city: "xxxx",
       },
