@@ -145,13 +145,23 @@ export const createJwtAuthMiddleware = (
           req.payloads = { establishment: payload as EstablishmentJwtPayload };
           break;
         default:
-          throw new Error("Should not happen.");
+          // eslint-disable-next-line no-case-declarations
+          const unhandledPayloadKey: never = payloadKey;
+          throw new Error(
+            "Should not happen. Expected payoaldKey, received : " +
+              unhandledPayloadKey,
+          );
       }
 
       next();
     } catch (err: any) {
       const unsafePayload = jwt.decode(maybeJwt) as MagicLinkPayload;
       if (err instanceof TokenExpiredError) {
+        logger.warn(
+          { token: maybeJwt, payload: unsafePayload },
+          "token expired",
+        );
+
         return unsafePayload
           ? sendNeedsRenewedLinkError(res, err)
           : sendAuthenticationError(res, err);
@@ -160,8 +170,8 @@ export const createJwtAuthMiddleware = (
       try {
         verifyDeprecatedJwt(maybeJwt);
         return sendNeedsRenewedLinkError(res, err);
-      } catch (deprecatedError: any) {
-        return sendAuthenticationError(res, deprecatedError);
+      } catch (error: any) {
+        return sendAuthenticationError(res, error);
       }
     }
   };

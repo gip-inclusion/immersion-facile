@@ -2,8 +2,8 @@ import { Router } from "express";
 import promClient from "prom-client";
 import {
   getImmersionOfferByIdRoute,
-  addEstablishmentFormRouteWithApiKey,
   searchImmersionRoute,
+  immersionOffersApiAuthRoute,
 } from "../../shared/routes";
 import { AppDependencies } from "./config";
 import { sendHttpResponse } from "./helpers/sendHttpResponse";
@@ -41,7 +41,7 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
     );
 
   authenticatedRouter
-    .route(`/${addEstablishmentFormRouteWithApiKey}`)
+    .route(`/${immersionOffersApiAuthRoute}`)
     .post(async (req, res) => {
       counterFormEstablishmentCaller.inc({
         referer: req.get("Referrer"),

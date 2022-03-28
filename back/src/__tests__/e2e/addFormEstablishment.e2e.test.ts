@@ -1,10 +1,7 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneRepository";
-import {
-  addEstablishmentFormRouteWithApiKey,
-  addEstablishmentFormRouteWithoutApiKey,
-} from "../../shared/routes";
+import { addEstablishmentFormRouteWithoutApiKey } from "../../shared/routes";
 
 describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
   it("support posting valid establishment from front", async () => {
@@ -26,12 +23,11 @@ describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
   });
 
   describe("Route to post addEstablishmentFormRouteWithApiKey", () => {
+    // we don't want to use variables from shared/routes.ts so that we can check if contract breaks
     it("forbids access to route if no api consumer", async () => {
       const { request } = await buildTestApp();
 
-      const response = await request
-        .post(`/${addEstablishmentFormRouteWithApiKey}`)
-        .send({});
+      const response = await request.post(`/immersion-offers`).send({});
 
       expect(response.status).toBe(403);
     });
@@ -48,7 +44,7 @@ describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
       const jwt = generateApiJwt({ id: "my-id" });
 
       const response = await request
-        .post(`/${addEstablishmentFormRouteWithApiKey}`)
+        .post(`/immersion-offers`)
         .set("Authorization", jwt)
         .send(formEstablishmentWithoutSource);
 
