@@ -5,7 +5,6 @@ back/node_modules
 front/node_modules
 
 nginx/etc/letsencrypt
-front/env-config.js
 front/dist
 front/dist-ssr
 .env

@@ -1,12 +1,7 @@
-import { throwIfNotInArray } from "src/shared/envHelpers";
+const gateway =
+  import.meta.env.VITE_GATEWAY === "IN_MEMORY" ? "IN_MEMORY" : "HTTP";
 
-const windowEnv = (window as any)._env_;
-
-const gateway = throwIfNotInArray({
-  processEnv: windowEnv,
-  authorizedValues: ["HTTP", "IN_MEMORY"],
-  variableName: "GATEWAY",
-});
+console.info("Gateway is : ", gateway);
 
 export const ENV = {
   dev: import.meta.env.DEV,

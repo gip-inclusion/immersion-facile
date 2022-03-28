@@ -32,9 +32,7 @@ describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
       it("forbids access to route if no api consumer", async () => {
         const { request } = await buildTestApp();
 
-        const response = await request
-          .post(`/immersion-offers`)
-          .send({});
+        const response = await request.post(`/immersion-offers`).send({});
 
         expect(response.status).toBe(403);
       });

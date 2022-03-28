@@ -22,36 +22,36 @@ import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGa
 import { ENV } from "src/environmentVariables";
 
 export const formEstablishmentGateway: FormEstablishmentGateway =
-  ENV.gateway === "HTTP"
-    ? new HttpFormEstablishmentGateway()
-    : new InMemoryFormEstablishmentGateway(["12345678901238"]);
+  ENV.gateway === "IN_MEMORY"
+    ? new InMemoryFormEstablishmentGateway(["12345678901238"])
+    : new HttpFormEstablishmentGateway();
 
 export const immersionApplicationGateway: ImmersionApplicationGateway =
-  ENV.gateway === "HTTP"
-    ? new HttpImmersionApplicationGateway()
-    : new InMemoryImmersionApplicationGateway();
+  ENV.gateway === "IN_MEMORY"
+    ? new InMemoryImmersionApplicationGateway()
+    : new HttpImmersionApplicationGateway();
 
 export const immersionSearchGateway: ImmersionSearchGateway =
-  ENV.gateway === "HTTP"
-    ? new HttpImmersionSearchGateway()
-    : new InMemoryImmersionSearchGateway();
+  ENV.gateway === "IN_MEMORY"
+    ? new InMemoryImmersionSearchGateway()
+    : new HttpImmersionSearchGateway();
 
 export const apiAdresseGateway: ApiAdresseGateway =
-  ENV.gateway === "HTTP"
-    ? new HttpApiAdresseGateway()
-    : new InMemoryApiAdresseGateway();
+  ENV.gateway === "IN_MEMORY"
+    ? new InMemoryApiAdresseGateway()
+    : new HttpApiAdresseGateway();
 
 export const featureFlagsGateway: FeatureFlagsGateway =
-  ENV.gateway === "HTTP"
-    ? new HttpFeatureFlagGateway()
-    : new InMemoryFeatureFlagGateway();
+  ENV.gateway === "IN_MEMORY"
+    ? new InMemoryFeatureFlagGateway()
+    : new HttpFeatureFlagGateway();
 
 export const agencyGateway: AgencyGateway =
-  ENV.gateway === "HTTP"
-    ? new HttpAgencyGateway()
-    : new InMemoryAgencyGateway();
+  ENV.gateway === "IN_MEMORY"
+    ? new InMemoryAgencyGateway()
+    : new HttpAgencyGateway();
 
 export const romeAutocompleteGateway: RomeAutocompleteGateway =
-  ENV.gateway === "HTTP"
-    ? new HttpRomeAutocompleteGateway()
-    : new InMemoryRomeAutocompleteGateway();
+  ENV.gateway === "IN_MEMORY"
+    ? new InMemoryRomeAutocompleteGateway()
+    : new HttpRomeAutocompleteGateway();
