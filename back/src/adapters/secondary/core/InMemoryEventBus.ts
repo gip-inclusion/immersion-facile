@@ -193,7 +193,10 @@ const monitorAbsenceOfSubscribers = (event: DomainEvent) => {
 };
 
 const monitorErrorInCallback = (error: any, event: DomainEvent) => {
-  logger.error({ error, event }, "Error when publishing event");
+  logger.error(
+    { event, error: error.message || JSON.stringify(error) },
+    "Error when publishing event",
+  );
   counterPublishedEventsError.inc({
     topic: event.topic,
     errorType: "callback_failed",
