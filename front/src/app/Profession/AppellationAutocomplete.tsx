@@ -85,7 +85,6 @@ export const AppellationAutocomplete = ({
         noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: Option) => option.value.appellationLabel}
         renderOption={(props, option) => (
-          // <li {...props}>{option.romeLabel}</li>
           <li {...props}>
             <StringWithHighlights
               description={option.description}

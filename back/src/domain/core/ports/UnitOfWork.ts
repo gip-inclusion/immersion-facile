@@ -1,6 +1,7 @@
 import { AgencyRepository } from "../../immersionApplication/ports/AgencyRepository";
 import { FormEstablishmentRepository } from "../../immersionOffer/ports/FormEstablishmentRepository";
 import { ImmersionOfferRepository } from "../../immersionOffer/ports/ImmersionOfferRepository";
+import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { GetFeatureFlags } from "./GetFeatureFlags";
 import { OutboxRepository } from "./OutboxRepository";
 import { ImmersionApplicationRepository } from "../../immersionApplication/ports/ImmersionApplicationRepository";
@@ -9,6 +10,7 @@ import { EstablishmentExportQueries } from "../../establishment/ports/Establishm
 import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
 
 export type UnitOfWork = {
+  romeRepo: RomeRepository;
   outboxRepo: OutboxRepository;
   agencyRepo: AgencyRepository;
   formEstablishmentRepo: FormEstablishmentRepository;

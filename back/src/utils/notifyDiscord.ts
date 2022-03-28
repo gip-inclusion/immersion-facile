@@ -14,7 +14,6 @@ export const notifyDiscord = (
 
   if (!discordWebhookUrl) return;
 
-
   const content = rawContent.slice(0, discordSizeLimit);
   // This is intentionaly not awaited following a fire and forget logic.
   axios.post(

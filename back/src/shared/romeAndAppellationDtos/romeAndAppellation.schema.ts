@@ -9,7 +9,6 @@ import type {
   MatchRangeDto,
 } from "./romeAndAppellation.dto";
 
-
 const codeRomeRegex = /^[A-N]\d{4}$/;
 export const codeRomeSchema: z.Schema<RomeCode> = z
   .string()

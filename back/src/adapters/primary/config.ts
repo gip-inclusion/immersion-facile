@@ -350,6 +350,7 @@ const createRomeRepostiory = async (
 
 export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;
 export const createInMemoryUow = (repositories?: Repositories) => ({
+  romeRepo: repositories?.rome ?? new InMemoryRomeRepository(),
   outboxRepo:
     (repositories?.outbox as InMemoryOutboxRepository) ??
     new InMemoryOutboxRepository(),
@@ -381,6 +382,7 @@ export const createInMemoryUow = (repositories?: Repositories) => ({
 const _isAssignable = (inMemory: InMemoryUnitOfWork): UnitOfWork => inMemory;
 
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
+  romeRepo: new PgRomeRepository(client),
   outboxRepo: new PgOutboxRepository(client),
   agencyRepo: new PgAgencyRepository(client),
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
@@ -567,8 +569,8 @@ const createUseCases = (
     getSiret,
 
     // romes
-    appellationSearch: new AppellationSearch(repositories.rome),
-    romeSearch: new RomeSearch(repositories.rome),
+    appellationSearch: new AppellationSearch(uowPerformer),
+    romeSearch: new RomeSearch(uowPerformer),
 
     // agencies
     listAgencies: new ListAgencies(repositories.agency),

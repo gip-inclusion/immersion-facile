@@ -1,17 +1,23 @@
+import { createInMemoryUow } from "../../../adapters/primary/config";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
 import { AppellationMatchDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 describe("AppellationSearch", () => {
-  let gateway: RomeRepository;
+  let romeRepo: RomeRepository;
 
   beforeEach(() => {
-    gateway = new InMemoryRomeRepository();
+    romeRepo = new InMemoryRomeRepository();
   });
 
   const createUseCase = () => {
-    return new AppellationSearch(gateway);
+    const uowPerformer = new InMemoryUowPerformer({
+      ...createInMemoryUow(),
+      romeRepo,
+    });
+    return new AppellationSearch(uowPerformer);
   };
 
   it("returns the list of found matches with ranges", async () => {
@@ -34,7 +40,7 @@ describe("AppellationSearch", () => {
     const mockSearchMetierFn = jest.fn();
     const mockSearchAppellationFn = jest.fn();
     const mockAppellationToCodeMetier = jest.fn();
-    gateway = {
+    romeRepo = {
       searchRome: mockSearchMetierFn,
       searchAppellation: mockSearchAppellationFn,
       appellationToCodeMetier: mockAppellationToCodeMetier,

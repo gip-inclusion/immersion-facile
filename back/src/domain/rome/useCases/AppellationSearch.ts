@@ -2,25 +2,30 @@ import { AppellationMatchDto } from "../../../shared/romeAndAppellationDtos/rome
 import { zTrimmedString } from "../../../shared/zodUtils";
 import { createLogger } from "../../../utils/logger";
 import { findMatchRanges } from "../../../utils/textSearch";
-import { UseCase } from "../../core/UseCase";
-import { RomeRepository } from "../ports/RomeRepository";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
 
 const MIN_SEARCH_TEXT_LENGTH = 3;
-export class AppellationSearch extends UseCase<string, AppellationMatchDto[]> {
-  public constructor(readonly romeRepository: RomeRepository) {
-    super();
+
+export class AppellationSearch extends TransactionalUseCase<
+  string,
+  AppellationMatchDto[]
+> {
+  public constructor(uowPerformer: UnitOfWorkPerformer) {
+    super(uowPerformer);
   }
 
   inputSchema = zTrimmedString;
 
-  public async _execute(searchText: string): Promise<AppellationMatchDto[]> {
+  public async _execute(
+    searchText: string,
+    uow: UnitOfWork,
+  ): Promise<AppellationMatchDto[]> {
     if (searchText.length <= MIN_SEARCH_TEXT_LENGTH) return [];
 
-    const appellations = await this.romeRepository.searchAppellation(
-      searchText,
-    );
+    const appellations = await uow.romeRepo.searchAppellation(searchText);
 
     const appellationsWithMatch: AppellationMatchDto[] = appellations.map(
       (appellation) => ({
