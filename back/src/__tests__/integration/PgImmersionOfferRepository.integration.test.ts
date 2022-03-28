@@ -789,7 +789,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
           // /// Contact should not have been added
           // expect(await getAllImmersionContactsRows()).toHaveLength(0); // TODO : fix me ?
-        });
+        }, 10_000);
       });
       describe("existing establishment's data source is `api_labonneboite` and new data source is also `api_labonneboite`", () => {
         it("updates the data in the establishments table", async () => {

@@ -113,7 +113,7 @@ describe("PgEstablishmentExportQueries", () => {
           siret: "79341726200037",
         },
       ]);
-    });
+    }, 10_000);
   });
 });
 

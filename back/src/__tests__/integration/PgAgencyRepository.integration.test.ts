@@ -132,7 +132,7 @@ describe("PgAgencyRepository", () => {
 
       // Assert
       expect(agencies).toEqual([nancyAgency, epinalAgency]);
-    });
+    }, 10_000);
   });
 
   describe("insert", () => {
