@@ -2,7 +2,7 @@
 import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.addColumn("form_establishments", {
+  pgm.addColumn("establishments", {
     source: {
       type: "varchar(255)",
       notNull: true,
@@ -12,5 +12,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumn("form_establishments", "source");
+  pgm.dropColumn("establishments", "data_provider");
 }
