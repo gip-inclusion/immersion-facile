@@ -17,7 +17,7 @@ export class PgRomeRepository implements RomeRepository {
     return this.client
       .query(
         `SELECT code_rome
-        FROM public_appelations_data
+        FROM public_appellations_data
         WHERE ogr_appellation=$1`,
         [romeCodeAppellation],
       )
@@ -40,21 +40,16 @@ export class PgRomeRepository implements RomeRepository {
   }
 
   public async searchRome(query: string): Promise<RomeDto[]> {
-    const queryWords = query.split(" ");
-    const lastWord = queryWords[queryWords.length - 1];
-    const queryBeginning =
-      queryWords.length === 1
-        ? queryWords.join(" ")
-        : queryWords.slice(0, queryWords.length - 1).join(" ");
+    const [queryBeginning, lastWord] = prepareQueryParams(query);
 
     return await this.client
       .query(
-        `SELECT DISTINCT public_appelations_data.code_rome, libelle_rome
-        FROM public_appelations_data 
-        JOIN public_romes_data ON  public_appelations_data.code_rome = public_romes_data.code_rome
+        `SELECT DISTINCT public_appellations_data.code_rome, libelle_rome
+        FROM public_appellations_data 
+        JOIN public_romes_data ON  public_appellations_data.code_rome = public_romes_data.code_rome
         WHERE
-           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long ILIKE $3)
-           OR (libelle_appellation_long ILIKE $2 AND libelle_appellation_long ILIKE $3)
+           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long_without_special_char ILIKE $3)
+           OR (libelle_appellation_long_without_special_char ILIKE $2 AND libelle_appellation_long_without_special_char ILIKE $3)
         LIMIT 80`,
         [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
       )
@@ -73,21 +68,16 @@ export class PgRomeRepository implements RomeRepository {
   }
 
   public async searchAppellation(query: string): Promise<AppellationDto[]> {
-    const queryWords = query.split(" ");
-    const lastWord = queryWords[queryWords.length - 1];
-    const queryBeginning =
-      queryWords.length === 1
-        ? queryWords.join(" ")
-        : queryWords.slice(0, queryWords.length - 1).join(" ");
+    const [queryBeginning, lastWord] = prepareQueryParams(query);
 
     return await this.client
       .query(
-        `SELECT ogr_appellation, libelle_appellation_court, public_appelations_data.code_rome, libelle_rome
-        FROM public_appelations_data 
-        JOIN public_romes_data ON  public_appelations_data.code_rome = public_romes_data.code_rome
+        `SELECT ogr_appellation, libelle_appellation_long, public_appellations_data.code_rome, libelle_rome
+        FROM public_appellations_data 
+        JOIN public_romes_data ON  public_appellations_data.code_rome = public_romes_data.code_rome
         WHERE
-           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long ILIKE $3)
-           OR (libelle_appellation_long ILIKE $2 AND libelle_appellation_long ILIKE $3)
+           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long_without_special_char ILIKE $3)
+           OR (libelle_appellation_long_without_special_char ILIKE $2 AND libelle_appellation_long_without_special_char ILIKE $3)
         LIMIT 80`,
         [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
       )
@@ -96,7 +86,7 @@ export class PgRomeRepository implements RomeRepository {
           (row): AppellationDto => ({
             appellationCode: row.ogr_appellation.toString(),
             romeCode: row.code_rome,
-            appellationLabel: row.libelle_appellation_court,
+            appellationLabel: row.libelle_appellation_long,
             romeLabel: row.libelle_rome,
           }),
         ),
@@ -109,3 +99,23 @@ export class PgRomeRepository implements RomeRepository {
 }
 
 const toTsQuery = (query: string): string => query.split(/\s+/).join(" & ");
+
+const prepareQueryParams = (query: string): [string, string] => {
+  const queryWords = query.split(" ");
+  const lastWord = removeAccentAndParentheses(
+    queryWords[queryWords.length - 1],
+  );
+  const queryBeginning = removeAccentAndParentheses(
+    queryWords.length === 1
+      ? queryWords.join(" ")
+      : queryWords.slice(0, queryWords.length - 1).join(" "),
+  );
+
+  return [queryBeginning, lastWord];
+};
+
+const removeAccentAndParentheses = (str: string) =>
+  str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[()]/g, "");

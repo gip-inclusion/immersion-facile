@@ -273,7 +273,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         searchMade.distance_km * 1000, // Formats parameters $1, $2
         maxResults,
       ])
-      .then((res) => res.rows.map((result) => {
+      .then((res) =>
+        res.rows.map((result) => {
           const immersionContact: SearchContact | null =
             result.contact_in_establishment_uuid != null
               ? {
@@ -311,7 +312,8 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               immersionContact && { contactDetails: immersionContact }),
           };
           return searchImmersionResultDto;
-        }))
+        }),
+      )
       .catch((e) => {
         logger.error("Error in Pg implementation of getFromSearch", e);
         console.log(e);
@@ -618,7 +620,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
       `SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
        FROM immersion_offers io
        JOIN public_romes_data prd ON prd.code_rome = io.rome_code 
-       LEFT JOIN public_appelations_data pad on io.rome_appellation = pad.ogr_appellation
+       LEFT JOIN public_appellations_data pad on io.rome_appellation = pad.ogr_appellation
        WHERE siret = $1;`,
       [siret],
     );

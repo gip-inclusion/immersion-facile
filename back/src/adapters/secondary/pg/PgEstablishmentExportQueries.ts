@@ -22,11 +22,11 @@ export class PgEstablishmentExportQueries
         establishments.creation_date, 
         establishments.is_commited,
         immersion_offers.rome_code,
-        public_appelations_data.libelle_appellation_court,
+        public_appellations_data.libelle_appellation_court,
         immersion_contacts.contact_mode
       FROM establishments 
       LEFT JOIN immersion_offers ON establishments.siret = immersion_offers.siret
-      LEFT JOIN public_appelations_data ON public_appelations_data.ogr_appellation = immersion_offers.rome_appellation
+      LEFT JOIN public_appellations_data ON public_appellations_data.ogr_appellation = immersion_offers.rome_appellation
       LEFT JOIN establishments__immersion_contacts ON establishments.siret = establishments__immersion_contacts.establishment_siret
       LEFT JOIN immersion_contacts ON immersion_contacts.uuid = establishments__immersion_contacts.contact_uuid
       WHERE data_source = 'form'
