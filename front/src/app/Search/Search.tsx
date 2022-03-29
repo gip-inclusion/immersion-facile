@@ -27,7 +27,6 @@ const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initiallySelectedIndex = 3; // to get 10 km radius by default
 
 export const Search = () => {
-  const searchResults = useObservable(searchEpic.views.searchResults$, []);
   const isSearching = useObservable(searchEpic.views.isSearching$, false);
 
   return (
@@ -117,10 +116,7 @@ export const Search = () => {
           </Formik>
         </div>
         <div className="flex flex-col items-center sm:h-[670px] sm:flex-1 sm:overflow-y-scroll">
-          <SearchResultPanel
-            searchResults={searchResults}
-            isSearching={isSearching}
-          />
+          <SearchResultPanel />
         </div>
       </div>
       <div>

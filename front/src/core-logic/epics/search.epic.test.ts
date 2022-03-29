@@ -4,6 +4,9 @@ import { createSearchEpic } from "src/core-logic/epics/search.epic";
 import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 import DoneCallback = jest.DoneCallback;
 
+// those test should be fast, we don't want to wait 5s if they fail (
+jest.setTimeout(300);
+
 describe("Search immersions", () => {
   let immersionSearchGateway: InMemoryImmersionSearchGateway;
   let searchEpic: ReturnType<typeof createSearchEpic>;
@@ -37,7 +40,7 @@ describe("Search immersions", () => {
 
     expectObservableNextValuesToBe(
       searchEpic.views.searchResults$,
-      [[], [], returnedFromApi],
+      [[], returnedFromApi],
       done,
     );
 
@@ -76,6 +79,31 @@ describe("Search immersions", () => {
       distance_km: 1,
     });
   });
+
+  it("when nothing happened, it should invite to give fill the form", (done) => {
+    expectObservableNextValuesToBe(
+      searchEpic.views.searchInfo$,
+      ["Veuillez sélectionner vos critères"],
+      done,
+    );
+  });
+
+  it("when triggering a search and no results, it should inform the user", (done) => {
+    expectObservableNextValuesToBe(
+      searchEpic.views.searchInfo$,
+      [
+        "Veuillez sélectionner vos critères",
+        "Pas de résultat. Essayez avec un plus grand rayon de recherche...",
+      ],
+      done,
+    );
+
+    searchEpic.actions.search({
+      siret: "11112222333344",
+      location: { lat: 0, lon: 0 },
+      distance_km: 1,
+    });
+  });
 });
 
 const expectObservableNextValuesToBe = <T>(
@@ -83,10 +111,15 @@ const expectObservableNextValuesToBe = <T>(
   values: T[],
   done: DoneCallback,
 ) => {
-  obs$.subscribe((v) => {
-    expect(v).toEqual(values.shift());
-    if (values.length === 0) {
-      done();
-    }
+  obs$.subscribe({
+    next: (v) => {
+      const expectedValue = values.shift();
+      expect(v).toEqual(expectedValue);
+      if (values.length === 0) done();
+    },
+    error: (err) => {
+      console.error(err);
+      done.fail(err);
+    },
   });
 };

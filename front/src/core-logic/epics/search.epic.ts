@@ -1,5 +1,14 @@
-import { prop } from "ramda";
-import { BehaviorSubject, catchError, from, map } from "rxjs";
+import {
+  BehaviorSubject,
+  catchError,
+  concat,
+  filter,
+  from,
+  map,
+  Observable,
+  of,
+  switchMap,
+} from "rxjs";
 import type { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import type {
   SearchImmersionRequestDto,
@@ -10,37 +19,52 @@ interface SearchEpicDependencies {
   immersionSearchGateway: ImmersionSearchGateway;
 }
 
-interface SearchState {
-  searchResults: SearchImmersionResultDto[];
-  isSearching: boolean;
-}
+type SearchStatus = "noSearchMade" | "ok" | "loading" | "error";
 
 export const createSearchEpic = ({
   immersionSearchGateway,
 }: SearchEpicDependencies) => {
-  const searchState$ = new BehaviorSubject<SearchState>({
-    isSearching: false,
-    searchResults: [],
-  });
+  const searchResults$ = new BehaviorSubject<SearchImmersionResultDto[]>([]);
+  const searchStatus$ = new BehaviorSubject<SearchStatus>("noSearchMade");
+
+  const searchInfo$: Observable<string | null> = concat(
+    of("Veuillez sélectionner vos critères"),
+    searchStatus$.pipe(
+      filter((status) => status === "ok"),
+      switchMap(() =>
+        searchResults$.pipe(
+          map((results) => {
+            return results.length === 0
+              ? "Pas de résultat. Essayez avec un plus grand rayon de recherche..."
+              : null;
+          }),
+        ),
+      ),
+    ),
+  );
 
   return {
     views: {
-      searchResults$: searchState$.pipe(map(prop("searchResults"))),
-      isSearching$: searchState$.pipe(map(prop("isSearching"))),
+      searchResults$,
+      isSearching$: searchStatus$.pipe(map((status) => status === "loading")),
+      searchInfo$,
     },
     actions: {
       search: (params: SearchImmersionRequestDto) => {
-        searchState$.next({ ...searchState$.value, isSearching: true });
+        searchStatus$.next("loading");
+
         from(immersionSearchGateway.search(params))
           .pipe(
             catchError((err) => {
               console.error(err);
-              return [];
+              searchStatus$.next("error");
+              return of([]);
             }),
           )
-          .subscribe((searchResults) =>
-            searchState$.next({ searchResults, isSearching: false }),
-          );
+          .subscribe((searchResults) => {
+            searchResults$.next(searchResults);
+            searchStatus$.next("ok");
+          });
       },
     },
   };

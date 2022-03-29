@@ -1,5 +1,6 @@
 import { CircularProgress } from "@mui/material";
 import React, { ReactNode, useState } from "react";
+import { searchEpic } from "src/app/dependencies";
 import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,
@@ -8,6 +9,7 @@ import { EnterpriseSearchResult } from "src/app/Search/EnterpriseSearchResult";
 import { SuccessFeedback } from "src/components/SuccessFeedback";
 import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
 import type { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
+import { useObservable } from "src/useObservable";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -21,15 +23,19 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   }
 };
 
-type SearchResultsProps = {
-  searchResults: SearchImmersionResultDto[] | null;
-  isSearching: boolean;
-};
+// type SearchResultsProps = {
+//   searchResults: SearchImmersionResultDto[] | null;
+//   isSearching: boolean;
+// };
 
-export const SearchResultPanel = ({
-  searchResults,
-  isSearching,
-}: SearchResultsProps) => {
+export const SearchResultPanel = () => {
+  const searchResults = useObservable(searchEpic.views.searchResults$, []);
+  const isSearching = useObservable(searchEpic.views.isSearching$, false);
+  const searchInfo = useObservable(
+    searchEpic.views.searchInfo$,
+    "Veuillez sélectionner vos critères",
+  );
+
   // prettier-ignore
   const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
   const [successFullyValidated, setSuccessfullyValidated] = useState(false);
@@ -42,15 +48,7 @@ export const SearchResultPanel = ({
       </SearchInfos>
     );
 
-  if (searchResults === null)
-    return <SearchInfos>Veuillez sélectionner vos critères</SearchInfos>;
-
-  if (searchResults.length === 0)
-    return (
-      <SearchInfos>
-        Pas de résultat. Essayez avec un plus grand rayon de recherche...
-      </SearchInfos>
-    );
+  if (searchInfo) return <SearchInfos>{searchInfo}</SearchInfos>;
 
   return (
     <>
