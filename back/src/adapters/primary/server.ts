@@ -62,7 +62,7 @@ export const createApp = async (
   app.use(createImmersionApplicationRouter(deps));
   app.use(createAgenciesRouter(deps));
   app.use(createExcelExportRouter(deps));
-  app.use(createPeConnectRouter(deps, config));
+  app.use(createPeConnectRouter(deps));
   app.use(createApiKeyAuthRouter(deps));
   app.use(createEstablishmentRouter(deps));
 

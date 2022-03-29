@@ -4,6 +4,7 @@ import {
   PeConnectGateway,
   PeConnectUserInfo,
 } from "../../domain/generic/peConnect/port/PeConnectGateway";
+import { queryParamsAsString } from "../../shared/utils/queryParams";
 
 export class InMemoryPeConnectGateway implements PeConnectGateway {
   async oAuthGetAccessTokenThroughAuthorizationCode(
@@ -23,21 +24,19 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
      * We would then exchange this code against an access token
      * This token let us call the api user authenticated routes to get its data
      */
-    const mockedUserInfo = {
+    const mockedUserInfo: PeConnectUserInfo = {
       sub: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
       gender: "male",
       family_name: "John",
       given_name: "Doe",
       email: "john.doe@gmail.com",
       idIdentiteExterne: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
-    } as PeConnectUserInfo;
+    };
 
     //We would then be redirected on our /demande-immersion url with the associated urlencoded payload
-    return `../${frontRoutes.immersionApplicationsRoute}?email=${encodeURI(
-      mockedUserInfo.email,
-    )}&firstName=${encodeURI(mockedUserInfo.family_name)}&lastName=${encodeURI(
-      mockedUserInfo.given_name,
-    )}&peExternalId=${encodeURI(mockedUserInfo.idIdentiteExterne)}`;
+    return `${
+      frontRoutes.immersionApplicationsRoute
+    }?${queryParamsAsString<PeConnectUserInfo>(mockedUserInfo)}`;
   }
 
   async getUserInfo(
@@ -50,6 +49,6 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
       given_name: "Doe",
       email: "john.doe@gmail.com",
       idIdentiteExterne: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
-    } as PeConnectUserInfo;
+    };
   }
 }

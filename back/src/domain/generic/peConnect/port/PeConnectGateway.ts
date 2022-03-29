@@ -9,6 +9,23 @@ export type PeConnectUserInfo = {
   idIdentiteExterne: string;
 };
 
+export type PeConnectOAuthGrantPayload = {
+  response_type: string;
+  client_id: string;
+  realm: string;
+  redirect_uri: string;
+  scope: string;
+};
+
+export type PeConnectOAuthGetTokenWithCodeGrantPayload = {
+  grant_type: string;
+  code: string;
+  client_id: string;
+  client_secret: string;
+  realm: string;
+  redirect_uri: string;
+};
+
 export interface PeConnectGateway {
   oAuthGetAuthorizationCodeRedirectUrl: () => string;
   oAuthGetAccessTokenThroughAuthorizationCode: (

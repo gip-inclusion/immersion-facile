@@ -1,13 +1,9 @@
 import { Router } from "express";
 import { loginPeConnect, peConnect } from "../../../shared/routes";
-import { AppConfig } from "../appConfig";
 import { AppDependencies } from "../config";
 import { sendRedirectResponse } from "../helpers/sendHttpResponse";
 
-export const createPeConnectRouter = (
-  deps: AppDependencies,
-  _config: AppConfig,
-) => {
+export const createPeConnectRouter = (deps: AppDependencies) => {
   const peConnectRouter = Router({ mergeParams: true });
 
   peConnectRouter.route(`/${loginPeConnect}`).get(async (req, res) =>
