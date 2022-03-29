@@ -8,15 +8,29 @@ import { deleteFile } from "../../../utils/filesystemUtils";
 const logger = createLogger(__filename);
 
 // TODO better type for error ?
-const handleResponseError = (res: Response, error: any) => {
+const handleResponseError = (req: Request, res: Response, error: any) => {
   if (error instanceof HttpError) {
     if (error instanceof UnauthorizedError) {
       res.setHeader("WWW-Authenticate", "Basic");
     }
     res.status(error.httpCode);
   } else {
-    logger.error(error, "Unhandled error");
-    notifyObjectDiscord({ _message: `Unhandled Error : ${error.message}` });
+    logger.error(
+      {
+        error,
+        request: {
+          path: req.path,
+          method: req.method,
+          body: req.body,
+        },
+      },
+      "Unhandled error",
+    );
+    notifyObjectDiscord({
+      _message: `Unhandled Error : ${error.message}`,
+      routePath: req.path,
+      routeMethod: req.method,
+    });
     res.status(500);
   }
 
@@ -50,7 +64,7 @@ export const sendHttpResponse = async (
 
     return res.json(response ?? { success: true });
   } catch (error: any) {
-    handleResponseError(res, error);
+    handleResponseError(req, res, error);
   }
 };
 
@@ -68,7 +82,7 @@ export const sendRedirectResponse = async (
 
     return res.redirect(redirectUrl);
   } catch (error: any) {
-    handleResponseError(res, error);
+    handleResponseError(req, res, error);
   }
 };
 
@@ -90,6 +104,6 @@ export const sendZipResponse = async (
       deleteFile(archivePath);
     });
   } catch (error: any) {
-    handleResponseError(res, error);
+    handleResponseError(req, res, error);
   }
 };
