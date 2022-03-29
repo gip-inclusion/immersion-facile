@@ -43,13 +43,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     agencyConfig = defaultAgencyConfig;
   });
 
-  const createUseCase = () => {
-    return new NotifyAllActorsOfFinalApplicationValidation(
+  const createUseCase = () => new NotifyAllActorsOfFinalApplicationValidation(
       emailFilter,
       emailGw,
       new InMemoryAgencyRepository([agencyConfig]),
     );
-  };
 
   it("Sends no emails when allowList is enforced and empty", async () => {
     emailFilter = new AllowListEmailFilter([]);

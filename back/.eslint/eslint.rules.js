@@ -1,4 +1,8 @@
 module.exports = {
+  'arrow-body-style': ['error', 'as-needed'],
+};
+
+const toAdd =    {
   'array-callback-return': [
     'error',
     {
@@ -66,7 +70,7 @@ module.exports = {
     }
   ],
   'accessor-pairs': 'off',
-  'arrow-body-style': ['error', 'as-needed'],
+
   'block-scoped-var': 'error',
   camelcase: 'error',
   'capitalized-comments': 'off',

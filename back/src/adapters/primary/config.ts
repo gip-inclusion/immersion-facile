@@ -448,9 +448,7 @@ export const createGenerateVerificationMagicLink = (config: AppConfig) => {
 export const createRenewMagicLinkUrl = (
   role: Role,
   applicationId: ImmersionApplicationId,
-) => {
-  return `/${frontRoutes.magicLinkRenewal}?id=${applicationId}&role=${role}`;
-};
+) => `/${frontRoutes.magicLinkRenewal}?id=${applicationId}&role=${role}`;
 
 export type UseCases = ReturnType<typeof createUseCases>;
 

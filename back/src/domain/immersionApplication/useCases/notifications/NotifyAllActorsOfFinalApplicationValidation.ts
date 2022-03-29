@@ -62,8 +62,7 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
 export const getValidatedApplicationFinalConfirmationParams = (
   agencyConfig: AgencyConfig,
   dto: ImmersionApplicationDto,
-): ValidatedApplicationFinalConfirmationParams => {
-  return {
+): ValidatedApplicationFinalConfirmationParams => ({
     beneficiaryFirstName: dto.firstName,
     beneficiaryLastName: dto.lastName,
     dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
@@ -84,5 +83,4 @@ export const getValidatedApplicationFinalConfirmationParams = (
     questionnaireUrl: agencyConfig.questionnaireUrl,
     signature: agencyConfig.signature,
     workConditions: dto.workConditions,
-  };
-};
+  });

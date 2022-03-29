@@ -24,7 +24,7 @@ module.exports = {
       },
       plugins: ["@typescript-eslint" /*'rxjs'*/],
       rules: {
-        //...require("./.eslint/eslint.rules"),
+        ...require("./.eslint/eslint.rules"),
         ...require("./.eslint/typescript-eslint.rules"),
         //...require('./.eslint/eslint.rules'),
         //...require('./.eslint/typescript-eslint.rules'),

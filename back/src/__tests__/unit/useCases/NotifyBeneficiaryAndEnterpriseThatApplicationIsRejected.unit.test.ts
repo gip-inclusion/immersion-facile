@@ -37,13 +37,11 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     emailGw = new InMemoryEmailGateway();
   });
 
-  const createUseCase = () => {
-    return new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+  const createUseCase = () => new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
       emailFilter,
       emailGw,
       new InMemoryAgencyRepository([agencyConfig]),
     );
-  };
 
   it("Sends rejection email to beneficiary, mentor, and counsellor", async () => {
     await createUseCase().execute(rejectedImmersionApplication);

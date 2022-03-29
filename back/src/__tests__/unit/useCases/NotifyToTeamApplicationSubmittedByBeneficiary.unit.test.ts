@@ -27,13 +27,11 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
     emailGw = new InMemoryEmailGateway();
   });
 
-  const createUseCase = () => {
-    return new NotifyToTeamApplicationSubmittedByBeneficiary(
+  const createUseCase = () => new NotifyToTeamApplicationSubmittedByBeneficiary(
       emailGw,
       new InMemoryAgencyRepository([agencyConfig]),
       fakeGenerateMagicLinkUrlFn,
     );
-  };
 
   it("Sends no mail when contact Email is not set", async () => {
     await createUseCase().execute(validImmersionApplication);

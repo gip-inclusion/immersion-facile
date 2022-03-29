@@ -24,6 +24,4 @@ const rootLogger = pino({
 });
 
 // Example use: const logger = createLogger(__filename);
-export const createLogger = (filename: string): Logger => {
-  return rootLogger.child({ name: path.basename(filename) });
-};
+export const createLogger = (filename: string): Logger => rootLogger.child({ name: path.basename(filename) });

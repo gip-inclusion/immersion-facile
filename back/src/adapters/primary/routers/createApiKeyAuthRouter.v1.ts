@@ -35,6 +35,7 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
           (domainFormEstablishmentWithoutSource) =>
             deps.useCases.addFormEstablishment.execute({
               ...domainFormEstablishmentWithoutSource,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               source: req.apiConsumer!.consumer,
             }),
         );

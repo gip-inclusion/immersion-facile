@@ -25,31 +25,25 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
 
   establishmentRouter
     .route(`/${formAlreadyExistsRoute}/:siret`)
-    .get(async (req, res) => {
-      return sendHttpResponse(req, res, async () =>
+    .get(async (req, res) => sendHttpResponse(req, res, async () =>
         deps.repositories.immersionOffer.hasEstablishmentFromFormWithSiret(
           req.params.siret,
         ),
-      );
-    });
+      ));
 
   establishmentRouter
     .route(`/${formAlreadyExistsRoute}/:siret`)
-    .get(async (req, res) => {
-      return sendHttpResponse(req, res, async () =>
+    .get(async (req, res) => sendHttpResponse(req, res, async () =>
         deps.repositories.immersionOffer.hasEstablishmentFromFormWithSiret(
           req.params.siret,
         ),
-      );
-    });
+      ));
 
   establishmentRouter
     .route(`/${requestEmailToUpdateFormRoute}/:siret`)
-    .get(async (req, res) => {
-      return sendHttpResponse(req, res, async () =>
+    .get(async (req, res) => sendHttpResponse(req, res, async () =>
         deps.useCases.requestEditFormEstablishment.execute(req.params.siret),
-      );
-    });
+      ));
 
   establishmentRouter
     .route(`/${contactEstablishmentRoute}`)
@@ -78,15 +72,13 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
 
   establishmentRouterWithJwt
     .route(`/${editEstablishmentFormRouteWithApiKey}/:jwt`)
-    .post(async (req, res) => {
-      return sendHttpResponse(req, res, () => {
+    .post(async (req, res) => sendHttpResponse(req, res, () => {
         if (!req.payloads?.establishment) throw new UnauthorizedError();
         return deps.useCases.editFormEstablishment.execute(
           req.body,
           req.payloads.establishment,
         );
-      });
-    });
+      }));
 
   establishmentRouter.use(establishmentRouterWithJwt);
 

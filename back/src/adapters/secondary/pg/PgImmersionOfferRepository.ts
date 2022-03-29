@@ -273,8 +273,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
         searchMade.distance_km * 1000, // Formats parameters $1, $2
         maxResults,
       ])
-      .then((res) => {
-        return res.rows.map((result) => {
+      .then((res) => res.rows.map((result) => {
           const immersionContact: SearchContact | null =
             result.contact_in_establishment_uuid != null
               ? {
@@ -312,8 +311,7 @@ export class PgImmersionOfferRepository implements ImmersionOfferRepository {
               immersionContact && { contactDetails: immersionContact }),
           };
           return searchImmersionResultDto;
-        });
-      })
+        }))
       .catch((e) => {
         logger.error("Error in Pg implementation of getFromSearch", e);
         console.log(e);

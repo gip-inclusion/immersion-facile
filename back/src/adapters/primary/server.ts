@@ -45,9 +45,7 @@ export const createApp = async (
   app.use(metrics);
   app.use(bodyParser.json());
 
-  router.route("/").get((_req, res) => {
-    return res.json({ message: "Hello World !" });
-  });
+  router.route("/").get((_req, res) => res.json({ message: "Hello World !" }));
 
   const deps = await createAppDependencies(config);
 

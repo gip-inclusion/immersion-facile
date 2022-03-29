@@ -50,8 +50,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Use
 const getRejectedApplicationNotificationParams = (
   dto: ImmersionApplicationDto,
   agencyConfig: AgencyConfig,
-): RejectedApplicationNotificationParams => {
-  return {
+): RejectedApplicationNotificationParams => ({
     beneficiaryFirstName: dto.firstName,
     beneficiaryLastName: dto.lastName,
     businessName: dto.businessName,
@@ -59,5 +58,4 @@ const getRejectedApplicationNotificationParams = (
     signature: agencyConfig.signature,
     agency: agencyConfig.name,
     immersionProfession: dto.immersionProfession,
-  };
-};
+  });

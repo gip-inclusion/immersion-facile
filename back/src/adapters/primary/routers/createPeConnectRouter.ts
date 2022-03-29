@@ -7,17 +7,13 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
   const peConnectRouter = Router({ mergeParams: true });
 
   peConnectRouter.route(`/${loginPeConnect}`).get(async (req, res) =>
-    sendRedirectResponse(req, res, async (): Promise<string> => {
-      return deps.repositories.peConnectGateway.oAuthGetAuthorizationCodeRedirectUrl();
-    }),
+    sendRedirectResponse(req, res, async (): Promise<string> => deps.repositories.peConnectGateway.oAuthGetAuthorizationCodeRedirectUrl()),
   );
 
   peConnectRouter.route(`/${peConnect}`).get(async (req, res) =>
-    sendRedirectResponse(req, res, async (): Promise<string> => {
-      return deps.useCases.linkUserPeConnectAccount.execute(
+    sendRedirectResponse(req, res, async (): Promise<string> => deps.useCases.linkUserPeConnectAccount.execute(
         req.query.code as string,
-      );
-    }),
+      )),
   );
 
   return peConnectRouter;

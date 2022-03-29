@@ -15,6 +15,4 @@ export const deleteFiles = (filesPaths: string[]): void => {
   filesPaths.map(deleteFile);
 };
 
-export const deleteFile = (filePath: string): void => {
-  return fse.unlinkSync(filePath);
-};
+export const deleteFile = (filePath: string): void => fse.unlinkSync(filePath);

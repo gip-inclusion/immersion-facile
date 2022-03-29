@@ -11,9 +11,7 @@ export const sleep = (ms: number): Promise<number> => {
 };
 
 export type RandomFn = typeof random;
-export const random = (max: number): number => {
-  return Math.floor(Math.random() * max);
-};
+export const random = (max: number): number => Math.floor(Math.random() * max);
 
 export const removeAtIndex = <T>(array: T[], indexToRemove: number): T[] => [
   ...array.slice(0, indexToRemove),
@@ -40,10 +38,8 @@ export const replaceArrayElement = <T>(
   original: Array<T>,
   replaceAt: number,
   replaceBy: T,
-) => {
-  return [
+) => [
     ...original.slice(0, replaceAt),
     replaceBy,
     ...original.slice(replaceAt + 1),
   ];
-};
