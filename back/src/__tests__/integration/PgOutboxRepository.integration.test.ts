@@ -35,9 +35,10 @@ describe("PgOutboxRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE outbox CASCADE");
-    await client.query("TRUNCATE outbox_publications CASCADE");
-    await client.query("TRUNCATE outbox_failures CASCADE");
+    await client.query("DELETE FROM outbox_failures");
+    await client.query("DELETE FROM outbox_publications");
+    await client.query("DELETE FROM outbox");
+
     outboxRepository = new PgOutboxRepository(client);
   });
 

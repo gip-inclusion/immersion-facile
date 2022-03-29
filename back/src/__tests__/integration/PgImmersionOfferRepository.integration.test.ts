@@ -35,10 +35,8 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE immersion_contacts CASCADE");
-    await client.query("TRUNCATE establishments CASCADE");
-    await client.query("TRUNCATE immersion_offers CASCADE");
-    await client.query("TRUNCATE establishments__immersion_contacts CASCADE");
+    await client.query("DELETE FROM establishments");
+    await client.query("DELETE FROM immersion_contacts");
     pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
   });
 
