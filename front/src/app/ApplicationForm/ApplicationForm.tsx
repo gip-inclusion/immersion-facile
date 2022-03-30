@@ -212,14 +212,14 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             >
               <img
                 className="icon-pe-connect"
-                src="src/assets/pe-connect-barre-nav-b.svg"
+                src="/pe-connect-barre-nav-b.svg"
                 alt=""
                 width="300"
                 height="75"
               />
               <img
                 className="icon-pe-connect-hover"
-                src="src/assets/pe-connect-barre-nav-b-o.svg"
+                src="/pe-connect-barre-nav-b-o.svg"
                 alt=""
                 width="300"
                 height="75"
