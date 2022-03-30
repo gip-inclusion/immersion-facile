@@ -43,11 +43,8 @@ describe("NotifyContactRequest", () => {
     ]);
   });
 
-  const createUseCase = () => new NotifyContactRequest(
-      immersionOfferRepository,
-      emailFilter,
-      emailGw,
-    );
+  const createUseCase = () =>
+    new NotifyContactRequest(immersionOfferRepository, emailFilter, emailGw);
 
   it("Sends ContactByEmailRequest email to establishment", async () => {
     const validEmailPayload: ContactEstablishmentRequestDto = {

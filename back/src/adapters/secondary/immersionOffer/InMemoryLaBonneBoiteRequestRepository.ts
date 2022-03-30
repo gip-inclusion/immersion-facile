@@ -67,6 +67,8 @@ const findGeographicalyClosestRequestParams = (
           toPotision.lon,
         ) / 1000,
     }))
-    .reduce((previous, current) => previous.distanceToPositionKm < current.distanceToPositionKm
+    .reduce((previous, current) =>
+      previous.distanceToPositionKm < current.distanceToPositionKm
         ? previous
-        : current);
+        : current,
+    );

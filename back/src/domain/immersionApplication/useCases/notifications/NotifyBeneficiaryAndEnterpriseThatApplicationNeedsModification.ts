@@ -109,12 +109,12 @@ const getModificationRequestApplicationNotificationParams = (
   reason: string,
   magicLink: string,
 ): ModificationRequestApplicationNotificationParams => ({
-    beneficiaryFirstName: dto.firstName,
-    beneficiaryLastName: dto.lastName,
-    businessName: dto.businessName,
-    reason,
-    signature: agencyConfig.signature,
-    agency: agencyConfig.name,
-    immersionProfession: dto.immersionProfession,
-    magicLink,
-  });
+  beneficiaryFirstName: dto.firstName,
+  beneficiaryLastName: dto.lastName,
+  businessName: dto.businessName,
+  reason,
+  signature: agencyConfig.signature,
+  agency: agencyConfig.name,
+  immersionProfession: dto.immersionProfession,
+  magicLink,
+});

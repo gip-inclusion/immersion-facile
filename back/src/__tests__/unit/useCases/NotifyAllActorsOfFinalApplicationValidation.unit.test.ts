@@ -43,7 +43,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     agencyConfig = defaultAgencyConfig;
   });
 
-  const createUseCase = () => new NotifyAllActorsOfFinalApplicationValidation(
+  const createUseCase = () =>
+    new NotifyAllActorsOfFinalApplicationValidation(
       emailFilter,
       emailGw,
       new InMemoryAgencyRepository([agencyConfig]),

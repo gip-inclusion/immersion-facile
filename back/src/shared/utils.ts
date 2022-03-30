@@ -39,7 +39,7 @@ export const replaceArrayElement = <T>(
   replaceAt: number,
   replaceBy: T,
 ) => [
-    ...original.slice(0, replaceAt),
-    replaceBy,
-    ...original.slice(replaceAt + 1),
-  ];
+  ...original.slice(0, replaceAt),
+  replaceBy,
+  ...original.slice(replaceAt + 1),
+];

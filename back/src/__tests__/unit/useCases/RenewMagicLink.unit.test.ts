@@ -63,7 +63,8 @@ describe("RenewMagicLink use case", () => {
     generateJwtFn = makeGenerateJwt(config.magicLinkJwtPrivateKey);
   });
 
-  const createUseCase = () => new RenewMagicLink(
+  const createUseCase = () =>
+    new RenewMagicLink(
       applicationRepository,
       createNewEvent,
       outboxRepository,

@@ -3,7 +3,8 @@ import { GetAccessTokenResponse } from "../../domain/core/ports/AccessTokenGatew
 import { createAxiosInstance } from "../../utils/axiosUtils";
 import { secondsToMilliseconds } from "date-fns";
 import {
-  PeConnectGateway, PeConnectOAuthGetTokenWithCodeGrantPayload,
+  PeConnectGateway,
+  PeConnectOAuthGetTokenWithCodeGrantPayload,
   PeConnectOAuthGrantPayload,
   PeConnectUserInfo,
 } from "../../domain/generic/peConnect/port/PeConnectGateway";

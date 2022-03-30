@@ -27,7 +27,8 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
     emailGw = new InMemoryEmailGateway();
   });
 
-  const createUseCase = () => new NotifyToTeamApplicationSubmittedByBeneficiary(
+  const createUseCase = () =>
+    new NotifyToTeamApplicationSubmittedByBeneficiary(
       emailGw,
       new InMemoryAgencyRepository([agencyConfig]),
       fakeGenerateMagicLinkUrlFn,

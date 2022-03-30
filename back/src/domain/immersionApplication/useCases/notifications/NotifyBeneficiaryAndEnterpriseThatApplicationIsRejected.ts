@@ -51,11 +51,11 @@ const getRejectedApplicationNotificationParams = (
   dto: ImmersionApplicationDto,
   agencyConfig: AgencyConfig,
 ): RejectedApplicationNotificationParams => ({
-    beneficiaryFirstName: dto.firstName,
-    beneficiaryLastName: dto.lastName,
-    businessName: dto.businessName,
-    rejectionReason: dto.rejectionJustification || "",
-    signature: agencyConfig.signature,
-    agency: agencyConfig.name,
-    immersionProfession: dto.immersionProfession,
-  });
+  beneficiaryFirstName: dto.firstName,
+  beneficiaryLastName: dto.lastName,
+  businessName: dto.businessName,
+  rejectionReason: dto.rejectionJustification || "",
+  signature: agencyConfig.signature,
+  agency: agencyConfig.name,
+  immersionProfession: dto.immersionProfession,
+});

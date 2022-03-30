@@ -6,15 +6,29 @@ import { sendRedirectResponse } from "../helpers/sendHttpResponse";
 export const createPeConnectRouter = (deps: AppDependencies) => {
   const peConnectRouter = Router({ mergeParams: true });
 
-  peConnectRouter.route(`/${loginPeConnect}`).get(async (req, res) =>
-    sendRedirectResponse(req, res, async (): Promise<string> => deps.repositories.peConnectGateway.oAuthGetAuthorizationCodeRedirectUrl()),
-  );
+  peConnectRouter
+    .route(`/${loginPeConnect}`)
+    .get(async (req, res) =>
+      sendRedirectResponse(
+        req,
+        res,
+        async (): Promise<string> =>
+          deps.repositories.peConnectGateway.oAuthGetAuthorizationCodeRedirectUrl(),
+      ),
+    );
 
-  peConnectRouter.route(`/${peConnect}`).get(async (req, res) =>
-    sendRedirectResponse(req, res, async (): Promise<string> => deps.useCases.linkUserPeConnectAccount.execute(
-        req.query.code as string,
-      )),
-  );
+  peConnectRouter
+    .route(`/${peConnect}`)
+    .get(async (req, res) =>
+      sendRedirectResponse(
+        req,
+        res,
+        async (): Promise<string> =>
+          deps.useCases.linkUserPeConnectAccount.execute(
+            req.query.code as string,
+          ),
+      ),
+    );
 
   return peConnectRouter;
 };

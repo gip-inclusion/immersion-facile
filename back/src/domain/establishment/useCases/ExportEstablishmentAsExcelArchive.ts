@@ -94,7 +94,8 @@ export class ExportEstablishmentAsExcelArchive extends TransactionalUseCase<Esta
 export const aggregateProfessionsIfNeeded = (
   config: EstablishmentExportConfigDto,
   establishmentsWithoutGeoRawBeforeExport: EstablishmentRawProps[],
-) => config.aggregateProfession
+) =>
+  config.aggregateProfession
     ? reduceByProfessions(establishmentsWithoutGeoRawBeforeExport)
     : establishmentsWithoutGeoRawBeforeExport;
 

@@ -17,7 +17,8 @@ describe("NotifyConfirmationEstablismentCreated", () => {
     ]);
   });
 
-  const createUseCase = () => new NotifyConfirmationEstablishmentCreated(emailFilter, emailGw);
+  const createUseCase = () =>
+    new NotifyConfirmationEstablishmentCreated(emailFilter, emailGw);
 
   describe("When establishment is valid", () => {
     it("Nominal case: Sends notification email to Establisment contact", async () => {

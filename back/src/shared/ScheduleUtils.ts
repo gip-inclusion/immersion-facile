@@ -7,7 +7,8 @@ import {
   weekdays,
 } from "./ScheduleSchema";
 
-const minutesInDay = (timePeriods: TimePeriodDto[]): number => timePeriods.reduce(
+const minutesInDay = (timePeriods: TimePeriodDto[]): number =>
+  timePeriods.reduce(
     (totalMinutes, period) => totalMinutes + timePeriodDuration(period),
     0,
   );
@@ -129,7 +130,8 @@ export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
 };
 
 // Generates a string in format: "(09:00 - 13:00)"
-const periodToHumanReadableString = (period: TimePeriodDto): string => "(" + period.start + " - " + period.end + ")";
+const periodToHumanReadableString = (period: TimePeriodDto): string =>
+  "(" + period.start + " - " + period.end + ")";
 
 export const checkComplexSchedule = (schedule: ComplexScheduleDto) => {
   for (let dayIndex = 0; dayIndex < schedule.length; dayIndex++) {

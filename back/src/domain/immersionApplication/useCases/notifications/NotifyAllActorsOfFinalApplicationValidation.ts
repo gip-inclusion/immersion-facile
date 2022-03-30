@@ -63,24 +63,24 @@ export const getValidatedApplicationFinalConfirmationParams = (
   agencyConfig: AgencyConfig,
   dto: ImmersionApplicationDto,
 ): ValidatedApplicationFinalConfirmationParams => ({
-    beneficiaryFirstName: dto.firstName,
-    beneficiaryLastName: dto.lastName,
-    dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
-    dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
-    mentorName: dto.mentor,
-    scheduleText: dto.legacySchedule?.description
-      ? prettyPrintLegacySchedule(dto.legacySchedule)
-      : prettyPrintSchedule(dto.schedule),
-    businessName: dto.businessName,
-    immersionAddress: dto.immersionAddress || "",
-    immersionProfession: dto.immersionProfession,
-    immersionActivities: dto.immersionActivities,
-    sanitaryPrevention:
-      dto.sanitaryPrevention && dto.sanitaryPreventionDescription
-        ? dto.sanitaryPreventionDescription
-        : "non",
-    individualProtection: dto.individualProtection ? "oui" : "non",
-    questionnaireUrl: agencyConfig.questionnaireUrl,
-    signature: agencyConfig.signature,
-    workConditions: dto.workConditions,
-  });
+  beneficiaryFirstName: dto.firstName,
+  beneficiaryLastName: dto.lastName,
+  dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
+  dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
+  mentorName: dto.mentor,
+  scheduleText: dto.legacySchedule?.description
+    ? prettyPrintLegacySchedule(dto.legacySchedule)
+    : prettyPrintSchedule(dto.schedule),
+  businessName: dto.businessName,
+  immersionAddress: dto.immersionAddress || "",
+  immersionProfession: dto.immersionProfession,
+  immersionActivities: dto.immersionActivities,
+  sanitaryPrevention:
+    dto.sanitaryPrevention && dto.sanitaryPreventionDescription
+      ? dto.sanitaryPreventionDescription
+      : "non",
+  individualProtection: dto.individualProtection ? "oui" : "non",
+  questionnaireUrl: agencyConfig.questionnaireUrl,
+  signature: agencyConfig.signature,
+  workConditions: dto.workConditions,
+});

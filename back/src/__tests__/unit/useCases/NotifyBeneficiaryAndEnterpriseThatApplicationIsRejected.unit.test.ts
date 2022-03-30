@@ -37,7 +37,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     emailGw = new InMemoryEmailGateway();
   });
 
-  const createUseCase = () => new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+  const createUseCase = () =>
+    new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
       emailFilter,
       emailGw,
       new InMemoryAgencyRepository([agencyConfig]),
