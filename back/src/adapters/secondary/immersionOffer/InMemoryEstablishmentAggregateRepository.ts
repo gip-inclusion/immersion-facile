@@ -8,7 +8,6 @@ import {
 import {
   AnnotatedImmersionOfferEntityV2,
   ImmersionOfferEntityV2,
-  ImmersionOfferId,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
@@ -18,6 +17,7 @@ import { createLogger } from "../../../utils/logger";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
 
 const logger = createLogger(__filename);
 

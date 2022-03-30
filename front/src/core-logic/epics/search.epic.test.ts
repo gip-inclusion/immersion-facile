@@ -1,7 +1,7 @@
 import { Observable } from "rxjs";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { createSearchEpic } from "src/core-logic/epics/search.epic";
-import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
+import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 import DoneCallback = jest.DoneCallback;
 
 // those test should be fast, we don't want to wait 5s if they fail (

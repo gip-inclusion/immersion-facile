@@ -12,12 +12,10 @@ import {
   EstablishmentEntityV2,
   DataSource,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import {
-  AnnotatedImmersionOfferEntityV2,
-  ImmersionOfferId,
-} from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
+import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
 import { LatLonDto } from "../../../shared/latLon";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {

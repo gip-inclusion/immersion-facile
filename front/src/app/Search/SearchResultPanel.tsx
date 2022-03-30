@@ -8,7 +8,6 @@ import {
 import { EnterpriseSearchResult } from "src/app/Search/EnterpriseSearchResult";
 import { SuccessFeedback } from "src/components/SuccessFeedback";
 import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
-import type { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 import { useObservable } from "src/useObservable";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {

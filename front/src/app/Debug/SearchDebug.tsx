@@ -4,7 +4,7 @@ import { immersionSearchGateway } from "src/app/dependencies";
 import { AppellationAutocomplete } from "src/app/Profession/AppellationAutocomplete";
 import { AddressAutocomplete } from "src/components/AddressAutocomplete";
 import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
+import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 
 interface Values {
   rome: string;

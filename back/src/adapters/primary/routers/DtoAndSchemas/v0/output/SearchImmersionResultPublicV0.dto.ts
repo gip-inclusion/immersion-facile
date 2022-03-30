@@ -1,12 +1,18 @@
-import {
-  ContactEntityV2,
-  ContactMethod,
-} from "../../../../../../domain/immersionOffer/entities/ContactEntity";
+import { ImmersionContactInEstablishmentId } from "../../../../../../shared/formEstablishment/FormEstablishment.dto";
 import { LatLonDto } from "../../../../../../shared/latLon";
 import { RomeCode } from "../../../../../../shared/rome";
 import { SearchImmersionResultDto } from "../../../../../../shared/searchImmersion/SearchImmersionResult.dto";
 
 import { SiretDto } from "../../../../../../shared/siret";
+
+export type ContactDetailsPublicV0 = {
+  id: ImmersionContactInEstablishmentId;
+  lastName: string;
+  firstName: string;
+  email: string;
+  role: string;
+  phone: string;
+};
 
 export type SearchImmersionResultPublicV0 = {
   id: string;
@@ -20,9 +26,9 @@ export type SearchImmersionResultPublicV0 = {
   location: LatLonDto;
   address: string;
   city: string;
-  contactMethod?: ContactMethod;
+  contactMode?: "EMAIL" | "PHONE" | "IN_PERSON";
   distance_m?: number;
-  businessContact?: ContactEntityV2;
+  contactDetails?: ContactDetailsPublicV0;
   numberOfEmployeeRange?: string;
 };
 

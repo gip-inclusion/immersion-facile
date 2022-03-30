@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { agencyGateway } from "src/app/dependencies";
 import { AgencyId, AgencyInListDto } from "src/shared/agencies";
 import type { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { LatLonDto } from "src/shared/SearchImmersionDto";
+import { LatLonDto } from "src/shared/latLon";
+
 import { PostcodeAutocomplete } from "./PostcodeAutocomplete";
 
 const placeholderAgency: AgencyInListDto = {

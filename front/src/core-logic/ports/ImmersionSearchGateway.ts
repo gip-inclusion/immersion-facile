@@ -1,9 +1,6 @@
 import { ContactEstablishmentRequestDto } from "src/shared/contactEstablishment";
-import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import {
-  SearchImmersionRequestDto,
-  SearchImmersionResultDto,
-} from "src/shared/SearchImmersionDto";
+import { SearchImmersionRequestDto } from "src/shared/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 
 export interface ImmersionSearchGateway {
   search(

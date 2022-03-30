@@ -1,8 +1,6 @@
 import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
-import React from "react";
 import { searchEpic } from "src/app/dependencies";
-import { AppellationAutocomplete } from "src/app/Profession/AppellationAutocomplete";
 import { RomeAutocomplete } from "src/app/Profession/RomeAutocomplete";
 import { OurAdvises } from "src/app/Search/OurAdvises";
 import { SearchResultPanel } from "src/app/Search/SearchResultPanel";
@@ -14,6 +12,7 @@ import { Layout } from "src/components/Layout";
 import { SearchButton } from "src/components/SearchButton";
 import { useObservable } from "src/useObservable";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
+import React from "react";
 
 interface SearchInput {
   rome?: string;

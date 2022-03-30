@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ImmersionOfferId } from "../ImmersionOfferId";
 import { latLonSchema } from "../latLon";
 import { romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret";
@@ -8,9 +9,10 @@ import {
   SearchImmersionResultDto,
 } from "./SearchImmersionResult.dto";
 
-export const immersionOfferIdSchema: z.ZodSchema<string> = zTrimmedString;
+export const immersionOfferIdSchema: z.ZodSchema<ImmersionOfferId> =
+  zTrimmedString;
 
-export const searchContactSchema: z.Schema<SearchContactDto> = z.object({
+export const contactDetailsSchema: z.Schema<SearchContactDto> = z.object({
   id: z.string(),
   lastName: z.string(),
   firstName: z.string(),
@@ -34,7 +36,7 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
     city: z.string(),
     contactMode: z.enum(["EMAIL", "PHONE", "IN_PERSON"]).optional(),
     distance_m: z.number().optional(),
-    contactDetails: searchContactSchema.optional(),
+    contactDetails: contactDetailsSchema.optional(),
     numberOfEmployeeRange: z.string().optional(),
   });
 

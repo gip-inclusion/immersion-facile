@@ -10,10 +10,8 @@ import {
   switchMap,
 } from "rxjs";
 import type { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
-import type {
-  SearchImmersionRequestDto,
-  SearchImmersionResultDto,
-} from "src/shared/SearchImmersionDto";
+import { SearchImmersionRequestDto } from "src/shared/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 
 interface SearchEpicDependencies {
   immersionSearchGateway: ImmersionSearchGateway;

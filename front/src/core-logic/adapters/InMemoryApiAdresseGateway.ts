@@ -1,4 +1,5 @@
-import { LatLonDto } from "src/shared/SearchImmersionDto";
+import { LatLonDto } from "src/shared/latLon";
+
 import { sleep } from "src/shared/utils";
 import {
   AddressWithCoordinates,

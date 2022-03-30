@@ -1,4 +1,5 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
 import {
   SearchContactDto,
   SearchImmersionResultDto,
@@ -8,7 +9,6 @@ import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { UseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
-import { ImmersionOfferId } from "../entities/ImmersionOfferEntity";
 
 export class GetImmersionOfferById extends UseCase<
   ImmersionOfferId,

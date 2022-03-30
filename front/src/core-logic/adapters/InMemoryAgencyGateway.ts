@@ -1,7 +1,7 @@
 import { values } from "ramda";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { AgencyInListDto, CreateAgencyConfig } from "src/shared/agencies";
-import { LatLonDto } from "src/shared/SearchImmersionDto";
+import { LatLonDto } from "src/shared/latLon";
 
 const TEST_AGENCIES: Record<string, CreateAgencyConfig> = {
   "test-agency-1-front": {

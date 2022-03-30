@@ -1,6 +1,5 @@
 import { SuperTest, Test } from "supertest";
 import {
-  TEST_APPELLATION_LABEL,
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,

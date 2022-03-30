@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg";
+import { prop, sortBy } from "ramda";
 import {
   PgContactMethod,
   PgEstablishmentAggregateRepository,
@@ -75,6 +76,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       siret: string,
       rome: string,
       establishmentPosition: LatLonDto,
+      appellationCode?: string,
       offerContactUid?: string,
       dataSource: DataSource = "form",
       sourceProvider: FormEstablishmentSource = "immersion-facile",
@@ -102,6 +104,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         uuid: offerUid,
         siret,
         romeCode: rome,
+        romeAppellation: appellationCode,
       });
     };
     describe("if parameter `maxResults` is given", () => {
@@ -138,7 +141,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     describe("if no rome code is given", () => {
       it("returns all establishments within geographical area", async () => {
         // Prepare
-        /// Two establishments with offer inside geographical area
+        /// Two establishments located inside geographical area
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
           testUid1,
           "78000403200029",
@@ -146,13 +149,12 @@ describe("Postgres implementation of immersion offer repository", () => {
           searchedPosition, // Position matching
           "20404", // Appellation : Tractoriste agricole; Tractoriste agricole
         );
-        await insertActiveEstablishmentAndOfferAndEventuallyContact(
-          testUid2,
-          "78000403200029",
-          "A1101", // Whatever
-          searchedPosition, // Position matching
-          "17751", // Appellation : Pilote de machines d'abattage;Pilote de machines d'abattage
-        );
+        await insertImmersionOffer({
+          uuid: testUid2,
+          romeCode: "A1201",
+          siret: "78000403200029",
+          romeAppellation: "17751", // Appellation : Pilote de machines d'abattage;Pilote de machines d'abattage
+        });
 
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
           testUid3,
@@ -176,7 +178,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           );
 
         // Assert : one match and defined contact details
-        expect(searchResult).toHaveLength(2);
+        expect(searchResult).toHaveLength(3);
 
         const expectedResult: Partial<SearchImmersionResultDto>[] = [
           {
@@ -188,7 +190,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           {
             id: testUid2,
             rome: "A1201",
-            siret: "79000403200029",
+            siret: "78000403200029",
             distance_m: 0,
           },
           {
@@ -199,7 +201,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           },
         ];
 
-        expect(searchResult).toMatchObject(expectedResult);
+        expect(sortBy(prop("id"), searchResult)).toMatchObject(expectedResult);
       });
     });
 
@@ -241,6 +243,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siretMatchingToSearch,
         searchedRome, // Matching
         searchedPosition, // Establishment position matching
+        undefined, // No appellation given
         undefined, // no  contact !
         "form", // data source
         "immersion-facile", // source_provider
@@ -303,6 +306,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siretMatchingToSearch,
         searchedRome, // Matching
         searchedPosition, // Establishment position matching
+        undefined, // No appellation given
         contactUidOfOfferMatchingSearch,
       );
 

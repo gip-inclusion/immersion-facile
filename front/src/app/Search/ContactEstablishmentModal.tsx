@@ -7,7 +7,7 @@ import {
   ContactMethod,
   ImmersionContactInEstablishmentId,
 } from "src/shared/formEstablishment/FormEstablishment.dto";
-import { ImmersionOfferId } from "src/shared/SearchImmersionDto";
+import { ImmersionOfferId } from "src/shared/ImmersionOfferId";
 import { ContactInPerson } from "./ContactInPerson";
 
 type ModalState = {

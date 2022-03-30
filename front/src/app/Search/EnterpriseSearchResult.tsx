@@ -3,9 +3,9 @@ import { DistanceIcon } from "src/assets/DistanceIcon";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { TrefleIcon } from "src/assets/TrefleIcon";
 import { SearchButton } from "src/components/SearchButton";
-import { SearchImmersionResultDto } from "src/shared/SearchImmersionDto";
 import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;

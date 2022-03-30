@@ -1,3 +1,4 @@
+import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
 import { ContactEntityV2 } from "../entities/ContactEntity";
@@ -6,10 +7,7 @@ import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../entities/EstablishmentEntity";
-import {
-  AnnotatedImmersionOfferEntityV2,
-  ImmersionOfferId,
-} from "../entities/ImmersionOfferEntity";
+import { AnnotatedImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 
 export interface EstablishmentAggregateRepository {

@@ -5,8 +5,8 @@ import {
   CreateAgencyConfig,
   listAgenciesResponseSchema,
 } from "src/shared/agencies";
+import { LatLonDto } from "src/shared/latLon";
 import { agenciesRoute } from "src/shared/routes";
-import { LatLonDto } from "src/shared/SearchImmersionDto";
 
 const prefix = "api";
 

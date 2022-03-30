@@ -42,9 +42,10 @@ export const searchImmersionResultPublicV0Schema: z.Schema<SearchImmersionResult
     distance_m: z.number().optional(),
     contactDetails: z
       .object({
+        id: z.string(),
         lastName: zTrimmedString,
         firstName: zTrimmedString,
-        job: zTrimmedString,
+        role: zTrimmedString,
         phone: zString.regex(phoneRegExp, "Numero de téléphone incorrect"),
         email: zEmail,
       })

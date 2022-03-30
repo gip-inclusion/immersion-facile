@@ -1,11 +1,8 @@
-import { RomeCode } from "src/shared/rome";
-import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { SearchImmersionRequestDto } from "src/shared/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 import { sleep } from "src/shared/utils";
 import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
-import {
-  SearchImmersionRequestDto,
-  SearchImmersionResultDto,
-} from "../../shared/SearchImmersionDto";
+
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 
 const DEFAULT_SIMULATED_LATENCY_MS = 500;

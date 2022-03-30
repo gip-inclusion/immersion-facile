@@ -1,5 +1,6 @@
 import axios from "axios";
-import { LatLonDto } from "src/shared/SearchImmersionDto";
+import { LatLonDto } from "src/shared/latLon";
+
 import {
   AddressWithCoordinates,
   ApiAdresseGateway,

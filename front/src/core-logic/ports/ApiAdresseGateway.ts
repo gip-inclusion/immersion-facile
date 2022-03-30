@@ -1,4 +1,4 @@
-import { LatLonDto } from "src/shared/SearchImmersionDto";
+import { LatLonDto } from "src/shared/latLon";
 
 export type AddressWithCoordinates = {
   label: string;

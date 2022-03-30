@@ -8,9 +8,9 @@ import {
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
-import { ImmersionOfferId } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
+import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
 import { SearchImmersionRequestDto } from "../../../shared/searchImmersion/SearchImmersionRequest.dto";
 import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";

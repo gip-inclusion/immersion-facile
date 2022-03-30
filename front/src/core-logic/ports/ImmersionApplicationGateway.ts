@@ -1,5 +1,4 @@
-import { generateApplication } from "src/helpers/generateImmersionApplication";
-import { AgencyInListDto, AgencyId } from "src/shared/agencies";
+import { AgencyId } from "src/shared/agencies";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -7,7 +6,6 @@ import {
   UpdateImmersionApplicationStatusRequestDto,
   WithImmersionApplicationId,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { LatLonDto } from "src/shared/SearchImmersionDto";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 import { ShareLinkByEmailDTO } from "../../shared/ShareLinkByEmailDTO";

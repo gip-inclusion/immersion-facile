@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { apiAdresseGateway } from "src/app/dependencies";
 import { TextInput } from "src/components/form/TextInput";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { LatLonDto } from "src/shared/SearchImmersionDto";
+import { LatLonDto } from "src/shared/latLon";
 
 export type PostcodeAutocompleteProps = {
   initialSearchTerm?: string;

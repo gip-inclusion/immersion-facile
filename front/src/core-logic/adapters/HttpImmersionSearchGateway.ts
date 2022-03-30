@@ -1,13 +1,11 @@
 import axios from "axios";
+import { SearchImmersionRequestDto } from "src/shared/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
 import {
   contactEstablishmentRoute,
   searchImmersionRoute,
 } from "../../shared/routes";
-import {
-  SearchImmersionRequestDto,
-  SearchImmersionResultDto,
-} from "../../shared/SearchImmersionDto";
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 
 const prefix = "api";
