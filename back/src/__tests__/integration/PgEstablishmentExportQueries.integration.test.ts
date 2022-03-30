@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { PgImmersionOfferRepository } from "../../adapters/secondary/pg/PgImmersionOfferRepository";
+import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
 import { EstablishmentAggregate } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
@@ -11,7 +11,7 @@ import { format } from "date-fns";
 describe("PgEstablishmentExportQueries", () => {
   let pool: Pool;
   let client: PoolClient;
-  let establishmentAggregateRepository: PgImmersionOfferRepository;
+  let establishmentAggregateRepository: PgEstablishmentAggregateRepository;
   let establismentExportQueries: PgEstablishmentExportQueries;
 
   beforeAll(async () => {
@@ -23,8 +23,9 @@ describe("PgEstablishmentExportQueries", () => {
     await client.query("TRUNCATE establishments CASCADE");
     await client.query("TRUNCATE immersion_contacts CASCADE");
 
-    // TODO PgImmersionOfferRepository should be renamed PgEstablishmentAggregateRepository
-    establishmentAggregateRepository = new PgImmersionOfferRepository(client);
+    establishmentAggregateRepository = new PgEstablishmentAggregateRepository(
+      client,
+    );
     establismentExportQueries = new PgEstablishmentExportQueries(client);
   });
 

@@ -2,7 +2,7 @@ import { createInMemoryUow } from "../../../adapters/primary/config";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -61,14 +61,14 @@ const getEstablishmentFromSireneApi = (
 
 describe("Upsert Establishment aggregate from form data", () => {
   let sireneRepo: InMemorySireneRepository;
-  let immersionOfferRepo: InMemoryImmersionOfferRepository;
+  let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let addresseAPI: InMemoryAdresseAPI;
   let useCase: UpsertEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
     sireneRepo = new InMemorySireneRepository();
-    immersionOfferRepo = new InMemoryImmersionOfferRepository();
+    establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     addresseAPI = new InMemoryAdresseAPI(fakePosition);
     uuidGenerator = new TestUuidGenerator();
     const inMemoryRomeRepository = new InMemoryRomeRepository();
@@ -76,7 +76,7 @@ describe("Upsert Establishment aggregate from form data", () => {
 
     const uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
-      immersionOfferRepo,
+      establishmentAggregateRepo,
     });
 
     useCase = new UpsertEstablishmentAggregateFromForm(
@@ -138,7 +138,7 @@ describe("Upsert Establishment aggregate from form data", () => {
     offerRomeCodesAndAppellations: { code: string; appellation?: number }[];
   }) => {
     const repoEstablishmentAggregate =
-      immersionOfferRepo.establishmentAggregates[0];
+      establishmentAggregateRepo.establishmentAggregates[0];
 
     expect(repoEstablishmentAggregate).toBeDefined();
     expect(repoEstablishmentAggregate.establishment.siret).toEqual(
@@ -185,7 +185,7 @@ describe("Upsert Establishment aggregate from form data", () => {
     await useCase.execute(formEstablishment);
 
     const establishmentAggregate =
-      immersionOfferRepo.establishmentAggregates[0];
+      establishmentAggregateRepo.establishmentAggregates[0];
     expect(establishmentAggregate).toBeDefined();
     expect(establishmentAggregate.establishment.siret).toEqual(
       formEstablishment.siret,
@@ -211,7 +211,7 @@ describe("Upsert Establishment aggregate from form data", () => {
       ])
       .withContact(previousContact)
       .build();
-    immersionOfferRepo.establishmentAggregates = [previousAggregate];
+    establishmentAggregateRepo.establishmentAggregates = [previousAggregate];
 
     const newRomeCode = "A1101";
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
@@ -238,7 +238,7 @@ describe("Upsert Establishment aggregate from form data", () => {
 
     // Assert
     // One aggregate only
-    expect(immersionOfferRepo.establishmentAggregates).toHaveLength(1);
+    expect(establishmentAggregateRepo.establishmentAggregates).toHaveLength(1);
 
     // Establishment matches update from form
     const partialExpectedEstablishment: Partial<EstablishmentEntityV2> = {
@@ -249,20 +249,21 @@ describe("Upsert Establishment aggregate from form data", () => {
       name: formEstablishment.businessName,
     };
     expect(
-      immersionOfferRepo.establishmentAggregates[0].establishment,
+      establishmentAggregateRepo.establishmentAggregates[0].establishment,
     ).toMatchObject(partialExpectedEstablishment);
 
     // Offers match update from form
     expect(
-      immersionOfferRepo.establishmentAggregates[0].immersionOffers,
+      establishmentAggregateRepo.establishmentAggregates[0].immersionOffers,
     ).toHaveLength(1);
     expect(
-      immersionOfferRepo.establishmentAggregates[0].immersionOffers[0].romeCode,
+      establishmentAggregateRepo.establishmentAggregates[0].immersionOffers[0]
+        .romeCode,
     ).toEqual(newRomeCode);
 
     // Contact match update from form
-    expect(immersionOfferRepo.establishmentAggregates[0].contact?.email).toBe(
-      "new.contact@gmail.com",
-    );
+    expect(
+      establishmentAggregateRepo.establishmentAggregates[0].contact?.email,
+    ).toBe("new.contact@gmail.com");
   });
 });

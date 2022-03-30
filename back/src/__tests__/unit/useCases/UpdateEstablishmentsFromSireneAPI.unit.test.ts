@@ -1,6 +1,6 @@
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
@@ -11,7 +11,7 @@ import { pathEq } from "../../../shared/ramdaExtensions/path";
 
 const prepareUseCase = () => {
   const sireneRepo = new InMemorySireneRepository();
-  const immersionRepo = new InMemoryImmersionOfferRepository();
+  const immersionRepo = new InMemoryEstablishmentAggregateRepository();
   const clock = new CustomClock();
   const adresseAPI = new InMemoryAdresseAPI();
   const useCase = new UpdateEstablishmentsFromSireneAPI(
@@ -35,7 +35,7 @@ const makeEstablishmentWithUpdatedAt = (siret: string, updatedAt: Date) =>
     .build();
 
 const findEstablishmentEntityGivenSiret = (
-  immersionRepo: InMemoryImmersionOfferRepository,
+  immersionRepo: InMemoryEstablishmentAggregateRepository,
   siret: string,
 ): EstablishmentEntityV2 | undefined =>
   immersionRepo.establishmentAggregates.find(

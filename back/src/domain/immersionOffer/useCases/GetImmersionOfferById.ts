@@ -8,7 +8,7 @@ import {
 import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { UseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
-import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
 export class GetImmersionOfferById extends UseCase<
   ImmersionOfferId,
@@ -16,7 +16,7 @@ export class GetImmersionOfferById extends UseCase<
   ApiConsumer
 > {
   constructor(
-    private readonly immersionOfferRepository: ImmersionOfferRepository,
+    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
   ) {
     super();
   }
@@ -28,15 +28,15 @@ export class GetImmersionOfferById extends UseCase<
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto> {
     const annotatedEstablishment =
-      await this.immersionOfferRepository.getAnnotatedEstablishmentByImmersionOfferId(
+      await this.establishmentAggregateRepository.getAnnotatedEstablishmentByImmersionOfferId(
         immersionOfferId,
       );
     const annotatedOffer =
-      await this.immersionOfferRepository.getAnnotatedImmersionOfferById(
+      await this.establishmentAggregateRepository.getAnnotatedImmersionOfferById(
         immersionOfferId,
       );
     const contact =
-      await this.immersionOfferRepository.getContactByImmersionOfferId(
+      await this.establishmentAggregateRepository.getContactByImmersionOfferId(
         immersionOfferId,
       );
 

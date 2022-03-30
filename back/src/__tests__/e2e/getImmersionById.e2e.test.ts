@@ -3,7 +3,7 @@ import {
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
-} from "../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+} from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { makeGenerateJwt } from "../../domain/auth/jwt";
 import { SearchImmersionResultDto } from "../../shared/SearchImmersionDto";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";

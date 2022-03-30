@@ -8,7 +8,7 @@ import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
-import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { SearchMadeRepository } from "../ports/SearchMadeRepository";
 
 const histogramSearchImmersionStoredCount = new promClient.Histogram({
@@ -24,7 +24,7 @@ export class SearchImmersion extends UseCase<
 > {
   constructor(
     private readonly searchesMadeRepository: SearchMadeRepository,
-    private readonly immersionOfferRepository: ImmersionOfferRepository,
+    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly uuidGenerator: UuidGenerator,
   ) {
     super();
@@ -51,7 +51,7 @@ export class SearchImmersion extends UseCase<
     const apiConsumerName = apiConsumer?.consumer;
 
     const resultsFromStorage =
-      await this.immersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+      await this.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
         {
           searchMade,
           withContactDetails: apiConsumerName !== undefined,

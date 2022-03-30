@@ -12,7 +12,7 @@ import {
 import { AnnotatedImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 
-export interface ImmersionOfferRepository {
+export interface EstablishmentAggregateRepository {
   hasEstablishmentFromFormWithSiret: (siret: string) => Promise<boolean>;
   getContactEmailFromSiret: (siret: string) => Promise<string | undefined>;
   insertEstablishmentAggregates: (

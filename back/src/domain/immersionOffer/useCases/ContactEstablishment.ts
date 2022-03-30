@@ -25,24 +25,27 @@ export class ContactEstablishment extends TransactionalUseCase<
 
   public async _execute(
     params: ContactEstablishmentRequestDto,
-    { immersionOfferRepo, outboxRepo }: UnitOfWork,
+    { establishmentAggregateRepo, outboxRepo }: UnitOfWork,
   ): Promise<void> {
     const { immersionOfferId, contactMode } = params;
 
     const annotatedImmersionOffer =
-      await immersionOfferRepo.getAnnotatedImmersionOfferById(immersionOfferId);
+      await establishmentAggregateRepo.getAnnotatedImmersionOfferById(
+        immersionOfferId,
+      );
     if (!annotatedImmersionOffer) throw new NotFoundError(immersionOfferId);
 
-    const contact = await immersionOfferRepo.getContactByImmersionOfferId(
-      immersionOfferId,
-    );
+    const contact =
+      await establishmentAggregateRepo.getContactByImmersionOfferId(
+        immersionOfferId,
+      );
     if (!contact)
       throw new BadRequestError(
         `No contact for immersion offer: ${immersionOfferId}`,
       );
 
     const annotatedEstablishment =
-      await immersionOfferRepo.getAnnotatedEstablishmentByImmersionOfferId(
+      await establishmentAggregateRepo.getAnnotatedEstablishmentByImmersionOfferId(
         immersionOfferId,
       );
     if (!annotatedEstablishment) throw new NotFoundError(immersionOfferId);

@@ -1,8 +1,8 @@
 import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import {
-  InMemoryImmersionOfferRepository,
+  InMemoryEstablishmentAggregateRepository,
   TEST_ROME_LABEL,
-} from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+} from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
@@ -30,12 +30,13 @@ const payload: ContactEstablishmentRequestDto = {
 const allowedContactEmail = "toto@gmail.com";
 
 describe("NotifyContactRequest", () => {
-  let immersionOfferRepository: InMemoryImmersionOfferRepository;
+  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
   let emailGw: InMemoryEmailGateway;
   let emailFilter: EmailFilter;
 
   beforeEach(() => {
-    immersionOfferRepository = new InMemoryImmersionOfferRepository();
+    establishmentAggregateRepository =
+      new InMemoryEstablishmentAggregateRepository();
     emailGw = new InMemoryEmailGateway();
     emailFilter = new AllowListEmailFilter([
       allowedContactEmail,
@@ -44,7 +45,11 @@ describe("NotifyContactRequest", () => {
   });
 
   const createUseCase = () =>
-    new NotifyContactRequest(immersionOfferRepository, emailFilter, emailGw);
+    new NotifyContactRequest(
+      establishmentAggregateRepository,
+      emailFilter,
+      emailGw,
+    );
 
   it("Sends ContactByEmailRequest email to establishment", async () => {
     const validEmailPayload: ContactEstablishmentRequestDto = {
@@ -57,7 +62,7 @@ describe("NotifyContactRequest", () => {
       .withContactMethod("EMAIL")
       .withEmail(allowedContactEmail)
       .build();
-    await immersionOfferRepository.insertEstablishmentAggregates([
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
@@ -92,7 +97,7 @@ describe("NotifyContactRequest", () => {
     const contact = new ContactEntityV2Builder()
       .withContactMethod("PHONE")
       .build();
-    await immersionOfferRepository.insertEstablishmentAggregates([
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
@@ -123,7 +128,7 @@ describe("NotifyContactRequest", () => {
     const contact = new ContactEntityV2Builder()
       .withContactMethod("IN_PERSON")
       .build();
-    await immersionOfferRepository.insertEstablishmentAggregates([
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(contact)
@@ -153,7 +158,7 @@ describe("NotifyContactRequest", () => {
       contactMode: "IN_PERSON",
     };
     const establishment = new EstablishmentEntityV2Builder().build();
-    await immersionOfferRepository.insertEstablishmentAggregates([
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(

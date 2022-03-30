@@ -1,6 +1,6 @@
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
@@ -12,7 +12,7 @@ import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstab
 describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let testUuidGenerator: TestUuidGenerator;
   let updateEstablishmentsAndImmersionOffersFromLastSearches: UpdateEstablishmentsAndImmersionOffersFromLastSearches;
-  let immersionOfferRepository: InMemoryImmersionOfferRepository;
+  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
   let searchesMadeRepository: InMemorySearchMadeRepository;
   let laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   let sireneRepository: InMemorySireneRepository;
@@ -20,7 +20,8 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   beforeEach(() => {
     testUuidGenerator = new TestUuidGenerator();
 
-    immersionOfferRepository = new InMemoryImmersionOfferRepository();
+    establishmentAggregateRepository =
+      new InMemoryEstablishmentAggregateRepository();
 
     searchesMadeRepository = new InMemorySearchMadeRepository();
 
@@ -35,7 +36,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
         laBonneBoiteAPI,
         sireneRepository,
         searchesMadeRepository,
-        immersionOfferRepository,
+        establishmentAggregateRepository,
       );
   });
 
@@ -66,7 +67,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 
     // We expect to find the establishments in results
     const establishmentAggregatesInRepo =
-      immersionOfferRepository.establishmentAggregates;
+      establishmentAggregateRepository.establishmentAggregates;
 
     expect(establishmentAggregatesInRepo).toHaveLength(1);
 
@@ -91,7 +92,8 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 const prepareUseCase = () => {
   const testUuidGenerator = new TestUuidGenerator();
 
-  const immersionOfferRepository = new InMemoryImmersionOfferRepository();
+  const establishmentAggregateRepository =
+    new InMemoryEstablishmentAggregateRepository();
 
   const searchesMadeRepository = new InMemorySearchMadeRepository();
 
@@ -105,13 +107,13 @@ const prepareUseCase = () => {
     laBonneBoiteAPI,
     sireneRepository,
     searchesMadeRepository,
-    immersionOfferRepository,
+    establishmentAggregateRepository,
   );
   return {
     useCase,
     sireneRepository,
     searchesMadeRepository,
-    immersionOfferRepository,
+    establishmentAggregateRepository,
     testUuidGenerator,
     laBonneBoiteAPI,
   };
@@ -128,7 +130,7 @@ describe("Update establishments and offers based on searches made during the day
             laBonneBoiteAPI,
             sireneRepository,
             testUuidGenerator,
-            immersionOfferRepository,
+            establishmentAggregateRepository,
             useCase,
           } = prepareUseCase();
 
@@ -160,11 +162,12 @@ describe("Update establishments and offers based on searches made during the day
           await useCase.execute();
           // Assert
           expect(laBonneBoiteAPI.nbOfCalls).toBe(1);
-          expect(immersionOfferRepository.establishmentAggregates).toHaveLength(
-            2,
-          );
           expect(
-            immersionOfferRepository.establishmentAggregates[0].immersionOffers,
+            establishmentAggregateRepository.establishmentAggregates,
+          ).toHaveLength(2);
+          expect(
+            establishmentAggregateRepository.establishmentAggregates[0]
+              .immersionOffers,
           ).toEqual([
             {
               id: "uuidLBB1",
@@ -173,7 +176,8 @@ describe("Update establishments and offers based on searches made during the day
             },
           ]);
           expect(
-            immersionOfferRepository.establishmentAggregates[1].immersionOffers,
+            establishmentAggregateRepository.establishmentAggregates[1]
+              .immersionOffers,
           ).toEqual([
             {
               id: "uuidLBB2",
@@ -199,7 +203,7 @@ describe("Update establishments and offers based on searches made during the day
             laBonneBoiteAPI,
             searchesMadeRepository,
             useCase,
-            immersionOfferRepository,
+            establishmentAggregateRepository,
           } = prepareUseCase();
           searchesMadeRepository.setSearchesMade([
             { id: "searchMadeId" } as SearchMadeEntity,
@@ -210,9 +214,9 @@ describe("Update establishments and offers based on searches made during the day
           // Act
           await useCase.execute();
           // Assert
-          expect(immersionOfferRepository.establishmentAggregates).toHaveLength(
-            0,
-          );
+          expect(
+            establishmentAggregateRepository.establishmentAggregates,
+          ).toHaveLength(0);
         });
       });
       it("Should turn the search made flag `needs to be processed` to False", async () => {

@@ -4,7 +4,7 @@ import type { Repositories } from "../adapters/primary/config";
 import { createApp } from "../adapters/primary/server";
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import type { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
-import { InMemoryImmersionOfferRepository } from "../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+import { InMemoryEstablishmentAggregateRepository } from "../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemorySearchMadeRepository } from "../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import { InMemoryLaBonneBoiteRequestRepository } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
@@ -30,7 +30,7 @@ import { PeConnectGateway } from "../domain/generic/peConnect/port/PeConnectGate
 
 export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
-  immersionOffer: InMemoryImmersionOfferRepository;
+  immersionOffer: InMemoryEstablishmentAggregateRepository;
   agency: InMemoryAgencyRepository;
   formEstablishment: InMemoryFormEstablishmentRepository;
   immersionApplication: InMemoryImmersionApplicationRepository;

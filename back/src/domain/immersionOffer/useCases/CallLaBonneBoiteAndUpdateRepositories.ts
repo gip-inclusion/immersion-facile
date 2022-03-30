@@ -9,7 +9,7 @@ import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
-import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import {
   LaBonneBoiteAPI,
   LaBonneBoiteRequestParams,
@@ -40,7 +40,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
   void
 > {
   constructor(
-    private readonly immersionOfferRepository: ImmersionOfferRepository,
+    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly laBonneBoiteRequestRepository: LaBonneBoiteRequestRepository,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly uuidGenerator: UuidGenerator,
@@ -83,7 +83,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
     );
     if (relevantCompanies) {
       const existingFormEstablishmentsSirets =
-        await this.immersionOfferRepository.getSiretOfEstablishmentsFromFormSource();
+        await this.establishmentAggregateRepository.getSiretOfEstablishmentsFromFormSource();
 
       const newRelevantCompanies = relevantCompanies.filter(
         (company) => !existingFormEstablishmentsSirets.includes(company.siret),
@@ -145,7 +145,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
         company.toEstablishmentAggregate(this.uuidGenerator, updatedAt),
     );
 
-    await this.immersionOfferRepository.insertEstablishmentAggregates(
+    await this.establishmentAggregateRepository.insertEstablishmentAggregates(
       llbResultsConvertedToEstablishmentAggregates,
     );
   }

@@ -1,6 +1,6 @@
 import { AgencyRepository } from "../../immersionApplication/ports/AgencyRepository";
 import { FormEstablishmentRepository } from "../../immersionOffer/ports/FormEstablishmentRepository";
-import { ImmersionOfferRepository } from "../../immersionOffer/ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../../immersionOffer/ports/EstablishmentAggregateRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { GetFeatureFlags } from "./GetFeatureFlags";
 import { OutboxRepository } from "./OutboxRepository";
@@ -14,7 +14,7 @@ export type UnitOfWork = {
   outboxRepo: OutboxRepository;
   agencyRepo: AgencyRepository;
   formEstablishmentRepo: FormEstablishmentRepository;
-  immersionOfferRepo: ImmersionOfferRepository;
+  establishmentAggregateRepo: EstablishmentAggregateRepository;
   immersionApplicationRepo: ImmersionApplicationRepository;
   establishmentExportQueries: EstablishmentExportQueries;
   immersionApplicationExportQueries: ImmersionApplicationExportQueries;

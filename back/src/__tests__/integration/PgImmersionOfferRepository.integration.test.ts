@@ -1,8 +1,8 @@
 import { Pool, PoolClient } from "pg";
 import {
   PgContactMethod,
-  PgImmersionOfferRepository,
-} from "../../adapters/secondary/pg/PgImmersionOfferRepository";
+  PgEstablishmentAggregateRepository,
+} from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
 import {
   DataSource,
   EstablishmentEntityV2,
@@ -27,7 +27,7 @@ const testUid4 = "44444444-a2a5-430a-b558-ed3e2f03512d";
 describe("Postgres implementation of immersion offer repository", () => {
   let pool: Pool;
   let client: PoolClient;
-  let pgImmersionOfferRepository: PgImmersionOfferRepository;
+  let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -37,7 +37,9 @@ describe("Postgres implementation of immersion offer repository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM establishments");
     await client.query("DELETE FROM immersion_contacts");
-    pgImmersionOfferRepository = new PgImmersionOfferRepository(client);
+    pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
+      client,
+    );
   });
 
   afterAll(async () => {
@@ -62,7 +64,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     it("returns empty list when repo is empty", async () => {
       // Act
       const searchWithNoRomeResult =
-        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
           { searchMade: searchMadeWithRome },
         );
       // Assert
@@ -120,7 +122,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
         // Act
         const searchResult: SearchImmersionResultDto[] =
-          await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
             {
               searchMade: searchMadeWithoutRome,
               withContactDetails: false,
@@ -158,7 +160,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
         // Act
         const searchResult: SearchImmersionResultDto[] =
-          await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
             { searchMade: searchMadeWithoutRome },
           );
 
@@ -201,7 +203,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Act
       const searchWithNoRomeResult =
-        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
           { searchMade: searchMadeWithRome },
         );
       // Assert
@@ -247,7 +249,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Act
       const searchResult: SearchImmersionResultDto[] =
-        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
           { searchMade: searchMadeWithRome },
         );
 
@@ -288,7 +290,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Act
       const searchResult: SearchImmersionResultDto[] =
-        await pgImmersionOfferRepository.getSearchImmersionResultDtoFromSearchMade(
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
           { searchMade: searchMadeWithRome, withContactDetails: true },
         );
 
@@ -310,7 +312,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         .build();
 
       // Act
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishment(storedEstablishment)
           .withImmersionOffers([
@@ -323,7 +325,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Assert
       const establishment =
-        await pgImmersionOfferRepository.getAnnotatedEstablishmentByImmersionOfferId(
+        await pgEstablishmentAggregateRepository.getAnnotatedEstablishmentByImmersionOfferId(
           immersionOfferId,
         );
       expect(establishment).toEqual({
@@ -335,7 +337,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     it("returns undefined for missing establishment", async () => {
       const missingOfferId = "82e37a80-eb0b-4de6-a531-68d30af7887a";
       expect(
-        await pgImmersionOfferRepository.getAnnotatedEstablishmentByImmersionOfferId(
+        await pgEstablishmentAggregateRepository.getAnnotatedEstablishmentByImmersionOfferId(
           missingOfferId,
         ),
       ).toBeUndefined();
@@ -346,7 +348,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     it("fetches existing contact", async () => {
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
       const storedContact = new ContactEntityV2Builder().build();
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishment(new EstablishmentEntityV2Builder().build())
           .withContact(storedContact)
@@ -358,7 +360,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           .build(),
       ]);
       const contact =
-        await pgImmersionOfferRepository.getContactByImmersionOfferId(
+        await pgEstablishmentAggregateRepository.getContactByImmersionOfferId(
           immersionOfferId,
         );
       expect(contact).toEqual(storedContact);
@@ -366,7 +368,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
     it("returns undefined for offer without contact", async () => {
       const immersionOfferId = "fdc2c62d-103d-4474-a546-8bf3fbebe83f";
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishment(new EstablishmentEntityV2Builder().build())
           .withoutContact() // no contact
@@ -378,7 +380,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           .build(),
       ]);
       expect(
-        await pgImmersionOfferRepository.getContactByImmersionOfferId(
+        await pgEstablishmentAggregateRepository.getContactByImmersionOfferId(
           immersionOfferId,
         ),
       ).toBeUndefined();
@@ -387,7 +389,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     it("returns undefined for missing offer", async () => {
       const missingOfferId = "82e37a80-eb0b-4de6-a531-68d30af7887a";
       expect(
-        await pgImmersionOfferRepository.getContactByImmersionOfferId(
+        await pgEstablishmentAggregateRepository.getContactByImmersionOfferId(
           missingOfferId,
         ),
       ).toBeUndefined();
@@ -401,14 +403,14 @@ describe("Postgres implementation of immersion offer repository", () => {
         .withId(immersionOfferId)
         .withRomeCode("M1808")
         .build();
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishment(new EstablishmentEntityV2Builder().build())
           .withImmersionOffers([storedImmersionOffer])
           .build(),
       ]);
       const immersionOffer =
-        await pgImmersionOfferRepository.getAnnotatedImmersionOfferById(
+        await pgEstablishmentAggregateRepository.getAnnotatedImmersionOfferById(
           immersionOfferId,
         );
       expect(immersionOffer).toEqual({
@@ -420,7 +422,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     it("returns undefined for missing offer", async () => {
       const missingOfferId = "82e37a80-eb0b-4de6-a531-68d30af7887a";
       expect(
-        await pgImmersionOfferRepository.getAnnotatedImmersionOfferById(
+        await pgEstablishmentAggregateRepository.getAnnotatedImmersionOfferById(
           missingOfferId,
         ),
       ).toBeUndefined();
@@ -477,7 +479,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Act
       const actualResult =
-        await pgImmersionOfferRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
+        await pgEstablishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
           since,
         );
 
@@ -497,7 +499,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       // Act
       const actualResult =
-        await pgImmersionOfferRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
+        await pgEstablishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
           new Date("2020-04-14T12:00:00.000"), // whatever date
         );
 
@@ -522,7 +524,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Act
       const updatedAt = new Date("2020-05-15T12:00:00.000");
-      await pgImmersionOfferRepository.updateEstablishment(
+      await pgEstablishmentAggregateRepository.updateEstablishment(
         siretOfEstablishmentToUpdate,
         {
           isActive: false,
@@ -562,7 +564,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Act
       const updatedAt = new Date("2020-05-15T12:00:00.000");
-      await pgImmersionOfferRepository.updateEstablishment(
+      await pgEstablishmentAggregateRepository.updateEstablishment(
         siretOfEstablishmentToUpdate,
         {
           ...updateProps,
@@ -595,7 +597,9 @@ describe("Postgres implementation of immersion offer repository", () => {
     const siret2 = "22222222222222";
     describe("create new establishments", () => {
       it("does nothing if empty list given", async () => {
-        await pgImmersionOfferRepository.insertEstablishmentAggregates([]);
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates(
+          [],
+        );
         expect(await getAllEstablishmentsRows()).toHaveLength(0);
       });
       it("adds the establishment values in `establishments` table when one new establishment is given", async () => {
@@ -604,7 +608,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           new EstablishmentEntityV2Builder().build();
 
         // Act;
-        await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
             .withEstablishment(establishmentToInsert)
             .build(),
@@ -632,7 +636,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       it("adds one new row per establishment in `establishments` table when multiple establishments are given", async () => {
         // Act
-        await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret1)
             .build(),
@@ -657,7 +661,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           .build();
 
         // Act
-        await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret1)
             .withContact(firstContact)
@@ -700,7 +704,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             .withContactId(contactId)
             .build();
 
-        await pgImmersionOfferRepository.insertEstablishmentAggregates([
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
           establishmentAggregateToInsert,
         ]);
 
@@ -750,22 +754,24 @@ describe("Postgres implementation of immersion offer repository", () => {
 
           // Act : An aggregate with same siret and rome offer needs to be inserted from source `api_labonneboite`
           const offer2Rome = "A1201";
-          await pgImmersionOfferRepository.insertEstablishmentAggregates([
-            new EstablishmentAggregateBuilder()
-              .withEstablishment(
-                new EstablishmentEntityV2Builder()
-                  .withSiret(existingSiret)
-                  .withDataSource("api_labonneboite")
-                  .withAddress("LBB address should be ignored")
-                  .build(),
-              )
-              .withImmersionOffers([
-                new ImmersionOfferEntityV2Builder()
-                  .withRomeCode(offer2Rome)
-                  .build(),
-              ])
-              .build(),
-          ]);
+          await pgEstablishmentAggregateRepository.insertEstablishmentAggregates(
+            [
+              new EstablishmentAggregateBuilder()
+                .withEstablishment(
+                  new EstablishmentEntityV2Builder()
+                    .withSiret(existingSiret)
+                    .withDataSource("api_labonneboite")
+                    .withAddress("LBB address should be ignored")
+                    .build(),
+                )
+                .withImmersionOffers([
+                  new ImmersionOfferEntityV2Builder()
+                    .withRomeCode(offer2Rome)
+                    .build(),
+                ])
+                .build(),
+            ],
+          );
 
           // Assert : establishment is not updated, but
           /// Update date and address should not have changed
@@ -796,20 +802,22 @@ describe("Postgres implementation of immersion offer repository", () => {
 
           // Act
           const newAddress = "New establishment address, 44000 Nantes";
-          await pgImmersionOfferRepository.insertEstablishmentAggregates([
-            new EstablishmentAggregateBuilder()
-              .withEstablishment(
-                new EstablishmentEntityV2Builder()
-                  .withSiret(existingSiret)
-                  .withAddress(newAddress)
-                  .withDataSource("api_labonneboite")
-                  .build(),
-              )
-              .withImmersionOffers([
-                new ImmersionOfferEntityV2Builder().build(),
-              ])
-              .build(),
-          ]);
+          await pgEstablishmentAggregateRepository.insertEstablishmentAggregates(
+            [
+              new EstablishmentAggregateBuilder()
+                .withEstablishment(
+                  new EstablishmentEntityV2Builder()
+                    .withSiret(existingSiret)
+                    .withAddress(newAddress)
+                    .withDataSource("api_labonneboite")
+                    .build(),
+                )
+                .withImmersionOffers([
+                  new ImmersionOfferEntityV2Builder().build(),
+                ])
+                .build(),
+            ],
+          );
           // Assert
           /// Address (amongst other fields) should have been updated
           expect(
@@ -830,19 +838,21 @@ describe("Postgres implementation of immersion offer repository", () => {
             siret: existingSiret,
           });
           // Act : an establishment aggregate with this siret is inserted by source Form
-          await pgImmersionOfferRepository.insertEstablishmentAggregates([
-            new EstablishmentAggregateBuilder()
-              .withEstablishment(
-                new EstablishmentEntityV2Builder()
-                  .withSiret(existingSiret)
-                  .withDataSource("form")
-                  .build(),
-              )
-              .withImmersionOffers([
-                new ImmersionOfferEntityV2Builder().build(),
-              ])
-              .build(),
-          ]);
+          await pgEstablishmentAggregateRepository.insertEstablishmentAggregates(
+            [
+              new EstablishmentAggregateBuilder()
+                .withEstablishment(
+                  new EstablishmentEntityV2Builder()
+                    .withSiret(existingSiret)
+                    .withDataSource("form")
+                    .build(),
+                )
+                .withImmersionOffers([
+                  new ImmersionOfferEntityV2Builder().build(),
+                ])
+                .build(),
+            ],
+          );
           // Assert
           /// Data Source (amongst other fields) should have been updated
           expect(
@@ -861,7 +871,9 @@ describe("Postgres implementation of immersion offer repository", () => {
     it("returns undefined if no establishment contact with this siret", async () => {
       // Act
       const actualContactEmail =
-        await pgImmersionOfferRepository.getContactEmailFromSiret(siret);
+        await pgEstablishmentAggregateRepository.getContactEmailFromSiret(
+          siret,
+        );
       // Assert
       expect(actualContactEmail).toBeUndefined();
     });
@@ -878,7 +890,9 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       // Act
       const actualContactEmail =
-        await pgImmersionOfferRepository.getContactEmailFromSiret(siret);
+        await pgEstablishmentAggregateRepository.getContactEmailFromSiret(
+          siret,
+        );
       // Assert
       expect(actualContactEmail).toEqual(contactEmail);
     });
@@ -893,7 +907,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       // Act and assert
       expect(
-        await pgImmersionOfferRepository.hasEstablishmentFromFormWithSiret(
+        await pgEstablishmentAggregateRepository.hasEstablishmentFromFormWithSiret(
           siret,
         ),
       ).toBe(false);
@@ -906,7 +920,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       // Act and assert
       expect(
-        await pgImmersionOfferRepository.hasEstablishmentFromFormWithSiret(
+        await pgEstablishmentAggregateRepository.hasEstablishmentFromFormWithSiret(
           siret,
         ),
       ).toBe(true);
@@ -916,7 +930,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     const siret = "12345678901234";
     it("Returns undefined when there is no establishment in db with this siret", async () => {
       const establishmentDataSource =
-        await pgImmersionOfferRepository.getEstablishmentDataSourceFromSiret(
+        await pgEstablishmentAggregateRepository.getEstablishmentDataSourceFromSiret(
           siret,
         );
       expect(establishmentDataSource).toBeUndefined();
@@ -929,7 +943,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       // Act
       const establishmentDataSource =
-        await pgImmersionOfferRepository.getEstablishmentDataSourceFromSiret(
+        await pgEstablishmentAggregateRepository.getEstablishmentDataSourceFromSiret(
           siret,
         );
       // Assert
@@ -960,7 +974,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Act
       const actualSiretOfEstablishmentsFromFormSource =
-        await pgImmersionOfferRepository.getSiretOfEstablishmentsFromFormSource();
+        await pgEstablishmentAggregateRepository.getSiretOfEstablishmentsFromFormSource();
       // Assert
       expect(actualSiretOfEstablishmentsFromFormSource).toEqual([
         siretFromForm1,
@@ -1001,7 +1015,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       ]);
 
       // Act
-      await pgImmersionOfferRepository.removeEstablishmentAndOffersWithSiret(
+      await pgEstablishmentAggregateRepository.removeEstablishmentAndOffersWithSiret(
         siretToRemove,
       );
       // Assert
@@ -1042,7 +1056,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         .withContact(contact)
         .withImmersionOffers(offers)
         .build();
-      await pgImmersionOfferRepository.insertEstablishmentAggregates([
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         aggregate,
       ]);
     });
@@ -1051,14 +1065,14 @@ describe("Postgres implementation of immersion offer repository", () => {
         const siretNotInTable = "11111111111111";
 
         expect(
-          await pgImmersionOfferRepository.getEstablishmentForSiret(
+          await pgEstablishmentAggregateRepository.getEstablishmentForSiret(
             siretNotInTable,
           ),
         ).toBeUndefined();
       });
       it("returns the establishment entity with given siret", async () => {
         expect(
-          await pgImmersionOfferRepository.getEstablishmentForSiret(
+          await pgEstablishmentAggregateRepository.getEstablishmentForSiret(
             siretInTable,
           ),
         ).toEqual(establishment);
@@ -1069,14 +1083,14 @@ describe("Postgres implementation of immersion offer repository", () => {
         const siretNotInTable = "11111111111111";
 
         expect(
-          await pgImmersionOfferRepository.getContactForEstablishmentSiret(
+          await pgEstablishmentAggregateRepository.getContactForEstablishmentSiret(
             siretNotInTable,
           ),
         ).toBeUndefined();
       });
       it("returns the first contact entity attached to establishment of given siret", async () => {
         expect(
-          await pgImmersionOfferRepository.getContactForEstablishmentSiret(
+          await pgEstablishmentAggregateRepository.getContactForEstablishmentSiret(
             siretInTable,
           ),
         ).toEqual(contact);
@@ -1088,7 +1102,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         const siretNotInTable = "11111111111111";
 
         expect(
-          await pgImmersionOfferRepository.getOffersAsAppelationDtoForFormEstablishment(
+          await pgEstablishmentAggregateRepository.getOffersAsAppelationDtoForFormEstablishment(
             siretNotInTable,
           ),
         ).toHaveLength(0);
@@ -1109,7 +1123,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           },
         ];
         const actualOffersAsAppelationDto =
-          await pgImmersionOfferRepository.getOffersAsAppelationDtoForFormEstablishment(
+          await pgEstablishmentAggregateRepository.getOffersAsAppelationDtoForFormEstablishment(
             siretInTable,
           );
         expect(actualOffersAsAppelationDto).toEqual(

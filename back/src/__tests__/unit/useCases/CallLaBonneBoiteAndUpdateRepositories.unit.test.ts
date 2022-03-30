@@ -1,6 +1,6 @@
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteRequestRepository } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
 import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
@@ -15,7 +15,8 @@ import { EstablishmentEntityV2Builder } from "../../../_testBuilders/Establishme
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
 
 const prepareUseCase = async () => {
-  const immersionOfferRepository = new InMemoryImmersionOfferRepository();
+  const establishmentAggregateRepository =
+    new InMemoryEstablishmentAggregateRepository();
   const laBonneBoiteRequestRepository =
     new InMemoryLaBonneBoiteRequestRepository();
 
@@ -31,7 +32,7 @@ const prepareUseCase = async () => {
   laBonneBoiteAPI.setNextResults([lbbCompany]);
 
   const useCase = new CallLaBonneBoiteAndUpdateRepositories(
-    immersionOfferRepository,
+    establishmentAggregateRepository,
     laBonneBoiteRequestRepository,
     laBonneBoiteAPI,
     uuidGenerator,
@@ -40,7 +41,7 @@ const prepareUseCase = async () => {
 
   return {
     useCase,
-    immersionOfferRepository,
+    establishmentAggregateRepository,
     laBonneBoiteRequestRepository,
     laBonneBoiteAPI,
     uuidGenerator,
@@ -111,9 +112,9 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
     });
     it("should insert as many 'relevant' establishments and offers in repositories as LBB responded with undefined field `updatedAt`", async () => {
       // Prepare
-      const { useCase, laBonneBoiteAPI, immersionOfferRepository } =
+      const { useCase, laBonneBoiteAPI, establishmentAggregateRepository } =
         await prepareUseCase();
-      immersionOfferRepository.establishmentAggregates = [];
+      establishmentAggregateRepository.establishmentAggregates = [];
 
       const ignoredNafRomeCombination = {
         matched_rome_code: "D1202",
@@ -137,16 +138,18 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       await useCase.execute(dto);
 
       // Assert
-      expect(immersionOfferRepository.establishmentAggregates).toHaveLength(2);
       expect(
-        immersionOfferRepository.establishmentAggregates[0].establishment
-          .updatedAt,
+        establishmentAggregateRepository.establishmentAggregates,
+      ).toHaveLength(2);
+      expect(
+        establishmentAggregateRepository.establishmentAggregates[0]
+          .establishment.updatedAt,
       ).toBeUndefined();
     });
     it("Should ignore establishments that have been inserted with `form` dataSource", async () => {
       const conflictSiret = "12345678901234";
       // Prepare : an establishment already inserted from form
-      const { useCase, laBonneBoiteAPI, immersionOfferRepository } =
+      const { useCase, laBonneBoiteAPI, establishmentAggregateRepository } =
         await prepareUseCase();
       const alreadyExistingAggregateFromForm =
         new EstablishmentAggregateBuilder()
@@ -158,7 +161,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
           )
           .build();
 
-      immersionOfferRepository.establishmentAggregates = [
+      establishmentAggregateRepository.establishmentAggregates = [
         alreadyExistingAggregateFromForm,
       ];
 
@@ -170,7 +173,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       await useCase.execute(dto);
 
       // Assert : Should have skipped this establishment
-      expect(immersionOfferRepository.establishmentAggregates).toEqual([
+      expect(establishmentAggregateRepository.establishmentAggregates).toEqual([
         alreadyExistingAggregateFromForm,
       ]);
     });

@@ -21,20 +21,21 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     uow: UnitOfWork,
     { siret }: EstablishmentJwtPayload,
   ) {
-    const establishment = await uow.immersionOfferRepo.getEstablishmentForSiret(
-      siret,
-    );
+    const establishment =
+      await uow.establishmentAggregateRepo.getEstablishmentForSiret(siret);
     if (!establishment || establishment?.dataSource !== "form")
       throw new BadRequestError(
         `No establishment found with siret ${siret} and form data source. `,
       );
 
     const contact =
-      await uow.immersionOfferRepo.getContactForEstablishmentSiret(siret);
+      await uow.establishmentAggregateRepo.getContactForEstablishmentSiret(
+        siret,
+      );
     if (!contact) throw new BadRequestError("No contact ");
 
     const offersAsAppellationDto =
-      await uow.immersionOfferRepo.getOffersAsAppelationDtoForFormEstablishment(
+      await uow.establishmentAggregateRepo.getOffersAsAppelationDtoForFormEstablishment(
         siret,
       );
 

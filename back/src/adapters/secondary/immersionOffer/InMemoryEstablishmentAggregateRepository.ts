@@ -10,7 +10,7 @@ import {
   ImmersionOfferEntityV2,
 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { path, pathEq, pathNotEq } from "../../../shared/ramdaExtensions/path";
 import { propEq } from "../../../shared/ramdaExtensions/propEq";
 import type { ImmersionOfferId } from "../../../shared/SearchImmersionDto";
@@ -27,8 +27,8 @@ export const TEST_APPELLATION_LABEL = "test_appellation_label";
 export const TEST_CITY = "test_city";
 export const TEST_POSITION = { lat: 43.8666, lon: 8.3333 };
 
-export class InMemoryImmersionOfferRepository
-  implements ImmersionOfferRepository
+export class InMemoryEstablishmentAggregateRepository
+  implements EstablishmentAggregateRepository
 {
   public constructor(
     private _establishmentAggregates: EstablishmentAggregate[] = [],

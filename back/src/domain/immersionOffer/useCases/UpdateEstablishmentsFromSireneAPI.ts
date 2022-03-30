@@ -6,7 +6,7 @@ import {
   SireneRepository,
 } from "../../sirene/ports/SireneRepository";
 import { AdresseAPI } from "../ports/AdresseAPI";
-import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
 const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
 
@@ -15,7 +15,7 @@ const logger = createLogger(__filename);
 export class UpdateEstablishmentsFromSireneAPI {
   constructor(
     private readonly sireneRepository: SireneRepository,
-    private readonly immersionOfferRepository: ImmersionOfferRepository,
+    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly adresseAPI: AdresseAPI,
     private readonly clock: Clock,
   ) {}
@@ -23,7 +23,7 @@ export class UpdateEstablishmentsFromSireneAPI {
   public async execute() {
     const since = addDays(this.clock.now(), -SIRENE_NB_DAYS_BEFORE_REFRESH);
     const establishmentSiretsToUpdate =
-      await this.immersionOfferRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
+      await this.establishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
         since,
       );
 
@@ -58,7 +58,7 @@ export class UpdateEstablishmentsFromSireneAPI {
     );
 
     if (!sireneAnswer || sireneAnswer.etablissements.length === 0) {
-      await this.immersionOfferRepository.updateEstablishment(siret, {
+      await this.establishmentAggregateRepository.updateEstablishment(siret, {
         updatedAt: this.clock.now(),
         isActive: false,
       });
@@ -80,7 +80,7 @@ export class UpdateEstablishmentsFromSireneAPI {
         "Unable to retrieve position from API Adresse",
       );
     }
-    await this.immersionOfferRepository.updateEstablishment(siret, {
+    await this.establishmentAggregateRepository.updateEstablishment(siret, {
       updatedAt: this.clock.now(),
       nafDto,
       numberEmployeesRange,

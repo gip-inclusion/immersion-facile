@@ -6,7 +6,7 @@ import {
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
@@ -33,18 +33,19 @@ const validRequest: ContactEstablishmentRequestDto = {
 
 describe("ContactEstablishment", () => {
   let contactEstablishment: ContactEstablishment;
-  let immersionOfferRepository: InMemoryImmersionOfferRepository;
+  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
   let outboxRepository: InMemoryOutboxRepository;
   let uowPerformer: UnitOfWorkPerformer;
   let uuidGenerator: TestUuidGenerator;
   let clock: CustomClock;
 
   beforeEach(() => {
-    immersionOfferRepository = new InMemoryImmersionOfferRepository();
+    establishmentAggregateRepository =
+      new InMemoryEstablishmentAggregateRepository();
     outboxRepository = new InMemoryOutboxRepository();
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
-      immersionOfferRepo: immersionOfferRepository,
+      establishmentAggregateRepo: establishmentAggregateRepository,
       outboxRepo: outboxRepository,
     });
     clock = new CustomClock();
@@ -58,7 +59,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid contact request", async () => {
-    await immersionOfferRepository.insertEstablishmentAggregates([
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())
         .withContact(
@@ -94,7 +95,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid PHONE contact request", async () => {
-    await immersionOfferRepository.insertEstablishmentAggregates([
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())
         .withContact(
@@ -129,7 +130,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid IN_PERSON contact requests", async () => {
-    await immersionOfferRepository.insertEstablishmentAggregates([
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())
         .withContact(
@@ -177,7 +178,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("throws BadRequestError for contact mode mismatch", async () => {
-    await immersionOfferRepository.insertEstablishmentAggregates([
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())
         .withContact(
@@ -199,7 +200,7 @@ describe("ContactEstablishment", () => {
   });
 
   it("throws BadRequestError immersion offer without contact id", async () => {
-    await immersionOfferRepository.insertEstablishmentAggregates([
+    await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(new EstablishmentEntityV2Builder().build())
         .withoutContact() // no contact

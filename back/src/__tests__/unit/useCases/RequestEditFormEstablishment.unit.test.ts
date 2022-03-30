@@ -3,14 +3,14 @@ import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryImmersionOfferRepository } from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import {
   InMemoryEmailGateway,
   TemplatedEmail,
 } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
 import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
@@ -18,17 +18,18 @@ import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helper
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";
 const setMethodGetContactEmailFromSiret = (
-  immersionOfferRepo: ImmersionOfferRepository,
+  establishmentAggregateRepo: EstablishmentAggregateRepository,
 ) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  immersionOfferRepo.getContactEmailFromSiret = async (siret: string) =>
+  establishmentAggregateRepo.getContactEmailFromSiret = async (siret: string) =>
     contactEmail;
 };
 
 const prepareUseCase = () => {
   const outboxRepo = new InMemoryOutboxRepository();
-  const immersionOfferRepo = new InMemoryImmersionOfferRepository();
-  setMethodGetContactEmailFromSiret(immersionOfferRepo); // In most of the tests, we need the contact to be defined
+  const establishmentAggregateRepo =
+    new InMemoryEstablishmentAggregateRepository();
+  setMethodGetContactEmailFromSiret(establishmentAggregateRepo); // In most of the tests, we need the contact to be defined
 
   const clock = new CustomClock();
   const emailGateway = new InMemoryEmailGateway();
@@ -37,7 +38,7 @@ const prepareUseCase = () => {
 
   const uowPerformer = new InMemoryUowPerformer({
     ...createInMemoryUow(),
-    immersionOfferRepo,
+    establishmentAggregateRepo,
     outboxRepo,
   });
 
@@ -51,14 +52,20 @@ const prepareUseCase = () => {
     generateEditFormEstablishmentUrl,
     createNewEvent,
   );
-  return { useCase, outboxRepo, immersionOfferRepo, emailGateway, clock };
+  return {
+    useCase,
+    outboxRepo,
+    establishmentAggregateRepo,
+    emailGateway,
+    clock,
+  };
 };
 
 describe("RequestUpdateFormEstablishment", () => {
   it("Throws an error if contact email is unknown", async () => {
     // Prepare
-    const { useCase, immersionOfferRepo } = prepareUseCase();
-    immersionOfferRepo.getContactEmailFromSiret = async (
+    const { useCase, establishmentAggregateRepo } = prepareUseCase();
+    establishmentAggregateRepo.getContactEmailFromSiret = async (
       siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
     ) => undefined;
 

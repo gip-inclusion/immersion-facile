@@ -1,11 +1,11 @@
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
-  InMemoryImmersionOfferRepository,
+  InMemoryEstablishmentAggregateRepository,
   TEST_CITY,
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
-} from "../../../adapters/secondary/immersionOffer/InMemoryImmersionOfferRepository";
+} from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -32,14 +32,15 @@ const searchInMetzParams = {
 };
 
 const prepareSearchableData = async () => {
-  const immersionOfferRepository = new InMemoryImmersionOfferRepository();
+  const establishmentAggregateRepository =
+    new InMemoryEstablishmentAggregateRepository();
   const searchMadeRepository = new InMemorySearchMadeRepository();
 
   const uuidGenerator = new TestUuidGenerator();
 
   const searchImmersion = new SearchImmersion(
     searchMadeRepository,
-    immersionOfferRepository,
+    establishmentAggregateRepository,
     uuidGenerator,
   );
   const siret = "78000403200019";
@@ -81,7 +82,7 @@ const prepareSearchableData = async () => {
       .withImmersionOffers([boulangerInMetzImmersionOffer])
       .build();
 
-  await immersionOfferRepository.insertEstablishmentAggregates([
+  await establishmentAggregateRepository.insertEstablishmentAggregates([
     establishmentAggregateInMetzForSecretariat,
     establishmentAggregateInMetzForBoulanger,
   ]);
@@ -90,7 +91,7 @@ const prepareSearchableData = async () => {
     searchImmersion,
     immersionOfferId: secretariatInMetzOfferId,
     searchMadeRepository,
-    immersionOfferRepository,
+    establishmentAggregateRepository,
     uuidGenerator,
   };
 };

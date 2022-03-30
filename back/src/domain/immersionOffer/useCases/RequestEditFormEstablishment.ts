@@ -24,9 +24,8 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
   }
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
-    const contactEmail = await uow.immersionOfferRepo.getContactEmailFromSiret(
-      siret,
-    );
+    const contactEmail =
+      await uow.establishmentAggregateRepo.getContactEmailFromSiret(siret);
 
     if (!contactEmail) throw Error("Email du contact introuvable.");
 

@@ -14,7 +14,7 @@ import {
 } from "../../sirene/ports/SireneRepository";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
-import { ImmersionOfferRepository } from "../ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { LaBonneBoiteAPI } from "../ports/LaBonneBoiteAPI";
 import { SearchMadeRepository } from "../ports/SearchMadeRepository";
 import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
@@ -34,7 +34,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly sireneRepository: SireneRepository,
     private readonly searchMadeRepository: SearchMadeRepository,
-    private readonly immersionOfferRepository: ImmersionOfferRepository,
+    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
   ) {}
 
   public async execute() {
@@ -114,7 +114,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
         establishmentAggregates,
       );
 
-      await this.immersionOfferRepository.insertEstablishmentAggregates(
+      await this.establishmentAggregateRepository.insertEstablishmentAggregates(
         dedupedAggregates,
       );
       logger.info(

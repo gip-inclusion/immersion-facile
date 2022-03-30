@@ -7,7 +7,7 @@ import {
 import { AgencyId } from "../../../shared/agencies";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { createLogger } from "../../../utils/logger";
-import { parseGeoJson } from "./PgImmersionOfferRepository";
+import { parseGeoJson } from "./PgEstablishmentAggregateRepository";
 
 const logger = createLogger(__filename);
 

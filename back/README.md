@@ -235,7 +235,7 @@ An [AppConfig](./src/adapters/primary/appConfig.ts) instance must be provided to
    ```ts
    beforeEach(() => {
      const appConfig = AppConfig.createFromEnv();
-     repositoryUnderTest = new PgImmersionOfferRepository(
+     repositoryUnderTest = new PgEstablishmentAggregateRepository(
        new Client({ config.pgImmersionDbUrl })
      );
    });

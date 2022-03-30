@@ -76,7 +76,7 @@ import { makeStubGetFeatureFlags } from "../secondary/makeStubGetFeatureFlags";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
-import { InMemoryImmersionOfferRepository } from "../secondary/immersionOffer/InMemoryImmersionOfferRepository";
+import { InMemoryEstablishmentAggregateRepository } from "../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteAPI } from "../secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteRequestRepository } from "../secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
 import { InMemorySearchMadeRepository } from "../secondary/immersionOffer/InMemorySearchMadeRepository";
@@ -93,7 +93,7 @@ import { PgAgencyRepository } from "../secondary/pg/PgAgencyRepository";
 import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
 import { makePgGetApiConsumerById } from "../secondary/pg/makePgGetApiConsumerById";
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
-import { PgImmersionOfferRepository } from "../secondary/pg/PgImmersionOfferRepository";
+import { PgEstablishmentAggregateRepository } from "../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgLaBonneBoiteRequestRepository } from "../secondary/pg/PgLaBonneBoiteRequestRepository";
 import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
 import { PgRomeRepository } from "../secondary/pg/PgRomeRepository";
@@ -266,13 +266,13 @@ export const createRepositories = async (
 
     immersionOffer:
       config.repositories === "PG"
-        ? new PgImmersionOfferRepository(
+        ? new PgEstablishmentAggregateRepository(
             // Details in https://node-postgres.com/features/pooling
             // Now using connection pool
             // TODO: Still we would need to release the connection
             await getPgPoolFn().connect(),
           )
-        : new InMemoryImmersionOfferRepository(),
+        : new InMemoryEstablishmentAggregateRepository(),
 
     laBonneBoiteRequest:
       config.repositories === "PG"
@@ -365,9 +365,9 @@ export const createInMemoryUow = (repositories?: Repositories) => ({
   formEstablishmentRepo:
     (repositories?.formEstablishment as InMemoryFormEstablishmentRepository) ??
     new InMemoryFormEstablishmentRepository(),
-  immersionOfferRepo:
-    (repositories?.immersionOffer as InMemoryImmersionOfferRepository) ??
-    new InMemoryImmersionOfferRepository(),
+  establishmentAggregateRepo:
+    (repositories?.immersionOffer as InMemoryEstablishmentAggregateRepository) ??
+    new InMemoryEstablishmentAggregateRepository(),
   immersionApplicationRepo:
     (repositories?.immersionApplication as InMemoryImmersionApplicationRepository) ??
     new InMemoryImmersionApplicationRepository(),
@@ -394,7 +394,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   outboxRepo: new PgOutboxRepository(client),
   agencyRepo: new PgAgencyRepository(client),
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
-  immersionOfferRepo: new PgImmersionOfferRepository(client),
+  establishmentAggregateRepo: new PgEstablishmentAggregateRepository(client),
   immersionApplicationRepo: new PgImmersionApplicationRepository(client),
   establishmentExportQueries: new PgEstablishmentExportQueries(client),
   immersionApplicationExportQueries: new PgImmersionApplicationExportQueries(

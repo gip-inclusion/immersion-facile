@@ -14,7 +14,7 @@ import {
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { ImmersionOfferRepository } from "../../../domain/immersionOffer/ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   ImmersionOfferId,
@@ -58,7 +58,9 @@ export const parseGeoJson = (raw: string): LatLonDto => {
   };
 };
 
-export class PgImmersionOfferRepository implements ImmersionOfferRepository {
+export class PgEstablishmentAggregateRepository
+  implements EstablishmentAggregateRepository
+{
   constructor(private client: PoolClient) {}
 
   public async insertEstablishmentAggregates(

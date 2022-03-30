@@ -6,13 +6,13 @@ import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../../immersionApplication/ports/EmailGateway";
-import { ImmersionOfferRepository } from "../../ports/ImmersionOfferRepository";
+import { EstablishmentAggregateRepository } from "../../ports/EstablishmentAggregateRepository";
 
 const logger = createLogger(__filename);
 
 export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto> {
   constructor(
-    private readonly immersionOfferRepository: ImmersionOfferRepository,
+    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
   ) {
@@ -26,14 +26,14 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
     const { immersionOfferId } = payload;
 
     const annotatedImmersionOffer =
-      await this.immersionOfferRepository.getAnnotatedImmersionOfferById(
+      await this.establishmentAggregateRepository.getAnnotatedImmersionOfferById(
         immersionOfferId,
       );
     if (!annotatedImmersionOffer)
       throw new Error(`Not found: immersionOfferId=${immersionOfferId}`);
 
     const contact =
-      await this.immersionOfferRepository.getContactByImmersionOfferId(
+      await this.establishmentAggregateRepository.getContactByImmersionOfferId(
         immersionOfferId,
       );
     if (!contact)
@@ -42,7 +42,7 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
       );
 
     const annotatedEstablishment =
-      await this.immersionOfferRepository.getAnnotatedEstablishmentByImmersionOfferId(
+      await this.establishmentAggregateRepository.getAnnotatedEstablishmentByImmersionOfferId(
         immersionOfferId,
       );
     if (!annotatedEstablishment)
