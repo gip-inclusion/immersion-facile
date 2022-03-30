@@ -6,6 +6,7 @@ export type EstablishmentRawProps = {
   customizedName: string;
   address: string;
   nafCode: string;
+  numberEmployees: number;
   createdAt: string;
   isCommited: boolean;
   professions: string;
@@ -13,20 +14,14 @@ export type EstablishmentRawProps = {
 };
 
 export type EstablishmentRawBeforeExportProps = EstablishmentRawProps & {
+  postalCode: string;
+  city: string;
   region: string;
   department: string;
 };
 
-export type EstablishmentWithGeoRawBeforeExportProps =
-  EstablishmentRawBeforeExportProps & {
-    region: string;
-    department: string;
-  };
-
 export class EstablishmentRawBeforeExportVO {
-  constructor(
-    public readonly _props: EstablishmentWithGeoRawBeforeExportProps,
-  ) {}
+  constructor(public readonly _props: EstablishmentRawBeforeExportProps) {}
 
   public toEstablishmentReadyForExportVO =
     (): EstablishmentReadyForExportVO => ({
@@ -34,6 +29,7 @@ export class EstablishmentRawBeforeExportVO {
       preferredContactMethods:
         translateContactMethod[this._props.preferredContactMethods],
       isCommited: translateBoolean(this._props.isCommited),
+      numberEmployees: translateNumberEmployes(this._props.numberEmployees),
     });
 }
 
@@ -45,3 +41,6 @@ const translateContactMethod: Record<string, string> = {
   mail: "Email",
   in_person: "En personne",
 };
+
+const translateNumberEmployes = (value: number): string =>
+  value >= 0 ? value.toString() : "Non déclaré";

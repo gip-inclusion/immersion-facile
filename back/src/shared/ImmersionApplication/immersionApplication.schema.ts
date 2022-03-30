@@ -27,7 +27,7 @@ import {
 import { LegacyScheduleDto, ScheduleDto } from "../ScheduleSchema";
 import { dateRegExp } from "../utils/date";
 import { allRoles } from "../tokens/MagicLinkPayload";
-import { addressWithPostalCodeSchema } from "../postalCode";
+import { addressWithPostalCodeSchema } from "../utils/postalCode";
 
 export const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
   zTrimmedString;

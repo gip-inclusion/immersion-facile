@@ -119,7 +119,7 @@ import { EstablishmentExportQueries } from "../../domain/establishment/ports/Est
 import { PgPostalCodeDepartmentRegionQueries } from "../secondary/pg/PgPostalCodeDepartmentRegionQueries";
 import { PostalCodeDepartmentRegionQueries } from "../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { StubPostalCodeDepartmentRegionQueries } from "../secondary/StubPostalCodeDepartmentRegionQueries";
-import { ExportEstablishmentAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentAsExcelArchive";
+import { ExportEstablishmentsAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import { EditFormEstablishment } from "../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { InMemoryPeConnectGateway } from "../secondary/InMemoryPeConnectGateway";
@@ -483,7 +483,7 @@ const createUseCases = (
     exportImmersionApplicationsAsExcelArchive:
       new ExportImmersionApplicationsAsExcelArchive(uowPerformer),
 
-    exportEstablishmentsAsExcelArchive: new ExportEstablishmentAsExcelArchive(
+    exportEstablishmentsAsExcelArchive: new ExportEstablishmentsAsExcelArchive(
       uowPerformer,
     ),
 

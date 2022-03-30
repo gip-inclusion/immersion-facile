@@ -21,23 +21,16 @@ import {
 } from "../../shared/routes";
 import { EstablishmentExportConfigDto } from "../../shared/establishmentExport/establishmentExport.dto";
 import { keys } from "ramda";
+import { queryParamsAsString } from "../../shared/utils/queryParams";
 
 interface AdminProps {
   route: Route<typeof routes.admin> | Route<typeof routes.agencyAdmin>;
 }
 
-const buildExportEstablishmentRoute = (
-  params: EstablishmentExportConfigDto,
-) => {
-  const queryParams = keys(params)
-    .reduce<string[]>((acc, key) => {
-      const value = params[key];
-      return [...acc, `${key}=${value}`];
-    }, [])
-    .join("&");
-
-  return `/api/${exportEstablismentsExcelRoute}?${queryParams}`;
-};
+const buildExportEstablishmentRoute = (params: EstablishmentExportConfigDto) =>
+  `/api/${exportEstablismentsExcelRoute}?${queryParamsAsString<EstablishmentExportConfigDto>(
+    params,
+  )}`;
 
 export const Admin = ({ route }: AdminProps) => {
   const featureFlags = useFeatureFlagsContext();
@@ -88,11 +81,12 @@ export const Admin = ({ route }: AdminProps) => {
               href={buildExportEstablishmentRoute({
                 aggregateProfession: true,
                 groupKey: "region",
+                sourceProvider: "all",
               })}
               target="_blank"
             >
-              Exporter les entreprises référencées par région avec aggrégation
-              des métiers
+              Exporter toutes les entreprises référencées par région avec
+              aggrégation des métiers
             </a>
             <br />
             <a
@@ -100,10 +94,11 @@ export const Admin = ({ route }: AdminProps) => {
               href={buildExportEstablishmentRoute({
                 aggregateProfession: true,
                 groupKey: "department",
+                sourceProvider: "all",
               })}
               target="_blank"
             >
-              Exporter les entreprises référencées par département avec
+              Exporter toutes les entreprises référencées par département avec
               aggrégation des métiers
             </a>
             <br />
@@ -112,11 +107,12 @@ export const Admin = ({ route }: AdminProps) => {
               href={buildExportEstablishmentRoute({
                 aggregateProfession: false,
                 groupKey: "region",
+                sourceProvider: "all",
               })}
               target="_blank"
             >
-              Exporter les entreprises référencées par région sans aggrégation
-              des métiers
+              Exporter toutes les entreprises référencées par région sans
+              aggrégation des métiers
             </a>
             <br />
             <a
@@ -124,11 +120,37 @@ export const Admin = ({ route }: AdminProps) => {
               href={buildExportEstablishmentRoute({
                 aggregateProfession: false,
                 groupKey: "department",
+                sourceProvider: "all",
               })}
               target="_blank"
             >
-              Exporter les entreprises référencées par département sans
+              Exporter toutes les entreprises référencées par département sans
               aggrégation des métiers
+            </a>
+            <br />
+            <a
+              className="fr-link"
+              href={buildExportEstablishmentRoute({
+                aggregateProfession: true,
+                groupKey: "region",
+                sourceProvider: "cci",
+              })}
+              target="_blank"
+            >
+              Exporter les entreprises référencées par la cci (region) avec
+              aggrégation des métiers
+            </a>
+            <a
+              className="fr-link"
+              href={buildExportEstablishmentRoute({
+                aggregateProfession: true,
+                groupKey: "region",
+                sourceProvider: "unJeuneUneSolution",
+              })}
+              target="_blank"
+            >
+              Exporter les entreprises référencées par unJeuneUneSolution
+              (region) avec aggrégation des métiers
             </a>
           </div>
 

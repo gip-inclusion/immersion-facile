@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { nafSchema } from "../naf";
-import { addressWithPostalCodeSchema } from "../postalCode";
+import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret";
 import { NotEmptyArray, phoneRegExp } from "../utils";

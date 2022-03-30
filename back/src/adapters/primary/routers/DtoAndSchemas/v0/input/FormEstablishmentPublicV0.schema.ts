@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { nafSchema } from "../../../../../../shared/naf";
-import { addressWithPostalCodeSchema } from "../../../../../../shared/postalCode";
+import { addressWithPostalCodeSchema } from "../../../../../../shared/utils/postalCode";
 import {
   appellationSchema,
   romeCodeSchema,

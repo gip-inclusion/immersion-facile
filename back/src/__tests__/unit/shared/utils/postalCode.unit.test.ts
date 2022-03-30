@@ -1,6 +1,6 @@
-import { addressWithPostalCodeSchema } from "../../shared/postalCode";
+import { addressWithPostalCodeSchema } from "../../../../shared/utils/postalCode";
 
-describe("utils", () => {
+describe("postalCode", () => {
   describe("addressWithPostalCodeSchema", () => {
     it("accepts valid postal codes", () => {
       expect(() =>

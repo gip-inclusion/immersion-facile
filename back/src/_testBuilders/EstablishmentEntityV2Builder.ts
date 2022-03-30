@@ -5,6 +5,7 @@ import {
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { NafDto } from "../shared/naf";
 import { Builder } from "./Builder";
+import { FormSourceProvider } from "../shared/establishmentExport/establishmentExport.dto";
 
 export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   siret: "78000403200019",
@@ -68,6 +69,13 @@ export class EstablishmentEntityV2Builder
     return new EstablishmentEntityV2Builder({
       ...this.entity,
       isActive: false,
+    });
+  }
+
+  withSourceProvider(sourceProvider: FormSourceProvider) {
+    return new EstablishmentEntityV2Builder({
+      ...this.entity,
+      sourceProvider,
     });
   }
 

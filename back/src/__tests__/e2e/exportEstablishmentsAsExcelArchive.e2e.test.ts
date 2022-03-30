@@ -14,16 +14,16 @@ describe("/export-establishments", () => {
 
     const result = await request
       .get(
-        `/${exportEstablismentsExcelRoute}?groupKey=region&aggregateProfession=true`,
+        `/${exportEstablismentsExcelRoute}?groupKey=region&aggregateProfession=true&sourceProvider=all`,
       )
       .auth("e2e_tests", "e2e");
 
-    expect(result.status).toBe(200);
     expect(result.headers).toMatchObject({
       "content-disposition":
-        'attachment; filename="exportEstablishmentsByRegionAggregatedProfessions.zip"',
+        'attachment; filename="exportAllEstablishmentsByRegionAggregatedProfessions.zip"',
       "content-type": "application/zip",
     });
+    expect(result.status).toBe(200);
 
     expect(fse.readdirSync(temporaryStoragePath())).toHaveLength(0);
   });
@@ -32,16 +32,16 @@ describe("/export-establishments", () => {
 
     const result = await request
       .get(
-        `/${exportEstablismentsExcelRoute}?groupKey=department&aggregateProfession=false`,
+        `/${exportEstablismentsExcelRoute}?groupKey=department&aggregateProfession=false&sourceProvider=all`,
       )
       .auth("e2e_tests", "e2e");
 
-    expect(result.status).toBe(200);
     expect(result.headers).toMatchObject({
       "content-disposition":
-        'attachment; filename="exportEstablishmentsByDepartment.zip"',
+        'attachment; filename="exportAllEstablishmentsByDepartment.zip"',
       "content-type": "application/zip",
     });
+    expect(result.status).toBe(200);
 
     expect(fse.readdirSync(temporaryStoragePath())).toHaveLength(0);
   });
@@ -50,14 +50,32 @@ describe("/export-establishments", () => {
 
     const result = await request
       .get(
-        `/${exportEstablismentsExcelRoute}?groupBy=lol&aggregateProfession=poney`,
+        `/${exportEstablismentsExcelRoute}?groupBy=lol&aggregateProfession=poney&sourceProvider=cma`,
       )
       .auth("e2e_tests", "e2e");
 
     expect(result.status).toBe(200);
     expect(result.headers).toMatchObject({
       "content-disposition":
-        'attachment; filename="exportEstablishmentsByDepartment.zip"',
+        'attachment; filename="exportCmaEstablishmentsByDepartment.zip"',
+      "content-type": "application/zip",
+    });
+
+    expect(fse.readdirSync(temporaryStoragePath())).toHaveLength(0);
+  });
+  it("source provider is cci", async () => {
+    const { request } = await buildTestApp();
+
+    const result = await request
+      .get(
+        `/${exportEstablismentsExcelRoute}?groupKey=region&aggregateProfession=true&sourceProvider=cci`,
+      )
+      .auth("e2e_tests", "e2e");
+
+    expect(result.status).toBe(200);
+    expect(result.headers).toMatchObject({
+      "content-disposition":
+        'attachment; filename="exportCciEstablishmentsByRegionAggregatedProfessions.zip"',
       "content-type": "application/zip",
     });
 

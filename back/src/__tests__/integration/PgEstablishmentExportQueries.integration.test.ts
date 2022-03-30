@@ -34,8 +34,94 @@ describe("PgEstablishmentExportQueries", () => {
     await pool.end();
   });
 
-  describe("Get for export", () => {
-    it("Retrieves all establishments exports where source = form", async () => {
+  describe("Get establishments for export", () => {
+    it("Retrieves all establishments exports where data_source = form", async () => {
+      await establishmentAggregateRepository.insertEstablishmentAggregates([
+        establishmentAggregateArtusInterim(),
+        establishmentAggregateMiniWorldLyon(),
+      ]);
+
+      const establishmentsExportRaw =
+        await establismentExportQueries.getAllEstablishmentsForExport();
+
+      expect(establishmentsExportRaw).toHaveLength(6);
+      expect(establishmentsExportRaw).toStrictEqual(
+        expect.arrayContaining([
+          {
+            address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
+            createdAt: format(new Date(), "dd/MM/yyyy"),
+            customizedName: undefined,
+            isCommited: true,
+            nafCode: "7820Z",
+            name: "ARTUS INTERIM LA ROCHE SUR YON",
+            preferredContactMethods: "phone",
+            professions: "M1502 - Chargé / Chargée de recrutement",
+            siret: "79158476600012",
+          },
+          {
+            address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
+            createdAt: format(new Date(), "dd/MM/yyyy"),
+            customizedName: undefined,
+            isCommited: true,
+            nafCode: "7820Z",
+            name: "ARTUS INTERIM LA ROCHE SUR YON",
+            preferredContactMethods: "phone",
+            professions: "A1205 - Ouvrier sylviculteur / Ouvrière sylvicutrice",
+            siret: "79158476600012",
+          },
+          {
+            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+            createdAt: format(new Date(), "dd/MM/yyyy"),
+            customizedName: undefined,
+            isCommited: false,
+            nafCode: "9321Z",
+            name: "MINI WORLD LYON",
+            preferredContactMethods: "mail",
+            professions:
+              "I1304 - Technicien(ne) de maintenance industrielle polyvalente",
+            siret: "79341726200037",
+          },
+          {
+            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+            createdAt: format(new Date(), "dd/MM/yyyy"),
+            customizedName: undefined,
+            isCommited: false,
+            nafCode: "9321Z",
+            name: "MINI WORLD LYON",
+            preferredContactMethods: "mail",
+            professions:
+              "G1205 - Agent / Agente d'exploitation des attractions",
+            siret: "79341726200037",
+          },
+          {
+            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+            createdAt: format(new Date(), "dd/MM/yyyy"),
+            customizedName: undefined,
+            isCommited: false,
+            nafCode: "9321Z",
+            name: "MINI WORLD LYON",
+            preferredContactMethods: "mail",
+            professions:
+              "G1205 - Agent / Agente d'exploitation des attractions",
+            siret: "79341726200037",
+          },
+          {
+            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+            createdAt: format(new Date(), "dd/MM/yyyy"),
+            customizedName: undefined,
+            isCommited: false,
+            nafCode: "9321Z",
+            name: "MINI WORLD LYON",
+            preferredContactMethods: "mail",
+            professions:
+              "I1304 - Technicien(ne) maintenance d'équipnts de parcs d'attractions",
+            siret: "79341726200037",
+          },
+        ]),
+      );
+    }, 10_000);
+
+    it("Retrieves establishments with 'cci' sourceProvider exports where data_source = form", async () => {
       await establishmentAggregateRepository.insertEstablishmentAggregates([
         establishmentAggregateArtusInterim(),
         establishmentAggregateMiniWorldLyon(),
@@ -129,6 +215,7 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
     .withAddress("9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON")
     .withName("ARTUS INTERIM LA ROCHE SUR YON")
     .withDataSource("form")
+    .withSourceProvider("form")
     .withNafDto({ code: "7820Z", nomenclature: "NAFRev2" })
     .withIsCommited(true)
     .build(),

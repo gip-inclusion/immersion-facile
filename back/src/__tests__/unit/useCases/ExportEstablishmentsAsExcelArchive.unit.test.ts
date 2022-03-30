@@ -3,7 +3,8 @@ import {
   addZonesDelimiters,
   aggregateProfessionsIfNeeded,
   EstablishmentExportConfig,
-} from "../../../domain/establishment/useCases/ExportEstablishmentAsExcelArchive";
+  getEstablishmentsForExport,
+} from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import {
   EstablishmentRawBeforeExportProps,
   EstablishmentRawProps,
@@ -11,10 +12,11 @@ import {
 import { DepartmentAndRegion } from "../../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { StubEstablishmentExportQueries } from "../../../adapters/secondary/StubEstablishmentExportQueries";
 import { format } from "date-fns";
+import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
 
-describe("ExportEstablishmentByZoneAsExcelArchive", () => {
-  describe("establishmentsExportByZoneColumnsOptions", () => {
-    it("establishmentsExportByZoneColumnsOptions should not have department columns in group by department config", () => {
+describe("ExportEstablishmentsAsExcelArchive", () => {
+  describe("establishmentsExportColumnsOptions", () => {
+    it("establishmentsExportColumnsOptions should not have department columns in group by department config", () => {
       expect(
         establishmentsExportByZoneColumnsOptions("department"),
       ).not.toEqual(
@@ -33,8 +35,10 @@ describe("ExportEstablishmentByZoneAsExcelArchive", () => {
 
       const expected = {
         address: wrongPostal,
-        region: "invalid-postal-code-format",
-        department: "invalid-postal-code-format",
+        postalCode: "invalid-address-format",
+        city: "invalid-address-format",
+        region: "invalid-address-format",
+        department: "invalid-address-format",
       } as EstablishmentRawBeforeExportProps;
 
       expect(
@@ -47,7 +51,7 @@ describe("ExportEstablishmentByZoneAsExcelArchive", () => {
 
     it("returns postal-code-not-in-dataset if postal code was not found in postal code department region dataset", () => {
       const wrongPostal =
-        "Address with a postal code that does not exist 99999";
+        "Valid address structure with a postal code that does not exist 99999 City Group";
 
       const postalCodeDepartmentRegionDataset: Record<
         string[5],
@@ -60,7 +64,10 @@ describe("ExportEstablishmentByZoneAsExcelArchive", () => {
       };
 
       const expected = {
-        address: wrongPostal,
+        address:
+          "Valid address structure with a postal code that does not exist",
+        city: "City Group",
+        postalCode: "99999",
         region: "postal-code-not-in-dataset",
         department: "postal-code-not-in-dataset",
       } as EstablishmentRawBeforeExportProps;
@@ -79,7 +86,9 @@ describe("ExportEstablishmentByZoneAsExcelArchive", () => {
       } as EstablishmentRawProps;
 
       const expected = {
-        address: "51 rue Courtejaire 11000 Carcassonne",
+        address: "51 rue Courtejaire",
+        postalCode: "11000",
+        city: "Carcassonne",
         region: "Occitanie",
         department: "Aude",
       } as EstablishmentRawBeforeExportProps;
@@ -122,6 +131,7 @@ describe("ExportEstablishmentByZoneAsExcelArchive", () => {
           customizedName: "Custom name",
           isCommited: true,
           nafCode: "7820Z",
+          numberEmployees: 300,
           name: "ARTUS INTERIM LA ROCHE SUR YON",
           preferredContactMethods: "phone",
           professions:
@@ -134,6 +144,7 @@ describe("ExportEstablishmentByZoneAsExcelArchive", () => {
           customizedName: "Custom name",
           isCommited: false,
           nafCode: "9321Z",
+          numberEmployees: 200,
           name: "MINI WORLD LYON",
           preferredContactMethods: "mail",
           professions:
@@ -145,6 +156,37 @@ describe("ExportEstablishmentByZoneAsExcelArchive", () => {
       expect(
         aggregateProfessionsIfNeeded(config, rawEstablishments),
       ).toStrictEqual(expected);
+    });
+  });
+
+  describe("getEstablishmentsForExport", () => {
+    const unitOfWorkMock = {
+      establishmentExportQueries: {
+        getAllEstablishmentsForExport: () =>
+          "getAllEstablishmentsForExport called",
+        getEstablishmentsBySourceProviderForExport: (sourceProvider: string) =>
+          sourceProvider,
+      },
+    } as unknown as UnitOfWork;
+
+    it("should retreive all establishment if sourceProvider is 'all'", () => {
+      const configMock = {
+        sourceProvider: "all",
+      } as EstablishmentExportConfig;
+
+      expect(getEstablishmentsForExport(configMock, unitOfWorkMock)).toBe(
+        "getAllEstablishmentsForExport called",
+      );
+    });
+
+    it("should retreive cci establishments if sourceProvider is 'cci'", () => {
+      const configMock = {
+        sourceProvider: "cci",
+      } as EstablishmentExportConfig;
+
+      expect(getEstablishmentsForExport(configMock, unitOfWorkMock)).toBe(
+        "cci",
+      );
     });
   });
 });

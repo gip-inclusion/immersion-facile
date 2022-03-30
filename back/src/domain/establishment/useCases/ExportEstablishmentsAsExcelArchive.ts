@@ -14,22 +14,22 @@ import {
 } from "../valueObjects/EstablishmentRawBeforeExportVO";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { DepartmentAndRegion } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
-import {
-  capturePostalCode,
-  CapturePostalCodeResult,
-} from "../../../shared/postalCode";
 import { establishmentExportSchemaObj } from "../../../shared/establishmentExport/establishmentExport.schema";
 import {
   DepartmentOrRegion,
   EstablishmentExportConfigDto,
 } from "../../../shared/establishmentExport/establishmentExport.dto";
 import { z } from "zod";
+import {
+  captureAddressGroups,
+  CaptureAddressGroupsResult,
+} from "../../../shared/utils/address";
 
 export type EstablishmentExportConfig = EstablishmentExportConfigDto & {
   archivePath: string;
 };
 
-export class ExportEstablishmentAsExcelArchive extends TransactionalUseCase<EstablishmentExportConfig> {
+export class ExportEstablishmentsAsExcelArchive extends TransactionalUseCase<EstablishmentExportConfig> {
   inputSchema = z.object({
     ...establishmentExportSchemaObj,
     archivePath: z.string(),
@@ -47,7 +47,7 @@ export class ExportEstablishmentAsExcelArchive extends TransactionalUseCase<Esta
       establishmentsWithoutGeoRawBeforeExport,
       postalCodeDepartmentRegion,
     ] = await Promise.all([
-      uow.establishmentExportQueries.getAllEstablishmentsForExport(),
+      getEstablishmentsForExport(config, uow),
       uow.postalCodeDepartmentRegionQueries.getAllRegionAndDepartmentByPostalCode(),
     ]);
 
@@ -99,6 +99,16 @@ export const aggregateProfessionsIfNeeded = (
     ? reduceByProfessions(establishmentsWithoutGeoRawBeforeExport)
     : establishmentsWithoutGeoRawBeforeExport;
 
+export const getEstablishmentsForExport = (
+  config: EstablishmentExportConfigDto & { archivePath: string },
+  uow: UnitOfWork,
+) =>
+  config.sourceProvider === "all"
+    ? uow.establishmentExportQueries.getAllEstablishmentsForExport()
+    : uow.establishmentExportQueries.getEstablishmentsBySourceProviderForExport(
+        config.sourceProvider,
+      );
+
 export const establishmentsExportByZoneColumnsOptions = (
   groupBy: DepartmentOrRegion,
 ): Partial<Column>[] => {
@@ -121,7 +131,17 @@ export const establishmentsExportByZoneColumnsOptions = (
     {
       header: "Adresse",
       key: "address",
-      width: 40,
+      width: 20,
+    },
+    {
+      header: "Code Postal",
+      key: "address",
+      width: 15,
+    },
+    {
+      header: "Ville",
+      key: "address",
+      width: 15,
     },
     {
       header: "Département",
@@ -131,6 +151,11 @@ export const establishmentsExportByZoneColumnsOptions = (
     {
       header: "NAF",
       key: "nafCode",
+      width: 15,
+    },
+    {
+      header: "Nombre d'employés",
+      key: "numberEmployees",
       width: 15,
     },
     {
@@ -232,20 +257,25 @@ export const addZonesDelimiters = (
   establishment: EstablishmentRawProps,
   postalCodeDepartmentRegion: Record<string, DepartmentAndRegion>,
 ): EstablishmentRawBeforeExportProps => {
-  const capture: CapturePostalCodeResult = capturePostalCode(
+  const capture: CaptureAddressGroupsResult = captureAddressGroups(
     establishment.address,
   );
 
-  if (!capture.hasPostalCode) {
+  if (!capture.validAddress) {
     return {
       ...establishment,
-      region: "invalid-postal-code-format",
-      department: "invalid-postal-code-format",
+      postalCode: "invalid-address-format",
+      city: "invalid-address-format",
+      region: "invalid-address-format",
+      department: "invalid-address-format",
     };
   }
 
   return {
     ...establishment,
+    address: capture.address,
+    postalCode: capture.postalCode,
+    city: capture.city,
     region:
       postalCodeDepartmentRegion[capture.postalCode]?.region ??
       "postal-code-not-in-dataset",
