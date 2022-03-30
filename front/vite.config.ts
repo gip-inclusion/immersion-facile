@@ -18,6 +18,9 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: ['react/jsx-runtime'],
+  },
   server: {
     proxy: {
       "/api": {
