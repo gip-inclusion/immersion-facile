@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
-import { DistanceIcon } from "src/assets/DistanceIcon";
+import { DistanceIcon } from "src/icons/DistanceIcon";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { TrefleIcon } from "src/assets/TrefleIcon";
+import { TrefleIcon } from "src/icons/TrefleIcon";
 import { SearchButton } from "src/components/SearchButton";
 import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";

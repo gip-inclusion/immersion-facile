@@ -1,5 +1,5 @@
 import React from "react";
-import poleEmploiLogo from "src/assets/pole-emploi-logo.png";
+import poleEmploiLogo from "/pole-emploi-logo.png";
 
 export const MinistereLogo = () => (
   <div className="fr-header__brand-top">

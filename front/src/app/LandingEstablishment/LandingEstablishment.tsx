@@ -1,8 +1,8 @@
 import React from "react";
 import { routes } from "src/app/routes";
-import bubbles from "src/assets/bulles.svg";
-import greatings from "src/assets/greatings.png";
-import tandem from "src/assets/tandem.png";
+import bubbles from "/bulles.svg";
+import greatings from "/greatings.png";
+import tandem from "/tandem.png";
 import { BulletPoint } from "src/components/BulletPoint";
 import { Card } from "src/components/Card";
 import { Colored } from "src/components/Colored";

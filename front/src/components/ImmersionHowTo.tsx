@@ -1,6 +1,6 @@
 import React from "react";
-import establishmentVideoImage from "src/assets/establishment_video_image.png";
-import homeVideoImage from "src/assets/home_video_image.jpg";
+import establishmentVideoImage from "/establishment_video_image.png";
+import homeVideoImage from "/home_video_image.jpg";
 import { BulletPoint } from "./BulletPoint";
 import { Colored } from "./Colored";
 import { SubTitle, Title } from "./Title";
