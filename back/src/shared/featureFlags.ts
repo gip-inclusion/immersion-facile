@@ -1,5 +1,5 @@
 export type FeatureFlags = {
   enableAdminUi: boolean;
-  enableByPassInseeApi: boolean;
+  enableInseeApi: boolean;
   enablePeConnectApi: boolean;
 };

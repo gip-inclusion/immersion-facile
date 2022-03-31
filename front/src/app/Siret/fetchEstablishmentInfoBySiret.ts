@@ -72,7 +72,7 @@ export const useSiretFetcher = (options: SiretFetcherOptions) => {
       }
 
       // Does siret exist in Sirene API ?
-      if (featureFlags.enableByPassInseeApi) {
+      if (!featureFlags.enableInseeApi) {
         setIsFetchingSiret(false);
         return;
       }

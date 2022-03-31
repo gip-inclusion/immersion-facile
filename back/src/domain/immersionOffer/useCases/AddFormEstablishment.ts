@@ -27,7 +27,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
   ): Promise<SiretDto> {
     const featureFlags = await uow.getFeatureFlags();
 
-    if (!featureFlags.enableByPassInseeApi) {
+    if (featureFlags.enableInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
     }
 
@@ -36,7 +36,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
     const event = this.createNewEvent({
       topic: "FormEstablishmentAdded",
       payload: dto,
-      ...(featureFlags.enableByPassInseeApi ? { wasQuarantined: true } : {}),
+      ...(featureFlags.enableInseeApi ? {} : { wasQuarantined: true }),
     });
 
     await uow.outboxRepo.save(event);

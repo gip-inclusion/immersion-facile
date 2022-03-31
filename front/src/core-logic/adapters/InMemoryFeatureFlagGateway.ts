@@ -4,7 +4,7 @@ import { FeatureFlags } from "src/shared/featureFlags";
 export class InMemoryFeatureFlagGateway implements FeatureFlagsGateway {
   private _featureFlags: FeatureFlags = {
     enableAdminUi: true,
-    enableByPassInseeApi: false,
+    enableInseeApi: true,
     enablePeConnectApi: true,
   };
 

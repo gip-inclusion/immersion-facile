@@ -43,7 +43,7 @@ describe("Update immersionApplication", () => {
     });
     getFeatureFlags = makeStubGetFeatureFlags({
       enableAdminUi: false,
-      enableByPassInseeApi: false,
+      enableInseeApi: true,
     });
 
     uowPerformer = new InMemoryUowPerformer({

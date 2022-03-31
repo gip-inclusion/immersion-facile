@@ -30,7 +30,7 @@ describe("Add FormEstablishment", () => {
     outboxRepo = new InMemoryOutboxRepository();
     getFeatureFlags = makeStubGetFeatureFlags({
       enableAdminUi: false,
-      enableByPassInseeApi: false,
+      enableInseeApi: true,
     });
 
     uowPerformer = new InMemoryUowPerformer({
@@ -93,11 +93,11 @@ describe("Add FormEstablishment", () => {
   describe("SIRET validation", () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
 
-    describe("when feature flag to skip siret validation is on", () => {
+    describe("when feature flag to do siret validation is OFF", () => {
       it("accepts formEstablishment with SIRETs that don't correspond to active businesses and quarantines events", async () => {
         const getFeatureFlagsWithInseeByPass = makeStubGetFeatureFlags({
           enableAdminUi: false,
-          enableByPassInseeApi: true,
+          enableInseeApi: false,
         });
         uowPerformer.setUow({
           getFeatureFlags: getFeatureFlagsWithInseeByPass,

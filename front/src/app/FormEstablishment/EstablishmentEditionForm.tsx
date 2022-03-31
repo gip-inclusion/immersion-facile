@@ -73,7 +73,7 @@ const EditionSiretRelatedInputs = ({
 
       <TextInput
         {...getMandatoryLabelAndName("businessName")}
-        disabled={!featureFlags.enableByPassInseeApi}
+        disabled={featureFlags.enableInseeApi}
       />
       <TextInput {...getLabelAndName("businessNameCustomized")} />
       <AddressAutocomplete

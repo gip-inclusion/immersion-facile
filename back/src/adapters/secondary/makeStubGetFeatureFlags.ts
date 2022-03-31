@@ -3,7 +3,7 @@ import { FeatureFlags } from "../../shared/featureFlags";
 
 const defaultFlags: FeatureFlags = {
   enableAdminUi: true,
-  enableByPassInseeApi: false,
+  enableInseeApi: true,
   enablePeConnectApi: false,
 };
 

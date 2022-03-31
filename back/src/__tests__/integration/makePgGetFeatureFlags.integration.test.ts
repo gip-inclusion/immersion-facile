@@ -25,7 +25,7 @@ describe("PG getFeatureFlags", () => {
 
   it("gets all the Feature Flags of the app", async () => {
     const expectedFeatureFlags: FeatureFlags = {
-      enableByPassInseeApi: false,
+      enableInseeApi: true,
       enableAdminUi: true,
       enablePeConnectApi: true,
     };
@@ -35,7 +35,7 @@ describe("PG getFeatureFlags", () => {
     const featureFlags = await getFeatureFlags();
 
     expectTypeToMatchAndEqual(featureFlags, {
-      enableByPassInseeApi: false,
+      enableInseeApi: true,
       enableAdminUi: true,
       enablePeConnectApi: true,
     });

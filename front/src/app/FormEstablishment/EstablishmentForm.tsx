@@ -1,12 +1,11 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
+import { AppellationList } from "src/app/FormEstablishment/AppellationList";
 import { BusinessContact } from "src/app/FormEstablishment/BusinessContact";
 import {
   fieldsToLabel,
   FieldsWithLabel,
 } from "src/app/FormEstablishment/fieldsToLabels";
-import { AppellationList } from "src/app/FormEstablishment/AppellationList";
-import { RadioGroupForField } from "src/app/RadioGroup";
 import { BoolCheckboxGroup } from "src/components/form/CheckboxGroup";
 import { ErrorMessage } from "src/components/form/ErrorMessage";
 import { SuccessMessage } from "src/components/form/SuccessMessage";

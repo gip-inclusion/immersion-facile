@@ -39,7 +39,7 @@ describe("Add immersionApplication", () => {
   beforeEach(() => {
     getFeatureFlags = makeStubGetFeatureFlags({
       enableAdminUi: false,
-      enableByPassInseeApi: false,
+      enableInseeApi: true,
     });
     applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
@@ -137,11 +137,11 @@ describe("Add immersionApplication", () => {
   });
 
   describe("SIRET validation", () => {
-    describe("if feature flag to skip siret validation is ON", () => {
+    describe("if feature flag to do siret validation is OFF", () => {
       it("accepts applications with SIRETs that don't correspond to active businesses", async () => {
         const getFeatureFlagsWithInseeByPass = makeStubGetFeatureFlags({
           enableAdminUi: false,
-          enableByPassInseeApi: true,
+          enableInseeApi: false,
         });
         uowPerformer.setUow({
           getFeatureFlags: getFeatureFlagsWithInseeByPass,

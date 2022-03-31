@@ -47,7 +47,7 @@ export class AddImmersionApplication extends TransactionalUseCase<
     );
 
     const featureFlags = await uow.getFeatureFlags();
-    if (!featureFlags.enableByPassInseeApi) {
+    if (featureFlags.enableInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(
         this.getSiret,
         immersionApplicationDto.siret,
