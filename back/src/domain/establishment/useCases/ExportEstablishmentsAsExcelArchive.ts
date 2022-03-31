@@ -95,7 +95,7 @@ export const aggregateProfessionsIfNeeded = (
   config: EstablishmentExportConfigDto,
   establishmentsWithoutGeoRawBeforeExport: EstablishmentRawProps[],
 ) =>
-  config.aggregateProfession
+  config.aggregateProfession === "true"
     ? reduceByProfessions(establishmentsWithoutGeoRawBeforeExport)
     : establishmentsWithoutGeoRawBeforeExport;
 

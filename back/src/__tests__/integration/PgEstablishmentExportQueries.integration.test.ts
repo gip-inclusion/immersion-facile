@@ -215,7 +215,7 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
     .withAddress("9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON")
     .withName("ARTUS INTERIM LA ROCHE SUR YON")
     .withDataSource("form")
-    .withSourceProvider("form")
+    .withSourceProvider("immersion-facile")
     .withNafDto({ code: "7820Z", nomenclature: "NAFRev2" })
     .withIsCommited(true)
     .build(),
@@ -247,6 +247,7 @@ const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
     .withAddress("2 RUE JACQUARD 69120 VAULX-EN-VELIN")
     .withName("MINI WORLD LYON")
     .withDataSource("form")
+    .withSourceProvider("cci")
     .withNafDto({ code: "9321Z", nomenclature: "NAFRev2" })
     .withIsCommited(false)
     .build(),

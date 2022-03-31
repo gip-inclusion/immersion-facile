@@ -3,7 +3,7 @@ import { EstablishmentExportConfigDto } from "./establishmentExport.dto";
 
 export const establishmentExportSchemaObj = {
   groupKey: z.enum(["region", "department"]),
-  aggregateProfession: z.boolean(),
+  aggregateProfession: z.enum(["true", "false"]),
   sourceProvider: z.enum([
     "all",
     "immersion-facile",

@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate";
-
-export const shorthands: ColumnDefinitions | undefined = undefined;
+import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.addColumn("source_provider", {
-    source: {
+  pgm.addColumn("establishments", {
+    source_provider: {
       type: "varchar(255)",
     },
   });
@@ -31,10 +29,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     UPDATE establishments
     SET source_provider = 'immersion-facile' 
        FROM imf_from_form
-    WHERE establishments.siret = immersion-facile_from_form.siret;
+    WHERE establishments.siret = imf_from_form.siret;
   `);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumn("form_establishments", "source_provider");
+  pgm.dropColumn("establishments", "source_provider");
 }

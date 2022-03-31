@@ -1,7 +1,7 @@
 import { pipeWithValue } from "../pipeWithValue";
 import { join, keys, reduce } from "ramda";
 
-type RawQueryParams = { [key: string]: string | boolean };
+type RawQueryParams = { [key: string]: string };
 
 export type QueryParams<T extends RawQueryParams> = {
   [K in keyof T]: T[K];
@@ -16,7 +16,7 @@ export const queryParamsAsString = <Q extends QueryParams<RawQueryParams>>(
     reduce<keyof Q, string[]>(
       (acc: string[], param) => [
         ...acc,
-        `${param}=${encodeURI(queryParams[param] as string)}`,
+        `${param}=${encodeURI(queryParams[param])}`,
       ],
       [],
     ),

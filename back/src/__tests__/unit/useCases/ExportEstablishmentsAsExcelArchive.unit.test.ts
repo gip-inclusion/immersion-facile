@@ -105,7 +105,7 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
   describe("aggregateProfessionsIfNeeded", () => {
     it("returns the data unchanged if no aggregation is needed", async () => {
       const config = {
-        aggregateProfession: false,
+        aggregateProfession: "false",
       } as EstablishmentExportConfig;
 
       const rawEstablishments =
@@ -118,7 +118,7 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
 
     it("returns one entity per siret with concatenated and sorted professions strings (rome - appelation)", async () => {
       const config = {
-        aggregateProfession: true,
+        aggregateProfession: "true",
       } as EstablishmentExportConfig;
 
       const rawEstablishments =

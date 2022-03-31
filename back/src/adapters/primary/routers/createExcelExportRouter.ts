@@ -38,7 +38,8 @@ export const createExcelExportRouter = (deps: AppDependencies) => {
         async () => {
           const groupKey =
             req.query.groupKey === "region" ? "region" : "department";
-          const aggregateProfession = req.query.aggregateProfession === "true";
+          const aggregateProfession =
+            req.query.aggregateProfession === "true" ? "true" : "false";
 
           const sourceProvider = [
             "immersion-facile",
@@ -53,7 +54,9 @@ export const createExcelExportRouter = (deps: AppDependencies) => {
           const archivePath = temporaryStoragePath(
             `export${capitalize(sourceProvider)}EstablishmentsBy${capitalize(
               groupKey,
-            )}${aggregateProfession ? "AggregatedProfessions" : ""}.zip`,
+            )}${
+              aggregateProfession === "true" ? "AggregatedProfessions" : ""
+            }.zip`,
           );
 
           await deps.useCases.exportEstablishmentsAsExcelArchive.execute({
