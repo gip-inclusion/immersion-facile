@@ -1,7 +1,6 @@
 import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
 import { searchEpic } from "src/app/dependencies";
-import { RomeAutocomplete } from "src/app/Profession/RomeAutocomplete";
 import { OurAdvises } from "src/app/Search/OurAdvises";
 import { SearchResultPanel } from "src/app/Search/SearchResultPanel";
 import distanceSearchIcon from "src/assets/distance-search-icon.svg";
@@ -13,6 +12,7 @@ import { SearchButton } from "src/components/SearchButton";
 import { useObservable } from "src/useObservable";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import React from "react";
+import { AppellationAutocomplete } from "src/app/Profession/AppellationAutocomplete";
 
 interface SearchInput {
   rome?: string;
@@ -59,7 +59,7 @@ export const Search = () => {
               <Form>
                 <div className="gap-5 flex flex-col">
                   <div>
-                    <RomeAutocomplete
+                    <AppellationAutocomplete
                       title="Métier recherché"
                       setFormValue={(newValue) =>
                         setFieldValue("rome", newValue.romeCode)
