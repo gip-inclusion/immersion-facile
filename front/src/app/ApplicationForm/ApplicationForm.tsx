@@ -3,6 +3,7 @@ import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { ApplicationFormFields } from "src/app/ApplicationForm/ApplicationFormFields";
 import { immersionApplicationGateway } from "src/app/dependencies";
+import { useFeatureFlagsContext } from "src/app/FeatureFlagContext";
 import { routes } from "src/app/routes";
 import { toFormikValidationSchema } from "src/components/form/zodValidate";
 import { Layout } from "src/components/Layout";
@@ -194,38 +195,7 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
             </p>
           </div>
 
-          <div className="fr-text">
-            <p>
-              <b>(Optionnel) Lier mon compte pôle emploi</b>
-            </p>
-            <p>
-              Lier votre identifiant pole emploi permet d'accélérer le
-              traitement du dossier par votre conseiller.
-            </p>
-          </div>
-
-          <div className="pe-connect flex justify-center">
-            <a
-              href={`/api/${loginPeConnect}`}
-              className="button-pe-connect"
-              title=""
-            >
-              <img
-                className="icon-pe-connect"
-                src="/pe-connect-barre-nav-b.svg"
-                alt=""
-                width="300"
-                height="75"
-              />
-              <img
-                className="icon-pe-connect-hover"
-                src="/pe-connect-barre-nav-b-o.svg"
-                alt=""
-                width="300"
-                height="75"
-              />
-            </a>
-          </div>
+          <PeConnectButton />
 
           <Formik
             enableReinitialize={true}
@@ -280,5 +250,46 @@ export const ApplicationForm = ({ route }: ApplicationFormProps) => {
         </div>
       </div>
     </Layout>
+  );
+};
+
+const PeConnectButton = () => {
+  const featureFlags = useFeatureFlagsContext();
+
+  if (!featureFlags.enablePeConnectApi) return null;
+  return (
+    <>
+      <div className="fr-text">
+        <p>
+          <b>
+            (Optionnel) Vous connecter avec votre identifiant Pôle emploi pour
+            accélérer le traitement de votre demande de convention.
+          </b>
+        </p>
+      </div>
+
+      <div className="pe-connect flex justify-center">
+        <a
+          href={`/api/${loginPeConnect}`}
+          className="button-pe-connect"
+          title=""
+        >
+          <img
+            className="icon-pe-connect"
+            src="/pe-connect-barre-nav-b.svg"
+            alt=""
+            width="300"
+            height="75"
+          />
+          <img
+            className="icon-pe-connect-hover"
+            src="/pe-connect-barre-nav-b-o.svg"
+            alt=""
+            width="300"
+            height="75"
+          />
+        </a>
+      </div>
+    </>
   );
 };

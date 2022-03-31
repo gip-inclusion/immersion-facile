@@ -326,7 +326,7 @@ export const createRepositories = async (
     peConnectGateway:
       config.peConnectGateway === "HTTPS"
         ? new HttpPeConnectGateway(config.poleEmploiAccessTokenConfig)
-        : new InMemoryPeConnectGateway(),
+        : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl),
 
     postalCodeDepartmentRegion:
       config.repositories === "PG"
@@ -508,6 +508,7 @@ const createUseCases = (
     ),
     linkUserPeConnectAccount: new LinkUserPeConnectAccount(
       repositories.peConnectGateway,
+      config.immersionFacileBaseUrl,
     ),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewMagicLink: new RenewMagicLink(

@@ -3,6 +3,7 @@ import { ProcessEnv } from "../shared/envHelpers";
 import { Builder } from "./Builder";
 
 const defaultConfigParams = {
+  DOMAIN: "localhost",
   NODE_ENV: "test",
   LA_BONNE_BOITE_GATEWAY: "IN_MEMORY",
 

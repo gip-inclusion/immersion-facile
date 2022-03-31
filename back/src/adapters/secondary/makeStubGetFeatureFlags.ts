@@ -4,6 +4,7 @@ import { FeatureFlags } from "../../shared/featureFlags";
 const defaultFlags: FeatureFlags = {
   enableAdminUi: true,
   enableByPassInseeApi: false,
+  enablePeConnectApi: false,
 };
 
 export const makeStubGetFeatureFlags =

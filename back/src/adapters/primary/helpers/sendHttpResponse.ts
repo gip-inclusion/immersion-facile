@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { AuthChecker } from "../../../domain/auth/AuthChecker";
+import { AbsoluteUrl } from "../../../shared/AbsoluteUrl";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { HttpError, UnauthorizedError } from "./httpErrors";
@@ -71,7 +72,7 @@ export const sendHttpResponse = async (
 export const sendRedirectResponse = async (
   req: Request,
   res: Response,
-  callback: () => Promise<string>,
+  callback: () => Promise<AbsoluteUrl>,
   authChecker?: AuthChecker,
 ) => {
   try {
@@ -79,7 +80,6 @@ export const sendRedirectResponse = async (
 
     const redirectUrl = await callback();
     res.status(302);
-
     return res.redirect(redirectUrl);
   } catch (error: any) {
     handleResponseError(req, res, error);

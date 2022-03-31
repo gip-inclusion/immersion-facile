@@ -12,6 +12,7 @@ import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAge
 import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
 import type { InMemoryImmersionApplicationRepository } from "../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryPeConnectGateway } from "../adapters/secondary/InMemoryPeConnectGateway";
 import { InMemoryRomeRepository } from "../adapters/secondary/InMemoryRomeRepository";
 import { InMemorySireneRepository } from "../adapters/secondary/InMemorySireneRepository";
 import { GetApiConsumerById } from "../domain/core/ports/GetApiConsumerById";
@@ -26,7 +27,6 @@ import {
   GenerateApiConsumerJtw,
   GenerateMagicLinkJwt,
 } from "../domain/auth/jwt";
-import { PeConnectGateway } from "../domain/generic/peConnect/port/PeConnectGateway";
 
 export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
@@ -37,7 +37,7 @@ export type InMemoryRepositories = {
   searchesMade: InMemorySearchMadeRepository;
   rome: InMemoryRomeRepository;
   email: InMemoryEmailGateway;
-  peConnectGateway: PeConnectGateway;
+  peConnectGateway: InMemoryPeConnectGateway;
   sirene: InMemorySireneRepository;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;

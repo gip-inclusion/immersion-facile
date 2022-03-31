@@ -1,3 +1,5 @@
+import { AbsoluteUrl } from "../../../../shared/AbsoluteUrl";
+import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { GetAccessTokenResponse } from "../../../core/ports/AccessTokenGateway";
 
 export type PeConnectUserInfo = {
@@ -27,7 +29,7 @@ export type PeConnectOAuthGetTokenWithCodeGrantPayload = {
 };
 
 export interface PeConnectGateway {
-  oAuthGetAuthorizationCodeRedirectUrl: () => string;
+  oAuthGetAuthorizationCodeRedirectUrl: () => AbsoluteUrl;
   oAuthGetAccessTokenThroughAuthorizationCode: (
     authorizationCode: string,
   ) => Promise<GetAccessTokenResponse>;
@@ -35,3 +37,17 @@ export interface PeConnectGateway {
     accesstoken: GetAccessTokenResponse,
   ) => Promise<PeConnectUserInfo>;
 }
+
+export type ImmersionApplicationPeConnectFields = Pick<
+  ImmersionApplicationDto,
+  "email" | "firstName" | "lastName" | "peExternalId"
+>;
+
+export const peConnectUserInfoToImmersionApplicationDto = (
+  peConnectUserInfo: PeConnectUserInfo,
+): ImmersionApplicationPeConnectFields => ({
+  email: peConnectUserInfo.email,
+  firstName: peConnectUserInfo.given_name,
+  lastName: peConnectUserInfo.family_name,
+  peExternalId: peConnectUserInfo.idIdentiteExterne,
+});

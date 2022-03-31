@@ -1,3 +1,4 @@
+import { AbsoluteUrl } from "../../shared/AbsoluteUrl";
 import { AccessTokenConfig } from "../primary/appConfig";
 import { GetAccessTokenResponse } from "../../domain/core/ports/AccessTokenGateway";
 import { createAxiosInstance } from "../../utils/axiosUtils";
@@ -13,7 +14,7 @@ import { queryParamsAsString } from "../../shared/utils/queryParams";
 export class HttpPeConnectGateway implements PeConnectGateway {
   public constructor(private readonly config: AccessTokenConfig) {}
 
-  public oAuthGetAuthorizationCodeRedirectUrl(): string {
+  public oAuthGetAuthorizationCodeRedirectUrl(): AbsoluteUrl {
     const getAuthorizationCodePayload: PeConnectOAuthGrantPayload = {
       response_type: "code",
       client_id: this.config.clientId,

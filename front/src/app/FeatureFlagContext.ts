@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { apiAdresseGateway, featureFlagsGateway } from "src/app/dependencies";
+import { featureFlagsGateway } from "src/app/dependencies";
 import { FeatureFlags } from "src/shared/featureFlags";
 
 const defaultFeatureFlags: FeatureFlags = {
   enableAdminUi: false,
   enableByPassInseeApi: false,
+  enablePeConnectApi: false,
 };
 
 export const useFetchFeatureFlags = () => {

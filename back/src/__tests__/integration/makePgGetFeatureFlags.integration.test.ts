@@ -27,6 +27,7 @@ describe("PG getFeatureFlags", () => {
     const expectedFeatureFlags: FeatureFlags = {
       enableByPassInseeApi: false,
       enableAdminUi: true,
+      enablePeConnectApi: true,
     };
 
     await insertFeatureFlagsInTable(expectedFeatureFlags);
@@ -36,6 +37,7 @@ describe("PG getFeatureFlags", () => {
     expectTypeToMatchAndEqual(featureFlags, {
       enableByPassInseeApi: false,
       enableAdminUi: true,
+      enablePeConnectApi: true,
     });
   });
 

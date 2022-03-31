@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
 import { DomainTopic } from "../../domain/core/eventBus/events";
+import { AbsoluteUrl } from "../../shared/AbsoluteUrl";
 import {
   makeGetBooleanVariable,
   makeThrowIfNotDefined,
@@ -144,9 +145,11 @@ export class AppConfig {
 
   // == Magic links ==
 
-  public get immersionFacileBaseUrl() {
+  public get immersionFacileBaseUrl(): AbsoluteUrl {
     const domain = this.throwIfNotDefined("DOMAIN");
-    return domain === "localhost" ? domain : `https://${domain}`;
+    return domain.includes("localhost")
+      ? `http://${domain}`
+      : `https://${domain}`;
   }
 
   public get apiJwtPublicKey() {
