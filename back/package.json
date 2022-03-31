@@ -6,7 +6,6 @@
     "dev": "NODE_ENV=local ts-node-dev src/adapters/primary/startServer.ts",
     "start": "NODE_ENV=local ts-node src/adapters/primary/startServer.ts",
     "start-prod": "NODE_ENV=production ts-node src/adapters/primary/startServer.ts",
-    "start-establishment-backfill": "ts-node src/adapters/primary/startEstablishmentBackfill.ts",
     "start-update-establishments-from-sirene": "ts-node src/adapters/primary/startUpdateEstablishmentsFromSirene.ts",
     "free-quarantined-form-establishments-with-correct-siret": "ts-node src/adapters/primary/freeQuarantinedFormEstablishmentsWithCorrectSiret.ts",
     "transform-past-form-establishments-into-searchable-data": "ts-node src/adapters/primary/transformPastFormEstablishmentsIntoSearchableData.ts",

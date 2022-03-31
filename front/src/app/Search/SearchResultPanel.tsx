@@ -23,11 +23,6 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   }
 };
 
-// type SearchResultsProps = {
-//   searchResults: SearchImmersionResultDto[] | null;
-//   isSearching: boolean;
-// };
-
 export const SearchResultPanel = () => {
   const searchResults = useObservable(searchEpic.views.searchResults$, []);
   const isSearching = useObservable(searchEpic.views.isSearching$, false);

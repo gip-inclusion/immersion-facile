@@ -12,10 +12,6 @@ echo "Running $0 $@ (pwd: $(pwd))"
 #  overwritten.
 : "${CRONFILE:?Variable not set or empty}"
 
-#  ESTABLISHMENT_BACKFILL_SCHEDULE (optional): The execution schedule for the establishment-backfill
-#  pipeline in cron format. Default: daily at midnight.
-: "${ESTABLISHMENT_BACKFILL_SCHEDULE:=0 0 * * *}"
-
 #  ESTABLISHMENT_UPDATE_FROM_SIRENE (optional): The execution schedule for the establishment-backfill
 #  pipeline in cron format. Default: daily at midnight.
 : "${ESTABLISHMENT_UPDATE_FROM_SIRENE:=0 0 * * *}"
@@ -29,9 +25,6 @@ fi
 cat <<EOT > $CRONFILE
 SHELL=/bin/bash
 PATH=$PATH
-
-# Pipeline: establishment-backfill
-$ESTABLISHMENT_BACKFILL_SCHEDULE cd /app && npm run start-establishment-backfill >> $LOGDIR/establishment-backfill.log 2>&1
 
 # Pipeline: update-establishments-from-sirene
 $ESTABLISHMENT_UPDATE_FROM_SIRENE cd /app && npm run start-update-establishments-from-sirene >> $LOGDIR/update-establishments-from-sirene.log 2>&1
