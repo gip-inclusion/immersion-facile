@@ -28,10 +28,10 @@ export class ForbiddenError extends HttpError {
 }
 
 export class FeatureDisabledError extends HttpError {
-  httpCode = 404;
+  httpCode = 424;
 
-  constructor(msg?: string) {
-    super(msg);
+  constructor(disableService?: string) {
+    super(disableService + " is disabled");
     Object.setPrototypeOf(this, FeatureDisabledError.prototype);
   }
 }
