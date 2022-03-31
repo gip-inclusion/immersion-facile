@@ -85,6 +85,7 @@ export class PgEstablishmentAggregateRepository
       establishment.nafDto.code,
       establishment.nafDto.nomenclature,
       establishment.dataSource,
+      establishment.sourceProvider,
       convertPositionToStGeography(establishment.position),
       establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
       establishment.isActive,
@@ -97,7 +98,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, address, number_employees, naf_code, naf_nomenclature, data_source, gps, update_date, is_active, is_commited
+          siret, name, customized_name, address, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, update_date, is_active, is_commited
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey

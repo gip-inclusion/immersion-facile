@@ -123,6 +123,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       address: formEstablishment.businessAddress,
       voluntaryToImmersion: true,
       dataSource: "form",
+      sourceProvider: formEstablishment.source,
       nafDto,
       position,
       numberEmployeesRange,

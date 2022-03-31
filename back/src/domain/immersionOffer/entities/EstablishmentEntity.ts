@@ -2,7 +2,7 @@ import { NafDto } from "../../../shared/naf";
 import { LatLonDto } from "../../../shared/SearchImmersionDto";
 import { ContactEntityV2 } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
-import { FormSourceProvider } from "../../../shared/establishmentExport/establishmentExport.dto";
+import { FormEstablishmentSource } from "../../../shared/formEstablishment/FormEstablishment.dto";
 
 export type DataSource = "api_labonneboite" | "form";
 
@@ -35,7 +35,7 @@ export type EstablishmentEntityV2 = {
   address: string;
   voluntaryToImmersion: boolean;
   dataSource: DataSource;
-  sourceProvider?: FormSourceProvider;
+  sourceProvider?: FormEstablishmentSource;
   position: LatLonDto;
   nafDto: NafDto;
   numberEmployeesRange: TefenCode;

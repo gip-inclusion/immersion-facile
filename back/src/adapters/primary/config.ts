@@ -119,13 +119,13 @@ import { EstablishmentExportQueries } from "../../domain/establishment/ports/Est
 import { PgPostalCodeDepartmentRegionQueries } from "../secondary/pg/PgPostalCodeDepartmentRegionQueries";
 import { PostalCodeDepartmentRegionQueries } from "../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { StubPostalCodeDepartmentRegionQueries } from "../secondary/StubPostalCodeDepartmentRegionQueries";
-import { ExportEstablishmentsAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import { EditFormEstablishment } from "../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { InMemoryPeConnectGateway } from "../secondary/InMemoryPeConnectGateway";
 import { LinkUserPeConnectAccount } from "../../domain/generic/peConnect/useCases/linkUserPeConnectAccount";
 import { HttpPeConnectGateway } from "../secondary/HttpPeConnectGateway";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
+import { ExportEstablishmentsAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 
 const logger = createLogger(__filename);
 

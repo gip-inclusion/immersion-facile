@@ -18,6 +18,7 @@ import { EstablishmentAggregateBuilder } from "../../_testBuilders/Establishment
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { FormEstablishmentSource } from "../../shared/formEstablishment/FormEstablishment.dto";
 
 const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
 const testUid2 = "22222222-a2a5-430a-b558-ed3e2f03512d";
@@ -78,6 +79,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       establishmentPosition: LatLonDto,
       offerContactUid?: string,
       dataSource: DataSource = "form",
+      sourceProvider: FormEstablishmentSource = "immersion-facile",
       address?: string,
       nafCode?: string,
       numberEmployeesRange?: number,
@@ -87,6 +89,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         isActive: true,
         position: establishmentPosition,
         dataSource: dataSource,
+        sourceProvider: sourceProvider,
         address: address,
         nafCode,
         numberEmployeesRange,
@@ -226,6 +229,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         searchedPosition, // Establishment position matching
         undefined, // no  contact !
         "form", // data source
+        "immersion-facile", // source_provider
         matchingEstablishmentAddress,
         matchingNaf,
         matchingNumberOfEmployeeRange,
@@ -466,6 +470,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           isActive: true,
           position,
           dataSource: "form",
+          sourceProvider: "immersion-facile",
         }),
         insertEstablishment({
           // Should NOT update because already updated since date
@@ -1212,13 +1217,14 @@ describe("Postgres implementation of immersion offer repository", () => {
     numberEmployeesRange?: number;
     address?: string;
     dataSource?: DataSource;
+    sourceProvider?: FormEstablishmentSource;
     position?: LatLonDto;
   }) => {
     const defaultPosition = { lon: 12.2, lat: 2.1 };
     const insertQuery = `
     INSERT INTO establishments (
-      siret, name, address, number_employees, naf_code, data_source, update_date, is_active, gps
-    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, ST_GeographyFromText('POINT(${
+      siret, name, address, number_employees, naf_code, data_source, source_provider, update_date, is_active, gps
+    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, ST_GeographyFromText('POINT(${
       props.position?.lon ?? defaultPosition.lon
     } ${props.position?.lat ?? defaultPosition.lat})'))`;
     await client.query(insertQuery, [
@@ -1227,6 +1233,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.numberEmployeesRange ?? null,
       props.nafCode ?? "8622B",
       props.dataSource ?? "api_labonneboite",
+      props.sourceProvider ?? null,
       props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
       props.isActive ?? true,
     ]);

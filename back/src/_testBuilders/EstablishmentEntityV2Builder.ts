@@ -5,13 +5,16 @@ import {
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { NafDto } from "../shared/naf";
 import { Builder } from "./Builder";
-import { FormSourceProvider } from "../shared/establishmentExport/establishmentExport.dto";
+import { FormEstablishmentSource } from "../shared/formEstablishment/FormEstablishment.dto";
 
 export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   siret: "78000403200019",
   name: "Company inside repository",
   address: "30 avenue des champs Elysées, 75017 Paris",
+  customizedName: undefined,
+  isCommited: undefined,
   dataSource: "form",
+  sourceProvider: undefined,
   voluntaryToImmersion: true,
   position: { lat: 35, lon: 50 },
   nafDto: { code: "8539A", nomenclature: "NAFRev2" },
@@ -72,7 +75,7 @@ export class EstablishmentEntityV2Builder
     });
   }
 
-  withSourceProvider(sourceProvider: FormSourceProvider) {
+  withSourceProvider(sourceProvider: FormEstablishmentSource) {
     return new EstablishmentEntityV2Builder({
       ...this.entity,
       sourceProvider,
