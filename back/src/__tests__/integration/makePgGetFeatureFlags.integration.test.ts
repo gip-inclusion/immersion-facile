@@ -14,7 +14,7 @@ describe("PG getFeatureFlags", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    await client.query("TRUNCATE feature_flags");
+    await client.query("DELETE FROM feature_flags");
     getFeatureFlags = makePgGetFeatureFlags(client);
   });
 

@@ -20,8 +20,8 @@ describe("PgEstablishmentExportQueries", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE establishments CASCADE");
-    await client.query("TRUNCATE immersion_contacts CASCADE");
+    await client.query("DELETE FROM establishments");
+    await client.query("DELETE FROM immersion_contacts");
 
     establishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       client,
@@ -119,7 +119,7 @@ describe("PgEstablishmentExportQueries", () => {
           },
         ]),
       );
-    }, 10_000);
+    });
 
     it("Retrieves establishments with 'cci' sourceProvider exports where data_source = form", async () => {
       await establishmentAggregateRepository.insertEstablishmentAggregates([
@@ -205,7 +205,7 @@ describe("PgEstablishmentExportQueries", () => {
           },
         ]),
       );
-    }, 10_000);
+    });
   });
 });
 

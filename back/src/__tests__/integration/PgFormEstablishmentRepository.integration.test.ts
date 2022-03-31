@@ -14,7 +14,7 @@ describe("PgFormEstablishmentRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE form_establishments");
+    await client.query("DELETE FROM form_establishments");
     formEstablishmentRepository = new PgFormEstablishmentRepository(client);
   });
 

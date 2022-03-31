@@ -52,7 +52,8 @@ describe("PgAgencyRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE agencies CASCADE");
+    await client.query("DELETE FROM immersion_applications");
+    await client.query("DELETE FROM agencies");
     agencyRepository = new PgAgencyRepository(client);
   });
 
@@ -132,7 +133,7 @@ describe("PgAgencyRepository", () => {
 
       // Assert
       expect(agencies).toEqual([nancyAgency, epinalAgency]);
-    }, 10_000);
+    });
   });
 
   describe("insert", () => {

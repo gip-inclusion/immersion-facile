@@ -26,8 +26,10 @@ describe("PgUowPerformer", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE form_establishments");
-    await client.query("TRUNCATE outbox CASCADE");
+    await client.query("DELETE FROM form_establishments");
+    await client.query("DELETE FROM outbox_failures");
+    await client.query("DELETE FROM outbox_publications");
+    await client.query("DELETE FROM outbox");
     pgUowPerformer = new PgUowPerformer(pool, createPgUow);
   });
 

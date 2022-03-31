@@ -22,8 +22,8 @@ describe("Pg implementation of ImmersionApplicationExportQueries", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE immersion_applications CASCADE; ");
-    await client.query("TRUNCATE agencies CASCADE; ");
+    await client.query("DELETE FROM immersion_applications");
+    await client.query("DELETE FROM agencies");
     exportQueries = new PgImmersionApplicationExportQueries(client);
     agencyRepo = new PgAgencyRepository(client);
     immersionApplicationRepo = new PgImmersionApplicationRepository(client);

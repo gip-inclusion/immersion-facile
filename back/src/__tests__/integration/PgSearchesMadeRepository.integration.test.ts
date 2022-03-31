@@ -18,7 +18,7 @@ describe("PgSearchesMadeRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE searches_made CASCADE; ");
+    await client.query("DELETE FROM searches_made");
     pgSearchesMadeRepository = new PgSearchMadeRepository(client);
   });
 

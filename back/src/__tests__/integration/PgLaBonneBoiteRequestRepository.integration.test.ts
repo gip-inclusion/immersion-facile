@@ -16,7 +16,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("TRUNCATE lbb_requests CASCADE");
+    await client.query("DELETE FROM lbb_requests");
     repo = new PgLaBonneBoiteRequestRepository(client);
   });
 

@@ -13,7 +13,7 @@ describe("PG GetApiConsumerById", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    await client.query("TRUNCATE api_consumers");
+    await client.query("DELETE FROM api_consumers");
     getAuthorizedApiConsumersIds = makePgGetApiConsumerById(client);
   });
 
