@@ -56,6 +56,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         establishmentSiret,
       )
     )?.dataSource;
+
     if (establishmentDataSource === "form") {
       throw new Error(
         `Cannot insert establishment from form with siret ${establishmentSiret} since it already exists.`,

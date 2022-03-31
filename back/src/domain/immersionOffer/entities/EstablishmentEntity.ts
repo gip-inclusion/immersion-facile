@@ -4,7 +4,12 @@ import { ContactEntityV2 } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
 import { FormEstablishmentSource } from "../../../shared/formEstablishment/FormEstablishment.dto";
 
-export type DataSource = "api_labonneboite" | "form";
+export type DataSource =
+  | "api_labonneboite"
+  | "api_laplateformedelinclusion"
+  | "form";
+type ApiSource = "api_labonneboite" | "api_laplateformedelinclusion";
+type SourceProvider = FormEstablishmentSource | ApiSource;
 
 // prettier-ignore
 export type TefenCode = -1 | 0 | 1 | 2 | 3 | 11 | 12 | 21 | 22 | 31 | 32 | 41 | 42 | 51 | 52 | 53;
@@ -35,7 +40,7 @@ export type EstablishmentEntityV2 = {
   address: string;
   voluntaryToImmersion: boolean;
   dataSource: DataSource;
-  sourceProvider?: FormEstablishmentSource;
+  sourceProvider: SourceProvider;
   position: LatLonDto;
   nafDto: NafDto;
   numberEmployeesRange: TefenCode;

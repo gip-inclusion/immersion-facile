@@ -494,13 +494,14 @@ describe("Postgres implementation of immersion offer repository", () => {
       ];
       expect(actualResult).toEqual(expectedResult);
     });
-    it("returns a siret list of all establishmetns having same `update_date` and `create_date` (which means they have never been updated !)", async () => {
+    it("returns a siret list of all establishments having same `update_date` and `create_date` (which means they have never been updated !)", async () => {
       // Prepare
       const neverUpdatedEstablishmentSiret = "88000403200022";
       await insertEstablishment({
         siret: neverUpdatedEstablishmentSiret,
         isActive: true,
         position,
+        dataSource: "api_labonneboite"
       });
       // Act
       const actualResult =
@@ -1233,7 +1234,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.numberEmployeesRange ?? null,
       props.nafCode ?? "8622B",
       props.dataSource ?? "api_labonneboite",
-      props.sourceProvider ?? null,
+      props.sourceProvider ?? "api_labonneboite",
       props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
       props.isActive ?? true,
     ]);

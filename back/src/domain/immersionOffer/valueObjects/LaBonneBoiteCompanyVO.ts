@@ -52,6 +52,7 @@ export class LaBonneBoiteCompanyVO {
       },
       nafDto: extraData?.nafDto ?? { code: this.props.naf, nomenclature: "" }, // Unknown nomenclature (would required to call sirene API)
       dataSource: "api_labonneboite",
+      sourceProvider: "api_labonneboite",
       name: this.props.name,
       siret: this.props.siret,
       voluntaryToImmersion: false,

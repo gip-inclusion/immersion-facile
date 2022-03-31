@@ -14,7 +14,7 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   customizedName: undefined,
   isCommited: undefined,
   dataSource: "form",
-  sourceProvider: undefined,
+  sourceProvider: "immersion-facile",
   voluntaryToImmersion: true,
   position: { lat: 35, lon: 50 },
   nafDto: { code: "8539A", nomenclature: "NAFRev2" },
