@@ -15,7 +15,7 @@ export class InMemoryFormEstablishmentRepository
   public async create(dto: FormEstablishmentDto): Promise<void> {
     if (await this.getBySiret(dto.siret)) {
       const message = `Immersion DTO with siret ${dto.siret} is already in the list`;
-      logger.info({ dto: dto }, message);
+      logger.info({ dto }, message);
       throw new ConflictError(message);
     }
     logger.debug({ immersionOffer: dto }, "Creating a new Immersion Offer");
@@ -24,7 +24,7 @@ export class InMemoryFormEstablishmentRepository
   public async update(dto: FormEstablishmentDto): Promise<void> {
     if (!(await this.getBySiret(dto.siret))) {
       const message = `Cannot update form establishlment DTO with siret ${dto.siret}, since it is not in list.`;
-      logger.info({ dto: dto }, message);
+      logger.info({ dto }, message);
       throw new ConflictError(message);
     }
     this.formEstablishments = this.formEstablishments.map((repoDto) =>

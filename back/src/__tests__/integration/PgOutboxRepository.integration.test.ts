@@ -330,7 +330,7 @@ describe("PgOutboxRepository", () => {
       const eventWithSiret_01jan20 = createNewEvent({
         topic: "FormEstablishmentEditLinkSent",
         payload: {
-          siret: siret,
+          siret,
           iat: new Date("2020-01-01").getTime(),
           exp: new Date("2020-01-02").getTime(),
           version: 1,
@@ -343,7 +343,7 @@ describe("PgOutboxRepository", () => {
       const eventWithSiret_05jan20 = createNewEvent({
         topic: "FormEstablishmentEditLinkSent",
         payload: {
-          siret: siret,
+          siret,
           iat: new Date("2020-01-05").getTime(),
           exp: new Date("2020-01-06").getTime(),
           version: 1,

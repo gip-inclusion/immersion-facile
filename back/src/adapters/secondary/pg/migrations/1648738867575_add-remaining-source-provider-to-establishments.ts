@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { MigrationBuilder, ColumnDefinitions } from "node-pg-migrate";
-
-export const shorthands: ColumnDefinitions | undefined = undefined;
+import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   await pgm.sql(` 
@@ -17,12 +15,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   `);
 
   pgm.alterColumn("establishments", "source_provider", {
-    type: "varchar(255)",
+    type: "text",
     notNull: true,
   });
 
   pgm.alterColumn("establishments", "data_source", {
-    type: "varchar(255)",
+    type: "text",
     notNull: true,
   });
 }

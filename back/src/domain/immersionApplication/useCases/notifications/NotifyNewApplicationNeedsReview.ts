@@ -61,7 +61,7 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
 
     logger.info(
       {
-        recipients: recipients,
+        recipients,
         applicationId: immersionApplicationDto.id,
       },
       "Sending Mail to review an immersion",
@@ -89,7 +89,7 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
 
     logger.info(
       {
-        recipients: recipients,
+        recipients,
         immersionId: immersionApplicationDto.id,
       },
       "Mail to review an immersion sent",

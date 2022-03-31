@@ -36,7 +36,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     // Act
     const validJwt = generateMagicLinkJwt(
       createEstablishmentJwtPayload({
-        siret: siret,
+        siret,
         durationDays: 1,
         now: new Date(),
       }),

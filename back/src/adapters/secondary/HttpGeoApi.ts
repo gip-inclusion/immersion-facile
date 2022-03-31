@@ -38,7 +38,7 @@ export class HttpGeoApi implements GeoApi {
           axios.get("https://geo.api.gouv.fr/communes", {
             timeout: secondsToMilliseconds(10),
             params: {
-              codePostal: codePostal,
+              codePostal,
               limit: 1,
             },
           }),

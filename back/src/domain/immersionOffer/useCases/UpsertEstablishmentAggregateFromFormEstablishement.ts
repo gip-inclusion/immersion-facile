@@ -107,7 +107,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
           appellationCode,
         }): Promise<ImmersionOfferEntityV2 | undefined> => ({
           id: this.uuidGenerator.new(),
-          romeCode: romeCode,
+          romeCode,
           romeAppellation: appellationCode
             ? Number(appellationCode)
             : undefined,
@@ -134,7 +134,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     const establishmentAggregate: EstablishmentAggregate = {
       establishment,
-      contact: contact,
+      contact,
       immersionOffers,
     };
     await uow.establishmentAggregateRepo

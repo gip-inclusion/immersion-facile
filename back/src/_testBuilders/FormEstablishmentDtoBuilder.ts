@@ -96,7 +96,7 @@ export class FormEstablishmentDtoBuilder
   public withAppellations(appellations: AppellationDto[]) {
     return new FormEstablishmentDtoBuilder({
       ...this.dto,
-      appellations: appellations,
+      appellations,
     });
   }
   public withBusinessContact(businessContact: ContactEntityV2) {

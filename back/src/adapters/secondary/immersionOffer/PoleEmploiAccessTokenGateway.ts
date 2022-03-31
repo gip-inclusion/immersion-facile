@@ -30,7 +30,7 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
       grant_type: "client_credentials",
       client_id: this.config.clientId,
       client_secret: this.config.clientSecret,
-      scope: scope,
+      scope,
     });
     const headers = {
       "Content-Type": "application/x-www-form-urlencoded",

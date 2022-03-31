@@ -126,7 +126,7 @@ describe("UpdateImmersionApplicationStatus", () => {
       for (const role of validRoles) {
         it("accepted from " + role, () =>
           testAcceptsStatusUpdateToDraftAndInvalidatesSignatures({
-            role: role,
+            role,
             oldStatus: status,
           }),
         );

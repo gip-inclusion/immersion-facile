@@ -107,7 +107,7 @@ describe("RequestUpdateFormEstablishment", () => {
       expect(outboxRepo.events).toHaveLength(1);
       expect(outboxRepo.events[0]).toMatchObject({
         topic: "FormEstablishmentEditLinkSent",
-        payload: { siret: siret },
+        payload: { siret },
       });
     });
   });

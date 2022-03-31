@@ -88,9 +88,9 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret,
         isActive: true,
         position: establishmentPosition,
-        dataSource: dataSource,
-        sourceProvider: sourceProvider,
-        address: address,
+        dataSource,
+        sourceProvider,
+        address,
         nafCode,
         numberEmployeesRange,
       });
@@ -501,7 +501,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: neverUpdatedEstablishmentSiret,
         isActive: true,
         position,
-        dataSource: "api_labonneboite"
+        dataSource: "api_labonneboite",
       });
       // Act
       const actualResult =

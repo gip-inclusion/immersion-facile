@@ -110,7 +110,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
               Authorization: createAuthorization(accessToken.access_token),
             },
             timeout: secondsToMilliseconds(10),
-            params: params,
+            params,
           });
         });
         return response;

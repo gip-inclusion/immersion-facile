@@ -1,5 +1,6 @@
 module.exports = {
   'arrow-body-style': ['error', 'as-needed'],
+  'object-shorthand': ['error', 'always'],
 };
 
 const toAdd =    {
@@ -234,7 +235,7 @@ const toAdd =    {
   'no-useless-return': 'error',
   'no-var': 'error',
   'no-void': 'error',
-  'object-shorthand': ['error', 'always'],
+
   'one-var': ['error', 'never'],
   'prefer-arrow-callback': 'error',
   'prefer-const': 'error',

@@ -92,7 +92,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     logger.info({ recipients, params }, "sendNewApplicationAdminNotification");
     this.sentEmails.push({
       type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
-      recipients: recipients,
+      recipients,
       params,
     });
   }
@@ -107,7 +107,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     );
     this.sentEmails.push({
       type: "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-      recipients: recipients,
+      recipients,
       params,
     });
   }
@@ -122,8 +122,8 @@ export class InMemoryEmailGateway implements EmailGateway {
     );
     this.sentEmails.push({
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
-      recipients: recipients,
-      params: params,
+      recipients,
+      params,
     });
   }
 
@@ -134,8 +134,8 @@ export class InMemoryEmailGateway implements EmailGateway {
     logger.info({ recipients, params }, "sendRejecteddApplicationNotification");
     this.sentEmails.push({
       type: "REJECTED_APPLICATION_NOTIFICATION",
-      recipients: recipients,
-      params: params,
+      recipients,
+      params,
     });
   }
 
@@ -149,8 +149,8 @@ export class InMemoryEmailGateway implements EmailGateway {
     );
     this.sentEmails.push({
       type: "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION",
-      recipients: recipients,
-      params: params,
+      recipients,
+      params,
     });
   }
 
@@ -161,8 +161,8 @@ export class InMemoryEmailGateway implements EmailGateway {
     logger.info({ recipients, params }, "sendRenewedMagicLink");
     this.sentEmails.push({
       type: "MAGIC_LINK_RENEWAL",
-      recipients: recipients,
-      params: params,
+      recipients,
+      params,
     });
   }
 
@@ -174,7 +174,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
       recipients: [recipient],
-      params: params,
+      params,
     });
   }
 
@@ -189,7 +189,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
-      params: params,
+      params,
     });
   }
 
@@ -204,7 +204,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
-      params: params,
+      params,
     });
   }
 
@@ -216,7 +216,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "CONTACT_BY_EMAIL_REQUEST",
       recipients: [recipient],
-      params: params,
+      params,
     });
   }
 
@@ -228,7 +228,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "CONTACT_BY_PHONE_INSTRUCTIONS",
       recipients: [recipient],
-      params: params,
+      params,
     });
   }
 
@@ -240,7 +240,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "CONTACT_IN_PERSON_INSTRUCTIONS",
       recipients: [recipient],
-      params: params,
+      params,
     });
   }
 
@@ -252,7 +252,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "SHARE_DRAFT_APPLICATION_BY_LINK",
       recipients: [recipient],
-      params: params,
+      params,
     });
   }
 
