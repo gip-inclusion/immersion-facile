@@ -1031,10 +1031,10 @@ describe("Postgres implementation of immersion offer repository", () => {
       const actualSiretOfEstablishmentsFromFormSource =
         await pgEstablishmentAggregateRepository.getSiretOfEstablishmentsFromFormSource();
       // Assert
-      expect(actualSiretOfEstablishmentsFromFormSource).toEqual([
-        siretFromForm1,
-        siretFromForm2,
-      ]);
+      expectArraysToEqualIgnoringOrder(
+        actualSiretOfEstablishmentsFromFormSource,
+        [siretFromForm1, siretFromForm2],
+      );
     });
   });
   describe("Pg implementation of method removeEstablishmentAndOffersWithSiret", () => {
