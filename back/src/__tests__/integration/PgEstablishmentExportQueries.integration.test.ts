@@ -7,6 +7,7 @@ import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOffe
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { PgEstablishmentExportQueries } from "../../adapters/secondary/pg/PgEstablishmentExportQueries";
 import { format } from "date-fns";
+import {EstablishmentRawProps} from "../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 
 describe("PgEstablishmentExportQueries", () => {
   let pool: Pool;
@@ -44,80 +45,88 @@ describe("PgEstablishmentExportQueries", () => {
       const establishmentsExportRaw =
         await establismentExportQueries.getAllEstablishmentsForExport();
 
+      const expected: EstablishmentRawProps[] =  [
+        {
+          address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: true,
+          nafCode: "7820Z",
+          name: "ARTUS INTERIM LA ROCHE SUR YON",
+          numberEmployeesRange: "10-19",
+          preferredContactMethods: "phone",
+          professions: "M1502 - Chargé / Chargée de recrutement",
+          siret: "79158476600012",
+        },
+        {
+          address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: true,
+          nafCode: "7820Z",
+          name: "ARTUS INTERIM LA ROCHE SUR YON",
+          numberEmployeesRange: "10-19",
+          preferredContactMethods: "phone",
+          professions: "A1205 - Ouvrier sylviculteur / Ouvrière sylvicutrice",
+          siret: "79158476600012",
+        },
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          numberEmployeesRange: "250-499",
+          preferredContactMethods: "mail",
+          professions:
+            "I1304 - Technicien(ne) de maintenance industrielle polyvalente",
+          siret: "79341726200037",
+        },
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          numberEmployeesRange: "250-499",
+          preferredContactMethods: "mail",
+          professions:
+            "G1205 - Agent / Agente d'exploitation des attractions",
+          siret: "79341726200037",
+        },
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          numberEmployeesRange: "250-499",
+          preferredContactMethods: "mail",
+          professions:
+            "G1205 - Agent / Agente d'exploitation des attractions",
+          siret: "79341726200037",
+        },
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          numberEmployeesRange: "250-499",
+          preferredContactMethods: "mail",
+          professions:
+            "I1304 - Technicien(ne) maintenance d'équipnts de parcs d'attractions",
+          siret: "79341726200037",
+        },
+      ];
+
       expect(establishmentsExportRaw).toHaveLength(6);
       expect(establishmentsExportRaw).toStrictEqual(
-        expect.arrayContaining([
-          {
-            address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: true,
-            nafCode: "7820Z",
-            name: "ARTUS INTERIM LA ROCHE SUR YON",
-            preferredContactMethods: "phone",
-            professions: "M1502 - Chargé / Chargée de recrutement",
-            siret: "79158476600012",
-          },
-          {
-            address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: true,
-            nafCode: "7820Z",
-            name: "ARTUS INTERIM LA ROCHE SUR YON",
-            preferredContactMethods: "phone",
-            professions: "A1205 - Ouvrier sylviculteur / Ouvrière sylvicutrice",
-            siret: "79158476600012",
-          },
-          {
-            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: false,
-            nafCode: "9321Z",
-            name: "MINI WORLD LYON",
-            preferredContactMethods: "mail",
-            professions:
-              "I1304 - Technicien(ne) de maintenance industrielle polyvalente",
-            siret: "79341726200037",
-          },
-          {
-            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: false,
-            nafCode: "9321Z",
-            name: "MINI WORLD LYON",
-            preferredContactMethods: "mail",
-            professions:
-              "G1205 - Agent / Agente d'exploitation des attractions",
-            siret: "79341726200037",
-          },
-          {
-            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: false,
-            nafCode: "9321Z",
-            name: "MINI WORLD LYON",
-            preferredContactMethods: "mail",
-            professions:
-              "G1205 - Agent / Agente d'exploitation des attractions",
-            siret: "79341726200037",
-          },
-          {
-            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: false,
-            nafCode: "9321Z",
-            name: "MINI WORLD LYON",
-            preferredContactMethods: "mail",
-            professions:
-              "I1304 - Technicien(ne) maintenance d'équipnts de parcs d'attractions",
-            siret: "79341726200037",
-          },
-        ]),
+        expect.arrayContaining(expected),
       );
     });
 
@@ -127,83 +136,66 @@ describe("PgEstablishmentExportQueries", () => {
         establishmentAggregateMiniWorldLyon(),
       ]);
 
-      const establishmentsExportRaw =
-        await establismentExportQueries.getAllEstablishmentsForExport();
+      const establishmentsExportRaw = await establismentExportQueries.getEstablishmentsBySourceProviderForExport('cci');
 
-      expect(establishmentsExportRaw).toHaveLength(6);
+      const expected: EstablishmentRawProps[] = [
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          numberEmployeesRange: "250-499",
+          preferredContactMethods: "mail",
+          professions:
+            "I1304 - Technicien(ne) de maintenance industrielle polyvalente",
+          siret: "79341726200037",
+        },
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          numberEmployeesRange: "250-499",
+          preferredContactMethods: "mail",
+          professions:
+            "G1205 - Agent / Agente d'exploitation des attractions",
+          siret: "79341726200037",
+        },
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          numberEmployeesRange: "250-499",
+          preferredContactMethods: "mail",
+          professions:
+            "G1205 - Agent / Agente d'exploitation des attractions",
+          siret: "79341726200037",
+        },
+        {
+          address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
+          createdAt: format(new Date(), "dd/MM/yyyy"),
+          customizedName: undefined,
+          isCommited: false,
+          nafCode: "9321Z",
+          name: "MINI WORLD LYON",
+          numberEmployeesRange: "250-499",
+          preferredContactMethods: "mail",
+          professions:
+            "I1304 - Technicien(ne) maintenance d'équipnts de parcs d'attractions",
+          siret: "79341726200037",
+        },
+      ];
+
+      expect(establishmentsExportRaw).toHaveLength(4);
       expect(establishmentsExportRaw).toStrictEqual(
-        expect.arrayContaining([
-          {
-            address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: true,
-            nafCode: "7820Z",
-            name: "ARTUS INTERIM LA ROCHE SUR YON",
-            preferredContactMethods: "phone",
-            professions: "M1502 - Chargé / Chargée de recrutement",
-            siret: "79158476600012",
-          },
-          {
-            address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: true,
-            nafCode: "7820Z",
-            name: "ARTUS INTERIM LA ROCHE SUR YON",
-            preferredContactMethods: "phone",
-            professions: "A1205 - Ouvrier sylviculteur / Ouvrière sylvicutrice",
-            siret: "79158476600012",
-          },
-          {
-            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: false,
-            nafCode: "9321Z",
-            name: "MINI WORLD LYON",
-            preferredContactMethods: "mail",
-            professions:
-              "I1304 - Technicien(ne) de maintenance industrielle polyvalente",
-            siret: "79341726200037",
-          },
-          {
-            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: false,
-            nafCode: "9321Z",
-            name: "MINI WORLD LYON",
-            preferredContactMethods: "mail",
-            professions:
-              "G1205 - Agent / Agente d'exploitation des attractions",
-            siret: "79341726200037",
-          },
-          {
-            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: false,
-            nafCode: "9321Z",
-            name: "MINI WORLD LYON",
-            preferredContactMethods: "mail",
-            professions:
-              "G1205 - Agent / Agente d'exploitation des attractions",
-            siret: "79341726200037",
-          },
-          {
-            address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
-            createdAt: format(new Date(), "dd/MM/yyyy"),
-            customizedName: undefined,
-            isCommited: false,
-            nafCode: "9321Z",
-            name: "MINI WORLD LYON",
-            preferredContactMethods: "mail",
-            professions:
-              "I1304 - Technicien(ne) maintenance d'équipnts de parcs d'attractions",
-            siret: "79341726200037",
-          },
-        ]),
+        expect.arrayContaining(expected),
       );
     });
   });
@@ -217,6 +209,7 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
     .withDataSource("form")
     .withSourceProvider("immersion-facile")
     .withNafDto({ code: "7820Z", nomenclature: "NAFRev2" })
+    .withNumberOfEmployeeRange(11)
     .withIsCommited(true)
     .build(),
   immersionOffers: [
@@ -249,6 +242,7 @@ const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
     .withDataSource("form")
     .withSourceProvider("cci")
     .withNafDto({ code: "9321Z", nomenclature: "NAFRev2" })
+    .withNumberOfEmployeeRange(32)
     .withIsCommited(false)
     .build(),
   immersionOffers: [

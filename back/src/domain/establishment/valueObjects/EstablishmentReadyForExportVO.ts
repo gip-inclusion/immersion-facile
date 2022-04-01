@@ -1,13 +1,13 @@
 import { OmitFromExistingKeys } from "../../../shared/utils";
 import { EstablishmentRawBeforeExportProps } from "./EstablishmentRawBeforeExportVO";
 
-type TranslatedFields = "isCommited" | "numberEmployees";
+type TranslatedFields = "isCommited";
 
 export type EstablishmentReadyForExportVO = OmitFromExistingKeys<
   EstablishmentRawBeforeExportProps,
   TranslatedFields
 > & {
-  numberEmployees: string;
+  numberEmployeesRange: string;
   isCommited: string;
   department: string;
   region: string;

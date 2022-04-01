@@ -3,10 +3,10 @@ import type { EstablishmentReadyForExportVO } from "./EstablishmentReadyForExpor
 export type EstablishmentRawProps = {
   siret: string;
   name: string;
-  customizedName: string;
+  customizedName?: string;
   address: string;
   nafCode: string;
-  numberEmployees: number;
+  numberEmployeesRange: string;
   createdAt: string;
   isCommited: boolean;
   professions: string;
@@ -29,7 +29,6 @@ export class EstablishmentRawBeforeExportVO {
       preferredContactMethods:
         translateContactMethod[this._props.preferredContactMethods],
       isCommited: translateBoolean(this._props.isCommited),
-      numberEmployees: translateNumberEmployes(this._props.numberEmployees),
     });
 }
 
@@ -41,6 +40,3 @@ const translateContactMethod: Record<string, string> = {
   mail: "Email",
   in_person: "En personne",
 };
-
-const translateNumberEmployes = (value: number): string =>
-  value >= 0 ? value.toString() : "Non déclaré";

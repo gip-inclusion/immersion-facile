@@ -131,7 +131,7 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
           customizedName: "Custom name",
           isCommited: true,
           nafCode: "7820Z",
-          numberEmployees: 300,
+          numberEmployeesRange: "250-499",
           name: "ARTUS INTERIM LA ROCHE SUR YON",
           preferredContactMethods: "phone",
           professions:
@@ -144,7 +144,7 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
           customizedName: "Custom name",
           isCommited: false,
           nafCode: "9321Z",
-          numberEmployees: 200,
+          numberEmployeesRange: "250-499",
           name: "MINI WORLD LYON",
           preferredContactMethods: "mail",
           professions:

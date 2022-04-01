@@ -4,6 +4,7 @@ import { valueOrFalse, optional } from "./pgUtils";
 import { EstablishmentExportQueries } from "../../../domain/establishment/ports/EstablishmentExportQueries";
 import { EstablishmentRawProps } from "../../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 import { FormSourceProvider } from "../../../shared/establishmentExport/establishmentExport.dto";
+import {employeeRangeByTefenCode, TefenCode} from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 
 export class PgEstablishmentExportQueries
   implements EstablishmentExportQueries
@@ -37,7 +38,8 @@ const sqlSelectAllEstablishmentsQuery = `
         establishments.address,
         establishments.naf_code,
         establishments.customized_name, 
-        establishments.creation_date, 
+        establishments.creation_date,
+        establishments.number_employees,
         establishments.is_commited,
         immersion_offers.rome_code,
         public_appellations_data.libelle_appellation_court,
@@ -55,13 +57,13 @@ const sqlSelectAllEstablishmentsQueryWithSourceProviderFilter = (
 ): string =>
   `${sqlSelectAllEstablishmentsQuery} AND source_provider = '${sourceProvider}'`;
 
-const rowToEstablishmentRawProps = (row: any) => ({
+const rowToEstablishmentRawProps = (row: any): EstablishmentRawProps => ({
   siret: row.siret,
   name: row.name,
   customizedName: optional(row.customized_name),
   address: row.address,
   nafCode: optional(row.naf_code),
-  numberEmployees: row.number_employees,
+  numberEmployeesRange: employeeRangeByTefenCode[row.number_employees as TefenCode],
   createdAt: format(row.creation_date, "dd/MM/yyyy"),
   isCommited: valueOrFalse(row.is_commited),
   professions: `${row.rome_code} - ${row.libelle_appellation_court}`,

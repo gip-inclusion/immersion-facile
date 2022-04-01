@@ -135,12 +135,12 @@ export const establishmentsExportByZoneColumnsOptions = (
     },
     {
       header: "Code Postal",
-      key: "address",
+      key: "postalCode",
       width: 15,
     },
     {
       header: "Ville",
-      key: "address",
+      key: "city",
       width: 15,
     },
     {
@@ -155,7 +155,7 @@ export const establishmentsExportByZoneColumnsOptions = (
     },
     {
       header: "Nombre d'employés",
-      key: "numberEmployees",
+      key: "numberEmployeesRange",
       width: 15,
     },
     {
