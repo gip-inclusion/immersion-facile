@@ -15,8 +15,8 @@ import { ContactInPerson } from "./ContactInPerson";
 type ModalState = {
   isOpen: boolean;
   isValidating: boolean;
-  contactId?: ImmersionContactInEstablishmentId;
-  immersionOfferId: ImmersionOfferId;
+  siret: SiretDto;
+  romeLabel: string;
   contactMethod?: ContactMethod;
 };
 
@@ -26,7 +26,8 @@ type ModalAction =
       payload: {
         immersionOfferRome: RomeCode;
         immersionOfferSiret: SiretDto;
-        contactId?: ImmersionContactInEstablishmentId;
+        siret: SiretDto;
+        romeLabel: string;
         contactMethod?: ContactMethod;
       };
     }
@@ -39,11 +40,21 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
     case "CLICKED_OPEN":
       return { ...state, isOpen: true, ...action.payload };
     case "CLICKED_CLOSE":
-      return { immersionOfferId: "", isOpen: false, isValidating: false };
+      return {
+        romeLabel: "",
+        siret: "",
+        isOpen: false,
+        isValidating: false,
+      };
     case "CLICKED_VALIDATE":
       return { ...state, isOpen: false, isValidating: true };
     case "VALIDATION_HANDLED":
-      return { immersionOfferId: "", isOpen: false, isValidating: false };
+      return {
+        romeLabel: "",
+        siret: "",
+        isOpen: false,
+        isValidating: false,
+      };
     default:
       const shouldNeverBeAssigned: never = action;
       return shouldNeverBeAssigned;
@@ -52,7 +63,8 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
 
 export const useContactEstablishmentModal = () => {
   const initialModalState: ModalState = {
-    immersionOfferId: "",
+    romeLabel: "",
+    siret: "",
     isOpen: false,
     isValidating: false,
   };
@@ -106,21 +118,24 @@ const ModalContactContent = ({
     case "EMAIL":
       return (
         <ContactByEmail
-          immersionOfferId={modalState.immersionOfferId}
+          siret={modalState.siret}
+          romeLabel={modalState.romeLabel}
           onSuccess={onSuccess}
         />
       );
     case "PHONE":
       return (
         <ContactByPhone
-          immersionOfferId={modalState.immersionOfferId}
+          siret={modalState.siret}
+          romeLabel={modalState.romeLabel}
           onSuccess={onSuccess}
         />
       );
     case "IN_PERSON":
       return (
         <ContactInPerson
-          immersionOfferId={modalState.immersionOfferId}
+          siret={modalState.siret}
+          romeLabel={modalState.romeLabel}
           onSuccess={onSuccess}
         />
       );

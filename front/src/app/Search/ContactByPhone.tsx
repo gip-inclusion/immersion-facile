@@ -8,20 +8,24 @@ import {
   ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
 } from "src/shared/contactEstablishment";
+import { SiretDto } from "src/shared/siret";
 
 type ContactByPhoneProps = {
-  immersionOfferId: string;
+  siret: SiretDto;
+  romeLabel: string;
   onSuccess: () => void;
 };
 
 const getName = (v: keyof ContactEstablishmentByPhoneDto) => v;
 
 export const ContactByPhone = ({
-  immersionOfferId,
+  siret,
+  romeLabel,
   onSuccess,
 }: ContactByPhoneProps) => {
   const initialValues: ContactEstablishmentByPhoneDto = {
-    immersionOfferId,
+    siret,
+    romeLabel,
     contactMode: "PHONE",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",

@@ -8,20 +8,24 @@ import {
   ContactEstablishmentInPersonDto,
   contactEstablishmentInPersonSchema,
 } from "src/shared/contactEstablishment";
+import { SiretDto } from "src/shared/siret";
 
 type ContactInPersonProps = {
-  immersionOfferId: string;
+  siret: SiretDto;
+  romeLabel: string;
   onSuccess: () => void;
 };
 
 const getName = (v: keyof ContactEstablishmentInPersonDto) => v;
 
 export const ContactInPerson = ({
-  immersionOfferId,
+  siret,
+  romeLabel,
   onSuccess,
 }: ContactInPersonProps) => {
   const initialValues: ContactEstablishmentInPersonDto = {
-    immersionOfferId,
+    siret,
+    romeLabel,
     contactMode: "IN_PERSON",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",

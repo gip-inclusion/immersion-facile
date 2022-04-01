@@ -27,32 +27,20 @@ export class ContactEstablishment extends TransactionalUseCase<
     params: ContactEstablishmentRequestDto,
     { establishmentAggregateRepo, outboxRepo }: UnitOfWork,
   ): Promise<void> {
-    const { immersionOfferId, contactMode } = params;
+    const { siret, contactMode } = params;
 
-    const annotatedImmersionOffer =
-      await establishmentAggregateRepo.getAnnotatedImmersionOfferById(
-        immersionOfferId,
-      );
-    if (!annotatedImmersionOffer) throw new NotFoundError(immersionOfferId);
+    const establishment =
+      await establishmentAggregateRepo.getEstablishmentForSiret(siret);
+    if (!establishment) throw new NotFoundError(siret);
 
     const contact =
-      await establishmentAggregateRepo.getContactByImmersionOfferId(
-        immersionOfferId,
-      );
+      await establishmentAggregateRepo.getContactForEstablishmentSiret(siret);
     if (!contact)
-      throw new BadRequestError(
-        `No contact for immersion offer: ${immersionOfferId}`,
-      );
-
-    const annotatedEstablishment =
-      await establishmentAggregateRepo.getAnnotatedEstablishmentByImmersionOfferId(
-        immersionOfferId,
-      );
-    if (!annotatedEstablishment) throw new NotFoundError(immersionOfferId);
+      throw new BadRequestError(`No contact for establishment: ${siret}`);
 
     if (contactMode !== contact.contactMethod)
       throw new BadRequestError(
-        `Contact mode mismatch: IN_PERSON in immersion offer: ${immersionOfferId}`,
+        `Contact mode mismatch: ${contactMode} in params. In contact (fetched with siret) : ${contact.contactMethod}`,
       );
 
     const event = this.createNewEvent({

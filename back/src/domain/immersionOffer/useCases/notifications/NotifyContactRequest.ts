@@ -23,35 +23,23 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
   public async _execute(
     payload: ContactEstablishmentRequestDto,
   ): Promise<void> {
-    const { immersionOfferId } = payload;
-
-    const annotatedImmersionOffer =
-      await this.establishmentAggregateRepository.getAnnotatedImmersionOfferById(
-        immersionOfferId,
-      );
-    if (!annotatedImmersionOffer)
-      throw new Error(`Not found: immersionOfferId=${immersionOfferId}`);
+    const { siret, romeLabel } = payload;
 
     const contact =
-      await this.establishmentAggregateRepository.getContactByImmersionOfferId(
-        immersionOfferId,
+      await this.establishmentAggregateRepository.getContactForEstablishmentSiret(
+        siret,
       );
-    if (!contact)
-      throw new Error(
-        `Missing contact details: immersionOffer.id=${annotatedImmersionOffer.id}`,
+    if (!contact) throw new Error(`Missing contact details for siret=${siret}`);
+    const establishment =
+      await this.establishmentAggregateRepository.getEstablishmentForSiret(
+        siret,
       );
+    if (!establishment)
+      throw new Error(`Missing establishment: siret=${siret}`);
 
-    const annotatedEstablishment =
-      await this.establishmentAggregateRepository.getAnnotatedEstablishmentByImmersionOfferId(
-        immersionOfferId,
-      );
-    if (!annotatedEstablishment)
-      throw new Error(
-        `Missing establishment: immersionOffer.id=${annotatedImmersionOffer.id}`,
-      );
     if (contact.contactMethod !== payload.contactMode) {
       throw new Error(
-        `Contact mode mismatch: immersionOffer.id=${annotatedImmersionOffer.id}, ` +
+        `Contact mode mismatch: ` +
           `establishment.contactMethod=${contact.contactMethod}, ` +
           `payload.contactMode=${payload.contactMode}`,
       );
@@ -65,10 +53,10 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
             this.emailGateway.sendContactByEmailRequest(
               establishmentContactEmail,
               {
-                businessName: annotatedEstablishment.name,
+                businessName: establishment.name,
                 contactFirstName: contact.firstName,
                 contactLastName: contact.lastName,
-                jobLabel: annotatedImmersionOffer.romeLabel,
+                jobLabel: romeLabel,
                 potentialBeneficiaryFirstName:
                   payload.potentialBeneficiaryFirstName,
                 potentialBeneficiaryLastName:
@@ -88,7 +76,7 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
             this.emailGateway.sendContactByPhoneInstructions(
               potentialBeneficiaryEmail,
               {
-                businessName: annotatedEstablishment.name,
+                businessName: establishment.name,
                 contactFirstName: contact.firstName,
                 contactLastName: contact.lastName,
                 contactPhone: contact.phone,
@@ -109,10 +97,10 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
             this.emailGateway.sendContactInPersonInstructions(
               potentialBeneficiaryEmail,
               {
-                businessName: annotatedEstablishment.name,
+                businessName: establishment.name,
                 contactFirstName: contact.firstName,
                 contactLastName: contact.lastName,
-                businessAddress: annotatedEstablishment.address,
+                businessAddress: establishment.address,
                 potentialBeneficiaryFirstName:
                   payload.potentialBeneficiaryFirstName,
                 potentialBeneficiaryLastName:

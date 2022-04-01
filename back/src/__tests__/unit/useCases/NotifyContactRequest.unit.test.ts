@@ -19,8 +19,12 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 
+const siret = "11112222333344";
+const contactId = "theContactId";
+
 const payload: ContactEstablishmentRequestDto = {
-  immersionOfferId: immersionOffer.id,
+  siret,
+  romeLabel: TEST_ROME_LABEL,
   contactMode: "PHONE",
   potentialBeneficiaryFirstName: "potential_beneficiary_name",
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",
@@ -57,8 +61,11 @@ describe("NotifyContactRequest", () => {
       contactMode: "EMAIL",
       message: "message_to_send",
     };
-    const establishment = new EstablishmentEntityV2Builder().build();
+    const establishment = new EstablishmentEntityV2Builder()
+      .withSiret(siret)
+      .build();
     const contact = new ContactEntityV2Builder()
+      .withId(contactId)
       .withContactMethod("EMAIL")
       .withEmail(allowedContactEmail)
       .build();
@@ -93,8 +100,11 @@ describe("NotifyContactRequest", () => {
       ...payload,
       contactMode: "PHONE",
     };
-    const establishment = new EstablishmentEntityV2Builder().build();
+    const establishment = new EstablishmentEntityV2Builder()
+      .withSiret(siret)
+      .build();
     const contact = new ContactEntityV2Builder()
+      .withId(contactId)
       .withContactMethod("PHONE")
       .build();
     await establishmentAggregateRepository.insertEstablishmentAggregates([
@@ -124,8 +134,11 @@ describe("NotifyContactRequest", () => {
       ...payload,
       contactMode: "IN_PERSON",
     };
-    const establishment = new EstablishmentEntityV2Builder().build();
+    const establishment = new EstablishmentEntityV2Builder()
+      .withSiret(siret)
+      .build();
     const contact = new ContactEntityV2Builder()
+      .withId(contactId)
       .withContactMethod("IN_PERSON")
       .build();
     await establishmentAggregateRepository.insertEstablishmentAggregates([
@@ -157,12 +170,17 @@ describe("NotifyContactRequest", () => {
       ...payload,
       contactMode: "IN_PERSON",
     };
-    const establishment = new EstablishmentEntityV2Builder().build();
+    const establishment = new EstablishmentEntityV2Builder()
+      .withSiret(siret)
+      .build();
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
         .withContact(
-          new ContactEntityV2Builder().withContactMethod("IN_PERSON").build(),
+          new ContactEntityV2Builder()
+            .withId(contactId)
+            .withContactMethod("IN_PERSON")
+            .build(),
         )
         .withImmersionOffers([immersionOffer])
         .build(),

@@ -64,7 +64,7 @@ const seedResults: SearchImmersionResultDto[] = [
     city: "xxxx",
   },
   {
-    rome: "A0000",
+    rome: "A0001",
     naf: defaultNaf,
     siret: "12345678901234",
     name: "Mega Corp",
@@ -80,7 +80,7 @@ const seedResults: SearchImmersionResultDto[] = [
     numberOfEmployeeRange: "11-49",
   },
   {
-    rome: "A0000",
+    rome: "A0002",
     naf: defaultNaf,
     siret: "12345678901234",
     name: "Hyper Corp",
@@ -94,7 +94,7 @@ const seedResults: SearchImmersionResultDto[] = [
     city: "xxxx",
   },
   {
-    rome: "A0000",
+    rome: "A0003",
     naf: defaultNaf,
     siret: "12345678901235",
     name: "Giga Corp",

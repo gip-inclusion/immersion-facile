@@ -56,7 +56,8 @@ export const SearchResultPanel = () => {
               payload: {
                 immersionOfferRome: searchResult.rome,
                 immersionOfferSiret: searchResult.siret,
-                contactId: searchResult.contactDetails?.id,
+                siret: searchResult.siret,
+                romeLabel: searchResult.romeLabel,
                 contactMethod: searchResult.contactMode,
               },
             })

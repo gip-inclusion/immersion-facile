@@ -1,10 +1,11 @@
 import { z } from "zod";
-import { immersionOfferIdSchema } from "./searchImmersion/SearchImmersionResult.schema";
+import { siretSchema } from "./siret";
 
-import { zEmail, zTrimmedString } from "./zodUtils";
+import { zEmail, zString, zTrimmedString } from "./zodUtils";
 
 const commonFields = {
-  immersionOfferId: immersionOfferIdSchema,
+  romeLabel: zString,
+  siret: siretSchema,
   potentialBeneficiaryFirstName: zTrimmedString,
   potentialBeneficiaryLastName: zTrimmedString,
   potentialBeneficiaryEmail: zEmail,

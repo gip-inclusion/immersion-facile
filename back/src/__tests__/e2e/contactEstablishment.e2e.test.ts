@@ -12,8 +12,12 @@ import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Build
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 const immersionOfferId = "61649067-cd6a-4aa3-8866-d1f3d61292b4";
+const siret = "11112222333344";
+const contactId = "theContactId";
+
 const validRequest: ContactEstablishmentRequestDto = {
-  immersionOfferId,
+  romeLabel: "My rome label",
+  siret,
   contactMode: "EMAIL",
   potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",
@@ -31,8 +35,11 @@ describe("/contact-establishment route", () => {
   });
 
   it("sends email for valid request", async () => {
-    const establishment = new EstablishmentEntityV2Builder().build();
+    const establishment = new EstablishmentEntityV2Builder()
+      .withSiret(siret)
+      .build();
     const contact = new ContactEntityV2Builder()
+      .withId(contactId)
       .withContactMethod("EMAIL")
       .build();
     const immersionOffer = new ImmersionOfferEntityV2Builder()
@@ -47,20 +54,12 @@ describe("/contact-establishment route", () => {
         .build(),
     ]);
 
-    const contactEstablishmentRequest = {
-      ...validRequest,
-      immersionOfferId,
-    };
-
-    await request
-      .post(`/contact-establishment`)
-      .send(contactEstablishmentRequest)
-      .expect(200);
+    await request.post(`/contact-establishment`).send(validRequest).expect(200);
 
     expectArraysToMatch(reposAndGateways.outbox.events, [
       {
         topic: "ContactRequestedByBeneficiary",
-        payload: contactEstablishmentRequest,
+        payload: validRequest,
       },
     ]);
 
@@ -71,14 +70,14 @@ describe("/contact-establishment route", () => {
     );
   });
 
-  it("fails with 404 for unknown immersion offers", async () => {
-    await request
-      .post(`/contact-establishment`)
-      .send({
-        ...validRequest,
-        immersionOfferId: "unknown-immersion-offer-id",
-      })
-      .expect(404);
+  it("fails with 404 for unknown siret", async () => {
+    const response = await request.post(`/contact-establishment`).send({
+      ...validRequest,
+      siret: "40400040000404",
+    });
+
+    expect(response.body).toEqual({ errors: 40400040000404 });
+    expect(response.status).toBe(404);
   });
 
   it("fails with 400 for invalid requests", async () => {

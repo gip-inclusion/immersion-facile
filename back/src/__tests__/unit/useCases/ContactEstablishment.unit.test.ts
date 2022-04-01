@@ -1,8 +1,13 @@
-import { createInMemoryUow } from "../../../adapters/primary/config";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+  expectArraysToEqual,
+  expectPromiseToFailWithError,
+} from "../../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../../adapters/primary/config";
+import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -12,19 +17,14 @@ import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
 import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablishment";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import {
-  expectArraysToEqual,
-  expectPromiseToFailWithError,
-} from "../../../_testBuilders/test.helpers";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
+const siret = "11112222333344";
+const contactId = "theContactId";
 
 const validRequest: ContactEstablishmentRequestDto = {
-  immersionOfferId: immersionOffer.id,
+  romeLabel: "my rome label",
+  siret,
   contactMode: "PHONE",
   potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",
@@ -61,9 +61,14 @@ describe("ContactEstablishment", () => {
   it("schedules event for valid contact request", async () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withEstablishment(
+          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+        )
         .withContact(
-          new ContactEntityV2Builder().withContactMethod("EMAIL").build(),
+          new ContactEntityV2Builder()
+            .withId(contactId)
+            .withContactMethod("EMAIL")
+            .build(),
         )
         .withImmersionOffers([immersionOffer])
         .build(),
@@ -97,9 +102,14 @@ describe("ContactEstablishment", () => {
   it("schedules event for valid PHONE contact request", async () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withEstablishment(
+          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+        )
         .withContact(
-          new ContactEntityV2Builder().withContactMethod("PHONE").build(),
+          new ContactEntityV2Builder()
+            .withId(contactId)
+            .withContactMethod("PHONE")
+            .build(),
         )
         .withImmersionOffers([immersionOffer])
         .build(),
@@ -132,9 +142,14 @@ describe("ContactEstablishment", () => {
   it("schedules event for valid IN_PERSON contact requests", async () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withEstablishment(
+          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+        )
         .withContact(
-          new ContactEntityV2Builder().withContactMethod("IN_PERSON").build(),
+          new ContactEntityV2Builder()
+            .withId(contactId)
+            .withContactMethod("IN_PERSON")
+            .build(),
         )
         .withImmersionOffers([immersionOffer])
         .build(),
@@ -164,25 +179,17 @@ describe("ContactEstablishment", () => {
     ]);
   });
 
-  it("throws NotFoundError for missing immersion offer", async () => {
-    // No immersion offer
-
-    await expectPromiseToFailWithError(
-      contactEstablishment.execute({
-        ...validRequest,
-        contactMode: "PHONE",
-        immersionOfferId: "missing_offer_id",
-      }),
-      new NotFoundError("missing_offer_id"),
-    );
-  });
-
   it("throws BadRequestError for contact mode mismatch", async () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withEstablishment(
+          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+        )
         .withContact(
-          new ContactEntityV2Builder().withContactMethod("EMAIL").build(),
+          new ContactEntityV2Builder()
+            .withId("wrong_contact_id")
+            .withContactMethod("EMAIL")
+            .build(),
         )
         .withImmersionOffers([immersionOffer])
         .build(),
@@ -194,7 +201,7 @@ describe("ContactEstablishment", () => {
         contactMode: "IN_PERSON",
       }),
       new BadRequestError(
-        `Contact mode mismatch: IN_PERSON in immersion offer: ${immersionOffer.id}`,
+        "Contact mode mismatch: IN_PERSON in params. In contact (fetched with siret) : EMAIL",
       ),
     );
   });
@@ -202,7 +209,9 @@ describe("ContactEstablishment", () => {
   it("throws BadRequestError immersion offer without contact id", async () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
-        .withEstablishment(new EstablishmentEntityV2Builder().build())
+        .withEstablishment(
+          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+        )
         .withoutContact() // no contact
         .withImmersionOffers([immersionOffer])
         .build(),
@@ -213,9 +222,7 @@ describe("ContactEstablishment", () => {
         ...validRequest,
         contactMode: "PHONE",
       }),
-      new BadRequestError(
-        `No contact for immersion offer: ${immersionOffer.id}`,
-      ),
+      new BadRequestError(`No contact for establishment: 11112222333344`),
     );
   });
 });

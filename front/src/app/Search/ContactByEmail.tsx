@@ -8,9 +8,11 @@ import {
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailSchema,
 } from "src/shared/contactEstablishment";
+import { SiretDto } from "src/shared/siret";
 
 type ContactByEmailProps = {
-  immersionOfferId: string;
+  siret: SiretDto;
+  romeLabel: string;
   onSuccess: () => void;
 };
 
@@ -27,11 +29,13 @@ const initialMessage =
   En vous remerciant,";
 
 export const ContactByEmail = ({
-  immersionOfferId,
+  siret,
+  romeLabel,
   onSuccess,
 }: ContactByEmailProps) => {
   const initialValues: ContactEstablishmentByMailDto = {
-    immersionOfferId,
+    siret,
+    romeLabel,
     contactMode: "EMAIL",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",
