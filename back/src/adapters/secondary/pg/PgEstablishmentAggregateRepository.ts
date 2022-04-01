@@ -271,7 +271,7 @@ export class PgEstablishmentAggregateRepository
         WHERE rome_code IS NOT NULL AND
         ST_DWithin(gps, ST_GeographyFromText($1), $2) 
       ORDER BY
-        data_source ASC,
+        data_source DESC,
         distance_m
       LIMIT $3;`;
     const formatedQuery = format(query, searchMade.rome); // Formats optional litterals %1$L and %2$L
