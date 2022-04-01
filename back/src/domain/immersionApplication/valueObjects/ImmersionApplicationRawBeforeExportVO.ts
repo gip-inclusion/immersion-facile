@@ -22,7 +22,6 @@ type KeysForExport =
   | "mentorPhone"
   | "mentorEmail"
   | "immersionObjective"
-  | "immersionProfession"
   | "beneficiaryAccepted"
   | "enterpriseAccepted"
   | "schedule"
@@ -33,7 +32,7 @@ type KeysForExport =
 export type ImmersionApplicationRawBeforeExportProps = Pick<
   ImmersionApplicationDto,
   KeysForExport
-> & { agencyName: string };
+> & { agencyName: string; immersionProfession: string };
 
 export class ImmersionApplicationRawBeforeExportVO {
   constructor(

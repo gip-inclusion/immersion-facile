@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { Accordion } from "./Accordion";
 import { TextCell } from "./TextCell";
 import { FormAccordionProps as FormAccordeonProps } from "./FormAccordion";
@@ -22,7 +22,7 @@ const immersionFields: FieldForFormDetails[] = [
   { title: "Fin", key: "dateEnd" },
   { title: "Adresse d'immersion", key: "immersionAddress" },
   { title: "Activités", key: "immersionActivities" },
-  { title: "Metier observé", key: "immersionProfession" },
+  { title: "Metier observé", key: "immersionAppellation" },
   { title: "Objectif", key: "immersionObjective" },
 ];
 

@@ -57,5 +57,5 @@ const getRejectedApplicationNotificationParams = (
   rejectionReason: dto.rejectionJustification || "",
   signature: agencyConfig.signature,
   agency: agencyConfig.name,
-  immersionProfession: dto.immersionProfession,
+  immersionProfession: dto.immersionAppellation.appellationLabel,
 });

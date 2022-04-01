@@ -65,7 +65,8 @@ export class NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty e
           missingSignatureName,
           beneficiaryFirstName: application.firstName,
           beneficiaryLastName: application.lastName,
-          immersionProfession: application.immersionProfession,
+          immersionProfession:
+            application.immersionAppellation.appellationLabel,
         }),
       logger,
     );

@@ -38,24 +38,25 @@ describe("PgImmersionApplicationRepository", () => {
       .build();
     await immersionApplicationRepository.save(immersionApplicationEntity);
 
-    const result = await client.query("SELECT * FROM immersion_applications");
-
-    expect(immersionApplicationRepository.pgToEntity(result.rows[0])).toEqual(
-      immersionApplicationEntity,
-    );
+    expect(
+      await immersionApplicationRepository.getById(
+        immersionApplicationEntity.id,
+      ),
+    ).toEqual(immersionApplicationEntity);
   });
 
   it("Adds a new ImmersionApplicationEntity with field workConditions undefined", async () => {
     const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
       .withoutWorkCondition()
       .build();
+
     await immersionApplicationRepository.save(immersionApplicationEntity);
 
-    const result = await client.query("SELECT * FROM immersion_applications");
-
-    expect(immersionApplicationRepository.pgToEntity(result.rows[0])).toEqual(
-      immersionApplicationEntity,
-    );
+    expect(
+      await immersionApplicationRepository.getById(
+        immersionApplicationEntity.id,
+      ),
+    ).toEqual(immersionApplicationEntity);
   });
   it("Gets saved immersion", async () => {
     const idA: ImmersionApplicationId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
@@ -101,9 +102,7 @@ describe("PgImmersionApplicationRepository", () => {
       updatedImmersionApplicationEntity,
     );
 
-    const result = await client.query("SELECT * FROM immersion_applications");
-    expect(result.rows).toHaveLength(1);
-    expect(immersionApplicationRepository.pgToEntity(result.rows[0])).toEqual(
+    expect(await immersionApplicationRepository.getById(idA)).toEqual(
       updatedImmersionApplicationEntity,
     );
   });

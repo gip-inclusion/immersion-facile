@@ -115,6 +115,6 @@ const getModificationRequestApplicationNotificationParams = (
   reason,
   signature: agencyConfig.signature,
   agency: agencyConfig.name,
-  immersionProfession: dto.immersionProfession,
+  immersionAppellation: dto.immersionAppellation,
   magicLink,
 });

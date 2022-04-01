@@ -1,4 +1,5 @@
 import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
+import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type NewApplicationAdminNotificationParams = {
   demandeId: string;
@@ -34,7 +35,7 @@ export type ValidatedApplicationFinalConfirmationParams = {
   scheduleText: string;
   businessName: string;
   immersionAddress: string;
-  immersionProfession: string;
+  immersionAppellationLabel: string;
   immersionActivities: string;
   sanitaryPrevention: string;
   individualProtection: string;
@@ -59,7 +60,7 @@ export type ModificationRequestApplicationNotificationParams = {
   reason: string;
   businessName: string;
   signature: string;
-  immersionProfession: string;
+  immersionAppellation: AppellationDto;
   agency: string;
   magicLink: string;
 };

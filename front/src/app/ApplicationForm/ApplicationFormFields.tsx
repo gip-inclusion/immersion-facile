@@ -104,15 +104,21 @@ export const ApplicationFormFields = ({
   });
 
   const watchedValues = makeValuesToWatchInUrl(values);
-  const { schedule, ...watchedValuesExceptSchedule } = watchedValues;
+  const {
+    schedule,
+    immersionAppellation,
+    ...watchedValuesExceptScheduleAndAppellation
+  } = watchedValues;
 
   const route = useRoute();
   useEffect(() => {
+    console.log("values ", values);
     if (route.name !== "immersionApplication" || !!route.params.jwt) return;
     routes.immersionApplication(watchedValues).replace();
   }, [
-    ...Object.values(watchedValuesExceptSchedule),
+    ...Object.values(watchedValuesExceptScheduleAndAppellation),
     JSON.stringify(values.schedule),
+    JSON.stringify(values.immersionAppellation),
   ]);
 
   const isSignatureMode = isSignOnly;
@@ -266,7 +272,7 @@ export const ApplicationFormFields = ({
       <br />
       <AddressAutocomplete
         initialSearchTerm={
-          establishmentInfo?.businessAddress ?? values.immersionAddress
+          values.immersionAddress ?? establishmentInfo?.businessAddress
         }
         label="Adresse du lieu où se fera l'immersion * "
         setFormValue={({ label }) => setFieldValue("immersionAddress", label)}
@@ -309,6 +315,7 @@ export const ApplicationFormFields = ({
         label="Intitulé du poste / métier observé pendant l'immersion *"
         description="Ex : employé libre service, web développeur, boulanger …"
         disabled={isFrozen}
+        initialFieldValue={values.immersionAppellation}
       />
 
       <TextInput
@@ -470,8 +477,18 @@ const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
     "mentorEmail",
     "mentorPhone",
     "agencyId",
-    "schedule",
+
+    "immersionAddress",
+    "sanitaryPrevention",
+    "individualProtection",
+    "sanitaryPreventionDescription",
+    "immersionObjective",
+    "immersionActivities",
+    "immersionSkills",
     "workConditions",
+
+    "schedule",
+    "immersionAppellation",
   ];
   const watchedValuesObject = keysToWatch.reduce(
     (acc, watchedKey) => ({ ...acc, [watchedKey]: values[watchedKey] }),

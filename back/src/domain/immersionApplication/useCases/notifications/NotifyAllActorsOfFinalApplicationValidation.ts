@@ -79,7 +79,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
     : prettyPrintSchedule(dto.schedule),
   businessName: dto.businessName,
   immersionAddress: dto.immersionAddress || "",
-  immersionProfession: dto.immersionProfession,
+  immersionAppellationLabel: dto.immersionAppellation.appellationLabel,
   immersionActivities: dto.immersionActivities,
   sanitaryPrevention:
     dto.sanitaryPrevention && dto.sanitaryPreventionDescription

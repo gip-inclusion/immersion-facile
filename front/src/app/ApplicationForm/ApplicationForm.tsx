@@ -70,7 +70,7 @@ const createInitialApplication = (
 
     // Immersion
     immersionObjective: route.params.immersionObjective ?? "",
-    immersionProfession: route.params.immersionProfession ?? "",
+    immersionAppellation: route.params.immersionAppellation,
     immersionActivities: route.params.immersionActivities ?? "",
     immersionSkills: route.params.immersionSkills ?? "",
 
@@ -110,8 +110,12 @@ const createInitialApplication = (
 
     // Immersion
     immersionObjective: emptyForm.immersionObjective || "",
-    immersionProfession:
-      emptyForm.immersionProfession || "Boulanger / Boulangère",
+    immersionAppellation: emptyForm.immersionAppellation || {
+      romeLabel: "Boulanger / Boulangère",
+      appellationLabel: "Boulangerie",
+      romeCode: "D1502",
+      appellationCode: "12278",
+    },
     immersionActivities: emptyForm.immersionActivities || "Superviser",
     immersionSkills: emptyForm.immersionSkills || "Attention au détail",
 

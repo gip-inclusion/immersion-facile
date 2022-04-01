@@ -38,7 +38,7 @@ const immersionFields: FieldsToLabel = {
   dateStart: "Début",
   dateEnd: "Fin",
   immersionAddress: "Adresse d'immersion",
-  immersionProfession: "Métier observé",
+  immersionAppellation: "Métier observé",
   immersionActivities: "Activités",
   immersionObjective: "Objectif",
   schedule: "Horaires",

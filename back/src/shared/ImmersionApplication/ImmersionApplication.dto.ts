@@ -4,6 +4,7 @@ import { SiretDto } from "../siret";
 import { Flavor } from "../typeFlavors";
 
 import { Role } from "../tokens/MagicLinkPayload";
+import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type ApplicationStatus = typeof validApplicationStatus[number];
 
@@ -46,7 +47,7 @@ export type ImmersionApplicationDto = {
   sanitaryPreventionDescription?: string;
   immersionAddress?: string;
   immersionObjective?: string;
-  immersionProfession: string;
+  immersionAppellation: AppellationDto;
   immersionActivities: string;
   immersionSkills?: string;
   beneficiaryAccepted: boolean;

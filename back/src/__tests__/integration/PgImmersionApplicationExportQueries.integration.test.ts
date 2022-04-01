@@ -72,6 +72,7 @@ describe("Pg implementation of ImmersionApplicationExportQueries", () => {
         individualProtection,
         sanitaryPrevention,
         sanitaryPreventionDescription,
+        immersionAppellation,
         ...filteredProperties
       } = immersionApplicationEntity.properties;
       // Assert
@@ -79,6 +80,9 @@ describe("Pg implementation of ImmersionApplicationExportQueries", () => {
         new ImmersionApplicationRawBeforeExportVO({
           ...filteredProperties,
           agencyName: appleAgency.name,
+          immersionProfession:
+            immersionApplicationEntity.properties.immersionAppellation
+              .appellationLabel,
           status: immersionApplicationEntity.status,
           dateEnd: "20/01/2021",
           dateStart: "15/01/2021",

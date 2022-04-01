@@ -15,6 +15,7 @@ export class PgImmersionApplicationExportQueries
       SELECT *, immersion_applications.status as immersion_applications_status, agencies.status as agency_status
       FROM immersion_applications
       LEFT JOIN agencies ON agencies.id = immersion_applications.agency_id
+      LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_applications.immersion_appellation
       `);
     return pgResult.rows.map(
       (row) =>
@@ -34,7 +35,7 @@ export class PgImmersionApplicationExportQueries
           mentorPhone: row.mentor_phone,
           mentorEmail: row.mentor_email,
           immersionObjective: row.immersion_objective,
-          immersionProfession: row.immersion_profession,
+          immersionProfession: row.libelle_appellation_court,
           beneficiaryAccepted: row.beneficiary_accepted,
           enterpriseAccepted: row.enterprise_accepted,
           schedule: row.schedule,

@@ -1,36 +1,27 @@
 import { useField } from "formik";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { AppellationAutocomplete } from "src/app/Profession/AppellationAutocomplete";
 import { TextInput } from "src/components/form/TextInput";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { AppellationCode } from "src/shared/rome";
 import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 type ApplicationFormProfessionProps = {
   label: string;
   description?: string;
   disabled?: boolean;
+  initialFieldValue: AppellationDto;
 };
 
 export const ApplicationFormProfession = ({
   label,
   description,
   disabled,
+  initialFieldValue,
 }: ApplicationFormProfessionProps) => {
-  const name: keyof ImmersionApplicationDto = "immersionProfession";
+  const name: keyof ImmersionApplicationDto = "immersionAppellation";
+
   const [{ value }, _, { setValue }] =
-    useField<ImmersionApplicationDto["immersionProfession"]>(name);
-
-  const [profession, setProfession] = useState<AppellationDto>({
-    romeCode: "",
-    appellationCode: "",
-    romeLabel: "",
-    appellationLabel: "",
-  });
-
-  useEffect(() => {
-    setValue(profession.appellationLabel || value);
-  }, [profession]);
+    useField<ImmersionApplicationDto["immersionAppellation"]>(name);
 
   if (disabled) return <TextInput label={label} name={name} disabled />;
 
@@ -47,8 +38,8 @@ export const ApplicationFormProfession = ({
         )}
         <AppellationAutocomplete
           title=""
-          initialValue={profession}
-          setFormValue={setProfession}
+          initialValue={initialFieldValue}
+          setFormValue={setValue}
         />
       </div>
     </>

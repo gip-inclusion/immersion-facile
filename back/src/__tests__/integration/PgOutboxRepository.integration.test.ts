@@ -441,6 +441,5 @@ const expectStoredRowsToMatchEvent = (
       );
     },
   );
-
   expectArraysToEqualIgnoringOrder(rows, expectedRowsForEvent);
 };

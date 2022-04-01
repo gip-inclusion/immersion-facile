@@ -28,6 +28,7 @@ import { LegacyScheduleDto, ScheduleDto } from "../ScheduleSchema";
 import { dateRegExp } from "../utils/date";
 import { allRoles } from "../tokens/MagicLinkPayload";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
+import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 
 export const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
   zTrimmedString;
@@ -76,7 +77,7 @@ export const immersionApplicationSchema: z.Schema<ImmersionApplicationDto> = z
     sanitaryPreventionDescription: z.string().optional(),
     immersionAddress: addressWithPostalCodeSchema.optional(),
     immersionObjective: zString,
-    immersionProfession: zTrimmedString,
+    immersionAppellation: appellationDtoSchema,
     immersionActivities: zTrimmedString,
     immersionSkills: z.string().optional(),
     beneficiaryAccepted: zBoolean,

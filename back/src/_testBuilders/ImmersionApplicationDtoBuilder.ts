@@ -10,6 +10,7 @@ import {
   ImmersionApplicationDto,
   ImmersionApplicationId,
 } from "../shared/ImmersionApplication/ImmersionApplication.dto";
+import { AppellationDto } from "../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 export const VALID_EMAILS = [
@@ -48,7 +49,12 @@ const validImmersionApplication: ImmersionApplicationDto = {
   sanitaryPrevention: true,
   sanitaryPreventionDescription: "fourniture de gel",
   immersionObjective: "Confirmer un projet professionnel",
-  immersionProfession: "Pilote d'automobile",
+  immersionAppellation: {
+    romeCode: "A1101",
+    romeLabel: "Conduite d'engins agricoles et forestiers",
+    appellationCode: "17751",
+    appellationLabel: "Pilote de machines d'abattage",
+  },
   immersionActivities: "Piloter un automobile",
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
   beneficiaryAccepted: true,
@@ -174,7 +180,14 @@ export class ImmersionApplicationDtoBuilder
       workConditions: undefined,
     });
   }
-
+  public withImmersinAppelation(
+    immersionAppellation: AppellationDto,
+  ): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      immersionAppellation,
+    });
+  }
   public notSigned() {
     return new ImmersionApplicationDtoBuilder({
       ...this.dto,

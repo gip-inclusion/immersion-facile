@@ -202,7 +202,7 @@ export class SendinblueEmailGateway implements EmailGateway {
         SCHEDULE_LINES: params.scheduleText.split("\n"),
         BUSINESS_NAME: params.businessName,
         IMMERSION_ADDRESS: params.immersionAddress,
-        IMMERSION_PROFESSION: params.immersionProfession,
+        IMMERSION_PROFESSION: params.immersionAppellationLabel,
         IMMERSION_ACTIVITIES: params.immersionActivities,
         SANITARY_PREVENTION_DESCRIPTION: params.sanitaryPrevention,
         INDIVIDUAL_PROTECTION: params.individualProtection,

@@ -186,7 +186,8 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       scheduleText: prettyPrintSchedule(application.schedule),
       businessName: application.businessName,
       immersionAddress: "immersionAddress",
-      immersionProfession: application.immersionProfession,
+      immersionAppellationLabel:
+        application.immersionAppellation.appellationLabel,
       immersionActivities: application.immersionActivities,
       sanitaryPrevention: "sanitaryPreventionDescription",
       individualProtection: "oui",
