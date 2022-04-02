@@ -21,7 +21,7 @@ export const submissionAndStartDatesConstraints = ({
 export const startDateIsBeforeEndDate = ({
   dateStart,
   dateEnd,
-}: DatesInApplication) => new Date(dateEnd) > new Date(dateStart);
+}: DatesInApplication) => new Date(dateEnd) >= new Date(dateStart);
 
 export const enoughWorkedDaysToReviewFromSubmitDate = ({
   dateSubmission,
