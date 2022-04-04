@@ -1,6 +1,7 @@
-import { LegacyScheduleDto } from "./ScheduleSchema";
+import { addDays } from "date-fns";
 import {
   ComplexScheduleDto,
+  LegacyScheduleDto,
   ScheduleDto,
   SimpleScheduleDto,
   TimePeriodDto,
@@ -269,4 +270,86 @@ export const prettyPrintDayFromSchedule = (
     ? convertSimpleToComplexSchedule(schedule.simpleSchedule)
     : schedule.complexSchedule;
   return prettyPrintDaySchedule(complexSchedule[dayIndex]);
+};
+
+type DatesOfImmersion = {
+  dateStart: string;
+  dateEnd: string;
+};
+
+type CalculateTotalHoursProps = DatesOfImmersion & {
+  schedule: ScheduleDto;
+};
+
+export const calculateTotalImmersionHoursBetweenDate = ({
+  schedule,
+  ...dates
+}: CalculateTotalHoursProps): number => {
+  if (schedule.isSimple)
+    return calculateTotalImmersionHoursBetweenDateSimple({
+      simpleSchedule: schedule.simpleSchedule,
+      ...dates,
+    });
+
+  return calculateTotalImmersionHoursBetweenDateComplex({
+    complexSchedule: schedule.complexSchedule,
+    ...dates,
+  });
+};
+
+const getIndexInWeekFromMonday = (date: Date) => {
+  const dayIndex = date.getDay();
+  return dayIndex === 0 ? 6 : dayIndex - 1;
+};
+
+const calculateTotalImmersionHoursBetweenDateSimple = ({
+  dateStart,
+  dateEnd,
+  simpleSchedule,
+}: DatesOfImmersion & { simpleSchedule: SimpleScheduleDto }): number => {
+  const start = new Date(dateStart);
+  const end = new Date(dateEnd);
+
+  let totalOfHours = 0;
+
+  for (
+    let currentDate = start;
+    currentDate <= end;
+    currentDate = addDays(currentDate, 1)
+  ) {
+    const indexInWeek = getIndexInWeekFromMonday(currentDate);
+    const isDayInSchedule = simpleSchedule.dayPeriods.some(
+      (period) => period[0] <= indexInWeek && indexInWeek <= period[1],
+    );
+    if (!isDayInSchedule) continue;
+    totalOfHours += minutesInDay(simpleSchedule.hours) / 60;
+  }
+
+  return totalOfHours;
+};
+
+const calculateTotalImmersionHoursBetweenDateComplex = ({
+  dateStart,
+  dateEnd,
+  complexSchedule,
+}: DatesOfImmersion & { complexSchedule: ComplexScheduleDto }): number => {
+  const minutesOfWorkByDay = complexSchedule.map(minutesInDay);
+
+  const start = new Date(dateStart);
+  const end = new Date(dateEnd);
+
+  let totalOfMinutes = 0;
+
+  for (
+    let currentDate = start;
+    currentDate <= end;
+    currentDate = addDays(currentDate, 1)
+  ) {
+    const indexInWeek = getIndexInWeekFromMonday(currentDate);
+    const numberOfMinutesInDay = minutesOfWorkByDay[indexInWeek];
+    if (!numberOfMinutesInDay) continue;
+    totalOfMinutes += numberOfMinutesInDay;
+  }
+
+  return totalOfMinutes / 60;
 };

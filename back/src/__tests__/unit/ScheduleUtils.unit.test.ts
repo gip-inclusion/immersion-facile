@@ -1,5 +1,6 @@
 import { weekdays } from "../../shared/ScheduleSchema";
 import {
+  calculateTotalImmersionHoursBetweenDate,
   convertToFrenchNamedDays,
   isArrayOfWeekdays,
   prettyPrintSchedule,
@@ -139,6 +140,116 @@ describe("ScheduleUtils", () => {
       expect(isArrayOfWeekdays([1, 2, 3])).toBe(false);
       expect(isArrayOfWeekdays(["Lundi"])).toBe(false);
       expect(isArrayOfWeekdays(["lundi", "MARDI"])).toBe(false);
+    });
+  });
+
+  describe("calculateTotalImmersionHoursBetweenDate", () => {
+    describe("with simple schedule", () => {
+      const simpleScheduleClassic = new ScheduleDtoBuilder()
+        .withSimpleSchedule({
+          dayPeriods: [
+            [0, 0],
+            [2, 3],
+          ],
+          hours: [
+            { start: "09:00", end: "12:30" },
+            { start: "14:00", end: "18:00" },
+          ],
+        })
+        .build();
+
+      it("give hours time when immersion last only one day", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022-04-04",
+          dateEnd: "2022-04-04",
+          schedule: simpleScheduleClassic,
+        });
+        expect(totalHours).toBe(7.5);
+      });
+
+      it("has no hours if the day is not one of the worked day", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022-04-05",
+          dateEnd: "2022-04-05",
+          schedule: simpleScheduleClassic,
+        });
+        expect(totalHours).toBe(0);
+      });
+
+      it("calculate the some of days worked", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022-04-04",
+          dateEnd: "2022-04-07",
+          schedule: simpleScheduleClassic,
+        });
+        expect(totalHours).toBe(22.5);
+      });
+
+      it("calculate the some of days worked even on several weeks", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022-04-04",
+          dateEnd: "2022-04-18",
+          schedule: simpleScheduleClassic,
+        });
+        expect(totalHours).toBe(52.5);
+      });
+    });
+
+    describe("with complex schedule", () => {
+      const complexSchedule = new ScheduleDtoBuilder()
+        .withComplexSchedule([
+          [{ start: "08:00", end: "12:00" }],
+          [],
+          [],
+          [
+            { start: "06:00", end: "12:00" },
+            { start: "18:00", end: "22:00" },
+          ],
+          [],
+          [],
+          [
+            { start: "02:00", end: "06:00" },
+            { start: "07:00", end: "10:00" },
+            { start: "19:00", end: "21:00" },
+          ],
+        ])
+        .build();
+
+      it("give day hours when immersion last only one day", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022-04-04",
+          dateEnd: "2022-04-04",
+          schedule: complexSchedule,
+        });
+        expect(totalHours).toBe(4);
+      });
+
+      it("has no hours if the day is not one of the worked day", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022-04-05",
+          dateEnd: "2022-04-05",
+          schedule: complexSchedule,
+        });
+        expect(totalHours).toBe(0);
+      });
+
+      it("calculate the some of days worked", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022-04-04",
+          dateEnd: "2022-04-10",
+          schedule: complexSchedule,
+        });
+        expect(totalHours).toBe(23);
+      });
+
+      it("calculate the some of days worked even on several weeks", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022-04-04",
+          dateEnd: "2022-04-18",
+          schedule: complexSchedule,
+        });
+        expect(totalHours).toBe(50);
+      });
     });
   });
 });
