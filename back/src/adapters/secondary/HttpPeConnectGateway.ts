@@ -58,7 +58,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
     const response = await createAxiosInstance(_logger).post(
       "https://authentification-candidat.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Findividu",
-      getAccessTokenPayload,
+      queryParamsAsString<PeConnectOAuthGetTokenWithCodeGrantPayload>(
+        getAccessTokenPayload,
+      ),
       {
         headers,
         timeout: secondsToMilliseconds(10),
