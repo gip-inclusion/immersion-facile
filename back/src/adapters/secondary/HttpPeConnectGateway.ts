@@ -10,7 +10,9 @@ import {
   PeConnectUserInfo,
 } from "../../domain/generic/peConnect/port/PeConnectGateway";
 import { queryParamsAsString } from "../../shared/utils/queryParams";
-import { notifyObjectDiscord } from "../../utils/notifyDiscord";
+import { createLogger } from "../../utils/logger";
+
+const _logger = createLogger(__filename);
 
 export class HttpPeConnectGateway implements PeConnectGateway {
   public constructor(private readonly config: AccessTokenConfig) {}
@@ -51,12 +53,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     };
 
     const headers = {
-      ContentType: "application/x-www-form-urlencoded",
+      "Content-Type": "application/x-www-form-urlencoded",
     };
 
-    notifyObjectDiscord(getAccessTokenPayload);
-
-    const response = await createAxiosInstance().post(
+    const response = await createAxiosInstance(_logger).post(
       "https://authentification-candidat.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Findividu",
       getAccessTokenPayload,
       {
