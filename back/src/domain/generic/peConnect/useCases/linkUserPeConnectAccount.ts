@@ -29,15 +29,16 @@ export class LinkUserPeConnectAccount extends UseCase<string, AbsoluteUrl> {
         authorizationCode,
       );
 
-    notifyObjectDiscord({ _message: "PeAccessToken", ...peAccessToken });
+    //notifyObjectDiscord({ _message: "PeAccessToken", ...peAccessToken });
     const userInfo = await this.peConnectGateway.getUserInfo(peAccessToken);
-
-    notifyObjectDiscord(userInfo);
 
     const queryParams =
       queryParamsAsString<ImmersionApplicationPeConnectFields>(
         peConnectUserInfoToImmersionApplicationDto(userInfo),
       );
+
+    const testApiConseiller = this.testApiConseiller(peAccessToken);
+    notifyObjectDiscord(testApiConseiller);
 
     return `${this.baseUrl}/${frontRoutes.immersionApplicationsRoute}?${queryParams}`;
   }
@@ -49,9 +50,8 @@ export class LinkUserPeConnectAccount extends UseCase<string, AbsoluteUrl> {
       Authorization: `Bearer ${peAccessToken.access_token}`,
     };
 
-    const response = await createAxiosInstance().post(
-      "https://authentification-candidat.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Findividu",
-      undefined,
+    const response = await createAxiosInstance().get(
+      "https://api.emploi-store.fr/partenaire/peconnect-conseillers/v1/contactspe/conseillers",
       {
         headers,
         timeout: secondsToMilliseconds(10),
