@@ -10,6 +10,7 @@ import {
   PeConnectUserInfo,
 } from "../../domain/generic/peConnect/port/PeConnectGateway";
 import { queryParamsAsString } from "../../shared/utils/queryParams";
+import { notifyObjectDiscord } from "../../utils/notifyDiscord";
 
 export class HttpPeConnectGateway implements PeConnectGateway {
   public constructor(private readonly config: AccessTokenConfig) {}
@@ -44,7 +45,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       code: authorization_code,
       client_id: this.config.clientId,
       client_secret: this.config.clientSecret,
-      realm: "/individu",
       redirect_uri: encodeURI(
         "https://immersion-facile.beta.gouv.fr/api/pe-connect",
       ),
@@ -53,6 +53,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     const headers = {
       ContentType: "application/x-www-form-urlencoded",
     };
+
+    notifyObjectDiscord(getAccessTokenPayload);
 
     const response = await createAxiosInstance().post(
       "https://authentification-candidat.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Findividu",

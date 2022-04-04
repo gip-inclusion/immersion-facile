@@ -24,7 +24,6 @@ export type PeConnectOAuthGetTokenWithCodeGrantPayload = {
   code: string;
   client_id: string;
   client_secret: string;
-  realm: string;
   redirect_uri: string;
 };
 

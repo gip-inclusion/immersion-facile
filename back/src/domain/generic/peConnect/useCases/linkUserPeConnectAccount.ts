@@ -8,6 +8,7 @@ import {
   PeConnectGateway,
   peConnectUserInfoToImmersionApplicationDto,
 } from "../port/PeConnectGateway";
+import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 
 export class LinkUserPeConnectAccount extends UseCase<string, AbsoluteUrl> {
   inputSchema = z.string();
@@ -20,11 +21,17 @@ export class LinkUserPeConnectAccount extends UseCase<string, AbsoluteUrl> {
   }
 
   protected async _execute(authorizationCode: string): Promise<AbsoluteUrl> {
-    const userInfo = await this.peConnectGateway.getUserInfo(
+    notifyObjectDiscord(authorizationCode);
+
+    const peAccessToken =
       await this.peConnectGateway.oAuthGetAccessTokenThroughAuthorizationCode(
         authorizationCode,
-      ),
-    );
+      );
+
+    notifyObjectDiscord(authorizationCode);
+    const userInfo = await this.peConnectGateway.getUserInfo(peAccessToken);
+
+    notifyObjectDiscord(userInfo);
 
     const queryParams =
       queryParamsAsString<ImmersionApplicationPeConnectFields>(
