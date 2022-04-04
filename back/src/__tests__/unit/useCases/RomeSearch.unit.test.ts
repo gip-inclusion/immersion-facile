@@ -28,7 +28,7 @@ describe("RomeSearch", () => {
 
   it("issues no queries for short search texts", async () => {
     const useCase = prepareUseCase();
-    const response = await useCase.execute("lap");
+    const response = await useCase.execute("la");
     expect(response).toEqual([]);
   });
 });

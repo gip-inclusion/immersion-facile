@@ -18,7 +18,9 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   public async processNewEvents() {
+    console.time("__metrics : getAllUnpublishedEvents query duration");
     const events = await this.outboxRepository.getAllUnpublishedEvents();
+    console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
     logger.debug(
       { events: eventsToDebugInfo(events) },
       "processing new Events",
@@ -27,7 +29,9 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   public async retryFailedEvents() {
+    console.time("__metrics : getAllFailedEvents query duration");
     const events = await this.outboxRepository.getAllFailedEvents();
+    console.timeEnd("__metrics : getAllFailedEvents query duration");
     logger.debug({ events: eventsToDebugInfo(events) }, "retrying Events");
     await Promise.all(events.map((event) => this.eventBus.publish(event)));
   }

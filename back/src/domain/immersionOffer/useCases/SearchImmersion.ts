@@ -48,6 +48,7 @@ export class SearchImmersion extends UseCase<
     await this.searchesMadeRepository.insertSearchMade(searchMadeEntity);
     const apiConsumerName = apiConsumer?.consumer;
 
+    console.time("searchImmersionQueryDuration");
     const resultsFromStorage =
       await this.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
         {
@@ -56,6 +57,7 @@ export class SearchImmersion extends UseCase<
           maxResults: 100,
         },
       );
+    console.timeEnd("searchImmersionQueryDuration");
 
     histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);
 
