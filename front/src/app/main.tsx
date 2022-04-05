@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { App } from "src/app/App";
-import "./index.css";
-import { RouteProvider } from "./routes";
+import "../assets/index.css";
+import { RouteProvider } from "./routing/routes";
 
 ReactDOM.render(
   <React.StrictMode>

@@ -1,7 +1,7 @@
 import { SearchImmersionRequestDto } from "src/shared/searchImmersion/SearchImmersionRequest.dto";
 import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 import { sleep } from "src/shared/utils";
-import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
+import { ContactEstablishmentRequestDto } from "src/shared/contactEstablishment";
 
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 

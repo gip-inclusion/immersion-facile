@@ -2,9 +2,9 @@ import React from "react";
 import {
   FeatureFlagsContext,
   useFetchFeatureFlags,
-} from "src/app/FeatureFlagContext";
-import { Navigation } from "src/app/Navigation";
-import { Router } from "src/app/Router";
+} from "./utils/FeatureFlagContext";
+import { Navigation } from "./components/Navigation";
+import { Router } from "./routing/Router";
 import { ENV } from "src/environmentVariables";
 
 const { dev } = ENV;
