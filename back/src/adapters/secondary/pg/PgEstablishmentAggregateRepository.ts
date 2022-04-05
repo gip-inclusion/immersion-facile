@@ -236,6 +236,7 @@ export class PgEstablishmentAggregateRepository
         )
     SELECT 
         establishments.name as establishment_name,
+        establishments.customized_name as establishment_customized_name,
         number_employees AS establishment_tefen_code, 
         address,
         naf_code,
@@ -317,7 +318,8 @@ export class PgEstablishmentAggregateRepository
             naf: result.naf_code,
             nafLabel: result.class_label,
             siret: result.establishment_siret,
-            name: result.establishment_name,
+            name:
+              result.establishment_customized_name ?? result.establishment_name,
             voluntaryToImmersion: result.data_source === "form",
             numberOfEmployeeRange:
               employeeRangeByTefenCode[
