@@ -59,6 +59,7 @@ export class LaBonneBoiteCompanyVO {
       numberEmployeesRange: extraData?.numberEmployeesRange ?? -1,
       isActive: true,
       updatedAt,
+      isSearchable: true,
     };
 
     return {

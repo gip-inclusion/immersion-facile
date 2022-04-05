@@ -243,6 +243,38 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(searchWithNoRomeResult).toHaveLength(0);
     });
 
+    it("returns searchable establishments only", async () => {
+      // Prepare : establishment in geographical area but not active
+      const notSearchableSiret = "78000403200029";
+
+      await insertEstablishment({
+        siret: notSearchableSiret,
+        isSearchable: false,
+        position: searchedPosition,
+      });
+      await insertImmersionOffer({
+        uuid: testUid1,
+        romeCode: informationGeographiqueRome,
+        romeAppellation: undefined, // Appellation
+        siret: notSearchableSiret,
+      });
+
+      await insertImmersionOffer({
+        uuid: testUid2,
+        romeCode: informationGeographiqueRome,
+        romeAppellation: undefined, // Appellation
+        siret: notSearchableSiret,
+      });
+
+      // Act
+      const searchWithNoRomeResult =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
+          { searchMade: searchMadeWithRome },
+        );
+      // Assert
+      expect(searchWithNoRomeResult).toHaveLength(0);
+    });
+
     it("returns one search DTO by establishment, with offers matching rome and geographical area", async () => {
       // Prepare
       /// Establishment with offer inside geographical area with searched rome
@@ -1268,6 +1300,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     siret: string;
     updatedAt?: Date;
     isActive?: boolean;
+    isSearchable?: boolean;
     nafCode?: string;
     numberEmployeesRange?: number;
     address?: string;
@@ -1278,8 +1311,8 @@ describe("Postgres implementation of immersion offer repository", () => {
     const defaultPosition = { lon: 12.2, lat: 2.1 };
     const insertQuery = `
     INSERT INTO establishments (
-      siret, name, address, number_employees, naf_code, data_source, source_provider, update_date, is_active, gps
-    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, ST_GeographyFromText('POINT(${
+      siret, name, address, number_employees, naf_code, data_source, source_provider, update_date, is_active, is_searchable, gps
+    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, $9, ST_GeographyFromText('POINT(${
       props.position?.lon ?? defaultPosition.lon
     } ${props.position?.lat ?? defaultPosition.lat})'))`;
     await client.query(insertQuery, [
@@ -1291,6 +1324,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.sourceProvider ?? "api_labonneboite",
       props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
       props.isActive ?? true,
+      props.isSearchable ?? true,
     ]);
   };
   const insertImmersionOffer = async (props: {

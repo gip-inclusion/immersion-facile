@@ -97,6 +97,7 @@ export class PgFormEstablishmentRepository
       naf: params.naf,
       appellations: params.professions,
       businessContact: params.business_contact,
+      isSearchable: params.is_searchable,
     };
   }
 }

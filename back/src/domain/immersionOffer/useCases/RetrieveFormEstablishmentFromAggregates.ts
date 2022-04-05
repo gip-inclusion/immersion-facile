@@ -54,6 +54,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         appellationLabel: offerAsAppellationDto.appellationLabel,
       })),
       businessContact: contact,
+      isSearchable: establishment.isSearchable,
     };
     return retrievedForm;
   }

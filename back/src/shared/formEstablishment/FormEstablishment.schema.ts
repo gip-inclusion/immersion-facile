@@ -56,6 +56,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
       .array(appellationDtoSchema)
       .min(1, "Spécifiez au moins 1 métier"),
     businessContact: businessContactSchema,
+    isSearchable: zBoolean,
   },
   { required_error: "Obligatoire" },
 );

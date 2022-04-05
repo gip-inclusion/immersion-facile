@@ -83,6 +83,7 @@ describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
           .set("Authorization", jwt)
           .send(formEstablishmentDtoPublicV0);
 
+        expect(response.body).toBe(formEstablishmentDtoPublicV0.siret);
         expect(response.status).toBe(200);
       });
     });

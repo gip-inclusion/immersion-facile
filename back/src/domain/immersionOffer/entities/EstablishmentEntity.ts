@@ -46,6 +46,7 @@ export type EstablishmentEntityV2 = {
   numberEmployeesRange: TefenCode;
   updatedAt?: Date;
   isActive: boolean;
+  isSearchable: boolean;
   isCommited?: boolean;
 };
 

@@ -106,6 +106,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       naf: row.naf,
       appellations: row.professions,
       businessContact: row.business_contact,
+      isSearchable: true,
     };
     try {
       await upsertAggregateFromForm.execute(formEstablishmentDto);

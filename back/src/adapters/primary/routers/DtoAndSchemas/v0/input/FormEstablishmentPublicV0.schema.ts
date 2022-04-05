@@ -65,6 +65,7 @@ export const formEstablishmentSchemaPublicV0: z.Schema<FormEstablishmentDtoPubli
       preferredContactMethods: z
         .array(z.enum(validContactMethodsV0), { required_error: "Obligatoire" })
         .length(1, "Spécifiez un mode de contact"),
+      isSearchable: zBoolean,
     },
     { required_error: "Obligatoire" },
   );

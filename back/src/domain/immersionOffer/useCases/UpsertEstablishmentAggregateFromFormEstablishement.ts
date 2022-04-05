@@ -128,6 +128,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       numberEmployeesRange,
       isActive: true,
       updatedAt: this.clock.now(),
+      isSearchable: formEstablishment.isSearchable,
     };
 
     const establishmentAggregate: EstablishmentAggregate = {

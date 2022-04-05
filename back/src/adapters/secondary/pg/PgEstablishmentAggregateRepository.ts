@@ -91,6 +91,7 @@ export class PgEstablishmentAggregateRepository
       convertPositionToStGeography(establishment.position),
       establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
       establishment.isActive,
+      establishment.isSearchable,
       establishment.isCommited,
     ]);
 
@@ -100,7 +101,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, address, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, update_date, is_active, is_commited
+          siret, name, customized_name, address, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, update_date, is_active, is_searchable, is_commited
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -224,7 +225,7 @@ export class PgEstablishmentAggregateRepository
             (WITH active_establishments_within_area AS (
                 SELECT siret
                 FROM establishments 
-                WHERE is_active AND ST_DWithin(gps, ST_GeographyFromText($1), $2)) 
+                WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)) 
         SELECT io.siret, rome_code, 
         JSONB_AGG(distinct libelle_appellation_long) filter(WHERE libelle_appellation_long is not null) AS appellation_labels
         FROM immersion_offers io 
@@ -368,6 +369,7 @@ export class PgEstablishmentAggregateRepository
         public_naf_classes_2008.class_label AS naf_label,
         establishments.number_employees,
         establishments.update_date as establishments_update_date,
+        establishments.is_searchable,
         contact_mode
       FROM
         establishments
@@ -404,6 +406,7 @@ export class PgEstablishmentAggregateRepository
       isActive: true,
       isCommited: optional(row.is_commited),
       updatedAt: row.establishments_update_date,
+      isSearchable: row.is_searchable,
     };
   }
   public async getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
@@ -632,6 +635,7 @@ export class PgEstablishmentAggregateRepository
       customizedName: optional(row.customized_name),
       nafLabel: row.naf_label ?? "",
       updatedAt: row.update_date,
+      isSearchable: row.is_searchable,
     };
     return establishmentForSiret;
   }

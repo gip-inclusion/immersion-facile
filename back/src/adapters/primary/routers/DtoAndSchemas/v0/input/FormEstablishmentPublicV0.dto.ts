@@ -54,5 +54,6 @@ export const formEstablishmentDtoPublicV0ToDomain = (
           ? "EMAIL"
           : preferredContactMethods[0],
     },
+    isSearchable: true,
   };
 };

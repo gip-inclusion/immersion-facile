@@ -32,6 +32,7 @@ export type FormEstablishmentDtoPublicV1 = {
   naf?: { code: string; nomenclature: string };
   appellations: AppellationDtoPublicV1[]; // at least one
   businessContact: BusinessContactDtoPublicV1;
+  isSearchable: boolean;
 };
 
 export const formEstablishmentDtoPublicV1ToDomain = (

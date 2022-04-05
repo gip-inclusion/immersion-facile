@@ -25,6 +25,7 @@ const validFormEstablishment: FormEstablishmentDto = {
   businessNameCustomized: "Ma belle enseigne du quartier",
   isEngagedEnterprise: false,
   siret: "01234567890123",
+  isSearchable: true,
   appellations: [
     {
       romeCode: "A1111",
@@ -62,6 +63,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   businessName: "",
   siret: "",
   appellations: [],
+  isSearchable: true,
 };
 
 export class FormEstablishmentDtoBuilder

@@ -43,4 +43,5 @@ export type FormEstablishmentDto = {
   naf?: NafDto; // { code: string, nomenclature: string }
   appellations: AppellationDto[]; // at least one
   businessContact: BusinessContactDto; // array of exactly one element (a bit strange but it from long ago)
+  isSearchable: boolean;
 };
