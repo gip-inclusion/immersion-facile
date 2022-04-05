@@ -25,6 +25,7 @@ export type NewApplicationMentorConfirmationParams = {
 };
 
 export type ValidatedApplicationFinalConfirmationParams = {
+  totalHours: number;
   beneficiaryFirstName: string;
   beneficiaryLastName: string;
   dateStart: string;

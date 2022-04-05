@@ -4,7 +4,11 @@ import { Accordion } from "./Accordion";
 import { TextCell } from "./TextCell";
 import { FormAccordionProps } from "./FormAccordion";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { prettyPrintSchedule } from "src/shared/ScheduleUtils";
+import {
+  calculateTotalImmersionHoursBetweenDate,
+  calculateWeeklyHoursFromSchedule,
+  prettyPrintSchedule,
+} from "src/shared/ScheduleUtils";
 
 type ImmersionField = keyof ImmersionApplicationDto;
 type FieldsToLabel = Partial<Record<ImmersionField, string>>;
@@ -43,7 +47,10 @@ const immersionFields: FieldsToLabel = {
   workConditions: "Conditions de travail particulières",
 };
 
-type FieldsAndTitle = { listTitle: string; fields: FieldsToLabel };
+type FieldsAndTitle = {
+  listTitle: string;
+  fields: FieldsToLabel;
+};
 
 const allFields: FieldsAndTitle[] = [
   { listTitle: "Immersion", fields: immersionFields },
@@ -84,6 +91,26 @@ export const FormDetails = ({ immersionApplication }: FormAccordionProps) => {
                   key={field}
                 />
               ),
+          )}
+          {listTitle === "Immersion" && (
+            <>
+              <TextCell
+                title="Heures hebdomadaires"
+                contents={calculateWeeklyHoursFromSchedule(
+                  immersionApplication.schedule,
+                )}
+                key="weeklyHours"
+              />
+              <TextCell
+                title="Nombre d'heures totale"
+                contents={calculateTotalImmersionHoursBetweenDate({
+                  dateStart: immersionApplication.dateStart,
+                  dateEnd: immersionApplication.dateEnd,
+                  schedule: immersionApplication.schedule,
+                })}
+                key="totalHours"
+              />
+            </>
           )}
         </Accordion>
       ))}

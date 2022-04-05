@@ -193,6 +193,7 @@ export class SendinblueEmailGateway implements EmailGateway {
       "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
       recipients,
       {
+        TOTAL_HOURS: params.totalHours,
         BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
         BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
         DATE_START: params.dateStart,

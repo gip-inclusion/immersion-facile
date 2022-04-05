@@ -1,5 +1,6 @@
 import { parseISO } from "date-fns";
 import {
+  calculateTotalImmersionHoursBetweenDate,
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "../../../../shared/ScheduleUtils";
@@ -63,6 +64,11 @@ export const getValidatedApplicationFinalConfirmationParams = (
   agencyConfig: AgencyConfig,
   dto: ImmersionApplicationDto,
 ): ValidatedApplicationFinalConfirmationParams => ({
+  totalHours: calculateTotalImmersionHoursBetweenDate({
+    dateStart: dto.dateStart,
+    dateEnd: dto.dateEnd,
+    schedule: dto.schedule,
+  }),
   beneficiaryFirstName: dto.firstName,
   beneficiaryLastName: dto.lastName,
   dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),

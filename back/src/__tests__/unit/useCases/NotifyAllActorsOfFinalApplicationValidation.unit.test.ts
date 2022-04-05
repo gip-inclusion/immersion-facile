@@ -7,7 +7,10 @@ import {
   getValidatedApplicationFinalConfirmationParams,
   NotifyAllActorsOfFinalApplicationValidation,
 } from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { LegacyScheduleDto } from "../../../shared/ScheduleSchema";
+import {
+  LegacyScheduleDto,
+  reasonableSchedule,
+} from "../../../shared/ScheduleSchema";
 import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
@@ -170,9 +173,11 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .withSanitaryPrevention(true)
       .withSanitaryPreventionDescription("sanitaryPreventionDescription")
       .withIndividualProtection(true)
+      .withSchedule(reasonableSchedule)
       .build();
 
     const expectedParams: ValidatedApplicationFinalConfirmationParams = {
+      totalHours: 56,
       beneficiaryFirstName: application.firstName,
       beneficiaryLastName: application.lastName,
       dateStart: parseISO(application.dateStart).toLocaleDateString("fr"),
