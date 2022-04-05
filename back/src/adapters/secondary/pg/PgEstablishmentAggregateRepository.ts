@@ -6,11 +6,11 @@ import {
 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
+  DataSource,
   employeeRangeByTefenCode,
   EstablishmentAggregate,
-  TefenCode,
   EstablishmentEntityV2,
-  DataSource,
+  TefenCode,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -25,6 +25,7 @@ import {
 
 import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { createLogger } from "../../../utils/logger";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
@@ -231,6 +232,7 @@ export class PgEstablishmentAggregateRepository
         LEFT JOIN public_appellations_data pad ON (io.rome_appellation = pad.ogr_appellation) 
         ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
         GROUP BY(io.siret, rome_code)
+        LIMIT $3
         )
     SELECT 
         establishments.name as establishment_name,
@@ -263,7 +265,7 @@ export class PgEstablishmentAggregateRepository
       LEFT JOIN immersion_contacts ON (contact_uuid = immersion_contacts.uuid)
       LEFT OUTER JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       LEFT OUTER JOIN public_romes_data ON (rome_code = public_romes_data.code_rome)
-      ORDER BY data_source DESC, distance_m LIMIT $3
+      ORDER BY data_source DESC, distance_m
     `;
     const formatedQuery = format(query, searchMade.rome); // Formats optional litterals %1$L and %2$L
     return this.client
@@ -285,6 +287,29 @@ export class PgEstablishmentAggregateRepository
                   phone: result.contact_phone,
                 }
               : null;
+
+          let city: string;
+          try {
+            city = extractCityFromAddress(result.address);
+          } catch (err) {
+            notifyObjectDiscord({
+              _message: "error on city extract from address",
+              searchMade,
+              result,
+              err,
+            });
+            logger.error(
+              {
+                err,
+                address: result.address,
+                searchMade,
+              },
+              "error extracting city from address : ",
+            );
+            logger.error(result, "result: ");
+            city = "";
+          }
+
           const searchImmersionResultDto: SearchImmersionResultDto = {
             rome: result.rome_code,
             romeLabel: result.libelle_rome,
@@ -299,7 +324,7 @@ export class PgEstablishmentAggregateRepository
                 result.establishment_tefen_code as TefenCode
               ],
             address: result.address,
-            city: extractCityFromAddress(result.address),
+            city,
             contactMode:
               optional(result.contact_mode) &&
               parseContactMethod(result.contact_mode),
@@ -314,7 +339,10 @@ export class PgEstablishmentAggregateRepository
         }),
       )
       .catch((e) => {
-        logger.error("Error in Pg implementation of getFromSearch", e);
+        logger.error(
+          e,
+          "Error in Pg implementation of getSearchImmersionResultDtoFromSearchMade",
+        );
         console.log(e);
         throw e;
       });
