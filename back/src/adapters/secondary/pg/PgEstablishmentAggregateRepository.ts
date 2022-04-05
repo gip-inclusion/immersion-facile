@@ -216,64 +216,55 @@ export class PgEstablishmentAggregateRepository
     maxResults?: number;
   }): Promise<SearchImmersionResultDto[]> {
     const query = `
-        WITH active_establishments_with_contact_uuid AS (
-          SELECT 
-            DISTINCT ON (siret)
-            establishments.name as establishment_name,
-            number_employees AS establishment_tefen_code, 
-            address,
-            naf_code,
-            data_source,
-            siret AS establishment_siret,
-            contact_uuid as contact_in_establishment_uuid,
-            gps,
-            ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
-            ST_AsGeoJSON(gps) AS establishment_position
-          FROM establishments 
-          LEFT JOIN establishments__immersion_contacts e_ic ON e_ic.establishment_siret = establishments.siret
-          WHERE is_active
-          ),
-          filtered_immersion_offers AS (
-            WITH offers_with_appellations AS (
-            SELECT siret, rome_code, libelle_appellation_long
-            FROM immersion_offers 
-            LEFT JOIN public_appellations_data 
-            ON (immersion_offers.rome_appellation = public_appellations_data.ogr_appellation) 
-            ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
-            )
-            SELECT siret AS offer_siret, rome_code, 
-            jsonb_agg(distinct libelle_appellation_long) filter (where libelle_appellation_long is not null) AS appellation_labels
-            FROM offers_with_appellations group by(siret, rome_code)
-            )
-      SELECT
-          filtered_immersion_offers.*,
-          active_establishments_with_contact_uuid.*,
-          immersion_contacts.uuid AS contact_uuid,
-          immersion_contacts.lastname,
-          immersion_contacts.firstname,
-          immersion_contacts.contact_mode,
-          immersion_contacts.email,
-          immersion_contacts.role,
-          immersion_contacts.phone AS contact_phone,
-          public_naf_classes_2008.class_label,
-          libelle_rome
-      FROM
-        filtered_immersion_offers
-      LEFT JOIN active_establishments_with_contact_uuid
-        ON (offer_siret = establishment_siret)
-      LEFT JOIN immersion_contacts
-        ON (contact_in_establishment_uuid = immersion_contacts.uuid)
-      LEFT OUTER JOIN public_naf_classes_2008
-        ON (public_naf_classes_2008.class_id =
-            REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      LEFT OUTER JOIN public_romes_data
-        ON (rome_code = public_romes_data.code_rome)
-        WHERE rome_code IS NOT NULL AND
-        ST_DWithin(gps, ST_GeographyFromText($1), $2) 
-      ORDER BY
-        data_source DESC,
-        distance_m
-      LIMIT $3;`;
+      WITH unique_establishments__immersion_contacts AS (
+        SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts
+      ),
+           matching_offers AS
+            (WITH active_establishments_within_area AS (
+                SELECT siret
+                FROM establishments 
+                WHERE is_active AND ST_DWithin(gps, ST_GeographyFromText($1), $2)) 
+        SELECT io.siret, rome_code, 
+        JSONB_AGG(distinct libelle_appellation_long) filter(WHERE libelle_appellation_long is not null) AS appellation_labels
+        FROM immersion_offers io 
+        RIGHT JOIN active_establishments_within_area aewa ON io.siret = aewa.siret 
+        LEFT JOIN public_appellations_data pad ON (io.rome_appellation = pad.ogr_appellation) 
+        ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
+        GROUP BY(io.siret, rome_code)
+        )
+    SELECT 
+        establishments.name as establishment_name,
+        number_employees AS establishment_tefen_code, 
+        address,
+        naf_code,
+        data_source,
+        establishments.siret AS establishment_siret,
+        contact_uuid as contact_in_establishment_uuid,
+        gps,
+        ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
+        ST_AsGeoJSON(gps) AS establishment_position,
+
+        immersion_contacts.lastname,
+        immersion_contacts.firstname,
+        immersion_contacts.contact_mode,
+        immersion_contacts.email,
+        immersion_contacts.role,
+        immersion_contacts.phone AS contact_phone,
+
+        rome_code, 
+        appellation_labels,
+
+        public_naf_classes_2008.class_label,
+        libelle_rome
+
+    FROM establishments 
+      RIGHT join matching_offers on establishments.siret = matching_offers.siret
+      LEFT JOIN unique_establishments__immersion_contacts ue_ic ON ue_ic.establishment_siret = establishments.siret 
+      LEFT JOIN immersion_contacts ON (contact_uuid = immersion_contacts.uuid)
+      LEFT OUTER JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+      LEFT OUTER JOIN public_romes_data ON (rome_code = public_romes_data.code_rome)
+      ORDER BY data_source DESC, distance_m LIMIT $3
+    `;
     const formatedQuery = format(query, searchMade.rome); // Formats optional litterals %1$L and %2$L
     return this.client
       .query(formatedQuery, [
