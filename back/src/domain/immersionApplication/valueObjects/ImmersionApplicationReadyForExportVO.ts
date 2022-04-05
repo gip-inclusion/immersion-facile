@@ -10,6 +10,7 @@ export type ImmersionApplicationReadyForExportVO = OmitFromExistingKeys<
   status: string;
   beneficiaryAccepted: string;
   enterpriseAccepted: string;
+  totalHours: number;
   weeklyHours: number;
   monday: string;
   tuesday: string;

@@ -91,6 +91,11 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
       },
       { header: "Date de fin", key: "dateEnd", width: 15 },
       {
+        header: "Nombre d'heures total de l'immersion",
+        key: "totalHours",
+        width: 30,
+      },
+      {
         header: "Heures hebdomadaires",
         key: "weeklyHours",
         width: 22,

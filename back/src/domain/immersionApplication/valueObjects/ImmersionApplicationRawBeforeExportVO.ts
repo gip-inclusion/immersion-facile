@@ -1,5 +1,6 @@
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import {
+  calculateTotalImmersionHoursBetweenDate,
   calculateWeeklyHoursFromSchedule,
   prettyPrintDayFromSchedule,
 } from "../../../shared/ScheduleUtils";
@@ -43,6 +44,11 @@ export class ImmersionApplicationRawBeforeExportVO {
     (): ImmersionApplicationReadyForExportVO => ({
       ...this.toTranslatedImmersionApplication(),
       weeklyHours: calculateWeeklyHoursFromSchedule(this._props.schedule),
+      totalHours: calculateTotalImmersionHoursBetweenDate({
+        dateStart: this._props.dateStart,
+        dateEnd: this._props.dateEnd,
+        schedule: this._props.schedule,
+      }),
       ...this.splitSchedulePerDay(),
     });
 
