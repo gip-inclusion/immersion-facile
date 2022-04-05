@@ -201,9 +201,12 @@ export class InMemoryEstablishmentAggregateRepository
 
   public async getEstablishmentForSiret(
     siret: string,
-  ): Promise<EstablishmentEntityV2 | undefined> {
+  ): Promise<AnnotatedEstablishmentEntityV2 | undefined> {
     return this.establishmentAggregates
-      .map(path("establishment"))
+      .map((aggegate) => ({
+        ...aggegate.establishment,
+        nafLabel: "",
+      }))
       .find(propEq("siret", siret));
   }
 

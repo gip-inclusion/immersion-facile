@@ -1,6 +1,5 @@
 import { SuperTest, Test } from "supertest";
 import {
-  TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -19,7 +18,7 @@ import { getImmersionOfferByIdRoute } from "../../shared/routes";
 import { SearchImmersionResultPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 
 const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
-const immersionOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03512d";
+const immersionOfferId = "78000403200019-B1805";
 const immersionOfferRome = "B1805";
 
 describe("Route to get immersion offer by id", () => {
@@ -39,6 +38,7 @@ describe("Route to get immersion offer by id", () => {
       new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityV2Builder()
+            .withPosition(TEST_POSITION)
             .withAddress("55 rue de Faubourg Sante Honoré 75008 Paris")
             .build(),
         )
@@ -47,7 +47,6 @@ describe("Route to get immersion offer by id", () => {
         )
         .withImmersionOffers([
           new ImmersionOfferEntityV2Builder()
-            .withId(immersionOfferId)
             .withRomeCode(immersionOfferRome)
             .build(),
         ])
@@ -58,7 +57,7 @@ describe("Route to get immersion offer by id", () => {
   it("accepts valid unauthenticated requests", async () => {
     const expectedResult: SearchImmersionResultPublicV0 = {
       // /!\ Those fields come from Builder (should probably not.)
-      id: "",
+      id: "78000403200019-" + immersionOfferRome,
       rome: immersionOfferRome,
       naf: "8539A",
       siret: "78000403200019",
@@ -67,7 +66,7 @@ describe("Route to get immersion offer by id", () => {
       location: TEST_POSITION,
       address: "55 rue de Faubourg Sante Honoré 75008 Paris",
       romeLabel: TEST_ROME_LABEL,
-      nafLabel: TEST_NAF_LABEL,
+      nafLabel: "",
       city: "Paris",
       contactMode: "EMAIL",
     };
@@ -80,7 +79,7 @@ describe("Route to get immersion offer by id", () => {
   it("accepts valid authenticated requests", async () => {
     // /!\ Those fields come from Builder (should probably not.)
     const expectedResult: SearchImmersionResultPublicV0 = {
-      id: "",
+      id: "78000403200019-" + immersionOfferRome,
       rome: immersionOfferRome,
       naf: "8539A",
       siret: "78000403200019",
@@ -98,7 +97,7 @@ describe("Route to get immersion offer by id", () => {
         role: "le big boss",
       },
       romeLabel: TEST_ROME_LABEL,
-      nafLabel: TEST_NAF_LABEL,
+      nafLabel: "",
       city: "Paris",
     };
 

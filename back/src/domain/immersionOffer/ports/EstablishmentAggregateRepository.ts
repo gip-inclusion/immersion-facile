@@ -57,7 +57,7 @@ export interface EstablishmentAggregateRepository {
 
   getEstablishmentForSiret: (
     siret: string,
-  ) => Promise<EstablishmentEntityV2 | undefined>;
+  ) => Promise<AnnotatedEstablishmentEntityV2 | undefined>;
   getContactForEstablishmentSiret: (
     siret: string,
   ) => Promise<ContactEntityV2 | undefined>;

@@ -59,7 +59,7 @@ describe("search-immersion route", () => {
             distance_m: 719436,
             location: { lat: 43.8666, lon: 8.3333 },
             city: "test_city",
-            id: "",
+            id: "78000403200019-A1000",
           },
         ];
         await request

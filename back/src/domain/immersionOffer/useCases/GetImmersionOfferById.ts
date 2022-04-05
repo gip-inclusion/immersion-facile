@@ -1,3 +1,4 @@
+import { prop } from "ramda";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
 import {
@@ -24,23 +25,28 @@ export class GetImmersionOfferById extends UseCase<
   inputSchema = immersionOfferIdSchema;
 
   public async _execute(
-    immersionOfferId: ImmersionOfferId,
+    immersionOfferId: string,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto> {
-    const annotatedEstablishment =
-      await this.establishmentAggregateRepository.getAnnotatedEstablishmentByImmersionOfferId(
-        immersionOfferId,
-      );
-    const annotatedOffer =
-      await this.establishmentAggregateRepository.getAnnotatedImmersionOfferById(
-        immersionOfferId,
-      );
-    const contact =
-      await this.establishmentAggregateRepository.getContactByImmersionOfferId(
-        immersionOfferId,
+    const [siret, romeCode] = immersionOfferId.split("-");
+
+    const establishment =
+      await this.establishmentAggregateRepository.getEstablishmentForSiret(
+        siret,
       );
 
-    if (!annotatedEstablishment || !annotatedOffer)
+    const appellationsDtos = (
+      await this.establishmentAggregateRepository.getOffersAsAppelationDtoForFormEstablishment(
+        siret,
+      )
+    ).filter((appellationDto) => appellationDto.romeCode === romeCode);
+
+    const contact =
+      await this.establishmentAggregateRepository.getContactForEstablishmentSiret(
+        siret,
+      );
+
+    if (!establishment || !appellationsDtos.length)
       throw new NotFoundError(immersionOfferId);
 
     const contactDetails: SearchContactDto | undefined =
@@ -57,27 +63,25 @@ export class GetImmersionOfferById extends UseCase<
 
     const searchImmersionResultDto: SearchImmersionResultDto = {
       // Establishment informations
-      address: annotatedEstablishment.address,
-      location: annotatedEstablishment.position,
-      naf: annotatedEstablishment.nafDto.code,
-      nafLabel: annotatedEstablishment.nafLabel,
-      name: annotatedEstablishment.name,
-      siret: annotatedEstablishment.siret,
-      voluntaryToImmersion: annotatedEstablishment.voluntaryToImmersion,
+      address: establishment.address,
+      location: establishment.position,
+      naf: establishment.nafDto.code,
+      nafLabel: establishment.nafLabel,
+      name: establishment.name,
+      siret: establishment.siret,
+      voluntaryToImmersion: establishment.voluntaryToImmersion,
       contactMode: contact?.contactMethod,
 
       // Offer information
-      rome: annotatedOffer.romeCode,
-      romeLabel: annotatedOffer.romeLabel,
-      appellationLabels: annotatedOffer.appellationLabel
-        ? [annotatedOffer.appellationLabel]
-        : [],
+      rome: appellationsDtos[0].romeCode,
+      romeLabel: appellationsDtos[0].romeLabel,
+      appellationLabels: appellationsDtos.map(prop("appellationLabel")),
 
       // Contact informations
       contactDetails,
 
       // Complementary informations
-      city: extractCityFromAddress(annotatedEstablishment.address),
+      city: extractCityFromAddress(establishment.address),
       distance_m: undefined,
     };
 

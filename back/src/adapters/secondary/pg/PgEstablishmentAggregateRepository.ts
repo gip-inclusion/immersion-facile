@@ -572,16 +572,22 @@ export class PgEstablishmentAggregateRepository
   }
   public async getEstablishmentForSiret(
     siret: string,
-  ): Promise<EstablishmentEntityV2 | undefined> {
+  ): Promise<AnnotatedEstablishmentEntityV2 | undefined> {
     const pgResult = await this.client.query(
-      `SELECT *, ST_AsGeoJSON(gps) AS position FROM establishments WHERE siret = $1;`,
+      `
+        SELECT establishments.*, public_naf_classes_2008.class_label AS naf_label, ST_AsGeoJSON(gps) AS position
+        FROM establishments
+        LEFT OUTER JOIN public_naf_classes_2008
+          ON (public_naf_classes_2008.class_id =
+              REGEXP_REPLACE(establishments.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+        WHERE siret = $1;`,
       [siret],
     );
     const row = pgResult.rows[0];
 
     if (!row) return;
 
-    const establishmentForSiret: EstablishmentEntityV2 = {
+    const establishmentForSiret: AnnotatedEstablishmentEntityV2 = {
       siret: row.siret,
       name: row.name,
       address: row.address,
@@ -594,6 +600,7 @@ export class PgEstablishmentAggregateRepository
       voluntaryToImmersion: row.data_source == "form",
       isCommited: optional(row.is_commited),
       customizedName: optional(row.customized_name),
+      nafLabel: row.naf_label ?? "",
       updatedAt: row.update_date,
     };
     return establishmentForSiret;

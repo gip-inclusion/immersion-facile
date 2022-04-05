@@ -36,5 +36,8 @@ export const domainToSearchImmersionResultPublicV0 = (
   domain: SearchImmersionResultDto,
 ): SearchImmersionResultPublicV0 => {
   const { appellationLabels, ...domainWithoutAppellationLabels } = domain;
-  return { ...domainWithoutAppellationLabels, id: "" };
+  return {
+    ...domainWithoutAppellationLabels,
+    id: `${domainWithoutAppellationLabels.siret}-${domainWithoutAppellationLabels.rome}`,
+  };
 };

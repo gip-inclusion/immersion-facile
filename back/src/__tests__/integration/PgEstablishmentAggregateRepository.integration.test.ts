@@ -18,7 +18,10 @@ import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentE
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { FormEstablishmentSource } from "../../shared/formEstablishment/FormEstablishment.dto";
-import { expectArraysToEqualIgnoringOrder } from "../../_testBuilders/test.helpers";
+import {
+  expectArraysToEqualIgnoringOrder,
+  expectTypeToMatchAndEqual,
+} from "../../_testBuilders/test.helpers";
 
 const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
 const testUid2 = "22222222-a2a5-430a-b558-ed3e2f03512d";
@@ -1126,11 +1129,12 @@ describe("Postgres implementation of immersion offer repository", () => {
         ).toBeUndefined();
       });
       it("returns the establishment entity with given siret", async () => {
-        expect(
+        expectTypeToMatchAndEqual(
           await pgEstablishmentAggregateRepository.getEstablishmentForSiret(
             siretInTable,
           ),
-        ).toEqual(establishment);
+          { ...establishment, nafLabel: "" },
+        );
       });
     });
     describe("getContactForEstablishmentSiret", () => {
