@@ -1,9 +1,7 @@
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
 import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
-import { AppellationMatchDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "src/shared/siret";
 import { sleep } from "src/shared/utils";
-import { v4 as uuidV4 } from "uuid";
 
 export class InMemoryFormEstablishmentGateway
   implements FormEstablishmentGateway
@@ -62,6 +60,7 @@ export class InMemoryFormEstablishmentGateway
         email: "joe@mail.com",
         contactMethod: "EMAIL",
       },
+      isSearchable: true,
     };
   }
   public async updateFormEstablishment(

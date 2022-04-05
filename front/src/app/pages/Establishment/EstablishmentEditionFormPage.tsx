@@ -10,6 +10,7 @@ import {
 } from "./EstablishmentFormPage";
 import { routes } from "src/app/routing/routes";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
+import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
 import { Route } from "type-route";
@@ -48,6 +49,7 @@ export const EstablishmentEditionFormPage = ({
           route.params.jwt,
         )
       }
+      isEditing
     >
       <EditionSiretRelatedInputs
         businessAddress={initialValues.businessAddress}

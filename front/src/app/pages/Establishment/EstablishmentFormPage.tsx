@@ -13,6 +13,7 @@ import { formEstablishmentSchema } from "src/shared/formEstablishment/FormEstabl
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
   saveForm: (establishment: FormEstablishmentDto) => Promise<void>;
+  isEditing?: boolean;
   children: React.ReactNode;
 };
 
@@ -30,6 +31,7 @@ export const EstablishmentFormPage = ({
   initialValues,
   saveForm,
   children,
+  isEditing,
 }: EstablishmentFormProps) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<Error | null>(null);
@@ -115,6 +117,12 @@ export const EstablishmentFormPage = ({
                 title={`${fieldsToLabel["appellations"]} *`}
               />
               <BusinessContact />
+              {isEditing && (
+                <BoolCheckboxGroup
+                  name="isSearchable"
+                  label="L'entreprise est-elle recherchable par les utilisateurs ? (décoché si vous ne voulez pas être trouvable sur la recherche)"
+                />
+              )}
 
               {submitCount !== 0 && Object.values(errors).length > 0 && (
                 <div style={{ color: "red" }}>

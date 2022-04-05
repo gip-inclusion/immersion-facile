@@ -9,8 +9,8 @@ import React from "react";
 
 type BoolCheckboxGroupProps = {
   label: string;
-  description: string;
-  descriptionLink: string;
+  description?: string;
+  descriptionLink?: string;
   disabled?: boolean;
   name: string;
 };

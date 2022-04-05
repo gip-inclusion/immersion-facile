@@ -31,9 +31,11 @@ export const EstablishmentCreationForm = ({
   source,
 }: EstablishmentCreationFormProps) => {
   const creationInitialValues = {
-    ...creationInitialValuesWithoutSource,
+    ...creationInitialValuesWithoutSourceAndSearchable,
     source,
+    isSearchable: true,
   };
+
   return (
     <EstablishmentFormPage
       initialValues={creationInitialValues}
@@ -144,11 +146,12 @@ export const defaultInitialValue: OmitFromExistingKeys<
     email: "",
     contactMethod: "EMAIL",
   },
+  isSearchable: true,
 };
 
-const creationInitialValuesWithoutSource: OmitFromExistingKeys<
+const creationInitialValuesWithoutSourceAndSearchable: OmitFromExistingKeys<
   FormEstablishmentDto,
-  "source"
+  "source" | "isSearchable"
 > = !ENV.dev
   ? defaultInitialValue
   : {
