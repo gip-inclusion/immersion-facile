@@ -75,7 +75,7 @@ export const EstablishmentFormPage = ({
           }
         }}
       >
-        {({ isSubmitting, submitCount, errors }) => (
+        {({ isSubmitting, submitCount, errors, values }) => (
           <div style={{ margin: "5px 12px", maxWidth: "600px" }}>
             <p>
               Bienvenue sur l'espace de référencement des entreprises
@@ -104,7 +104,6 @@ export const EstablishmentFormPage = ({
                 Votre établissement
               </span>
               {children}
-              {/* <SiretRelatedInputs /> */}
               <p className="mt-4" />
               <BoolCheckboxGroup
                 {...getLabelAndName("isEngagedEnterprise")}
@@ -120,7 +119,11 @@ export const EstablishmentFormPage = ({
               {isEditing && (
                 <BoolCheckboxGroup
                   name="isSearchable"
-                  label="L'entreprise est-elle recherchable par les utilisateurs ? (décoché si vous ne voulez pas être trouvable sur la recherche)"
+                  label={`L'entreprise est-elle recherchable par les utilisateurs ? ${
+                    values.isSearchable
+                      ? "(décochez la case si vous ne  voulez pas être visible sur la recherche)"
+                      : "(cochez la case si vous voulez être visible sur la recherche)"
+                  }`}
                 />
               )}
 

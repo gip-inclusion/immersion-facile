@@ -11,15 +11,18 @@ type TextInputProps = {
   disabled?: boolean;
   multiline?: boolean;
   className?: string;
+  value?: string;
 };
 
 export const TextInput = (props: TextInputProps) => {
+  const { value } = props;
   const [field, meta] = useField<string>({ name: props.name });
 
   return (
     <ImmersionTextField
       {...props}
       {...field}
+      {...(value && value !== "" && { value })}
       error={meta.touched ? meta.error : undefined}
     />
   );

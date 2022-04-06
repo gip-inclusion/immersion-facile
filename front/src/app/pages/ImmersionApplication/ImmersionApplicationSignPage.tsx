@@ -57,7 +57,7 @@ export const ImmersionApplicationSignPage = ({ route }: SignFormProps) => {
 };
 
 type SignFormSpecificProps = {
-  response: any;
+  response: ImmersionApplicationDto | null;
   jwt: string;
 };
 

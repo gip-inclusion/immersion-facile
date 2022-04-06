@@ -313,7 +313,6 @@ export const ApplicationFormFields = ({
         ]}
         disabled={isFrozen}
       />
-
       <ApplicationFormProfession
         label="Intitulé du poste / métier observé pendant l'immersion *"
         description="Ex : employé libre service, web développeur, boulanger …"

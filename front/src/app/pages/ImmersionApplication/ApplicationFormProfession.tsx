@@ -23,7 +23,15 @@ export const ApplicationFormProfession = ({
   const [{ value }, _, { setValue }] =
     useField<ImmersionApplicationDto["immersionAppellation"]>(name);
 
-  if (disabled) return <TextInput label={label} name={name} disabled />;
+  if (disabled)
+    return (
+      <TextInput
+        label={label}
+        name={name}
+        disabled
+        value={value.appellationLabel}
+      />
+    );
 
   return (
     <>

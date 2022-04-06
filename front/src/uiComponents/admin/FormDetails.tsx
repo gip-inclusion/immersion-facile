@@ -1,4 +1,5 @@
 import React, { Component, ReactNode } from "react";
+import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { keys } from "src/shared/utils";
 import { Accordion } from "./Accordion";
 import { TextCell } from "./TextCell";
@@ -73,6 +74,8 @@ export const FormDetails = ({ immersionApplication }: FormAccordionProps) => {
         ? immersionApplication.sanitaryPreventionDescription ?? "✅"
         : "❌";
     }
+    if (field === "immersionAppellation")
+      return (value as AppellationDto).appellationLabel;
     if (typeof value === "string") return value;
     if (typeof value === "boolean") return value ? "✅" : "❌";
     return JSON.stringify(value);
@@ -102,7 +105,7 @@ export const FormDetails = ({ immersionApplication }: FormAccordionProps) => {
                 key="weeklyHours"
               />
               <TextCell
-                title="Nombre d'heures totale"
+                title="Nombre total d'heures"
                 contents={calculateTotalImmersionHoursBetweenDate({
                   dateStart: immersionApplication.dateStart,
                   dateEnd: immersionApplication.dateEnd,
