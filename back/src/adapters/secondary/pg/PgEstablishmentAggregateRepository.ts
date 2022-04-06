@@ -223,16 +223,19 @@ export class PgEstablishmentAggregateRepository
       ),
            matching_offers AS
             (WITH active_establishments_within_area AS (
-                SELECT siret
+                SELECT siret, 
+                (data_source = 'form')::boolean AS voluntary_to_immersion
                 FROM establishments 
-                WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)) 
-        SELECT io.siret, rome_code, 
+                WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)
+                ) 
+        SELECT io.siret, rome_code, voluntary_to_immersion,
         JSONB_AGG(distinct libelle_appellation_long) filter(WHERE libelle_appellation_long is not null) AS appellation_labels
         FROM immersion_offers io 
         RIGHT JOIN active_establishments_within_area aewa ON io.siret = aewa.siret 
         LEFT JOIN public_appellations_data pad ON (io.rome_appellation = pad.ogr_appellation) 
         ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
-        GROUP BY(io.siret, rome_code)
+        GROUP BY(io.siret, voluntary_to_immersion, rome_code)
+        ORDER BY aewa.voluntary_to_immersion DESC
         LIMIT $3
         )
     SELECT 
@@ -241,7 +244,7 @@ export class PgEstablishmentAggregateRepository
         number_employees AS establishment_tefen_code, 
         address,
         naf_code,
-        data_source,
+        voluntary_to_immersion,
         establishments.siret AS establishment_siret,
         contact_uuid as contact_in_establishment_uuid,
         gps,
@@ -267,7 +270,7 @@ export class PgEstablishmentAggregateRepository
       LEFT JOIN immersion_contacts ON (contact_uuid = immersion_contacts.uuid)
       LEFT OUTER JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       LEFT OUTER JOIN public_romes_data ON (rome_code = public_romes_data.code_rome)
-      ORDER BY data_source DESC, distance_m
+      ORDER BY voluntary_to_immersion DESC, distance_m
     `;
     const formatedQuery = format(query, searchMade.rome); // Formats optional litterals %1$L and %2$L
     return this.client
@@ -321,7 +324,7 @@ export class PgEstablishmentAggregateRepository
             siret: result.establishment_siret,
             name:
               result.establishment_customized_name ?? result.establishment_name,
-            voluntaryToImmersion: result.data_source === "form",
+            voluntaryToImmersion: result.voluntary_to_immersion,
             numberOfEmployeeRange:
               employeeRangeByTefenCode[
                 result.establishment_tefen_code as TefenCode

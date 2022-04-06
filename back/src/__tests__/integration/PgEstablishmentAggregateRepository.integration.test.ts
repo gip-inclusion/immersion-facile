@@ -348,6 +348,54 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       expect(searchResult).toMatchObject([expectedResult]);
     });
+    it("returns Form establishments before LBB establishments", async () => {
+      // Prepare : establishment in geographical area but not active
+      const formSiret = "99000403200029";
+      const lbbSiret1 = "11000403200029";
+      const lbbSiret2 = "22000403200029";
+
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        testUid2,
+        lbbSiret1,
+        informationGeographiqueRome, // Matching
+        searchedPosition, // Establishment position matching
+        cartographeAppellation,
+        undefined,
+        "api_labonneboite", // data source
+      );
+
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        testUid3,
+        lbbSiret2,
+        informationGeographiqueRome, // Matching
+        searchedPosition, // Establishment position matching
+        cartographeAppellation,
+        undefined,
+        "api_labonneboite", // data source
+      );
+
+      await insertActiveEstablishmentAndOfferAndEventuallyContact(
+        testUid1,
+        formSiret,
+        informationGeographiqueRome, // Matching
+        searchedPosition, // Establishment position matching
+        cartographeAppellation,
+        undefined,
+        "form", // data source
+      );
+
+      // Act
+      const searchResult =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
+          { searchMade: searchMadeWithRome, maxResults: 2 },
+        );
+      // Assert
+      expect(searchResult).toHaveLength(2);
+      expect(searchResult[0].siret).toEqual(formSiret);
+      expect(searchResult[0].voluntaryToImmersion).toBe(true);
+      expect(searchResult[1].siret).toEqual(lbbSiret1);
+      expect(searchResult[1].voluntaryToImmersion).toBe(false);
+    });
     it("returns also contact details if offer has contact uuid and flag is True", async () => {
       // Prepare
       /// Establishment with offer inside geographical area with searched rome
