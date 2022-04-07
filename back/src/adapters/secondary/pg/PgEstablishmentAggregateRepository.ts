@@ -12,10 +12,8 @@ import {
   EstablishmentEntityV2,
   TefenCode,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { AnnotatedImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
-import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
 import { LatLonDto } from "../../../shared/latLon";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
@@ -354,64 +352,6 @@ export class PgEstablishmentAggregateRepository
       });
   }
 
-  public async getAnnotatedEstablishmentByImmersionOfferId(
-    immersionOfferId: ImmersionOfferId,
-  ): Promise<AnnotatedEstablishmentEntityV2 | undefined> {
-    const query = format(
-      `SELECT
-        establishments.siret,
-        establishments.name,
-        establishments.customized_name,
-        establishments.is_commited,
-        establishments.address,
-        establishments.data_source,
-        establishments.source_provider,
-        ST_AsGeoJSON(establishments.gps) AS position,
-        establishments.naf_code,
-        establishments.naf_nomenclature,
-        public_naf_classes_2008.class_label AS naf_label,
-        establishments.number_employees,
-        establishments.update_date as establishments_update_date,
-        establishments.is_searchable,
-        contact_mode
-      FROM
-        establishments
-        JOIN immersion_offers
-          ON (immersion_offers.siret = establishments.siret)
-        LEFT JOIN establishments__immersion_contacts e_ic
-          ON e_ic.establishment_siret = establishments.siret
-        LEFT JOIN immersion_contacts ic
-          ON ic.uuid = e_ic.contact_uuid
-        LEFT OUTER JOIN public_naf_classes_2008
-          ON (public_naf_classes_2008.class_id =
-              REGEXP_REPLACE(establishments.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      WHERE
-        establishments.is_active
-        AND immersion_offers.uuid = %L`,
-      immersionOfferId,
-    );
-    const pgResult = await this.client.query(query);
-    const row = pgResult.rows[0];
-
-    if (!row) return;
-    return {
-      siret: row.siret,
-      name: row.name,
-      customizedName: optional(row.customized_name),
-      address: row.address,
-      voluntaryToImmersion: row.data_source == "form",
-      dataSource: row.data_source,
-      sourceProvider: row.source_provider,
-      position: row.position && parseGeoJson(row.position),
-      nafDto: { code: row.naf_code, nomenclature: row.naf_nomenclature },
-      nafLabel: row.naf_label,
-      numberEmployeesRange: row.number_employees,
-      isActive: true,
-      isCommited: optional(row.is_commited),
-      updatedAt: row.establishments_update_date,
-      isSearchable: row.is_searchable,
-    };
-  }
   public async getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
     since: Date,
   ): Promise<string[]> {
@@ -502,83 +442,6 @@ export class PgEstablishmentAggregateRepository
     await this.client.query(formatedQuery);
   }
 
-  async getContactByImmersionOfferId(
-    immersionOfferId: ImmersionOfferId,
-  ): Promise<ContactEntityV2 | undefined> {
-    const query = format(
-      `WITH filtered_offers as (SELECT siret from immersion_offers WHERE uuid = %L)    
-      SELECT
-              immersion_contacts.uuid,
-              immersion_contacts.lastname,
-              immersion_contacts.firstname,
-              immersion_contacts.email,
-              immersion_contacts.role,
-              immersion_contacts.phone,
-              immersion_contacts.contact_mode,
-              establishment_siret
-            FROM
-              immersion_contacts
-              RIGHT JOIN establishments__immersion_contacts
-                ON (establishments__immersion_contacts.contact_uuid = immersion_contacts.uuid)
-              RIGHT JOIN filtered_offers 
-                ON (filtered_offers.siret = establishment_siret)
-            WHERE immersion_contacts.uuid IS NOT NULL 
-            LIMIT 1`,
-
-      immersionOfferId,
-    );
-    const pgResult = await this.client.query(query);
-    const row = pgResult.rows[0];
-
-    if (!row) return;
-    return {
-      id: row.uuid,
-      lastName: row.lastname,
-      firstName: row.firstname,
-      email: row.email,
-      job: row.role,
-      phone: row.phone,
-      contactMethod:
-        optional(row.contact_mode) && parseContactMethod(row.contact_mode),
-    };
-  }
-
-  async getAnnotatedImmersionOfferById(
-    immersionOfferId: ImmersionOfferId,
-  ): Promise<AnnotatedImmersionOfferEntityV2 | undefined> {
-    const query = format(
-      `SELECT
-        immersion_offers.uuid,
-        immersion_offers.rome_code,
-        immersion_offers.rome_appellation,
-        public_romes_data.libelle_rome,
-        immersion_offers.score,
-        public_appellations_data.libelle_appellation_long
-      FROM
-        immersion_offers
-        LEFT JOIN public_appellations_data 
-          ON (immersion_offers.rome_appellation = public_appellations_data.ogr_appellation) 
-        LEFT OUTER JOIN public_romes_data
-          ON (immersion_offers.rome_code = public_romes_data.code_rome)
-      WHERE uuid = %L`,
-      immersionOfferId,
-    );
-
-    const pgResult = await this.client.query(query);
-    const row = pgResult.rows[0];
-
-    if (!row) return;
-    return {
-      id: row.uuid,
-      romeCode: row.rome_code,
-      romeLabel: row.libelle_rome,
-      score: row.score,
-      appellationCode:
-        optional(row.rome_appellation) && row.rome_appellation.toString(),
-      appellationLabel:
-        optional(row.libelle_appellation_long) && row.libelle_appellation_long,
-    };
-  }
   public async getContactEmailFromSiret(
     siret: string,
   ): Promise<string | undefined> {

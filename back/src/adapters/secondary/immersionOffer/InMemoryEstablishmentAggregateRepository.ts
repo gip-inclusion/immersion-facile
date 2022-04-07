@@ -5,10 +5,7 @@ import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import {
-  AnnotatedImmersionOfferEntityV2,
-  ImmersionOfferEntityV2,
-} from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
+import { ImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { path, pathEq, pathNotEq } from "../../../shared/ramdaExtensions/path";
@@ -17,7 +14,6 @@ import { createLogger } from "../../../utils/logger";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
-import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
 
 const logger = createLogger(__filename);
 
@@ -40,50 +36,6 @@ export class InMemoryEstablishmentAggregateRepository
       ...this._establishmentAggregates,
       ...aggregates,
     ];
-  }
-
-  async getAnnotatedEstablishmentByImmersionOfferId(
-    immersionOfferId: ImmersionOfferId,
-  ): Promise<AnnotatedEstablishmentEntityV2 | undefined> {
-    const establishment = this._establishmentAggregates.find((aggregate) =>
-      aggregate.immersionOffers.some((offer) => offer.id === immersionOfferId),
-    )?.establishment;
-
-    if (establishment)
-      return {
-        ...establishment,
-        nafLabel: TEST_NAF_LABEL,
-        position: TEST_POSITION,
-      };
-  }
-
-  async getContactByImmersionOfferId(
-    immersionOfferId: ImmersionOfferId,
-  ): Promise<ContactEntityV2 | undefined> {
-    logger.info({ immersionOfferId }, "getContactByImmersionOfferId");
-    const establishment =
-      await this.getAnnotatedEstablishmentByImmersionOfferId(immersionOfferId);
-    if (!establishment) return;
-    const contact = this._establishmentAggregates.find(
-      (aggregate) => aggregate.establishment.siret === establishment?.siret,
-    )?.contact;
-    return contact;
-  }
-
-  async getAnnotatedImmersionOfferById(
-    immersionOfferId: ImmersionOfferId,
-  ): Promise<AnnotatedImmersionOfferEntityV2 | undefined> {
-    logger.info({ immersionOfferId }, "getAnnotatedImmersionOfferById");
-    const immersionOffer = this._establishmentAggregates
-      .flatMap((aggregate) => aggregate.immersionOffers)
-      .find((immersionOffer) => (immersionOffer.id = immersionOfferId));
-
-    if (immersionOffer)
-      return {
-        ...immersionOffer,
-        romeLabel: TEST_ROME_LABEL,
-        appellationLabel: TEST_APPELLATION_LABEL,
-      };
   }
 
   public async getSearchImmersionResultDtoFromSearchMade({

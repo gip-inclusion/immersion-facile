@@ -1,4 +1,3 @@
-import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
 import { ContactEntityV2 } from "../entities/ContactEntity";
@@ -7,7 +6,6 @@ import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../entities/EstablishmentEntity";
-import { AnnotatedImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 
 export interface EstablishmentAggregateRepository {
@@ -16,18 +14,6 @@ export interface EstablishmentAggregateRepository {
   insertEstablishmentAggregates: (
     establishments: EstablishmentAggregate[],
   ) => Promise<void>;
-
-  getAnnotatedEstablishmentByImmersionOfferId: (
-    immersionOfferId: ImmersionOfferId,
-  ) => Promise<AnnotatedEstablishmentEntityV2 | undefined>;
-
-  getAnnotatedImmersionOfferById: (
-    immersionOfferId: ImmersionOfferId,
-  ) => Promise<AnnotatedImmersionOfferEntityV2 | undefined>;
-
-  getContactByImmersionOfferId: (
-    immersionOfferId: ImmersionOfferId,
-  ) => Promise<ContactEntityV2 | undefined>;
 
   getSearchImmersionResultDtoFromSearchMade: (props: {
     searchMade: SearchMade;
