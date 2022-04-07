@@ -177,7 +177,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 };
 
 const beneficiarySignsApplication = async (
-  { request, reposAndGateways }: TestAppAndDeps,
+  { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
   beneficiarySignJwt: string,
   initialImmersionApplication: ImmersionApplicationDto,
 ) => {
@@ -195,6 +195,17 @@ const beneficiarySignsApplication = async (
       beneficiaryAccepted: true,
       enterpriseAccepted: false,
     },
+  );
+
+  await eventCrawler.processNewEvents();
+
+  const sentEmails = reposAndGateways.email.getSentEmails();
+  expect(sentEmails).toHaveLength(4);
+  const needsReviewEmail = sentEmails[sentEmails.length - 1];
+  expect(needsReviewEmail.recipients).toEqual(["establishment@example.com"]);
+  expectTypeToMatchAndEqual(
+    needsReviewEmail.type,
+    "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
   );
 };
 
@@ -220,7 +231,7 @@ const establishmentSignsApplication = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(4);
+  expect(sentEmails).toHaveLength(5);
   const needsReviewEmail = sentEmails[sentEmails.length - 1];
   expect(needsReviewEmail.recipients).toEqual([validatorEmail]);
   return {
@@ -256,7 +267,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 
   await eventCrawler.processNewEvents();
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(5);
+  expect(sentEmails).toHaveLength(6);
   const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
   expectTypeToMatchAndEqual(
     needsToTriggerConventionSentEmail.type,

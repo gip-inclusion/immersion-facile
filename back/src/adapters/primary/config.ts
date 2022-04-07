@@ -31,7 +31,7 @@ import { DeliverRenewedMagicLink } from "../../domain/immersionApplication/useCa
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty";
+import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../domain/immersionApplication/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
@@ -643,10 +643,9 @@ const createUseCases = (
       repositories.email,
     ),
     notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty:
-      new NotifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty(
+      new NotifyImmersionApplicationWasSignedByOtherParty(
         emailFilter,
         repositories.email,
-        repositories.agency,
         generateMagicLinkFn,
       ),
     shareApplicationByEmail: new ShareApplicationLinkByEmail(

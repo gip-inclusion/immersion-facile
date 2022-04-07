@@ -24,10 +24,8 @@ const getUseCasesByTopics = (
     useCases.confirmToMentorThatApplicationCorrectlySubmittedRequestSignature,
     useCases.notifyToTeamApplicationSubmittedByBeneficiary,
   ],
-
   ImmersionApplicationPartiallySigned: [
-    // Currently there's no need to send this notification. Keep if for later if necessary.
-    // useCases.notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty,
+    useCases.notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty,
   ],
   ImmersionApplicationFullySigned: [useCases.notifyNewApplicationNeedsReview],
   ImmersionApplicationAcceptedByCounsellor: [
@@ -45,7 +43,6 @@ const getUseCasesByTopics = (
   ImmersionApplicationRequiresModification: [
     useCases.notifyBeneficiaryAndEnterpriseThatApplicationNeedsModifications,
   ],
-
   ImmersionApplicationRejected: [
     useCases.notifyBeneficiaryAndEnterpriseThatApplicationIsRejected,
   ],

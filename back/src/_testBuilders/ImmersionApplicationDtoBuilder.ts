@@ -72,8 +72,23 @@ export class ImmersionApplicationDtoBuilder
     return new ImmersionApplicationDtoBuilder({ ...this.dto, email });
   }
 
+  public withFirstName(firstName: string): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, firstName });
+  }
+
+  public withLastName(lastName: string): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({ ...this.dto, lastName });
+  }
+
   public withPhone(phone: string): ImmersionApplicationDtoBuilder {
     return new ImmersionApplicationDtoBuilder({ ...this.dto, phone });
+  }
+
+  public withMentor(mentor: string): ImmersionApplicationDtoBuilder {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      mentor,
+    });
   }
 
   public withMentorPhone(mentorPhone: string): ImmersionApplicationDtoBuilder {
@@ -193,6 +208,20 @@ export class ImmersionApplicationDtoBuilder
       ...this.dto,
       beneficiaryAccepted: false,
       enterpriseAccepted: false,
+    });
+  }
+
+  public signedByBeneficiary() {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      beneficiaryAccepted: true,
+    });
+  }
+
+  public signedByEnterprise() {
+    return new ImmersionApplicationDtoBuilder({
+      ...this.dto,
+      enterpriseAccepted: true,
     });
   }
 

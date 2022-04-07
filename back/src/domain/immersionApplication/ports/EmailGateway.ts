@@ -79,12 +79,13 @@ export type SendRenewedMagicLinkParams = {
 
 // For BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION
 export type SignedByOtherPartyNotificationParams = {
-  magicLink: string; //< MAGIC_LINK
-  existingSignatureName: string; //< EXISTING_SIGNATURE_NAME
-  missingSignatureName: string; //< MISSING_SIGNATURE_NAME
-  beneficiaryFirstName: string; //< FIRST_NAME
-  beneficiaryLastName: string; //< LAST_NAME
-  immersionProfession: string; //< IMMERSION_PROFESSION
+  magicLink: string;
+  existingSignatureName: string;
+  beneficiaryFirstName: string;
+  beneficiaryLastName: string;
+  immersionProfession: string;
+  businessName: string;
+  mentor: string;
 };
 
 // NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE

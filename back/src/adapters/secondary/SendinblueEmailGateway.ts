@@ -72,8 +72,8 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/15/message-setup
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: 15,
 
-  // https://my.sendinblue.com/camp/template/17/message-setup
-  BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION: 17, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
+  // https://my.sendinblue.com/camp/template/16/message-setup
+  BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION: 16, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
 
   // https://my.sendinblue.com/camp/template/18/message-setup
   NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE: 18,
@@ -284,12 +284,13 @@ export class SendinblueEmailGateway implements EmailGateway {
       "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
       [recipient],
       {
-        MAGIC_LINK: params.magicLink,
-        EXISTING_SIGNATURE_NAME: params.existingSignatureName,
-        MISSING_SIGNATURE_NAME: params.missingSignatureName,
         FIRST_NAME: params.beneficiaryFirstName,
         LAST_NAME: params.beneficiaryLastName,
         IMMERSION_PROFESSION: params.immersionProfession,
+        COMPANY_NAME: params.businessName,
+        MENTOR: params.mentor,
+        EXISTING_SIGNATURE_NAME: params.existingSignatureName,
+        MAGIC_LINK: params.magicLink,
       },
     );
   }
