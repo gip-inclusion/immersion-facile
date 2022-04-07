@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { App } from "src/app/App";
-import "../assets/index.css";
+import "src/assets/index.css";
 import { RouteProvider } from "./routing/routes";
 
 ReactDOM.render(

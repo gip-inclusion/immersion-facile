@@ -1,9 +1,10 @@
+import poleEmploiLogo from "/pole-emploi-logo.svg";
+import lesEntrepriseSengagent from "/les-entreprises-s-engagent.svg";
 import React from "react";
-import poleEmploiLogo from "/pole-emploi-logo.png";
 
 export const MinistereLogo = () => (
-  <div className="fr-header__brand-top">
-    <div className="fr-header__logo">
+  <div className="fr-header__brand-top w-auto">
+    <div className="fr-header__logo w-auto">
       <p className="fr-logo">
         Ministère
         <br />
@@ -21,9 +22,12 @@ export const ImmersionFooter = () => (
   <div className="mx-3 md:mx-20 mt-10">
     <footer className="fr-footer" role="contentinfo" id="footer">
       <div className="fr-container">
-        <div className="fr-footer__body flex justify-between">
+        <div className="flex justify-between fr-footer__body">
           <MinistereLogo />
-          <img src={poleEmploiLogo} alt="logo-pole-emploi" height={20} />
+          <div className="flex">
+            <img src={poleEmploiLogo} alt="logo-pole-emploi" />
+            <img src={lesEntrepriseSengagent} alt="logo-pole-emploi" />
+          </div>
         </div>
         <div className="fr-footer__bottom">
           <ul className="fr-footer__bottom-list">
