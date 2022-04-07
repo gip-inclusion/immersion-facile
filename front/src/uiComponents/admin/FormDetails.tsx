@@ -41,6 +41,7 @@ const immersionFields: FieldsToLabel = {
   immersionAddress: "Adresse d'immersion",
   immersionAppellation: "Métier observé",
   immersionActivities: "Activités",
+  immersionSkills: "Compétences évaluées",
   immersionObjective: "Objectif",
   schedule: "Horaires",
   individualProtection: "Protection individuelle",
