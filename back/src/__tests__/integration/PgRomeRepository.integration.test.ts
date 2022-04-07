@@ -35,6 +35,12 @@ describe("Postgres implementation of Rome Gateway", () => {
         { romeCode: "D1102", romeLabel: "Boulangerie - viennoiserie" },
       ]);
     });
+    it("Searches match in rome and returns distinct rome", async () => {
+      expect((await pgRomeRepository.searchRome("boulangerie"))[0]).toEqual({
+        romeCode: "D1102",
+        romeLabel: "Boulangerie - viennoiserie",
+      });
+    });
 
     it("Correctly handles search queries with multiple words", async () => {
       expect(
@@ -55,7 +61,7 @@ describe("Postgres implementation of Rome Gateway", () => {
       );
 
       expectTypeToMatchAndEqual(
-        await pgRomeRepository.searchAppellation("Aide-boulanger"),
+        await pgRomeRepository.searchAppellation("Aide-boulangère"),
         [
           {
             appellationCode: "10868",

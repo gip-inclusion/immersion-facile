@@ -41,16 +41,24 @@ export class PgRomeRepository implements RomeRepository {
 
   public async searchRome(query: string): Promise<RomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
-
     return await this.client
       .query(
-        `SELECT DISTINCT public_appellations_data.code_rome, libelle_rome
-        FROM public_appellations_data 
-        JOIN public_romes_data ON  public_appellations_data.code_rome = public_romes_data.code_rome
-        WHERE
-           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long_without_special_char ILIKE $3)
-           OR (libelle_appellation_long_without_special_char ILIKE $2 AND libelle_appellation_long_without_special_char ILIKE $3)
-        LIMIT 80`,
+        `
+        WITH matching_rome AS(
+            WITH search_corpus AS (
+              SELECT code_rome, libelle_rome::text AS searchable_text, libelle_rome_tsvector AS ts_vector FROM public_romes_data
+              UNION
+              SELECT code_rome, libelle_appellation_long_without_special_char AS searchable_text, libelle_appellation_long_tsvector AS ts_vector FROM  public_appellations_data
+            )
+            SELECT DISTINCT code_rome
+            FROM search_corpus 
+            WHERE
+              (ts_vector @@ to_tsquery('french',$1) AND searchable_text ILIKE $3)
+              OR (searchable_text ILIKE $2 AND searchable_text ILIKE $3)
+            LIMIT 80
+            )
+        SELECT matching_rome.code_rome, libelle_rome
+        FROM matching_rome LEFT JOIN public_romes_data ON matching_rome.code_rome = public_romes_data.code_rome`,
         [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
       )
       .then((res) =>
