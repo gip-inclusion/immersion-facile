@@ -228,13 +228,13 @@ export class PgEstablishmentAggregateRepository
                 FROM establishments 
                 WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)
                 ) 
-        SELECT io.siret, rome_code, voluntary_to_immersion,
+        SELECT aewa.siret, rome_code, voluntary_to_immersion,
         JSONB_AGG(distinct libelle_appellation_long) filter(WHERE libelle_appellation_long is not null) AS appellation_labels
         FROM immersion_offers io 
         RIGHT JOIN active_establishments_within_area aewa ON io.siret = aewa.siret 
         LEFT JOIN public_appellations_data pad ON (io.rome_appellation = pad.ogr_appellation) 
         ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
-        GROUP BY(io.siret, voluntary_to_immersion, rome_code)
+        GROUP BY(aewa.siret, voluntary_to_immersion, rome_code)
         ORDER BY aewa.voluntary_to_immersion DESC
         LIMIT $3
         )
