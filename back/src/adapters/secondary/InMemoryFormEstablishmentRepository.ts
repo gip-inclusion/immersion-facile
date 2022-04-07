@@ -41,4 +41,9 @@ export class InMemoryFormEstablishmentRepository
   ): Promise<FormEstablishmentDto | undefined> {
     return this.formEstablishments.find(propEq("siret", siretToGet));
   }
+
+  // for testing purpose
+  public setFormEstablishments(formEstablishments: FormEstablishmentDto[]) {
+    this.formEstablishments = formEstablishments;
+  }
 }

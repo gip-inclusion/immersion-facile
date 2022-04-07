@@ -1,3 +1,4 @@
+import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormEstablishment.schema";
 import { SiretDto } from "../../../shared/siret";
@@ -27,11 +28,18 @@ export class AddFormEstablishment extends TransactionalUseCase<
   ): Promise<SiretDto> {
     const featureFlags = await uow.getFeatureFlags();
 
+    const existingFormEstablishment =
+      await uow.formEstablishmentRepo.getBySiret(dto.siret);
+
+    if (existingFormEstablishment) {
+      throw new ConflictError(
+        `Establishment with siret ${dto.siret} already exists`,
+      );
+    }
+
     if (featureFlags.enableInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
     }
-
-    await uow.formEstablishmentRepo.create(dto);
 
     const event = this.createNewEvent({
       topic: "FormEstablishmentAdded",
@@ -39,7 +47,11 @@ export class AddFormEstablishment extends TransactionalUseCase<
       ...(featureFlags.enableInseeApi ? {} : { wasQuarantined: true }),
     });
 
-    await uow.outboxRepo.save(event);
+    await Promise.all([
+      uow.formEstablishmentRepo.create(dto),
+      uow.outboxRepo.save(event),
+    ]);
+
     return dto.siret;
   }
 }

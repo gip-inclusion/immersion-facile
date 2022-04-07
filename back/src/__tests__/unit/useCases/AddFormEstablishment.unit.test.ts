@@ -5,7 +5,10 @@ import {
   expectPromiseToFailWithError,
 } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  BadRequestError,
+  ConflictError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -65,6 +68,19 @@ describe("Add FormEstablishment", () => {
       topic: "FormEstablishmentAdded",
       payload: formEstablishment,
     });
+  });
+
+  it("cannot save an establishment with same siret", async () => {
+    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
+
+    formEstablishmentRepo.setFormEstablishments([formEstablishment]);
+
+    await expectPromiseToFailWithError(
+      addFormEstablishment.execute(formEstablishment),
+      new ConflictError(
+        "Establishment with siret 01234567890123 already exists",
+      ),
+    );
   });
 
   it("reject when trying to save Form Establishment in the repository with null values", async () => {
