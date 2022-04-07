@@ -12,13 +12,14 @@ import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
 
 export interface ImmersionApplicationGateway {
   add(immersionApplicationDto: ImmersionApplicationDto): Promise<string>;
+  addUkraine(immersionApplicationDto: ImmersionApplicationDto): Promise<string>;
 
   // Get an immersion application through backoffice, password-protected route.
   backofficeGet(id: ImmersionApplicationId): Promise<ImmersionApplicationDto>;
-  getML(jwt: string): Promise<ImmersionApplicationDto>;
+  getMagicLink(jwt: string): Promise<ImmersionApplicationDto>;
 
   update(immersionApplicationDto: ImmersionApplicationDto): Promise<string>;
-  updateML(
+  updateMagicLink(
     immersionApplicationDto: ImmersionApplicationDto,
     jwt: string,
   ): Promise<string>;

@@ -41,7 +41,7 @@ export const ImmersionApplicationValidatePage = ({
 
   return (
     <ApiDataContainer
-      callApi={() => immersionApplicationGateway.getML(jwt)}
+      callApi={() => immersionApplicationGateway.getMagicLink(jwt)}
       jwt={jwt}
     >
       {(immersionApplication) => {

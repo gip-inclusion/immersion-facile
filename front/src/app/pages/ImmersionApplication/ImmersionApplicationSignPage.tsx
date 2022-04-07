@@ -45,7 +45,9 @@ export const ImmersionApplicationSignPage = ({ route }: SignFormProps) => {
       <ImmersionMarianneHeader />
 
       <ApiDataContainer
-        callApi={() => immersionApplicationGateway.getML(route.params.jwt)}
+        callApi={() =>
+          immersionApplicationGateway.getMagicLink(route.params.jwt)
+        }
         jwt={route.params.jwt}
       >
         {(response) => (

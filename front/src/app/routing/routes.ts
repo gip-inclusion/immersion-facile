@@ -1,6 +1,6 @@
 import { frontRoutes } from "src/shared/routes";
 import { createRouter, defineRoute, param } from "type-route";
-import { defaultImmersionApplicationValues } from "./route-params";
+import { immersionApplicationValuesFromUrl } from "./route-params";
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute("/ajouter-prescripteur"),
@@ -25,10 +25,22 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     "/etablissement",
     "/immersion-offer" /* old name, still redirected*/,
   ]),
+  formEstablishmentForExternals: defineRoute(
+    { consumer: param.path.string },
+    (p) => `/etablissement/${p.consumer}`,
+  ),
   home: defineRoute("/"),
   immersionApplication: defineRoute(
-    { jwt: param.query.optional.string, ...defaultImmersionApplicationValues },
+    { jwt: param.query.optional.string, ...immersionApplicationValuesFromUrl },
     () => "/demande-immersion",
+  ),
+  immersionApplicationForExternals: defineRoute(
+    {
+      consumer: param.path.string,
+      jwt: param.query.optional.string,
+      ...immersionApplicationValuesFromUrl,
+    },
+    (p) => `/demande-immersion/${p.consumer}`,
   ),
   immersionApplicationsToValidate: defineRoute(
     { jwt: param.query.string },
@@ -39,10 +51,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.immersionApplicationsToSign}`,
   ),
   landingEstablishment: defineRoute("/accueil-etablissement"),
-  formEstablishmentForExternals: defineRoute(
-    { consumer: param.path.string },
-    (p) => `/etablissement/${p.consumer}`,
-  ),
   renewMagicLink: defineRoute(
     {
       expiredJwt: param.query.string,

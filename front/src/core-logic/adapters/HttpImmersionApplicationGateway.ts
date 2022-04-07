@@ -45,6 +45,20 @@ export class HttpImmersionApplicationGateway
     return addImmersionApplicationResponse.id;
   }
 
+  public async addUkraine(
+    immersionApplicationDto: ImmersionApplicationDto,
+  ): Promise<string> {
+    immersionApplicationSchema.parse(immersionApplicationDto);
+    const httpResponse = await axios.post(
+      `/${prefix}/${immersionApplicationsRoute}`,
+      immersionApplicationDto,
+    );
+    const addImmersionApplicationResponse: WithImmersionApplicationId =
+      httpResponse.data;
+    withImmersionApplicationIdSchema.parse(addImmersionApplicationResponse);
+    return addImmersionApplicationResponse.id;
+  }
+
   public async backofficeGet(id: string): Promise<ImmersionApplicationDto> {
     const response = await axios.get(
       `/${prefix}/${immersionApplicationsRoute}/${id}`,
@@ -53,7 +67,7 @@ export class HttpImmersionApplicationGateway
     return response.data;
   }
 
-  public async getML(jwt: string): Promise<ImmersionApplicationDto> {
+  public async getMagicLink(jwt: string): Promise<ImmersionApplicationDto> {
     const response = await axios.get(
       `/${prefix}/auth/${immersionApplicationsRoute}/${jwt}`,
     );
@@ -92,7 +106,7 @@ export class HttpImmersionApplicationGateway
     return updateImmersionApplicationResponse.id;
   }
 
-  public async updateML(
+  public async updateMagicLink(
     immersionApplicationDto: ImmersionApplicationDto,
     jwt: string,
   ): Promise<string> {

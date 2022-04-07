@@ -1,6 +1,8 @@
 import React from "react";
 import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
+import { ImmersionApplicationPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
+import { ImmersionApplicationPageForExternals } from "src/app/pages/ImmersionApplication/ImmersionApplicationPageForExternals";
 import { useFeatureFlagsContext } from "src/app/utils/FeatureFlagContext";
 import { EstablishmentEditionFormPage } from "../pages/Establishment/EstablishmentEditionFormPage";
 import { HomePage } from "src/app/pages/Static/HomePage";
@@ -14,8 +16,8 @@ import { ImmersionApplicationSignPage } from "src/app/pages/ImmersionApplication
 import { SearchDebugPage } from "../components/SearchDebugPage";
 import { SearchPage } from "src/app/pages/Search/SearchPage";
 import { EstablishmentFormImmersionFacilePage } from "../pages/Establishment/EstablishmentFormImmersionFacilePage";
-import { EstablishmentFormForExternalsPage } from "../pages/Establishment/EstablishmentFormForExternalsPage";
-import { ImmersionApplicationPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
+import { EstablishmentFormPageForExternals } from "../pages/Establishment/EstablishmentFormPageForExternals";
+import { ImmersionApplicationForm } from "src/app/pages/ImmersionApplication/ImmersionApplicationForm";
 
 const { dev } = ENV;
 
@@ -49,13 +51,16 @@ export const Router = () => {
         <EstablishmentFormImmersionFacilePage />
       )}
       {route.name === "formEstablishmentForExternals" && (
-        <EstablishmentFormForExternalsPage route={route} />
+        <EstablishmentFormPageForExternals route={route} />
       )}
       {route.name === "home" && <HomePage showDebugInfo={dev} />}
 
       {route.name === "landingEstablishment" && <LandingEstablishmentPage />}
       {route.name === "immersionApplication" && (
         <ImmersionApplicationPage route={route} />
+      )}
+      {route.name === "immersionApplicationForExternals" && (
+        <ImmersionApplicationPageForExternals route={route} />
       )}
       {route.name === "immersionApplicationsToValidate" && (
         <ImmersionApplicationValidatePage route={route} />

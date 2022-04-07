@@ -1,6 +1,7 @@
 import { param, ValueSerializer } from "type-route";
 import { ScheduleDto } from "src/shared/ScheduleSchema";
 import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 
 const scheduleSerializer: ValueSerializer<ScheduleDto> = {
   parse: (raw) => JSON.parse(raw),
@@ -13,11 +14,11 @@ const appellationDtoSerializer: ValueSerializer<AppellationDto> = {
 };
 
 export type ApplicationFormKeysInUrl =
-  keyof typeof defaultImmersionApplicationValues;
+  keyof typeof immersionApplicationValuesFromUrl;
 
-export const defaultImmersionApplicationValues = {
-  peExternalId: param.query.optional.string,
+export const immersionApplicationValuesFromUrl = {
   email: param.query.optional.string,
+  peExternalId: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,
   phone: param.query.optional.string,

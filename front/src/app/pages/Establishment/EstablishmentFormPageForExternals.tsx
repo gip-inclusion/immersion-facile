@@ -17,7 +17,7 @@ const externalConsumers: Partial<
   "lesentreprises-sengagent": { isIframe: true },
 };
 
-export const EstablishmentFormForExternalsPage = ({
+export const EstablishmentFormPageForExternals = ({
   route,
 }: EstablishmentFormForExternalsProps) => {
   const { params } = route;

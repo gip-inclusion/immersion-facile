@@ -62,6 +62,18 @@ export class InMemoryImmersionApplicationGateway
     return immersionApplication.id;
   }
 
+  public async addUkraine(
+    immersionApplication: ImmersionApplicationDto,
+  ): Promise<ImmersionApplicationId> {
+    console.log(
+      "InMemoryImmersionApplicationGateway.add: ",
+      immersionApplication,
+    );
+    await sleep(SIMULATED_LATENCY_MS);
+    this._immersionApplications[immersionApplication.id] = immersionApplication;
+    return immersionApplication.id;
+  }
+
   public async backofficeGet(
     id: ImmersionApplicationId,
   ): Promise<ImmersionApplicationDto> {
@@ -71,7 +83,7 @@ export class InMemoryImmersionApplicationGateway
   }
 
   // Same as GET above, but using a magic link
-  public async getML(jwt: string): Promise<ImmersionApplicationDto> {
+  public async getMagicLink(jwt: string): Promise<ImmersionApplicationDto> {
     await sleep(SIMULATED_LATENCY_MS);
 
     const payload = decodeJwt<MagicLinkPayload>(jwt);
@@ -102,7 +114,7 @@ export class InMemoryImmersionApplicationGateway
     return immersionApplication.id;
   }
 
-  public async updateML(
+  public async updateMagicLink(
     immersionApplication: ImmersionApplicationDto,
     jwt: string,
   ): Promise<string> {
