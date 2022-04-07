@@ -30,6 +30,19 @@ const searchInMetzParams = {
   },
 };
 
+const insertLBBAggregate = async (
+  establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository,
+) =>
+  establishmentAggregateRepository.insertEstablishmentAggregates([
+    new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityV2Builder()
+          .withDataSource("api_labonneboite")
+          .build(),
+      )
+      .build(),
+  ]);
+
 const prepareSearchableData = async () => {
   const establishmentAggregateRepository =
     new InMemoryEstablishmentAggregateRepository();
@@ -49,7 +62,7 @@ const prepareSearchableData = async () => {
   const establishment = new EstablishmentEntityV2Builder()
     .withSiret(siret)
     .withAddress("55 Rue du Faubourg Saint-Honoré")
-    .withDataSource("api_labonneboite")
+    .withDataSource("form")
     .withNumberOfEmployeeRange(12)
     .build();
 
@@ -137,7 +150,7 @@ describe("SearchImmersionUseCase", () => {
       naf: "8539A",
       siret: "78000403200019",
       name: "Company inside repository",
-      voluntaryToImmersion: false,
+      voluntaryToImmersion: true,
       location: TEST_POSITION,
       address: "55 Rue du Faubourg Saint-Honoré",
       contactMode: "EMAIL",
@@ -146,6 +159,33 @@ describe("SearchImmersionUseCase", () => {
       nafLabel: TEST_NAF_LABEL,
       romeLabel: TEST_ROME_LABEL,
     });
+  });
+  it("gets only form establishments if voluntary_to_immersion is true", async () => {
+    const { searchImmersion, establishmentAggregateRepository } =
+      await prepareSearchableData();
+    await insertLBBAggregate(establishmentAggregateRepository);
+    const response = await searchImmersion.execute({
+      ...searchInMetzParams,
+      voluntary_to_immersion: true,
+    });
+
+    expect(response).toHaveLength(2);
+    expect(response[0].voluntaryToImmersion).toBe(true);
+    expect(response[1].voluntaryToImmersion).toBe(true);
+  });
+  it("gets only lbb establishments if voluntary_to_immersion is false", async () => {
+    const { searchImmersion, establishmentAggregateRepository } =
+      await prepareSearchableData();
+
+    await insertLBBAggregate(establishmentAggregateRepository);
+
+    const response = await searchImmersion.execute({
+      ...searchInMetzParams,
+      voluntary_to_immersion: false,
+    });
+
+    expect(response).toHaveLength(1);
+    expect(response[0].voluntaryToImmersion).toBe(false);
   });
 
   describe("authenticated with api key", () => {
@@ -165,7 +205,7 @@ describe("SearchImmersionUseCase", () => {
           naf: "8539A",
           siret: "78000403200019",
           name: "Company inside repository",
-          voluntaryToImmersion: false,
+          voluntaryToImmersion: true,
           location: TEST_POSITION,
           address: "55 Rue du Faubourg Saint-Honoré",
           contactMode: "EMAIL",
@@ -204,7 +244,7 @@ describe("SearchImmersionUseCase", () => {
           naf: "8539A",
           siret: "78000403200019",
           name: "Company inside repository",
-          voluntaryToImmersion: false,
+          voluntaryToImmersion: true,
           location: TEST_POSITION,
           address: "55 Rue du Faubourg Saint-Honoré",
           contactMode: "EMAIL",

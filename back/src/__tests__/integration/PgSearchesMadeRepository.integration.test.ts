@@ -88,6 +88,8 @@ describe("PgSearchesMadeRepository", () => {
       lat: 49.119146,
       lon: 6.17602,
       needsToBeSearched: true,
+      voluntary_to_immersion: true,
+      apiConsumerName: "passeEmploi",
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "9f6daac0-6f02-11ec-90d6-0242ac120003",
@@ -150,8 +152,8 @@ describe("PgSearchesMadeRepository", () => {
   const insertEntity = async (searchMadeEntity: SearchMadeEntity) => {
     await client.query(
       `INSERT INTO searches_made (
-       id, ROME, lat, lon, distance, needsToBeSearched, gps
-     ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7));`,
+       id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion
+     ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8);`,
       [
         searchMadeEntity.id,
         searchMadeEntity.rome,
@@ -160,6 +162,7 @@ describe("PgSearchesMadeRepository", () => {
         searchMadeEntity.distance_km,
         searchMadeEntity.needsToBeSearched,
         `POINT(${searchMadeEntity.lon} ${searchMadeEntity.lat})`,
+        searchMadeEntity.voluntary_to_immersion,
       ],
     );
   };

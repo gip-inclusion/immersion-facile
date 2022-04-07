@@ -34,19 +34,24 @@ export class SearchImmersion extends UseCase<
     params: SearchImmersionRequestDto,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
+    const apiConsumerName = apiConsumer?.consumer;
+
     const searchMade: SearchMade = {
       rome: params.rome,
       lat: params.location.lat,
       lon: params.location.lon,
       distance_km: params.distance_km,
+      voluntary_to_immersion: params.voluntary_to_immersion,
     };
+
     const searchMadeEntity: SearchMadeEntity = {
       ...searchMade,
       id: this.uuidGenerator.new(),
       needsToBeSearched: true,
+      apiConsumerName,
     };
+
     await this.searchesMadeRepository.insertSearchMade(searchMadeEntity);
-    const apiConsumerName = apiConsumer?.consumer;
 
     console.time("searchImmersionQueryDuration");
     const resultsFromStorage =

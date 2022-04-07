@@ -225,6 +225,9 @@ export class PgEstablishmentAggregateRepository
                 (data_source = 'form')::boolean AS voluntary_to_immersion
                 FROM establishments 
                 WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)
+                ${filterOnVoluntaryToImmersion(
+                  searchMade.voluntary_to_immersion,
+                )}
                 ) 
         SELECT aewa.siret, rome_code, voluntary_to_immersion,
         JSONB_AGG(distinct libelle_appellation_long) filter(WHERE libelle_appellation_long is not null) AS appellation_labels
@@ -560,3 +563,11 @@ const reStGeographyFromText =
 // TODO : find a better way than that : This is due to the Literal formatting that turns all simple quote into double quote.
 const fixStGeographyEscapingInQuery = (query: string) =>
   query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");
+
+const filterOnVoluntaryToImmersion = (voluntaryToImmersion?: boolean) => {
+  if (voluntaryToImmersion === undefined) return "";
+
+  return voluntaryToImmersion
+    ? "AND data_source = 'form'"
+    : "AND data_source != 'form'";
+};

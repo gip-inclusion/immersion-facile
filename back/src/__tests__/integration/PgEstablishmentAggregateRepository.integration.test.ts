@@ -431,6 +431,49 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactUidOfOfferMatchingSearch,
       );
     });
+    it("returns only form establishments if voluntaryOnly is true", async () => {
+      // Prepare : establishment in geographical area but not active
+      const formSiret = "11000403200029";
+      const lbbSiret = "22000403200029";
+
+      await Promise.all([
+        insertEstablishment({
+          siret: formSiret,
+          isActive: true,
+          position: searchedPosition,
+          dataSource: "form",
+        }),
+        insertEstablishment({
+          siret: lbbSiret,
+          isActive: true,
+          position: searchedPosition,
+          dataSource: "api_labonneboite",
+        }),
+      ]);
+      await Promise.all([
+        insertImmersionOffer({
+          uuid: testUid1,
+          romeCode: informationGeographiqueRome,
+          siret: formSiret,
+        }),
+
+        insertImmersionOffer({
+          uuid: testUid2,
+          romeCode: informationGeographiqueRome,
+          siret: lbbSiret,
+        }),
+      ]);
+      // Act
+      const searchWithVoluntaryOnly =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
+          {
+            searchMade: { ...searchMadeWithRome, voluntary_to_immersion: true },
+          },
+        );
+      // Assert
+      expect(searchWithVoluntaryOnly).toHaveLength(1);
+      expect(searchWithVoluntaryOnly[0].siret).toEqual(formSiret);
+    });
   });
 
   describe("Pg implementation of method getActiveEstablishmentSiretsNotUpdatedSince", () => {

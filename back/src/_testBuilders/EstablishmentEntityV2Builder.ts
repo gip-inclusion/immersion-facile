@@ -50,7 +50,7 @@ export class EstablishmentEntityV2Builder
     return new EstablishmentEntityV2Builder({
       ...this.entity,
       dataSource,
-      voluntaryToImmersion: dataSource == "form",
+      voluntaryToImmersion: dataSource === "form",
     });
   }
 

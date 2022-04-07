@@ -168,6 +168,19 @@ describe("search-immersion route", () => {
           })
           .expect(200, []);
       });
+      it("with filter voluntary_to_immersion", async () => {
+        await request
+          .post(`/v1/search-immersion`)
+          .send({
+            location: {
+              lat: 48.8531,
+              lon: 2.34999,
+            },
+            distance_km: 30,
+            voluntary_to_immersion: true,
+          })
+          .expect(200, []);
+      });
     });
 
     // TODO add test which actually recovers data (and one with token, one without)

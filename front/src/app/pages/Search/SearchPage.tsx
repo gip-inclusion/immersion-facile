@@ -51,7 +51,7 @@ export const SearchPage = () => {
                   lon: values.lon,
                 },
                 distance_km: values.radiusKm,
-                nafDivision: values.nafDivision,
+                voluntary_to_immersion: undefined, // TODO : call in 2 steps : 1. voluntary_to_immersion=true; 2. voluntary_to_immersion=false
               });
             }}
           >

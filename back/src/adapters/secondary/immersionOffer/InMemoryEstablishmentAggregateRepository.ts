@@ -49,6 +49,12 @@ export class InMemoryEstablishmentAggregateRepository
   }): Promise<SearchImmersionResultDto[]> {
     logger.info({ searchMade, withContactDetails }, "getFromSearch");
     return this._establishmentAggregates
+      .filter((aggregate) =>
+        searchMade.voluntary_to_immersion === undefined
+          ? true
+          : aggregate.establishment.voluntaryToImmersion ==
+            searchMade.voluntary_to_immersion,
+      )
       .flatMap((aggregate) =>
         aggregate.immersionOffers
           .filter(
@@ -65,6 +71,7 @@ export class InMemoryEstablishmentAggregateRepository
             ),
           ),
       )
+
       .slice(0, maxResults);
   }
 

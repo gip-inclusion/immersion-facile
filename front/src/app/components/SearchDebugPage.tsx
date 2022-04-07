@@ -41,10 +41,6 @@ export const SearchDebugPage = () => {
                 lon: values.lon,
               },
               distance_km: values.radius,
-              nafDivision:
-                values.nafDivision.length === 0
-                  ? values.nafDivision
-                  : undefined,
             })
             .then((response) => {
               setResponseText(JSON.stringify(response));
