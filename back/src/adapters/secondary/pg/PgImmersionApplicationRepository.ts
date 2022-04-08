@@ -69,7 +69,8 @@ export class PgImmersionApplicationRepository
     const query = `UPDATE immersion_applications
       SET status=$2,  email=$3,  first_name=$4,  last_name=$5,  phone=$6,  agency_id=$7, date_submission=$8, date_start=$9, date_end=$10, siret=$11,
         business_name=$12, mentor=$13, mentor_phone=$14, mentor_email=$15, schedule=$16, individual_protection=$17, sanitary_prevention=$18, sanitary_prevention_description=$19, immersion_address=$20,
-        immersion_objective=$21, immersion_appellation=$22, immersion_activities=$23, immersion_skills=$24, beneficiary_accepted=$25, enterprise_accepted=$26, work_conditions=$27, pe_external_id=$28
+        immersion_objective=$21, immersion_appellation=$22, immersion_activities=$23, immersion_skills=$24, beneficiary_accepted=$25, enterprise_accepted=$26, work_conditions=$27, pe_external_id=$28, 
+        updated_at=now()
       WHERE id=$1`;
 
     // prettier-ignore
