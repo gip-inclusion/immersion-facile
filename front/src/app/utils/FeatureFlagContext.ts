@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { featureFlagsGateway } from "src/app/config/dependencies";
+import { featureFlagGateway } from "src/app/config/dependencies";
 import { FeatureFlags } from "src/shared/featureFlags";
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -13,7 +13,7 @@ export const useFetchFeatureFlags = () => {
     useState<FeatureFlags>(defaultFeatureFlags);
 
   useEffect(() => {
-    featureFlagsGateway.getAll().then(setFeatureFlags);
+    featureFlagGateway.getAll().then(setFeatureFlags);
   }, []);
 
   return featureFlags;

@@ -1,46 +1,62 @@
+import { filter as ramdaFilter } from "ramda";
+import { BehaviorSubject, delay, map, Observable, Subject } from "rxjs";
+import { ContactEstablishmentRequestDto } from "src/shared/contactEstablishment";
 import { SearchImmersionRequestDto } from "src/shared/searchImmersion/SearchImmersionRequest.dto";
 import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 import { sleep } from "src/shared/utils";
-import { ContactEstablishmentRequestDto } from "src/shared/contactEstablishment";
-
 import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 
-const DEFAULT_SIMULATED_LATENCY_MS = 500;
-
 export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
-  private _results: SearchImmersionResultDto[];
-  private readonly _simulatedLatency: number;
+  private readonly _results$: Subject<SearchImmersionResultDto[]>;
   private _error: Error | null = null;
 
-  constructor(params?: {
-    simulatedLatency?: number;
-    defaultResults?: SearchImmersionResultDto[];
-  }) {
-    this._simulatedLatency =
-      params?.simulatedLatency ?? DEFAULT_SIMULATED_LATENCY_MS;
-    this._results = params?.defaultResults ?? seedResults;
+  constructor(
+    private readonly seedResults?: SearchImmersionResultDto[],
+    private readonly simulatedLatency = 0,
+  ) {
+    this._results$ = seedResults
+      ? new BehaviorSubject(seedResults)
+      : new Subject<SearchImmersionResultDto[]>();
   }
 
-  public async search(
+  public search(
     searchParams: SearchImmersionRequestDto,
-  ): Promise<SearchImmersionResultDto[]> {
-    await sleep(this._simulatedLatency);
+  ): Observable<SearchImmersionResultDto[]> {
     if (this._error) throw this._error;
-    return this._results;
+    if (this.seedResults) return this.simulateSearch(searchParams);
+
+    return this.simulatedLatency
+      ? this._results$.pipe(delay(this.simulatedLatency))
+      : this._results$;
   }
 
   public async contactEstablishment(
     params: ContactEstablishmentRequestDto,
   ): Promise<void> {
-    await sleep(this._simulatedLatency);
+    await sleep(this.simulatedLatency);
     if (this._error) throw this._error;
     return;
   }
 
-  // test purpose
-  setNextSearchResult(results: SearchImmersionResultDto[]) {
-    this._results = results;
+  private simulateSearch(searchParams: SearchImmersionRequestDto) {
+    if (searchParams.voluntary_to_immersion === undefined)
+      return this._results$;
+    return this._results$.pipe(
+      delay(this.simulatedLatency),
+      map(
+        ramdaFilter<SearchImmersionResultDto>(
+          (result) =>
+            result.voluntaryToImmersion === searchParams.voluntary_to_immersion,
+        ),
+      ),
+    );
   }
+
+  // test purpose
+  get searchResults$() {
+    return this._results$;
+  }
+
   setError(error: Error) {
     this._error = error;
   }
@@ -48,7 +64,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
 
 const defaultNaf = "MyNaf";
 
-const seedResults: SearchImmersionResultDto[] = [
+export const seedResults: SearchImmersionResultDto[] = [
   {
     rome: "A0000",
     naf: defaultNaf,
@@ -68,7 +84,7 @@ const seedResults: SearchImmersionResultDto[] = [
     naf: defaultNaf,
     siret: "12345678901234",
     name: "Mega Corp",
-    voluntaryToImmersion: true,
+    voluntaryToImmersion: false,
     location: { lat: 48.8666, lon: 2.3333 },
     address: "55 rue du Faubourg Saint-Honoré",
     contactMode: "PHONE",

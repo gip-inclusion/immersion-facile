@@ -1,5 +1,6 @@
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import React, { useState } from "react";
+import { firstValueFrom } from "rxjs";
 import { immersionSearchGateway } from "src/app/config/dependencies";
 import { AppellationAutocomplete } from "./AppellationAutocomplete";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
@@ -33,15 +34,16 @@ export const SearchDebugPage = () => {
         onSubmit={async (values, { setSubmitting }: FormikHelpers<Values>) => {
           setLatency(0);
           let requestDate = new Date();
-          immersionSearchGateway
-            .search({
+          firstValueFrom(
+            immersionSearchGateway.search({
               rome: values.rome,
               location: {
                 lat: values.lat,
                 lon: values.lon,
               },
               distance_km: values.radius,
-            })
+            }),
+          )
             .then((response) => {
               setResponseText(JSON.stringify(response));
               setResult(response);

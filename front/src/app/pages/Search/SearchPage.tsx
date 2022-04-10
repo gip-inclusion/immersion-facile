@@ -1,18 +1,20 @@
-import SearchIcon from "@mui/icons-material/Search";
-import { Form, Formik } from "formik";
-import { searchEpic } from "src/app/config/dependencies";
-import { RomeAutocomplete } from "src/app/components/RomeAutocomplete";
-import { OurAdvises } from "./OurAdvises";
-import { SearchResultPanel } from "./SearchResultPanel";
 import distanceSearchIcon from "/distance-search-icon.svg";
 import locationSearchIcon from "/location-search-icon.svg";
+import SearchIcon from "@mui/icons-material/Search";
+import { Form, Formik } from "formik";
+import React from "react";
+import { useDispatch } from "react-redux";
+import { RomeAutocomplete } from "src/app/components/RomeAutocomplete";
+import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { searchSelectors } from "src/core-logic/search/search.selectors";
+import { searchSlice } from "src/core-logic/search/search.slice";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { SearchButton } from "src/uiComponents/SearchButton";
-import { useObservable } from "src/useObservable";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
-import React from "react";
+import { OurAdvises } from "./OurAdvises";
+import { SearchResultPanel } from "./SearchResultPanel";
 
 interface SearchInput {
   rome?: string;
@@ -26,7 +28,8 @@ const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initiallySelectedIndex = 3; // to get 10 km radius by default
 
 export const SearchPage = () => {
-  const isSearching = useObservable(searchEpic.views.isSearching$, false);
+  const searchStatus = useAppSelector(searchSelectors.searchStatus);
+  const dispatch = useDispatch();
 
   return (
     <HeaderFooterLayout>
@@ -44,15 +47,16 @@ export const SearchPage = () => {
               radiusKm: 10,
             }}
             onSubmit={(values) => {
-              searchEpic.actions.search({
-                rome: values.rome || undefined,
-                location: {
-                  lat: values.lat,
-                  lon: values.lon,
-                },
-                distance_km: values.radiusKm,
-                voluntary_to_immersion: undefined, // TODO : call in 2 steps : 1. voluntary_to_immersion=true; 2. voluntary_to_immersion=false
-              });
+              dispatch(
+                searchSlice.actions.searchRequested({
+                  rome: values.rome || undefined,
+                  location: {
+                    lat: values.lat,
+                    lon: values.lon,
+                  },
+                  distance_km: values.radiusKm,
+                }),
+              );
             }}
           >
             {({ setFieldValue }) => (
@@ -103,7 +107,10 @@ export const SearchPage = () => {
                   <SearchButton
                     className="mt-12"
                     dark
-                    disabled={isSearching}
+                    disabled={
+                      searchStatus === "initialFetch" ||
+                      searchStatus === "extraFetch"
+                    }
                     type="submit"
                   >
                     <SearchIcon />

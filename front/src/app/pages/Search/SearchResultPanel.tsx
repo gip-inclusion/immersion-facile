@@ -1,14 +1,14 @@
 import { CircularProgress } from "@mui/material";
 import React, { ReactNode, useState } from "react";
-import { searchEpic } from "src/app/config/dependencies";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { searchSelectors } from "src/core-logic/search/search.selectors";
+import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { SuccessFeedback } from "src/uiComponents/SuccessFeedback";
 import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,
 } from "./ContactEstablishmentModal";
 import { EnterpriseSearchResult } from "./EnterpriseSearchResult";
-import { SuccessFeedback } from "src/uiComponents/SuccessFeedback";
-import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
-import { useObservable } from "src/useObservable";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -23,32 +23,30 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
 };
 
 export const SearchResultPanel = () => {
-  const searchResults = useObservable(searchEpic.views.searchResults$, []);
-  const isSearching = useObservable(searchEpic.views.isSearching$, false);
-  const searchInfo = useObservable(
-    searchEpic.views.searchInfo$,
-    "Veuillez sélectionner vos critères",
-  );
+  const searchResults = useAppSelector(searchSelectors.searchResults);
+  const searchStatus = useAppSelector(searchSelectors.searchStatus);
+  const searchInfo = useAppSelector(searchSelectors.searchInfo);
 
   // prettier-ignore
   const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
   const [successFullyValidated, setSuccessfullyValidated] = useState(false);
   const { modalState, dispatch } = useContactEstablishmentModal();
 
-  if (isSearching)
+  if (searchStatus === "initialFetch")
     return (
       <SearchInfos>
         <CircularProgress color="inherit" size="75px" />
       </SearchInfos>
     );
 
-  if (searchInfo) return <SearchInfos>{searchInfo}</SearchInfos>;
+  if (searchInfo && searchResults.length === 0)
+    return <SearchInfos>{searchInfo}</SearchInfos>;
 
   return (
     <>
       {searchResults.map((searchResult) => (
         <EnterpriseSearchResult
-          key={searchResult.siret + "_" + searchResult.rome} // Should be unique !
+          key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
           searchResult={searchResult}
           onButtonClick={() =>
             dispatch({
@@ -65,6 +63,9 @@ export const SearchResultPanel = () => {
           disableButton={modalState.isValidating}
         />
       ))}
+      {searchStatus === "extraFetch" && searchInfo && (
+        <SearchInfos>{searchInfo}</SearchInfos>
+      )}
       <ContactEstablishmentModal
         modalState={modalState}
         dispatch={dispatch}

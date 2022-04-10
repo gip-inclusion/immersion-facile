@@ -10,9 +10,11 @@ import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAd
 import { InMemoryFeatureFlagGateway } from "src/core-logic/adapters/InMemoryFeatureFlagGateway";
 import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemoryFormEstablishmentGateway";
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
-import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
+import {
+  InMemoryImmersionSearchGateway,
+  seedResults,
+} from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
-import { createSearchEpic } from "src/core-logic/epics/search.epic";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { FeatureFlagsGateway } from "src/core-logic/ports/FeatureFlagsGateway";
@@ -20,6 +22,7 @@ import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishment
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
+import { createStore } from "src/core-logic/storeConfig/store";
 import { ENV } from "src/environmentVariables";
 
 export const formEstablishmentGateway: FormEstablishmentGateway =
@@ -34,7 +37,7 @@ export const immersionApplicationGateway: ImmersionApplicationGateway =
 
 export const immersionSearchGateway: ImmersionSearchGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryImmersionSearchGateway()
+    ? new InMemoryImmersionSearchGateway(seedResults, 2000)
     : new HttpImmersionSearchGateway();
 
 export const apiAdresseGateway: ApiAdresseGateway =
@@ -42,7 +45,7 @@ export const apiAdresseGateway: ApiAdresseGateway =
     ? new InMemoryApiAdresseGateway()
     : new HttpApiAdresseGateway();
 
-export const featureFlagsGateway: FeatureFlagsGateway =
+export const featureFlagGateway: FeatureFlagsGateway =
   ENV.gateway === "IN_MEMORY"
     ? new InMemoryFeatureFlagGateway()
     : new HttpFeatureFlagGateway();
@@ -57,4 +60,26 @@ export const romeAutocompleteGateway: RomeAutocompleteGateway =
     ? new InMemoryRomeAutocompleteGateway()
     : new HttpRomeAutocompleteGateway();
 
-export const searchEpic = createSearchEpic({ immersionSearchGateway });
+export type Dependencies = {
+  agencyGateway: AgencyGateway;
+  apiAdresseGateway: ApiAdresseGateway;
+  featureFlagGateway: FeatureFlagsGateway;
+  formEstablishmentGateway: FormEstablishmentGateway;
+  immersionApplicationGateway: ImmersionApplicationGateway;
+  immersionSearchGateway: ImmersionSearchGateway;
+  romeAutocompleteGateway: RomeAutocompleteGateway;
+  minSearchResultsToPreventRefetch: number;
+};
+
+export const store = createStore({
+  dependencies: {
+    agencyGateway,
+    apiAdresseGateway,
+    featureFlagGateway,
+    formEstablishmentGateway,
+    immersionApplicationGateway,
+    immersionSearchGateway,
+    romeAutocompleteGateway,
+    minSearchResultsToPreventRefetch: 10,
+  },
+});

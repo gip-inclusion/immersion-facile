@@ -1,4 +1,6 @@
 import axios from "axios";
+import { map, Observable } from "rxjs";
+import { ajax } from "rxjs/ajax";
 import { SearchImmersionRequestDto } from "src/shared/searchImmersion/SearchImmersionRequest.dto";
 import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 import { ContactEstablishmentRequestDto } from "src/shared/contactEstablishment";
@@ -11,15 +13,15 @@ import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 const prefix = "api";
 
 export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
-  public async search(
+  public search(
     searchParams: SearchImmersionRequestDto,
-  ): Promise<SearchImmersionResultDto[]> {
-    const response = await axios.post(
-      `/${prefix}/v1/${searchImmersionRoute}`,
-      searchParams,
-    );
-
-    return response.data;
+  ): Observable<SearchImmersionResultDto[]> {
+    return ajax
+      .post<SearchImmersionResultDto[]>(
+        `/${prefix}/v1/${searchImmersionRoute}`,
+        searchParams,
+      )
+      .pipe(map(({ response }) => response));
   }
 
   public async contactEstablishment(
