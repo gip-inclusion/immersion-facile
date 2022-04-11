@@ -9,7 +9,7 @@ import { Router } from "./routing/Router";
 import { Provider } from "react-redux";
 import { ENV } from "src/environmentVariables";
 
-const { env_type } = ENV;
+const { envType } = ENV;
 
 export const App = () => {
   const featureFlags = useFetchFeatureFlags();
@@ -17,7 +17,7 @@ export const App = () => {
   return (
     <Provider store={store}>
       <FeatureFlagsContext.Provider value={featureFlags}>
-        {env_type === "DEV" && <Navigation />}
+        {envType === "DEV" && <Navigation />}
         <Router />
       </FeatureFlagsContext.Provider>
     </Provider>

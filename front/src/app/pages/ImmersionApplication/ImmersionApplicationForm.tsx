@@ -10,7 +10,7 @@ import {
   createOrUpdateImmersionApplication,
   isImmersionApplicationFrozen,
   undefinedIfEmptyString,
-} from "src/app/pages/ImmersionApplication/immersionApplicationHooks";
+} from "src/app/pages/ImmersionApplication/immersionApplicationHelpers";
 import { ImmersionApplicationPresentation } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
 import { PeConnect } from "src/app/pages/ImmersionApplication/PeConnect";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";

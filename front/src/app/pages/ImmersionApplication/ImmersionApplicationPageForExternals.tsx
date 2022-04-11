@@ -2,7 +2,7 @@ import React from "react";
 import { ImmersionApplicationForm } from "src/app/pages/ImmersionApplication/ImmersionApplicationForm";
 import { ImmersionApplicationFormContainerLayout } from "src/app/pages/ImmersionApplication/ImmersionApplicationFormContainerLayout";
 import { ImmersionApplicationFormUkraine } from "src/app/pages/ImmersionApplication/ImmersionApplicationFormUkraine";
-import { immersionApplicationInitialValuesFromUrl } from "src/app/pages/ImmersionApplication/immersionApplicationHooks";
+import { immersionApplicationInitialValuesFromUrl } from "src/app/pages/ImmersionApplication/immersionApplicationHelpers";
 import { routes } from "src/app/routing/routes";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { Route } from "type-route";

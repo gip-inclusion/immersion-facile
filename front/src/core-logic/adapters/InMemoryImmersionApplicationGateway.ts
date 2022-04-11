@@ -61,18 +61,6 @@ export class InMemoryImmersionApplicationGateway
     return immersionApplication.id;
   }
 
-  public async addUkraine(
-    immersionApplication: ImmersionApplicationDto,
-  ): Promise<ImmersionApplicationId> {
-    console.log(
-      "InMemoryImmersionApplicationGateway.add: ",
-      immersionApplication,
-    );
-    await sleep(SIMULATED_LATENCY_MS);
-    this._immersionApplications[immersionApplication.id] = immersionApplication;
-    return immersionApplication.id;
-  }
-
   public async backofficeGet(
     id: ImmersionApplicationId,
   ): Promise<ImmersionApplicationDto> {
