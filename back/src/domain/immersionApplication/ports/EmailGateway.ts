@@ -147,6 +147,7 @@ export type EmailType =
   | "NEW_APPLICATION_BENEFICIARY_CONFIRMATION"
   | "NEW_APPLICATION_MENTOR_CONFIRMATION"
   | "NEW_APPLICATION_ADMIN_NOTIFICATION"
+  | "NEW_APPLICATION_AGENCY_NOTIFICATION"
   | "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION"
   | "VALIDATED_APPLICATION_FINAL_CONFIRMATION"
   | "REJECTED_APPLICATION_NOTIFICATION"
@@ -181,6 +182,10 @@ export interface EmailGateway {
   ) => Promise<void>;
   sendNewApplicationAdminNotification: (
     recipients: string[],
+    params: NewApplicationAdminNotificationParams,
+  ) => Promise<void>;
+  sendNewApplicationAgencyNotification: (
+    recipient: string[],
     params: NewApplicationAdminNotificationParams,
   ) => Promise<void>;
   sendValidatedApplicationFinalConfirmation: (

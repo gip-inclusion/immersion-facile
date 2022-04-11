@@ -97,6 +97,18 @@ export class InMemoryEmailGateway implements EmailGateway {
     });
   }
 
+  public async sendNewApplicationAgencyNotification(
+    recipients: string[],
+    params: NewApplicationAdminNotificationParams,
+  ): Promise<void> {
+    logger.info({ recipients, params }, "sendNewApplicationAgencyNotification");
+    this.sentEmails.push({
+      type: "NEW_APPLICATION_AGENCY_NOTIFICATION",
+      recipients,
+      params,
+    });
+  }
+
   public async sendNewApplicationForReviewNotification(
     recipients: string[],
     params: NewImmersionApplicationReviewForEligibilityOrValidationParams,

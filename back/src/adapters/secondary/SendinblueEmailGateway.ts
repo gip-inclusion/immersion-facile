@@ -48,6 +48,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/10/message-setup
   NEW_APPLICATION_ADMIN_NOTIFICATION: 10, // v2
 
+  // https://my.sendinblue.com/camp/template/27/message-setup
+  NEW_APPLICATION_AGENCY_NOTIFICATION: 27,
+
   // https://my.sendinblue.com/camp/template/4/message-setup
   NEW_APPLICATION_BENEFICIARY_CONFIRMATION: 4, // v1
 
@@ -171,6 +174,26 @@ export class SendinblueEmailGateway implements EmailGateway {
   ) {
     await this.sendTransacEmail(
       "NEW_APPLICATION_ADMIN_NOTIFICATION",
+      recipients,
+      {
+        DEMANDE_ID: params.demandeId,
+        FIRST_NAME: params.firstName,
+        LAST_NAME: params.lastName,
+        DATE_START: params.dateStart,
+        DATE_END: params.dateEnd,
+        BUSINESS_NAME: params.businessName,
+        AGENCY_NAME: params.agencyName,
+        MAGIC_LINK: params.magicLink,
+      },
+    );
+  }
+
+  public async sendNewApplicationAgencyNotification(
+    recipients: string[],
+    params: NewApplicationAdminNotificationParams,
+  ) {
+    await this.sendTransacEmail(
+      "NEW_APPLICATION_AGENCY_NOTIFICATION",
       recipients,
       {
         DEMANDE_ID: params.demandeId,
