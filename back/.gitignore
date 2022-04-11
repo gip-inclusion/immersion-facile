@@ -4,3 +4,4 @@ coverage
 data-test.json
 .env
 storage/tmp/
+wallaby.js

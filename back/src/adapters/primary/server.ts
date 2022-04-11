@@ -20,7 +20,7 @@ import { createMagicLinkRouter } from "./routers/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/createPeConnectRouter";
 import { createTechnicalRouter } from "./routers/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
-import expressPrometheusMiddleware = require("express-prometheus-middleware");
+import expressPrometheusMiddleware from "express-prometheus-middleware";
 import { createApiKeyAuthRouterV1 } from "./routers/createApiKeyAuthRouter.v1";
 
 const logger = createLogger(__filename);
