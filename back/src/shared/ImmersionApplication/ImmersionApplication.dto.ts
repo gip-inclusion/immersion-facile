@@ -1,4 +1,4 @@
-import { AgencyId } from "../agencies";
+import { AgencyId } from "../agency/agency.dto";
 import { LegacyScheduleDto, ScheduleDto } from "../ScheduleSchema";
 import { SiretDto } from "../siret";
 import { Flavor } from "../typeFlavors";

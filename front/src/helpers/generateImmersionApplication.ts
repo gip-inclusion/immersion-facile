@@ -1,6 +1,6 @@
 import { addDays, format } from "date-fns";
 import { frenchFirstNames } from "src/helpers/namesList";
-import { AgencyInListDto } from "src/shared/agencies";
+import { AgencyInListDto } from "src/shared/agency/agency.dto";
 import {
   ImmersionApplicationDto,
   validApplicationStatus,

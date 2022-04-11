@@ -17,13 +17,13 @@ import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { Title } from "src/uiComponents/Title";
 import {
-  agencyConfigSchema,
   AgencyKind,
   agencyKindList,
   CreateAgencyConfig,
-} from "src/shared/agencies";
+} from "src/shared/agency/agency.dto";
 import { zEmail } from "src/shared/zodUtils";
 import { v4 as uuidV4 } from "uuid";
+import { agencyConfigSchema } from "src/shared/agency/agency.schema";
 
 const initialValues: CreateAgencyConfig = {
   id: uuidV4(),

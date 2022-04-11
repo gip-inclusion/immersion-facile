@@ -1,4 +1,4 @@
-import { AgencyId } from "../shared/agencies";
+import { AgencyId } from "../shared/agency/agency.dto";
 import {
   LegacyScheduleDto,
   reasonableSchedule,

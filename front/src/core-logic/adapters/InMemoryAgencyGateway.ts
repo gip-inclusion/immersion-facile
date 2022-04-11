@@ -1,6 +1,10 @@
 import { values } from "ramda";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
-import { AgencyInListDto, CreateAgencyConfig } from "src/shared/agencies";
+import {
+  AgencyInListDto,
+  CreateAgencyConfig,
+} from "src/shared/agency/agency.dto";
+import { AgencyId } from "src/shared/agency/agency.dto";
 import { LatLonDto } from "src/shared/latLon";
 
 const TEST_AGENCIES: Record<string, CreateAgencyConfig> = {
@@ -29,5 +33,9 @@ export class InMemoryAgencyGateway implements AgencyGateway {
 
   async listAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
     return values(this._agencies);
+  }
+
+  async getImmersionFacileAgencyId(): Promise<AgencyId> {
+    return "agency-id-with-immersion-facile-kind";
   }
 }

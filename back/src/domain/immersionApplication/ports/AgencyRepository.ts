@@ -1,4 +1,7 @@
-import { AgencyId, CreateAgencyConfig } from "../../../shared/agencies";
+import {
+  AgencyId,
+  CreateAgencyConfig,
+} from "../../../shared/agency/agency.dto";
 import { LatLonDto } from "../../../shared/latLon";
 import { RequireField } from "../../../shared/utils";
 

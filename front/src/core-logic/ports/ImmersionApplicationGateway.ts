@@ -1,4 +1,4 @@
-import { AgencyId } from "src/shared/agencies";
+import { AgencyId } from "src/shared/agency/agency.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -12,7 +12,6 @@ import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
 
 export interface ImmersionApplicationGateway {
   add(immersionApplicationDto: ImmersionApplicationDto): Promise<string>;
-  addUkraine(immersionApplicationDto: ImmersionApplicationDto): Promise<string>;
 
   // Get an immersion application through backoffice, password-protected route.
   backofficeGet(id: ImmersionApplicationId): Promise<ImmersionApplicationDto>;

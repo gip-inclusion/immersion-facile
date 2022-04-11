@@ -26,6 +26,7 @@ export const rejectSigningApplicationRoute = "reject-application";
 export const searchImmersionRoute = "search-immersion";
 export const getImmersionOfferByIdRoute = "get-immersion-by-id";
 export const agenciesRoute = "agencies";
+export const agencyImmersionFacileIdRoute = "immersion-facile-agency";
 export const contactEstablishmentRoute = "contact-establishment";
 export const getFeatureFlags = "feature-flags";
 export const immersionApplicationShareRoute = "share-immersion-demand";

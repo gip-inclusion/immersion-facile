@@ -19,7 +19,7 @@ import {
 } from "src/shared/routes";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
-import { AgencyId } from "src/shared/agencies";
+import { AgencyId } from "src/shared/agency/agency.dto";
 import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
 import {
   immersionApplicationSchema,

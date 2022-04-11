@@ -1,7 +1,6 @@
 import { param, ValueSerializer } from "type-route";
 import { ScheduleDto } from "src/shared/ScheduleSchema";
 import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 
 const scheduleSerializer: ValueSerializer<ScheduleDto> = {
   parse: (raw) => JSON.parse(raw),

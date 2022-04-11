@@ -1,5 +1,5 @@
 import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyInListDto, AgencyId } from "../../shared/agencies";
+import { AgencyInListDto, AgencyId } from "../../shared/agency/agency.dto";
 import { createLogger } from "../../utils/logger";
 import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { values } from "ramda";

@@ -14,7 +14,7 @@ import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { toDateString } from "src/shared/utils/date";
 import { v4 as uuidV4 } from "uuid";
 
-const { dev } = ENV;
+const { env_type } = ENV;
 
 export const createOrUpdateImmersionApplication = async (
   properties: { jwt?: string; demandeId?: string },
@@ -85,7 +85,7 @@ export const immersionApplicationInitialValuesFromUrl = ({
     enterpriseAccepted: false,
   };
 
-  if (!dev) return emptyForm;
+  if (!env_type) return emptyForm;
   return devPrefilledValues(emptyForm);
 };
 

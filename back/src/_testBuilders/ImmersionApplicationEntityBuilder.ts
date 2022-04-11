@@ -1,4 +1,4 @@
-import { AgencyId } from "../shared/agencies";
+import { AgencyId } from "../shared/agency/agency.dto";
 import { ImmersionApplicationEntity } from "../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { Builder } from "./Builder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";

@@ -17,9 +17,8 @@ import { SearchDebugPage } from "../components/SearchDebugPage";
 import { SearchPage } from "src/app/pages/Search/SearchPage";
 import { EstablishmentFormImmersionFacilePage } from "../pages/Establishment/EstablishmentFormImmersionFacilePage";
 import { EstablishmentFormPageForExternals } from "../pages/Establishment/EstablishmentFormPageForExternals";
-import { ImmersionApplicationForm } from "src/app/pages/ImmersionApplication/ImmersionApplicationForm";
 
-const { dev } = ENV;
+const { env_type } = ENV;
 
 const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
 
@@ -53,7 +52,7 @@ export const Router = () => {
       {route.name === "formEstablishmentForExternals" && (
         <EstablishmentFormPageForExternals route={route} />
       )}
-      {route.name === "home" && <HomePage showDebugInfo={dev} />}
+      {route.name === "home" && <HomePage showDebugInfo={env_type === "DEV"} />}
 
       {route.name === "landingEstablishment" && <LandingEstablishmentPage />}
       {route.name === "immersionApplication" && (
@@ -72,7 +71,9 @@ export const Router = () => {
         <RenewExpiredLinkPage route={route} />
       )}
       {route.name === "search" && <SearchPage />}
-      {dev && route.name === "searchDebug" && <SearchDebugPage />}
+      {env_type === "DEV" && route.name === "searchDebug" && (
+        <SearchDebugPage />
+      )}
     </>
   );
 };

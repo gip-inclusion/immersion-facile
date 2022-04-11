@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zBoolean, zEmail, zString, zTrimmedString } from "../zodUtils";
 import { phoneRegExp, stringOfNumbers } from "../utils";
-import { agencyIdSchema } from "../agencies";
+import { agencyIdSchema } from "../agency/agency.schema";
 import { siretSchema } from "../siret";
 import {
   emailAndMentorEmailAreDifferent,

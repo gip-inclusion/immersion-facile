@@ -1,6 +1,6 @@
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
-import { AgencyInListDto } from "src/shared/agencies";
+import { AgencyId, AgencyInListDto } from "src/shared/agency/agency.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -11,7 +11,6 @@ import {
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
-import { AgencyId } from "src/shared/agencies";
 import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
 import { signApplicationDtoWithRole } from "src/shared/ImmersionApplication/immersionApplication";
 

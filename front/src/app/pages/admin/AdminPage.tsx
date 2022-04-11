@@ -6,7 +6,7 @@ import { ArrayDropdown } from "src/uiComponents/admin/ArrayDropdown";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
-import { AgencyId } from "src/shared/agencies";
+import { AgencyId } from "src/shared/agency/agency.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,

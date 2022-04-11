@@ -1,6 +1,6 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
-import { CreateAgencyConfig } from "../../shared/agencies";
+import { CreateAgencyConfig } from "../../shared/agency/agency.dto";
 import { agenciesRoute } from "../../shared/routes";
 
 describe("Route to add Agency", () => {
