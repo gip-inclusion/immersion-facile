@@ -64,7 +64,12 @@ export const SearchResultPanel = () => {
         />
       ))}
       {searchStatus === "extraFetch" && searchInfo && (
-        <SearchInfos>{searchInfo}</SearchInfos>
+        <SearchInfos>
+          <div className="flex flex-col items-center">
+            <div>{searchInfo}</div>
+            <CircularProgress color="inherit" size="40px" />
+          </div>
+        </SearchInfos>
       )}
       <ContactEstablishmentModal
         modalState={modalState}
