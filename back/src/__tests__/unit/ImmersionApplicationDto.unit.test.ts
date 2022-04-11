@@ -1,4 +1,3 @@
-import type { ZodError } from "zod";
 import {
   DATE_START,
   DATE_SUBMISSION,
@@ -86,32 +85,6 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeInvalid(immersionApplication);
   });
 
-  it("rejects start dates that are monday if submiting on previous friday", () => {
-    const immersionApplication = new ImmersionApplicationDtoBuilder()
-      .withDateSubmission("2021-10-15") // which is a friday
-      .withDateStart("2021-10-18") // which is the following monday
-      .withDateEnd("2021-10-30")
-      .build();
-
-    expectImmersionApplicationDtoToBeInvalidWith(
-      immersionApplication,
-      "Veuillez saisir une date de démarrage permettant au moins 24h pour sa validation par un conseiller",
-    );
-  });
-
-  it("rejects start dates that are sunday if submiting on previous friday", () => {
-    const immersionApplication = new ImmersionApplicationDtoBuilder()
-      .withDateSubmission("2021-10-15") // which is a friday
-      .withDateStart("2021-10-17") // which is the following sunday
-      .withDateEnd("2021-10-30")
-      .build();
-
-    expectImmersionApplicationDtoToBeInvalidWith(
-      immersionApplication,
-      "Veuillez saisir une date de démarrage permettant au moins 24h pour sa validation par un conseiller",
-    );
-  });
-
   it("accept start dates that are tuesday if submiting on previous friday", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder()
       .withDateSubmission("2021-10-15") // which is a friday
@@ -148,15 +121,6 @@ describe("immersionApplicationDtoSchema", () => {
 
     expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
-
-  it("rejects start dates that are < 2 days after the submission date", () => {
-    const immersionApplication = new ImmersionApplicationDtoBuilder()
-      .withDateSubmission(DATE_SUBMISSION)
-      .withDateStart(addDays(DATE_SUBMISSION, 1))
-      .build();
-
-    expectImmersionApplicationDtoToBeInvalid(immersionApplication);
-  });
 });
 
 const expectImmersionApplicationDtoToBeValid = (
@@ -177,18 +141,3 @@ const expectImmersionApplicationDtoToBeInvalid = (
   expect(() =>
     immersionApplicationSchema.parse(immersionApplicationDto),
   ).toThrow();
-
-const expectImmersionApplicationDtoToBeInvalidWith = (
-  immersionApplicationDto: ImmersionApplicationDto,
-  expectedErrorMessage: string,
-) => {
-  expectImmersionApplicationDtoToBeInvalid(immersionApplicationDto);
-  try {
-    immersionApplicationSchema.parse(immersionApplicationDto);
-  } catch (e) {
-    const error = e as ZodError;
-    error.issues.some(({ message }) =>
-      expect(message).toBe(expectedErrorMessage),
-    );
-  }
-};

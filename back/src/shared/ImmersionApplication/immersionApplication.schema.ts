@@ -5,11 +5,9 @@ import { agencyIdSchema } from "../agency/agency.schema";
 import { siretSchema } from "../siret";
 import {
   emailAndMentorEmailAreDifferent,
-  enoughWorkedDaysToReviewFromSubmitDate,
   mustBeSignedByBeneficiaryBeforeReview,
   mustBeSignedByEstablishmentBeforeReview,
   startDateIsBeforeEndDate,
-  submissionAndStartDatesConstraints,
   underMaxDuration,
 } from "../immersionApplicationRefinement";
 import {
@@ -83,16 +81,6 @@ export const immersionApplicationSchema: z.Schema<ImmersionApplicationDto> = z
     beneficiaryAccepted: zBoolean,
     enterpriseAccepted: zBoolean,
     peExternalId: z.string().optional(),
-  })
-  .refine(submissionAndStartDatesConstraints, {
-    message:
-      "Il n'est pas possible de faire une demande moins de 48h avant la date de démarrage souhaitée. Veuillez proposez une nouvelle date",
-    path: ["dateStart"],
-  })
-  .refine(enoughWorkedDaysToReviewFromSubmitDate, {
-    message:
-      "Veuillez saisir une date de démarrage permettant au moins 24h pour sa validation par un conseiller",
-    path: ["dateStart"],
   })
   .refine(startDateIsBeforeEndDate, {
     message: "La date de fin doit être après la date de début.",

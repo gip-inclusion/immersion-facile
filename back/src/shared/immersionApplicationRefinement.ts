@@ -1,4 +1,3 @@
-import { differenceInDays, isMonday, isSunday } from "date-fns";
 import { ApplicationStatus } from "./ImmersionApplication/ImmersionApplication.dto";
 
 type DatesInApplication = {
@@ -7,39 +6,10 @@ type DatesInApplication = {
   dateSubmission: string;
 };
 
-export const submissionAndStartDatesConstraints = ({
-  dateStart,
-  dateSubmission,
-}: DatesInApplication) => {
-  const startDate = new Date(dateStart);
-  const submissionDate = new Date(dateSubmission);
-  const minStartDate = new Date(submissionDate);
-  minStartDate.setDate(minStartDate.getDate() + 2);
-  return startDate >= minStartDate;
-};
-
 export const startDateIsBeforeEndDate = ({
   dateStart,
   dateEnd,
 }: DatesInApplication) => new Date(dateEnd) >= new Date(dateStart);
-
-export const enoughWorkedDaysToReviewFromSubmitDate = ({
-  dateSubmission,
-  dateStart,
-}: DatesInApplication) => {
-  const startDate = new Date(dateStart);
-
-  const daysBeforeImmersionStart = differenceInDays(
-    startDate,
-    new Date(dateSubmission),
-  );
-
-  // If start date is Sunday or Monday, we accept only if request is made before the previous friday
-  return !(
-    daysBeforeImmersionStart < 4 &&
-    (isMonday(startDate) || isSunday(startDate))
-  );
-};
 
 export const underMaxDuration = ({
   dateStart,
