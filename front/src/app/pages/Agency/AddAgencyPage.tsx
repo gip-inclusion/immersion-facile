@@ -187,7 +187,10 @@ export const AddAgencyPage = () => {
   );
 };
 
-const agencyKindToLabel: Record<AgencyKind, string> = {
+const agencyKindToLabel: Record<
+  Exclude<AgencyKind, "immersion-facile">,
+  string
+> = {
   "mission-locale": "Mission Locale",
   "pole-emploi": "Pole Emploi",
   "cap-emploi": "Cap Emploi",

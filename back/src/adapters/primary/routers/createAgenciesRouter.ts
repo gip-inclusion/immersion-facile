@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { agenciesRoute } from "../../../shared/routes";
+import {
+  agenciesRoute,
+  agencyPublicInfoByIdRoute,
+  agencyImmersionFacileIdRoute,
+} from "../../../shared/routes";
 import { AppDependencies } from "../config";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
@@ -23,6 +27,25 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
         deps.useCases.addAgency.execute(req.body),
       ),
     );
+
+  agenciesRouter
+    .route(`/${agencyImmersionFacileIdRoute}`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        console.log();
+        const t = await deps.repositories.agency.getImmersionFacileIdByKind();
+        console.log("PLOP", t);
+        return t;
+      }),
+    );
+
+  agenciesRouter.route(`/${agencyPublicInfoByIdRoute}`).get(async (req, res) =>
+    sendHttpResponse(req, res, async () =>
+      deps.useCases.getAgencyPublicInfoById.execute({
+        id: req.query.id as string,
+      }),
+    ),
+  );
 
   return agenciesRouter;
 };

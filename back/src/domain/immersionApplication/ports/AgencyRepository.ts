@@ -1,23 +1,10 @@
-import {
-  AgencyId,
-  CreateAgencyConfig,
-} from "../../../shared/agency/agency.dto";
+import { AgencyConfig, AgencyId } from "../../../shared/agency/agency.dto";
 import { LatLonDto } from "../../../shared/latLon";
-import { RequireField } from "../../../shared/utils";
-
-export type AgencyStatus = "active" | "closed" | "needsReview";
-
-export type AgencyConfig = RequireField<
-  CreateAgencyConfig,
-  "questionnaireUrl"
-> & {
-  status: AgencyStatus;
-  adminEmails: string[];
-};
 
 export interface AgencyRepository {
   insert: (config: AgencyConfig) => Promise<AgencyId | undefined>;
   getById: (id: AgencyId) => Promise<AgencyConfig | undefined>;
+  getImmersionFacileIdByKind: () => Promise<AgencyId>;
   getNearby: (position: LatLonDto) => Promise<AgencyConfig[]>;
   getAllActive: () => Promise<AgencyConfig[]>;
 }

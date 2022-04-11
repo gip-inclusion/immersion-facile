@@ -1,3 +1,4 @@
+import { AgencyConfig } from "../../../../shared/agency/agency.dto";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
@@ -6,7 +7,6 @@ import {
   EmailGateway,
   RejectedApplicationNotificationParams,
 } from "../../ports/EmailGateway";
-import { AgencyConfig } from "../../ports/AgencyRepository";
 import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
 

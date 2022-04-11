@@ -1,11 +1,27 @@
 import { LatLonDto } from "../latLon";
 import { Flavor } from "../typeFlavors";
-import { NotEmptyArray } from "../utils";
+import { NotEmptyArray, RequireField } from "../utils";
+
+export type AgencyStatus = "active" | "closed" | "needsReview";
+
+export type AgencyConfig = RequireField<
+  CreateAgencyConfig,
+  "questionnaireUrl"
+> & {
+  kind: AgencyKind;
+  status: AgencyStatus;
+  adminEmails: string[];
+};
 
 export type AgencyId = Flavor<string, "AgencyId">;
 
-// There is a kind 'immersion-facile' in db for edge cases which is not declared here intentionally.
-export const agencyKindList: NotEmptyArray<AgencyKind> = [
+export type WithAgencyId = {
+  id: AgencyId;
+};
+
+export const agencyKindList: NotEmptyArray<
+  Exclude<AgencyKind, "immersion-facile">
+> = [
   "pole-emploi",
   "mission-locale",
   "cap-emploi",
@@ -22,6 +38,7 @@ export type AgencyInListDto = {
 };
 
 export type AgencyKind =
+  | "immersion-facile"
   | "pole-emploi"
   | "mission-locale"
   | "cap-emploi"
@@ -33,6 +50,11 @@ export type AgencyKind =
 export type ListAgenciesRequestDto = {
   position?: LatLonDto;
 };
+
+export type AgencyPublicDisplayDto = Pick<
+  CreateAgencyConfig,
+  "id" | "name" | "address" | "position"
+>;
 
 export type CreateAgencyConfig = {
   id: AgencyId;

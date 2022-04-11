@@ -19,7 +19,7 @@ import {
 } from "../../domain/core/eventBus/EventBus";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
-import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig } from "../../shared/agency/agency.dto";
 import {
   ImmersionApplicationDto,
   RenewMagicLinkRequestDto,

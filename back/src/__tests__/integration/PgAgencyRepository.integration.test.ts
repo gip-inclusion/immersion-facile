@@ -1,8 +1,8 @@
 import { Pool, PoolClient } from "pg";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
-import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
+import { AgencyConfig } from "../../shared/agency/agency.dto";
 import { LatLonDto } from "../../shared/latLon";
 
 const agency1builder = AgencyConfigBuilder.create(
@@ -69,6 +69,13 @@ describe("PgAgencyRepository", () => {
 
     it("returns undefined for missing agency", async () => {
       const agency = await agencyRepository.getById(agency1.id);
+      expect(agency).toBeUndefined();
+    });
+  });
+
+  describe("getImmersionFacileIdByKind", () => {
+    it("returns undefined for missing agency", async () => {
+      const agency = await agencyRepository.getImmersionFacileIdByKind();
       expect(agency).toBeUndefined();
     });
   });

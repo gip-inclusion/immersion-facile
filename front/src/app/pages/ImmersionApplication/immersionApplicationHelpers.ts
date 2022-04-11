@@ -4,7 +4,7 @@ import {
   ImmersionApplicationPageRoute,
   ImmersionApplicationPresentation,
 } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
-import { ImmersionApplicationPageForExternalRoute } from "src/app/pages/ImmersionApplication/ImmersionApplicationPageForExternals";
+import { ImmersionApplicationUkrainePageRoute } from "src/app/pages/ImmersionApplication/ImmersionApplicationPageForUkraine";
 import { ENV } from "src/environmentVariables";
 import {
   ApplicationStatus,
@@ -42,7 +42,7 @@ export const immersionApplicationInitialValuesFromUrl = ({
   params,
 }:
   | ImmersionApplicationPageRoute
-  | ImmersionApplicationPageForExternalRoute): ImmersionApplicationPresentation => {
+  | ImmersionApplicationUkrainePageRoute): ImmersionApplicationPresentation => {
   const emptyForm = {
     id: uuidV4(),
     status: "DRAFT" as ApplicationStatus,

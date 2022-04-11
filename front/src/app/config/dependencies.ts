@@ -1,11 +1,11 @@
-import { HttpAgencyGateway } from "src/core-logic/adapters/HttpAgencyGateway";
+import { HttpAgencyGateway } from "src/infra/gateway/AgencyGateway/HttpAgencyGateway";
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
 import { HttpFeatureFlagGateway } from "src/core-logic/adapters/HttpFeatureFlagGateway";
 import { HttpFormEstablishmentGateway } from "src/core-logic/adapters/HttpFormEstablishmentGateway";
 import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/HttpRomeAutocompleteGateway";
-import { InMemoryAgencyGateway } from "src/core-logic/adapters/InMemoryAgencyGateway";
+import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryFeatureFlagGateway } from "src/core-logic/adapters/InMemoryFeatureFlagGateway";
 import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemoryFormEstablishmentGateway";
@@ -15,7 +15,7 @@ import {
   seedResults,
 } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
-import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
+import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { FeatureFlagsGateway } from "src/core-logic/ports/FeatureFlagsGateway";
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";

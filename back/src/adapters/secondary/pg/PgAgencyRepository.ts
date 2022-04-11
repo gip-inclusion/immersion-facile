@@ -1,10 +1,7 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import {
-  AgencyConfig,
-  AgencyRepository,
-} from "../../../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyId } from "../../../shared/agency/agency.dto";
+import { AgencyRepository } from "../../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig, AgencyId } from "../../../shared/agency/agency.dto";
 import { LatLonDto } from "../../../shared/latLon";
 import { createLogger } from "../../../utils/logger";
 import { parseGeoJson } from "./PgEstablishmentAggregateRepository";
@@ -75,6 +72,17 @@ export class PgAgencyRepository implements AgencyRepository {
       throw error;
     }
     return agency.id;
+  }
+
+  async getImmersionFacileIdByKind(): Promise<AgencyId> {
+    const pgResult = await this.client.query(`
+           SELECT id 
+           FROM agencies
+           WHERE agencies.kind = 'immersion-facile'
+           LIMIT 1
+           `);
+
+    return pgResult.rows[0]?.id;
   }
 }
 

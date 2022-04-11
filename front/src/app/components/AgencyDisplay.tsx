@@ -6,7 +6,8 @@ import { AgencyId, AgencyInListDto } from "src/shared/agency/agency.dto";
 import type { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { LatLonDto } from "src/shared/latLon";
 
-import { PostcodeAutocomplete } from "./PostcodeAutocomplete";
+import { PostcodeAutocomplete } from "../../uiComponents/form/PostcodeAutocomplete";
+import { Agencies } from "./Agency";
 
 const placeholderAgency: AgencyInListDto = {
   id: "",
@@ -14,18 +15,17 @@ const placeholderAgency: AgencyInListDto = {
   position: { lat: 0, lon: 0 },
 };
 
-type AgencySelectorProps = {
+type AgencyDisplayProps = {
   label: string;
   description?: string;
-  disabled?: boolean;
-  defaultAgencyId?: string;
+  agencyId?: string;
 };
-export const AgencySelector = ({
+
+export const AgencyDisplay = ({
   label,
   description,
-  disabled,
-  defaultAgencyId,
-}: AgencySelectorProps) => {
+  agencyId,
+}: AgencyDisplayProps) => {
   const name: keyof ImmersionApplicationDto = "agencyId";
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>({ name });
@@ -37,12 +37,11 @@ export const AgencySelector = ({
   const [agencies, setAgencies] = useState([placeholderAgency]);
 
   useEffect(() => {
-    if (!position) return;
+    if (!agencyId) return;
 
-    setIsLoading(true);
     agencyGateway
-      .listAgencies(position)
-      .then((agencies) => {
+      .getAgencyPublicInfoById({ id: agencyId! })
+      .then((agency) => {
         setAgencies([
           {
             id: "",
@@ -52,14 +51,10 @@ export const AgencySelector = ({
               lon: 0,
             },
           },
-          ...agencies,
+          { ...agency },
         ]);
-        if (
-          !disabled &&
-          defaultAgencyId &&
-          agencies.map((agency) => agency.id).includes(defaultAgencyId)
-        )
-          setValue(defaultAgencyId);
+        if (agencyId && agencies.map((agency) => agency.id).includes(agencyId))
+          setValue(agencyId);
         setLoaded(true);
         setLoadingError(false);
       })
@@ -81,7 +76,7 @@ export const AgencySelector = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      <PostcodeAutocomplete onFound={setPosition} disabled={disabled} />
+      <PostcodeAutocomplete onFound={setPosition} disabled={true} />
       <label className="fr-label pt-4" htmlFor={name}>
         {label}
       </label>
@@ -106,7 +101,7 @@ export const AgencySelector = ({
           }}
           onBlur={onBlur}
           aria-describedby={`agency-code-{name}-error-desc-error`}
-          disabled={disabled || !loaded || !position}
+          disabled={true}
         >
           <Agencies agencies={agencies} />
         </select>
@@ -120,21 +115,5 @@ export const AgencySelector = ({
         </p>
       )}
     </div>
-  );
-};
-
-type AgenciesProps = {
-  agencies: AgencyInListDto[];
-};
-
-const Agencies = ({ agencies }: AgenciesProps) => {
-  return (
-    <>
-      {agencies.map(({ id, name }) => (
-        <option value={id} key={id} label={name}>
-          {name}
-        </option>
-      ))}
-    </>
   );
 };

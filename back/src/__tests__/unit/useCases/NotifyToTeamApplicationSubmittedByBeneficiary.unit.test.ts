@@ -7,7 +7,7 @@ import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder"
 import { expectEmailAdminNotificationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
-import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig } from "../../../shared/agency/agency.dto";
 
 const adminEmail = "admin@email.fr";
 const validImmersionApplication = new ImmersionApplicationDtoBuilder().build();

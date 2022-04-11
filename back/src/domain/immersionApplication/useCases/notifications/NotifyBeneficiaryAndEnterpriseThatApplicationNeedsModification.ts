@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
+import { AgencyConfig } from "../../../../shared/agency/agency.dto";
 import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "../../../../shared/routes";
 import { allRoles } from "../../../../shared/tokens/MagicLinkPayload";
@@ -7,7 +8,7 @@ import { zTrimmedString } from "../../../../shared/zodUtils";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
-import { AgencyConfig, AgencyRepository } from "../../ports/AgencyRepository";
+import { AgencyRepository } from "../../ports/AgencyRepository";
 import {
   EmailGateway,
   ModificationRequestApplicationNotificationParams,

@@ -6,11 +6,16 @@ import {
   agencyKindList,
   CreateAgencyConfig,
   ListAgenciesRequestDto,
+  WithAgencyId,
 } from "./agency.dto";
 import { latLonSchema } from "../latLon";
 import { zEmail, zString, zTrimmedString } from "../zodUtils";
 
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
+
+export const withAgencyIdSchema: z.Schema<WithAgencyId> = z.object({
+  id: agencyIdSchema,
+});
 
 export const agencyInListSchema: z.ZodSchema<AgencyInListDto> = z.object({
   id: agencyIdSchema,

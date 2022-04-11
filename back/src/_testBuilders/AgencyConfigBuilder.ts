@@ -1,7 +1,4 @@
-import {
-  AgencyConfig,
-  AgencyStatus,
-} from "../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig, AgencyStatus } from "../shared/agency/agency.dto";
 import { AgencyId, AgencyKind } from "../shared/agency/agency.dto";
 import { Builder } from "./Builder";
 

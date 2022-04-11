@@ -1,13 +1,13 @@
 import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablishment";
 import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { Flavor } from "../../../shared/typeFlavors";
-import { AgencyConfig } from "../../immersionApplication/ports/AgencyRepository";
 import {
   ImmersionApplicationRequiresModificationPayload,
   RenewMagicLinkPayload,
 } from "../../immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import type { DateStr } from "../ports/Clock";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { AgencyConfig } from "../../../shared/agency/agency.dto";
 import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;

@@ -1,11 +1,12 @@
 import {
+  AgencyConfig,
   AgencyInListDto,
   ListAgenciesRequestDto,
 } from "../../../shared/agency/agency.dto";
 import { listAgenciesRequestSchema } from "../../../shared/agency/agency.schema";
 import { LatLonDto } from "../../../shared/latLon";
 import { UseCase } from "../../core/UseCase";
-import { AgencyConfig, AgencyRepository } from "../ports/AgencyRepository";
+import { AgencyRepository } from "../ports/AgencyRepository";
 
 export class ListAgencies extends UseCase<
   ListAgenciesRequestDto,

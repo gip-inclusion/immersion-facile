@@ -9,7 +9,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
-import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig } from "../../../shared/agency/agency.dto";
 import { createMagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";

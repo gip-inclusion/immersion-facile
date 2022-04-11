@@ -2,7 +2,7 @@ import React from "react";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
 import { ImmersionApplicationPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
-import { ImmersionApplicationPageForExternals } from "src/app/pages/ImmersionApplication/ImmersionApplicationPageForExternals";
+import { ImmersionApplicationPageForUkraine } from "src/app/pages/ImmersionApplication/ImmersionApplicationPageForUkraine";
 import { ImmersionApplicationSignPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationSignPage";
 import { ImmersionApplicationValidatePage } from "src/app/pages/ImmersionApplication/ImmersionApplicationValidatePage";
 import { SearchPage } from "src/app/pages/Search/SearchPage";
@@ -59,8 +59,8 @@ export const Router = () => {
       {route.name === "immersionApplication" && (
         <ImmersionApplicationPage route={route} />
       )}
-      {route.name === "immersionApplicationForExternals" && (
-        <ImmersionApplicationPageForExternals route={route} />
+      {route.name === "immersionApplicationForUkraine" && (
+        <ImmersionApplicationPageForUkraine route={route} />
       )}
       {route.name === "immersionApplicationsToValidate" && (
         <ImmersionApplicationValidatePage route={route} />

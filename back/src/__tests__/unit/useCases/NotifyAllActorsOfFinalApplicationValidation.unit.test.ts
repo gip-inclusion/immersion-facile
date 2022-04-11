@@ -23,7 +23,7 @@ import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,
 } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { AgencyConfig } from "../../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig } from "../../../shared/agency/agency.dto";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 
 const validImmersionApplication: ImmersionApplicationDto =

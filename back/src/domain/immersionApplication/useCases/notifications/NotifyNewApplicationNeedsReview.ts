@@ -1,4 +1,5 @@
 import type { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
+import { AgencyConfig } from "../../../../shared/agency/agency.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -7,7 +8,7 @@ import { frontRoutes } from "../../../../shared/routes";
 import { Role } from "../../../../shared/tokens/MagicLinkPayload";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
-import { AgencyConfig, AgencyRepository } from "../../ports/AgencyRepository";
+import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
 import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
 

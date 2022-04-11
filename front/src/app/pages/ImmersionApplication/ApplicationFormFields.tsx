@@ -1,5 +1,6 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect } from "react";
+import { AgencyDisplay } from "src/app/components/AgencyDisplay";
 import {
   BoolRadioGroup,
   RadioGroupForField,
@@ -11,7 +12,7 @@ import {
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
-import { AgencySelector } from "src/uiComponents/form/AgencySelector";
+import { AgencySelector } from "src/app/components/AgencySelector";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { DateInput } from "src/uiComponents/form/DateInput";
 import {
@@ -75,6 +76,7 @@ type ApplicationFieldsProps = {
   signeeName?: string; //< Ignored if !isSignOnly. Name of the person signing.
   alreadySubmitted?: boolean;
   onRejectForm?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
+  isUkraine?: boolean;
 };
 
 export const ApplicationFormFields = ({
@@ -84,6 +86,7 @@ export const ApplicationFormFields = ({
   signeeName,
   alreadySubmitted,
   onRejectForm,
+  isUkraine,
 }: ApplicationFieldsProps) => {
   const {
     errors,
@@ -133,9 +136,7 @@ export const ApplicationFormFields = ({
       {isFrozen && isSignatureMode && (
         <SignOnlyMessage isAlreadySigned={alreadySubmitted ?? false} />
       )}
-
       <input type="hidden" name="peExternalIdentity" />
-
       <FormSectionTitle>1. Coordonnées du bénéficiaire</FormSectionTitle>
       <TextInput
         label="Email *"
@@ -145,7 +146,6 @@ export const ApplicationFormFields = ({
         description="cela nous permet de vous transmettre la validation de la convention"
         disabled={isFrozen}
       />
-
       <TextInput
         label="Votre prénom *"
         name="firstName"
@@ -154,7 +154,6 @@ export const ApplicationFormFields = ({
         description=""
         disabled={isFrozen}
       />
-
       <TextInput
         label="Votre nom *"
         name="lastName"
@@ -163,7 +162,6 @@ export const ApplicationFormFields = ({
         description=""
         disabled={isFrozen}
       />
-
       <TextInput
         label="Votre numéro de téléphone"
         name="phone"
@@ -173,23 +171,28 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
       />
 
-      <AgencySelector
-        label="Votre structure d'accompagnement *"
-        disabled={isFrozen}
-        defaultAgencyId={values.agencyId}
-      />
-
+      {isFrozen && (
+        <AgencyDisplay
+          label="Votre structure d'accompagnement *"
+          agencyId={values.agencyId}
+        />
+      )}
+      {!isFrozen && !isUkraine && (
+        <AgencySelector
+          label="Votre structure d'accompagnement *"
+          disabled={isFrozen}
+          defaultAgencyId={values.agencyId}
+        />
+      )}
       <FormSectionTitle>
         2. Coordonnées de l'entreprise
         <CopyLink />
         <ShareLinkByEmail />
       </FormSectionTitle>
-
       <h4>
         Les questions suivantes doivent être complétées avec la personne qui
         vous accueillera pendant votre immersion
       </h4>
-
       <TextInput
         label="Indiquez le SIRET de la structure d'accueil *"
         name="siret"
@@ -197,7 +200,6 @@ export const ApplicationFormFields = ({
         description="la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
         disabled={isFrozen}
       />
-
       <TextInput
         label="Indiquez le nom (raison sociale) de l'établissement d'accueil *"
         name="businessName"
@@ -206,7 +208,6 @@ export const ApplicationFormFields = ({
         description=""
         disabled={featureFlags.enableInseeApi}
       />
-
       <TextInput
         label="Indiquez le prénom, nom et fonction du tuteur *"
         name="mentor"
@@ -215,7 +216,6 @@ export const ApplicationFormFields = ({
         description="Ex : Alain Prost, pilote automobile"
         disabled={isFrozen || isFetchingSiret}
       />
-
       <TextInput
         label="Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil *"
         name="mentorPhone"
@@ -224,7 +224,6 @@ export const ApplicationFormFields = ({
         description="pour que l'on puisse le contacter à propos de l’immersion"
         disabled={isFrozen}
       />
-
       <TextInput
         label="Indiquez l'e-mail du tuteur *"
         name="mentorEmail"
@@ -234,13 +233,11 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
         className="!mb-1"
       />
-
       <FormSectionTitle>
         3. Conditions d’accueil de l’immersion professionnelle
         <CopyLink />
         <ShareLinkByEmail />
       </FormSectionTitle>
-
       <DateInput
         label="Date de début de l'immersion *"
         name="dateStart"
@@ -255,7 +252,6 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
       />
       <br />
-
       <SchedulePicker
         name="schedule"
         validate={scheduleValidator}
@@ -264,9 +260,7 @@ export const ApplicationFormFields = ({
         }}
         disabled={isFrozen}
       />
-
       <br />
-
       <TextInput
         label="Conditions de travail, propres  au métier observé pendant l’immersion. "
         name="workConditions"
@@ -288,13 +282,11 @@ export const ApplicationFormFields = ({
         label="Un équipement de protection individuelle est-il fourni pour l’immersion ? *"
         disabled={isFrozen}
       />
-
       <BoolRadioGroup
         name="sanitaryPrevention"
         label="Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ? *"
         disabled={isFrozen}
       />
-
       <TextInput
         label="Si oui, précisez-les"
         name="sanitaryPreventionDescription"
@@ -303,7 +295,6 @@ export const ApplicationFormFields = ({
         description="Ex : fourniture de gel, de masques"
         disabled={isFrozen}
       />
-
       <RadioGroupForField
         name="immersionObjective"
         label="Objet de la période de mise en situation en milieu professionnel *"
@@ -320,7 +311,6 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
         initialFieldValue={values.immersionAppellation}
       />
-
       <TextInput
         label="Activités observées / pratiquées pendant l'immersion *"
         name="immersionActivities"
@@ -329,7 +319,6 @@ export const ApplicationFormFields = ({
         description="Ex : mise en rayon, accueil et aide à la clientèle"
         disabled={isFrozen}
       />
-
       <TextInput
         label="Compétences/aptitudes observées / évaluées pendant l'immersion"
         name="immersionSkills"
@@ -338,10 +327,8 @@ export const ApplicationFormFields = ({
         description="Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe"
         disabled={isFrozen}
       />
-
       <p />
       <p />
-
       {!isSignatureMode &&
         submitCount !== 0 &&
         Object.values(errors).length > 0 && (
@@ -349,20 +336,16 @@ export const ApplicationFormFields = ({
             Veuillez corriger les champs erronés
           </div>
         )}
-
       {!isFrozen && (
         <p className="font-bold">
           Une fois le formulaire envoyé, vous allez recevoir une demande de
           validation par mail et l'entreprise également.
         </p>
       )}
-
       <br />
-
       {!isFrozen && !isSignatureMode && (
         <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
       )}
-
       {isSignatureMode && (
         <>
           {alreadySubmitted ? (

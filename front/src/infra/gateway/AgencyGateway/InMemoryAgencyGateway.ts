@@ -1,8 +1,11 @@
 import { values } from "ramda";
-import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
+import { Observable, of } from "rxjs";
+import { AgencyGateway } from "src/domain/ports/AgencyGateway";
+import { toAgencyPublicDisplayDto } from "src/shared/agency/agency";
 import {
   AgencyInListDto,
   CreateAgencyConfig,
+  WithAgencyId,
 } from "src/shared/agency/agency.dto";
 import { AgencyId } from "src/shared/agency/agency.dto";
 import { LatLonDto } from "src/shared/latLon";
@@ -35,7 +38,12 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     return values(this._agencies);
   }
 
-  async getImmersionFacileAgencyId(): Promise<AgencyId> {
-    return "agency-id-with-immersion-facile-kind";
+  async getAgencyPublicInfoById(agencyId: WithAgencyId) {
+    const agency = this._agencies[agencyId.id];
+    return toAgencyPublicDisplayDto(agency);
+  }
+
+  getImmersionFacileAgencyId(): Observable<AgencyId> {
+    return of("agency-id-with-immersion-facile-kind");
   }
 }

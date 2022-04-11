@@ -1,7 +1,7 @@
 import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { AgencyInListDto, AgencyId } from "../../shared/agency/agency.dto";
 import { createLogger } from "../../utils/logger";
-import { AgencyConfig } from "../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig } from "../../shared/agency/agency.dto";
 import { values } from "ramda";
 import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
 import { LatLonDto } from "../../shared/latLon";
@@ -9,6 +9,22 @@ import { LatLonDto } from "../../shared/latLon";
 const logger = createLogger(__filename);
 
 const testAgencies: AgencyConfig[] = [
+  {
+    id: "immersion-facile-agency",
+    name: "Immersion Facile Agency (back)",
+    status: "active",
+    kind: "immersion-facile",
+    counsellorEmails: ["notificationsconventions@immersion-facile.fr"],
+    validatorEmails: [],
+    adminEmails: ["contact@immersion-facile.fr"],
+    questionnaireUrl: "",
+    signature: "Signature of Immersion Facile",
+    address: "No address",
+    position: {
+      lat: 22.319469,
+      lon: 114.189505,
+    },
+  },
   {
     id: "test-agency-1-back",
     name: "Test Agency 1 (back)",
@@ -94,8 +110,11 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return config.id;
   }
 
-  // test purpose only
+  public async getImmersionFacileIdByKind(): Promise<AgencyId> {
+    return "immersion-facile-agency";
+  }
 
+  // test purpose only
   get agencies(): AgencyConfig[] {
     return values(this._agencies);
   }

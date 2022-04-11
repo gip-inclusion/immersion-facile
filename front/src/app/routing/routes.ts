@@ -34,13 +34,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.optional.string, ...immersionApplicationValuesFromUrl },
     () => "/demande-immersion",
   ),
-  immersionApplicationForExternals: defineRoute(
+  immersionApplicationForUkraine: defineRoute(
     {
-      consumer: param.path.string,
-      jwt: param.query.optional.string,
       ...immersionApplicationValuesFromUrl,
     },
-    (p) => `/demande-immersion/${p.consumer}`,
+    (p) => `/demande-immersion/lesentreprises-sengagent-ukraine`,
   ),
   immersionApplicationsToValidate: defineRoute(
     { jwt: param.query.string },

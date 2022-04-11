@@ -22,6 +22,7 @@ import {
 } from "../../domain/core/ports/UnitOfWork";
 import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
+import { GetAgencyPublicInfoById } from "../../domain/immersionApplication/useCases/GetAgencyPublicInfoById";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
 import { ListAgencies } from "../../domain/immersionApplication/useCases/ListAgencies";
 import { ListImmersionApplication } from "../../domain/immersionApplication/useCases/ListImmersionApplication";
@@ -585,6 +586,7 @@ const createUseCases = (
 
     // agencies
     listAgencies: new ListAgencies(repositories.agency),
+    getAgencyPublicInfoById: new GetAgencyPublicInfoById(repositories.agency),
 
     // notifications
     confirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature:

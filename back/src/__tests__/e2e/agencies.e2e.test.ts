@@ -36,6 +36,11 @@ describe("/agencies route", () => {
           lon: 89.9999,
         },
       },
+      {
+        id: "immersion-facile-agency",
+        name: "Immersion Facile Agency (back)",
+        position: { lat: 22.319469, lon: 114.189505 },
+      },
     ]);
   });
 });

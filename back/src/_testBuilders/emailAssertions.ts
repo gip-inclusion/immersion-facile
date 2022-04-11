@@ -1,5 +1,5 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
-import { AgencyConfig } from "../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyConfig } from "../shared/agency/agency.dto";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import {

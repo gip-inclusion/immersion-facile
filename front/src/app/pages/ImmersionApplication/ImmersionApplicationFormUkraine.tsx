@@ -4,8 +4,11 @@ import {
   SubmitFeedback,
   SuccessFeedbackKind,
 } from "src/app/components/SubmitFeedback";
-import { immersionApplicationGateway } from "src/app/config/dependencies";
-import { ApplicationFormFieldsUkraine } from "src/app/pages/ImmersionApplication/ApplicationFormFieldsUkraine";
+import {
+  agencyGateway,
+  immersionApplicationGateway,
+} from "src/app/config/dependencies";
+import { ApplicationFormFields } from "src/app/pages/ImmersionApplication/ApplicationFormFields";
 import { ImmersionApplicationPresentation } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "src/shared/ImmersionApplication/immersionApplication.schema";
@@ -93,7 +96,7 @@ const FormikApplicationForm = ({
         return (
           <div>
             <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-              <ApplicationFormFieldsUkraine />
+              <ApplicationFormFields isUkraine={true} />
               <SubmitFeedback submitFeedback={submitFeedback} />
             </form>
           </div>
