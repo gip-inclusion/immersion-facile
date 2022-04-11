@@ -9,7 +9,7 @@
     "start-update-establishments-from-sirene": "ts-node src/adapters/primary/startUpdateEstablishmentsFromSirene.ts",
     "free-quarantined-form-establishments-with-correct-siret": "ts-node src/adapters/primary/freeQuarantinedFormEstablishmentsWithCorrectSiret.ts",
     "transform-past-form-establishments-into-searchable-data": "ts-node src/adapters/primary/transformPastFormEstablishmentsIntoSearchableData.ts",
-    "test:unit": "jest --watchAll --testRegex=.unit.test.ts --runInBand",
+    "test:unit": "jest --watchAll --testRegex=.unit.test.ts",
     "test:e2e": "jest --runInBand --watchAll --testRegex=.e2e.test.ts",
     "test:integration": "jest --runInBand --testRegex=.integration.test.ts",
     "test:manual": "jest --runInBand --watchAll --testRegex=.manual.test.ts",
