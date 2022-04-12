@@ -5,7 +5,10 @@ import { Form, Formik } from "formik";
 import React from "react";
 import { RomeAutocomplete } from "src/app/components/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { useSearchUseCase } from "src/app/pages/Search/search.hooks";
+import {
+  SearchInput,
+  useSearchUseCase,
+} from "src/app/pages/Search/search.hooks";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";

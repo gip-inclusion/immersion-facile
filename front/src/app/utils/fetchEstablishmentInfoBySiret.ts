@@ -1,13 +1,12 @@
-import type { AxiosError } from "axios";
 import { useField } from "formik";
 import { useEffect, useRef, useState } from "react";
 import {
-  immersionApplicationGateway,
   formEstablishmentGateway,
+  immersionApplicationGateway,
 } from "src/app/config/dependencies";
-import { useFeatureFlagsContext } from "./FeatureFlagContext";
-import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
-import { siretSchema } from "src/shared/siret";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import { GetSiretResponseDto, SiretDto, siretSchema } from "src/shared/siret";
 
 export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
   fieldFromInfo: K,
@@ -37,7 +36,7 @@ type SiretFetcherOptions = {
 };
 
 export const useSiretFetcher = (options: SiretFetcherOptions) => {
-  const featureFlags = useFeatureFlagsContext();
+  const featureFlags = useAppSelector(featureFlagsSelector);
   const [isFetchingSiret, setIsFetchingSiret] = useState(false);
   const [siretAlreadyExists, setSiretAlreadyExists] = useState(false);
   const [establishmentInfo, setEstablishmentInfo] = useState<

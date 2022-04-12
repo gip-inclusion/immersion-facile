@@ -1,6 +1,5 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import { useFeatureFlagsContext } from "src/app/utils/FeatureFlagContext";
 import {
   BoolRadioGroup,
   RadioGroupForField,
@@ -9,6 +8,8 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/utils/fetchEstablishmentInfoBySiret";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { AgencySelector } from "src/uiComponents/form/AgencySelector";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
@@ -92,7 +93,7 @@ export const ApplicationFormFields = ({
     submitForm,
     values,
   } = useFormikContext<ImmersionApplicationDto>();
-  const featureFlags = useFeatureFlagsContext();
+  const featureFlags = useAppSelector(featureFlagsSelector);
   const isSiretFetcherDisabled = values.status !== "DRAFT";
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher({
     fetchSirenApiEvenAlreadyInDb: true,

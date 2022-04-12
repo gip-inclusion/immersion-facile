@@ -1,22 +1,23 @@
 import React from "react";
-import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
+import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
 import { ImmersionApplicationPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
 import { ImmersionApplicationPageForExternals } from "src/app/pages/ImmersionApplication/ImmersionApplicationPageForExternals";
-import { useFeatureFlagsContext } from "src/app/utils/FeatureFlagContext";
-import { EstablishmentEditionFormPage } from "../pages/Establishment/EstablishmentEditionFormPage";
+import { ImmersionApplicationSignPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationSignPage";
+import { ImmersionApplicationValidatePage } from "src/app/pages/ImmersionApplication/ImmersionApplicationValidatePage";
+import { SearchPage } from "src/app/pages/Search/SearchPage";
 import { HomePage } from "src/app/pages/Static/HomePage";
 import { LandingEstablishmentPage } from "src/app/pages/Static/LandingEstablishmentPage";
-import { useRoute } from "./routes";
-import { ImmersionApplicationValidatePage } from "src/app/pages/ImmersionApplication/ImmersionApplicationValidatePage";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { ENV } from "src/environmentVariables";
 import { RenewExpiredLinkPage } from "../../helpers/RenewExpiredLinkPage";
-import { AdminVerificationPage } from "../pages/admin/AdminVerificationPage";
-import { ImmersionApplicationSignPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationSignPage";
 import { SearchDebugPage } from "../components/SearchDebugPage";
-import { SearchPage } from "src/app/pages/Search/SearchPage";
+import { AdminVerificationPage } from "../pages/admin/AdminVerificationPage";
+import { EstablishmentEditionFormPage } from "../pages/Establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormImmersionFacilePage } from "../pages/Establishment/EstablishmentFormImmersionFacilePage";
 import { EstablishmentFormPageForExternals } from "../pages/Establishment/EstablishmentFormPageForExternals";
+import { useRoute } from "./routes";
 
 const { envType } = ENV;
 
@@ -24,7 +25,7 @@ const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
 
 export const Router = () => {
   const route = useRoute();
-  const featureFlags = useFeatureFlagsContext();
+  const featureFlags = useAppSelector(featureFlagsSelector);
 
   return (
     <>

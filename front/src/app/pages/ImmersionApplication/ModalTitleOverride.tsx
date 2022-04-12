@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import classNames from "classnames";
 
 const ModalTitle = ({
   children,
@@ -10,7 +9,7 @@ const ModalTitle = ({
   className: string;
 }) => {
   return (
-    <h1 className={classNames(className)} id="fr-modal-title-modal">
+    <h1 className={className} id="fr-modal-title-modal">
       {children}
     </h1>
   );

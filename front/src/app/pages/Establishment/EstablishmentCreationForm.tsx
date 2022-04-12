@@ -1,27 +1,28 @@
 import { useField } from "formik";
 import React, { useState } from "react";
 import { formEstablishmentGateway } from "src/app/config/dependencies";
-import { useFeatureFlagsContext } from "src/app/utils/FeatureFlagContext";
-import {
-  EstablishmentFormPage,
-  getLabelAndName,
-  getMandatoryLabelAndName,
-} from "./EstablishmentFormPage";
 import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/utils/fetchEstablishmentInfoBySiret";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import { ENV } from "src/environmentVariables";
+import {
+  FormEstablishmentDto,
+  FormEstablishmentSource,
+} from "src/shared/formEstablishment/FormEstablishment.dto";
+import { OmitFromExistingKeys } from "src/shared/utils";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button } from "src/uiComponents/Button";
 import { InfoMessage } from "src/uiComponents/form/InfoMessage";
 import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { TextInput } from "src/uiComponents/form/TextInput";
-import { ENV } from "src/environmentVariables";
-import { OmitFromExistingKeys } from "src/shared/utils";
 import {
-  FormEstablishmentDto,
-  FormEstablishmentSource,
-} from "src/shared/formEstablishment/FormEstablishment.dto";
+  EstablishmentFormPage,
+  getLabelAndName,
+  getMandatoryLabelAndName,
+} from "./EstablishmentFormPage";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;
@@ -61,7 +62,7 @@ const CreationSiretRelatedInputs = () => {
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField("businessAddress", establishmentInfo);
   useSiretRelatedField("naf", establishmentInfo);
-  const featureFlags = useFeatureFlagsContext();
+  const featureFlags = useAppSelector(featureFlagsSelector);
 
   const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
 

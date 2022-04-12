@@ -2,7 +2,7 @@
 import { useDispatch } from "react-redux";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 
-interface SearchInput {
+export interface SearchInput {
   rome?: string;
   nafDivision?: string;
   lat: number;

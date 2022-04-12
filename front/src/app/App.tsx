@@ -1,25 +1,15 @@
 import React from "react";
+import { Provider } from "react-redux";
 import { store } from "src/app/config/dependencies";
-import {
-  FeatureFlagsContext,
-  useFetchFeatureFlags,
-} from "./utils/FeatureFlagContext";
+import { ENV } from "src/environmentVariables";
 import { Navigation } from "./components/Navigation";
 import { Router } from "./routing/Router";
-import { Provider } from "react-redux";
-import { ENV } from "src/environmentVariables";
 
 const { envType } = ENV;
 
-export const App = () => {
-  const featureFlags = useFetchFeatureFlags();
-
-  return (
-    <Provider store={store}>
-      <FeatureFlagsContext.Provider value={featureFlags}>
-        {envType === "DEV" && <Navigation />}
-        <Router />
-      </FeatureFlagsContext.Provider>
-    </Provider>
-  );
-};
+export const App = () => (
+  <Provider store={store}>
+    {envType === "DEV" && <Navigation />}
+    <Router />
+  </Provider>
+);

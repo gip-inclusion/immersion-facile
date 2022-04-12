@@ -1,7 +1,8 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { formEstablishmentGateway } from "src/app/config/dependencies";
-import { useFeatureFlagsContext } from "src/app/utils/FeatureFlagContext";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { defaultInitialValue } from "./EstablishmentCreationForm";
 import {
   EstablishmentFormPage,
@@ -62,7 +63,7 @@ const EditionSiretRelatedInputs = ({
 }: {
   businessAddress: string;
 }) => {
-  const featureFlags = useFeatureFlagsContext();
+  const featureFlags = useAppSelector(featureFlagsSelector);
   const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
   const [_, __, { setValue: setAddressValue }] = useField<string>(
     businessLabelAndName.name,

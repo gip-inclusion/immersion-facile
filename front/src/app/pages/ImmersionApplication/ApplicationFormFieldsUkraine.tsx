@@ -1,17 +1,22 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import { useFeatureFlagsContext } from "src/app/utils/FeatureFlagContext";
 import {
   BoolRadioGroup,
   RadioGroupForField,
 } from "src/app/components/RadioGroup";
+import { ApplicationFormKeysInUrl } from "src/app/routing/route-params";
+import { routes, useRoute } from "src/app/routing/routes";
 import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/utils/fetchEstablishmentInfoBySiret";
-import { ENV } from "src/environmentVariables";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import type {
+  ApplicationStatus,
+  ImmersionApplicationDto,
+} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
-import { AgencySelector } from "src/uiComponents/form/AgencySelector";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { DateInput } from "src/uiComponents/form/DateInput";
 import {
@@ -20,15 +25,9 @@ import {
 } from "src/uiComponents/form/SchedulePicker/SchedulePicker";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
-import type {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { routes, useRoute } from "src/app/routing/routes";
+import { ApplicationFormProfession } from "./ApplicationFormProfession";
 import { CopyLink } from "./CopyLink";
 import { ShareLinkByEmail } from "./ShareLinkByEmail";
-import { ApplicationFormProfession } from "./ApplicationFormProfession";
-import { ApplicationFormKeysInUrl } from "src/app/routing/route-params";
 
 const FrozenMessage = () => (
   <>
@@ -93,7 +92,7 @@ export const ApplicationFormFieldsUkraine = ({
     submitForm,
     values,
   } = useFormikContext<ImmersionApplicationDto>();
-  const featureFlags = useFeatureFlagsContext();
+  const featureFlags = useAppSelector(featureFlagsSelector);
   const isSiretFetcherDisabled = values.status !== "DRAFT";
   const { establishmentInfo, isFetchingSiret } = useSiretFetcher({
     fetchSirenApiEvenAlreadyInDb: true,

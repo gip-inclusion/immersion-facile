@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { immersionApplicationGateway } from "src/app/config/dependencies";
-import { useFeatureFlagsContext } from "src/app/utils/FeatureFlagContext";
 import { routes } from "src/app/routing/routes";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { ArrayDropdown } from "src/uiComponents/admin/ArrayDropdown";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
@@ -32,7 +33,7 @@ const buildExportEstablishmentRoute = (params: EstablishmentExportConfigDto) =>
   )}`;
 
 export const AdminPage = ({ route }: AdminProps) => {
-  const featureFlags = useFeatureFlagsContext();
+  const featureFlags = useAppSelector(featureFlagsSelector);
   const [immersionApplications, setImmersionApplications] = useState<
     ImmersionApplicationDto[]
   >([]);

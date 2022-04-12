@@ -1,9 +1,10 @@
 import React from "react";
-import { useFeatureFlagsContext } from "src/app/utils/FeatureFlagContext";
 import { routes } from "src/app/routing/routes";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 
 export const Navigation = () => {
-  const featureFlags = useFeatureFlagsContext();
+  const featureFlags = useAppSelector(featureFlagsSelector);
 
   return (
     <nav>
