@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import React, { ReactNode, useState } from "react";
 import { useAppSelector } from "src/app/utils/reduxHooks";
-import { searchSelectors } from "src/core-logic/search/search.selectors";
+import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
 import { SuccessFeedback } from "src/uiComponents/SuccessFeedback";
 import {

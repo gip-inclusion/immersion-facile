@@ -1,7 +1,10 @@
 import { Epic } from "redux-observable";
 import { concatWith, filter, from, map, of, switchMap, take, tap } from "rxjs";
 import { Dependencies } from "src/app/config/dependencies";
-import { SearchAction, searchSlice } from "src/core-logic/search/search.slice";
+import {
+  SearchAction,
+  searchSlice,
+} from "src/core-logic/domain/search/search.slice";
 import { RootState } from "src/core-logic/storeConfig/store";
 
 type SearchEpic = Epic<SearchAction, SearchAction, RootState, Dependencies>;

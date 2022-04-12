@@ -7,8 +7,8 @@ import {
 import { combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/app/config/dependencies";
-import { searchSlice } from "src/core-logic/search/search.slice";
-import { searchEpics } from "src/core-logic/search/search.epic";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
+import { searchEpics } from "src/core-logic/domain/search/search.epic";
 
 const allEpics = [...searchEpics];
 

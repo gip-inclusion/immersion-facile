@@ -1,6 +1,9 @@
 import { Store } from "@reduxjs/toolkit";
-import { searchSelectors } from "src/core-logic/search/search.selectors";
-import { searchSlice, SearchStatus } from "src/core-logic/search/search.slice";
+import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
+import {
+  searchSlice,
+  SearchStatus,
+} from "src/core-logic/domain/search/search.slice";
 import {
   createTestStore,
   TestDependencies,
