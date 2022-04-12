@@ -7,10 +7,14 @@ import {
 import { combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/app/config/dependencies";
+import {
+  featureFlagsSlice,
+  fetchFeatureFlagsEpic,
+} from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epic";
 
-const allEpics = [...searchEpics];
+const allEpics: any[] = [...searchEpics, fetchFeatureFlagsEpic];
 
 const rootEpic: Epic = (action$, store$, dependencies) =>
   combineEpics(...allEpics)(action$, store$, dependencies).pipe(
@@ -22,6 +26,7 @@ const rootEpic: Epic = (action$, store$, dependencies) =>
 
 const rootReducer = combineReducers({
   [searchSlice.name]: searchSlice.reducer,
+  [featureFlagsSlice.name]: featureFlagsSlice.reducer,
 });
 
 export type StoreProps = {

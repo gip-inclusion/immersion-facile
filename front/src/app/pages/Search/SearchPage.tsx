@@ -3,12 +3,11 @@ import locationSearchIcon from "/location-search-icon.svg";
 import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
 import React from "react";
-import { useDispatch } from "react-redux";
 import { RomeAutocomplete } from "src/app/components/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
+import { useSearchUseCase } from "src/app/pages/Search/search.hooks";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { SearchButton } from "src/uiComponents/SearchButton";
@@ -16,20 +15,12 @@ import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import { OurAdvises } from "./OurAdvises";
 import { SearchResultPanel } from "./SearchResultPanel";
 
-interface SearchInput {
-  rome?: string;
-  nafDivision?: string;
-  lat: number;
-  lon: number;
-  radiusKm: number;
-}
-
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initiallySelectedIndex = 3; // to get 10 km radius by default
 
 export const SearchPage = () => {
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
-  const dispatch = useDispatch();
+  const searchUseCase = useSearchUseCase();
 
   return (
     <HeaderFooterLayout>
@@ -46,18 +37,7 @@ export const SearchPage = () => {
               lon: 0,
               radiusKm: 10,
             }}
-            onSubmit={(values) => {
-              dispatch(
-                searchSlice.actions.searchRequested({
-                  rome: values.rome || undefined,
-                  location: {
-                    lat: values.lat,
-                    lon: values.lon,
-                  },
-                  distance_km: values.radiusKm,
-                }),
-              );
-            }}
+            onSubmit={searchUseCase}
           >
             {({ setFieldValue }) => (
               <Form>
