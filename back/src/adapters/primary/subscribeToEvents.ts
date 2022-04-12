@@ -23,6 +23,7 @@ const getUseCasesByTopics = (
     useCases.confirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature,
     useCases.confirmToMentorThatApplicationCorrectlySubmittedRequestSignature,
     useCases.notifyToTeamApplicationSubmittedByBeneficiary,
+    useCases.notifyToAgencyApplicationSubmitted,
   ],
   ImmersionApplicationPartiallySigned: [
     useCases.notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty,

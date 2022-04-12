@@ -153,11 +153,12 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(3);
+  expect(sentEmails).toHaveLength(4);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],
     [adminEmail],
+    ["validator@mail.com"],
   ]);
 
   const beneficiarySignEmail = sentEmails[0];
@@ -200,7 +201,7 @@ const beneficiarySignsApplication = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(4);
+  expect(sentEmails).toHaveLength(5);
   const needsReviewEmail = sentEmails[sentEmails.length - 1];
   expect(needsReviewEmail.recipients).toEqual(["establishment@example.com"]);
   expectTypeToMatchAndEqual(
@@ -231,7 +232,7 @@ const establishmentSignsApplication = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(5);
+  expect(sentEmails).toHaveLength(6);
   const needsReviewEmail = sentEmails[sentEmails.length - 1];
   expect(needsReviewEmail.recipients).toEqual([validatorEmail]);
   return {
@@ -267,7 +268,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 
   await eventCrawler.processNewEvents();
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(6);
+  expect(sentEmails).toHaveLength(7);
   const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
   expectTypeToMatchAndEqual(
     needsToTriggerConventionSentEmail.type,

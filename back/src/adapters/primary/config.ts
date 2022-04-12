@@ -126,6 +126,7 @@ import { LinkUserPeConnectAccount } from "../../domain/generic/peConnect/useCase
 import { HttpPeConnectGateway } from "../secondary/HttpPeConnectGateway";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { ExportEstablishmentsAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
+import { NotifyToAgencyApplicationSubmitted } from "../../domain/immersionApplication/useCases/notifications/NotifyToAgencyApplicationSubmitted";
 
 const logger = createLogger(__filename);
 
@@ -615,6 +616,12 @@ const createUseCases = (
         repositories.agency,
         generateMagicLinkFn,
       ),
+    notifyToAgencyApplicationSubmitted: new NotifyToAgencyApplicationSubmitted(
+      uowPerformer,
+      emailFilter,
+      repositories.email,
+      generateMagicLinkFn,
+    ),
     notifyBeneficiaryAndEnterpriseThatApplicationIsRejected:
       new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
         emailFilter,
