@@ -85,7 +85,7 @@ export const immersionApplicationInitialValuesFromUrl = ({
     enterpriseAccepted: false,
   };
 
-  if (envType === "DEV") devPrefilledValues(emptyForm);
+  if (envType === "DEV") return devPrefilledValues(emptyForm);
   return emptyForm;
 };
 
@@ -94,7 +94,6 @@ const devPrefilledValues = (
 ): ImmersionApplicationPresentation => {
   return {
     ...emptyForm,
-
     // Participant
     email: emptyForm.email || "sylvanie@monemail.fr",
     firstName: emptyForm.firstName || "Sylvanie",
