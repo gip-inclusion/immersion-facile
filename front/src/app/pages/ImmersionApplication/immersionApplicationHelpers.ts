@@ -84,7 +84,6 @@ export const immersionApplicationInitialValuesFromUrl = ({
     beneficiaryAccepted: false,
     enterpriseAccepted: false,
   };
-
   if (envType === "DEV") return devPrefilledValues(emptyForm);
   return emptyForm;
 };

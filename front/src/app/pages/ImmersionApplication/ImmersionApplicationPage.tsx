@@ -22,8 +22,6 @@ export type ImmersionApplicationPresentation = Exclude<
 > & {
   beneficiaryAccepted: boolean;
   enterpriseAccepted: boolean;
-  jwt?: string;
-  demandeId?: string;
 };
 
 export const ImmersionApplicationPage = ({
@@ -34,6 +32,7 @@ export const ImmersionApplicationPage = ({
       <ImmersionApplicationFormContainerLayout>
         <ImmersionApplicationForm
           properties={immersionApplicationInitialValuesFromUrl(route)}
+          routeParams={route.params}
         />
       </ImmersionApplicationFormContainerLayout>
     </HeaderFooterLayout>

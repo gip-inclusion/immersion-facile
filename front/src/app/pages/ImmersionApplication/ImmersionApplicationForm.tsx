@@ -1,5 +1,6 @@
 import { startOfToday } from "date-fns";
 import { Formik } from "formik";
+import { keys } from "ramda";
 import React, { useEffect, useState } from "react";
 import {
   SubmitFeedback,
@@ -22,10 +23,12 @@ import { ApplicationFormFields } from "./ApplicationFormFields";
 
 type ImmersionApplicationFormProps = {
   properties: ImmersionApplicationPresentation;
+  routeParams?: { jwt?: string; demandeId?: string };
 };
 
 export const ImmersionApplicationForm = ({
   properties,
+  routeParams = {},
 }: ImmersionApplicationFormProps) => {
   const [initialValues, setInitialValues] = useState(properties);
   const [submitFeedback, setSubmitFeedback] = useState<
@@ -33,12 +36,12 @@ export const ImmersionApplicationForm = ({
   >(null);
 
   useEffect(() => {
-    if (!("demandeId" in properties) && !("jwt" in properties)) return;
-    if (!("jwt" in properties) || properties.jwt === undefined) {
+    if (!("demandeId" in routeParams) && !("jwt" in routeParams)) return;
+    if (!("jwt" in routeParams) || routeParams.jwt === undefined) {
       return;
     }
     immersionApplicationGateway
-      .getMagicLink(properties.jwt!)
+      .getMagicLink(routeParams.jwt!)
       .then((response) => {
         if (response.status === "DRAFT") {
           response.dateSubmission = toDateString(startOfToday());
@@ -46,7 +49,7 @@ export const ImmersionApplicationForm = ({
         setInitialValues(response);
       })
       .catch((e) => {
-        console.log(e);
+        console.log("fetch error", e);
         setSubmitFeedback(e);
       });
   }, []);
@@ -107,7 +110,7 @@ export const ImmersionApplicationForm = ({
               };
 
               await createOrUpdateImmersionApplication(
-                properties,
+                routeParams,
                 immersionApplication,
               );
               setInitialValues(immersionApplication);
@@ -122,7 +125,7 @@ export const ImmersionApplicationForm = ({
           {(props) => {
             return (
               <div>
-                {console.log(props.errors)}
+                {keys(props.errors).length !== 0 && console.log(props.errors)}
                 <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
                   <ApplicationFormFields isFrozen={isFrozen} />
                   <SubmitFeedback submitFeedback={submitFeedback} />
