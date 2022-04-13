@@ -75,10 +75,10 @@ describe("PgImmersionApplicationRepository", () => {
     const resultA = await immersionApplicationRepository.getById(idA);
     expect(resultA).toEqual(immersionApplicationEntityA);
 
-    const resultAll = await immersionApplicationRepository.getAll();
+    const resultAll = await immersionApplicationRepository.getLatestUpdated();
     expect(resultAll).toEqual([
-      immersionApplicationEntityA,
       immersionApplicationEntityB,
+      immersionApplicationEntityA,
     ]);
   });
 

@@ -72,7 +72,7 @@ describe("Add immersionApplication", () => {
       id: validImmersionApplication.id,
     });
 
-    const storedInRepo = await applicationRepository.getAll();
+    const storedInRepo = await applicationRepository.getLatestUpdated();
     expect(storedInRepo).toHaveLength(1);
     expect(storedInRepo[0].toDto()).toEqual(validImmersionApplication);
     expectDomainEventsToBeInOutbox([

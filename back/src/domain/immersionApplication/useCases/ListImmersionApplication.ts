@@ -22,7 +22,8 @@ export class ListImmersionApplication extends UseCase<
     status,
     agencyId,
   }: ListImmersionApplicationRequestDto) {
-    const entities = await this.immersionApplicationRepository.getAll();
+    const entities =
+      await this.immersionApplicationRepository.getLatestUpdated();
     return entities
       .map((entity) => entity.toDto())
       .filter((dto) => !status || dto.status === status)

@@ -5,7 +5,7 @@ export interface ImmersionApplicationRepository {
   save: (
     immersionApplicationEntity: ImmersionApplicationEntity,
   ) => Promise<ImmersionApplicationId | undefined>;
-  getAll: () => Promise<ImmersionApplicationEntity[]>;
+  getLatestUpdated: () => Promise<ImmersionApplicationEntity[]>;
   getById: (
     id: ImmersionApplicationId,
   ) => Promise<ImmersionApplicationEntity | undefined>;

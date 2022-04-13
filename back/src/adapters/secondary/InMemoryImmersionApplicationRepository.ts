@@ -23,7 +23,7 @@ export class InMemoryImmersionApplicationRepository
     return immersionApplicationEntity.id;
   }
 
-  public async getAll() {
+  public async getLatestUpdated() {
     logger.info("getAll");
     return Object.values(this._immersionApplications);
   }

@@ -19,6 +19,7 @@ const handleResponseError = (req: Request, res: Response, error: any) => {
     logger.error(
       {
         error,
+        errorMessage: error.message,
         request: {
           path: req.path,
           method: req.method,

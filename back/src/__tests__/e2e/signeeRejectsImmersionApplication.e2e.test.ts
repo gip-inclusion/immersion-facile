@@ -122,7 +122,7 @@ const expectStoreImmersionToHaveStatus = async (
   applicationRepo: ImmersionApplicationRepository,
   expectedStatus: ApplicationStatus,
 ) => {
-  const savedImmersionApplications = await applicationRepo.getAll();
+  const savedImmersionApplications = await applicationRepo.getLatestUpdated();
   expect(savedImmersionApplications).toHaveLength(1);
   expectObjectsToMatch(savedImmersionApplications[0].toDto(), {
     status: expectedStatus,

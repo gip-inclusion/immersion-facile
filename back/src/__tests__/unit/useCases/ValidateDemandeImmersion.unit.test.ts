@@ -66,7 +66,7 @@ describe("Validate immersionApplication", () => {
       });
       expect(id).toEqual(immersionApplicationEntity.id);
 
-      const storedInRepo = await repository.getAll();
+      const storedInRepo = await repository.getLatestUpdated();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
         expectedImmersionApplication,
       ]);
@@ -89,7 +89,7 @@ describe("Validate immersionApplication", () => {
       );
 
       // And the immersion application is still DRAFT
-      const storedInRepo = await repository.getAll();
+      const storedInRepo = await repository.getLatestUpdated();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
         immersionApplicationEntity.toDto(),
       ]);

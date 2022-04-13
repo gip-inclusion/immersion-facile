@@ -79,7 +79,7 @@ describe("Update immersionApplication", () => {
       });
       expect(id).toEqual(updatedImmersionApplication.id);
 
-      const storedInRepo = await immersionApplicationRepo.getAll();
+      const storedInRepo = await immersionApplicationRepo.getLatestUpdated();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
         updatedImmersionApplication,
       ]);
