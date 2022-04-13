@@ -1,3 +1,4 @@
+import { DeepPartial } from "@reduxjs/toolkit";
 import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryFeatureFlagGateway } from "src/core-logic/adapters/InMemoryFeatureFlagGateway";
@@ -5,7 +6,7 @@ import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemo
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
-import { createStore } from "src/core-logic/storeConfig/store";
+import { createStore, RootState } from "src/core-logic/storeConfig/store";
 
 export interface TestDependencies {
   agencyGateway: InMemoryAgencyGateway;
@@ -18,7 +19,7 @@ export interface TestDependencies {
   minSearchResultsToPreventRefetch: number;
 }
 
-export const createTestStore = () => {
+export const createTestStore = (preloadedState?: Partial<RootState>) => {
   const dependencies: TestDependencies = {
     immersionSearchGateway: new InMemoryImmersionSearchGateway(),
     minSearchResultsToPreventRefetch: 2,
@@ -30,5 +31,5 @@ export const createTestStore = () => {
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),
   };
 
-  return { store: createStore({ dependencies }), dependencies };
+  return { store: createStore({ dependencies, preloadedState }), dependencies };
 };

@@ -8,6 +8,7 @@ import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
+import { expectToEqual } from "src/core-logic/storeConfig/redux.helpers";
 import { RootState } from "src/core-logic/storeConfig/store";
 import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 
@@ -101,7 +102,3 @@ describe("search epic", () => {
   const feedWithSearchResults = (results: SearchImmersionResultDto[]) =>
     dependencies.immersionSearchGateway.searchResults$.next(results);
 });
-
-const expectToEqual = <T>(actual: T, expected: T) => {
-  expect(actual).toEqual(expected);
-};

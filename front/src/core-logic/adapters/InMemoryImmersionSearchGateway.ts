@@ -64,7 +64,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
 
 const defaultNaf = "MyNaf";
 
-export const seedResults: SearchImmersionResultDto[] = [
+export const seedSearchResults: SearchImmersionResultDto[] = [
   {
     rome: "A0000",
     naf: defaultNaf,

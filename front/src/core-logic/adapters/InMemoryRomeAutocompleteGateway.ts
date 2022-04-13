@@ -1,3 +1,4 @@
+import { BehaviorSubject, delay, Observable, of, Subject } from "rxjs";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
 import {
   AppellationMatchDto,
@@ -8,30 +9,27 @@ import { sleep } from "src/shared/utils";
 export class InMemoryRomeAutocompleteGateway
   implements RomeAutocompleteGateway
 {
-  public async getRomeDtoMatching(searchText: string): Promise<RomeDto[]> {
-    await sleep(700);
-    if (searchText === "givemeanemptylistplease") return [];
+  private readonly _romeDtos$: Subject<RomeDto[]>;
+
+  constructor(
+    private readonly seedRomeDtos?: RomeDto[],
+    private readonly simulatedLatency = 0,
+  ) {
+    this._romeDtos$ = seedRomeDtos
+      ? new BehaviorSubject(seedRomeDtos)
+      : new Subject<RomeDto[]>();
+  }
+
+  public getRomeDtoMatching(searchText: string): Observable<RomeDto[]> {
+    if (searchText === "givemeanemptylistplease") return of([]);
     if (searchText === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
-    return [
-      {
-        romeCode: "C1504",
-        romeLabel: "Transaction immobilière",
-      },
-      {
-        romeCode: "D1102",
-        romeLabel: "Boulangerie - viennoiserie",
-      },
-      {
-        romeCode: "D1101",
-        romeLabel: "Boucherie",
-      },
-      {
-        romeCode: "D1105",
-        romeLabel: "Poissonneriee",
-      },
-    ];
+
+    return this.simulatedLatency
+      ? this._romeDtos$.pipe(delay(this.simulatedLatency))
+      : this._romeDtos$;
   }
+
   public async getAppellationDtoMatching(
     searchText: string,
   ): Promise<AppellationMatchDto[]> {
@@ -91,4 +89,28 @@ export class InMemoryRomeAutocompleteGateway
       },
     ];
   }
+
+  // for test purpose
+  get romeDtos$() {
+    return this._romeDtos$;
+  }
 }
+
+export const seedRomeDtos: RomeDto[] = [
+  {
+    romeCode: "C1504",
+    romeLabel: "Transaction immobilière",
+  },
+  {
+    romeCode: "D1102",
+    romeLabel: "Boulangerie - viennoiserie",
+  },
+  {
+    romeCode: "D1101",
+    romeLabel: "Boucherie",
+  },
+  {
+    romeCode: "D1105",
+    romeLabel: "Poissonneriee",
+  },
+];

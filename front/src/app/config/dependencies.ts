@@ -12,9 +12,12 @@ import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemo
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
 import {
   InMemoryImmersionSearchGateway,
-  seedResults,
+  seedSearchResults,
 } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
-import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
+import {
+  InMemoryRomeAutocompleteGateway,
+  seedRomeDtos,
+} from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
 import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { FeatureFlagsGateway } from "src/core-logic/ports/FeatureFlagsGateway";
@@ -37,7 +40,7 @@ export const immersionApplicationGateway: ImmersionApplicationGateway =
 
 export const immersionSearchGateway: ImmersionSearchGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryImmersionSearchGateway(seedResults, 2000)
+    ? new InMemoryImmersionSearchGateway(seedSearchResults, 500)
     : new HttpImmersionSearchGateway();
 
 export const apiAdresseGateway: ApiAdresseGateway =
@@ -57,7 +60,7 @@ export const agencyGateway: AgencyGateway =
 
 export const romeAutocompleteGateway: RomeAutocompleteGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryRomeAutocompleteGateway()
+    ? new InMemoryRomeAutocompleteGateway(seedRomeDtos, 500)
     : new HttpRomeAutocompleteGateway();
 
 export type Dependencies = {

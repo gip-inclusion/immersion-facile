@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { romeAutocompleteInputSchema } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.schema";
 import {
   appellationRoute,
   romeRoute,
@@ -25,7 +26,8 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
   formCompletionRouter.route(`/${romeRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
       logger.info(req);
-      return deps.useCases.romeSearch.execute(req.query.searchText as any);
+      const query = romeAutocompleteInputSchema.parse(req.query);
+      return deps.useCases.romeSearch.execute(query.searchText);
     }),
   );
 

@@ -1,6 +1,7 @@
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 import { z } from "zod";
 import { zTrimmedString } from "../zodUtils";
+import { RomeSearchInput } from "./romeAndAppellation.dto";
 import type {
   AppellationDto,
   AppellationMatchDto,
@@ -24,6 +25,10 @@ export const appellationDtoSchema: z.Schema<AppellationDto> = z.object({
   romeLabel: zTrimmedString,
   appellationCode: codeAppellationSchema,
   appellationLabel: zTrimmedString,
+});
+
+export const romeAutocompleteInputSchema: z.Schema<RomeSearchInput> = z.object({
+  searchText: zTrimmedString,
 });
 
 const matchRangeSchema: z.Schema<MatchRangeDto> = z.object({

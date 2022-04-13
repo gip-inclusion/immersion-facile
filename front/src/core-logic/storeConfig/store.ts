@@ -11,10 +11,18 @@ import {
   featureFlagsSlice,
   fetchFeatureFlagsEpic,
 } from "src/core-logic/domain/featureFlags/featureFlags.slice";
+import {
+  romeAutocompleteEpic,
+  romeAutocompleteSlice,
+} from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epic";
 
-const allEpics: any[] = [...searchEpics, fetchFeatureFlagsEpic];
+const allEpics: any[] = [
+  ...searchEpics,
+  fetchFeatureFlagsEpic,
+  romeAutocompleteEpic,
+];
 
 const rootEpic: Epic = (action$, store$, dependencies) =>
   combineEpics(...allEpics)(action$, store$, dependencies).pipe(
@@ -27,6 +35,7 @@ const rootEpic: Epic = (action$, store$, dependencies) =>
 const rootReducer = combineReducers({
   [searchSlice.name]: searchSlice.reducer,
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
+  [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
 });
 
 export type StoreProps = {
@@ -37,7 +46,7 @@ export type StoreProps = {
 export const createStore = ({ dependencies, preloadedState }: StoreProps) => {
   const epicMiddleware = createEpicMiddleware({ dependencies });
   const store = configureStore({
-    preloadedState: preloadedState as RootState,
+    preloadedState,
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) => [
       ...getDefaultMiddleware({ thunk: false }),

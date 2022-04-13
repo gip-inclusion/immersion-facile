@@ -1,8 +1,8 @@
 import Autocomplete from "@mui/material/Autocomplete";
-import React, { useEffect, useState } from "react";
-import { romeAutocompleteGateway } from "src/app/config/dependencies";
-import { Proposal } from "src/app/pages/Establishment/StringWithHighlights";
-import { useDebounce } from "src/app/utils/useDebounce";
+import React from "react";
+import { useRomeAutocompleteUseCase } from "src/app/components/romeAutocomplete.hook";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";
 import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 type RomeAutocompleteProps = {
@@ -12,55 +12,30 @@ type RomeAutocompleteProps = {
   className?: string;
 };
 
-type Option = Proposal<RomeDto>;
-
 export const RomeAutocomplete = ({
-  initialValue,
   setFormValue,
   title,
   className,
 }: RomeAutocompleteProps) => {
-  const [selectedRomeDto, setSelectedRomeDto] = useState<RomeDto | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>(
-    initialValue?.romeLabel ?? "",
-  );
-  const [romeDtoOptions, setRomeDtoOptions] = useState<RomeDto[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const debounceSearchTerm = useDebounce(searchTerm, 300);
-
-  useEffect(() => {
-    (async () => {
-      const sanitizedTerm = debounceSearchTerm.trim();
-      if (!sanitizedTerm) return [];
-      try {
-        setIsSearching(true);
-        const romeOptions = await romeAutocompleteGateway.getRomeDtoMatching(
-          sanitizedTerm,
-        );
-        setRomeDtoOptions(romeOptions);
-      } catch (e: any) {
-        console.error(e);
-      } finally {
-        setIsSearching(false);
-      }
-    })();
-  }, [debounceSearchTerm]);
+  const { romeSearchText, isSearching, selectedRomeDto, romeOptions } =
+    useAppSelector(romeAutocompleteSelector);
+  const { updateSearchTerm, selectOption } = useRomeAutocompleteUseCase();
 
   const noOptionText =
-    isSearching || !debounceSearchTerm ? "..." : "Aucun métier trouvé";
+    isSearching || !romeSearchText ? "..." : "Aucun métier trouvé";
 
   return (
     <>
       <Autocomplete
         disablePortal
         filterOptions={(x) => x}
-        options={romeDtoOptions}
+        options={romeOptions}
         value={selectedRomeDto}
-        noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
+        noOptionsText={romeSearchText ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: RomeDto) => option.romeLabel}
         renderOption={(props, option) => <li {...props}>{option.romeLabel}</li>}
         onChange={(_, selectedRomeDto: RomeDto | null) => {
-          setSelectedRomeDto(selectedRomeDto ?? null);
+          selectOption(selectedRomeDto ?? null);
           setFormValue(
             selectedRomeDto ?? {
               romeCode: "",
@@ -69,7 +44,7 @@ export const RomeAutocomplete = ({
           );
         }}
         onInputChange={(_, newSearchTerm) => {
-          setSearchTerm(newSearchTerm);
+          updateSearchTerm(newSearchTerm);
         }}
         renderInput={(params) => (
           <div ref={params.InputProps.ref}>
