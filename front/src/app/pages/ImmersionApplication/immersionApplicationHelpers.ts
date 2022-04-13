@@ -111,7 +111,7 @@ const devPrefilledValues = (
     immersionAddress:
       emptyForm.immersionAddress ||
       "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
-    agencyId: emptyForm.agencyId || "test-agency-1-front",
+    agencyId: emptyForm.agencyId || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
 
     // Covid
     individualProtection: emptyForm.individualProtection ?? true,
