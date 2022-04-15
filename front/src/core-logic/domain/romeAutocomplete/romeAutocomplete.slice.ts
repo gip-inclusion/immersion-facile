@@ -64,7 +64,7 @@ export const romeAutocompleteEpic: AppEpic<RomeAutocompleteAction> = (
       of(romeAutocompleteSlice.actions.searchStarted()).pipe(
         concatWith(
           romeAutocompleteGateway
-            .getRomeDtoMatching(action.payload)
+            .getRomeDtoMatching(action.payload.trim())
             .pipe(map(romeAutocompleteSlice.actions.setRomeOptions)),
         ),
       ),
