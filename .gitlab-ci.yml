@@ -6,18 +6,13 @@ variables:
   POSTGRES_PORT: 5432
   POSTGRES_HOST_AUTH_METHOD: trust
   PG_TEST_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB
+  STORAGE_ROOT: ./storage/
 
 stages:
-  - lint
   - test
   - deploy
 
 image: node:16.5
-
-cache:
-  paths:
-    - front/node_modules/
-    - back/node_modules/
 
 front:
   stage: test
@@ -41,10 +36,9 @@ back:
     - npm run format:check
     - npm run lint
     - npm run includecheck
-    - echo $PG_TEST_URL
-    - NODE_ENV=test DATABASE_URL=$PG_TEST_URL npm run migrate up
-    - PG_URL=$PG_TEST_URL npm run test:all
     - npm run typecheck
+    - NODE_ENV=test DATABASE_URL=$PG_TEST_URL npm run migrate up
+    - PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_ROOT npm run test:all
 
 sonarqube-check:
   stage: test
