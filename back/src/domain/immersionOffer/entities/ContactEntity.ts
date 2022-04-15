@@ -10,4 +10,5 @@ export type ContactEntityV2 = {
   job: string;
   phone: string;
   contactMethod: ContactMethod;
+  copyEmails: string[];
 };

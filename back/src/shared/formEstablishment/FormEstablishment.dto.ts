@@ -14,6 +14,7 @@ export type BusinessContactDto = {
   phone: string; // we have a very permissive regex /^\+?[0-9]+$/
   email: string; // a valid email
   contactMethod: ContactMethod;
+  copyEmails: string[];
 };
 
 export type FormEstablishmentSourceInUrl =
@@ -42,6 +43,6 @@ export type FormEstablishmentDto = {
   isEngagedEnterprise?: boolean;
   naf?: NafDto; // { code: string, nomenclature: string }
   appellations: AppellationDto[]; // at least one
-  businessContact: BusinessContactDto; // array of exactly one element (a bit strange but it from long ago)
+  businessContact: BusinessContactDto;
   isSearchable: boolean;
 };

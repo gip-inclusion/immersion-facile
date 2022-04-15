@@ -40,6 +40,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
       agencyName: agencyConfig.name,
       magicLink,
     },
+    cc: [],
   });
 };
 
@@ -65,6 +66,7 @@ export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersion
         ),
         businessName,
       },
+      cc: [],
     });
   };
 
@@ -85,10 +87,11 @@ export const expectEmailFinalValidationConfirmationMatchingImmersionApplication 
         agencyConfig,
         immersionApplication,
       ),
+      cc: [],
     });
   };
 
-export const expectedEmailEstablisentCreatedReviewMatchingEstablisment = (
+export const expectedEmailEstablishmentCreatedReviewMatchingEstablisment = (
   templatedEmail: TemplatedEmail,
   establishmentDto: FormEstablishmentDto,
 ) => {
@@ -96,6 +99,7 @@ export const expectedEmailEstablisentCreatedReviewMatchingEstablisment = (
     type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
     recipients: [establishmentDto.businessContact.email],
     params: { establishmentDto },
+    cc: establishmentDto.businessContact.copyEmails,
   });
 };
 
@@ -121,6 +125,7 @@ export const expectedEmailImmersionApplicationReviewMatchingImmersionApplication
         magicLink,
         possibleRoleAction,
       },
+      cc: [],
     });
   };
 
@@ -142,6 +147,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
       agency: agencyConfig.name,
       immersionProfession: dto.immersionAppellation.appellationLabel,
     },
+    cc: [],
   });
 };
 
@@ -165,6 +171,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationModificationIsRe
         agency: agencyConfig.name,
         immersionProfession: dto.immersionAppellation,
       },
+      cc: [],
     });
   };
 
@@ -179,6 +186,7 @@ export const expectEmailMatchingLinkRenewalEmail = (
     params: {
       magicLink,
     },
+    cc: [],
   });
 };
 
@@ -189,6 +197,7 @@ export const expectContactByEmailRequest = (
   establishment: EstablishmentEntityV2,
   contact: ContactEntityV2,
   payload: ContactEstablishmentByMailDto,
+  copy: string[],
 ) => {
   expectTemplatedEmailToEqual(templatedEmail, {
     type: "CONTACT_BY_EMAIL_REQUEST",
@@ -203,6 +212,7 @@ export const expectContactByEmailRequest = (
       potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
       message: payload.message,
     },
+    cc: copy,
   });
 };
 
@@ -224,6 +234,7 @@ export const expectContactByPhoneInstructions = (
       potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
       potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
     },
+    cc: [],
   });
 };
 
@@ -245,6 +256,7 @@ export const expectContactInPersonInstructions = (
       potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
       potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
     },
+    cc: [],
   });
 };
 

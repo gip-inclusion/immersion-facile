@@ -104,6 +104,7 @@ describe("NotifyImmersionApplicationWasSignedByOtherParty", () => {
         type: "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
         recipients: [recipientEmail],
         params,
+        cc: [],
       },
     ]);
   };

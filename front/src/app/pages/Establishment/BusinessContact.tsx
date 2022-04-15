@@ -1,4 +1,4 @@
-import { useField } from "formik";
+import { useField, useFormikContext } from "formik";
 import React from "react";
 import { RadioGroupForField } from "src/app/components/RadioGroup";
 import { DeleteButton } from "src/uiComponents/DeleteButton";
@@ -8,6 +8,8 @@ import {
   ContactMethod,
   FormEstablishmentDto,
 } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { FillableList } from "src/uiComponents/form/FillableList";
+import { zEmail } from "src/shared/zodUtils";
 
 const preferredContactMethodOptions: Array<{
   label?: string;
@@ -33,7 +35,7 @@ export const BusinessContact = () => {
   const parentFieldName: keyof FormEstablishmentDto = "businessContact";
   const makeName = (name: keyof BusinessContactDto) =>
     `${parentFieldName}.${name}`;
-
+  const { values, setFieldValue } = useFormikContext<FormEstablishmentDto>();
   return (
     <div>
       <div className=" py-2 my-2">
@@ -54,6 +56,18 @@ export const BusinessContact = () => {
         name={makeName("contactMethod")}
         label="Comment souhaitez-vous que les candidats vous contactent ?"
         options={preferredContactMethodOptions}
+      />
+
+      <FillableList
+        name={makeName("copyEmails")}
+        label="Autres destinataires"
+        description={"Adresses mail à mettre en copie"}
+        placeholder="cc1@mail.com, cc2@mail.com"
+        valuesInList={values.businessContact.copyEmails}
+        setValues={(newValues) => {
+          setFieldValue(makeName("copyEmails"), newValues);
+        }}
+        validationSchema={zEmail}
       />
     </div>
   );

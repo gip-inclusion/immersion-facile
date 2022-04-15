@@ -5,6 +5,7 @@ import {
   buildTestApp,
   InMemoryRepositories,
 } from "../../_testBuilders/buildTestApp";
+import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 
 describe("Route to generate an establishment edition link", () => {
   let request: SuperTest<Test>;
@@ -12,8 +13,9 @@ describe("Route to generate an establishment edition link", () => {
 
   beforeEach(async () => {
     ({ request, reposAndGateways } = await buildTestApp());
-    reposAndGateways.immersionOffer.getContactEmailFromSiret = async () =>
-      "erik@gmail.com";
+    reposAndGateways.immersionOffer.getContactForEstablishmentSiret =
+      async () =>
+        new ContactEntityV2Builder().withEmail("erik@gmail.com").build();
   });
   it("Returns 400 with an error message if previous edit link for this siret has not yet expired", async () => {
     // Prepare

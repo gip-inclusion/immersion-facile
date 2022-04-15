@@ -47,6 +47,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     const establishmentSiret = formEstablishment.siret;
+
     await uow.establishmentAggregateRepo.removeEstablishmentAndOffersAndContactWithSiret(
       establishmentSiret,
     );
@@ -60,10 +61,6 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     if (establishmentDataSource === "form") {
       throw new Error(
         `Cannot insert establishment from form with siret ${establishmentSiret} since it already exists.`,
-      );
-    } else if (establishmentDataSource === "api_labonneboite") {
-      await uow.establishmentAggregateRepo.removeEstablishmentAndOffersAndContactWithSiret(
-        establishmentSiret,
       );
     }
 

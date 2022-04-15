@@ -116,6 +116,7 @@ export const EstablishmentFormPage = ({
                 title={`${fieldsToLabel["appellations"]} *`}
               />
               <BusinessContact />
+
               {isEditing && (
                 <BoolCheckboxGroup
                   name="isSearchable"

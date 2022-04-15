@@ -59,6 +59,7 @@ export class InMemoryFormEstablishmentGateway
         phone: "02837",
         email: "joe@mail.com",
         contactMethod: "EMAIL",
+        copyEmails: ["recrutement@boucherie.net"],
       },
       isSearchable: true,
     };

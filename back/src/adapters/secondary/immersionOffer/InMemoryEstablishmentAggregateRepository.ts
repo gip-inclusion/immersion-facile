@@ -132,14 +132,6 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async getContactEmailFromSiret(
-    siret: string,
-  ): Promise<string | undefined> {
-    return this._establishmentAggregates.find(
-      (aggregate) => aggregate.establishment.siret === siret,
-    )?.contact?.email;
-  }
-
   public async hasEstablishmentFromFormWithSiret(
     siret: string,
   ): Promise<boolean> {

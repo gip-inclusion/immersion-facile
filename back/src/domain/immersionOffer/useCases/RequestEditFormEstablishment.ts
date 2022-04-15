@@ -24,10 +24,12 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
   }
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
-    const contactEmail =
-      await uow.establishmentAggregateRepo.getContactEmailFromSiret(siret);
+    const contact =
+      await uow.establishmentAggregateRepo.getContactForEstablishmentSiret(
+        siret,
+      );
 
-    if (!contactEmail) throw Error("Email du contact introuvable.");
+    if (!contact) throw Error("Email du contact introuvable.");
 
     const now = this.clock.now();
     const lastPayload =
@@ -54,9 +56,13 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
     try {
-      await this.emailGateway.sendEditFormEstablishmentLink(contactEmail, {
-        editFrontUrl,
-      });
+      await this.emailGateway.sendEditFormEstablishmentLink(
+        contact.email,
+        contact.copyEmails,
+        {
+          editFrontUrl,
+        },
+      );
 
       const event = this.createNewEvent({
         topic: "FormEstablishmentEditLinkSent",

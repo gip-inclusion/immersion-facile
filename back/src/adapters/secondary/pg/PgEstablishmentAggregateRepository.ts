@@ -148,6 +148,7 @@ export class PgEstablishmentAggregateRepository
         contact.job,
         contact.phone,
         contactModeMap[contact.contactMethod as KnownContactMethod],
+        JSON.stringify(contact.copyEmails),
       ];
     });
 
@@ -158,7 +159,7 @@ export class PgEstablishmentAggregateRepository
     try {
       const insertContactsQuery = format(
         `INSERT INTO immersion_contacts (
-        uuid, lastname, firstname, email, role, phone, contact_mode
+        uuid, lastname, firstname, email, role, phone, contact_mode, copy_emails
       ) VALUES %L`,
         contactFields,
       );
@@ -396,7 +397,7 @@ export class PgEstablishmentAggregateRepository
     siret: string,
   ): Promise<void> {
     const query = `
-      DELETE FROM establishments WHERE siret = $1;;`;
+      DELETE FROM establishments WHERE siret = $1;`;
     await this.client.query(query, [siret]);
   }
 
@@ -445,24 +446,6 @@ export class PgEstablishmentAggregateRepository
     await this.client.query(formatedQuery);
   }
 
-  public async getContactEmailFromSiret(
-    siret: string,
-  ): Promise<string | undefined> {
-    const query = format(
-      `SELECT
-        immersion_contacts.email
-      FROM
-        immersion_contacts
-      RIGHT JOIN establishments__immersion_contacts
-        ON (establishments__immersion_contacts.contact_uuid = immersion_contacts.uuid)
-      WHERE establishments__immersion_contacts.establishment_siret = %L`,
-      siret,
-    );
-    const pgResult = await this.client.query(query);
-    const row = pgResult.rows[0];
-    if (!row) return;
-    return row.email;
-  }
   public async hasEstablishmentFromFormWithSiret(
     siret: string,
   ): Promise<boolean> {
@@ -529,6 +512,7 @@ export class PgEstablishmentAggregateRepository
       contactMethod:
         optional(row.contact_mode) && parseContactMethod(row.contact_mode),
       job: row.role,
+      copyEmails: row.copy_emails,
     };
   }
 

@@ -13,16 +13,22 @@ import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
 import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";
+const copyEmails = ["copy@gmail.com"];
 const setMethodGetContactEmailFromSiret = (
   establishmentAggregateRepo: EstablishmentAggregateRepository,
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  establishmentAggregateRepo.getContactEmailFromSiret = async (siret: string) =>
-    contactEmail;
+  establishmentAggregateRepo.getContactForEstablishmentSiret = async (
+    _siret: string,
+  ) =>
+    new ContactEntityV2Builder()
+      .withEmail(contactEmail)
+      .withCopyEmails(copyEmails)
+      .build();
 };
 
 const prepareUseCase = () => {
@@ -65,7 +71,7 @@ describe("RequestUpdateFormEstablishment", () => {
   it("Throws an error if contact email is unknown", async () => {
     // Prepare
     const { useCase, establishmentAggregateRepo } = prepareUseCase();
-    establishmentAggregateRepo.getContactEmailFromSiret = async (
+    establishmentAggregateRepo.getContactForEstablishmentSiret = async (
       siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
     ) => undefined;
 
@@ -77,7 +83,7 @@ describe("RequestUpdateFormEstablishment", () => {
   });
 
   describe("If no email has been sent yet.", () => {
-    it("Sends an email to the contact of the establishment", async () => {
+    it("Sends an email to the contact of the establishment with eventually email in CC", async () => {
       // Prepare
       const { useCase, emailGateway } = prepareUseCase();
 
@@ -90,6 +96,7 @@ describe("RequestUpdateFormEstablishment", () => {
       const expectedEmail: TemplatedEmail = {
         type: "EDIT_FORM_ESTABLISHMENT_LINK",
         recipients: [contactEmail],
+        cc: copyEmails,
         params: {
           editFrontUrl: `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${siret}]`,
         },

@@ -31,6 +31,7 @@ export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   phone: zString.regex(phoneRegExp, "Numero de téléphone incorrect"),
   email: zEmail,
   contactMethod: preferredContactMethodSchema,
+  copyEmails: z.array(zEmail),
 });
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [

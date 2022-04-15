@@ -27,6 +27,7 @@ const logger = createLogger(__filename);
 export type TemplatedEmail = {
   type: EmailType;
   recipients: string[];
+  cc: string[];
   params: Record<string, unknown>;
 };
 
@@ -34,26 +35,30 @@ export class InMemoryEmailGateway implements EmailGateway {
   private readonly sentEmails: TemplatedEmail[] = [];
   public async sendEditFormEstablishmentLink(
     recipient: string,
+    copy: string[],
     params: { editFrontUrl: string },
   ) {
-    logger.info({ recipient, params }, "sendEditFormEstablishmentLink");
+    logger.info({ recipient, params, copy }, "sendEditFormEstablishmentLink");
     this.sentEmails.push({
       type: "EDIT_FORM_ESTABLISHMENT_LINK",
       recipients: [recipient],
+      cc: copy,
       params,
     });
   }
   public async sendNewEstablismentContactConfirmation(
     recipient: string,
+    copy: string[],
     formEstablishmentDto: FormEstablishmentDto,
   ): Promise<void> {
     logger.info(
-      { recipient, formEstablishmentDto },
+      { recipient, formEstablishmentDto, copy },
       "sendNewEstablismentContactConfirmation",
     );
     this.sentEmails.push({
       type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
       recipients: [recipient],
+      cc: copy,
       params: { establishmentDto: formEstablishmentDto },
     });
   }
@@ -69,6 +74,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
       recipients: [recipient],
+      cc: [],
       params,
     });
   }
@@ -81,6 +87,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "NEW_APPLICATION_MENTOR_CONFIRMATION",
       recipients: [recipient],
+      cc: [],
       params,
     });
   }
@@ -94,6 +101,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
       recipients,
       params,
+      cc: [],
     });
   }
 
@@ -106,6 +114,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       type: "NEW_APPLICATION_AGENCY_NOTIFICATION",
       recipients,
       params,
+      cc: [],
     });
   }
 
@@ -121,6 +130,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       type: "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
       recipients,
       params,
+      cc: [],
     });
   }
 
@@ -136,6 +146,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
       recipients,
       params,
+      cc: [],
     });
   }
 
@@ -148,6 +159,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       type: "REJECTED_APPLICATION_NOTIFICATION",
       recipients,
       params,
+      cc: [],
     });
   }
 
@@ -163,6 +175,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       type: "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION",
       recipients,
       params,
+      cc: [],
     });
   }
 
@@ -175,6 +188,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       type: "MAGIC_LINK_RENEWAL",
       recipients,
       params,
+      cc: [],
     });
   }
 
@@ -186,6 +200,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
       recipients: [recipient],
+      cc: [],
       params,
     });
   }
@@ -201,6 +216,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
+      cc: [],
       params,
     });
   }
@@ -216,18 +232,21 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
+      cc: [],
       params,
     });
   }
 
   public async sendContactByEmailRequest(
     recipient: string,
+    copy: string[],
     params: ContactByEmailRequestParams,
   ): Promise<void> {
     logger.info({ recipient, params }, "sendContactByEmailRequest");
     this.sentEmails.push({
       type: "CONTACT_BY_EMAIL_REQUEST",
       recipients: [recipient],
+      cc: copy,
       params,
     });
   }
@@ -240,6 +259,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "CONTACT_BY_PHONE_INSTRUCTIONS",
       recipients: [recipient],
+      cc: [],
       params,
     });
   }
@@ -252,6 +272,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "CONTACT_IN_PERSON_INSTRUCTIONS",
       recipients: [recipient],
+      cc: [],
       params,
     });
   }
@@ -264,6 +285,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "SHARE_DRAFT_APPLICATION_BY_LINK",
       recipients: [recipient],
+      cc: [],
       params,
     });
   }

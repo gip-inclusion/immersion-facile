@@ -18,8 +18,8 @@ const validFormEstablishment: FormEstablishmentDto = {
     phone: "+33012345678",
     job: "a job",
     contactMethod: "EMAIL",
+    copyEmails: ["copy1@mail.com", "copy2@mail.com"],
   },
-
   naf: { code: "A", nomenclature: "nomenclature code A" },
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
@@ -59,6 +59,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
     phone: "",
     email: "",
     job: "",
+    copyEmails: [],
   },
   businessName: "",
   siret: "",

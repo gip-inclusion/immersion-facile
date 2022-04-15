@@ -10,7 +10,6 @@ import { SearchMade } from "../entities/SearchMadeEntity";
 
 export interface EstablishmentAggregateRepository {
   hasEstablishmentFromFormWithSiret: (siret: string) => Promise<boolean>;
-  getContactEmailFromSiret: (siret: string) => Promise<string | undefined>;
   insertEstablishmentAggregates: (
     establishments: EstablishmentAggregate[],
   ) => Promise<void>;

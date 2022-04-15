@@ -12,6 +12,7 @@ const validContactEntityV2: ContactEntityV2 = {
   job: "le big boss",
   phone: "0612345678",
   contactMethod: "EMAIL",
+  copyEmails: [],
 };
 
 export class ContactEntityV2Builder implements Builder<ContactEntityV2> {
@@ -29,6 +30,9 @@ export class ContactEntityV2Builder implements Builder<ContactEntityV2> {
 
   withEmail(email: string) {
     return new ContactEntityV2Builder({ ...this.entity, email });
+  }
+  withCopyEmails(copyEmails: string[]) {
+    return new ContactEntityV2Builder({ ...this.entity, copyEmails });
   }
 
   withFirstname(firstName: string) {

@@ -701,11 +701,11 @@ describe("Postgres implementation of immersion offer repository", () => {
           siret2,
         ]);
       });
-      it("adds a new row in contact table with first contact referencing the establishment siret, if multiple contacts are given", async () => {
+      it("adds a new row in contact table with contact referencing the establishment siret", async () => {
         // Prepare
-        const firstContactId = "3ca6e619-d654-4d0d-8fa6-2febefbe953d";
-        const firstContact = new ContactEntityV2Builder()
-          .withId(firstContactId)
+        const contactId = "3ca6e619-d654-4d0d-8fa6-2febefbe953d";
+        const contact = new ContactEntityV2Builder()
+          .withId(contactId)
           .withContactMethod("EMAIL")
           .build();
 
@@ -713,7 +713,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret1)
-            .withContact(firstContact)
+            .withContact(contact)
             .build(),
         ]);
 
@@ -721,14 +721,15 @@ describe("Postgres implementation of immersion offer repository", () => {
         const actualImmersionContactRows = await getAllImmersionContactsRows();
         expect(actualImmersionContactRows).toHaveLength(1);
         const expectedImmersionContactRow: PgImmersionContactWithSiretRow = {
-          uuid: firstContact.id,
-          email: firstContact.email,
-          phone: firstContact.phone,
-          lastname: firstContact.lastName,
-          firstname: firstContact.firstName,
-          role: firstContact.job,
+          uuid: contact.id,
+          email: contact.email,
+          phone: contact.phone,
+          lastname: contact.lastName,
+          firstname: contact.firstName,
+          role: contact.job,
           establishment_siret: siret1,
           contact_mode: "mail",
+          copy_emails: contact.copyEmails,
         };
         expect(actualImmersionContactRows[0]).toMatchObject(
           expectedImmersionContactRow,
@@ -919,10 +920,11 @@ describe("Postgres implementation of immersion offer repository", () => {
     const siret = "12345678901234";
     it("returns undefined if no establishment contact with this siret", async () => {
       // Act
-      const actualContactEmail =
-        await pgEstablishmentAggregateRepository.getContactEmailFromSiret(
+      const actualContactEmail = (
+        await pgEstablishmentAggregateRepository.getContactForEstablishmentSiret(
           siret,
-        );
+        )
+      )?.email;
       // Assert
       expect(actualContactEmail).toBeUndefined();
     });
@@ -938,10 +940,11 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret_establishment: siret,
       });
       // Act
-      const actualContactEmail =
-        await pgEstablishmentAggregateRepository.getContactEmailFromSiret(
+      const actualContactEmail = (
+        await pgEstablishmentAggregateRepository.getContactForEstablishmentSiret(
           siret,
-        );
+        )
+      )?.email;
       // Assert
       expect(actualContactEmail).toEqual(contactEmail);
     });
@@ -1218,6 +1221,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     phone: string;
     establishment_siret: string;
     contact_mode: PgContactMethod;
+    copy_emails: string[];
   };
 
   const getAllImmersionContactsRows = async (): Promise<

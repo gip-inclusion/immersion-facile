@@ -32,6 +32,7 @@ const payload: ContactEstablishmentRequestDto = {
 };
 
 const allowedContactEmail = "toto@gmail.com";
+const allowedCopyEmail = "copy@gmail.com";
 
 describe("NotifyContactRequest", () => {
   let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
@@ -68,6 +69,7 @@ describe("NotifyContactRequest", () => {
       .withId(contactId)
       .withContactMethod("EMAIL")
       .withEmail(allowedContactEmail)
+      .withCopyEmails([allowedCopyEmail])
       .build();
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
@@ -92,6 +94,7 @@ describe("NotifyContactRequest", () => {
       establishment,
       contact,
       validEmailPayload,
+      contact.copyEmails,
     );
   });
 

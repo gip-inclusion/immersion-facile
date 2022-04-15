@@ -53,7 +53,9 @@ export const formEstablishmentDtoPublicV0ToDomain = (
         preferredContactMethods[0] === "UNKNOWN"
           ? "EMAIL"
           : preferredContactMethods[0],
+      copyEmails: [],
     },
+
     isSearchable: true,
   };
 };

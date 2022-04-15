@@ -2,7 +2,7 @@ import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilt
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { NotifyConfirmationEstablishmentCreated as NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
-import { expectedEmailEstablisentCreatedReviewMatchingEstablisment } from "../../../_testBuilders/emailAssertions";
+import { expectedEmailEstablishmentCreatedReviewMatchingEstablisment } from "../../../_testBuilders/emailAssertions";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 
 describe("NotifyConfirmationEstablismentCreated", () => {
@@ -27,7 +27,7 @@ describe("NotifyConfirmationEstablismentCreated", () => {
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(1);
 
-      expectedEmailEstablisentCreatedReviewMatchingEstablisment(
+      expectedEmailEstablishmentCreatedReviewMatchingEstablisment(
         sentEmails[0],
         validEstablishment,
       );

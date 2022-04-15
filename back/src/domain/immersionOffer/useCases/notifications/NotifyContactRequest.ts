@@ -52,6 +52,7 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
           ([establishmentContactEmail]) =>
             this.emailGateway.sendContactByEmailRequest(
               establishmentContactEmail,
+              contact.copyEmails,
               {
                 businessName: establishment.name,
                 contactFirstName: contact.firstName,

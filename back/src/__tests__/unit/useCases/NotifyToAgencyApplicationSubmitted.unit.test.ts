@@ -84,6 +84,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       {
         type: "NEW_APPLICATION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
+        cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn(
@@ -97,6 +98,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       {
         type: "NEW_APPLICATION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail2],
+        cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn(
@@ -136,6 +138,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       {
         type: "NEW_APPLICATION_AGENCY_NOTIFICATION",
         recipients: [validatorEmail],
+        cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn(

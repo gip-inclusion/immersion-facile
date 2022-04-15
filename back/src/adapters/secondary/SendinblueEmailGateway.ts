@@ -116,15 +116,22 @@ export class SendinblueEmailGateway implements EmailGateway {
 
   public async sendEditFormEstablishmentLink(
     recipient: string,
+    copy: string[],
     params: { editFrontUrl: string },
   ): Promise<void> {
-    await this.sendTransacEmail("EDIT_FORM_ESTABLISHMENT_LINK", [recipient], {
-      EDIT_FRONT_LINK: params.editFrontUrl,
-    });
+    await this.sendTransacEmail(
+      "EDIT_FORM_ESTABLISHMENT_LINK",
+      [recipient],
+      {
+        EDIT_FRONT_LINK: params.editFrontUrl,
+      },
+      copy,
+    );
   }
 
   public async sendNewEstablismentContactConfirmation(
     recipient: string,
+    copy: string[],
     formEstablishmentDto: FormEstablishmentDto,
   ): Promise<void> {
     await this.sendTransacEmail(
@@ -135,6 +142,7 @@ export class SendinblueEmailGateway implements EmailGateway {
         CONTACT_LAST_NAME: formEstablishmentDto.businessContact.lastName,
         BUSINESS_NAME: formEstablishmentDto.businessName,
       },
+      copy,
     );
   }
   public async sendNewApplicationBeneficiaryConfirmation(
@@ -353,18 +361,24 @@ export class SendinblueEmailGateway implements EmailGateway {
 
   public async sendContactByEmailRequest(
     recipient: string,
+    copy: string[],
     params: ContactByEmailRequestParams,
   ): Promise<void> {
-    await this.sendTransacEmail("CONTACT_BY_EMAIL_REQUEST", [recipient], {
-      BUSINESS_NAME: params.businessName,
-      CONTACT_FIRSTNAME: params.contactFirstName,
-      CONTACT_LASTNAME: params.contactLastName,
-      JOB_LABEL: params.jobLabel,
-      POTENTIAL_BENEFICIARY_FIRSTNAME: params.potentialBeneficiaryFirstName,
-      POTENTIAL_BENEFICIARY_LASTNAME: params.potentialBeneficiaryLastName,
-      POTENTIAL_BENEFICIARY_EMAIL: params.potentialBeneficiaryEmail,
-      MESSAGE: params.message,
-    });
+    await this.sendTransacEmail(
+      "CONTACT_BY_EMAIL_REQUEST",
+      [recipient],
+      {
+        BUSINESS_NAME: params.businessName,
+        CONTACT_FIRSTNAME: params.contactFirstName,
+        CONTACT_LASTNAME: params.contactLastName,
+        JOB_LABEL: params.jobLabel,
+        POTENTIAL_BENEFICIARY_FIRSTNAME: params.potentialBeneficiaryFirstName,
+        POTENTIAL_BENEFICIARY_LASTNAME: params.potentialBeneficiaryLastName,
+        POTENTIAL_BENEFICIARY_EMAIL: params.potentialBeneficiaryEmail,
+        MESSAGE: params.message,
+      },
+      copy,
+    );
   }
 
   public async sendContactByPhoneInstructions(
@@ -413,10 +427,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     emailType: EmailType,
     recipients: string[],
     params: any,
+    copy: string[] = [],
   ) {
     const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
     sibEmail.templateId = emailTypeToTemplateId[emailType];
     sibEmail.to = recipients.map((email) => ({ email }));
+    sibEmail.cc = copy.map((email) => ({ email }));
     sibEmail.params = params;
     try {
       counterSendTransactEmailTotal.inc({ emailType });

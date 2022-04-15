@@ -12,6 +12,7 @@ export type BusinessContactDtoPublicV1 = {
   phone: string; // we have a very permissive regex /^\+?[0-9]+$/
   email: string; // a valid email
   contactMethod: ContactMethodPublicV1;
+  copyEmails: string[];
 };
 
 export type ContactMethodPublicV1 = "EMAIL" | "PHONE" | "IN_PERSON";

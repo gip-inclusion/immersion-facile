@@ -166,6 +166,7 @@ export type EmailType =
 export interface EmailGateway {
   sendEditFormEstablishmentLink: (
     recipient: string,
+    copy: string[],
     params: { editFrontUrl: string },
   ) => Promise<void>;
   sendNewApplicationBeneficiaryConfirmation: (
@@ -174,6 +175,7 @@ export interface EmailGateway {
   ) => Promise<void>;
   sendNewEstablismentContactConfirmation: (
     recipients: string,
+    copy: string[],
     params: FormEstablishmentDto,
   ) => Promise<void>;
   sendNewApplicationMentorConfirmation: (
@@ -222,6 +224,7 @@ export interface EmailGateway {
   ) => Promise<void>;
   sendContactByEmailRequest: (
     recipient: string,
+    copy: string[],
     params: ContactByEmailRequestParams,
   ) => Promise<void>;
   sendContactByPhoneInstructions: (

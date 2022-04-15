@@ -24,6 +24,7 @@ export class NotifyConfirmationEstablishmentCreated extends UseCase<FormEstablis
       ([establishmentContactEmail]) =>
         this.emailGateway.sendNewEstablismentContactConfirmation(
           establishmentContactEmail,
+          formEstablishment.businessContact.copyEmails,
           { ...formEstablishment },
         ),
       logger,
