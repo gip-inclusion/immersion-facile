@@ -26,8 +26,6 @@ import type {
   ImmersionApplicationDto,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { routes, useRoute } from "src/app/routing/routes";
-import { CopyLink } from "./CopyLink";
-import { ShareLinkByEmail } from "./ShareLinkByEmail";
 import { ApplicationFormProfession } from "./ApplicationFormProfession";
 import { ApplicationFormKeysInUrl } from "src/app/routing/route-params";
 
@@ -76,15 +74,17 @@ type ApplicationFieldsProps = {
   signeeName?: string; //< Ignored if !isSignOnly. Name of the person signing.
   alreadySubmitted?: boolean;
   onRejectForm?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
+  isUkraine?: boolean;
 };
 
-export const ApplicationFormFields = ({
+export const ApplicationFormFieldsUkraine = ({
   isFrozen,
   isSignOnly,
   isSignatureEnterprise,
   signeeName,
   alreadySubmitted,
   onRejectForm,
+  isUkraine,
 }: ApplicationFieldsProps) => {
   const {
     errors,
@@ -169,24 +169,7 @@ export const ApplicationFormFields = ({
         disabled={isFrozen}
       />
 
-      {isFrozen && (
-        <AgencyDisplay
-          label="Votre structure d'accompagnement *"
-          agencyId={values.agencyId}
-        />
-      )}
-      {!isFrozen && (
-        <AgencySelector
-          label="Votre structure d'accompagnement *"
-          disabled={isFrozen}
-          defaultAgencyId={values.agencyId}
-        />
-      )}
-      <FormSectionTitle>
-        2. Coordonnées de l'entreprise
-        <CopyLink />
-        <ShareLinkByEmail />
-      </FormSectionTitle>
+      <FormSectionTitle>2. Coordonnées de l'entreprise</FormSectionTitle>
       <h4>
         Les questions suivantes doivent être complétées avec la personne qui
         vous accueillera pendant votre immersion
@@ -233,8 +216,6 @@ export const ApplicationFormFields = ({
       />
       <FormSectionTitle>
         3. Conditions d’accueil de l’immersion professionnelle
-        <CopyLink />
-        <ShareLinkByEmail />
       </FormSectionTitle>
       <DateInput
         label="Date de début de l'immersion *"
@@ -452,7 +433,6 @@ const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
     "firstName",
     "lastName",
     "phone",
-    "postalCode",
     "dateStart",
     "dateEnd",
     "siret",
@@ -461,7 +441,6 @@ const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
     "mentorEmail",
     "mentorPhone",
     "agencyId",
-
     "immersionAddress",
     "sanitaryPrevention",
     "individualProtection",
@@ -470,7 +449,6 @@ const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
     "immersionActivities",
     "immersionSkills",
     "workConditions",
-
     "schedule",
     "immersionAppellation",
   ];

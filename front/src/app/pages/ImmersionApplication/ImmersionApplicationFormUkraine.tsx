@@ -4,14 +4,11 @@ import {
   SubmitFeedback,
   SuccessFeedbackKind,
 } from "src/app/components/SubmitFeedback";
-import {
-  agencyGateway,
-  immersionApplicationGateway,
-} from "src/app/config/dependencies";
-import { ApplicationFormFields } from "src/app/pages/ImmersionApplication/ApplicationFormFields";
+import { immersionApplicationGateway } from "src/app/config/dependencies";
+import { ApplicationFormFieldsUkraine } from "src/app/pages/ImmersionApplication/ApplicationFormFieldsUkraine";
 import { ImmersionApplicationPresentation } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { immersionApplicationSchema } from "src/shared/ImmersionApplication/immersionApplication.schema";
+import { immersionApplicationUkraineSchema } from "src/shared/ImmersionApplication/immersionApplication.schema";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Title } from "src/uiComponents/Title";
 
@@ -76,11 +73,13 @@ const FormikApplicationForm = ({
     <Formik
       enableReinitialize={true}
       initialValues={initialValues}
-      validationSchema={toFormikValidationSchema(immersionApplicationSchema)}
+      validationSchema={toFormikValidationSchema(
+        immersionApplicationUkraineSchema,
+      )}
       onSubmit={async (values, { setSubmitting }) => {
         try {
           const immersionApplication: ImmersionApplicationDto =
-            immersionApplicationSchema.parse(values);
+            immersionApplicationUkraineSchema.parse(values);
 
           await immersionApplicationGateway.add(immersionApplication);
           setInitialValues(immersionApplication);
@@ -96,7 +95,7 @@ const FormikApplicationForm = ({
         return (
           <div>
             <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-              <ApplicationFormFields isUkraine={true} />
+              <ApplicationFormFieldsUkraine />
               <SubmitFeedback submitFeedback={submitFeedback} />
             </form>
           </div>

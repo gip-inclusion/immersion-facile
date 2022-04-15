@@ -103,6 +103,71 @@ export const immersionApplicationSchema: z.Schema<ImmersionApplicationDto> = z
     path: ["enterpriseAccepted"],
   });
 
+export const immersionApplicationUkraineSchema: z.Schema<ImmersionApplicationDto> =
+  z
+    .object({
+      id: immersionApplicationIdSchema,
+      status: z.enum(validApplicationStatus),
+      rejectionJustification: z.string().optional(),
+      email: zEmail,
+      firstName: zTrimmedString,
+      lastName: zTrimmedString,
+      phone: z
+        .string()
+        .regex(phoneRegExp, "Numero de téléphone incorrect")
+        .optional(),
+      agencyId: agencyIdSchema,
+      dateSubmission: zString.regex(
+        dateRegExp,
+        "La date de saisie est invalide.",
+      ),
+      dateStart: zString.regex(
+        dateRegExp,
+        "La date de démarrage est invalide.",
+      ),
+      dateEnd: zString.regex(dateRegExp, "La date de fin invalide."),
+      siret: siretSchema,
+      businessName: zTrimmedString,
+      mentor: zTrimmedString,
+      mentorPhone: zString.regex(
+        phoneRegExp,
+        "Numero de téléphone de tuteur incorrect",
+      ),
+      mentorEmail: zEmail,
+      schedule: scheduleSchema,
+      workConditions: z.string().optional(),
+      individualProtection: zBoolean,
+      sanitaryPrevention: zBoolean,
+      sanitaryPreventionDescription: z.string().optional(),
+      immersionAddress: addressWithPostalCodeSchema.optional(),
+      immersionObjective: zString,
+      immersionAppellation: appellationDtoSchema,
+      immersionActivities: zTrimmedString,
+      immersionSkills: z.string().optional(),
+      beneficiaryAccepted: zBoolean,
+      enterpriseAccepted: zBoolean,
+    })
+    .refine(startDateIsBeforeEndDate, {
+      message: "La date de fin doit être après la date de début.",
+      path: ["dateEnd"],
+    })
+    .refine(underMaxDuration, {
+      message: "La durée maximale d'immersion est de 28 jours.",
+      path: ["dateEnd"],
+    })
+    .refine(emailAndMentorEmailAreDifferent, {
+      message: "Votre adresse e-mail doit être différente de celle du tuteur",
+      path: ["mentorEmail"],
+    })
+    .refine(mustBeSignedByBeneficiaryBeforeReview, {
+      message: "La confirmation de votre accord est obligatoire.",
+      path: ["beneficiaryAccepted"],
+    })
+    .refine(mustBeSignedByEstablishmentBeforeReview, {
+      message: "La confirmation de votre accord est obligatoire.",
+      path: ["enterpriseAccepted"],
+    });
+
 export const withImmersionApplicationIdSchema: z.Schema<WithImmersionApplicationId> =
   z.object({
     id: immersionApplicationIdSchema,
