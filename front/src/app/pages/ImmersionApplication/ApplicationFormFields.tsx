@@ -184,8 +184,12 @@ export const ApplicationFormFields = ({
       )}
       <FormSectionTitle>
         2. Coordonnées de l'entreprise
-        <CopyLink />
-        <ShareLinkByEmail />
+        {!isFrozen && (
+          <>
+            <CopyLink />
+            <ShareLinkByEmail />
+          </>
+        )}
       </FormSectionTitle>
       <h4>
         Les questions suivantes doivent être complétées avec la personne qui
@@ -233,8 +237,12 @@ export const ApplicationFormFields = ({
       />
       <FormSectionTitle>
         3. Conditions d’accueil de l’immersion professionnelle
-        <CopyLink />
-        <ShareLinkByEmail />
+        {!isFrozen && (
+          <>
+            <CopyLink />
+            <ShareLinkByEmail />
+          </>
+        )}
       </FormSectionTitle>
       <DateInput
         label="Date de début de l'immersion *"
