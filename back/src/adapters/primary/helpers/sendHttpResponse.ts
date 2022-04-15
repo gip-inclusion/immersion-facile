@@ -4,7 +4,7 @@ import { AbsoluteUrl } from "../../../shared/AbsoluteUrl";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { HttpError, UnauthorizedError } from "./httpErrors";
-import { deleteFile } from "../../../utils/filesystemUtils";
+import { deleteFileAndParentFolder } from "../../../utils/filesystemUtils";
 
 const logger = createLogger(__filename);
 
@@ -102,7 +102,7 @@ export const sendZipResponse = async (
     res.setHeader("content-type", "application/zip");
 
     return res.download(archivePath, () => {
-      deleteFile(archivePath);
+      deleteFileAndParentFolder(archivePath);
     });
   } catch (error: any) {
     handleResponseError(req, res, error);

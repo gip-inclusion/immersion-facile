@@ -2,8 +2,6 @@ import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { exportImmersionApplicationsExcelRoute } from "../../shared/routes";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { AgencyConfig } from "../../shared/agency/agency.dto";
-import * as fse from "fs-extra";
-import { temporaryStoragePath } from "../../utils/filesystemUtils";
 
 describe("/export-demande-immersions-excel", () => {
   it("fails with 401 without authentication", async () => {
@@ -33,7 +31,5 @@ describe("/export-demande-immersions-excel", () => {
       "content-disposition": 'attachment; filename="exportAgencies.zip"',
       "content-type": "application/zip",
     });
-
-    expect(fse.readdirSync(temporaryStoragePath())).toHaveLength(0);
   });
 });

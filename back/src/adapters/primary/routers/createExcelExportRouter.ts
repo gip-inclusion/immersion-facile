@@ -19,7 +19,7 @@ export const createExcelExportRouter = (deps: AppDependencies) => {
         req,
         res,
         async () => {
-          const archivePath = temporaryStoragePath("exportAgencies.zip");
+          const archivePath = await temporaryStoragePath("exportAgencies.zip");
           await deps.useCases.exportImmersionApplicationsAsExcelArchive.execute(
             archivePath,
           );
@@ -51,7 +51,7 @@ export const createExcelExportRouter = (deps: AppDependencies) => {
             ? (req.query.sourceProvider as FormSourceProvider)
             : "all";
 
-          const archivePath = temporaryStoragePath(
+          const archivePath = await temporaryStoragePath(
             `export${capitalize(sourceProvider)}EstablishmentsBy${capitalize(
               groupKey,
             )}${

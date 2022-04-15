@@ -1,7 +1,5 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { exportEstablismentsExcelRoute } from "../../shared/routes";
-import * as fse from "fs-extra";
-import { temporaryStoragePath } from "../../utils/filesystemUtils";
 
 describe("/export-establishments", () => {
   it("fails with 401 without authentication", async () => {
@@ -23,9 +21,8 @@ describe("/export-establishments", () => {
         'attachment; filename="exportAllEstablishmentsByRegionAggregatedProfessions.zip"',
       "content-type": "application/zip",
     });
-    expect(result.status).toBe(200);
 
-    expect(fse.readdirSync(temporaryStoragePath())).toHaveLength(0);
+    expect(result.status).toBe(200);
   });
   it("by departements and expanded when authenticated", async () => {
     const { request } = await buildTestApp();
@@ -42,8 +39,6 @@ describe("/export-establishments", () => {
       "content-type": "application/zip",
     });
     expect(result.status).toBe(200);
-
-    expect(fse.readdirSync(temporaryStoragePath())).toHaveLength(0);
   });
   it("default to department and not aggregated if incorrect query params", async () => {
     const { request } = await buildTestApp();
@@ -60,8 +55,6 @@ describe("/export-establishments", () => {
         'attachment; filename="exportCmaEstablishmentsByDepartment.zip"',
       "content-type": "application/zip",
     });
-
-    expect(fse.readdirSync(temporaryStoragePath())).toHaveLength(0);
   });
   it("source provider is cci", async () => {
     const { request } = await buildTestApp();
@@ -78,7 +71,5 @@ describe("/export-establishments", () => {
         'attachment; filename="exportCciEstablishmentsByRegionAggregatedProfessions.zip"',
       "content-type": "application/zip",
     });
-
-    expect(fse.readdirSync(temporaryStoragePath())).toHaveLength(0);
   });
 });
