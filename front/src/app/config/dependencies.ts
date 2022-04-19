@@ -1,12 +1,12 @@
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
 import { HttpFeatureFlagGateway } from "src/core-logic/adapters/HttpFeatureFlagGateway";
-import { HttpFormEstablishmentGateway } from "src/core-logic/adapters/HttpFormEstablishmentGateway";
+import { HttpEstablishmentGateway } from "src/core-logic/adapters/HttpEstablishmentGateway";
 import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/HttpRomeAutocompleteGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryFeatureFlagGateway } from "src/core-logic/adapters/InMemoryFeatureFlagGateway";
-import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemoryFormEstablishmentGateway";
+import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
 import {
   InMemoryImmersionSearchGateway,
@@ -18,7 +18,7 @@ import {
 } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { FeatureFlagsGateway } from "src/core-logic/ports/FeatureFlagsGateway";
-import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
+import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
@@ -28,10 +28,10 @@ import { ENV } from "src/environmentVariables";
 import { HttpAgencyGateway } from "src/infra/gateway/AgencyGateway/HttpAgencyGateway";
 import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
 
-export const formEstablishmentGateway: FormEstablishmentGateway =
+export const establishmentGateway: EstablishmentGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryFormEstablishmentGateway(["12345678901238"])
-    : new HttpFormEstablishmentGateway();
+    ? new InMemoryEstablishmentGateway(["12345678901238"])
+    : new HttpEstablishmentGateway();
 
 export const immersionApplicationGateway: ImmersionApplicationGateway =
   ENV.gateway === "IN_MEMORY"
@@ -67,7 +67,7 @@ export type Dependencies = {
   agencyGateway: AgencyGateway;
   apiAdresseGateway: ApiAdresseGateway;
   featureFlagGateway: FeatureFlagsGateway;
-  formEstablishmentGateway: FormEstablishmentGateway;
+  establishmentGateway: EstablishmentGateway;
   immersionApplicationGateway: ImmersionApplicationGateway;
   immersionSearchGateway: ImmersionSearchGateway;
   romeAutocompleteGateway: RomeAutocompleteGateway;
@@ -79,7 +79,7 @@ export const store = createStore({
     agencyGateway,
     apiAdresseGateway,
     featureFlagGateway,
-    formEstablishmentGateway,
+    establishmentGateway: establishmentGateway,
     immersionApplicationGateway,
     immersionSearchGateway,
     romeAutocompleteGateway,

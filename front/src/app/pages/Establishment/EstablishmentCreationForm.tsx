@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React, { useState } from "react";
-import { formEstablishmentGateway } from "src/app/config/dependencies";
+import { establishmentGateway } from "src/app/config/dependencies";
 import {
   useSiretFetcher,
   useSiretRelatedField,
@@ -41,7 +41,7 @@ export const EstablishmentCreationForm = ({
     <EstablishmentFormPage
       initialValues={creationInitialValues}
       saveForm={async (data) => {
-        await formEstablishmentGateway.addFormEstablishment(data);
+        await establishmentGateway.addFormEstablishment(data);
       }}
     >
       <CreationSiretRelatedInputs />
@@ -83,8 +83,8 @@ const CreationSiretRelatedInputs = () => {
           <Button
             disable={requestEmailToEditFormSucceed}
             onSubmit={() => {
-              formEstablishmentGateway
-                .requestEmailToEditForm(siret)
+              establishmentGateway
+                .requestEstablishmentModification(siret)
                 .then(() => {
                   setRequestEmailToEditFormSucceed(true);
                 })

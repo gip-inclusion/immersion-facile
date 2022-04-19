@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { formEstablishmentGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
+import { establishmentGateway } from "src/app/config/dependencies";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
@@ -27,7 +27,7 @@ export const EstablishmentEditionFormPage = ({
 
   useEffect(() => {
     if (!route.params.jwt) return;
-    formEstablishmentGateway
+    establishmentGateway
       .getFormEstablishmentFromJwt(route.params.jwt)
       .then((savedValues) =>
         setInitialValues({ ...initialValues, ...savedValues }),
@@ -42,7 +42,7 @@ export const EstablishmentEditionFormPage = ({
     <EstablishmentFormPage
       initialValues={initialValues}
       saveForm={(data) =>
-        formEstablishmentGateway.updateFormEstablishment(
+        establishmentGateway.updateFormEstablishment(
           {
             ...data,
           },

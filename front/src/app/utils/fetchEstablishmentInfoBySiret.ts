@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import { useEffect, useRef, useState } from "react";
 import {
-  formEstablishmentGateway,
+  establishmentGateway,
   immersionApplicationGateway,
 } from "src/app/config/dependencies";
 import { useAppSelector } from "src/app/utils/reduxHooks";
@@ -61,7 +61,7 @@ export const useSiretFetcher = (options: SiretFetcherOptions) => {
       setTouched(true);
       // Does siret already exist in our form repository ?
       const siretAlreadyExists =
-        await formEstablishmentGateway.getSiretAlreadyExists(
+        await establishmentGateway.isEstablishmentAlreadyRegisteredBySiret(
           validatedSiret.current,
         );
       setSiretAlreadyExists(siretAlreadyExists);

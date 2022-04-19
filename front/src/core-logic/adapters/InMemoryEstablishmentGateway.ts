@@ -1,18 +1,20 @@
-import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
+import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
 import { SiretDto } from "src/shared/siret";
 import { sleep } from "src/shared/utils";
 
-export class InMemoryFormEstablishmentGateway
-  implements FormEstablishmentGateway
-{
-  private _existingEstablishmentSirets: SiretDto[] = [];
 
-  public constructor(existingEstablishmentSirets: SiretDto[] = []) {
-    this._existingEstablishmentSirets = existingEstablishmentSirets;
-  }
+export class InMemoryEstablishmentGateway
+  implements EstablishmentGateway {
+
+
+  public constructor(
+    public _existingEstablishmentSirets: SiretDto[] = [],
+    public _currentEstablishmentModifyRequest: SiretDto | undefined = undefined
+  ) { }
+
   public async addFormEstablishment(
-    immersionOffer: FormEstablishmentDto,
+    immersionOffer: FormEstablishmentDto
   ): Promise<SiretDto> {
     console.log(immersionOffer);
     await sleep(2000);
@@ -21,15 +23,16 @@ export class InMemoryFormEstablishmentGateway
     return immersionOffer.siret;
   }
 
-  public async getSiretAlreadyExists(siret: SiretDto): Promise<boolean> {
+  public async isEstablishmentAlreadyRegisteredBySiret(siret: SiretDto): Promise<boolean> {
     return this._existingEstablishmentSirets.includes(siret);
   }
-
-  public async requestEmailToEditForm(_siret: SiretDto): Promise<void> {
+  
+  public async requestEstablishmentModification(siret: SiretDto): Promise<void> {
+    this._currentEstablishmentModifyRequest = siret;
     return;
   }
   public async getFormEstablishmentFromJwt(
-    jwt: string,
+    jwt: string
   ): Promise<FormEstablishmentDto> {
     return {
       siret: "12345678901234",
@@ -65,14 +68,15 @@ export class InMemoryFormEstablishmentGateway
     };
   }
   public async updateFormEstablishment(
-    formEstablishmentDto: FormEstablishmentDto,
+    formEstablishmentDto: FormEstablishmentDto
   ): Promise<void> {
     console.log(
       "Would update form establishment with siret ",
-      formEstablishmentDto.siret,
+      formEstablishmentDto.siret
     );
     await sleep(1000);
     if (formEstablishmentDto.businessName === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
   }
+
 }

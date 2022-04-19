@@ -35,7 +35,7 @@ export const ImmersionApplicationFormUkraine = ({
       />
     </>
   );
-};
+}; 
 
 const StaticText = () => (
   <>
