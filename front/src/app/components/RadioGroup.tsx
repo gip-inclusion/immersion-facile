@@ -135,7 +135,7 @@ const getInputValue = (
   return value;
 };
 
-const isEqual = <T extends unknown>(a: T, b: T): boolean => {
+const isEqual = <T,>(a: T, b: T): boolean => {
   if (a instanceof Array && b instanceof Array) {
     if (a[0] === undefined || b[0] === undefined) return false;
     return a[0] === b[0];

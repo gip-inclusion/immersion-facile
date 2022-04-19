@@ -1,13 +1,13 @@
 import axios from "axios";
-import { map, Observable, tap } from "rxjs";
+import { map, Observable } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
 import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import {
   AgencyId,
   AgencyInListDto,
+  AgencyPublicDisplayDto,
   CreateAgencyConfig,
   WithAgencyId,
-  AgencyPublicDisplayDto,
 } from "src/shared/agency/agency.dto";
 import { listAgenciesResponseSchema } from "src/shared/agency/agency.schema";
 import { LatLonDto } from "src/shared/latLon";
@@ -26,11 +26,9 @@ export class HttpAgencyGateway implements AgencyGateway {
         `/${prefix}/${agencyImmersionFacileIdRoute}`,
       )
       .pipe(
-        map((response: AjaxResponse<AgencyId | { success: boolean }>) => {
-          return typeof response.response === "string"
-            ? response.response
-            : false;
-        }),
+        map((response: AjaxResponse<AgencyId | { success: boolean }>) =>
+          typeof response.response === "string" ? response.response : false,
+        ),
       );
   }
 
@@ -52,12 +50,6 @@ export class HttpAgencyGateway implements AgencyGateway {
     const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
       params: position,
     });
-    const response = listAgenciesResponseSchema.parse(httpResponse.data);
-    return response;
+    return listAgenciesResponseSchema.parse(httpResponse.data);
   }
-}
-function of(
-  data: any,
-): Observable<AgencyId> | PromiseLike<Observable<AgencyId>> {
-  throw new Error("Function not implemented.");
 }

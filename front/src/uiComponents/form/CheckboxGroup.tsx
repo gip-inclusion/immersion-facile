@@ -1,10 +1,4 @@
-import {
-  Field,
-  FieldHookConfig,
-  FormikHelpers,
-  FormikState,
-  useField,
-} from "formik";
+import { Field, useField } from "formik";
 import React from "react";
 
 type BoolCheckboxGroupProps = {

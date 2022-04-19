@@ -1,6 +1,6 @@
+import immersionFacileLogo from "/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 import React from "react";
 import { routes } from "src/app/routing/routes";
-import immersionFacileLogo from "/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 
 export const LinkHome: React.FC<{ className?: string }> = ({
   children,

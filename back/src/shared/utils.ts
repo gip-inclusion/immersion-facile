@@ -3,11 +3,27 @@ export const phoneRegExp = /^\+?[0-9]+$/;
 export const stringOfNumbers = /^\+?[0-9]+$/;
 
 export type SleepFn = typeof sleep;
+
+// TODO WTF is that and how do we remove it from the solution
+/*
+ * export const sleep = (ms: number): Promise<number> => {
+ *  if (ms <= 0) {
+ *    return Promise.resolve(0);
+ *  }
+ *  return new Promise((r) => setTimeout(r, ms));
+ *};
+ *
+ * Suddenly give the following error on typecheck
+ * error TS2345: Argument of type '(value: number | PromiseLike<number>) => void' is not assignable to parameter of type '(args: void) => void'.
+ * Types of parameters 'value' and 'args' are incompatible.
+ *   Type 'void' is not assignable to type 'number | PromiseLike<number>'.
+ */
 export const sleep = (ms: number): Promise<number> => {
   if (ms <= 0) {
     return Promise.resolve(0);
   }
-  return new Promise((r) => setTimeout(r, ms));
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  return new Promise((): NodeJS.Timeout => setTimeout(() => {}, ms));
 };
 
 export type RandomFn = typeof random;

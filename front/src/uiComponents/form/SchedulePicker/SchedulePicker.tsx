@@ -14,7 +14,7 @@ import { TotalHoursIndicator } from "./TotalHoursIndicator";
 
 // Function that can be used as `validate` in Formik.
 export function scheduleValidator(value: ScheduleDto): string | void {
-  let totalHours = calculateWeeklyHoursFromSchedule(value);
+  const totalHours = calculateWeeklyHoursFromSchedule(value);
 
   if (totalHours > maxPermittedHoursPerWeek) {
     return "Veuillez saisir moins de 35h par semaine.";
@@ -42,7 +42,7 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
         noLabel="Non, irréguliers"
         checked={field.value.isSimple}
         setFieldValue={(newValue) => {
-          let schedule = field.value;
+          const schedule = field.value;
           schedule.isSimple = newValue;
           props.setFieldValue(schedule);
         }}

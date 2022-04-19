@@ -3,11 +3,11 @@ import { Observable, of } from "rxjs";
 import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import { toAgencyPublicDisplayDto } from "src/shared/agency/agency";
 import {
+  AgencyId,
   AgencyInListDto,
   CreateAgencyConfig,
   WithAgencyId,
 } from "src/shared/agency/agency.dto";
-import { AgencyId } from "src/shared/agency/agency.dto";
 import { LatLonDto } from "src/shared/latLon";
 
 const TEST_AGENCIES: Record<string, CreateAgencyConfig> = {
@@ -34,7 +34,7 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     this._agencies[agency.id] = agency;
   }
 
-  async listAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
+  async listAgencies(_position: LatLonDto): Promise<AgencyInListDto[]> {
     return values(this._agencies);
   }
 

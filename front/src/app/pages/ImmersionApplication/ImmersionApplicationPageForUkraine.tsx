@@ -32,7 +32,7 @@ export const ImmersionApplicationPageForUkraine = ({
         <ImmersionApplicationFormUkraine
           properties={{
             ...immersionApplicationInitialValuesFromUrl(route),
-            agencyId: agencyId!,
+            agencyId,
           }}
         />
       ) : (

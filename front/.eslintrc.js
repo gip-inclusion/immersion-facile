@@ -14,7 +14,7 @@ module.exports = {
         //'plugin:rxjs/recommended',
         "prettier",
       ],
-      files: ["**/*.ts"],
+      files: ["**/*.ts", "**/*.tsx"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
         tsconfigRootDir: __dirname,
@@ -26,11 +26,11 @@ module.exports = {
       rules: {
         ...require("../.eslint/eslint.rules"),
         ...require("../.eslint/typescript-eslint.rules"),
-        //...require('./.eslint/eslint.rules'),
-        //...require('./.eslint/typescript-eslint.rules'),
-        //...require('./.eslint/angular-eslint.rules'),
-        //...require('./.eslint/rxjs-eslint.rules'),
-        //...require('./.eslint/rxjs-angular-eslint.rules')
+        //...require('../.eslint/eslint.rules'),
+        //...require('../.eslint/typescript-eslint.rules'),
+        //...require('../.eslint/angular-eslint.rules'),
+        //...require('../.eslint/rxjs-eslint.rules'),
+        //...require('../.eslint/rxjs-angular-eslint.rules')
       },
     },
     {

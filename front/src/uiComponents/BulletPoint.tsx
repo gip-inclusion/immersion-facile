@@ -1,5 +1,5 @@
-import React, { ReactNode } from "react";
 import arrow from "/fleche.svg";
+import React, { ReactNode } from "react";
 
 type WithNumAndColor = { num?: number; red?: boolean };
 const ArrowOrNumber = ({ num, red }: WithNumAndColor) => {

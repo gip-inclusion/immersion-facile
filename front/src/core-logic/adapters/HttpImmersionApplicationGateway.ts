@@ -1,12 +1,17 @@
 import axios from "axios";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { AgencyId } from "src/shared/agency/agency.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
-  WithImmersionApplicationId,
   UpdateImmersionApplicationStatusRequestDto,
+  WithImmersionApplicationId,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+import {
+  immersionApplicationSchema,
+  withImmersionApplicationIdSchema,
+} from "src/shared/ImmersionApplication/immersionApplication.schema";
 import {
   generateMagicLinkRoute,
   immersionApplicationShareRoute,
@@ -17,14 +22,9 @@ import {
   updateApplicationStatusRoute,
   validateImmersionApplicationRoute,
 } from "src/shared/routes";
+import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
-import { AgencyId } from "src/shared/agency/agency.dto";
-import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
-import {
-  immersionApplicationSchema,
-  withImmersionApplicationIdSchema,
-} from "src/shared/ImmersionApplication/immersionApplication.schema";
 
 const prefix = "api";
 

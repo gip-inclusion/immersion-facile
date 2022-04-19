@@ -1,13 +1,13 @@
-import React from "react";
-import { routes } from "src/app/routing/routes";
 import bubbles from "/bulles.svg";
 import greatings from "/greatings.png";
 import tandem from "/tandem.png";
+import React from "react";
+import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
+import { routes } from "src/app/routing/routes";
 import { BulletPoint } from "src/uiComponents/BulletPoint";
 import { Card } from "src/uiComponents/Card";
 import { Colored } from "src/uiComponents/Colored";
 import { EstablishmentImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { Statistic } from "src/uiComponents/Statistic";
 import { Title } from "src/uiComponents/Title";
 

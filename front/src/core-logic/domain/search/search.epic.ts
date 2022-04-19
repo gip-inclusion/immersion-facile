@@ -9,7 +9,7 @@ type SearchEpic = AppEpic<SearchAction>;
 
 const initialSearchEpic: SearchEpic = (
   action$,
-  state$,
+  _state$,
   { immersionSearchGateway },
 ) =>
   action$.pipe(
@@ -34,7 +34,7 @@ const initialSearchEpic: SearchEpic = (
 
 const extraFetchEpic: SearchEpic = (
   action$,
-  state$,
+  _state$,
   { immersionSearchGateway, minSearchResultsToPreventRefetch },
 ) =>
   action$.pipe(

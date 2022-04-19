@@ -53,7 +53,7 @@ type RomeAutocompleteAction = ActionOfSlice<typeof romeAutocompleteSlice>;
 
 export const romeAutocompleteEpic: AppEpic<RomeAutocompleteAction> = (
   action$,
-  state$,
+  _state$,
   { romeAutocompleteGateway },
 ) =>
   action$.pipe(

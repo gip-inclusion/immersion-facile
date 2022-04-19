@@ -1,5 +1,5 @@
-import React from "react";
 import checked from "/checked.svg";
+import React from "react";
 
 type CardProps = {
   boldText: string;

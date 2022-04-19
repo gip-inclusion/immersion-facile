@@ -37,24 +37,22 @@ export const ImmersionApplicationFormUkraine = ({
   );
 };
 
-const StaticText = () => {
-  return (
-    <>
-      <div className="flex justify-center">
-        <Title red>
-          Formulaire pour conventionner une période de mise en situation
-          professionnelle (PMSMP) à destination des réfugiés ukrainiens
-        </Title>
-      </div>
+const StaticText = () => (
+  <>
+    <div className="flex justify-center">
+      <Title red>
+        Formulaire pour conventionner une période de mise en situation
+        professionnelle (PMSMP) à destination des réfugiés ukrainiens
+      </Title>
+    </div>
 
-      <div className="fr-text">
-        <p className="fr-text--xs">
-          Ce formulaire vaut équivalence du CERFA 13912 * 04
-        </p>
-      </div>
-    </>
-  );
-};
+    <div className="fr-text">
+      <p className="fr-text--xs">
+        Ce formulaire vaut équivalence du CERFA 13912 * 04
+      </p>
+    </div>
+  </>
+);
 
 const FormikApplicationForm = ({
   initialValues,
@@ -68,39 +66,35 @@ const FormikApplicationForm = ({
     SetStateAction<SuccessFeedbackKind | Error | null>
   >;
   submitFeedback: SuccessFeedbackKind | Error | null;
-}) => {
-  return (
-    <Formik
-      enableReinitialize={true}
-      initialValues={initialValues}
-      validationSchema={toFormikValidationSchema(
-        immersionApplicationUkraineSchema,
-      )}
-      onSubmit={async (values, { setSubmitting }) => {
-        try {
-          const immersionApplication: ImmersionApplicationDto =
-            immersionApplicationUkraineSchema.parse(values);
+}) => (
+  <Formik
+    enableReinitialize={true}
+    initialValues={initialValues}
+    validationSchema={toFormikValidationSchema(
+      immersionApplicationUkraineSchema,
+    )}
+    onSubmit={async (values, { setSubmitting }) => {
+      try {
+        const immersionApplication: ImmersionApplicationDto =
+          immersionApplicationUkraineSchema.parse(values);
 
-          await immersionApplicationGateway.add(immersionApplication);
-          setInitialValues(immersionApplication);
-          setSubmitFeedback("justSubmitted");
-        } catch (e: any) {
-          console.log(e);
-          setSubmitFeedback(e);
-        }
-        setSubmitting(false);
-      }}
-    >
-      {(props: FormikProps<FormikValues>) => {
-        return (
-          <div>
-            <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-              <ApplicationFormFieldsUkraine />
-              <SubmitFeedback submitFeedback={submitFeedback} />
-            </form>
-          </div>
-        );
-      }}
-    </Formik>
-  );
-};
+        await immersionApplicationGateway.add(immersionApplication);
+        setInitialValues(immersionApplication);
+        setSubmitFeedback("justSubmitted");
+      } catch (e: any) {
+        console.log(e);
+        setSubmitFeedback(e);
+      }
+      setSubmitting(false);
+    }}
+  >
+    {(props: FormikProps<FormikValues>) => (
+      <div>
+        <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
+          <ApplicationFormFieldsUkraine />
+          <SubmitFeedback submitFeedback={submitFeedback} />
+        </form>
+      </div>
+    )}
+  </Formik>
+);

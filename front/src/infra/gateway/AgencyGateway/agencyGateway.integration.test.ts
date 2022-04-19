@@ -1,6 +1,5 @@
 import { firstValueFrom, Observable } from "rxjs";
 import { AgencyGateway } from "src/domain/ports/AgencyGateway";
-import { HttpAgencyGateway } from "src/infra/gateway/AgencyGateway/HttpAgencyGateway";
 import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
 import { AgencyId } from "src/shared/agency/agency.dto";
 
@@ -13,6 +12,7 @@ const adapters: AgencyGateway[] = [
 ];
 
 describe("Agency Gateway - integration tests", () => {
+  // eslint-disable-next-line jest/require-hook
   adapters.forEach((adapter: AgencyGateway) => {
     describe(`immersionFacileAgency ${adapter.constructor.name}`, () => {
       it("retreive the id as observable from the gateway", async () => {

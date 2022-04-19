@@ -38,7 +38,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     {
       ...immersionApplicationValuesFromUrl,
     },
-    (p) => `/demande-immersion/lesentreprises-sengagent-ukraine`,
+    () => `/demande-immersion/lesentreprises-sengagent-ukraine`,
   ),
   immersionApplicationsToValidate: defineRoute(
     { jwt: param.query.string },

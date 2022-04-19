@@ -11,10 +11,11 @@
     "includecheck": "./check_includes.sh",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
-    "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck",
+    "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck && npm run lint",
     "symlink-or-copy-shared": "if [ ! -z $CI ]; then npm run copy-shared; else npm run symlink-shared; fi;",
     "copy-shared": "rm -rf ./src/shared; cp -Rf ../back/src/shared ./src",
-    "symlink-shared": "rm -rf ./src/shared; ln -fs ../../back/src/shared ./src/;"
+    "symlink-shared": "rm -rf ./src/shared; ln -fs ../../back/src/shared ./src/;",
+    "lint": "eslint ./src --fix"
   },
   "dependencies": {
     "@dataesr/react-dsfr": "^1.0.5",
@@ -35,7 +36,12 @@
     "rxjs": "^7.5.5",
     "type-route": "^0.6.0",
     "uuid": "^8.3.2",
-    "zod": "^3.14.2"
+    "zod": "^3.14.2",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-jest": "^26.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",

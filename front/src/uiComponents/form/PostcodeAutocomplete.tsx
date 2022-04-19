@@ -1,9 +1,9 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { apiAdresseGateway } from "src/app/config/dependencies";
-import { TextInput } from "src/uiComponents/form/TextInput";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { LatLonDto } from "src/shared/latLon";
+import { TextInput } from "src/uiComponents/form/TextInput";
 
 export type PostcodeAutocompleteProps = {
   initialSearchTerm?: string;

@@ -1,27 +1,27 @@
 import React, { useState } from "react";
+import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import { immersionApplicationGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
-import { ArrayDropdown } from "src/uiComponents/admin/ArrayDropdown";
-import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
-import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
-import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import { AgencyId } from "src/shared/agency/agency.dto";
+import { EstablishmentExportConfigDto } from "src/shared/establishmentExport/establishmentExport.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
   validApplicationStatus,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { Route } from "type-route";
-import "./Admin.css";
-import { ApiDataContainer } from "./ApiDataContainer";
 import {
   exportEstablismentsExcelRoute,
   exportImmersionApplicationsExcelRoute,
 } from "src/shared/routes";
-import { EstablishmentExportConfigDto } from "src/shared/establishmentExport/establishmentExport.dto";
 import { queryParamsAsString } from "src/shared/utils/queryParams";
+import { ArrayDropdown } from "src/uiComponents/admin/ArrayDropdown";
+import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
+import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
+import { Route } from "type-route";
+import "./Admin.css";
+import { ApiDataContainer } from "./ApiDataContainer";
 
 interface AdminProps {
   route: Route<typeof routes.admin> | Route<typeof routes.agencyAdmin>;
@@ -34,7 +34,7 @@ const buildExportEstablishmentRoute = (params: EstablishmentExportConfigDto) =>
 
 export const AdminPage = ({ route }: AdminProps) => {
   const featureFlags = useAppSelector(featureFlagsSelector);
-  const [immersionApplications, setImmersionApplications] = useState<
+  const [_immersionApplications, setImmersionApplications] = useState<
     ImmersionApplicationDto[]
   >([]);
 
@@ -42,12 +42,12 @@ export const AdminPage = ({ route }: AdminProps) => {
     ApplicationStatus | undefined
   >();
 
-  let agency =
+  const agency =
     "agencyId" in route.params
       ? (route.params.agencyId as AgencyId)
       : undefined;
 
-  const filterChanged = (selectedIndex: number, selectedLabel: string) => {
+  const filterChanged = (selectedIndex: number, _selectedLabel: string) => {
     setImmersionApplications([]);
     setStatusFilter(validApplicationStatus[selectedIndex]);
   };

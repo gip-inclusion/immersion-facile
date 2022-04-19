@@ -1,18 +1,16 @@
 import { useField } from "formik";
 import React from "react";
 import { AppellationAutocomplete } from "src/app/components/AppellationAutocomplete";
-import { DeleteButton } from "src/uiComponents/DeleteButton";
 import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { DeleteButton } from "src/uiComponents/DeleteButton";
 
 type ProfessionProps = {
   name: string;
-  label: string;
   onDelete: () => void;
 };
 
 export const FormEstablishmentAppellation = ({
   name,
-  label,
   onDelete,
 }: ProfessionProps) => {
   const [{ value }, _, { setValue }] = useField<AppellationDto>(name);

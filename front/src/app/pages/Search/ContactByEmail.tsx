@@ -1,14 +1,14 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { immersionSearchGateway } from "src/app/config/dependencies";
-import { Button } from "src/uiComponents/Button";
-import { TextInput } from "src/uiComponents/form/TextInput";
-import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import {
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailSchema,
 } from "src/shared/contactEstablishment";
 import { SiretDto } from "src/shared/siret";
+import { Button } from "src/uiComponents/Button";
+import { TextInput } from "src/uiComponents/form/TextInput";
+import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 
 type ContactByEmailProps = {
   siret: SiretDto;

@@ -1,10 +1,10 @@
-import React from "react";
-import { Form, Formik, useField } from "formik";
 import { Button } from "@mui/material";
-import { TextInput } from "src/uiComponents/form/TextInput";
+import { Form, Formik, useField } from "formik";
+import React from "react";
 import { immersionApplicationGateway } from "src/app/config/dependencies";
-import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { shareLinkByEmailSchema } from "src/shared/ShareLinkByEmailDTO";
+import { TextInput } from "src/uiComponents/form/TextInput";
+import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 
 type ShareFormProps = {
   onSuccess: () => void;

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { IconButton, Tooltip } from "@mui/material";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import { ShareForm } from "./ShareForm";
+import { IconButton, Tooltip } from "@mui/material";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+import React, { useState } from "react";
 import {
   ElementModalContainer,
   useElementContainerModal,
 } from "src/uiComponents/FormModal/ElementModalContainer";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import { ShareForm } from "./ShareForm";
 
 const iconColor = "#3458a2";
 

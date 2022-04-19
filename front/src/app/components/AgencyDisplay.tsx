@@ -6,7 +6,7 @@ import { AgencyId, AgencyInListDto } from "src/shared/agency/agency.dto";
 import type { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { LatLonDto } from "src/shared/latLon";
 
-import { PostcodeAutocomplete } from "../../uiComponents/form/PostcodeAutocomplete";
+import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
 import { Agencies } from "./Agency";
 
 const placeholderAgency: AgencyInListDto = {
@@ -31,7 +31,7 @@ export const AgencyDisplay = ({
     useField<AgencyId>({ name });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const [_loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
   const [position, setPosition] = useState<LatLonDto | null>(null);
   const [agencies, setAgencies] = useState([placeholderAgency]);
@@ -40,7 +40,7 @@ export const AgencyDisplay = ({
     if (!agencyId) return;
 
     agencyGateway
-      .getAgencyPublicInfoById({ id: agencyId! })
+      .getAgencyPublicInfoById({ id: agencyId })
       .then((agency) => {
         setAgencies([
           {

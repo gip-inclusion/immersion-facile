@@ -30,7 +30,7 @@ export const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
-    searchRequested: (state, action: PayloadAction<SearchParams>) => {
+    searchRequested: (state, _action: PayloadAction<SearchParams>) => {
       state.searchStatus = "initialFetch";
       state.searchResults = [];
     },

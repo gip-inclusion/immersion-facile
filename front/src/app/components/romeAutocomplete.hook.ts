@@ -1,9 +1,6 @@
 import { useDispatch } from "react-redux";
 import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
-import {
-  RomeCode,
-  RomeDto,
-} from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export const useRomeAutocompleteUseCase = () => {
   const dispatch = useDispatch();

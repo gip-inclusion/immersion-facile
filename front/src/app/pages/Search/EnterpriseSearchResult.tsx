@@ -1,11 +1,11 @@
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import React, { ReactNode } from "react";
 import { DistanceIcon } from "src/icons/DistanceIcon";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { TrefleIcon } from "src/icons/TrefleIcon";
-import { SearchButton } from "src/uiComponents/SearchButton";
-import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
 import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
+import { SearchButton } from "src/uiComponents/SearchButton";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;

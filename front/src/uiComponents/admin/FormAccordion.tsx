@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import type {
-  ImmersionApplicationDto,
-  ApplicationStatus,
-} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { formatDistance, formatDuration, intervalToDuration } from "date-fns";
+import { formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
+import React from "react";
+import type {
+  ApplicationStatus,
+  ImmersionApplicationDto,
+} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { FormDetails } from "./FormDetails";
 
 const beforeAfterString = (date: string) => {
@@ -15,15 +15,6 @@ const beforeAfterString = (date: string) => {
     addSuffix: true,
     locale: fr,
   });
-};
-
-const durationDays = (dateStart: string, dateEnd: string) => {
-  let d = intervalToDuration({
-    start: new Date(dateStart),
-    end: new Date(dateEnd),
-  });
-
-  return formatDuration(d, { locale: fr });
 };
 
 export interface FormAccordionProps {
@@ -54,8 +45,14 @@ const getPrefix = (status: ApplicationStatus) => {
 };
 
 export const FormAccordion = ({ immersionApplication }: FormAccordionProps) => {
-  const { status, lastName, firstName, businessName, dateStart, dateEnd } =
-    immersionApplication;
+  const {
+    status,
+    lastName,
+    firstName,
+    businessName,
+    dateStart,
+    dateEnd: _,
+  } = immersionApplication;
 
   const title =
     `${getPrefix(status)} ` +

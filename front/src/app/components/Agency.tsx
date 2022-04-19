@@ -5,14 +5,12 @@ export type AgenciesProps = {
   agencies: AgencyInListDto[];
 };
 
-export const Agencies = ({ agencies }: AgenciesProps) => {
-  return (
-    <>
-      {agencies.map(({ id, name }) => (
-        <option value={id} key={id} label={name}>
-          {name}
-        </option>
-      ))}
-    </>
-  );
-};
+export const Agencies = ({ agencies }: AgenciesProps) => (
+  <>
+    {agencies.map(({ id, name }) => (
+      <option value={id} key={id} label={name}>
+        {name}
+      </option>
+    ))}
+  </>
+);

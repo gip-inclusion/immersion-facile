@@ -1,6 +1,6 @@
 import { Modal, ModalClose, ModalContent } from "@dataesr/react-dsfr";
-import ModalTitle from "src/app/pages/ImmersionApplication/ModalTitleOverride";
 import React, { useReducer } from "react";
+import ModalTitle from "src/app/pages/ImmersionApplication/ModalTitleOverride";
 
 type ModalState = {
   isOpen: boolean;
@@ -14,9 +14,10 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
       return { ...state, isOpen: true };
     case "CLICKED_CLOSE":
       return { isOpen: false };
-    default:
+    default: {
       const shouldNeverBeAssigned: never = action;
       return shouldNeverBeAssigned;
+    }
   }
 };
 

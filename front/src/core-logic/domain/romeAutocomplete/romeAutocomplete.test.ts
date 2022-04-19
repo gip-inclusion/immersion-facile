@@ -1,5 +1,4 @@
 import { Store } from "@reduxjs/toolkit";
-import { TestScheduler } from "rxjs/testing";
 import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";
 import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
 import {
@@ -44,6 +43,7 @@ describe("rome Autocomplete", () => {
     expectSelectedRomeToEqual({ romeCode: "B1000", romeLabel: "Métier B" });
   });
 
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip("triggers rome search when search text changes", () => {
     const searchedText = "bou";
     store.dispatch(

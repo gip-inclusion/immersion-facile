@@ -16,7 +16,7 @@ export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
     disabled?: boolean;
   },
 ) => {
-  const [{ value }, { touched }, { setValue }] = useField<
+  const [{ value: _ }, { touched }, { setValue }] = useField<
     GetSiretResponseDto[K]
   >({
     name: options?.fieldToUpdate ?? fieldFromInfo,
@@ -43,7 +43,7 @@ export const useSiretFetcher = (options: SiretFetcherOptions) => {
     GetSiretResponseDto | undefined
   >();
 
-  const [field, _, { setValue, setError, setTouched }] = useField<string>({
+  const [field, _, { setValue: _2, setError, setTouched }] = useField<string>({
     name: "siret",
   });
   const validatedSiret = useRef<SiretDto>(field.value);
@@ -54,7 +54,7 @@ export const useSiretFetcher = (options: SiretFetcherOptions) => {
     (async () => {
       try {
         validatedSiret.current = siretSchema.parse(field.value);
-      } catch (e: any) {
+      } catch (_: any) {
         return;
       }
       setIsFetchingSiret(true);

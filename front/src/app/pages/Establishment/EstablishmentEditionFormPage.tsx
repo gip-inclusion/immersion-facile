@@ -1,19 +1,19 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { formEstablishmentGateway } from "src/app/config/dependencies";
+import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
+import { TextInput } from "src/uiComponents/form/TextInput";
+import { Route } from "type-route";
 import { defaultInitialValue } from "./EstablishmentCreationForm";
 import {
   EstablishmentFormPage,
   getLabelAndName,
   getMandatoryLabelAndName,
 } from "./EstablishmentFormPage";
-import { routes } from "src/app/routing/routes";
-import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
-import { TextInput } from "src/uiComponents/form/TextInput";
-import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
-import { Route } from "type-route";
 
 export const EstablishmentEditionFormPage = ({
   route,

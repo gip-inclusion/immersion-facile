@@ -90,47 +90,45 @@ export const immersionApplicationInitialValuesFromUrl = ({
 
 const devPrefilledValues = (
   emptyForm: ImmersionApplicationPresentation,
-): ImmersionApplicationPresentation => {
-  return {
-    ...emptyForm,
-    // Participant
-    email: emptyForm.email || "sylvanie@monemail.fr",
-    firstName: emptyForm.firstName || "Sylvanie",
-    lastName: emptyForm.lastName || "Durand",
-    phone: emptyForm.phone || "0612345678",
-    postalCode: emptyForm.postalCode || "75001",
-    peExternalId: emptyForm.peExternalId || undefined,
+): ImmersionApplicationPresentation => ({
+  ...emptyForm,
+  // Participant
+  email: emptyForm.email || "sylvanie@monemail.fr",
+  firstName: emptyForm.firstName || "Sylvanie",
+  lastName: emptyForm.lastName || "Durand",
+  phone: emptyForm.phone || "0612345678",
+  postalCode: emptyForm.postalCode || "75001",
+  peExternalId: emptyForm.peExternalId || undefined,
 
-    // Enterprise
-    siret: emptyForm.siret || "1234567890123",
-    businessName: emptyForm.businessName || "Futuroscope",
-    mentor: emptyForm.mentor || "Le Mentor du futur",
-    mentorPhone: emptyForm.mentorPhone || "0101100110",
-    mentorEmail: emptyForm.mentorEmail || "mentor@supermentor.fr",
-    immersionAddress:
-      emptyForm.immersionAddress ||
-      "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
-    agencyId: emptyForm.agencyId || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+  // Enterprise
+  siret: emptyForm.siret || "1234567890123",
+  businessName: emptyForm.businessName || "Futuroscope",
+  mentor: emptyForm.mentor || "Le Mentor du futur",
+  mentorPhone: emptyForm.mentorPhone || "0101100110",
+  mentorEmail: emptyForm.mentorEmail || "mentor@supermentor.fr",
+  immersionAddress:
+    emptyForm.immersionAddress ||
+    "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
+  agencyId: emptyForm.agencyId || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
 
-    // Covid
-    individualProtection: emptyForm.individualProtection ?? true,
-    sanitaryPrevention: emptyForm.sanitaryPrevention ?? true,
-    sanitaryPreventionDescription:
-      emptyForm.sanitaryPreventionDescription || "Aucunes",
+  // Covid
+  individualProtection: emptyForm.individualProtection ?? true,
+  sanitaryPrevention: emptyForm.sanitaryPrevention ?? true,
+  sanitaryPreventionDescription:
+    emptyForm.sanitaryPreventionDescription || "Aucunes",
 
-    // Immersion
-    immersionObjective: emptyForm.immersionObjective || "",
-    immersionAppellation: emptyForm.immersionAppellation || {
-      romeLabel: "Boulanger / Boulangère",
-      appellationLabel: "Boulangerie",
-      romeCode: "D1502",
-      appellationCode: "12278",
-    },
-    immersionActivities: emptyForm.immersionActivities || "Superviser",
-    immersionSkills: emptyForm.immersionSkills || "Attention au détail",
+  // Immersion
+  immersionObjective: emptyForm.immersionObjective || "",
+  immersionAppellation: emptyForm.immersionAppellation || {
+    romeLabel: "Boulanger / Boulangère",
+    appellationLabel: "Boulangerie",
+    romeCode: "D1502",
+    appellationCode: "12278",
+  },
+  immersionActivities: emptyForm.immersionActivities || "Superviser",
+  immersionSkills: emptyForm.immersionSkills || "Attention au détail",
 
-    // Signatures
-    beneficiaryAccepted: false,
-    enterpriseAccepted: false,
-  };
-};
+  // Signatures
+  beneficiaryAccepted: false,
+  enterpriseAccepted: false,
+});

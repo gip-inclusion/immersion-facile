@@ -1,11 +1,9 @@
-import { HttpAgencyGateway } from "src/infra/gateway/AgencyGateway/HttpAgencyGateway";
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
 import { HttpFeatureFlagGateway } from "src/core-logic/adapters/HttpFeatureFlagGateway";
 import { HttpFormEstablishmentGateway } from "src/core-logic/adapters/HttpFormEstablishmentGateway";
 import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/HttpRomeAutocompleteGateway";
-import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryFeatureFlagGateway } from "src/core-logic/adapters/InMemoryFeatureFlagGateway";
 import { InMemoryFormEstablishmentGateway } from "src/core-logic/adapters/InMemoryFormEstablishmentGateway";
@@ -18,7 +16,6 @@ import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,
 } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
-import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { FeatureFlagsGateway } from "src/core-logic/ports/FeatureFlagsGateway";
 import { FormEstablishmentGateway } from "src/core-logic/ports/FormEstablishmentGateway";
@@ -26,7 +23,10 @@ import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionAppli
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
+import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import { ENV } from "src/environmentVariables";
+import { HttpAgencyGateway } from "src/infra/gateway/AgencyGateway/HttpAgencyGateway";
+import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
 
 export const formEstablishmentGateway: FormEstablishmentGateway =
   ENV.gateway === "IN_MEMORY"

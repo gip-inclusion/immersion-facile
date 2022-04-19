@@ -1,10 +1,10 @@
 import React from "react";
 import { immersionApplicationGateway } from "src/app/config/dependencies";
-import { Button } from "src/uiComponents/Button";
 import {
-  ImmersionApplicationDto,
   ApplicationStatus,
+  ImmersionApplicationDto,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+import { Button } from "src/uiComponents/Button";
 
 export type VerificationActionButtonProps = {
   immersionApplication?: ImmersionApplicationDto;
@@ -39,7 +39,7 @@ const onSubmit = async ({
   }
 
   return immersionApplicationGateway
-    .updateStatus({ status: newStatus, justification: justification }, jwt)
+    .updateStatus({ status: newStatus, justification }, jwt)
     .then(() => onSuccess(messageToShowOnSuccess))
     .catch((e) => onError(e.message));
 };

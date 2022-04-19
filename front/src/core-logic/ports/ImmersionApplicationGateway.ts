@@ -6,9 +6,9 @@ import {
   UpdateImmersionApplicationStatusRequestDto,
   WithImmersionApplicationId,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
-import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
 
 export interface ImmersionApplicationGateway {
   add(immersionApplicationDto: ImmersionApplicationDto): Promise<string>;

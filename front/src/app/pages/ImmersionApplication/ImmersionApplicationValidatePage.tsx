@@ -1,16 +1,16 @@
 import React, { useState } from "react";
+import { immersionApplicationGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
-import { VerificationActionButton } from "./VerificationActionButton";
-import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
-import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
-import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ApplicationStatus } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { statusTransitionConfigs } from "src/shared/immersionApplicationStatusTransitions";
 import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
+import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
+import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
+import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
-import { immersionApplicationGateway } from "src/app/config/dependencies";
+import { VerificationActionButton } from "./VerificationActionButton";
 
 type VerificationPageProps = {
   route: Route<typeof routes.immersionApplicationsToValidate>;

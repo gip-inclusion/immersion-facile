@@ -1,9 +1,9 @@
 import React, { useState } from "react";
+import { immersionApplicationGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { Button } from "src/uiComponents/Button";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { Route } from "type-route";
-import { immersionApplicationGateway } from "src/app/config/dependencies";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewMagicLink>;
@@ -75,11 +75,9 @@ export const RenewExpiredLinkContent = ({
   );
 };
 
-export const RenewExpiredLinkPage = ({ route }: RenewExpiredLinkProps) => {
-  return (
-    <RenewExpiredLinkContent
-      expiredJwt={route.params.expiredJwt}
-      originalURL={route.params.originalURL}
-    />
-  );
-};
+export const RenewExpiredLinkPage = ({ route }: RenewExpiredLinkProps) => (
+  <RenewExpiredLinkContent
+    expiredJwt={route.params.expiredJwt}
+    originalURL={route.params.originalURL}
+  />
+);

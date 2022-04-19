@@ -5,13 +5,11 @@ interface InfoMessageProps {
   title: string;
 }
 
-export const InfoMessage = ({ text, title }: InfoMessageProps) => {
-  return (
-    <>
-      <div role="alert" className="fr-alert fr-alert--info">
-        <p className="fr-alert__title">{title}</p>
-        <p>{text}</p>
-      </div>
-    </>
-  );
-};
+export const InfoMessage = ({ text, title }: InfoMessageProps) => (
+  <>
+    <div role="alert" className="fr-alert fr-alert--info">
+      <p className="fr-alert__title">{title}</p>
+      <p>{text}</p>
+    </div>
+  </>
+);

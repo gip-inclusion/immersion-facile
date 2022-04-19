@@ -25,7 +25,7 @@ export class InMemoryFormEstablishmentGateway
     return this._existingEstablishmentSirets.includes(siret);
   }
 
-  public async requestEmailToEditForm(siret: SiretDto): Promise<void> {
+  public async requestEmailToEditForm(_siret: SiretDto): Promise<void> {
     return;
   }
   public async getFormEstablishmentFromJwt(

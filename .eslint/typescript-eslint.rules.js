@@ -17,6 +17,7 @@ module.exports = {
       ignoreRestSiblings: true,
     },
   ],
+  "@typescript-eslint/no-non-null-assertion": "error"
 };
 
 const toAddBitsByBits = {

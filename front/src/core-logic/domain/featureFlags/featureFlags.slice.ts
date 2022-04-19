@@ -1,11 +1,8 @@
-import { createSlice, PayloadAction, Slice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Epic } from "redux-observable";
 import { filter, map, switchMap } from "rxjs";
 import { Dependencies } from "src/app/config/dependencies";
-import {
-  ActionOfSlice,
-  AppEpic,
-} from "src/core-logic/storeConfig/redux.helpers";
+import { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
 import { RootState } from "src/core-logic/storeConfig/store";
 import { FeatureFlags } from "src/shared/featureFlags";
 
@@ -37,11 +34,12 @@ export const featureFlagsSlice = createSlice({
 
 export type FeatureFlagsAction = ActionOfSlice<typeof featureFlagsSlice>;
 
-export const fetchFeatureFlagsEpic: AppEpic<FeatureFlagsAction> = (
-  action$,
-  state$,
-  { featureFlagGateway },
-) =>
+export const fetchFeatureFlagsEpic: Epic<
+  FeatureFlagsAction,
+  FeatureFlagsAction,
+  RootState,
+  Dependencies
+> = (action$, _state$, { featureFlagGateway }) =>
   action$.pipe(
     filter(featureFlagsSlice.actions.retrieveFeatureFlagsRequested.match),
     switchMap(() =>

@@ -1,18 +1,24 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect } from "react";
 import { AgencyDisplay } from "src/app/components/AgencyDisplay";
+import { AgencySelector } from "src/app/components/AgencySelector";
 import {
   BoolRadioGroup,
   RadioGroupForField,
 } from "src/app/components/RadioGroup";
+import { ApplicationFormKeysInUrl } from "src/app/routing/route-params";
+import { routes, useRoute } from "src/app/routing/routes";
 import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/utils/fetchEstablishmentInfoBySiret";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import type {
+  ApplicationStatus,
+  ImmersionApplicationDto,
+} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
-import { AgencySelector } from "src/app/components/AgencySelector";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { DateInput } from "src/uiComponents/form/DateInput";
 import {
@@ -21,15 +27,9 @@ import {
 } from "src/uiComponents/form/SchedulePicker/SchedulePicker";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
-import type {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { routes, useRoute } from "src/app/routing/routes";
+import { ApplicationFormProfession } from "./ApplicationFormProfession";
 import { CopyLink } from "./CopyLink";
 import { ShareLinkByEmail } from "./ShareLinkByEmail";
-import { ApplicationFormProfession } from "./ApplicationFormProfession";
-import { ApplicationFormKeysInUrl } from "src/app/routing/route-params";
 
 const FrozenMessage = () => (
   <>
@@ -84,7 +84,8 @@ export const ApplicationFormFields = ({
   isSignatureEnterprise,
   signeeName,
   alreadySubmitted,
-  onRejectForm,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onRejectForm = async () => {},
 }: ApplicationFieldsProps) => {
   const {
     errors,
@@ -377,7 +378,7 @@ export const ApplicationFormFields = ({
                 <SignButton isSubmitting={isSubmitting} onSubmit={submitForm} />
 
                 <RequestModificationButton
-                  onSubmit={onRejectForm!}
+                  onSubmit={onRejectForm}
                   isSubmitting={isSubmitting}
                 />
               </p>
@@ -393,17 +394,6 @@ type SubmitButtonProps = {
   isSubmitting: boolean;
   onSubmit: () => Promise<void>;
 };
-
-const SaveButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => (
-  <button
-    className="fr-fi-save-line fr-btn--icon-left"
-    type="button"
-    onClick={onSubmit}
-    disabled={isSubmitting}
-  >
-    {isSubmitting ? "Éxecution" : "Sauvegarder"}
-  </button>
-);
 
 const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
   const [_, __, { setValue }] = useField<ApplicationStatus>({ name: "status" });
@@ -424,34 +414,30 @@ const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
   );
 };
 
-const SignButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
-  return (
-    <button
-      className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-      type="button"
-      onClick={onSubmit}
-    >
-      {isSubmitting ? "Éxecution" : "Confirmer et signer"}
-    </button>
-  );
-};
+const SignButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => (
+  <button
+    className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+    type="button"
+    onClick={onSubmit}
+  >
+    {isSubmitting ? "Éxecution" : "Confirmer et signer"}
+  </button>
+);
 
 export const RequestModificationButton = ({
   onSubmit,
   isSubmitting,
-}: SubmitButtonProps) => {
-  return (
-    <button
-      className="fr-btn fr-fi-edit-fill fr-btn--icon-left fr-btn--secondary"
-      type="button"
-      onClick={onSubmit}
-    >
-      {isSubmitting
-        ? "Éxecution"
-        : "Annuler les signatures et demander des modifications"}
-    </button>
-  );
-};
+}: SubmitButtonProps) => (
+  <button
+    className="fr-btn fr-fi-edit-fill fr-btn--icon-left fr-btn--secondary"
+    type="button"
+    onClick={onSubmit}
+  >
+    {isSubmitting
+      ? "Éxecution"
+      : "Annuler les signatures et demander des modifications"}
+  </button>
+);
 
 const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
   const keysToWatch: ApplicationFormKeysInUrl[] = [
@@ -482,9 +468,9 @@ const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
     "schedule",
     "immersionAppellation",
   ];
-  const watchedValuesObject = keysToWatch.reduce(
+
+  return keysToWatch.reduce(
     (acc, watchedKey) => ({ ...acc, [watchedKey]: values[watchedKey] }),
     {} as Partial<ImmersionApplicationDto>,
   );
-  return watchedValuesObject;
 };

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/config/dependencies";
-import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
-import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
-import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { Route } from "type-route";
 import { routes } from "src/app/routing/routes";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
+import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { InfoMessage } from "src/uiComponents/form/InfoMessage";
+import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
+import { Route } from "type-route";
 
 // Temporary "final verification" page for the admin to re-verify the form.
 
@@ -44,9 +44,7 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
       "Attention! Cette demande d'immersion est à statut 'En cours de revue', l'opération que vous venez d'effectuer ne semble pas avoir été appliquée. Veuillez réésayer ou consulter l'équipe Immérsion Facilitée",
   };
 
-  const validationDisabled = () => {
-    return !form || form.status !== "IN_REVIEW";
-  };
+  const validationDisabled = () => !form || form.status !== "IN_REVIEW";
   useEffect(() => {
     immersionApplicationGateway
       .backofficeGet(id)

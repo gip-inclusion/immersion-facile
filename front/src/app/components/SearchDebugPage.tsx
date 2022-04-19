@@ -2,10 +2,10 @@ import { Field, Form, Formik, FormikHelpers } from "formik";
 import React, { useState } from "react";
 import { firstValueFrom } from "rxjs";
 import { immersionSearchGateway } from "src/app/config/dependencies";
-import { AppellationAutocomplete } from "./AppellationAutocomplete";
-import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
+import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
+import { AppellationAutocomplete } from "./AppellationAutocomplete";
 
 interface Values {
   rome: string;
@@ -33,7 +33,7 @@ export const SearchDebugPage = () => {
         }}
         onSubmit={async (values, { setSubmitting }: FormikHelpers<Values>) => {
           setLatency(0);
-          let requestDate = new Date();
+          const requestDate = new Date();
           firstValueFrom(
             immersionSearchGateway.search({
               rome: values.rome,
@@ -52,7 +52,7 @@ export const SearchDebugPage = () => {
               setResponseText(e.toString());
             })
             .finally(() => {
-              let responseDate = new Date();
+              const responseDate = new Date();
               setLatency(responseDate.getTime() - requestDate.getTime());
               setSubmitting(false);
             });

@@ -1,6 +1,11 @@
 import React from "react";
+import { SearchDebugPage } from "src/app/components/SearchDebugPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
+import { AdminVerificationPage } from "src/app/pages/admin/AdminVerificationPage";
 import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
+import { EstablishmentEditionFormPage } from "src/app/pages/Establishment/EstablishmentEditionFormPage";
+import { EstablishmentFormImmersionFacilePage } from "src/app/pages/Establishment/EstablishmentFormImmersionFacilePage";
+import { EstablishmentFormPageForExternals } from "src/app/pages/Establishment/EstablishmentFormPageForExternals";
 import { ImmersionApplicationPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
 import { ImmersionApplicationPageForUkraine } from "src/app/pages/ImmersionApplication/ImmersionApplicationPageForUkraine";
 import { ImmersionApplicationSignPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationSignPage";
@@ -11,12 +16,7 @@ import { LandingEstablishmentPage } from "src/app/pages/Static/LandingEstablishm
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { ENV } from "src/environmentVariables";
-import { RenewExpiredLinkPage } from "../../helpers/RenewExpiredLinkPage";
-import { SearchDebugPage } from "../components/SearchDebugPage";
-import { AdminVerificationPage } from "../pages/admin/AdminVerificationPage";
-import { EstablishmentEditionFormPage } from "../pages/Establishment/EstablishmentEditionFormPage";
-import { EstablishmentFormImmersionFacilePage } from "../pages/Establishment/EstablishmentFormImmersionFacilePage";
-import { EstablishmentFormPageForExternals } from "../pages/Establishment/EstablishmentFormPageForExternals";
+import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
 import { useRoute } from "./routes";
 
 const { envType } = ENV;

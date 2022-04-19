@@ -32,57 +32,55 @@ export const ImmersionTextField = ({
   multiline,
   disabled,
   name,
-}: ImmersionTextFieldProps) => {
-  return (
-    <>
-      <div
-        className={`fr-input-group${error ? " fr-input-group--error" : ""} ${
-          className ?? ""
-        }`}
-      >
-        <label className="fr-label" htmlFor={name}>
-          {label}
-        </label>
-        {description && (
-          <span className="fr-hint-text" id="select-hint-desc-hint">
-            {description}
-          </span>
-        )}
-        {multiline ? (
-          <textarea
-            id={name}
-            value={value}
-            name={name}
-            onKeyPress={onKeyPress}
-            onChange={onChange}
-            onBlur={onBlur}
-            className={`fr-input${error ? " fr-input--error" : ""}`}
-            placeholder={placeholder || ""}
-            aria-describedby="text-input-error-desc-error"
-            disabled={disabled}
-            rows={4}
-          />
-        ) : (
-          <input
-            id={name}
-            value={value}
-            type={type}
-            name={name}
-            onKeyPress={onKeyPress}
-            onChange={onChange}
-            onBlur={onBlur}
-            className={`fr-input${error ? " fr-input--error" : ""}`}
-            placeholder={placeholder || ""}
-            aria-describedby="text-input-error-desc-error"
-            disabled={disabled}
-          />
-        )}
-        {error && (
-          <p id="text-input-email-error-desc-error" className="fr-error-text">
-            {error}
-          </p>
-        )}
-      </div>
-    </>
-  );
-};
+}: ImmersionTextFieldProps) => (
+  <>
+    <div
+      className={`fr-input-group${error ? " fr-input-group--error" : ""} ${
+        className ?? ""
+      }`}
+    >
+      <label className="fr-label" htmlFor={name}>
+        {label}
+      </label>
+      {description && (
+        <span className="fr-hint-text" id="select-hint-desc-hint">
+          {description}
+        </span>
+      )}
+      {multiline ? (
+        <textarea
+          id={name}
+          value={value}
+          name={name}
+          onKeyPress={onKeyPress}
+          onChange={onChange}
+          onBlur={onBlur}
+          className={`fr-input${error ? " fr-input--error" : ""}`}
+          placeholder={placeholder || ""}
+          aria-describedby="text-input-error-desc-error"
+          disabled={disabled}
+          rows={4}
+        />
+      ) : (
+        <input
+          id={name}
+          value={value}
+          type={type}
+          name={name}
+          onKeyPress={onKeyPress}
+          onChange={onChange}
+          onBlur={onBlur}
+          className={`fr-input${error ? " fr-input--error" : ""}`}
+          placeholder={placeholder || ""}
+          aria-describedby="text-input-error-desc-error"
+          disabled={disabled}
+        />
+      )}
+      {error && (
+        <p id="text-input-email-error-desc-error" className="fr-error-text">
+          {error}
+        </p>
+      )}
+    </div>
+  </>
+);

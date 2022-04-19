@@ -7,7 +7,7 @@ import { AgencyId, AgencyInListDto } from "src/shared/agency/agency.dto";
 import type { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { LatLonDto } from "src/shared/latLon";
 
-import { PostcodeAutocomplete } from "../../uiComponents/form/PostcodeAutocomplete";
+import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
 
 const placeholderAgency: AgencyInListDto = {
   id: "",

@@ -1,11 +1,11 @@
-import React from "react";
-import { routes } from "src/app/routing/routes";
-import { ImmersionFooter } from "src/app/components/ImmersionFooter";
-import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
-import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import SearchIcon from "@mui/icons-material/Search";
+import React from "react";
+import { ImmersionFooter } from "src/app/components/ImmersionFooter";
+import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
+import { routes } from "src/app/routing/routes";
 
 import { ENV } from "src/environmentVariables";
+import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 
 const DebugInfo = () => (
   <div>

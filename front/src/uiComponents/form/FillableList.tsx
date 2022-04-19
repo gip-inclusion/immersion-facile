@@ -2,10 +2,10 @@ import MuiChip from "@mui/material/Chip";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button } from "src/uiComponents/Button";
-import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 import { notEqual } from "src/shared/ramdaExtensions/notEqual";
 import { OmitFromExistingKeys } from "src/shared/utils";
+import { Button } from "src/uiComponents/Button";
+import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 import { z } from "zod";
 
 const immersionBlue = "#3458a2";
@@ -124,18 +124,16 @@ type ListOfChipProps = {
   onDelete: (valueToDelete: string) => void;
 };
 
-const ListOfChip = ({ values, onDelete }: ListOfChipProps) => {
-  return (
-    <div className="pb-4">
-      {values.map((value) => (
-        <span key={value} className="px-1">
-          <Chip
-            variant="outlined"
-            label={value}
-            onDelete={() => onDelete(value)}
-          />
-        </span>
-      ))}
-    </div>
-  );
-};
+const ListOfChip = ({ values, onDelete }: ListOfChipProps) => (
+  <div className="pb-4">
+    {values.map((value) => (
+      <span key={value} className="px-1">
+        <Chip
+          variant="outlined"
+          label={value}
+          onDelete={() => onDelete(value)}
+        />
+      </span>
+    ))}
+  </div>
+);

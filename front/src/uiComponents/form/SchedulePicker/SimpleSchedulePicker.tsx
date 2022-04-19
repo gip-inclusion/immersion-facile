@@ -1,8 +1,8 @@
-import React from "react";
 import { FieldHookConfig, useField } from "formik";
+import React from "react";
+import { ScheduleDto } from "src/shared/ScheduleSchema";
 import { HourPicker } from "./HourPicker";
 import { WeekdayPicker } from "./WeekdayPicker";
-import { ScheduleDto } from "src/shared/ScheduleSchema";
 
 export type SimpleSchedulePickerProps = {
   setFieldValue: (updatedSchedule: ScheduleDto) => void;
@@ -18,7 +18,7 @@ export const SimpleSchedulePicker = (props: SimpleSchedulePickerProps) => {
         name={props.name}
         schedule={field.value.simpleSchedule.dayPeriods}
         onValueChange={(updatedWeekdays: number[][]) => {
-          let schedule = field.value;
+          const schedule = field.value;
           schedule.simpleSchedule.dayPeriods = updatedWeekdays;
           props.setFieldValue(schedule);
         }}
@@ -31,7 +31,7 @@ export const SimpleSchedulePicker = (props: SimpleSchedulePickerProps) => {
         name={props.name}
         schedule={field.value.simpleSchedule.hours}
         onValueChange={(newHours) => {
-          let schedule = field.value;
+          const schedule = field.value;
           schedule.simpleSchedule.hours = newHours;
           props.setFieldValue(schedule);
         }}

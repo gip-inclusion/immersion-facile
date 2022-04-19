@@ -41,7 +41,7 @@ export const ImmersionApplicationForm = ({
       return;
     }
     immersionApplicationGateway
-      .getMagicLink(routeParams.jwt!)
+      .getMagicLink(routeParams.jwt)
       .then((response) => {
         if (response.status === "DRAFT") {
           response.dateSubmission = toDateString(startOfToday());
@@ -122,17 +122,15 @@ export const ImmersionApplicationForm = ({
             setSubmitting(false);
           }}
         >
-          {(props) => {
-            return (
-              <div>
-                {keys(props.errors).length !== 0 && console.log(props.errors)}
-                <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-                  <ApplicationFormFields isFrozen={isFrozen} />
-                  <SubmitFeedback submitFeedback={submitFeedback} />
-                </form>
-              </div>
-            );
-          }}
+          {(props) => (
+            <div>
+              {keys(props.errors).length !== 0 && console.log(props.errors)}
+              <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
+                <ApplicationFormFields isFrozen={isFrozen} />
+                <SubmitFeedback submitFeedback={submitFeedback} />
+              </form>
+            </div>
+          )}
         </Formik>
       </div>
     </div>

@@ -1,9 +1,9 @@
-import React from "react";
 import { FieldHookConfig } from "formik";
-import { ButtonAdd } from "src/uiComponents/ButtonAdd";
+import React from "react";
 import { ScheduleDto } from "src/shared/ScheduleSchema";
-import { WeekdayDropdown } from "./WeekdayDropdown";
+import { ButtonAdd } from "src/uiComponents/ButtonAdd";
 import { DeleteButton } from "src/uiComponents/DeleteButton";
+import { WeekdayDropdown } from "./WeekdayDropdown";
 
 type WeekdayPickerProps = {
   schedule: number[][];
@@ -23,7 +23,7 @@ export const WeekdayPicker = ({
     if (schedule.length > 0) {
       // Autofill next period as one day after the current period,
       // with duration of 1 day.
-      let last = schedule[schedule.length - 1];
+      const last = schedule[schedule.length - 1];
       if (last[1] < 5) {
         start = last[1] + 2;
         end = last[1] + 2;

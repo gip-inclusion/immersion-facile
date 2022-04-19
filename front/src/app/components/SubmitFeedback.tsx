@@ -1,6 +1,6 @@
+import React from "react";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
-import React from "react";
 
 export type SuccessFeedbackKind =
   | "justSubmitted"
@@ -70,6 +70,5 @@ const messageByKind: Record<SuccessFeedbackKind, React.ReactNode> = {
     "avant qu'elle ne soit effectivement disponible pour conventionner des immersions",
 };
 
-const getErrorMessage = (submitError: Error) => {
-  return (submitError as any)?.response?.data?.errors ?? submitError?.message;
-};
+const getErrorMessage = (submitError: Error) =>
+  (submitError as any)?.response?.data?.errors ?? submitError?.message;

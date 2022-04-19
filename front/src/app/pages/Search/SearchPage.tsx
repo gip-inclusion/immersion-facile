@@ -78,7 +78,7 @@ export const SearchPage = () => {
                       }}
                       title="Rayon"
                       onSelection={(
-                        newValue: string,
+                        _newValue: string,
                         selectedIndex: number,
                       ) => {
                         setFieldValue("radiusKm", radiusOptions[selectedIndex]);

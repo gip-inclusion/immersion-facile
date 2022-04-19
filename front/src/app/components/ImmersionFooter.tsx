@@ -1,5 +1,5 @@
-import poleEmploiLogo from "/pole-emploi-logo.svg";
 import lesEntrepriseSengagent from "/les-entreprises-s-engagent.svg";
+import poleEmploiLogo from "/pole-emploi-logo.svg";
 import React from "react";
 
 export const MinistereLogo = () => (

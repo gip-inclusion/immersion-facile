@@ -2,9 +2,9 @@ import { Observable } from "rxjs";
 import {
   AgencyId,
   AgencyInListDto,
+  AgencyPublicDisplayDto,
   CreateAgencyConfig,
   WithAgencyId,
-  AgencyPublicDisplayDto,
 } from "src/shared/agency/agency.dto";
 import { LatLonDto } from "src/shared/latLon";
 

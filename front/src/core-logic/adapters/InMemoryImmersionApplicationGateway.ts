@@ -1,6 +1,7 @@
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { AgencyId, AgencyInListDto } from "src/shared/agency/agency.dto";
+import { signApplicationDtoWithRole } from "src/shared/ImmersionApplication/immersionApplication";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -8,11 +9,10 @@ import {
   UpdateImmersionApplicationStatusRequestDto,
   WithImmersionApplicationId,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
-import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
-import { signApplicationDtoWithRole } from "src/shared/ImmersionApplication/immersionApplication";
 
 const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
   {
@@ -117,7 +117,7 @@ export class InMemoryImmersionApplicationGateway
   }
 
   public async updateStatus(
-    { status, justification }: UpdateImmersionApplicationStatusRequestDto,
+    { status, justification: _ }: UpdateImmersionApplicationStatusRequestDto,
     jwt: string,
   ): Promise<WithImmersionApplicationId> {
     const payload = decodeJwt<MagicLinkPayload>(jwt);
@@ -143,7 +143,7 @@ export class InMemoryImmersionApplicationGateway
   public async validate(id: ImmersionApplicationId): Promise<string> {
     console.log("InMemoryImmersionApplicationGateway.validate: ", id);
     await sleep(SIMULATED_LATENCY_MS);
-    let form = { ...this._immersionApplications[id] };
+    const form = { ...this._immersionApplications[id] };
     if (form.status === "IN_REVIEW") {
       form.status = "VALIDATED";
       this._immersionApplications[id] = form;
@@ -154,8 +154,8 @@ export class InMemoryImmersionApplicationGateway
   }
 
   public async generateMagicLink(
-    applicationId: ImmersionApplicationId,
-    role: Role,
+    _applicationId: ImmersionApplicationId,
+    _role: Role,
   ): Promise<string> {
     // TODO: generate actual JWTs here
     throw new Error("500 Not Implemented In InMemory Gateway");
@@ -163,8 +163,8 @@ export class InMemoryImmersionApplicationGateway
   }
 
   public async renewMagicLink(
-    expiredJwt: string,
-    linkFormat: string,
+    _expiredJwt: string,
+    _linkFormat: string,
   ): Promise<void> {
     // This is supposed to ask the backend to send a new email to the owner of the expired magic link.
     // Since this operation makes no sense for local development, the implementation here is left empty.

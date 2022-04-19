@@ -1,5 +1,5 @@
+import { FieldHookConfig } from "formik";
 import React from "react";
-import { useField, FieldHookConfig } from "formik";
 
 type BoolRadioPickerProps = {
   label: string;
@@ -11,8 +11,6 @@ type BoolRadioPickerProps = {
   disabled?: boolean;
 } & FieldHookConfig<boolean>;
 export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
-  const [field] = useField(props);
-
   const setFieldAsTrue = () => !props.disabled && props.setFieldValue(true);
   const setFieldAsFalse = () => !props.disabled && props.setFieldValue(false);
 

@@ -1,8 +1,8 @@
 import React from "react";
-import { Accordion } from "./Accordion";
-import { TextCell } from "./TextCell";
-import { FormAccordionProps as FormAccordeonProps } from "./FormAccordion";
 import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+import { Accordion } from "./Accordion";
+import { FormAccordionProps as FormAccordeonProps } from "./FormAccordion";
+import { TextCell } from "./TextCell";
 
 type FieldForFormDetails = {
   title: string;
@@ -46,20 +46,16 @@ const allFields = [
 
 export const FormDetails = ({ immersionApplication }: FormAccordeonProps) => (
   <div className="static-application-container">
-    {allFields.map(({ listTitle, fields }, index) => {
-      return (
-        <Accordion title={listTitle} key={listTitle}>
-          {fields.map(({ title, key }) => {
-            return (
-              <TextCell
-                title={title}
-                contents={JSON.stringify(immersionApplication[key])}
-                key={key}
-              />
-            );
-          })}
-        </Accordion>
-      );
-    })}
+    {allFields.map(({ listTitle, fields }) => (
+      <Accordion title={listTitle} key={listTitle}>
+        {fields.map(({ title, key }) => (
+          <TextCell
+            title={title}
+            contents={JSON.stringify(immersionApplication[key])}
+            key={key}
+          />
+        ))}
+      </Accordion>
+    ))}
   </div>
 );

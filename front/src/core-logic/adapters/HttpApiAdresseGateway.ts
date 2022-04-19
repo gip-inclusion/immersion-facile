@@ -1,10 +1,10 @@
 import axios from "axios";
-import { LatLonDto } from "src/shared/latLon";
 
 import {
   AddressWithCoordinates,
   ApiAdresseGateway,
-} from "../ports/ApiAdresseGateway";
+} from "src/core-logic/ports/ApiAdresseGateway";
+import { LatLonDto } from "src/shared/latLon";
 
 type ValidFeature = {
   properties: {

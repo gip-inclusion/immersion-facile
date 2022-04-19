@@ -1,20 +1,20 @@
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
-import { ApplicationFormFields } from "./ApplicationFormFields";
-import { immersionApplicationGateway } from "src/app/config/dependencies";
-import { routes } from "src/app/routing/routes";
-import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
-import { Route } from "type-route";
-import { ApiDataContainer } from "../admin/ApiDataContainer";
 import {
   SubmitFeedback,
   SuccessFeedbackKind,
 } from "src/app/components/SubmitFeedback";
+import { immersionApplicationGateway } from "src/app/config/dependencies";
+import { ApiDataContainer } from "src/app/pages/admin/ApiDataContainer";
+import { routes } from "src/app/routing/routes";
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
+import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "src/shared/ImmersionApplication/immersionApplication.schema";
+import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
+import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
+import { Route } from "type-route";
+import { ApplicationFormFields } from "./ApplicationFormFields";
 
 type SignFormRoute = Route<typeof routes.immersionApplicationsToSign>;
 

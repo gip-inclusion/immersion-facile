@@ -1,8 +1,8 @@
+import { FieldHookConfig, useField } from "formik";
 import React from "react";
-import { useField, FieldHookConfig } from "formik";
-import { HourPicker } from "./HourPicker";
-import { DayPicker } from "./DayPicker";
 import { ScheduleDto } from "src/shared/ScheduleSchema";
+import { DayPicker } from "./DayPicker";
+import { HourPicker } from "./HourPicker";
 
 type ComplexSchedulePickerProps = {
   selectedIndex: number;
@@ -18,7 +18,7 @@ export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
         complexSchedule={field.value.complexSchedule}
         selectedIndex={field.value.selectedIndex}
         onChange={(lastClickedIndex) => {
-          let schedule = field.value;
+          const schedule = field.value;
           schedule.selectedIndex = lastClickedIndex;
           props.setFieldValue(schedule);
         }}
@@ -28,7 +28,7 @@ export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
         name={props.name}
         schedule={field.value.complexSchedule[field.value.selectedIndex]}
         onValueChange={(newHours) => {
-          let schedule = field.value;
+          const schedule = field.value;
           schedule.complexSchedule[schedule.selectedIndex] = newHours;
           props.setFieldValue(schedule);
         }}

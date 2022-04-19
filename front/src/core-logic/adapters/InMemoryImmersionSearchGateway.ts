@@ -1,10 +1,10 @@
 import { filter as ramdaFilter } from "ramda";
 import { BehaviorSubject, delay, map, Observable, Subject } from "rxjs";
+import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { ContactEstablishmentRequestDto } from "src/shared/contactEstablishment";
 import { SearchImmersionRequestDto } from "src/shared/searchImmersion/SearchImmersionRequest.dto";
 import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 import { sleep } from "src/shared/utils";
-import { ImmersionSearchGateway } from "../ports/ImmersionSearchGateway";
 
 export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
   private readonly _results$: Subject<SearchImmersionResultDto[]>;
@@ -31,7 +31,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
   }
 
   public async contactEstablishment(
-    params: ContactEstablishmentRequestDto,
+    _params: ContactEstablishmentRequestDto,
   ): Promise<void> {
     await sleep(this.simulatedLatency);
     if (this._error) throw this._error;

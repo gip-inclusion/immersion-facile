@@ -1,9 +1,9 @@
 import { useField } from "formik";
 import React from "react";
-import { FormEstablishmentAppellation } from "./FormEstablishmentAppellation";
-import { ButtonAdd } from "src/uiComponents/ButtonAdd";
 import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { removeAtIndex } from "src/shared/utils";
+import { ButtonAdd } from "src/uiComponents/ButtonAdd";
+import { FormEstablishmentAppellation } from "./FormEstablishmentAppellation";
 
 type AppellationListProps = {
   name: string;
@@ -26,10 +26,9 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
     >
       <div className="w-full">
         {title && <h5 className="text-lg font-semibold mt-6">{title}</h5>}
-        {professions.map(({ appellationLabel }, index) => (
+        {professions.map((_, index) => (
           <FormEstablishmentAppellation
             name={`${name}[${index}]`}
-            label={appellationLabel}
             onDelete={() => onDelete(index)}
             key={index}
           />

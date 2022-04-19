@@ -1,29 +1,29 @@
 import { Form, Formik, FormikHelpers } from "formik";
 import { keys } from "ramda";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { RadioGroup } from "src/app/components/RadioGroup";
 import {
   SubmitFeedback,
   SuccessFeedbackKind,
 } from "src/app/components/SubmitFeedback";
 import { agencyGateway } from "src/app/config/dependencies";
-import { RadioGroup } from "src/app/components/RadioGroup";
+import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
+import {
+  AgencyKind,
+  agencyKindList,
+  CreateAgencyConfig,
+} from "src/shared/agency/agency.dto";
+import { agencyConfigSchema } from "src/shared/agency/agency.schema";
+import { zEmail } from "src/shared/zodUtils";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button } from "src/uiComponents/Button";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { Title } from "src/uiComponents/Title";
-import {
-  AgencyKind,
-  agencyKindList,
-  CreateAgencyConfig,
-} from "src/shared/agency/agency.dto";
-import { zEmail } from "src/shared/zodUtils";
 import { v4 as uuidV4 } from "uuid";
-import { agencyConfigSchema } from "src/shared/agency/agency.schema";
 
 const initialValues: CreateAgencyConfig = {
   id: uuidV4(),
