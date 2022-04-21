@@ -54,11 +54,11 @@ type RomeAutocompleteAction = ActionOfSlice<typeof romeAutocompleteSlice>;
 export const romeAutocompleteEpic: AppEpic<RomeAutocompleteAction> = (
   action$,
   _state$,
-  { romeAutocompleteGateway },
+  { romeAutocompleteGateway, scheduler },
 ) =>
   action$.pipe(
     filter(romeAutocompleteSlice.actions.setRomeSearchText.match),
-    debounceTime(400),
+    debounceTime(400, scheduler),
     distinctUntilChanged(),
     switchMap((action) =>
       of(romeAutocompleteSlice.actions.searchStarted()).pipe(

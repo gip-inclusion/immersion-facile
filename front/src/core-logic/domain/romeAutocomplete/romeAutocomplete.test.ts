@@ -44,14 +44,15 @@ describe("rome Autocomplete", () => {
   });
 
   // eslint-disable-next-line jest/no-disabled-tests
-  it.skip("triggers rome search when search text changes", () => {
+  it("triggers rome search when search text changes", () => {
     const searchedText = "bou";
     store.dispatch(
       romeAutocompleteSlice.actions.setRomeSearchText(searchedText),
     );
     expectIsSearchingToBe(false);
 
-    // need to go forward by 400 ms, not sure how to test this...
+    // execute all time related work (for exemple in this case: debounceTime)
+    dependencies.scheduler.flush();
 
     expectIsSearchingToBe(true);
 
