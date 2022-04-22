@@ -377,13 +377,6 @@ export class PgEstablishmentAggregateRepository
     const pgResult = await this.client.query(query, [siret]);
     return pgResult.rows[0]?.data_source;
   }
-  public async removeEstablishmentAndOffersWithSiret(
-    siret: string,
-  ): Promise<void> {
-    const query = `
-      DELETE FROM establishments WHERE siret = $1;`;
-    await this.client.query(query, [siret]);
-  }
 
   public async getSiretOfEstablishmentsFromFormSource(): Promise<string[]> {
     const query = `

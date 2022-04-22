@@ -1,13 +1,15 @@
 import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormEstablishment.schema";
+import { LatLonDto } from "../../../shared/latLon";
 import { NafDto } from "../../../shared/naf";
+import { SiretDto } from "../../../shared/siret";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
+import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
 import { SequenceRunner } from "../../core/ports/SequenceRunner";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { RomeRepository } from "../../rome/ports/RomeRepository";
 import {
   SireneEstablishmentVO,
   SireneRepository,
@@ -24,6 +26,11 @@ import { AdresseAPI } from "../ports/AdresseAPI";
 
 const offerFromFormScore = 10; // 10/10 if voluntaryToImmersion=true (consider removing this field)
 
+export type NewImmersionOfferFromFormCreatedPayload = {
+  siret: SiretDto;
+  position: LatLonDto;
+  createdAt: Date;
+};
 export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
   void
@@ -32,7 +39,6 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private readonly sireneRepository: SireneRepository,
     private readonly adresseAPI: AdresseAPI,
-    private readonly romeRepository: RomeRepository,
     private readonly sequenceRunner: SequenceRunner,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
@@ -46,34 +52,39 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     formEstablishment: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const establishmentSiret = formEstablishment.siret;
-
     await uow.establishmentAggregateRepo.removeEstablishmentAndOffersAndContactWithSiret(
-      establishmentSiret,
+      formEstablishment.siret,
     );
 
-    const establishmentDataSource = (
-      await uow.establishmentAggregateRepo.getEstablishmentForSiret(
-        establishmentSiret,
-      )
-    )?.dataSource;
+    const establishmentAggregate =
+      await this.formEstablishmentToEstablishmentAggregate(formEstablishment);
 
-    if (establishmentDataSource === "form") {
-      throw new Error(
-        `Cannot insert establishment from form with siret ${establishmentSiret} since it already exists.`,
-      );
-    }
+    if (!establishmentAggregate) return;
 
+    await uow.establishmentAggregateRepo
+      .insertEstablishmentAggregates([establishmentAggregate])
+      .catch((err: any) => {
+        notifyAndThrowErrorDiscord(
+          new Error(
+            `Error when adding establishment aggregate with siret ${formEstablishment.siret} due to ${err}`,
+          ),
+        );
+      });
+  }
+
+  private async formEstablishmentToEstablishmentAggregate(
+    formEstablishment: FormEstablishmentDto,
+  ): Promise<EstablishmentAggregate | undefined> {
     const position = await this.adresseAPI.getPositionFromAddress(
       formEstablishment.businessAddress,
     );
     const sireneRepoAnswer = await this.sireneRepository.get(
-      establishmentSiret,
+      formEstablishment.siret,
     );
     if (!sireneRepoAnswer) {
       await notifyAndThrowErrorDiscord(
         new Error(
-          `Could not get siret ${establishmentSiret} from siren gateway`,
+          `Could not get siret ${formEstablishment.siret} from siren gateway`,
         ),
       );
       return;
@@ -85,7 +96,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     if (!nafDto || !position || numberEmployeesRange === undefined) {
       notifyAndThrowErrorDiscord(
         new Error(
-          `Some field from siren gateway are missing for establishment with siret ${establishmentSiret}`,
+          `Some field from siren gateway are missing for establishment with siret ${formEstablishment.siret}`,
         ),
       );
       return;
@@ -112,7 +123,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     ).filter((offer): offer is ImmersionOfferEntityV2 => !!offer);
 
     const establishment: EstablishmentEntityV2 = {
-      siret: establishmentSiret,
+      siret: formEstablishment.siret,
       name: formEstablishment.businessName,
       customizedName: formEstablishment.businessNameCustomized,
       isCommited: formEstablishment.isEngagedEnterprise,
@@ -133,15 +144,7 @@ export class UpsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       contact,
       immersionOffers,
     };
-    await uow.establishmentAggregateRepo
-      .insertEstablishmentAggregates([establishmentAggregate])
-      .catch((err: any) => {
-        notifyAndThrowErrorDiscord(
-          new Error(
-            `Error when adding establishment aggregate with siret ${establishmentSiret} due to ${err}`,
-          ),
-        );
-      });
+    return establishmentAggregate;
   }
 }
 

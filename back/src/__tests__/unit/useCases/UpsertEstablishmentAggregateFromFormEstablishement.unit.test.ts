@@ -3,7 +3,6 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
@@ -71,7 +70,6 @@ describe("Upsert Establishment aggregate from form data", () => {
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     addresseAPI = new InMemoryAdresseAPI(fakePosition);
     uuidGenerator = new TestUuidGenerator();
-    const inMemoryRomeRepository = new InMemoryRomeRepository();
     const sequencerRunner = new TestSequenceRunner();
 
     const uowPerformer = new InMemoryUowPerformer({
@@ -83,7 +81,6 @@ describe("Upsert Establishment aggregate from form data", () => {
       uowPerformer,
       sireneRepo,
       addresseAPI,
-      inMemoryRomeRepository,
       sequencerRunner,
       uuidGenerator,
       new CustomClock(),

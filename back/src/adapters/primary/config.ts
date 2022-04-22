@@ -550,7 +550,6 @@ const createUseCases = (
         uowPerformer,
         repositories.sirene,
         adresseAPI,
-        repositories.rome,
         sequenceRunner,
         uuidGenerator,
         clock,

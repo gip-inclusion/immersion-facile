@@ -1067,7 +1067,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       ]);
 
       // Act
-      await pgEstablishmentAggregateRepository.removeEstablishmentAndOffersWithSiret(
+      await pgEstablishmentAggregateRepository.removeEstablishmentAndOffersAndContactWithSiret(
         siretToRemove,
       );
       // Assert
