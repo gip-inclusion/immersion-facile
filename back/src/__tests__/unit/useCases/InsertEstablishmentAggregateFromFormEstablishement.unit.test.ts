@@ -1,10 +1,12 @@
 import { createInMemoryUow } from "../../../adapters/primary/config";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import {
@@ -46,6 +48,7 @@ const prepareSireneRepo = (
 describe("Insert Establishment aggregate from form data", () => {
   let sireneRepo: InMemorySireneRepository;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
+  let outboxRepo: InMemoryOutboxRepository;
   let addresseAPI: InMemoryAdresseAPI;
   let useCase: InsertEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
@@ -53,12 +56,15 @@ describe("Insert Establishment aggregate from form data", () => {
   beforeEach(() => {
     sireneRepo = new InMemorySireneRepository();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
+    outboxRepo = new InMemoryOutboxRepository();
+
     addresseAPI = new InMemoryAdresseAPI(fakePosition);
     uuidGenerator = new TestUuidGenerator();
 
     const uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
       establishmentAggregateRepo,
+      outboxRepo,
     });
     const clock = new CustomClock();
 
@@ -68,6 +74,7 @@ describe("Insert Establishment aggregate from form data", () => {
       addresseAPI,
       uuidGenerator,
       clock,
+      makeCreateNewEvent({ clock, uuidGenerator }),
     );
   });
 
@@ -234,5 +241,21 @@ describe("Insert Establishment aggregate from form data", () => {
     expect(
       establishmentAggregateRepo.establishmentAggregates[0].contact?.email,
     ).toBe("new.contact@gmail.com");
+  });
+
+  it("Publishes an event with the new establishment aggregate as payload", async () => {
+    const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withSiret(fakeSiret)
+      .build();
+
+    prepareSireneRepo(sireneRepo, fakeSiret, "00");
+
+    await useCase.execute(formEstablishment);
+
+    const establishmentAggregate =
+      establishmentAggregateRepo.establishmentAggregates[0];
+    expect(establishmentAggregate).toBeDefined();
+    expect(outboxRepo.events).toHaveLength(1);
+    expect(outboxRepo.events[0].payload).toEqual(establishmentAggregate);
   });
 });

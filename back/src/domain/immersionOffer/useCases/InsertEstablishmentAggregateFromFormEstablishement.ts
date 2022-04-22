@@ -2,6 +2,7 @@ import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEsta
 import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormEstablishment.schema";
 import { makeFormEstablishmentToEstablishmentAggregate } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
+import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -19,6 +20,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     private readonly adresseAPI: AdresseAPI,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
+    private readonly createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
@@ -53,5 +55,11 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
           ),
         );
       });
+
+    const event = this.createNewEvent({
+      topic: "NewEstablishmentAggregateInsertedFromForm",
+      payload: establishmentAggregate,
+    });
+    await uow.outboxRepo.save(event);
   }
 }

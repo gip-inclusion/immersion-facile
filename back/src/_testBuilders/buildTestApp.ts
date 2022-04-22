@@ -28,6 +28,7 @@ import {
   GenerateMagicLinkJwt,
 } from "../domain/auth/jwt";
 import { InMemoryOutboxQueries } from "../adapters/secondary/core/InMemoryOutboxQueries";
+import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
 
 export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
@@ -43,6 +44,7 @@ export type InMemoryRepositories = {
   sirene: InMemorySireneRepository;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;
+  passEmploiGateway: InMemoryPassEmploiGateway;
   immersionApplicationExport: ImmersionApplicationExportQueries;
   establishmentExport: EstablishmentExportQueries;
   postalCodeDepartmentRegion: PostalCodeDepartmentRegionQueries;
@@ -86,6 +88,7 @@ export const buildTestApp = async (
     DOMAIN: "my-domain",
     REPOSITORIES: "IN_MEMORY",
     LA_BONNE_BOITE_GATEWAY: "IN_MEMORY",
+    PASS_EMPLOI_GATEWAY: "IN_MEMORY",
     EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
     ...appConfigOverrides?.configParams,
   }).build();

@@ -56,6 +56,9 @@ const getUseCasesByTopics = (
   ],
   FormEstablishmentEdited: [useCases.updateEstablishmentAggregateFromForm],
   FormEstablishmentEditLinkSent: [],
+  NewEstablishmentAggregateInsertedFromForm: [
+    useCases.notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm,
+  ],
 
   // Search related
   ContactRequestedByBeneficiary: [useCases.notifyContactRequest],

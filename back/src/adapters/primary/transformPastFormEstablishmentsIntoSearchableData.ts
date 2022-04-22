@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { FormEstablishmentDto } from "../../shared/formEstablishment/FormEstablishment.dto";
 
@@ -70,13 +71,14 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   );
   const testPool = getTestPgPool();
   const pgUowPerformer = new PgUowPerformer(testPool, createPgUow);
-
+  const uuidGenerator = new UuidV4Generator();
   const upsertAggregateFromForm = new InsertEstablishmentAggregateFromForm(
     pgUowPerformer,
     sireneRepository,
     adresseAPI,
     new UuidV4Generator(),
-    new RealClock(),
+    clock,
+    makeCreateNewEvent({ clock, uuidGenerator }),
   );
   const missingFormEstablishmentRows = (
     await clientOrigin.query(

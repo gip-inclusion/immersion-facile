@@ -9,7 +9,7 @@ export type DataSource =
   | "api_laplateformedelinclusion"
   | "form";
 type ApiSource = "api_labonneboite" | "api_laplateformedelinclusion";
-type SourceProvider = FormEstablishmentSource | ApiSource;
+export type SourceProvider = FormEstablishmentSource | ApiSource;
 
 // prettier-ignore
 export type NumberEmployeesRange = ""| "0"| "1-2"| "3-5"| "6-9"| "10-19"| "20-49"| "50-99"| "100-199"| "200-249"| "250-499"| "500-999"| "1000-1999"| "2000-4999"| "5000-9999"| "+10000";

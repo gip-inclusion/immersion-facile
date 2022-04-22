@@ -1,8 +1,9 @@
 import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
+import { RomeCode } from "../../../shared/rome";
 
 export type ImmersionOfferEntityV2 = {
   id: ImmersionOfferId;
-  romeCode: string;
+  romeCode: RomeCode;
   score: number;
   appellationCode?: string; // TODO : make it mandatory
 };

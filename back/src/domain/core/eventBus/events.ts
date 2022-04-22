@@ -9,6 +9,7 @@ import type { DateStr } from "../ports/Clock";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { AgencyConfig } from "../../../shared/agency/agency.dto";
 import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
+import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
 
@@ -63,6 +64,8 @@ export type DomainEvent =
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentRequestDto>
   // prettier-ignore
   | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload>
+  // prettier-ignore
+  | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", EstablishmentAggregate>
 
   // AGENCY RELATED
   | GenericEvent<"NewAgencyAdded", AgencyConfig>;

@@ -89,6 +89,22 @@ export class AppConfig {
     });
   }
 
+  public get passEmploiGateway() {
+    return throwIfNotInArray({
+      processEnv: this.env,
+      variableName: "PASS_EMPLOI_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+    });
+  }
+
+  public get passEmploiUrl() {
+    return this.throwIfNotDefined("PASS_EMPLOI_URL");
+  }
+
+  public get passEmploiKey() {
+    return this.throwIfNotDefined("PASS_EMPLOI_KEY");
+  }
+
   public get sireneHttpsConfig(): AxiosConfig {
     return {
       endpoint: this.throwIfNotDefined("SIRENE_ENDPOINT"),

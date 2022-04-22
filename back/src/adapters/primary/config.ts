@@ -58,6 +58,7 @@ import { GetImmersionOfferBySiretAndRome } from "../../domain/immersionOffer/use
 import { InsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
+import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domain/immersionOffer/useCases/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
@@ -92,9 +93,11 @@ import { HttpPeConnectGateway } from "../secondary/HttpPeConnectGateway";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
+import { HttpPassEmploiGateway } from "../secondary/immersionOffer/HttpPassEmploiGateway";
 import { InMemoryEstablishmentAggregateRepository } from "../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteAPI } from "../secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteRequestRepository } from "../secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
+import { InMemoryPassEmploiGateway } from "../secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { InMemorySearchMadeRepository } from "../secondary/immersionOffer/InMemorySearchMadeRepository";
 import { PoleEmploiAccessTokenGateway } from "../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { InMemoryAgencyRepository } from "../secondary/InMemoryAgencyRepository";
@@ -338,6 +341,10 @@ export const createRepositories = async (
             noRetries,
           )
         : new InMemoryLaBonneBoiteAPI(),
+    passEmploiGateway:
+      config.passEmploiGateway === "HTTPS"
+        ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)
+        : new InMemoryPassEmploiGateway(),
 
     peConnectGateway:
       config.peConnectGateway === "HTTPS"
@@ -583,6 +590,7 @@ const createUseCases = (
         adresseAPI,
         uuidGenerator,
         clock,
+        createNewEvent,
       ),
     contactEstablishment: new ContactEstablishment(
       uowPerformer,
@@ -604,6 +612,11 @@ const createUseCases = (
       makeGenerateEditFormEstablishmentUrl(config),
       createNewEvent,
     ),
+
+    notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:
+      new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
+        repositories.passEmploiGateway,
+      ),
 
     // siret
     getSiret,
