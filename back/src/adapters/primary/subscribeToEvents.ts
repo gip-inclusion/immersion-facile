@@ -50,10 +50,10 @@ const getUseCasesByTopics = (
 
   // Establishment form related
   FormEstablishmentAdded: [
-    useCases.upsertEstablishmentAggregateFromForm,
+    useCases.insertEstablishmentAggregateFromForm,
     useCases.notifyConfirmationEstablishmentCreated,
   ],
-  FormEstablishmentEdited: [useCases.upsertEstablishmentAggregateFromForm],
+  FormEstablishmentEdited: [useCases.updateEstablishmentAggregateFromForm],
   FormEstablishmentEditLinkSent: [],
 
   // Search related

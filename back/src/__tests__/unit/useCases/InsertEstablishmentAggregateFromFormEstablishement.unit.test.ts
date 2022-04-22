@@ -7,9 +7,11 @@ import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySi
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { UpsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpsertEstablishmentAggregateFromFormEstablishement";
-import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
-import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
+import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
+import {
+  SireneEstablishmentProps,
+  SireneEstablishmentVO,
+} from "../../../domain/sirene/ports/SireneRepository";
 import { LatLonDto } from "../../../shared/latLon";
 import { NafDto } from "../../../shared/naf";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
@@ -26,43 +28,32 @@ class TestSequenceRunner implements SequenceRunner {
 }
 const fakeSiret = "90040893100013";
 const fakePosition: LatLonDto = { lat: 49.119146, lon: 6.17602 };
-const fakeActivitePrincipaleUniteLegale = "85.59A";
 const fakeBusinessContact = new ContactEntityV2Builder().build();
 
 const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
 
-const getEstablishmentFromSireneApi = (
-  formEstablishment: FormEstablishmentDto,
-): SireneEstablishmentVO =>
-  new SireneEstablishmentVO({
-    siret: formEstablishment.siret,
+const prepareSireneRepo = (
+  sireneRepo: InMemorySireneRepository,
+  siret: string,
+  trancheEffectifsUniteLegale?: string,
+) => {
+  const sireneEstablishmentFromAPI = new SireneEstablishmentVO({
+    siret,
     uniteLegale: {
-      denominationUniteLegale: formEstablishment.businessName,
-      activitePrincipaleUniteLegale: fakeActivitePrincipaleUniteLegale,
-      trancheEffectifsUniteLegale: "01",
+      activitePrincipaleUniteLegale: "85.59A",
+      trancheEffectifsUniteLegale: trancheEffectifsUniteLegale ?? "01",
       nomenclatureActivitePrincipaleUniteLegale: "nomencl",
     },
-    adresseEtablissement: {
-      numeroVoieEtablissement: formEstablishment.businessAddress,
-      typeVoieEtablissement: formEstablishment.businessAddress,
-      libelleVoieEtablissement: formEstablishment.businessAddress,
-      codePostalEtablissement: formEstablishment.businessAddress,
-      libelleCommuneEtablissement: formEstablishment.businessAddress,
-    },
-    periodesEtablissement: [
-      {
-        dateFin: null,
-        dateDebut: "2022-01-01",
-        etatAdministratifEtablissement: "A",
-      },
-    ],
-  });
+  } as SireneEstablishmentProps);
 
-describe("Upsert Establishment aggregate from form data", () => {
+  sireneRepo.setEstablishment(sireneEstablishmentFromAPI);
+};
+
+describe("Insert Establishment aggregate from form data", () => {
   let sireneRepo: InMemorySireneRepository;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let addresseAPI: InMemoryAdresseAPI;
-  let useCase: UpsertEstablishmentAggregateFromForm;
+  let useCase: InsertEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
@@ -76,18 +67,19 @@ describe("Upsert Establishment aggregate from form data", () => {
       ...createInMemoryUow(),
       establishmentAggregateRepo,
     });
+    const clock = new CustomClock();
 
-    useCase = new UpsertEstablishmentAggregateFromForm(
+    useCase = new InsertEstablishmentAggregateFromForm(
       uowPerformer,
       sireneRepo,
       addresseAPI,
       sequencerRunner,
       uuidGenerator,
-      new CustomClock(),
+      clock,
     );
   });
 
-  it("converts Form Establishment in search format", async () => {
+  it("Converts Form Establishment in search format", async () => {
     // Prepare
     const professions: AppellationDto[] = [
       {
@@ -109,9 +101,7 @@ describe("Upsert Establishment aggregate from form data", () => {
       .withBusinessContact(fakeBusinessContact)
       .build();
 
-    const establishmentFromApi =
-      getEstablishmentFromSireneApi(formEstablishment);
-    sireneRepo.setEstablishment(establishmentFromApi);
+    prepareSireneRepo(sireneRepo, fakeSiret);
 
     // Act
     await useCase.execute(formEstablishment);
@@ -164,20 +154,12 @@ describe("Upsert Establishment aggregate from form data", () => {
     );
   };
 
-  it("correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {
-    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
-    const establishmentFromApi =
-      getEstablishmentFromSireneApi(formEstablishment);
+  it("Correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {
+    const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withSiret(fakeSiret)
+      .build();
 
-    sireneRepo.setEstablishment(
-      new SireneEstablishmentVO({
-        ...establishmentFromApi.props,
-        uniteLegale: {
-          ...establishmentFromApi.uniteLegale,
-          trancheEffectifsUniteLegale: "00",
-        },
-      }),
-    );
+    prepareSireneRepo(sireneRepo, fakeSiret, "00");
 
     await useCase.execute(formEstablishment);
 
@@ -226,9 +208,7 @@ describe("Upsert Establishment aggregate from form data", () => {
       )
       .build();
 
-    const establishmentFromApi =
-      getEstablishmentFromSireneApi(formEstablishment);
-    sireneRepo.setEstablishment(establishmentFromApi);
+    prepareSireneRepo(sireneRepo, siret);
 
     // Act : execute use-case with same siret
     await useCase.execute(formEstablishment);

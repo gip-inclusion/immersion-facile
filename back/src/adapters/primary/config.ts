@@ -47,7 +47,6 @@ import { GetImmersionOfferById } from "../../domain/immersionOffer/useCases/GetI
 import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
-import { UpsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpsertEstablishmentAggregateFromFormEstablishement";
 import { RomeRepository } from "../../domain/rome/ports/RomeRepository";
 import { AppellationSearch } from "../../domain/rome/useCases/AppellationSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
@@ -128,6 +127,8 @@ import { HttpPeConnectGateway } from "../secondary/HttpPeConnectGateway";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { ExportEstablishmentsAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import { NotifyToAgencyApplicationSubmitted } from "../../domain/immersionApplication/useCases/notifications/NotifyToAgencyApplicationSubmitted";
+import { UpdateEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
+import { InsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 
 const logger = createLogger(__filename);
 
@@ -545,8 +546,8 @@ const createUseCases = (
     ),
     retrieveFormEstablishmentFromAggregates:
       new RetrieveFormEstablishmentFromAggregates(uowPerformer),
-    upsertEstablishmentAggregateFromForm:
-      new UpsertEstablishmentAggregateFromForm(
+    updateEstablishmentAggregateFromForm:
+      new UpdateEstablishmentAggregateFromForm(
         uowPerformer,
         repositories.sirene,
         adresseAPI,
@@ -554,7 +555,15 @@ const createUseCases = (
         uuidGenerator,
         clock,
       ),
-
+    insertEstablishmentAggregateFromForm:
+      new InsertEstablishmentAggregateFromForm(
+        uowPerformer,
+        repositories.sirene,
+        adresseAPI,
+        sequenceRunner,
+        uuidGenerator,
+        clock,
+      ),
     contactEstablishment: new ContactEstablishment(
       uowPerformer,
       createNewEvent,

@@ -10,7 +10,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { SireneRepository } from "../../sirene/ports/SireneRepository";
 import { AdresseAPI } from "../ports/AdresseAPI";
 
-export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
+export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
   void
 > {
@@ -31,18 +31,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     formEstablishment: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const establishmentAlreadyExists =
-      (
-        await uow.establishmentAggregateRepo.getEstablishmentForSiret(
-          formEstablishment.siret,
-        )
-      )?.dataSource === "form";
-    if (!establishmentAlreadyExists)
-      throw new Error(
-        "Cannot update establishment from form that does not exist.",
-      );
-
-    // TODO : We should not remove the aggregate but rather update it !
+    // Remove existing aggregate that could have been inserted by another process (eg. La Bonne Boite)
     await uow.establishmentAggregateRepo.removeEstablishmentAndOffersAndContactWithSiret(
       formEstablishment.siret,
     );
