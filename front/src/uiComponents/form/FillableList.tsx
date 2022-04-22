@@ -94,27 +94,43 @@ const AddToList = ({
   };
 
   return (
-    <div className="flex items-center w-full">
-      <ImmersionTextField
-        type="text"
-        description={description}
-        className="w-[620px]"
-        label={label}
-        placeholder={placeholder}
-        name={name}
-        value={inputValue}
-        error={error ?? undefined}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyPress={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            onAddClick();
-          }
-        }}
-      />
-      <Button type="button" className="h-10" onSubmit={onAddClick}>
-        Ajouter
-      </Button>
+    <div>
+      <div className={`fr-input-group${error ? " fr-input-group--error" : ""}`}>
+        <label className="fr-label" htmlFor={name}>
+          {label}
+        </label>
+        {description && (
+          <span className="fr-hint-text" id="select-hint-desc-hint">
+            {description}
+          </span>
+        )}
+        <div className="flex items-center justify-center w-full">
+          <input
+            id={name}
+            value={inputValue}
+            type="text"
+            name={name}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                onAddClick();
+              }
+            }}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`fr-input${error ? " fr-input--error" : ""}`}
+            placeholder={placeholder || ""}
+            aria-describedby="text-input-error-desc-error"
+          />
+          <Button type="button" className="h-10" onSubmit={onAddClick}>
+            Ajouter
+          </Button>
+        </div>
+        {error && (
+          <p id="text-input-email-error-desc-error" className="fr-error-text">
+            {error}
+          </p>
+        )}
+      </div>
     </div>
   );
 };
@@ -125,7 +141,7 @@ type ListOfChipProps = {
 };
 
 const ListOfChip = ({ values, onDelete }: ListOfChipProps) => (
-  <div className="pb-4">
+  <div className="pt-2">
     {values.map((value) => (
       <span key={value} className="px-1">
         <Chip

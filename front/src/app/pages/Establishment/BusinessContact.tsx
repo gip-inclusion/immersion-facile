@@ -51,12 +51,6 @@ export const BusinessContact = () => {
         name={makeName("phone")}
       />
       <TextInput label="Email *" name={makeName("email")} />
-      <RadioGroupForField
-        name={makeName("contactMethod")}
-        label="Comment souhaitez-vous que les candidats vous contactent ?"
-        options={preferredContactMethodOptions}
-      />
-
       <FillableList
         name={makeName("copyEmails")}
         label="Autres destinataires"
@@ -67,6 +61,11 @@ export const BusinessContact = () => {
           setFieldValue(makeName("copyEmails"), newValues);
         }}
         validationSchema={zEmail}
+      />
+      <RadioGroupForField
+        name={makeName("contactMethod")}
+        label="Comment souhaitez-vous que les candidats vous contactent ? *"
+        options={preferredContactMethodOptions}
       />
     </div>
   );
