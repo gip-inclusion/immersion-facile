@@ -45,7 +45,6 @@ describe("List Immersion Applications", () => {
   });
 
   describe("filters", () => {
-    // eslint-disable-next-line jest/require-hook
     let applicationCount = 0;
 
     // Populate the DB with 1 record of with all possible statuses and a set of agency ids.

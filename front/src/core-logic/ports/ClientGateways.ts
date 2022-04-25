@@ -5,10 +5,7 @@ import { EventGateway } from "./EventGateway";
 export interface ClientGateways {
   establishments: EstablishmentGateway;
   establishmentsUi: EstablishmentUiGateway;
-  event:EventGateway
+  event: EventGateway;
 }
 
-
-export interface ClientTestGateways extends ClientGateways {
-
-}
+export type ClientTestGateways = ClientGateways;

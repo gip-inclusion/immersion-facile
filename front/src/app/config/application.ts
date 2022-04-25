@@ -6,17 +6,15 @@ import { ReactEstablishmentUiGateway } from "src/infra/gateway/EstablishmentUiGa
 import { InMemoryEventGateway } from "src/infra/gateway/EventGateway/InMemoryEventGateway";
 import { establishmentGateway } from "./dependencies";
 const primaryController = new ApplicationPrimaryController();
-const gateways:ClientGateways = {
+const gateways: ClientGateways = {
   establishments: establishmentGateway,
   establishmentsUi: new ReactEstablishmentUiGateway(),
-  event: new InMemoryEventGateway(primaryController)
-}
-const repositories:ClientRepositories = {
-
-}
+  event: new InMemoryEventGateway(primaryController),
+};
+const repositories: ClientRepositories = {};
 
 export const clientApplication = new ClientApplication({
   primaryController,
   gateways,
-  repositories
-})
+  repositories,
+});

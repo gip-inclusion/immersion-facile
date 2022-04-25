@@ -38,41 +38,42 @@ type HomeButtonProps = {
   onClick?: () => void | Promise<void>;
   children: ReactNode;
   className?: string;
-  type?:"primary"|"secondary"
+  type?: "primary" | "secondary";
 };
 export const HomeButton = ({
   onClick,
   disable,
   children,
   className,
-  type = "primary"
-}: HomeButtonProps) => {
-  return (
-    <button
-      className={className ? className : `rounded-md w-full h-15 py-3 px-2 no-underline ${type === "primary"?"bg-immersionBlue text-white shadow-none":"bg-white text-immersionBlue border-2 border-blue-200"} font-semibold text-center text-sm`} 
-      style={type === "secondary"? {border: '2px solid'} :{} }
-      onClick={onClick}
-      disabled={disable}
-    >
-      {children}
-    </button>
-  );
-};
-
+  type = "primary",
+}: HomeButtonProps) => (
+  <button
+    className={
+      className
+        ? className
+        : `rounded-md w-full h-15 py-3 px-2 no-underline ${
+            type === "primary"
+              ? "bg-immersionBlue text-white shadow-none"
+              : "bg-white text-immersionBlue border-2 border-blue-200"
+          } font-semibold text-center text-sm`
+    }
+    style={type === "secondary" ? { border: "2px solid" } : {}}
+    onClick={onClick}
+    disabled={disable}
+  >
+    {children}
+  </button>
+);
 
 interface ButtonLinkContract {
-  text:string
-  url:Link
+  text: string;
+  url: Link;
 }
-export const ButtonLink = (
-  { text,url }:ButtonLinkContract
-) =>{
-  return (
-    <a
-      {...url}
-      className="no-underline shadow-none bg-immersionBlue py-3 px-2 rounded-md text-white font-semibold w-full text-center  h-15 text-sm "
-    >
-      {text}
-    </a>
-  );
-}
+export const ButtonLink = ({ text, url }: ButtonLinkContract) => (
+  <a
+    {...url}
+    className="no-underline shadow-none bg-immersionBlue py-3 px-2 rounded-md text-white font-semibold w-full text-center  h-15 text-sm "
+  >
+    {text}
+  </a>
+);

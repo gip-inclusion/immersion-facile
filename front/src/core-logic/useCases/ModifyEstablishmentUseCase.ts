@@ -7,34 +7,49 @@ import { UseCase } from "./UseCase";
 
 export class ModifyEstablishmentUseCase extends UseCase {
   constructor(
-    private establishmentGateway:EstablishmentGateway,
-    private establishmentUiGateway:EstablishmentUiGateway
-  ) { super(); }
+    private establishmentGateway: EstablishmentGateway,
+    private establishmentUiGateway: EstablishmentUiGateway,
+  ) {
+    super();
+  }
   execute(event: ModifyEstablishmentEvent): Promise<void> {
-    return this.isSiretValid(event.siret) 
+    return this.isSiretValid(event.siret)
       ? this.onValidSiret(event)
-      : this.establishmentUiGateway.updateCallToAction(EstablishementCallToAction.BAD_SIRET)
+      : this.establishmentUiGateway.updateCallToAction(
+          EstablishementCallToAction.BAD_SIRET,
+        );
   }
   private onValidSiret(event: ModifyEstablishmentEvent): Promise<void> {
-    return this.establishmentGateway.isEstablishmentAlreadyRegisteredBySiret(event.siret)
-      .then(isEstablishmentRegisteredBySiret => isEstablishmentRegisteredBySiret
-        ? this.establishmentRegistered(event)
-        : this.establishmentNotRegistered()
+    return this.establishmentGateway
+      .isEstablishmentAlreadyRegisteredBySiret(event.siret)
+      .then((isEstablishmentRegisteredBySiret) =>
+        isEstablishmentRegisteredBySiret
+          ? this.establishmentRegistered(event)
+          : this.establishmentNotRegistered(),
       )
-      .catch(error=>Promise.reject(error))
+      .catch((error) => Promise.reject(error));
   }
 
   private establishmentNotRegistered(): Promise<void> {
-    return this.establishmentUiGateway.updateCallToAction(EstablishementCallToAction.UNREGISTERED_SIRET)
+    return this.establishmentUiGateway.updateCallToAction(
+      EstablishementCallToAction.UNREGISTERED_SIRET,
+    );
   }
 
-  private establishmentRegistered(event: ModifyEstablishmentEvent): Promise<void> {
-    return this.establishmentGateway.requestEstablishmentModification(event.siret)
-      .then(() => this.establishmentUiGateway.updateCallToAction(EstablishementCallToAction.MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION))
-      .catch(error => Promise.reject(error));
+  private establishmentRegistered(
+    event: ModifyEstablishmentEvent,
+  ): Promise<void> {
+    return this.establishmentGateway
+      .requestEstablishmentModification(event.siret)
+      .then(() =>
+        this.establishmentUiGateway.updateCallToAction(
+          EstablishementCallToAction.MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION,
+        ),
+      )
+      .catch((error) => Promise.reject(error));
   }
-  private isSiretValid(potentialSiret:SiretDto):boolean {
-    const regExp = new RegExp('^[0-9]{14}$')
-    return regExp.test(potentialSiret)
+  private isSiretValid(potentialSiret: SiretDto): boolean {
+    const regExp = new RegExp("^[0-9]{14}$");
+    return regExp.test(potentialSiret);
   }
 }

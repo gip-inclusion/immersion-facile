@@ -79,7 +79,7 @@ export const store = createStore({
     agencyGateway,
     apiAdresseGateway,
     featureFlagGateway,
-    establishmentGateway: establishmentGateway,
+    establishmentGateway,
     immersionApplicationGateway,
     immersionSearchGateway,
     romeAutocompleteGateway,

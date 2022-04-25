@@ -1,17 +1,22 @@
 import SearchIcon from "@mui/icons-material/Search";
 import React from "react";
-import { EstablishmentSubTitle, EstablishmentTitle } from "src/uiComponents/Title";
+import {
+  EstablishmentSubTitle,
+  EstablishmentTitle,
+} from "src/uiComponents/Title";
 import { routes } from "../routing/routes";
 
-
-export const ImmersionHomeMenu = ()=>(
+export const ImmersionHomeMenu = () => (
   <div
     className={`border-2 border-red-200 bg-red-50 flex flex-col items-center justify-between px-4 p-1 m-2 w-48`}
     style={{ width: "400px", height: "250px" }}
   >
     <div className="flex flex-col">
       <EstablishmentTitle type={"candidate"} text="CANDIDAT À UNE IMMERSION" />
-      <EstablishmentSubTitle type={"candidate"} text="Vous voulez essayer un métier en conditions réelles ?" />
+      <EstablishmentSubTitle
+        type={"candidate"}
+        text="Vous voulez essayer un métier en conditions réelles ?"
+      />
     </div>
     <div className="flex flex-col w-full h-full items-center justify-center">
       <a

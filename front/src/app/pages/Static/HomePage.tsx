@@ -7,7 +7,6 @@ import { clientApplication } from "src/app/config/application";
 import { ENV } from "src/environmentVariables";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 
-
 const DebugInfo = () => (
   <div>
     <br />
@@ -41,8 +40,8 @@ export const HomePage = ({ showDebugInfo }: HomeProps) => (
         className="flex flex-wrap justify-center "
         style={{ minWidth: "420px" }}
       >
-        <ImmersionHomeMenu/>
-        <EstablishmentHomeMenu clientApplication={clientApplication}/>
+        <ImmersionHomeMenu />
+        <EstablishmentHomeMenu clientApplication={clientApplication} />
         {/* OLD MENUS
         <div
           className="border-2 border-blue-200 px-4  p-8 m-2 w-48 bg-blue-50  flex flex-col items-center justify-between "
@@ -96,7 +95,6 @@ export const HomePage = ({ showDebugInfo }: HomeProps) => (
           </a>
         </div>
         */}
-        
       </div>
     </section>
     <HomeImmersionHowTo />

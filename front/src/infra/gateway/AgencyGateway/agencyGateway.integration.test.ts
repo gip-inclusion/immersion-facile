@@ -12,7 +12,6 @@ const adapters: AgencyGateway[] = [
 ];
 
 describe("Agency Gateway - integration tests", () => {
-  // eslint-disable-next-line jest/require-hook
   adapters.forEach((adapter: AgencyGateway) => {
     describe(`immersionFacileAgency ${adapter.constructor.name}`, () => {
       it("retreive the id as observable from the gateway", async () => {

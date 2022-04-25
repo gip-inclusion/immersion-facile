@@ -26,7 +26,7 @@ module.exports = {
   "jest/prefer-to-contain": "error",
   "jest/prefer-to-have-length": "error",
   "jest/prefer-todo": "error",
-  "jest/require-hook": "error",
+  "jest/require-hook": "off",
   "jest/require-to-throw-message": "off",
   "jest/require-top-level-describe": "error",
 };

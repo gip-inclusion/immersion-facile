@@ -3,5 +3,5 @@ export abstract class ApplicationEvent {
 }
 export enum EventType {
   VERIFY_SIRET = "VERIFY_SIRET",
-  MODIFY_ESTABLISHMENT = "MODIFY_ESTABLISHMENT"
+  MODIFY_ESTABLISHMENT = "MODIFY_ESTABLISHMENT",
 }

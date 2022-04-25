@@ -1,7 +1,4 @@
-export interface ClientRepositories {
+//eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ClientRepositories {}
 
-}
-
-
-export interface ClientTestRepositories extends ClientRepositories {
-}
+export type ClientTestRepositories = ClientRepositories;

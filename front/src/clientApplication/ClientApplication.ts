@@ -1,5 +1,8 @@
 import { ClientGateways } from "src/core-logic/ports/ClientGateways";
-import { ClientRepositories, ClientTestRepositories } from "src/core-logic/ports/ClientRepositories";
+import {
+  ClientRepositories,
+  ClientTestRepositories,
+} from "src/core-logic/ports/ClientRepositories";
 import { EventGateway } from "src/core-logic/ports/EventGateway";
 import { ApplicationPrimaryController } from "src/core-logic/ports/primaryController/ApplicationPrimaryController";
 import { ClientTestGateways } from "src/infra/gateway/ClientTestGateways";
@@ -8,20 +11,23 @@ import { ApplicationEvent } from "../core-logic/events/ApplicationEvent";
 export interface ClientApplicationProperties {
   gateways: ClientGateways;
   repositories: ClientRepositories;
-  primaryController:ApplicationPrimaryController
+  primaryController: ApplicationPrimaryController;
 }
 
 export interface ClientTestApplicationProperties {
   gateways: ClientTestGateways;
   repositories: ClientTestRepositories;
-  primaryController:ApplicationPrimaryController
+  primaryController: ApplicationPrimaryController;
 }
 
-
 export class ClientApplication {
-  constructor({ gateways, primaryController, repositories }: ClientApplicationProperties) {
+  constructor({
+    gateways,
+    primaryController,
+    repositories: _,
+  }: ClientApplicationProperties) {
     primaryController.addDependencies(gateways);
-    this.eventBus = gateways.event
+    this.eventBus = gateways.event;
   }
   onEvent(event: ApplicationEvent) {
     this.eventBus.onEvent(event);
@@ -30,10 +36,14 @@ export class ClientApplication {
 }
 
 export class ClientTestApplication extends ClientApplication {
-  constructor({gateways, primaryController, repositories}:ClientTestApplicationProperties){
-    super({gateways,primaryController,repositories})
-    this.gateways = gateways
-    this.repositories = repositories
+  constructor({
+    gateways,
+    primaryController,
+    repositories,
+  }: ClientTestApplicationProperties) {
+    super({ gateways, primaryController, repositories });
+    this.gateways = gateways;
+    this.repositories = repositories;
   }
   gateways: ClientTestGateways;
   repositories: ClientTestRepositories;
