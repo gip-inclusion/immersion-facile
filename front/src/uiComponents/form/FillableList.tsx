@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { notEqual } from "src/shared/ramdaExtensions/notEqual";
 import { OmitFromExistingKeys } from "src/shared/utils";
 import { Button } from "src/uiComponents/Button";
-import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 import { z } from "zod";
 
 const immersionBlue = "#3458a2";
