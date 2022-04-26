@@ -30,12 +30,18 @@ import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryA
 
 export const establishmentGateway: EstablishmentGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryEstablishmentGateway(["12345678901238"])
+    ? new InMemoryEstablishmentGateway(["12345678901238","12345678901239","12345678901237"])
     : new HttpEstablishmentGateway();
 
+const inMemoryImmersionApplicationGateway = new InMemoryImmersionApplicationGateway();
+inMemoryImmersionApplicationGateway._sireneEstablishments = {
+  12345678901238:{naf:"",siret:"12345678901238",businessName:"",businessAddress:"",isOpen:true},
+  12345678901239:{naf:"",siret:"12345678901239",businessName:"",businessAddress:"",isOpen:false},
+  12345678901236:{naf:"",siret:"12345678901236",businessName:"",businessAddress:"",isOpen:true},
+}
 export const immersionApplicationGateway: ImmersionApplicationGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryImmersionApplicationGateway()
+    ? inMemoryImmersionApplicationGateway
     : new HttpImmersionApplicationGateway();
 
 export const immersionSearchGateway: ImmersionSearchGateway =

@@ -3,11 +3,13 @@ import {
   badSiretTooLong,
   badSiretTooShort,
   emptySiret,
+  existingClosedSireneResponse,
+  existingOpenSireneResponse,
   validSiret,
-} from "src/core-logic/tests/expectedValues";
-import { theEstablishmentUiGatewayHasCallToAction } from "src/core-logic/tests/unitTests/EstablishmentUiGateway";
-import { whenTheEventIsSent } from "src/core-logic/tests/unitTests/EventGateway";
-import { EstablishementCallToAction } from "../../domain/establishments/EstablishementCallToAction";
+} from "src/domain/tests/expectedValues";
+import { theEstablishmentUiGatewayHasCallToAction } from "src/domain/tests/unitTests/EstablishmentUiGateway";
+import { whenTheEventIsSent } from "src/domain/tests/unitTests/EventGateway";
+import { EstablishementCallToAction } from "../../valueObjects/EstablishementCallToAction";
 import { clientScenario } from "../../tests/clientScenario";
 import { Gherkin } from "../../tests/Gherkin";
 import {
@@ -15,11 +17,18 @@ import {
   theEstablishmentGatewayHasRegisteredSiret,
 } from "../../tests/unitTests/EstablishmentGateway";
 import { VerifySiretEvent } from "./VerifySiretEvent";
+import { theImmersionApplicationGatewayHasSireneRegisteredSirets } from "src/domain/tests/unitTests/ImmersionApplicationGateway";
 
 describe("Feature - Verify SIRET", () => {
   clientScenario(`Scénario 1 - Existing SIRET - Modify Establishment`, [
     (app) =>
       theEstablishmentGatewayHasRegisteredSiret(Gherkin.GIVEN, app, validSiret),
+    (app) =>
+      theImmersionApplicationGatewayHasSireneRegisteredSirets(
+        Gherkin.GIVEN,
+        app,
+        {[existingOpenSireneResponse.siret]: existingOpenSireneResponse},
+      ),
     (app) => whenTheEventIsSent(app, new VerifySiretEvent(validSiret)),
     (app) =>
       theEstablishmentUiGatewayHasCallToAction(
@@ -30,6 +39,12 @@ describe("Feature - Verify SIRET", () => {
   ]);
   clientScenario(`Scénario 2 - Unexisting SIRET - Register Establishment`, [
     (app) => theEstablishmentGatewayDontHasRegisteredSiret(Gherkin.GIVEN, app),
+    (app) =>
+      theImmersionApplicationGatewayHasSireneRegisteredSirets(
+        Gherkin.GIVEN,
+        app,
+        {[existingOpenSireneResponse.siret]: existingOpenSireneResponse},
+      ),
     (app) => whenTheEventIsSent(app, new VerifySiretEvent(validSiret)),
     (app) =>
       theEstablishmentUiGatewayHasCallToAction(
@@ -73,6 +88,40 @@ describe("Feature - Verify SIRET", () => {
         Gherkin.THEN,
         app,
         EstablishementCallToAction.NOTHING,
+      ),
+  ]);
+  clientScenario(`Scénario 7 - Existing SIRET - Closed Sirene Establishment`, [
+    (app) =>
+      theEstablishmentGatewayHasRegisteredSiret(Gherkin.GIVEN, app, validSiret),
+    (app) =>
+      theImmersionApplicationGatewayHasSireneRegisteredSirets(
+        Gherkin.GIVEN,
+        app,
+        {[existingClosedSireneResponse.siret]: existingClosedSireneResponse},
+      ),
+    (app) => whenTheEventIsSent(app, new VerifySiretEvent(validSiret)),
+    (app) =>
+      theEstablishmentUiGatewayHasCallToAction(
+        Gherkin.THEN,
+        app,
+        EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE,
+      ),
+  ]);
+  clientScenario(`Scénario 8 - Existing SIRET - Missing Sirene Establishment`, [
+    (app) =>
+      theEstablishmentGatewayHasRegisteredSiret(Gherkin.GIVEN, app, validSiret),
+    (app) =>
+      theImmersionApplicationGatewayHasSireneRegisteredSirets(
+        Gherkin.GIVEN,
+        app,
+        {}
+      ),
+    (app) => whenTheEventIsSent(app, new VerifySiretEvent(validSiret)),
+    (app) =>
+      theEstablishmentUiGatewayHasCallToAction(
+        Gherkin.THEN,
+        app,
+        EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE,
       ),
   ]);
 });

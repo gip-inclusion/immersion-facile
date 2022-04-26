@@ -11,12 +11,12 @@ import { ImmersionApplicationPageForUkraine } from "src/app/pages/ImmersionAppli
 import { ImmersionApplicationSignPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationSignPage";
 import { ImmersionApplicationValidatePage } from "src/app/pages/ImmersionApplication/ImmersionApplicationValidatePage";
 import { SearchPage } from "src/app/pages/Search/SearchPage";
-import { HomePage } from "src/app/pages/Static/HomePage";
 import { LandingEstablishmentPage } from "src/app/pages/Static/LandingEstablishmentPage";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { ENV } from "src/environmentVariables";
 import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
+import { HomePage } from "../pages/home/HomePage";
 import { useRoute } from "./routes";
 
 const { envType } = ENV;

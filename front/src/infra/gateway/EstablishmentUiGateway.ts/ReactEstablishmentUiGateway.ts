@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable } from "rxjs";
-import { EstablishementCallToAction } from "src/core-logic/domain/establishments/EstablishementCallToAction";
 import { EstablishmentUiGateway } from "src/core-logic/ports/EstablishmentUiGateway";
+import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
 const establishementCallToActionSubject$: BehaviorSubject<EstablishementCallToAction> =
   new BehaviorSubject<EstablishementCallToAction>(
     EstablishementCallToAction.NOTHING,
@@ -9,6 +9,7 @@ export const establishementCallToActionObservable$: Observable<EstablishementCal
   establishementCallToActionSubject$.asObservable();
 export class ReactEstablishmentUiGateway implements EstablishmentUiGateway {
   updateCallToAction(callToAction: EstablishementCallToAction): Promise<void> {
+    console.log("updateCallToAction",callToAction)
     establishementCallToActionSubject$.next(callToAction);
     return Promise.resolve();
   }

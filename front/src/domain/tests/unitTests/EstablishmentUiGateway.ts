@@ -1,5 +1,5 @@
-import { ClientTestApplication } from "src/clientApplication/ClientApplication";
-import { EstablishementCallToAction } from "src/core-logic/domain/establishments/EstablishementCallToAction";
+import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
+import { ClientTestApplication } from "src/infra/application/ClientApplication";
 import { Gherkin } from "../Gherkin";
 
 export const theEstablishmentUiGatewayHasCallToAction = (

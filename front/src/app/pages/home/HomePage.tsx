@@ -1,10 +1,10 @@
 import React from "react";
 import { EstablishmentHomeMenu } from "src/app/components/EstablishmentHomeMenu";
 import { ImmersionFooter } from "src/app/components/ImmersionFooter";
+import { ImmersionHomeMenu } from "src/app/components/ImmersionHomeMenu";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
-import { ImmersionHomeMenu } from "src/app/components/ImmertionHomeMenu";
-import { clientApplication } from "src/app/config/application";
 import { ENV } from "src/environmentVariables";
+import { clientApplication } from "src/infra/application/application";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 
 const DebugInfo = () => (

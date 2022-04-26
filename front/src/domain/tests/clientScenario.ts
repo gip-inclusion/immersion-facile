@@ -2,10 +2,11 @@ import { InMemoryEstablishmentUiGateway } from "src/infra/gateway/EstablishmentU
 import {
   ClientTestApplication,
   ClientTestApplicationProperties,
-} from "../../clientApplication/ClientApplication";
+} from "../../infra/application/ClientApplication";
 import { InMemoryEventGateway } from "../../infra/gateway/EventGateway/InMemoryEventGateway";
-import { InMemoryEstablishmentGateway } from "../adapters/InMemoryEstablishmentGateway";
-import { ApplicationPrimaryController } from "../ports/primaryController/ApplicationPrimaryController";
+import { InMemoryEstablishmentGateway } from "../../core-logic/adapters/InMemoryEstablishmentGateway";
+import { ApplicationPrimaryController } from "../../core-logic/ports/primaryController/ApplicationPrimaryController";
+import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
 
 export function clientScenario(
   scenarioTitle: string,
@@ -14,6 +15,7 @@ export function clientScenario(
   const primaryController = new ApplicationPrimaryController();
   const clientTestApplication: ClientTestApplicationProperties = {
     gateways: {
+      immersionApplication: new InMemoryImmersionApplicationGateway(),
       establishments: new InMemoryEstablishmentGateway(),
       event: new InMemoryEventGateway(primaryController),
       establishmentsUi: new InMemoryEstablishmentUiGateway(),

@@ -1,4 +1,4 @@
-import { ApplicationEvent } from "../../../core-logic/events/ApplicationEvent";
+import { ApplicationEvent } from "../../../domain/events/ApplicationEvent";
 import { ApplicationPrimaryController } from "../../../core-logic/ports/primaryController/ApplicationPrimaryController";
 
 export class InMemoryEventGateway {

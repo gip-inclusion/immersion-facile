@@ -1,5 +1,5 @@
 import { Gherkin } from "../Gherkin";
-import { ClientTestApplication } from "../../../clientApplication/ClientApplication";
+import { ClientTestApplication } from "../../../infra/application/ClientApplication";
 
 export function theEstablishmentGatewayHasRegisteredSiret(
   gherkin: Gherkin,

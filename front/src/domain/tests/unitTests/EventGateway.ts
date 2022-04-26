@@ -1,5 +1,5 @@
-import { ApplicationEvent } from "src/core-logic/events/ApplicationEvent";
-import { ClientApplication } from "../../../clientApplication/ClientApplication";
+import { ApplicationEvent } from "src/domain/events/ApplicationEvent";
+import { ClientApplication } from "../../../infra/application/ClientApplication";
 
 export const whenTheEventIsSent = (
   application: ClientApplication,

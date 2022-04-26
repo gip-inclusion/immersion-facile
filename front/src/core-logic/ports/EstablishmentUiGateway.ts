@@ -1,4 +1,4 @@
-import { EstablishementCallToAction } from "../domain/establishments/EstablishementCallToAction";
+import { EstablishementCallToAction } from "../../domain/valueObjects/EstablishementCallToAction";
 
 export interface EstablishmentUiGateway {
   updateCallToAction(

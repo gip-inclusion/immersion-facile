@@ -1,8 +1,11 @@
-import { ApplicationEvent, EventType } from "../../events/ApplicationEvent";
-import { UseCase } from "../../useCases/UseCase";
-import { VerifySiretUseCase } from "../../useCases/VerifySiretUseCase";
+import {
+  ApplicationEvent,
+  EventType,
+} from "../../../domain/events/ApplicationEvent";
+import { UseCase } from "../../../domain/useCases/UseCase";
+import { VerifySiretUseCase } from "../../../domain/useCases/VerifySiretUseCase";
 import { ClientGateways } from "../ClientGateways";
-import { ModifyEstablishmentUseCase } from "../../useCases/ModifyEstablishmentUseCase";
+import { ModifyEstablishmentUseCase } from "../../../domain/useCases/ModifyEstablishmentUseCase";
 
 export class ApplicationPrimaryController {
   addDependencies(gateways: ClientGateways) {
@@ -11,6 +14,7 @@ export class ApplicationPrimaryController {
       new VerifySiretUseCase(
         gateways.establishmentsUi,
         gateways.establishments,
+        gateways.immersionApplication
       ),
     );
     this.useCases.set(
@@ -18,6 +22,7 @@ export class ApplicationPrimaryController {
       new ModifyEstablishmentUseCase(
         gateways.establishments,
         gateways.establishmentsUi,
+        gateways.immersionApplication
       ),
     );
   }

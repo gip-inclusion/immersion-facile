@@ -6,7 +6,7 @@ import {
 import { EventGateway } from "src/core-logic/ports/EventGateway";
 import { ApplicationPrimaryController } from "src/core-logic/ports/primaryController/ApplicationPrimaryController";
 import { ClientTestGateways } from "src/infra/gateway/ClientTestGateways";
-import { ApplicationEvent } from "../core-logic/events/ApplicationEvent";
+import { ApplicationEvent } from "../../domain/events/ApplicationEvent";
 
 export interface ClientApplicationProperties {
   gateways: ClientGateways;

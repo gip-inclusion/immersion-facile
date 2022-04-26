@@ -1,9 +1,7 @@
 import SearchIcon from "@mui/icons-material/Search";
 import React from "react";
-import {
-  EstablishmentSubTitle,
-  EstablishmentTitle,
-} from "src/uiComponents/Title";
+import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSubTitle";
+import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
 import { routes } from "../routing/routes";
 
 export const ImmersionHomeMenu = () => (

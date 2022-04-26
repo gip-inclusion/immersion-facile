@@ -11,24 +11,6 @@ export const Title = ({ children, red }: TitleProps) => (
     {children}
   </div>
 );
-interface EstablishmentTitleContract {
-  text: string;
-  type: "establishment" | "candidate";
-}
-export const EstablishmentTitle = ({
-  text,
-  type,
-}: EstablishmentTitleContract) => (
-  <div
-    className={`${
-      type === "establishment"
-        ? "text-immersionBlue-dark"
-        : "text-immersionRed-dark"
-    }  text-center font-semibold py-2 tracking-widest`}
-  >
-    {text}
-  </div>
-);
 
 export const SubTitle = ({ children, red }: TitleProps) => (
   <div
@@ -37,24 +19,5 @@ export const SubTitle = ({ children, red }: TitleProps) => (
     } font-semibold text-center py-4`}
   >
     {children}
-  </div>
-);
-interface EstablishmentSubTitleContract {
-  text: string;
-  type: "establishment" | "candidate";
-}
-export const EstablishmentSubTitle = ({
-  text,
-  type,
-}: EstablishmentSubTitleContract) => (
-  <div
-    className={`${
-      type === "establishment"
-        ? "text-immersionBlue-dark"
-        : "text-immersionRed-dark"
-    }  text-center`}
-    style={{ maxWidth: "16rem" }}
-  >
-    {text}
   </div>
 );

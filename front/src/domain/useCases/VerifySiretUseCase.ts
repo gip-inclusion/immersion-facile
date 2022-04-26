@@ -1,13 +1,17 @@
-import { EstablishementCallToAction } from "../domain/establishments/EstablishementCallToAction";
+import { EstablishementCallToAction } from "../valueObjects/EstablishementCallToAction";
 import { VerifySiretEvent } from "../events/verifySiret/VerifySiretEvent";
-import { EstablishmentUiGateway } from "../ports/EstablishmentUiGateway";
-import { EstablishmentGateway } from "../ports/EstablishmentGateway";
+import { EstablishmentUiGateway } from "../../core-logic/ports/EstablishmentUiGateway";
+import { EstablishmentGateway } from "../../core-logic/ports/EstablishmentGateway";
 import { UseCase } from "./UseCase";
+import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { NafDto } from "src/shared/naf";
+import { SiretDto } from "src/shared/siret";
 
 export class VerifySiretUseCase extends UseCase {
   constructor(
     private establishmentUiGateway: EstablishmentUiGateway,
     private establishmentGateway: EstablishmentGateway,
+    private immersionApplicationGateway:ImmersionApplicationGateway
   ) {
     super();
   }
@@ -28,8 +32,16 @@ export class VerifySiretUseCase extends UseCase {
   }
 
   private onValidSiret(event: VerifySiretEvent): Promise<void> {
-    return this.establishmentGateway
-      .isEstablishmentAlreadyRegisteredBySiret(event.siret)
+    return this.immersionApplicationGateway.getSiretInfo(event.siret)
+      .then(siretInfo => this.onSiretInfo(siretInfo))
+      .catch(error =>this.establishmentUiGateway.updateCallToAction( EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE ) )
+    
+  }
+  private onSiretInfo(siretInfo: { naf?: NafDto | undefined; siret:SiretDto; businessName: string; businessAddress: string; isOpen: boolean; }): Promise<void> {
+    return siretInfo.isOpen === false
+      ? this.establishmentUiGateway.updateCallToAction( EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE, )
+      : this.establishmentGateway
+      .isEstablishmentAlreadyRegisteredBySiret(siretInfo.siret)
       .then((isEstablishmentRegistered) =>
         isEstablishmentRegistered
           ? this.establishmentUiGateway.updateCallToAction(
