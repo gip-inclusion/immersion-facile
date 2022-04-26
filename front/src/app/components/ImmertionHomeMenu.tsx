@@ -8,7 +8,7 @@ import { routes } from "../routing/routes";
 
 export const ImmersionHomeMenu = () => (
   <div
-    className={`border-2 border-red-200 bg-red-50 flex flex-col items-center justify-between px-4 p-1 m-2 w-48`}
+    className={`border-2 border-red-200 bg-red-50 flex flex-col items-center rounded justify-between px-4 p-1 m-2 w-48`}
     style={{ width: "400px", height: "250px" }}
   >
     <div className="flex flex-col">
