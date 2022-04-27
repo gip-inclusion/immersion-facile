@@ -48,14 +48,6 @@ const parseContactMethod = (raw: string): ContactMethod => {
   return pgContactToContactMethod[pgContactMethod];
 };
 
-export const parseGeoJson = (raw: string): LatLonDto => {
-  const json = JSON.parse(raw);
-  return {
-    lat: json.coordinates[1],
-    lon: json.coordinates[0],
-  };
-};
-
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
@@ -85,6 +77,8 @@ export class PgEstablishmentAggregateRepository
       establishment.dataSource,
       establishment.sourceProvider,
       convertPositionToStGeography(establishment.position),
+      establishment.position.lon,
+      establishment.position.lat,
       establishment.updatedAt ? establishment.updatedAt.toISOString() : null,
       establishment.isActive,
       establishment.isSearchable,
@@ -97,7 +91,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, address, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, update_date, is_active, is_searchable, is_commited
+          siret, name, customized_name, address, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -249,7 +243,8 @@ export class PgEstablishmentAggregateRepository
         contact_uuid as contact_in_establishment_uuid,
         gps,
         ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
-        ST_AsGeoJSON(gps) AS establishment_position,
+        lon as establishment_lon,
+        lat as establishment_lat,
 
         immersion_contacts.lastname,
         immersion_contacts.firstname,
@@ -331,9 +326,10 @@ export class PgEstablishmentAggregateRepository
             contactMode:
               optional(result.contact_mode) &&
               parseContactMethod(result.contact_mode),
-            location:
-              optional(result.establishment_position) &&
-              parseGeoJson(result.establishment_position),
+            location: optional(result.establishment_lon) && {
+              lon: result.establishment_lon,
+              lat: result.establishment_lat,
+            },
             distance_m: Math.round(result.distance_m),
             ...(withContactDetails &&
               immersionContact && { contactDetails: immersionContact }),
@@ -414,10 +410,10 @@ export class PgEstablishmentAggregateRepository
                    }
                    ${
                      propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
-                       ? ", address=%6$L, gps=ST_GeographyFromText(%7$L)"
+                       ? ", address=%6$L, gps=ST_GeographyFromText(%7$L), lon=%8$L, lat=%9$L"
                        : ""
                    }
-                   WHERE siret=%8$L;`;
+                   WHERE siret=%10$L;`;
     const queryArgs = [
       propertiesToUpdate.updatedAt.toISOString(),
       propertiesToUpdate.isActive,
@@ -428,6 +424,8 @@ export class PgEstablishmentAggregateRepository
       propertiesToUpdate.position
         ? `POINT(${propertiesToUpdate.position.lon} ${propertiesToUpdate.position.lat})`
         : undefined,
+      propertiesToUpdate.position?.lon,
+      propertiesToUpdate.position?.lat,
       siret,
     ];
     const formatedQuery = format(updateQuery, ...queryArgs);
@@ -448,7 +446,7 @@ export class PgEstablishmentAggregateRepository
   ): Promise<AnnotatedEstablishmentEntityV2 | undefined> {
     const pgResult = await this.client.query(
       `
-        SELECT establishments.*, public_naf_classes_2008.class_label AS naf_label, ST_AsGeoJSON(gps) AS position
+        SELECT establishments.*, public_naf_classes_2008.class_label AS naf_label, lon, lat
         FROM establishments
         LEFT OUTER JOIN public_naf_classes_2008
           ON (public_naf_classes_2008.class_id =
@@ -468,7 +466,7 @@ export class PgEstablishmentAggregateRepository
       sourceProvider: row.source_provider,
       isActive: row.is_active,
       nafDto: { code: row.naf_code, nomenclature: row.naf_nomenclature },
-      position: optional(row.position) && parseGeoJson(row.position),
+      position: optional(row.lon) && { lon: row.lon, lat: row.lat },
       numberEmployeesRange: row.number_employees,
       voluntaryToImmersion: row.data_source == "form",
       isCommited: optional(row.is_commited),

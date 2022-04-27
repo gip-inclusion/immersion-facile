@@ -4,7 +4,6 @@ import { AgencyRepository } from "../../../domain/immersionApplication/ports/Age
 import { AgencyConfig, AgencyId } from "../../../shared/agency/agency.dto";
 import { LatLonDto } from "../../../shared/latLon";
 import { createLogger } from "../../../utils/logger";
-import { parseGeoJson } from "./PgEstablishmentAggregateRepository";
 
 const logger = createLogger(__filename);
 
@@ -116,3 +115,11 @@ const pgToEntity = (params: Record<any, any>): AgencyConfig => ({
   signature: params.email_signature,
   position: parseGeoJson(params.position),
 });
+
+export const parseGeoJson = (raw: string): LatLonDto => {
+  const json = JSON.parse(raw);
+  return {
+    lat: json.coordinates[1],
+    lon: json.coordinates[0],
+  };
+};

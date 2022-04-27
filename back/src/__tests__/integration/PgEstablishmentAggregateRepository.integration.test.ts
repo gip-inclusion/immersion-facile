@@ -1273,12 +1273,11 @@ describe("Postgres implementation of immersion offer repository", () => {
     position?: LatLonDto;
   }) => {
     const defaultPosition = { lon: 12.2, lat: 2.1 };
+    const position = props.position ?? defaultPosition;
     const insertQuery = `
     INSERT INTO establishments (
-      siret, name, address, number_employees, naf_code, data_source, source_provider, update_date, is_active, is_searchable, gps
-    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, $9, ST_GeographyFromText('POINT(${
-      props.position?.lon ?? defaultPosition.lon
-    } ${props.position?.lat ?? defaultPosition.lat})'))`;
+      siret, name, address, number_employees, naf_code, data_source, source_provider, update_date, is_active, is_searchable, gps, lon, lat
+    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, $9, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $10, $11)`;
     await client.query(insertQuery, [
       props.siret,
       props.address ?? "7 rue guillaume tell, 75017 Paris",
@@ -1289,6 +1288,8 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
       props.isActive ?? true,
       props.isSearchable ?? true,
+      position.lon,
+      position.lat,
     ]);
   };
   const insertImmersionOffer = async (props: {
