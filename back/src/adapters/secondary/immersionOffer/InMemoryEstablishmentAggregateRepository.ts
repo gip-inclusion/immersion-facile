@@ -1,7 +1,6 @@
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
-  employeeRangeByTefenCode,
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
@@ -211,8 +210,7 @@ const buildSearchImmersionResultDto = (
   siret: establishment.siret,
   voluntaryToImmersion: establishment.voluntaryToImmersion,
   contactMode: contact?.contactMethod,
-  numberOfEmployeeRange:
-    employeeRangeByTefenCode[establishment.numberEmployeesRange],
+  numberOfEmployeeRange: establishment.numberEmployeesRange,
   distance_m: distanceBetweenCoordinatesInMeters(
     TEST_POSITION.lat,
     TEST_POSITION.lon,

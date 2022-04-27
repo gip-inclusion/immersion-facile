@@ -4,7 +4,7 @@ import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
-  TefenCode,
+  NumberEmployeesRange,
 } from "../entities/EstablishmentEntity";
 
 const logger = createLogger(__filename);
@@ -41,7 +41,7 @@ export class LaBonneBoiteCompanyVO {
     updatedAt?: Date,
     extraData?: {
       nafDto?: NafDto;
-      numberEmployeesRange?: TefenCode;
+      numberEmployeesRange?: NumberEmployeesRange;
     },
   ): EstablishmentAggregate {
     const establishment: EstablishmentEntityV2 = {
@@ -56,7 +56,7 @@ export class LaBonneBoiteCompanyVO {
       name: this.props.name,
       siret: this.props.siret,
       voluntaryToImmersion: false,
-      numberEmployeesRange: extraData?.numberEmployeesRange ?? -1,
+      numberEmployeesRange: extraData?.numberEmployeesRange ?? "",
       isActive: true,
       updatedAt,
       isSearchable: true,

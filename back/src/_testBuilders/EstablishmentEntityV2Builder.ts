@@ -1,7 +1,7 @@
 import {
   DataSource,
   EstablishmentEntityV2,
-  TefenCode,
+  NumberEmployeesRange,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { NafDto } from "../shared/naf";
 import { Builder } from "./Builder";
@@ -19,7 +19,7 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   voluntaryToImmersion: true,
   position: { lat: 35, lon: 50 },
   nafDto: { code: "8539A", nomenclature: "NAFRev2" },
-  numberEmployeesRange: 11,
+  numberEmployeesRange: "10-19",
   updatedAt: new Date("2022-01-05T00:00:00.000"),
   isActive: true,
   isSearchable: true,
@@ -58,10 +58,10 @@ export class EstablishmentEntityV2Builder
     return new EstablishmentEntityV2Builder({ ...this.entity, nafDto });
   }
 
-  withNumberOfEmployeeRange(tefenCode: TefenCode) {
+  withNumberOfEmployeeRange(numberEmployeesRange: NumberEmployeesRange) {
     return new EstablishmentEntityV2Builder({
       ...this.entity,
-      numberEmployeesRange: tefenCode,
+      numberEmployeesRange,
     });
   }
 

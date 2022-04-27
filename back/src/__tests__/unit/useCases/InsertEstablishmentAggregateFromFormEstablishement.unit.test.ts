@@ -169,7 +169,7 @@ describe("Insert Establishment aggregate from form data", () => {
     expect(establishmentAggregate.establishment.siret).toEqual(
       formEstablishment.siret,
     );
-    expect(establishmentAggregate.establishment.numberEmployeesRange).toBe(0);
+    expect(establishmentAggregate.establishment.numberEmployeesRange).toBe("0");
   });
   it("Removes (and replaces) establishment and offers with same siret if exists", async () => {
     const siret = "12345678911234";

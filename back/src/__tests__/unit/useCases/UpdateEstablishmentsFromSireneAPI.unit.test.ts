@@ -123,7 +123,7 @@ describe("Update establishments from Sirene API", () => {
       {
         updatedAt: now,
         nafDto: { code: "8559A", nomenclature: "nafNom" },
-        numberEmployeesRange: 1,
+        numberEmployeesRange: "1-2",
       },
     );
   });

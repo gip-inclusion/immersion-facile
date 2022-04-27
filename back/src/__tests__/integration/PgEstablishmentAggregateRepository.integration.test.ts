@@ -7,6 +7,7 @@ import {
 import {
   DataSource,
   EstablishmentEntityV2,
+  NumberEmployeesRange,
 } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
 import { LatLonDto } from "../../shared/latLon";
@@ -89,7 +90,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       sourceProvider: FormEstablishmentSource = "immersion-facile",
       address?: string,
       nafCode?: string,
-      numberEmployeesRange?: number,
+      numberEmployeesRange?: NumberEmployeesRange,
     ) => {
       await insertEstablishment({
         siret,
@@ -282,7 +283,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       const immersionOfferIdMatchingSearch = testUid1;
       const matchingEstablishmentAddress = "4 rue de Bitche, 44000 Nantes";
       const matchingNaf = "8622B";
-      const matchingNumberOfEmployeeRange = 1;
+      const matchingNumberOfEmployeeRange = "1-2";
       const matchingNafLabel = "Activité des médecins spécialistes";
       await insertActiveEstablishmentAndOfferAndEventuallyContact(
         immersionOfferIdMatchingSearch,
@@ -600,7 +601,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         "address" | "nafDto" | "numberEmployeesRange" | "position"
       > = {
         nafDto: { code: "8722B", nomenclature: "nomenc" },
-        numberEmployeesRange: 1,
+        numberEmployeesRange: "1-2",
         position: { lon: 21, lat: 23 },
         address: "4 rue de l'île de Bitche 44000 Nantes",
       };
@@ -786,7 +787,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           position: { lat: 88, lon: 3 },
           address: existingEstablishmentAddress,
           nafCode: "1032Z",
-          numberEmployeesRange: 1,
+          numberEmployeesRange: "1-2",
           updatedAt: existingUpdateAt,
           dataSource,
         });
@@ -1192,7 +1193,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     name: string;
     customized_name?: string | null;
     address: string;
-    number_employees: number;
+    number_employees: string;
     naf_code: string;
     naf_nomenclature: string;
     data_source: string;
@@ -1265,7 +1266,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     isActive?: boolean;
     isSearchable?: boolean;
     nafCode?: string;
-    numberEmployeesRange?: number;
+    numberEmployeesRange?: NumberEmployeesRange;
     address?: string;
     dataSource?: DataSource;
     sourceProvider?: FormEstablishmentSource;

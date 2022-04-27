@@ -7,10 +7,8 @@ import {
 import {
   AnnotatedEstablishmentEntityV2,
   DataSource,
-  employeeRangeByTefenCode,
   EstablishmentAggregate,
   EstablishmentEntityV2,
-  TefenCode,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
@@ -243,7 +241,7 @@ export class PgEstablishmentAggregateRepository
     SELECT 
         establishments.name as establishment_name,
         establishments.customized_name as establishment_customized_name,
-        number_employees AS establishment_tefen_code, 
+        number_employees, 
         address,
         naf_code,
         voluntary_to_immersion,
@@ -327,10 +325,7 @@ export class PgEstablishmentAggregateRepository
             name:
               result.establishment_customized_name ?? result.establishment_name,
             voluntaryToImmersion: result.voluntary_to_immersion,
-            numberOfEmployeeRange:
-              employeeRangeByTefenCode[
-                result.establishment_tefen_code as TefenCode
-              ],
+            numberOfEmployeeRange: result.number_employees,
             address: result.address,
             city,
             contactMode:

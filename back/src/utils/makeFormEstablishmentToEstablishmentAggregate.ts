@@ -5,39 +5,17 @@ import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity
 import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
-  TefenCode,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { AdresseAPI } from "../domain/immersionOffer/ports/AdresseAPI";
 import {
   SireneEstablishmentVO,
   SireneRepository,
-  SireneRepositoryAnswer,
 } from "../domain/sirene/ports/SireneRepository";
 import { FormEstablishmentDto } from "../shared/formEstablishment/FormEstablishment.dto";
-import { NafDto } from "../shared/naf";
 import { notifyAndThrowErrorDiscord } from "./notifyDiscord";
 
 const offerFromFormScore = 10; // 10/10 if voluntaryToImmersion=true (consider removing this field)
-
-// Those will probably be shared in a utils/helpers folder
-const inferNafDtoFromSireneAnswer = (
-  sireneRepoAnswer: SireneRepositoryAnswer,
-): NafDto | undefined => {
-  const establishmentProps = sireneRepoAnswer.etablissements[0];
-  if (!establishmentProps) return;
-  return new SireneEstablishmentVO(establishmentProps).nafAndNomenclature;
-};
-
-const inferNumberEmployeesRangeFromSireneAnswer = (
-  sireneRepoAnswer: SireneRepositoryAnswer,
-): TefenCode => {
-  const tefenCode =
-    sireneRepoAnswer.etablissements[0].uniteLegale.trancheEffectifsUniteLegale;
-
-  if (tefenCode && tefenCode != "NN") return <TefenCode>+tefenCode;
-  return -1;
-};
 
 export const makeFormEstablishmentToEstablishmentAggregate = ({
   uuidGenerator,
@@ -61,7 +39,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
     const sireneRepoAnswer = await sireneRepository.get(
       formEstablishment.siret,
     );
-    if (!sireneRepoAnswer) {
+    if (!sireneRepoAnswer || !sireneRepoAnswer.etablissements[0]) {
       await notifyAndThrowErrorDiscord(
         new Error(
           `Could not get siret ${formEstablishment.siret} from siren gateway`,
@@ -69,9 +47,12 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
       );
       return;
     }
-    const nafDto = inferNafDtoFromSireneAnswer(sireneRepoAnswer);
-    const numberEmployeesRange =
-      inferNumberEmployeesRangeFromSireneAnswer(sireneRepoAnswer);
+    const sireneEstablishmentVo = new SireneEstablishmentVO(
+      sireneRepoAnswer.etablissements[0],
+    );
+
+    const nafDto = sireneEstablishmentVo.nafAndNomenclature;
+    const numberEmployeesRange = sireneEstablishmentVo.numberEmployeesRange;
 
     if (!nafDto || !position || numberEmployeesRange === undefined) {
       notifyAndThrowErrorDiscord(

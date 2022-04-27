@@ -4,10 +4,6 @@ import { valueOrFalse, optional } from "./pgUtils";
 import { EstablishmentExportQueries } from "../../../domain/establishment/ports/EstablishmentExportQueries";
 import { EstablishmentRawProps } from "../../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 import { FormSourceProvider } from "../../../shared/establishmentExport/establishmentExport.dto";
-import {
-  employeeRangeByTefenCode,
-  TefenCode,
-} from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 
 export class PgEstablishmentExportQueries
   implements EstablishmentExportQueries
@@ -66,8 +62,7 @@ const rowToEstablishmentRawProps = (row: any): EstablishmentRawProps => ({
   customizedName: optional(row.customized_name),
   address: row.address,
   nafCode: optional(row.naf_code),
-  numberEmployeesRange:
-    employeeRangeByTefenCode[row.number_employees as TefenCode],
+  numberEmployeesRange: row.number_employees,
   createdAt: format(row.creation_date, "dd/MM/yyyy"),
   isCommited: valueOrFalse(row.is_commited),
   professions: `${row.rome_code} - ${row.libelle_appellation_court}`,

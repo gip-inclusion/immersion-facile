@@ -63,7 +63,7 @@ const prepareSearchableData = async () => {
     .withSiret(siret)
     .withAddress("55 Rue du Faubourg Saint-Honoré")
     .withDataSource("form")
-    .withNumberOfEmployeeRange(12)
+    .withNumberOfEmployeeRange("20-49")
     .build();
 
   const secretariatImmersionOffer = new ImmersionOfferEntityV2Builder()

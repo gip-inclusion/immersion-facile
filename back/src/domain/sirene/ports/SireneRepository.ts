@@ -3,7 +3,7 @@ import { NafDto } from "../../../shared/naf";
 import { propEq } from "../../../shared/ramdaExtensions/propEq";
 import { SiretDto } from "../../../shared/siret";
 import { createLogger } from "../../../utils/logger";
-import { TefenCode } from "../../immersionOffer/entities/EstablishmentEntity";
+import { NumberEmployeesRange } from "../../immersionOffer/entities/EstablishmentEntity";
 
 const logger = createLogger(__filename);
 
@@ -85,9 +85,11 @@ export class SireneEstablishmentVO {
       nomenclature: this.uniteLegale.nomenclatureActivitePrincipaleUniteLegale,
     };
   }
-  public get numberEmployeesRange(): TefenCode {
+  public get numberEmployeesRange(): NumberEmployeesRange {
     const tefenCode = this.uniteLegale.trancheEffectifsUniteLegale;
-    return !tefenCode || tefenCode == "NN" ? -1 : <TefenCode>+tefenCode;
+
+    if (!tefenCode || tefenCode === "NN") return "";
+    return employeeRangeByTefenCode[<TefenCode>+tefenCode];
   }
   public get isActive(): boolean {
     const lastPeriod = this.props.periodesEtablissement.find(
@@ -129,3 +131,26 @@ export abstract class SireneRepository {
     includeClosedEstablishments?: boolean,
   ): Promise<SireneRepositoryAnswer | undefined>;
 }
+
+// prettier-ignore
+export type TefenCode = -1 | 0 | 1 | 2 | 3 | 11 | 12 | 21 | 22 | 31 | 32 | 41 | 42 | 51 | 52 | 53;
+
+export const employeeRangeByTefenCode: Record<TefenCode, NumberEmployeesRange> =
+  {
+    [-1]: "",
+    [0]: "0",
+    [1]: "1-2",
+    [2]: "3-5",
+    [3]: "6-9",
+    [11]: "10-19",
+    [12]: "20-49",
+    [21]: "50-99",
+    [22]: "100-199",
+    [31]: "200-249",
+    [32]: "250-499",
+    [41]: "500-999",
+    [42]: "1000-1999",
+    [51]: "2000-4999",
+    [52]: "5000-9999",
+    [53]: "+10000",
+  };

@@ -53,7 +53,7 @@ describe("PgEstablishmentExportQueries", () => {
           isCommited: true,
           nafCode: "7820Z",
           name: "ARTUS INTERIM LA ROCHE SUR YON",
-          numberEmployeesRange: "10-19",
+          numberEmployeesRange: "250-499",
           preferredContactMethods: "phone",
           professions: "M1502 - Chargé / Chargée de recrutement",
           siret: "79158476600012",
@@ -65,7 +65,7 @@ describe("PgEstablishmentExportQueries", () => {
           isCommited: true,
           nafCode: "7820Z",
           name: "ARTUS INTERIM LA ROCHE SUR YON",
-          numberEmployeesRange: "10-19",
+          numberEmployeesRange: "250-499",
           preferredContactMethods: "phone",
           professions: "A1205 - Ouvrier sylviculteur / Ouvrière sylvicutrice",
           siret: "79158476600012",
@@ -208,7 +208,7 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
     .withDataSource("form")
     .withSourceProvider("immersion-facile")
     .withNafDto({ code: "7820Z", nomenclature: "NAFRev2" })
-    .withNumberOfEmployeeRange(11)
+    .withNumberOfEmployeeRange("250-499")
     .withIsCommited(true)
     .build(),
   immersionOffers: [
@@ -241,7 +241,7 @@ const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
     .withDataSource("form")
     .withSourceProvider("cci")
     .withNafDto({ code: "9321Z", nomenclature: "NAFRev2" })
-    .withNumberOfEmployeeRange(32)
+    .withNumberOfEmployeeRange("250-499")
     .withIsCommited(false)
     .build(),
   immersionOffers: [
