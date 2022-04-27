@@ -42,6 +42,8 @@ describe("Postgres implementation of immersion offer repository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM establishments");
     await client.query("DELETE FROM immersion_contacts");
+    await client.query("DELETE FROM immersion_offers");
+    await client.query("DELETE FROM establishments__immersion_contacts");
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       client,
     );
@@ -692,6 +694,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             .build(),
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret2)
+            .withGeneratedContactId()
             .build(),
         ]);
         // Assert
@@ -1184,6 +1187,88 @@ describe("Postgres implementation of immersion offer repository", () => {
           actualOffersAsAppelationDto,
           expectedOffersAsAppelationDto,
         );
+      });
+    });
+  });
+  describe("Pg implementation of method getSearchImmersionResultDtoBySiretAndRome", () => {
+    it("Returns undefined when no matching establishment", async () => {
+      const siretNotInTable = "11111111111111";
+
+      expect(
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
+          siretNotInTable,
+          "A1401",
+        ),
+      ).toBeUndefined();
+    });
+    it("Returns reconstructed SearchImmersionResultDto for given siret and rome", async () => {
+      // Prepare
+      const siret = "12345678901234";
+      const boulangerRome = "D1102";
+      const establishment = new EstablishmentEntityV2Builder()
+        .withSiret(siret)
+        .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
+        .withAddress("2 RUE JACQUARD 69120 VAULX-EN-VELIN")
+        .build();
+      const boulangerOffer1 = new ImmersionOfferEntityV2Builder()
+        .withNewId()
+        .withRomeCode(boulangerRome)
+        .withAppellationCode("10868") // Aide-boulanger / Aide-boulangère
+        .build();
+      const boulangerOffer2 = new ImmersionOfferEntityV2Builder()
+        .withNewId()
+        .withRomeCode(boulangerRome)
+        .withAppellationCode("12006") // Chef boulanger / boulangère
+        .build();
+      const otherOffer = new ImmersionOfferEntityV2Builder()
+        .withNewId()
+        .withRomeCode("H2102")
+        .build();
+      const contact = new ContactEntityV2Builder()
+        .withGeneratedContactId()
+        .build();
+
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(establishment)
+          .withImmersionOffers([boulangerOffer1, boulangerOffer2, otherOffer])
+          .withContact(contact)
+          .build(),
+      ]);
+
+      // Act
+      const actualSearchResultDto =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
+          siret,
+          boulangerRome,
+        );
+
+      // Assert
+      expectTypeToMatchAndEqual(actualSearchResultDto, {
+        rome: boulangerRome,
+        romeLabel: "Boulangerie - viennoiserie",
+        appellationLabels: [
+          "Aide-boulanger / Aide-boulangère",
+          "Chef boulanger / boulangère",
+        ],
+        naf: establishment.nafDto.code,
+        nafLabel: "Fabrication de pain et de pâtisserie fraîche",
+        siret,
+        name: establishment.name,
+        voluntaryToImmersion: establishment.voluntaryToImmersion,
+        location: establishment.position,
+        address: establishment.address,
+        numberOfEmployeeRange: establishment.numberEmployeesRange,
+        city: "VAULX-EN-VELIN",
+        contactMode: contact.contactMethod,
+        contactDetails: {
+          id: contact.id,
+          firstName: contact.firstName,
+          lastName: contact.lastName,
+          role: contact.job,
+          email: contact.email,
+          phone: contact.phone,
+        },
       });
     });
   });

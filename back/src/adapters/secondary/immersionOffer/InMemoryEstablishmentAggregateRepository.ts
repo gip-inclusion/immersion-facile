@@ -13,6 +13,7 @@ import { createLogger } from "../../../utils/logger";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { SiretDto } from "../../../shared/siret";
 
 const logger = createLogger(__filename);
 
@@ -181,6 +182,40 @@ export class InMemoryEstablishmentAggregateRepository
           appellationLabel: TEST_APPELLATION_LABEL,
         })) ?? []
     );
+  }
+  public async getSearchImmersionResultDtoBySiretAndRome(
+    siret: SiretDto,
+    rome: string,
+  ): Promise<SearchImmersionResultDto | undefined> {
+    const aggregate = this.establishmentAggregates.find(
+      (aggregate) => aggregate.establishment.siret === siret,
+    );
+    if (!aggregate) return;
+    return {
+      rome,
+      romeLabel: TEST_ROME_LABEL,
+      appellationLabels: aggregate.immersionOffers
+        .filter(propEq("romeCode", rome))
+        .map(() => TEST_APPELLATION_LABEL),
+      naf: aggregate.establishment.nafDto.code,
+      nafLabel: TEST_NAF_LABEL,
+      siret,
+      name: aggregate?.establishment.name,
+      voluntaryToImmersion: aggregate?.establishment.voluntaryToImmersion,
+      numberOfEmployeeRange: aggregate.establishment.numberEmployeesRange,
+      location: aggregate?.establishment.position,
+      address: aggregate.establishment.address,
+      city: TEST_CITY,
+      contactMode: aggregate.contact?.contactMethod,
+      contactDetails: aggregate.contact && {
+        id: aggregate.contact.id,
+        lastName: aggregate.contact.lastName,
+        firstName: aggregate.contact.firstName,
+        email: aggregate.contact.email,
+        phone: aggregate.contact.phone,
+        role: aggregate.contact.job,
+      },
+    };
   }
   // for test purposes only :
   get establishmentAggregates() {

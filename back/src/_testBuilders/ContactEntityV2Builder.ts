@@ -1,3 +1,4 @@
+import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   ContactEntityV2,
   ContactMethod,
@@ -23,7 +24,9 @@ export class ContactEntityV2Builder implements Builder<ContactEntityV2> {
   withId(id: string) {
     return new ContactEntityV2Builder({ ...this.entity, id });
   }
-
+  withGeneratedContactId() {
+    return this.withId(new UuidV4Generator().new());
+  }
   withContactMethod(contactMethod: ContactMethod) {
     return new ContactEntityV2Builder({ ...this.entity, contactMethod });
   }

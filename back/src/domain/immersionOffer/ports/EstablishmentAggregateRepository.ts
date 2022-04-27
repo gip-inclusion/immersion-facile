@@ -1,5 +1,6 @@
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { SiretDto } from "../../../shared/siret";
 import { ContactEntityV2 } from "../entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
@@ -49,4 +50,8 @@ export interface EstablishmentAggregateRepository {
   getOffersAsAppelationDtoForFormEstablishment: (
     siret: string,
   ) => Promise<AppellationDto[]>;
+  getSearchImmersionResultDtoBySiretAndRome: (
+    siret: SiretDto,
+    rome: string,
+  ) => Promise<SearchImmersionResultDto | undefined>;
 }

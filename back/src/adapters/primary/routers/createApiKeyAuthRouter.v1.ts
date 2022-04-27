@@ -2,6 +2,7 @@ import { Router } from "express";
 import promClient from "prom-client";
 import {
   addEstablishmentFormRouteWithApiKey,
+  getImmersionOfferBySiretAndRomeRoute,
   searchImmersionRoute,
 } from "../../../shared/routes";
 import { AppDependencies } from "../config";
@@ -12,6 +13,7 @@ import {
 } from "../helpers/httpErrors";
 import { pipeWithValue } from "../../../shared/pipeWithValue";
 import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormEstablishment.schema";
+import { SiretAndRomeDto } from "../../../shared/siretAndRome/SiretAndRome.dto";
 
 const counterFormEstablishmentCaller = new promClient.Counter({
   name: "form_establishment_v1_callers_counter",
@@ -53,6 +55,16 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
       return deps.useCases.searchImmersion.execute(req.body, req.apiConsumer);
     }),
   );
-
+  publicV1Router
+    .route(`/${getImmersionOfferBySiretAndRomeRoute}`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
+        return await deps.useCases.getImmersionOfferBySiretAndRome.execute(
+          req.query as SiretAndRomeDto,
+          req.apiConsumer,
+        );
+      }),
+    );
   return publicV1Router;
 };

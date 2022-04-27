@@ -1,3 +1,4 @@
+import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
@@ -63,7 +64,9 @@ export class EstablishmentAggregateBuilder
       contact: new ContactEntityV2Builder().withId(id).build(),
     });
   }
-
+  public withGeneratedContactId() {
+    return this.withContactId(new UuidV4Generator().new());
+  }
   build() {
     return this.entity;
   }

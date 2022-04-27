@@ -50,7 +50,6 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
         ),
       ),
     );
-
   authenticatedRouter
     .route(`/${immersionOffersApiAuthRoute}`)
     .post(async (req, res) => {

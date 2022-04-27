@@ -129,6 +129,7 @@ import { ExportEstablishmentsAsExcelArchive } from "../../domain/establishment/u
 import { NotifyToAgencyApplicationSubmitted } from "../../domain/immersionApplication/useCases/notifications/NotifyToAgencyApplicationSubmitted";
 import { UpdateEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { InsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
+import { GetImmersionOfferBySiretAndRome } from "../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndRome";
 
 const logger = createLogger(__filename);
 
@@ -531,6 +532,9 @@ const createUseCases = (
       uuidGenerator,
     ),
     getImmersionOfferById: new GetImmersionOfferById(
+      repositories.immersionOffer,
+    ),
+    getImmersionOfferBySiretAndRome: new GetImmersionOfferBySiretAndRome(
       repositories.immersionOffer,
     ),
 

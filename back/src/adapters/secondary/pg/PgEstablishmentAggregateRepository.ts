@@ -15,6 +15,7 @@ import {
   SearchContactDto,
   SearchImmersionResultDto,
 } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { SiretDto } from "../../../shared/siret";
 
 import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { createLogger } from "../../../utils/logger";
@@ -494,6 +495,45 @@ export class PgEstablishmentAggregateRepository
       romeLabel: row.libelle_rome,
       appellationLabel: row.libelle_appellation_long, // libelle_appellation_long should not be undefined
     }));
+  }
+
+  public async getSearchImmersionResultDtoBySiretAndRome(
+    siret: SiretDto,
+    rome: string,
+  ): Promise<SearchImmersionResultDto | undefined> {
+    const pgResult = await this.client.query(
+      `WITH match_immersion_offer AS (
+        SELECT siret, io.rome_code, rome_label, json_agg(appellation_label) AS appellation_labels
+        FROM immersion_offers AS io
+        LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = io.rome_appellation 
+        WHERE io.siret = $1 AND io.rome_code = $2
+        GROUP BY (siret, io.rome_code, rome_label) 
+        ) 
+        SELECT JSONB_BUILD_OBJECT(
+         'rome', io.rome_code, 
+         'siret', io.siret, 
+         'name', e.name, 
+         'voluntaryToImmersion', e.data_source = 'form',
+         'location', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+         'romeLabel', io.rome_label,
+         'appellationLabels',  io.appellation_labels,
+         'naf', e.naf_code,
+         'nafLabel', public_naf_classes_2008.class_label,
+         'address', e.address, 
+         'city', (REGEXP_MATCH(e.address,  '^.*\\d{5}\\s(.*)$'))[1],
+         'contactMode', ic.contact_mode,
+         'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'role', ic.role, 'phone', ic.phone ),
+         'numberOfEmployeeRange', e.number_employees 
+        ) AS search_immersion_result
+        FROM match_immersion_offer AS io 
+        LEFT JOIN establishments AS e ON e.siret = io.siret  
+        LEFT OUTER JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+        LEFT JOIN establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
+        LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
+        `,
+      [siret, rome],
+    );
+    return pgResult.rows[0]?.search_immersion_result;
   }
 }
 
