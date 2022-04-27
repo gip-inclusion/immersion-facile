@@ -1,9 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
-import {
-  PgContactMethod,
-  PgEstablishmentAggregateRepository,
-} from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
+import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
 import {
   DataSource,
   EstablishmentEntityV2,
@@ -18,7 +15,10 @@ import { EstablishmentAggregateBuilder } from "../../_testBuilders/Establishment
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { FormEstablishmentSource } from "../../shared/formEstablishment/FormEstablishment.dto";
+import {
+  ContactMethod,
+  FormEstablishmentSource,
+} from "../../shared/formEstablishment/FormEstablishment.dto";
 import {
   expectArraysToEqualIgnoringOrder,
   expectTypeToMatchAndEqual,
@@ -729,7 +729,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           firstname: contact.firstName,
           role: contact.job,
           establishment_siret: siret1,
-          contact_mode: "mail",
+          contact_mode: "EMAIL",
           copy_emails: contact.copyEmails,
         };
         expect(actualImmersionContactRows[0]).toMatchObject(
@@ -1221,7 +1221,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     email: string;
     phone: string;
     establishment_siret: string;
-    contact_mode: PgContactMethod;
+    contact_mode: ContactMethod;
     copy_emails: string[];
   };
 
@@ -1323,7 +1323,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     INSERT INTO immersion_contacts (
     uuid, lastname, firstname, role, email, phone, contact_mode
   ) VALUES
-   ($1, $2, '', '', $3, '', 'mail');`,
+   ($1, $2, '', '', $3, '', 'EMAIL');`,
       [
         props.uuid,
         props.lastName ?? "Jacques",

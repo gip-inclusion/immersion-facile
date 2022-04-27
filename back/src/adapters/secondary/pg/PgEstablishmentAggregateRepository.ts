@@ -1,9 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import {
-  ContactEntityV2,
-  ContactMethod,
-} from "../../../domain/immersionOffer/entities/ContactEntity";
+import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
   DataSource,
@@ -26,27 +23,7 @@ import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
-export type PgContactMethod = "phone" | "mail" | "in_person";
 export type PgDataSource = "api_labonneboite" | "form";
-
-type KnownContactMethod = Exclude<ContactMethod, "UNKNOWN">;
-const contactModeMap: Record<KnownContactMethod, PgContactMethod> = {
-  PHONE: "phone",
-  EMAIL: "mail",
-  IN_PERSON: "in_person",
-};
-
-const pgContactToContactMethod = Object.fromEntries(
-  Object.entries(contactModeMap).map(([method, pgMethod]) => [
-    pgMethod,
-    method,
-  ]),
-) as Record<PgContactMethod, KnownContactMethod>;
-
-const parseContactMethod = (raw: string): ContactMethod => {
-  const pgContactMethod = raw as PgContactMethod;
-  return pgContactToContactMethod[pgContactMethod];
-};
 
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
@@ -139,7 +116,7 @@ export class PgEstablishmentAggregateRepository
         contact.email,
         contact.job,
         contact.phone,
-        contactModeMap[contact.contactMethod as KnownContactMethod],
+        contact.contactMethod,
         JSON.stringify(contact.copyEmails),
       ];
     });
@@ -323,9 +300,7 @@ export class PgEstablishmentAggregateRepository
             numberOfEmployeeRange: result.number_employees,
             address: result.address,
             city,
-            contactMode:
-              optional(result.contact_mode) &&
-              parseContactMethod(result.contact_mode),
+            contactMode: optional(result.contact_mode) && result.contact_mode,
             location: optional(result.establishment_lon) && {
               lon: result.establishment_lon,
               lat: result.establishment_lat,
@@ -495,8 +470,7 @@ export class PgEstablishmentAggregateRepository
       lastName: row.lastname,
       email: row.email,
       phone: optional(row.phone) && row.phone,
-      contactMethod:
-        optional(row.contact_mode) && parseContactMethod(row.contact_mode),
+      contactMethod: optional(row.contact_mode) && row.contact_mode,
       job: row.role,
       copyEmails: row.copy_emails,
     };
