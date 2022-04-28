@@ -5,7 +5,7 @@ import { ENV } from "src/environmentVariables";
 import { Navigation } from "./components/Navigation";
 import { Router } from "./routing/Router";
 
-const { envType } = ENV;
+const { frontEnvType: envType } = ENV;
 
 const useFetchFeatureFlags = () => {
   const dispatch = useDispatch();

@@ -1,15 +1,5 @@
 import React, { Fragment } from "react";
-
-type MatchRange = {
-  startIndexInclusive: number;
-  endIndexExclusive: number;
-};
-
-export type Proposal<T> = {
-  description: string;
-  value: T;
-  matchRanges: MatchRange[];
-};
+import { Proposal } from "./Proposal";
 
 type SliceOfString = {
   startIndexInclusive: number;

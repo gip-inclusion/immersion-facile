@@ -14,7 +14,7 @@ import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { toDateString } from "src/shared/utils/date";
 import { v4 as uuidV4 } from "uuid";
 
-const { envType } = ENV;
+const { frontEnvType: envType } = ENV;
 
 export const createOrUpdateImmersionApplication = async (
   properties: { jwt?: string; demandeId?: string },

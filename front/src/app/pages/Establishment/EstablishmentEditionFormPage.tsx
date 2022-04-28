@@ -8,12 +8,12 @@ import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablish
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { Route } from "type-route";
-import { defaultInitialValue } from "./EstablishmentCreationForm";
+import { defaultInitialValue } from "./components/defaultInitialValue";
 import {
-  EstablishmentFormPage,
+  EstablishmentFormikForm,
   getLabelAndName,
   getMandatoryLabelAndName,
-} from "./EstablishmentFormPage";
+} from "./components/EstablishmentFormikForm";
 
 export const EstablishmentEditionFormPage = ({
   route,
@@ -22,7 +22,7 @@ export const EstablishmentEditionFormPage = ({
 }) => {
   const [initialValues, setInitialValues] = useState<FormEstablishmentDto>({
     source: "immersion-facile",
-    ...defaultInitialValue,
+    ...defaultInitialValue(),
   });
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export const EstablishmentEditionFormPage = ({
   }
 
   return (
-    <EstablishmentFormPage
+    <EstablishmentFormikForm
       initialValues={initialValues}
       saveForm={(data) =>
         establishmentGateway.updateFormEstablishment(
@@ -54,7 +54,7 @@ export const EstablishmentEditionFormPage = ({
       <EditionSiretRelatedInputs
         businessAddress={initialValues.businessAddress}
       />
-    </EstablishmentFormPage>
+    </EstablishmentFormikForm>
   );
 };
 

@@ -12,47 +12,51 @@ import {
   FormEstablishmentDto,
   FormEstablishmentSource,
 } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { SiretDto } from "src/shared/siret";
 import { OmitFromExistingKeys } from "src/shared/utils";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button } from "src/uiComponents/Button";
 import { InfoMessage } from "src/uiComponents/form/InfoMessage";
 import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { TextInput } from "src/uiComponents/form/TextInput";
+import { defaultInitialValue } from "./defaultInitialValue";
 import {
-  EstablishmentFormPage,
+  EstablishmentFormikForm,
   getLabelAndName,
   getMandatoryLabelAndName,
-} from "./EstablishmentFormPage";
+} from "./EstablishmentFormikForm";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;
+  siret?: SiretDto;
 };
 
 export const EstablishmentCreationForm = ({
   source,
+  siret,
 }: EstablishmentCreationFormProps) => {
   const creationInitialValues = {
-    ...creationInitialValuesWithoutSourceAndSearchable,
+    ...creationInitialValuesWithoutSourceAndSearchable(siret),
     source,
     isSearchable: true,
   };
 
   return (
-    <EstablishmentFormPage
+    <EstablishmentFormikForm
       initialValues={creationInitialValues}
       saveForm={async (data) => {
         await establishmentGateway.addFormEstablishment(data);
       }}
     >
       <CreationSiretRelatedInputs />
-    </EstablishmentFormPage>
+    </EstablishmentFormikForm>
   );
 };
 
 const CreationSiretRelatedInputs = () => {
   const { siret, establishmentInfo, isFetchingSiret, siretAlreadyExists } =
     useSiretFetcher({ fetchSirenApiEvenAlreadyInDb: false, disabled: false });
-
+  console.log(siret);
   const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
     useState(false);
 
@@ -73,6 +77,7 @@ const CreationSiretRelatedInputs = () => {
   return (
     <>
       <TextInput
+        //value={siretFromPageQueryParam || ""}
         {...getMandatoryLabelAndName("siret")}
         placeholder="362 521 879 00034"
         disabled={isFetchingSiret}
@@ -131,59 +136,40 @@ const CreationSiretRelatedInputs = () => {
   );
 };
 
-export const defaultInitialValue: OmitFromExistingKeys<
-  FormEstablishmentDto,
-  "source"
-> = {
-  siret: "",
-  businessName: "",
-  businessAddress: "",
-  appellations: [],
-  businessContact: {
-    firstName: "",
-    lastName: "",
-    job: "",
-    phone: "",
-    email: "",
-    contactMethod: "EMAIL",
-    copyEmails: [],
-  },
-  isSearchable: true,
-};
-
-const creationInitialValuesWithoutSourceAndSearchable: OmitFromExistingKeys<
-  FormEstablishmentDto,
-  "source" | "isSearchable"
-> = !ENV.dev
-  ? defaultInitialValue
-  : {
-      siret: "1234567890123",
-      businessName: "My business name, replaced by result from API",
-      businessNameCustomized:
-        "My Customized Business name, not replaced by API",
-      businessAddress: "My business address, replaced by result from API",
-      isEngagedEnterprise: true,
-      appellations: [
-        {
-          appellationCode: "11573",
-          romeCode: "D1102",
-          romeLabel: "Boulangerie",
-          appellationLabel: "Boulanger - Boulangère",
+// A gérer dans un Unit Test automatisé
+const creationInitialValuesWithoutSourceAndSearchable = (
+  siret?: SiretDto,
+): OmitFromExistingKeys<FormEstablishmentDto, "source" | "isSearchable"> =>
+  !ENV.PREFILED_ESTABLISHMENT_FORM
+    ? defaultInitialValue(siret)
+    : {
+        siret: "1234567890123",
+        businessName: "My business name, replaced by result from API",
+        businessNameCustomized:
+          "My Customized Business name, not replaced by API",
+        businessAddress: "My business address, replaced by result from API",
+        isEngagedEnterprise: true,
+        appellations: [
+          {
+            appellationCode: "11573",
+            romeCode: "D1102",
+            romeLabel: "Boulangerie",
+            appellationLabel: "Boulanger - Boulangère",
+          },
+          {
+            appellationCode: "11564",
+            romeCode: "D1101",
+            romeLabel: "Boucherie",
+            appellationLabel: "Boucher - Bouchère",
+          },
+        ],
+        businessContact: {
+          firstName: "John",
+          lastName: "Doe",
+          job: "super job",
+          phone: "02837",
+          email: "joe@mail.com",
+          contactMethod: "EMAIL",
+          copyEmails: ["recrutement@boucherie.net"],
         },
-        {
-          appellationCode: "11564",
-          romeCode: "D1101",
-          romeLabel: "Boucherie",
-          appellationLabel: "Boucher - Bouchère",
-        },
-      ],
-      businessContact: {
-        firstName: "John",
-        lastName: "Doe",
-        job: "super job",
-        phone: "02837",
-        email: "joe@mail.com",
-        contactMethod: "EMAIL",
-        copyEmails: ["recrutement@boucherie.net"],
-      },
-    };
+      };

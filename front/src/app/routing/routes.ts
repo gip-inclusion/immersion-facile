@@ -7,27 +7,31 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   admin: defineRoute("/admin"),
   adminVerification: defineRoute(
     { demandeId: param.path.string },
-    (p) => `/admin-verification/${p.demandeId}`,
+    (params) => `/admin-verification/${params.demandeId}`,
   ),
   agencyAdmin: defineRoute(
     { agencyId: param.path.string },
-    (p) => `/agence/${p.agencyId}`,
+    (params) => `/agence/${params.agencyId}`,
   ),
   debugPopulateDB: defineRoute(
     { count: param.path.number },
-    (p) => `/debug/populate/${p.count}`,
+    (params) => `/debug/populate/${params.count}`,
   ),
   editFormEstablishment: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.editFormEstablishmentRoute}`,
   ),
-  formEstablishment: defineRoute([
-    "/etablissement",
-    "/immersion-offer" /* old name, still redirected*/,
-  ]),
+  formEstablishment: defineRoute(
+    { siret: param.query.optional.string },
+    () => "/etablissement",
+  ),
+  oldFormEstablishment: defineRoute(
+    { siret: param.query.optional.string },
+    () => "/immersion-offer" /* old name, still redirected*/,
+  ),
   formEstablishmentForExternals: defineRoute(
     { consumer: param.path.string },
-    (p) => `/etablissement/${p.consumer}`,
+    (params) => `/etablissement/${params.consumer}`,
   ),
   home: defineRoute("/"),
   immersionApplication: defineRoute(

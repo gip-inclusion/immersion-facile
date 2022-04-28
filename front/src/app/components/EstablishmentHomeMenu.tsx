@@ -104,7 +104,7 @@ export const EstablishmentHomeMenu = ({
               EstablishementCallToAction.REGISTER_ESTABLISHEMENT && (
               <ButtonLink
                 text={`Référencer votre entreprise`}
-                url={routes.formEstablishment().link}
+                url={routes.formEstablishment({ siret }).link}
               />
             )}
             {callToAction ===

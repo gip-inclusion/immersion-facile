@@ -4,7 +4,6 @@ import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AdminVerificationPage } from "src/app/pages/admin/AdminVerificationPage";
 import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/Establishment/EstablishmentEditionFormPage";
-import { EstablishmentFormImmersionFacilePage } from "src/app/pages/Establishment/EstablishmentFormImmersionFacilePage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/Establishment/EstablishmentFormPageForExternals";
 import { ImmersionApplicationPage } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
 import { ImmersionApplicationPageForUkraine } from "src/app/pages/ImmersionApplication/ImmersionApplicationPageForUkraine";
@@ -16,10 +15,11 @@ import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { ENV } from "src/environmentVariables";
 import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
+import { EstablishmentFormPage } from "../pages/Establishment/EstablishmentFormPage";
 import { HomePage } from "../pages/home/HomePage";
 import { useRoute } from "./routes";
 
-const { envType } = ENV;
+const { frontEnvType: envType } = ENV;
 
 const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
 
@@ -48,7 +48,10 @@ export const Router = () => {
         <EstablishmentEditionFormPage route={route} />
       )}
       {route.name === "formEstablishment" && (
-        <EstablishmentFormImmersionFacilePage />
+        <EstablishmentFormPage route={route} />
+      )}
+      {route.name === "oldFormEstablishment" && (
+        <EstablishmentFormPage route={route} />
       )}
       {route.name === "formEstablishmentForExternals" && (
         <EstablishmentFormPageForExternals route={route} />

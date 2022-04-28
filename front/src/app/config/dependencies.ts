@@ -55,10 +55,11 @@ inMemoryImmersionApplicationGateway._sireneEstablishments = {
     isOpen: false,
   },
   12345678901236: {
-    naf: "",
+    naf: "47.11C",
     siret: "12345678901236",
-    businessName: "",
-    businessAddress: "",
+    businessName:
+      "Open Business on SIRENE but not registered on Immersion Facile",
+    businessAddress: "5 Rue du Chevalier de Saint-George, 75008 Paris",
     isOpen: true,
   },
 };

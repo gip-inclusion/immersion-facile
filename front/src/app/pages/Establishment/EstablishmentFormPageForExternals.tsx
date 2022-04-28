@@ -3,7 +3,7 @@ import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { FormEstablishmentSource } from "src/shared/formEstablishment/FormEstablishment.dto";
 import { Route } from "type-route";
-import { EstablishmentCreationForm } from "./EstablishmentCreationForm";
+import { EstablishmentCreationForm } from "./components/EstablishmentCreationForm";
 
 type EstablishmentFormForExternalsProps = {
   route: Route<typeof routes.formEstablishmentForExternals>;
