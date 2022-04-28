@@ -9,7 +9,6 @@ export const establishementCallToActionObservable$: Observable<EstablishementCal
   establishementCallToActionSubject$.asObservable();
 export class ReactEstablishmentUiGateway implements EstablishmentUiGateway {
   updateCallToAction(callToAction: EstablishementCallToAction): Promise<void> {
-    console.log("updateCallToAction", callToAction);
     establishementCallToActionSubject$.next(callToAction);
     return Promise.resolve();
   }

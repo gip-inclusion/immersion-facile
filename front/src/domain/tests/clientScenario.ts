@@ -1,4 +1,3 @@
-import { InMemoryEstablishmentUiGateway } from "src/infra/gateway/EstablishmentUiGateway.ts/InMemoryEstablishmentUiGaetway";
 import {
   ClientTestApplication,
   ClientTestApplicationProperties,
@@ -7,6 +6,7 @@ import { InMemoryEventGateway } from "../../infra/gateway/EventGateway/InMemoryE
 import { InMemoryEstablishmentGateway } from "../../core-logic/adapters/InMemoryEstablishmentGateway";
 import { ApplicationPrimaryController } from "../../core-logic/ports/primaryController/ApplicationPrimaryController";
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
+import { InMemoryEstablishmentUiGateway } from "src/infra/gateway/EstablishmentUiGateway/InMemoryEstablishmentUiGateway";
 
 export function clientScenario(
   scenarioTitle: string,

@@ -42,59 +42,6 @@ export const HomePage = ({ showDebugInfo }: HomeProps) => (
       >
         <ImmersionHomeMenu />
         <EstablishmentHomeMenu clientApplication={clientApplication} />
-        {/* OLD MENUS
-        <div
-          className="border-2 border-blue-200 px-4  p-8 m-2 w-48 bg-blue-50  flex flex-col items-center justify-between "
-          style={{ width: "400px", height: "250px" }}
-        >
-          <div className="text-immersionBlue-dark  text-center text-sm py-2 tracking-widest">
-            ENTREPRISE
-          </div>
-          <div
-            className="text-immersionBlue-dark font-semibold text-center"
-            style={{ maxWidth: "16rem" }}
-          >
-            Vos équipes souhaitent accueillir en immersion professionnelle ?
-          </div>
-          <a
-            {...routes.formEstablishment().link}
-            className="no-underline shadow-none bg-immersionBlue py-3 px-2 rounded-md text-white font-semibold w-full text-center  h-15 text-sm "
-          >
-            Référencer votre entreprise
-          </a>
-          <div
-            className="text-immersionBlue-dark font-sans text-center"
-            style={{ maxWidth: "16rem" }}
-          >
-            <a {...routes.landingEstablishment().link}>En savoir plus</a>
-          </div>
-        </div>
-        <div
-          className="border-2 border-red-200 px-4  p-8 m-2 w-48 bg-red-50  flex flex-col items-center justify-between"
-          style={{ width: "400px", height: "250px" }}
-        >
-          <div className="text-immersionRed-dark text-center ext-immersionRed-dark text-sm py-2  tracking-widest">
-            CANDIDAT À UNE IMMERSION
-          </div>
-          <div className="text-immersionRed-dark font-semibold text-center">
-            Vous voulez essayer un métier en conditions réelles ?
-          </div>
-          <a
-            {...routes.search().link}
-            className="no-underline shadow-none bg-immersionRed py-3 px-2 mt-1 mb-2 rounded-md text-white font-semibold  w-full text-center h-15 text-sm "
-          >
-            Trouver une entreprise accueillante <SearchIcon />
-          </a>
-          <a
-            {...routes.immersionApplication().link}
-            className="no-underline shadow-none bg-immersionRed py-3 px-2 rounded-md text-white font-semibold  w-full text-center h-15 text-sm "
-          >
-            J'ai trouvé mon immersion,
-            <br />
-            Initier une demande de convention
-          </a>
-        </div>
-        */}
       </div>
     </section>
     <HomeImmersionHowTo />

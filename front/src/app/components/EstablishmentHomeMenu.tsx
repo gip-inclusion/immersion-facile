@@ -2,7 +2,7 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import React, { useEffect, useState } from "react";
 import { ModifyEstablishmentEvent } from "src/domain/events/modifyEstablishment.ts/ModifyEstablishmentEvent";
 import { VerifySiretEvent } from "src/domain/events/verifySiret/VerifySiretEvent";
-import { establishementCallToActionObservable$ } from "src/infra/gateway/EstablishmentUiGateway.ts/ReactEstablishmentUiGateway";
+import { establishementCallToActionObservable$ } from "src/infra/gateway/EstablishmentUiGateway/ReactEstablishmentUiGateway";
 import { SiretDto } from "src/shared/siret";
 import { ButtonLink, HomeButton } from "src/uiComponents/Button";
 import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
