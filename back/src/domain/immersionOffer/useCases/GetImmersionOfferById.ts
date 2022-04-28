@@ -26,7 +26,7 @@ export class GetImmersionOfferById extends UseCase<
 
   public async _execute(
     immersionOfferId: string,
-    apiConsumer: ApiConsumer,
+    apiConsumer?: ApiConsumer,
   ): Promise<SearchImmersionResultDto> {
     const [siret, romeCode] = immersionOfferId.split("-");
 
