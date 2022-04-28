@@ -27,7 +27,7 @@ describe("Feature - Verify SIRET", () => {
       theImmersionApplicationGatewayHasSireneRegisteredSirets(
         Gherkin.GIVEN,
         app,
-        {[existingOpenSireneResponse.siret]: existingOpenSireneResponse},
+        { [existingOpenSireneResponse.siret]: existingOpenSireneResponse },
       ),
     (app) => whenTheEventIsSent(app, new VerifySiretEvent(validSiret)),
     (app) =>
@@ -43,7 +43,7 @@ describe("Feature - Verify SIRET", () => {
       theImmersionApplicationGatewayHasSireneRegisteredSirets(
         Gherkin.GIVEN,
         app,
-        {[existingOpenSireneResponse.siret]: existingOpenSireneResponse},
+        { [existingOpenSireneResponse.siret]: existingOpenSireneResponse },
       ),
     (app) => whenTheEventIsSent(app, new VerifySiretEvent(validSiret)),
     (app) =>
@@ -97,7 +97,7 @@ describe("Feature - Verify SIRET", () => {
       theImmersionApplicationGatewayHasSireneRegisteredSirets(
         Gherkin.GIVEN,
         app,
-        {[existingClosedSireneResponse.siret]: existingClosedSireneResponse},
+        { [existingClosedSireneResponse.siret]: existingClosedSireneResponse },
       ),
     (app) => whenTheEventIsSent(app, new VerifySiretEvent(validSiret)),
     (app) =>
@@ -114,7 +114,7 @@ describe("Feature - Verify SIRET", () => {
       theImmersionApplicationGatewayHasSireneRegisteredSirets(
         Gherkin.GIVEN,
         app,
-        {}
+        {},
       ),
     (app) => whenTheEventIsSent(app, new VerifySiretEvent(validSiret)),
     (app) =>

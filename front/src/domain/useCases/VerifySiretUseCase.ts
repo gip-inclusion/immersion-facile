@@ -11,7 +11,7 @@ export class VerifySiretUseCase extends UseCase {
   constructor(
     private establishmentUiGateway: EstablishmentUiGateway,
     private establishmentGateway: EstablishmentGateway,
-    private immersionApplicationGateway:ImmersionApplicationGateway
+    private immersionApplicationGateway: ImmersionApplicationGateway,
   ) {
     super();
   }
@@ -32,26 +32,38 @@ export class VerifySiretUseCase extends UseCase {
   }
 
   private onValidSiret(event: VerifySiretEvent): Promise<void> {
-    return this.immersionApplicationGateway.getSiretInfo(event.siret)
-      .then(siretInfo => this.onSiretInfo(siretInfo))
-      .catch(error =>this.establishmentUiGateway.updateCallToAction( EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE ) )
-    
+    return this.immersionApplicationGateway
+      .getSiretInfo(event.siret)
+      .then((siretInfo) => this.onSiretInfo(siretInfo))
+      .catch(() =>
+        this.establishmentUiGateway.updateCallToAction(
+          EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE,
+        ),
+      );
   }
-  private onSiretInfo(siretInfo: { naf?: NafDto | undefined; siret:SiretDto; businessName: string; businessAddress: string; isOpen: boolean; }): Promise<void> {
+  private onSiretInfo(siretInfo: {
+    naf?: NafDto | undefined;
+    siret: SiretDto;
+    businessName: string;
+    businessAddress: string;
+    isOpen: boolean;
+  }): Promise<void> {
     return siretInfo.isOpen === false
-      ? this.establishmentUiGateway.updateCallToAction( EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE, )
+      ? this.establishmentUiGateway.updateCallToAction(
+          EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE,
+        )
       : this.establishmentGateway
-      .isEstablishmentAlreadyRegisteredBySiret(siretInfo.siret)
-      .then((isEstablishmentRegistered) =>
-        isEstablishmentRegistered
-          ? this.establishmentUiGateway.updateCallToAction(
-              EstablishementCallToAction.MODIFY_ESTABLISHEMENT,
-            )
-          : this.establishmentUiGateway.updateCallToAction(
-              EstablishementCallToAction.REGISTER_ESTABLISHEMENT,
-            ),
-      )
-      .catch((error) => Promise.reject(error));
+          .isEstablishmentAlreadyRegisteredBySiret(siretInfo.siret)
+          .then((isEstablishmentRegistered) =>
+            isEstablishmentRegistered
+              ? this.establishmentUiGateway.updateCallToAction(
+                  EstablishementCallToAction.MODIFY_ESTABLISHEMENT,
+                )
+              : this.establishmentUiGateway.updateCallToAction(
+                  EstablishementCallToAction.REGISTER_ESTABLISHEMENT,
+                ),
+          )
+          .catch((error) => Promise.reject(error));
   }
 
   private isSiretValid(potentialSiret: string): boolean {

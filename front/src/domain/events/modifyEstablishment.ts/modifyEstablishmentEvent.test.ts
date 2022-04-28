@@ -34,7 +34,7 @@ describe(`Feature - ${EventType.MODIFY_ESTABLISHMENT}`, () => {
       theImmersionApplicationGatewayHasSireneRegisteredSirets(
         Gherkin.GIVEN,
         app,
-        {[existingOpenSireneResponse.siret]: existingOpenSireneResponse},
+        { [existingOpenSireneResponse.siret]: existingOpenSireneResponse },
       ),
     (app) => whenTheEventIsSent(app, new ModifyEstablishmentEvent(validSiret)),
     (app) =>
@@ -61,7 +61,7 @@ describe(`Feature - ${EventType.MODIFY_ESTABLISHMENT}`, () => {
       theImmersionApplicationGatewayHasSireneRegisteredSirets(
         Gherkin.GIVEN,
         app,
-        {[existingOpenSireneResponse.siret]: existingOpenSireneResponse},
+        { [existingOpenSireneResponse.siret]: existingOpenSireneResponse },
       ),
     (app) => whenTheEventIsSent(app, new ModifyEstablishmentEvent(validSiret)),
     (app) =>
@@ -154,7 +154,7 @@ describe(`Feature - ${EventType.MODIFY_ESTABLISHMENT}`, () => {
       theImmersionApplicationGatewayHasSireneRegisteredSirets(
         Gherkin.GIVEN,
         app,
-        {[existingClosedSireneResponse.siret]:existingClosedSireneResponse},
+        { [existingClosedSireneResponse.siret]: existingClosedSireneResponse },
       ),
     (app) => whenTheEventIsSent(app, new ModifyEstablishmentEvent(validSiret)),
     (app) =>
@@ -169,31 +169,39 @@ describe(`Feature - ${EventType.MODIFY_ESTABLISHMENT}`, () => {
         EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE,
       ),
   ]);
-  clientScenario(`Scénario 7 - Existing SIRET & Missing establishment on Sirene `, [
-    (app) =>
-      theEstablishmentGatewayHasRegisteredSiret(Gherkin.GIVEN, app, validSiret),
-    (app) =>
-      theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
-        Gherkin.GIVEN,
-        app,
-      ),
-    (app) =>
-      theImmersionApplicationGatewayHasSireneRegisteredSirets(
-        Gherkin.GIVEN,
-        app,
-        {},
-      ),
-    (app) => whenTheEventIsSent(app, new ModifyEstablishmentEvent(validSiret)),
-    (app) =>
-      theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
-        Gherkin.THEN,
-        app,
-      ),
-    (app) =>
-      theEstablishmentUiGatewayHasCallToAction(
-        Gherkin.THEN,
-        app,
-        EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE,
-      ),
-  ]);
+  clientScenario(
+    `Scénario 7 - Existing SIRET & Missing establishment on Sirene `,
+    [
+      (app) =>
+        theEstablishmentGatewayHasRegisteredSiret(
+          Gherkin.GIVEN,
+          app,
+          validSiret,
+        ),
+      (app) =>
+        theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
+          Gherkin.GIVEN,
+          app,
+        ),
+      (app) =>
+        theImmersionApplicationGatewayHasSireneRegisteredSirets(
+          Gherkin.GIVEN,
+          app,
+          {},
+        ),
+      (app) =>
+        whenTheEventIsSent(app, new ModifyEstablishmentEvent(validSiret)),
+      (app) =>
+        theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
+          Gherkin.THEN,
+          app,
+        ),
+      (app) =>
+        theEstablishmentUiGatewayHasCallToAction(
+          Gherkin.THEN,
+          app,
+          EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE,
+        ),
+    ],
+  );
 });

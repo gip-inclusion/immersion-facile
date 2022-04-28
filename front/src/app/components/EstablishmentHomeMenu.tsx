@@ -34,15 +34,24 @@ export const EstablishmentHomeMenu = ({
   const [inputTimeout, inputTimeoutUpdate] = useState<
     NodeJS.Timeout | undefined
   >(undefined);
-  const badSiretError = (callToAction: EstablishementCallToAction) =>{
-    const badCallToAction = new Map<EstablishementCallToAction,string>([
-      [EstablishementCallToAction.BAD_SIRET,"Votre SIRET doît contenir 14 chiffres"],
-      [EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE,"Votre établissement est fermé"],
-      [EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE,"Votre établissement n'existe pas"]
-    ])
-    const strategy = badCallToAction.get(callToAction)
-    return strategy ? strategy : undefined
-  }
+  const badSiretError = (callToAction: EstablishementCallToAction) => {
+    const badCallToAction = new Map<EstablishementCallToAction, string>([
+      [
+        EstablishementCallToAction.BAD_SIRET,
+        "Votre SIRET doît contenir 14 chiffres",
+      ],
+      [
+        EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE,
+        "Votre établissement est fermé",
+      ],
+      [
+        EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE,
+        "Votre établissement n'existe pas",
+      ],
+    ]);
+    const strategy = badCallToAction.get(callToAction);
+    return strategy ? strategy : undefined;
+  };
   return (
     <div
       className={`flex flex-col items-center justify-center border-2 border-blue-200 rounded px-4 p-1 m-2 w-48 bg-blue-50  `}
@@ -66,14 +75,14 @@ export const EstablishmentHomeMenu = ({
               children="Référencer votre entreprise"
             />
             <HomeButton
-                  type="secondary"
-                  onClick={() => startEstablishmentPathUpdate(true) }
-                  children="Modifier votre entreprise"
-                />
+              type="secondary"
+              onClick={() => startEstablishmentPathUpdate(true)}
+              children="Modifier votre entreprise"
+            />
           </>
         ) : (
           <>
-            {(isNothingOrErrorCallToAction(callToAction)) && (
+            {isNothingOrErrorCallToAction(callToAction) && (
               <ImmersionTextField
                 className="w-2/3"
                 name="siret"
@@ -156,10 +165,14 @@ const onSiretFieldChange = (
     ),
   );
 };
-function isNothingOrErrorCallToAction(callToAction: EstablishementCallToAction) {
-  return callToAction === EstablishementCallToAction.NOTHING ||
+function isNothingOrErrorCallToAction(
+  callToAction: EstablishementCallToAction,
+) {
+  return (
+    callToAction === EstablishementCallToAction.NOTHING ||
     callToAction === EstablishementCallToAction.BAD_SIRET ||
-    callToAction === EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE ||
+    callToAction ===
+      EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE ||
     callToAction === EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE
+  );
 }
-

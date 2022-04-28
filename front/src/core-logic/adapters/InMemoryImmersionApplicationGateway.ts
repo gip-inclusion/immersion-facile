@@ -38,9 +38,11 @@ const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
 export class InMemoryImmersionApplicationGateway
   implements ImmersionApplicationGateway
 {
-  public constructor(private simulatedLatency?:number) {
-    TEST_ESTABLISHMENTS.forEach((establishment) =>
-      this._sireneEstablishments[establishment.siret] = establishment);
+  public constructor(private simulatedLatency?: number) {
+    TEST_ESTABLISHMENTS.forEach(
+      (establishment) =>
+        (this._sireneEstablishments[establishment.siret] = establishment),
+    );
   }
 
   public async add(
@@ -50,7 +52,7 @@ export class InMemoryImmersionApplicationGateway
       "InMemoryImmersionApplicationGateway.add: ",
       immersionApplication,
     );
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._immersionApplications[immersionApplication.id] = immersionApplication;
     return immersionApplication.id;
   }
@@ -59,13 +61,13 @@ export class InMemoryImmersionApplicationGateway
     id: ImmersionApplicationId,
   ): Promise<ImmersionApplicationDto> {
     console.log("InMemoryImmersionApplicationGateway.get: ", id);
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
     return this._immersionApplications[id];
   }
 
   // Same as GET above, but using a magic link
   public async getMagicLink(jwt: string): Promise<ImmersionApplicationDto> {
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
 
     const payload = decodeJwt<MagicLinkPayload>(jwt);
     return this._immersionApplications[payload.applicationId];
@@ -76,7 +78,7 @@ export class InMemoryImmersionApplicationGateway
     status?: ApplicationStatus,
   ): Promise<Array<ImmersionApplicationDto>> {
     console.log("InMemoryImmersionApplicationGateway.getAll: ", agency, status);
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
 
     return Object.values(this._immersionApplications)
       .filter((application) => !agency || application.agencyId === agency)
@@ -90,7 +92,7 @@ export class InMemoryImmersionApplicationGateway
       "InMemoryImmersionApplicationGateway.update: ",
       immersionApplication,
     );
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._immersionApplications[immersionApplication.id] = immersionApplication;
     return immersionApplication.id;
   }
@@ -105,7 +107,7 @@ export class InMemoryImmersionApplicationGateway
     );
     const payload = decodeJwt<MagicLinkPayload>(jwt);
 
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._immersionApplications[payload.applicationId] = immersionApplication;
     return immersionApplication.id;
   }
@@ -115,7 +117,7 @@ export class InMemoryImmersionApplicationGateway
     jwt: string,
   ): Promise<WithImmersionApplicationId> {
     const payload = decodeJwt<MagicLinkPayload>(jwt);
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._immersionApplications[payload.applicationId] = {
       ...this._immersionApplications[payload.applicationId],
       status,
@@ -126,7 +128,7 @@ export class InMemoryImmersionApplicationGateway
   public async signApplication(
     jwt: string,
   ): Promise<WithImmersionApplicationId> {
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
     const payload = decodeJwt<MagicLinkPayload>(jwt);
     const application = this._immersionApplications[payload.applicationId];
     this._immersionApplications[payload.applicationId] =
@@ -136,7 +138,7 @@ export class InMemoryImmersionApplicationGateway
 
   public async validate(id: ImmersionApplicationId): Promise<string> {
     console.log("InMemoryImmersionApplicationGateway.validate: ", id);
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
     const form = { ...this._immersionApplications[id] };
     if (form.status === "IN_REVIEW") {
       form.status = "VALIDATED";
@@ -162,7 +164,7 @@ export class InMemoryImmersionApplicationGateway
   ): Promise<void> {
     // This is supposed to ask the backend to send a new email to the owner of the expired magic link.
     // Since this operation makes no sense for local development, the implementation here is left empty.
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
     throw new Error("500 Not Implemented In InMemory Gateway");
   }
 
@@ -170,7 +172,7 @@ export class InMemoryImmersionApplicationGateway
     console.log(
       "InMemoryImmersionApplicationGateway.getSiretInfo for siret: " + siret,
     );
-    this.simulatedLatency && await sleep(this.simulatedLatency);
+    this.simulatedLatency && (await sleep(this.simulatedLatency));
 
     const establishment = this._sireneEstablishments[siret];
     console.log(
@@ -196,7 +198,7 @@ export class InMemoryImmersionApplicationGateway
     return true;
   }
 
-  public _sireneEstablishments: {[siret:SiretDto]:GetSiretResponseDto} = {};
+  public _sireneEstablishments: { [siret: SiretDto]: GetSiretResponseDto } = {};
   private _immersionApplications: { [id: string]: ImmersionApplicationDto } =
     {};
   private _agencies: { [id: string]: AgencyInListDto } = {};
