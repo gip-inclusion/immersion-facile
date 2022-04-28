@@ -48,16 +48,16 @@ export class PgImmersionApplicationRepository
     immersionApplicationEntity: ImmersionApplicationEntity,
   ): Promise<ImmersionApplicationId | undefined> {
     // prettier-ignore
-    const { id, status, email, firstName, lastName, phone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions, peExternalId } =
+    const { id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions, peExternalId } =
       immersionApplicationEntity.toDto();
 
     const query = `INSERT INTO immersion_applications(
-        id, status, email, first_name, last_name, phone, agency_id, date_submission, date_start, date_end, siret, business_name, mentor, mentor_phone, mentor_email, schedule, individual_protection,
+        id, status, email, first_name, last_name, phone, emergency_contact, emergency_contact_phone, agency_id, date_submission, date_start, date_end, siret, business_name, mentor, mentor_phone, mentor_email, schedule, individual_protection,
         sanitary_prevention, sanitary_prevention_description, immersion_address, immersion_objective, immersion_appellation, immersion_activities, immersion_skills, beneficiary_accepted, enterprise_accepted, postal_code, work_conditions, pe_external_id
-      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)`;
+      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)`;
 
     // prettier-ignore
-    await this.client.query(query, [id, status, email, firstName, lastName, phone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions, peExternalId]);
+    await this.client.query(query, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions, peExternalId]);
     return immersionApplicationEntity.id;
   }
 
@@ -65,18 +65,19 @@ export class PgImmersionApplicationRepository
     immersionApplicationEntity: ImmersionApplicationEntity,
   ): Promise<ImmersionApplicationId | undefined> {
     // prettier-ignore
-    const { id, status, email, firstName, lastName, phone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, workConditions, peExternalId } =
+    const { id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, workConditions, peExternalId } =
       immersionApplicationEntity.toDto();
 
     const query = `UPDATE immersion_applications
-      SET status=$2,  email=$3,  first_name=$4,  last_name=$5,  phone=$6,  agency_id=$7, date_submission=$8, date_start=$9, date_end=$10, siret=$11,
-        business_name=$12, mentor=$13, mentor_phone=$14, mentor_email=$15, schedule=$16, individual_protection=$17, sanitary_prevention=$18, sanitary_prevention_description=$19, immersion_address=$20,
-        immersion_objective=$21, immersion_appellation=$22, immersion_activities=$23, immersion_skills=$24, beneficiary_accepted=$25, enterprise_accepted=$26, work_conditions=$27, pe_external_id=$28, 
+      SET status=$2,  email=$3,  first_name=$4,  last_name=$5,  phone=$6,  emergency_contact=$7, emergency_contact_phone=$8, 
+      agency_id=$9, date_submission=$10, date_start=$11, date_end=$12, siret=$13,
+        business_name=$14, mentor=$15, mentor_phone=$16, mentor_email=$17, schedule=$18, individual_protection=$19, sanitary_prevention=$20, sanitary_prevention_description=$21, immersion_address=$22,
+        immersion_objective=$23, immersion_appellation=$24, immersion_activities=$25, immersion_skills=$26, beneficiary_accepted=$27, enterprise_accepted=$28, work_conditions=$29, pe_external_id=$30, 
         updated_at=now()
       WHERE id=$1`;
 
     // prettier-ignore
-    await this.client.query(query, [id, status, email, firstName, lastName, phone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, workConditions, peExternalId]);
+    await this.client.query(query, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, workConditions, peExternalId]);
     return immersionApplicationEntity.id;
   }
 
@@ -89,6 +90,8 @@ export class PgImmersionApplicationRepository
       lastName: params.last_name,
       phone: optional(params.phone),
       postalCode: optional(params.postal_code),
+      emergencyContact: optional(params.emergency_contact),
+      emergencyContactPhone: optional(params.emergency_contact_phone),
       agencyId: params.agency_id,
       dateSubmission: toDateString(params.date_submission),
       dateStart: toDateString(params.date_start),

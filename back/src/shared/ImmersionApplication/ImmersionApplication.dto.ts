@@ -31,6 +31,8 @@ export type ImmersionApplicationDto = {
   lastName: string;
   phone?: string;
   postalCode?: string;
+  emergencyContact?: string;
+  emergencyContactPhone?: string;
   agencyId: AgencyId;
   dateSubmission: string; // Date iso string
   dateStart: string; // Date iso string

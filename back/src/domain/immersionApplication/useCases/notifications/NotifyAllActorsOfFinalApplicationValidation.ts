@@ -72,6 +72,8 @@ export const getValidatedApplicationFinalConfirmationParams = (
   }),
   beneficiaryFirstName: dto.firstName,
   beneficiaryLastName: dto.lastName,
+  emergencyContact: dto.emergencyContact,
+  emergencyContactPhone: dto.emergencyContactPhone,
   dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
   dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
   mentorName: dto.mentor,

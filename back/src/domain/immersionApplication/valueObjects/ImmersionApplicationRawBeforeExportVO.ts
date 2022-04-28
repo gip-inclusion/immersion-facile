@@ -18,6 +18,8 @@ type KeysForExport =
   | "dateStart"
   | "dateEnd"
   | "businessName"
+  | "emergencyContact"
+  | "emergencyContactPhone"
   | "mentor"
   | "mentorPhone"
   | "mentorEmail"

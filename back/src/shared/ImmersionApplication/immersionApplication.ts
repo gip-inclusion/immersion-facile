@@ -56,6 +56,8 @@ export const IMMERSION_APPLICATION_TEMPLATE: ImmersionApplicationDto = {
   firstName: "Esteban",
   lastName: "Ocon",
   postalCode: "75000",
+  emergencyContact: "Camille Dumaître",
+  emergencyContactPhone: "0601020202",
   agencyId: "fake-agency-id",
   dateSubmission: "2021-07-01",
   dateStart: "2021-08-01",

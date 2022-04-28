@@ -180,6 +180,8 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       totalHours: 56,
       beneficiaryFirstName: application.firstName,
       beneficiaryLastName: application.lastName,
+      emergencyContact: application.emergencyContact,
+      emergencyContactPhone: application.emergencyContactPhone,
       dateStart: parseISO(application.dateStart).toLocaleDateString("fr"),
       dateEnd: parseISO(application.dateEnd).toLocaleDateString("fr"),
       mentorName: application.mentor,

@@ -166,6 +166,22 @@ export const ApplicationFormFieldsUkraine = ({
         description="pour qu’on puisse vous contacter à propos de l’immersion"
         disabled={isFrozen}
       />
+      <TextInput
+        label="Indiquez le prénom et le nom de la personne à prévenir en cas d'urgence"
+        name="emergencyContact"
+        type="text"
+        placeholder=""
+        description=""
+        disabled={isFrozen}
+      />
+      <TextInput
+        label="Indiquez le numéro de téléphone de la personne à prévenir en cas d'urgence"
+        name="emergencyContactPhone"
+        type="tel"
+        placeholder="0606060607"
+        description=""
+        disabled={isFrozen}
+      />
 
       <FormSectionTitle>2. Coordonnées de l'entreprise</FormSectionTitle>
       <h4>

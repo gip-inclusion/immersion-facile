@@ -227,6 +227,8 @@ export class SendinblueEmailGateway implements EmailGateway {
         TOTAL_HOURS: params.totalHours,
         BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
         BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+        EMERGENCY_CONTACT: params.emergencyContact,
+        EMERGENCY_CONTACT_PHONE: params.emergencyContactPhone,
         DATE_START: params.dateStart,
         DATE_END: params.dateEnd,
         MENTOR_NAME: params.mentorName,

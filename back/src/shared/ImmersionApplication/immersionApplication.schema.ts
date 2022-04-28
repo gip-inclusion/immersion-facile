@@ -51,6 +51,12 @@ export const immersionApplicationSchema: z.Schema<ImmersionApplicationDto> = z
       .regex(stringOfNumbers)
       .length(5, "5 chiffres sont nécessaires pour le code postal")
       .optional(),
+    emergencyContact: z.string().optional(),
+    emergencyContactPhone: z
+      .string()
+      .regex(phoneRegExp, "Numero de téléphone incorrect")
+      .optional()
+      .or(z.literal("")),
     agencyId: agencyIdSchema,
     dateSubmission: zString.regex(
       dateRegExp,
@@ -113,6 +119,16 @@ export const immersionApplicationUkraineSchema: z.Schema<ImmersionApplicationDto
       firstName: zTrimmedString,
       lastName: zTrimmedString,
       phone: z
+        .string()
+        .regex(phoneRegExp, "Numero de téléphone incorrect")
+        .optional(),
+      postalCode: z
+        .string()
+        .regex(stringOfNumbers)
+        .length(5, "5 chiffres sont nécessaires pour le code postal")
+        .optional(),
+      emergencyContact: zTrimmedString.optional(),
+      emergencyContactPhone: z
         .string()
         .regex(phoneRegExp, "Numero de téléphone incorrect")
         .optional(),

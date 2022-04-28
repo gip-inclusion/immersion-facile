@@ -183,6 +183,22 @@ export const ApplicationFormFields = ({
           defaultAgencyId={values.agencyId}
         />
       )}
+      <TextInput
+        label="Indiquez le prénom et le nom de la personne à prévenir en cas d'urgence"
+        name="emergencyContact"
+        type="text"
+        placeholder=""
+        description=""
+        disabled={isFrozen}
+      />
+      <TextInput
+        label="Indiquez le numéro de téléphone de la personne à prévenir en cas d'urgence"
+        name="emergencyContactPhone"
+        type="tel"
+        placeholder="0606060607"
+        description=""
+        disabled={isFrozen}
+      />
       <FormSectionTitle>
         2. Coordonnées de l'entreprise
         {!isFrozen && (
@@ -446,6 +462,8 @@ const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
     "firstName",
     "lastName",
     "phone",
+    "emergencyContact",
+    "emergencyContactPhone",
     "postalCode",
     "dateStart",
     "dateEnd",

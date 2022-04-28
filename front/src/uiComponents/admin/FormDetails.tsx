@@ -32,6 +32,8 @@ const candidateFields: FieldsToLabel = {
   firstName: "Prénom",
   phone: "Numéro de téléphone",
   beneficiaryAccepted: "Signé",
+  emergencyContact: "Contact d'urgence",
+  emergencyContactPhone: "Numéro du contact d'urgence",
 };
 
 const immersionFields: FieldsToLabel = {

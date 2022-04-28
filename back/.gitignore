@@ -6,3 +6,4 @@ data-test.json
 storage/tmp/*
 !storage/tmp/.gitkeep
 wallaby.js
+.vscode/settings.json

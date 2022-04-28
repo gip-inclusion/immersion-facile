@@ -36,6 +36,8 @@ const validImmersionApplication: ImmersionApplicationDto = {
   phone: VALID_PHONES[0],
   firstName: "Esteban",
   lastName: "Ocon",
+  emergencyContact: "Clariss Ocon",
+  emergencyContactPhone: "0663567896",
   dateSubmission: DATE_SUBMISSION,
   dateStart: DATE_START,
   dateEnd: DATE_END,

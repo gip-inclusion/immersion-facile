@@ -29,6 +29,8 @@ export type ValidatedApplicationFinalConfirmationParams = {
   totalHours: number;
   beneficiaryFirstName: string;
   beneficiaryLastName: string;
+  emergencyContact?: string;
+  emergencyContactPhone?: string;
   dateStart: string;
   dateEnd: string;
   mentorName: string;
