@@ -76,7 +76,6 @@ const CreationSiretRelatedInputs = () => {
   return (
     <>
       <TextInput
-        //value={siretFromPageQueryParam || ""}
         {...getMandatoryLabelAndName("siret")}
         placeholder="362 521 879 00034"
         disabled={isFetchingSiret}
@@ -135,7 +134,7 @@ const CreationSiretRelatedInputs = () => {
   );
 };
 
-// A gérer dans un Unit Test automatisé
+// Should be handled by Unit Test Suites
 const creationInitialValuesWithoutSourceAndSearchable = (
   siret?: SiretDto,
 ): OmitFromExistingKeys<FormEstablishmentDto, "source" | "isSearchable"> =>
