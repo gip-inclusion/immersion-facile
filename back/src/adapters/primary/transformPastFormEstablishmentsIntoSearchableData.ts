@@ -13,7 +13,6 @@ import {
   ExponentialBackoffRetryStrategy,
 } from "../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
-import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
@@ -57,7 +56,6 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       random,
     ),
   );
-  const sequenceRunner = new ThrottledSequenceRunner(100, 3);
   const sireneRepository = new HttpsSireneRepository(
     config.sireneHttpsConfig,
     clock,
@@ -77,7 +75,6 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     pgUowPerformer,
     sireneRepository,
     adresseAPI,
-    sequenceRunner,
     new UuidV4Generator(),
     new RealClock(),
   );

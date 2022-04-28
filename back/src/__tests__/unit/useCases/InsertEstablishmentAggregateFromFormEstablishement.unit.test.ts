@@ -5,7 +5,6 @@ import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/I
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import {
@@ -21,11 +20,6 @@ import { EstablishmentEntityV2Builder } from "../../../_testBuilders/Establishme
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 
-class TestSequenceRunner implements SequenceRunner {
-  public run<Input, Output>(array: Input[], cb: (a: Input) => Promise<Output>) {
-    return Promise.all(array.map(cb));
-  }
-}
 const fakeSiret = "90040893100013";
 const fakePosition: LatLonDto = { lat: 49.119146, lon: 6.17602 };
 const fakeBusinessContact = new ContactEntityV2Builder().build();
@@ -61,7 +55,6 @@ describe("Insert Establishment aggregate from form data", () => {
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     addresseAPI = new InMemoryAdresseAPI(fakePosition);
     uuidGenerator = new TestUuidGenerator();
-    const sequencerRunner = new TestSequenceRunner();
 
     const uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
@@ -73,7 +66,6 @@ describe("Insert Establishment aggregate from form data", () => {
       uowPerformer,
       sireneRepo,
       addresseAPI,
-      sequencerRunner,
       uuidGenerator,
       clock,
     );

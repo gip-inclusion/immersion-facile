@@ -87,7 +87,6 @@ import {
 import { InMemoryEventBus } from "../secondary/core/InMemoryEventBus";
 import { InMemoryOutboxQueries } from "../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
-import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpPeConnectGateway } from "../secondary/HttpPeConnectGateway";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
@@ -143,7 +142,6 @@ const counterEventsMarkedAsPublished = new promClient.Counter({
 
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
-const sequenceRunner = new ThrottledSequenceRunner(1500, 3);
 
 export const createAppDependencies = async (config: AppConfig) => {
   const getPgPoolFn = createGetPgPoolFn(config);
@@ -575,7 +573,6 @@ const createUseCases = (
         uowPerformer,
         repositories.sirene,
         adresseAPI,
-        sequenceRunner,
         uuidGenerator,
         clock,
       ),
@@ -584,7 +581,6 @@ const createUseCases = (
         uowPerformer,
         repositories.sirene,
         adresseAPI,
-        sequenceRunner,
         uuidGenerator,
         clock,
       ),

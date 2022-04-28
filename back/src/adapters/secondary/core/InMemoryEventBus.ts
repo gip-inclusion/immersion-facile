@@ -17,28 +17,11 @@ import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 
-const counterPublishedEventsTotal = new promClient.Counter({
-  name: "in_memory_event_bus_published_events_total",
-  help: "The total count of events published by InMemoryEventBus.",
-  labelNames: ["topic"],
-});
-
-const counterPublishedEventsSuccess = new promClient.Counter({
-  name: "in_memory_event_bus_published_events_success",
-  help: "The success count of events published by InMemoryEventBus.",
-  labelNames: ["topic"],
-});
-
-const counterPublishedEventsError = new promClient.Counter({
-  name: "in_memory_event_bus_published_events_error",
-  help: "The error count of events published by InMemoryEventBus.",
-  labelNames: ["topic", "errorType"],
-});
-
 type SubscriptionsForTopic = Record<string, EventCallback<DomainTopic>>;
 
 export class InMemoryEventBus implements EventBus {
   public subscriptions: Partial<Record<DomainTopic, SubscriptionsForTopic>>;
+
   constructor(
     private clock: Clock,
     private afterPublish: (event: DomainEvent) => Promise<void>,
@@ -52,6 +35,32 @@ export class InMemoryEventBus implements EventBus {
     await this.afterPublish(publishedEvent);
   }
 
+  public subscribe<T extends DomainTopic>(
+    domainTopic: T,
+    subscriptionId: SubscriptionId,
+    callback: EventCallback<T>,
+  ) {
+    logger.info({ domainTopic }, "subscribe");
+    if (!this.subscriptions[domainTopic]) {
+      this.subscriptions[domainTopic] = {};
+    }
+
+    // prettier-ignore
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const subscriptionsForTopic: SubscriptionsForTopic = this.subscriptions[domainTopic]!;
+
+    if (subscriptionsForTopic[subscriptionId]) {
+      logger.warn(
+        { domainTopic, subscriptionId },
+        "Subscription with this id already exists. It will be override",
+      );
+    }
+
+    if (callback) {
+      subscriptionsForTopic[subscriptionId] = callback as any;
+    }
+  }
+
   private async _publish(
     event: DomainEvent,
     publishedAt: DateStr,
@@ -63,45 +72,22 @@ export class InMemoryEventBus implements EventBus {
     const topic = event.topic;
     counterPublishedEventsTotal.inc({ topic });
 
-    const callbacksById = this.subscriptions[topic];
-    if (callbacksById === undefined) {
-      monitorAbsenceOfCallback(event);
-      return addNewPublicationWithoutFailureToEvent(event, publishedAt);
-    }
+    const callbacksByIdOrUndefined: SubscriptionsForTopic | undefined =
+      this.subscriptions[topic];
 
-    const subscriptionsIdToPublish = getSubscriptionsIdToPublish(
-      event,
-      callbacksById,
-    );
+    if (noSubscribersToEvent(callbacksByIdOrUndefined))
+      return publishEventWithNoCallbacks(event, publishedAt);
 
-    if (!subscriptionsIdToPublish.length) {
-      // this should not happen because the case callbacksById === undefined has been handle before
-      monitorAbsenceOfSubscribers(event);
-      return addNewPublicationWithoutFailureToEvent(event, publishedAt);
-    }
+    //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const callbacksById: SubscriptionsForTopic = callbacksByIdOrUndefined!;
 
     const failuresOrUndefined: (EventFailure | void)[] = await Promise.all(
-      subscriptionsIdToPublish.map(
-        async (subscriptionId): Promise<EventFailure | void> => {
-          const cb = callbacksById[subscriptionId];
-          logger.info(
-            { eventId: event.id, topic: event.topic },
-            `Sending an event`,
-          );
-
-          try {
-            await cb(event);
-          } catch (error: any) {
-            monitorErrorInCallback(error, event);
-            return { subscriptionId, errorMessage: error.message };
-          }
-        },
+      getSubscriptionsIdToPublish(event, callbacksById).map(
+        subscriptionCallbackToExecute(event, callbacksById),
       ),
     );
 
-    const failures = failuresOrUndefined.filter(
-      (failure): failure is EventFailure => !!failure,
-    );
+    const failures: EventFailure[] = failuresOrUndefined.filter(isEventFailure);
 
     const publications: EventPublication[] = [
       ...event.publications,
@@ -132,33 +118,41 @@ export class InMemoryEventBus implements EventBus {
       wasQuarantined,
     };
   }
-
-  public subscribe<T extends DomainTopic>(
-    domainTopic: T,
-    subscriptionId: SubscriptionId,
-    callback: EventCallback<T>,
-  ) {
-    logger.info({ domainTopic }, "subscribe");
-    if (!this.subscriptions[domainTopic]) {
-      this.subscriptions[domainTopic] = {};
-    }
-
-    // prettier-ignore
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const subscriptionsForTopic: SubscriptionsForTopic = this.subscriptions[domainTopic]!;
-
-    if (subscriptionsForTopic[subscriptionId]) {
-      logger.warn(
-        { domainTopic, subscriptionId },
-        "Subscription with this id already exists. It will be override",
-      );
-    }
-
-    if (callback) {
-      subscriptionsForTopic[subscriptionId] = callback as any;
-    }
-  }
 }
+
+const noSubscribersToEvent = (
+  callbacksById: SubscriptionsForTopic | undefined,
+) => callbacksById === undefined;
+
+const publishEventWithNoCallbacks = (
+  event: DomainEvent,
+  publishedAt: DateStr,
+): DomainEvent => {
+  monitorAbsenceOfCallback(event);
+  return addNewPublicationWithoutFailureToEvent(event, publishedAt);
+};
+
+const subscriptionCallbackToExecute =
+  (event: DomainEvent, callbacksById: SubscriptionsForTopic) =>
+  async (subscriptionId: SubscriptionId): Promise<void | EventFailure> => {
+    const cb = callbacksById[subscriptionId];
+    logger.info(
+      { eventId: event.id, topic: event.topic },
+      `Sending an event for ${subscriptionId}`,
+    );
+
+    try {
+      await cb(event);
+      console.log(`A callback has ben resolved ${subscriptionId}`);
+    } catch (error: any) {
+      monitorErrorInCallback(error, event);
+      return { subscriptionId, errorMessage: error.message };
+    }
+  };
+
+const isEventFailure = (
+  failure: EventFailure | void,
+): failure is EventFailure => !!failure;
 
 const addNewPublicationWithoutFailureToEvent = (
   event: DomainEvent,
@@ -185,13 +179,6 @@ const monitorAbsenceOfCallback = (event: DomainEvent) => {
   });
 };
 
-const monitorAbsenceOfSubscribers = (event: DomainEvent) => {
-  logger.warn(
-    { event },
-    "No subscriber to publish to, event was already fully processed (should not happen)",
-  );
-};
-
 const monitorErrorInCallback = (error: any, event: DomainEvent) => {
   logger.error(
     { event, error: error.message || JSON.stringify(error) },
@@ -202,3 +189,21 @@ const monitorErrorInCallback = (error: any, event: DomainEvent) => {
     errorType: "callback_failed",
   });
 };
+
+const counterPublishedEventsTotal = new promClient.Counter({
+  name: "in_memory_event_bus_published_events_total",
+  help: "The total count of events published by InMemoryEventBus.",
+  labelNames: ["topic"],
+});
+
+const counterPublishedEventsSuccess = new promClient.Counter({
+  name: "in_memory_event_bus_published_events_success",
+  help: "The success count of events published by InMemoryEventBus.",
+  labelNames: ["topic"],
+});
+
+const counterPublishedEventsError = new promClient.Counter({
+  name: "in_memory_event_bus_published_events_error",
+  help: "The error count of events published by InMemoryEventBus.",
+  labelNames: ["topic", "errorType"],
+});

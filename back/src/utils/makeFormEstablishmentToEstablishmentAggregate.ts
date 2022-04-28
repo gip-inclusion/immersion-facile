@@ -1,5 +1,4 @@
 import { Clock } from "../domain/core/ports/Clock";
-import { SequenceRunner } from "../domain/core/ports/SequenceRunner";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import {
@@ -13,22 +12,32 @@ import {
   SireneRepository,
 } from "../domain/sirene/ports/SireneRepository";
 import { FormEstablishmentDto } from "../shared/formEstablishment/FormEstablishment.dto";
+import { AppellationDto } from "../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { notifyAndThrowErrorDiscord } from "./notifyDiscord";
 
-const offerFromFormScore = 10; // 10/10 if voluntaryToImmersion=true (consider removing this field)
+const appelationToImmersionOfferEntity = (uuidGenerator: UuidGenerator) => {
+  const offerFromFormScore = 10;
+  return ({
+    romeCode,
+    appellationCode,
+  }: AppellationDto): ImmersionOfferEntityV2 => ({
+    id: uuidGenerator.new(),
+    romeCode,
+    appellationCode,
+    score: offerFromFormScore,
+  });
+};
 
 export const makeFormEstablishmentToEstablishmentAggregate = ({
   uuidGenerator,
   clock,
   adresseAPI,
   sireneRepository,
-  sequenceRunner,
 }: {
   uuidGenerator: UuidGenerator;
   clock: Clock;
   adresseAPI: AdresseAPI;
   sireneRepository: SireneRepository;
-  sequenceRunner: SequenceRunner;
 }) => {
   const formEstablishmentToEstablishmentAggregate = async (
     formEstablishment: FormEstablishmentDto,
@@ -68,20 +77,10 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
       ...formEstablishment.businessContact,
     };
 
-    const immersionOffers: ImmersionOfferEntityV2[] = (
-      await sequenceRunner.run(
-        formEstablishment.appellations,
-        async ({
-          romeCode,
-          appellationCode,
-        }): Promise<ImmersionOfferEntityV2 | undefined> => ({
-          id: uuidGenerator.new(),
-          romeCode,
-          appellationCode: appellationCode ? appellationCode : undefined,
-          score: offerFromFormScore,
-        }),
-      )
-    ).filter((offer): offer is ImmersionOfferEntityV2 => !!offer);
+    const immersionOffers: ImmersionOfferEntityV2[] =
+      formEstablishment.appellations.map(
+        appelationToImmersionOfferEntity(uuidGenerator),
+      );
 
     const establishment: EstablishmentEntityV2 = {
       siret: formEstablishment.siret,

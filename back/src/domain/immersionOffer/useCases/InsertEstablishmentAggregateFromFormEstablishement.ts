@@ -3,7 +3,6 @@ import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormE
 import { makeFormEstablishmentToEstablishmentAggregate } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { Clock } from "../../core/ports/Clock";
-import { SequenceRunner } from "../../core/ports/SequenceRunner";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -18,7 +17,6 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private readonly sireneRepository: SireneRepository,
     private readonly adresseAPI: AdresseAPI,
-    private readonly sequenceRunner: SequenceRunner,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
   ) {
@@ -40,7 +38,6 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       await makeFormEstablishmentToEstablishmentAggregate({
         sireneRepository: this.sireneRepository,
         adresseAPI: this.adresseAPI,
-        sequenceRunner: this.sequenceRunner,
         uuidGenerator: this.uuidGenerator,
         clock: this.clock,
       })(formEstablishment);

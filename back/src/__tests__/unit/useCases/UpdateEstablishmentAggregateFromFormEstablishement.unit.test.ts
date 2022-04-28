@@ -5,7 +5,6 @@ import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/I
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { SequenceRunner } from "../../../domain/core/ports/SequenceRunner";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
 import {
@@ -18,12 +17,6 @@ import { EstablishmentEntityV2Builder } from "../../../_testBuilders/Establishme
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { expectPromiseToFailWith } from "../../../_testBuilders/test.helpers";
-
-class TestSequenceRunner implements SequenceRunner {
-  public run<Input, Output>(array: Input[], cb: (a: Input) => Promise<Output>) {
-    return Promise.all(array.map(cb));
-  }
-}
 
 const prepareSireneRepo = (
   sireneRepo: InMemorySireneRepository,
@@ -53,7 +46,6 @@ describe("Update Establishment aggregate from form data", () => {
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     addresseAPI = new InMemoryAdresseAPI();
     uuidGenerator = new TestUuidGenerator();
-    const sequencerRunner = new TestSequenceRunner();
 
     const uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
@@ -64,7 +56,6 @@ describe("Update Establishment aggregate from form data", () => {
       uowPerformer,
       sireneRepo,
       addresseAPI,
-      sequencerRunner,
       uuidGenerator,
       new CustomClock(),
     );
