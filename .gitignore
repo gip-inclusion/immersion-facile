@@ -3,6 +3,5 @@
 node_modules
 .env
 docker-data
-.vscode
 nginx/etc/letsencrypt
 backup/**/*.bz2
