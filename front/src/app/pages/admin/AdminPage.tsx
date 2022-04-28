@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import { immersionApplicationGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
@@ -21,7 +21,6 @@ import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
 import { Route } from "type-route";
 import "./Admin.css";
-import { ApiDataContainer } from "./ApiDataContainer";
 
 interface AdminProps {
   route: Route<typeof routes.admin> | Route<typeof routes.agencyAdmin>;
@@ -34,7 +33,7 @@ const buildExportEstablishmentRoute = (params: EstablishmentExportConfigDto) =>
 
 export const AdminPage = ({ route }: AdminProps) => {
   const featureFlags = useAppSelector(featureFlagsSelector);
-  const [_immersionApplications, setImmersionApplications] = useState<
+  const [immersionApplications, setImmersionApplications] = useState<
     ImmersionApplicationDto[]
   >([]);
 
@@ -51,6 +50,12 @@ export const AdminPage = ({ route }: AdminProps) => {
     setImmersionApplications([]);
     setStatusFilter(validApplicationStatus[selectedIndex]);
   };
+
+  useEffect(() => {
+    immersionApplicationGateway
+      .getAll(agency, statusFilter)
+      .then((applications) => setImmersionApplications(applications));
+  }, [statusFilter]);
 
   return (
     <>
@@ -166,48 +171,40 @@ export const AdminPage = ({ route }: AdminProps) => {
               >
                 Demandes d'immersions à traiter
               </div>
-              <ApiDataContainer
-                callApi={() =>
-                  immersionApplicationGateway.getAll(agency, statusFilter)
+              <div>
+                {
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: "30px",
+                        backgroundColor: "#E5E5F4",
+                        padding: "10px",
+                      }}
+                    >
+                      <p>filtres</p>
+                      <ArrayDropdown
+                        labels={[...validApplicationStatus]}
+                        didPick={filterChanged}
+                      />
+                    </div>
+
+                    <ul className="fr-accordions-group">
+                      {immersionApplications.map((item) => (
+                        <li key={item.id}>
+                          <FormAccordion immersionApplication={item} />
+                          {route.name === "admin" && (
+                            <FormMagicLinks immersionApplication={item} />
+                          )}
+                          <hr />
+                        </li>
+                      ))}
+                    </ul>
+                  </>
                 }
-              >
-                {(immersionApplications) => {
-                  if (!immersionApplications) return <p />;
-
-                  return (
-                    <>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: "30px",
-                          backgroundColor: "#E5E5F4",
-                          padding: "10px",
-                        }}
-                      >
-                        <p>filtres</p>
-                        <ArrayDropdown
-                          labels={[...validApplicationStatus]}
-                          didPick={filterChanged}
-                        />
-                      </div>
-
-                      <ul className="fr-accordions-group">
-                        {immersionApplications.map((item) => (
-                          <li key={item.id}>
-                            <FormAccordion immersionApplication={item} />
-                            {route.name === "admin" && (
-                              <FormMagicLinks immersionApplication={item} />
-                            )}
-                            <hr />
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  );
-                }}
-              </ApiDataContainer>
+              </div>
             </div>
           )}
         </div>

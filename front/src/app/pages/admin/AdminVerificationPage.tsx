@@ -42,6 +42,8 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
       "Attention! Cette demande d'immersion est à statut 'Signée Partiellement', donc vous ne devriez pas encore pouvoir la visualiser. Veuillez consulter l'équipe Immérsion Facilitée",
     IN_REVIEW:
       "Attention! Cette demande d'immersion est à statut 'En cours de revue', l'opération que vous venez d'effectuer ne semble pas avoir été appliquée. Veuillez réésayer ou consulter l'équipe Immérsion Facilitée",
+    CANCELLED:
+      "Attention! Cette demande d'immersion est à statut 'annulée', l'opération que vous venez d'effectuer ne semble pas avoir été appliquée. Veuillez réésayer ou consulter l'équipe Immérsion Facilitée",
   };
 
   const validationDisabled = () => !form || form.status !== "IN_REVIEW";

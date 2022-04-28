@@ -52,6 +52,7 @@ export const statusTransitionConfigs: Record<
   },
   CANCELLED: {
     validInitialStatuses: [
+      "DRAFT",
       "IN_REVIEW",
       "READY_TO_SIGN",
       "PARTIALLY_SIGNED",
