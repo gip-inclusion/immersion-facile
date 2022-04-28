@@ -38,7 +38,7 @@ export const statusTransitionConfigs: Record<
     validRoles: ["admin"],
   },
 
-  // This config allows a counsellor to reject an application after it been
+  // This config allows a counsellor to reject or cancel an application after it been
   // accepted by a validator. Should we be stricter? We assume that this is a
   // rare edge case that can be addressed at a later stage.
   REJECTED: {
@@ -50,7 +50,16 @@ export const statusTransitionConfigs: Record<
     ],
     validRoles: ["counsellor", "validator", "admin"],
   },
-
+  CANCELLED: {
+    validInitialStatuses: [
+      "IN_REVIEW",
+      "READY_TO_SIGN",
+      "PARTIALLY_SIGNED",
+      "ACCEPTED_BY_COUNSELLOR",
+      "REJECTED",
+    ],
+    validRoles: ["counsellor", "validator", "admin"],
+  },
   // This enables the "require modifications" flow. The agents can put the request
   // back in the draft state for the beneficiary to modify the request and reapply.
   // Also enables the company/beneficiary to request modifications and revoke signatures

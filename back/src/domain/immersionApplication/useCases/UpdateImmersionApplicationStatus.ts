@@ -28,6 +28,7 @@ const domainTopicByTargetStatusMap: Partial<
   ACCEPTED_BY_VALIDATOR: "ImmersionApplicationAcceptedByValidator",
   VALIDATED: "FinalImmersionApplicationValidationByAdmin",
   REJECTED: "ImmersionApplicationRejected",
+  CANCELLED: "ImmersionApplicationCancelled",
   DRAFT: "ImmersionApplicationRequiresModification",
 };
 

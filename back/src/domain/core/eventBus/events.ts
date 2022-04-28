@@ -49,6 +49,7 @@ export type DomainEvent =
 
   // UNHAPPY PATHS
   | GenericEvent<"ImmersionApplicationRejected", ImmersionApplicationDto>
+  | GenericEvent<"ImmersionApplicationCancelled", ImmersionApplicationDto>
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationRequiresModification", ImmersionApplicationRequiresModificationPayload>
 

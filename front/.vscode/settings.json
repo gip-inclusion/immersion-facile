@@ -1,0 +1,13 @@
+{
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascript",
+    "html": "HTML"
+  },
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#2ec9ce",
+    "titleBar.inactiveBackground": "#25a7ac",
+    "titleBar.activeForeground": "#ffffff",
+    "titleBar.inactiveForeground": "#cccccc"
+  },
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+}

@@ -24,7 +24,11 @@ export class GetImmersionApplication extends UseCase<
   }: WithImmersionApplicationId): Promise<ImmersionApplicationDto> {
     const immersionApplicationEntity =
       await this.immersionApplicationRepository.getById(id);
-    if (!immersionApplicationEntity) throw new NotFoundError(id);
+    if (
+      !immersionApplicationEntity ||
+      immersionApplicationEntity.status === "CANCELLED"
+    )
+      throw new NotFoundError(id);
     return immersionApplicationEntity.toDto();
   }
 }

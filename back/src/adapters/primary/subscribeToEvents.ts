@@ -47,6 +47,7 @@ const getUseCasesByTopics = (
   ImmersionApplicationRejected: [
     useCases.notifyBeneficiaryAndEnterpriseThatApplicationIsRejected,
   ],
+  ImmersionApplicationCancelled: [],
 
   // Establishment form related
   FormEstablishmentAdded: [

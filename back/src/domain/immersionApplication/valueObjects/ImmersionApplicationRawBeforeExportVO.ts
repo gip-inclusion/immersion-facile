@@ -84,6 +84,7 @@ const translateStatus: Record<string, string> = {
   ["ACCEPTED_BY_VALIDATOR"]: "Validé par la structure",
   ["VALIDATED"]: "Convention envoyée",
   ["REJECTED"]: "Refusée",
+  ["CANCELLED"]: "Annulée",
 };
 
 type PrettySchedule = {

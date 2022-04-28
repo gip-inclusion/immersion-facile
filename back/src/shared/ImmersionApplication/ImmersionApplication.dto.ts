@@ -17,6 +17,7 @@ export const validApplicationStatus = [
   "ACCEPTED_BY_VALIDATOR",
   "VALIDATED",
   "REJECTED",
+  "CANCELLED",
 ] as const;
 
 export type ImmersionApplicationId = Flavor<string, "ImmersionApplicationId">;

@@ -39,6 +39,8 @@ const getPrefix = (status: ApplicationStatus) => {
       return "[✅ DEMANDE VALIDÉE]";
     case "VALIDATED":
       return "[👩‍💼 ENVOI DE CONVENTION VALIDÉE PAR ADMIN]";
+    case "CANCELLED":
+      return "[🗑️ CONVENTION ANNULÉE PAR ADMIN]";
   }
 
   return "[⁉️ STATUS DE LA DEMANDE INDÉFINI]";
