@@ -56,7 +56,6 @@ export const EstablishmentCreationForm = ({
 const CreationSiretRelatedInputs = () => {
   const { siret, establishmentInfo, isFetchingSiret, siretAlreadyExists } =
     useSiretFetcher({ fetchSirenApiEvenAlreadyInDb: false, disabled: false });
-  console.log(siret);
   const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
     useState(false);
 
