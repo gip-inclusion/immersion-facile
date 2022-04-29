@@ -1,5 +1,5 @@
 import { NotEmptyArray } from "../utils";
-import crypto from "crypto";
+import * as crypto from "crypto";
 import { SiretDto } from "../siret";
 
 export type JwtPayloads = {
@@ -52,7 +52,7 @@ export const createMagicLinkPayload = (
   nowFn = Date.now,
   iat: number = Math.round(nowFn() / 1000),
   exp: number = iat + durationDays * 24 * 3600,
-  version = currentJwtVersions.application,
+  version = currentJwtVersions.application
 ) => ({
   version,
   applicationId,

@@ -1,4 +1,4 @@
-import { z } from "../../node_modules/zod";
+import { z } from "zod";
 import { NotEmptyArray } from "./utils";
 import { zTrimmedString } from "./zodUtils";
 

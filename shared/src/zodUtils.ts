@@ -1,4 +1,4 @@
-import { z } from "../../node_modules/zod";
+import { z } from "zod";
 
 export const zString = z
   .string({

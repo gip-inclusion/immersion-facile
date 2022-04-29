@@ -8,36 +8,51 @@ variables:
   PG_TEST_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB
   STORAGE_ROOT: ./storage/
 
+image: node:16.5-buster
+
 stages:
+#  - build
   - test
   - deploy
 
-image: node:16.5
+#build:
+#  stage: build
+#  before_script:
+#    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7.0.0-rc.9
+#    - pnpm config set store-dir .pnpm-store
+#  script:
+#    - pnpm install --frozen-lockfile
 
 front:
   stage: test
+  before_script:
+    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7.0.0-rc.9
+    - pnpm config set store-dir .pnpm-store
   script:
+    - pnpm install --frozen-lockfile
     - cd front
-    - npm ci
-    - npm run includecheck
-    - npm run format:check
-    - npm run lint
-    - npm run test
-    - npm run typecheck
-    - npm run build
+    - pnpm includecheck
+    - pnpm format:check
+    - pnpm lint
+    - pnpm test
+    - pnpm typecheck
+    - pnpm build
 
 back:
   stage: test
+  before_script:
+    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7.0.0-rc.9
+    - pnpm config set store-dir .pnpm-store
   services:
     - name: postgis/postgis:13-master
       alias: postgres
   script:
+    - pnpm install --frozen-lockfile
     - cd back
-    - npm ci
-    - npm run format:check
-    - npm run lint
-    - npm run includecheck
-    - npm run typecheck
+    - pnpm format:check
+    - pnpm lint
+    - pnpm includecheck
+    - pnpm typecheck
     - NODE_ENV=test DATABASE_URL=$PG_TEST_URL npm run migrate up
     - PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_ROOT npm run test:all
 

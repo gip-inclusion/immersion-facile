@@ -1,4 +1,4 @@
-import { z } from "../../node_modules/zod";
+import { z } from "zod";
 import { nafSchema } from "./naf";
 import { Flavor } from "./typeFlavors";
 

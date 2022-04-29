@@ -1,4 +1,4 @@
-import { z } from "../../node_modules/zod";
+import { z } from "zod";
 import { keys } from "./utils";
 
 export type NafSectorCode = keyof typeof nafSectorLabels;

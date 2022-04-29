@@ -23,7 +23,7 @@
     "fullcheck": "npm run includecheck && npm run format && npm run lint && npm run test && npm run typecheck",
     "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck",
     "generate-api-key": "ts-node src/adapters/primary/generateApiKey.ts",
-    "migrate": "ts-node node_modules/.bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",
+    "migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",
     "lint": "eslint ./src --fix"
   },
   "keywords": [],
@@ -34,6 +34,7 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
     "@types/archiver": "^5.3.1",
+    "@types/body-parser": "^1.19.2",
     "@types/express": "^4.17.13",
     "@types/express-prometheus-middleware": "^1.2.1",
     "@types/fs-extra": "^9.0.13",
@@ -62,6 +63,7 @@
   "dependencies": {
     "archiver": "^5.3.0",
     "axios": "^0.26.1",
+    "body-parser": "^1.20.0",
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.0",
     "exceljs": "^4.3.0",
@@ -78,6 +80,7 @@
     "prom-client": "^14.0.1",
     "querystring": "^0.2.1",
     "ramda": "^0.28.0",
+    "shared": "workspace:*",
     "sib-api-v3-typescript": "^2.2.2",
     "slugify": "^1.6.5",
     "ts-node": "^10.7.0",
