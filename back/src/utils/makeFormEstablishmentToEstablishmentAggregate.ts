@@ -15,18 +15,16 @@ import { FormEstablishmentDto } from "../shared/formEstablishment/FormEstablishm
 import { AppellationDto } from "../shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { notifyAndThrowErrorDiscord } from "./notifyDiscord";
 
-const appelationToImmersionOfferEntity = (uuidGenerator: UuidGenerator) => {
-  const offerFromFormScore = 10;
-  return ({
-    romeCode,
-    appellationCode,
-  }: AppellationDto): ImmersionOfferEntityV2 => ({
+const offerFromFormScore = 10;
+
+const appelationToImmersionOfferEntity =
+  (uuidGenerator: UuidGenerator) =>
+  ({ romeCode, appellationCode }: AppellationDto): ImmersionOfferEntityV2 => ({
     id: uuidGenerator.new(),
     romeCode,
     appellationCode,
     score: offerFromFormScore,
   });
-};
 
 export const makeFormEstablishmentToEstablishmentAggregate = ({
   uuidGenerator,
