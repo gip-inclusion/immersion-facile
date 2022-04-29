@@ -19,7 +19,7 @@ import { EstablishmentFormPage } from "../pages/Establishment/EstablishmentFormP
 import { HomePage } from "../pages/home/HomePage";
 import { useRoute } from "./routes";
 
-const { frontEnvType: envType } = ENV;
+const { frontEnvType } = ENV;
 
 const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
 
@@ -56,7 +56,9 @@ export const Router = () => {
       {route.name === "formEstablishmentForExternals" && (
         <EstablishmentFormPageForExternals route={route} />
       )}
-      {route.name === "home" && <HomePage showDebugInfo={envType === "DEV"} />}
+      {route.name === "home" && (
+        <HomePage showDebugInfo={frontEnvType === "DEV"} />
+      )}
 
       {route.name === "landingEstablishment" && <LandingEstablishmentPage />}
       {route.name === "immersionApplication" && (
@@ -75,7 +77,9 @@ export const Router = () => {
         <RenewExpiredLinkPage route={route} />
       )}
       {route.name === "search" && <SearchPage />}
-      {envType === "DEV" && route.name === "searchDebug" && <SearchDebugPage />}
+      {frontEnvType === "DEV" && route.name === "searchDebug" && (
+        <SearchDebugPage />
+      )}
     </>
   );
 };

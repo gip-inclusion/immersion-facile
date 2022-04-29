@@ -12,7 +12,7 @@ Object.entries(originalEnvVariables).forEach(([key, value]) =>
 
 export const ENV = {
   dev: originalEnvVariables.DEV,
-  frontEnvType: originalEnvVariables.VITE_ENV_TYPE || "PROD",
+  frontEnvType: String(originalEnvVariables.VITE_ENV_TYPE) || "PROD",
   gateway:
     originalEnvVariables.VITE_GATEWAY === "IN_MEMORY" ? "IN_MEMORY" : "HTTP",
   PREFILED_ESTABLISHMENT_FORM: Boolean(
