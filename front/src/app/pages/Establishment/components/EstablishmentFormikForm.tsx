@@ -2,6 +2,8 @@ import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "src/shared/formEstablishment/FormEstablishment.schema";
+import { SiretDto } from "src/shared/siret";
+import { HomeButton } from "src/uiComponents/Button";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
@@ -171,9 +173,36 @@ export const EstablishmentFormikForm = ({
             </Form>
             <br />
             <br />
+            {isEditing === true && (
+              <>
+                <HomeButton
+                  onClick={(_) => {
+                    window.open(mailtoHref(initialValues.siret));
+                  }}
+                  type="error"
+                >
+                  Supprimer votre entreprise
+                </HomeButton>
+                <p>
+                  Si vous avez besoin d'aide, envoyez-nous un email: <br />
+                  contact@immersion-facile.beta.gouv.fr
+                </p>
+              </>
+            )}
           </div>
         )}
       </Formik>
     </div>
   );
 };
+
+const lineBreak = "%0D%0A";
+const deleteEstablishmentSubject = "Demande de suppression d'entreprise";
+const deleteEstablishmentBody = (siret: SiretDto) =>
+  `Bonjour,${lineBreak}Je souhaite supprimer les données de mon entreprise dont le numéro de SIRET est ${siret}.${lineBreak}Cordialement.`;
+const immersionFacileContactEmailAddress =
+  "contact@immersion-facile.beta.gouv.fr";
+const mailtoHref = (siret: SiretDto) =>
+  `mailto:${immersionFacileContactEmailAddress}?subject=${deleteEstablishmentSubject}&body=${deleteEstablishmentBody(
+    siret,
+  )}`;

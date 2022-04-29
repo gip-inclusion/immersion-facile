@@ -43,9 +43,7 @@ export const EstablishmentEditionFormPage = ({
       initialValues={initialValues}
       saveForm={(data) =>
         establishmentGateway.updateFormEstablishment(
-          {
-            ...data,
-          },
+          { ...data },
           route.params.jwt,
         )
       }
