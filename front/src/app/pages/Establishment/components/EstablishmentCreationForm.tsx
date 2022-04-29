@@ -138,7 +138,7 @@ const CreationSiretRelatedInputs = () => {
 const creationInitialValuesWithoutSourceAndSearchable = (
   siret?: SiretDto,
 ): OmitFromExistingKeys<FormEstablishmentDto, "source" | "isSearchable"> =>
-  !ENV.PREFILED_ESTABLISHMENT_FORM
+  !ENV.PREFILLED_ESTABLISHMENT_FORM
     ? defaultInitialValue(siret)
     : {
         siret: "1234567890123",
