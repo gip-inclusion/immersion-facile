@@ -18,6 +18,14 @@ interface EstablishmentHomeMenuProperties {
   clientApplication: ClientApplication;
 }
 
+const badEstablishmentCallToActionNotifications: Partial<
+  Record<EstablishementCallToAction, string>
+> = {
+  BAD_SIRET: "Votre SIRET doît contenir 14 chiffres",
+  CLOSED_ESTABLISHMENT_ON_SIRENE: "Votre établissement est fermé",
+  MISSING_ESTABLISHMENT_ON_SIRENE: "Votre établissement n'existe pas",
+};
+
 export const EstablishmentHomeMenu = ({
   clientApplication,
 }: EstablishmentHomeMenuProperties) => {
@@ -34,12 +42,6 @@ export const EstablishmentHomeMenu = ({
   const [inputTimeout, inputTimeoutUpdate] = useState<
     NodeJS.Timeout | undefined
   >(undefined);
-  const badSiretError = (callToAction: EstablishementCallToAction) =>
-    new Map<EstablishementCallToAction, string>([
-      ["BAD_SIRET", "Votre SIRET doît contenir 14 chiffres"],
-      ["CLOSED_ESTABLISHMENT_ON_SIRENE", "Votre établissement est fermé"],
-      ["MISSING_ESTABLISHMENT_ON_SIRENE", "Votre établissement n'existe pas"],
-    ]).get(callToAction);
   return (
     <div
       className={`flex flex-col items-center justify-center border-2 border-blue-200 rounded px-4 p-1 m-2 w-48 bg-blue-50  `}
@@ -75,7 +77,7 @@ export const EstablishmentHomeMenu = ({
                 name="siret"
                 value={siret}
                 placeholder="SIRET de votre entreprise"
-                error={badSiretError(callToAction)}
+                error={badEstablishmentCallToActionNotifications[callToAction]}
                 onChange={(event) =>
                   onSiretFieldChange(
                     event,
