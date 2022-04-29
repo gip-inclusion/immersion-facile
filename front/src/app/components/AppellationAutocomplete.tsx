@@ -36,7 +36,7 @@ export const AppellationAutocomplete = ({
   const initialOption: Option | null = initialValue
     ? {
         value: initialValue,
-        description: initialValue.appellationLabel,
+        description: initialValue?.appellationLabel ?? "",
         matchRanges: [],
       }
     : null;
