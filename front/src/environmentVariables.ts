@@ -15,9 +15,11 @@ export const ENV = {
   frontEnvType: String(originalEnvVariables.VITE_ENV_TYPE) || "PROD",
   gateway:
     originalEnvVariables.VITE_GATEWAY === "IN_MEMORY" ? "IN_MEMORY" : "HTTP",
-  PREFILLED_ESTABLISHMENT_FORM: Boolean(
-    originalEnvVariables.VITE_PREFILLED_ESTABLISHMENT_FORM,
-  ),
+  PREFILLED_ESTABLISHMENT_FORM:
+    typeof originalEnvVariables.VITE_PREFILLED_ESTABLISHMENT_FORM ===
+      "string" &&
+    originalEnvVariables.VITE_PREFILLED_ESTABLISHMENT_FORM.toLowerCase() ===
+      "true",
 };
 Object.entries(ENV).forEach(([key, value]) =>
   console.info(`ENV.${key} >>> `, value),
