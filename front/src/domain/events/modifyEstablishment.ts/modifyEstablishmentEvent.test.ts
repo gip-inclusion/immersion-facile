@@ -19,7 +19,7 @@ import {
 import { ModifyEstablishmentEvent } from "./ModifyEstablishmentEvent";
 import { feature } from "src/domain/tests/feature";
 
-feature("ESTABLISHMENT_MODIFICATION_REQUEST", [
+feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
   clientScenario(`Scénario 1 - Existing & registered/open on Sirene SIRET`, [
     theEstablishmentGatewayHasRegisteredSiret("Given", validSiret),
     theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(

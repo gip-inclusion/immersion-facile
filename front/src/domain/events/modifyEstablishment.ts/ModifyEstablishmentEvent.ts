@@ -5,5 +5,5 @@ export class ModifyEstablishmentEvent extends ApplicationEvent {
   constructor(public siret: SiretDto) {
     super();
   }
-  public eventType: EventType = "ESTABLISHMENT_MODIFICATION_REQUEST";
+  public eventType: EventType = "ESTABLISHMENT_MODIFICATION_REQUESTED";
 }

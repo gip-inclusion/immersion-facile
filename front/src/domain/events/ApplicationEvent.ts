@@ -3,4 +3,4 @@ export abstract class ApplicationEvent {
 }
 export type EventType =
   | "SIRET_VERIFICATION_REQUESTED"
-  | "ESTABLISHMENT_MODIFICATION_REQUEST";
+  | "ESTABLISHMENT_MODIFICATION_REQUESTED";

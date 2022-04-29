@@ -34,15 +34,12 @@ export const EstablishmentHomeMenu = ({
   const [inputTimeout, inputTimeoutUpdate] = useState<
     NodeJS.Timeout | undefined
   >(undefined);
-  const badSiretError = (callToAction: EstablishementCallToAction) => {
-    const badCallToAction = new Map<EstablishementCallToAction, string>([
+  const badSiretError = (callToAction: EstablishementCallToAction) =>
+    new Map<EstablishementCallToAction, string>([
       ["BAD_SIRET", "Votre SIRET doît contenir 14 chiffres"],
       ["CLOSED_ESTABLISHMENT_ON_SIRENE", "Votre établissement est fermé"],
       ["MISSING_ESTABLISHMENT_ON_SIRENE", "Votre établissement n'existe pas"],
-    ]);
-    const strategy = badCallToAction.get(callToAction);
-    return strategy ? strategy : undefined;
-  };
+    ]).get(callToAction);
   return (
     <div
       className={`flex flex-col items-center justify-center border-2 border-blue-200 rounded px-4 p-1 m-2 w-48 bg-blue-50  `}

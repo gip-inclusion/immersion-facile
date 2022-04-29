@@ -18,7 +18,7 @@ export class ApplicationPrimaryController {
       ),
     );
     this.useCases.set(
-      "ESTABLISHMENT_MODIFICATION_REQUEST",
+      "ESTABLISHMENT_MODIFICATION_REQUESTED",
       new ModifyEstablishmentUseCase(
         gateways.establishments,
         gateways.establishmentsUi,
