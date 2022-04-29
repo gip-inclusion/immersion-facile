@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import { MatchRangeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 import { Proposal } from "./Proposal";
 
 type SliceOfString = {
@@ -13,50 +14,8 @@ export const StringWithHighlights = ({
 }: Pick<Proposal<unknown>, "description" | "matchRanges">) => {
   const slices: SliceOfString[] =
     matchRanges.length === 0
-      ? [
-          {
-            startIndexInclusive: 0,
-            endIndexExclusive: description.length,
-            bolded: false,
-          },
-        ]
-      : matchRanges.reduce(
-          (acc, { startIndexInclusive, endIndexExclusive }, index) => {
-            const isFirstMatch = acc.length === 0;
-            const unboldedRange = {
-              startIndexInclusive: isFirstMatch
-                ? 0
-                : acc[acc.length - 1].endIndexExclusive,
-              endIndexExclusive: startIndexInclusive,
-              bolded: false,
-            };
-
-            const boldedRange = {
-              startIndexInclusive,
-              endIndexExclusive,
-              bolded: true,
-            };
-
-            const isLastMatch = index === matchRanges.length - 1;
-            const addEndOfDescriptionIfLastMatch = isLastMatch
-              ? [
-                  {
-                    startIndexInclusive: endIndexExclusive,
-                    endIndexExclusive: description.length,
-                    bolded: false,
-                  },
-                ]
-              : [];
-
-            return [
-              ...acc,
-              unboldedRange,
-              boldedRange,
-              ...addEndOfDescriptionIfLastMatch,
-            ];
-          },
-          [] as SliceOfString[],
-        );
+      ? onNoMatchRanges(description)
+      : onMatchRange(matchRanges, description);
 
   return (
     <span>
@@ -78,3 +37,50 @@ export const StringWithHighlights = ({
     </span>
   );
 };
+
+const onNoMatchRanges = (description: string) => [
+  {
+    startIndexInclusive: 0,
+    endIndexExclusive: description.length,
+    bolded: false,
+  },
+];
+
+const onMatchRange = (matchRanges: MatchRangeDto[], description: string) =>
+  matchRanges.reduce(
+    (acc, { startIndexInclusive, endIndexExclusive }, index) => {
+      const isFirstMatch = acc.length === 0;
+      const unboldedRange = {
+        startIndexInclusive: isFirstMatch
+          ? 0
+          : acc[acc.length - 1].endIndexExclusive,
+        endIndexExclusive: startIndexInclusive,
+        bolded: false,
+      };
+
+      const boldedRange = {
+        startIndexInclusive,
+        endIndexExclusive,
+        bolded: true,
+      };
+
+      const isLastMatch = index === matchRanges.length - 1;
+      const addEndOfDescriptionIfLastMatch = isLastMatch
+        ? [
+            {
+              startIndexInclusive: endIndexExclusive,
+              endIndexExclusive: description.length,
+              bolded: false,
+            },
+          ]
+        : [];
+
+      return [
+        ...acc,
+        unboldedRange,
+        boldedRange,
+        ...addEndOfDescriptionIfLastMatch,
+      ];
+    },
+    [] as SliceOfString[],
+  );
