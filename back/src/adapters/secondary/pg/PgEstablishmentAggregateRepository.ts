@@ -19,7 +19,6 @@ import { SiretDto } from "../../../shared/siret";
 
 import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
@@ -266,28 +265,6 @@ export class PgEstablishmentAggregateRepository
                 }
               : null;
 
-          let city: string;
-          try {
-            city = extractCityFromAddress(result.address);
-          } catch (err) {
-            notifyObjectDiscord({
-              _message: "error on city extract from address",
-              searchMade,
-              result,
-              err,
-            });
-            logger.error(
-              {
-                err,
-                address: result.address,
-                searchMade,
-              },
-              "error extracting city from address : ",
-            );
-            logger.error(result, "result: ");
-            city = "";
-          }
-
           const searchImmersionResultDto: SearchImmersionResultDto = {
             rome: result.rome_code,
             romeLabel: result.libelle_rome,
@@ -300,7 +277,7 @@ export class PgEstablishmentAggregateRepository
             voluntaryToImmersion: result.voluntary_to_immersion,
             numberOfEmployeeRange: result.number_employees,
             address: result.address,
-            city,
+            city: extractCityFromAddress(result.address),
             contactMode: optional(result.contact_mode) && result.contact_mode,
             location: optional(result.establishment_lon) && {
               lon: result.establishment_lon,

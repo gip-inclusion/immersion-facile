@@ -18,7 +18,6 @@ import {
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
-import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import { AgencyConfig } from "../../shared/agency/agency.dto";
 import {
   ImmersionApplicationDto,
@@ -32,12 +31,13 @@ import { createMagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { AppConfig } from "../../adapters/primary/appConfig";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { InMemoryOutboxQueries } from "../../adapters/secondary/core/InMemoryOutboxQueries";
 
 const adminEmail = "admin@email.fr";
 
 describe("Magic link renewal flow", () => {
   let applicationRepository: InMemoryImmersionApplicationRepository;
-  let outboxRepository: OutboxRepository;
+  let outboxRepository: InMemoryOutboxRepository;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
@@ -56,6 +56,7 @@ describe("Magic link renewal flow", () => {
   beforeEach(() => {
     applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
+    const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
     clock = new CustomClock();
     clock.setNextDate(new Date());
     uuidGenerator = new TestUuidGenerator();
@@ -63,7 +64,7 @@ describe("Magic link renewal flow", () => {
     emailGw = new InMemoryEmailGateway();
     validImmersionApplication = new ImmersionApplicationDtoBuilder().build();
     eventBus = new InMemoryEventBus(clock, (e) => outboxRepository.save(e));
-    eventCrawler = new BasicEventCrawler(eventBus, outboxRepository);
+    eventCrawler = new BasicEventCrawler(eventBus, outboxQueries);
 
     emailFilter = new AlwaysAllowEmailFilter();
 

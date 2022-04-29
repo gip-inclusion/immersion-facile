@@ -13,14 +13,20 @@ import {
 } from "../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
-import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
+import { OutboxQueries } from "../../domain/core/ports/OutboxQueries";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../domain/core/ports/UnitOfWork";
+import { EstablishmentExportQueries } from "../../domain/establishment/ports/EstablishmentExportQueries";
+import { ExportEstablishmentsAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
+import { PostalCodeDepartmentRegionQueries } from "../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
+import { LinkUserPeConnectAccount } from "../../domain/generic/peConnect/useCases/linkUserPeConnectAccount";
+import { ImmersionApplicationExportQueries } from "../../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
 import { AddImmersionApplication } from "../../domain/immersionApplication/useCases/AddImmersionApplication";
+import { ExportImmersionApplicationsAsExcelArchive } from "../../domain/immersionApplication/useCases/ExportImmersionApplicationsAsExcelArchive";
 import { GenerateMagicLink } from "../../domain/immersionApplication/useCases/GenerateMagicLink";
 import { GetAgencyPublicInfoById } from "../../domain/immersionApplication/useCases/GetAgencyPublicInfoById";
 import { GetImmersionApplication } from "../../domain/immersionApplication/useCases/GetImmersionApplication";
@@ -34,22 +40,33 @@ import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../d
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../domain/immersionApplication/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
+import { NotifyToAgencyApplicationSubmitted } from "../../domain/immersionApplication/useCases/notifications/NotifyToAgencyApplicationSubmitted";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
+import { ShareApplicationLinkByEmail } from "../../domain/immersionApplication/useCases/ShareApplicationLinkByEmail";
 import { SignImmersionApplication } from "../../domain/immersionApplication/useCases/SignImmersionApplication";
 import { UpdateImmersionApplication } from "../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { ValidateImmersionApplication } from "../../domain/immersionApplication/useCases/ValidateImmersionApplication";
 import { AddAgency } from "../../domain/immersionOffer/useCases/AddAgency";
 import { AddFormEstablishment } from "../../domain/immersionOffer/useCases/AddFormEstablishment";
+import { CallLaBonneBoiteAndUpdateRepositories } from "../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { ContactEstablishment } from "../../domain/immersionOffer/useCases/ContactEstablishment";
+import { EditFormEstablishment } from "../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetImmersionOfferById } from "../../domain/immersionOffer/useCases/GetImmersionOfferById";
+import { GetImmersionOfferBySiretAndRome } from "../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndRome";
+import { InsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
+import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
+import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
+import { UpdateEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { RomeRepository } from "../../domain/rome/ports/RomeRepository";
 import { AppellationSearch } from "../../domain/rome/useCases/AppellationSearch";
+import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
+import { ImmersionApplicationId } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "../../shared/routes";
 import {
   createMagicLinkPayload,
@@ -68,11 +85,11 @@ import {
   RealEventCrawler,
 } from "../secondary/core/EventCrawlerImplementations";
 import { InMemoryEventBus } from "../secondary/core/InMemoryEventBus";
+import { InMemoryOutboxQueries } from "../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { ThrottledSequenceRunner } from "../secondary/core/ThrottledSequenceRunner";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
-import { makeStubGetApiConsumerById } from "../secondary/makeStubGetApiConsumerById";
-import { makeStubGetFeatureFlags } from "../secondary/makeStubGetFeatureFlags";
+import { HttpPeConnectGateway } from "../secondary/HttpPeConnectGateway";
 import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
@@ -85,51 +102,36 @@ import { InMemoryAgencyRepository } from "../secondary/InMemoryAgencyRepository"
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryPeConnectGateway } from "../secondary/InMemoryPeConnectGateway";
 import { InMemoryRomeRepository } from "../secondary/InMemoryRomeRepository";
 import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
 import { InMemoryUowPerformer } from "../secondary/InMemoryUowPerformer";
+import { makeStubGetApiConsumerById } from "../secondary/makeStubGetApiConsumerById";
+import { makeStubGetFeatureFlags } from "../secondary/makeStubGetFeatureFlags";
+import { makePgGetApiConsumerById } from "../secondary/pg/makePgGetApiConsumerById";
 import { makePgGetFeatureFlags } from "../secondary/pg/makePgGetFeatureFlags";
 import { PgAgencyRepository } from "../secondary/pg/PgAgencyRepository";
-import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
-import { makePgGetApiConsumerById } from "../secondary/pg/makePgGetApiConsumerById";
-import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgEstablishmentAggregateRepository } from "../secondary/pg/PgEstablishmentAggregateRepository";
+import { PgEstablishmentExportQueries } from "../secondary/pg/PgEstablishmentExportQueries";
+import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
+import { PgImmersionApplicationExportQueries } from "../secondary/pg/PgImmersionApplicationExportQueries";
+import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
 import { PgLaBonneBoiteRequestRepository } from "../secondary/pg/PgLaBonneBoiteRequestRepository";
+import { PgOutboxQueries } from "../secondary/pg/PgOutboxQueries";
 import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
+import { PgPostalCodeDepartmentRegionQueries } from "../secondary/pg/PgPostalCodeDepartmentRegionQueries";
 import { PgRomeRepository } from "../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../secondary/pg/PgSearchMadeRepository";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../secondary/SendinblueEmailGateway";
+import { StubEstablishmentExportQueries } from "../secondary/StubEstablishmentExportQueries";
+import { StubImmersionApplicationExportQueries } from "../secondary/StubImmersionApplicationExportQueries";
+import { StubPostalCodeDepartmentRegionQueries } from "../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";
 import {
   createApiKeyAuthMiddleware,
   createJwtAuthMiddleware,
 } from "./authMiddleware";
-import { ExportImmersionApplicationsAsExcelArchive } from "../../domain/immersionApplication/useCases/ExportImmersionApplicationsAsExcelArchive";
-import { StubImmersionApplicationExportQueries } from "../secondary/StubImmersionApplicationExportQueries";
-import { PgImmersionApplicationExportQueries } from "../secondary/pg/PgImmersionApplicationExportQueries";
-import { CallLaBonneBoiteAndUpdateRepositories } from "../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
-import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
-import { ShareApplicationLinkByEmail } from "../../domain/immersionApplication/useCases/ShareApplicationLinkByEmail";
-import { ImmersionApplicationId } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { StubEstablishmentExportQueries } from "../secondary/StubEstablishmentExportQueries";
-import { PgEstablishmentExportQueries } from "../secondary/pg/PgEstablishmentExportQueries";
-import { ImmersionApplicationExportQueries } from "../../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
-import { EstablishmentExportQueries } from "../../domain/establishment/ports/EstablishmentExportQueries";
-import { PgPostalCodeDepartmentRegionQueries } from "../secondary/pg/PgPostalCodeDepartmentRegionQueries";
-import { PostalCodeDepartmentRegionQueries } from "../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
-import { StubPostalCodeDepartmentRegionQueries } from "../secondary/StubPostalCodeDepartmentRegionQueries";
-import { EditFormEstablishment } from "../../domain/immersionOffer/useCases/EditFormEstablishment";
-import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
-import { InMemoryPeConnectGateway } from "../secondary/InMemoryPeConnectGateway";
-import { LinkUserPeConnectAccount } from "../../domain/generic/peConnect/useCases/linkUserPeConnectAccount";
-import { HttpPeConnectGateway } from "../secondary/HttpPeConnectGateway";
-import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
-import { ExportEstablishmentsAsExcelArchive } from "../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
-import { NotifyToAgencyApplicationSubmitted } from "../../domain/immersionApplication/useCases/notifications/NotifyToAgencyApplicationSubmitted";
-import { UpdateEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
-import { InsertEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
-import { GetImmersionOfferBySiretAndRome } from "../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndRome";
 
 const logger = createLogger(__filename);
 
@@ -186,7 +188,11 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateMagicLinkJwt,
     generateApiJwt,
     eventBus,
-    eventCrawler: createEventCrawler(config, repositories.outbox, eventBus),
+    eventCrawler: createEventCrawler(
+      config,
+      repositories.outboxQueries,
+      eventBus,
+    ),
   };
 };
 
@@ -241,6 +247,16 @@ export const createRepositories = async (
     emailGateway: config.emailGateway,
     romeRepository: config.romeRepository,
   });
+
+  const outboxRepo =
+    config.repositories === "PG"
+      ? new PgOutboxRepository(await getPgPoolFn().connect())
+      : new InMemoryOutboxRepository();
+
+  const outboxQueries =
+    outboxRepo instanceof PgOutboxRepository
+      ? new PgOutboxQueries(await getPgPoolFn().connect())
+      : new InMemoryOutboxQueries(outboxRepo);
 
   return {
     immersionApplication:
@@ -305,10 +321,8 @@ export const createRepositories = async (
 
     rome: await createRomeRepostiory(config, getPgPoolFn),
 
-    outbox:
-      config.repositories === "PG"
-        ? new PgOutboxRepository(await getPgPoolFn().connect())
-        : new InMemoryOutboxRepository(),
+    outbox: outboxRepo,
+    outboxQueries,
 
     laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"
@@ -361,34 +375,39 @@ const createRomeRepostiory = async (
 };
 
 export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;
-export const createInMemoryUow = (repositories?: Repositories) => ({
-  romeRepo: repositories?.rome ?? new InMemoryRomeRepository(),
-  outboxRepo:
+export const createInMemoryUow = (repositories?: Repositories) => {
+  const outboxRepo =
     (repositories?.outbox as InMemoryOutboxRepository) ??
-    new InMemoryOutboxRepository(),
-  formEstablishmentRepo:
-    (repositories?.formEstablishment as InMemoryFormEstablishmentRepository) ??
-    new InMemoryFormEstablishmentRepository(),
-  establishmentAggregateRepo:
-    (repositories?.immersionOffer as InMemoryEstablishmentAggregateRepository) ??
-    new InMemoryEstablishmentAggregateRepository(),
-  immersionApplicationRepo:
-    (repositories?.immersionApplication as InMemoryImmersionApplicationRepository) ??
-    new InMemoryImmersionApplicationRepository(),
-  establishmentExportQueries:
-    (repositories?.establishmentExport as EstablishmentExportQueries) ??
-    StubEstablishmentExportQueries,
-  immersionApplicationExportQueries:
-    (repositories?.immersionApplicationExport as ImmersionApplicationExportQueries) ??
-    StubImmersionApplicationExportQueries,
-  postalCodeDepartmentRegionQueries:
-    (repositories?.postalCodeDepartmentRegion as PostalCodeDepartmentRegionQueries) ??
-    StubPostalCodeDepartmentRegionQueries,
-  getFeatureFlags: makeStubGetFeatureFlags(),
-  agencyRepo:
-    (repositories?.agency as InMemoryAgencyRepository) ??
-    new InMemoryAgencyRepository(),
-});
+    new InMemoryOutboxRepository();
+  const outboxQueries = new InMemoryOutboxQueries(outboxRepo);
+  return {
+    romeRepo: repositories?.rome ?? new InMemoryRomeRepository(),
+    outboxRepo,
+    outboxQueries,
+    formEstablishmentRepo:
+      (repositories?.formEstablishment as InMemoryFormEstablishmentRepository) ??
+      new InMemoryFormEstablishmentRepository(),
+    establishmentAggregateRepo:
+      (repositories?.immersionOffer as InMemoryEstablishmentAggregateRepository) ??
+      new InMemoryEstablishmentAggregateRepository(),
+    immersionApplicationRepo:
+      (repositories?.immersionApplication as InMemoryImmersionApplicationRepository) ??
+      new InMemoryImmersionApplicationRepository(),
+    establishmentExportQueries:
+      (repositories?.establishmentExport as EstablishmentExportQueries) ??
+      StubEstablishmentExportQueries,
+    immersionApplicationExportQueries:
+      (repositories?.immersionApplicationExport as ImmersionApplicationExportQueries) ??
+      StubImmersionApplicationExportQueries,
+    postalCodeDepartmentRegionQueries:
+      (repositories?.postalCodeDepartmentRegion as PostalCodeDepartmentRegionQueries) ??
+      StubPostalCodeDepartmentRegionQueries,
+    getFeatureFlags: makeStubGetFeatureFlags(),
+    agencyRepo:
+      (repositories?.agency as InMemoryAgencyRepository) ??
+      new InMemoryAgencyRepository(),
+  };
+};
 
 // following function is for type check only, it is verifies InMemoryUnitOfWork is assignable to UnitOfWork
 const _isAssignable = (inMemory: InMemoryUnitOfWork): UnitOfWork => inMemory;
@@ -396,6 +415,7 @@ const _isAssignable = (inMemory: InMemoryUnitOfWork): UnitOfWork => inMemory;
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
   romeRepo: new PgRomeRepository(client),
   outboxRepo: new PgOutboxRepository(client),
+  outboxQueries: new PgOutboxQueries(client),
   agencyRepo: new PgAgencyRepository(client),
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
   establishmentAggregateRepo: new PgEstablishmentAggregateRepository(client),
@@ -682,9 +702,9 @@ const createUseCases = (
 
 const createEventCrawler = (
   config: AppConfig,
-  outbox: OutboxRepository,
+  outboxQueries: OutboxQueries,
   eventBus: EventBus,
 ): EventCrawler =>
   config.eventCrawlerPeriodMs > 0
-    ? new RealEventCrawler(eventBus, outbox, config.eventCrawlerPeriodMs)
-    : new BasicEventCrawler(eventBus, outbox);
+    ? new RealEventCrawler(eventBus, outboxQueries, config.eventCrawlerPeriodMs)
+    : new BasicEventCrawler(eventBus, outboxQueries);

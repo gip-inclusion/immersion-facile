@@ -8,10 +8,12 @@ import { ImmersionApplicationRepository } from "../../immersionApplication/ports
 import { ImmersionApplicationExportQueries } from "../../immersionApplication/ports/ImmersionApplicationExportQueries";
 import { EstablishmentExportQueries } from "../../establishment/ports/EstablishmentExportQueries";
 import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
+import { OutboxQueries } from "./OutboxQueries";
 
 export type UnitOfWork = {
   romeRepo: RomeRepository;
   outboxRepo: OutboxRepository;
+  outboxQueries: OutboxQueries;
   agencyRepo: AgencyRepository;
   formEstablishmentRepo: FormEstablishmentRepository;
   establishmentAggregateRepo: EstablishmentAggregateRepository;

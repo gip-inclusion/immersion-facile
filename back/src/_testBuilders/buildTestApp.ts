@@ -27,9 +27,11 @@ import {
   GenerateApiConsumerJtw,
   GenerateMagicLinkJwt,
 } from "../domain/auth/jwt";
+import { InMemoryOutboxQueries } from "../adapters/secondary/core/InMemoryOutboxQueries";
 
 export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
+  outboxQueries: InMemoryOutboxQueries;
   immersionOffer: InMemoryEstablishmentAggregateRepository;
   agency: InMemoryAgencyRepository;
   formEstablishment: InMemoryFormEstablishmentRepository;

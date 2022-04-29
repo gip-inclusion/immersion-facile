@@ -33,7 +33,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     const now = this.clock.now();
     const lastPayload =
-      await uow.outboxRepo.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret(
+      await uow.outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret(
         siret,
       );
     if (lastPayload) {

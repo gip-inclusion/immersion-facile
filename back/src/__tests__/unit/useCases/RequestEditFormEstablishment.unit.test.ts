@@ -1,6 +1,7 @@
 import { createInMemoryUow } from "../../../adapters/primary/config";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -33,6 +34,7 @@ const setMethodGetContactEmailFromSiret = (
 
 const prepareUseCase = () => {
   const outboxRepo = new InMemoryOutboxRepository();
+  const outboxQueries = new InMemoryOutboxQueries(outboxRepo);
   const establishmentAggregateRepo =
     new InMemoryEstablishmentAggregateRepository();
   setMethodGetContactEmailFromSiret(establishmentAggregateRepo); // In most of the tests, we need the contact to be defined
@@ -46,6 +48,7 @@ const prepareUseCase = () => {
     ...createInMemoryUow(),
     establishmentAggregateRepo,
     outboxRepo,
+    outboxQueries,
   });
 
   const generateEditFormEstablishmentUrl = (payload: EstablishmentJwtPayload) =>
@@ -60,6 +63,7 @@ const prepareUseCase = () => {
   );
   return {
     useCase,
+    outboxQueries,
     outboxRepo,
     establishmentAggregateRepo,
     emailGateway,
@@ -121,8 +125,8 @@ describe("RequestUpdateFormEstablishment", () => {
   describe("If an email has already been sent for this establishment.", () => {
     it("Throws an error if an email has already been sent to this contact and the edit link is still valid", async () => {
       // Prepare
-      const { useCase, outboxRepo, clock } = prepareUseCase();
-      outboxRepo.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
+      const { useCase, outboxQueries, clock } = prepareUseCase();
+      outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
         async (
           siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
         ) => ({
@@ -144,16 +148,18 @@ describe("RequestUpdateFormEstablishment", () => {
   });
   it("Sends a new email if the edit link in last email has expired", async () => {
     // Prepare
-    const { useCase, outboxRepo, emailGateway, clock } = prepareUseCase();
+    const { useCase, outboxRepo, outboxQueries, emailGateway, clock } =
+      prepareUseCase();
 
-    outboxRepo.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret = async (
-      siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-    ) => ({
-      siret,
-      iat: new Date("2021-01-01T12:00:00.000").getTime(),
-      exp: new Date("2021-01-02T12:00:00.000").getTime(),
-      version: 1,
-    });
+    outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
+      async (
+        siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
+      ) => ({
+        siret,
+        iat: new Date("2021-01-01T12:00:00.000").getTime(),
+        exp: new Date("2021-01-02T12:00:00.000").getTime(),
+        version: 1,
+      });
     clock.setNextDate(new Date("2021-01-02T13:00:00.000")); // 1 hour after the link of the last email for this siret has expired
 
     // Act

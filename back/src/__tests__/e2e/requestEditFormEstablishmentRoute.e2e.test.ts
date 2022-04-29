@@ -1,5 +1,6 @@
 import { addHours } from "date-fns";
 import { SuperTest, Test } from "supertest";
+import { DomainEvent } from "../../domain/core/eventBus/events";
 import { EstablishmentJwtPayload } from "../../shared/tokens/MagicLinkPayload";
 import {
   buildTestApp,
@@ -26,8 +27,10 @@ describe("Route to generate an establishment edition link", () => {
       exp: addHours(now, 24).getTime(),
       version: 1,
     };
-    reposAndGateways.outbox.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
-      async () => lastPayload;
+    await reposAndGateways.outbox.save({
+      topic: "FormEstablishmentEditLinkSent",
+      payload: lastPayload,
+    } as DomainEvent);
 
     // Act and assert
     await request

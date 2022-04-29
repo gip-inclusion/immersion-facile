@@ -14,7 +14,6 @@ import {
   NarrowEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
-import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import {
@@ -27,10 +26,11 @@ import {
   ApplicationStatus,
   ImmersionApplicationDto,
 } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 
 describe("UpdateImmersionApplicationStatus", () => {
   let updateImmersionApplicationStatus: UpdateImmersionApplicationStatus;
-  let outboxRepository: OutboxRepository;
+  let outboxRepository: InMemoryOutboxRepository;
   let immersionApplicationRepository: InMemoryImmersionApplicationRepository;
 
   let createNewEvent: CreateNewEvent;
@@ -448,7 +448,9 @@ describe("UpdateImmersionApplicationStatus", () => {
     _topic: T,
     expectedEvent: Partial<NarrowEvent<T>>,
   ) => {
-    const allEvents = await outboxRepository.getAllUnpublishedEvents();
+    const allEvents = await new InMemoryOutboxQueries(
+      outboxRepository,
+    ).getAllUnpublishedEvents();
     expect(allEvents).toHaveLength(1);
     expect(allEvents[0]).toMatchObject(expectedEvent);
   };

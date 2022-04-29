@@ -8,7 +8,6 @@ import { ValidateImmersionApplication } from "../../../domain/immersionApplicati
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -18,10 +17,13 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
+import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 
 describe("Validate immersionApplication", () => {
   let validateImmersionApplication: ValidateImmersionApplication;
-  let outboxRepository: OutboxRepository;
+  let outboxRepository: InMemoryOutboxRepository;
+  let outboxQueries: InMemoryOutboxQueries;
   let repository: InMemoryImmersionApplicationRepository;
   let createNewEvent: CreateNewEvent;
   let clock: CustomClock;
@@ -30,6 +32,7 @@ describe("Validate immersionApplication", () => {
   beforeEach(() => {
     repository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
+    outboxQueries = new InMemoryOutboxQueries(outboxRepository);
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
@@ -60,7 +63,7 @@ describe("Validate immersionApplication", () => {
         status: "VALIDATED",
       };
 
-      expectEventSavedInOutbox(outboxRepository, {
+      expectEventSavedInOutbox(outboxQueries, {
         topic: "FinalImmersionApplicationValidationByAdmin",
         payload: expectedImmersionApplication,
       });
@@ -109,9 +112,9 @@ describe("Validate immersionApplication", () => {
 });
 
 const expectEventSavedInOutbox = async (
-  outboxRepository: OutboxRepository,
+  outboxQueries: OutboxQueries,
   event: Partial<DomainEvent>,
 ) => {
-  const publishedEvents = await outboxRepository.getAllUnpublishedEvents();
+  const publishedEvents = await outboxQueries.getAllUnpublishedEvents();
   expect(publishedEvents[publishedEvents.length - 1]).toMatchObject(event);
 };
