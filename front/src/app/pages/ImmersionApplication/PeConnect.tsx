@@ -1,7 +1,7 @@
 import React from "react";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
-import { loginPeConnect } from "src/shared/routes";
+import { loginPeConnect } from "shared/src/routes";
 
 export const PeConnect = () => {
   const featureFlags = useAppSelector(featureFlagsSelector);

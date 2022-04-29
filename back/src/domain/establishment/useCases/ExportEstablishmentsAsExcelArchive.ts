@@ -1,6 +1,6 @@
 import { Column } from "exceljs";
 import { map, prop, groupBy, uniq, reduceBy, values } from "ramda";
-import { pipeWithValue } from "../../../shared/pipeWithValue";
+import { pipeWithValue } from "shared/src/pipeWithValue";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { Archive } from "../../generic/archive/port/Archive";
@@ -14,16 +14,16 @@ import {
 } from "../valueObjects/EstablishmentRawBeforeExportVO";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { DepartmentAndRegion } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
-import { establishmentExportSchemaObj } from "../../../shared/establishmentExport/establishmentExport.schema";
+import { establishmentExportSchemaObj } from "shared/src/establishmentExport/establishmentExport.schema";
 import {
   DepartmentOrRegion,
   EstablishmentExportConfigDto,
-} from "../../../shared/establishmentExport/establishmentExport.dto";
+} from "shared/src/establishmentExport/establishmentExport.dto";
 import { z } from "zod";
 import {
   captureAddressGroups,
   CaptureAddressGroupsResult,
-} from "../../../shared/utils/address";
+} from "shared/src/utils/address";
 
 export type EstablishmentExportConfig = EstablishmentExportConfigDto & {
   archivePath: string;

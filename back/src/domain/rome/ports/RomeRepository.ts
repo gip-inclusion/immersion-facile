@@ -1,8 +1,8 @@
-import { AppellationCode, RomeCode } from "../../../shared/rome";
+import { AppellationCode, RomeCode } from "shared/src/rome";
 import {
   AppellationDto,
   RomeDto,
-} from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+} from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export interface RomeRepository {
   appellationToCodeMetier(

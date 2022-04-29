@@ -5,7 +5,7 @@ import { useDebounce } from "src/app/utils/useDebounce";
 import {
   AppellationDto,
   AppellationMatchDto,
-} from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+} from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { Proposal } from "../pages/Establishment/components/Proposal";
 import { StringWithHighlights } from "../pages/Establishment/components/StringWithHighlights";
 

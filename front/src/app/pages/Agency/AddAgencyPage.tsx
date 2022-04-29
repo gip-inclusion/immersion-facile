@@ -13,9 +13,9 @@ import {
   AgencyKind,
   agencyKindList,
   CreateAgencyConfig,
-} from "src/shared/agency/agency.dto";
-import { agencyConfigSchema } from "src/shared/agency/agency.schema";
-import { zEmail } from "src/shared/zodUtils";
+} from "shared/src/agency/agency.dto";
+import { agencyConfigSchema } from "shared/src/agency/agency.schema";
+import { zEmail } from "shared/src/zodUtils";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button } from "src/uiComponents/Button";
 import { FillableList } from "src/uiComponents/form/FillableList";

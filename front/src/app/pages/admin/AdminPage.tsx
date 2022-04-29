@@ -4,18 +4,18 @@ import { immersionApplicationGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
-import { AgencyId } from "src/shared/agency/agency.dto";
-import { EstablishmentExportConfigDto } from "src/shared/establishmentExport/establishmentExport.dto";
+import { AgencyId } from "shared/src/agency/agency.dto";
+import { EstablishmentExportConfigDto } from "shared/src/establishmentExport/establishmentExport.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
   validApplicationStatus,
-} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import {
   exportEstablismentsExcelRoute,
   exportImmersionApplicationsExcelRoute,
-} from "src/shared/routes";
-import { queryParamsAsString } from "src/shared/utils/queryParams";
+} from "shared/src/routes";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
 import { ArrayDropdown } from "src/uiComponents/admin/ArrayDropdown";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";

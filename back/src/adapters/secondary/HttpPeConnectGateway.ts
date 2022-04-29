@@ -1,4 +1,4 @@
-import { AbsoluteUrl } from "../../shared/AbsoluteUrl";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { AccessTokenConfig } from "../primary/appConfig";
 import { GetAccessTokenResponse } from "../../domain/core/ports/AccessTokenGateway";
 import { createAxiosInstance } from "../../utils/axiosUtils";
@@ -9,7 +9,7 @@ import {
   PeConnectOAuthGrantPayload,
   PeConnectUserInfo,
 } from "../../domain/generic/peConnect/port/PeConnectGateway";
-import { queryParamsAsString } from "../../shared/utils/queryParams";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
 import { createLogger } from "../../utils/logger";
 
 const _logger = createLogger(__filename);

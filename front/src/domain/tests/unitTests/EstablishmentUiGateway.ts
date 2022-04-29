@@ -1,6 +1,6 @@
 import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
 import { ClientTestApplication } from "src/infra/application/ClientApplication";
-import { SiretDto } from "src/shared/siret";
+import { SiretDto } from "shared/src/siret";
 import { Gherkin, isGiven } from "../Gherkin";
 
 export const theEstablishmentUiGatewayHasCallToAction =

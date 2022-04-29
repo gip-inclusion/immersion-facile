@@ -3,7 +3,7 @@ import { ImmersionApplicationEntity } from "../../domain/immersionApplication/en
 import {
   currentJwtVersions,
   emailHashForMagicLink,
-} from "../../shared/tokens/MagicLinkPayload";
+} from "shared/src/tokens/MagicLinkPayload";
 import supertest, { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../adapters/primary/appConfig";
 import { createApp } from "../../adapters/primary/server";
@@ -11,11 +11,11 @@ import {
   immersionApplicationsRoute,
   updateApplicationStatusRoute,
   validateImmersionApplicationRoute,
-} from "../../shared/routes";
+} from "shared/src/routes";
 import {
   createMagicLinkPayload,
   Role,
-} from "../../shared/tokens/MagicLinkPayload";
+} from "shared/src/tokens/MagicLinkPayload";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";

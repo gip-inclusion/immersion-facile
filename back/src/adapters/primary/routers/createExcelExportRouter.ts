@@ -2,12 +2,12 @@ import { Router } from "express";
 import {
   exportEstablismentsExcelRoute,
   exportImmersionApplicationsExcelRoute,
-} from "../../../shared/routes";
-import { capitalize } from "../../../shared/utils/string";
+} from "shared/src/routes";
+import { capitalize } from "shared/src/utils/string";
 import { temporaryStoragePath } from "../../../utils/filesystemUtils";
 import { AppDependencies } from "../config";
 import { sendZipResponse } from "../helpers/sendHttpResponse";
-import { FormSourceProvider } from "../../../shared/establishmentExport/establishmentExport.dto";
+import { FormSourceProvider } from "shared/src/establishmentExport/establishmentExport.dto";
 
 export const createExcelExportRouter = (deps: AppDependencies) => {
   const excelExportRouter = Router({ mergeParams: true });

@@ -1,5 +1,5 @@
-import { AgencyConfig, AgencyStatus } from "../shared/agency/agency.dto";
-import { AgencyId, AgencyKind } from "../shared/agency/agency.dto";
+import { AgencyConfig, AgencyStatus } from "shared/src/agency/agency.dto";
+import { AgencyId, AgencyKind } from "shared/src/agency/agency.dto";
 import { Builder } from "./Builder";
 
 const emptyAgency: AgencyConfig = {

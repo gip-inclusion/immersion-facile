@@ -1,13 +1,13 @@
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { AgencyConfig } from "../../../shared/agency/agency.dto";
+import { AgencyConfig } from "shared/src/agency/agency.dto";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
-import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { expectedEmailImmersionApplicationReviewMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
-import { frontRoutes } from "../../../shared/routes";
+import { frontRoutes } from "shared/src/routes";
 
 const defaultImmersionApplication =
   new ImmersionApplicationDtoBuilder().build();

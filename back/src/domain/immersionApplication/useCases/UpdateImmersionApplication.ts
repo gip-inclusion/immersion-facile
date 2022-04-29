@@ -7,12 +7,12 @@ import {
   ApplicationStatus,
   UpdateImmersionApplicationRequestDto,
   WithImmersionApplicationId,
-} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
-import { updateImmersionApplicationRequestDtoSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
+import { updateImmersionApplicationRequestDtoSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 
 export class UpdateImmersionApplication extends TransactionalUseCase<
   UpdateImmersionApplicationRequestDto,

@@ -1,5 +1,5 @@
 import seedrandom from "seedrandom";
-import { LatLonDto } from "./shared/SearchImmersionDto";
+import { LatLonDto } from "./src/SearchImmersionDto";
 
 // prettier-ignore
 const ROME_CODES: string[] = [

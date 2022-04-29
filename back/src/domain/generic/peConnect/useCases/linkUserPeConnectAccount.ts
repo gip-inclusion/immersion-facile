@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { AbsoluteUrl } from "../../../../shared/AbsoluteUrl";
-import { frontRoutes } from "../../../../shared/routes";
-import { queryParamsAsString } from "../../../../shared/utils/queryParams";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { frontRoutes } from "shared/src/routes";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
 import { UseCase } from "../../../core/UseCase";
 import {
   ImmersionApplicationPeConnectFields,

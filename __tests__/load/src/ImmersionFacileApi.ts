@@ -1,5 +1,5 @@
 import http from "k6/http";
-import type { SearchImmersionRequestDto } from "./shared/SearchImmersionDto";
+import type { SearchImmersionRequestDto } from "./src/SearchImmersionDto";
 
 export class ImmersionFacileApi {
   private readonly urlPrefix: string;

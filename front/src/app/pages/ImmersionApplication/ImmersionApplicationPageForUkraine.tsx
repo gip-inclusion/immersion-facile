@@ -6,7 +6,7 @@ import { ImmersionApplicationFormUkraine } from "src/app/pages/ImmersionApplicat
 import { immersionApplicationInitialValuesFromUrl } from "src/app/pages/ImmersionApplication/immersionApplicationHelpers";
 import { ImmersionFacileAgencyNotActive } from "src/app/pages/ImmersionApplication/ImmersionFacileAgencyNotActive";
 import { routes } from "src/app/routing/routes";
-import { AgencyId } from "src/shared/agency/agency.dto";
+import { AgencyId } from "shared/src/agency/agency.dto";
 import { useObservable } from "src/useObservable";
 import { Route } from "type-route";
 

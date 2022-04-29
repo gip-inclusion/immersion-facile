@@ -7,9 +7,9 @@ import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilt
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { SignedByOtherPartyNotificationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
 import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/immersionApplication/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
-import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { frontRoutes } from "../../../shared/routes";
-import { Role } from "../../../shared/tokens/MagicLinkPayload";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { frontRoutes } from "shared/src/routes";
+import { Role } from "shared/src/tokens/MagicLinkPayload";
 
 const beneficiaryEmail = "beneficiary@mail.com";
 const mentorEmail = "mentor@mail.com";

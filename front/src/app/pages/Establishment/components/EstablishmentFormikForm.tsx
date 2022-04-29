@@ -1,8 +1,8 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
-import { formEstablishmentSchema } from "src/shared/formEstablishment/FormEstablishment.schema";
-import { SiretDto } from "src/shared/siret";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
+import { SiretDto } from "shared/src/siret";
 import { HomeButton } from "src/uiComponents/Button";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";

@@ -1,15 +1,15 @@
 import axios from "axios";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
-import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import {
   addEstablishmentFormRouteWithoutApiKey,
   editEstablishmentFormRouteWithApiKey,
   formAlreadyExistsRoute,
   requestEmailToUpdateFormRoute,
   retrieveEstablishmentFormRouteWithApiKey,
-} from "src/shared/routes";
-import { SiretDto } from "src/shared/siret";
-import { zString } from "src/shared/zodUtils";
+} from "shared/src/routes";
+import { SiretDto } from "shared/src/siret";
+import { zString } from "shared/src/zodUtils";
 
 const prefix = "api";
 export class HttpEstablishmentGateway implements EstablishmentGateway {

@@ -1,6 +1,6 @@
 import { SuperTest, Test } from "supertest";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
-import { ContactEstablishmentRequestDto } from "../../shared/contactEstablishment";
+import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
 import {
   buildTestApp,
   InMemoryRepositories,

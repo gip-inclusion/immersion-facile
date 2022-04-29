@@ -5,7 +5,7 @@ import {
 import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
-} from "../../../shared/contactEstablishment";
+} from "shared/src/contactEstablishment";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";

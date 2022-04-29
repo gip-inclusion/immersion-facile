@@ -1,4 +1,4 @@
-import { SiretDto } from "src/shared/siret";
+import { SiretDto } from "shared/src/siret";
 import { ApplicationEvent, EventType } from "../ApplicationEvent";
 
 export class VerifySiretEvent extends ApplicationEvent {

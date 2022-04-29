@@ -1,5 +1,5 @@
 import { AppConfig } from "../adapters/primary/appConfig";
-import { ProcessEnv } from "../shared/envHelpers";
+import { ProcessEnv } from "shared/src/envHelpers";
 import { Builder } from "./Builder";
 
 const defaultConfigParams = {

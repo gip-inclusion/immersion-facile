@@ -1,4 +1,4 @@
-import { GetSiretResponseDto } from "src/shared/siret";
+import { GetSiretResponseDto } from "shared/src/siret";
 
 export const validSiret = "12345678901234";
 export const existingOpenSireneResponse: GetSiretResponseDto = {

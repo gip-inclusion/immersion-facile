@@ -9,8 +9,8 @@ import {
 } from "../../../domain/core/eventBus/events";
 import { DateStr } from "../../../domain/core/ports/Clock";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
-import { propEq } from "../../../shared/ramdaExtensions/propEq";
-import { replaceArrayElement } from "../../../shared/utils";
+import { propEq } from "shared/src/ramdaExtensions/propEq";
+import { replaceArrayElement } from "shared/src/utils";
 
 const counterEventsSaved = new promClient.Counter({
   name: "pg_outbox_repository_events_saved",

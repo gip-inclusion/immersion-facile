@@ -2,8 +2,8 @@ import { addDays as dateFnsAddDays, format } from "date-fns";
 import type { GenerateVerificationMagicLink } from "../adapters/primary/config";
 import { EventBus } from "../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
-import { Role } from "../shared/tokens/MagicLinkPayload";
-import { ImmersionApplicationId } from "../shared/ImmersionApplication/ImmersionApplication.dto";
+import { Role } from "shared/src/tokens/MagicLinkPayload";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 export const expectPromiseToFailWith = async (
   promise: Promise<unknown>,

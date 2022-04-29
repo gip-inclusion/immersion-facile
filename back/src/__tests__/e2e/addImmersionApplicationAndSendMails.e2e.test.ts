@@ -18,12 +18,12 @@ import { ImmersionApplicationEntity } from "../../domain/immersionApplication/en
 import {
   ImmersionApplicationDto,
   UpdateImmersionApplicationStatusRequestDto,
-} from "../../shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import {
   immersionApplicationsRoute,
   signApplicationRoute,
   updateApplicationStatusRoute,
-} from "../../shared/routes";
+} from "shared/src/routes";
 
 const adminEmail = "admin@email.fr";
 const validatorEmail = "validator@mail.com";

@@ -1,4 +1,4 @@
-import { SiretDto } from "src/shared/siret";
+import { SiretDto } from "shared/src/siret";
 import { EstablishementCallToAction } from "../../domain/valueObjects/EstablishementCallToAction";
 
 export interface EstablishmentUiGateway {

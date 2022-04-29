@@ -1,5 +1,5 @@
-import { LatLonDto } from "../../../shared/latLon";
-import { RomeCode } from "../../../shared/rome";
+import { LatLonDto } from "shared/src/latLon";
+import { RomeCode } from "shared/src/rome";
 
 export type PassEmploiNotificationParams = {
   immersions: { siret: string; rome: RomeCode; location: LatLonDto }[];

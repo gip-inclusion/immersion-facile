@@ -4,7 +4,7 @@ import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { makePgGetFeatureFlags } from "../../adapters/secondary/pg/makePgGetFeatureFlags";
 import { GetFeatureFlags } from "../../domain/core/ports/GetFeatureFlags";
-import { FeatureFlags } from "../../shared/featureFlags";
+import { FeatureFlags } from "shared/src/featureFlags";
 
 describe("PG getFeatureFlags", () => {
   let pool: Pool;

@@ -3,7 +3,7 @@ import {
   GetSiretRequestDto,
   getSiretRequestSchema,
   GetSiretResponseDto,
-} from "../../../shared/siret";
+} from "shared/src/siret";
 import { UseCase } from "../../core/UseCase";
 import {
   SireneEstablishmentVO,

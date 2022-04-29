@@ -1,4 +1,4 @@
-import { LatLonDto } from "../../../shared/latLon";
+import { LatLonDto } from "shared/src/latLon";
 
 export interface AdresseAPI {
   getPositionFromAddress: (address: string) => Promise<LatLonDto | undefined>;

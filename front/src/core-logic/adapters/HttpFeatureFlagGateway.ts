@@ -1,7 +1,7 @@
 import { ajax } from "rxjs/ajax";
 import { FeatureFlagsGateway } from "src/core-logic/ports/FeatureFlagsGateway";
-import { FeatureFlags } from "src/shared/featureFlags";
-import { getFeatureFlags } from "src/shared/routes";
+import { FeatureFlags } from "shared/src/featureFlags";
+import { getFeatureFlags } from "shared/src/routes";
 
 const prefix = "/api";
 

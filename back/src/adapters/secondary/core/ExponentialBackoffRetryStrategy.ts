@@ -8,7 +8,7 @@ import {
   RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
-import { RandomFn, SleepFn } from "../../../shared/utils";
+import { RandomFn, SleepFn } from "shared/src/utils";
 import { createLogger } from "../../../utils/logger";
 
 export const defaultMaxBackoffPeriodMs = minutesToMilliseconds(1);

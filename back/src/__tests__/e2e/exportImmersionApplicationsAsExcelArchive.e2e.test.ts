@@ -1,7 +1,7 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { exportImmersionApplicationsExcelRoute } from "../../shared/routes";
+import { exportImmersionApplicationsExcelRoute } from "shared/src/routes";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { AgencyConfig } from "../../shared/agency/agency.dto";
+import { AgencyConfig } from "shared/src/agency/agency.dto";
 
 describe("/export-demande-immersions-excel", () => {
   it("fails with 401 without authentication", async () => {

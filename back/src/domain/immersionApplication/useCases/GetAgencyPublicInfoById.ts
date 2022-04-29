@@ -1,10 +1,10 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { toAgencyPublicDisplayDto } from "../../../shared/agency/agency";
+import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
 import {
   AgencyPublicDisplayDto,
   WithAgencyId,
-} from "../../../shared/agency/agency.dto";
-import { withAgencyIdSchema } from "../../../shared/agency/agency.schema";
+} from "shared/src/agency/agency.dto";
+import { withAgencyIdSchema } from "shared/src/agency/agency.schema";
 import { UseCase } from "../../core/UseCase";
 import { AgencyRepository } from "../ports/AgencyRepository";
 

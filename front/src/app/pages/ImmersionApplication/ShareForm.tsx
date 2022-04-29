@@ -2,7 +2,7 @@ import { Button } from "@mui/material";
 import { Form, Formik, useField } from "formik";
 import React from "react";
 import { immersionApplicationGateway } from "src/app/config/dependencies";
-import { shareLinkByEmailSchema } from "src/shared/ShareLinkByEmailDTO";
+import { shareLinkByEmailSchema } from "shared/src/ShareLinkByEmailDTO";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 

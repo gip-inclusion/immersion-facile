@@ -3,10 +3,10 @@ import {
   EstablishmentEntityV2,
   NumberEmployeesRange,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
-import { NafDto } from "../shared/naf";
+import { NafDto } from "shared/src/naf";
 import { Builder } from "./Builder";
-import { FormEstablishmentSource } from "../shared/formEstablishment/FormEstablishment.dto";
-import { LatLonDto } from "../shared/latLon";
+import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { LatLonDto } from "shared/src/latLon";
 
 export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   siret: "78000403200019",

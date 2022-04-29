@@ -1,13 +1,13 @@
-import { AgencyId } from "src/shared/agency/agency.dto";
+import { AgencyId } from "shared/src/agency/agency.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
   UpdateImmersionApplicationStatusRequestDto,
   WithImmersionApplicationId,
-} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
-import { Role } from "src/shared/tokens/MagicLinkPayload";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ShareLinkByEmailDTO } from "shared/src/ShareLinkByEmailDTO";
+import { Role } from "shared/src/tokens/MagicLinkPayload";
 
 export interface ImmersionApplicationGateway {
   add(immersionApplicationDto: ImmersionApplicationDto): Promise<string>;

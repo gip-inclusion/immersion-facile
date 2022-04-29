@@ -1,5 +1,5 @@
-import { AbsoluteUrl } from "../../../../shared/AbsoluteUrl";
-import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { GetAccessTokenResponse } from "../../../core/ports/AccessTokenGateway";
 
 export type PeConnectUserInfo = {

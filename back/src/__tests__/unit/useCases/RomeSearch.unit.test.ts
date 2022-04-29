@@ -2,7 +2,7 @@ import { createInMemoryUow } from "../../../adapters/primary/config";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
-import { RomeDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 const prepareUseCase = () => {
   const romeRepo = new InMemoryRomeRepository();

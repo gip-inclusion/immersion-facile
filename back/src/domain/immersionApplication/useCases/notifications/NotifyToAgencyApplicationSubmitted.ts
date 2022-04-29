@@ -7,10 +7,10 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
-import { frontRoutes } from "../../../../shared/routes";
-import { Role } from "../../../../shared/tokens/MagicLinkPayload";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
+import { frontRoutes } from "shared/src/routes";
+import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../../utils/logger";
 
 const logger = createLogger(__filename);

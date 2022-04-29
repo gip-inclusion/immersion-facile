@@ -1,7 +1,7 @@
 import { Column } from "exceljs";
 import { groupBy, map, prop } from "ramda";
 import { z } from "zod";
-import { pipeWithValue } from "../../../shared/pipeWithValue";
+import { pipeWithValue } from "shared/src/pipeWithValue";
 import { temporaryStoragePath } from "../../../utils/filesystemUtils";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";

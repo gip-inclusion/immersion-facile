@@ -11,8 +11,8 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
-import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
-import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 

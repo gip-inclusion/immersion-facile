@@ -1,4 +1,4 @@
-import { queryParamsAsString } from "../../../../shared/utils/queryParams";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
 
 describe("QueryParams utils", () => {
   it("should return empty string when param array is empty", () => {

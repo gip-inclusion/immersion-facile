@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { PoolClient } from "pg";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../../../domain/immersionApplication/ports/ImmersionApplicationRepository";
-import { ImmersionApplicationId } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { optional } from "./pgUtils";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");

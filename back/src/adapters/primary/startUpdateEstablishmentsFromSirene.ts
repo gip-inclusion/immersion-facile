@@ -1,5 +1,5 @@
 import { UpdateEstablishmentsFromSireneAPI } from "../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
-import { random, sleep } from "../../shared/utils";
+import { random, sleep } from "shared/src/utils";
 import { createLogger } from "../../utils/logger";
 import { PipelineStats } from "../../utils/pipelineStats";
 import { RealClock } from "../secondary/core/ClockImplementations";

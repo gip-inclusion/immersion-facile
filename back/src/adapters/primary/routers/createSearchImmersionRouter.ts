@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { searchImmersionRoute } from "../../../shared/routes";
+import { searchImmersionRoute } from "shared/src/routes";
 import { AppDependencies } from "../config";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 

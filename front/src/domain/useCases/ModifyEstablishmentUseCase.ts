@@ -1,11 +1,11 @@
+import { NafDto } from "shared/src/naf";
+import { SiretDto } from "shared/src/siret";
+import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
+import { EstablishmentUiGateway } from "src/core-logic/ports/EstablishmentUiGateway";
 import {
   GetSiretInfoError,
   SiretGatewayThroughBack,
 } from "src/core-logic/ports/SiretGatewayThroughBack";
-import { SiretDto } from "src/shared/siret";
-import { EstablishmentGateway } from "../../core-logic/ports/EstablishmentGateway";
-import { EstablishmentUiGateway } from "../../core-logic/ports/EstablishmentUiGateway";
-import { NafDto } from "../../shared/naf";
 import { ModifyEstablishmentEvent } from "../events/modifyEstablishment.ts/ModifyEstablishmentEvent";
 import { UseCase } from "./UseCase";
 
@@ -17,6 +17,7 @@ export class ModifyEstablishmentUseCase extends UseCase {
   ) {
     super();
   }
+
   execute(event: ModifyEstablishmentEvent): Promise<void> {
     return this.isSiretValid(event.siret)
       ? this.onValidSiret(event)

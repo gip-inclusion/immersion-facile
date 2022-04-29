@@ -1,5 +1,5 @@
-import { SiretDto, siretSchema } from "../../../shared/siret";
-import { createEstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { SiretDto, siretSchema } from "shared/src/siret";
+import { createEstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateEditFormEstablishmentUrl } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";

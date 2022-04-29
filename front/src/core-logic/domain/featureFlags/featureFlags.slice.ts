@@ -4,7 +4,7 @@ import { filter, map, switchMap } from "rxjs";
 import { Dependencies } from "src/app/config/dependencies";
 import { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
 import { RootState } from "src/core-logic/storeConfig/store";
-import { FeatureFlags } from "src/shared/featureFlags";
+import { FeatureFlags } from "shared/src/featureFlags";
 
 interface FeatureFlagsState {
   featureFlags: FeatureFlags;

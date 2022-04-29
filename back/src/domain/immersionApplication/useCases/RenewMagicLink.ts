@@ -1,16 +1,16 @@
-import { ImmersionApplicationId } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import jwt from "jsonwebtoken";
 import {
   emailHashForMagicLink,
   MagicLinkPayload,
   Role,
-} from "../../../shared/tokens/MagicLinkPayload";
+} from "shared/src/tokens/MagicLinkPayload";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { RenewMagicLinkRequestDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { RenewMagicLinkRequestDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { GenerateMagicLinkJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UseCase } from "../../core/UseCase";
@@ -18,12 +18,12 @@ import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRep
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { AgencyRepository } from "../ports/AgencyRepository";
 import { createLogger } from "../../../utils/logger";
-import { createMagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { AppConfig } from "../../../adapters/primary/appConfig";
 import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
 import { TokenExpiredError } from "jsonwebtoken";
 import { Clock } from "../../core/ports/Clock";
-import { renewMagicLinkRequestSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
+import { renewMagicLinkRequestSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 

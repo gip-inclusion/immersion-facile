@@ -1,9 +1,9 @@
-import { ImmersionApplicationDto } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import {
   calculateTotalImmersionHoursBetweenDate,
   calculateWeeklyHoursFromSchedule,
   prettyPrintDayFromSchedule,
-} from "../../../shared/ScheduleUtils";
+} from "shared/src/ScheduleUtils";
 import type { ImmersionApplicationReadyForExportVO } from "./ImmersionApplicationReadyForExportVO";
 import slugify from "slugify";
 

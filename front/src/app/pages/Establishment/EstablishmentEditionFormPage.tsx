@@ -4,7 +4,7 @@ import { routes } from "src/app/routing/routes";
 import { establishmentGateway } from "src/app/config/dependencies";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
-import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { Route } from "type-route";

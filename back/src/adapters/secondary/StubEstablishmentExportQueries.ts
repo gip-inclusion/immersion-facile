@@ -1,7 +1,7 @@
 import { EstablishmentExportQueries } from "../../domain/establishment/ports/EstablishmentExportQueries";
 import { EstablishmentRawProps } from "../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 import { format } from "date-fns";
-import { FormSourceProvider } from "../../shared/establishmentExport/establishmentExport.dto";
+import { FormSourceProvider } from "shared/src/establishmentExport/establishmentExport.dto";
 
 export const StubEstablishmentExportQueries: EstablishmentExportQueries = {
   async getEstablishmentsBySourceProviderForExport(

@@ -1,4 +1,4 @@
-import { NafDto } from "../../../shared/naf";
+import { NafDto } from "shared/src/naf";
 import { createLogger } from "../../../utils/logger";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import {

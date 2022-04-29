@@ -1,6 +1,6 @@
 import { EstablishmentUiGateway } from "src/core-logic/ports/EstablishmentUiGateway";
 import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
-import { SiretDto } from "src/shared/siret";
+import { SiretDto } from "shared/src/siret";
 export class InMemoryEstablishmentUiGateway implements EstablishmentUiGateway {
   navigateToEstablishementForm(siret: SiretDto): Promise<void> {
     this.navigateToEstablishementFormState = siret;

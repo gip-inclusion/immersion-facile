@@ -7,8 +7,8 @@ import {
 import { immersionApplicationGateway } from "src/app/config/dependencies";
 import { ApplicationFormFieldsUkraine } from "src/app/pages/ImmersionApplication/ApplicationFormFieldsUkraine";
 import { ImmersionApplicationPresentation } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { immersionApplicationUkraineSchema } from "src/shared/ImmersionApplication/immersionApplication.schema";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationUkraineSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Title } from "src/uiComponents/Title";
 

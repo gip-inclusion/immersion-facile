@@ -1,8 +1,8 @@
 import { Modal, ModalClose, ModalContent } from "@dataesr/react-dsfr";
 import React, { ReactNode, useReducer } from "react";
-import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
-import { RomeCode } from "src/shared/rome";
-import { SiretDto } from "src/shared/siret";
+import { ContactMethod } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { RomeCode } from "shared/src/rome";
+import { SiretDto } from "shared/src/siret";
 import { SubTitle, Title } from "src/uiComponents/Title";
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";

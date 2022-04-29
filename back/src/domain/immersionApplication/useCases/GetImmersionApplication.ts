@@ -4,8 +4,8 @@ import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRep
 import {
   ImmersionApplicationDto,
   WithImmersionApplicationId,
-} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { withImmersionApplicationIdSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { withImmersionApplicationIdSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 
 export class GetImmersionApplication extends UseCase<
   WithImmersionApplicationId,

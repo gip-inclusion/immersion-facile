@@ -9,9 +9,9 @@ import { ENV } from "src/environmentVariables";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
-} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { reasonableSchedule } from "src/shared/ScheduleSchema";
-import { toDateString } from "src/shared/utils/date";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { reasonableSchedule } from "shared/src/ScheduleSchema";
+import { toDateString } from "shared/src/utils/date";
 import { v4 as uuidV4 } from "uuid";
 
 const { frontEnvType } = ENV;

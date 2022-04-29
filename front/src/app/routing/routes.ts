@@ -1,4 +1,4 @@
-import { frontRoutes } from "src/shared/routes";
+import { frontRoutes } from "shared/src/routes";
 import { createRouter, defineRoute, param } from "type-route";
 import { immersionApplicationValuesFromUrl } from "./route-params";
 

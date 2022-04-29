@@ -2,8 +2,8 @@ import { Pool, PoolClient } from "pg";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
-import { AgencyConfig } from "../../shared/agency/agency.dto";
-import { LatLonDto } from "../../shared/latLon";
+import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { LatLonDto } from "shared/src/latLon";
 
 const agency1builder = AgencyConfigBuilder.create(
   "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",

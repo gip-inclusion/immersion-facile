@@ -3,7 +3,7 @@ import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import {
   AppellationDto,
   RomeDto,
-} from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+} from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);

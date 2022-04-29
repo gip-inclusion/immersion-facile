@@ -4,7 +4,7 @@ import {
   AddressWithCoordinates,
   ApiAdresseGateway,
 } from "src/core-logic/ports/ApiAdresseGateway";
-import { LatLonDto } from "src/shared/latLon";
+import { LatLonDto } from "shared/src/latLon";
 
 type ValidFeature = {
   properties: {

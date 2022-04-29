@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import React from "react";
-import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import { removeAtIndex } from "src/shared/utils";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { removeAtIndex } from "shared/src/utils";
 import { ButtonAdd } from "src/uiComponents/ButtonAdd";
 import { FormEstablishmentAppellation } from "./FormEstablishmentAppellation";
 

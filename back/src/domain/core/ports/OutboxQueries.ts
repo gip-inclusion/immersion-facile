@@ -1,4 +1,4 @@
-import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { DomainEvent } from "../eventBus/events";
 
 export interface OutboxQueries {

@@ -1,18 +1,10 @@
 import { z } from "zod";
-import { nafSchema } from "../../../../../../shared/naf";
-import { addressWithPostalCodeSchema } from "../../../../../../shared/utils/postalCode";
-import {
-  appellationSchema,
-  romeCodeSchema,
-} from "../../../../../../shared/rome";
-import { siretSchema } from "../../../../../../shared/siret";
-import { NotEmptyArray, phoneRegExp } from "../../../../../../shared/utils";
-import {
-  zBoolean,
-  zEmail,
-  zString,
-  zTrimmedString,
-} from "../../../../../../shared/zodUtils";
+import { nafSchema } from "shared/src/naf";
+import { addressWithPostalCodeSchema } from "shared/src/utils/postalCode";
+import { appellationSchema, romeCodeSchema } from "shared/src/rome";
+import { siretSchema } from "shared/src/siret";
+import { NotEmptyArray, phoneRegExp } from "shared/src/utils";
+import { zBoolean, zEmail, zString, zTrimmedString } from "shared/src/zodUtils";
 import {
   BusinessContactDtoPublicV0,
   FormEstablishmentDtoPublicV0,

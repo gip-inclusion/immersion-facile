@@ -2,8 +2,8 @@ import MuiChip from "@mui/material/Chip";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { notEqual } from "src/shared/ramdaExtensions/notEqual";
-import { OmitFromExistingKeys } from "src/shared/utils";
+import { notEqual } from "shared/src/ramdaExtensions/notEqual";
+import { OmitFromExistingKeys } from "shared/src/utils";
 import { Button } from "src/uiComponents/Button";
 import { z } from "zod";
 

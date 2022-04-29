@@ -9,8 +9,8 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
-import { AgencyConfig } from "../../../shared/agency/agency.dto";
-import { createMagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
@@ -25,7 +25,7 @@ import { RenewMagicLinkPayload } from "../../../domain/immersionApplication/useC
 import {
   ImmersionApplicationDto,
   RenewMagicLinkRequestDto,
-} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 const validImmersionApplication: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();

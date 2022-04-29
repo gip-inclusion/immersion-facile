@@ -3,7 +3,7 @@ import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyReposito
 import { PgImmersionApplicationExportQueries } from "../../adapters/secondary/pg/PgImmersionApplicationExportQueries";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
-import { ImmersionApplicationId } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";

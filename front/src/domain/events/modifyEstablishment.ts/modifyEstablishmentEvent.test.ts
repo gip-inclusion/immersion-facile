@@ -1,5 +1,3 @@
-// noinspection JSVoidFunctionReturnValueUsed
-
 import {
   badSiretOneWithLetter,
   badSiretTooLong,
@@ -16,7 +14,7 @@ import {
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
   tooManySirenRequestsSiret,
-} from "src/shared/siret";
+} from "shared/src/siret";
 import { clientScenario } from "../../tests/clientScenario";
 import {
   theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret,

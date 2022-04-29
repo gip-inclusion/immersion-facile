@@ -6,9 +6,9 @@ import {
   AppellationMatchDto,
   RomeDto,
   RomeSearchInput,
-} from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import { appellationRoute, romeRoute } from "src/shared/routes";
-import { queryParamsAsString } from "src/shared/utils/queryParams";
+} from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { appellationRoute, romeRoute } from "shared/src/routes";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
 
 const prefix = "api";
 

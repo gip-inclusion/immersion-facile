@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { valueOrFalse, optional } from "./pgUtils";
 import { EstablishmentExportQueries } from "../../../domain/establishment/ports/EstablishmentExportQueries";
 import { EstablishmentRawProps } from "../../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
-import { FormSourceProvider } from "../../../shared/establishmentExport/establishmentExport.dto";
+import { FormSourceProvider } from "shared/src/establishmentExport/establishmentExport.dto";
 
 export class PgEstablishmentExportQueries
   implements EstablishmentExportQueries

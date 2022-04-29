@@ -1,10 +1,6 @@
 import { Router } from "express";
-import { romeAutocompleteInputSchema } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.schema";
-import {
-  appellationRoute,
-  romeRoute,
-  siretRoute,
-} from "../../../shared/routes";
+import { romeAutocompleteInputSchema } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
+import { appellationRoute, romeRoute, siretRoute } from "shared/src/routes";
 import { createLogger } from "../../../utils/logger";
 import { AppDependencies } from "../config";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";

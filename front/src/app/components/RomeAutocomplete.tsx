@@ -1,6 +1,6 @@
 import Autocomplete from "@mui/material/Autocomplete";
 import React from "react";
-import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { useRomeAutocompleteUseCase } from "src/app/components/romeAutocomplete.hook";
 import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";

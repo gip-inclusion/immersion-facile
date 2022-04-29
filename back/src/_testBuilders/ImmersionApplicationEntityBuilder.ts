@@ -1,9 +1,9 @@
-import { AgencyId } from "../shared/agency/agency.dto";
+import { AgencyId } from "shared/src/agency/agency.dto";
 import { ImmersionApplicationEntity } from "../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { Builder } from "./Builder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
-import { ScheduleDto } from "../shared/ScheduleSchema";
-import { ImmersionApplicationId } from "../shared/ImmersionApplication/ImmersionApplication.dto";
+import { ScheduleDto } from "shared/src/ScheduleSchema";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 export class ImmersionApplicationEntityBuilder
   implements Builder<ImmersionApplicationEntity>

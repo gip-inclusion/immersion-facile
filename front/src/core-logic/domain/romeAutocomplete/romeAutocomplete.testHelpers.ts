@@ -7,7 +7,7 @@ import {
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { expectToEqual } from "src/core-logic/storeConfig/redux.helpers";
-import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 const makeFeedRomeAutocompleteGatewayWithRomeDtos =
   (dependencies: TestDependencies) => (romeDtos: RomeDto[]) => {

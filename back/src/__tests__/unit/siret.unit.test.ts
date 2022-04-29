@@ -1,4 +1,4 @@
-import { siretSchema } from "../../shared/siret";
+import { siretSchema } from "shared/src/siret";
 
 describe("siretSchema", () => {
   it("accepts exactly 14 digits", () => {

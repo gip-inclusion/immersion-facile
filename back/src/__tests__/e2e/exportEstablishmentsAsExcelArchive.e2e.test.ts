@@ -1,5 +1,5 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { exportEstablismentsExcelRoute } from "../../shared/routes";
+import { exportEstablismentsExcelRoute } from "shared/src/routes";
 
 describe("/export-establishments", () => {
   it("fails with 401 without authentication", async () => {

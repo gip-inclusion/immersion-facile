@@ -1,7 +1,7 @@
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../../domain/immersionApplication/ports/ImmersionApplicationRepository";
 import { createLogger } from "../../utils/logger";
-import { ImmersionApplicationId } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 const logger = createLogger(__filename);
 

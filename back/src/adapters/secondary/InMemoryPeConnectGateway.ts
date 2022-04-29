@@ -1,13 +1,13 @@
 import { GetAccessTokenResponse } from "../../domain/core/ports/AccessTokenGateway";
-import { AbsoluteUrl } from "../../shared/AbsoluteUrl";
-import { frontRoutes } from "../../shared/routes";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { frontRoutes } from "shared/src/routes";
 import {
   ImmersionApplicationPeConnectFields,
   PeConnectGateway,
   PeConnectUserInfo,
   peConnectUserInfoToImmersionApplicationDto,
 } from "../../domain/generic/peConnect/port/PeConnectGateway";
-import { queryParamsAsString } from "../../shared/utils/queryParams";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
 
 export class InMemoryPeConnectGateway implements PeConnectGateway {
   constructor(private baseUrl: AbsoluteUrl) {}

@@ -6,7 +6,7 @@ import {
 } from "date-fns";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
-import { SleepFn } from "../../../shared/utils";
+import { SleepFn } from "shared/src/utils";
 
 // Simple rate limiter that limits the output to the specified queries per second (QPS) rate.
 //

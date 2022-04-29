@@ -12,7 +12,7 @@ import {
   MagicLinkPayload,
   PayloadKey,
   PayloadOption,
-} from "../../shared/tokens/MagicLinkPayload";
+} from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
 import { makeVerifyJwt } from "../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";

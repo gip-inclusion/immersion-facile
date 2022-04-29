@@ -4,16 +4,16 @@ import {
   addEstablishmentFormRouteWithApiKey,
   getImmersionOfferBySiretAndRomeRoute,
   searchImmersionRoute,
-} from "../../../shared/routes";
+} from "shared/src/routes";
 import { AppDependencies } from "../config";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 import {
   ForbiddenError,
   validateAndParseZodSchema,
 } from "../helpers/httpErrors";
-import { pipeWithValue } from "../../../shared/pipeWithValue";
-import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormEstablishment.schema";
-import { SiretAndRomeDto } from "../../../shared/siretAndRome/SiretAndRome.dto";
+import { pipeWithValue } from "shared/src/pipeWithValue";
+import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
+import { SiretAndRomeDto } from "shared/src/siretAndRome/SiretAndRome.dto";
 
 const counterFormEstablishmentCaller = new promClient.Counter({
   name: "form_establishment_v1_callers_counter",

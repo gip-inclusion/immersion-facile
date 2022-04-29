@@ -4,7 +4,7 @@ import {
   createMagicLinkPayload,
   MagicLinkPayload,
   Role,
-} from "../../../shared/tokens/MagicLinkPayload";
+} from "shared/src/tokens/MagicLinkPayload";
 
 const generateJwtFn: GenerateMagicLinkJwt = (payload) => {
   const { applicationId, role, iat } = payload as MagicLinkPayload;

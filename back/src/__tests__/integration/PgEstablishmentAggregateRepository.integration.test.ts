@@ -7,9 +7,9 @@ import {
   NumberEmployeesRange,
 } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
-import { LatLonDto } from "../../shared/latLon";
-import { AppellationDto } from "../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import { SearchImmersionResultDto } from "../../shared/searchImmersion/SearchImmersionResult.dto";
+import { LatLonDto } from "shared/src/latLon";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
@@ -18,7 +18,7 @@ import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOffe
 import {
   ContactMethod,
   FormEstablishmentSource,
-} from "../../shared/formEstablishment/FormEstablishment.dto";
+} from "shared/src/formEstablishment/FormEstablishment.dto";
 import {
   expectArraysToEqualIgnoringOrder,
   expectTypeToMatchAndEqual,

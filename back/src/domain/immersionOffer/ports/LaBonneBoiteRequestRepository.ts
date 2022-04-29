@@ -1,4 +1,4 @@
-import { LatLonDto } from "../../../shared/latLon";
+import { LatLonDto } from "shared/src/latLon";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
 import { LaBonneBoiteRequestParams } from "./LaBonneBoiteAPI";
 

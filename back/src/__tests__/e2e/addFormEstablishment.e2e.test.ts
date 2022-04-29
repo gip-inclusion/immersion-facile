@@ -3,8 +3,8 @@ import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishme
 import { FormEstablishmentDtoPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneRepository";
-import { FormEstablishmentDto } from "../../shared/formEstablishment/FormEstablishment.dto";
-import { addEstablishmentFormRouteWithoutApiKey } from "../../shared/routes";
+import { addEstablishmentFormRouteWithoutApiKey } from "shared/src/routes";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 
 describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
   // from front
@@ -61,7 +61,7 @@ describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
 describe("Route to post addEstablishmentFormRouteWithApiKey", () => {
   // from external
   describe("v0", () => {
-    // we don't want to use variables from shared/routes.ts so that we can check if contract breaks
+    // we don't want to use variables from src/routes.ts so that we can check if contract breaks
     it("forbids access to route if no api consumer", async () => {
       const { request } = await buildTestApp();
 

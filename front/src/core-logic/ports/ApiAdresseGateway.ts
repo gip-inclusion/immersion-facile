@@ -1,4 +1,4 @@
-import { LatLonDto } from "src/shared/latLon";
+import { LatLonDto } from "shared/src/latLon";
 
 export type AddressWithCoordinates = {
   label: string;

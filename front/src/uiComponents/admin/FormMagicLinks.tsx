@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { immersionApplicationGateway } from "src/app/config/dependencies";
-import { frontRoutes } from "src/shared/routes";
-import { allRoles, Role } from "src/shared/tokens/MagicLinkPayload";
+import { frontRoutes } from "shared/src/routes";
+import { allRoles, Role } from "shared/src/tokens/MagicLinkPayload";
 import { FormAccordionProps } from "./FormAccordion";
 
 // Component to show the magic links picker

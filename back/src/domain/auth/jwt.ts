@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import {
   EstablishmentJwtPayload,
   PayloadOption,
-} from "../../shared/tokens/MagicLinkPayload";
+} from "shared/src/tokens/MagicLinkPayload";
 import { WithApiConsumerId } from "../core/valueObjects/ApiConsumer";
 
 const algo = "ES256";

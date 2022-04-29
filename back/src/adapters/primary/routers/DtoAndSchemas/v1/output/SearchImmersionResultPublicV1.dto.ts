@@ -1,9 +1,9 @@
 import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
-import { LatLonDto } from "../../../../../../shared/latLon";
-import { RomeCode } from "../../../../../../shared/rome";
-import { SearchImmersionResultDto } from "../../../../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { LatLonDto } from "shared/src/latLon";
+import { RomeCode } from "shared/src/rome";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 
-import { SiretDto } from "../../../../../../shared/siret";
+import { SiretDto } from "shared/src/siret";
 
 export type SearchContactDto = {
   id: string;

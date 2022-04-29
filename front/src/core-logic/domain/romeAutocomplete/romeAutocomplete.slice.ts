@@ -12,8 +12,8 @@ import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { RomeCode } from "src/shared/rome";
-import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { RomeCode } from "shared/src/rome";
+import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 interface RomeAutocompleteState {
   romeSearchText: string;

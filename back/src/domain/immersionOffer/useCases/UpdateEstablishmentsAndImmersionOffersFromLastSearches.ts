@@ -1,8 +1,5 @@
 import { groupBy } from "ramda";
-import {
-  removeUndefinedElements,
-  replaceArrayElement,
-} from "../../../shared/utils";
+import { removeUndefinedElements, replaceArrayElement } from "shared/src/utils";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";

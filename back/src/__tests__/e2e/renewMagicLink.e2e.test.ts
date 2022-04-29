@@ -18,16 +18,16 @@ import {
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
-import { AgencyConfig } from "../../shared/agency/agency.dto";
+import { AgencyConfig } from "shared/src/agency/agency.dto";
 import {
   ImmersionApplicationDto,
   RenewMagicLinkRequestDto,
-} from "../../shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
-import { createMagicLinkPayload } from "../../shared/tokens/MagicLinkPayload";
+import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { AppConfig } from "../../adapters/primary/appConfig";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";

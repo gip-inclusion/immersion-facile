@@ -1,5 +1,5 @@
-import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
-import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type NewApplicationAdminNotificationParams = {
   demandeId: string;

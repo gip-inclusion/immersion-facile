@@ -6,7 +6,7 @@ import {
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { RootState } from "src/core-logic/storeConfig/store";
-import { FeatureFlags } from "src/shared/featureFlags";
+import { FeatureFlags } from "shared/src/featureFlags";
 
 describe("feature flag slice", () => {
   let store: Store<RootState>;

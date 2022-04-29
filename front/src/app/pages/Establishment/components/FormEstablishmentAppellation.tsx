@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import React from "react";
 import { AppellationAutocomplete } from "src/app/components/AppellationAutocomplete";
-import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { DeleteButton } from "src/uiComponents/DeleteButton";
 
 type ProfessionProps = {

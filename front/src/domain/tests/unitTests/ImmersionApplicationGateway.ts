@@ -1,5 +1,5 @@
 import { ClientTestApplication } from "src/infra/application/ClientApplication";
-import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
+import { GetSiretResponseDto, SiretDto } from "shared/src/siret";
 import { Gherkin, isGiven } from "../Gherkin";
 
 export const theSiretGatewayThroughBackHasSireneRegisteredSirets =

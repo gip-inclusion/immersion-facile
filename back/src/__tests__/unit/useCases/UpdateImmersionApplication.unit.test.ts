@@ -24,7 +24,7 @@ import { ImmersionApplicationEntity } from "../../../domain/immersionApplication
 import {
   ImmersionApplicationId,
   validApplicationStatus,
-} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 describe("Update immersionApplication", () => {
   let updateImmersionApplication: UpdateImmersionApplication;

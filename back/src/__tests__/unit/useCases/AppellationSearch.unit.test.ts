@@ -3,7 +3,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
-import { AppellationMatchDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationMatchDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 describe("AppellationSearch", () => {
   let romeRepo: RomeRepository;

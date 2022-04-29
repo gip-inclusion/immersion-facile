@@ -6,7 +6,7 @@ import {
   DATE_END,
   ImmersionApplicationDtoBuilder,
 } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { ImmersionApplicationDto } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 describe("ImmersionApplicationIdEntity", () => {
   describe("ImmersionApplicationIdEntity.create()", () => {

@@ -1,7 +1,7 @@
 import {
   apiSirenNotAvailableSiret,
   tooManySirenRequestsSiret,
-} from "src/shared/siret";
+} from "shared/src/siret";
 import {
   GetSiretInfoError,
   SiretGatewayThroughBack,

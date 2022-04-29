@@ -2,7 +2,7 @@ import { addMonths } from "date-fns";
 import { Pool } from "pg";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { SuggestEditFormEstablishment } from "../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
-import { SiretDto } from "../../shared/siret";
+import { SiretDto } from "shared/src/siret";
 import { createLogger } from "../../utils/logger";
 
 import { notifyDiscord } from "../../utils/notifyDiscord";

@@ -7,9 +7,9 @@ import {
   ApplicationStatus,
   UpdateImmersionApplicationStatusRequestDto,
   WithImmersionApplicationId,
-} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { statusTransitionConfigs } from "../../../shared/immersionApplicationStatusTransitions";
-import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { statusTransitionConfigs } from "shared/src/immersionApplicationStatusTransitions";
+import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
@@ -17,7 +17,7 @@ import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
-import { updateImmersionApplicationStatusRequestSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
+import { updateImmersionApplicationStatusRequestSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 

@@ -13,9 +13,9 @@ import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,
 } from "../../../domain/sirene/ports/SireneRepository";
-import { LatLonDto } from "../../../shared/latLon";
-import { NafDto } from "../../../shared/naf";
-import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { LatLonDto } from "shared/src/latLon";
+import { NafDto } from "shared/src/naf";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";

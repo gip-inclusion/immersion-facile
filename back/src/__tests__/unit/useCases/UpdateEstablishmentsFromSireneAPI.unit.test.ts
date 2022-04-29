@@ -7,7 +7,7 @@ import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffe
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentBuilder";
-import { pathEq } from "../../../shared/ramdaExtensions/path";
+import { pathEq } from "shared/src/ramdaExtensions/path";
 
 const prepareUseCase = () => {
   const sireneRepo = new InMemorySireneRepository();

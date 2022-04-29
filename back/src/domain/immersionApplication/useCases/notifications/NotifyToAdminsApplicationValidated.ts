@@ -1,12 +1,12 @@
 import { parseISO } from "date-fns";
 import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import { ImmersionApplicationDto } from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { frontRoutes } from "../../../../shared/routes";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { frontRoutes } from "shared/src/routes";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
+import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 export class NotifyToAdminsApplicationValidated extends UseCase<ImmersionApplicationDto> {

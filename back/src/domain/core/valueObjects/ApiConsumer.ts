@@ -1,4 +1,4 @@
-import { Flavor } from "../../../shared/typeFlavors";
+import { Flavor } from "shared/src/typeFlavors";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
 

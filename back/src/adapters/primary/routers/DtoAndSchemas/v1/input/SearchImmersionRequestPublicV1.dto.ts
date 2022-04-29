@@ -1,6 +1,6 @@
-import { LatLonDto } from "../../../../../../shared/latLon";
-import { RomeCode } from "../../../../../../shared/rome";
-import { SearchImmersionRequestDto } from "../../../../../../shared/searchImmersion/SearchImmersionRequest.dto";
+import { LatLonDto } from "shared/src/latLon";
+import { RomeCode } from "shared/src/rome";
+import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
 
 export type SearchImmersionRequestPublicV1 = {
   rome?: RomeCode;

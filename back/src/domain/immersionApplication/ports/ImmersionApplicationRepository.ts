@@ -1,4 +1,4 @@
-import { ImmersionApplicationId } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 
 export interface ImmersionApplicationRepository {

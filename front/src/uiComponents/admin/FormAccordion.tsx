@@ -4,7 +4,7 @@ import React from "react";
 import type {
   ApplicationStatus,
   ImmersionApplicationDto,
-} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { FormDetails } from "./FormDetails";
 
 const beforeAfterString = (date: string) => {

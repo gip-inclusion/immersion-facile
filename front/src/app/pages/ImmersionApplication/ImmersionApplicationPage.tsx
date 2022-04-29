@@ -5,7 +5,7 @@ import { ImmersionApplicationFormContainerLayout } from "src/app/pages/Immersion
 import { immersionApplicationInitialValuesFromUrl } from "src/app/pages/ImmersionApplication/immersionApplicationHelpers";
 
 import { routes } from "src/app/routing/routes";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { Route } from "type-route";
 
 export type ImmersionApplicationPageRoute = Route<

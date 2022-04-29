@@ -1,7 +1,7 @@
 import promClient from "prom-client";
-import { SearchImmersionRequestDto } from "../../../shared/searchImmersion/SearchImmersionRequest.dto";
-import { searchImmersionRequestSchema } from "../../../shared/searchImmersion/SearchImmersionRequest.schema";
-import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
+import { searchImmersionRequestSchema } from "shared/src/searchImmersion/SearchImmersionRequest.schema";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";

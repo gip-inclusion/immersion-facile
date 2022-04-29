@@ -1,4 +1,4 @@
-import { SiretDto, GetSiretResponseDto } from "src/shared/siret";
+import { SiretDto, GetSiretResponseDto } from "shared/src/siret";
 
 export const tooManiSirenRequestsSiretErrorMessage =
   "Too many requests on SIRENE API.";

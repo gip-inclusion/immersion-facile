@@ -9,9 +9,9 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
-import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";

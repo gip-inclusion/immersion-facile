@@ -1,15 +1,15 @@
 import { values } from "ramda";
 import { Observable, of } from "rxjs";
 import { AgencyGateway } from "src/domain/ports/AgencyGateway";
-import { toAgencyPublicDisplayDto } from "src/shared/agency/agency";
+import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
 import {
   AgencyId,
   AgencyInListDto,
   AgencyPublicDisplayDto,
   CreateAgencyConfig,
   WithAgencyId,
-} from "src/shared/agency/agency.dto";
-import { LatLonDto } from "src/shared/latLon";
+} from "shared/src/agency/agency.dto";
+import { LatLonDto } from "shared/src/latLon";
 
 const TEST_AGENCIES: Record<string, CreateAgencyConfig> = {
   "test-agency-1-front": {

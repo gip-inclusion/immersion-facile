@@ -13,9 +13,9 @@ import {
 } from "src/app/pages/ImmersionApplication/immersionApplicationHelpers";
 import { ImmersionApplicationPresentation } from "src/app/pages/ImmersionApplication/ImmersionApplicationPage";
 import { PeConnect } from "src/app/pages/ImmersionApplication/PeConnect";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { immersionApplicationSchema } from "src/shared/ImmersionApplication/immersionApplication.schema";
-import { toDateString } from "src/shared/utils/date";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
+import { toDateString } from "shared/src/utils/date";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Title } from "src/uiComponents/Title";
 import { ApplicationFormFields } from "./ApplicationFormFields";

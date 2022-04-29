@@ -1,8 +1,8 @@
-import { LatLonDto } from "../../../shared/latLon";
-import { NafDto } from "../../../shared/naf";
+import { LatLonDto } from "shared/src/latLon";
+import { NafDto } from "shared/src/naf";
 import { ContactEntityV2 } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
-import { FormEstablishmentSource } from "../../../shared/formEstablishment/FormEstablishment.dto";
+import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
 
 export type DataSource =
   | "api_labonneboite"

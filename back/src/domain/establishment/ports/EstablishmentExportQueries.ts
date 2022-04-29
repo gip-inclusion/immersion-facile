@@ -1,5 +1,5 @@
 import { EstablishmentRawProps } from "../valueObjects/EstablishmentRawBeforeExportVO";
-import { FormSourceProvider } from "../../../shared/establishmentExport/establishmentExport.dto";
+import { FormSourceProvider } from "shared/src/establishmentExport/establishmentExport.dto";
 
 export interface EstablishmentExportQueries {
   getAllEstablishmentsForExport: () => Promise<EstablishmentRawProps[]>;

@@ -9,11 +9,11 @@ import {
   ApplicationStatus,
   ImmersionApplicationDto,
   UpdateImmersionApplicationStatusRequestDto,
-} from "../../shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import {
   immersionApplicationsRoute,
   updateApplicationStatusRoute,
-} from "../../shared/routes";
+} from "shared/src/routes";
 
 const adminEmail = "admin@email.fr";
 

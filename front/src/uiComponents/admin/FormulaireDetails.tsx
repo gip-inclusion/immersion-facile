@@ -1,5 +1,5 @@
 import React from "react";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { Accordion } from "./Accordion";
 import { FormAccordionProps as FormAccordeonProps } from "./FormAccordion";
 import { TextCell } from "./TextCell";

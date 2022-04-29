@@ -8,7 +8,7 @@ import {
   apiSirenUnexpectedError,
   SiretDto,
   tooManySirenRequestsSiret,
-} from "../../shared/siret";
+} from "shared/src/siret";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);

@@ -1,7 +1,7 @@
 import { PoolClient } from "pg";
 import { FormEstablishmentRepository } from "../../../domain/immersionOffer/ports/FormEstablishmentRepository";
-import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
-import { SiretDto } from "../../../shared/siret";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { SiretDto } from "shared/src/siret";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { ConflictError } from "../../primary/helpers/httpErrors";

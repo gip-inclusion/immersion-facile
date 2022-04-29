@@ -1,14 +1,10 @@
 import { z } from "zod";
-import { latLonSchema } from "../../../../../../shared/latLon";
-import { romeCodeSchema } from "../../../../../../shared/rome";
-import { appellationDtoSchema } from "../../../../../../shared/romeAndAppellationDtos/romeAndAppellation.schema";
-import { siretSchema } from "../../../../../../shared/siret";
-import { phoneRegExp } from "../../../../../../shared/utils";
-import {
-  zEmail,
-  zString,
-  zTrimmedString,
-} from "../../../../../../shared/zodUtils";
+import { latLonSchema } from "shared/src/latLon";
+import { romeCodeSchema } from "shared/src/rome";
+import { appellationDtoSchema } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
+import { siretSchema } from "shared/src/siret";
+import { phoneRegExp } from "shared/src/utils";
+import { zEmail, zString, zTrimmedString } from "shared/src/zodUtils";
 import { SearchImmersionResultPublicV0 } from "./SearchImmersionResultPublicV0.dto";
 
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<string> =

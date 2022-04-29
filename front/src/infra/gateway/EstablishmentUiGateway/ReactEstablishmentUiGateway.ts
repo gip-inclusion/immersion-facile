@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from "rxjs";
 import { EstablishmentUiGateway } from "src/core-logic/ports/EstablishmentUiGateway";
 import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
-import { SiretDto } from "src/shared/siret";
+import { SiretDto } from "shared/src/siret";
 import { routes } from "src/app/routing/routes";
 const establishementCallToActionSubject$: BehaviorSubject<EstablishementCallToAction> =
   new BehaviorSubject<EstablishementCallToAction>("NOTHING");

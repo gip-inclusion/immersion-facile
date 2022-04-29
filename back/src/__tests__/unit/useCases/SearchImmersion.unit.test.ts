@@ -11,9 +11,9 @@ import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immers
 import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
-import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
-import { SearchImmersionRequestDto } from "../../../shared/searchImmersion/SearchImmersionRequest.dto";
-import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { ImmersionOfferId } from "shared/src/ImmersionOfferId";
+import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";

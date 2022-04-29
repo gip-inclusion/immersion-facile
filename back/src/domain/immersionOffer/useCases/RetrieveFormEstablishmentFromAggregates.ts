@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
-import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 

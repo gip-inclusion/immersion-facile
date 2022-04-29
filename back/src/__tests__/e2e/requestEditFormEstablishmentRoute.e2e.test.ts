@@ -1,7 +1,7 @@
 import { addHours } from "date-fns";
 import { SuperTest, Test } from "supertest";
 import { DomainEvent } from "../../domain/core/eventBus/events";
-import { EstablishmentJwtPayload } from "../../shared/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import {
   buildTestApp,
   InMemoryRepositories,

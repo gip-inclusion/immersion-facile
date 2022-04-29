@@ -3,8 +3,8 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   ApplicationStatus,
   WithImmersionApplicationId,
-} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { MagicLinkPayload } from "../../../shared/tokens/MagicLinkPayload";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
@@ -12,7 +12,7 @@ import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
-import { signApplicationDtoWithRole } from "../../../shared/ImmersionApplication/immersionApplication";
+import { signApplicationDtoWithRole } from "shared/src/ImmersionApplication/immersionApplication";
 
 const logger = createLogger(__filename);
 

@@ -4,8 +4,8 @@ import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAg
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { NewApplicationAdminNotificationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
-import { frontRoutes } from "../../../shared/routes";
-import { OmitFromExistingKeys } from "../../../shared/utils";
+import { frontRoutes } from "shared/src/routes";
+import { OmitFromExistingKeys } from "shared/src/utils";
 import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import {

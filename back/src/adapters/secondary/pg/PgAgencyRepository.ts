@@ -1,8 +1,8 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { AgencyRepository } from "../../../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyConfig, AgencyId } from "../../../shared/agency/agency.dto";
-import { LatLonDto } from "../../../shared/latLon";
+import { AgencyConfig, AgencyId } from "shared/src/agency/agency.dto";
+import { LatLonDto } from "shared/src/latLon";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);

@@ -5,7 +5,7 @@ import { VerifySiretEvent } from "src/domain/events/verifySiret/VerifySiretEvent
 import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
 import { ClientApplication } from "src/infra/application/ClientApplication";
 import { establishementCallToActionObservable$ } from "src/infra/gateway/EstablishmentUiGateway/ReactEstablishmentUiGateway";
-import { SiretDto } from "src/shared/siret";
+import { SiretDto } from "shared/src/siret";
 import { HomeButton } from "src/uiComponents/Button";
 import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 import { Link } from "src/uiComponents/Link";
@@ -32,6 +32,8 @@ const badEstablishmentCallToActionNotifications: Partial<
     "Erreur inattendue avec le service de vérification du SIRET.",
 };
 
+type Timeout = ReturnType<typeof setTimeout>;
+
 export const EstablishmentHomeMenu = ({
   clientApplication,
 }: EstablishmentHomeMenuProperties) => {
@@ -45,9 +47,9 @@ export const EstablishmentHomeMenu = ({
   const [startEstablishmentPath, startEstablishmentPathUpdate] =
     useState<boolean>(false);
   const [siret, siretUpdate] = useState<SiretDto>("");
-  const [inputTimeout, inputTimeoutUpdate] = useState<
-    NodeJS.Timeout | undefined
-  >(undefined);
+  const [inputTimeout, inputTimeoutUpdate] = useState<Timeout | undefined>(
+    undefined,
+  );
   return (
     <div
       className={`flex flex-col items-center justify-center border-2 border-blue-200 rounded px-4 p-1 m-2 w-48 bg-blue-50  `}
@@ -131,10 +133,8 @@ const onSiretFieldChange = (
   event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   clientApplication: ClientApplication,
   siretUpdate: React.Dispatch<React.SetStateAction<SiretDto>>,
-  timeout: NodeJS.Timeout | undefined,
-  timeoutUpdate: React.Dispatch<
-    React.SetStateAction<NodeJS.Timeout | undefined>
-  >,
+  timeout: Timeout | undefined,
+  timeoutUpdate: React.Dispatch<React.SetStateAction<Timeout | undefined>>,
 ) => {
   siretUpdate(event.target.value);
   timeout && clearTimeout(timeout);

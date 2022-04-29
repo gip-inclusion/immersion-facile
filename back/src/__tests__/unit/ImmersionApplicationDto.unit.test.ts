@@ -4,8 +4,8 @@ import {
   ImmersionApplicationDtoBuilder,
 } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { addDays } from "../../_testBuilders/test.helpers";
-import { ImmersionApplicationDto } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { immersionApplicationSchema } from "../../shared/ImmersionApplication/immersionApplication.schema";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 
 describe("immersionApplicationDtoSchema", () => {
   it("accepts valid immersionApplication", () => {

@@ -1,10 +1,10 @@
+import { NafDto } from "shared/src/naf";
+import { propEq } from "shared/src/ramdaExtensions/propEq";
+import { SiretDto } from "shared/src/siret";
 import {
   TooManyRequestApiError,
   UnavailableApiError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { NafDto } from "../../../shared/naf";
-import { propEq } from "../../../shared/ramdaExtensions/propEq";
-import { SiretDto } from "../../../shared/siret";
 import { createLogger } from "../../../utils/logger";
 import { NumberEmployeesRange } from "../../immersionOffer/entities/EstablishmentEntity";
 

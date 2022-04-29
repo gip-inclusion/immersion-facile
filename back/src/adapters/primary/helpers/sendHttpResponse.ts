@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AuthChecker } from "../../../domain/auth/AuthChecker";
-import { AbsoluteUrl } from "../../../shared/AbsoluteUrl";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { HttpError, UnauthorizedError } from "./httpErrors";

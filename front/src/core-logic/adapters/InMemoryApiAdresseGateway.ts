@@ -2,9 +2,9 @@ import {
   AddressWithCoordinates,
   ApiAdresseGateway,
 } from "src/core-logic/ports/ApiAdresseGateway";
-import { LatLonDto } from "src/shared/latLon";
+import { LatLonDto } from "shared/src/latLon";
 
-import { sleep } from "src/shared/utils";
+import { sleep } from "shared/src/utils";
 
 const SIMULATED_LATENCY_MS = 150;
 

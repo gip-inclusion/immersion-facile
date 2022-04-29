@@ -13,7 +13,7 @@ import {
   AddAgency,
   defaultQuestionnaireUrl,
 } from "../../../domain/immersionOffer/useCases/AddAgency";
-import { CreateAgencyConfig } from "../../../shared/agency/agency.dto";
+import { CreateAgencyConfig } from "shared/src/agency/agency.dto";
 
 const defaultAdminEmail = "myAdmin@mail.com";
 

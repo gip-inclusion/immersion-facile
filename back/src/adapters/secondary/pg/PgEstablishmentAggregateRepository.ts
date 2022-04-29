@@ -9,10 +9,10 @@ import {
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
-import { LatLonDto } from "../../../shared/latLon";
-import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
-import { SiretDto } from "../../../shared/siret";
+import { LatLonDto } from "shared/src/latLon";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { SiretDto } from "shared/src/siret";
 
 import { createLogger } from "../../../utils/logger";
 import { optional } from "./pgUtils";

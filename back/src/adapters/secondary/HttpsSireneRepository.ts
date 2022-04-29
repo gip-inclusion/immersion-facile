@@ -9,7 +9,7 @@ import {
   SireneRepository,
   SireneRepositoryAnswer,
 } from "../../domain/sirene/ports/SireneRepository";
-import { SiretDto } from "../../shared/siret";
+import { SiretDto } from "shared/src/siret";
 import {
   createAxiosInstance,
   isRetryableError,

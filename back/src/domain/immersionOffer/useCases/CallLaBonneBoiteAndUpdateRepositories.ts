@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import promClient from "prom-client";
-import { SearchImmersionRequestDto } from "../../../shared/searchImmersion/SearchImmersionRequest.dto";
-import { searchImmersionRequestSchema } from "../../../shared/searchImmersion/SearchImmersionRequest.schema";
+import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
+import { searchImmersionRequestSchema } from "shared/src/searchImmersion/SearchImmersionRequest.schema";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";

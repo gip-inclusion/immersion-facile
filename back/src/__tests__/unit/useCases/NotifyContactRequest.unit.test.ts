@@ -6,7 +6,7 @@ import {
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
-import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablishment";
+import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import {
   expectContactByEmailRequest,

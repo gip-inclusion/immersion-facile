@@ -3,8 +3,8 @@ import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt
 import React, { ReactNode } from "react";
 import { DistanceIcon } from "src/icons/DistanceIcon";
 import { TrefleIcon } from "src/icons/TrefleIcon";
-import { ContactMethod } from "src/shared/formEstablishment/FormEstablishment.dto";
-import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
+import { ContactMethod } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { SearchButton } from "src/uiComponents/SearchButton";
 
 type EnterpriseSearchResultProps = {

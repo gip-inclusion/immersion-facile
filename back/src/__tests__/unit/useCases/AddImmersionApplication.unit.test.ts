@@ -21,7 +21,7 @@ import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
-import { validApplicationStatus } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { validApplicationStatus } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 describe("Add immersionApplication", () => {
   let addImmersionApplication: AddImmersionApplication;

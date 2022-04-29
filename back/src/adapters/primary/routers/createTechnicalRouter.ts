@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getFeatureFlags, renewMagicLinkRoute } from "../../../shared/routes";
+import { getFeatureFlags, renewMagicLinkRoute } from "shared/src/routes";
 import { AppDependencies } from "../config";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 

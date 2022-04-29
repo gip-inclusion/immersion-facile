@@ -4,7 +4,7 @@ import {
   getImmersionOfferByIdRoute,
   searchImmersionRoute,
   immersionOffersApiAuthRoute,
-} from "../../../shared/routes";
+} from "shared/src/routes";
 import { AppDependencies } from "../config";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 import {
@@ -13,7 +13,7 @@ import {
 } from "../helpers/httpErrors";
 import { formEstablishmentDtoPublicV0ToDomain } from "./DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { formEstablishmentSchemaPublicV0 } from "./DtoAndSchemas/v0/input/FormEstablishmentPublicV0.schema";
-import { pipeWithValue } from "../../../shared/pipeWithValue";
+import { pipeWithValue } from "shared/src/pipeWithValue";
 import { domainToSearchImmersionResultPublicV0 } from "./DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 
 const counterFormEstablishmentCaller = new promClient.Counter({

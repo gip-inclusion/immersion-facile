@@ -1,5 +1,5 @@
-import { AppellationMatchDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import { zTrimmedString } from "../../../shared/zodUtils";
+import { AppellationMatchDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { zTrimmedString } from "shared/src/zodUtils";
 import { createLogger } from "../../../utils/logger";
 import { findMatchRanges } from "../../../utils/textSearch";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

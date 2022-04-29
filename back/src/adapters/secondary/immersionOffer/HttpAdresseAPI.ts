@@ -5,7 +5,7 @@ import {
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
-import { LatLonDto } from "../../../shared/latLon";
+import { LatLonDto } from "shared/src/latLon";
 import {
   createAxiosInstance,
   isRetryableError,

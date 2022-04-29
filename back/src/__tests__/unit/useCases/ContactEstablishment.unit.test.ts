@@ -16,7 +16,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
-import { ContactEstablishmentRequestDto } from "../../../shared/contactEstablishment";
+import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 const siret = "11112222333344";

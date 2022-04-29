@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
-import { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { AppellationDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   calculateTotalImmersionHoursBetweenDate,
   calculateWeeklyHoursFromSchedule,
   prettyPrintSchedule,
-} from "src/shared/ScheduleUtils";
-import { keys } from "src/shared/utils";
+} from "shared/src/ScheduleUtils";
+import { keys } from "shared/src/utils";
 import { Accordion } from "./Accordion";
 import { FormAccordionProps } from "./FormAccordion";
 import { TextCell } from "./TextCell";

@@ -2,8 +2,8 @@ import {
   ComplexScheduleDto,
   ScheduleDto,
   SimpleScheduleDto,
-} from "../shared/ScheduleSchema";
-import { emptySchedule } from "../shared/ScheduleSchema";
+} from "shared/src/ScheduleSchema";
+import { emptySchedule } from "shared/src/ScheduleSchema";
 import { Builder } from "./Builder";
 export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
   constructor(private dto: ScheduleDto = emptySchedule) {}

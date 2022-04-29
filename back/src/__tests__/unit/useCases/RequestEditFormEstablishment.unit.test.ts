@@ -13,7 +13,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
-import { EstablishmentJwtPayload } from "../../../shared/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 

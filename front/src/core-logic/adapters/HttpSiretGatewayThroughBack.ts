@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
-import { siretRoute } from "src/shared/routes";
-import { SiretDto } from "src/shared/siret";
+import { siretRoute } from "shared/src/routes";
+import { SiretDto } from "shared/src/siret";
 import {
   GetSiretInfo,
   sirenApiMissingEstablishmentMessage,

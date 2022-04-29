@@ -17,7 +17,7 @@ import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/feature
 import type {
   ApplicationStatus,
   ImmersionApplicationDto,
-} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { DateInput } from "src/uiComponents/form/DateInput";

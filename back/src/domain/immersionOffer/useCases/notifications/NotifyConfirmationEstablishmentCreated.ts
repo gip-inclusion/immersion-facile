@@ -1,5 +1,5 @@
-import { FormEstablishmentDto } from "../../../../shared/formEstablishment/FormEstablishment.dto";
-import { formEstablishmentSchema } from "../../../../shared/formEstablishment/FormEstablishment.schema";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";

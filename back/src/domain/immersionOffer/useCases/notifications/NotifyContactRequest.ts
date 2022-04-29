@@ -1,7 +1,7 @@
 import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
-} from "../../../../shared/contactEstablishment";
+} from "shared/src/contactEstablishment";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";

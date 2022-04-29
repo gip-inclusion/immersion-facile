@@ -1,16 +1,16 @@
 import type { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
-import { AgencyConfig } from "../../../../shared/agency/agency.dto";
+import { AgencyConfig } from "shared/src/agency/agency.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
-} from "../../../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { frontRoutes } from "../../../../shared/routes";
-import { Role } from "../../../../shared/tokens/MagicLinkPayload";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { frontRoutes } from "shared/src/routes";
+import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { immersionApplicationSchema } from "../../../../shared/ImmersionApplication/immersionApplication.schema";
+import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 
 const logger = createLogger(__filename);
 

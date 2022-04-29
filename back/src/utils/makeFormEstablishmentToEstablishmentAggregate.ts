@@ -11,8 +11,8 @@ import {
   SireneEstablishmentVO,
   SireneRepository,
 } from "../domain/sirene/ports/SireneRepository";
-import { FormEstablishmentDto } from "../shared/formEstablishment/FormEstablishment.dto";
-import { AppellationDto } from "../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { notifyAndThrowErrorDiscord } from "./notifyDiscord";
 
 const offerFromFormScore = 10;

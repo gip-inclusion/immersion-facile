@@ -1,10 +1,10 @@
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ListImmersionApplication } from "../../../domain/immersionApplication/useCases/ListImmersionApplication";
-import { AgencyId } from "../../../shared/agency/agency.dto";
+import { AgencyId } from "shared/src/agency/agency.dto";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { validApplicationStatus } from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+import { validApplicationStatus } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 const agencyIds: AgencyId[] = [
   "11111111-1111-1111-1111-111111111111",

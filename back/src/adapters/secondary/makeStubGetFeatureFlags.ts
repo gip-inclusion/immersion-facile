@@ -1,5 +1,5 @@
 import { GetFeatureFlags } from "../../domain/core/ports/GetFeatureFlags";
-import { FeatureFlags } from "../../shared/featureFlags";
+import { FeatureFlags } from "shared/src/featureFlags";
 
 const defaultFlags: FeatureFlags = {
   enableAdminUi: true,

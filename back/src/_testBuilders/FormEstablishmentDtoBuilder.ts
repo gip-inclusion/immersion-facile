@@ -2,10 +2,10 @@ import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity
 import {
   FormEstablishmentDto,
   FormEstablishmentSource,
-} from "../shared/formEstablishment/FormEstablishment.dto";
-import { AppellationDto } from "../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+} from "shared/src/formEstablishment/FormEstablishment.dto";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
-import { SiretDto } from "../shared/siret";
+import { SiretDto } from "shared/src/siret";
 import { Builder } from "./Builder";
 
 const validFormEstablishment: FormEstablishmentDto = {

@@ -1,10 +1,10 @@
 import {
   ImmersionApplicationDto,
   ListImmersionApplicationRequestDto,
-} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
-import { listImmersionApplicationRequestDtoSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
+import { listImmersionApplicationRequestDtoSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 
 export class ListImmersionApplication extends UseCase<
   ListImmersionApplicationRequestDto,

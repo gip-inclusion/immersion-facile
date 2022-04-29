@@ -3,7 +3,7 @@ import { immersionApplicationGateway } from "src/app/config/dependencies";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
-} from "src/shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { Button } from "src/uiComponents/Button";
 
 export type VerificationActionButtonProps = {

@@ -1,5 +1,5 @@
-import { FormEstablishmentDto } from "src/shared/formEstablishment/FormEstablishment.dto";
-import { SiretDto } from "src/shared/siret";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { SiretDto } from "shared/src/siret";
 
 export interface EstablishmentGateway {
   addFormEstablishment: (

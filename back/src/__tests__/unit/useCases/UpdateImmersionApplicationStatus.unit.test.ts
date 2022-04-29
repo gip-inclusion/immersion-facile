@@ -19,13 +19,13 @@ import { UpdateImmersionApplicationStatus } from "../../../domain/immersionAppli
 import {
   createMagicLinkPayload,
   Role,
-} from "../../../shared/tokens/MagicLinkPayload";
+} from "shared/src/tokens/MagicLinkPayload";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
-} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 
 describe("UpdateImmersionApplicationStatus", () => {

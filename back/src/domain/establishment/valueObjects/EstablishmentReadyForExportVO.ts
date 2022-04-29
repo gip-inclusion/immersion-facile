@@ -1,4 +1,4 @@
-import { OmitFromExistingKeys } from "../../../shared/utils";
+import { OmitFromExistingKeys } from "shared/src/utils";
 import { EstablishmentRawBeforeExportProps } from "./EstablishmentRawBeforeExportVO";
 
 type TranslatedFields = "isCommited";

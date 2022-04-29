@@ -67,13 +67,13 @@ import { RomeRepository } from "../../domain/rome/ports/RomeRepository";
 import { AppellationSearch } from "../../domain/rome/useCases/AppellationSearch";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../domain/sirene/useCases/GetSiret";
-import { ImmersionApplicationId } from "../../shared/ImmersionApplication/ImmersionApplication.dto";
-import { frontRoutes } from "../../shared/routes";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { frontRoutes } from "shared/src/routes";
 import {
   createMagicLinkPayload,
   EstablishmentJwtPayload,
   Role,
-} from "../../shared/tokens/MagicLinkPayload";
+} from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";

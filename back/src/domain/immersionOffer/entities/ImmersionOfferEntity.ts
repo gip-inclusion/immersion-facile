@@ -1,5 +1,5 @@
-import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
-import { RomeCode } from "../../../shared/rome";
+import { ImmersionOfferId } from "shared/src/ImmersionOfferId";
+import { RomeCode } from "shared/src/rome";
 
 export type ImmersionOfferEntityV2 = {
   id: ImmersionOfferId;

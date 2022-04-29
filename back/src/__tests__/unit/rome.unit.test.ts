@@ -1,4 +1,4 @@
-import { appellationDtoSchema } from "../../shared/romeAndAppellationDtos/romeAndAppellation.schema";
+import { appellationDtoSchema } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
 
 describe("appel", () => {
   it("must include rome code and can inculde appellation", () => {

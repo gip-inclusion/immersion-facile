@@ -2,8 +2,8 @@ import {
   GetSiretInfoError,
   SiretGatewayThroughBack,
 } from "src/core-logic/ports/SiretGatewayThroughBack";
-import { NafDto } from "src/shared/naf";
-import { SiretDto } from "src/shared/siret";
+import { NafDto } from "shared/src/naf";
+import { SiretDto } from "shared/src/siret";
 import { EstablishmentGateway } from "../../core-logic/ports/EstablishmentGateway";
 import { EstablishmentUiGateway } from "../../core-logic/ports/EstablishmentUiGateway";
 import { VerifySiretEvent } from "../events/verifySiret/VerifySiretEvent";

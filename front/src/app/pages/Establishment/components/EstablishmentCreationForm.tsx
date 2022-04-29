@@ -11,9 +11,9 @@ import { ENV } from "src/environmentVariables";
 import {
   FormEstablishmentDto,
   FormEstablishmentSource,
-} from "src/shared/formEstablishment/FormEstablishment.dto";
-import { SiretDto } from "src/shared/siret";
-import { OmitFromExistingKeys } from "src/shared/utils";
+} from "shared/src/formEstablishment/FormEstablishment.dto";
+import { SiretDto } from "shared/src/siret";
+import { OmitFromExistingKeys } from "shared/src/utils";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button } from "src/uiComponents/Button";
 import { InfoMessage } from "src/uiComponents/form/InfoMessage";

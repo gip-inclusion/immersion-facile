@@ -1,6 +1,6 @@
 import { ErrorMessage } from "formik";
 import React from "react";
-import { TimePeriodDto } from "src/shared/ScheduleSchema";
+import { TimePeriodDto } from "shared/src/ScheduleSchema";
 import { ButtonAdd } from "src/uiComponents/ButtonAdd";
 import { DeleteButton } from "src/uiComponents/DeleteButton";
 

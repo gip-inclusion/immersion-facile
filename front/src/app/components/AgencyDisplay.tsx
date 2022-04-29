@@ -2,9 +2,9 @@ import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { agencyGateway } from "src/app/config/dependencies";
-import { AgencyId, AgencyInListDto } from "src/shared/agency/agency.dto";
-import type { ImmersionApplicationDto } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { LatLonDto } from "src/shared/latLon";
+import { AgencyId, AgencyInListDto } from "shared/src/agency/agency.dto";
+import type { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { LatLonDto } from "shared/src/latLon";
 
 import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
 import { Agencies } from "./Agency";

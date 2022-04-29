@@ -4,8 +4,8 @@ import {
   GetSiretResponseDto,
   SiretDto,
   tooManySirenRequestsSiret,
-} from "src/shared/siret";
-import { sleep } from "src/shared/utils";
+} from "shared/src/siret";
+import { sleep } from "shared/src/utils";
 import {
   GetSiretInfo,
   sirenApiMissingEstablishmentMessage,

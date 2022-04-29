@@ -1,12 +1,12 @@
 import * as dotenv from "dotenv";
 import { DomainTopic } from "../../domain/core/eventBus/events";
-import { AbsoluteUrl } from "../../shared/AbsoluteUrl";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import {
   makeGetBooleanVariable,
   makeThrowIfNotDefined,
   ProcessEnv,
   throwIfNotInArray,
-} from "../../shared/envHelpers";
+} from "shared/src/envHelpers";
 
 export type AccessTokenConfig = {
   clientId: string;

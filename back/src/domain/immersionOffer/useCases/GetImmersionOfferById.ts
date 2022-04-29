@@ -1,11 +1,11 @@
 import { prop } from "ramda";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { ImmersionOfferId } from "../../../shared/ImmersionOfferId";
+import { ImmersionOfferId } from "shared/src/ImmersionOfferId";
 import {
   SearchContactDto,
   SearchImmersionResultDto,
-} from "../../../shared/searchImmersion/SearchImmersionResult.dto";
-import { immersionOfferIdSchema } from "../../../shared/searchImmersion/SearchImmersionResult.schema";
+} from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { immersionOfferIdSchema } from "shared/src/searchImmersion/SearchImmersionResult.schema";
 import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { UseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";

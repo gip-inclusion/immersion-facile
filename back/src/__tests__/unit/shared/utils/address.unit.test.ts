@@ -1,4 +1,4 @@
-import { captureAddressGroups } from "../../../../shared/utils/address";
+import { captureAddressGroups } from "shared/src/utils/address";
 
 describe("address", () => {
   it("captureAddressGroups should match address postalCode and city groups", () => {

@@ -5,13 +5,13 @@ import {
 import {
   ImmersionApplicationId,
   WithImmersionApplicationId,
-} from "../../../shared/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
-import { immersionApplicationIdSchema } from "../../../shared/ImmersionApplication/immersionApplication.schema";
+import { immersionApplicationIdSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 
 export class ValidateImmersionApplication extends UseCase<
   ImmersionApplicationId,

@@ -1,7 +1,7 @@
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
-import { FormEstablishmentDto } from "../../../shared/formEstablishment/FormEstablishment.dto";
-import { formEstablishmentSchema } from "../../../shared/formEstablishment/FormEstablishment.schema";
-import { SiretDto } from "../../../shared/siret";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
+import { SiretDto } from "shared/src/siret";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";

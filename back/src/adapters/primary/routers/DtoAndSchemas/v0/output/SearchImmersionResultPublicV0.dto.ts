@@ -1,9 +1,9 @@
-import { ImmersionContactInEstablishmentId } from "../../../../../../shared/formEstablishment/FormEstablishment.dto";
-import { LatLonDto } from "../../../../../../shared/latLon";
-import { RomeCode } from "../../../../../../shared/rome";
-import { SearchImmersionResultDto } from "../../../../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { ImmersionContactInEstablishmentId } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { LatLonDto } from "shared/src/latLon";
+import { RomeCode } from "shared/src/rome";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 
-import { SiretDto } from "../../../../../../shared/siret";
+import { SiretDto } from "shared/src/siret";
 
 export type ContactDetailsPublicV0 = {
   id: ImmersionContactInEstablishmentId;

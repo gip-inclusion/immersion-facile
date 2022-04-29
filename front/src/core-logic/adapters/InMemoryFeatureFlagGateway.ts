@@ -1,6 +1,6 @@
 import { Subject } from "rxjs";
 import { FeatureFlagsGateway } from "src/core-logic/ports/FeatureFlagsGateway";
-import { FeatureFlags } from "src/shared/featureFlags";
+import { FeatureFlags } from "shared/src/featureFlags";
 
 export class InMemoryFeatureFlagGateway implements FeatureFlagsGateway {
   private _featureFlags$ = new Subject<FeatureFlags>();

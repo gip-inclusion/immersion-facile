@@ -6,7 +6,7 @@ import {
 } from "src/app/config/dependencies";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
-import { GetSiretResponseDto, SiretDto, siretSchema } from "src/shared/siret";
+import { GetSiretResponseDto, SiretDto, siretSchema } from "shared/src/siret";
 
 export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
   fieldFromInfo: K,

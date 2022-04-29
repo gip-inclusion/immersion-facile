@@ -1,16 +1,16 @@
-import { AgencyId } from "../shared/agency/agency.dto";
+import { AgencyId } from "shared/src/agency/agency.dto";
 import {
   LegacyScheduleDto,
   reasonableSchedule,
   ScheduleDto,
-} from "../shared/ScheduleSchema";
+} from "shared/src/ScheduleSchema";
 import { Builder } from "./Builder";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
-} from "../shared/ImmersionApplication/ImmersionApplication.dto";
-import { AppellationDto } from "../shared/romeAndAppellationDtos/romeAndAppellation.dto";
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 export const VALID_EMAILS = [

@@ -1,6 +1,6 @@
-import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
-import { SiretDto } from "../../../shared/siret";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { SiretDto } from "shared/src/siret";
 import { ContactEntityV2 } from "../entities/ContactEntity";
 import {
   AnnotatedEstablishmentEntityV2,
