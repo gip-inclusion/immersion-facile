@@ -6,11 +6,9 @@ import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { EmailGateway } from "../../immersionApplication/ports/EmailGateway";
-import { isAfter } from "date-fns";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
-export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
+export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
   inputSchema = siretSchema;
 
   constructor(
@@ -32,21 +30,6 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     if (!contact) throw Error("Email du contact introuvable.");
 
     const now = this.clock.now();
-    const lastPayload =
-      await uow.outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret(
-        siret,
-      );
-    if (lastPayload) {
-      const editLinkIsExpired = isAfter(new Date(lastPayload.exp), now);
-      if (editLinkIsExpired) {
-        const editLinkSentAt = new Date(lastPayload.iat);
-        throw new BadRequestError(
-          `Un email a déjà été envoyé au contact référent de l'établissement le ${editLinkSentAt.toLocaleDateString(
-            "fr-FR",
-          )}`,
-        );
-      }
-    }
 
     const payload = createEstablishmentJwtPayload({
       siret,
@@ -56,7 +39,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
     try {
-      await this.emailGateway.sendRequestedEditFormEstablishmentLink(
+      await this.emailGateway.sendFormEstablishmentEditionSuggestion(
         contact.email,
         contact.copyEmails,
         {

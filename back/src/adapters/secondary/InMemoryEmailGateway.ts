@@ -33,7 +33,7 @@ export type TemplatedEmail = {
 
 export class InMemoryEmailGateway implements EmailGateway {
   private readonly sentEmails: TemplatedEmail[] = [];
-  public async sendEditFormEstablishmentLink(
+  public async sendRequestedEditFormEstablishmentLink(
     recipient: string,
     copy: string[],
     params: { editFrontUrl: string },
@@ -46,6 +46,23 @@ export class InMemoryEmailGateway implements EmailGateway {
       params,
     });
   }
+  public async sendFormEstablishmentEditionSuggestion(
+    recipient: string,
+    copy: string[],
+    params: { editFrontUrl: string },
+  ) {
+    logger.info(
+      { recipient, params, copy },
+      "sendFormEstablishmentEditionSuggestion",
+    );
+    this.sentEmails.push({
+      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+      recipients: [recipient],
+      cc: copy,
+      params,
+    });
+  }
+
   public async sendNewEstablismentContactConfirmation(
     recipient: string,
     copy: string[],

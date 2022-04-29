@@ -9,6 +9,7 @@
     "start-update-establishments-from-sirene": "ts-node src/adapters/primary/startUpdateEstablishmentsFromSirene.ts",
     "free-quarantined-form-establishments-with-correct-siret": "ts-node src/adapters/primary/freeQuarantinedFormEstablishmentsWithCorrectSiret.ts",
     "transform-past-form-establishments-into-searchable-data": "ts-node src/adapters/primary/transformPastFormEstablishmentsIntoSearchableData.ts",
+    "trigger-suggest-edit-form-establishment-every-6-months": "ts-node src/adapters/primary/triggerSuggestEditFormEstablishmentEvery6Months.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts",
     "test:e2e": "jest --watchAll --testRegex=.e2e.test.ts",
     "test:integration": "jest --runInBand --testRegex=.integration.test.ts",

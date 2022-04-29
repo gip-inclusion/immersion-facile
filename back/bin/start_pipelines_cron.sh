@@ -16,6 +16,10 @@ echo "Running $0 $@ (pwd: $(pwd))"
 #  pipeline in cron format. Default: daily at midnight.
 : "${ESTABLISHMENT_UPDATE_FROM_SIRENE:=0 0 * * *}"
 
+#  ESTABLISHMENT_SUGGEST_FORM_EDITION (optional): The execution schedule for the establishment-backfill
+#  pipeline in cron format. Default: daily at midnight.
+: "${ESTABLISHMENT_SUGGEST_FORM_EDITION:=0 0 * * *}"
+
 # Create logdir if it doesn't already exist.
 if [[ ! -d $LOGDIR ]]; then
   mkdir -p $LOGDIR && chmod 755 $LOGDIR
@@ -28,6 +32,9 @@ PATH=$PATH
 
 # Pipeline: update-establishments-from-sirene
 $ESTABLISHMENT_UPDATE_FROM_SIRENE cd /app && npm run start-update-establishments-from-sirene >> $LOGDIR/update-establishments-from-sirene.log 2>&1
+
+# Pipeline: trigger-suggest-edit-form-establishment-every-6-months
+$ESTABLISHMENT_SUGGEST_FORM_EDITION cd /app && npm run trigger-suggest-edit-form-establishment-every-6-months >> $LOGDIR/trigger-suggest-edit-form-establishment-every-6-months.log 2>&1
 
 EOT
 

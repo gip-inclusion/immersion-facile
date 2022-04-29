@@ -163,10 +163,16 @@ export type EmailType =
   | "CONTACT_BY_PHONE_INSTRUCTIONS"
   | "CONTACT_IN_PERSON_INSTRUCTIONS"
   | "EDIT_FORM_ESTABLISHMENT_LINK"
+  | "SUGGEST_EDIT_FORM_ESTABLISHMENT"
   | "SHARE_DRAFT_APPLICATION_BY_LINK";
 
 export interface EmailGateway {
-  sendEditFormEstablishmentLink: (
+  sendRequestedEditFormEstablishmentLink: (
+    recipient: string,
+    copy: string[],
+    params: { editFrontUrl: string },
+  ) => Promise<void>;
+  sendFormEstablishmentEditionSuggestion: (
     recipient: string,
     copy: string[],
     params: { editFrontUrl: string },
