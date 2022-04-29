@@ -34,6 +34,20 @@ module.exports = {
       },
     },
     {
+      files: ["**/InMemory*.ts", "**/*Stub*.ts", "**/pg/migrations/*.ts"],
+      parser: "@typescript-eslint/parser",
+      parserOptions: {
+        tsconfigRootDir: __dirname,
+        project: ["./tsconfig.json"],
+        ecmaVersion: 2020,
+        sourceType: "module",
+      },
+      plugins: ["@typescript-eslint"],
+      rules: {
+        "@typescript-eslint/require-await": "off",
+      },
+    },
+    {
       env: {
         "jest/globals": true,
       },

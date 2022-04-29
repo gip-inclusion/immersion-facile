@@ -40,9 +40,9 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
   }
 }
 
-export const convertEtablissementToResponse = async (
+export const convertEtablissementToResponse = (
   sireneEstablishment: SireneEstablishmentVO,
-): Promise<GetSiretResponseDto> => ({
+): GetSiretResponseDto => ({
   siret: sireneEstablishment.siret,
   businessName: sireneEstablishment.businessName,
   businessAddress: sireneEstablishment.formatedAddress,

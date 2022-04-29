@@ -82,7 +82,8 @@ const FormikApplicationForm = ({
         setInitialValues(immersionApplication);
         setSubmitFeedback("justSubmitted");
       } catch (e: any) {
-        console.log(e);
+        //eslint-disable-next-line no-console
+        console.log("onSubmit", e);
         setSubmitFeedback(e);
       }
       setSubmitting(false);

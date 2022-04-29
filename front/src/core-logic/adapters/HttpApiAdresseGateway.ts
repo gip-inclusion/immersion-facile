@@ -37,7 +37,8 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
         .map(featureToStreetAddressWithCoordinates)
         .filter(removeNilValues);
     } catch (e) {
-      console.error(e);
+      //eslint-disable-next-line no-console
+      console.error("Api Adresse Search Error", e);
       return [];
     }
   }
@@ -67,7 +68,8 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
         return null;
       }
     } catch (e) {
-      console.error(e);
+      //eslint-disable-next-line no-console
+      console.error("Api Adresse Search Error", e);
       return null;
     }
   }
@@ -109,7 +111,7 @@ const buildLabel = (feature: {
 
   if (feature.properties.type === "municipality")
     return [feature.properties.postcode, feature.properties.name].join(" ");
-
+  //eslint-disable-next-line no-console
   console.error("Unexpected API adresse feature", feature);
   return;
 };

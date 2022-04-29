@@ -24,6 +24,7 @@ export const RenewExpiredLinkContent = ({
   const [requestSuccessful, setRequestSuccessful] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  //eslint-disable-next-line @typescript-eslint/require-await
   const onClick = async () => {
     if (location.search.length === 0) {
       setErrorMessage("URL invalide");

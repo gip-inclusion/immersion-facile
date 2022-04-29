@@ -15,6 +15,7 @@ describe("Route to generate an establishment edition link", () => {
   beforeEach(async () => {
     ({ request, reposAndGateways } = await buildTestApp());
     reposAndGateways.immersionOffer.getContactForEstablishmentSiret =
+      //eslint-disable-next-line @typescript-eslint/require-await
       async () =>
         new ContactEntityV2Builder().withEmail("erik@gmail.com").build();
   });

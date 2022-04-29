@@ -17,6 +17,7 @@ export class GenerateMagicLink extends UseCase<
 
   inputSchema = generateMagicLinkRequestSchema;
 
+  //eslint-disable-next-line @typescript-eslint/require-await
   public async _execute({
     applicationId,
     role,

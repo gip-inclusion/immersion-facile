@@ -295,7 +295,6 @@ export class PgEstablishmentAggregateRepository
           e,
           "Error in Pg implementation of getSearchImmersionResultDtoFromSearchMade",
         );
-        console.log(e);
         throw e;
       });
   }

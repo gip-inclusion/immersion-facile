@@ -24,9 +24,6 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
   const [firstName] = useField<string>({ name: "firstName" });
   const [lastName] = useField<string>({ name: "lastName" });
 
-  console.log(firstName);
-  console.log(lastName);
-
   return (
     <Formik
       initialValues={{

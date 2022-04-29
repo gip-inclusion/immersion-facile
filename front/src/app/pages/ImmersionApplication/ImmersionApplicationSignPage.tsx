@@ -143,7 +143,8 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
 
                   setAlreadySigned(true);
                 } catch (e: any) {
-                  console.log(e);
+                  //eslint-disable-next-line no-console
+                  console.log("onSubmitError", e);
                   setSubmitFeedback(e);
                 } finally {
                   setSubmitting(false);
@@ -158,8 +159,7 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
 
                   if (justification === null || justification === undefined)
                     return;
-                  if (justification === "")
-                    return await rejectWithMessageForm();
+                  if (justification === "") return rejectWithMessageForm();
 
                   try {
                     await immersionApplicationGateway.updateStatus(
@@ -168,7 +168,8 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
                     );
                     setSubmitFeedback("modificationsAsked");
                   } catch (e: any) {
-                    console.log(e);
+                    //eslint-disable-next-line no-console
+                    console.log("updateStatus Error", e);
                     setSubmitFeedback(e);
                   }
                 };

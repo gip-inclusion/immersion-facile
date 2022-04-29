@@ -38,11 +38,13 @@ export const spyOnTopic = (
   subscriptionId: string,
 ): DomainEvent[] => {
   const publishedEvents: DomainEvent[] = [];
+  //eslint-disable-next-line @typescript-eslint/require-await
   eventBus.subscribe(topic, subscriptionId, async (event) => {
     publishedEvents.push(event);
   });
   return publishedEvents;
 };
+
 export const fakeGenerateMagicLinkUrlFn: GenerateVerificationMagicLink = (
   applicationId: ImmersionApplicationId,
   role: Role,

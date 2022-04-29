@@ -18,8 +18,10 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   public async processNewEvents() {
+    //eslint-disable-next-line no-console
     console.time("__metrics : getAllUnpublishedEvents query duration");
     const events = await this.outboxQueries.getAllUnpublishedEvents();
+    //eslint-disable-next-line no-console
     console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
     logger.debug(
       { events: eventsToDebugInfo(events) },
@@ -29,8 +31,10 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   public async retryFailedEvents() {
+    //eslint-disable-next-line no-console
     console.time("__metrics : getAllFailedEvents query duration");
     const events = await this.outboxQueries.getAllFailedEvents();
+    //eslint-disable-next-line no-console
     console.timeEnd("__metrics : getAllFailedEvents query duration");
     logger.debug({ events: eventsToDebugInfo(events) }, "retrying Events");
     await Promise.all(events.map((event) => this.eventBus.publish(event)));

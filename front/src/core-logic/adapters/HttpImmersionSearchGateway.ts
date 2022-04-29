@@ -27,13 +27,6 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
   public async contactEstablishment(
     params: ContactEstablishmentRequestDto,
   ): Promise<void> {
-    const response = await axios.post(
-      `/${prefix}/${contactEstablishmentRoute}`,
-      params,
-    );
-    console.log(
-      "Contact establishments response status",
-      response?.data?.status,
-    );
+    await axios.post(`/${prefix}/${contactEstablishmentRoute}`, params);
   }
 }

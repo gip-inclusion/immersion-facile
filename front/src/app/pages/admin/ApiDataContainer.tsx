@@ -13,7 +13,6 @@ function useApiCall<T>({ callApi }: UseApiCallProps<T>) {
   useEffect(() => {
     callApi()
       .then((apiData) => {
-        console.log(apiData);
         setApiData(apiData);
       })
       .catch((e) => {

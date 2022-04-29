@@ -12,6 +12,7 @@ export class InMemoryApiAdresseGateway implements ApiAdresseGateway {
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressWithCoordinates[]> {
+    //eslint-disable-next-line no-console
     console.log("InMemoryApiAddresseGateway.lookupStreetAddress", query);
     await sleep(SIMULATED_LATENCY_MS);
 
@@ -39,6 +40,7 @@ export class InMemoryApiAdresseGateway implements ApiAdresseGateway {
   }
 
   public async lookupPostCode(query: string): Promise<LatLonDto | null> {
+    //eslint-disable-next-line no-console
     console.log("InMemoryApiAddresseGateway.lookupPostCode", query);
     await sleep(SIMULATED_LATENCY_MS);
 

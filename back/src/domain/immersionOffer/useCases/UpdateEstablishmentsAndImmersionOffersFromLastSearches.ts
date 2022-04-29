@@ -171,6 +171,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
       );
       return removeUndefinedElements(establishmentAggregates);
     } catch (error: any) {
+      //eslint-disable-next-line no-console
       console.log("Error in searchLaBonneBoite ", error);
       logger.error({ searchMade }, "Error in searchLaBonneBoite: " + error);
       throw error;

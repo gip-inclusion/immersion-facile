@@ -143,7 +143,6 @@ const subscriptionCallbackToExecute =
 
     try {
       await cb(event);
-      console.log(`A callback has ben resolved ${subscriptionId}`);
     } catch (error: any) {
       monitorErrorInCallback(error, event);
       return { subscriptionId, errorMessage: error.message };

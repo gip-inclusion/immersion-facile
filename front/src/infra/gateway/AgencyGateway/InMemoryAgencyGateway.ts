@@ -5,6 +5,7 @@ import { toAgencyPublicDisplayDto } from "src/shared/agency/agency";
 import {
   AgencyId,
   AgencyInListDto,
+  AgencyPublicDisplayDto,
   CreateAgencyConfig,
   WithAgencyId,
 } from "src/shared/agency/agency.dto";
@@ -38,7 +39,9 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     return values(this._agencies);
   }
 
-  async getAgencyPublicInfoById(agencyId: WithAgencyId) {
+  async getAgencyPublicInfoById(
+    agencyId: WithAgencyId,
+  ): Promise<AgencyPublicDisplayDto> {
     const agency = this._agencies[agencyId.id];
     return toAgencyPublicDisplayDto(agency);
   }

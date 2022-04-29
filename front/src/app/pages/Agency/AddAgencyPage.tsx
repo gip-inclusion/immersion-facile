@@ -71,7 +71,8 @@ export const AddAgencyPage = () => {
               })
               .then(() => setSubmitFeedback("agencyAdded"))
               .catch((e) => {
-                console.log(e);
+                //eslint-disable-next-line  no-console
+                console.log("AddAgencyPage", e);
                 setSubmitFeedback(e);
               })
           }

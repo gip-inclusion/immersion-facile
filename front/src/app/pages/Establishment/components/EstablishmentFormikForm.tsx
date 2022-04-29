@@ -69,7 +69,8 @@ export const EstablishmentFormikForm = ({
             setIsSuccess(true);
             setSubmitError(null);
           } catch (e: any) {
-            console.log(e);
+            //eslint-disable-next-line no-console
+            console.log("onSubmit", e);
             setIsSuccess(false);
             setSubmitError(e);
           } finally {
@@ -132,7 +133,6 @@ export const EstablishmentFormikForm = ({
 
               {submitCount !== 0 && Object.values(errors).length > 0 && (
                 <div style={{ color: "red" }}>
-                  {console.log(errors)}
                   Veuillez corriger les champs erronés :
                   <ul>
                     {(Object.keys(errors) as FieldsWithLabel[]).map((field) => {

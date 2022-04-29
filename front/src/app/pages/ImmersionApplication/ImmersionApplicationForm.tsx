@@ -1,6 +1,5 @@
 import { startOfToday } from "date-fns";
 import { Formik } from "formik";
-import { keys } from "ramda";
 import React, { useEffect, useState } from "react";
 import {
   SubmitFeedback,
@@ -49,7 +48,8 @@ export const ImmersionApplicationForm = ({
         setInitialValues(response);
       })
       .catch((e) => {
-        console.log("fetch error", e);
+        //eslint-disable-next-line no-console
+        console.log("immersionApplicationGateway fetch error", e);
         setSubmitFeedback(e);
       });
   }, []);
@@ -116,7 +116,8 @@ export const ImmersionApplicationForm = ({
               setInitialValues(immersionApplication);
               setSubmitFeedback("justSubmitted");
             } catch (e: any) {
-              console.log(e);
+              //eslint-disable-next-line no-console
+              console.log("onSubmit error", e);
               setSubmitFeedback(e);
             }
             setSubmitting(false);
@@ -124,7 +125,6 @@ export const ImmersionApplicationForm = ({
         >
           {(props) => (
             <div>
-              {keys(props.errors).length !== 0 && console.log(props.errors)}
               <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
                 <ApplicationFormFields isFrozen={isFrozen} />
                 <SubmitFeedback submitFeedback={submitFeedback} />

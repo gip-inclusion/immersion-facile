@@ -63,7 +63,8 @@ export const AppellationAutocomplete = ({
           );
         setOptions(romeOptions.map(romeSearchMatchToProposal));
       } catch (e: any) {
-        console.error(e);
+        //eslint-disable-next-line no-console
+        console.log("AppellationAutocomplete", e);
       } finally {
         setIsSearching(false);
       }

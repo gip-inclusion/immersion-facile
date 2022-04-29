@@ -6,7 +6,7 @@ import {
 } from "../../utils/notifyDiscord";
 
 describe("Notify Discord", () => {
-  it("Should serialize the thrown Error and notify channel dev-error channel", async () => {
+  it("Should serialize the thrown Error and notify channel dev-error channel", () => {
     try {
       throw new SyntaxError("Invalid syntax for action !");
     } catch (e: unknown) {
@@ -16,7 +16,7 @@ describe("Notify Discord", () => {
     }
   });
 
-  it("Should serialize the thrown Error, notify channel dev-error channel and throw Error", async () => {
+  it("Should serialize the thrown Error, notify channel dev-error channel and throw Error", () => {
     try {
       throw new SyntaxError("Invalid syntax for action !");
     } catch (e: unknown) {

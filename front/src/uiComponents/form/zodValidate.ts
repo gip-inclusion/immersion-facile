@@ -24,12 +24,13 @@ const createValidationError = (e: z.ZodError) => {
 
 export const toFormikValidationSchema = <T>(
   schema: z.ZodSchema<T>,
-): { validate: (obj: T) => Promise<void> } => ({
-  async validate(obj: T) {
+): { validate: (obj: T) => void } => ({
+  validate(obj: T) {
     try {
       schema.parse(obj);
     } catch (err: unknown) {
       const error = err as z.ZodError<T>;
+      //eslint-disable-next-line no-console
       console.log(
         "zod error :",
         error.errors.map((e) => `${e.path} : ${e.message}`),

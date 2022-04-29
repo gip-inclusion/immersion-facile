@@ -42,7 +42,8 @@ export const AddressAutocomplete = ({
       setOptions(addresses);
       return addresses;
     } catch (e: any) {
-      console.error(e);
+      //eslint-disable-next-line no-console
+      console.error("lookupStreetAddress", e);
       return [];
     } finally {
       setIsSearching(false);

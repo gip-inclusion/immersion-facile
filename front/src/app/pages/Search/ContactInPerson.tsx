@@ -78,7 +78,8 @@ export const ContactInPerson = ({
           />
           {submitCount !== 0 &&
             Object.values(errors).length > 0 &&
-            console.log({ errors })}
+            //eslint-disable-next-line no-console
+            console.log("onSubmit Error", { errors })}
           <Button level="secondary" type="submit" disable={isSubmitting}>
             Envoyer
           </Button>

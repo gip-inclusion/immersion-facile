@@ -115,7 +115,6 @@ export const ApplicationFormFieldsUkraine = ({
 
   const route = useRoute();
   useEffect(() => {
-    console.log("values ", values);
     if (route.name !== "immersionApplication" || !!route.params.jwt) return;
     routes.immersionApplication(watchedValues).replace();
   }, [

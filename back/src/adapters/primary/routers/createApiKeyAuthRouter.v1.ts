@@ -60,7 +60,7 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () => {
         if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
-        return await deps.useCases.getImmersionOfferBySiretAndRome.execute(
+        return deps.useCases.getImmersionOfferBySiretAndRome.execute(
           req.query as SiretAndRomeDto,
           req.apiConsumer,
         );

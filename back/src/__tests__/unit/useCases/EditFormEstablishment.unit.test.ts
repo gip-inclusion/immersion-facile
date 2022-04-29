@@ -92,7 +92,7 @@ describe("Edit Form Establishment", () => {
     describe("If establishment form id does not exist", () => {
       it("should throw a conflict error", async () => {
         const { useCase } = prepareUseCase();
-        expectPromiseToFailWithError(
+        await expectPromiseToFailWithError(
           useCase.execute(
             FormEstablishmentDtoBuilder.valid().withSiret(formSiret).build(),
             payload,

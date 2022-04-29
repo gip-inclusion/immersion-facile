@@ -17,6 +17,6 @@ export class RomeSearch extends TransactionalUseCase<string, RomeDto[]> {
     uow: UnitOfWork,
   ): Promise<RomeDto[]> {
     if (searchText.length < MIN_SEARCH_TEXT_LENGTH) return [];
-    return await uow.romeRepo.searchRome(searchText);
+    return uow.romeRepo.searchRome(searchText);
   }
 }

@@ -27,7 +27,8 @@ const allEpics: any[] = [
 const rootEpic: Epic = (action$, store$, dependencies) =>
   combineEpics(...allEpics)(action$, store$, dependencies).pipe(
     catchError((error, source) => {
-      console.error(error);
+      //eslint-disable-next-line no-console
+      console.error("combineEpic", error);
       return source;
     }),
   );

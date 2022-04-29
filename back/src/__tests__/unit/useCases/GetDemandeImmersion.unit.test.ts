@@ -15,7 +15,7 @@ describe("Get ImmersionApplication", () => {
 
   describe("When the ImmersionApplication does not exist", () => {
     it("throws NotFoundError", async () => {
-      expectPromiseToFailWithError(
+      await expectPromiseToFailWithError(
         getImmersionApplication.execute({ id: "unknown_demande_immersion_id" }),
         new NotFoundError("unknown_demande_immersion_id"),
       );

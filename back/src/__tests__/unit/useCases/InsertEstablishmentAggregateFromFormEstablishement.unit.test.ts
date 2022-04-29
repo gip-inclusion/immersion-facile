@@ -106,7 +106,7 @@ describe("Insert Establishment aggregate from form data", () => {
     await useCase.execute(formEstablishment);
 
     // Assert
-    await expectEstablishmentAggregateInRepo({
+    expectEstablishmentAggregateInRepo({
       siret: fakeSiret,
       nafDto: expectedNafDto,
       offerRomeCodesAndAppellations: [
@@ -117,7 +117,7 @@ describe("Insert Establishment aggregate from form data", () => {
     });
   });
 
-  const expectEstablishmentAggregateInRepo = async (expected: {
+  const expectEstablishmentAggregateInRepo = (expected: {
     siret: string;
     nafDto: NafDto;
     contactEmail: string;

@@ -59,10 +59,13 @@ const makeSqlQueryToAddConsumer = ({
   `VALUES ('${id}', '${consumer}', '${description}', ${isAuthorized}, '${createdAt.toISOString()}', '${expirationDate.toISOString()}');`;
 
 logger.info(apiConsumer, "Generating api key with payload ");
+//eslint-disable-next-line no-console
 console.log("\n ApiConsumer : ", apiConsumer);
+//eslint-disable-next-line no-console
 console.log(
   "\n Query to add in DB : \n",
   makeSqlQueryToAddConsumer(apiConsumer),
   "\n ----- \n",
 );
+//eslint-disable-next-line no-console
 console.log("\n JWT : ", generateApiKeyJwt({ id: apiConsumer.id }));

@@ -26,7 +26,7 @@ export const withQpsLimit = <Input, Output>(
   cb: (arg: Input) => Promise<Output>,
 ): ((arg: Input) => Promise<Output>) => {
   const limiter = new QpsRateLimiter(maxQps, clock, sleepFn);
-  return async (arg: Input) => await limiter.whenReady(() => cb(arg));
+  return async (arg: Input) => limiter.whenReady(() => cb(arg));
 };
 
 export class QpsRateLimiter implements RateLimiter {

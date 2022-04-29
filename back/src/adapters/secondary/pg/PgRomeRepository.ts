@@ -11,7 +11,7 @@ const logger = createLogger(__filename);
 export class PgRomeRepository implements RomeRepository {
   constructor(private client: PoolClient) {}
 
-  appellationToCodeMetier(
+  public async appellationToCodeMetier(
     romeCodeAppellation: string,
   ): Promise<string | undefined> {
     return this.client
@@ -41,7 +41,7 @@ export class PgRomeRepository implements RomeRepository {
 
   public async searchRome(query: string): Promise<RomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
-    return await this.client
+    return this.client
       .query(
         `
         WITH matching_rome AS(
@@ -78,7 +78,7 @@ export class PgRomeRepository implements RomeRepository {
   public async searchAppellation(query: string): Promise<AppellationDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
 
-    return await this.client
+    return this.client
       .query(
         `SELECT ogr_appellation, libelle_appellation_long, public_appellations_data.code_rome, libelle_rome
         FROM public_appellations_data 

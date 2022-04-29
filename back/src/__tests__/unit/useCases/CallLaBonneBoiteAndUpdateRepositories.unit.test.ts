@@ -14,7 +14,7 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/Establishm
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
 
-const prepareUseCase = async () => {
+const prepareUseCase = () => {
   const establishmentAggregateRepository =
     new InMemoryEstablishmentAggregateRepository();
   const laBonneBoiteRequestRepository =
@@ -53,7 +53,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
   it("should not request LBB if no rome code is provided", async () => {
     // Prepare
     const { useCase, laBonneBoiteRequestRepository, laBonneBoiteAPI } =
-      await prepareUseCase();
+      prepareUseCase();
 
     // Act
     await useCase.execute({
@@ -79,7 +79,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
     it("should add the request entity to the repository", async () => {
       // Prepare
       const { useCase, laBonneBoiteRequestRepository, laBonneBoiteAPI, clock } =
-        await prepareUseCase();
+        prepareUseCase();
 
       clock.setNextDate(nextDate);
       laBonneBoiteAPI.setNextResults([]);
@@ -113,7 +113,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
     it("should insert as many 'relevant' establishments and offers in repositories as LBB responded with undefined field `updatedAt`", async () => {
       // Prepare
       const { useCase, laBonneBoiteAPI, establishmentAggregateRepository } =
-        await prepareUseCase();
+        prepareUseCase();
       establishmentAggregateRepository.establishmentAggregates = [];
 
       const ignoredNafRomeCombination = {
@@ -177,77 +177,74 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
         alreadyExistingAggregateFromForm,
       ]);
     });
-  }),
-    describe("lBB has been requested for this rome code and this geographic area", () => {
-      const userSearchedRome = "M1234";
-      const userSearchedLocationInParis17 = {
-        lat: 48.862725, // 7 rue guillaume Tell, 75017 Paris
-        lon: 2.287592,
-      };
-      const previouslySearchedLocationInParis10 = {
-        lat: 48.8841446, // 169 Bd de la Villette, 75010 Paris
-        lon: 2.3651789,
-      };
+  });
 
-      const previousSimilarRequestEntity = {
-        params: {
-          rome: userSearchedRome,
-          lat: previouslySearchedLocationInParis10.lat,
-          lon: previouslySearchedLocationInParis10.lon,
-          distance_km: 50,
-        },
-        requestedAt: new Date("2021-01-01"),
-      } as LaBonneBoiteRequestEntity;
+  describe("lBB has been requested for this rome code and this geographic area", () => {
+    const userSearchedRome = "M1234";
+    const userSearchedLocationInParis17 = {
+      lat: 48.862725, // 7 rue guillaume Tell, 75017 Paris
+      lon: 2.287592,
+    };
+    const previouslySearchedLocationInParis10 = {
+      lat: 48.8841446, // 169 Bd de la Villette, 75010 Paris
+      lon: 2.3651789,
+    };
 
-      it("should not request LBB if the request has been made in the last month", async () => {
-        // Prepare
-        const {
-          useCase,
-          laBonneBoiteRequestRepository,
-          laBonneBoiteAPI,
-          clock,
-        } = await prepareUseCase();
+    const previousSimilarRequestEntity = {
+      params: {
+        rome: userSearchedRome,
+        lat: previouslySearchedLocationInParis10.lat,
+        lon: previouslySearchedLocationInParis10.lon,
+        distance_km: 50,
+      },
+      requestedAt: new Date("2021-01-01"),
+    } as LaBonneBoiteRequestEntity;
 
-        laBonneBoiteRequestRepository.laBonneBoiteRequests = [
-          previousSimilarRequestEntity,
-        ];
-        clock.setNextDate(new Date("2021-01-30"));
+    it("should not request LBB if the request has been made in the last month", async () => {
+      // Prepare
+      const { useCase, laBonneBoiteRequestRepository, laBonneBoiteAPI, clock } =
+        prepareUseCase();
 
-        // Act
-        await useCase.execute({
-          rome: userSearchedRome,
-          location: userSearchedLocationInParis17,
-          distance_km: 10,
-        });
+      laBonneBoiteRequestRepository.laBonneBoiteRequests = [
+        previousSimilarRequestEntity,
+      ];
+      clock.setNextDate(new Date("2021-01-30"));
 
-        // Assert
-        expect(laBonneBoiteAPI.nbOfCalls).toBe(0);
-        expect(laBonneBoiteRequestRepository.laBonneBoiteRequests).toHaveLength(
-          1,
-        );
+      // Act
+      await useCase.execute({
+        rome: userSearchedRome,
+        location: userSearchedLocationInParis17,
+        distance_km: 10,
       });
 
-      it("should request LBB if the request was made more than a month ago", async () => {
-        // Prepare
-        const { useCase, laBonneBoiteRequestRepository, clock } =
-          await prepareUseCase();
-
-        laBonneBoiteRequestRepository.laBonneBoiteRequests = [
-          previousSimilarRequestEntity,
-        ];
-        clock.setNextDate(new Date("2021-02-01"));
-
-        // Act
-        await useCase.execute({
-          rome: userSearchedRome,
-          location: userSearchedLocationInParis17,
-          distance_km: 10,
-        });
-
-        // Assert
-        expect(laBonneBoiteRequestRepository.laBonneBoiteRequests).toHaveLength(
-          2,
-        );
-      });
+      // Assert
+      expect(laBonneBoiteAPI.nbOfCalls).toBe(0);
+      expect(laBonneBoiteRequestRepository.laBonneBoiteRequests).toHaveLength(
+        1,
+      );
     });
+
+    it("should request LBB if the request was made more than a month ago", async () => {
+      // Prepare
+      const { useCase, laBonneBoiteRequestRepository, clock } =
+        await prepareUseCase();
+
+      laBonneBoiteRequestRepository.laBonneBoiteRequests = [
+        previousSimilarRequestEntity,
+      ];
+      clock.setNextDate(new Date("2021-02-01"));
+
+      // Act
+      await useCase.execute({
+        rome: userSearchedRome,
+        location: userSearchedLocationInParis17,
+        distance_km: 10,
+      });
+
+      // Assert
+      expect(laBonneBoiteRequestRepository.laBonneBoiteRequests).toHaveLength(
+        2,
+      );
+    });
+  });
 });

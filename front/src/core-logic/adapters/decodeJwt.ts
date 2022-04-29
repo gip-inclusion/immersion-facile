@@ -15,7 +15,8 @@ export const decodeJwt = <T extends MagicLinkPayload | EstablishmentJwtPayload>(
     // decode and parse to json
     return JSON.parse(window.atob(base64));
   } catch (error) {
-    console.error(error);
+    //eslint-disable-next-line no-console
+    console.error(decodeJwt, error);
     throw new Error("401 Malformed JWT payload");
   }
 };

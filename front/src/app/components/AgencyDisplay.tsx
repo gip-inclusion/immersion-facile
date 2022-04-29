@@ -59,7 +59,8 @@ export const AgencyDisplay = ({
         setLoadingError(false);
       })
       .catch((e) => {
-        console.log(e);
+        //eslint-disable-next-line no-console
+        console.log("AgencyDisplay", e);
         setAgencies([]);
         setLoaded(false);
         setLoadingError(true);

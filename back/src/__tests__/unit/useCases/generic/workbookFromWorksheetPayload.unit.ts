@@ -54,7 +54,7 @@ describe("Excel Generator", (): void => {
       expect(workbook.getWorksheet("main").getRow(0).values).toEqual([]);
     });
 
-    it("should write each given entity as a row of data keeping only mapped keys", async (): Promise<void> => {
+    it("should write each given entity as a row of data keeping only mapped keys", () => {
       type DummySimpleMappedType = {
         name: string;
         email: string;

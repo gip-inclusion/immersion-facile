@@ -23,13 +23,13 @@ const copyEmails = ["copy@gmail.com"];
 const setMethodGetContactEmailFromSiret = (
   establishmentAggregateRepo: EstablishmentAggregateRepository,
 ) => {
-  establishmentAggregateRepo.getContactForEstablishmentSiret = async (
-    _siret: string,
-  ) =>
-    new ContactEntityV2Builder()
-      .withEmail(contactEmail)
-      .withCopyEmails(copyEmails)
-      .build();
+  establishmentAggregateRepo.getContactForEstablishmentSiret =
+    //eslint-disable-next-line @typescript-eslint/require-await
+    async (_siret: string) =>
+      new ContactEntityV2Builder()
+        .withEmail(contactEmail)
+        .withCopyEmails(copyEmails)
+        .build();
 };
 
 const prepareUseCase = () => {
@@ -75,9 +75,10 @@ describe("RequestUpdateFormEstablishment", () => {
   it("Throws an error if contact email is unknown", async () => {
     // Prepare
     const { useCase, establishmentAggregateRepo } = prepareUseCase();
-    establishmentAggregateRepo.getContactForEstablishmentSiret = async (
-      siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-    ) => undefined;
+
+    establishmentAggregateRepo.getContactForEstablishmentSiret =
+      //eslint-disable-next-line @typescript-eslint/require-await
+      async (_siret: string) => undefined;
 
     // Act and assert
     await expectPromiseToFailWithError(
@@ -126,15 +127,16 @@ describe("RequestUpdateFormEstablishment", () => {
     it("Throws an error if an email has already been sent to this contact and the edit link is still valid", async () => {
       // Prepare
       const { useCase, outboxQueries, clock } = prepareUseCase();
+
       outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
-        async (
-          siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-        ) => ({
+        //eslint-disable-next-line @typescript-eslint/require-await
+        async (siret: string) => ({
           siret,
           iat: new Date("2021-01-01T12:00:00.000").getTime(),
           exp: new Date("2021-01-02T12:00:00.000").getTime(),
           version: 1,
         });
+
       clock.setNextDate(new Date("2021-01-01T13:00:00.000")); // The last email's link for this siret has not expired
 
       // Act and assert
@@ -146,15 +148,15 @@ describe("RequestUpdateFormEstablishment", () => {
       );
     });
   });
+
   it("Sends a new email if the edit link in last email has expired", async () => {
     // Prepare
     const { useCase, outboxRepo, outboxQueries, emailGateway, clock } =
       prepareUseCase();
 
     outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
-      async (
-        siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-      ) => ({
+      //eslint-disable-next-line @typescript-eslint/require-await
+      async (siret: string) => ({
         siret,
         iat: new Date("2021-01-01T12:00:00.000").getTime(),
         exp: new Date("2021-01-02T12:00:00.000").getTime(),

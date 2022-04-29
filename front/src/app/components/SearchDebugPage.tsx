@@ -31,32 +31,35 @@ export const SearchDebugPage = () => {
           lon: 2.3333,
           radius: 12,
         }}
-        onSubmit={async (values, { setSubmitting }: FormikHelpers<Values>) => {
-          setLatency(0);
-          const requestDate = new Date();
-          firstValueFrom(
-            immersionSearchGateway.search({
-              rome: values.rome,
-              location: {
-                lat: values.lat,
-                lon: values.lon,
-              },
-              distance_km: values.radius,
-            }),
-          )
-            .then((response) => {
-              setResponseText(JSON.stringify(response));
-              setResult(response);
-            })
-            .catch((e) => {
-              setResponseText(e.toString());
-            })
-            .finally(() => {
-              const responseDate = new Date();
-              setLatency(responseDate.getTime() - requestDate.getTime());
-              setSubmitting(false);
-            });
-        }}
+        onSubmit={
+          //eslint-disable-next-line @typescript-eslint/require-await
+          async (values, { setSubmitting }: FormikHelpers<Values>) => {
+            setLatency(0);
+            const requestDate = new Date();
+            firstValueFrom(
+              immersionSearchGateway.search({
+                rome: values.rome,
+                location: {
+                  lat: values.lat,
+                  lon: values.lon,
+                },
+                distance_km: values.radius,
+              }),
+            )
+              .then((response) => {
+                setResponseText(JSON.stringify(response));
+                setResult(response);
+              })
+              .catch((e) => {
+                setResponseText(e.toString());
+              })
+              .finally(() => {
+                const responseDate = new Date();
+                setLatency(responseDate.getTime() - requestDate.getTime());
+                setSubmitting(false);
+              });
+          }
+        }
       >
         {({ setFieldValue }) => (
           <Form>

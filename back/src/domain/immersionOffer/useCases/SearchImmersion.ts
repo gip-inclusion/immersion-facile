@@ -53,6 +53,7 @@ export class SearchImmersion extends UseCase<
 
     await this.searchesMadeRepository.insertSearchMade(searchMadeEntity);
 
+    //eslint-disable-next-line no-console
     console.time("searchImmersionQueryDuration");
     const resultsFromStorage =
       await this.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
@@ -62,6 +63,7 @@ export class SearchImmersion extends UseCase<
           maxResults: 100,
         },
       );
+    //eslint-disable-next-line no-console
     console.timeEnd("searchImmersionQueryDuration");
 
     histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);

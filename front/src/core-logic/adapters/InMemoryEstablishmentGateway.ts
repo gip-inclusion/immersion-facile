@@ -12,7 +12,8 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
   public async addFormEstablishment(
     immersionOffer: FormEstablishmentDto,
   ): Promise<SiretDto> {
-    console.log(immersionOffer);
+    //eslint-disable-next-line no-console
+    console.log("addFormEstablishment", immersionOffer);
     await sleep(2000);
     if (immersionOffer.businessName === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
@@ -29,8 +30,8 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
     siret: SiretDto,
   ): Promise<void> {
     this._currentEstablishmentModifyRequest = siret;
-    return;
   }
+
   public async getFormEstablishmentFromJwt(
     jwt: string,
   ): Promise<FormEstablishmentDto> {
@@ -70,6 +71,7 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
   public async updateFormEstablishment(
     formEstablishmentDto: FormEstablishmentDto,
   ): Promise<void> {
+    //eslint-disable-next-line no-console
     console.log(
       "Would update form establishment with siret ",
       formEstablishmentDto.siret,

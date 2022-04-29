@@ -70,7 +70,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
     agencyName: string;
     role: Role;
   }) {
-    this.emailFilter.withAllowedRecipients(
+    await this.emailFilter.withAllowedRecipients(
       recipients,
       async (filteredRecipients) => {
         await Promise.all(

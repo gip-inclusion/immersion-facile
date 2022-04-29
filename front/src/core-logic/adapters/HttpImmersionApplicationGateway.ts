@@ -49,7 +49,6 @@ export class HttpImmersionApplicationGateway
     const response = await axios.get(
       `/${prefix}/${immersionApplicationsRoute}/${id}`,
     );
-    console.log(response.data);
     return response.data;
   }
 
@@ -57,7 +56,6 @@ export class HttpImmersionApplicationGateway
     const response = await axios.get(
       `/${prefix}/auth/${immersionApplicationsRoute}/${jwt}`,
     );
-    console.log(response.data);
     return response.data;
   }
 
