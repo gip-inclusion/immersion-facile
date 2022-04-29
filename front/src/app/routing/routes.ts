@@ -25,10 +25,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { siret: param.query.optional.string },
     () => "/etablissement",
   ),
-  oldFormEstablishment: defineRoute(
-    { siret: param.query.optional.string },
-    () => "/immersion-offer" /* old name, still redirected*/,
-  ),
   formEstablishmentForExternals: defineRoute(
     { consumer: param.path.string },
     (params) => `/etablissement/${params.consumer}`,

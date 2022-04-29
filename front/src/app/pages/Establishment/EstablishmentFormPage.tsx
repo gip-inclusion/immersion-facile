@@ -7,9 +7,7 @@ import { EstablishmentCreationForm } from "./components/EstablishmentCreationFor
 export const EstablishmentFormPage = ({
   route,
 }: {
-  route: Route<
-    typeof routes.formEstablishment | typeof routes.oldFormEstablishment
-  >;
+  route: Route<typeof routes.formEstablishment>;
 }) => (
   <HeaderFooterLayout>
     <EstablishmentCreationForm

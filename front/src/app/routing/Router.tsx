@@ -50,9 +50,6 @@ export const Router = () => {
       {route.name === "formEstablishment" && (
         <EstablishmentFormPage route={route} />
       )}
-      {route.name === "oldFormEstablishment" && (
-        <EstablishmentFormPage route={route} />
-      )}
       {route.name === "formEstablishmentForExternals" && (
         <EstablishmentFormPageForExternals route={route} />
       )}
