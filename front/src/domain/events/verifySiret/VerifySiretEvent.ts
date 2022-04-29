@@ -5,5 +5,5 @@ export class VerifySiretEvent extends ApplicationEvent {
   constructor(public readonly siret: SiretDto) {
     super();
   }
-  public eventType: EventType = EventType.VERIFY_SIRET;
+  public eventType: EventType = "SIRET_VERIFICATION_REQUESTED";
 }

@@ -5,5 +5,5 @@ export class InMemoryEstablishmentUiGateway implements EstablishmentUiGateway {
     this.callToAction = callToAction;
     return Promise.resolve();
   }
-  callToAction: EstablishementCallToAction = EstablishementCallToAction.NOTHING;
+  callToAction: EstablishementCallToAction = "NOTHING";
 }

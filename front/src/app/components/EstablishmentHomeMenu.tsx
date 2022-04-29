@@ -26,7 +26,7 @@ export const EstablishmentHomeMenu = ({
   });
   const callToAction: EstablishementCallToAction = useObservable(
     establishementCallToActionObservable$,
-    EstablishementCallToAction.NOTHING,
+    "NOTHING",
   );
   const [startEstablishmentPath, startEstablishmentPathUpdate] =
     useState<boolean>(false);
@@ -36,18 +36,9 @@ export const EstablishmentHomeMenu = ({
   >(undefined);
   const badSiretError = (callToAction: EstablishementCallToAction) => {
     const badCallToAction = new Map<EstablishementCallToAction, string>([
-      [
-        EstablishementCallToAction.BAD_SIRET,
-        "Votre SIRET doît contenir 14 chiffres",
-      ],
-      [
-        EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE,
-        "Votre établissement est fermé",
-      ],
-      [
-        EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE,
-        "Votre établissement n'existe pas",
-      ],
+      ["BAD_SIRET", "Votre SIRET doît contenir 14 chiffres"],
+      ["CLOSED_ESTABLISHMENT_ON_SIRENE", "Votre établissement est fermé"],
+      ["MISSING_ESTABLISHMENT_ON_SIRENE", "Votre établissement n'existe pas"],
     ]);
     const strategy = badCallToAction.get(callToAction);
     return strategy ? strategy : undefined;
@@ -59,8 +50,7 @@ export const EstablishmentHomeMenu = ({
     >
       <div className="flex flex-col">
         <EstablishmentTitle type={"establishment"} text="ENTREPRISE" />
-        {callToAction !==
-          EstablishementCallToAction.MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION && (
+        {callToAction !== "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
           <EstablishmentSubTitle
             type={"establishment"}
             text="Vos équipes souhaitent accueillir en immersion professionnelle ?"
@@ -100,15 +90,13 @@ export const EstablishmentHomeMenu = ({
                 }
               />
             )}
-            {callToAction ===
-              EstablishementCallToAction.REGISTER_ESTABLISHEMENT && (
+            {callToAction === "REGISTER_ESTABLISHEMENT" && (
               <ButtonLink
                 text={`Référencer votre entreprise`}
                 url={routes.formEstablishment({ siret }).link}
               />
             )}
-            {callToAction ===
-              EstablishementCallToAction.MODIFY_ESTABLISHEMENT && (
+            {callToAction === "MODIFY_ESTABLISHEMENT" && (
               <HomeButton
                 type="secondary"
                 onClick={() =>
@@ -118,15 +106,13 @@ export const EstablishmentHomeMenu = ({
                 children="Modifier votre entreprise"
               />
             )}
-            {callToAction ===
-              EstablishementCallToAction.MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION && (
+            {callToAction === "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
               <ModifyEstablishmentRequestNotification />
             )}
           </>
         )}
       </div>
-      {callToAction !==
-        EstablishementCallToAction.MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION && (
+      {callToAction !== "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
         <Link text="En savoir plus" url={routes.landingEstablishment().link} />
       )}
     </div>
@@ -169,10 +155,9 @@ function isNothingOrErrorCallToAction(
   callToAction: EstablishementCallToAction,
 ) {
   return (
-    callToAction === EstablishementCallToAction.NOTHING ||
-    callToAction === EstablishementCallToAction.BAD_SIRET ||
-    callToAction ===
-      EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE ||
-    callToAction === EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE
+    callToAction === "NOTHING" ||
+    callToAction === "BAD_SIRET" ||
+    callToAction === "CLOSED_ESTABLISHMENT_ON_SIRENE" ||
+    callToAction === "MISSING_ESTABLISHMENT_ON_SIRENE"
   );
 }

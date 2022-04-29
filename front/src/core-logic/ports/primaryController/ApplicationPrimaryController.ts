@@ -10,7 +10,7 @@ import { ModifyEstablishmentUseCase } from "../../../domain/useCases/ModifyEstab
 export class ApplicationPrimaryController {
   addDependencies(gateways: ClientGateways) {
     this.useCases.set(
-      EventType.VERIFY_SIRET,
+      "SIRET_VERIFICATION_REQUESTED",
       new VerifySiretUseCase(
         gateways.establishmentsUi,
         gateways.establishments,
@@ -18,7 +18,7 @@ export class ApplicationPrimaryController {
       ),
     );
     this.useCases.set(
-      EventType.MODIFY_ESTABLISHMENT,
+      "ESTABLISHMENT_MODIFICATION_REQUEST",
       new ModifyEstablishmentUseCase(
         gateways.establishments,
         gateways.establishmentsUi,

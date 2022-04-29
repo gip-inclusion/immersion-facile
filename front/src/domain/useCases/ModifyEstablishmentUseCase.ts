@@ -1,11 +1,10 @@
-import { SiretDto } from "src/shared/siret";
-import { EstablishementCallToAction } from "../valueObjects/EstablishementCallToAction";
-import { ModifyEstablishmentEvent } from "../events/modifyEstablishment.ts/ModifyEstablishmentEvent";
-import { EstablishmentUiGateway } from "../../core-logic/ports/EstablishmentUiGateway";
-import { EstablishmentGateway } from "../../core-logic/ports/EstablishmentGateway";
-import { UseCase } from "./UseCase";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { SiretDto } from "src/shared/siret";
+import { EstablishmentGateway } from "../../core-logic/ports/EstablishmentGateway";
+import { EstablishmentUiGateway } from "../../core-logic/ports/EstablishmentUiGateway";
 import { NafDto } from "../../shared/naf";
+import { ModifyEstablishmentEvent } from "../events/modifyEstablishment.ts/ModifyEstablishmentEvent";
+import { UseCase } from "./UseCase";
 
 export class ModifyEstablishmentUseCase extends UseCase {
   constructor(
@@ -18,9 +17,7 @@ export class ModifyEstablishmentUseCase extends UseCase {
   execute(event: ModifyEstablishmentEvent): Promise<void> {
     return this.isSiretValid(event.siret)
       ? this.onValidSiret(event)
-      : this.establishmentUiGateway.updateCallToAction(
-          EstablishementCallToAction.BAD_SIRET,
-        );
+      : this.establishmentUiGateway.updateCallToAction("BAD_SIRET");
   }
 
   private onValidSiret(event: ModifyEstablishmentEvent): Promise<void> {
@@ -29,7 +26,7 @@ export class ModifyEstablishmentUseCase extends UseCase {
       .then((siretInfo) => this.onSiretInfo(siretInfo))
       .catch(() =>
         this.establishmentUiGateway.updateCallToAction(
-          EstablishementCallToAction.MISSING_ESTABLISHMENT_ON_SIRENE,
+          "MISSING_ESTABLISHMENT_ON_SIRENE",
         ),
       );
   }
@@ -43,7 +40,7 @@ export class ModifyEstablishmentUseCase extends UseCase {
   }): Promise<void> {
     return siretInfo.isOpen === false
       ? this.establishmentUiGateway.updateCallToAction(
-          EstablishementCallToAction.CLOSED_ESTABLISHMENT_ON_SIRENE,
+          "CLOSED_ESTABLISHMENT_ON_SIRENE",
         )
       : this.onOpenEstablishment(siretInfo.siret);
   }
@@ -60,9 +57,7 @@ export class ModifyEstablishmentUseCase extends UseCase {
   }
 
   private establishmentNotRegistered(): Promise<void> {
-    return this.establishmentUiGateway.updateCallToAction(
-      EstablishementCallToAction.UNREGISTERED_SIRET,
-    );
+    return this.establishmentUiGateway.updateCallToAction("UNREGISTERED_SIRET");
   }
 
   private establishmentRegistered(siret: SiretDto): Promise<void> {
@@ -70,7 +65,7 @@ export class ModifyEstablishmentUseCase extends UseCase {
       .requestEstablishmentModification(siret)
       .then(() =>
         this.establishmentUiGateway.updateCallToAction(
-          EstablishementCallToAction.MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION,
+          "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION",
         ),
       )
       .catch((error) => Promise.reject(error));
