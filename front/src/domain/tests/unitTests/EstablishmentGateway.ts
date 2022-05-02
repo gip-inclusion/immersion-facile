@@ -7,6 +7,7 @@ export const theEstablishmentGatewayHasRegisteredSiret =
     const expectedRegisteredSirets = Array.isArray(expectedRegisteredSiret)
       ? expectedRegisteredSiret
       : [expectedRegisteredSiret];
+
     return it(`${gherkin} the establishments with SIRET '${expectedRegisteredSirets}' are registered on Immersion Facile.`, () => {
       if (isGiven(gherkin))
         application.gateways.establishments._existingEstablishmentSirets =

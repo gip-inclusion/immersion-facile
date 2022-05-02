@@ -1,3 +1,5 @@
+// noinspection JSVoidFunctionReturnValueUsed
+
 import {
   badSiretOneWithLetter,
   badSiretTooLong,

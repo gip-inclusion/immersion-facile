@@ -9,13 +9,16 @@ export const theSiretGatewayThroughBackHasSireneRegisteredSirets =
   ) =>
   (application: ClientTestApplication) =>
     it(message(gherkin, expectedRegisteredSirets), () => {
-      if (isGiven(gherkin))
+      if (isGiven(gherkin)) {
         application.gateways.siretGatewayThroughBack.sireneEstablishments =
           expectedRegisteredSirets;
+      }
+
       expect(
         application.gateways.siretGatewayThroughBack.sireneEstablishments,
       ).toEqual(expectedRegisteredSirets);
     });
+
 const message = (
   gherkin: Gherkin,
   expectedRegisteredSirets: { [siret: SiretDto]: GetSiretResponseDto },
@@ -24,6 +27,7 @@ const message = (
     (value) => JSON.stringify(value),
   );
   const linebreakWithTab = "\n        ";
+
   return prettyRegisteredSirets.length === 0
     ? `${gherkin} there is no establishments registered on SIRENE.`
     : `${gherkin} the following establishments are registered on SIRENE:${

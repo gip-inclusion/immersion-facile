@@ -15,6 +15,8 @@ import {
 import { RomeCode } from "src/shared/rome";
 import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
 
+// RomeDto = {romeCode: string, romeLabel: string}
+
 interface RomeAutocompleteState {
   romeSearchText: string;
   romeOptions: RomeDto[];

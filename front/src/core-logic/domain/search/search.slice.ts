@@ -4,7 +4,7 @@ import { SearchImmersionRequestDto } from "src/shared/searchImmersion/SearchImme
 import { SearchImmersionResultDto } from "src/shared/searchImmersion/SearchImmersionResult.dto";
 import { OmitFromExistingKeys } from "src/shared/utils";
 
-type SearchParams = OmitFromExistingKeys<
+export type SearchParams = OmitFromExistingKeys<
   SearchImmersionRequestDto,
   "voluntary_to_immersion"
 >;

@@ -1,104 +1,61 @@
-import { Store } from "@reduxjs/toolkit";
-import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";
-import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
+/* eslint-disable jest/require-top-level-describe */
+/* eslint-disable jest/consistent-test-it */
+
 import {
-  createTestStore,
-  TestDependencies,
-} from "src/core-logic/storeConfig/createTestStore";
-import { expectToEqual } from "src/core-logic/storeConfig/redux.helpers";
-import { RootState } from "src/core-logic/storeConfig/store";
-import { RomeDto } from "src/shared/romeAndAppellationDtos/romeAndAppellation.dto";
+  feedRomeAutocompleteGatewayWith,
+  thenIsSearchingIs,
+  thenRomeOptionsAre,
+  thenSelectedRomeDtoIs,
+  whenRomeOptionIsSelected,
+  whenSearchTextIsProvided,
+} from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.testHelpers";
+import {
+  fastForwardObservables,
+  triggerTests,
+} from "src/core-logic/domain/test.helpers";
+import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 
-describe("rome Autocomplete", () => {
-  let store: Store<RootState>;
-  let dependencies: TestDependencies;
-
-  beforeEach(() => {
-    ({ store, dependencies } = createTestStore());
-  });
-
-  it("updates searchedText immediately", () => {
-    const searchedText = "bou";
-    store.dispatch(
-      romeAutocompleteSlice.actions.setRomeSearchText(searchedText),
-    );
-    expectSearchTextToBe(searchedText);
-  });
-
-  it("set the selected rome", () => {
-    ({ store, dependencies } = createTestStore({
-      romeAutocomplete: {
-        selectedRome: null,
-        romeOptions: [
-          { romeCode: "A1000", romeLabel: "Métier A" },
-          { romeCode: "B1000", romeLabel: "Métier B" },
-        ],
-        romeSearchText: "méti",
-        isSearching: false,
+describe("Rome Autocomplete", () => {
+  describe("select one of the romeOptions", () => {
+    const appAndDeps = createTestStore(
+      {
+        romeAutocomplete: {
+          selectedRome: null,
+          romeOptions: [
+            { romeCode: "A1000", romeLabel: "Job A" },
+            { romeCode: "B1000", romeLabel: "Job B" },
+          ],
+          romeSearchText: "job",
+          isSearching: false,
+        },
       },
-    }));
-
-    store.dispatch(romeAutocompleteSlice.actions.setSelectedRome("B1000"));
-
-    expectSelectedRomeToEqual({ romeCode: "B1000", romeLabel: "Métier B" });
-  });
-
-  // eslint-disable-next-line jest/no-disabled-tests
-  it("triggers rome search when search text changes", () => {
-    const searchedText = "bou";
-    store.dispatch(
-      romeAutocompleteSlice.actions.setRomeSearchText(searchedText),
+      "Given there are 2 rome options Job A and Job B",
     );
-    expectIsSearchingToBe(false);
 
-    // execute all time related work (for exemple in this case: debounceTime)
-    dependencies.scheduler.flush();
-
-    expectIsSearchingToBe(true);
-
-    dependencies.romeAutocompleteGateway.romeDtos$.next([
-      { romeCode: "A10000", romeLabel: "Mon métier" },
+    triggerTests(appAndDeps, [
+      whenRomeOptionIsSelected("B1000"),
+      thenSelectedRomeDtoIs({ romeCode: "B1000", romeLabel: "Job B" }),
     ]);
-
-    expectRomeOptionsToEqual([{ romeCode: "A10000", romeLabel: "Mon métier" }]);
-    expectIsSearchingToBe(false);
   });
 
-  it("does not trigger search if text is less than 3 charters", () => {
-    const searchedText = "bo";
-    store.dispatch(
-      romeAutocompleteSlice.actions.setRomeSearchText(searchedText),
-    );
-    expectIsSearchingToBe(false);
-    dependencies.scheduler.flush();
-    expectIsSearchingToBe(false);
+  describe("triggers rome search when search text changes", () => {
+    triggerTests(createTestStore(), [
+      whenSearchTextIsProvided("bou"),
+      fastForwardObservables("waits 400ms"),
+      thenIsSearchingIs(true),
+      feedRomeAutocompleteGatewayWith([
+        { romeCode: "A10000", romeLabel: "Mon métier" },
+      ]),
+      thenRomeOptionsAre([{ romeCode: "A10000", romeLabel: "Mon métier" }]),
+      thenIsSearchingIs(false),
+    ]);
   });
 
-  const expectIsSearchingToBe = (expected: boolean) => {
-    expectToEqual(
-      romeAutocompleteSelector(store.getState()).isSearching,
-      expected,
-    );
-  };
-
-  const expectSearchTextToBe = (expected: string) => {
-    expectToEqual(
-      romeAutocompleteSelector(store.getState()).romeSearchText,
-      expected,
-    );
-  };
-
-  const expectRomeOptionsToEqual = (expected: RomeDto[]) => {
-    expectToEqual(
-      romeAutocompleteSelector(store.getState()).romeOptions,
-      expected,
-    );
-  };
-
-  const expectSelectedRomeToEqual = (expected: RomeDto | null) => {
-    expectToEqual(
-      romeAutocompleteSelector(store.getState()).selectedRomeDto,
-      expected,
-    );
-  };
+  describe("does not trigger search if text is less than 3 characters", () => {
+    triggerTests(createTestStore(), [
+      whenSearchTextIsProvided("bo"),
+      fastForwardObservables("waits 400ms"),
+      thenIsSearchingIs(false),
+    ]);
+  });
 });

@@ -1,4 +1,9 @@
 import {
+  createTestStore,
+  StoreAndDeps,
+} from "src/core-logic/storeConfig/createTestStore";
+import { RootState } from "src/core-logic/storeConfig/store";
+import {
   ClientTestApplication,
   ClientTestApplicationProperties,
 } from "../../infra/application/ClientApplication";
@@ -29,3 +34,21 @@ export function clientScenario(
     testSuite.forEach((unitTest) => unitTest(application));
   });
 }
+
+export type ScenarioUnitTest = (storeAndDeps: StoreAndDeps) => void;
+
+type ScenarioContext = {
+  title: string;
+  preloadedState?: Partial<RootState>;
+};
+
+export const clientScenarioRedux = (
+  { title, preloadedState }: ScenarioContext,
+  testSuite: ScenarioUnitTest[],
+): void => {
+  const storeAndDeps = createTestStore(preloadedState);
+  // console.log("storeAndDeps", storeAndDeps);
+  describe(title, () => {
+    testSuite.forEach((unitTest) => unitTest(storeAndDeps));
+  });
+};
