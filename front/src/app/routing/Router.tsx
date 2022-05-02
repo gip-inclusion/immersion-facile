@@ -53,9 +53,7 @@ export const Router = () => {
       {route.name === "formEstablishmentForExternals" && (
         <EstablishmentFormPageForExternals route={route} />
       )}
-      {route.name === "home" && (
-        <HomePage showDebugInfo={frontEnvType === "DEV"} />
-      )}
+      {route.name === "home" && <HomePage />}
 
       {route.name === "landingEstablishment" && <LandingEstablishmentPage />}
       {route.name === "immersionApplication" && (

@@ -7,6 +7,7 @@ import { ENV } from "src/environmentVariables";
 import { clientApplication } from "src/infra/application/application";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 
+const { frontEnvType } = ENV;
 const DebugInfo = () => (
   <div>
     <br />
@@ -20,31 +21,22 @@ const DebugInfo = () => (
   </div>
 );
 
-type HomeProps = {
-  showDebugInfo: boolean;
-};
-
-export const HomePage = ({ showDebugInfo }: HomeProps) => (
-  <div className="relative">
-    <div
-      className="absolute left-0 top-0 right-0 bottom-0 "
-      style={{ zIndex: -1 }}
-    >
-      <div className="bg-white w-full h-48" />
-      <div className="bg-red-50 w-full h-full bg-gradient-to-b from-gray-100 via-gray-50 to-white" />
-    </div>
-    {showDebugInfo && <DebugInfo />}
+export const HomePage = () => (
+  <div>
+    {frontEnvType === "DEV" && <DebugInfo />}
     <ImmersionMarianneHeader />
-    <section className="flex flex-col items-center mt-14">
-      <div
-        className="flex flex-wrap justify-center "
-        style={{ minWidth: "420px" }}
-      >
-        <ImmersionHomeMenu />
-        <EstablishmentHomeMenu clientApplication={clientApplication} />
-      </div>
-    </section>
-    <HomeImmersionHowTo />
+    <div className="bg-gradient-to-b from--100 from-gray-100 via-gray-50 to-white pt-14">
+      <section className="flex flex-col items-center">
+        <div
+          className="flex flex-wrap justify-center "
+          style={{ minWidth: "420px" }}
+        >
+          <ImmersionHomeMenu />
+          <EstablishmentHomeMenu clientApplication={clientApplication} />
+        </div>
+      </section>
+      <HomeImmersionHowTo />
+    </div>
     <ImmersionFooter />
   </div>
 );

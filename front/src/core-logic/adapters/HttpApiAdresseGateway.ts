@@ -28,6 +28,7 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
         {
           params: {
             q: query,
+            limit: 10,
           },
         },
       );
