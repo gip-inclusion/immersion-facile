@@ -296,7 +296,7 @@ The source code is located in `back/src` so that it can take advantage of the ad
 We use a docker container that is running [cron](https://en.wikipedia.org/wiki/Cron) to schedule the execution of the pipelines. The main configuration files are
   * [docker-compose.yml](../docker-compose.yml)
     * defines the `pipelines` docker container
-  * [back/Dockerfile.pipelines](./Dockerfile.pipelines)
+  * [back/Dockerfile.pipelines](../Dockerfile.pipelines)
     * creates the docker image
   * [back/bin/start_pipelines_cron.sh](./bin/start_pipelines_cron.sh):
     * initializes the docker container

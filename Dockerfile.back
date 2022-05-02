@@ -12,12 +12,16 @@ RUN pnpm install --frozen-lockfile
 
 COPY ./shared/ /app/shared
 
-# front only
+# back only
 FROM builder
-COPY ./front/ /app/front
+COPY ./back/ /app/back
 
-WORKDIR /app/front
+WORKDIR /app/back
 
-RUN pnpm build
-CMD npm run serve -- --host 0.0.0.0
+CMD pnpm migrate up && pnpm start-prod
+
+
+#COPY ./back/ /app/back
+#WORKDIR /app/back
+#CMD npm run migrate up && npm run start-prod
 

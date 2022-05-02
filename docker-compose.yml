@@ -2,10 +2,10 @@ version: "3"
 services:
   back:
     build:
-      context: "./back"
+      context: "."
       dockerfile: Dockerfile.back
     env_file:
-      - .env
+      - back/.env
     depends_on:
       - postgres
     restart: unless-stopped
@@ -19,10 +19,10 @@ services:
 
   pipelines:
     build:
-      context: ./back
+      context: "."
       dockerfile: Dockerfile.pipelines
     env_file:
-      - .env
+        - back/.env
     environment:
       - LOGDIR=/var/lib/pipelines/log
       - CRONFILE=/var/lib/pipelines/crontab
