@@ -16,7 +16,6 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
   public async getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto> {
     const httpResponse = await this.axiosInstance.get(
       `/${siretRoute}/${siret}`,
-      // `/${prefix}/${siretRoute}/${siret}`,
     );
     return httpResponse.data;
   }
