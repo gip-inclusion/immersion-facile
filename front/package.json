@@ -1,7 +1,8 @@
 {
   "version": "0.0.0",
   "scripts": {
-    "test": "npm run symlink-or-copy-shared && jest --passWithNoTests --verbose",
+    "test": "npm run symlink-or-copy-shared && jest --passWithNoTests --verbose --testRegex='^((?!(integration|manual)).)*.test.ts$'",
+    "test:manual": "npm run symlink-or-copy-shared && jest --runInBand --watchAll --testRegex=.manual.test.ts",
     "dev": "npm run symlink-shared && VITE_GATEWAY=IN_MEMORY VITE_ENV_TYPE=DEV VITE_PREFILLED_ESTABLISHMENT_FORM=true vite",
     "dev-http": "npm run symlink-shared && VITE_ENV_TYPE=DEV vite",
     "build": "npm run symlink-or-copy-shared && vite build",

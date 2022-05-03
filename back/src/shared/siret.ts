@@ -7,6 +7,9 @@ const normalizeSiret = (siret: string): string => siret.replace(/\s/g, "");
 // Matches strings containing exactly 14 digits with any number of interspersed whitespaces.
 const siretRegex = /^(?:\s*\d){14}\s*$/;
 
+export const tooManySirenRequestsSiret = "42900000000429";
+export const apiSirenNotAvailableSiret = "50300000000503";
+
 export type SiretDto = Flavor<string, "SiretDto">;
 export const siretSchema: z.Schema<SiretDto> = z
   .string()

@@ -1,10 +1,14 @@
-import { createLogger } from "../../utils/logger";
 import {
-  SireneRepositoryAnswer,
-  SireneRepository,
   SireneEstablishmentVO,
+  SireneRepository,
+  SireneRepositoryAnswer,
 } from "../../domain/sirene/ports/SireneRepository";
-import { SiretDto } from "../../shared/siret";
+import {
+  apiSirenNotAvailableSiret,
+  SiretDto,
+  tooManySirenRequestsSiret,
+} from "../../shared/siret";
+import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 
@@ -133,9 +137,24 @@ export class InMemorySireneRepository extends SireneRepository {
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SireneRepositoryAnswer | undefined> {
-    if (this._error) {
-      throw this._error;
-    }
+    if (this._error) throw this._error;
+    if (siret === tooManySirenRequestsSiret)
+      throw {
+        initialError: {
+          message: "Request failed with status code 429",
+          status: 429,
+          data: "some error",
+        },
+      };
+    if (siret === apiSirenNotAvailableSiret)
+      throw {
+        initialError: {
+          message: "Api down",
+          status: 503,
+          data: "some error",
+        },
+      };
+
     logger.info({ siret, includeClosedEstablishments }, "get");
     const establishment = this._repo[siret];
     if (!establishment) return undefined;
