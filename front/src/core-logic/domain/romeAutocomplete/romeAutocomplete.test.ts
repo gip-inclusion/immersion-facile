@@ -64,6 +64,16 @@ describe("rome Autocomplete", () => {
     expectIsSearchingToBe(false);
   });
 
+  it("does not trigger search if text is less than 3 charters", () => {
+    const searchedText = "bo";
+    store.dispatch(
+      romeAutocompleteSlice.actions.setRomeSearchText(searchedText),
+    );
+    expectIsSearchingToBe(false);
+    dependencies.scheduler.flush();
+    expectIsSearchingToBe(false);
+  });
+
   const expectIsSearchingToBe = (expected: boolean) => {
     expectToEqual(
       romeAutocompleteSelector(store.getState()).isSearching,
