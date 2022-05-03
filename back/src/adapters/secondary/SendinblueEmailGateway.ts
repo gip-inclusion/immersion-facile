@@ -23,6 +23,7 @@ import {
 } from "../../domain/immersionApplication/ports/EmailGateway";
 import { FormEstablishmentDto } from "../../shared/formEstablishment/FormEstablishment.dto";
 import { createLogger } from "../../utils/logger";
+import { notifyObjectDiscord } from "../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 
@@ -465,6 +466,19 @@ export class SendinblueEmailGateway implements EmailGateway {
     } catch (e: any) {
       counterSendTransactEmailError.inc({ emailType });
       logger.error(e, "Email sending failed");
+      notifyObjectDiscord({
+        _message: `Email ${emailType} sending failed`,
+        recipients: recipients.join("; "),
+        body: JSON.stringify(e?.body, null, 2),
+        response: JSON.stringify(
+          {
+            statusCode: e?.response?.statusCode,
+            body: e?.response?.body
+          },
+          null,
+          2,
+        ),
+      });
     }
   }
 }

@@ -9,6 +9,7 @@ import { EmailGateway } from "../../immersionApplication/ports/EmailGateway";
 import { isAfter } from "date-fns";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+import { ContactEntityV2 } from "../entities/ContactEntity";
 
 export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
   inputSchema = siretSchema;
@@ -24,7 +25,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
   }
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
-    const contact =
+    const contact: ContactEntityV2 | undefined =
       await uow.establishmentAggregateRepo.getContactForEstablishmentSiret(
         siret,
       );
@@ -53,6 +54,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
       now,
       durationDays: 2,
     });
+
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
     try {
