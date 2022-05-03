@@ -95,16 +95,8 @@ export const EstablishmentHomeMenu = ({
                 url={routes.formEstablishment({ siret }).link}
               />
             )}
-            {callToAction === "MODIFY_ESTABLISHEMENT" && (
-              <HomeButton
-                type="secondary"
-                onClick={() =>
-                  siret &&
-                  clientApplication.onEvent(new ModifyEstablishmentEvent(siret))
-                }
-                children="Modifier votre entreprise"
-              />
-            )}
+            {callToAction === "MODIFY_ESTABLISHEMENT" &&
+              modifyEstablishmentRequestForMailUpdate(siret, clientApplication)}
             {callToAction === "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
               <ModifyEstablishmentRequestNotification />
             )}
@@ -150,6 +142,24 @@ const onSiretFieldChange = (
     ),
   );
 };
+const modifyEstablishmentRequestForMailUpdate = (
+  siret: SiretDto,
+  clientApplication: ClientApplication,
+) => (
+  <>
+    <p className="text-immersionBlue-dark  text-center text-xs py-2">
+      Nous avons bien trouvé votre établissement dans notre base de donnée.
+    </p>
+    <HomeButton
+      type="secondary"
+      onClick={() =>
+        siret && clientApplication.onEvent(new ModifyEstablishmentEvent(siret))
+      }
+      children="Recevoir le mail de modification"
+    />
+  </>
+);
+
 function isNothingOrErrorCallToAction(
   callToAction: EstablishementCallToAction,
 ) {
