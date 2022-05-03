@@ -4,7 +4,7 @@ import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helper
 import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
 import {
   NotFoundError,
-  UnavailableApiError,
+  TooManyRequestApiError,
 } from "../../../adapters/primary/helpers/httpErrors";
 
 const validEstablishment = new SireneEstablishmentVO({
@@ -143,10 +143,16 @@ describe("GetSiret", () => {
   });
 
   it("returns unavailable Api error if it gets a 429 from API", async () => {
-    repository.setError({ response: { status: 429, data: "some error" } });
+    repository.setError({
+      initialError: {
+        message: "Request failed with status code 429",
+        status: 429,
+        data: "some error",
+      },
+    });
     await expectPromiseToFailWithError(
       getSiret.execute({ siret: "42942942942900" }),
-      new UnavailableApiError("Sirene API"),
+      new TooManyRequestApiError("Sirene API"),
     );
   });
 

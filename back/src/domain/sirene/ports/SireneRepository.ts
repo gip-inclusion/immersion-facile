@@ -1,4 +1,7 @@
-import { UnavailableApiError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  TooManyRequestApiError,
+  UnavailableApiError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { NafDto } from "../../../shared/naf";
 import { propEq } from "../../../shared/ramdaExtensions/propEq";
 import { SiretDto } from "../../../shared/siret";
@@ -121,8 +124,11 @@ export abstract class SireneRepository {
     includeClosedEstablishments?: boolean,
   ): Promise<SireneRepositoryAnswer | undefined> {
     return this._get(siret, includeClosedEstablishments).catch((error) => {
+      const serviceName = "Sirene API";
       logger.error({ siret, error }, "Error fetching siret");
-      throw new UnavailableApiError("Sirene API");
+      if (error.initialError.status === 429)
+        throw new TooManyRequestApiError(serviceName);
+      throw new UnavailableApiError(serviceName);
     });
   }
 

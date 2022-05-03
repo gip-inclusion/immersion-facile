@@ -133,7 +133,9 @@ export class InMemorySireneRepository extends SireneRepository {
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SireneRepositoryAnswer | undefined> {
-    if (this._error) throw this._error;
+    if (this._error) {
+      throw this._error;
+    }
     logger.info({ siret, includeClosedEstablishments }, "get");
     const establishment = this._repo[siret];
     if (!establishment) return undefined;

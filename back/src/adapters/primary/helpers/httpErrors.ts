@@ -62,12 +62,21 @@ export class ConflictError extends HttpError {
   }
 }
 
+export class TooManyRequestApiError extends HttpError {
+  httpCode = 429;
+
+  constructor(public serviceName: string) {
+    super(`Le service ${serviceName} a subit trop de solicitation`);
+    Object.setPrototypeOf(this, TooManyRequestApiError.prototype);
+  }
+}
+
 export class UnavailableApiError extends HttpError {
   httpCode = 503;
 
   constructor(public serviceName: string) {
     super(`Le service ${serviceName} n'est pas disponible`);
-    Object.setPrototypeOf(this, ForbiddenError.prototype);
+    Object.setPrototypeOf(this, UnavailableApiError.prototype);
   }
 }
 
