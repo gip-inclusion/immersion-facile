@@ -2,7 +2,7 @@ import { ClientTestApplication } from "src/infra/application/ClientApplication";
 import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Gherkin, isGiven } from "../Gherkin";
 
-export const theImmersionApplicationGatewayHasSireneRegisteredSirets =
+export const theSiretGatewayThroughBackHasSireneRegisteredSirets =
   (
     gherkin: Gherkin,
     expectedRegisteredSirets: { [siret: SiretDto]: GetSiretResponseDto },
@@ -10,10 +10,10 @@ export const theImmersionApplicationGatewayHasSireneRegisteredSirets =
   (application: ClientTestApplication) =>
     it(message(gherkin, expectedRegisteredSirets), () => {
       if (isGiven(gherkin))
-        application.gateways.immersionApplication._sireneEstablishments =
+        application.gateways.siretGatewayThroughBack.sireneEstablishments =
           expectedRegisteredSirets;
       expect(
-        application.gateways.immersionApplication._sireneEstablishments,
+        application.gateways.siretGatewayThroughBack.sireneEstablishments,
       ).toEqual(expectedRegisteredSirets);
     });
 const message = (

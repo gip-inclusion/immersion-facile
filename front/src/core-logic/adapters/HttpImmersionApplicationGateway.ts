@@ -18,12 +18,10 @@ import {
   immersionApplicationsRoute,
   renewMagicLinkRoute,
   signApplicationRoute,
-  siretRoute,
   updateApplicationStatusRoute,
   validateImmersionApplicationRoute,
 } from "src/shared/routes";
 import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
-import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 
 const prefix = "api";
@@ -131,11 +129,6 @@ export class HttpImmersionApplicationGateway
       `/${prefix}/${validateImmersionApplicationRoute}/${id}`,
     );
     return data.id;
-  }
-
-  public async getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto> {
-    const httpResponse = await axios.get(`/${prefix}/${siretRoute}/${siret}`);
-    return httpResponse.data;
   }
 
   public async generateMagicLink(

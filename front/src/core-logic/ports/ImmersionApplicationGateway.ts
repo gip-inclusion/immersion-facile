@@ -7,7 +7,6 @@ import {
   WithImmersionApplicationId,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
-import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { Role } from "src/shared/tokens/MagicLinkPayload";
 
 export interface ImmersionApplicationGateway {
@@ -32,7 +31,6 @@ export interface ImmersionApplicationGateway {
 
   signApplication(jwt: string): Promise<WithImmersionApplicationId>;
 
-  getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto>;
   getAll(
     agency?: AgencyId,
     status?: ApplicationStatus,

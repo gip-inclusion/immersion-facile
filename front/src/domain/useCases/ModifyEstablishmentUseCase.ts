@@ -1,4 +1,4 @@
-import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { SiretDto } from "src/shared/siret";
 import { EstablishmentGateway } from "../../core-logic/ports/EstablishmentGateway";
 import { EstablishmentUiGateway } from "../../core-logic/ports/EstablishmentUiGateway";
@@ -10,7 +10,7 @@ export class ModifyEstablishmentUseCase extends UseCase {
   constructor(
     private establishmentGateway: EstablishmentGateway,
     private establishmentUiGateway: EstablishmentUiGateway,
-    private immersionApplication: ImmersionApplicationGateway,
+    private siretGatewayThroughBack: SiretGatewayThroughBack,
   ) {
     super();
   }
@@ -21,7 +21,7 @@ export class ModifyEstablishmentUseCase extends UseCase {
   }
 
   private onValidSiret(event: ModifyEstablishmentEvent): Promise<void> {
-    return this.immersionApplication
+    return this.siretGatewayThroughBack
       .getSiretInfo(event.siret)
       .then((siretInfo) => this.onSiretInfo(siretInfo))
       .catch(() =>

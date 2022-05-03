@@ -2,7 +2,7 @@ import { useField } from "formik";
 import { useEffect, useRef, useState } from "react";
 import {
   establishmentGateway,
-  immersionApplicationGateway,
+  siretGatewayThroughBack,
 } from "src/app/config/dependencies";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
@@ -77,7 +77,7 @@ export const useSiretFetcher = (options: SiretFetcherOptions) => {
       }
 
       try {
-        const response = await immersionApplicationGateway.getSiretInfo(
+        const response = await siretGatewayThroughBack.getSiretInfo(
           validatedSiret.current,
         );
         setEstablishmentInfo(response);

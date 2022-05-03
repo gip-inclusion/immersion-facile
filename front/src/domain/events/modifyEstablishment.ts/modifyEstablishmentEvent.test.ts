@@ -8,7 +8,7 @@ import {
 } from "src/domain/tests/expectedValues";
 import { theEstablishmentUiGatewayHasCallToAction } from "src/domain/tests/unitTests/EstablishmentUiGateway";
 import { whenTheEventIsSent } from "src/domain/tests/unitTests/EventGateway";
-import { theImmersionApplicationGatewayHasSireneRegisteredSirets } from "src/domain/tests/unitTests/ImmersionApplicationGateway";
+import { theSiretGatewayThroughBackHasSireneRegisteredSirets } from "src/domain/tests/unitTests/ImmersionApplicationGateway";
 import { clientScenario } from "../../tests/clientScenario";
 import {
   theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret,
@@ -25,7 +25,7 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
     theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
       "And given",
     ),
-    theImmersionApplicationGatewayHasSireneRegisteredSirets("And given", {
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {
       [existingOpenSireneResponse.siret]: existingOpenSireneResponse,
     }),
     whenTheEventIsSent(new ModifyEstablishmentEvent(validSiret)),
@@ -43,7 +43,7 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
     theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
       "And given",
     ),
-    theImmersionApplicationGatewayHasSireneRegisteredSirets("And given", {
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {
       [existingOpenSireneResponse.siret]: existingOpenSireneResponse,
     }),
     whenTheEventIsSent(new ModifyEstablishmentEvent(validSiret)),
@@ -82,7 +82,7 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
     theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
       "And given",
     ),
-    theImmersionApplicationGatewayHasSireneRegisteredSirets("And given", {
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {
       [existingClosedSireneResponse.siret]: existingClosedSireneResponse,
     }),
     whenTheEventIsSent(new ModifyEstablishmentEvent(validSiret)),
@@ -99,7 +99,7 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
       theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
         "And given",
       ),
-      theImmersionApplicationGatewayHasSireneRegisteredSirets("And given", {}),
+      theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {}),
       whenTheEventIsSent(new ModifyEstablishmentEvent(validSiret)),
       theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
       theEstablishmentUiGatewayHasCallToAction(

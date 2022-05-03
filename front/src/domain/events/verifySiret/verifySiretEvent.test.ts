@@ -15,13 +15,13 @@ import {
   theEstablishmentGatewayHasRegisteredSiret,
 } from "../../tests/unitTests/EstablishmentGateway";
 import { VerifySiretEvent } from "./VerifySiretEvent";
-import { theImmersionApplicationGatewayHasSireneRegisteredSirets } from "src/domain/tests/unitTests/ImmersionApplicationGateway";
+import { theSiretGatewayThroughBackHasSireneRegisteredSirets } from "src/domain/tests/unitTests/ImmersionApplicationGateway";
 import { feature } from "src/domain/tests/feature";
 
 feature("SIRET_VERIFICATION_REQUESTED", [
   clientScenario(`Scénario 1 - Existing SIRET - Modify Establishment`, [
     theEstablishmentGatewayHasRegisteredSiret("Given", validSiret),
-    theImmersionApplicationGatewayHasSireneRegisteredSirets("And given", {
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {
       [existingOpenSireneResponse.siret]: existingOpenSireneResponse,
     }),
     whenTheEventIsSent(new VerifySiretEvent(validSiret)),
@@ -29,7 +29,7 @@ feature("SIRET_VERIFICATION_REQUESTED", [
   ]),
   clientScenario(`Scénario 2 - Unexisting SIRET - Register Establishment`, [
     theEstablishmentGatewayDontHasRegisteredSiret("Given"),
-    theImmersionApplicationGatewayHasSireneRegisteredSirets("And given", {
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {
       [existingOpenSireneResponse.siret]: existingOpenSireneResponse,
     }),
     whenTheEventIsSent(new VerifySiretEvent(validSiret)),
@@ -53,7 +53,7 @@ feature("SIRET_VERIFICATION_REQUESTED", [
   ]),
   clientScenario(`Scénario 7 - Existing SIRET - Closed Sirene Establishment`, [
     theEstablishmentGatewayHasRegisteredSiret("Given", validSiret),
-    theImmersionApplicationGatewayHasSireneRegisteredSirets("And given", {
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {
       [existingClosedSireneResponse.siret]: existingClosedSireneResponse,
     }),
     whenTheEventIsSent(new VerifySiretEvent(validSiret)),
@@ -64,7 +64,7 @@ feature("SIRET_VERIFICATION_REQUESTED", [
   ]),
   clientScenario(`Scénario 8 - Existing SIRET - Missing Sirene Establishment`, [
     theEstablishmentGatewayHasRegisteredSiret("Given", validSiret),
-    theImmersionApplicationGatewayHasSireneRegisteredSirets("And given", {}),
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {}),
     whenTheEventIsSent(new VerifySiretEvent(validSiret)),
     theEstablishmentUiGatewayHasCallToAction(
       "Then",

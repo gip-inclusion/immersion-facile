@@ -1,10 +1,10 @@
-import { EstablishmentUiGateway } from "./EstablishmentUiGateway";
 import { EstablishmentGateway } from "./EstablishmentGateway";
+import { EstablishmentUiGateway } from "./EstablishmentUiGateway";
 import { EventGateway } from "./EventGateway";
-import { ImmersionApplicationGateway } from "./ImmersionApplicationGateway";
+import { SiretGatewayThroughBack } from "./SiretGatewayThroughBack";
 
 export interface ClientGateways {
-  immersionApplication: ImmersionApplicationGateway;
+  siretGatewayThroughBack: SiretGatewayThroughBack;
   establishments: EstablishmentGateway;
   establishmentsUi: EstablishmentUiGateway;
   event: EventGateway;

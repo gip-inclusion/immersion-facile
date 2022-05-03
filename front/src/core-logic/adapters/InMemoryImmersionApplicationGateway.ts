@@ -10,38 +10,13 @@ import {
   WithImmersionApplicationId,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
 import { ShareLinkByEmailDTO } from "src/shared/ShareLinkByEmailDTO";
-import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
 import { MagicLinkPayload, Role } from "src/shared/tokens/MagicLinkPayload";
 import { sleep } from "src/shared/utils";
-
-const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
-  {
-    siret: "12345678901234",
-    businessName: "MA P'TITE BOITE",
-    businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-    naf: {
-      code: "78.3Z",
-      nomenclature: "Ref2",
-    },
-    isOpen: true,
-  },
-  {
-    siret: "11111111111111",
-    businessName: "ALAIN PROST",
-    businessAddress: "CHALET SECRET 73550 MERIBEL",
-    isOpen: true,
-  },
-];
 
 export class InMemoryImmersionApplicationGateway
   implements ImmersionApplicationGateway
 {
-  public constructor(private simulatedLatency?: number) {
-    TEST_ESTABLISHMENTS.forEach(
-      (establishment) =>
-        (this._sireneEstablishments[establishment.siret] = establishment),
-    );
-  }
+  public constructor(private simulatedLatency?: number) {}
 
   public async add(
     immersionApplication: ImmersionApplicationDto,
@@ -171,23 +146,6 @@ export class InMemoryImmersionApplicationGateway
     throw new Error("500 Not Implemented In InMemory Gateway");
   }
 
-  public async getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto> {
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-
-    const establishment = this._sireneEstablishments[siret];
-    //eslint-disable-next-line no-console
-    console.log(
-      "InMemoryImmersionApplicationGateway.getSiretInfo returned: ",
-      establishment,
-    );
-
-    if (!establishment) {
-      throw new Error("404 Not found");
-    }
-
-    return establishment;
-  }
-
   async shareLinkByEmail(
     shareLinkByEmailDTO: ShareLinkByEmailDTO,
   ): Promise<boolean> {
@@ -200,7 +158,6 @@ export class InMemoryImmersionApplicationGateway
     return true;
   }
 
-  public _sireneEstablishments: { [siret: SiretDto]: GetSiretResponseDto } = {};
   private _immersionApplications: { [id: string]: ImmersionApplicationDto } =
     {};
   private _agencies: { [id: string]: AgencyInListDto } = {};

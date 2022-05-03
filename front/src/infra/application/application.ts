@@ -5,12 +5,12 @@ import { ReactEstablishmentUiGateway } from "src/infra/gateway/EstablishmentUiGa
 import { InMemoryEventGateway } from "src/infra/gateway/EventGateway/InMemoryEventGateway";
 import {
   establishmentGateway,
-  immersionApplicationGateway,
+  siretGatewayThroughBack,
 } from "../../app/config/dependencies";
 import { ClientApplication } from "./ClientApplication";
 const primaryController = new ApplicationPrimaryController();
 const gateways: ClientGateways = {
-  immersionApplication: immersionApplicationGateway,
+  siretGatewayThroughBack,
   establishments: establishmentGateway,
   establishmentsUi: new ReactEstablishmentUiGateway(),
   event: new InMemoryEventGateway(primaryController),

@@ -14,7 +14,7 @@ export class ApplicationPrimaryController {
       new VerifySiretUseCase(
         gateways.establishmentsUi,
         gateways.establishments,
-        gateways.immersionApplication,
+        gateways.siretGatewayThroughBack,
       ),
     );
     this.useCases.set(
@@ -22,7 +22,7 @@ export class ApplicationPrimaryController {
       new ModifyEstablishmentUseCase(
         gateways.establishments,
         gateways.establishmentsUi,
-        gateways.immersionApplication,
+        gateways.siretGatewayThroughBack,
       ),
     );
   }
