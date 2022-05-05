@@ -1,6 +1,10 @@
 import { FieldHookConfig, useField } from "formik";
 import React from "react";
-import { ScheduleDto } from "src/shared/ScheduleSchema";
+import {
+  emptySchedule,
+  reasonableSchedule,
+  ScheduleDto,
+} from "src/shared/ScheduleSchema";
 import {
   calculateWeeklyHoursFromSchedule,
   checkSchedule,
@@ -41,10 +45,8 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
         yesLabel="Oui"
         noLabel="Non, irréguliers"
         checked={field.value.isSimple}
-        setFieldValue={(newValue) => {
-          const schedule = field.value;
-          schedule.isSimple = newValue;
-          props.setFieldValue(schedule);
+        setFieldValue={(isSimple) => {
+          props.setFieldValue(isSimple ? reasonableSchedule : emptySchedule);
         }}
         disabled={props.disabled}
       />

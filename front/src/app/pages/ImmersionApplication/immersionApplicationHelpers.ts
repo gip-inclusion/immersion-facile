@@ -10,7 +10,7 @@ import {
   ApplicationStatus,
   ImmersionApplicationDto,
 } from "src/shared/ImmersionApplication/ImmersionApplication.dto";
-import { emptySchedule } from "src/shared/ScheduleSchema";
+import { reasonableSchedule } from "src/shared/ScheduleSchema";
 import { toDateString } from "src/shared/utils/date";
 import { v4 as uuidV4 } from "uuid";
 
@@ -67,7 +67,7 @@ export const immersionApplicationInitialValuesFromUrl = ({
     mentor: params.mentor ?? "",
     mentorPhone: params.mentorPhone ?? "",
     mentorEmail: params.mentorEmail ?? "",
-    schedule: params.schedule ?? emptySchedule,
+    schedule: params.schedule ?? reasonableSchedule,
     immersionAddress: params.immersionAddress ?? "",
     agencyId: params.agencyId ?? undefined,
     workConditions: params.workConditions ?? "",
