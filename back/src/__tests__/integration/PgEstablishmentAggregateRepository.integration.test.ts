@@ -1261,6 +1261,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         city: "VAULX-EN-VELIN",
         contactMode: contact.contactMethod,
+        distance_m: undefined,
         contactDetails: {
           id: contact.id,
           firstName: contact.firstName,

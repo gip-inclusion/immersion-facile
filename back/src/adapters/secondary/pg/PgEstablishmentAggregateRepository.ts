@@ -11,13 +11,9 @@ import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEn
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { LatLonDto } from "../../../shared/latLon";
 import { AppellationDto } from "../../../shared/romeAndAppellationDtos/romeAndAppellation.dto";
-import {
-  SearchContactDto,
-  SearchImmersionResultDto,
-} from "../../../shared/searchImmersion/SearchImmersionResult.dto";
+import { SearchImmersionResultDto } from "../../../shared/searchImmersion/SearchImmersionResult.dto";
 import { SiretDto } from "../../../shared/siret";
 
-import { extractCityFromAddress } from "../../../utils/extractCityFromAddress";
 import { createLogger } from "../../../utils/logger";
 import { optional } from "./pgUtils";
 
@@ -185,118 +181,37 @@ export class PgEstablishmentAggregateRepository
     withContactDetails?: boolean;
     maxResults?: number;
   }): Promise<SearchImmersionResultDto[]> {
-    const query = `
-      WITH unique_establishments__immersion_contacts AS (
-        SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts
-      ),
-           matching_offers AS
-            (WITH active_establishments_within_area AS (
-                SELECT siret, 
-                (data_source = 'form')::boolean AS voluntary_to_immersion
-                FROM establishments 
-                WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)
-                ${filterOnVoluntaryToImmersion(
-                  searchMade.voluntary_to_immersion,
-                )}
-                ) 
-        SELECT aewa.siret, rome_code, voluntary_to_immersion,
-        JSONB_AGG(distinct libelle_appellation_long) filter(WHERE libelle_appellation_long is not null) AS appellation_labels
-        FROM immersion_offers io 
-        RIGHT JOIN active_establishments_within_area aewa ON io.siret = aewa.siret 
-        LEFT JOIN public_appellations_data pad ON (io.rome_appellation = pad.ogr_appellation) 
+    const selectedOffersSubQuery = format(
+      `
+    WITH active_establishments_within_area AS (SELECT siret, (data_source = 'form')::boolean AS voluntary_to_immersion, gps FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
+      searchMade.voluntary_to_immersion,
+    )}) 
+        SELECT aewa.siret, rome_code, prd.libelle_rome as rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
+        COALESCE(json_agg(distinct libelle_appellation_long) FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels
+        FROM active_establishments_within_area aewa 
+        LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
+        LEFT JOIN public_appellations_data pad ON io.rome_appellation = pad.ogr_appellation
+        LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
         ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
-        GROUP BY(aewa.siret, voluntary_to_immersion, rome_code)
+        GROUP BY(aewa.siret, aewa.gps, aewa.voluntary_to_immersion, io.rome_code, prd.libelle_rome)
         ORDER BY aewa.voluntary_to_immersion DESC
-        LIMIT $3
-        )
-    SELECT 
-        establishments.name as establishment_name,
-        establishments.customized_name as establishment_customized_name,
-        number_employees, 
-        address,
-        naf_code,
-        voluntary_to_immersion,
-        establishments.siret AS establishment_siret,
-        contact_uuid as contact_in_establishment_uuid,
-        gps,
-        ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
-        lon as establishment_lon,
-        lat as establishment_lat,
+        LIMIT $3`,
+      searchMade.rome,
+    ); // Formats optional litterals %1$L
 
-        immersion_contacts.lastname,
-        immersion_contacts.firstname,
-        immersion_contacts.contact_mode,
-        immersion_contacts.email,
-        immersion_contacts.role,
-        immersion_contacts.phone AS contact_phone,
-
-        rome_code, 
-        appellation_labels,
-
-        public_naf_classes_2008.class_label,
-        libelle_rome
-
-    FROM establishments 
-      RIGHT join matching_offers on establishments.siret = matching_offers.siret
-      LEFT JOIN unique_establishments__immersion_contacts ue_ic ON ue_ic.establishment_siret = establishments.siret 
-      LEFT JOIN immersion_contacts ON (contact_uuid = immersion_contacts.uuid)
-      LEFT OUTER JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      LEFT OUTER JOIN public_romes_data ON (rome_code = public_romes_data.code_rome)
-      ORDER BY voluntary_to_immersion DESC, distance_m
-    `;
-    const formatedQuery = format(query, searchMade.rome); // Formats optional litterals %1$L and %2$L
-    return this.client
-      .query(formatedQuery, [
-        `POINT(${searchMade.lon} ${searchMade.lat})`,
-        searchMade.distance_km * 1000, // Formats parameters $1, $2
-        maxResults,
-      ])
-      .then((res) =>
-        res.rows.map((result) => {
-          const immersionContact: SearchContactDto | null =
-            result.contact_in_establishment_uuid != null
-              ? {
-                  id: result.contact_in_establishment_uuid,
-                  firstName: result.contact_firstname,
-                  lastName: result.contact_name,
-                  email: result.contact_email,
-                  role: result.contact_role,
-                  phone: result.contact_phone,
-                }
-              : null;
-
-          const searchImmersionResultDto: SearchImmersionResultDto = {
-            rome: result.rome_code,
-            romeLabel: result.libelle_rome,
-            appellationLabels: result.appellation_labels ?? [],
-            naf: result.naf_code,
-            nafLabel: result.class_label,
-            siret: result.establishment_siret,
-            name:
-              result.establishment_customized_name ?? result.establishment_name,
-            voluntaryToImmersion: result.voluntary_to_immersion,
-            numberOfEmployeeRange: result.number_employees,
-            address: result.address,
-            city: extractCityFromAddress(result.address),
-            contactMode: optional(result.contact_mode) && result.contact_mode,
-            location: optional(result.establishment_lon) && {
-              lon: result.establishment_lon,
-              lat: result.establishment_lat,
-            },
-            distance_m: Math.round(result.distance_m),
-            ...(withContactDetails &&
-              immersionContact && { contactDetails: immersionContact }),
-          };
-          return searchImmersionResultDto;
-        }),
-      )
-      .catch((e) => {
-        logger.error(
-          e,
-          "Error in Pg implementation of getSearchImmersionResultDtoFromSearchMade",
-        );
-        throw e;
-      });
+    const immersionSearchResultDtos =
+      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        selectedOffersSubQuery,
+        [
+          `POINT(${searchMade.lon} ${searchMade.lat})`,
+          searchMade.distance_km * 1000, // Formats parameters $1, $2
+          maxResults,
+        ],
+      );
+    return immersionSearchResultDtos.map((dto) => ({
+      ...dto,
+      contactDetails: withContactDetails ? dto.contactDetails : undefined,
+    }));
   }
 
   public async getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
@@ -477,39 +392,39 @@ export class PgEstablishmentAggregateRepository
     siret: SiretDto,
     rome: string,
   ): Promise<SearchImmersionResultDto | undefined> {
+    const immersionSearchResultDtos =
+      await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        `
+      SELECT siret, io.rome_code, rome_label, COALESCE(json_agg(appellation_label) FILTER (WHERE appellation_label IS NOT NULL), '[]') AS appellation_labels, null AS distance_m
+      FROM immersion_offers AS io
+      LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = io.rome_appellation 
+      WHERE io.siret = $1 AND io.rome_code = $2
+      GROUP BY (siret, io.rome_code, rome_label)`,
+        [siret, rome],
+      );
+    return immersionSearchResultDtos[0];
+  }
+  private async selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+    selectedOffersSubQuery: string,
+    selectedOffersSubQueryParams: any[],
+  ): Promise<SearchImmersionResultDto[]> {
+    // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellation_labels and distance_m),
+    // this method returns a list of SearchImmersionResultDto
     const pgResult = await this.client.query(
-      `WITH match_immersion_offer AS (
-        SELECT siret, io.rome_code, rome_label, json_agg(appellation_label) AS appellation_labels
-        FROM immersion_offers AS io
-        LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = io.rome_appellation 
-        WHERE io.siret = $1 AND io.rome_code = $2
-        GROUP BY (siret, io.rome_code, rome_label) 
-        ) 
-        SELECT JSONB_BUILD_OBJECT(
-         'rome', io.rome_code, 
-         'siret', io.siret, 
-         'name', e.name, 
-         'voluntaryToImmersion', e.data_source = 'form',
-         'location', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
-         'romeLabel', io.rome_label,
-         'appellationLabels',  io.appellation_labels,
-         'naf', e.naf_code,
-         'nafLabel', public_naf_classes_2008.class_label,
-         'address', e.address, 
-         'city', (REGEXP_MATCH(e.address,  '^.*\\d{5}\\s(.*)$'))[1],
-         'contactMode', ic.contact_mode,
-         'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'role', ic.role, 'phone', ic.phone ),
-         'numberOfEmployeeRange', e.number_employees 
-        ) AS search_immersion_result
-        FROM match_immersion_offer AS io 
-        LEFT JOIN establishments AS e ON e.siret = io.siret  
-        LEFT OUTER JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-        LEFT JOIN establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
-        LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
-        `,
-      [siret, rome],
+      makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        selectedOffersSubQuery,
+      ),
+      selectedOffersSubQueryParams,
     );
-    return pgResult.rows[0]?.search_immersion_result;
+    return pgResult.rows.map((row) => ({
+      ...row.search_immersion_result,
+      contactMode: optional(row.search_immersion_result.contactMode),
+      contactDetails: optional(row.search_immersion_result.contactDetails),
+      distance_m: optional(row.search_immersion_result.distance_m),
+      numberOfEmployeeRange: optional(
+        row.search_immersion_result.numberOfEmployeeRange,
+      ),
+    }));
   }
 }
 
@@ -531,3 +446,31 @@ const filterOnVoluntaryToImmersion = (voluntaryToImmersion?: boolean) => {
     ? "AND data_source = 'form'"
     : "AND data_source != 'form'";
 };
+
+const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
+  selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellation_labels and distance_m
+) => `
+      WITH unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ), 
+           match_immersion_offer AS (${selectedOffersSubQuery}) 
+      SELECT JSONB_BUILD_OBJECT(
+      'rome', io.rome_code, 
+      'siret', io.siret, 
+      'distance_m', io.distance_m, 
+      'name', e.name, 
+      'voluntaryToImmersion', e.data_source = 'form',
+      'location', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+      'romeLabel', io.rome_label,
+      'appellationLabels',  io.appellation_labels,
+      'naf', e.naf_code,
+      'nafLabel', public_naf_classes_2008.class_label,
+      'address', e.address, 
+      'city', (REGEXP_MATCH(e.address,  '^.*\\d{5}\\s(.*)$'))[1],
+      'contactMode', ic.contact_mode,
+      'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'role', ic.role, 'phone', ic.phone ),
+      'numberOfEmployeeRange', e.number_employees 
+      ) AS search_immersion_result
+      FROM match_immersion_offer AS io 
+      LEFT JOIN establishments AS e ON e.siret = io.siret  
+      LEFT OUTER JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+      LEFT JOIN unique_establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
+      LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid`;
