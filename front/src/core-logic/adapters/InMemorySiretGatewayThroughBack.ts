@@ -58,17 +58,6 @@ export class InMemorySiretGatewayThroughBack
     if (siret === apiSirenUnexpectedError)
       throw new Error(sirenApiUnexpectedErrorErrorMessage);
     const establishment = this.sireneEstablishments[siret];
-    //eslint-disable-next-line no-console
-    this.log(
-      `InMemoryImmersionApplicationGateway.getSiretInfo(${siret})`,
-      establishment,
-    );
-    if (!establishment) return sirenApiMissingEstablishmentMessage;
-    return establishment;
-  }
-
-  private log(message?: any, ...optionalParams: any[]) {
-    // eslint-disable-next-line no-console
-    this.logging && console.log(message, ...optionalParams);
+    return establishment || sirenApiMissingEstablishmentMessage;
   }
 }
