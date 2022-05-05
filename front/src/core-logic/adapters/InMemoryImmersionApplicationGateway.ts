@@ -21,11 +21,6 @@ export class InMemoryImmersionApplicationGateway
   public async add(
     immersionApplication: ImmersionApplicationDto,
   ): Promise<ImmersionApplicationId> {
-    //eslint-disable-next-line no-console
-    console.log(
-      "InMemoryImmersionApplicationGateway.add: ",
-      immersionApplication,
-    );
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._immersionApplications[immersionApplication.id] = immersionApplication;
     return immersionApplication.id;
@@ -34,8 +29,6 @@ export class InMemoryImmersionApplicationGateway
   public async backofficeGet(
     id: ImmersionApplicationId,
   ): Promise<ImmersionApplicationDto> {
-    //eslint-disable-next-line no-console
-    console.log("InMemoryImmersionApplicationGateway.get: ", id);
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     return this._immersionApplications[id];
   }
@@ -52,8 +45,6 @@ export class InMemoryImmersionApplicationGateway
     agency?: AgencyId,
     status?: ApplicationStatus,
   ): Promise<Array<ImmersionApplicationDto>> {
-    //eslint-disable-next-line no-console
-    console.log("InMemoryImmersionApplicationGateway.getAll: ", agency, status);
     this.simulatedLatency && (await sleep(this.simulatedLatency));
 
     return Object.values(this._immersionApplications)
@@ -64,11 +55,6 @@ export class InMemoryImmersionApplicationGateway
   public async update(
     immersionApplication: ImmersionApplicationDto,
   ): Promise<ImmersionApplicationId> {
-    //eslint-disable-next-line no-console
-    console.log(
-      "InMemoryImmersionApplicationGateway.update: ",
-      immersionApplication,
-    );
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._immersionApplications[immersionApplication.id] = immersionApplication;
     return immersionApplication.id;
@@ -78,11 +64,6 @@ export class InMemoryImmersionApplicationGateway
     immersionApplication: ImmersionApplicationDto,
     jwt: string,
   ): Promise<string> {
-    //eslint-disable-next-line no-console
-    console.log(
-      "InMemoryImmersionApplicationGateway.updateML: ",
-      immersionApplication,
-    );
     const payload = decodeJwt<MagicLinkPayload>(jwt);
 
     this.simulatedLatency && (await sleep(this.simulatedLatency));
@@ -115,8 +96,6 @@ export class InMemoryImmersionApplicationGateway
   }
 
   public async validate(id: ImmersionApplicationId): Promise<string> {
-    //eslint-disable-next-line no-console
-    console.log("InMemoryImmersionApplicationGateway.validate: ", id);
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     const form = { ...this._immersionApplications[id] };
     if (form.status === "IN_REVIEW") {
@@ -147,14 +126,8 @@ export class InMemoryImmersionApplicationGateway
   }
 
   async shareLinkByEmail(
-    shareLinkByEmailDTO: ShareLinkByEmailDTO,
+    _shareLinkByEmailDTO: ShareLinkByEmailDTO,
   ): Promise<boolean> {
-    //eslint-disable-next-line no-console
-    console.log(
-      "InMemoryImmersionApplicationGateway.shareLinkByEmail",
-      shareLinkByEmailDTO,
-    );
-
     return true;
   }
 

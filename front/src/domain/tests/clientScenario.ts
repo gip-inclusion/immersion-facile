@@ -1,17 +1,12 @@
-import {
-  createTestStore,
-  StoreAndDeps,
-} from "src/core-logic/storeConfig/createTestStore";
-import { RootState } from "src/core-logic/storeConfig/store";
+import { InMemorySiretGatewayThroughBack } from "src/core-logic/adapters/InMemorySiretGatewayThroughBack";
+import { InMemoryEstablishmentUiGateway } from "src/infra/gateway/EstablishmentUiGateway/InMemoryEstablishmentUiGateway";
+import { InMemoryEstablishmentGateway } from "../../core-logic/adapters/InMemoryEstablishmentGateway";
+import { ApplicationPrimaryController } from "../../core-logic/ports/primaryController/ApplicationPrimaryController";
 import {
   ClientTestApplication,
   ClientTestApplicationProperties,
 } from "../../infra/application/ClientApplication";
 import { InMemoryEventGateway } from "../../infra/gateway/EventGateway/InMemoryEventGateway";
-import { InMemoryEstablishmentGateway } from "../../core-logic/adapters/InMemoryEstablishmentGateway";
-import { ApplicationPrimaryController } from "../../core-logic/ports/primaryController/ApplicationPrimaryController";
-import { InMemoryEstablishmentUiGateway } from "src/infra/gateway/EstablishmentUiGateway/InMemoryEstablishmentUiGateway";
-import { InMemorySiretGatewayThroughBack } from "src/core-logic/adapters/InMemorySiretGatewayThroughBack";
 
 export function clientScenario(
   scenarioTitle: string,
@@ -34,21 +29,3 @@ export function clientScenario(
     testSuite.forEach((unitTest) => unitTest(application));
   });
 }
-
-export type ScenarioUnitTest = (storeAndDeps: StoreAndDeps) => void;
-
-type ScenarioContext = {
-  title: string;
-  preloadedState?: Partial<RootState>;
-};
-
-export const clientScenarioRedux = (
-  { title, preloadedState }: ScenarioContext,
-  testSuite: ScenarioUnitTest[],
-): void => {
-  const storeAndDeps = createTestStore(preloadedState);
-  // console.log("storeAndDeps", storeAndDeps);
-  describe(title, () => {
-    testSuite.forEach((unitTest) => unitTest(storeAndDeps));
-  });
-};
