@@ -920,7 +920,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
-  describe("pg implementation of method hasEstablishmentFromFormWithSiret", () => {
+  describe("Pg implementation of method hasEstablishmentFromFormWithSiret", () => {
     const siret = "12345678901234";
     it("returns false if no establishment from form with given siret exists", async () => {
       // Prepare
@@ -1176,6 +1176,41 @@ describe("Postgres implementation of immersion offer repository", () => {
           email: contact.email,
           phone: contact.phone,
         },
+      });
+    });
+    describe("Pg implementation of method  getOffersAsAppelationDtoForFormEstablishment", () => {
+      const siret = "12345678901234";
+      it("Returns undefined if no aggregate exists with given siret", async () => {
+        // Act
+        const retrievedAggregate =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            siret,
+          );
+        // Assert
+        expect(retrievedAggregate).toBeUndefined();
+      });
+      it("Retrieves an existing aggregate given its siret", async () => {
+        // Prepare
+        const establishmentAggregate = new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityV2Builder()
+              .withSiret(siret)
+              .withUpdatedAt(new Date("2020-01-05T23:00:00"))
+              .build(),
+          )
+          .build();
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+          establishmentAggregate,
+        ]);
+        // Act
+        const retrievedAggregate =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            siret,
+          );
+        // Assert
+        expect(retrievedAggregate).toEqual(
+          JSON.parse(JSON.stringify(establishmentAggregate)),
+        );
       });
     });
   });

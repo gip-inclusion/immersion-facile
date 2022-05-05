@@ -186,8 +186,8 @@ export class PgEstablishmentAggregateRepository
     WITH active_establishments_within_area AS (SELECT siret, (data_source = 'form')::boolean AS voluntary_to_immersion, gps FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
       searchMade.voluntary_to_immersion,
     )}) 
-        SELECT aewa.siret, rome_code, prd.libelle_rome as rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
-        COALESCE(json_agg(distinct libelle_appellation_long) FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels
+        SELECT aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
+        COALESCE(JSON_AGG(DISTINCT libelle_appellation_long) FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels
         FROM active_establishments_within_area aewa 
         LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
         LEFT JOIN public_appellations_data pad ON io.rome_appellation = pad.ogr_appellation
@@ -361,10 +361,50 @@ export class PgEstablishmentAggregateRepository
     }));
   }
   async getEstablishmentAggregateBySiret(
-    _siret: SiretDto,
+    siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
-    await this.client.query(``);
-    throw new Error("Not implemented");
+    return (
+      await this.client.query(
+        `WITH 
+          unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ),
+          filtered_immersion_offers AS (SELECT siret, JSON_AGG(JSON_BUILD_OBJECT('romeCode', rome_code, 'score', score, 'id', uuid, 'appellationCode', rome_appellation)) as immersionOffers
+             FROM immersion_offers WHERE siret = $1 GROUP BY siret)
+        SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
+          'establishment', JSON_BUILD_OBJECT(
+            'siret', e.siret, 
+            'name', e.name, 
+            'customizedName', e.customized_name, 
+            'address', e.address, 
+            'voluntaryToImmersion', e.data_source = 'form',
+            'dataSource', e.data_source, 
+            'sourceProvider', e.source_provider, 
+            'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+            'nafDto',JSON_BUILD_OBJECT('code', e.naf_code, 'nomenclature', e.naf_nomenclature), 
+            'numberEmployeesRange', e.number_employees, 
+            'updatedAt', to_char(e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'), 
+            'isActive', e.is_active, 
+            'isSearchable', e.is_searchable, 
+            'isCommited', e.is_commited
+            ),
+          'immersionOffers', io.immersionOffers,
+          'contact', JSON_BUILD_OBJECT(
+            'id', ic.uuid,
+            'firstName', ic.firstname,
+            'lastName', ic.lastname,
+            'job', ic.role,
+            'contactMethod', ic.contact_mode,
+            'phone', ic.phone,
+            'email', ic.email,
+            'copyEmails', ic.copy_emails)
+          )) AS aggregate
+          FROM filtered_immersion_offers AS io
+          LEFT JOIN establishments AS e ON e.siret = io.siret
+          LEFT JOIN unique_establishments__immersion_contacts AS eic ON e.siret = eic.establishment_siret
+          LEFT JOIN immersion_contacts AS ic ON eic.contact_uuid = ic.uuid; 
+        `,
+        [siret],
+      )
+    ).rows[0]?.aggregate;
   }
 }
 
