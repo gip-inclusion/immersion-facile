@@ -25,17 +25,15 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
   ): Promise<void> {
     const { siret, romeLabel } = payload;
 
-    const contact =
-      await this.establishmentAggregateRepository.getContactForEstablishmentSiret(
+    const establishmentAggregate =
+      await this.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
-    if (!contact) throw new Error(`Missing contact details for siret=${siret}`);
-    const establishment =
-      await this.establishmentAggregateRepository.getEstablishmentForSiret(
-        siret,
-      );
-    if (!establishment)
+    if (!establishmentAggregate)
       throw new Error(`Missing establishment: siret=${siret}`);
+
+    const contact = establishmentAggregate.contact;
+    if (!contact) throw new Error(`Missing contact details for siret=${siret}`);
 
     if (contact.contactMethod !== payload.contactMode) {
       throw new Error(
@@ -54,7 +52,7 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
               establishmentContactEmail,
               contact.copyEmails,
               {
-                businessName: establishment.name,
+                businessName: establishmentAggregate.establishment.name,
                 contactFirstName: contact.firstName,
                 contactLastName: contact.lastName,
                 jobLabel: romeLabel,
@@ -77,7 +75,7 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
             this.emailGateway.sendContactByPhoneInstructions(
               potentialBeneficiaryEmail,
               {
-                businessName: establishment.name,
+                businessName: establishmentAggregate.establishment.name,
                 contactFirstName: contact.firstName,
                 contactLastName: contact.lastName,
                 contactPhone: contact.phone,
@@ -98,10 +96,10 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
             this.emailGateway.sendContactInPersonInstructions(
               potentialBeneficiaryEmail,
               {
-                businessName: establishment.name,
+                businessName: establishmentAggregate.establishment.name,
                 contactFirstName: contact.firstName,
                 contactLastName: contact.lastName,
-                businessAddress: establishment.address,
+                businessAddress: establishmentAggregate.establishment.address,
                 potentialBeneficiaryFirstName:
                   payload.potentialBeneficiaryFirstName,
                 potentialBeneficiaryLastName:

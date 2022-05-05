@@ -920,39 +920,6 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
-  describe("pg implementation of method getContactEmailFromSiret", () => {
-    const siret = "12345678901234";
-    it("returns undefined if no establishment contact with this siret", async () => {
-      // Act
-      const actualContactEmail = (
-        await pgEstablishmentAggregateRepository.getContactForEstablishmentSiret(
-          siret,
-        )
-      )?.email;
-      // Assert
-      expect(actualContactEmail).toBeUndefined();
-    });
-    it("returns the first contact if exist", async () => {
-      // Prepare
-      await insertEstablishment({
-        siret,
-      });
-      const contactEmail = "antoine@yahoo.fr";
-      await insertImmersionContact({
-        uuid: testUid1,
-        email: contactEmail,
-        siret_establishment: siret,
-      });
-      // Act
-      const actualContactEmail = (
-        await pgEstablishmentAggregateRepository.getContactForEstablishmentSiret(
-          siret,
-        )
-      )?.email;
-      // Assert
-      expect(actualContactEmail).toEqual(contactEmail);
-    });
-  });
   describe("pg implementation of method hasEstablishmentFromFormWithSiret", () => {
     const siret = "12345678901234";
     it("returns false if no establishment from form with given siret exists", async () => {
@@ -982,30 +949,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       ).toBe(true);
     });
   });
-  describe("Pg implementation of method getEstablishmentDataSourceFromSiret", () => {
-    const siret = "12345678901234";
-    it("Returns undefined when there is no establishment in db with this siret", async () => {
-      const establishmentDataSource =
-        await pgEstablishmentAggregateRepository.getEstablishmentDataSourceFromSiret(
-          siret,
-        );
-      expect(establishmentDataSource).toBeUndefined();
-    });
-    it("Check the establishment data_source", async () => {
-      // Prepare
-      await insertEstablishment({
-        siret,
-        dataSource: "form",
-      });
-      // Act
-      const establishmentDataSource =
-        await pgEstablishmentAggregateRepository.getEstablishmentDataSourceFromSiret(
-          siret,
-        );
-      // Assert
-      expect(establishmentDataSource).toBe("form");
-    });
-  });
+
   describe("Pg implementation of method getSiretOfEstablishmentsFromFormSource", () => {
     it("Returns a list of sirets of establishments with `form` data source", async () => {
       // Prepare
@@ -1085,7 +1029,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     });
   });
 
-  describe("Pg implementation of methods getEstablishmentForSiret, getContactsForEstablishmentSiret and getOffersFromEstablishmentSiret", () => {
+  describe("Pg implementation of method  getOffersAsAppelationDtoForFormEstablishment", () => {
     const siretInTable = "12345678901234";
     const establishment = new EstablishmentEntityV2Builder()
       .withSiret(siretInTable)
@@ -1116,78 +1060,38 @@ describe("Postgres implementation of immersion offer repository", () => {
         aggregate,
       ]);
     });
-    describe("getEstablishmentForSiret", () => {
-      it("returns undefined if no establishment found with this siret", async () => {
-        const siretNotInTable = "11111111111111";
+    it("returns an empty list if no establishment found with this siret", async () => {
+      const siretNotInTable = "11111111111111";
 
-        expect(
-          await pgEstablishmentAggregateRepository.getEstablishmentForSiret(
-            siretNotInTable,
-          ),
-        ).toBeUndefined();
-      });
-      it("returns the establishment entity with given siret", async () => {
-        expectTypeToMatchAndEqual(
-          await pgEstablishmentAggregateRepository.getEstablishmentForSiret(
-            siretInTable,
-          ),
-          { ...establishment, nafLabel: "" },
-        );
-      });
+      expect(
+        await pgEstablishmentAggregateRepository.getOffersAsAppelationDtoForFormEstablishment(
+          siretNotInTable,
+        ),
+      ).toHaveLength(0);
     });
-    describe("getContactForEstablishmentSiret", () => {
-      it("returns undefined if no establishment found with this siret", async () => {
-        const siretNotInTable = "11111111111111";
-
-        expect(
-          await pgEstablishmentAggregateRepository.getContactForEstablishmentSiret(
-            siretNotInTable,
-          ),
-        ).toBeUndefined();
-      });
-      it("returns the first contact entity attached to establishment of given siret", async () => {
-        expect(
-          await pgEstablishmentAggregateRepository.getContactForEstablishmentSiret(
-            siretInTable,
-          ),
-        ).toEqual(contact);
-      });
-    });
-
-    describe("getOffersAsAppelationDtoForFormEstablishment", () => {
-      it("returns an empty list if no establishment found with this siret", async () => {
-        const siretNotInTable = "11111111111111";
-
-        expect(
-          await pgEstablishmentAggregateRepository.getOffersAsAppelationDtoForFormEstablishment(
-            siretNotInTable,
-          ),
-        ).toHaveLength(0);
-      });
-      it("returns a list with offers from offers as AppellationDto of given siret", async () => {
-        const expectedOffersAsAppelationDto: AppellationDto[] = [
-          {
-            romeCode: offers[0].romeCode,
-            romeLabel: "Conduite d'engins agricoles et forestiers",
-            appellationCode: offers[0].appellationCode!.toString(),
-            appellationLabel: "Chauffeur / Chauffeuse de machines agricoles",
-          },
-          {
-            romeCode: offers[1].romeCode,
-            romeLabel: "Conduite d'engins agricoles et forestiers",
-            appellationCode: offers[1].appellationCode!.toString(),
-            appellationLabel: "Conducteur / Conductrice d'abatteuses",
-          },
-        ];
-        const actualOffersAsAppelationDto =
-          await pgEstablishmentAggregateRepository.getOffersAsAppelationDtoForFormEstablishment(
-            siretInTable,
-          );
-        expectArraysToEqualIgnoringOrder(
-          actualOffersAsAppelationDto,
-          expectedOffersAsAppelationDto,
+    it("returns a list with offers from offers as AppellationDto of given siret", async () => {
+      const expectedOffersAsAppelationDto: AppellationDto[] = [
+        {
+          romeCode: offers[0].romeCode,
+          romeLabel: "Conduite d'engins agricoles et forestiers",
+          appellationCode: offers[0].appellationCode!.toString(),
+          appellationLabel: "Chauffeur / Chauffeuse de machines agricoles",
+        },
+        {
+          romeCode: offers[1].romeCode,
+          romeLabel: "Conduite d'engins agricoles et forestiers",
+          appellationCode: offers[1].appellationCode!.toString(),
+          appellationLabel: "Conducteur / Conductrice d'abatteuses",
+        },
+      ];
+      const actualOffersAsAppelationDto =
+        await pgEstablishmentAggregateRepository.getOffersAsAppelationDtoForFormEstablishment(
+          siretInTable,
         );
-      });
+      expectArraysToEqualIgnoringOrder(
+        actualOffersAsAppelationDto,
+        expectedOffersAsAppelationDto,
+      );
     });
   });
   describe("Pg implementation of method getSearchImmersionResultDtoBySiretAndRome", () => {

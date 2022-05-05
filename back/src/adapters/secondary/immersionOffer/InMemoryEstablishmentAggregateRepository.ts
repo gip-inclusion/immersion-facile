@@ -1,6 +1,5 @@
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
-  AnnotatedEstablishmentEntityV2,
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
@@ -38,7 +37,22 @@ export class InMemoryEstablishmentAggregateRepository
       ...aggregates,
     ];
   }
-
+  async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
+    logger.info({ aggregate }, "updateEstablishmentAggregate");
+    this._establishmentAggregates = this._establishmentAggregates.map(
+      (existingAggregate) =>
+        existingAggregate.establishment.siret === aggregate.establishment.siret
+          ? aggregate
+          : existingAggregate,
+    );
+  }
+  async getEstablishmentAggregateBySiret(
+    siret: SiretDto,
+  ): Promise<EstablishmentAggregate | undefined> {
+    return this._establishmentAggregates.find(
+      pathEq("establishment.siret", siret),
+    );
+  }
   public async getSearchImmersionResultDtoFromSearchMade({
     searchMade,
     withContactDetails = false,
@@ -153,25 +167,6 @@ export class InMemoryEstablishmentAggregateRepository
     this.establishmentAggregates = this._establishmentAggregates.filter(
       pathNotEq("establishment.siret", siret),
     );
-  }
-
-  public async getEstablishmentForSiret(
-    siret: string,
-  ): Promise<AnnotatedEstablishmentEntityV2 | undefined> {
-    return this.establishmentAggregates
-      .map((aggegate) => ({
-        ...aggegate.establishment,
-        nafLabel: "",
-      }))
-      .find(propEq("siret", siret));
-  }
-
-  public async getContactForEstablishmentSiret(
-    siret: string,
-  ): Promise<ContactEntityV2 | undefined> {
-    return this.establishmentAggregates.find(
-      pathEq("establishment.siret", siret),
-    )?.contact;
   }
 
   public async getOffersAsAppelationDtoForFormEstablishment(

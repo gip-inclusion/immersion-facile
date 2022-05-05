@@ -1,7 +1,6 @@
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { makeFormEstablishmentToEstablishmentAggregate } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
-import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -31,19 +30,14 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   ): Promise<void> {
     const establishmentAlreadyExists =
       (
-        await uow.establishmentAggregateRepo.getEstablishmentForSiret(
+        await uow.establishmentAggregateRepo.getEstablishmentAggregateBySiret(
           formEstablishment.siret,
         )
-      )?.dataSource === "form";
+      )?.establishment?.dataSource === "form";
     if (!establishmentAlreadyExists)
       throw new Error(
         "Cannot update establishment from form that does not exist.",
       );
-
-    // TODO : We should not remove the aggregate but rather update it !
-    await uow.establishmentAggregateRepo.removeEstablishmentAndOffersAndContactWithSiret(
-      formEstablishment.siret,
-    );
 
     const establishmentAggregate =
       await makeFormEstablishmentToEstablishmentAggregate({
@@ -55,14 +49,8 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     if (!establishmentAggregate) return;
 
-    await uow.establishmentAggregateRepo
-      .insertEstablishmentAggregates([establishmentAggregate])
-      .catch((err: any) => {
-        notifyAndThrowErrorDiscord(
-          new Error(
-            `Error when adding establishment aggregate with siret ${formEstablishment.siret} due to ${err}`,
-          ),
-        );
-      });
+    await uow.establishmentAggregateRepo.updateEstablishmentAggregate(
+      establishmentAggregate,
+    );
   }
 }

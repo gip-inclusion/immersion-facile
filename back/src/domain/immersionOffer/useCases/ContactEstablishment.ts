@@ -29,12 +29,11 @@ export class ContactEstablishment extends TransactionalUseCase<
   ): Promise<void> {
     const { siret, contactMode } = params;
 
-    const establishment =
-      await establishmentAggregateRepo.getEstablishmentForSiret(siret);
-    if (!establishment) throw new NotFoundError(siret);
+    const establishmentAggregate =
+      await establishmentAggregateRepo.getEstablishmentAggregateBySiret(siret);
+    if (!establishmentAggregate) throw new NotFoundError(siret);
 
-    const contact =
-      await establishmentAggregateRepo.getContactForEstablishmentSiret(siret);
+    const contact = establishmentAggregate.contact;
     if (!contact)
       throw new BadRequestError(`No contact for establishment: ${siret}`);
 

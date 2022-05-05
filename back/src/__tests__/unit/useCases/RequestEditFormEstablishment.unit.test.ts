@@ -15,6 +15,7 @@ import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 const siret = "12345678912345";
@@ -23,12 +24,16 @@ const copyEmails = ["copy@gmail.com"];
 const setMethodGetContactEmailFromSiret = (
   establishmentAggregateRepo: EstablishmentAggregateRepository,
 ) => {
-  establishmentAggregateRepo.getContactForEstablishmentSiret =
+  establishmentAggregateRepo.getEstablishmentAggregateBySiret =
     //eslint-disable-next-line @typescript-eslint/require-await
     async (_siret: string) =>
-      new ContactEntityV2Builder()
-        .withEmail(contactEmail)
-        .withCopyEmails(copyEmails)
+      new EstablishmentAggregateBuilder()
+        .withContact(
+          new ContactEntityV2Builder()
+            .withEmail(contactEmail)
+            .withCopyEmails(copyEmails)
+            .build(),
+        )
         .build();
 };
 
@@ -76,9 +81,10 @@ describe("RequestUpdateFormEstablishment", () => {
     // Prepare
     const { useCase, establishmentAggregateRepo } = prepareUseCase();
 
-    establishmentAggregateRepo.getContactForEstablishmentSiret =
+    establishmentAggregateRepo.getEstablishmentAggregateBySiret =
       //eslint-disable-next-line @typescript-eslint/require-await
-      async (_siret: string) => undefined;
+      async (_siret: string) =>
+        new EstablishmentAggregateBuilder().withoutContact().build();
 
     // Act and assert
     await expectPromiseToFailWithError(

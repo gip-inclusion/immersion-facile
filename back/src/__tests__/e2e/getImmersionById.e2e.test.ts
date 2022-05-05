@@ -1,5 +1,7 @@
 import { SuperTest, Test } from "supertest";
 import {
+  TEST_CITY,
+  TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -40,6 +42,7 @@ describe("Route to get immersion offer by id", () => {
           new EstablishmentEntityV2Builder()
             .withPosition(TEST_POSITION)
             .withAddress("55 rue de Faubourg Sante Honoré 75008 Paris")
+            .withNumberOfEmployeeRange("10-19")
             .build(),
         )
         .withContact(
@@ -66,9 +69,10 @@ describe("Route to get immersion offer by id", () => {
       location: TEST_POSITION,
       address: "55 rue de Faubourg Sante Honoré 75008 Paris",
       romeLabel: TEST_ROME_LABEL,
-      nafLabel: "",
-      city: "Paris",
+      nafLabel: TEST_NAF_LABEL,
+      city: TEST_CITY,
       contactMode: "EMAIL",
+      numberOfEmployeeRange: "10-19",
     };
 
     await request
@@ -96,9 +100,10 @@ describe("Route to get immersion offer by id", () => {
         phone: "0612345678",
         role: "le big boss",
       },
+      numberOfEmployeeRange: "10-19",
       romeLabel: TEST_ROME_LABEL,
-      nafLabel: "",
-      city: "Paris",
+      nafLabel: TEST_NAF_LABEL,
+      city: TEST_CITY,
     };
 
     const authToken = generateApiJwt({

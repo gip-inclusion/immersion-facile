@@ -7,6 +7,7 @@ import {
   InMemoryRepositories,
 } from "../../_testBuilders/buildTestApp";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 
 describe("Route to generate an establishment edition link", () => {
   let request: SuperTest<Test>;
@@ -14,10 +15,14 @@ describe("Route to generate an establishment edition link", () => {
 
   beforeEach(async () => {
     ({ request, reposAndGateways } = await buildTestApp());
-    reposAndGateways.immersionOffer.getContactForEstablishmentSiret =
+    reposAndGateways.immersionOffer.getEstablishmentAggregateBySiret =
       //eslint-disable-next-line @typescript-eslint/require-await
       async () =>
-        new ContactEntityV2Builder().withEmail("erik@gmail.com").build();
+        new EstablishmentAggregateBuilder()
+          .withContact(
+            new ContactEntityV2Builder().withEmail("erik@gmail.com").build(),
+          )
+          .build();
   });
   it("Returns 400 with an error message if previous edit link for this siret has not yet expired", async () => {
     // Prepare

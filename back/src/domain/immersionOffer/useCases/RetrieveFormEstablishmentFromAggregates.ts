@@ -21,18 +21,21 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     uow: UnitOfWork,
     { siret }: EstablishmentJwtPayload,
   ) {
-    const establishment =
-      await uow.establishmentAggregateRepo.getEstablishmentForSiret(siret);
-    if (!establishment || establishment?.dataSource !== "form")
+    const establishmentAggregate =
+      await uow.establishmentAggregateRepo.getEstablishmentAggregateBySiret(
+        siret,
+      );
+
+    if (
+      !establishmentAggregate ||
+      establishmentAggregate?.establishment?.dataSource !== "form"
+    )
       throw new BadRequestError(
         `No establishment found with siret ${siret} and form data source. `,
       );
 
-    const contact =
-      await uow.establishmentAggregateRepo.getContactForEstablishmentSiret(
-        siret,
-      );
-    if (!contact) throw new BadRequestError("No contact ");
+    if (!establishmentAggregate.contact)
+      throw new BadRequestError("No contact ");
 
     const offersAsAppellationDto =
       await uow.establishmentAggregateRepo.getOffersAsAppelationDtoForFormEstablishment(
@@ -42,19 +45,15 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     const retrievedForm: FormEstablishmentDto = {
       siret,
       source: "immersion-facile",
-      businessName: establishment.name,
-      businessNameCustomized: establishment.customizedName,
-      businessAddress: establishment.address,
-      isEngagedEnterprise: establishment.isCommited,
-      naf: establishment?.nafDto,
-      appellations: offersAsAppellationDto.map((offerAsAppellationDto) => ({
-        romeLabel: offerAsAppellationDto.romeLabel,
-        romeCode: offerAsAppellationDto.romeCode,
-        appellationCode: offerAsAppellationDto.appellationCode,
-        appellationLabel: offerAsAppellationDto.appellationLabel,
-      })),
-      businessContact: contact,
-      isSearchable: establishment.isSearchable,
+      businessName: establishmentAggregate.establishment.name,
+      businessNameCustomized:
+        establishmentAggregate.establishment.customizedName,
+      businessAddress: establishmentAggregate.establishment.address,
+      isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
+      naf: establishmentAggregate.establishment?.nafDto,
+      appellations: offersAsAppellationDto,
+      businessContact: establishmentAggregate.contact,
+      isSearchable: establishmentAggregate.establishment.isSearchable,
     };
     return retrievedForm;
   }

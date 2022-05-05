@@ -1,9 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
-  AnnotatedEstablishmentEntityV2,
-  DataSource,
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
@@ -35,7 +32,10 @@ export class PgEstablishmentAggregateRepository
 
     return;
   }
-
+  public async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
+    await this._upsertEstablishmentsFromAggregates([aggregate]);
+    throw new Error("Not implemented");
+  }
   private async _upsertEstablishmentsFromAggregates(
     aggregates: EstablishmentAggregate[],
   ) {
@@ -226,15 +226,6 @@ export class PgEstablishmentAggregateRepository
     const pgResult = await this.client.query(query, [since.toISOString()]);
     return pgResult.rows.map((row) => row.siret);
   }
-  public async getEstablishmentDataSourceFromSiret(
-    siret: string,
-  ): Promise<DataSource | undefined> {
-    const query = `
-      SELECT data_source FROM establishments
-      WHERE siret = $1`;
-    const pgResult = await this.client.query(query, [siret]);
-    return pgResult.rows[0]?.data_source;
-  }
 
   public async getSiretOfEstablishmentsFromFormSource(): Promise<string[]> {
     const query = `
@@ -308,66 +299,6 @@ export class PgEstablishmentAggregateRepository
     );
     return pgResult.rows[0].exists;
   }
-  public async getEstablishmentForSiret(
-    siret: string,
-  ): Promise<AnnotatedEstablishmentEntityV2 | undefined> {
-    const pgResult = await this.client.query(
-      `
-        SELECT establishments.*, public_naf_classes_2008.class_label AS naf_label, lon, lat
-        FROM establishments
-        LEFT OUTER JOIN public_naf_classes_2008
-          ON (public_naf_classes_2008.class_id =
-              REGEXP_REPLACE(establishments.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-        WHERE siret = $1;`,
-      [siret],
-    );
-    const row = pgResult.rows[0];
-
-    if (!row) return;
-
-    const establishmentForSiret: AnnotatedEstablishmentEntityV2 = {
-      siret: row.siret,
-      name: row.name,
-      address: row.address,
-      dataSource: row.data_source,
-      sourceProvider: row.source_provider,
-      isActive: row.is_active,
-      nafDto: { code: row.naf_code, nomenclature: row.naf_nomenclature },
-      position: optional(row.lon) && { lon: row.lon, lat: row.lat },
-      numberEmployeesRange: row.number_employees,
-      voluntaryToImmersion: row.data_source == "form",
-      isCommited: optional(row.is_commited),
-      customizedName: optional(row.customized_name),
-      nafLabel: row.naf_label ?? "",
-      updatedAt: row.update_date,
-      isSearchable: row.is_searchable,
-    };
-    return establishmentForSiret;
-  }
-
-  public async getContactForEstablishmentSiret(
-    siret: string,
-  ): Promise<ContactEntityV2 | undefined> {
-    const pgResult = await this.client.query(
-      `SELECT * FROM immersion_contacts ic
-       JOIN establishments__immersion_contacts eic ON ic.uuid = eic.contact_uuid
-       WHERE establishment_siret = $1;`,
-      [siret],
-    );
-    const row = pgResult.rows[0];
-
-    if (!row) return;
-    return {
-      id: row.uuid,
-      firstName: row.firstname,
-      lastName: row.lastname,
-      email: row.email,
-      phone: optional(row.phone) && row.phone,
-      contactMethod: optional(row.contact_mode) && row.contact_mode,
-      job: row.role,
-      copyEmails: row.copy_emails,
-    };
-  }
 
   public async getOffersAsAppelationDtoForFormEstablishment(
     siret: string,
@@ -428,6 +359,12 @@ export class PgEstablishmentAggregateRepository
         row.search_immersion_result.numberOfEmployeeRange,
       ),
     }));
+  }
+  async getEstablishmentAggregateBySiret(
+    _siret: SiretDto,
+  ): Promise<EstablishmentAggregate | undefined> {
+    await this.client.query(``);
+    throw new Error("Not implemented");
   }
 }
 
