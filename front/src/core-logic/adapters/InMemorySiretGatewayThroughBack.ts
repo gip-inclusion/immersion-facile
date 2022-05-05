@@ -1,6 +1,19 @@
-import { GetSiretResponseDto, SiretDto } from "src/shared/siret";
+import {
+  apiSirenNotAvailableSiret,
+  apiSirenUnexpectedError,
+  GetSiretResponseDto,
+  SiretDto,
+  tooManySirenRequestsSiret,
+} from "src/shared/siret";
 import { sleep } from "src/shared/utils";
-import { SiretGatewayThroughBack } from "../ports/SiretGatewayThroughBack";
+import {
+  GetSiretInfo,
+  sirenApiMissingEstablishmentMessage,
+  sirenApiUnavailableSiretErrorMessage,
+  sirenApiUnexpectedErrorErrorMessage,
+  SiretGatewayThroughBack,
+  tooManiSirenRequestsSiretErrorMessage,
+} from "../ports/SiretGatewayThroughBack";
 
 const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
   {
@@ -33,20 +46,23 @@ export class InMemorySiretGatewayThroughBack
     );
   }
 
-  public async getSiretInfo(siret: SiretDto): Promise<GetSiretResponseDto> {
+  public async getSiretInfo(siret: SiretDto): Promise<GetSiretInfo> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
-
+    if (siret === tooManySirenRequestsSiret)
+      return Promise.resolve(tooManiSirenRequestsSiretErrorMessage);
+    if (siret === apiSirenNotAvailableSiret)
+      return Promise.resolve(sirenApiUnavailableSiretErrorMessage);
+    if (siret === apiSirenUnexpectedError)
+      return Promise.reject(new Error(sirenApiUnexpectedErrorErrorMessage));
     const establishment = this.sireneEstablishments[siret];
     //eslint-disable-next-line no-console
     console.log(
-      "InMemoryImmersionApplicationGateway.getSiretInfo returned: ",
+      `InMemoryImmersionApplicationGateway.getSiretInfo(${siret}) returned: `,
       establishment,
     );
 
-    if (!establishment) {
-      throw new Error("404 Not found");
-    }
-
+    if (!establishment)
+      return Promise.resolve(sirenApiMissingEstablishmentMessage);
     return establishment;
   }
 }

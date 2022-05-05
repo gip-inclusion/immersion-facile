@@ -9,6 +9,7 @@ const siretRegex = /^(?:\s*\d){14}\s*$/;
 
 export const tooManySirenRequestsSiret = "42900000000429";
 export const apiSirenNotAvailableSiret = "50300000000503";
+export const apiSirenUnexpectedError = "66600666600666";
 
 export type SiretDto = Flavor<string, "SiretDto">;
 export const siretSchema: z.Schema<SiretDto> = z

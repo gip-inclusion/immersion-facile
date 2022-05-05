@@ -80,6 +80,7 @@ export const useSiretFetcher = (options: SiretFetcherOptions) => {
         const response = await siretGatewayThroughBack.getSiretInfo(
           validatedSiret.current,
         );
+        if (typeof response === "string") throw new Error(response);
         setEstablishmentInfo(response);
       } catch (err: any) {
         if (err.isAxiosError && err.response && err.response.status === 404) {

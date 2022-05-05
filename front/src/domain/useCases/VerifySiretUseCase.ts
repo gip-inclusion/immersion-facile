@@ -1,4 +1,7 @@
-import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
+import {
+  GetSiretInfoError,
+  SiretGatewayThroughBack,
+} from "src/core-logic/ports/SiretGatewayThroughBack";
 import { NafDto } from "src/shared/naf";
 import { SiretDto } from "src/shared/siret";
 import { EstablishmentGateway } from "../../core-logic/ports/EstablishmentGateway";
@@ -23,19 +26,33 @@ export class VerifySiretUseCase extends UseCase {
   private onSiret(event: VerifySiretEvent): Promise<void> {
     return this.isSiretValid(event.siret)
       ? this.onValidSiret(event)
-      : this.establishmentUiGateway.updateCallToAction("BAD_SIRET");
+      : this.establishmentUiGateway.updateCallToAction("ERROR_BAD_SIRET");
   }
 
   private onValidSiret(event: VerifySiretEvent): Promise<void> {
     return this.siretGatewayThroughBack
       .getSiretInfo(event.siret)
-      .then((siretInfo) => this.onSiretInfo(siretInfo))
+      .then((siretInfo) =>
+        typeof siretInfo === "string"
+          ? this.onMissingSiretInfo(siretInfo)
+          : this.onSiretInfo(siretInfo),
+      )
       .catch(() =>
         this.establishmentUiGateway.updateCallToAction(
-          "MISSING_ESTABLISHMENT_ON_SIRENE",
+          "ERROR_UNEXPECTED_ERROR",
         ),
       );
   }
+  private onMissingSiretInfo(siretInfo: GetSiretInfoError): Promise<void> {
+    return this.establishmentUiGateway.updateCallToAction(
+      siretInfo === "SIRENE API not available."
+        ? "ERROR_SIRENE_API_UNAVAILABLE"
+        : siretInfo === "Missing establishment on SIRENE API."
+        ? "ERROR_MISSING_ESTABLISHMENT_ON_SIRENE"
+        : "ERROR_TOO_MANY_REQUESTS_ON_SIRET_API",
+    );
+  }
+
   private onSiretInfo(siretInfo: {
     naf?: NafDto | undefined;
     siret: SiretDto;
@@ -45,7 +62,7 @@ export class VerifySiretUseCase extends UseCase {
   }): Promise<void> {
     return siretInfo.isOpen === false
       ? this.establishmentUiGateway.updateCallToAction(
-          "CLOSED_ESTABLISHMENT_ON_SIRENE",
+          "ERROR_CLOSED_ESTABLISHMENT_ON_SIRENE",
         )
       : this.establishmentGateway
           .isEstablishmentAlreadyRegisteredBySiret(siretInfo.siret)
@@ -54,8 +71,8 @@ export class VerifySiretUseCase extends UseCase {
               ? this.establishmentUiGateway.updateCallToAction(
                   "MODIFY_ESTABLISHEMENT",
                 )
-              : this.establishmentUiGateway.updateCallToAction(
-                  "REGISTER_ESTABLISHEMENT",
+              : this.establishmentUiGateway.navigateToEstablishementForm(
+                  siretInfo.siret,
                 ),
           )
           .catch((error) => Promise.reject(error));

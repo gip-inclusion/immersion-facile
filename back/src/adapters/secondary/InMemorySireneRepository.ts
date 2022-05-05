@@ -5,6 +5,7 @@ import {
 } from "../../domain/sirene/ports/SireneRepository";
 import {
   apiSirenNotAvailableSiret,
+  apiSirenUnexpectedError,
   SiretDto,
   tooManySirenRequestsSiret,
 } from "../../shared/siret";
@@ -138,6 +139,14 @@ export class InMemorySireneRepository extends SireneRepository {
     includeClosedEstablishments = false,
   ): Promise<SireneRepositoryAnswer | undefined> {
     if (this._error) throw this._error;
+    if (siret === apiSirenUnexpectedError)
+      throw {
+        initialError: {
+          message: "Unexpected error",
+          status: 666,
+          data: "some error",
+        },
+      };
     if (siret === tooManySirenRequestsSiret)
       throw {
         initialError: {

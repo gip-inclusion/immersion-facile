@@ -8,9 +8,15 @@ import {
   existingOpenSireneResponse,
   validSiret,
 } from "src/domain/tests/expectedValues";
+import { feature } from "src/domain/tests/feature";
 import { theEstablishmentUiGatewayHasCallToAction } from "src/domain/tests/unitTests/EstablishmentUiGateway";
 import { whenTheEventIsSent } from "src/domain/tests/unitTests/EventGateway";
 import { theSiretGatewayThroughBackHasSireneRegisteredSirets } from "src/domain/tests/unitTests/ImmersionApplicationGateway";
+import {
+  apiSirenNotAvailableSiret,
+  apiSirenUnexpectedError,
+  tooManySirenRequestsSiret,
+} from "src/shared/siret";
 import { clientScenario } from "../../tests/clientScenario";
 import {
   theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret,
@@ -19,7 +25,6 @@ import {
   theEstablishmentGatewayHasRegisteredSiret,
 } from "../../tests/unitTests/EstablishmentGateway";
 import { ModifyEstablishmentEvent } from "./ModifyEstablishmentEvent";
-import { feature } from "src/domain/tests/feature";
 
 feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
   clientScenario(`Scénario 1 - Existing & registered/open on Sirene SIRET`, [
@@ -50,7 +55,10 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
     }),
     whenTheEventIsSent(new ModifyEstablishmentEvent(validSiret)),
     theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
-    theEstablishmentUiGatewayHasCallToAction("And then", "UNREGISTERED_SIRET"),
+    theEstablishmentUiGatewayHasCallToAction(
+      "And then",
+      "ERROR_UNREGISTERED_SIRET",
+    ),
   ]),
   clientScenario(`Scénario 3 - Bad SIRET - too short`, [
     theEstablishmentGatewayDontHasRegisteredSiret("Given"),
@@ -59,7 +67,7 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
     ),
     whenTheEventIsSent(new ModifyEstablishmentEvent(badSiretTooShort)),
     theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
-    theEstablishmentUiGatewayHasCallToAction("And then", "BAD_SIRET"),
+    theEstablishmentUiGatewayHasCallToAction("And then", "ERROR_BAD_SIRET"),
   ]),
   clientScenario(`Scénario 4 - Bad SIRET - 13 numbers and 1 letter`, [
     theEstablishmentGatewayDontHasRegisteredSiret("Given"),
@@ -68,7 +76,7 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
     ),
     whenTheEventIsSent(new ModifyEstablishmentEvent(badSiretOneWithLetter)),
     theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
-    theEstablishmentUiGatewayHasCallToAction("And then", "BAD_SIRET"),
+    theEstablishmentUiGatewayHasCallToAction("And then", "ERROR_BAD_SIRET"),
   ]),
   clientScenario(`Scénario 5 - Bad SIRET - too long`, [
     theEstablishmentGatewayDontHasRegisteredSiret("Given"),
@@ -77,7 +85,7 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
     ),
     whenTheEventIsSent(new ModifyEstablishmentEvent(badSiretTooLong)),
     theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
-    theEstablishmentUiGatewayHasCallToAction("And then", "BAD_SIRET"),
+    theEstablishmentUiGatewayHasCallToAction("And then", "ERROR_BAD_SIRET"),
   ]),
   clientScenario(`Scénario 6 - Existing & registered/closed on Sirene SIRET`, [
     theEstablishmentGatewayHasRegisteredSiret("Given", validSiret),
@@ -91,11 +99,11 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
     theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
     theEstablishmentUiGatewayHasCallToAction(
       "And then",
-      "CLOSED_ESTABLISHMENT_ON_SIRENE",
+      "ERROR_CLOSED_ESTABLISHMENT_ON_SIRENE",
     ),
   ]),
   clientScenario(
-    `Scénario 7 - Existing SIRET & Missing establishment on Sirene `,
+    `Scénario 7 - Existing SIRET & Missing establishment on Sirene`,
     [
       theEstablishmentGatewayHasRegisteredSiret("Given", validSiret),
       theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
@@ -106,8 +114,74 @@ feature("ESTABLISHMENT_MODIFICATION_REQUESTED", [
       theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
       theEstablishmentUiGatewayHasCallToAction(
         "And then",
-        "MISSING_ESTABLISHMENT_ON_SIRENE",
+        "ERROR_MISSING_ESTABLISHMENT_ON_SIRENE",
       ),
     ],
   ),
+  clientScenario(`Scénario 9 - Existing SIRET & too many request en SIRENE`, [
+    theEstablishmentGatewayHasRegisteredSiret(
+      "Given",
+      tooManySirenRequestsSiret,
+    ),
+    theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
+      "And given",
+    ),
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {
+      [tooManySirenRequestsSiret]: {
+        siret: tooManySirenRequestsSiret,
+        businessAddress: "",
+        businessName: "",
+        isOpen: true,
+      },
+    }),
+    whenTheEventIsSent(new ModifyEstablishmentEvent(tooManySirenRequestsSiret)),
+    theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
+    theEstablishmentUiGatewayHasCallToAction(
+      "And then",
+      "ERROR_TOO_MANY_REQUESTS_ON_SIRET_API",
+    ),
+  ]),
+  clientScenario(`Scénario 10 - Existing SIRET & API Sirene unavailable`, [
+    theEstablishmentGatewayHasRegisteredSiret(
+      "Given",
+      apiSirenNotAvailableSiret,
+    ),
+    theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
+      "And given",
+    ),
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {
+      [apiSirenNotAvailableSiret]: {
+        siret: apiSirenNotAvailableSiret,
+        businessAddress: "",
+        businessName: "",
+        isOpen: true,
+      },
+    }),
+    whenTheEventIsSent(new ModifyEstablishmentEvent(apiSirenNotAvailableSiret)),
+    theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
+    theEstablishmentUiGatewayHasCallToAction(
+      "And then",
+      "ERROR_SIRENE_API_UNAVAILABLE",
+    ),
+  ]),
+  clientScenario(`Scénario 11 - Existing SIRET & API Sirene unexpected error`, [
+    theEstablishmentGatewayHasRegisteredSiret("Given", apiSirenUnexpectedError),
+    theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret(
+      "And given",
+    ),
+    theSiretGatewayThroughBackHasSireneRegisteredSirets("And given", {
+      [apiSirenUnexpectedError]: {
+        siret: apiSirenUnexpectedError,
+        businessAddress: "",
+        businessName: "",
+        isOpen: true,
+      },
+    }),
+    whenTheEventIsSent(new ModifyEstablishmentEvent(apiSirenUnexpectedError)),
+    theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret("Then"),
+    theEstablishmentUiGatewayHasCallToAction(
+      "And then",
+      "ERROR_UNEXPECTED_ERROR",
+    ),
+  ]),
 ]);

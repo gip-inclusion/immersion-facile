@@ -2,17 +2,17 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import React, { useEffect, useState } from "react";
 import { ModifyEstablishmentEvent } from "src/domain/events/modifyEstablishment.ts/ModifyEstablishmentEvent";
 import { VerifySiretEvent } from "src/domain/events/verifySiret/VerifySiretEvent";
+import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
+import { ClientApplication } from "src/infra/application/ClientApplication";
 import { establishementCallToActionObservable$ } from "src/infra/gateway/EstablishmentUiGateway/ReactEstablishmentUiGateway";
 import { SiretDto } from "src/shared/siret";
-import { ButtonLink, HomeButton } from "src/uiComponents/Button";
+import { HomeButton } from "src/uiComponents/Button";
 import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 import { Link } from "src/uiComponents/Link";
 import { useObservable } from "src/useObservable";
-import { routes } from "../routing/routes";
 import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSubTitle";
 import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
-import { ClientApplication } from "src/infra/application/ClientApplication";
-import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
+import { routes } from "../routing/routes";
 
 interface EstablishmentHomeMenuProperties {
   clientApplication: ClientApplication;
@@ -21,9 +21,15 @@ interface EstablishmentHomeMenuProperties {
 const badEstablishmentCallToActionNotifications: Partial<
   Record<EstablishementCallToAction, string>
 > = {
-  BAD_SIRET: "Votre SIRET doît contenir 14 chiffres",
-  CLOSED_ESTABLISHMENT_ON_SIRENE: "Votre établissement est fermé",
-  MISSING_ESTABLISHMENT_ON_SIRENE: "Votre établissement n'existe pas",
+  ERROR_BAD_SIRET: "Votre SIRET doit contenir 14 chiffres.",
+  ERROR_CLOSED_ESTABLISHMENT_ON_SIRENE: "Votre établissement est fermé.",
+  ERROR_MISSING_ESTABLISHMENT_ON_SIRENE: "Votre établissement n'existe pas.",
+  ERROR_TOO_MANY_REQUESTS_ON_SIRET_API:
+    "Le service de vérification du SIRET a reçu trop d'appels.",
+  ERROR_SIRENE_API_UNAVAILABLE:
+    "Le service de vérification du SIRET est indisponible.",
+  ERROR_UNEXPECTED_ERROR:
+    "Erreur inattendue avec le service de vérification du SIRET.",
 };
 
 export const EstablishmentHomeMenu = ({
@@ -87,12 +93,6 @@ export const EstablishmentHomeMenu = ({
                     inputTimeoutUpdate,
                   )
                 }
-              />
-            )}
-            {callToAction === "REGISTER_ESTABLISHEMENT" && (
-              <ButtonLink
-                text={`Référencer votre entreprise`}
-                url={routes.formEstablishment({ siret }).link}
               />
             )}
             {callToAction === "MODIFY_ESTABLISHEMENT" &&
@@ -170,13 +170,13 @@ const modifyEstablishmentRequestForMailUpdate = ({
   </>
 );
 
-function isNothingOrErrorCallToAction(
+const isNothingOrErrorCallToAction = (
   callToAction: EstablishementCallToAction,
-) {
-  return (
-    callToAction === "NOTHING" ||
-    callToAction === "BAD_SIRET" ||
-    callToAction === "CLOSED_ESTABLISHMENT_ON_SIRENE" ||
-    callToAction === "MISSING_ESTABLISHMENT_ON_SIRENE"
-  );
-}
+) =>
+  callToAction === "NOTHING" ||
+  callToAction === "ERROR_BAD_SIRET" ||
+  callToAction === "ERROR_CLOSED_ESTABLISHMENT_ON_SIRENE" ||
+  callToAction === "ERROR_MISSING_ESTABLISHMENT_ON_SIRENE" ||
+  callToAction === "ERROR_SIRENE_API_UNAVAILABLE" ||
+  callToAction === "ERROR_TOO_MANY_REQUESTS_ON_SIRET_API" ||
+  callToAction === "ERROR_UNEXPECTED_ERROR";
