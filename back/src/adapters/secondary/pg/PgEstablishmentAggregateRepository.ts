@@ -365,7 +365,7 @@ export class PgEstablishmentAggregateRepository
       phone: optional(row.phone) && row.phone,
       contactMethod: optional(row.contact_mode) && row.contact_mode,
       job: row.role,
-      copyEmails: row.copy_emails ?? [],
+      copyEmails: row.copy_emails,
     };
   }
 

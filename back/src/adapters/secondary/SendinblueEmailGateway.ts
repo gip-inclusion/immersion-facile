@@ -1,5 +1,10 @@
 import promClient from "prom-client";
 import * as SibApiV3Sdk from "sib-api-v3-typescript";
+import {
+  SendSmtpEmail,
+  SendSmtpEmailCc,
+  SendSmtpEmailTo,
+} from "sib-api-v3-typescript";
 import type {
   BeneficiarySignatureRequestNotificationParams,
   ContactByEmailRequestParams,
@@ -164,6 +169,7 @@ export class SendinblueEmailGateway implements EmailGateway {
       copy,
     );
   }
+
   public async sendNewApplicationBeneficiaryConfirmation(
     recipient: string,
     params: NewApplicationBeneficiaryConfirmationParams,
@@ -448,37 +454,56 @@ export class SendinblueEmailGateway implements EmailGateway {
     emailType: EmailType,
     recipients: string[],
     params: any,
-    copy: string[] = [],
+    carbonCopy: string[] = [],
   ) {
-    const sibEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sibEmail.templateId = emailTypeToTemplateId[emailType];
-    sibEmail.to = recipients.map((email) => ({ email }));
-    sibEmail.cc = copy.map((email) => ({ email }));
-    sibEmail.params = params;
+    const baseEmailConfig: SendSmtpEmail = {
+      templateId: emailTypeToTemplateId[emailType],
+      to: recipients.map((email): SendSmtpEmailTo => ({ email })),
+      params,
+    };
+
+    const fullEmailConfig = addCarbonCopyFieldIfNeeded(
+      baseEmailConfig,
+      carbonCopy,
+    );
+
     try {
       counterSendTransactEmailTotal.inc({ emailType });
-      logger.info({ sibEmail }, "Sending email");
+      logger.info({ fullEmailConfig }, "Sending email");
 
-      const data = await this.apiInstance.sendTransacEmail(sibEmail);
+      const data = await this.apiInstance.sendTransacEmail(fullEmailConfig);
 
       counterSendTransactEmailSuccess.inc({ emailType });
       logger.info(data, "Email sending succeeded");
-    } catch (e: any) {
+    } catch (error: any) {
       counterSendTransactEmailError.inc({ emailType });
-      logger.error(e, "Email sending failed");
+      logger.error(error, "Email sending failed");
       notifyObjectDiscord({
         _message: `Email ${emailType} sending failed`,
         recipients: recipients.join("; "),
-        body: JSON.stringify(e?.body, null, 2),
+        body: JSON.stringify(error?.body, null, 2),
         response: JSON.stringify(
           {
-            statusCode: e?.response?.statusCode,
-            body: e?.response?.body
+            statusCode: error?.response?.statusCode,
+            body: error?.response?.body,
           },
           null,
           2,
         ),
       });
+      throw error;
     }
   }
 }
+
+const addCarbonCopyFieldIfNeeded = (
+  baseEmailConfig: SendSmtpEmail,
+  carbonCopy: string[],
+): SendSmtpEmail => {
+  if (carbonCopy.length === 0) return baseEmailConfig;
+
+  return {
+    ...baseEmailConfig,
+    cc: carbonCopy.map((email): SendSmtpEmailCc => ({ email })),
+  };
+};

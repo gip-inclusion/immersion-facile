@@ -8,7 +8,6 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { EmailGateway } from "../../immersionApplication/ports/EmailGateway";
 import { isAfter } from "date-fns";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { ContactEntityV2 } from "../entities/ContactEntity";
 
 export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
@@ -57,22 +56,19 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
-    try {
-      await this.emailGateway.sendRequestedEditFormEstablishmentLink(
-        contact.email,
-        contact.copyEmails,
-        {
-          editFrontUrl,
-        },
-      );
+    await this.emailGateway.sendRequestedEditFormEstablishmentLink(
+      contact.email,
+      contact.copyEmails,
+      {
+        editFrontUrl,
+      },
+    );
 
-      const event = this.createNewEvent({
-        topic: "FormEstablishmentEditLinkSent",
-        payload,
-      });
-      await uow.outboxRepo.save(event);
-    } catch (error) {
-      notifyObjectDiscord(error);
-    }
+    const event = this.createNewEvent({
+      topic: "FormEstablishmentEditLinkSent",
+      payload,
+    });
+
+    await uow.outboxRepo.save(event);
   }
 }
