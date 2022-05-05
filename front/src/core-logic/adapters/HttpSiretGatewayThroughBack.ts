@@ -24,14 +24,16 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
       .get(`/${siretRoute}/${siret}`)
       .then((response) => response.data)
       .catch((error) => {
-        if (this.isErrorCode(error, 429))
-          return tooManiSirenRequestsSiretErrorMessage;
-        if (this.isErrorCode(error, 503))
-          return sirenApiUnavailableSiretErrorMessage;
-        if (this.isErrorCode(error, 404))
-          return sirenApiMissingEstablishmentMessage;
-        return Promise.reject(error);
+        const strategy = this.errorCodeStrategy(error).get(true);
+        return strategy ? Promise.resolve(strategy) : Promise.reject(error);
       });
+  }
+  private errorCodeStrategy(error: any) {
+    return new Map([
+      [this.isErrorCode(error, 429), tooManiSirenRequestsSiretErrorMessage],
+      [this.isErrorCode(error, 503), sirenApiUnavailableSiretErrorMessage],
+      [this.isErrorCode(error, 404), sirenApiMissingEstablishmentMessage],
+    ]);
   }
 
   private isErrorCode(error: any, errorCode: number): boolean {

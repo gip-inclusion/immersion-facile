@@ -41,7 +41,7 @@ export const theEstablishmentGatewayHasModifyEstablishmentRequestForSiret =
 
 export const theEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret =
   (gherkin: Gherkin) => (application: ClientTestApplication) =>
-    it(`${gherkin} there is not a modify establishment request.`, () => {
+    it(`${gherkin} there is no modify establishment request.`, () => {
       if (isGiven(gherkin))
         application.gateways.establishments._currentEstablishmentModifyRequest =
           undefined;

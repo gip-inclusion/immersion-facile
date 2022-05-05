@@ -9,19 +9,21 @@ export const establishementCallToActionObservable$: Observable<EstablishementCal
   establishementCallToActionSubject$.asObservable();
 export class ReactEstablishmentUiGateway implements EstablishmentUiGateway {
   constructor(private logging = false) {}
+
   navigateToEstablishementForm(siret: SiretDto): Promise<void> {
     const route = routes.formEstablishment({ siret });
     this.log("Navigate to", route.link.href);
     route.push();
     return Promise.resolve();
   }
-  private log(message?: any, ...optionalParams: any[]) {
-    // eslint-disable-next-line no-console
-    if (this.logging === true) console.log(message, ...optionalParams);
-  }
 
   updateCallToAction(callToAction: EstablishementCallToAction): Promise<void> {
     establishementCallToActionSubject$.next(callToAction);
     return Promise.resolve();
+  }
+
+  private log(message?: any, ...optionalParams: any[]) {
+    // eslint-disable-next-line no-console
+    if (this.logging === true) console.log(message, ...optionalParams);
   }
 }

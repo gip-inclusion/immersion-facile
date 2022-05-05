@@ -39,7 +39,10 @@ export class InMemorySiretGatewayThroughBack
 {
   public sireneEstablishments: { [siret: SiretDto]: GetSiretResponseDto } = {};
 
-  public constructor(private simulatedLatency?: number) {
+  public constructor(
+    private simulatedLatency?: number,
+    private logging: boolean = false,
+  ) {
     TEST_ESTABLISHMENTS.forEach(
       (establishment) =>
         (this.sireneEstablishments[establishment.siret] = establishment),
@@ -49,20 +52,23 @@ export class InMemorySiretGatewayThroughBack
   public async getSiretInfo(siret: SiretDto): Promise<GetSiretInfo> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     if (siret === tooManySirenRequestsSiret)
-      return Promise.resolve(tooManiSirenRequestsSiretErrorMessage);
+      return tooManiSirenRequestsSiretErrorMessage;
     if (siret === apiSirenNotAvailableSiret)
-      return Promise.resolve(sirenApiUnavailableSiretErrorMessage);
+      return sirenApiUnavailableSiretErrorMessage;
     if (siret === apiSirenUnexpectedError)
-      return Promise.reject(new Error(sirenApiUnexpectedErrorErrorMessage));
+      throw new Error(sirenApiUnexpectedErrorErrorMessage);
     const establishment = this.sireneEstablishments[siret];
     //eslint-disable-next-line no-console
-    console.log(
-      `InMemoryImmersionApplicationGateway.getSiretInfo(${siret}) returned: `,
+    this.log(
+      `InMemoryImmersionApplicationGateway.getSiretInfo(${siret})`,
       establishment,
     );
-
-    if (!establishment)
-      return Promise.resolve(sirenApiMissingEstablishmentMessage);
+    if (!establishment) return sirenApiMissingEstablishmentMessage;
     return establishment;
+  }
+
+  private log(message?: any, ...optionalParams: any[]) {
+    // eslint-disable-next-line no-console
+    this.logging && console.log(message, ...optionalParams);
   }
 }

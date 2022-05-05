@@ -37,12 +37,14 @@ inMemory.sireneEstablishments = {
 };
 const http = new HttpSiretGatewayThroughBack("http://localhost:1234");
 
-const gateways: SiretGatewayThroughBack[] = [inMemory, http];
+const siretGatewaysThroughBack: SiretGatewayThroughBack[] = [inMemory, http];
 
-gateways.forEach((gateway) => {
-  describe(`${gateway.constructor.name} - manual`, () => {
+siretGatewaysThroughBack.forEach((siretGatewayThroughBack) => {
+  describe(`${siretGatewayThroughBack.constructor.name} - manual`, () => {
     it("gets siret when all is good", async () => {
-      const response = await gateway.getSiretInfo("12345678901234");
+      const response = await siretGatewayThroughBack.getSiretInfo(
+        "12345678901234",
+      );
       expectToEqual(response, {
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
         businessName: "MA P'TITE BOITE",
@@ -79,7 +81,7 @@ gateways.forEach((gateway) => {
       siret: string,
       expectedInfoError: GetSiretInfoError,
     ) =>
-      gateway.getSiretInfo(siret).then((result) => {
+      siretGatewayThroughBack.getSiretInfo(siret).then((result) => {
         expect(result).toBe(expectedInfoError);
       });
   });
