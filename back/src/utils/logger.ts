@@ -17,7 +17,7 @@ const rootLogger = pino({
     options: {
       colorize: true,
       singleLine: !process.env.LOGGER_MULTI_LINE,
-      translateTime: "yyyy-mm-dd HH:MM:ss.l",
+      translateTime: "yyyy-mm-dd HH:MM:ss.l Z",
       ignore: "pid,hostname",
     },
   },
