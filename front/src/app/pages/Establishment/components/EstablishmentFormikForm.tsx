@@ -180,6 +180,7 @@ export const EstablishmentFormikForm = ({
                     window.open(mailtoHref(initialValues.siret));
                   }}
                   type="error"
+                  width={null}
                 >
                   Supprimer votre entreprise
                 </HomeButton>

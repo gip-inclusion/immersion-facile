@@ -43,6 +43,7 @@ type HomeButtonProps = {
   children: ReactNode;
   className?: string;
   type?: HomeButtonTypes;
+  width?: "w-full" | null;
 };
 
 const buttonClassnames: Record<HomeButtonTypes, string> = {
@@ -57,12 +58,15 @@ export const HomeButton = ({
   children,
   className,
   type = "primary",
+  width = "w-full",
 }: HomeButtonProps) => (
   <button
     className={
       className
         ? className
-        : `rounded-md w-full h-15 py-3 px-2 no-underline ${buttonClassnames[type]} font-semibold text-center text-sm`
+        : `rounded-md${width ? ` ${width} ` : " "}h-15 py-3 px-2 no-underline ${
+            buttonClassnames[type]
+          } font-semibold text-center text-sm`
     }
     style={type === "secondary" ? { border: "2px solid" } : {}}
     onClick={onClick}
