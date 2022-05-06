@@ -7,11 +7,12 @@ import {
   ClientTestApplicationProperties,
 } from "../../infra/application/ClientApplication";
 import { InMemoryEventGateway } from "../../infra/gateway/EventGateway/InMemoryEventGateway";
-
-export function clientScenario(
-  scenarioTitle: string,
-  testSuite: ((application: ClientTestApplication) => void)[],
-) {
+type UnitTestWithDependencies = (application: ClientTestApplication) => void;
+export const executeTestSuite = (testSuite: UnitTestWithDependencies[]) => {
+  const application = makeAcceptanceTestApplication();
+  testSuite.forEach((unitTest) => unitTest(application));
+};
+function makeAcceptanceTestApplication() {
   const primaryController = new ApplicationPrimaryController();
   const clientTestApplication: ClientTestApplicationProperties = {
     gateways: {
@@ -23,9 +24,5 @@ export function clientScenario(
     repositories: {},
     primaryController,
   };
-
-  const application = new ClientTestApplication(clientTestApplication);
-  describe(scenarioTitle, () => {
-    testSuite.forEach((unitTest) => unitTest(application));
-  });
+  return new ClientTestApplication(clientTestApplication);
 }
