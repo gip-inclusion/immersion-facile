@@ -14,6 +14,7 @@ export interface EstablishmentAggregateRepository {
   ) => Promise<void>;
   updateEstablishmentAggregate: (
     establishmentAggregate: EstablishmentAggregate,
+    updatedAt: Date,
   ) => Promise<void>;
   getSearchImmersionResultDtoFromSearchMade: (props: {
     searchMade: SearchMade;
@@ -28,13 +29,10 @@ export interface EstablishmentAggregateRepository {
   getSiretOfEstablishmentsFromFormSource: () => Promise<SiretDto[]>;
 
   updateEstablishment: (
-    siret: string,
-    propertiesToUpdate: Partial<
-      Pick<
-        EstablishmentEntityV2,
-        "address" | "position" | "nafDto" | "numberEmployeesRange" | "isActive"
-      >
-    > & { updatedAt: Date },
+    propertiesToUpdate: Partial<EstablishmentEntityV2> & {
+      updatedAt: Date;
+      siret: SiretDto;
+    },
   ) => Promise<void>;
 
   removeEstablishmentAndOffersAndContactWithSiret: (

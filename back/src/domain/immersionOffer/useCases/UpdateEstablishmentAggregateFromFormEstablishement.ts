@@ -51,6 +51,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     await uow.establishmentAggregateRepo.updateEstablishmentAggregate(
       establishmentAggregate,
+      this.clock.now(),
     );
   }
 }

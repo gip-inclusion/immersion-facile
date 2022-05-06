@@ -3,6 +3,7 @@ import { prop, sortBy } from "ramda";
 import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
 import {
   DataSource,
+  EstablishmentAggregate,
   EstablishmentEntityV2,
   NumberEmployeesRange,
 } from "../../domain/immersionOffer/entities/EstablishmentEntity";
@@ -21,6 +22,7 @@ import {
 } from "shared/src/formEstablishment/FormEstablishment.dto";
 import {
   expectArraysToEqualIgnoringOrder,
+  expectPromiseToFailWith,
   expectTypeToMatchAndEqual,
 } from "../../_testBuilders/test.helpers";
 
@@ -576,13 +578,11 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Act
       const updatedAt = new Date("2020-05-15T12:00:00.000");
-      await pgEstablishmentAggregateRepository.updateEstablishment(
-        siretOfEstablishmentToUpdate,
-        {
-          isActive: false,
-          updatedAt,
-        },
-      );
+      await pgEstablishmentAggregateRepository.updateEstablishment({
+        siret: siretOfEstablishmentToUpdate,
+        isActive: false,
+        updatedAt,
+      });
 
       // Assert
       const establishmentRowInDB = await retrieveEstablishmentWithSiret(
@@ -616,13 +616,11 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       // Act
       const updatedAt = new Date("2020-05-15T12:00:00.000");
-      await pgEstablishmentAggregateRepository.updateEstablishment(
-        siretOfEstablishmentToUpdate,
-        {
-          ...updateProps,
-          updatedAt,
-        },
-      );
+      await pgEstablishmentAggregateRepository.updateEstablishment({
+        ...updateProps,
+        siret: siretOfEstablishmentToUpdate,
+        updatedAt,
+      });
 
       // Assert
       const actualEstablishmentRowInDB = await retrieveEstablishmentWithSiret(
@@ -691,9 +689,15 @@ describe("Postgres implementation of immersion offer repository", () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret1)
+            .withImmersionOffers([
+              new ImmersionOfferEntityV2Builder().withNewId().build(),
+            ])
             .build(),
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret2)
+            .withImmersionOffers([
+              new ImmersionOfferEntityV2Builder().withNewId().build(),
+            ])
             .withGeneratedContactId()
             .build(),
         ]);
@@ -1178,7 +1182,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         },
       });
     });
-    describe("Pg implementation of method  getOffersAsAppelationDtoForFormEstablishment", () => {
+    describe("Pg implementation of method  getEstablishmentAggregateBySiret", () => {
       const siret = "12345678901234";
       it("Returns undefined if no aggregate exists with given siret", async () => {
         // Act
@@ -1198,6 +1202,13 @@ describe("Postgres implementation of immersion offer repository", () => {
               .withUpdatedAt(new Date("2020-01-05T23:00:00"))
               .build(),
           )
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withAppellationCode("10900") // Appellation given
+              .withRomeCode("A1401")
+              .build(),
+            new ImmersionOfferEntityV2Builder().withRomeCode("A1402").build(), // No appellation
+          ])
           .build();
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
           establishmentAggregate,
@@ -1208,9 +1219,149 @@ describe("Postgres implementation of immersion offer repository", () => {
             siret,
           );
         // Assert
-        expect(retrievedAggregate).toEqual(
-          JSON.parse(JSON.stringify(establishmentAggregate)),
+        expect(retrievedAggregate).toBeDefined();
+        expectAggregateEqual(retrievedAggregate!, establishmentAggregate);
+      });
+    });
+
+    describe("Pg implementation of method updateEstablishmentAggregate", () => {
+      const updatedAt = new Date("2022-01-05T23:00:00.000Z");
+      const existingSiret = "12345678901234";
+      const existingEstablishmentAggregate = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret(existingSiret)
+        .withImmersionOffers([
+          new ImmersionOfferEntityV2Builder() // Offer with code A1402 without an appellation
+            .withAppellationCode(undefined)
+            .withRomeCode("A1402")
+            .withNewId()
+            .build(),
+          new ImmersionOfferEntityV2Builder() // Offer with code A1401 and an appellation
+            .withAppellationCode("10806")
+            .withRomeCode("A1401")
+            .withNewId()
+            .build(),
+          new ImmersionOfferEntityV2Builder() // Offer with code A1401 and an appellation
+            .withAppellationCode("10900")
+            .withRomeCode("A1401")
+            .withNewId()
+            .build(),
+        ])
+        .build();
+
+      beforeEach(async () => {
+        // Prepare: insert an existing aggregate
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+          existingEstablishmentAggregate,
+        ]);
+      });
+      it("Throws if the siret does not exist in base", async () => {
+        const aggregateNotInBase = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("11111111111111")
+          .build();
+
+        await expectPromiseToFailWith(
+          pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
+            aggregateNotInBase,
+            updatedAt,
+          ),
+          `We do not have an establishment with siret 11111111111111 to update`,
         );
+      });
+      it("Updates offers: removes some and creates some", async () => {
+        // Act
+        const updatedAggregate: EstablishmentAggregate = {
+          ...existingEstablishmentAggregate,
+          immersionOffers: [
+            existingEstablishmentAggregate.immersionOffers[2], // Existing offer to keep
+            new ImmersionOfferEntityV2Builder() // New offer to create
+              .withAppellationCode("17892")
+              .withRomeCode("A1401")
+              .withNewId()
+              .build(),
+          ],
+        };
+        await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
+          updatedAggregate,
+          updatedAt,
+        );
+
+        // Assert
+        const retrievedAggregate =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            existingSiret,
+          );
+        expect(retrievedAggregate).toBeDefined();
+        expectAggregateEqual(retrievedAggregate!, updatedAggregate);
+      });
+      it("Updates establishment informations", async () => {
+        // Act
+        const updatedAggregate: EstablishmentAggregate = {
+          ...existingEstablishmentAggregate,
+          establishment: {
+            siret: existingSiret,
+            name: "New name",
+            address: "10 new road, 75010 Paris",
+            customizedName: "a new customize name",
+            isCommited: true,
+            dataSource: "form",
+            sourceProvider: "immersion-facile",
+            voluntaryToImmersion: true,
+            position: { lat: 8, lon: 30 },
+            nafDto: { code: "8539B", nomenclature: "NAFRev3" },
+            numberEmployeesRange: "100-199",
+            isActive: true,
+            isSearchable: false,
+          },
+        };
+        await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
+          updatedAggregate,
+          updatedAt,
+        );
+        // Assert
+        const retrievedAggregate =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            existingSiret,
+          );
+        expect(retrievedAggregate).toBeDefined();
+        const expectedAggregate = {
+          ...updatedAggregate,
+          establishment: { ...updatedAggregate.establishment, updatedAt },
+        };
+        expectAggregateEqual(retrievedAggregate!, expectedAggregate);
+      });
+      it("Updates immersion contact but keeps the same id", async () => {
+        // Act
+        const updatedAggregate: EstablishmentAggregate = {
+          ...existingEstablishmentAggregate,
+          contact: {
+            id: "11111111-d654-4d0d-8fa6-2febefbe953d",
+            lastName: "Boitier",
+            firstName: "Anne",
+            email: "anne.boitier@email.fr",
+            job: "la big boss",
+            phone: "0600335980",
+            contactMethod: "PHONE",
+            copyEmails: ["olivia.baini@email.fr"],
+          },
+        };
+        await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
+          updatedAggregate,
+          updatedAt,
+        );
+        // Assert
+        const retrievedAggregate =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            existingSiret,
+          );
+        expect(retrievedAggregate).toBeDefined();
+        const expectedAggregate = {
+          ...updatedAggregate,
+          contact: {
+            ...updatedAggregate.contact!,
+            id: existingEstablishmentAggregate.contact!.id,
+          },
+        };
+        expectAggregateEqual(retrievedAggregate!, expectedAggregate);
       });
     });
   });
@@ -1362,5 +1513,13 @@ describe("Postgres implementation of immersion offer repository", () => {
       `INSERT INTO establishments__immersion_contacts (establishment_siret, contact_uuid) VALUES ($1, $2)`,
       [props.siret_establishment, props.uuid],
     );
+  };
+  const expectAggregateEqual = (
+    actual: EstablishmentAggregate,
+    expected: EstablishmentAggregate,
+  ) => {
+    expect(JSON.parse(JSON.stringify(actual))).toEqual(
+      JSON.parse(JSON.stringify(expected)),
+    ); // parse and stringinfy to avoid comparing no key vs. undefined key
   };
 });

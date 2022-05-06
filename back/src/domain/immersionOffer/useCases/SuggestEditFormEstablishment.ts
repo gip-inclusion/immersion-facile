@@ -22,10 +22,11 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
   }
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
-    const contact =
-      await uow.establishmentAggregateRepo.getContactForEstablishmentSiret(
+    const contact = (
+      await uow.establishmentAggregateRepo.getEstablishmentAggregateBySiret(
         siret,
-      );
+      )
+    )?.contact;
 
     if (!contact) throw Error("Email du contact introuvable.");
 

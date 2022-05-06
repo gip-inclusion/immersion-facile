@@ -14,7 +14,10 @@ export class ImmersionOfferEntityV2Builder
   implements Builder<ImmersionOfferEntityV2>
 {
   constructor(
-    private readonly entity: ImmersionOfferEntityV2 = validImmersionOfferEntityV2,
+    private readonly entity: ImmersionOfferEntityV2 = {
+      ...validImmersionOfferEntityV2,
+      id: new UuidV4Generator().new(),
+    },
   ) {}
 
   withId(id: ImmersionOfferId) {
@@ -33,7 +36,7 @@ export class ImmersionOfferEntityV2Builder
     });
   }
 
-  withAppellationCode(appellationCode: string) {
+  withAppellationCode(appellationCode: string | undefined) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,
       appellationCode,

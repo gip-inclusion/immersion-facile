@@ -12,6 +12,7 @@ import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/use
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";
@@ -19,16 +20,18 @@ const copyEmails = ["copy@gmail.com"];
 const setMethodGetContactEmailFromSiret = (
   establishmentAggregateRepo: EstablishmentAggregateRepository,
 ) => {
-  establishmentAggregateRepo.getContactForEstablishmentSiret = async (
-    _siret: string,
-    // eslint-disable-next-line @typescript-eslint/require-await
-  ) =>
-    new ContactEntityV2Builder()
-      .withEmail(contactEmail)
-      .withCopyEmails(copyEmails)
-      .build();
+  establishmentAggregateRepo.getEstablishmentAggregateBySiret =
+    //eslint-disable-next-line @typescript-eslint/require-await
+    async (_siret: string) =>
+      new EstablishmentAggregateBuilder()
+        .withContact(
+          new ContactEntityV2Builder()
+            .withEmail(contactEmail)
+            .withCopyEmails(copyEmails)
+            .build(),
+        )
+        .build();
 };
-
 const prepareUseCase = () => {
   const outboxRepo = new InMemoryOutboxRepository();
   const outboxQueries = new InMemoryOutboxQueries(outboxRepo);
@@ -71,10 +74,11 @@ describe("SuggestEditFormEstablishment", () => {
   it("Throws an error if contact email is unknown", async () => {
     // Prepare
     const { useCase, establishmentAggregateRepo } = prepareUseCase();
-    establishmentAggregateRepo.getContactForEstablishmentSiret = async (
-      siret: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-      // eslint-disable-next-line @typescript-eslint/require-await
-    ) => undefined;
+
+    establishmentAggregateRepo.getEstablishmentAggregateBySiret =
+      //eslint-disable-next-line @typescript-eslint/require-await
+      async (_siret: string) =>
+        new EstablishmentAggregateBuilder().withoutContact().build();
 
     // Act and assert
     await expectPromiseToFailWithError(

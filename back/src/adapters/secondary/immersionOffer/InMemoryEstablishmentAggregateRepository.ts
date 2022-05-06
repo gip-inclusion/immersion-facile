@@ -13,7 +13,8 @@ import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetwe
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { conflictErrorSiret, SiretDto } from "shared/src/siret";
-import { ConflictError } from "../../primary/helpers/httpErrors";
+import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
+import { replaceArrayElement } from "shared/src/utils";
 
 const logger = createLogger(__filename);
 
@@ -39,11 +40,17 @@ export class InMemoryEstablishmentAggregateRepository
   }
   async updateEstablishmentAggregate(aggregate: EstablishmentAggregate) {
     logger.info({ aggregate }, "updateEstablishmentAggregate");
-    this._establishmentAggregates = this._establishmentAggregates.map(
-      (existingAggregate) =>
-        existingAggregate.establishment.siret === aggregate.establishment.siret
-          ? aggregate
-          : existingAggregate,
+    const aggregateIndex = this._establishmentAggregates.findIndex(
+      pathEq("establishment.siret", aggregate.establishment.siret),
+    );
+    if (aggregateIndex === -1)
+      throw new NotFoundError(
+        `We do not have an establishment with siret ${aggregate.establishment.siret} to update`,
+      );
+    this._establishmentAggregates = replaceArrayElement(
+      this._establishmentAggregates,
+      aggregateIndex,
+      aggregate,
     );
   }
   async getEstablishmentAggregateBySiret(
@@ -111,35 +118,19 @@ export class InMemoryEstablishmentAggregateRepository
   }
 
   public async updateEstablishment(
-    siret: string,
-    propertiesToUpdate: Partial<
-      Pick<
-        EstablishmentEntityV2,
-        "address" | "position" | "nafDto" | "numberEmployeesRange" | "isActive"
-      >
-    > & { updatedAt: Date },
+    propertiesToUpdate: Partial<EstablishmentEntityV2> & {
+      updatedAt: Date;
+      siret: SiretDto;
+    },
   ): Promise<void> {
     this._establishmentAggregates = this._establishmentAggregates.map(
       (aggregate) =>
-        aggregate.establishment.siret === siret
+        aggregate.establishment.siret === propertiesToUpdate.siret
           ? {
               ...aggregate,
               establishment: {
                 ...aggregate.establishment,
-                address:
-                  propertiesToUpdate.address || aggregate.establishment.address,
-                position:
-                  propertiesToUpdate.position ||
-                  aggregate.establishment.position,
-                nafDto:
-                  propertiesToUpdate.nafDto || aggregate.establishment.nafDto,
-                numberEmployeesRange:
-                  propertiesToUpdate.numberEmployeesRange ||
-                  aggregate.establishment.numberEmployeesRange,
-                isActive:
-                  propertiesToUpdate.isActive !== undefined
-                    ? propertiesToUpdate.isActive
-                    : aggregate.establishment.isActive,
+                ...JSON.parse(JSON.stringify(propertiesToUpdate)), // parse and stringify to drop undefined values from propertiesToUpdate
                 updatedAt: propertiesToUpdate.updatedAt,
               },
             }

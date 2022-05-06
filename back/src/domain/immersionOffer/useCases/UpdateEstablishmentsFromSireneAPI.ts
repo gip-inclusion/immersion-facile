@@ -56,7 +56,8 @@ export class UpdateEstablishmentsFromSireneAPI {
     );
 
     if (!sireneAnswer || sireneAnswer.etablissements.length === 0) {
-      await this.establishmentAggregateRepository.updateEstablishment(siret, {
+      await this.establishmentAggregateRepository.updateEstablishment({
+        siret,
         updatedAt: this.clock.now(),
         isActive: false,
       });
@@ -78,7 +79,8 @@ export class UpdateEstablishmentsFromSireneAPI {
         "Unable to retrieve position from API Adresse",
       );
     }
-    await this.establishmentAggregateRepository.updateEstablishment(siret, {
+    await this.establishmentAggregateRepository.updateEstablishment({
+      siret,
       updatedAt: this.clock.now(),
       nafDto,
       numberEmployeesRange,
