@@ -44,35 +44,28 @@ export const establishmentGateway: EstablishmentGateway =
 const inMemoryImmersionApplicationGateway =
   new InMemoryImmersionApplicationGateway();
 
-const getInMemorySiretGatewayThroughBack = () => {
-  const inMemorySiretGatewayThroughBack = new InMemorySiretGatewayThroughBack();
-  inMemorySiretGatewayThroughBack.sireneEstablishments = {
+const getInMemorySiretGatewayThroughBack = () =>
+  new InMemorySiretGatewayThroughBack({
     12345678901238: {
-      naf: "",
       siret: "12345678901238",
       businessName: "",
       businessAddress: "",
       isOpen: true,
     },
     12345678901239: {
-      naf: "",
       siret: "12345678901239",
       businessName: "",
       businessAddress: "",
       isOpen: false,
     },
     12345678901236: {
-      naf: "47.11C",
       siret: "12345678901236",
       businessName:
         "Open Business on SIRENE but not registered on Immersion Facile",
       businessAddress: "5 Rue du Chevalier de Saint-George, 75008 Paris",
       isOpen: true,
     },
-  };
-
-  return inMemorySiretGatewayThroughBack;
-};
+  });
 
 export const siretGatewayThroughBack =
   ENV.gateway === "IN_MEMORY"

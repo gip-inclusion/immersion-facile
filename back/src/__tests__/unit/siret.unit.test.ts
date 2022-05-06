@@ -4,11 +4,11 @@ import { zTrimmedString } from "shared/src/zodUtils";
 describe("siretSchema", () => {
   it("accepts exactly 14 digits", () => {
     expect(() => siretSchema.parse("1234567890123")).toThrow(
-      "SIRET doit étre composé de 14 chiffres",
+      "SIRET doit être composé de 14 chiffres",
     );
     expect(() => siretSchema.parse("12345678901234")).not.toThrow();
     expect(() => siretSchema.parse("123456789012345")).toThrow(
-      "SIRET doit étre composé de 14 chiffres",
+      "SIRET doit être composé de 14 chiffres",
     );
   });
 

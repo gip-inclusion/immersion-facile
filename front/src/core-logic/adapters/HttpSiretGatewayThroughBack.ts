@@ -10,6 +10,7 @@ import {
   SiretGatewayThroughBack,
   tooManiSirenRequestsSiretErrorMessage,
 } from "../ports/SiretGatewayThroughBack";
+
 const prefix = "api";
 
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
@@ -30,6 +31,10 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
         if (!errorMessage) throw error;
         return errorMessage;
       });
+  }
+
+  public getSiretInfoObservable(siret: SiretDto): Observable<GetSiretInfo> {
+    return from(this.getSiretInfo(siret));
   }
 
   public getSiretInfoIfNotAlreadySaved(

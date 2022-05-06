@@ -25,7 +25,10 @@ import {
   SchedulePicker,
   scheduleValidator,
 } from "src/uiComponents/form/SchedulePicker/SchedulePicker";
-import { TextInput } from "src/uiComponents/form/TextInput";
+import {
+  TextInput,
+  TextInputControlled,
+} from "src/uiComponents/form/TextInput";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
 import { ApplicationFormProfession } from "./ApplicationFormProfession";
 import { CopyLink } from "./CopyLink";
@@ -97,10 +100,10 @@ export const ApplicationFormFields = ({
   } = useFormikContext<ImmersionApplicationDto>();
   const featureFlags = useAppSelector(featureFlagsSelector);
   const isSiretFetcherDisabled = values.status !== "DRAFT";
-  const { establishmentInfo, isFetchingSiret } = useSiretFetcher({
-    fetchSirenApiEvenAlreadyInDb: true,
-    disabled: isSiretFetcherDisabled,
-  });
+  const { establishmentInfo, isFetchingSiret, updateSiret, currentSiret } =
+    useSiretFetcher({
+      shouldFetchEvenIfAlreadySaved: true,
+    });
   useSiretRelatedField("businessName", establishmentInfo, {
     disabled: isSiretFetcherDisabled,
   });
@@ -211,7 +214,9 @@ export const ApplicationFormFields = ({
         Les questions suivantes doivent être complétées avec la personne qui
         vous accueillera pendant votre immersion
       </h4>
-      <TextInput
+      <TextInputControlled
+        value={currentSiret}
+        setValue={updateSiret}
         label="Indiquez le SIRET de la structure d'accueil *"
         name="siret"
         placeholder="362 521 879 00034"

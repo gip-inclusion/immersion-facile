@@ -1,5 +1,11 @@
 import { useField } from "formik";
 import React, { useState } from "react";
+import {
+  FormEstablishmentDto,
+  FormEstablishmentSource,
+} from "shared/src/formEstablishment/FormEstablishment.dto";
+import { SiretDto } from "shared/src/siret";
+import { OmitFromExistingKeys } from "shared/src/utils";
 import { establishmentGateway } from "src/app/config/dependencies";
 import {
   useSiretFetcher,
@@ -8,17 +14,14 @@ import {
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { ENV } from "src/environmentVariables";
-import {
-  FormEstablishmentDto,
-  FormEstablishmentSource,
-} from "shared/src/formEstablishment/FormEstablishment.dto";
-import { SiretDto } from "shared/src/siret";
-import { OmitFromExistingKeys } from "shared/src/utils";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button } from "src/uiComponents/Button";
 import { InfoMessage } from "src/uiComponents/form/InfoMessage";
 import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
-import { TextInput } from "src/uiComponents/form/TextInput";
+import {
+  TextInput,
+  TextInputControlled,
+} from "src/uiComponents/form/TextInput";
 import { defaultInitialValue } from "./defaultInitialValue";
 import {
   EstablishmentFormikForm,
@@ -54,8 +57,13 @@ export const EstablishmentCreationForm = ({
 };
 
 const CreationSiretRelatedInputs = () => {
-  const { siret, establishmentInfo, isFetchingSiret, siretAlreadyExists } =
-    useSiretFetcher({ fetchSirenApiEvenAlreadyInDb: false, disabled: false });
+  const {
+    currentSiret,
+    establishmentInfo,
+    isFetchingSiret,
+    siretError,
+    updateSiret,
+  } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: false });
   const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
     useState(false);
 
@@ -75,31 +83,35 @@ const CreationSiretRelatedInputs = () => {
 
   return (
     <>
-      <TextInput
+      <TextInputControlled
         {...getMandatoryLabelAndName("siret")}
+        value={currentSiret}
+        setValue={updateSiret}
+        error={siretError}
         placeholder="362 521 879 00034"
         disabled={isFetchingSiret}
       />
-      {siretAlreadyExists && !requestEmailToEditFormSucceed && (
-        <div>
-          Cette entreprise a déjà été référencée.
-          <Button
-            disable={requestEmailToEditFormSucceed}
-            onSubmit={() => {
-              establishmentGateway
-                .requestEstablishmentModification(siret)
-                .then(() => {
-                  setRequestEmailToEditFormSucceed(true);
-                })
-                .catch((err) => {
-                  setRequestEmailToEditFormError(err.response.data.errors);
-                });
-            }}
-          >
-            Demande de modification du formulaire de référencement
-          </Button>
-        </div>
-      )}
+      {siretError === "Establishment with this siret is already in our DB" &&
+        !requestEmailToEditFormSucceed && (
+          <div>
+            Cette entreprise a déjà été référencée.
+            <Button
+              disable={requestEmailToEditFormSucceed}
+              onSubmit={() => {
+                establishmentGateway
+                  .requestEstablishmentModification(currentSiret)
+                  .then(() => {
+                    setRequestEmailToEditFormSucceed(true);
+                  })
+                  .catch((err) => {
+                    setRequestEmailToEditFormError(err.response.data.errors);
+                  });
+              }}
+            >
+              Demande de modification du formulaire de référencement
+            </Button>
+          </div>
+        )}
       {requestEmailToEditFormSucceed && (
         <SuccessMessage title="Succès de la demande">
           Succès. Un mail a été envoyé au référent de cet établissement avec un

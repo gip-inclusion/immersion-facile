@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { nafSchema } from "./naf";
 import { Flavor } from "./typeFlavors";
+import { zString } from "./zodUtils";
 
 const normalizeSiret = (siret: string): string => siret.replace(/\s/g, "");
 
@@ -13,9 +14,8 @@ export const apiSirenNotAvailableSiret = "50300000000503";
 export const apiSirenUnexpectedError = "66600666600666";
 
 export type SiretDto = Flavor<string, "SiretDto">;
-export const siretSchema: z.Schema<SiretDto> = z
-  .string()
-  .regex(siretRegex, "SIRET doit étre composé de 14 chiffres")
+export const siretSchema: z.Schema<SiretDto> = zString
+  .regex(siretRegex, "SIRET doit être composé de 14 chiffres")
   .transform(normalizeSiret);
 
 export type GetSiretRequestDto = z.infer<typeof getSiretRequestSchema>;

@@ -17,5 +17,6 @@ export type GetSiretInfo = GetSiretResponseDto | GetSiretInfoError;
 
 export interface SiretGatewayThroughBack {
   getSiretInfo: (siret: SiretDto) => Promise<GetSiretInfo>;
+  getSiretInfoObservable: (siret: SiretDto) => Observable<GetSiretInfo>;
   getSiretInfoIfNotAlreadySaved: (siret: SiretDto) => Observable<GetSiretInfo>;
 }

@@ -12,8 +12,7 @@ import { expectToEqual } from "../storeConfig/redux.helpers";
 import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
 import { InMemorySiretGatewayThroughBack } from "./InMemorySiretGatewayThroughBack";
 
-const inMemory = new InMemorySiretGatewayThroughBack();
-inMemory.sireneEstablishments = {
+const inMemory = new InMemorySiretGatewayThroughBack({
   "12345678901234": {
     businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
     businessName: "MA P'TITE BOITE",
@@ -36,7 +35,8 @@ inMemory.sireneEstablishments = {
     isOpen: false,
     siret: apiSirenNotAvailableSiret,
   },
-};
+});
+
 const http = new HttpSiretGatewayThroughBack("http://localhost:1234");
 
 const siretGatewaysThroughBack: SiretGatewayThroughBack[] = [inMemory, http];

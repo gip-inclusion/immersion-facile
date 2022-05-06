@@ -1,9 +1,4 @@
-import {
-  Action,
-  combineReducers,
-  configureStore,
-  ThunkAction,
-} from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/app/config/dependencies";
@@ -15,11 +10,14 @@ import {
   romeAutocompleteEpic,
   romeAutocompleteSlice,
 } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
-import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epic";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
+import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
+import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
 const allEpics: any[] = [
   ...searchEpics,
+  ...siretEpics,
   fetchFeatureFlagsEpic,
   romeAutocompleteEpic,
 ];
@@ -37,6 +35,7 @@ const rootReducer = combineReducers({
   [searchSlice.name]: searchSlice.reducer,
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
   [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
+  [siretSlice.name]: siretSlice.reducer,
 });
 
 export type StoreProps = {
@@ -59,14 +58,9 @@ export const createStore = ({ dependencies, preloadedState }: StoreProps) => {
 };
 
 export type RootState = ReturnType<typeof rootReducer>;
+export const createRootSelector = <T>(selector: (state: RootState) => T) =>
+  selector;
 
 type Store = ReturnType<typeof createStore>;
 // export type RootState2 = ReturnType<Store["getState"]>;
 export type AppDispatch = Store["dispatch"];
-
-export type AppThunk = ThunkAction<
-  void,
-  RootState,
-  Dependencies,
-  Action<string>
->;

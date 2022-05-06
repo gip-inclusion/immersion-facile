@@ -1,4 +1,4 @@
-import { delay, Observable, of } from "rxjs";
+import { delay, Observable, of, Subject } from "rxjs";
 import {
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
@@ -17,38 +17,20 @@ import {
   tooManiSirenRequestsSiretErrorMessage,
 } from "../ports/SiretGatewayThroughBack";
 
-const TEST_ESTABLISHMENTS: GetSiretResponseDto[] = [
-  {
-    siret: "12345678901234",
-    businessName: "MA P'TITE BOITE",
-    businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-    naf: {
-      code: "78.3Z",
-      nomenclature: "Ref2",
-    },
-    isOpen: true,
-  },
-  {
-    siret: "11111111111111",
-    businessName: "ALAIN PROST",
-    businessAddress: "CHALET SECRET 73550 MERIBEL",
-    isOpen: true,
-  },
-];
-
 export class InMemorySiretGatewayThroughBack
   implements SiretGatewayThroughBack
 {
-  public sireneEstablishments: { [siret: SiretDto]: GetSiretResponseDto } = {};
+  private readonly _siretInfo$: Subject<GetSiretInfo>;
+  private _getSiretInfoObservableCallCount = 0;
+  private _getSiretInfoIfNotAlreadySavedCallCount = 0;
 
   public constructor(
-    private simulatedLatency?: number,
-    private logging: boolean = false,
+    public sireneEstablishments: {
+      [siret: SiretDto]: GetSiretResponseDto;
+    } = {},
+    private readonly simulatedLatency = 0,
   ) {
-    TEST_ESTABLISHMENTS.forEach(
-      (establishment) =>
-        (this.sireneEstablishments[establishment.siret] = establishment),
-    );
+    this._siretInfo$ = new Subject<GetSiretInfo>();
   }
 
   public async getSiretInfo(siret: SiretDto): Promise<GetSiretInfo> {
@@ -56,13 +38,29 @@ export class InMemorySiretGatewayThroughBack
     return this.simulatedResponse(siret);
   }
 
+  public getSiretInfoObservable(siret: SiretDto): Observable<GetSiretInfo> {
+    this._getSiretInfoObservableCallCount += 1;
+    if (Object.keys(this.sireneEstablishments).length > 0) {
+      const response$ = of(this.simulatedResponse(siret));
+      return this.simulatedLatency
+        ? response$.pipe(delay(this.simulatedLatency))
+        : response$;
+    }
+    return this._siretInfo$;
+  }
+
   public getSiretInfoIfNotAlreadySaved(
     siret: SiretDto,
   ): Observable<GetSiretInfo> {
-    const response$ = of(this.simulatedResponse(siret));
-    return this.simulatedLatency
-      ? response$.pipe(delay(this.simulatedLatency))
-      : response$;
+    this._getSiretInfoIfNotAlreadySavedCallCount += 1;
+    if (Object.keys(this.sireneEstablishments).length > 0) {
+      const response$ = of(this.simulatedResponse(siret));
+      return this.simulatedLatency
+        ? response$.pipe(delay(this.simulatedLatency))
+        : response$;
+    }
+
+    return this._siretInfo$;
   }
 
   private simulatedResponse(siret: SiretDto): GetSiretInfo {
@@ -76,5 +74,17 @@ export class InMemorySiretGatewayThroughBack
       throw new Error(sirenApiUnexpectedErrorErrorMessage);
     const establishment = this.sireneEstablishments[siret];
     return establishment || sirenApiMissingEstablishmentMessage;
+  }
+
+  get siretInfo$() {
+    return this._siretInfo$;
+  }
+
+  get getSiretInfoObservableCallCount() {
+    return this._getSiretInfoObservableCallCount;
+  }
+
+  get getSiretInfoIfNotAlreadySavedCallCount() {
+    return this._getSiretInfoIfNotAlreadySavedCallCount;
   }
 }

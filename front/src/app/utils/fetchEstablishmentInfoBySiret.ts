@@ -1,12 +1,10 @@
 import { useField } from "formik";
-import { useEffect, useRef, useState } from "react";
-import {
-  establishmentGateway,
-  siretGatewayThroughBack,
-} from "src/app/config/dependencies";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { GetSiretResponseDto } from "shared/src/siret";
 import { useAppSelector } from "src/app/utils/reduxHooks";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
-import { GetSiretResponseDto, SiretDto, siretSchema } from "shared/src/siret";
+import { siretStateSelector } from "src/core-logic/domain/siret/siret.selectors";
+import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
 export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
   fieldFromInfo: K,
@@ -31,75 +29,27 @@ export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
 };
 
 type SiretFetcherOptions = {
-  fetchSirenApiEvenAlreadyInDb: boolean;
-  disabled: boolean;
+  shouldFetchEvenIfAlreadySaved: boolean;
 };
 
-export const useSiretFetcher = (options: SiretFetcherOptions) => {
-  const featureFlags = useAppSelector(featureFlagsSelector);
-  const [isFetchingSiret, setIsFetchingSiret] = useState(false);
-  const [siretAlreadyExists, setSiretAlreadyExists] = useState(false);
-  const [establishmentInfo, setEstablishmentInfo] = useState<
-    GetSiretResponseDto | undefined
-  >();
-
-  const [field, _, { setValue: _2, setError, setTouched }] = useField<string>({
-    name: "siret",
-  });
-  const validatedSiret = useRef<SiretDto>(field.value);
-
+export const useSiretFetcher = ({
+  shouldFetchEvenIfAlreadySaved,
+}: SiretFetcherOptions) => {
+  const siretState = useAppSelector(siretStateSelector);
+  const dispatch = useDispatch();
   useEffect(() => {
-    if (options.disabled) return;
-
-    (async () => {
-      try {
-        validatedSiret.current = siretSchema.parse(field.value);
-      } catch (_: any) {
-        return;
-      }
-      setIsFetchingSiret(true);
-      setTouched(true);
-      // Does siret already exist in our form repository ?
-      const siretAlreadyExists =
-        await establishmentGateway.isEstablishmentAlreadyRegisteredBySiret(
-          validatedSiret.current,
-        );
-      setSiretAlreadyExists(siretAlreadyExists);
-      if (siretAlreadyExists && !options.fetchSirenApiEvenAlreadyInDb) {
-        setIsFetchingSiret(false);
-        return;
-      }
-
-      // Does siret exist in Sirene API ?
-      if (!featureFlags.enableInseeApi) {
-        setIsFetchingSiret(false);
-        return;
-      }
-
-      try {
-        const response = await siretGatewayThroughBack.getSiretInfo(
-          validatedSiret.current,
-        );
-        if (typeof response === "string") throw new Error(response);
-        setEstablishmentInfo(response);
-      } catch (err: any) {
-        if (err.isAxiosError && err.response && err.response.status === 404) {
-          setError(
-            "Ce SIRET n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.",
-          );
-        } else {
-          setError(err.response?.data.errors ?? err.message);
-        }
-      } finally {
-        setIsFetchingSiret(false);
-      }
-    })();
-  }, [field.value]);
+    if (
+      shouldFetchEvenIfAlreadySaved !== siretState.shouldFetchEvenIfAlreadySaved
+    )
+      dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+  }, [siretState.shouldFetchEvenIfAlreadySaved]);
 
   return {
-    establishmentInfo,
-    siretAlreadyExists,
-    isFetchingSiret,
-    siret: validatedSiret.current,
+    currentSiret: siretState.currentSiret,
+    establishmentInfo: siretState.establishment ?? undefined,
+    isFetchingSiret: siretState.isSearching,
+    siretError: siretState.error ?? undefined,
+    updateSiret: (newSiret: string) =>
+      dispatch(siretSlice.actions.siretModified(newSiret)),
   };
 };

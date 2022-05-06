@@ -24,7 +24,7 @@ export interface TestDependencies {
 
 export const createTestStore = (
   preloadedState?: Partial<RootState>,
-  message?: string,
+  message?: "skip" | string,
 ) => {
   const dependencies: TestDependencies = {
     siretGatewayThroughBack: new InMemorySiretGatewayThroughBack(),
@@ -40,6 +40,7 @@ export const createTestStore = (
   };
 
   preloadedState &&
+    message !== "skip" &&
     it(createMessage(preloadedState, message), () => {
       /* do nothing */
     });

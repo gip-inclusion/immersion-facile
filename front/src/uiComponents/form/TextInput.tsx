@@ -1,5 +1,5 @@
 import { useField } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 
 type TextInputProps = {
@@ -24,6 +24,37 @@ export const TextInput = (props: TextInputProps) => {
       {...field}
       {...(value && value !== "" && { value })}
       error={meta.touched ? meta.error : undefined}
+    />
+  );
+};
+
+export const TextInputControlled = (
+  props: TextInputProps & {
+    value: string;
+    setValue: (v: string) => void;
+    error?: string;
+  },
+) => {
+  const { value } = props;
+  const [field, meta, { setError, setValue }] = useField<string>({
+    name: props.name,
+  });
+
+  useEffect(() => {
+    setError(props.error);
+    if (field.value) setValue(props.value);
+  }, [props.value, props.error]);
+
+  return (
+    <ImmersionTextField
+      {...props}
+      {...field}
+      onChange={(e) => {
+        props.setValue(e.target.value);
+        field.onChange(e.target.value);
+      }}
+      {...(value && value !== "" && { value })}
+      error={meta.touched ? props.error || meta.error : undefined}
     />
   );
 };
