@@ -15,7 +15,7 @@ import {
 } from "src/domain/tests/unitTests/EstablishmentUiGateway";
 import { whenTheEventIsSent } from "src/domain/tests/unitTests/EventGateway";
 import { andGivenTheSiretGatewayThroughBackHasSireneRegisteredSirets } from "src/domain/tests/unitTests/ImmersionApplicationGateway";
-import { executeTestSuite } from "../../tests/clientScenario";
+import { executeTestSuite } from "../../tests/testSuit";
 import {
   givenTheEstablishmentGatewayDontHasRegisteredSiret,
   givenTheEstablishmentGatewayHasRegisteredSiret,
