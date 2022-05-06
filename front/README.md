@@ -2,7 +2,7 @@
 
 #### Install
 
-In front folder, install node modules:
+**In root folder**, install all dependencies (also installs the backend dependencies):
 ```shell
 pnpm install
 ```

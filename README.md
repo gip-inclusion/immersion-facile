@@ -3,20 +3,21 @@
 Le but du projet immersion facile est de faciliter les immersions professionnelles.
 Il y pour cela plusieurs axes de travail :
 
-- Dématérialiser entièrement les demandes d'immersion et les intéractions des conseillers pôle emploi ou mission locale
-- Constituer un annuaire des entreprises qui sont suceptibles d'accueillir en immersion
+- Dématérialiser entièrement les demandes d'immersion et les interactions des conseillers pôle emploi ou mission locale
+- Constituer un annuaire des entreprises qui sont susceptible d'accueillir en immersion
 - Rendre les immersions recherchables par les bénéficiaires
 
 ### Prérequis
 
 Pour démarrer le projet il vous faut `git`, `docker` et `node` (version > 12 )installée sur la machine.
+Nous utilions également `pnpm` comme gestionnaire de paquets (pour l'installer : `npm install -g pnpm`).
 
 ### Démarrer le projet
 
 Il faut demander d'être ajouté au projet sur le gitlab de pole-emploi. L'url du projet est la suivante :
 [https://git.beta.pole-emploi.fr/jburkard/immersion-facile](https://git.beta.pole-emploi.fr/jburkard/immersion-facile)
 
-Récuppérer ou pousser du code sur gitlab, il faut également avoir (ou générer) une paire de clé ssh et **donner la clé public à l'équipe pole-emploi**.
+Récupérer ou pousser du code sur gitlab, il faut également avoir (ou générer) une paire de clé ssh et **donner la clé public à l'équipe pole-emploi**.
 Le but étant de donner les droits sur gitlab et sur la machines de recette.
 
 #### Exemple de création de clé ssh (en général à la racine de l'utilisateur) :

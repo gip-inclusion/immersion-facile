@@ -2,8 +2,9 @@ You need node 12+ to use the app :
 
 **Install**
 
+The install is done with pnpm from the **root of the project**
 ```
-npm install
+pnpm install
 ```
 
 **Env variables**
@@ -13,10 +14,10 @@ Copy (or simlink) the .env from the root to here.
 cp ../.env.sample ./env
 ```
 
-**To test the app :**
+**To check everything is fine :**
 
 ```
-npm run test:all
+pnpm fullcheck
 ```
 
 You can run in watch mode individually :
