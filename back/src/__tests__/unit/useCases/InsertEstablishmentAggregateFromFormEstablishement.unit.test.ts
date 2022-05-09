@@ -9,10 +9,6 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
-import {
-  SireneEstablishmentProps,
-  SireneEstablishmentVO,
-} from "../../../domain/sirene/ports/SireneGateway";
 import { LatLonDto } from "shared/src/latLon";
 import { NafDto } from "shared/src/naf";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
@@ -21,6 +17,10 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/Establishm
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import {
+  SireneEstablishmentProps,
+  SireneEstablishmentVO,
+} from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
 
 const fakeSiret = "90040893100013";
 const fakePosition: LatLonDto = { lat: 49.119146, lon: 6.17602 };

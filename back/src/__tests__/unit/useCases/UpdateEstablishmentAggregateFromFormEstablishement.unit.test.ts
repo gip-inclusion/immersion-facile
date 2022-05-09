@@ -7,16 +7,16 @@ import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySiren
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
-import {
-  SireneEstablishmentProps,
-  SireneEstablishmentVO,
-} from "../../../domain/sirene/ports/SireneGateway";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { expectPromiseToFailWith } from "../../../_testBuilders/test.helpers";
+import {
+  SireneEstablishmentProps,
+  SireneEstablishmentVO,
+} from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
 
 const prepareSireneRepo = (
   sireneRepo: InMemorySireneGateway,

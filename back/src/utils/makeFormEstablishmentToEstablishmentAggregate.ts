@@ -7,12 +7,10 @@ import {
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { AdresseAPI } from "../domain/immersionOffer/ports/AdresseAPI";
-import {
-  SireneEstablishmentVO,
-  SireneGateway,
-} from "../domain/sirene/ports/SireneGateway";
+import { SireneGateway } from "../domain/sirene/ports/SireneGateway";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { SireneEstablishmentVO } from "../domain/sirene/valueObjects/SireneEstablishmentVO";
 import { notifyAndThrowErrorDiscord } from "./notifyDiscord";
 
 const offerFromFormScore = 10;

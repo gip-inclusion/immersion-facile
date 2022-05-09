@@ -1,11 +1,11 @@
 import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneGateway";
 import {
   NotFoundError,
   TooManyRequestApiError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { SireneEstablishmentVO } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
 
 const validEstablishment = new SireneEstablishmentVO({
   siret: "12345678901234",

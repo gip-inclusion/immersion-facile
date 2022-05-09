@@ -1,5 +1,4 @@
 import {
-  SireneEstablishmentVO,
   SireneGateway,
   SireneGatewayAnswer,
 } from "../../domain/sirene/ports/SireneGateway";
@@ -9,6 +8,7 @@ import {
   SiretDto,
   tooManySirenRequestsSiret,
 } from "shared/src/siret";
+import { SireneEstablishmentVO } from "../../domain/sirene/valueObjects/SireneEstablishmentVO";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -134,10 +134,10 @@ export class InMemorySireneGateway extends SireneGateway {
     this._repo[TEST_ESTABLISHMENT4_SIRET] = TEST_ESTABLISHMENT4;
   }
 
-  public async _get(
+  protected _get = async (
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SireneGatewayAnswer | undefined> {
+  ): Promise<SireneGatewayAnswer | undefined> => {
     if (this._error) throw this._error;
     if (siret === apiSirenUnexpectedError)
       throw {
@@ -183,7 +183,7 @@ export class InMemorySireneGateway extends SireneGateway {
       },
       etablissements: [establishment.props],
     };
-  }
+  };
 
   // Visible for testing
   public setEstablishment(establishment: SireneEstablishmentVO) {

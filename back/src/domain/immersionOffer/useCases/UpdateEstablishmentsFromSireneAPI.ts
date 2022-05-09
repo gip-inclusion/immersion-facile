@@ -1,10 +1,8 @@
 import { addDays } from "date-fns";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
-import {
-  SireneEstablishmentVO,
-  SireneGateway,
-} from "../../sirene/ports/SireneGateway";
+import { SireneGateway } from "../../sirene/ports/SireneGateway";
+import { SireneEstablishmentVO } from "../../sirene/valueObjects/SireneEstablishmentVO";
 import { AdresseAPI } from "../ports/AdresseAPI";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 

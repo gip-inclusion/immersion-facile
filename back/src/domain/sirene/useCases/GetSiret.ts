@@ -1,11 +1,12 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   GetSiretRequestDto,
   getSiretRequestSchema,
   GetSiretResponseDto,
 } from "shared/src/siret";
 import { UseCase } from "../../core/UseCase";
-import { SireneEstablishmentVO, SireneGateway } from "../ports/SireneGateway";
+import { SireneGateway } from "../ports/SireneGateway";
+import { SireneEstablishmentVO } from "../valueObjects/SireneEstablishmentVO";
+import { pipeWithValue } from "shared/src/pipeWithValue";
 
 export type GetSiretUseCase = UseCase<GetSiretRequestDto, GetSiretResponseDto>;
 
@@ -20,19 +21,12 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
     siret,
     includeClosedEstablishments = false,
   }: GetSiretRequestDto): Promise<GetSiretResponseDto> {
-    const response = await this.sireneGateway.get(
-      siret,
-      includeClosedEstablishments,
-    );
-    if (
-      !response ||
-      !response.etablissements ||
-      response.etablissements.length < 1
-    ) {
-      throw new NotFoundError("Did not find siret : " + siret);
-    }
-    return convertEtablissementToResponse(
-      new SireneEstablishmentVO(response.etablissements[0]),
+    return pipeWithValue(
+      await SireneEstablishmentVO.getFromApi(
+        { siret, includeClosedEstablishments },
+        (...args) => this.sireneGateway.get(...args),
+      ),
+      convertEtablissementToResponse,
     );
   }
 }

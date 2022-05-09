@@ -5,10 +5,8 @@ import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import {
-  SireneEstablishmentVO,
-  SireneGateway,
-} from "../../sirene/ports/SireneGateway";
+import { SireneGateway } from "../../sirene/ports/SireneGateway";
+import { SireneEstablishmentVO } from "../../sirene/valueObjects/SireneEstablishmentVO";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";

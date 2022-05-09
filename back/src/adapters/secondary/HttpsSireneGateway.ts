@@ -41,10 +41,10 @@ export class HttpsSireneGateway extends SireneGateway {
     });
   }
 
-  public async _get(
+  protected _get = async (
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SireneGatewayAnswer | undefined> {
+  ): Promise<SireneGatewayAnswer | undefined> => {
     logger.debug({ siret, includeClosedEstablishments }, "get");
 
     return this.retryStrategy.apply(async () => {
@@ -68,7 +68,7 @@ export class HttpsSireneGateway extends SireneGateway {
         throw error;
       }
     });
-  }
+  };
 
   private createSiretQueryParams(
     siret: SiretDto,
