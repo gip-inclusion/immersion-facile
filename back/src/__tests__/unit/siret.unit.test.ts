@@ -1,4 +1,5 @@
 import { siretSchema } from "shared/src/siret";
+import { zTrimmedString } from "shared/src/zodUtils";
 
 describe("siretSchema", () => {
   it("accepts exactly 14 digits", () => {
@@ -34,5 +35,9 @@ describe("siretSchema", () => {
     expect(siretSchema.parse("1  23   4  5678 90 1   2 34")).toBe(
       "12345678901234",
     );
+  });
+
+  it("trims the given input", () => {
+    expect(zTrimmedString.parse("yolo ")).toBe("yolo");
   });
 });

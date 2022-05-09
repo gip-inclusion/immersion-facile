@@ -7,10 +7,9 @@ export const zString = z
   })
   .nonempty("Obligatoire");
 
-export const zTrimmedString = zString.refine(
-  (s) => s.trim() === s,
-  "Obligatoire",
-);
+export const zTrimmedString = zString
+  .transform((s) => s.trim())
+  .refine((s) => s.length > 0, "Obligatoire");
 
 export const zEmail = zString
   .nonempty("Obligatoire")
