@@ -1,6 +1,8 @@
+import { delay, Observable, of } from "rxjs";
 import {
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
+  conflictErrorSiret,
   GetSiretResponseDto,
   SiretDto,
   tooManySirenRequestsSiret,
@@ -51,10 +53,25 @@ export class InMemorySiretGatewayThroughBack
 
   public async getSiretInfo(siret: SiretDto): Promise<GetSiretInfo> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
+    return this.simulatedResponse(siret);
+  }
+
+  public getSiretInfoIfNotAlreadySaved(
+    siret: SiretDto,
+  ): Observable<GetSiretInfo> {
+    const response$ = of(this.simulatedResponse(siret));
+    return this.simulatedLatency
+      ? response$.pipe(delay(this.simulatedLatency))
+      : response$;
+  }
+
+  private simulatedResponse(siret: SiretDto): GetSiretInfo {
     if (siret === tooManySirenRequestsSiret)
       return tooManiSirenRequestsSiretErrorMessage;
     if (siret === apiSirenNotAvailableSiret)
       return sirenApiUnavailableSiretErrorMessage;
+    if (siret === conflictErrorSiret)
+      return "Establishment with this siret is already in our DB";
     if (siret === apiSirenUnexpectedError)
       throw new Error(sirenApiUnexpectedErrorErrorMessage);
     const establishment = this.sireneEstablishments[siret];

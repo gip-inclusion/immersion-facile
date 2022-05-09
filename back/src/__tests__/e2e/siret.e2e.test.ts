@@ -4,7 +4,7 @@ import { createApp } from "../../adapters/primary/server";
 import { InMemoryEstablishmentAggregateRepository } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { TEST_ESTABLISHMENT1 } from "../../adapters/secondary/InMemorySireneGateway";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { siretIfNotSavedRoute } from "shared/src/routes";
+import { getSiretIfNotSavedRoute } from "shared/src/routes";
 
 describe("/siret route", () => {
   let request: SuperTest<Test>;
@@ -45,7 +45,7 @@ describe("/siret route", () => {
 
     await request
       .get(
-        `/${siretIfNotSavedRoute}/${establishmentAggregate.establishment.siret}`,
+        `/${getSiretIfNotSavedRoute}/${establishmentAggregate.establishment.siret}`,
       )
       .expect(409);
   });

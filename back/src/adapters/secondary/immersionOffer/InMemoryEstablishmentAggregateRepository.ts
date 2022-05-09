@@ -13,7 +13,8 @@ import { createLogger } from "../../../utils/logger";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { SiretDto } from "shared/src/siret";
+import { conflictErrorSiret, SiretDto } from "shared/src/siret";
+import { ConflictError } from "../../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
@@ -135,6 +136,10 @@ export class InMemoryEstablishmentAggregateRepository
   public async hasEstablishmentFromFormWithSiret(
     siret: string,
   ): Promise<boolean> {
+    if (siret === conflictErrorSiret)
+      throw new ConflictError(
+        `Establishment with siret ${siret} already in db`,
+      );
     return !!this._establishmentAggregates.find(
       (aggregate) =>
         aggregate.establishment.siret === siret &&

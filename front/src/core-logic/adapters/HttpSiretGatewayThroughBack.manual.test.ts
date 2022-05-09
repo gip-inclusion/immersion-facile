@@ -1,5 +1,7 @@
+import { firstValueFrom } from "rxjs";
 import {
   apiSirenNotAvailableSiret,
+  conflictErrorSiret,
   tooManySirenRequestsSiret,
 } from "shared/src/siret";
 import {
@@ -64,24 +66,44 @@ siretGatewaysThroughBack.forEach((siretGatewayThroughBack) => {
           "Missing establishment on SIRENE API.",
         );
       });
+
       it("Too many requests", async () => {
         await expectGetSirenInfoError(
           tooManySirenRequestsSiret,
           "Too many requests on SIRENE API.",
         );
       });
+
       it("Sirene api not available", async () => {
         await expectGetSirenInfoError(
           apiSirenNotAvailableSiret,
           "SIRENE API not available.",
         );
       });
+
+      it("Conflict error", async () => {
+        await expectGetSirenInfoErrorWhenCallingGetSiretInfoIfNotAlreadySaved(
+          conflictErrorSiret,
+          "Establishment with this siret is already in our DB",
+        );
+      });
     });
-    const expectGetSirenInfoError = async (
+
+    const expectGetSirenInfoError = (
       siret: string,
       expectedInfoError: GetSiretInfoError,
     ) =>
       siretGatewayThroughBack.getSiretInfo(siret).then((result) => {
+        expect(result).toBe(expectedInfoError);
+      });
+
+    const expectGetSirenInfoErrorWhenCallingGetSiretInfoIfNotAlreadySaved = (
+      siret: string,
+      expectedInfoError: GetSiretInfoError,
+    ) =>
+      firstValueFrom(
+        siretGatewayThroughBack.getSiretInfoIfNotAlreadySaved(siret),
+      ).then((result) => {
         expect(result).toBe(expectedInfoError);
       });
   });

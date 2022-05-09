@@ -8,6 +8,7 @@ const normalizeSiret = (siret: string): string => siret.replace(/\s/g, "");
 const siretRegex = /^(?:\s*\d){14}\s*$/;
 
 export const tooManySirenRequestsSiret = "42900000000429";
+export const conflictErrorSiret = "40900000000409";
 export const apiSirenNotAvailableSiret = "50300000000503";
 export const apiSirenUnexpectedError = "66600666600666";
 

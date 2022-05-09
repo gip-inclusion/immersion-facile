@@ -1,3 +1,4 @@
+import { Observable } from "rxjs";
 import { SiretDto, GetSiretResponseDto } from "shared/src/siret";
 
 export const tooManiSirenRequestsSiretErrorMessage =
@@ -9,10 +10,12 @@ export const sirenApiMissingEstablishmentMessage =
 export type GetSiretInfoError =
   | typeof sirenApiMissingEstablishmentMessage
   | typeof tooManiSirenRequestsSiretErrorMessage
-  | typeof sirenApiUnavailableSiretErrorMessage;
+  | typeof sirenApiUnavailableSiretErrorMessage
+  | "Establishment with this siret is already in our DB";
 
 export type GetSiretInfo = GetSiretResponseDto | GetSiretInfoError;
 
 export interface SiretGatewayThroughBack {
   getSiretInfo: (siret: SiretDto) => Promise<GetSiretInfo>;
+  getSiretInfoIfNotAlreadySaved: (siret: SiretDto) => Observable<GetSiretInfo>;
 }

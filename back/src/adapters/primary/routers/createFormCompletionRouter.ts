@@ -3,7 +3,7 @@ import { romeAutocompleteInputSchema } from "shared/src/romeAndAppellationDtos/r
 import {
   appellationRoute,
   romeRoute,
-  siretIfNotSavedRoute,
+  getSiretIfNotSavedRoute,
   siretRoute,
 } from "shared/src/routes";
 import { createLogger } from "../../../utils/logger";
@@ -41,7 +41,7 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
     );
 
   formCompletionRouter
-    .route(`/${siretIfNotSavedRoute}/:siret`)
+    .route(`/${getSiretIfNotSavedRoute}/:siret`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.getSiretIfNotAlreadySaved.execute(req.params),
