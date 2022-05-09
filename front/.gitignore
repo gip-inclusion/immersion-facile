@@ -4,5 +4,4 @@ dist
 dist-ssr
 *.local
 .idea
-src/shared
 .vscode/settings.json

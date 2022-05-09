@@ -5,7 +5,7 @@ services:
       context: "."
       dockerfile: Dockerfile.back
     env_file:
-      - back/.env
+      - .env
     depends_on:
       - postgres
     restart: unless-stopped
@@ -22,7 +22,7 @@ services:
       context: "."
       dockerfile: Dockerfile.pipelines
     env_file:
-        - back/.env
+        - .env
     environment:
       - LOGDIR=/var/lib/pipelines/log
       - CRONFILE=/var/lib/pipelines/crontab
