@@ -32,12 +32,12 @@ const validEstablishment = new SireneEstablishmentVO({
 });
 
 describe("GetSiret", () => {
-  let repository: InMemorySireneGateway;
+  let sireneGateway: InMemorySireneGateway;
   let getSiret: GetSiret;
 
   beforeEach(() => {
-    repository = new InMemorySireneGateway();
-    getSiret = new GetSiret(repository);
+    sireneGateway = new InMemorySireneGateway();
+    getSiret = new GetSiret(sireneGateway);
   });
 
   describe("checking for business being opened", () => {
@@ -50,8 +50,8 @@ describe("GetSiret", () => {
     });
 
     beforeEach(() => {
-      repository.setEstablishment(validEstablishment);
-      repository.setEstablishment(closedEstablishment);
+      sireneGateway.setEstablishment(validEstablishment);
+      sireneGateway.setEstablishment(closedEstablishment);
     });
 
     it("marks an open establishment as open, regardless of the period count", async () => {
@@ -77,7 +77,7 @@ describe("GetSiret", () => {
   });
 
   it("returns the parsed info when siret found", async () => {
-    repository.setEstablishment(validEstablishment);
+    sireneGateway.setEstablishment(validEstablishment);
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
     });
@@ -91,7 +91,7 @@ describe("GetSiret", () => {
   });
 
   it("populates businessName from nom/prenom when denomination not available", async () => {
-    repository.setEstablishment(
+    sireneGateway.setEstablishment(
       new SireneEstablishmentVO({
         ...validEstablishment.props,
         uniteLegale: {
@@ -107,7 +107,7 @@ describe("GetSiret", () => {
   });
 
   it("skips missing parts of adresseEtablissment", async () => {
-    repository.setEstablishment(
+    sireneGateway.setEstablishment(
       new SireneEstablishmentVO({
         ...validEstablishment.props,
         adresseEtablissement: {
@@ -126,7 +126,7 @@ describe("GetSiret", () => {
   });
 
   it("skips naf when not available", async () => {
-    repository.setEstablishment(
+    sireneGateway.setEstablishment(
       new SireneEstablishmentVO({
         ...validEstablishment.props,
         uniteLegale: {
@@ -143,7 +143,7 @@ describe("GetSiret", () => {
   });
 
   it("returns unavailable Api error if it gets a 429 from API", async () => {
-    repository.setError({
+    sireneGateway.setError({
       initialError: {
         message: "Request failed with status code 429",
         status: 429,
@@ -157,7 +157,7 @@ describe("GetSiret", () => {
   });
 
   it("returns establishment as not Open if it is not at the current period", async () => {
-    repository.setEstablishment(
+    sireneGateway.setEstablishment(
       new SireneEstablishmentVO({
         ...validEstablishment.props,
         periodesEtablissement: [

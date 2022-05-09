@@ -6,7 +6,7 @@ import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/E
 import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentBuilder";
+import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentVOBuilder";
 import { pathEq } from "shared/src/ramdaExtensions/path";
 
 const prepareUseCase = () => {

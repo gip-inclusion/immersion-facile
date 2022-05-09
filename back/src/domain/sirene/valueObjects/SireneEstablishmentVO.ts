@@ -1,9 +1,9 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { NumberEmployeesRange } from "../../immersionOffer/entities/EstablishmentEntity";
 import { NafDto } from "shared/src/naf";
 import { propEq } from "shared/src/ramdaExtensions/propEq";
+import { GetSiretRequestDto, GetSiretResponseDto } from "shared/src/siret";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { NumberEmployeesRange } from "../../immersionOffer/entities/EstablishmentEntity";
 import { GetSiretCall } from "../ports/SireneGateway";
-import { GetSiretRequestDto } from "shared/src/siret";
 
 export type SireneEstablishmentProps = {
   siret: string;
@@ -122,6 +122,16 @@ export class SireneEstablishmentVO {
     );
   }
 }
+
+export const convertSireneEtablissementToResponse = (
+  sireneEstablishment: SireneEstablishmentVO,
+): GetSiretResponseDto => ({
+  siret: sireneEstablishment.siret,
+  businessName: sireneEstablishment.businessName,
+  businessAddress: sireneEstablishment.formatedAddress,
+  naf: sireneEstablishment.nafAndNomenclature,
+  isOpen: sireneEstablishment.isActive,
+});
 
 // prettier-ignore
 // tefenCode is a French standard code for the number of employees in a company.
