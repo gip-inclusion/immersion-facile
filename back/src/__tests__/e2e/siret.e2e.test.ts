@@ -1,13 +1,21 @@
 import supertest, { SuperTest, Test } from "supertest";
+import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { createApp } from "../../adapters/primary/server";
+import { InMemoryEstablishmentAggregateRepository } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { TEST_ESTABLISHMENT1 } from "../../adapters/secondary/InMemorySireneGateway";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { siretIfNotSavedRoute } from "shared/src/routes";
 
 describe("/siret route", () => {
   let request: SuperTest<Test>;
+  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
 
   beforeEach(async () => {
-    const { app } = await createApp(new AppConfigBuilder().build());
+    const { app, repositories } = await createApp(
+      new AppConfigBuilder().build(),
+    );
+    establishmentAggregateRepository =
+      repositories.immersionOffer as InMemoryEstablishmentAggregateRepository;
     request = supertest(app);
   });
 
@@ -27,5 +35,18 @@ describe("/siret route", () => {
 
   it("returns 404 Not Found for unknown siret", async () => {
     await request.get("/siret/40400000000404").expect(404);
+  });
+
+  it("returns 409 Conflict for siret already in db", async () => {
+    const establishmentAggregate = new EstablishmentAggregateBuilder().build();
+    establishmentAggregateRepository.establishmentAggregates = [
+      establishmentAggregate,
+    ];
+
+    await request
+      .get(
+        `/${siretIfNotSavedRoute}/${establishmentAggregate.establishment.siret}`,
+      )
+      .expect(409);
   });
 });

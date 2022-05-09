@@ -74,6 +74,7 @@ import {
   EstablishmentJwtPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
+import { GetSiretIfNotAlreadySaved } from "../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import { createLogger } from "../../utils/logger";
 import { CachingAccessTokenGateway } from "../secondary/core/CachingAccessTokenGateway";
 import { RealClock } from "../secondary/core/ClockImplementations";
@@ -620,6 +621,10 @@ const createUseCases = (
 
     // siret
     getSiret,
+    getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
+      uowPerformer,
+      repositories.sirene,
+    ),
 
     // romes
     appellationSearch: new AppellationSearch(uowPerformer),
