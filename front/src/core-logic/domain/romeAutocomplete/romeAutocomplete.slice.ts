@@ -35,6 +35,7 @@ export const romeAutocompleteSlice = createSlice({
   reducers: {
     setRomeSearchText: (state, action: PayloadAction<string>) => {
       state.romeSearchText = action.payload;
+      state.selectedRome = null;
     },
     searchStarted: (state) => {
       state.isSearching = true;
@@ -45,6 +46,9 @@ export const romeAutocompleteSlice = createSlice({
     },
     setSelectedRome: (state, action: PayloadAction<RomeCode | null>) => {
       state.selectedRome = action.payload;
+      state.romeSearchText =
+        state.romeOptions.find(({ romeCode }) => romeCode === action.payload)
+          ?.romeLabel ?? state.romeSearchText;
     },
   },
 });

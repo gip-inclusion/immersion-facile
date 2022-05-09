@@ -1,4 +1,5 @@
 import { Store } from "@reduxjs/toolkit";
+import { RomeCode } from "shared/src/rome";
 import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";
 import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
 import { createScenarioUnitTest } from "src/core-logic/domain/test.helpers";
@@ -61,6 +62,17 @@ export const whenSearchTextIsProvided = createScenarioUnitTest<string>(
     },
 );
 
+export const thenSearchTextIs = createScenarioUnitTest<string>(
+  (searchedText) =>
+    ({ store }: StoreAndDeps) => {
+      const expectSearchTextToBe = makeExpectSearchTextToBe(store);
+
+      it(`then searched text is ${searchedText}`, () => {
+        expectSearchTextToBe(searchedText);
+      });
+    },
+);
+
 export const thenIsSearchingIs = createScenarioUnitTest<boolean>(
   (expected) =>
     ({ store }) => {
@@ -68,6 +80,15 @@ export const thenIsSearchingIs = createScenarioUnitTest<boolean>(
 
       it(`then isSearching is ${expected}`, () => {
         expectIsSearchingToBe(expected);
+      });
+    },
+);
+
+export const thenSelectedRomeIs = createScenarioUnitTest<RomeCode | null>(
+  (expected) =>
+    ({ store }) => {
+      it(`then selectedRome is ${expected}`, () => {
+        expectToEqual(store.getState().romeAutocomplete.selectedRome, expected);
       });
     },
 );

@@ -5,7 +5,9 @@ import {
   feedRomeAutocompleteGatewayWith,
   thenIsSearchingIs,
   thenRomeOptionsAre,
+  thenSearchTextIs,
   thenSelectedRomeDtoIs,
+  thenSelectedRomeIs,
   whenRomeOptionIsSelected,
   whenSearchTextIsProvided,
 } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.testHelpers";
@@ -35,6 +37,7 @@ describe("Rome Autocomplete", () => {
     triggerTests(appAndDeps, [
       whenRomeOptionIsSelected("B1000"),
       thenSelectedRomeDtoIs({ romeCode: "B1000", romeLabel: "Job B" }),
+      thenSearchTextIs("Job B"),
     ]);
   });
 
@@ -48,6 +51,28 @@ describe("Rome Autocomplete", () => {
       ]),
       thenRomeOptionsAre([{ romeCode: "A10000", romeLabel: "Mon métier" }]),
       thenIsSearchingIs(false),
+    ]);
+  });
+
+  describe("A rome was already selected", () => {
+    const appAndDeps = createTestStore(
+      {
+        romeAutocomplete: {
+          selectedRome: "A1000",
+          romeOptions: [
+            { romeCode: "A1000", romeLabel: "Job A" },
+            { romeCode: "B1000", romeLabel: "Job B" },
+          ],
+          romeSearchText: "A1000",
+          isSearching: false,
+        },
+      },
+      "Given code rome A1000 is selected",
+    );
+
+    triggerTests(appAndDeps, [
+      whenSearchTextIsProvided("b"),
+      thenSelectedRomeIs(null),
     ]);
   });
 

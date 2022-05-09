@@ -1,4 +1,5 @@
 import Autocomplete from "@mui/material/Autocomplete";
+import { prop } from "ramda";
 import React from "react";
 import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { useAppSelector } from "src/app/utils/reduxHooks";
@@ -11,6 +12,9 @@ type RomeAutocompleteProps = {
   setFormValue: (p: RomeDto) => void;
   className?: string;
 };
+
+const isOneOfTheOptionsLabel = (options: RomeDto[], searchTerm: string) =>
+  options.map(prop("romeLabel")).includes(searchTerm);
 
 export const RomeAutocomplete = ({
   setFormValue,
@@ -44,7 +48,9 @@ export const RomeAutocomplete = ({
           );
         }}
         onInputChange={(_, newSearchTerm) => {
-          updateSearchTerm(newSearchTerm);
+          if (!isOneOfTheOptionsLabel(romeOptions, newSearchTerm)) {
+            updateSearchTerm(newSearchTerm);
+          }
         }}
         renderInput={(params) => (
           <div ref={params.InputProps.ref}>
