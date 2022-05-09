@@ -16,7 +16,8 @@
     "jsx": "react",
     "baseUrl": "./src",
     "paths": {
-      "src/*": ["./*"]
+      "src/*": ["./*"],
+      "shared/*": ["./../../shared/*"]
     },
     "noImplicitOverride": true
   },
