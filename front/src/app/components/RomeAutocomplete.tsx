@@ -39,7 +39,7 @@ export const RomeAutocomplete = ({
         getOptionLabel={(option: RomeDto) => option.romeLabel}
         renderOption={(props, option) => <li {...props}>{option.romeLabel}</li>}
         onChange={(_, selectedRomeDto: RomeDto | null) => {
-          selectOption(selectedRomeDto ?? null);
+          selectOption(selectedRomeDto);
           setFormValue(
             selectedRomeDto ?? {
               romeCode: "",

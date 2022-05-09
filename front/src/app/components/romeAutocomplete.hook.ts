@@ -8,9 +8,7 @@ export const useRomeAutocompleteUseCase = () => {
   return {
     updateSearchTerm: (searchTerm: string) =>
       dispatch(romeAutocompleteSlice.actions.setRomeSearchText(searchTerm)),
-    selectOption: (rome: RomeDto | null) =>
-      dispatch(
-        romeAutocompleteSlice.actions.setSelectedRome(rome?.romeCode ?? null),
-      ),
+    selectOption: (romeDto: RomeDto | null) =>
+      dispatch(romeAutocompleteSlice.actions.setSelectedRome(romeDto)),
   };
 };

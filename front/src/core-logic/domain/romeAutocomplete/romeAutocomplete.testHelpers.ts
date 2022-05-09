@@ -116,12 +116,17 @@ export const feedRomeAutocompleteGatewayWith = createScenarioUnitTest<
 });
 
 // export const whenRomeOptionIsSelected: ScenarioUnitTestWithParams<string> =
-export const whenRomeOptionIsSelected = createScenarioUnitTest<string>(
-  (codeRome) =>
+export const whenRomeOptionIsSelected = createScenarioUnitTest<RomeDto>(
+  (romeDto) =>
     ({ store }: StoreAndDeps) => {
-      it(`when ${codeRome} rome code is selected`, () => {
-        store.dispatch(romeAutocompleteSlice.actions.setSelectedRome(codeRome));
-        expect(store.getState()?.romeAutocomplete.selectedRome).toBe(codeRome);
+      it(`when ${romeDto.romeCode} rome code is selected`, () => {
+        store.dispatch(romeAutocompleteSlice.actions.setSelectedRome(romeDto));
+        expect(store.getState()?.romeAutocomplete.selectedRome).toBe(
+          romeDto.romeCode,
+        );
+        expect(store.getState()?.romeAutocomplete.romeSearchText).toBe(
+          romeDto.romeLabel,
+        );
       });
     },
 );

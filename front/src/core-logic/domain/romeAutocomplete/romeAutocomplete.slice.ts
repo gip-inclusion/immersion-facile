@@ -44,11 +44,9 @@ export const romeAutocompleteSlice = createSlice({
       state.romeOptions = action.payload;
       state.isSearching = false;
     },
-    setSelectedRome: (state, action: PayloadAction<RomeCode | null>) => {
-      state.selectedRome = action.payload;
-      state.romeSearchText =
-        state.romeOptions.find(({ romeCode }) => romeCode === action.payload)
-          ?.romeLabel ?? state.romeSearchText;
+    setSelectedRome: (state, action: PayloadAction<RomeDto | null>) => {
+      state.selectedRome = action.payload?.romeCode ?? null;
+      state.romeSearchText = action.payload?.romeLabel ?? "";
     },
   },
 });

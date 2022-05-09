@@ -35,7 +35,7 @@ describe("Rome Autocomplete", () => {
     );
 
     triggerTests(appAndDeps, [
-      whenRomeOptionIsSelected("B1000"),
+      whenRomeOptionIsSelected({ romeCode: "B1000", romeLabel: "Job B" }),
       thenSelectedRomeDtoIs({ romeCode: "B1000", romeLabel: "Job B" }),
       thenSearchTextIs("Job B"),
     ]);
