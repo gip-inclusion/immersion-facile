@@ -9,8 +9,8 @@ import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/Immers
 import { AdresseAPI } from "../domain/immersionOffer/ports/AdresseAPI";
 import {
   SireneEstablishmentVO,
-  SireneRepository,
-} from "../domain/sirene/ports/SireneRepository";
+  SireneGateway,
+} from "../domain/sirene/ports/SireneGateway";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { notifyAndThrowErrorDiscord } from "./notifyDiscord";
@@ -30,12 +30,12 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
   uuidGenerator,
   clock,
   adresseAPI,
-  sireneRepository,
+  sireneGateway,
 }: {
   uuidGenerator: UuidGenerator;
   clock: Clock;
   adresseAPI: AdresseAPI;
-  sireneRepository: SireneRepository;
+  sireneGateway: SireneGateway;
 }) => {
   const formEstablishmentToEstablishmentAggregate = async (
     formEstablishment: FormEstablishmentDto,
@@ -43,9 +43,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
     const position = await adresseAPI.getPositionFromAddress(
       formEstablishment.businessAddress,
     );
-    const sireneRepoAnswer = await sireneRepository.get(
-      formEstablishment.siret,
-    );
+    const sireneRepoAnswer = await sireneGateway.get(formEstablishment.siret);
     if (!sireneRepoAnswer || !sireneRepoAnswer.etablissements[0]) {
       await notifyAndThrowErrorDiscord(
         new Error(

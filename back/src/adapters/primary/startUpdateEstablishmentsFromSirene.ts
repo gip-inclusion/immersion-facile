@@ -9,7 +9,7 @@ import {
   ExponentialBackoffRetryStrategy,
 } from "../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
-import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import { HttpsSireneGateway } from "../secondary/HttpsSireneGateway";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { AppConfig } from "./appConfig";
 import { createGetPgPoolFn, createRepositories } from "./config";
@@ -41,7 +41,7 @@ const main = async () => {
     clock,
     sleep,
   );
-  const sireneRepo = new HttpsSireneRepository(
+  const sireneRepo = new HttpsSireneGateway(
     config.sireneHttpsConfig,
     clock,
     rateLimiter,

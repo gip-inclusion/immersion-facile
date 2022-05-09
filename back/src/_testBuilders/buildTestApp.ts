@@ -14,7 +14,7 @@ import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMem
 import type { InMemoryImmersionApplicationRepository } from "../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/InMemoryPeConnectGateway";
 import { InMemoryRomeRepository } from "../adapters/secondary/InMemoryRomeRepository";
-import { InMemorySireneRepository } from "../adapters/secondary/InMemorySireneRepository";
+import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
 import { GetApiConsumerById } from "../domain/core/ports/GetApiConsumerById";
 import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
 import { AgencyConfigBuilder } from "./AgencyConfigBuilder";
@@ -41,7 +41,7 @@ export type InMemoryRepositories = {
   rome: InMemoryRomeRepository;
   email: InMemoryEmailGateway;
   peConnectGateway: InMemoryPeConnectGateway;
-  sirene: InMemorySireneRepository;
+  sirene: InMemorySireneGateway;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;
   passEmploiGateway: InMemoryPassEmploiGateway;
@@ -95,7 +95,7 @@ export const buildTestApp = async (
 
   if (appConfig.emailGateway !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.repositories !== "IN_MEMORY") throwNotSupportedError();
-  if (appConfig.sireneRepository !== "IN_MEMORY") throwNotSupportedError();
+  if (appConfig.sireneGateway !== "IN_MEMORY") throwNotSupportedError();
 
   const {
     app,

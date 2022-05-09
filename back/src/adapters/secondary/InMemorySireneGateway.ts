@@ -1,8 +1,8 @@
 import {
   SireneEstablishmentVO,
-  SireneRepository,
-  SireneRepositoryAnswer,
-} from "../../domain/sirene/ports/SireneRepository";
+  SireneGateway,
+  SireneGatewayAnswer,
+} from "../../domain/sirene/ports/SireneGateway";
 import {
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
@@ -119,7 +119,7 @@ export const TEST_ESTABLISHMENT4 = new SireneEstablishmentVO({
 
 type EstablishmentBySiret = { [siret: string]: SireneEstablishmentVO };
 
-export class InMemorySireneRepository extends SireneRepository {
+export class InMemorySireneGateway extends SireneGateway {
   private _error: any = null;
 
   private readonly _repo: EstablishmentBySiret = {
@@ -137,7 +137,7 @@ export class InMemorySireneRepository extends SireneRepository {
   public async _get(
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SireneRepositoryAnswer | undefined> {
+  ): Promise<SireneGatewayAnswer | undefined> {
     if (this._error) throw this._error;
     if (siret === apiSirenUnexpectedError)
       throw {

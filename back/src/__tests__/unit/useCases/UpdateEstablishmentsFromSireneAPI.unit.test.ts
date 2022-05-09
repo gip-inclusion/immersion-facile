@@ -1,7 +1,7 @@
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
+import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
@@ -10,7 +10,7 @@ import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstab
 import { pathEq } from "shared/src/ramdaExtensions/path";
 
 const prepareUseCase = () => {
-  const sireneRepo = new InMemorySireneRepository();
+  const sireneRepo = new InMemorySireneGateway();
   const immersionRepo = new InMemoryEstablishmentAggregateRepository();
   const clock = new CustomClock();
   const adresseAPI = new InMemoryAdresseAPI();

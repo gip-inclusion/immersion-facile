@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { createApp } from "../../adapters/primary/server";
-import { TEST_ESTABLISHMENT1 } from "../../adapters/secondary/InMemorySireneRepository";
+import { TEST_ESTABLISHMENT1 } from "../../adapters/secondary/InMemorySireneGateway";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 
 describe("/siret route", () => {

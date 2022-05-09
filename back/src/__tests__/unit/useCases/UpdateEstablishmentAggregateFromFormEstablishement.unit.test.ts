@@ -3,14 +3,14 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
+import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
 import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,
-} from "../../../domain/sirene/ports/SireneRepository";
+} from "../../../domain/sirene/ports/SireneGateway";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
@@ -19,7 +19,7 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 import { expectPromiseToFailWith } from "../../../_testBuilders/test.helpers";
 
 const prepareSireneRepo = (
-  sireneRepo: InMemorySireneRepository,
+  sireneRepo: InMemorySireneGateway,
   siret: string,
 ) => {
   const sireneEstablishmentFromAPI = new SireneEstablishmentVO({
@@ -35,14 +35,14 @@ const prepareSireneRepo = (
 };
 
 describe("Update Establishment aggregate from form data", () => {
-  let sireneRepo: InMemorySireneRepository;
+  let sireneRepo: InMemorySireneGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let addresseAPI: InMemoryAdresseAPI;
   let useCase: UpdateEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    sireneRepo = new InMemorySireneRepository();
+    sireneRepo = new InMemorySireneGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     addresseAPI = new InMemoryAdresseAPI();
     uuidGenerator = new TestUuidGenerator();

@@ -7,8 +7,8 @@ import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import {
   SireneEstablishmentVO,
-  SireneRepository,
-} from "../../sirene/ports/SireneRepository";
+  SireneGateway,
+} from "../../sirene/ports/SireneGateway";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
@@ -29,7 +29,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
-    private readonly sireneRepository: SireneRepository,
+    private readonly sireneGateway: SireneGateway,
     private readonly searchMadeRepository: SearchMadeRepository,
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
   ) {}
@@ -178,7 +178,7 @@ export class UpdateEstablishmentsAndImmersionOffersFromLastSearches {
   private async convertLaBonneBoiteCompanyToEstablishmentAggregate(
     laBonneBoiteCompany: LaBonneBoiteCompanyVO,
   ): Promise<EstablishmentAggregate | undefined> {
-    const sireneAnswer = await this.sireneRepository.get(
+    const sireneAnswer = await this.sireneGateway.get(
       laBonneBoiteCompany.siret,
     );
     if (!sireneAnswer || sireneAnswer.etablissements.length === 0) {

@@ -3,7 +3,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
-import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
+import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { UpdateEstablishmentsAndImmersionOffersFromLastSearches } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsAndImmersionOffersFromLastSearches";
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
@@ -15,7 +15,7 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
   let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
   let searchesMadeRepository: InMemorySearchMadeRepository;
   let laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
-  let sireneRepository: InMemorySireneRepository;
+  let sireneGateway: InMemorySireneGateway;
 
   beforeEach(() => {
     testUuidGenerator = new TestUuidGenerator();
@@ -27,14 +27,14 @@ describe("UpdateEstablishmentsAndImmersionOffersFromLastSearches", () => {
 
     laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
 
-    sireneRepository = new InMemorySireneRepository();
+    sireneGateway = new InMemorySireneGateway();
 
     updateEstablishmentsAndImmersionOffersFromLastSearches =
       new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
         testUuidGenerator,
         new CustomClock(),
         laBonneBoiteAPI,
-        sireneRepository,
+        sireneGateway,
         searchesMadeRepository,
         establishmentAggregateRepository,
       );
@@ -99,19 +99,19 @@ const prepareUseCase = () => {
 
   const laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
 
-  const sireneRepository = new InMemorySireneRepository();
+  const sireneGateway = new InMemorySireneGateway();
 
   const useCase = new UpdateEstablishmentsAndImmersionOffersFromLastSearches(
     testUuidGenerator,
     new CustomClock(),
     laBonneBoiteAPI,
-    sireneRepository,
+    sireneGateway,
     searchesMadeRepository,
     establishmentAggregateRepository,
   );
   return {
     useCase,
-    sireneRepository,
+    sireneGateway,
     searchesMadeRepository,
     establishmentAggregateRepository,
     testUuidGenerator,
@@ -128,7 +128,7 @@ describe("Update establishments and offers based on searches made during the day
           const {
             searchesMadeRepository,
             laBonneBoiteAPI,
-            sireneRepository,
+            sireneGateway,
             testUuidGenerator,
             establishmentAggregateRepository,
             useCase,
@@ -151,10 +151,10 @@ describe("Update establishments and offers based on searches made during the day
               .build(),
           ]);
 
-          sireneRepository.setEstablishment(
+          sireneGateway.setEstablishment(
             new SireneEstablishmentVOBuilder().withSiret("siretLBB1").build(),
           );
-          sireneRepository.setEstablishment(
+          sireneGateway.setEstablishment(
             new SireneEstablishmentVOBuilder().withSiret("siretLBB2").build(),
           );
           testUuidGenerator.setNextUuids(["uuidLBB1", "uuidLBB2"]);

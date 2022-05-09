@@ -4,7 +4,7 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
+import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
@@ -12,7 +12,7 @@ import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionO
 import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,
-} from "../../../domain/sirene/ports/SireneRepository";
+} from "../../../domain/sirene/ports/SireneGateway";
 import { LatLonDto } from "shared/src/latLon";
 import { NafDto } from "shared/src/naf";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
@@ -29,7 +29,7 @@ const fakeBusinessContact = new ContactEntityV2Builder().build();
 const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
 
 const prepareSireneRepo = (
-  sireneRepo: InMemorySireneRepository,
+  sireneRepo: InMemorySireneGateway,
   siret: string,
   trancheEffectifsUniteLegale?: string,
 ) => {
@@ -46,7 +46,7 @@ const prepareSireneRepo = (
 };
 
 describe("Insert Establishment aggregate from form data", () => {
-  let sireneRepo: InMemorySireneRepository;
+  let sireneRepo: InMemorySireneGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let addresseAPI: InMemoryAdresseAPI;
@@ -54,7 +54,7 @@ describe("Insert Establishment aggregate from form data", () => {
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    sireneRepo = new InMemorySireneRepository();
+    sireneRepo = new InMemorySireneGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     outboxRepo = new InMemoryOutboxRepository();
 

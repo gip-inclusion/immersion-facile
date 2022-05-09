@@ -72,7 +72,7 @@ export class AppConfig {
 
   // == Sirene repository ==
 
-  public get sireneRepository() {
+  public get sireneGateway() {
     return throwIfNotInArray({
       processEnv: this.env,
       variableName: "SIRENE_REPOSITORY",

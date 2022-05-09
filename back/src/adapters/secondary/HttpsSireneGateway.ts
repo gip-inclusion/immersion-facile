@@ -6,9 +6,9 @@ import {
   RetryStrategy,
 } from "../../domain/core/ports/RetryStrategy";
 import {
-  SireneRepository,
-  SireneRepositoryAnswer,
-} from "../../domain/sirene/ports/SireneRepository";
+  SireneGateway,
+  SireneGatewayAnswer,
+} from "../../domain/sirene/ports/SireneGateway";
 import { SiretDto } from "shared/src/siret";
 import {
   createAxiosInstance,
@@ -20,7 +20,7 @@ import { AxiosConfig } from "../primary/appConfig";
 
 const logger = createLogger(__filename);
 
-export class HttpsSireneRepository extends SireneRepository {
+export class HttpsSireneGateway extends SireneGateway {
   public constructor(
     private readonly axiosConfig: AxiosConfig,
     private readonly clock: Clock,
@@ -44,7 +44,7 @@ export class HttpsSireneRepository extends SireneRepository {
   public async _get(
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SireneRepositoryAnswer | undefined> {
+  ): Promise<SireneGatewayAnswer | undefined> {
     logger.debug({ siret, includeClosedEstablishments }, "get");
 
     return this.retryStrategy.apply(async () => {

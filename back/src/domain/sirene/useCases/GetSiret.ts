@@ -5,15 +5,12 @@ import {
   GetSiretResponseDto,
 } from "shared/src/siret";
 import { UseCase } from "../../core/UseCase";
-import {
-  SireneEstablishmentVO,
-  SireneRepository,
-} from "../ports/SireneRepository";
+import { SireneEstablishmentVO, SireneGateway } from "../ports/SireneGateway";
 
 export type GetSiretUseCase = UseCase<GetSiretRequestDto, GetSiretResponseDto>;
 
 export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
-  constructor(private readonly sireneRepository: SireneRepository) {
+  constructor(private readonly sireneGateway: SireneGateway) {
     super();
   }
 
@@ -23,7 +20,7 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
     siret,
     includeClosedEstablishments = false,
   }: GetSiretRequestDto): Promise<GetSiretResponseDto> {
-    const response = await this.sireneRepository.get(
+    const response = await this.sireneGateway.get(
       siret,
       includeClosedEstablishments,
     );

@@ -1,7 +1,7 @@
 import {
   SireneEstablishmentVO,
   SireneEstablishmentProps,
-} from "../domain/sirene/ports/SireneRepository";
+} from "../domain/sirene/ports/SireneGateway";
 import { Builder } from "./Builder";
 
 const validSireneEstablishmentProps: SireneEstablishmentProps = {

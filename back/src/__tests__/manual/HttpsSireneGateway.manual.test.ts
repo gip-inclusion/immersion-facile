@@ -2,8 +2,8 @@ import { AppConfig } from "../../adapters/primary/appConfig";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
-import { HttpsSireneRepository } from "../../adapters/secondary/HttpsSireneRepository";
-import { SireneRepository } from "../../domain/sirene/ports/SireneRepository";
+import { HttpsSireneGateway } from "../../adapters/secondary/HttpsSireneGateway";
+import { SireneGateway } from "../../domain/sirene/ports/SireneGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota
@@ -12,12 +12,12 @@ import { SireneRepository } from "../../domain/sirene/ports/SireneRepository";
 // Requires the following environment variables to be set for the tests to pass:
 // - SIRENE_ENDPOINT
 // - SIRENE_BEARER_TOKEN
-describe("HttpsSireneRepository", () => {
-  let sireneRepository: SireneRepository;
+describe("HttpsSireneGateway", () => {
+  let sireneGateway: SireneGateway;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    sireneRepository = new HttpsSireneRepository(
+    sireneGateway = new HttpsSireneGateway(
       config.sireneHttpsConfig,
       new RealClock(),
       noRateLimit,
@@ -27,13 +27,13 @@ describe("HttpsSireneRepository", () => {
 
   it("returns open establishments", async () => {
     // ETABLISSEMENT PUBLIC DU MUSEE DU LOUVRE (should be active)
-    const response = await sireneRepository.get("18004623700012");
+    const response = await sireneGateway.get("18004623700012");
     expect(response?.etablissements).toHaveLength(1);
   });
 
   it("filters out closed establishments", async () => {
     // SOCIETE TEXTILE D'HENIN LIETARD, closed in 1966.
-    const response = await sireneRepository.get("38961161700017");
+    const response = await sireneGateway.get("38961161700017");
     expect(response).toBeUndefined();
   });
 });

@@ -3,8 +3,8 @@ import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
 import {
   SireneEstablishmentVO,
-  SireneRepository,
-} from "../../sirene/ports/SireneRepository";
+  SireneGateway,
+} from "../../sirene/ports/SireneGateway";
 import { AdresseAPI } from "../ports/AdresseAPI";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
@@ -14,7 +14,7 @@ const logger = createLogger(__filename);
 
 export class UpdateEstablishmentsFromSireneAPI {
   constructor(
-    private readonly sireneRepository: SireneRepository,
+    private readonly sireneGateway: SireneGateway,
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly adresseAPI: AdresseAPI,
     private readonly clock: Clock,
@@ -52,7 +52,7 @@ export class UpdateEstablishmentsFromSireneAPI {
   }
   private async updateEstablishmentWithSiret(siret: string) {
     const includeClosedEstablishments = false;
-    const sireneAnswer = await this.sireneRepository.get(
+    const sireneAnswer = await this.sireneGateway.get(
       siret,
       includeClosedEstablishments,
     );

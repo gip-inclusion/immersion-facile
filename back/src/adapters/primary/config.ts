@@ -90,7 +90,7 @@ import { InMemoryOutboxQueries } from "../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
 import { HttpPeConnectGateway } from "../secondary/HttpPeConnectGateway";
-import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import { HttpsSireneGateway } from "../secondary/HttpsSireneGateway";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpLaBonneBoiteAPI } from "../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { HttpPassEmploiGateway } from "../secondary/immersionOffer/HttpPassEmploiGateway";
@@ -106,7 +106,7 @@ import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEs
 import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryPeConnectGateway } from "../secondary/InMemoryPeConnectGateway";
 import { InMemoryRomeRepository } from "../secondary/InMemoryRomeRepository";
-import { InMemorySireneRepository } from "../secondary/InMemorySireneRepository";
+import { InMemorySireneGateway } from "../secondary/InMemorySireneGateway";
 import { InMemoryUowPerformer } from "../secondary/InMemoryUowPerformer";
 import { makeStubGetApiConsumerById } from "../secondary/makeStubGetApiConsumerById";
 import { makeStubGetFeatureFlags } from "../secondary/makeStubGetFeatureFlags";
@@ -244,7 +244,7 @@ export const createRepositories = async (
 ) => {
   logger.info({
     repositories: config.repositories,
-    sireneRepository: config.sireneRepository,
+    sireneGateway: config.sireneGateway,
     emailGateway: config.emailGateway,
     romeRepository: config.romeRepository,
   });
@@ -306,14 +306,14 @@ export const createRepositories = async (
         : new InMemoryAgencyRepository(),
 
     sirene:
-      config.sireneRepository === "HTTPS"
-        ? new HttpsSireneRepository(
+      config.sireneGateway === "HTTPS"
+        ? new HttpsSireneGateway(
             config.sireneHttpsConfig,
             clock,
             noRateLimit,
             noRetries,
           )
-        : new InMemorySireneRepository(),
+        : new InMemorySireneGateway(),
 
     email:
       config.emailGateway === "SENDINBLUE"

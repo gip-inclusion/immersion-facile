@@ -1,7 +1,7 @@
-import { InMemorySireneRepository } from "../../../adapters/secondary/InMemorySireneRepository";
+import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneRepository";
+import { SireneEstablishmentVO } from "../../../domain/sirene/ports/SireneGateway";
 import {
   NotFoundError,
   TooManyRequestApiError,
@@ -32,11 +32,11 @@ const validEstablishment = new SireneEstablishmentVO({
 });
 
 describe("GetSiret", () => {
-  let repository: InMemorySireneRepository;
+  let repository: InMemorySireneGateway;
   let getSiret: GetSiret;
 
   beforeEach(() => {
-    repository = new InMemorySireneRepository();
+    repository = new InMemorySireneGateway();
     getSiret = new GetSiret(repository);
   });
 

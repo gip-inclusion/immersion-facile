@@ -1,6 +1,6 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneRepository";
+import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
 import { editEstablishmentFormRouteWithApiKey } from "shared/src/routes";
 import { createEstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { makeGenerateJwt } from "../../domain/auth/jwt";

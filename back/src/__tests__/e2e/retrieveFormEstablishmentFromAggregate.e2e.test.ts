@@ -1,5 +1,5 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneRepository";
+import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
 import { retrieveEstablishmentFormRouteWithApiKey } from "shared/src/routes";
 import { createEstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";

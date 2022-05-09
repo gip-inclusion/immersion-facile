@@ -107,7 +107,7 @@ export class SireneEstablishmentVO {
   }
 }
 
-export type SireneRepositoryAnswer = {
+export type SireneGatewayAnswer = {
   header: {
     statut: number;
     message: string;
@@ -118,11 +118,11 @@ export type SireneRepositoryAnswer = {
   etablissements: SireneEstablishmentProps[];
 };
 
-export abstract class SireneRepository {
+export abstract class SireneGateway {
   public get(
     siret: SiretDto,
     includeClosedEstablishments?: boolean,
-  ): Promise<SireneRepositoryAnswer | undefined> {
+  ): Promise<SireneGatewayAnswer | undefined> {
     return this._get(siret, includeClosedEstablishments).catch((error) => {
       const serviceName = "Sirene API";
       logger.error({ siret, error }, "Error fetching siret");
@@ -135,7 +135,7 @@ export abstract class SireneRepository {
   abstract _get(
     siret: SiretDto,
     includeClosedEstablishments?: boolean,
-  ): Promise<SireneRepositoryAnswer | undefined>;
+  ): Promise<SireneGatewayAnswer | undefined>;
 }
 
 // prettier-ignore

@@ -15,7 +15,7 @@ import {
 } from "../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
-import { HttpsSireneRepository } from "../secondary/HttpsSireneRepository";
+import { HttpsSireneGateway } from "../secondary/HttpsSireneGateway";
 import { HttpAdresseAPI } from "../secondary/immersionOffer/HttpAdresseAPI";
 import { PgUowPerformer } from "../secondary/pg/PgUowPerformer";
 import { AppConfig } from "./appConfig";
@@ -57,7 +57,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       random,
     ),
   );
-  const sireneRepository = new HttpsSireneRepository(
+  const sireneGateway = new HttpsSireneGateway(
     config.sireneHttpsConfig,
     clock,
     new QpsRateLimiter(maxQpsSireneApi, clock, sleep),
@@ -74,7 +74,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   const uuidGenerator = new UuidV4Generator();
   const upsertAggregateFromForm = new InsertEstablishmentAggregateFromForm(
     pgUowPerformer,
-    sireneRepository,
+    sireneGateway,
     adresseAPI,
     new UuidV4Generator(),
     clock,
