@@ -2,7 +2,7 @@ import {
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
   tooManySirenRequestsSiret,
-} from "src/../../shared/src/siret";
+} from "shared/src/siret";
 import {
   badSiretOneWithLetter,
   badSiretTooLong,
