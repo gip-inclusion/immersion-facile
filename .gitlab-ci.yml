@@ -6,7 +6,7 @@ variables:
   POSTGRES_PORT: 5432
   POSTGRES_HOST_AUTH_METHOD: trust
   PG_TEST_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB
-  STORAGE_ROOT: ./storage/
+  STORAGE_ROOT: /storage
 
 image: node:16.5-buster
 
@@ -49,12 +49,15 @@ back:
   script:
     - pnpm install --frozen-lockfile
     - cd back
+    - PWD=$(pwd)
+    - STORAGE_FULL_PATH=$PWD$STORAGE_ROOT
+    - mkdir -p $STORAGE_FULL_PATH/tmp/
     - pnpm format:check
     - pnpm lint
     - pnpm includecheck
     - pnpm typecheck
     - NODE_ENV=test DATABASE_URL=$PG_TEST_URL npm run migrate up
-    - PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_ROOT npm run test:all
+    - PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm run test:all
 
 sonarqube-check:
   stage: test

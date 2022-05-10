@@ -3,7 +3,6 @@ coverage
 .idea
 data-test.json
 .env
-storage/tmp/*
-!storage/tmp/.gitkeep
+storage
 wallaby.js
 .vscode/settings.json
