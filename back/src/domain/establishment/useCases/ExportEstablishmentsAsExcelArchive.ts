@@ -82,9 +82,7 @@ export class ExportEstablishmentsAsExcelArchive extends TransactionalUseCase<Est
           groupBy,
           establishmentExportByZone[groupBy],
           workbookColumnsOptions,
-        ).toXlsx(() =>
-          Promise.resolve(retrieveParentDirectory(config.archivePath)),
-        ),
+        ).toXlsx(retrieveParentDirectory(config.archivePath)),
       ),
     );
 
