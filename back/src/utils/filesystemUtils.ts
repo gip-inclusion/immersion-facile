@@ -14,9 +14,14 @@ export const deleteFiles = (filesPaths: string[]): void => {
   filesPaths.map(deleteFile);
 };
 
-export const deleteFile = (filePath: string): void => fse.unlinkSync(filePath);
+export const deleteFile = (filePath: string): void => {
+  fse.unlinkSync(filePath);
+};
 
 export const deleteFileAndParentFolder = (filePath: string): void => {
   fse.unlinkSync(filePath);
   fse.removeSync(path.dirname(filePath));
 };
+
+export const retrieveParentDirectory = (pathName: string): string =>
+  path.dirname(pathName);

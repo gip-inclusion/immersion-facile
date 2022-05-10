@@ -100,8 +100,8 @@ export const sendZipResponse = async (
 
     res.status(200);
     res.setHeader("content-type", "application/zip");
-
-    return res.download(archivePath, () => {
+    return res.download(archivePath, (err?: Error) => {
+      if (err) notifyObjectDiscord(err);
       deleteFileAndParentFolder(archivePath);
     });
   } catch (error: any) {

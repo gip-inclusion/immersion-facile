@@ -6,7 +6,6 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { Archive } from "../../generic/archive/port/Archive";
 import { Workbook } from "../../generic/excel/port/Workbook";
 import { EstablishmentReadyForExportVO } from "../valueObjects/EstablishmentReadyForExportVO";
-import { temporaryStoragePath } from "../../../utils/filesystemUtils";
 import {
   EstablishmentRawBeforeExportProps,
   EstablishmentRawBeforeExportVO,
@@ -24,6 +23,7 @@ import {
   captureAddressGroups,
   CaptureAddressGroupsResult,
 } from "shared/src/utils/address";
+import { retrieveParentDirectory } from "../../../utils/filesystemUtils";
 
 export type EstablishmentExportConfig = EstablishmentExportConfigDto & {
   archivePath: string;
@@ -82,7 +82,9 @@ export class ExportEstablishmentsAsExcelArchive extends TransactionalUseCase<Est
           groupBy,
           establishmentExportByZone[groupBy],
           workbookColumnsOptions,
-        ).toXlsx(temporaryStoragePath),
+        ).toXlsx(() =>
+          Promise.resolve(retrieveParentDirectory(config.archivePath)),
+        ),
       ),
     );
 

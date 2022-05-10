@@ -2,6 +2,7 @@ import * as fse from "fs-extra";
 import path from "path";
 import {
   deleteFileAndParentFolder,
+  retrieveParentDirectory,
   temporaryStoragePath,
 } from "../../utils/filesystemUtils";
 
@@ -38,5 +39,14 @@ describe("Filesystem utils", () => {
 
     expect(fse.pathExistsSync(pathResult)).toBe(false);
     expect(fse.pathExistsSync(parentDirectory)).toBe(false);
+  });
+
+  it("retrieve parent directory path", () => {
+    const directory = "/home/user/immersion-facile/back/storage/tmp";
+    const expectedParentDirectoryPath =
+      "/home/user/immersion-facile/back/storage";
+    expect(retrieveParentDirectory(directory)).toBe(
+      expectedParentDirectoryPath,
+    );
   });
 });

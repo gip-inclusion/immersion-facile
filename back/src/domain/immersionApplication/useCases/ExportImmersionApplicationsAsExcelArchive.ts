@@ -2,7 +2,7 @@ import { Column } from "exceljs";
 import { groupBy, map, prop } from "ramda";
 import { z } from "zod";
 import { pipeWithValue } from "shared/src/pipeWithValue";
-import { temporaryStoragePath } from "../../../utils/filesystemUtils";
+import { retrieveParentDirectory } from "../../../utils/filesystemUtils";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { Archive } from "../../generic/archive/port/Archive";
@@ -37,7 +37,7 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
           agencyId,
           immersionApplicationExportByAgency[agencyId],
           workbookColumnsOptions,
-        ).toXlsx(temporaryStoragePath),
+        ).toXlsx(retrieveParentDirectory(archivePath)),
       ),
     );
 

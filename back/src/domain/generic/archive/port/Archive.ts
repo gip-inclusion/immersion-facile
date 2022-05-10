@@ -30,7 +30,6 @@ export class Archive {
 
       this.outputFile.on("finish", () => {
         if (options.removeOriginal) deleteFiles(filepaths);
-
         resolve();
       });
       this.outputFile.on("error", reject);
