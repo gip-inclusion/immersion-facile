@@ -15,6 +15,7 @@ COPY ./shared/ /app/shared
 # back only
 FROM builder
 COPY ./back/ /app/back
+RUN mkdir -p /app/storage/tmp
 
 WORKDIR /app/back
 
