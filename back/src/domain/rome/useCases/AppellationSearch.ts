@@ -7,7 +7,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
 
-const MIN_SEARCH_TEXT_LENGTH = 3;
+const MIN_SEARCH_TEXT_LENGTH = 2;
 
 export class AppellationSearch extends TransactionalUseCase<
   string,

@@ -36,6 +36,22 @@ describe("AppellationSearch", () => {
     expect(response).toEqual(expected);
   });
 
+  it("returns the list of found matches with ranges from minimum search caracters", async () => {
+    const response = await createUseCase().execute("lap");
+    const expected: AppellationMatchDto[] = [
+      {
+        appellation: {
+          appellationCode: "14704",
+          appellationLabel: "Éleveur / Éleveuse de lapins angoras",
+          romeCode: "A1409",
+          romeLabel: "Élevage",
+        },
+        matchRanges: [{ startIndexInclusive: 22, endIndexExclusive: 25 }],
+      },
+    ];
+    expect(response).toEqual(expected);
+  });
+
   it("issues no queries for short search texts", async () => {
     const mockSearchMetierFn = jest.fn();
     const mockSearchAppellationFn = jest.fn();
@@ -46,7 +62,7 @@ describe("AppellationSearch", () => {
       appellationToCodeMetier: mockAppellationToCodeMetier,
     };
 
-    const response = await createUseCase().execute("lap");
+    const response = await createUseCase().execute("la");
     expect(mockSearchMetierFn.mock.calls).toHaveLength(0);
     expect(mockSearchAppellationFn.mock.calls).toHaveLength(0);
     expect(response).toEqual([]);
