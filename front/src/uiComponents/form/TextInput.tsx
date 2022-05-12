@@ -42,7 +42,7 @@ export const TextInputControlled = (
 
   useEffect(() => {
     setError(props.error);
-    if (field.value) setValue(props.value);
+    setValue(props.value);
   }, [props.value, props.error]);
 
   return (
@@ -54,7 +54,7 @@ export const TextInputControlled = (
         field.onChange(e.target.value);
       }}
       {...(value && value !== "" && { value })}
-      error={meta.touched ? props.error || meta.error : undefined}
+      error={meta.touched ? props.error : undefined}
     />
   );
 };

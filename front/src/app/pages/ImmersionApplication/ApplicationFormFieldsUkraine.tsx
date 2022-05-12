@@ -97,10 +97,15 @@ export const ApplicationFormFieldsUkraine = ({
   } = useFormikContext<ImmersionApplicationDto>();
   const featureFlags = useAppSelector(featureFlagsSelector);
   const isSiretFetcherDisabled = values.status !== "DRAFT";
-  const { establishmentInfo, isFetchingSiret, updateSiret, currentSiret } =
-    useSiretFetcher({
-      shouldFetchEvenIfAlreadySaved: true,
-    });
+  const {
+    establishmentInfo,
+    isFetchingSiret,
+    updateSiret,
+    currentSiret,
+    siretError,
+  } = useSiretFetcher({
+    shouldFetchEvenIfAlreadySaved: true,
+  });
   useSiretRelatedField("businessName", establishmentInfo, {
     disabled: isSiretFetcherDisabled,
   });
@@ -193,6 +198,7 @@ export const ApplicationFormFieldsUkraine = ({
       <TextInputControlled
         value={currentSiret}
         setValue={updateSiret}
+        error={siretError}
         label="Indiquez le SIRET de la structure d'accueil *"
         name="siret"
         placeholder="362 521 879 00034"

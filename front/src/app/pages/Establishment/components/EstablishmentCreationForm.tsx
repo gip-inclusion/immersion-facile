@@ -8,6 +8,7 @@ import { SiretDto } from "shared/src/siret";
 import { OmitFromExistingKeys } from "shared/src/utils";
 import { establishmentGateway } from "src/app/config/dependencies";
 import {
+  useInitialSiret,
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/utils/fetchEstablishmentInfoBySiret";
@@ -38,6 +39,7 @@ export const EstablishmentCreationForm = ({
   source,
   siret,
 }: EstablishmentCreationFormProps) => {
+  useInitialSiret(siret);
   const creationInitialValues = {
     ...creationInitialValuesWithoutSourceAndSearchable(siret),
     source,

@@ -3,10 +3,17 @@ import { InvalidSiretError } from "src/core-logic/domain/siret/siret.slice";
 import { GetSiretInfoError } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-export const siretStateSelector = createRootSelector((state) => state.siret);
+export const siretStateSelector = createRootSelector(
+  ({ siret: { error, ...rest } }) => rest,
+);
 
-export const siretErrorSelector = createSelector(siretStateSelector, (state) =>
-  state.error ? errorTranslations[state.error] : null,
+export const currentSiretSelector = createSelector(
+  siretStateSelector,
+  (state) => state.currentSiret,
+);
+
+export const siretErrorSelector = createRootSelector((state) =>
+  state.siret.error ? errorTranslations[state.siret.error] : null,
 );
 
 const errorTranslations: Record<GetSiretInfoError | InvalidSiretError, string> =

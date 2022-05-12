@@ -6,6 +6,7 @@ import { useAppSelector } from "src/app/utils/reduxHooks";
 import {
   siretStateSelector,
   siretErrorSelector,
+  currentSiretSelector,
 } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
@@ -57,4 +58,15 @@ export const useSiretFetcher = ({
     updateSiret: (newSiret: string) =>
       dispatch(siretSlice.actions.siretModified(newSiret)),
   };
+};
+
+export const useInitialSiret = (siret?: string) => {
+  const currentSiret = useAppSelector(currentSiretSelector);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (siret && siret !== currentSiret) {
+      dispatch(siretSlice.actions.siretModified(siret));
+    }
+  }, []);
 };
