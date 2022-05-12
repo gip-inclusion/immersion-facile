@@ -31,7 +31,7 @@ describe("Rome Autocomplete", () => {
           isSearching: false,
         },
       },
-      //"Given there are 2 rome options Job A and Job B",
+      "Given there are 2 rome options Job A and Job B",
     );
 
     triggerTests(appAndDeps, [
