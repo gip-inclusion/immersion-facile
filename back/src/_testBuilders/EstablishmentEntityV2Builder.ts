@@ -45,7 +45,9 @@ export class EstablishmentEntityV2Builder
   withName(name: string) {
     return new EstablishmentEntityV2Builder({ ...this.entity, name });
   }
-
+  withCustomizedName(customizedName: string) {
+    return new EstablishmentEntityV2Builder({ ...this.entity, customizedName });
+  }
   withDataSource(dataSource: DataSource) {
     return new EstablishmentEntityV2Builder({
       ...this.entity,

@@ -1207,6 +1207,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       const boulangerRome = "D1102";
       const establishment = new EstablishmentEntityV2Builder()
         .withSiret(siret)
+        .withCustomizedName("La boulangerie de Lucie")
         .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
         .withAddress("2 RUE JACQUARD 69120 VAULX-EN-VELIN")
         .build();
@@ -1255,6 +1256,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         nafLabel: "Fabrication de pain et de pâtisserie fraîche",
         siret,
         name: establishment.name,
+        customizedName: establishment.customizedName,
         voluntaryToImmersion: establishment.voluntaryToImmersion,
         location: establishment.position,
         address: establishment.address,

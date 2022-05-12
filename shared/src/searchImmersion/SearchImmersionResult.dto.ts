@@ -20,6 +20,7 @@ export type SearchImmersionResultDto = {
   nafLabel: string;
   siret: SiretDto;
   name: string;
+  customizedName?: string;
   voluntaryToImmersion: boolean;
   location: LatLonDto;
   address: string;

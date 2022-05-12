@@ -68,6 +68,7 @@ export class GetImmersionOfferById extends UseCase<
       naf: establishment.nafDto.code,
       nafLabel: establishment.nafLabel,
       name: establishment.name,
+      customizedName: establishment.customizedName,
       siret: establishment.siret,
       voluntaryToImmersion: establishment.voluntaryToImmersion,
       contactMode: contact?.contactMethod,

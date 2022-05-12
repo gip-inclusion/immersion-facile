@@ -419,6 +419,8 @@ export class PgEstablishmentAggregateRepository
     );
     return pgResult.rows.map((row) => ({
       ...row.search_immersion_result,
+      // TODO : find a way to return 'undefined' instead of 'null' from query
+      customizedName: optional(row.search_immersion_result.customizedName),
       contactMode: optional(row.search_immersion_result.contactMode),
       contactDetails: optional(row.search_immersion_result.contactDetails),
       distance_m: optional(row.search_immersion_result.distance_m),
@@ -458,6 +460,7 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       'siret', io.siret, 
       'distance_m', io.distance_m, 
       'name', e.name, 
+      'customizedName', e.customized_name, 
       'voluntaryToImmersion', e.data_source = 'form',
       'location', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
       'romeLabel', io.rome_label,

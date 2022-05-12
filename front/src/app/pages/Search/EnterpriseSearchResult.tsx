@@ -34,6 +34,7 @@ export const EnterpriseSearchResult = ({
 }: EnterpriseSearchResultProps) => {
   const {
     name,
+    customizedName,
     distance_m,
     address,
     contactMode,
@@ -49,7 +50,7 @@ export const EnterpriseSearchResult = ({
       <div className="flex flex-wrap justify-between">
         <div className="pb-2">
           <div className="font-bold text-xl leading-6 text-immersionRed-light pb-1">
-            {name}
+            {customizedName ?? name}
           </div>
           {nafLabel && <div className="font-bold">{nafLabel}</div>}
           <div>

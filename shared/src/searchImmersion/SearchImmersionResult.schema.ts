@@ -30,6 +30,7 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
     nafLabel: z.string(),
     siret: siretSchema,
     name: z.string(),
+    customizedName: z.string().optional(),
     voluntaryToImmersion: z.boolean(),
     location: latLonSchema,
     address: z.string(),
