@@ -1,9 +1,10 @@
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 import { SiretDto } from "shared/src/siret";
-export class InMemoryEstablishmentUiGateway implements NavigationGateway {
+import { routes } from "src/app/routing/routes";
+
+export class ReactNavigationGateway implements NavigationGateway {
   navigateToEstablishementForm(siret: SiretDto): Promise<void> {
-    this.navigateToEstablishementFormState = siret;
+    routes.formEstablishment({ siret }).push();
     return Promise.resolve();
   }
-  navigateToEstablishementFormState: boolean | SiretDto = false;
 }

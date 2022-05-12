@@ -4,15 +4,14 @@ import { ModifyEstablishmentEvent } from "src/domain/events/modifyEstablishment.
 import { VerifySiretEvent } from "src/domain/events/verifySiret/VerifySiretEvent";
 import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
 import { ClientApplication } from "src/infra/application/ClientApplication";
-import { establishementCallToActionObservable$ } from "src/infra/gateway/EstablishmentUiGateway/ReactEstablishmentUiGateway";
 import { SiretDto } from "shared/src/siret";
 import { HomeButton } from "src/uiComponents/Button";
 import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 import { Link } from "src/uiComponents/Link";
-import { useObservable } from "src/useObservable";
 import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSubTitle";
 import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
 import { routes } from "../routing/routes";
+import { useAppSelector } from "../utils/reduxHooks";
 
 interface EstablishmentHomeMenuProperties {
   clientApplication: ClientApplication;
@@ -37,19 +36,19 @@ type Timeout = ReturnType<typeof setTimeout>;
 export const EstablishmentHomeMenu = ({
   clientApplication,
 }: EstablishmentHomeMenuProperties) => {
-  useEffect(() => {
-    siret === "" && clientApplication.onEvent(new VerifySiretEvent(siret));
-  });
-  const callToAction: EstablishementCallToAction = useObservable(
-    establishementCallToActionObservable$,
-    "NOTHING",
+  const [siret, siretUpdate] = useState<SiretDto>("");
+  const callToActionSlice = useAppSelector(
+    (state) => state.homeEstablishmentSlice,
   );
   const [startEstablishmentPath, startEstablishmentPathUpdate] =
     useState<boolean>(false);
-  const [siret, siretUpdate] = useState<SiretDto>("");
   const [inputTimeout, inputTimeoutUpdate] = useState<Timeout | undefined>(
     undefined,
   );
+  useEffect(() => {
+    siret === "" && clientApplication.onEvent(new VerifySiretEvent(siret));
+  }, []);
+
   return (
     <div
       className={`flex flex-col items-center justify-center border-2 border-blue-200 rounded px-4 p-1 m-2 w-48 bg-blue-50  `}
@@ -57,7 +56,8 @@ export const EstablishmentHomeMenu = ({
     >
       <div className="flex flex-col">
         <EstablishmentTitle type={"establishment"} text="ENTREPRISE" />
-        {callToAction !== "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
+        {callToActionSlice.status !==
+          "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
           <EstablishmentSubTitle
             type={"establishment"}
             text="Vos équipes souhaitent accueillir en immersion professionnelle ?"
@@ -79,13 +79,17 @@ export const EstablishmentHomeMenu = ({
           </>
         ) : (
           <>
-            {isNothingOrErrorCallToAction(callToAction) && (
+            {isNothingOrErrorCallToAction(callToActionSlice.status) && (
               <ImmersionTextField
                 className="w-2/3"
                 name="siret"
                 value={siret}
                 placeholder="SIRET de votre entreprise"
-                error={badEstablishmentCallToActionNotifications[callToAction]}
+                error={
+                  badEstablishmentCallToActionNotifications[
+                    callToActionSlice.status
+                  ]
+                }
                 onChange={(event) =>
                   onSiretFieldChange(
                     event,
@@ -97,18 +101,20 @@ export const EstablishmentHomeMenu = ({
                 }
               />
             )}
-            {callToAction === "MODIFY_ESTABLISHEMENT" &&
+            {callToActionSlice.status === "MODIFY_ESTABLISHEMENT" &&
               modifyEstablishmentRequestForMailUpdate({
                 siret,
                 clientApplication,
               })}
-            {callToAction === "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
+            {callToActionSlice.status ===
+              "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
               <ModifyEstablishmentRequestNotification />
             )}
           </>
         )}
       </div>
-      {callToAction !== "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
+      {callToActionSlice.status !==
+        "MODIFY_ESTABLISHEMENT_REQUEST_NOTIFICATION" && (
         <Link text="En savoir plus" url={routes.landingEstablishment().link} />
       )}
     </div>

@@ -11,11 +11,11 @@ import {
   existingOpenSireneResponse,
   validSiret,
 } from "src/domain/tests/expectedValues";
-import { andThenTheEstablishmentUiGatewayHasCallToAction } from "src/domain/tests/unitTests/EstablishmentUiGateway";
 import { whenTheEventIsSent } from "src/domain/tests/unitTests/EventGateway";
 import { andGivenTheSiretGatewayThroughBackHasSireneRegisteredSirets } from "src/domain/tests/unitTests/ImmersionApplicationGateway";
+import { andThenTheEstablishmentUiGatewayHasCallToAction } from "src/domain/tests/unitTests/store";
 
-import { executeTestSuite } from "../../tests/testSuit";
+import { executeTestSuite } from "../../tests/testSuite";
 import {
   andGivenTheEstablishmentGatewayDontHasModifyEstablishmentRequestForSiret,
   givenTheEstablishmentGatewayDontHasRegisteredSiret,

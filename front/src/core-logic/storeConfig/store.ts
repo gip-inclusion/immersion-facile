@@ -14,6 +14,7 @@ import { searchEpics } from "src/core-logic/domain/search/search.epic";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
+import { homeEstablishmentSlice } from "src/infra/gateway/EstablishmentUiGateway/homeEstablishmentSlice";
 
 const allEpics: any[] = [
   ...searchEpics,
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
   [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
+  [homeEstablishmentSlice.name]: homeEstablishmentSlice.reducer,
 });
 
 export type StoreProps = {
@@ -61,6 +63,6 @@ export type RootState = ReturnType<typeof rootReducer>;
 export const createRootSelector = <T>(selector: (state: RootState) => T) =>
   selector;
 
-type Store = ReturnType<typeof createStore>;
+export type ReduxStore = ReturnType<typeof createStore>;
 // export type RootState2 = ReturnType<Store["getState"]>;
-export type AppDispatch = Store["dispatch"];
+export type AppDispatch = ReduxStore["dispatch"];

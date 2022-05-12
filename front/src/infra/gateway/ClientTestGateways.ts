@@ -6,7 +6,7 @@ import { InMemoryEventGateway } from "./EventGateway/InMemoryEventGateway";
 
 export interface ClientTestGateways extends ClientGateways {
   siretGatewayThroughBack: InMemorySiretGatewayThroughBack;
-  establishmentsUi: InMemoryEstablishmentUiGateway;
+  navigation: InMemoryEstablishmentUiGateway;
   event: InMemoryEventGateway;
   establishments: InMemoryEstablishmentGateway;
 }

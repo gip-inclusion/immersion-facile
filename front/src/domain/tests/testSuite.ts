@@ -1,4 +1,4 @@
-import { InMemorySiretGatewayThroughBack } from "src/core-logic/adapters/InMemorySiretGatewayThroughBack";
+import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 import { InMemoryEstablishmentUiGateway } from "src/infra/gateway/EstablishmentUiGateway/InMemoryEstablishmentUiGateway";
 import { InMemoryEstablishmentGateway } from "../../core-logic/adapters/InMemoryEstablishmentGateway";
 import { ApplicationPrimaryController } from "../../core-logic/ports/primaryController/ApplicationPrimaryController";
@@ -13,16 +13,18 @@ export const executeTestSuite = (testSuite: UnitTestWithDependencies[]) => {
   testSuite.forEach((unitTest) => unitTest(application));
 };
 function makeAcceptanceTestApplication() {
-  const primaryController = new ApplicationPrimaryController();
+  const { store, dependencies } = createTestStore();
+  const primaryController = new ApplicationPrimaryController(store);
   const clientTestApplication: ClientTestApplicationProperties = {
     gateways: {
-      siretGatewayThroughBack: new InMemorySiretGatewayThroughBack(),
+      siretGatewayThroughBack: dependencies.siretGatewayThroughBack,
       establishments: new InMemoryEstablishmentGateway(),
       event: new InMemoryEventGateway(primaryController),
-      establishmentsUi: new InMemoryEstablishmentUiGateway(),
+      navigation: new InMemoryEstablishmentUiGateway(),
     },
     repositories: {},
     primaryController,
+    store,
   };
   return new ClientTestApplication(clientTestApplication);
 }

@@ -7,15 +7,16 @@ import {
   existingOpenSireneResponse,
   validSiret,
 } from "src/domain/tests/expectedValues";
-import {
-  andGivenTheEstablishmentUiGatewayHasCallToAction,
-  andThenTheEstablishmentUiGatewayNavigateToEstablishementFormWithSiret,
-  givenTheEstablishmentUiGatewayHasCallToAction,
-  thenTheEstablishmentUiGatewayHasCallToAction,
-} from "src/domain/tests/unitTests/EstablishmentUiGateway";
+
 import { whenTheEventIsSent } from "src/domain/tests/unitTests/EventGateway";
 import { andGivenTheSiretGatewayThroughBackHasSireneRegisteredSirets } from "src/domain/tests/unitTests/ImmersionApplicationGateway";
-import { executeTestSuite } from "../../tests/testSuit";
+import { andThenTheEstablishmentUiGatewayNavigateToEstablishementFormWithSiret } from "src/domain/tests/unitTests/Navigation";
+import {
+  andGivenTheEstablishmentUiGatewayHasCallToAction,
+  thenTheEstablishmentUiGatewayHasCallToAction,
+  givenTheEstablishmentUiGatewayHasCallToAction,
+} from "src/domain/tests/unitTests/store";
+import { executeTestSuite } from "../../tests/testSuite";
 import {
   givenTheEstablishmentGatewayDontHasRegisteredSiret,
   givenTheEstablishmentGatewayHasRegisteredSiret,

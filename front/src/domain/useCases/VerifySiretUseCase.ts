@@ -5,15 +5,19 @@ import {
 import { NafDto } from "shared/src/naf";
 import { SiretDto } from "shared/src/siret";
 import { EstablishmentGateway } from "../../core-logic/ports/EstablishmentGateway";
-import { EstablishmentUiGateway } from "../../core-logic/ports/EstablishmentUiGateway";
+import { NavigationGateway } from "../../core-logic/ports/NavigationGateway";
 import { VerifySiretEvent } from "../events/verifySiret/VerifySiretEvent";
 import { UseCase } from "./UseCase";
+import { ReduxStore } from "src/core-logic/storeConfig/store";
+import { homeEstablishmentSlice } from "src/infra/gateway/EstablishmentUiGateway/homeEstablishmentSlice";
+import { EstablishementCallToAction } from "../valueObjects/EstablishementCallToAction";
 
 export class VerifySiretUseCase extends UseCase {
   constructor(
-    private establishmentUiGateway: EstablishmentUiGateway,
+    private establishmentUiGateway: NavigationGateway,
     private establishmentGateway: EstablishmentGateway,
     private siretGatewayThroughBack: SiretGatewayThroughBack,
+    private store: ReduxStore,
   ) {
     super();
   }
@@ -21,12 +25,21 @@ export class VerifySiretUseCase extends UseCase {
   execute(event: VerifySiretEvent): Promise<void> {
     return event.siret.length > 0
       ? this.onSiret(event)
-      : this.establishmentUiGateway.updateCallToAction("NOTHING");
+      : this.callToActionChanged("NOTHING");
   }
+  private callToActionChanged(
+    callToAction: EstablishementCallToAction,
+  ): Promise<void> {
+    this.store.dispatch(
+      homeEstablishmentSlice.actions.callToActionChanged(callToAction),
+    );
+    return Promise.resolve();
+  }
+
   private onSiret(event: VerifySiretEvent): Promise<void> {
     return this.isSiretValid(event.siret)
       ? this.onValidSiret(event)
-      : this.establishmentUiGateway.updateCallToAction("ERROR_BAD_SIRET");
+      : this.callToActionChanged("ERROR_BAD_SIRET");
   }
 
   private onValidSiret(event: VerifySiretEvent): Promise<void> {
@@ -37,14 +50,10 @@ export class VerifySiretUseCase extends UseCase {
           ? this.onMissingSiretInfo(siretInfo)
           : this.onSiretInfo(siretInfo),
       )
-      .catch(() =>
-        this.establishmentUiGateway.updateCallToAction(
-          "ERROR_UNEXPECTED_ERROR",
-        ),
-      );
+      .catch(() => this.callToActionChanged("ERROR_UNEXPECTED_ERROR"));
   }
   private onMissingSiretInfo(siretInfo: GetSiretInfoError): Promise<void> {
-    return this.establishmentUiGateway.updateCallToAction(
+    return this.callToActionChanged(
       siretInfo === "SIRENE API not available."
         ? "ERROR_SIRENE_API_UNAVAILABLE"
         : siretInfo === "Missing establishment on SIRENE API."
@@ -61,16 +70,12 @@ export class VerifySiretUseCase extends UseCase {
     isOpen: boolean;
   }): Promise<void> {
     return siretInfo.isOpen === false
-      ? this.establishmentUiGateway.updateCallToAction(
-          "ERROR_CLOSED_ESTABLISHMENT_ON_SIRENE",
-        )
+      ? this.callToActionChanged("ERROR_CLOSED_ESTABLISHMENT_ON_SIRENE")
       : this.establishmentGateway
           .isEstablishmentAlreadyRegisteredBySiret(siretInfo.siret)
           .then((isEstablishmentRegistered) =>
             isEstablishmentRegistered
-              ? this.establishmentUiGateway.updateCallToAction(
-                  "MODIFY_ESTABLISHEMENT",
-                )
+              ? this.callToActionChanged("MODIFY_ESTABLISHEMENT")
               : this.establishmentUiGateway.navigateToEstablishementForm(
                   siretInfo.siret,
                 ),

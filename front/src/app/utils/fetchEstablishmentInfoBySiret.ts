@@ -3,7 +3,10 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { GetSiretResponseDto } from "shared/src/siret";
 import { useAppSelector } from "src/app/utils/reduxHooks";
-import { siretStateSelector } from "src/core-logic/domain/siret/siret.selectors";
+import {
+  siretStateSelector,
+  siretErrorSelector,
+} from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
 export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
@@ -36,7 +39,9 @@ export const useSiretFetcher = ({
   shouldFetchEvenIfAlreadySaved,
 }: SiretFetcherOptions) => {
   const siretState = useAppSelector(siretStateSelector);
+  const siretError = useAppSelector(siretErrorSelector);
   const dispatch = useDispatch();
+
   useEffect(() => {
     if (
       shouldFetchEvenIfAlreadySaved !== siretState.shouldFetchEvenIfAlreadySaved
@@ -48,7 +53,7 @@ export const useSiretFetcher = ({
     currentSiret: siretState.currentSiret,
     establishmentInfo: siretState.establishment ?? undefined,
     isFetchingSiret: siretState.isSearching,
-    siretError: siretState.error ?? undefined,
+    siretError: siretError ?? undefined,
     updateSiret: (newSiret: string) =>
       dispatch(siretSlice.actions.siretModified(newSiret)),
   };
