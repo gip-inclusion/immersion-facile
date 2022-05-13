@@ -39,6 +39,7 @@ export type ValidatedApplicationFinalConfirmationParams = {
   immersionAddress: string;
   immersionAppellationLabel: string;
   immersionActivities: string;
+  immersionSkills: string;
   sanitaryPrevention: string;
   individualProtection: string;
   questionnaireUrl: string;

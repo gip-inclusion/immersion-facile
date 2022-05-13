@@ -262,6 +262,7 @@ export class SendinblueEmailGateway implements EmailGateway {
         IMMERSION_ADDRESS: params.immersionAddress,
         IMMERSION_PROFESSION: params.immersionAppellationLabel,
         IMMERSION_ACTIVITIES: params.immersionActivities,
+        IMMERSION_SKILLS: params.immersionSkills,
         SANITARY_PREVENTION_DESCRIPTION: params.sanitaryPrevention,
         INDIVIDUAL_PROTECTION: params.individualProtection,
         QUESTIONNAIRE_URL: params.questionnaireUrl,

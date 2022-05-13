@@ -84,6 +84,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
   immersionAddress: dto.immersionAddress || "",
   immersionAppellationLabel: dto.immersionAppellation.appellationLabel,
   immersionActivities: dto.immersionActivities,
+  immersionSkills: dto.immersionSkills ?? "Non renseigné",
   sanitaryPrevention:
     dto.sanitaryPrevention && dto.sanitaryPreventionDescription
       ? dto.sanitaryPreventionDescription

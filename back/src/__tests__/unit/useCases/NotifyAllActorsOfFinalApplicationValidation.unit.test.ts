@@ -191,6 +191,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       immersionAppellationLabel:
         application.immersionAppellation.appellationLabel,
       immersionActivities: application.immersionActivities,
+      immersionSkills: application.immersionSkills ?? "Non renseigné",
       sanitaryPrevention: "sanitaryPreventionDescription",
       individualProtection: "oui",
       questionnaireUrl: agencyConfig.questionnaireUrl,
