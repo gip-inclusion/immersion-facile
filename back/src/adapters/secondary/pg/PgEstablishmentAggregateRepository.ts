@@ -3,12 +3,16 @@ import format from "pg-format";
 import R from "ramda";
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
+  DataSource,
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
+import {
+  EstablishmentAggregateRepository,
+  OfferWithSiret,
+} from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { LatLonDto } from "shared/src/latLon";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
@@ -58,7 +62,18 @@ export class PgEstablishmentAggregateRepository
   ) {
     await this._upsertEstablishmentsFromAggregates(aggregates);
     await this._insertContactsFromAggregates(aggregates);
-    await this._insertImmersionOffersFromAggregates(aggregates);
+
+    const offersWithSiret: OfferWithSiret[] = aggregates.reduce(
+      (offersWithSiret, aggregate) => [
+        ...offersWithSiret,
+        ...aggregate.immersionOffers.map((immersionOffer) => ({
+          siret: aggregate.establishment.siret,
+          ...immersionOffer,
+        })),
+      ],
+      [] as OfferWithSiret[],
+    );
+    await this.createImmersionOffersToEstablishments(offersWithSiret);
 
     return;
   }
@@ -209,30 +224,6 @@ export class PgEstablishmentAggregateRepository
     }
   }
 
-  private async _insertImmersionOffersFromAggregates(
-    aggregates: EstablishmentAggregate[],
-  ) {
-    if (aggregates.length === 0) return;
-
-    const immersionOfferFields: any[][] = aggregates.flatMap(
-      ({ establishment, immersionOffers }) =>
-        immersionOffers.map((immersionOffer) => [
-          immersionOffer.id,
-          immersionOffer.romeCode,
-          immersionOffer.appellationCode,
-          establishment.siret,
-          immersionOffer.score,
-        ]),
-    );
-    const query = format(
-      `INSERT INTO immersion_offers (
-          uuid, rome_code, rome_appellation, siret, score
-        ) VALUES %L`,
-      immersionOfferFields,
-    );
-    await this.client.query(query);
-  }
-
   private async _updateImmersionOffersFromAggregates(
     existingAggregate: EstablishmentAggregate,
     updatingAggregate: EstablishmentAggregate,
@@ -252,13 +243,14 @@ export class PgEstablishmentAggregateRepository
       await this.client.query(
         format(
           `INSERT INTO immersion_offers (
-            uuid, rome_code, rome_appellation, score, siret
+            uuid, rome_code, rome_appellation, score, creation_date, siret
           ) VALUES %L`,
           offersToAdd.map((offerToAdd) => [
             offerToAdd.id,
             offerToAdd.romeCode,
             offerToAdd.appellationCode,
             offerToAdd.score,
+            offerToAdd.createdAt,
             siret,
           ]),
         ),
@@ -341,10 +333,9 @@ export class PgEstablishmentAggregateRepository
     maxResults?: number;
   }): Promise<SearchImmersionResultDto[]> {
     const selectedOffersSubQuery = format(
-      `
-    WITH active_establishments_within_area AS (SELECT siret, (data_source = 'form')::boolean AS voluntary_to_immersion, gps FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
-      searchMade.voluntary_to_immersion,
-    )}) 
+      `WITH active_establishments_within_area AS (SELECT siret, (data_source = 'form')::boolean AS voluntary_to_immersion, gps FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
+        searchMade.voluntary_to_immersion,
+      )}) 
         SELECT aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
         COALESCE(JSON_AGG(DISTINCT libelle_appellation_long) FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels
         FROM active_establishments_within_area aewa 
@@ -386,11 +377,13 @@ export class PgEstablishmentAggregateRepository
     return pgResult.rows.map((row) => row.siret);
   }
 
-  public async getSiretOfEstablishmentsFromFormSource(): Promise<string[]> {
-    const query = `
-      SELECT siret FROM establishments
-      WHERE data_source = 'form'`;
-    const pgResult = await this.client.query(query);
+  public async getSiretsOfEstablishmentsWithRomeCode(
+    rome: string,
+  ): Promise<string[]> {
+    const pgResult = await this.client.query(
+      `SELECT siret FROM immersion_offers WHERE rome_code = $1`,
+      [rome],
+    );
     return pgResult.rows.map((row) => row.siret);
   }
 
@@ -516,6 +509,46 @@ export class PgEstablishmentAggregateRepository
       );
     return immersionSearchResultDtos[0];
   }
+
+  public async groupEstablishmentSiretsByDataSource(
+    sirets: SiretDto[],
+  ): Promise<Record<DataSource, SiretDto[]>> {
+    const query = format(
+      `
+      WITH grouped_sirets AS (SELECT data_source, JSONB_AGG(siret) AS sirets
+              FROM establishments
+              WHERE siret IN (%1$L)
+              GROUP BY data_source) 
+      SELECT JSONB_OBJECT_AGG(data_source, sirets) AS sirets_by_data_source FROM grouped_sirets`,
+      sirets,
+    );
+    const pgResult = await this.client.query(query);
+    return pgResult.rows[0].sirets_by_data_source;
+  }
+
+  public async createImmersionOffersToEstablishments(
+    offersWithSiret: OfferWithSiret[],
+  ) {
+    if (offersWithSiret.length === 0) return;
+
+    const immersionOfferFields: any[][] = offersWithSiret.map(
+      (offerWithSiret) => [
+        offerWithSiret.id,
+        offerWithSiret.romeCode,
+        offerWithSiret.appellationCode,
+        offerWithSiret.siret,
+        offerWithSiret.score,
+        offerWithSiret.createdAt,
+      ],
+    );
+    const query = format(
+      `INSERT INTO immersion_offers (
+          uuid, rome_code, rome_appellation, siret, score, creation_date
+        ) VALUES %L`,
+      immersionOfferFields,
+    );
+    await this.client.query(query);
+  }
   private async selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
     selectedOffersSubQuery: string,
     selectedOffersSubQueryParams: any[],
@@ -543,11 +576,11 @@ export class PgEstablishmentAggregateRepository
   async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
-    return (
+    const aggregateWithStringDates = (
       await this.client.query(
         `WITH 
           unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ),
-          filtered_immersion_offers AS (SELECT siret, JSON_AGG(JSON_BUILD_OBJECT('romeCode', rome_code, 'score', score, 'id', uuid, 'appellationCode', rome_appellation::text)) as immersionOffers
+          filtered_immersion_offers AS (SELECT siret, JSON_AGG(JSON_BUILD_OBJECT('romeCode', rome_code, 'score', score, 'id', uuid, 'appellationCode', rome_appellation::text, 'createdAt',  to_char(creation_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))) as immersionOffers
              FROM immersion_offers WHERE siret = $1 GROUP BY siret)
         SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'establishment', JSON_BUILD_OBJECT(
@@ -585,6 +618,24 @@ export class PgEstablishmentAggregateRepository
         [siret],
       )
     ).rows[0]?.aggregate;
+    // Convert date fields from string to Date
+    return (
+      aggregateWithStringDates && {
+        establishment: {
+          ...aggregateWithStringDates.establishment,
+          updatedAt: aggregateWithStringDates.establishment.updatedAt
+            ? new Date(aggregateWithStringDates.establishment.updatedAt)
+            : undefined,
+        },
+        immersionOffers: aggregateWithStringDates.immersionOffers.map(
+          (immersionOfferWithStringDate: any) => ({
+            ...immersionOfferWithStringDate,
+            createdAt: new Date(immersionOfferWithStringDate.createdAt),
+          }),
+        ),
+        contact: aggregateWithStringDates.contact,
+      }
+    );
   }
 }
 

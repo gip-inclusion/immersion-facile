@@ -8,6 +8,7 @@ const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {
   id: "13df03a5-a2a5-430a-b558-ed3e2f03512d",
   romeCode: "B1805",
   score: 4.5,
+  createdAt: new Date("2022-05-15T12:00:00.000"),
 };
 
 export class ImmersionOfferEntityV2Builder
@@ -42,7 +43,12 @@ export class ImmersionOfferEntityV2Builder
       appellationCode,
     });
   }
-
+  withCreatedAt(createdAt: Date) {
+    return new ImmersionOfferEntityV2Builder({
+      ...this.entity,
+      createdAt,
+    });
+  }
   build() {
     return this.entity;
   }

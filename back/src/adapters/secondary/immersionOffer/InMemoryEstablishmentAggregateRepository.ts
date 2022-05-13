@@ -1,11 +1,15 @@
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
+  DataSource,
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
+import {
+  EstablishmentAggregateRepository,
+  OfferWithSiret,
+} from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { path, pathEq, pathNotEq } from "shared/src/ramdaExtensions/path";
 import { propEq } from "shared/src/ramdaExtensions/propEq";
 import { createLogger } from "../../../utils/logger";
@@ -15,6 +19,7 @@ import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmer
 import { conflictErrorSiret, SiretDto } from "shared/src/siret";
 import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
 import { replaceArrayElement } from "shared/src/utils";
+import { groupBy } from "ramda";
 
 const logger = createLogger(__filename);
 
@@ -53,6 +58,26 @@ export class InMemoryEstablishmentAggregateRepository
       aggregate,
     );
   }
+  async createImmersionOffersToEstablishments(
+    offersWithSirets: OfferWithSiret[],
+  ) {
+    logger.info({ offersWithSirets }, "addImmersionOffersToEstablishments");
+
+    this._establishmentAggregates = this._establishmentAggregates.map(
+      (existingAggregate) => {
+        const matchOfferToAddWithSiret = offersWithSirets.find(
+          propEq("siret", existingAggregate.establishment.siret),
+        );
+        if (!matchOfferToAddWithSiret) return existingAggregate;
+        const { siret, ...offerToAdd } = matchOfferToAddWithSiret;
+        return {
+          ...existingAggregate,
+          immersionOffers: [...existingAggregate.immersionOffers, offerToAdd],
+        };
+      },
+    );
+  }
+
   async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
@@ -109,12 +134,6 @@ export class InMemoryEstablishmentAggregateRepository
             : true),
       )
       .map((aggregate) => aggregate.establishment.siret);
-  }
-
-  public async getSiretOfEstablishmentsFromFormSource(): Promise<string[]> {
-    return this._establishmentAggregates
-      .filter(pathEq("establishment.dataSource", "form"))
-      .map(path("establishment.siret"));
   }
 
   public async updateEstablishment(
@@ -209,6 +228,35 @@ export class InMemoryEstablishmentAggregateRepository
       },
     };
   }
+  async getSiretsOfEstablishmentsWithRomeCode(
+    rome: string,
+  ): Promise<SiretDto[]> {
+    return this._establishmentAggregates
+      .filter(
+        (aggregate) =>
+          !!aggregate.immersionOffers.find((offer) => offer.romeCode === rome),
+      )
+      .map(path("establishment.siret"));
+  }
+  async groupEstablishmentSiretsByDataSource(
+    sirets: SiretDto[],
+  ): Promise<Record<DataSource, SiretDto[]>> {
+    const kwnownSirets = sirets.filter(
+      (siret) =>
+        !!this._establishmentAggregates.find(
+          (aggregate) => aggregate.establishment.siret === siret,
+        ),
+    );
+    return groupBy(
+      (siret) =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we already filtered siret of existing establishments
+        this._establishmentAggregates.find(
+          (aggregate) => aggregate.establishment.siret === siret,
+        )!.establishment.dataSource,
+      kwnownSirets,
+    );
+  }
+
   // for test purposes only :
   get establishmentAggregates() {
     return this._establishmentAggregates;

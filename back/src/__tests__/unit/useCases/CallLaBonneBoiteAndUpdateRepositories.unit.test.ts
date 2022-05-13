@@ -13,6 +13,8 @@ import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImme
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
 const prepareUseCase = () => {
   const establishmentAggregateRepository =
@@ -176,6 +178,113 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       expect(establishmentAggregateRepository.establishmentAggregates).toEqual([
         alreadyExistingAggregateFromForm,
       ]);
+    });
+    it("Should ignore establishments that already exist and have offer with same rome", async () => {
+      const existingSiret = "12345678901234";
+      const existingRome = dto.rome!;
+      // Prepare : an establishment already inserted from form
+      const { useCase, laBonneBoiteAPI, establishmentAggregateRepository } =
+        await prepareUseCase();
+      const alreadyExistingAggregateFromLBB =
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityV2Builder()
+              .withSiret(existingSiret)
+              .withDataSource("api_labonneboite")
+              .withUpdatedAt(new Date("2022-05-11"))
+              .build(),
+          )
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withCreatedAt(new Date("2022-05-12"))
+              .withRomeCode(existingRome)
+              .build(),
+          ])
+          .build();
+
+      establishmentAggregateRepository.establishmentAggregates = [
+        alreadyExistingAggregateFromLBB,
+      ];
+
+      laBonneBoiteAPI.setNextResults([
+        new LaBonneBoiteCompanyBuilder()
+          .withSiret(existingSiret)
+          .withRome(existingRome)
+          .build(),
+      ]);
+
+      // Act : this establishment is referenced in LBB
+      await useCase.execute(dto);
+
+      // Assert : Should have skipped this establishment
+      expect(establishmentAggregateRepository.establishmentAggregates).toEqual([
+        alreadyExistingAggregateFromLBB,
+      ]);
+    });
+    it("Should update (and not re-create !) establishments that already exist but don't have this rome", async () => {
+      const existingSiret = "12345678901234";
+      const newRome = dto.rome!;
+      // Prepare : an establishment already inserted from form
+      const {
+        useCase,
+        laBonneBoiteAPI,
+        establishmentAggregateRepository,
+        uuidGenerator,
+        clock,
+      } = await prepareUseCase();
+      const alreadyExistingAggregateFromLBB =
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityV2Builder()
+              .withSiret(existingSiret)
+              .withDataSource("api_labonneboite")
+              .withUpdatedAt(new Date("2022-05-11"))
+              .build(),
+          )
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withCreatedAt(new Date("2022-05-12"))
+              .withRomeCode("A1101") // Existing offer
+              .build(),
+          ])
+          .build();
+
+      establishmentAggregateRepository.establishmentAggregates = [
+        alreadyExistingAggregateFromLBB,
+      ];
+
+      laBonneBoiteAPI.setNextResults([
+        new LaBonneBoiteCompanyBuilder()
+          .withSiret(existingSiret)
+          .withRome(newRome)
+          .withStars(5)
+          .build(),
+      ]);
+      uuidGenerator.setNextUuid("newOfferUuid");
+      const newOffercreatedAt = new Date("2022-05-18");
+      clock.setNextDate(newOffercreatedAt);
+
+      // Act : this establishment is referenced in LBB
+      await useCase.execute(dto);
+
+      // Assert : Should have skipped this establishment
+      expectTypeToMatchAndEqual(
+        establishmentAggregateRepository.establishmentAggregates,
+        [
+          {
+            ...alreadyExistingAggregateFromLBB,
+            immersionOffers: [
+              alreadyExistingAggregateFromLBB.immersionOffers[0],
+              {
+                id: "newOfferUuid",
+                romeCode: newRome,
+                score: 5,
+                createdAt: newOffercreatedAt,
+              },
+            ],
+          },
+        ],
+      );
     });
   });
 

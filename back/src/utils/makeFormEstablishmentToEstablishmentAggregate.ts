@@ -16,12 +16,13 @@ import { notifyAndThrowErrorDiscord } from "./notifyDiscord";
 const offerFromFormScore = 10;
 
 const appelationToImmersionOfferEntity =
-  (uuidGenerator: UuidGenerator) =>
+  (uuidGenerator: UuidGenerator, clock: Clock) =>
   ({ romeCode, appellationCode }: AppellationDto): ImmersionOfferEntityV2 => ({
     id: uuidGenerator.new(),
     romeCode,
     appellationCode,
     score: offerFromFormScore,
+    createdAt: clock.now(),
   });
 
 export const makeFormEstablishmentToEstablishmentAggregate = ({
@@ -73,7 +74,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
 
     const immersionOffers: ImmersionOfferEntityV2[] =
       formEstablishment.appellations.map(
-        appelationToImmersionOfferEntity(uuidGenerator),
+        appelationToImmersionOfferEntity(uuidGenerator, clock),
       );
 
     const establishment: EstablishmentEntityV2 = {

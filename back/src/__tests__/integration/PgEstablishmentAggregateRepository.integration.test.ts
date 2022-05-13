@@ -955,7 +955,7 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("Pg implementation of method getSiretOfEstablishmentsFromFormSource", () => {
-    it("Returns a list of sirets of establishments with `form` data source", async () => {
+    it("Returns a record with lists of sirets grouped by data source", async () => {
       // Prepare
       const siretFromForm1 = "11111111111111";
       const siretFromForm2 = "22222222222222";
@@ -977,13 +977,68 @@ describe("Postgres implementation of immersion offer repository", () => {
       ]);
 
       // Act
-      const actualSiretOfEstablishmentsFromFormSource =
-        await pgEstablishmentAggregateRepository.getSiretOfEstablishmentsFromFormSource();
+      const actualSiretsGroupedByDataSource =
+        await pgEstablishmentAggregateRepository.groupEstablishmentSiretsByDataSource(
+          [siretFromForm1, siretFromForm2, siretFromLBB, "44444444444444"],
+        );
       // Assert
+      expectArraysToEqualIgnoringOrder(actualSiretsGroupedByDataSource.form, [
+        siretFromForm1,
+        siretFromForm2,
+      ]);
       expectArraysToEqualIgnoringOrder(
-        actualSiretOfEstablishmentsFromFormSource,
-        [siretFromForm1, siretFromForm2],
+        actualSiretsGroupedByDataSource.api_labonneboite,
+        [siretFromLBB],
       );
+    });
+  });
+  describe("Pg implementation of method getSiretsOfEstablishmentsWithRomeCode", () => {
+    it("Returns a list of establishment sirets that have an offer with given rome", async () => {
+      // Prepare
+      const romeCode = "A1101";
+      const siretWithRomeCodeOffer = "11111111111111";
+      const siretWithoutRomeCodeOffer = "22222222222222";
+
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(siretWithRomeCodeOffer)
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder().withRomeCode(romeCode).build(),
+          ])
+          .build(),
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(siretWithoutRomeCodeOffer)
+
+          .build(),
+      ]);
+
+      // Act
+      const actualSiretOfEstablishmentsWithRomeCode =
+        await pgEstablishmentAggregateRepository.getSiretsOfEstablishmentsWithRomeCode(
+          romeCode,
+        );
+      // Assert
+      expect(actualSiretOfEstablishmentsWithRomeCode).toEqual([
+        siretWithRomeCodeOffer,
+      ]);
+    });
+  });
+  describe("Pg implementation of method createImmersionOffersToEstablishments", () => {
+    it("Creates offer related to an establishment siret", async () => {
+      // Prepare : create establishment
+      const siret = "1234567890123";
+      const newOffer = new ImmersionOfferEntityV2Builder().build();
+      await insertEstablishment({ siret });
+      // Act
+      await pgEstablishmentAggregateRepository.createImmersionOffersToEstablishments(
+        [{ ...newOffer, siret }],
+      );
+      // Assert : establishment aggregate has a new offer
+      const updatedAggregate =
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+          siret,
+        );
+      expect(updatedAggregate?.immersionOffers).toEqual([newOffer]);
     });
   });
   describe("Pg implementation of method removeEstablishmentAndOffersWithSiret", () => {

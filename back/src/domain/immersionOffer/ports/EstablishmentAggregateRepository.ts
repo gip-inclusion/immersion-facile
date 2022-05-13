@@ -2,11 +2,14 @@ import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppella
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { SiretDto } from "shared/src/siret";
 import {
+  DataSource,
   EstablishmentAggregate,
   EstablishmentEntityV2,
 } from "../entities/EstablishmentEntity";
+import { ImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 
+export type OfferWithSiret = ImmersionOfferEntityV2 & { siret: SiretDto };
 export interface EstablishmentAggregateRepository {
   hasEstablishmentFromFormWithSiret: (siret: string) => Promise<boolean>;
   insertEstablishmentAggregates: (
@@ -16,6 +19,10 @@ export interface EstablishmentAggregateRepository {
     establishmentAggregate: EstablishmentAggregate,
     updatedAt: Date,
   ) => Promise<void>;
+  createImmersionOffersToEstablishments: (
+    offersWithSiret: OfferWithSiret[],
+  ) => Promise<void>;
+
   getSearchImmersionResultDtoFromSearchMade: (props: {
     searchMade: SearchMade;
     withContactDetails?: boolean;
@@ -25,8 +32,6 @@ export interface EstablishmentAggregateRepository {
   getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince: (
     since: Date,
   ) => Promise<SiretDto[]>;
-
-  getSiretOfEstablishmentsFromFormSource: () => Promise<SiretDto[]>;
 
   updateEstablishment: (
     propertiesToUpdate: Partial<EstablishmentEntityV2> & {
@@ -50,4 +55,8 @@ export interface EstablishmentAggregateRepository {
     siret: SiretDto,
     rome: string,
   ) => Promise<SearchImmersionResultDto | undefined>;
+  getSiretsOfEstablishmentsWithRomeCode: (rome: string) => Promise<SiretDto[]>;
+  groupEstablishmentSiretsByDataSource: (
+    sirets: SiretDto[],
+  ) => Promise<Record<DataSource, SiretDto[]>>;
 }

@@ -1,5 +1,7 @@
 import { NafDto } from "shared/src/naf";
+import { SiretDto } from "shared/src/siret";
 import { createLogger } from "../../../utils/logger";
+import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import {
   EstablishmentAggregate,
@@ -18,7 +20,7 @@ export type LaBonneBoiteCompanyProps = {
   naf: string;
   naf_text: string;
   name: string;
-  siret: string;
+  siret: SiretDto;
   stars: number;
   raison_sociale: string;
   url: string; // URL to the company reference page on LaBonneBoite
@@ -38,7 +40,7 @@ export class LaBonneBoiteCompanyVO {
 
   public toEstablishmentAggregate(
     uuidGenerator: UuidGenerator,
-    updatedAt?: Date,
+    clock: Clock,
     extraData?: {
       nafDto?: NafDto;
       numberEmployeesRange?: NumberEmployeesRange;
@@ -58,7 +60,7 @@ export class LaBonneBoiteCompanyVO {
       voluntaryToImmersion: false,
       numberEmployeesRange: extraData?.numberEmployeesRange ?? "",
       isActive: true,
-      updatedAt,
+      updatedAt: undefined,
       isSearchable: true,
     };
 
@@ -69,6 +71,7 @@ export class LaBonneBoiteCompanyVO {
           id: uuidGenerator.new(),
           romeCode: this.props.matched_rome_code,
           score: this.props.stars,
+          createdAt: clock.now(),
         },
       ],
     };

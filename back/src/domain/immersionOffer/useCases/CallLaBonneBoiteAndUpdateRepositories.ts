@@ -1,5 +1,6 @@
 import { addDays } from "date-fns";
 import promClient from "prom-client";
+import { prop, propEq } from "ramda";
 import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
 import { searchImmersionRequestSchema } from "shared/src/searchImmersion/SearchImmersionRequest.schema";
 import { createLogger } from "../../../utils/logger";
@@ -7,7 +8,10 @@ import { Clock } from "../../core/ports/Clock";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
-import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
+import {
+  EstablishmentAggregateRepository,
+  OfferWithSiret,
+} from "../ports/EstablishmentAggregateRepository";
 import {
   LaBonneBoiteAPI,
   LaBonneBoiteRequestParams,
@@ -80,14 +84,46 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
       lbbRequestEntity,
     );
     if (relevantCompanies) {
-      const existingFormEstablishmentsSirets =
-        await this.establishmentAggregateRepository.getSiretOfEstablishmentsFromFormSource();
-
+      const lbbSirets = relevantCompanies.map(prop("siret"));
+      const siretGroupedByDataSource =
+        await this.establishmentAggregateRepository.groupEstablishmentSiretsByDataSource(
+          lbbSirets,
+        );
+      const existingEstablishments = [
+        ...(siretGroupedByDataSource.api_labonneboite ?? []),
+        ...(siretGroupedByDataSource.form ?? []),
+      ];
       const newRelevantCompanies = relevantCompanies.filter(
-        (company) => !existingFormEstablishmentsSirets.includes(company.siret),
+        (company) => !existingEstablishments.includes(company.siret),
       );
-
       await this.insertRelevantCompaniesInRepositories(newRelevantCompanies);
+
+      if (!siretGroupedByDataSource.api_labonneboite) return;
+
+      const existingCompaniesWithSameRome =
+        await this.establishmentAggregateRepository.getSiretsOfEstablishmentsWithRomeCode(
+          requestParams.rome,
+        );
+      const existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome =
+        siretGroupedByDataSource.api_labonneboite.filter(
+          (siret) => !existingCompaniesWithSameRome.includes(siret),
+        );
+
+      const immersionOffersWithSiretsToAdd: OfferWithSiret[] =
+        existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome.map((siret) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it's siret is within relevantCompanies
+          const company = relevantCompanies.find(propEq("siret", siret))!;
+          return {
+            siret: company.siret,
+            id: this.uuidGenerator.new(),
+            createdAt: this.clock.now(),
+            romeCode: company.props.matched_rome_code,
+            score: company.props.stars,
+          };
+        });
+      await this.establishmentAggregateRepository.createImmersionOffersToEstablishments(
+        immersionOffersWithSiretsToAdd,
+      );
     }
   }
 
@@ -137,10 +173,9 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
   private async insertRelevantCompaniesInRepositories(
     companies: LaBonneBoiteCompanyVO[],
   ) {
-    const updatedAt = undefined;
     const llbResultsConvertedToEstablishmentAggregates = companies.map(
       (company) =>
-        company.toEstablishmentAggregate(this.uuidGenerator, updatedAt),
+        company.toEstablishmentAggregate(this.uuidGenerator, this.clock),
     );
 
     await this.establishmentAggregateRepository.insertEstablishmentAggregates(
