@@ -9,6 +9,7 @@ import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/In
 import { InMemorySearchMadeRepository } from "../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import { InMemoryLaBonneBoiteRequestRepository } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
 import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
 import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
 import type { InMemoryImmersionApplicationRepository } from "../adapters/secondary/InMemoryImmersionApplicationRepository";
@@ -51,6 +52,7 @@ export type InMemoryRepositories = {
   postalCodeDepartmentRegion: PostalCodeDepartmentRegionQueries;
   getApiConsumerById: GetApiConsumerById;
   getFeatureFlags: GetFeatureFlags;
+  documentGateway: InMemoryDocumentGateway;
   reportingGateway: InMemoryReportingGateway;
 };
 

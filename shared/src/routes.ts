@@ -34,6 +34,7 @@ export const agencyPublicInfoByIdRoute = "agency-public-info-by-id";
 export const contactEstablishmentRoute = "contact-establishment";
 export const getFeatureFlags = "feature-flags";
 export const immersionApplicationShareRoute = "share-immersion-demand";
+export const uploadFileRoute = "upload-file";
 
 export const immersionAssessmentRoute = "immersion-assessment";
 

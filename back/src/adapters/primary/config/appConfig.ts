@@ -7,6 +7,7 @@ import {
   ProcessEnv,
   throwIfNotInArray,
 } from "shared/src/envHelpers";
+import { MinioParams } from "../secondary/MinioDocumentGateway";
 
 export type AccessTokenConfig = {
   clientId: string;
@@ -247,6 +248,27 @@ export class AppConfig {
   // Visible for testing.
   public get configParams() {
     return this.env;
+  }
+
+  public get documentGateway() {
+    return throwIfNotInArray({
+      processEnv: this.env,
+      authorizedValues: ["NONE", "MINIO"],
+      variableName: "DOCUMENT_GATEWAY",
+      defaultValue: "NONE",
+    });
+  }
+
+  public get minioParams(): MinioParams | undefined {
+    if (this.documentGateway === "MINIO") {
+      return {
+        endPoint: this.throwIfNotDefined("MINIO_ENDPOINT"),
+        port: +this.throwIfNotDefined("MINO_PORT"),
+        accessKey: this.throwIfNotDefined("MINIO_ACCESS_KEY"),
+        secretKey: this.throwIfNotDefined("MINIO_SECRET_KEY"),
+        bucketName: this.throwIfNotDefined("MINIO_BUCKET"),
+      };
+    }
   }
 }
 

@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { getFeatureFlags, renewMagicLinkRoute } from "shared/src/routes";
+import multer from "multer";
+import {
+  getFeatureFlags,
+  renewMagicLinkRoute,
+  uploadFileRoute,
+} from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
@@ -18,6 +23,22 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
     .route(`/${getFeatureFlags}`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, deps.repositories.getFeatureFlags),
+    );
+
+  const upload = multer({ dest: "storage/tmp" });
+
+  technicalRouter
+    .route(`/${uploadFileRoute}`)
+    .post(upload.single(uploadFileRoute), (req, res) =>
+      sendHttpResponse(req, res, () => {
+        if (!req.file) throw new Error("No file uploaded");
+        return deps.useCases.uploadFile.execute({
+          name: req.file.originalname,
+          encoding: req.file.encoding,
+          size: req.file.size,
+          path: req.file.path,
+        });
+      }),
     );
 
   return technicalRouter;

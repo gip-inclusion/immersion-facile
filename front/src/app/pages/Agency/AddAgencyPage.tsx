@@ -1,4 +1,5 @@
 import { Form, Formik, FormikHelpers } from "formik";
+import { File } from "@dataesr/react-dsfr";
 import { keys } from "ramda";
 import * as React from "react";
 import { useState } from "react";
@@ -7,6 +8,7 @@ import {
   SubmitFeedback,
   SuccessFeedbackKind,
 } from "src/app/components/SubmitFeedback";
+import { UploadFile } from "src/app/components/UploadFile";
 import { agencyGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import {
@@ -153,6 +155,11 @@ export const AddAgencyPage = () => {
                     name={getName("signature")}
                     label="Quel texte de signature souhaitez-vous pour les mails automatisés ?"
                     placeholder="L’équipe de l’agence de Boulogne-Billancourt"
+                  />
+                  <UploadFile
+                    maxSize_Mo={2}
+                    label="Vous pouvez également télécharger votre logo."
+                    hint="Cela permettra de personnaliser les mails automatisés."
                   />
                 </div>
                 <br />
