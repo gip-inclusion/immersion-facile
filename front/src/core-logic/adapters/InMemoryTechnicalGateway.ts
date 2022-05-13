@@ -1,11 +1,11 @@
 import { Subject } from "rxjs";
-import { FeatureFlagsGateway } from "src/core-logic/ports/FeatureFlagsGateway";
+import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { FeatureFlags } from "shared/src/featureFlags";
 
-export class InMemoryFeatureFlagGateway implements FeatureFlagsGateway {
+export class InMemoryTechnicalGateway implements TechnicalGateway {
   private _featureFlags$ = new Subject<FeatureFlags>();
 
-  getAll = () => this._featureFlags$;
+  getAllFeatureFlags = () => this._featureFlags$;
 
   // test purposes only
   get featureFlags$() {

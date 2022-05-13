@@ -23,7 +23,7 @@ describe("feature flag slice", () => {
       enableInseeApi: true,
       enablePeConnectApi: true,
     };
-    dependencies.featureFlagGateway.featureFlags$.next(valueFromApi);
+    dependencies.technicalGateway.featureFlags$.next(valueFromApi);
     expect(featureFlagsSelector(store.getState())).toEqual(valueFromApi);
   });
 });

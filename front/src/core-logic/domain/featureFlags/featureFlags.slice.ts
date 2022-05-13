@@ -39,12 +39,12 @@ export const fetchFeatureFlagsEpic: Epic<
   FeatureFlagsAction,
   RootState,
   Dependencies
-> = (action$, _state$, { featureFlagGateway }) =>
+> = (action$, _state$, { technicalGateway }) =>
   action$.pipe(
     filter(featureFlagsSlice.actions.retrieveFeatureFlagsRequested.match),
     switchMap(() =>
-      featureFlagGateway
-        .getAll()
+      technicalGateway
+        .getAllFeatureFlags()
         .pipe(map(featureFlagsSlice.actions.retrieveFeatureFlagsSucceeded)),
     ),
   );
