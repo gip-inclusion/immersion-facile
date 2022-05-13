@@ -28,7 +28,6 @@ type KeysForExport =
   | "enterpriseAccepted"
   | "schedule"
   | "siret"
-  | "peExternalId"
   | "workConditions";
 
 export type ImmersionApplicationRawBeforeExportProps = Pick<

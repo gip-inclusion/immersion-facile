@@ -86,7 +86,6 @@ export const immersionApplicationSchema: z.Schema<ImmersionApplicationDto> = z
     immersionSkills: z.string().optional(),
     beneficiaryAccepted: zBoolean,
     enterpriseAccepted: zBoolean,
-    peExternalId: z.string().optional(),
   })
   .refine(startDateIsBeforeEndDate, {
     message: "La date de fin doit être après la date de début.",

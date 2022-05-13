@@ -139,7 +139,6 @@ export const ApplicationFormFieldsUkraine = ({
       {isFrozen && isSignatureMode && (
         <SignOnlyMessage isAlreadySigned={alreadySubmitted ?? false} />
       )}
-      <input type="hidden" name="peExternalIdentity" />
       <FormSectionTitle>1. Coordonnées du bénéficiaire</FormSectionTitle>
       <TextInput
         label="Email *"
@@ -437,7 +436,6 @@ export const RequestModificationButton = ({
 
 const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
   const keysToWatch: ApplicationFormKeysInUrl[] = [
-    "peExternalId",
     "email",
     "firstName",
     "lastName",

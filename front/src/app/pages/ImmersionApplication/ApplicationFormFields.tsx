@@ -467,7 +467,6 @@ export const RequestModificationButton = ({
 
 const makeValuesToWatchInUrl = (values: ImmersionApplicationDto) => {
   const keysToWatch: ApplicationFormKeysInUrl[] = [
-    "peExternalId",
     "email",
     "firstName",
     "lastName",

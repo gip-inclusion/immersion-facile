@@ -53,7 +53,6 @@ describe("Pg implementation of ImmersionApplicationExportQueries", () => {
             .withDateSubmission(new Date("2021-01-10").toISOString())
             .withAgencyId(appleAgencyId)
             .withoutWorkCondition()
-            .withoutPeExternalId()
             .build(),
         );
 

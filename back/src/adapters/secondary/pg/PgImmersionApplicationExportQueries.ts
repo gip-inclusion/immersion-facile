@@ -42,7 +42,6 @@ export class PgImmersionApplicationExportQueries
           enterpriseAccepted: row.enterprise_accepted,
           schedule: row.schedule,
           siret: row.siret,
-          peExternalId: optional(row.pe_external_id),
           workConditions: optional(row.work_conditions),
         }),
     );

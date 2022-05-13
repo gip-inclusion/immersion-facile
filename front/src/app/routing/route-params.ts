@@ -17,7 +17,6 @@ export type ApplicationFormKeysInUrl =
 
 export const immersionApplicationValuesFromUrl = {
   email: param.query.optional.string,
-  peExternalId: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,
   phone: param.query.optional.string,

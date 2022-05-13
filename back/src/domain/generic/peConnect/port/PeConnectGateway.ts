@@ -39,7 +39,7 @@ export interface PeConnectGateway {
 
 export type ImmersionApplicationPeConnectFields = Pick<
   ImmersionApplicationDto,
-  "email" | "firstName" | "lastName" | "peExternalId"
+  "email" | "firstName" | "lastName"
 >;
 
 export const peConnectUserInfoToImmersionApplicationDto = (
@@ -48,5 +48,4 @@ export const peConnectUserInfoToImmersionApplicationDto = (
   email: peConnectUserInfo.email,
   firstName: peConnectUserInfo.given_name,
   lastName: peConnectUserInfo.family_name,
-  peExternalId: peConnectUserInfo.idIdentiteExterne,
 });

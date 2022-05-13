@@ -59,7 +59,6 @@ export const immersionApplicationInitialValuesFromUrl = ({
 
     dateStart: params.dateStart ?? toDateString(addDays(startOfToday(), 2)),
     dateEnd: params.dateEnd ?? toDateString(addDays(startOfToday(), 3)),
-    peExternalId: params.peExternalId ?? undefined,
 
     // Enterprise
     siret: params.siret ?? "",
@@ -103,8 +102,6 @@ const devPrefilledValues = (
   postalCode: emptyForm.postalCode || "75001",
   emergencyContact: emptyForm.emergencyContact || "Éric Durand",
   emergencyContactPhone: emptyForm.emergencyContactPhone || "0662552607",
-
-  peExternalId: emptyForm.peExternalId || undefined,
 
   // Enterprise
   siret: emptyForm.siret || "1234567890123",

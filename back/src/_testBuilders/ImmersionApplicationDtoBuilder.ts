@@ -184,13 +184,6 @@ export class ImmersionApplicationDtoBuilder
     });
   }
 
-  public withoutPeExternalId(): ImmersionApplicationDtoBuilder {
-    return new ImmersionApplicationDtoBuilder({
-      ...this.dto,
-      peExternalId: undefined,
-    });
-  }
-
   public withoutWorkCondition(): ImmersionApplicationDtoBuilder {
     return new ImmersionApplicationDtoBuilder({
       ...this.dto,
