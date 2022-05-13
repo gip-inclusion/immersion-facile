@@ -1,4 +1,4 @@
-import { expectToEqual } from "../../../../shared/src/expectToEqual";
+import { expectToEqual } from "shared/src/expectToEqual";
 import {
   PROD_MIX_PG_EXCEL_140_HOUR_EXEMPLE,
   PROD_PG_0_HOUR_EXEMPLE,

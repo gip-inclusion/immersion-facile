@@ -8,7 +8,7 @@ import {
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { expectToEqual } from "../../../../../shared/src/expectToEqual";
+import { expectToEqual } from "shared/src/expectToEqual";
 
 const makeFeedRomeAutocompleteGatewayWithRomeDtos =
   (dependencies: TestDependencies) => (romeDtos: RomeDto[]) => {

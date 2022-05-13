@@ -5,11 +5,10 @@ import {
 } from "../../../domain/core/ports/ReportingGateway";
 
 export class InMemoryReportingGateway implements ReportingGateway {
-  exportImmersionApplications(
+  async exportImmersionApplications(
     report: ArchivedReport<ImmersionApplicationsExportByAgency>,
   ): Promise<void> {
     this.expectedReport = report;
-    return Promise.resolve();
   }
   public expectedReport:
     | ArchivedReport<ImmersionApplicationsExportByAgency>

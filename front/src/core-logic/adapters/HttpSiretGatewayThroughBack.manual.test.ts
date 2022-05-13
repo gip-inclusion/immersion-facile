@@ -8,7 +8,7 @@ import {
   GetSiretInfoError,
   SiretGatewayThroughBack,
 } from "../ports/SiretGatewayThroughBack";
-import { expectToEqual } from "../../../../shared/src/expectToEqual";
+import { expectToEqual } from "shared/src/expectToEqual";
 import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
 import { InMemorySiretGatewayThroughBack } from "./InMemorySiretGatewayThroughBack";
 

@@ -251,7 +251,7 @@ describe("ScheduleUtils", () => {
         expect(totalHours).toBe(50);
       });
     });
-    describe("with complex schedule that return 0 on prod", () => {
+    describe("with complex schedule that return 0 on prod from Excel sample but OK on unit test", () => {
       const complexSchedule = new ScheduleDtoBuilder()
         .withComplexSchedule([
           [
@@ -279,13 +279,50 @@ describe("ScheduleUtils", () => {
         ])
         .build();
 
-      it("has no hours if the day is not one of the worked day", () => {
+      it("has 140 hours with good date format.", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
           dateStart: "2022/04/11",
           dateEnd: "2022/05/08",
           schedule: complexSchedule,
         });
         expect(totalHours).toBe(140);
+      });
+    });
+    describe("with complex schedule that return 0 on prod from PG sample and 0 on unit test", () => {
+      const complexSchedule = new ScheduleDtoBuilder()
+        .withComplexSchedule([
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [],
+          [],
+        ])
+        .build();
+
+      it("has no hours if the start and end dates are in french format", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "11/04/2022",
+          dateEnd: "08/05/2022",
+          schedule: complexSchedule,
+        });
+        expect(totalHours).toBe(0);
       });
     });
   });

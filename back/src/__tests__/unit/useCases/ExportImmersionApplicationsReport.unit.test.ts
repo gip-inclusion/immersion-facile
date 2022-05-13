@@ -192,7 +192,7 @@ describe("ExportImmersionApplicationsReport", () => {
     );
     expectTypeToMatchAndEqual(reportingGateway.expectedReport, expectedReport);
   });
-  it("BUG: compare 0 totalHours PROD_PG and 140 totalHours PROD_MIX_PG", () => {
+  it("compare PROD_PG sample and PROD_MIX_PG_EXCEL sample", () => {
     expectTypeToMatchAndEqual(PROD_PG_0_HOUR_EXEMPLE._props, {
       ...PROD_MIX_PG_EXCEL_140_HOUR_EXEMPLE._props,
       agencyName: "Pôle emploi d'Angers La Roseraie",
