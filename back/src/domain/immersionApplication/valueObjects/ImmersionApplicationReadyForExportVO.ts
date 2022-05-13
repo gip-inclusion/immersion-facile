@@ -7,6 +7,9 @@ export type ImmersionApplicationReadyForExportVO = OmitFromExistingKeys<
   ImmersionApplicationRawBeforeExportProps,
   TranslatedFields
 > & {
+  formatedDateSubmission: string;
+  formatedDateStart: string;
+  formatedDateEnd: string;
   status: string;
   beneficiaryAccepted: string;
   enterpriseAccepted: string;

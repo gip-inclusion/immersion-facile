@@ -9,7 +9,7 @@ import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { ExportEstablishmentsAsExcelArchive } from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import { LinkUserPeConnectAccount } from "../../../domain/generic/peConnect/useCases/linkUserPeConnectAccount";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
-import { ExportImmersionApplicationsAsExcelArchive } from "../../../domain/immersionApplication/useCases/ExportImmersionApplicationsAsExcelArchive";
+import { ExportImmersionApplicationsReport } from "../../../domain/immersionApplication/useCases/ExportImmersionApplicationsReport";
 import { GenerateMagicLink } from "../../../domain/immersionApplication/useCases/GenerateMagicLink";
 import { GetAgencyPublicInfoById } from "../../../domain/immersionApplication/useCases/GetAgencyPublicInfoById";
 import { GetImmersionApplication } from "../../../domain/immersionApplication/useCases/GetImmersionApplication";
@@ -89,7 +89,7 @@ export const createUseCases = (
       repositories.immersionApplication,
     ),
     exportImmersionApplicationsAsExcelArchive:
-      new ExportImmersionApplicationsAsExcelArchive(uowPerformer),
+      new ExportImmersionApplicationsReport(uowPerformer),
 
     exportEstablishmentsAsExcelArchive: new ExportEstablishmentsAsExcelArchive(
       uowPerformer,

@@ -9,6 +9,7 @@ import { ImmersionApplicationExportQueries } from "../../immersionApplication/po
 import { EstablishmentExportQueries } from "../../establishment/ports/EstablishmentExportQueries";
 import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { OutboxQueries } from "./OutboxQueries";
+import { ReportingGateway } from "./ReportingGateway";
 
 export type UnitOfWork = {
   romeRepo: RomeRepository;
@@ -21,6 +22,7 @@ export type UnitOfWork = {
   establishmentExportQueries: EstablishmentExportQueries;
   immersionApplicationExportQueries: ImmersionApplicationExportQueries;
   postalCodeDepartmentRegionQueries: PostalCodeDepartmentRegionQueries;
+  reportingGateway: ReportingGateway;
   getFeatureFlags: GetFeatureFlags;
 };
 

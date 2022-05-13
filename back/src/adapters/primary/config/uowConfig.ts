@@ -27,6 +27,8 @@ import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
 import { PgPostalCodeDepartmentRegionQueries } from "../../secondary/pg/PgPostalCodeDepartmentRegionQueries";
 import { PgRomeRepository } from "../../secondary/pg/PgRomeRepository";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
+import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
+import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
 import { StubEstablishmentExportQueries } from "../../secondary/StubEstablishmentExportQueries";
 import { StubImmersionApplicationExportQueries } from "../../secondary/StubImmersionApplicationExportQueries";
 import { StubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
@@ -65,6 +67,7 @@ export const createInMemoryUow = (repositories?: Repositories) => {
     agencyRepo:
       (repositories?.agency as InMemoryAgencyRepository) ??
       new InMemoryAgencyRepository(),
+    reportingGateway: new InMemoryReportingGateway(),
   };
 };
 
@@ -87,6 +90,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
     client,
   ),
   getFeatureFlags: makePgGetFeatureFlags(client),
+  reportingGateway: new ExcelReportingGateway(),
 });
 
 export const createUowPerformer = (

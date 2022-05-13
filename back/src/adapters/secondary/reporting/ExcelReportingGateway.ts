@@ -1,46 +1,32 @@
 import { Column } from "exceljs";
-import { groupBy, map, prop } from "ramda";
-import { z } from "zod";
-import { pipeWithValue } from "shared/src/pipeWithValue";
+
+import {
+  ArchivedReport,
+  ImmersionApplicationsExportByAgency,
+  ReportingGateway,
+} from "../../../domain/core/ports/ReportingGateway";
+import { Archive } from "../../../domain/generic/archive/port/Archive";
+import { Workbook } from "../../../domain/generic/excel/port/Workbook";
+import { ImmersionApplicationReadyForExportVO } from "../../../domain/immersionApplication/valueObjects/ImmersionApplicationReadyForExportVO";
 import { retrieveParentDirectory } from "../../../utils/filesystemUtils";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
-import { Archive } from "../../generic/archive/port/Archive";
-import { Workbook } from "../../generic/excel/port/Workbook";
-import { ImmersionApplicationReadyForExportVO } from "../valueObjects/ImmersionApplicationReadyForExportVO";
 
-export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseCase<string> {
-  inputSchema = z.string();
-
-  constructor(uowPerformer: UnitOfWorkPerformer) {
-    super(uowPerformer);
-  }
-
-  protected async _execute(
-    archivePath: string,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export class ExcelReportingGateway implements ReportingGateway {
+  async exportImmersionApplications({
+    report,
+    archivePath,
+  }: ArchivedReport<ImmersionApplicationsExportByAgency>): Promise<void> {
+    const workbookTitles = Object.keys(report);
     const workbookColumnsOptions =
       this.immersionApplicationExportColumnsOptions();
-
-    const immersionApplicationExportByAgency = pipeWithValue(
-      await uow.immersionApplicationExportQueries.getAllApplicationsForExport(),
-      map((i) => i.toImmersionApplicationReadyForExportVO()),
-      groupBy(prop("agencyName")),
-    );
-
-    const workbookTitles = Object.keys(immersionApplicationExportByAgency);
-
     const createdFilenames = await Promise.all(
       workbookTitles.map((agencyId: string) =>
         this.toWorkbook(
           agencyId,
-          immersionApplicationExportByAgency[agencyId],
+          report[agencyId],
           workbookColumnsOptions,
         ).toXlsx(retrieveParentDirectory(archivePath)),
       ),
     );
-
     const zipArchive = new Archive(archivePath);
     await zipArchive.addFiles(createdFilenames, { removeOriginal: true });
   }
@@ -86,10 +72,10 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
       },
       {
         header: "Date de Début",
-        key: "dateStart",
+        key: "formatedDateStart",
         width: 15,
       },
-      { header: "Date de fin", key: "dateEnd", width: 15 },
+      { header: "Date de fin", key: "formatedDateEnd", width: 15 },
       {
         header: "Nombre d'heures total de l'immersion",
         key: "totalHours",
@@ -133,7 +119,7 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
       },
       {
         header: "Date de Soumission",
-        key: "dateSubmission",
+        key: "formatedDateSubmission",
         width: 15,
       },
       {
@@ -179,7 +165,6 @@ export class ExportImmersionApplicationsAsExcelArchive extends TransactionalUseC
     ];
     return businessColumnMappingRules;
   }
-
   private toWorkbook(
     workbookTitle: string,
     immersionApplications: ImmersionApplicationReadyForExportVO[],

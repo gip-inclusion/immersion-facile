@@ -6,6 +6,7 @@ import {
 } from "shared/src/ScheduleUtils";
 import type { ImmersionApplicationReadyForExportVO } from "./ImmersionApplicationReadyForExportVO";
 import slugify from "slugify";
+import { format } from "date-fns";
 
 type KeysForExport =
   | "status"
@@ -50,6 +51,12 @@ export class ImmersionApplicationRawBeforeExportVO {
         schedule: this._props.schedule,
       }),
       ...this.splitSchedulePerDay(),
+      formatedDateEnd: format(new Date(this._props.dateEnd), "yyyy-MM-dd"),
+      formatedDateStart: format(new Date(this._props.dateStart), "yyyy-MM-dd"),
+      formatedDateSubmission: format(
+        new Date(this._props.dateSubmission),
+        "yyyy-MM-dd",
+      ),
     });
 
   private splitSchedulePerDay(): PrettySchedule {

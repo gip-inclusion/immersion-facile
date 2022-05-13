@@ -1,7 +1,6 @@
 import { PoolClient } from "pg";
 import { ImmersionApplicationExportQueries } from "../../../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
 import { ImmersionApplicationRawBeforeExportVO } from "../../../domain/immersionApplication/valueObjects/ImmersionApplicationRawBeforeExportVO";
-import { format } from "date-fns";
 import { optional } from "./pgUtils";
 
 export class PgImmersionApplicationExportQueries
@@ -29,9 +28,9 @@ export class PgImmersionApplicationExportQueries
           lastName: row.last_name,
           emergencyContact: row.emergency_contact,
           emergencyContactPhone: row.emergency_contact_phone,
-          dateSubmission: format(row.date_submission, "dd/MM/yyyy"),
-          dateStart: format(row.date_start, "dd/MM/yyyy"),
-          dateEnd: format(row.date_end, "dd/MM/yyyy"),
+          dateSubmission: new Date(row.date_submission).toISOString(),
+          dateStart: new Date(row.date_start).toISOString(),
+          dateEnd: new Date(row.date_end).toISOString(),
           businessName: row.business_name,
           mentor: row.mentor,
           mentorPhone: row.mentor_phone,
