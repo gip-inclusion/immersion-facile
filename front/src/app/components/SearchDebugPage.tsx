@@ -44,6 +44,7 @@ export const SearchDebugPage = () => {
                   lon: values.lon,
                 },
                 distance_km: values.radius,
+                sortedBy: "distance",
               }),
             )
               .then((response) => {

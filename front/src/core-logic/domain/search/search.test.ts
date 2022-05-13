@@ -37,6 +37,7 @@ describe("search epic", () => {
           distance_km: 10,
           location: { lat: 0, lon: 0 },
           rome: "A1000",
+          sortedBy: "distance",
         }),
       );
       expectStatus("initialFetch");
@@ -57,6 +58,7 @@ describe("search epic", () => {
           distance_km: 10,
           location: { lat: 0, lon: 0 },
           rome: "A1000",
+          sortedBy: "distance",
         }),
       );
       expectStatus("initialFetch");
@@ -72,6 +74,7 @@ describe("search epic", () => {
           distance_km: 10,
           location: { lat: 0, lon: 0 },
           rome: "A1000",
+          sortedBy: "distance",
         }),
       );
 

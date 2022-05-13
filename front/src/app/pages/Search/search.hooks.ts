@@ -22,6 +22,7 @@ export const useSearchUseCase = () => {
           lon: values.lon,
         },
         distance_km: values.radiusKm,
+        sortedBy: "distance",
       }),
     );
   };

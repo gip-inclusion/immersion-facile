@@ -42,6 +42,7 @@ export class SearchImmersion extends UseCase<
       lon: params.location.lon,
       distance_km: params.distance_km,
       voluntary_to_immersion: params.voluntary_to_immersion,
+      sortedBy: params.sortedBy,
     };
 
     const searchMadeEntity: SearchMadeEntity = {

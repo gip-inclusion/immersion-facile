@@ -22,12 +22,13 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 const secretariatRome = "M1607";
 const boulangerRome = "D1102";
 
-const searchInMetzParams = {
+const searchInMetzParams: SearchImmersionRequestDto = {
   distance_km: 30,
   location: {
     lat: 49.119146,
     lon: 6.17602,
   },
+  sortedBy: "distance",
 };
 
 const insertLBBAggregate = async (
@@ -111,6 +112,7 @@ const prepareSearchableData = async () => {
 const searchSecretariatInMetzRequestDto: SearchImmersionRequestDto = {
   rome: secretariatRome,
   ...searchInMetzParams,
+  sortedBy: "distance",
 };
 
 const authenticatedApiConsumerPayload: ApiConsumer = {
@@ -135,6 +137,7 @@ describe("SearchImmersionUseCase", () => {
         ...searchInMetzParams.location,
         distance_km: searchInMetzParams.distance_km,
         needsToBeSearched: true,
+        sortedBy: "distance",
       },
     ]);
   });
@@ -167,6 +170,7 @@ describe("SearchImmersionUseCase", () => {
     const response = await searchImmersion.execute({
       ...searchInMetzParams,
       voluntary_to_immersion: true,
+      sortedBy: "distance",
     });
 
     expect(response).toHaveLength(2);
@@ -182,6 +186,7 @@ describe("SearchImmersionUseCase", () => {
     const response = await searchImmersion.execute({
       ...searchInMetzParams,
       voluntary_to_immersion: false,
+      sortedBy: "distance",
     });
 
     expect(response).toHaveLength(1);

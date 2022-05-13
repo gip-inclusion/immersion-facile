@@ -243,7 +243,7 @@ export class PgEstablishmentAggregateRepository
       await this.client.query(
         format(
           `INSERT INTO immersion_offers (
-            uuid, rome_code, rome_appellation, score, creation_date, siret
+            uuid, rome_code, rome_appellation, score, created_at, siret
           ) VALUES %L`,
           offersToAdd.map((offerToAdd) => [
             offerToAdd.id,
@@ -332,19 +332,31 @@ export class PgEstablishmentAggregateRepository
     withContactDetails?: boolean;
     maxResults?: number;
   }): Promise<SearchImmersionResultDto[]> {
+    const sortExpression =
+      searchMade.sortedBy === "distance"
+        ? "ORDER BY voluntary_to_immersion DESC, distance_m ASC, max_created_at DESC"
+        : "ORDER BY voluntary_to_immersion DESC, max_created_at DESC, distance_m ASC";
+
     const selectedOffersSubQuery = format(
-      `WITH active_establishments_within_area AS (SELECT siret, (data_source = 'form')::boolean AS voluntary_to_immersion, gps FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
-        searchMade.voluntary_to_immersion,
-      )}) 
-        SELECT aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
-        COALESCE(JSON_AGG(DISTINCT libelle_appellation_long) FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels
-        FROM active_establishments_within_area aewa 
-        LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
-        LEFT JOIN public_appellations_data pad ON io.rome_appellation = pad.ogr_appellation
-        LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
-        ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
-        GROUP BY(aewa.siret, aewa.gps, aewa.voluntary_to_immersion, io.rome_code, prd.libelle_rome)
-        ORDER BY aewa.voluntary_to_immersion DESC
+      `WITH active_establishments_within_area AS 
+        (SELECT siret, (data_source = 'form')::boolean AS voluntary_to_immersion, gps 
+         FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
+           searchMade.voluntary_to_immersion,
+         )}),
+        matching_offers AS (
+          SELECT 
+            aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
+            COALESCE(JSON_AGG(DISTINCT libelle_appellation_long) FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels,
+            MAX(created_at) AS max_created_at, 
+            voluntary_to_immersion
+            FROM active_establishments_within_area aewa 
+            LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
+            LEFT JOIN public_appellations_data pad ON io.rome_appellation = pad.ogr_appellation
+            LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
+            ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
+            GROUP BY(aewa.siret, aewa.gps, aewa.voluntary_to_immersion, io.rome_code, prd.libelle_rome)
+          )
+        SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
         LIMIT $3`,
       searchMade.rome,
     ); // Formats optional litterals %1$L
@@ -500,7 +512,7 @@ export class PgEstablishmentAggregateRepository
     const immersionSearchResultDtos =
       await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
-      SELECT siret, io.rome_code, rome_label, COALESCE(json_agg(appellation_label) FILTER (WHERE appellation_label IS NOT NULL), '[]') AS appellation_labels, null AS distance_m
+      SELECT siret, io.rome_code, rome_label, COALESCE(json_agg(appellation_label) FILTER (WHERE appellation_label IS NOT NULL), '[]') AS appellation_labels, null AS distance_m, 1 AS row_number
       FROM immersion_offers AS io
       LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = io.rome_appellation 
       WHERE io.siret = $1 AND io.rome_code = $2
@@ -523,7 +535,11 @@ export class PgEstablishmentAggregateRepository
       sirets,
     );
     const pgResult = await this.client.query(query);
-    return pgResult.rows[0].sirets_by_data_source;
+    const row = pgResult.rows[0].sirets_by_data_source;
+    return {
+      api_labonneboite: row?.api_labonneboite ?? [],
+      form: row?.form ?? [],
+    };
   }
 
   public async createImmersionOffersToEstablishments(
@@ -543,7 +559,7 @@ export class PgEstablishmentAggregateRepository
     );
     const query = format(
       `INSERT INTO immersion_offers (
-          uuid, rome_code, rome_appellation, siret, score, creation_date
+          uuid, rome_code, rome_appellation, siret, score, created_at
         ) VALUES %L`,
       immersionOfferFields,
     );
@@ -580,7 +596,7 @@ export class PgEstablishmentAggregateRepository
       await this.client.query(
         `WITH 
           unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ),
-          filtered_immersion_offers AS (SELECT siret, JSON_AGG(JSON_BUILD_OBJECT('romeCode', rome_code, 'score', score, 'id', uuid, 'appellationCode', rome_appellation::text, 'createdAt',  to_char(creation_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))) as immersionOffers
+          filtered_immersion_offers AS (SELECT siret, JSON_AGG(JSON_BUILD_OBJECT('romeCode', rome_code, 'score', score, 'id', uuid, 'appellationCode', rome_appellation::text, 'createdAt',  to_char(created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))) as immersionOffers
              FROM immersion_offers WHERE siret = $1 GROUP BY siret)
         SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'establishment', JSON_BUILD_OBJECT(
@@ -662,8 +678,10 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
   selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellation_labels and distance_m
 ) => `
       WITH unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ), 
-           match_immersion_offer AS (${selectedOffersSubQuery}) 
-      SELECT JSONB_BUILD_OBJECT(
+           match_immersion_offer AS (${selectedOffersSubQuery})
+      SELECT 
+      row_number,
+      JSONB_BUILD_OBJECT(
       'rome', io.rome_code, 
       'siret', io.siret, 
       'distance_m', io.distance_m, 
@@ -683,6 +701,7 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       ) AS search_immersion_result
       FROM match_immersion_offer AS io 
       LEFT JOIN establishments AS e ON e.siret = io.siret  
-      LEFT OUTER JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+      LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
       LEFT JOIN unique_establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
-      LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid`;
+      LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
+      ORDER BY row_number ASC; `;

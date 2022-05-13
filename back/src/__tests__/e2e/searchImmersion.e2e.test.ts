@@ -99,7 +99,6 @@ describe("search-immersion route", () => {
             lat: 48.8531,
             lon: 2.34999,
           },
-          // eslint-disable-next-line @typescript-eslint/naming-convention
           distance_km: 30,
         })
         .expect(400, /Code ROME incorrect/);
@@ -153,6 +152,7 @@ describe("search-immersion route", () => {
               lon: 2.34999,
             },
             distance_km: 30,
+            sortedBy: "distance",
           })
           .expect(200, expectedResult);
       });
@@ -165,6 +165,7 @@ describe("search-immersion route", () => {
               lon: 2.34999,
             },
             distance_km: 30,
+            sortedBy: "distance",
           })
           .expect(200, []);
       });
@@ -178,6 +179,7 @@ describe("search-immersion route", () => {
             },
             distance_km: 30,
             voluntary_to_immersion: true,
+            sortedBy: "distance",
           })
           .expect(200, []);
       });
@@ -194,8 +196,8 @@ describe("search-immersion route", () => {
             lat: 48.8531,
             lon: 2.34999,
           },
-          // eslint-disable-next-line @typescript-eslint/naming-convention
           distance_km: 30,
+          sortedBy: "distance",
         })
         .expect(400, /Code ROME incorrect/);
     });

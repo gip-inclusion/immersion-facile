@@ -62,6 +62,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       rome: undefined,
       location: { lon: 10, lat: 10 },
       distance_km: 10,
+      sortedBy: "distance",
     });
 
     // Assert
@@ -74,6 +75,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       rome: "M1607",
       location: { lon: 10, lat: 9 },
       distance_km: 30,
+      sortedBy: "distance",
     };
 
     const nextDate = new Date("2022-01-01");
@@ -324,6 +326,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
         rome: userSearchedRome,
         location: userSearchedLocationInParis17,
         distance_km: 10,
+        sortedBy: "distance",
       });
 
       // Assert
@@ -348,6 +351,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
         rome: userSearchedRome,
         location: userSearchedLocationInParis17,
         distance_km: 10,
+        sortedBy: "distance",
       });
 
       // Assert

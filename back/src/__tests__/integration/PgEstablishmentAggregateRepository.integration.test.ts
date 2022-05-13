@@ -68,10 +68,12 @@ describe("Postgres implementation of immersion offer repository", () => {
       rome: informationGeographiqueRome,
       ...searchedPosition,
       distance_km: 30,
+      sortedBy: "distance",
     };
     const searchMadeWithoutRome: SearchMade = {
       ...searchedPosition,
       distance_km: 30,
+      sortedBy: "distance",
     };
     it("returns empty list when repo is empty", async () => {
       // Act
@@ -95,6 +97,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       address?: string,
       nafCode?: string,
       numberEmployeesRange?: NumberEmployeesRange,
+      offerCreatedAt?: Date,
     ) => {
       await insertEstablishment({
         siret,
@@ -117,6 +120,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret,
         romeCode: rome,
         romeAppellation: appellationCode,
+        offerCreatedAt,
       });
     };
     describe("if parameter `maxResults` is given", () => {
@@ -357,21 +361,10 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Prepare : establishment in geographical area but not active
       const formSiret = "99000403200029";
       const lbbSiret1 = "11000403200029";
-      const lbbSiret2 = "22000403200029";
 
       await insertActiveEstablishmentAndOfferAndEventuallyContact(
         testUid2,
         lbbSiret1,
-        informationGeographiqueRome, // Matching
-        searchedPosition, // Establishment position matching
-        cartographeAppellation,
-        undefined,
-        "api_labonneboite", // data source
-      );
-
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        testUid3,
-        lbbSiret2,
         informationGeographiqueRome, // Matching
         searchedPosition, // Establishment position matching
         cartographeAppellation,
@@ -400,6 +393,87 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(searchResult[0].voluntaryToImmersion).toBe(true);
       expect(searchResult[1].siret).toEqual(lbbSiret1);
       expect(searchResult[1].voluntaryToImmersion).toBe(false);
+    });
+    it("if sorted=distance, returns closest establishments in first", async () => {
+      // Prepare : establishment in geographical area but not active
+      const closeSiret = "99000403200029";
+      const farSiret = "11000403200029";
+
+      await insertEstablishment({
+        siret: closeSiret,
+        position: searchedPosition,
+      });
+      await insertEstablishment({
+        siret: farSiret,
+        position: {
+          lon: searchedPosition.lon + 0.01,
+          lat: searchedPosition.lat + 0.01,
+        },
+      });
+      await insertImmersionOffer({
+        uuid: testUid1,
+        romeCode: searchMadeWithRome.rome!,
+        siret: closeSiret,
+      });
+      await insertImmersionOffer({
+        uuid: testUid2,
+        romeCode: searchMadeWithRome.rome!,
+        siret: farSiret,
+      });
+      // Act
+      const searchResult =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
+          {
+            searchMade: { ...searchMadeWithRome, sortedBy: "distance" },
+            maxResults: 2,
+          },
+        );
+      // Assert
+      expect(searchResult[0].siret).toEqual(closeSiret);
+      expect(searchResult[1].siret).toEqual(farSiret);
+    });
+    it("if sorted=date, returns latest offers in first", async () => {
+      // Prepare : establishment in geographical area but not active
+      const recentOfferSiret = "99000403200029";
+      const oldOfferSiret = "11000403200029";
+
+      await Promise.all([
+        insertEstablishment({
+          siret: recentOfferSiret,
+          position: searchedPosition,
+        }),
+        insertEstablishment({
+          siret: oldOfferSiret,
+          position: searchedPosition,
+        }),
+      ]);
+
+      await Promise.all([
+        insertImmersionOffer({
+          uuid: testUid1,
+          romeCode: searchMadeWithRome.rome!,
+          siret: recentOfferSiret,
+          offerCreatedAt: new Date("2022-05-05"),
+        }),
+        insertImmersionOffer({
+          uuid: testUid2,
+          romeCode: searchMadeWithRome.rome!,
+          siret: oldOfferSiret,
+          offerCreatedAt: new Date("2022-05-02"),
+        }),
+      ]);
+
+      // Act
+      const searchResult =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
+          {
+            searchMade: { ...searchMadeWithRome, sortedBy: "date" },
+            maxResults: 2,
+          },
+        );
+      // Assert
+      expect(searchResult[0].siret).toEqual(recentOfferSiret);
+      expect(searchResult[1].siret).toEqual(oldOfferSiret);
     });
     it("returns also contact details if offer has contact uuid and flag is True", async () => {
       // Prepare
@@ -955,6 +1029,17 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("Pg implementation of method getSiretOfEstablishmentsFromFormSource", () => {
+    it("Returns empty lists if no establishments in repository", async () => {
+      const actualSiretsGroupedByDataSource =
+        await pgEstablishmentAggregateRepository.groupEstablishmentSiretsByDataSource(
+          ["44444444444444"],
+        );
+      // Assert
+      expect(actualSiretsGroupedByDataSource).toEqual({
+        form: [],
+        api_labonneboite: [],
+      });
+    });
     it("Returns a record with lists of sirets grouped by data source", async () => {
       // Prepare
       const siretFromForm1 = "11111111111111";
@@ -1530,12 +1615,14 @@ describe("Postgres implementation of immersion offer repository", () => {
     romeCode: string;
     siret: string;
     romeAppellation?: string;
+    offerCreatedAt?: Date;
   }) => {
     const insertQuery = `INSERT INTO immersion_offers (
-      uuid, rome_code, siret, score, rome_appellation
+      uuid, rome_code, siret, score, rome_appellation, created_at
     ) VALUES
-     ($1, $2, $3, $4, $5)`;
+     ($1, $2, $3, $4, $5, $6)`;
     const defaultScore = 4;
+    const defaultOfferCreatedAt = new Date("2022-01-08");
 
     await client.query(insertQuery, [
       props.uuid,
@@ -1543,6 +1630,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.siret,
       defaultScore,
       props.romeAppellation ?? null,
+      props.offerCreatedAt ?? defaultOfferCreatedAt,
     ]);
   };
   const insertImmersionContact = async (props: {

@@ -37,6 +37,7 @@ describe("PgSearchesMadeRepository", () => {
           distance_km: 30,
           lat: 49.119146,
           lon: 6.17602,
+          sortedBy: "date",
         })
       )[0].rome,
     ).toBe("M1607");
@@ -88,6 +89,7 @@ describe("PgSearchesMadeRepository", () => {
       lat: 49.119146,
       lon: 6.17602,
       needsToBeSearched: true,
+      sortedBy: "date",
       voluntary_to_immersion: true,
       apiConsumerName: "passeEmploi",
     });
@@ -98,6 +100,7 @@ describe("PgSearchesMadeRepository", () => {
       lat: 48.119146,
       lon: 6.17602,
       needsToBeSearched: true,
+      sortedBy: "distance",
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "9f6dac00-6f02-11ec-90d6-0242ac120003",
@@ -106,6 +109,7 @@ describe("PgSearchesMadeRepository", () => {
       lat: 48.119146,
       lon: 5.17602,
       needsToBeSearched: true,
+      sortedBy: "distance",
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
@@ -114,6 +118,7 @@ describe("PgSearchesMadeRepository", () => {
       lat: 48.119146,
       lon: 4.17602,
       needsToBeSearched: true,
+      sortedBy: "distance",
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "9f6dae4e-6f02-11ec-90d6-0242ac120003",
@@ -122,6 +127,7 @@ describe("PgSearchesMadeRepository", () => {
       lat: 48.129146,
       lon: 4.17602,
       needsToBeSearched: true,
+      sortedBy: "distance",
     });
     await pgSearchesMadeRepository.insertSearchMade({
       id: "bee68ce6-6f02-11ec-90d6-0242ac120003",
@@ -130,6 +136,7 @@ describe("PgSearchesMadeRepository", () => {
       lat: 48.129146,
       lon: 4.17602,
       needsToBeSearched: true,
+      sortedBy: "distance",
     });
     // Search made without rome !
     await pgSearchesMadeRepository.insertSearchMade({
@@ -138,6 +145,7 @@ describe("PgSearchesMadeRepository", () => {
       lat: 48.129146,
       lon: 4.17602,
       needsToBeSearched: true,
+      sortedBy: "distance",
     });
   };
 

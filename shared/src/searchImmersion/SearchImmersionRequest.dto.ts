@@ -7,4 +7,5 @@ export type SearchImmersionRequestDto = {
   location: LatLonDto;
   distance_km: number;
   voluntary_to_immersion?: boolean;
+  sortedBy: "distance" | "date";
 };

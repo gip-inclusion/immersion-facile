@@ -11,8 +11,8 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
   async insertSearchMade(searchMade: SearchMadeEntity) {
     await this.client.query(
       `INSERT INTO searches_made (
-         id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion, api_consumer_name
-       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8, $9)`,
+         id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion, api_consumer_name, sorted_by
+       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8, $9, $10)`,
       [
         searchMade.id,
         searchMade.rome,
@@ -23,6 +23,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         `POINT(${searchMade.lon} ${searchMade.lat})`,
         searchMade.voluntary_to_immersion,
         searchMade.apiConsumerName,
+        searchMade.sortedBy,
       ],
     );
   }
@@ -38,6 +39,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
       lon: row.lon,
       rome: row.rome,
       needsToBeSearched: row.needstobesearched,
+      sortedBy: row.sorted_by,
     }));
   }
   public async markSearchAsProcessed(

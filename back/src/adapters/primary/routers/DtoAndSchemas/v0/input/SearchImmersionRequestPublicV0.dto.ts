@@ -9,6 +9,6 @@ export type SearchImmersionRequestPublicV0 = {
   distance_km: number;
 };
 
-export const SearchImmersionRequestPublicV0ToDomain = (
+export const searchImmersionRequestPublicV0ToDomain = (
   publicV0: SearchImmersionRequestPublicV0,
-): SearchImmersionRequestDto => publicV0;
+): SearchImmersionRequestDto => ({ ...publicV0, sortedBy: "distance" });
