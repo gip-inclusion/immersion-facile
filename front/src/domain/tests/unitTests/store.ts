@@ -1,4 +1,4 @@
-import { expectToEqual } from "src/core-logic/storeConfig/redux.helpers";
+import { expectToEqual } from "../../../../../shared/src/expectToEqual";
 import { EstablishementCallToAction } from "src/domain/valueObjects/EstablishementCallToAction";
 import { ClientTestApplication } from "src/infra/application/ClientApplication";
 import { Gherkin } from "../Gherkin";

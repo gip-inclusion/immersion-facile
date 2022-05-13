@@ -12,7 +12,3 @@ export type AppEpic<Input extends Action, Output extends Input = Input> = Epic<
   RootState,
   Dependencies
 >;
-
-export const expectToEqual = <T>(actual: T, expected: T) => {
-  expect(actual).toEqual(expected);
-};

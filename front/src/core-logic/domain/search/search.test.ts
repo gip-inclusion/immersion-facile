@@ -8,9 +8,9 @@ import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
-import { expectToEqual } from "src/core-logic/storeConfig/redux.helpers";
 import { RootState } from "src/core-logic/storeConfig/store";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { expectToEqual } from "../../../../../shared/src/expectToEqual";
 
 // prettier-ignore
 const formSearchResult1 = { siret: "form1", rome: "A", voluntaryToImmersion: true} as SearchImmersionResultDto

@@ -251,5 +251,42 @@ describe("ScheduleUtils", () => {
         expect(totalHours).toBe(50);
       });
     });
+    describe("with complex schedule that return 0 on prod", () => {
+      const complexSchedule = new ScheduleDtoBuilder()
+        .withComplexSchedule([
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [
+            { end: "12:30", start: "08:00" },
+            { end: "16:30", start: "14:00" },
+          ],
+          [],
+          [],
+        ])
+        .build();
+
+      it("has no hours if the day is not one of the worked day", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022/04/11",
+          dateEnd: "2022/05/08",
+          schedule: complexSchedule,
+        });
+        expect(totalHours).toBe(140);
+      });
+    });
   });
 });
