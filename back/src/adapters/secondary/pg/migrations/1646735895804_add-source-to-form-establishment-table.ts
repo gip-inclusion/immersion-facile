@@ -11,5 +11,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumn("establishments", "data_provider");
+  pgm.dropColumn("form_establishments", "source");
 }

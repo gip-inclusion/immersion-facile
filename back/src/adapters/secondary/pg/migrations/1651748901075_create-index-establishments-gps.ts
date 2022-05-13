@@ -8,5 +8,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropIndex("establishments", "gps");
+  pgm.dropIndex("establishments", "", { name: "establishments_gps" });
 }

@@ -7,5 +7,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropColumn("agencies", "pe_external_id");
+  pgm.dropColumn("immersion_applications", "pe_external_id");
 }

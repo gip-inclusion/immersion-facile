@@ -136,5 +136,5 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumn("immersion_offers", "rome_appellation");
   pgm.renameColumn("establishments", "naf_code", "naf");
   pgm.renameColumn("immersion_offers", "rome_code", "rome");
-  pgm.dropConstraint("immersion_offers", "fk_rome_appellation");
+  //pgm.dropConstraint("immersion_offers", "fk_rome_appellation");
 }
