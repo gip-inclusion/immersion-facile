@@ -2,7 +2,7 @@ import { LatLonDto } from "../latLon";
 import { Flavor } from "../typeFlavors";
 import { NotEmptyArray, RequireField } from "../utils";
 
-export type AgencyStatus = "active" | "closed" | "needsReview";
+export type AgencyStatus = "active" | "closed" | "needsReview" | "from-api-PE";
 
 export type AgencyConfig = RequireField<
   CreateAgencyConfig,
@@ -11,6 +11,8 @@ export type AgencyConfig = RequireField<
   kind: AgencyKind;
   status: AgencyStatus;
   adminEmails: string[];
+  agencySiret?: string;
+  code?: string;
 };
 
 export type AgencyId = Flavor<string, "AgencyId">;

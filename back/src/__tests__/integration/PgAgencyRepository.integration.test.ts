@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg";
+import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
@@ -104,6 +105,33 @@ describe("PgAgencyRepository", () => {
     });
   });
 
+  describe("getAgencyWithValidatorEmail", () => {
+    const agency1 = agency1builder.build();
+    const agencyWithMatchingValidator = agency2builder
+      .withValidatorEmails(["existing@mail.com"])
+      .build();
+
+    it("returns undefined for empty table", async () => {
+      const result = await agencyRepository.getAgencyWithValidatorEmailMatching(
+        "notFound",
+      );
+      expect(result).toBeUndefined();
+    });
+
+    it("returns the first agency matching the email", async () => {
+      await Promise.all([
+        agencyRepository.insert(agency1),
+        agencyRepository.insert(agencyWithMatchingValidator),
+      ]);
+
+      const matched =
+        await agencyRepository.getAgencyWithValidatorEmailMatching(
+          "existing@mail.com",
+        );
+      expect(matched).toEqual(agencyWithMatchingValidator);
+    });
+  });
+
   describe("getNearby", () => {
     it("returns only agencies which are less than certain distance", async () => {
       const nancyAgency = agency1builder
@@ -136,7 +164,10 @@ describe("PgAgencyRepository", () => {
       ]);
 
       // Act
-      const agencies = await agencyRepository.getNearby(placeStanislasPosition);
+      const agencies = await agencyRepository.getNearby(
+        placeStanislasPosition,
+        100,
+      );
 
       // Assert
       expect(agencies).toEqual([nancyAgency, epinalAgency]);
@@ -158,6 +189,30 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.insert(agency2);
       expect(await agencyRepository.getAllActive()).toHaveLength(2);
+    });
+  });
+
+  describe("update", () => {
+    const agency1 = agency1builder.withPosition(40, 2).build();
+
+    it("updates entities", async () => {
+      expect(await agencyRepository.getAllActive()).toHaveLength(0);
+
+      await agencyRepository.insert(agency1);
+      expect(await agencyRepository.getAllActive()).toHaveLength(1);
+
+      const updatedAgency1 = agency1builder
+        .withName("Updated agency")
+        .withPosition(41, 3)
+        .withValidatorEmails(["updated@mail.com"])
+        .withAgencySiret("11110000111100")
+        .withCode("CODE_123")
+        .build();
+
+      await agencyRepository.update(updatedAgency1);
+      const inDb = await agencyRepository.getAllActive();
+      expect(inDb).toHaveLength(1);
+      expectTypeToMatchAndEqual(inDb[0], updatedAgency1);
     });
   });
 

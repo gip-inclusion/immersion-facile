@@ -4,24 +4,29 @@ import { AgencyRepository } from "../../../domain/immersionApplication/ports/Age
 import { AgencyConfig, AgencyId } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { createLogger } from "../../../utils/logger";
+import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
-
-const MAX_NEARBY_DISTANCE = 100_000; // = 100km
 
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private client: PoolClient) {}
 
   public async getAllActive(): Promise<AgencyConfig[]> {
     const pgResult = await this.client.query(
-      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position\
+      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position, agency_siret, code\
        FROM public.agencies\
        WHERE status = 'active'",
     );
     return pgResult.rows.map(pgToEntity);
   }
 
-  public async getNearby(searchPosition: LatLonDto): Promise<AgencyConfig[]> {
+  public async getNearby(
+    searchPosition: LatLonDto,
+    distance_km: number,
+  ): Promise<AgencyConfig[]> {
+    if (typeof distance_km !== "number")
+      throw new Error("distance_km must be a number");
+
     const pgResult = await this.client.query(
       `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position,
         ST_Distance(${STPointStringFromPosition(
@@ -32,13 +37,32 @@ export class PgAgencyRepository implements AgencyRepository {
       
       WHERE status = 'active' AND ST_Distance(${STPointStringFromPosition(
         searchPosition,
-      )}, position) <= ${MAX_NEARBY_DISTANCE}
+      )}, position) <= ${distance_km * 1000}
+      
       
       ORDER BY dist
       LIMIT 20`,
     );
 
     return pgResult.rows.map(pgToEntity);
+  }
+
+  public async getAgencyWithValidatorEmailMatching(email: string) {
+    const positionAsCoordinates = "ST_AsGeoJSON(position) AS position";
+    const validatorEmailsIncludesProvidedEmail =
+      "CAST(validator_emails AS text) ILIKE '%' || $1 || '%'";
+
+    const pgResult = await this.client.query(
+      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ${positionAsCoordinates}, agency_siret, code
+       FROM public.agencies
+       WHERE ${validatorEmailsIncludesProvidedEmail}`,
+      [email],
+    );
+
+    const first = pgResult.rows[0];
+
+    if (!first) return;
+    return pgToEntity(first);
   }
 
   public async getById(id: AgencyId): Promise<AgencyConfig | undefined> {
@@ -73,6 +97,28 @@ export class PgAgencyRepository implements AgencyRepository {
     return agency.id;
   }
 
+  public async update(agency: AgencyConfig): Promise<void> {
+    const query = `UPDATE public.agencies SET
+      name = $2,
+      status = $3 ,
+      kind = $4,
+      address = $5,
+      counsellor_emails = $6,
+      validator_emails = $7,
+      admin_emails = $8,
+      questionnaire_url = $9,
+      email_signature = $10,
+      position = ST_GeographyFromText($11),
+      agency_siret = $12,
+      code = $13
+    WHERE id = $1`;
+
+    const params = entityToPgArray(agency);
+    params[10] = `POINT(${agency.position.lon} ${agency.position.lat})`;
+
+    await this.client.query(query, params);
+  }
+
   async getImmersionFacileIdByKind(): Promise<AgencyId> {
     const pgResult = await this.client.query(`
            SELECT id 
@@ -86,7 +132,7 @@ export class PgAgencyRepository implements AgencyRepository {
 }
 
 const STPointStringFromPosition = (position: LatLonDto) =>
-  `public.st_geographyfromtext('POINT(${position.lon} ${position.lat})'::text)`;
+  `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
 
 const entityToPgArray = (agency: AgencyConfig): any[] => [
   agency.id,
@@ -100,6 +146,8 @@ const entityToPgArray = (agency: AgencyConfig): any[] => [
   agency.questionnaireUrl,
   agency.signature,
   STPointStringFromPosition(agency.position),
+  agency.agencySiret,
+  agency.code,
 ];
 
 const pgToEntity = (params: Record<any, any>): AgencyConfig => ({
@@ -114,6 +162,8 @@ const pgToEntity = (params: Record<any, any>): AgencyConfig => ({
   questionnaireUrl: params.questionnaire_url,
   signature: params.email_signature,
   position: parseGeoJson(params.position),
+  agencySiret: optional(params.agency_siret),
+  code: optional(params.code),
 });
 
 export const parseGeoJson = (raw: string): LatLonDto => {

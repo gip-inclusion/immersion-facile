@@ -26,7 +26,7 @@ export class ListAgencies extends UseCase<
   }
 
   private getAgenciesConfig(position?: LatLonDto): Promise<AgencyConfig[]> {
-    if (position) return this.agencyRepository.getNearby(position);
+    if (position) return this.agencyRepository.getNearby(position, 100);
     return this.agencyRepository.getAllActive();
   }
 }

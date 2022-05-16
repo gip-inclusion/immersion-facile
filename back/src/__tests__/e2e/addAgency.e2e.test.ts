@@ -29,6 +29,7 @@ describe("Route to add Agency", () => {
     expectTypeToMatchAndEqual(inRepo, [
       {
         ...parisMissionLocaleParams,
+        questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
         adminEmails: [appConfig.defaultAdminEmail],
         status: "needsReview",
       },

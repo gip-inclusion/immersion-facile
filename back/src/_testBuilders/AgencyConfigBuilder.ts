@@ -110,6 +110,19 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
     });
   }
 
+  public withAgencySiret(siret: string) {
+    return new AgencyConfigBuilder({
+      ...this.agency,
+      agencySiret: siret,
+    });
+  }
+  public withCode(code: string) {
+    return new AgencyConfigBuilder({
+      ...this.agency,
+      code,
+    });
+  }
+
   public build() {
     return this.agency;
   }

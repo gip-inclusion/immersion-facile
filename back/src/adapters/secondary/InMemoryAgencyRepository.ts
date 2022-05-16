@@ -103,11 +103,26 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return Object.values(this._agencies).filter(isAgencyActive);
   }
 
+  public async getAgencyWithValidatorEmailMatching(
+    email: string,
+  ): Promise<AgencyConfig | undefined> {
+    return Object.values(this._agencies).filter((agency) =>
+      agency.validatorEmails.includes(email),
+    )[0];
+  }
+
   public async insert(config: AgencyConfig): Promise<AgencyId | undefined> {
     logger.info({ config, configs: this._agencies }, "insert");
     if (this._agencies[config.id]) return undefined;
     this._agencies[config.id] = config;
     return config.id;
+  }
+
+  public async update(agency: AgencyConfig) {
+    if (!this._agencies[agency.id]) {
+      throw new Error(`Agency ${agency.id} does not exist`);
+    }
+    this._agencies[agency.id] = agency;
   }
 
   public async getImmersionFacileIdByKind(): Promise<AgencyId> {
