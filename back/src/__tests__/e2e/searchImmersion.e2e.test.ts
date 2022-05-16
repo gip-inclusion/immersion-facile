@@ -169,7 +169,7 @@ describe("search-immersion route", () => {
           })
           .expect(200, []);
       });
-      it("with filter voluntary_to_immersion", async () => {
+      it("with filter voluntaryToImmersion", async () => {
         await request
           .post(`/v1/search-immersion`)
           .send({

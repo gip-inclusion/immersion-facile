@@ -10,6 +10,6 @@ export const searchImmersionRequestSchema: z.Schema<SearchImmersionRequestDto> =
     siret: siretSchema.optional(),
     location: latLonSchema,
     distance_km: z.number().positive("'distance_km' doit être > 0"),
-    voluntary_to_immersion: z.boolean().optional(),
     sortedBy: z.enum(["distance", "date"]),
+    voluntaryToImmersion: z.boolean().optional(),
   });

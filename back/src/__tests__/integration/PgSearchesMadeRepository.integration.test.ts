@@ -170,7 +170,7 @@ describe("PgSearchesMadeRepository", () => {
         searchMadeEntity.distance_km,
         searchMadeEntity.needsToBeSearched,
         `POINT(${searchMadeEntity.lon} ${searchMadeEntity.lat})`,
-        searchMadeEntity.voluntary_to_immersion,
+        searchMadeEntity.voluntaryToImmersion,
       ],
     );
   };

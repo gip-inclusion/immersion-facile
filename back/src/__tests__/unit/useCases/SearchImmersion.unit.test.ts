@@ -163,10 +163,11 @@ describe("SearchImmersionUseCase", () => {
       romeLabel: TEST_ROME_LABEL,
     });
   });
-  it("gets only form establishments if voluntary_to_immersion is true", async () => {
+  it("gets only form establishments if voluntaryToImmersion is true", async () => {
     const { searchImmersion, establishmentAggregateRepository } =
       await prepareSearchableData();
     await insertLBBAggregate(establishmentAggregateRepository);
+
     const response = await searchImmersion.execute({
       ...searchInMetzParams,
       voluntary_to_immersion: true,
@@ -177,7 +178,7 @@ describe("SearchImmersionUseCase", () => {
     expect(response[0].voluntaryToImmersion).toBe(true);
     expect(response[1].voluntaryToImmersion).toBe(true);
   });
-  it("gets only lbb establishments if voluntary_to_immersion is false", async () => {
+  it("gets only lbb establishments if voluntarytoImmersion is false", async () => {
     const { searchImmersion, establishmentAggregateRepository } =
       await prepareSearchableData();
 
@@ -185,8 +186,8 @@ describe("SearchImmersionUseCase", () => {
 
     const response = await searchImmersion.execute({
       ...searchInMetzParams,
-      voluntary_to_immersion: false,
       sortedBy: "distance",
+      voluntaryToImmersion: false,
     });
 
     expect(response).toHaveLength(1);

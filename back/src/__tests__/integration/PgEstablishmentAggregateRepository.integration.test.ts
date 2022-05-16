@@ -546,7 +546,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       const searchWithVoluntaryOnly =
         await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
           {
-            searchMade: { ...searchMadeWithRome, voluntary_to_immersion: true },
+            searchMade: { ...searchMadeWithRome, voluntaryToImmersion: true },
           },
         );
       // Assert

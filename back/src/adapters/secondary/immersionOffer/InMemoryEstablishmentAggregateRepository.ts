@@ -97,10 +97,10 @@ export class InMemoryEstablishmentAggregateRepository
     logger.info({ searchMade, withContactDetails }, "getFromSearch");
     return this._establishmentAggregates
       .filter((aggregate) =>
-        searchMade.voluntary_to_immersion === undefined
+        searchMade.voluntaryToImmersion === undefined
           ? true
           : aggregate.establishment.voluntaryToImmersion ==
-            searchMade.voluntary_to_immersion,
+            searchMade.voluntaryToImmersion,
       )
       .flatMap((aggregate) =>
         aggregate.immersionOffers

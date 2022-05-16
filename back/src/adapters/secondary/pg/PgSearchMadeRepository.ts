@@ -21,7 +21,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         searchMade.distance_km,
         true,
         `POINT(${searchMade.lon} ${searchMade.lat})`,
-        searchMade.voluntary_to_immersion,
+        searchMade.voluntaryToImmersion,
         searchMade.apiConsumerName,
         searchMade.sortedBy,
       ],

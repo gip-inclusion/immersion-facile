@@ -6,6 +6,6 @@ export type SearchImmersionRequestDto = {
   siret?: string;
   location: LatLonDto;
   distance_km: number;
-  voluntary_to_immersion?: boolean;
   sortedBy: "distance" | "date";
+  voluntaryToImmersion?: boolean;
 };

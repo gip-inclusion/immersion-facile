@@ -341,7 +341,7 @@ export class PgEstablishmentAggregateRepository
       `WITH active_establishments_within_area AS 
         (SELECT siret, (data_source = 'form')::boolean AS voluntary_to_immersion, gps 
          FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
-           searchMade.voluntary_to_immersion,
+           searchMade.voluntaryToImmersion,
          )}),
         matching_offers AS (
           SELECT 

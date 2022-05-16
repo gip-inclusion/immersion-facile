@@ -7,8 +7,8 @@ export type SearchImmersionRequestPublicV1 = {
   siret?: string;
   location: LatLonDto;
   distance_km: number;
-  voluntary_only?: boolean;
   sortedBy: "distance" | "date";
+  voluntaryOnly?: boolean;
 };
 
 export const SearchImmersionRequestPublicV1ToDomain = (

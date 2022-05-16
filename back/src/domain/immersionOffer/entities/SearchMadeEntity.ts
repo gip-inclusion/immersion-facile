@@ -8,8 +8,8 @@ export type SearchMade = {
   distance_km: number;
   lat: number;
   lon: number;
-  voluntary_to_immersion?: boolean;
   sortedBy: "distance" | "date";
+  voluntaryToImmersion?: boolean;
 };
 
 export type SearchMadeEntity = {
