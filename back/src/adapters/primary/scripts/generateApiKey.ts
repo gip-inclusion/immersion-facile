@@ -1,14 +1,14 @@
 import { addYears } from "date-fns";
-import { makeGenerateJwt } from "../../domain/auth/jwt";
+import { makeGenerateJwt } from "../../../domain/auth/jwt";
 import {
   ApiConsumer,
   ApiConsumerName,
   WithApiConsumerId,
-} from "../../domain/core/valueObjects/ApiConsumer";
-import { createLogger } from "../../utils/logger";
-import { RealClock } from "../secondary/core/ClockImplementations";
-import { UuidV4Generator } from "../secondary/core/UuidGeneratorImplementations";
-import { AppConfig } from "./appConfig";
+} from "../../../domain/core/valueObjects/ApiConsumer";
+import { createLogger } from "../../../utils/logger";
+import { RealClock } from "../../secondary/core/ClockImplementations";
+import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
+import { AppConfig } from "../appConfig";
 
 const logger = createLogger(__filename);
 

@@ -1,6 +1,6 @@
-import { createLogger } from "../../utils/logger";
-import { AppConfig } from "./appConfig";
-import { createApp } from "./server";
+import { createLogger } from "../../../utils/logger";
+import { AppConfig } from "../appConfig";
+import { createApp } from "../server";
 
 const logger = createLogger(__filename);
 

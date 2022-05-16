@@ -1,15 +1,15 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared/src/utils";
-import { createLogger } from "../../utils/logger";
-import { RealClock } from "../secondary/core/ClockImplementations";
+import { createLogger } from "../../../utils/logger";
+import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
-} from "../secondary/core/ExponentialBackoffRetryStrategy";
-import { QpsRateLimiter } from "../secondary/core/QpsRateLimiter";
-import { HttpsSireneGateway } from "../secondary/HttpsSireneGateway";
-import { AppConfig } from "./appConfig";
+} from "../../secondary/core/ExponentialBackoffRetryStrategy";
+import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
+import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
+import { AppConfig } from "../appConfig";
 
 const maxQpsSireneApi = 0.25;
 
