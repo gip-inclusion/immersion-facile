@@ -1,13 +1,12 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { ImmersionOfferId } from "shared/src/ImmersionOfferId";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { immersionOfferIdSchema } from "shared/src/searchImmersion/SearchImmersionResult.schema";
 import { UseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
+import { zString } from "shared/src/zodUtils";
 
 export class GetImmersionOfferById extends UseCase<
-  ImmersionOfferId,
+  string,
   SearchImmersionResultDto,
   ApiConsumer
 > {
@@ -17,7 +16,7 @@ export class GetImmersionOfferById extends UseCase<
     super();
   }
 
-  inputSchema = immersionOfferIdSchema;
+  inputSchema = zString;
 
   public async _execute(
     immersionOfferId: string,

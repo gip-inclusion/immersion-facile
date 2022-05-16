@@ -2,7 +2,6 @@ import { NafDto } from "shared/src/naf";
 import { SiretDto } from "shared/src/siret";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
-import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
@@ -39,7 +38,6 @@ export class LaBonneBoiteCompanyVO {
   }
 
   public toEstablishmentAggregate(
-    uuidGenerator: UuidGenerator,
     clock: Clock,
     extraData?: {
       nafDto?: NafDto;
@@ -68,7 +66,6 @@ export class LaBonneBoiteCompanyVO {
       establishment,
       immersionOffers: [
         {
-          id: uuidGenerator.new(),
           romeCode: this.props.matched_rome_code,
           score: this.props.stars,
           createdAt: clock.now(),

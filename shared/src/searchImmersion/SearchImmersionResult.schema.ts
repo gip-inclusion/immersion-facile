@@ -1,16 +1,11 @@
 import { z } from "zod";
-import { ImmersionOfferId } from "../ImmersionOfferId";
 import { latLonSchema } from "../latLon";
 import { romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret";
-import { zTrimmedString } from "../zodUtils";
 import {
   SearchContactDto,
   SearchImmersionResultDto,
 } from "./SearchImmersionResult.dto";
-
-export const immersionOfferIdSchema: z.ZodSchema<ImmersionOfferId> =
-  zTrimmedString;
 
 export const contactDetailsSchema: z.Schema<SearchContactDto> = z.object({
   id: z.string(),

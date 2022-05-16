@@ -233,18 +233,15 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
     .build(),
   immersionOffers: [
     new ImmersionOfferEntityV2Builder()
-      .withId("a0d7d52e-d616-4a49-b635-3b801f0383af")
       .withRomeCode("M1502")
       .withAppellationCode("11863")
       .build(),
     new ImmersionOfferEntityV2Builder()
-      .withId("a0d7d52e-d616-4a49-b635-3b801f0383ad")
       .withRomeCode("A1205")
       .withAppellationCode("17537")
       .build(),
   ],
   contact: new ContactEntityV2Builder()
-    .withId("88401348-bad9-4933-87c6-405b8a8fe4cc")
     .withFirstname("Lauren")
     .withLastname("SCHEBUR")
     .withEmail("contact@artusinterim.world")
@@ -266,22 +263,18 @@ const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
     .build(),
   immersionOffers: [
     new ImmersionOfferEntityV2Builder()
-      .withId("c9b55cfb-db1d-4f5f-8f67-7df733ac05a8")
       .withRomeCode("I1304")
       .withAppellationCode("19871")
       .build(),
     new ImmersionOfferEntityV2Builder()
-      .withId("a69b6e06-b704-4e96-bfcd-7abbba472805")
       .withRomeCode("G1205")
       .withAppellationCode("10705")
       .build(),
     new ImmersionOfferEntityV2Builder()
-      .withId("04eded21-5102-4a91-b21d-5d78a04568bc")
       .withRomeCode("G1205")
       .withAppellationCode("10705")
       .build(),
     new ImmersionOfferEntityV2Builder()
-      .withId("9530af40-bf8a-411c-9fb9-cd4b38484028")
       .withRomeCode("I1304")
       .withAppellationCode("19825")
       .build(),

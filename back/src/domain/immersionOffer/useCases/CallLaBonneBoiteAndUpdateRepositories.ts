@@ -5,7 +5,6 @@ import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImme
 import { searchImmersionRequestSchema } from "shared/src/searchImmersion/SearchImmersionRequest.schema";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
-import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
 import {
@@ -45,7 +44,6 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly laBonneBoiteRequestRepository: LaBonneBoiteRequestRepository,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
-    private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
   ) {
     super();
@@ -177,8 +175,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
     companies: LaBonneBoiteCompanyVO[],
   ) {
     const llbResultsConvertedToEstablishmentAggregates = companies.map(
-      (company) =>
-        company.toEstablishmentAggregate(this.uuidGenerator, this.clock),
+      (company) => company.toEstablishmentAggregate(this.clock),
     );
 
     await this.establishmentAggregateRepository.insertEstablishmentAggregates(

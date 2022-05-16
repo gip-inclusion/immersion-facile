@@ -11,7 +11,6 @@ import { expectArraysToMatch } from "../../_testBuilders/test.helpers";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 
-const immersionOfferId = "61649067-cd6a-4aa3-8866-d1f3d61292b4";
 const siret = "11112222333344";
 const contactId = "theContactId";
 
@@ -42,9 +41,7 @@ describe("/contact-establishment route", () => {
       .withId(contactId)
       .withContactMethod("EMAIL")
       .build();
-    const immersionOffer = new ImmersionOfferEntityV2Builder()
-      .withId(immersionOfferId)
-      .build();
+    const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 
     await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()

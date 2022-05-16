@@ -37,7 +37,6 @@ const prepareUseCase = () => {
     establishmentAggregateRepository,
     laBonneBoiteRequestRepository,
     laBonneBoiteAPI,
-    uuidGenerator,
     clock,
   );
 

@@ -243,10 +243,9 @@ export class PgEstablishmentAggregateRepository
       await this.client.query(
         format(
           `INSERT INTO immersion_offers (
-            uuid, rome_code, rome_appellation, score, created_at, siret
+            rome_code, rome_appellation, score, created_at, siret
           ) VALUES %L`,
           offersToAdd.map((offerToAdd) => [
-            offerToAdd.id,
             offerToAdd.romeCode,
             offerToAdd.appellationCode,
             offerToAdd.score,
@@ -557,7 +556,6 @@ export class PgEstablishmentAggregateRepository
 
     const immersionOfferFields: any[][] = offersWithSiret.map(
       (offerWithSiret) => [
-        offerWithSiret.id,
         offerWithSiret.romeCode,
         offerWithSiret.appellationCode,
         offerWithSiret.siret,
@@ -567,7 +565,7 @@ export class PgEstablishmentAggregateRepository
     );
     const query = format(
       `INSERT INTO immersion_offers (
-          uuid, rome_code, rome_appellation, siret, score, created_at
+          rome_code, rome_appellation, siret, score, created_at
         ) VALUES %L`,
       immersionOfferFields,
     );

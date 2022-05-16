@@ -11,7 +11,6 @@ import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immers
 import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
-import { ImmersionOfferId } from "shared/src/ImmersionOfferId";
 import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
@@ -57,8 +56,6 @@ const prepareSearchableData = async () => {
     uuidGenerator,
   );
   const siret = "78000403200019";
-  const secretariatInMetzOfferId = "13df03a5-a2a5-430a-b558-ed3e2f03536d";
-  const boulangerInMetzOfferId = "16df03a5-a2a5-430a-b558-ed3e2f03536d";
 
   const establishment = new EstablishmentEntityV2Builder()
     .withSiret(siret)
@@ -68,12 +65,10 @@ const prepareSearchableData = async () => {
     .build();
 
   const secretariatImmersionOffer = new ImmersionOfferEntityV2Builder()
-    .withId(secretariatInMetzOfferId)
     .withRomeCode(secretariatRome)
     .build();
 
   const boulangerInMetzImmersionOffer = new ImmersionOfferEntityV2Builder()
-    .withId(boulangerInMetzOfferId)
     .withRomeCode(boulangerRome)
     .build();
 
@@ -102,7 +97,6 @@ const prepareSearchableData = async () => {
 
   return {
     searchImmersion,
-    immersionOfferId: secretariatInMetzOfferId,
     searchMadeRepository,
     establishmentAggregateRepository,
     uuidGenerator,
@@ -196,9 +190,7 @@ describe("SearchImmersionUseCase", () => {
 
   describe("authenticated with api key", () => {
     it("Search immersion, and provide contact details", async () => {
-      const { searchImmersion, uuidGenerator } = await prepareSearchableData();
-      const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
-      uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
+      const { searchImmersion } = await prepareSearchableData();
 
       const authenticatedResponse = await searchImmersion.execute(
         searchSecretariatInMetzRequestDto,
@@ -236,10 +228,8 @@ describe("SearchImmersionUseCase", () => {
 
   describe("Not authenticated with api key", () => {
     it("Search immersion, and do NOT provide contact details", async () => {
-      const { searchImmersion, uuidGenerator } = await prepareSearchableData();
+      const { searchImmersion } = await prepareSearchableData();
 
-      const generatedOfferId: ImmersionOfferId = "generated-immersion-offer-id";
-      uuidGenerator.setNextUuids(["searchMadeUuid", generatedOfferId]);
       const unauthenticatedResponse = await searchImmersion.execute(
         searchSecretariatInMetzRequestDto,
       );
