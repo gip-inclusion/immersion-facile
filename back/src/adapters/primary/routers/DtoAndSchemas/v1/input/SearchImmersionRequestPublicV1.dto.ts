@@ -5,7 +5,7 @@ import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImme
 export type SearchImmersionRequestPublicV1 = {
   rome?: RomeCode;
   siret?: string;
-  location: LatLonDto;
+  position: LatLonDto;
   distance_km: number;
   sortedBy: "distance" | "date";
   voluntaryOnly?: boolean;

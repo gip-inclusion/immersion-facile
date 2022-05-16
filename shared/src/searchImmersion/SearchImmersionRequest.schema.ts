@@ -8,7 +8,7 @@ export const searchImmersionRequestSchema: z.Schema<SearchImmersionRequestDto> =
   z.object({
     rome: romeCodeSchema.optional(),
     siret: siretSchema.optional(),
-    location: latLonSchema,
+    position: latLonSchema,
     distance_km: z.number().positive("'distance_km' doit être > 0"),
     sortedBy: z.enum(["distance", "date"]),
     voluntaryToImmersion: z.boolean().optional(),

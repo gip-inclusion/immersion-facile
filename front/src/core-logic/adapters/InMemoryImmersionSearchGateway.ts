@@ -39,14 +39,13 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
   }
 
   private simulateSearch(searchParams: SearchImmersionRequestDto) {
-    if (searchParams.voluntary_to_immersion === undefined)
-      return this._results$;
+    if (searchParams.voluntaryToImmersion === undefined) return this._results$;
     return this._results$.pipe(
       delay(this.simulatedLatency),
       map(
         ramdaFilter<SearchImmersionResultDto>(
           (result) =>
-            result.voluntaryToImmersion === searchParams.voluntary_to_immersion,
+            result.voluntaryToImmersion === searchParams.voluntaryToImmersion,
         ),
       ),
     );

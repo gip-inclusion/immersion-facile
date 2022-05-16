@@ -20,7 +20,7 @@ const initialSearchEpic: SearchEpic = (
       immersionSearchGateway
         .search({
           ...action.payload,
-          voluntary_to_immersion: true,
+          voluntaryToImmersion: true,
         })
         .pipe(
           take(1),
@@ -51,7 +51,7 @@ const extraFetchEpic: SearchEpic = (
           immersionSearchGateway
             .search({
               ...action.payload.searchParams,
-              voluntary_to_immersion: false,
+              voluntaryToImmersion: false,
             })
             .pipe(map(searchSlice.actions.extraFetchSucceeded)),
         ),

@@ -34,7 +34,7 @@ describe("search epic", () => {
       store.dispatch(
         searchSlice.actions.searchRequested({
           distance_km: 10,
-          location: { lat: 0, lon: 0 },
+          position: { lat: 0, lon: 0 },
           rome: "A1000",
           sortedBy: "distance",
         }),
@@ -55,7 +55,7 @@ describe("search epic", () => {
       store.dispatch(
         searchSlice.actions.searchRequested({
           distance_km: 10,
-          location: { lat: 0, lon: 0 },
+          position: { lat: 0, lon: 0 },
           rome: "A1000",
           sortedBy: "distance",
         }),
@@ -71,7 +71,7 @@ describe("search epic", () => {
       store.dispatch(
         searchSlice.actions.searchRequested({
           distance_km: 10,
-          location: { lat: 0, lon: 0 },
+          position: { lat: 0, lon: 0 },
           rome: "A1000",
           sortedBy: "distance",
         }),

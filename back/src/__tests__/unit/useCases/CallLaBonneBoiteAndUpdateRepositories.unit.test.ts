@@ -60,7 +60,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
     // Act
     await useCase.execute({
       rome: undefined,
-      location: { lon: 10, lat: 10 },
+      position: { lon: 10, lat: 10 },
       distance_km: 10,
       sortedBy: "distance",
     });
@@ -73,7 +73,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
   describe("lBB has not been requested for this rome code", () => {
     const dto: SearchImmersionRequestDto = {
       rome: "M1607",
-      location: { lon: 10, lat: 9 },
+      position: { lon: 10, lat: 9 },
       distance_km: 30,
       sortedBy: "distance",
     };
@@ -99,7 +99,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       const expectedRequestEntity: LaBonneBoiteRequestEntity = {
         params: {
           rome: dto.rome!,
-          ...dto.location,
+          ...dto.position,
           distance_km: 50, // LBB_DISTANCE_KM_REQUEST_PARAM
         },
         result: {
@@ -324,7 +324,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       // Act
       await useCase.execute({
         rome: userSearchedRome,
-        location: userSearchedLocationInParis17,
+        position: userSearchedLocationInParis17,
         distance_km: 10,
         sortedBy: "distance",
       });
@@ -349,7 +349,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       // Act
       await useCase.execute({
         rome: userSearchedRome,
-        location: userSearchedLocationInParis17,
+        position: userSearchedLocationInParis17,
         distance_km: 10,
         sortedBy: "distance",
       });

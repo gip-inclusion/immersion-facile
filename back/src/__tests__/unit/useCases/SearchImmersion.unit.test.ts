@@ -24,7 +24,7 @@ const boulangerRome = "D1102";
 
 const searchInMetzParams: SearchImmersionRequestDto = {
   distance_km: 30,
-  location: {
+  position: {
     lat: 49.119146,
     lon: 6.17602,
   },
@@ -134,7 +134,7 @@ describe("SearchImmersionUseCase", () => {
       {
         id: "searchMadeUuid",
         rome: secretariatRome,
-        ...searchInMetzParams.location,
+        ...searchInMetzParams.position,
         distance_km: searchInMetzParams.distance_km,
         needsToBeSearched: true,
         sortedBy: "distance",

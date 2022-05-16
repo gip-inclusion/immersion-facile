@@ -16,7 +16,7 @@ export const useSearchUseCase = () => {
     dispatch(
       searchSlice.actions.searchRequested({
         rome: values.rome || undefined,
-        location: {
+        position: {
           lat: values.lat,
           lon: values.lon,
         },

@@ -106,7 +106,7 @@ describe("search-immersion route", () => {
   });
   describe("v1", () => {
     describe("accepts valid requests", () => {
-      it("with given rome and location", async () => {
+      it("with given rome and position", async () => {
         // Prepare
         await immersionOfferRepo.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
@@ -147,7 +147,7 @@ describe("search-immersion route", () => {
           .post(`/v1/search-immersion`)
           .send({
             rome: "A1000",
-            location: {
+            position: {
               lat: 48.8531,
               lon: 2.34999,
             },
@@ -160,7 +160,7 @@ describe("search-immersion route", () => {
         await request
           .post(`/v1/search-immersion`)
           .send({
-            location: {
+            position: {
               lat: 48.8531,
               lon: 2.34999,
             },
@@ -173,7 +173,7 @@ describe("search-immersion route", () => {
         await request
           .post(`/v1/search-immersion`)
           .send({
-            location: {
+            position: {
               lat: 48.8531,
               lon: 2.34999,
             },
@@ -192,7 +192,7 @@ describe("search-immersion route", () => {
         .post(`/v1/search-immersion`)
         .send({
           rome: "XXXXX", // not a valid rome code
-          location: {
+          position: {
             lat: 48.8531,
             lon: 2.34999,
           },

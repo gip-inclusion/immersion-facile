@@ -39,7 +39,7 @@ export const SearchDebugPage = () => {
             firstValueFrom(
               immersionSearchGateway.search({
                 rome: values.rome,
-                location: {
+                position: {
                   lat: values.lat,
                   lon: values.lon,
                 },

@@ -206,7 +206,7 @@ export class PgEstablishmentAggregateRepository
     try {
       const insertContactsQuery = format(
         `INSERT INTO immersion_contacts (
-        uuid, lastname, firstname, email, role, phone, contact_mode, copy_emails
+        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails
       ) VALUES %L`,
         contactFields,
       );
@@ -304,7 +304,7 @@ export class PgEstablishmentAggregateRepository
        SET lastname = $1, 
             firstname = $2, 
             email = $3, 
-            role = $4, 
+            job = $4, 
             phone = $5, 
             contact_mode = $6, 
             copy_emails = $7
@@ -630,7 +630,7 @@ export class PgEstablishmentAggregateRepository
             'id', ic.uuid,
             'firstName', ic.firstname,
             'lastName', ic.lastname,
-            'job', ic.role,
+            'job', ic.job,
             'contactMethod', ic.contact_mode,
             'phone', ic.phone,
             'email', ic.email,
@@ -698,7 +698,7 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       'name', e.name, 
       'customizedName', e.customized_name, 
       'voluntaryToImmersion', e.data_source = 'form',
-      'location', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+      'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
       'romeLabel', io.rome_label,
       'appellationLabels',  io.appellation_labels,
       'naf', e.naf_code,
@@ -706,7 +706,7 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       'address', e.address, 
       'city', (REGEXP_MATCH(e.address,  '^.*\\d{5}\\s(.*)$'))[1],
       'contactMode', ic.contact_mode,
-      'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'role', ic.role, 'phone', ic.phone ),
+      'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'job', ic.job, 'phone', ic.phone ),
       'numberOfEmployeeRange', e.number_employees 
       ) AS search_immersion_result
       FROM match_immersion_offer AS io 

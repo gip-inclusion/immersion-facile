@@ -808,7 +808,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           phone: contact.phone,
           lastname: contact.lastName,
           firstname: contact.firstName,
-          role: contact.job,
+          job: contact.job,
           establishment_siret: siret1,
           contact_mode: "EMAIL",
           copy_emails: contact.copyEmails,
@@ -1596,7 +1596,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     uuid: string;
     lastname: string;
     firstname: string;
-    role: string;
+    job: string;
     email: string;
     phone: string;
     establishment_siret: string;
@@ -1703,7 +1703,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     await client.query(
       `
     INSERT INTO immersion_contacts (
-    uuid, lastname, firstname, role, email, phone, contact_mode
+    uuid, lastname, firstname, job, email, phone, contact_mode
   ) VALUES
    ($1, $2, '', '', $3, '', 'EMAIL');`,
       [

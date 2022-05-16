@@ -11,4 +11,8 @@ export type SearchImmersionRequestPublicV0 = {
 
 export const searchImmersionRequestPublicV0ToDomain = (
   publicV0: SearchImmersionRequestPublicV0,
-): SearchImmersionRequestDto => ({ ...publicV0, sortedBy: "distance" });
+): SearchImmersionRequestDto => ({
+  ...publicV0,
+  sortedBy: "distance",
+  position: publicV0.location,
+});

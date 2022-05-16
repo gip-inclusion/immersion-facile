@@ -59,8 +59,8 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
 
     const requestParams: LaBonneBoiteRequestParams = {
       rome: searchImmersionRequestDto.rome,
-      lon: searchImmersionRequestDto.location.lon,
-      lat: searchImmersionRequestDto.location.lat,
+      lon: searchImmersionRequestDto.position.lon,
+      lat: searchImmersionRequestDto.position.lat,
       distance_km: searchImmersionRequestDto.distance_km,
     };
 

@@ -5,7 +5,7 @@ import { OmitFromExistingKeys } from "shared/src/utils";
 
 export type SearchParams = OmitFromExistingKeys<
   SearchImmersionRequestDto,
-  "voluntary_to_immersion"
+  "voluntaryToImmersion"
 >;
 
 export type SearchStatus =
