@@ -45,10 +45,11 @@ const domainToContactDetailsV0 = (
 export const domainToSearchImmersionResultPublicV0 = (
   domain: SearchImmersionResultDto,
 ): SearchImmersionResultPublicV0 => {
-  const { appellationLabels, ...domainWithoutAppellationLabels } = domain;
+  const { appellationLabels, position, ...rest } = domain;
   return {
-    ...domainWithoutAppellationLabels,
-    id: `${domainWithoutAppellationLabels.siret}-${domainWithoutAppellationLabels.rome}`,
+    ...rest,
+    id: `${rest.siret}-${rest.rome}`,
+    location: position,
     contactDetails: domain.contactDetails
       ? domainToContactDetailsV0(domain.contactDetails)
       : undefined,

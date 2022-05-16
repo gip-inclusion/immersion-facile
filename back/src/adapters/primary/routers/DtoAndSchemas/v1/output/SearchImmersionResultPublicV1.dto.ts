@@ -23,7 +23,7 @@ export type SearchImmersionResultPublicV1 = {
   siret: SiretDto;
   name: string;
   voluntaryToImmersion: boolean;
-  location: LatLonDto;
+  position: LatLonDto;
   address: string;
   city: string;
   contactMode?: ContactMethod;

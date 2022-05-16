@@ -214,7 +214,7 @@ export class InMemoryEstablishmentAggregateRepository
       customizedName: aggregate?.establishment.customizedName,
       voluntaryToImmersion: aggregate?.establishment.voluntaryToImmersion,
       numberOfEmployeeRange: aggregate.establishment.numberEmployeesRange,
-      location: aggregate?.establishment.position,
+      position: aggregate?.establishment.position,
       address: aggregate.establishment.address,
       city: TEST_CITY,
       contactMode: aggregate.contact?.contactMethod,
@@ -293,7 +293,7 @@ const buildSearchImmersionResultDto = (
     searchMade.lat,
     searchMade.lon,
   ),
-  location: TEST_POSITION,
+  position: TEST_POSITION,
   city: TEST_CITY,
   ...(withContactDetails &&
     contact && {

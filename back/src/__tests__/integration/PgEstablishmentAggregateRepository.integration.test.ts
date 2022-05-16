@@ -352,7 +352,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         numberOfEmployeeRange: "1-2",
         naf: matchingNaf,
         nafLabel: matchingNafLabel,
-        location: searchedPosition,
+        position: searchedPosition,
       };
 
       expect(searchResult).toMatchObject([expectedResult]);
@@ -1318,7 +1318,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         name: establishment.name,
         customizedName: establishment.customizedName,
         voluntaryToImmersion: establishment.voluntaryToImmersion,
-        location: establishment.position,
+        position: establishment.position,
         address: establishment.address,
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         city: "VAULX-EN-VELIN",

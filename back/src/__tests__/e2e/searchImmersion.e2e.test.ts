@@ -139,7 +139,7 @@ describe("search-immersion route", () => {
             contactMode: "EMAIL",
             numberOfEmployeeRange: "10-19",
             distance_m: 719436,
-            location: { lat: 43.8666, lon: 8.3333 },
+            position: { lat: 43.8666, lon: 8.3333 },
             city: "test_city",
           },
         ];

@@ -32,7 +32,7 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
     name: z.string(),
     customizedName: z.string().optional(),
     voluntaryToImmersion: z.boolean(),
-    location: latLonSchema,
+    position: latLonSchema,
     address: z.string(),
     city: z.string(),
     contactMode: z.enum(["EMAIL", "PHONE", "IN_PERSON"]).optional(),

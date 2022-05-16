@@ -74,7 +74,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
       siret: "78000403200019",
       name: "Company inside repository",
       voluntaryToImmersion: true,
-      location: TEST_POSITION,
+      position: TEST_POSITION,
       numberOfEmployeeRange: "10-19",
       address: "55 rue de Faubourg Sante Honoré 75008 Paris",
       contactMode: "EMAIL",

@@ -22,7 +22,7 @@ export type SearchImmersionResultDto = {
   name: string;
   customizedName?: string;
   voluntaryToImmersion: boolean;
-  location: LatLonDto;
+  position: LatLonDto;
   address: string;
   city: string;
   contactMode?: ContactMethod;
