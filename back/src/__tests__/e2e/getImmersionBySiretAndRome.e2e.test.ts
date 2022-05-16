@@ -84,7 +84,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
         firstName: "Alain",
         email: "alain.prost@email.fr",
         phone: "0612345678",
-        role: "le big boss",
+        job: "le big boss",
       },
       romeLabel: TEST_ROME_LABEL,
       appellationLabels: [TEST_APPELLATION_LABEL],

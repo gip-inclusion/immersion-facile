@@ -224,7 +224,7 @@ export class InMemoryEstablishmentAggregateRepository
         firstName: aggregate.contact.firstName,
         email: aggregate.contact.email,
         phone: aggregate.contact.phone,
-        role: aggregate.contact.job,
+        job: aggregate.contact.job,
       },
     };
   }
@@ -303,7 +303,7 @@ const buildSearchImmersionResultDto = (
         lastName: contact.lastName,
         email: contact.email,
         phone: contact.phone,
-        role: contact.job,
+        job: contact.job,
       },
     }),
 });

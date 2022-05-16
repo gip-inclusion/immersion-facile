@@ -1,7 +1,10 @@
 import { ImmersionContactInEstablishmentId } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { RomeCode } from "shared/src/rome";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import {
+  SearchContactDto,
+  SearchImmersionResultDto,
+} from "shared/src/searchImmersion/SearchImmersionResult.dto";
 
 import { SiretDto } from "shared/src/siret";
 
@@ -32,6 +35,13 @@ export type SearchImmersionResultPublicV0 = {
   numberOfEmployeeRange?: string;
 };
 
+const domainToContactDetailsV0 = (
+  contactDetails: SearchContactDto,
+): ContactDetailsPublicV0 => {
+  const { job, ...rest } = contactDetails;
+  return { ...rest, role: job };
+};
+
 export const domainToSearchImmersionResultPublicV0 = (
   domain: SearchImmersionResultDto,
 ): SearchImmersionResultPublicV0 => {
@@ -39,5 +49,8 @@ export const domainToSearchImmersionResultPublicV0 = (
   return {
     ...domainWithoutAppellationLabels,
     id: `${domainWithoutAppellationLabels.siret}-${domainWithoutAppellationLabels.rome}`,
+    contactDetails: domain.contactDetails
+      ? domainToContactDetailsV0(domain.contactDetails)
+      : undefined,
   };
 };

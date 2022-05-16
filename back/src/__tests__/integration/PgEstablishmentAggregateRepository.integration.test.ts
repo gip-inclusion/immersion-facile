@@ -1328,7 +1328,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           id: contact.id,
           firstName: contact.firstName,
           lastName: contact.lastName,
-          role: contact.job,
+          job: contact.job,
           email: contact.email,
           phone: contact.phone,
         },

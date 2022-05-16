@@ -15,7 +15,7 @@ export const contactPublicV0Schema = z.object({
   lastName: z.string(),
   firstName: z.string(),
   email: z.string(),
-  role: z.string(),
+  job: z.string(),
   phone: z.string(),
 });
 

@@ -10,7 +10,7 @@ export type SearchContactDto = {
   lastName: string;
   firstName: string;
   email: string;
-  role: string;
+  job: string;
   phone: string;
 };
 

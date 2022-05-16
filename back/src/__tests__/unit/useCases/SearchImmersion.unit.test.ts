@@ -224,7 +224,7 @@ describe("SearchImmersionUseCase", () => {
             firstName: "Alain",
             lastName: "Prost",
             email: "alain.prost@email.fr",
-            role: "le big boss",
+            job: "le big boss",
             phone: "0612345678",
           },
           numberOfEmployeeRange: "20-49",
