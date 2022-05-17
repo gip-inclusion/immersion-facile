@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
-import { AuthChecker } from "../../../domain/auth/AuthChecker";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AuthChecker } from "../../../domain/auth/AuthChecker";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { HttpError, UnauthorizedError } from "./httpErrors";
-import { deleteFileAndParentFolder } from "../../../utils/filesystemUtils";
 
 const logger = createLogger(__filename);
 
@@ -102,7 +101,6 @@ export const sendZipResponse = async (
     res.setHeader("content-type", "application/zip");
     return res.download(archivePath, (err?: Error) => {
       if (err) notifyObjectDiscord(err);
-      deleteFileAndParentFolder(archivePath);
     });
   } catch (error: any) {
     handleResponseError(req, res, error);
