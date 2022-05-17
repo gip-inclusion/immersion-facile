@@ -54,8 +54,9 @@ describe("UpdateAllPeAgencies use case", () => {
       },
     ]);
   });
-  describe("Agency already exists, should add the new emails, siret and code", () => {
-    it("if PE agency has same email as existing", async () => {
+
+  describe("Agency already exists, should add the new emails, siret, code and replaces the adresse and position", () => {
+    it("if PE agency email is same as one of the already existing validator Email", async () => {
       const commonEmail = "common@mail.com";
       peAgenciesReferential.setPeAgencies([
         {
@@ -87,6 +88,55 @@ describe("UpdateAllPeAgencies use case", () => {
         {
           ...initialAgencyConfig,
           validatorEmails: [commonEmail],
+          address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
+          position: {
+            lon: 7.511,
+            lat: 48.532571,
+          },
+          agencySiret: "13000548120984",
+          code: "GRE0187",
+        },
+      ]);
+    });
+
+    it("if PE agency email is same as one of the already existing counsellor Email", async () => {
+      const commonEmail = "common@mail.com";
+      peAgenciesReferential.setPeAgencies([
+        {
+          ...peReferentialAgency,
+          contact: { ...peReferentialAgency.contact, email: commonEmail },
+        },
+      ]);
+      const initialAgencyConfig: AgencyConfig = {
+        id: "some-uuid",
+        name: "Agence Pôle emploi Molsheim",
+        counsellorEmails: [commonEmail],
+        validatorEmails: [],
+        adminEmails: ["someAdmin@mail.com"],
+        address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
+        position: {
+          lon: 3,
+          lat: 50,
+        },
+        signature: "L'équipe de l'Agence Pôle emploi Molsheim",
+        questionnaireUrl: "some-url",
+        kind: "pole-emploi",
+        status: "active",
+      };
+      agencyRepository.setAgencies([initialAgencyConfig]);
+      uuid.setNextUuid("other-uuid");
+      await updateAllPeAgencies.execute();
+
+      expectTypeToMatchAndEqual(agencyRepository.agencies, [
+        {
+          ...initialAgencyConfig,
+          counsellorEmails: [commonEmail],
+          validatorEmails: [],
+          address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
+          position: {
+            lon: 7.511,
+            lat: 48.532571,
+          },
           agencySiret: "13000548120984",
           code: "GRE0187",
         },
@@ -122,6 +172,11 @@ describe("UpdateAllPeAgencies use case", () => {
             ...initialAgencyConfig.validatorEmails,
             "molsheim@pole-emploi.fr",
           ],
+          address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
+          position: {
+            lon: 7.511,
+            lat: 48.532571,
+          },
           agencySiret: "13000548120984",
           code: "GRE0187",
         },

@@ -10,7 +10,7 @@ export interface AgencyRepository {
     position: LatLonDto,
     distance_km: number,
   ) => Promise<AgencyConfig[]>;
-  getAgencyWithValidatorEmailMatching: (
+  getAgencyWhereEmailMatches: (
     email: string,
   ) => Promise<AgencyConfig | undefined>;
   getAllActive: () => Promise<AgencyConfig[]>;

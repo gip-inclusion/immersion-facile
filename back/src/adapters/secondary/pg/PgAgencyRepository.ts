@@ -47,15 +47,17 @@ export class PgAgencyRepository implements AgencyRepository {
     return pgResult.rows.map(pgToEntity);
   }
 
-  public async getAgencyWithValidatorEmailMatching(email: string) {
+  public async getAgencyWhereEmailMatches(email: string) {
     const positionAsCoordinates = "ST_AsGeoJSON(position) AS position";
     const validatorEmailsIncludesProvidedEmail =
       "CAST(validator_emails AS text) ILIKE '%' || $1 || '%'";
+    const councellorEmailsIncludesProvidedEmail =
+      "CAST(counsellor_emails AS text) ILIKE '%' || $1 || '%'";
 
     const pgResult = await this.client.query(
       `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ${positionAsCoordinates}, agency_siret, code
        FROM public.agencies
-       WHERE ${validatorEmailsIncludesProvidedEmail}`,
+       WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
       [email],
     );
 

@@ -103,11 +103,13 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return Object.values(this._agencies).filter(isAgencyActive);
   }
 
-  public async getAgencyWithValidatorEmailMatching(
+  public async getAgencyWhereEmailMatches(
     email: string,
   ): Promise<AgencyConfig | undefined> {
-    return Object.values(this._agencies).filter((agency) =>
-      agency.validatorEmails.includes(email),
+    return Object.values(this._agencies).filter(
+      (agency) =>
+        agency.validatorEmails.includes(email) ||
+        agency.counsellorEmails.includes(email),
     )[0];
   }
 

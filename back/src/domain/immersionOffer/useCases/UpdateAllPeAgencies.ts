@@ -1,4 +1,5 @@
 import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { LatLonDto } from "shared/src/latLon";
 import { z } from "zod";
 import { AppLogger } from "../../core/ports/AppLogger";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -44,6 +45,11 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
       total: 0,
     };
 
+    this.logger.info(
+      "Total number of active agencies in DB before script : ",
+      (await this.agencyRepository.getAllActive()).length,
+    );
+
     for (const peReferentialAgency of peReferentialAgencies) {
       counts.total++;
 
@@ -53,7 +59,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
         continue;
       }
 
-      const matchedEmailAgency = await this.getAgencyWithSameValidatorEmail(
+      const matchedEmailAgency = await this.getAgencyWhereEmailMatches(
         peReferentialAgency,
       );
 
@@ -110,7 +116,6 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
   private convertToAgencyConfig(
     peReferentialAgency: PeAgencyFromReferenciel,
   ): AgencyConfig {
-    const { ligne4, ligne5, ligne6 } = peReferentialAgency.adressePrincipale;
     return {
       id: this.uuid.new(),
       name: peReferentialAgency.libelleEtendu,
@@ -119,11 +124,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
         ? [peReferentialAgency.contact.email]
         : [],
       adminEmails: [this.defaultAdminEmail],
-      address: [ligne4, ligne5, ligne6].filter((v) => v !== "").join(", "),
-      position: {
-        lat: peReferentialAgency.adressePrincipale.gpsLat,
-        lon: peReferentialAgency.adressePrincipale.gpsLon,
-      },
+      ...normalizeAddressAndPosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
       questionnaireUrl: defaultQuestionnaireUrl,
       code: peReferentialAgency.code,
@@ -146,15 +147,14 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
     return agencies.filter((agency) => agency.kind === "pole-emploi");
   }
 
-  private async getAgencyWithSameValidatorEmail(
+  private async getAgencyWhereEmailMatches(
     peReferentialAgency: PeAgencyFromReferenciel,
   ): Promise<AgencyConfig | undefined> {
     if (!peReferentialAgency.contact?.email) return;
 
-    const result =
-      await this.agencyRepository.getAgencyWithValidatorEmailMatching(
-        peReferentialAgency.contact.email,
-      );
+    const result = await this.agencyRepository.getAgencyWhereEmailMatches(
+      peReferentialAgency.contact.email,
+    );
 
     return result;
   }
@@ -165,21 +165,49 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
   ): Promise<void> {
     const updatedAgency: AgencyConfig = {
       ...existingAgency,
-      validatorEmails: this.updateEmails(
-        existingAgency.validatorEmails,
-        peReferentialAgency.contact?.email,
-      ),
+      ...normalizeAddressAndPosition(peReferentialAgency),
+      ...updateEmails({
+        validatorEmails: existingAgency.validatorEmails,
+        counsellorEmails: existingAgency.counsellorEmails,
+        newEmail: peReferentialAgency.contact?.email,
+      }),
       agencySiret: peReferentialAgency.siret,
       code: peReferentialAgency.code,
     };
     await this.agencyRepository.update(updatedAgency);
   }
-
-  private updateEmails(
-    existingEmails: string[],
-    newEmail: string | undefined,
-  ): string[] {
-    if (!newEmail || existingEmails.includes(newEmail)) return existingEmails;
-    return [...existingEmails, newEmail];
-  }
 }
+
+const updateEmails = ({
+  counsellorEmails,
+  validatorEmails,
+  newEmail,
+}: {
+  counsellorEmails: string[];
+  validatorEmails: string[];
+  newEmail: string | undefined;
+}): { validatorEmails: string[]; counsellorEmails: string[] } => {
+  if (
+    !newEmail ||
+    validatorEmails.includes(newEmail) ||
+    counsellorEmails.includes(newEmail)
+  ) {
+    return {
+      validatorEmails,
+      counsellorEmails,
+    };
+  }
+
+  return { counsellorEmails, validatorEmails: [...validatorEmails, newEmail] };
+};
+
+const normalizeAddressAndPosition = ({
+  adressePrincipale,
+  adressePrincipale: { ligne4, ligne5, ligne6 },
+}: PeAgencyFromReferenciel): { address: string; position: LatLonDto } => ({
+  address: [ligne4, ligne5, ligne6].filter((v) => !!v).join(", "),
+  position: {
+    lat: adressePrincipale.gpsLat,
+    lon: adressePrincipale.gpsLon,
+  },
+});
