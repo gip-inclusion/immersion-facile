@@ -22,7 +22,7 @@ const validContactMethods: NotEmptyArray<ContactMethod> = [
   "PHONE",
   "IN_PERSON",
 ];
-export const preferredContactMethodSchema = z.enum(validContactMethods);
+const preferredContactMethodSchema = z.enum(validContactMethods);
 
 export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   lastName: zTrimmedString,
@@ -44,7 +44,7 @@ const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "passeEmploi",
 ];
 
-export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
+export const formEstablishmentSchema = z.object(
   {
     source: z.enum(formEstablishmentSources),
     siret: siretSchema,

@@ -19,6 +19,7 @@ import { InMemorySearchMadeRepository } from "../../secondary/immersionOffer/InM
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryDocumentGateway } from "../../secondary/InMemoryDocumentGateway";
+import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryEmailGateway } from "../../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionApplicationRepository } from "../../secondary/InMemoryImmersionApplicationRepository";
@@ -31,6 +32,7 @@ import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { makePgGetApiConsumerById } from "../../secondary/pg/makePgGetApiConsumerById";
 import { makePgGetFeatureFlags } from "../../secondary/pg/makePgGetFeatureFlags";
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
+import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgConventionPoleEmploiAdvisorRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgEstablishmentExportQueries } from "../../secondary/pg/PgEstablishmentExportQueries";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
@@ -98,6 +100,13 @@ export const createRepositories = async (
       : new InMemoryOutboxQueries(outboxRepo);
 
   return {
+    conventionPoleEmploiAdvisor:
+      config.repositories === "PG"
+        ? new PgConventionPoleEmploiAdvisorRepository(
+            await getPgPoolFn().connect(),
+          )
+        : new InMemoryConventionPoleEmploiAdvisorRepository(),
+
     immersionApplication:
       config.repositories === "PG"
         ? new PgImmersionApplicationRepository(await getPgPoolFn().connect())

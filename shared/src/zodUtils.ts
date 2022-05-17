@@ -24,3 +24,11 @@ export const zBoolean = z.boolean({
   required_error: "Obligatoire",
   invalid_type_error: "Un booléen est attendu",
 });
+
+type GuardedType<T> = T extends (x: any) => x is infer T ? T : never;
+
+type TypeGuard<Input, Output extends Input> = (value: Input) => value is Output;
+
+export const zCustom = <T extends TypeGuard<unknown, unknown>>(typeguard: T) => {
+  return z.custom<GuardedType<T>>(typeguard);
+};

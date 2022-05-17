@@ -21,6 +21,7 @@ export const PostcodeAutocomplete = ({
   const [error, setError] = useState<any | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
       const sanitizedTerm = value.trim();
       if (sanitizedTerm.length !== 5) return;

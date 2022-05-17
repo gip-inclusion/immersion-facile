@@ -95,4 +95,13 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
   logger.info(scriptSummaryMessage);
 };
 
-triggerSuggestEditFormEstablishmentEvery6Months();
+triggerSuggestEditFormEstablishmentEvery6Months().then(
+  () => {
+    logger.info(`Script finished success`);
+    process.exit(0);
+  },
+  (error: any) => {
+    logger.error(error, `Script failed`);
+    process.exit(1);
+  },
+);

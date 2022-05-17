@@ -45,3 +45,7 @@ export const replaceArrayElement = <T>(
   replaceBy,
   ...original.slice(replaceAt + 1),
 ];
+
+export const isOneOf = <T extends readonly string[]>(set: T, element: string): element is T[number] => {
+  return set.includes(element)
+}

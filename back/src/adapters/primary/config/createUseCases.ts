@@ -8,7 +8,6 @@ import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { ExportEstablishmentsAsExcelArchive } from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
-import { LinkUserPeConnectAccount } from "../../../domain/generic/peConnect/useCases/linkUserPeConnectAccount";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { ExportImmersionApplicationsReport } from "../../../domain/immersionApplication/useCases/ExportImmersionApplicationsReport";
 import { GenerateMagicLink } from "../../../domain/immersionApplication/useCases/GenerateMagicLink";
@@ -48,6 +47,7 @@ import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/use
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
+import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
@@ -92,6 +92,13 @@ export const createUseCases = (
     getImmersionApplication: new GetImmersionApplication(
       repositories.immersionApplication,
     ),
+    linkPoleEmploiAdvisorAndRedirectToConvention:
+      new LinkPoleEmploiAdvisorAndRedirectToConvention({
+        uowPerformer,
+        uuidGenerator,
+        peConnectGateway: repositories.peConnectGateway,
+        baseUrlForRedirect: config.immersionFacileBaseUrl,
+      }),
     listImmersionApplication: new ListImmersionApplication(
       repositories.immersionApplication,
     ),
@@ -120,10 +127,6 @@ export const createUseCases = (
       repositories.immersionApplication,
       createNewEvent,
       repositories.outbox,
-    ),
-    linkUserPeConnectAccount: new LinkUserPeConnectAccount(
-      repositories.peConnectGateway,
-      config.immersionFacileBaseUrl,
     ),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewMagicLink: new RenewMagicLink(

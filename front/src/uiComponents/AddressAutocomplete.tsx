@@ -52,8 +52,12 @@ export const AddressAutocomplete = ({
 
   useEffect(() => {
     if (initialSearchTerm && initialSearchTerm !== selectedOption?.label) {
-      getAddressesFromApi(initialSearchTerm).then((addresses) =>
-        setSelectedOption(addresses?.[0] ?? null),
+      getAddressesFromApi(initialSearchTerm).then(
+        (addresses) => setSelectedOption(addresses?.[0] ?? null),
+        (error: any) => {
+          // eslint-disable-next-line no-console
+          console.error("getAddressesFromApi", error);
+        },
       );
     }
   }, [initialSearchTerm]);
@@ -63,6 +67,7 @@ export const AddressAutocomplete = ({
       debounceSearchTerm &&
       ![initialSearchTerm, selectedOption?.label].includes(debounceSearchTerm)
     ) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       getAddressesFromApi(debounceSearchTerm);
     }
   }, [debounceSearchTerm]);

@@ -16,6 +16,7 @@ export const FormMagicLinks = ({
   const [expired, setExpired] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     immersionApplicationGateway
       .generateMagicLink(immersionApplication.id, role, expired)
       .then(

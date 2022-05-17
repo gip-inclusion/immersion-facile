@@ -11,8 +11,8 @@ export const CopyLink = () => {
   return (
     <Tooltip title={tooltipText}>
       <IconButton
-        onClick={() => {
-          navigator.clipboard.writeText(window.location.href);
+        onClick={async () => {
+          await navigator.clipboard.writeText(window.location.href);
           setTooltipText("Lien copié !");
         }}
       >

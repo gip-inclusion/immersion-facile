@@ -2,6 +2,7 @@ import { NafDto } from "../naf";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret";
 import { Flavor } from "../typeFlavors";
+import { formEstablishmentSchema } from "./FormEstablishment.schema";
 
 // prettier-ignore
 export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;

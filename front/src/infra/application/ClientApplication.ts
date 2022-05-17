@@ -36,6 +36,7 @@ export class ClientApplication {
   }
 
   onEvent(event: ApplicationEvent) {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.eventBus.onEvent(event);
   }
   private eventBus: EventGateway;

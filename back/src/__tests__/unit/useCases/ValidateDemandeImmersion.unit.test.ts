@@ -63,7 +63,7 @@ describe("Validate immersionApplication", () => {
         status: "VALIDATED",
       };
 
-      expectEventSavedInOutbox(outboxQueries, {
+      await expectEventSavedInOutbox(outboxQueries, {
         topic: "FinalImmersionApplicationValidationByAdmin",
         payload: expectedImmersionApplication,
       });

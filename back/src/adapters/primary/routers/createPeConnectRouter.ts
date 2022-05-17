@@ -17,7 +17,7 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
   peConnectRouter.route(`/${peConnect}`).get(async (req, res) =>
     sendRedirectResponse(req, res, async () => {
       await throwIfPeConnectDisabled(deps);
-      return deps.useCases.linkUserPeConnectAccount.execute(
+      return deps.useCases.linkPoleEmploiAdvisorAndRedirectToConvention.execute(
         req.query.code as string,
       );
     }),

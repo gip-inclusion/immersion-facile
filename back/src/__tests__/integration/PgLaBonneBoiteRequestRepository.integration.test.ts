@@ -77,7 +77,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
     it("Should return null if the given rome has not been requested since the given date", async () => {
       // Prepare
       const dateBefore = getDateBefore();
-      insertEntity(dateBefore, paris17, thisRome);
+      await insertEntity(dateBefore, paris17, thisRome);
       // Act
       const closestRequestAndDistance =
         await repo.getClosestRequestParamsWithThisRomeSince({
@@ -91,10 +91,10 @@ describe("PgLaBonneBoiteRequestRepository", () => {
 
     it("Should return closest (geographicaly) made request with the  given rome since the given date", async () => {
       // Prepare
-      insertEntity(getDateAfter("08"), paris10, thisRome, 100); // Same rome, 6km away (our match !)
-      insertEntity(getDateAfter("09"), paris17, "F2222"); //  Not same rome, 0km away
-      insertEntity(getDateAfter("10"), evry, thisRome); // Same rome, 31km away
-      insertEntity(getDateBefore(), paris17, thisRome); //  Same rome, 0km away, but before the given date
+      await insertEntity(getDateAfter("08"), paris10, thisRome, 100); // Same rome, 6km away (our match !)
+      await insertEntity(getDateAfter("09"), paris17, "F2222"); //  Not same rome, 0km away
+      await insertEntity(getDateAfter("10"), evry, thisRome); // Same rome, 31km away
+      await insertEntity(getDateBefore(), paris17, thisRome); //  Same rome, 0km away, but before the given date
 
       // Act
       const closestRequestAndDistance =

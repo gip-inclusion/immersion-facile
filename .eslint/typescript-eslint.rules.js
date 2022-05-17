@@ -20,6 +20,13 @@ module.exports = {
   "@typescript-eslint/no-non-null-assertion": "error",
   "@typescript-eslint/require-await": "error",
   "@typescript-eslint/return-await": "error",
+  "@typescript-eslint/no-floating-promises": [
+    "error",
+    {
+      ignoreVoid: false,
+      ignoreIIFE: false,
+    },
+  ],
 };
 
 const toAddBitsByBits = {
@@ -193,13 +200,7 @@ const toAddBitsByBits = {
       allowWithDecorator: true,
     },
   ],
-  "@typescript-eslint/no-floating-promises": [
-    "error",
-    {
-      ignoreVoid: false,
-      ignoreIIFE: false,
-    },
-  ],
+
   "@typescript-eslint/no-inferrable-types": "off",
   "@typescript-eslint/no-invalid-void-type": [
     "error",

@@ -81,4 +81,13 @@ const main = async () => {
   process.exit(errorCode);
 };
 
-main();
+main().then(
+  () => {
+    logger.info(`Script finished success`);
+    process.exit(0);
+  },
+  (error: any) => {
+    logger.error(error, `Script failed`);
+    process.exit(1);
+  },
+);

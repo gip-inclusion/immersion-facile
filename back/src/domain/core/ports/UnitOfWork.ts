@@ -1,3 +1,4 @@
+import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { AgencyRepository } from "../../immersionApplication/ports/AgencyRepository";
 import { FormEstablishmentRepository } from "../../immersionOffer/ports/FormEstablishmentRepository";
 import { EstablishmentAggregateRepository } from "../../immersionOffer/ports/EstablishmentAggregateRepository";
@@ -13,6 +14,7 @@ import { OutboxQueries } from "./OutboxQueries";
 import { ReportingGateway } from "./ReportingGateway";
 
 export type UnitOfWork = {
+  conventionPoleEmploiAdvisorRepo: ConventionPoleEmploiAdvisorRepository;
   immersionAssessmentRepository: ImmersionAssessmentRepository;
   romeRepo: RomeRepository;
   outboxRepo: OutboxRepository;

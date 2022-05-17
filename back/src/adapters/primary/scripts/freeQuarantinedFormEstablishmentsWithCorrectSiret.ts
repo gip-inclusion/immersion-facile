@@ -66,4 +66,13 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
   await pool.end();
 };
 
-freeQuarantinedFormEstablishmentsWithCorrectSiret();
+freeQuarantinedFormEstablishmentsWithCorrectSiret().then(
+  () => {
+    logger.info(`Script finished success`);
+    process.exit(0);
+  },
+  (error: any) => {
+    logger.error(error, `Script failed`);
+    process.exit(1);
+  },
+);

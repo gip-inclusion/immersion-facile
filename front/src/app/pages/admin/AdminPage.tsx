@@ -51,9 +51,13 @@ export const AdminPage = ({ route }: AdminProps) => {
   };
 
   useEffect(() => {
-    immersionApplicationGateway
-      .getAll(agency, statusFilter)
-      .then((applications) => setImmersionApplications(applications));
+    immersionApplicationGateway.getAll(agency, statusFilter).then(
+      (applications) => setImmersionApplications(applications),
+      (error: any) => {
+        // eslint-disable-next-line no-console
+        console.log("getFormEstablishmentFromJwt", error);
+      },
+    );
   }, [statusFilter]);
 
   return (

@@ -52,6 +52,7 @@ export const AppellationAutocomplete = ({
   const debounceSearchTerm = useDebounce(searchTerm, 300);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
       const sanitizedTerm = debounceSearchTerm.trim();
       if (!sanitizedTerm) return [];

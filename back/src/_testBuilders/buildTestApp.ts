@@ -9,6 +9,7 @@ import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/In
 import { InMemorySearchMadeRepository } from "../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
 import { InMemoryLaBonneBoiteRequestRepository } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
 import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryConventionPoleEmploiAdvisorRepository } from "../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
 import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
@@ -33,6 +34,7 @@ import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/
 import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
 
 export type InMemoryRepositories = {
+  conventionPoleEmploiAdvisor: InMemoryConventionPoleEmploiAdvisorRepository;
   outbox: InMemoryOutboxRepository;
   outboxQueries: InMemoryOutboxQueries;
   immersionOffer: InMemoryEstablishmentAggregateRepository;

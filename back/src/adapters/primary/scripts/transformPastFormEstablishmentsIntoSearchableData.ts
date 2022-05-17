@@ -131,4 +131,13 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
 transformPastFormEstablishmentsIntoSearchableData(
   config.pgImmersionDbUrl,
   config.pgImmersionDbUrl,
+).then(
+  () => {
+    logger.info(`Script finished success`);
+    process.exit(0);
+  },
+  (error: any) => {
+    logger.error(error, `Script failed`);
+    process.exit(1);
+  },
 );

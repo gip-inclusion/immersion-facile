@@ -26,11 +26,13 @@ export const EstablishmentEditionFormPage = ({
 
   useEffect(() => {
     if (!route.params.jwt) return;
-    establishmentGateway
-      .getFormEstablishmentFromJwt(route.params.jwt)
-      .then((savedValues) =>
-        setInitialValues({ ...initialValues, ...savedValues }),
-      );
+    establishmentGateway.getFormEstablishmentFromJwt(route.params.jwt).then(
+      (savedValues) => setInitialValues({ ...initialValues, ...savedValues }),
+      (error: any) => {
+        // eslint-disable-next-line no-console
+        console.error("getFormEstablishmentFromJwt", error);
+      },
+    );
   }, [route.params.jwt]);
 
   if (!route.params.jwt) {

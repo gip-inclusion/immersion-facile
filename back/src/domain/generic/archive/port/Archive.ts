@@ -34,6 +34,7 @@ export class Archive {
       });
       this.outputFile.on("error", reject);
 
+      //eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.archive.finalize();
     });
   }

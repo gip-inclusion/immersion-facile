@@ -53,6 +53,19 @@ export const logAxiosError = (logger: Logger, error: any, msg?: string) => {
   }
 };
 
+export const PrettyAxiosResponseError = (message: string, error: any): Error =>
+  new Error(
+    JSON.stringify(
+      {
+        _message: message,
+        status: `${error.response.status}`,
+        body: error.response.data,
+      },
+      null,
+      2,
+    ),
+  );
+
 const extractPartialRequest = (request: AxiosRequestConfig) => ({
   method: request.method,
   url: request.url,

@@ -47,7 +47,7 @@ describe("PG getFeatureFlags", () => {
     await Promise.all(
       keys(flags).map((flagName) => {
         const isFlagActive = flags[flagName];
-        client.query(
+        return client.query(
           `INSERT INTO feature_flags (flag_name, is_active) VALUES ('${flagName}', ${isFlagActive});`,
         );
       }),
