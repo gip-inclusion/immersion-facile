@@ -5,23 +5,23 @@ import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGate
 import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
 import {
   contactEstablishmentRoute,
-  searchImmersionRoute,
+  immersionOffersRoute,
 } from "shared/src/routes";
-import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
 
 const prefix = "api";
 
 export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
   public search(
-    searchParams: SearchImmersionRequestDto,
+    searchParams: SearchImmersionQueryParamsDto,
   ): Observable<SearchImmersionResultDto[]> {
     return ajax
       .get<SearchImmersionResultDto[]>(
-        `/${prefix}/v1/${searchImmersionRoute}?rome=${searchParams.rome}
-        &position.lon=${searchParams.position.lon}&position.lat=${searchParams.position.lat}
-        &distance_km=${searchParams.distance_km}
-        &voluntaryToImmersion=${searchParams.voluntaryToImmersion}`,
+        `/${prefix}/v1/${immersionOffersRoute}?${queryParamsAsString<SearchImmersionQueryParamsDto>(
+          searchParams,
+        )}`,
       )
       .pipe(map(({ response }) => response));
   }

@@ -1,5 +1,5 @@
 import { pipe } from "ramda";
-import { z, ZodTypeAny } from "zod";
+import { z, preprocess } from "zod";
 
 export const zString = z
   .string({
@@ -27,3 +27,17 @@ export const zBoolean = z.boolean({
   required_error: "Obligatoire",
   invalid_type_error: "Un booléen est attendu",
 });
+
+export const zPreprocessedBoolean = (schema: z.ZodBoolean = z.boolean()) =>
+  preprocess((a) => {
+    if (typeof a === "boolean") return a;
+    const aLowerCase = zTrimmedString.parse(a).toLowerCase();
+    const parsedA = z.enum(["true", "false"]).optional().parse(aLowerCase);
+    if (parsedA) return parsedA.toLowerCase() === "true";
+  }, schema);
+
+export const zPreprocessedNumber = (schema: z.ZodNumber = z.number()) =>
+  preprocess((a) => {
+    if (typeof a === "number") return a;
+    return parseFloat(z.string().parse(a));
+  }, schema);

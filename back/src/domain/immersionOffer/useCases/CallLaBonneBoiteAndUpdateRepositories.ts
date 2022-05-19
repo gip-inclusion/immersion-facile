@@ -1,8 +1,8 @@
 import { addDays } from "date-fns";
 import promClient from "prom-client";
 import { prop, propEq } from "ramda";
-import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
-import { searchImmersionRequestSchema } from "shared/src/searchImmersion/SearchImmersionRequest.schema";
+import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
+import { searchImmersionQueryParamsSchema } from "shared/src/searchImmersion/SearchImmersionQueryParams.schema";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
 import { UseCase } from "../../core/UseCase";
@@ -37,7 +37,7 @@ const counterSearchImmersionLBBRequestsSkipped = new promClient.Counter({
 
 const LBB_DISTANCE_KM_REQUEST_PARAM = 50;
 export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
-  SearchImmersionRequestDto,
+  SearchImmersionQueryParamsDto,
   void
 > {
   constructor(
@@ -48,17 +48,17 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
   ) {
     super();
   }
-  inputSchema = searchImmersionRequestSchema;
+  inputSchema = searchImmersionQueryParamsSchema;
 
   public async _execute(
-    searchImmersionRequestDto: SearchImmersionRequestDto,
+    searchImmersionRequestDto: SearchImmersionQueryParamsDto,
   ): Promise<void> {
     if (!searchImmersionRequestDto.rome) return;
 
     const requestParams: LaBonneBoiteRequestParams = {
       rome: searchImmersionRequestDto.rome,
-      lon: searchImmersionRequestDto.position.lon,
-      lat: searchImmersionRequestDto.position.lat,
+      lon: searchImmersionRequestDto.longitude,
+      lat: searchImmersionRequestDto.latitude,
       distance_km: searchImmersionRequestDto.distance_km,
     };
 
@@ -111,21 +111,21 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
         (siret) => !existingCompaniesWithSameRome.includes(siret),
       );
 
-    const immersionOffersWithSiretsToAdd: OfferWithSiret[] =
-      existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome.map((siret) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it's siret is within relevantCompanies
-        const company = relevantCompanies.find(propEq("siret", siret))!;
-        return {
-          siret: company.siret,
-          id: this.uuidGenerator.new(),
-          createdAt: this.clock.now(),
-          romeCode: company.props.matched_rome_code,
-          score: company.props.stars,
-        };
-      });
-    await this.establishmentAggregateRepository.createImmersionOffersToEstablishments(
-      immersionOffersWithSiretsToAdd,
-    );
+      const immersionOffersWithSiretsToAdd: OfferWithSiret[] =
+        existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome.map((siret) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it's siret is within relevantCompanies
+          const company = relevantCompanies.find(propEq("siret", siret))!;
+          return {
+            siret: company.siret,
+            createdAt: this.clock.now(),
+            romeCode: company.props.matched_rome_code,
+            score: company.props.stars,
+          };
+        });
+      await this.establishmentAggregateRepository.createImmersionOffersToEstablishments(
+        immersionOffersWithSiretsToAdd,
+      );
+
   }
 
   private async requestLaBonneBoite(

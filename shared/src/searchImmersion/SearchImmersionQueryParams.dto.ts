@@ -1,9 +1,9 @@
-import { LatLonDto } from "../latLon";
 import { RomeCode } from "../rome";
 
-export type SearchImmersionRequestDto = {
+export type SearchImmersionQueryParamsDto = {
+  longitude: number;
+  latitude: number;
   rome?: RomeCode;
-  position: LatLonDto;
   distance_km: number;
   sortedBy: "distance" | "date";
   voluntaryToImmersion?: boolean;

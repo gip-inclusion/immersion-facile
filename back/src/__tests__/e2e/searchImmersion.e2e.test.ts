@@ -144,21 +144,21 @@ describe("search-immersion route", () => {
         ];
         await request
           .get(
-            `/v1/immersion-offers?rome=A1000&distance_km=30&position={"lat":48.8531,"lon":2.34999}`,
+            `/v1/immersion-offers?rome=A1000&distance_km=30&longitude=2.34999&latitude=48.8531`,
           )
           .expect(200, expectedResult);
       });
       it("with no specified rome", async () => {
         await request
           .get(
-            `/v1/immersion-offers?distance_km=30&position={"lat":48.8531,"lon":2.34999}`,
+            `/v1/immersion-offers?distance_km=30&longitude=2.34999&latitude=48.8531`,
           )
           .expect(200, []);
       });
       it("with filter voluntaryToImmersion", async () => {
         await request
           .get(
-            `/v1/immersion-offers?distance_km=30&position.lat=48.8531&position={"lat":48.8531,"lon":2.34999}&voluntaryToImmersion=true`,
+            `/v1/immersion-offers?distance_km=30&longitude=2.34999&latitude=48.8531&voluntaryToImmersion=true`,
           )
           .expect(200, []);
       });
@@ -169,7 +169,7 @@ describe("search-immersion route", () => {
     it("rejects invalid requests with error code 400", async () => {
       await request
         .get(
-          `/v1/immersion-offers?rome=XXXXX&distance_km=30&position={"lat":48.8531,"lon":2.34999}`,
+          `/v1/immersion-offers?rome=XXXXX&distance_km=30&longitude=2.34999&latitude=48.8531`,
         )
         .expect(400, /Code ROME incorrect/);
     });

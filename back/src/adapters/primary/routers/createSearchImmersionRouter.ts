@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { searchImmersionRoute__v0 } from "shared/src/routes";
-import { searchImmersionRequestSchema } from "shared/src/searchImmersion/SearchImmersionRequest.schema";
+import { searchImmersionQueryParamsSchema } from "shared/src/searchImmersion/SearchImmersionQueryParams.schema";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
 export const createSearchImmersionRouter = (deps: AppDependencies) => {
@@ -13,7 +13,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
   searchRouterWithAuth
     .route(`/${searchImmersionRoute__v0}`)
     .get(async (req, res) => {
-      const searchImmersionRequestDto = searchImmersionRequestSchema.parse(
+      const searchImmersionRequestDto = searchImmersionQueryParamsSchema.parse(
         req.query,
       );
 

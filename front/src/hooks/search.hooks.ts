@@ -16,10 +16,8 @@ export const useSearchUseCase = () => {
     dispatch(
       searchSlice.actions.searchRequested({
         rome: values.rome || undefined,
-        position: {
-          lat: values.lat,
-          lon: values.lon,
-        },
+        latitude: values.lat,
+        longitude: values.lon,
         distance_km: values.radiusKm,
         sortedBy: "distance",
       }),

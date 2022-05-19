@@ -1,6 +1,6 @@
 import { LatLonDto } from "shared/src/latLon";
 import { RomeCode } from "shared/src/rome";
-import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
 
 export type SearchImmersionRequestPublicV0 = {
   rome?: RomeCode;
@@ -10,8 +10,7 @@ export type SearchImmersionRequestPublicV0 = {
 
 export const searchImmersionRequestPublicV0ToDomain = (
   publicV0: SearchImmersionRequestPublicV0,
-): SearchImmersionRequestDto => ({
-  ...publicV0,
-  sortedBy: "distance",
-  position: publicV0.location,
-});
+): SearchImmersionQueryParamsDto => {
+  const { location, ...rest } = publicV0;
+  return { ...rest, longitude: location.lon, latitude: location.lat };
+};

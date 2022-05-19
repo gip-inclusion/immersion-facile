@@ -11,7 +11,7 @@ import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immers
 import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
-import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
@@ -23,11 +23,8 @@ const boulangerRome = "D1102";
 
 const searchInMetzParams: SearchImmersionRequestDto = {
   distance_km: 30,
-  position: {
-    lat: 49.119146,
-    lon: 6.17602,
-  },
-  sortedBy: "distance",
+  longitude: 6.17602,
+  latitude: 49.119146,
 };
 
 const insertLBBAggregate = async (
@@ -103,7 +100,7 @@ const prepareSearchableData = async () => {
   };
 };
 
-const searchSecretariatInMetzRequestDto: SearchImmersionRequestDto = {
+const searchSecretariatInMetzRequestDto: SearchImmersionQueryParamsDto = {
   rome: secretariatRome,
   ...searchInMetzParams,
   sortedBy: "distance",
@@ -128,7 +125,8 @@ describe("SearchImmersionUseCase", () => {
       {
         id: "searchMadeUuid",
         rome: secretariatRome,
-        ...searchInMetzParams.position,
+        lon: searchInMetzParams.longitude,
+        lat: searchInMetzParams.latitude,
         distance_km: searchInMetzParams.distance_km,
         needsToBeSearched: true,
         sortedBy: "distance",

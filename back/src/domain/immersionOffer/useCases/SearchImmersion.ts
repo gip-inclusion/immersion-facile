@@ -1,6 +1,6 @@
 import promClient from "prom-client";
-import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
-import { searchImmersionRequestSchema } from "shared/src/searchImmersion/SearchImmersionRequest.schema";
+import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
+import { searchImmersionQueryParamsSchema } from "shared/src/searchImmersion/SearchImmersionQueryParams.schema";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { createLogger } from "../../../utils/logger";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -19,7 +19,7 @@ const histogramSearchImmersionStoredCount = new promClient.Histogram({
 });
 
 export class SearchImmersion extends UseCase<
-  SearchImmersionRequestDto,
+  SearchImmersionQueryParamsDto,
   SearchImmersionResultDto[],
   ApiConsumer
 > {
@@ -31,18 +31,18 @@ export class SearchImmersion extends UseCase<
     super();
   }
 
-  inputSchema = searchImmersionRequestSchema;
+  inputSchema = searchImmersionQueryParamsSchema;
 
   public async _execute(
-    params: SearchImmersionRequestDto,
+    params: SearchImmersionQueryParamsDto,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
     const apiConsumerName = apiConsumer?.consumer;
 
     const searchMade: SearchMade = {
       rome: params.rome,
-      lat: params.position.lat,
-      lon: params.position.lon,
+      lat: params.latitude,
+      lon: params.longitude,
       distance_km: params.distance_km,
       sortedBy: params.sortedBy,
       voluntaryToImmersion: params.voluntaryToImmersion,

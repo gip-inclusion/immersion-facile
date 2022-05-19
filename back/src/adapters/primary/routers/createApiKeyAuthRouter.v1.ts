@@ -14,7 +14,6 @@ import {
 import { pipeWithValue } from "shared/src/pipeWithValue";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { SiretAndRomeDto } from "shared/src/siretAndRome/SiretAndRome.dto";
-import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
 
 const counterFormEstablishmentCaller = new promClient.Counter({
   name: "form_establishment_v1_callers_counter",
@@ -73,20 +72,11 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   // Immersion offers routes
   publicV1Router.route(`/${immersionOffersRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
-      const searchImmersionRequestDto: SearchImmersionRequestDto = {
-        rome: req.query.rome as string | undefined,
-        position: JSON.parse(req.query.position as string),
-        distance_km: Number(req.query.distance_km as string),
-        voluntaryToImmersion: req.query.voluntaryToImmersion
-          ? req.query.voluntaryToImmersion == "true"
-          : undefined,
-      };
-
       await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
-        searchImmersionRequestDto,
+        req.query as any,
       );
       return deps.useCases.searchImmersion.execute(
-        searchImmersionRequestDto,
+        req.query as any,
         req.apiConsumer,
       );
     }),

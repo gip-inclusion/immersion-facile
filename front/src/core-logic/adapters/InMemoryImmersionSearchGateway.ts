@@ -2,7 +2,7 @@ import { filter as ramdaFilter } from "ramda";
 import { BehaviorSubject, delay, map, Observable, Subject } from "rxjs";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
-import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { sleep } from "shared/src/utils";
 
@@ -20,7 +20,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
   }
 
   public search(
-    searchParams: SearchImmersionRequestDto,
+    searchParams: SearchImmersionQueryParamsDto,
   ): Observable<SearchImmersionResultDto[]> {
     if (this._error) throw this._error;
     if (this.seedResults) return this.simulateSearch(searchParams);
@@ -38,7 +38,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
     return;
   }
 
-  private simulateSearch(searchParams: SearchImmersionRequestDto) {
+  private simulateSearch(searchParams: SearchImmersionQueryParamsDto) {
     if (searchParams.voluntaryToImmersion === undefined) return this._results$;
     return this._results$.pipe(
       delay(this.simulatedLatency),

@@ -9,7 +9,7 @@ import {
   LaBonneBoiteCompanyProps,
   LaBonneBoiteCompanyVO,
 } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
-import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
+import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
@@ -59,7 +59,8 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
     // Act
     await useCase.execute({
       rome: undefined,
-      position: { lon: 10, lat: 10 },
+      longitude: 10,
+      latitude: 10,
       distance_km: 10,
       sortedBy: "distance",
     });
@@ -70,9 +71,10 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
   });
 
   describe("lBB has not been requested for this rome code", () => {
-    const dto: SearchImmersionRequestDto = {
+    const dto: SearchImmersionQueryParamsDto = {
       rome: "M1607",
-      position: { lon: 10, lat: 9 },
+      longitude: 10,
+      latitude: 9,
       distance_km: 30,
       sortedBy: "distance",
     };
@@ -98,7 +100,8 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       const expectedRequestEntity: LaBonneBoiteRequestEntity = {
         params: {
           rome: dto.rome!,
-          ...dto.position,
+          lon: dto.longitude,
+          lat: dto.latitude,
           distance_km: 50, // LBB_DISTANCE_KM_REQUEST_PARAM
         },
         result: {
@@ -323,7 +326,8 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       // Act
       await useCase.execute({
         rome: userSearchedRome,
-        position: userSearchedLocationInParis17,
+        latitude: userSearchedLocationInParis17.lat,
+        longitude: userSearchedLocationInParis17.lon,
         distance_km: 10,
         sortedBy: "distance",
       });
@@ -348,7 +352,8 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       // Act
       await useCase.execute({
         rome: userSearchedRome,
-        position: userSearchedLocationInParis17,
+        latitude: userSearchedLocationInParis17.lat,
+        longitude: userSearchedLocationInParis17.lon,
         distance_km: 10,
         sortedBy: "distance",
       });
