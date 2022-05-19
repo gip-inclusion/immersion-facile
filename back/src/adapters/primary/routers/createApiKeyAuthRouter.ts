@@ -28,24 +28,22 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
 
   authenticatedRouter.use(deps.apiKeyAuthMiddleware);
 
-  authenticatedRouter
-    .route(`/${searchImmersionRoute}`)
-    .post(async (req, res) => {
-      const searchImmersionRequestDto = searchImmersionRequestPublicV0ToDomain(
+  authenticatedRouter.route(`/${searchImmersionRoute}`).post(async (req, res) =>
+    sendHttpResponse(req, res, async () => {
+      const searchImmersionRequest = searchImmersionRequestPublicV0ToDomain(
         req.body,
       );
-      return sendHttpResponse(req, res, async () => {
-        await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
-          searchImmersionRequestDto,
-        );
-        return (
-          await deps.useCases.searchImmersion.execute(
-            searchImmersionRequestDto,
-            req.apiConsumer,
-          )
-        ).map(domainToSearchImmersionResultPublicV0);
-      });
-    });
+      await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
+        searchImmersionRequest,
+      );
+      return (
+        await deps.useCases.searchImmersion.execute(
+          searchImmersionRequest,
+          req.apiConsumer,
+        )
+      ).map(domainToSearchImmersionResultPublicV0);
+    }),
+  );
 
   authenticatedRouter
     .route(`/${getImmersionOfferByIdRoute}/:id`)

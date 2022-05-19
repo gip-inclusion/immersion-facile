@@ -1,7 +1,7 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
-import { editEstablishmentFormRouteWithApiKey } from "shared/src/routes";
+import { editEstablishmentFormRouteWithApiKey__v0 } from "shared/src/routes";
 import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { makeGenerateJwt } from "../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
@@ -11,7 +11,7 @@ describe("Route to post edited form establishments", () => {
     const { request } = await buildTestApp();
 
     const response = await request
-      .post(`/${editEstablishmentFormRouteWithApiKey}/dummyJwt`)
+      .post(`/${editEstablishmentFormRouteWithApiKey__v0}/dummyJwt`)
       .send({});
 
     // Assert
@@ -31,7 +31,7 @@ describe("Route to post edited form establishments", () => {
     );
 
     const response = await request
-      .post(`/${editEstablishmentFormRouteWithApiKey}/${wrongJwt}`)
+      .post(`/${editEstablishmentFormRouteWithApiKey__v0}/${wrongJwt}`)
       .send({});
 
     // Assert
@@ -60,7 +60,7 @@ describe("Route to post edited form establishments", () => {
       .withSiret(TEST_ESTABLISHMENT1_SIRET)
       .build();
     const response = await request
-      .post(`/${editEstablishmentFormRouteWithApiKey}/${validJwt}`)
+      .post(`/${editEstablishmentFormRouteWithApiKey__v0}/${validJwt}`)
       .send(formEstablishment);
 
     // Assert

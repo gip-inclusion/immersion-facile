@@ -16,7 +16,7 @@ import { EstablishmentAggregateBuilder } from "../../_testBuilders/Establishment
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
-import { getImmersionOfferByIdRoute } from "shared/src/routes";
+import { getImmersionOfferByIdRoute__v0 } from "shared/src/routes";
 import { SearchImmersionResultPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 
 const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
@@ -121,7 +121,7 @@ describe("Route to get immersion offer by id", () => {
       id: authorizedApiKeyId,
     });
     await request
-      .get(`/${getImmersionOfferByIdRoute}/sfdfdsdf`)
+      .get(`/${getImmersionOfferByIdRoute__v0}/sfdfdsdf`)
       .set("Authorization", authToken)
       .expect(404);
   });

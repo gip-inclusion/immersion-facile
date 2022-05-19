@@ -17,9 +17,11 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
     searchParams: SearchImmersionRequestDto,
   ): Observable<SearchImmersionResultDto[]> {
     return ajax
-      .post<SearchImmersionResultDto[]>(
-        `/${prefix}/v1/${searchImmersionRoute}`,
-        searchParams,
+      .get<SearchImmersionResultDto[]>(
+        `/${prefix}/v1/${searchImmersionRoute}?rome=${searchParams.rome}
+        &position.lon=${searchParams.position.lon}&position.lat=${searchParams.position.lat}
+        &distance_km=${searchParams.distance_km}
+        &voluntaryToImmersion=${searchParams.voluntaryToImmersion}`,
       )
       .pipe(map(({ response }) => response));
   }

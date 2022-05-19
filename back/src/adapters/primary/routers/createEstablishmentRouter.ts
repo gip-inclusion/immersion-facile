@@ -1,11 +1,10 @@
 import { Router } from "express";
 import {
-  addEstablishmentFormRouteWithoutApiKey,
   contactEstablishmentRoute,
-  editEstablishmentFormRouteWithApiKey,
+  editEstablishmentFormRouteWithApiKey__v0,
   formAlreadyExistsRoute,
+  formEstablishmentsRoute,
   requestEmailToUpdateFormRoute,
-  retrieveEstablishmentFormRouteWithApiKey,
 } from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { UnauthorizedError } from "../helpers/httpErrors";
@@ -16,7 +15,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
 
   // Routes WITHOUT jwt auth
   establishmentRouter
-    .route(`/${addEstablishmentFormRouteWithoutApiKey}`)
+    .route(`/${formEstablishmentsRoute}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.addFormEstablishment.execute(req.body),
@@ -65,7 +64,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   establishmentRouterWithJwt.use(deps.establishmentJwtAuthMiddleware);
 
   establishmentRouterWithJwt
-    .route(`/${retrieveEstablishmentFormRouteWithApiKey}/:jwt`)
+    .route(`/${formEstablishmentsRoute}/:jwt`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req.payloads?.establishment) throw new UnauthorizedError();
@@ -77,7 +76,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
     );
 
   establishmentRouterWithJwt
-    .route(`/${editEstablishmentFormRouteWithApiKey}/:jwt`)
+    .route(`/${editEstablishmentFormRouteWithApiKey__v0}/:jwt`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req.payloads?.establishment) throw new UnauthorizedError();

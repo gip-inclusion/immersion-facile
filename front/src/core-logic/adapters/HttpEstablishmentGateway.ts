@@ -3,11 +3,9 @@ import { from, Observable } from "rxjs";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import {
-  addEstablishmentFormRouteWithoutApiKey,
-  editEstablishmentFormRouteWithApiKey,
+  formEstablishmentsRoute,
   formAlreadyExistsRoute,
   requestEmailToUpdateFormRoute,
-  retrieveEstablishmentFormRouteWithApiKey,
 } from "shared/src/routes";
 import { SiretDto } from "shared/src/siret";
 import { zString } from "shared/src/zodUtils";
@@ -18,7 +16,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     establishment: FormEstablishmentDto,
   ): Promise<SiretDto> {
     const httpResponse = await axios.post(
-      `/${prefix}/${addEstablishmentFormRouteWithoutApiKey}`,
+      `/${prefix}/${formEstablishmentsRoute}`,
       establishment,
     );
 
@@ -50,7 +48,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     jwt: string,
   ): Promise<FormEstablishmentDto> {
     const httpResponse = await axios.get(
-      `/${prefix}/${retrieveEstablishmentFormRouteWithApiKey}/${jwt}`,
+      `/${prefix}/${formEstablishmentsRoute}/${jwt}`,
     );
     return httpResponse.data;
   }
@@ -59,8 +57,8 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     establishment: FormEstablishmentDto,
     jwt: string,
   ): Promise<void> {
-    await axios.post(
-      `/${prefix}/${editEstablishmentFormRouteWithApiKey}/${jwt}`,
+    await axios.put(
+      `/${prefix}/${formEstablishmentsRoute}/${jwt}`,
       establishment,
     );
   }

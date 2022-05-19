@@ -1,6 +1,6 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
-import { retrieveEstablishmentFormRouteWithApiKey } from "shared/src/routes";
+import { formEstablishmentsRoute } from "shared/src/routes";
 import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
@@ -9,9 +9,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   it("Throws 401 if not authenticated", async () => {
     const { request } = await buildTestApp();
 
-    const response = await request.get(
-      `/${retrieveEstablishmentFormRouteWithApiKey}/noJwt`,
-    );
+    const response = await request.get(`/${formEstablishmentsRoute}/noJwt`);
 
     // Assert
     expect(response.status).toBe(401);
@@ -42,7 +40,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       }),
     );
     const response = await request.get(
-      `/${retrieveEstablishmentFormRouteWithApiKey}/${validJwt}`,
+      `/${formEstablishmentsRoute}/${validJwt}`,
     );
 
     // Assert

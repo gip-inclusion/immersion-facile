@@ -60,9 +60,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
 
   it("rejects unauthenticated requests", async () => {
     await request
-      .get(
-        `/v1/get-immersion-by-siret-and-rome?siret=${immersionOfferSiret}&rome=${immersionOfferRome}`,
-      )
+      .get(`/v1/immersion-offers/${immersionOfferSiret}/${immersionOfferRome}`)
       .expect(403);
   });
 
@@ -97,9 +95,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
     });
 
     await request
-      .get(
-        `/v1/get-immersion-by-siret-and-rome?siret=${immersionOfferSiret}&rome=${immersionOfferRome}`,
-      )
+      .get(`/v1/immersion-offers/${immersionOfferSiret}/${immersionOfferRome}`)
       .set("Authorization", authToken)
       .expect(200, expectedResult);
   });
@@ -109,9 +105,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
       id: authorizedApiKeyId,
     });
     await request
-      .get(
-        `/v1/get-immersion-by-siret-and-rome?siret=${siretNotInDB}&rome=${immersionOfferRome}`,
-      )
+      .get(`/v1/immersion-offers/${siretNotInDB}/${immersionOfferRome}`)
       .set("Authorization", authToken)
       .expect(
         404,

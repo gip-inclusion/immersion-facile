@@ -1,15 +1,12 @@
 export const conventionsRoute = "demandes-immersion";
 export const exportConventionsExcelRoute = "export-demande-immersions-excel";
 export const exportEstablismentsExcelRoute = "export-establishments";
-export const immersionOffersApiAuthRoute = "immersion-offers";
-export const immersionOffersFromFrontRoute = "immersion-offers-from-front";
+export const immersionOffersApiAuthRoute__v0 = "immersion-offers";
+export const immersionOffersRoute = "immersion-offers";
 export const extractConventionsExcelRoute = "extract-demande-immersion-excel";
-export const addEstablishmentFormRouteWithoutApiKey =
-  "add-establishment-form-from-front";
-export const retrieveEstablishmentFormRouteWithApiKey =
-  "retrieve-establishment-form";
-export const addEstablishmentFormRouteWithApiKey = "add-establishment-form";
-export const editEstablishmentFormRouteWithApiKey = "edit-establishment-form";
+export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments
+export const editEstablishmentFormRouteWithApiKey__v0 =
+  "edit-establishment-form"; // Becomes PUT /v1/form-establishments
 export const validateConventionRoute = "validate-demande";
 export const generateMagicLinkRoute = "generate-magic-link";
 export const renewMagicLinkRoute = "renew-magic-link";
@@ -22,10 +19,9 @@ export const requestEmailToUpdateFormRoute = "request-email-to-update-form";
 export const updateConventionStatusRoute = "update-application-status";
 export const signConventionRoute = "sign-application";
 export const rejectSigningConventionRoute = "reject-application";
-export const searchImmersionRoute = "search-immersion";
-export const getImmersionOfferByIdRoute = "get-immersion-by-id";
-export const getImmersionOfferBySiretAndRomeRoute =
-  "get-immersion-by-siret-and-rome";
+export const searchImmersionRoute__v0 = "search-immersion"; // Becomes GET /immersion-offers?rome=A100&position.lon=2.2315&position.lat=48.8531
+export const getImmersionOfferByIdRoute__v0 = "get-immersion-by-id"; // Will be removed.
+export const formEstablishmentsRoute = "form-establishments";
 export const agenciesRoute = "agencies";
 export const agencyImmersionFacileIdRoute = "immersion-facile-agency-id";
 export const agencyPublicInfoByIdRoute = "agency-public-info-by-id";

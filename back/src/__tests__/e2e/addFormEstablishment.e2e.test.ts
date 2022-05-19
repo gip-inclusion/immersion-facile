@@ -3,10 +3,10 @@ import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEs
 import { FormEstablishmentDtoPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
-import { addEstablishmentFormRouteWithoutApiKey } from "shared/src/routes";
+import { formEstablishmentsRoute } from "shared/src/routes";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 
-describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
+describe("Route to post form establishments from front (hence, without API key)", () => {
   // from front
   it("support posting valid establishment from front", async () => {
     const { request, reposAndGateways } = await buildTestApp();
@@ -16,7 +16,7 @@ describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
       .build();
 
     const response = await request
-      .post(`/${addEstablishmentFormRouteWithoutApiKey}`)
+      .post(`/${formEstablishmentsRoute}`)
       .send(formEstablishment);
 
     expect(response.status).toBe(200);
@@ -43,7 +43,7 @@ describe("Route to post addEstablishmentFormRouteWithoutApiKey", () => {
     };
 
     const response = await request
-      .post(`/${addEstablishmentFormRouteWithoutApiKey}`)
+      .post(`/${formEstablishmentsRoute}`)
       .send(formEstablishmentWithBusinessContact);
 
     expect(response.status).toBe(200);
@@ -125,9 +125,7 @@ describe("Route to post addEstablishmentFormRouteWithApiKey", () => {
     it("forbids access to route if no api consumer", async () => {
       const { request } = await buildTestApp();
 
-      const response = await request
-        .post(`/v1/add-establishment-form`)
-        .send({});
+      const response = await request.post(`/v1/form-establishments`).send({});
 
       expect(response.status).toBe(403);
     });
@@ -143,7 +141,7 @@ describe("Route to post addEstablishmentFormRouteWithApiKey", () => {
       const jwt = generateApiJwt({ id: "my-id" });
 
       const response = await request
-        .post(`/v1/add-establishment-form`)
+        .post(`/v1/form-establishments`)
         .set("Authorization", jwt)
         .send(formEstablishmentDtoPublicV1);
 
