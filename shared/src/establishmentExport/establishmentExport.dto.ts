@@ -6,6 +6,6 @@ export type FormSourceProvider = FormEstablishmentSourceInUrl | "all";
 
 export type EstablishmentExportConfigDto = {
   groupKey: DepartmentOrRegion;
-  aggregateProfession: string;
+  aggregateProfession: boolean;
   sourceProvider: FormSourceProvider;
 };

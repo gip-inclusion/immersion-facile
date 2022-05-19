@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { zBoolean } from "../zodUtils";
 import { EstablishmentExportConfigDto } from "./establishmentExport.dto";
 
 export const establishmentExportSchemaObj = {
   groupKey: z.enum(["region", "department"]),
-  aggregateProfession: z.enum(["true", "false"]),
+  aggregateProfession: zBoolean,
   sourceProvider: z.enum([
     "all",
     "immersion-facile",

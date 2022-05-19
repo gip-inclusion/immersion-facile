@@ -1,5 +1,5 @@
 import {
-  establishmentsExportByZoneColumnsOptions,
+  inferColumnsFromConfigDto,
   addZonesDelimiters,
   aggregateProfessionsIfNeeded,
   EstablishmentExportConfig,
@@ -18,7 +18,11 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
   describe("establishmentsExportColumnsOptions", () => {
     it("establishmentsExportColumnsOptions should not have department columns in group by department config", () => {
       expect(
-        establishmentsExportByZoneColumnsOptions("department"),
+        inferColumnsFromConfigDto({
+          groupKey: "department",
+          sourceProvider: "all",
+          aggregateProfession: true,
+        }),
       ).not.toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -105,7 +109,7 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
   describe("aggregateProfessionsIfNeeded", () => {
     it("returns the data unchanged if no aggregation is needed", async () => {
       const config = {
-        aggregateProfession: "false",
+        aggregateProfession: false,
       } as EstablishmentExportConfig;
 
       const rawEstablishments =
@@ -118,7 +122,7 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
 
     it("returns one entity per siret with concatenated and sorted professions strings (rome - appelation)", async () => {
       const config = {
-        aggregateProfession: "true",
+        aggregateProfession: true,
       } as EstablishmentExportConfig;
 
       const rawEstablishments =
@@ -137,6 +141,8 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
           professions:
             "A1205 - Ouvrier sylviculteur / Ouvrière sylvicutrice | M1502 - Chargé / Chargée de recrutement",
           siret: "79158476600012",
+          contactEmail: "contact@artusinterim.world",
+          contactPhone: "0358339542",
         },
         {
           address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
@@ -150,6 +156,8 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
           professions:
             "G1205 - Agent / Agente d'exploitation des attractions | I1304 - Technicien(ne) de maintenance industrielle polyvalente | I1304 - Technicien(ne) maintenance d'équipnts de parcs d'attractions",
           siret: "79341726200037",
+          contactEmail: "rec@miniworld-lyon.com",
+          contactPhone: "0938339542",
         },
       ];
 

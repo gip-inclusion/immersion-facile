@@ -11,6 +11,8 @@ export type EstablishmentRawProps = {
   isCommited: boolean;
   professions: string;
   preferredContactMethods: string;
+  contactEmail: string;
+  contactPhone: string;
 };
 
 export type EstablishmentRawBeforeExportProps = EstablishmentRawProps & {
@@ -19,6 +21,9 @@ export type EstablishmentRawBeforeExportProps = EstablishmentRawProps & {
   region: string;
   department: string;
 };
+
+export type EstablishmentRawBeforeExportPropsKeys =
+  keyof EstablishmentRawBeforeExportProps;
 
 export class EstablishmentRawBeforeExportVO {
   constructor(public readonly _props: EstablishmentRawBeforeExportProps) {}

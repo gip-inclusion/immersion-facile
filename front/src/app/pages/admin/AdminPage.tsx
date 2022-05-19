@@ -84,7 +84,7 @@ export const AdminPage = ({ route }: AdminProps) => {
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
-                aggregateProfession: "true",
+                aggregateProfession: true,
                 groupKey: "region",
                 sourceProvider: "all",
               })}
@@ -97,7 +97,7 @@ export const AdminPage = ({ route }: AdminProps) => {
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
-                aggregateProfession: "true",
+                aggregateProfession: true,
                 groupKey: "department",
                 sourceProvider: "all",
               })}
@@ -110,7 +110,7 @@ export const AdminPage = ({ route }: AdminProps) => {
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
-                aggregateProfession: "false",
+                aggregateProfession: false,
                 groupKey: "region",
                 sourceProvider: "all",
               })}
@@ -123,7 +123,7 @@ export const AdminPage = ({ route }: AdminProps) => {
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
-                aggregateProfession: "false",
+                aggregateProfession: false,
                 groupKey: "department",
                 sourceProvider: "all",
               })}
@@ -136,7 +136,7 @@ export const AdminPage = ({ route }: AdminProps) => {
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
-                aggregateProfession: "true",
+                aggregateProfession: true,
                 groupKey: "region",
                 sourceProvider: "cci",
               })}
@@ -149,7 +149,7 @@ export const AdminPage = ({ route }: AdminProps) => {
             <a
               className="fr-link"
               href={buildExportEstablishmentRoute({
-                aggregateProfession: "true",
+                aggregateProfession: true,
                 groupKey: "region",
                 sourceProvider: "unJeuneUneSolution",
               })}

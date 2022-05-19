@@ -27,6 +27,8 @@ const establishmentExportQueries: EstablishmentRawProps[] = [
     preferredContactMethods: "phone",
     professions: "M1502 - Chargé / Chargée de recrutement",
     siret: "79158476600012",
+    contactEmail: "contact@artusinterim.world",
+    contactPhone: "0358339542",
   },
   {
     address: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
@@ -39,6 +41,8 @@ const establishmentExportQueries: EstablishmentRawProps[] = [
     preferredContactMethods: "phone",
     professions: "A1205 - Ouvrier sylviculteur / Ouvrière sylvicutrice",
     siret: "79158476600012",
+    contactEmail: "contact@artusinterim.world",
+    contactPhone: "0358339542",
   },
   {
     address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
@@ -52,6 +56,8 @@ const establishmentExportQueries: EstablishmentRawProps[] = [
     professions:
       "I1304 - Technicien(ne) de maintenance industrielle polyvalente",
     siret: "79341726200037",
+    contactEmail: "rec@miniworld-lyon.com",
+    contactPhone: "0938339542",
   },
   {
     address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
@@ -64,6 +70,8 @@ const establishmentExportQueries: EstablishmentRawProps[] = [
     preferredContactMethods: "mail",
     professions: "G1205 - Agent / Agente d'exploitation des attractions",
     siret: "79341726200037",
+    contactEmail: "rec@miniworld-lyon.com",
+    contactPhone: "0938339542",
   },
   {
     address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
@@ -76,6 +84,8 @@ const establishmentExportQueries: EstablishmentRawProps[] = [
     preferredContactMethods: "mail",
     professions: "G1205 - Agent / Agente d'exploitation des attractions",
     siret: "79341726200037",
+    contactEmail: "rec@miniworld-lyon.com",
+    contactPhone: "0938339542",
   },
   {
     address: "2 RUE JACQUARD 69120 VAULX-EN-VELIN",
@@ -89,5 +99,7 @@ const establishmentExportQueries: EstablishmentRawProps[] = [
     professions:
       "I1304 - Technicien(ne) maintenance d'équipnts de parcs d'attractions",
     siret: "79341726200037",
+    contactEmail: "rec@miniworld-lyon.com",
+    contactPhone: "0938339542",
   },
 ];

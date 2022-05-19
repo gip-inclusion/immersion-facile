@@ -42,7 +42,9 @@ const sqlSelectAllEstablishmentsQuery = `
         establishments.is_commited,
         immersion_offers.rome_code,
         public_appellations_data.libelle_appellation_court,
-        immersion_contacts.contact_mode
+        immersion_contacts.contact_mode,
+        immersion_contacts.email as contact_email,
+        immersion_contacts.phone as contact_phone
       FROM establishments 
       LEFT JOIN immersion_offers ON establishments.siret = immersion_offers.siret
       LEFT JOIN public_appellations_data ON public_appellations_data.ogr_appellation = immersion_offers.rome_appellation
@@ -67,4 +69,6 @@ const rowToEstablishmentRawProps = (row: any): EstablishmentRawProps => ({
   isCommited: valueOrFalse(row.is_commited),
   professions: `${row.rome_code} - ${row.libelle_appellation_court}`,
   preferredContactMethods: row.contact_mode,
+  contactEmail: row.contact_email,
+  contactPhone: row.contact_phone,
 });

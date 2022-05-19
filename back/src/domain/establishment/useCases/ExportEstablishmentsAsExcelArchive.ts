@@ -8,16 +8,14 @@ import { Workbook } from "../../generic/excel/port/Workbook";
 import { EstablishmentReadyForExportVO } from "../valueObjects/EstablishmentReadyForExportVO";
 import {
   EstablishmentRawBeforeExportProps,
+  EstablishmentRawBeforeExportPropsKeys,
   EstablishmentRawBeforeExportVO,
   EstablishmentRawProps,
 } from "../valueObjects/EstablishmentRawBeforeExportVO";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { DepartmentAndRegion } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { establishmentExportSchemaObj } from "shared/src/establishmentExport/establishmentExport.schema";
-import {
-  DepartmentOrRegion,
-  EstablishmentExportConfigDto,
-} from "shared/src/establishmentExport/establishmentExport.dto";
+import { EstablishmentExportConfigDto } from "shared/src/establishmentExport/establishmentExport.dto";
 import { z } from "zod";
 import {
   captureAddressGroups,
@@ -72,9 +70,7 @@ export class ExportEstablishmentsAsExcelArchive extends TransactionalUseCase<Est
 
     notifyProblematicEstablishments(workbooksTitles, establishmentExportByZone);
 
-    const workbookColumnsOptions = establishmentsExportByZoneColumnsOptions(
-      config.groupKey,
-    );
+    const workbookColumnsOptions = inferColumnsFromConfigDto(config);
 
     const createdFilenames = await Promise.all(
       workbooksTitles.map((groupBy: string) =>
@@ -95,7 +91,7 @@ export const aggregateProfessionsIfNeeded = (
   config: EstablishmentExportConfigDto,
   establishmentsWithoutGeoRawBeforeExport: EstablishmentRawProps[],
 ) =>
-  config.aggregateProfession === "true"
+  config.aggregateProfession
     ? reduceByProfessions(establishmentsWithoutGeoRawBeforeExport)
     : establishmentsWithoutGeoRawBeforeExport;
 
@@ -109,84 +105,111 @@ export const getEstablishmentsForExport = (
         config.sourceProvider,
       );
 
-export const establishmentsExportByZoneColumnsOptions = (
-  groupBy: DepartmentOrRegion,
-): Partial<Column>[] => {
-  const allColumns: Partial<Column>[] = [
-    {
-      header: "Siret",
-      key: "siret",
-      width: 25,
-    },
-    {
-      header: "Raison Sociale",
-      key: "name",
-      width: 35,
-    },
-    {
-      header: "Enseigne",
-      key: "customizedName",
-      width: 35,
-    },
-    {
-      header: "Adresse",
-      key: "address",
-      width: 20,
-    },
-    {
-      header: "Code Postal",
-      key: "postalCode",
-      width: 15,
-    },
-    {
-      header: "Ville",
-      key: "city",
-      width: 15,
-    },
-    {
-      header: "Département",
-      key: "department",
-      width: 30,
-    },
-    {
-      header: "NAF",
-      key: "nafCode",
-      width: 15,
-    },
-    {
-      header: "Nombre d'employés",
-      key: "numberEmployeesRange",
-      width: 15,
-    },
-    {
-      header: "Mode de contact",
-      key: "preferredContactMethods",
-      width: 15,
-    },
-    {
-      header: "Date de référencement",
-      key: "createdAt",
-      width: 15,
-    },
-    {
-      header: "Appartenance Réseau « Les entreprises s'engagent »",
-      key: "isCommited",
-      width: 25,
-    },
-    {
-      header: "Métiers",
-      key: "professions",
-      width: 400,
-    },
-  ];
+type ColumnWithTypedKey<T extends string> = Partial<Column> & { key: T };
 
-  const excludeDepartment = (column: Partial<Column>) =>
-    column.key != "department";
+export type EstablishmentColumn =
+  ColumnWithTypedKey<EstablishmentRawBeforeExportPropsKeys>;
 
-  return groupBy === "department"
-    ? allColumns.filter(excludeDepartment)
-    : allColumns;
-};
+const establishmentExportColumns: EstablishmentColumn[] = [
+  {
+    header: "Siret",
+    key: "siret",
+    width: 25,
+  },
+  {
+    header: "Raison Sociale",
+    key: "name",
+    width: 35,
+  },
+  {
+    header: "Enseigne",
+    key: "customizedName",
+    width: 35,
+  },
+  {
+    header: "Adresse",
+    key: "address",
+    width: 20,
+  },
+  {
+    header: "Code Postal",
+    key: "postalCode",
+    width: 15,
+  },
+  {
+    header: "Ville",
+    key: "city",
+    width: 15,
+  },
+  {
+    header: "Département",
+    key: "department",
+    width: 30,
+  },
+  {
+    header: "NAF",
+    key: "nafCode",
+    width: 15,
+  },
+  {
+    header: "Nombre d'employés",
+    key: "numberEmployeesRange",
+    width: 15,
+  },
+  {
+    header: "Mode de contact",
+    key: "preferredContactMethods",
+    width: 15,
+  },
+  {
+    header: "Email du contact",
+    key: "contactEmail",
+    width: 20,
+  },
+  {
+    header: "Numéro du contact",
+    key: "contactPhone",
+    width: 20,
+  },
+  {
+    header: "Date de référencement",
+    key: "createdAt",
+    width: 15,
+  },
+  {
+    header: "Appartenance Réseau « Les entreprises s'engagent »",
+    key: "isCommited",
+    width: 25,
+  },
+  {
+    header: "Métiers",
+    key: "professions",
+    width: 400,
+  },
+];
+
+export const inferColumnsFromConfigDto = (
+  configDto: EstablishmentExportConfigDto,
+): EstablishmentColumn[] =>
+  establishmentExportColumns
+    .filter(
+      (column) =>
+        configDto.groupKey === "department"
+          ? column.key !== "department"
+          : true, // Filter out column department if groupKey="department"
+    )
+    .filter(
+      (column) =>
+        configDto.sourceProvider !== "cci"
+          ? column.key !== "contactEmail"
+          : true, // Filter out column contactEmail if sourceProvider != cci"
+    )
+    .filter(
+      (column) =>
+        configDto.sourceProvider !== "cci"
+          ? column.key !== "contactPhone"
+          : true, // Filter out column contactPhone if sourceProvider != cci"
+    );
 
 const notifyProblematicEstablishments = (
   workbookTitles: string[],
