@@ -4,7 +4,6 @@ import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImme
 
 export type SearchImmersionRequestPublicV0 = {
   rome?: RomeCode;
-  siret?: string;
   location: LatLonDto;
   distance_km: number;
 };
