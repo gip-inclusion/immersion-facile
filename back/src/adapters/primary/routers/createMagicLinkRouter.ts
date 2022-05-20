@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   immersionApplicationsRoute,
+  immersionOutcomeRoute,
   signApplicationRoute,
   updateApplicationStatusRoute,
 } from "shared/src/routes";
@@ -12,6 +13,17 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   const authenticatedRouter = Router({ mergeParams: true });
 
   authenticatedRouter.use(deps.applicationJwtAuthMiddleware);
+
+  authenticatedRouter
+    .route(`/${immersionOutcomeRoute}/:jwt`)
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.createImmersionOutcome.execute(
+          req.body,
+          req.payloads?.application,
+        ),
+      ),
+    );
 
   authenticatedRouter
     .route(`/${immersionApplicationsRoute}/:jwt`)

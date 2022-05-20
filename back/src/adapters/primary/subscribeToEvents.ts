@@ -69,6 +69,9 @@ const getUseCasesByTopics = (
 
   // Agency related :
   NewAgencyAdded: [],
+
+  // Immersion Outcome :
+  ImmersionOutcomeCreated: [],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

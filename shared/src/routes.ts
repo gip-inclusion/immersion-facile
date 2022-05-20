@@ -35,6 +35,8 @@ export const contactEstablishmentRoute = "contact-establishment";
 export const getFeatureFlags = "feature-flags";
 export const immersionApplicationShareRoute = "share-immersion-demand";
 
+export const immersionOutcomeRoute = "immersion-outcome";
+
 export const peConnect = "pe-connect";
 export const loginPeConnect = "login-pe-connect";
 

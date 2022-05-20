@@ -4,7 +4,6 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ImmersionOutcomeDto } from "shared/src/immersionOutcome/ImmersionOutcomeDto";
 import { immersionOutcomeSchema } from "shared/src/immersionOutcome/immersionOutcomeSchema";
-import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 
 export class CreateImmersionOutcome extends TransactionalUseCase<
@@ -46,7 +45,7 @@ const throwForbiddenIfNotAllow = (
   if (
     !magicLinkPayload ||
     magicLinkPayload.role !== "establishment" ||
-    dto.immersionApplicationId !== magicLinkPayload.applicationId
+    dto.conventionId !== magicLinkPayload.applicationId
   )
     throw new ForbiddenError();
 };

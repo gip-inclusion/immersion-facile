@@ -7,8 +7,8 @@ import {
 } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryImmersionOutcomeRepository } from "../../../adapters/secondary/InMemoryImmersionOutcomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryImmersionOutcomeRepository } from "../../../domain/immersionOutcome/ports/ImmersionOutcomeRepository";
 import { CreateImmersionOutcome } from "../../../domain/immersionOutcome/useCases/CreateImmersionOutcome";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
@@ -19,7 +19,7 @@ const immersionOutcome: ImmersionOutcomeDto = {
   id: "123",
   status: "FINISHED",
   establishmentFeedback: "Ca c'est bien passé",
-  immersionApplicationId: applicationId,
+  conventionId: applicationId,
 };
 
 const validPayload = {
@@ -78,7 +78,7 @@ describe("CreateImmersionOutcome", () => {
     ]);
   });
 
-  it("should dispatch an ImmersionOutcomeCreated event the ImmersionOutcome", async () => {
+  it("should dispatch an ImmersionOutcomeCreated event", async () => {
     await createImmersionOutcome.execute(immersionOutcome, validPayload);
     expect(outboxRepository.events).toHaveLength(1);
     expectObjectsToMatch(outboxRepository.events[0], {
