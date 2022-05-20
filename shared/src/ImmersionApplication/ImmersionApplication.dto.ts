@@ -5,9 +5,9 @@ import { Flavor } from "../typeFlavors";
 
 import { Role } from "../tokens/MagicLinkPayload";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { TypeFromTuple } from "../utils";
 
 export type ApplicationStatus = typeof validApplicationStatus[number];
-
 export const validApplicationStatus = [
   "DRAFT",
   "READY_TO_SIGN",

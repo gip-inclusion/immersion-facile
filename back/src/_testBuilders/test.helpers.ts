@@ -1,6 +1,8 @@
 import { addDays as dateFnsAddDays, format } from "date-fns";
 import { GenerateVerificationMagicLink } from "../adapters/primary/config/createGenerateVerificationMagicLink";
-import { EventBus } from "../domain/core/eventBus/EventBus";
+import { CustomClock } from "../adapters/secondary/core/ClockImplementations";
+import { TestUuidGenerator } from "../adapters/secondary/core/UuidGeneratorImplementations";
+import { EventBus, makeCreateNewEvent } from "../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
@@ -50,6 +52,12 @@ export const fakeGenerateMagicLinkUrlFn: GenerateVerificationMagicLink = (
   role: Role,
   targetRoute: string,
 ) => `http://fake-magic-link/${applicationId}/${targetRoute}/${role}`;
+
+export const makeTestCreateNewEvent = () => {
+  const clock = new CustomClock();
+  const uuidGenerator = new TestUuidGenerator();
+  return makeCreateNewEvent({ clock, uuidGenerator });
+};
 
 export const expectArraysToMatch = <T>(actual: T[], expected: Partial<T>[]) => {
   expect(actual).toMatchObject(expected);

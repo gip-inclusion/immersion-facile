@@ -42,6 +42,7 @@ describe("Add FormEstablishment", () => {
       formEstablishmentRepo,
       getFeatureFlags,
     });
+
     const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
