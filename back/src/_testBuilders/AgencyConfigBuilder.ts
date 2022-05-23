@@ -1,3 +1,4 @@
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { AgencyConfig, AgencyStatus } from "shared/src/agency/agency.dto";
 import { AgencyId, AgencyKind } from "shared/src/agency/agency.dto";
 import { Builder } from "./Builder";
@@ -75,24 +76,35 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
       counsellorEmails,
     });
   }
+
   public withValidatorEmails(validatorEmails: string[]) {
     return new AgencyConfigBuilder({
       ...this.agency,
       validatorEmails,
     });
   }
+
   public withAdminEmails(adminEmails: string[]) {
     return new AgencyConfigBuilder({
       ...this.agency,
       adminEmails,
     });
   }
+
   public withQuestionnaireUrl(questionnaireUrl: string) {
     return new AgencyConfigBuilder({
       ...this.agency,
       questionnaireUrl,
     });
   }
+
+  public withLogoUrl(logoUrl?: AbsoluteUrl) {
+    return new AgencyConfigBuilder({
+      ...this.agency,
+      logoUrl,
+    });
+  }
+
   public withSignature(signature: string) {
     return new AgencyConfigBuilder({
       ...this.agency,
@@ -116,6 +128,7 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
       agencySiret: siret,
     });
   }
+
   public withCode(code: string) {
     return new AgencyConfigBuilder({
       ...this.agency,

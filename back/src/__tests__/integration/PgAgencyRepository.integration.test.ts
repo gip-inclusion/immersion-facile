@@ -16,7 +16,8 @@ const agency1builder = AgencyConfigBuilder.create(
   .withValidatorEmails(["validatorA@agency1.fr", "validatorB@agency1.fr"])
   .withAdminEmails(["adminA@agency1.fr", "adminB@agency1.fr"])
   .withQuestionnaireUrl("http://questionnaire.agency1.fr")
-  .withSignature("The team of agency1");
+  .withSignature("The team of agency1")
+  .withLogoUrl("http://logo.agency1.fr");
 
 const agency2builder = AgencyConfigBuilder.create(
   "22222222-2222-2222-2222-222222222222",
@@ -201,7 +202,9 @@ describe("PgAgencyRepository", () => {
       expect(await agencyRepository.getAllActive()).toHaveLength(0);
 
       await agencyRepository.insert(agency1);
-      expect(await agencyRepository.getAllActive()).toHaveLength(1);
+      const allActiveAgencies = await agencyRepository.getAllActive();
+      expect(allActiveAgencies).toHaveLength(1);
+      expect(allActiveAgencies[0]).toEqual(agency1);
 
       await agencyRepository.insert(agency2);
       expect(await agencyRepository.getAllActive()).toHaveLength(2);

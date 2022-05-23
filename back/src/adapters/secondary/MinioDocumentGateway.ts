@@ -1,6 +1,9 @@
 import * as Minio from "minio";
 import { StoredFile } from "../../domain/generic/fileManagement/entity/StoredFile";
 import { DocumentGateway } from "../../domain/generic/fileManagement/port/DocumentGateway";
+import { createLogger } from "../../utils/logger";
+
+const logger = createLogger(__filename);
 
 export interface MinioParams {
   endPoint: string;
@@ -18,7 +21,7 @@ export class MinioDocumentGateway implements DocumentGateway {
   constructor(params: MinioParams) {
     const { endPoint, port, accessKey, secretKey, bucketName } = params;
     this.bucketName = bucketName;
-    this.baseUrl = `${endPoint}:${port}/buckets/${bucketName}`;
+    this.baseUrl = `http://${endPoint}:${port}/${bucketName}`;
     this.minioClient = new Minio.Client({
       useSSL: false,
       endPoint,
@@ -38,8 +41,8 @@ export class MinioDocumentGateway implements DocumentGateway {
         (err) => {
           if (err) return reject(err);
 
-          console.log("File uploaded successfully");
-          console.log(file);
+          logger.info("File uploaded successfully");
+          logger.info(file);
           return resolve();
         },
       );

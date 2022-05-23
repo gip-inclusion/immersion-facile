@@ -1,5 +1,4 @@
 import { Form, Formik, FormikHelpers } from "formik";
-import { File } from "@dataesr/react-dsfr";
 import { keys } from "ramda";
 import * as React from "react";
 import { useState } from "react";
@@ -39,6 +38,7 @@ const initialValues: CreateAgencyConfig = {
   counsellorEmails: [],
   validatorEmails: [],
   questionnaireUrl: "",
+  logoUrl: undefined,
   signature: "",
 };
 
@@ -47,9 +47,9 @@ type KeysExceptId = Exclude<keyof CreateAgencyConfig, "id">;
 const getName = (name: keyof CreateAgencyConfig) => name;
 
 // prettier-ignore
-type MakeTypedSetField = (setFieldValue: FormikHelpers<CreateAgencyConfig>["setFieldValue"]) => <K extends KeysExceptId>(fieldName: K, fieldValue: CreateAgencyConfig[K]) => void
+type MakeTypedSetField = (setFieldValue: FormikHelpers<CreateAgencyConfig>["setFieldValue"]) => <K extends KeysExceptId>(fieldName: K) => (fieldValue: CreateAgencyConfig[K]) => void
 const makeTypedSetField: MakeTypedSetField =
-  (setFieldValue) => (fieldName, fieldValue) =>
+  (setFieldValue) => (fieldName) => (fieldValue) =>
     setFieldValue(fieldName, fieldValue);
 
 export const AddAgencyPage = () => {
@@ -102,8 +102,8 @@ export const AddAgencyPage = () => {
                   <AddressAutocomplete
                     label="Adresse de la structure"
                     setFormValue={({ coordinates, label }) => {
-                      typedSetField("position", coordinates);
-                      typedSetField("address", label);
+                      typedSetField("position")(coordinates);
+                      typedSetField("address")(label);
                     }}
                   />
 
@@ -124,9 +124,7 @@ export const AddAgencyPage = () => {
                       description="Les personnes ou emails génériques suivants recevront en premier les demandes de convention à examiner."
                       placeholder="equipe1@mail.com, conseiller.dupont@mail.com"
                       valuesInList={values.counsellorEmails}
-                      setValues={(newValues) => {
-                        typedSetField("counsellorEmails", newValues);
-                      }}
+                      setValues={typedSetField("counsellorEmails")}
                       validationSchema={zEmail}
                     />
                   )}
@@ -137,9 +135,7 @@ export const AddAgencyPage = () => {
                     description={descriptionByValidationSteps[validationSteps]}
                     placeholder="equipe.validation@mail.com, valideur.dupont@mail.com"
                     valuesInList={values.validatorEmails}
-                    setValues={(newValues) => {
-                      typedSetField("validatorEmails", newValues);
-                    }}
+                    setValues={typedSetField("validatorEmails")}
                     validationSchema={zEmail}
                   />
 
@@ -157,10 +153,18 @@ export const AddAgencyPage = () => {
                     placeholder="L’équipe de l’agence de Boulogne-Billancourt"
                   />
                   <UploadFile
+                    setFileUrl={typedSetField("logoUrl")}
                     maxSize_Mo={2}
                     label="Vous pouvez également télécharger votre logo."
                     hint="Cela permettra de personnaliser les mails automatisés."
                   />
+                  {values.logoUrl && (
+                    <img
+                      src={values.logoUrl}
+                      alt="uploaded-logo"
+                      width="100px"
+                    />
+                  )}
                 </div>
                 <br />
                 <Button

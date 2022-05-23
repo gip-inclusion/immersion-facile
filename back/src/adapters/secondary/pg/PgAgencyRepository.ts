@@ -13,7 +13,7 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getAllActive(): Promise<AgencyConfig[]> {
     const pgResult = await this.client.query(
-      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position, agency_siret, code\
+      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, agency_siret, code\
        FROM public.agencies\
        WHERE status = 'active'",
     );
@@ -28,7 +28,7 @@ export class PgAgencyRepository implements AgencyRepository {
       throw new Error("distance_km must be a number");
 
     const pgResult = await this.client.query(
-      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position,
+      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,
         ST_Distance(${STPointStringFromPosition(
           searchPosition,
         )}, position) as dist
@@ -55,7 +55,7 @@ export class PgAgencyRepository implements AgencyRepository {
       "CAST(counsellor_emails AS text) ILIKE '%' || $1 || '%'";
 
     const pgResult = await this.client.query(
-      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ${positionAsCoordinates}, agency_siret, code
+      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code
        FROM public.agencies
        WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
       [email],
@@ -69,7 +69,7 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getById(id: AgencyId): Promise<AgencyConfig | undefined> {
     const pgResult = await this.client.query(
-      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, ST_AsGeoJSON(position) AS position\
+      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position\
       FROM public.agencies\
       WHERE id = $1",
       [id],
@@ -83,8 +83,8 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async insert(agency: AgencyConfig): Promise<AgencyId | undefined> {
     const query = `INSERT INTO public.agencies(
-      id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, position
-    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s)`;
+      id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, position
+    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s)`;
     try {
       await this.client.query(format(query, ...entityToPgArray(agency)));
     } catch (error: any) {
@@ -110,13 +110,14 @@ export class PgAgencyRepository implements AgencyRepository {
       admin_emails = $8,
       questionnaire_url = $9,
       email_signature = $10,
-      position = ST_GeographyFromText($11),
-      agency_siret = $12,
-      code = $13
+      logo_url = $11,
+      position = ST_GeographyFromText($12),
+      agency_siret = $13,
+      code = $14
     WHERE id = $1`;
 
     const params = entityToPgArray(agency);
-    params[10] = `POINT(${agency.position.lon} ${agency.position.lat})`;
+    params[11] = `POINT(${agency.position.lon} ${agency.position.lat})`;
 
     await this.client.query(query, params);
   }
@@ -147,6 +148,7 @@ const entityToPgArray = (agency: AgencyConfig): any[] => [
   JSON.stringify(agency.adminEmails),
   agency.questionnaireUrl,
   agency.signature,
+  agency.logoUrl,
   STPointStringFromPosition(agency.position),
   agency.agencySiret,
   agency.code,
@@ -163,6 +165,7 @@ const pgToEntity = (params: Record<any, any>): AgencyConfig => ({
   adminEmails: params.admin_emails,
   questionnaireUrl: params.questionnaire_url,
   signature: params.email_signature,
+  logoUrl: optional(params.logo_url),
   position: parseGeoJson(params.position),
   agencySiret: optional(params.agency_siret),
   code: optional(params.code),

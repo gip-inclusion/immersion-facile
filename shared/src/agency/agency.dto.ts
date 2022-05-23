@@ -1,3 +1,4 @@
+import { AbsoluteUrl } from "../AbsoluteUrl";
 import { LatLonDto } from "../latLon";
 import { Flavor } from "../typeFlavors";
 import { NotEmptyArray, RequireField } from "../utils";
@@ -68,5 +69,6 @@ export type CreateAgencyConfig = {
   validatorEmails: string[];
   // adminEmails: string[];
   questionnaireUrl?: string;
+  logoUrl?: AbsoluteUrl;
   signature: string;
 };

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
   AgencyId,
   AgencyInListDto,
@@ -43,4 +44,5 @@ export const agencyConfigSchema: z.ZodSchema<CreateAgencyConfig> = z.object({
   validatorEmails: z.array(zEmail).min(1),
   questionnaireUrl: z.string().optional(),
   signature: zString,
+  logoUrl: absoluteUrlSchema.optional(),
 });
