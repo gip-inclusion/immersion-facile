@@ -1,11 +1,11 @@
-import { ImmersionOutcomeDto } from "shared/src/immersionOutcome/ImmersionOutcomeDto";
-import { immersionOutcomeRoute } from "shared/src/routes";
+import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { immersionAssessmentRoute } from "shared/src/routes";
 import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 
-describe("Immersion outcome routes", () => {
-  describe(`POST /auth/${immersionOutcomeRoute}/:jwt`, () => {
+describe("Immersion assessment routes", () => {
+  describe(`POST /auth/${immersionAssessmentRoute}/:jwt`, () => {
     it("returns 200 if the jwt is valid", async () => {
       const { request, generateMagicLinkJwt, reposAndGateways } =
         await buildTestApp();
@@ -27,16 +27,16 @@ describe("Immersion outcome routes", () => {
         [convention.id]: convention,
       });
 
-      const immersionOutcome: ImmersionOutcomeDto = {
-        id: "my-immersion-outcome-id",
+      const assessment: ImmersionAssessmentDto = {
+        id: "my-immersion-assessment-id",
         conventionId: applicationId,
         status: "ABANDONED",
         establishmentFeedback: "The guy left after one day",
       };
 
       const response = await request
-        .post(`/auth/${immersionOutcomeRoute}/${jwt}`)
-        .send(immersionOutcome);
+        .post(`/auth/${immersionAssessmentRoute}/${jwt}`)
+        .send(assessment);
 
       expect(response.body).toEqual({ success: true });
       expect(response.status).toBe(200);
@@ -45,16 +45,16 @@ describe("Immersion outcome routes", () => {
     it("fails with 401 if jwt is not valid", async () => {
       const { request } = await buildTestApp();
       const applicationId = "my-convention-id";
-      const immersionOutcome: ImmersionOutcomeDto = {
-        id: "my-immersion-outcome-id",
+      const assessment: ImmersionAssessmentDto = {
+        id: "my-immersion-assessment-id",
         conventionId: applicationId,
         status: "ABANDONED",
         establishmentFeedback: "The guy left after one day",
       };
 
       const response = await request
-        .post(`/auth/${immersionOutcomeRoute}/invalid-jwt`)
-        .send(immersionOutcome);
+        .post(`/auth/${immersionAssessmentRoute}/invalid-jwt`)
+        .send(assessment);
 
       expect(response.body).toEqual({ message: "Provided token is invalid" });
       expect(response.status).toBe(401);

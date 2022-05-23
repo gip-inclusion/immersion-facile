@@ -1,7 +1,7 @@
 import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.createTable("immersion_outcomes", {
+  pgm.createTable("immersion_assessments", {
     id: { type: "uuid", primaryKey: true },
     status: { type: "text", notNull: true },
     establishment_feedback: { type: "text", notNull: true },
@@ -16,5 +16,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropTable("immersion_outcomes");
+  pgm.dropTable("immersion_assessments");
 }

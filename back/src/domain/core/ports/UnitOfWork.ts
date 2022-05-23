@@ -1,7 +1,7 @@
 import { AgencyRepository } from "../../immersionApplication/ports/AgencyRepository";
 import { FormEstablishmentRepository } from "../../immersionOffer/ports/FormEstablishmentRepository";
 import { EstablishmentAggregateRepository } from "../../immersionOffer/ports/EstablishmentAggregateRepository";
-import { ImmersionOutcomeRepository } from "../../immersionOutcome/ports/ImmersionOutcomeRepository";
+import { ImmersionAssessmentRepository } from "../../immersionAssessment/ports/ImmersionAssessmentRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { GetFeatureFlags } from "./GetFeatureFlags";
 import { OutboxRepository } from "./OutboxRepository";
@@ -13,7 +13,7 @@ import { OutboxQueries } from "./OutboxQueries";
 import { ReportingGateway } from "./ReportingGateway";
 
 export type UnitOfWork = {
-  immersionOutcomeRepository: ImmersionOutcomeRepository;
+  immersionAssessmentRepository: ImmersionAssessmentRepository;
   romeRepo: RomeRepository;
   outboxRepo: OutboxRepository;
   outboxQueries: OutboxQueries;

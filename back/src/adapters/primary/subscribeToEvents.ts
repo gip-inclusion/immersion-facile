@@ -70,8 +70,8 @@ const getUseCasesByTopics = (
   // Agency related :
   NewAgencyAdded: [],
 
-  // Immersion Outcome :
-  ImmersionOutcomeCreated: [],
+  // Immersion Assessment related:
+  ImmersionAssessmentCreated: [],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

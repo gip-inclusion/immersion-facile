@@ -10,7 +10,7 @@ import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/Immersi
 import { AgencyConfig } from "shared/src/agency/agency.dto";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
-import { ImmersionOutcomeDto } from "shared/src/immersionOutcome/ImmersionOutcomeDto";
+import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
 
@@ -71,8 +71,8 @@ export type DomainEvent =
   // AGENCY RELATED
   | GenericEvent<"NewAgencyAdded", AgencyConfig>
 
-  // IMMERSION OUTCOME related
-  | GenericEvent<"ImmersionOutcomeCreated", ImmersionOutcomeDto>;
+  // IMMERSION ASSESSMENT related
+  | GenericEvent<"ImmersionAssessmentCreated", ImmersionAssessmentDto>;
 
 export type DomainTopic = DomainEvent["topic"];
 

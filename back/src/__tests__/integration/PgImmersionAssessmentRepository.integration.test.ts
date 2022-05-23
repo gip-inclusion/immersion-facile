@@ -8,8 +8,8 @@ import {
 } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
-import { PgImmersionOutcomeRepository } from "../../adapters/secondary/pg/PgImmersionOutcomeRepository";
-import { ImmersionOutcomeDto } from "shared/src/immersionOutcome/ImmersionOutcomeDto";
+import { PgImmersionAssessmentRepository } from "../../adapters/secondary/pg/PgImmersionAssessmentRepository";
+import { ImmersionAssessmentEntity } from "../../domain/immersionAssessment/entities/ImmersionAssessmentEntity";
 
 const conventionId = "aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa";
 
@@ -17,22 +17,23 @@ const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
   .withId(conventionId)
   .build();
 
-const immersionOutcome: ImmersionOutcomeDto = {
+const assessment: ImmersionAssessmentEntity = {
+  _tag: "Entity",
   id: "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb",
   status: "FINISHED",
   establishmentFeedback: "Ca s'est bien passé",
   conventionId,
 };
 
-describe("PgImmersionOutcomeRepository", () => {
+describe("PgImmersionAssessmentRepository", () => {
   let pool: Pool;
   let client: PoolClient;
-  let immersionOutcomeRepository: PgImmersionOutcomeRepository;
+  let immersionAssessmentRepository: PgImmersionAssessmentRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    await client.query("DELETE FROM immersion_outcomes");
+    await client.query("DELETE FROM immersion_assessments");
     await client.query("DELETE FROM immersion_applications");
     await client.query("DELETE FROM agencies");
     const agencyRepository = new PgAgencyRepository(client);
@@ -49,15 +50,15 @@ describe("PgImmersionOutcomeRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM immersion_outcomes");
-    immersionOutcomeRepository = new PgImmersionOutcomeRepository(client);
+    await client.query("DELETE FROM immersion_assessments");
+    immersionAssessmentRepository = new PgImmersionAssessmentRepository(client);
   });
 
   describe("save", () => {
     it("fails to save when it does not match an existing convention", async () => {
       await expectPromiseToFailWithError(
-        immersionOutcomeRepository.save({
-          ...immersionOutcome,
+        immersionAssessmentRepository.save({
+          ...assessment,
           conventionId: "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
         }),
         new Error(
@@ -67,17 +68,17 @@ describe("PgImmersionOutcomeRepository", () => {
     });
 
     it("when all is good", async () => {
-      await immersionOutcomeRepository.save(immersionOutcome);
+      await immersionAssessmentRepository.save(assessment);
       const inDb = await client.query(
-        "SELECT * FROM immersion_outcomes WHERE id = $1",
-        [immersionOutcome.id],
+        "SELECT * FROM immersion_assessments WHERE id = $1",
+        [assessment.id],
       );
       expect(inDb.rows).toHaveLength(1);
       expectObjectsToMatch(inDb.rows[0], {
-        id: immersionOutcome.id,
-        status: immersionOutcome.status,
-        establishment_feedback: immersionOutcome.establishmentFeedback,
-        convention_id: immersionOutcome.conventionId,
+        id: assessment.id,
+        status: assessment.status,
+        establishment_feedback: assessment.establishmentFeedback,
+        convention_id: assessment.conventionId,
       });
     });
   });

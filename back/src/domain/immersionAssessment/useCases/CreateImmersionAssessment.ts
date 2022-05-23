@@ -5,15 +5,15 @@ import {
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { ImmersionOutcomeDto } from "shared/src/immersionOutcome/ImmersionOutcomeDto";
-import { immersionOutcomeSchema } from "shared/src/immersionOutcome/immersionOutcomeSchema";
+import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
 import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import {
-  createImmersionOutcomeEntity,
-  ImmersionOutcomeEntity,
-} from "../entities/ImmersionOutcomeEntity";
+  createImmersionAssessmentEntity,
+  ImmersionAssessmentEntity,
+} from "../entities/ImmersionAssessmentEntity";
 
-export class CreateImmersionOutcome extends TransactionalUseCase<ImmersionOutcomeDto> {
+export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAssessmentDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
@@ -21,34 +21,34 @@ export class CreateImmersionOutcome extends TransactionalUseCase<ImmersionOutcom
     super(uowPerformer);
   }
 
-  inputSchema = immersionOutcomeSchema;
+  inputSchema = immersionAssessmentSchema;
 
   public async _execute(
-    dto: ImmersionOutcomeDto,
+    dto: ImmersionAssessmentDto,
     uow: UnitOfWork,
     magicLinkPayload: MagicLinkPayload,
   ): Promise<void> {
     throwForbiddenIfNotAllow(dto, magicLinkPayload);
 
-    const immersionOutcomeEntity =
-      await validateConventionAndCreateImmersionOutcomeEntity(uow, dto);
+    const immersionAssessmentEntity =
+      await validateConventionAndCreateImmersionAssessmentEntity(uow, dto);
 
     const event = this.createNewEvent({
-      topic: "ImmersionOutcomeCreated",
+      topic: "ImmersionAssessmentCreated",
       payload: dto,
     });
 
     await Promise.all([
-      uow.immersionOutcomeRepository.save(immersionOutcomeEntity),
+      uow.immersionAssessmentRepository.save(immersionAssessmentEntity),
       uow.outboxRepo.save(event),
     ]);
   }
 }
 
-const validateConventionAndCreateImmersionOutcomeEntity = async (
+const validateConventionAndCreateImmersionAssessmentEntity = async (
   uow: UnitOfWork,
-  dto: ImmersionOutcomeDto,
-): Promise<ImmersionOutcomeEntity> => {
+  dto: ImmersionAssessmentDto,
+): Promise<ImmersionAssessmentEntity> => {
   const convention = await uow.immersionApplicationRepo.getById(
     dto.conventionId,
   );
@@ -58,11 +58,11 @@ const validateConventionAndCreateImmersionOutcomeEntity = async (
       `Did not found convention with id: ${dto.conventionId}`,
     );
 
-  return createImmersionOutcomeEntity(dto, convention);
+  return createImmersionAssessmentEntity(dto, convention);
 };
 
 const throwForbiddenIfNotAllow = (
-  dto: ImmersionOutcomeDto,
+  dto: ImmersionAssessmentDto,
   magicLinkPayload: MagicLinkPayload,
 ) => {
   if (

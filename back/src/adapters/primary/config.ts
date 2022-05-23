@@ -63,10 +63,7 @@ import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCas
 import { RetrieveFormEstablishmentFromAggregates } from "../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../domain/immersionOffer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
-import {
-  ImmersionOutcomeRepository,
-  InMemoryImmersionOutcomeRepository,
-} from "../../domain/immersionOutcome/ports/ImmersionOutcomeRepository";
+import { CreateImmersionAssessment } from "../../domain/immersionAssessment/useCases/CreateImmersionAssessment";
 import { RomeRepository } from "../../domain/rome/ports/RomeRepository";
 import { AppellationSearch } from "../../domain/rome/useCases/AppellationSearch";
 import { RomeSearch } from "../../domain/rome/useCases/RomeSearch";
@@ -109,6 +106,7 @@ import { InMemoryAgencyRepository } from "../secondary/InMemoryAgencyRepository"
 import { InMemoryEmailGateway } from "../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionApplicationRepository } from "../secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryImmersionAssessmentRepository } from "../secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryPeConnectGateway } from "../secondary/InMemoryPeConnectGateway";
 import { InMemoryRomeRepository } from "../secondary/InMemoryRomeRepository";
 import { InMemorySireneGateway } from "../secondary/InMemorySireneGateway";
@@ -123,6 +121,7 @@ import { PgEstablishmentExportQueries } from "../secondary/pg/PgEstablishmentExp
 import { PgFormEstablishmentRepository } from "../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionApplicationExportQueries } from "../secondary/pg/PgImmersionApplicationExportQueries";
 import { PgImmersionApplicationRepository } from "../secondary/pg/PgImmersionApplicationRepository";
+import { PgImmersionAssessmentRepository } from "../secondary/pg/PgImmersionAssessmentRepository";
 import { PgLaBonneBoiteRequestRepository } from "../secondary/pg/PgLaBonneBoiteRequestRepository";
 import { PgOutboxQueries } from "../secondary/pg/PgOutboxQueries";
 import { PgOutboxRepository } from "../secondary/pg/PgOutboxRepository";
@@ -391,7 +390,7 @@ export const createInMemoryUow = (repositories?: Repositories) => {
     new InMemoryOutboxRepository();
   const outboxQueries = new InMemoryOutboxQueries(outboxRepo);
   return {
-    immersionOutcomeRepository: new InMemoryImmersionOutcomeRepository(),
+    immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
     romeRepo: repositories?.rome ?? new InMemoryRomeRepository(),
     outboxRepo,
     outboxQueries,
@@ -424,6 +423,7 @@ export const createInMemoryUow = (repositories?: Repositories) => {
 const _isAssignable = (inMemory: InMemoryUnitOfWork): UnitOfWork => inMemory;
 
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
+  immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
   romeRepo: new PgRomeRepository(client),
   outboxRepo: new PgOutboxRepository(client),
   outboxQueries: new PgOutboxQueries(client),
@@ -638,6 +638,12 @@ const createUseCases = (
     // agencies
     listAgencies: new ListAgencies(repositories.agency),
     getAgencyPublicInfoById: new GetAgencyPublicInfoById(repositories.agency),
+
+    // immersion assessment
+    createImmersionAssessment: new CreateImmersionAssessment(
+      uowPerformer,
+      createNewEvent,
+    ),
 
     // notifications
     confirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature:

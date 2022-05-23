@@ -1,4 +1,4 @@
-import { ImmersionOutcomeDto } from "shared/src/immersionOutcome/ImmersionOutcomeDto";
+import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {
   expectObjectsToMatch,
@@ -13,15 +13,15 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
-import { InMemoryImmersionOutcomeRepository } from "../../../adapters/secondary/InMemoryImmersionOutcomeRepository";
+import { InMemoryImmersionAssessmentRepository } from "../../../adapters/secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { CreateImmersionOutcome } from "../../../domain/immersionOutcome/useCases/CreateImmersionOutcome";
+import { CreateImmersionAssessment } from "../../../domain/immersionAssessment/useCases/CreateImmersionAssessment";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 
 const applicationId = "conventionId";
 
-const immersionOutcome: ImmersionOutcomeDto = {
+const immersionAssessment: ImmersionAssessmentDto = {
   id: "123",
   status: "FINISHED",
   establishmentFeedback: "Ca c'est bien passé",
@@ -36,16 +36,16 @@ const validPayload = {
   role: "establishment",
 } as MagicLinkPayload;
 
-describe("CreateImmersionOutcome", () => {
+describe("CreateImmersionAssessment", () => {
   let outboxRepository: InMemoryOutboxRepository;
   let immersionApplicationRepository: InMemoryImmersionApplicationRepository;
-  let createImmersionOutcome: CreateImmersionOutcome;
+  let createImmersionAssessment: CreateImmersionAssessment;
   let uowPerformer: InMemoryUowPerformer;
-  let immersionOutcomeRepository: InMemoryImmersionOutcomeRepository;
+  let immersionAssessmentRepository: InMemoryImmersionAssessmentRepository;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    immersionOutcomeRepository = uow.immersionOutcomeRepository;
+    immersionAssessmentRepository = uow.immersionAssessmentRepository;
     immersionApplicationRepository = uow.immersionApplicationRepo;
     outboxRepository = uow.outboxRepo;
     uowPerformer = new InMemoryUowPerformer(uow);
@@ -56,7 +56,7 @@ describe("CreateImmersionOutcome", () => {
       [convention.id]: convention,
     });
     const createNewEvent = makeTestCreateNewEvent();
-    createImmersionOutcome = new CreateImmersionOutcome(
+    createImmersionAssessment = new CreateImmersionAssessment(
       uowPerformer,
       createNewEvent,
     );
@@ -64,14 +64,14 @@ describe("CreateImmersionOutcome", () => {
 
   it("throws forbidden if no magicLink payload is provided", async () => {
     await expectPromiseToFailWithError(
-      createImmersionOutcome.execute(immersionOutcome),
+      createImmersionAssessment.execute(immersionAssessment),
       new ForbiddenError(),
     );
   });
 
   it("throws forbidden if magicLink payload has a different applicationId linked", async () => {
     await expectPromiseToFailWithError(
-      createImmersionOutcome.execute(immersionOutcome, {
+      createImmersionAssessment.execute(immersionAssessment, {
         applicationId: "otherId",
       } as MagicLinkPayload),
       new ForbiddenError(),
@@ -80,7 +80,7 @@ describe("CreateImmersionOutcome", () => {
 
   it("throws forbidden if magicLink role is not establishment", async () => {
     await expectPromiseToFailWithError(
-      createImmersionOutcome.execute(immersionOutcome, {
+      createImmersionAssessment.execute(immersionAssessment, {
         applicationId,
         role: "beneficiary",
       } as MagicLinkPayload),
@@ -91,8 +91,8 @@ describe("CreateImmersionOutcome", () => {
   it("throws not found if provided conventionId does not match any in DB", async () => {
     const notFoundId = "not-found-id";
     await expectPromiseToFailWithError(
-      createImmersionOutcome.execute(
-        { ...immersionOutcome, conventionId: notFoundId },
+      createImmersionAssessment.execute(
+        { ...immersionAssessment, conventionId: notFoundId },
         { ...validPayload, applicationId: notFoundId },
       ),
       new NotFoundError(`Did not found convention with id: ${notFoundId}`),
@@ -108,26 +108,26 @@ describe("CreateImmersionOutcome", () => {
     });
 
     await expectPromiseToFailWithError(
-      createImmersionOutcome.execute(immersionOutcome, validPayload),
+      createImmersionAssessment.execute(immersionAssessment, validPayload),
       new BadRequestError(
-        "Cannot create an outcome for which the convention has not been validated, status was IN_REVIEW",
+        "Cannot create an assessment for which the convention has not been validated, status was IN_REVIEW",
       ),
     );
   });
 
-  it("should save the ImmersionOutcome", async () => {
-    await createImmersionOutcome.execute(immersionOutcome, validPayload);
-    expectTypeToMatchAndEqual(immersionOutcomeRepository.immersionOutcomes, [
-      { ...immersionOutcome, _tag: "Entity" },
+  it("should save the ImmersionAssessment", async () => {
+    await createImmersionAssessment.execute(immersionAssessment, validPayload);
+    expectTypeToMatchAndEqual(immersionAssessmentRepository.assessments, [
+      { ...immersionAssessment, _tag: "Entity" },
     ]);
   });
 
-  it("should dispatch an ImmersionOutcomeCreated event", async () => {
-    await createImmersionOutcome.execute(immersionOutcome, validPayload);
+  it("should dispatch an ImmersionAssessmentCreated event", async () => {
+    await createImmersionAssessment.execute(immersionAssessment, validPayload);
     expect(outboxRepository.events).toHaveLength(1);
     expectObjectsToMatch(outboxRepository.events[0], {
-      topic: "ImmersionOutcomeCreated",
-      payload: immersionOutcome,
+      topic: "ImmersionAssessmentCreated",
+      payload: immersionAssessment,
     });
   });
 });

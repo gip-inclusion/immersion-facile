@@ -1,4 +1,4 @@
-import { ImmersionOutcomeDto } from "shared/src/immersionOutcome/ImmersionOutcomeDto";
+import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { ImmersionApplicationEntity } from "../../immersionApplication/entities/ImmersionApplicationEntity";
 
@@ -6,19 +6,21 @@ type EntityFromDto<Dto> = Dto & {
   _tag: "Entity";
 };
 
-export type ImmersionOutcomeEntity = EntityFromDto<ImmersionOutcomeDto>;
+export type ImmersionAssessmentEntity = EntityFromDto<ImmersionAssessmentDto>;
 
-export const createImmersionOutcomeEntity = (
-  dto: ImmersionOutcomeDto,
+export const createImmersionAssessmentEntity = (
+  dto: ImmersionAssessmentDto,
   convention: ImmersionApplicationEntity,
-): ImmersionOutcomeEntity => {
+): ImmersionAssessmentEntity => {
   if (dto.conventionId !== convention.id) {
-    throw new BadRequestError("Convention should match the id of the outcome");
+    throw new BadRequestError(
+      "Convention should match the id of the assessment",
+    );
   }
 
   if (convention.status !== "ACCEPTED_BY_VALIDATOR")
     throw new BadRequestError(
-      `Cannot create an outcome for which the convention has not been validated, status was ${convention.status}`,
+      `Cannot create an assessment for which the convention has not been validated, status was ${convention.status}`,
     );
 
   return {
