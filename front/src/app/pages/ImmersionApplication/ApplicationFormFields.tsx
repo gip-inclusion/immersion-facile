@@ -1,5 +1,9 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect } from "react";
+import type {
+  ApplicationStatus,
+  ImmersionApplicationDto,
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { AgencyDisplay } from "src/app/components/AgencyDisplay";
 import { AgencySelector } from "src/app/components/AgencySelector";
 import {
@@ -12,12 +16,7 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/utils/fetchEstablishmentInfoBySiret";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
-import type {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { DateInput } from "src/uiComponents/form/DateInput";
@@ -98,7 +97,7 @@ export const ApplicationFormFields = ({
     submitForm,
     values,
   } = useFormikContext<ImmersionApplicationDto>();
-  const featureFlags = useAppSelector(featureFlagsSelector);
+  const featureFlags = useFeatureFlags();
   const isSiretFetcherDisabled = values.status !== "DRAFT";
   const {
     establishmentInfo,

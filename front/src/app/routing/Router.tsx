@@ -11,8 +11,7 @@ import { ImmersionApplicationSignPage } from "src/app/pages/ImmersionApplication
 import { ImmersionApplicationValidatePage } from "src/app/pages/ImmersionApplication/ImmersionApplicationValidatePage";
 import { SearchPage } from "src/app/pages/Search/SearchPage";
 import { LandingEstablishmentPage } from "src/app/pages/Static/LandingEstablishmentPage";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ENV } from "src/environmentVariables";
 import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
 import { EstablishmentFormPage } from "../pages/Establishment/EstablishmentFormPage";
@@ -25,7 +24,7 @@ const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
 
 export const Router = () => {
   const route = useRoute();
-  const featureFlags = useAppSelector(featureFlagsSelector);
+  const featureFlags = useFeatureFlags();
 
   return (
     <>

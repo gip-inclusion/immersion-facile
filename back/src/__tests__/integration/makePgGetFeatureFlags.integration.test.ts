@@ -28,6 +28,7 @@ describe("PG getFeatureFlags", () => {
       enableInseeApi: true,
       enableAdminUi: true,
       enablePeConnectApi: true,
+      enableLogoUpload: false,
     };
 
     await insertFeatureFlagsInTable(expectedFeatureFlags);
@@ -38,6 +39,7 @@ describe("PG getFeatureFlags", () => {
       enableInseeApi: true,
       enableAdminUi: true,
       enablePeConnectApi: true,
+      enableLogoUpload: false,
     });
   });
 

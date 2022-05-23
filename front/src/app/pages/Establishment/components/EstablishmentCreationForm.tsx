@@ -12,8 +12,7 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/utils/fetchEstablishmentInfoBySiret";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ENV } from "src/environmentVariables";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button } from "src/uiComponents/Button";
@@ -75,7 +74,7 @@ const CreationSiretRelatedInputs = () => {
   useSiretRelatedField("businessName", establishmentInfo);
   useSiretRelatedField("businessAddress", establishmentInfo);
   useSiretRelatedField("naf", establishmentInfo);
-  const featureFlags = useAppSelector(featureFlagsSelector);
+  const featureFlags = useFeatureFlags();
 
   const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
 

@@ -56,7 +56,7 @@ export type ListAgenciesRequestDto = {
 
 export type AgencyPublicDisplayDto = Pick<
   CreateAgencyConfig,
-  "id" | "name" | "address" | "position"
+  "id" | "name" | "address" | "position" | "logoUrl"
 >;
 
 export type CreateAgencyConfig = {

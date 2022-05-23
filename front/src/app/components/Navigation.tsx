@@ -1,10 +1,9 @@
 import React from "react";
 import { routes } from "src/app/routing/routes";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 
 export const Navigation = () => {
-  const featureFlags = useAppSelector(featureFlagsSelector);
+  const featureFlags = useFeatureFlags();
 
   return (
     <nav>

@@ -14,8 +14,7 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/utils/fetchEstablishmentInfoBySiret";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { DateInput } from "src/uiComponents/form/DateInput";
@@ -95,7 +94,7 @@ export const ApplicationFormFieldsUkraine = ({
     submitForm,
     values,
   } = useFormikContext<ImmersionApplicationDto>();
-  const featureFlags = useAppSelector(featureFlagsSelector);
+  const featureFlags = useFeatureFlags();
   const isSiretFetcherDisabled = values.status !== "DRAFT";
   const {
     establishmentInfo,

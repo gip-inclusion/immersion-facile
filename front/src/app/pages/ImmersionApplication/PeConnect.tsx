@@ -1,10 +1,9 @@
 import React from "react";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { loginPeConnect } from "shared/src/routes";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 
 export const PeConnect = () => {
-  const featureFlags = useAppSelector(featureFlagsSelector);
+  const featureFlags = useFeatureFlags();
 
   if (!featureFlags.enablePeConnectApi) return null;
   return (

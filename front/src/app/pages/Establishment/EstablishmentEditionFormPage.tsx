@@ -1,10 +1,9 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { routes } from "src/app/routing/routes";
-import { establishmentGateway } from "src/app/config/dependencies";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { establishmentGateway } from "src/app/config/dependencies";
+import { routes } from "src/app/routing/routes";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { Route } from "type-route";
@@ -61,7 +60,7 @@ const EditionSiretRelatedInputs = ({
 }: {
   businessAddress: string;
 }) => {
-  const featureFlags = useAppSelector(featureFlagsSelector);
+  const featureFlags = useFeatureFlags();
   const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
   const [_, __, { setValue: setAddressValue }] = useField<string>(
     businessLabelAndName.name,

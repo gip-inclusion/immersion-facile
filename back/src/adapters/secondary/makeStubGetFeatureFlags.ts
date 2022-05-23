@@ -5,6 +5,7 @@ const defaultFlags: FeatureFlags = {
   enableAdminUi: true,
   enableInseeApi: true,
   enablePeConnectApi: false,
+  enableLogoUpload: false,
 };
 
 export const makeStubGetFeatureFlags =

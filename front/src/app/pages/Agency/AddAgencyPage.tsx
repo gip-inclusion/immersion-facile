@@ -25,6 +25,7 @@ import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Title } from "src/uiComponents/Title";
 import { v4 as uuidV4 } from "uuid";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 
 const initialValues: CreateAgencyConfig = {
   id: uuidV4(),
@@ -56,6 +57,7 @@ export const AddAgencyPage = () => {
   const [submitFeedback, setSubmitFeedback] = useState<
     SuccessFeedbackKind | Error | null
   >(null);
+  const { enableLogoUpload } = useFeatureFlags();
 
   return (
     <HeaderFooterLayout>
@@ -152,18 +154,22 @@ export const AddAgencyPage = () => {
                     label="Quel texte de signature souhaitez-vous pour les mails automatisés ?"
                     placeholder="L’équipe de l’agence de Boulogne-Billancourt"
                   />
-                  <UploadFile
-                    setFileUrl={typedSetField("logoUrl")}
-                    maxSize_Mo={2}
-                    label="Vous pouvez également télécharger votre logo."
-                    hint="Cela permettra de personnaliser les mails automatisés."
-                  />
-                  {values.logoUrl && (
-                    <img
-                      src={values.logoUrl}
-                      alt="uploaded-logo"
-                      width="100px"
-                    />
+                  {enableLogoUpload && (
+                    <>
+                      <UploadFile
+                        setFileUrl={typedSetField("logoUrl")}
+                        maxSize_Mo={2}
+                        label="Vous pouvez également télécharger votre logo."
+                        hint="Cela permettra de personnaliser les mails automatisés."
+                      />
+                      {values.logoUrl && (
+                        <img
+                          src={values.logoUrl}
+                          alt="uploaded-logo"
+                          width="100px"
+                        />
+                      )}
+                    </>
                   )}
                 </div>
                 <br />

@@ -22,6 +22,7 @@ describe("feature flag slice", () => {
       enableAdminUi: true,
       enableInseeApi: true,
       enablePeConnectApi: true,
+      enableLogoUpload: false,
     };
     dependencies.technicalGateway.featureFlags$.next(valueFromApi);
     expect(featureFlagsSelector(store.getState())).toEqual(valueFromApi);

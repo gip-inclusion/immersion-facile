@@ -1,9 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
-import { immersionApplicationGateway } from "src/app/config/dependencies";
-import { routes } from "src/app/routing/routes";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import { EstablishmentExportConfigDto } from "shared/src/establishmentExport/establishmentExport.dto";
 import {
@@ -16,6 +11,10 @@ import {
   exportImmersionApplicationsExcelRoute,
 } from "shared/src/routes";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
+import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
+import { immersionApplicationGateway } from "src/app/config/dependencies";
+import { routes } from "src/app/routing/routes";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ArrayDropdown } from "src/uiComponents/admin/ArrayDropdown";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
@@ -32,7 +31,7 @@ const buildExportEstablishmentRoute = (params: EstablishmentExportConfigDto) =>
   )}`;
 
 export const AdminPage = ({ route }: AdminProps) => {
-  const featureFlags = useAppSelector(featureFlagsSelector);
+  const featureFlags = useFeatureFlags();
   const [immersionApplications, setImmersionApplications] = useState<
     ImmersionApplicationDto[]
   >([]);
