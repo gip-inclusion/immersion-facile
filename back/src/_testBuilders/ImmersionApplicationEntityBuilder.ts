@@ -3,7 +3,10 @@ import { ImmersionApplicationEntity } from "../domain/immersionApplication/entit
 import { Builder } from "./Builder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
 import { ScheduleDto } from "shared/src/ScheduleSchema";
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import {
+  ApplicationStatus,
+  ImmersionApplicationId,
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 export class ImmersionApplicationEntityBuilder
   implements Builder<ImmersionApplicationEntity>
@@ -39,6 +42,16 @@ export class ImmersionApplicationEntityBuilder
       ImmersionApplicationEntity.create(
         new ImmersionApplicationDtoBuilder(this.entity.toDto())
           .withAgencyId(id)
+          .build(),
+      ),
+    );
+  }
+
+  public withStatus(status: ApplicationStatus) {
+    return new ImmersionApplicationEntityBuilder(
+      ImmersionApplicationEntity.create(
+        new ImmersionApplicationDtoBuilder(this.entity.toDto())
+          .withStatus(status)
           .build(),
       ),
     );

@@ -1,5 +1,5 @@
-import { ImmersionOutcomeDto } from "shared/src/immersionOutcome/ImmersionOutcomeDto";
+import { ImmersionOutcomeEntity } from "../entities/ImmersionOutcomeEntity";
 
 export interface ImmersionOutcomeRepository {
-  save: (immersionOutcome: ImmersionOutcomeDto) => Promise<void>;
+  save: (immersionOutcome: ImmersionOutcomeEntity) => Promise<void>;
 }
