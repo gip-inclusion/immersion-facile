@@ -1,4 +1,4 @@
-import { AppConfig } from "../../adapters/primary/appConfig";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 
 const createAppConfig = (configParams: any): AppConfig =>
   AppConfig.createFromEnv(/* readDotEnv= */ false, configParams);

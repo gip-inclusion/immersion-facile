@@ -1,6 +1,6 @@
 import { parseISO } from "date-fns";
-import type { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import { frontRoutes } from "shared/src/routes";
+import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";

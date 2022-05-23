@@ -5,7 +5,7 @@ import {
   emailHashForMagicLink,
 } from "shared/src/tokens/MagicLinkPayload";
 import supertest, { SuperTest, Test } from "supertest";
-import { AppConfig } from "../../adapters/primary/appConfig";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { createApp } from "../../adapters/primary/server";
 import {
   immersionApplicationsRoute,

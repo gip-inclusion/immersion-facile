@@ -15,7 +15,7 @@ import {
 } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
 import { makeVerifyJwt } from "../../domain/auth/jwt";
-import { AppConfig } from "./appConfig";
+import { AppConfig } from "./config/appConfig";
 import jwt from "jsonwebtoken";
 import promClient from "prom-client";
 

@@ -1,5 +1,5 @@
-import { AppConfig } from "../../adapters/primary/appConfig";
-import { makeGenerateEditFormEstablishmentUrl } from "../../adapters/primary/config";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { makeGenerateEditFormEstablishmentUrl } from "../../adapters/primary/config/makeGenerateEditFormEstablishmentUrl";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";

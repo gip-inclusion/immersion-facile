@@ -1,5 +1,5 @@
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { AccessTokenConfig } from "../primary/appConfig";
+import { AccessTokenConfig } from "../primary/config/appConfig";
 import { GetAccessTokenResponse } from "../../domain/core/ports/AccessTokenGateway";
 import { createAxiosInstance } from "../../utils/axiosUtils";
 import { secondsToMilliseconds } from "date-fns";

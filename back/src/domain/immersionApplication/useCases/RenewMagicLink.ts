@@ -19,7 +19,7 @@ import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { AgencyRepository } from "../ports/AgencyRepository";
 import { createLogger } from "../../../utils/logger";
 import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { AppConfig } from "../../../adapters/primary/appConfig";
+import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
 import { TokenExpiredError } from "jsonwebtoken";
 import { Clock } from "../../core/ports/Clock";

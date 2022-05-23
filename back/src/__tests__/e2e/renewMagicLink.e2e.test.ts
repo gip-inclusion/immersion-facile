@@ -29,7 +29,7 @@ import { RenewMagicLink } from "../../domain/immersionApplication/useCases/Renew
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { AppConfig } from "../../adapters/primary/appConfig";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { InMemoryOutboxQueries } from "../../adapters/secondary/core/InMemoryOutboxQueries";
 

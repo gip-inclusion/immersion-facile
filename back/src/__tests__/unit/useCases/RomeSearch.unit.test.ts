@@ -1,4 +1,4 @@
-import { createInMemoryUow } from "../../../adapters/primary/config";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";

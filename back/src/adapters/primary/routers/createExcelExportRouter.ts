@@ -5,7 +5,7 @@ import {
 } from "shared/src/routes";
 import { capitalize } from "shared/src/utils/string";
 import { temporaryStoragePath } from "../../../utils/filesystemUtils";
-import { AppDependencies } from "../config";
+import type { AppDependencies } from "../config/createAppDependencies";
 import { sendZipResponse } from "../helpers/sendHttpResponse";
 import { FormSourceProvider } from "shared/src/establishmentExport/establishmentExport.dto";
 

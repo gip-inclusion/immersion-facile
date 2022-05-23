@@ -1,8 +1,8 @@
-import { AppConfig } from "../../adapters/primary/appConfig";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 import {
   createGenerateVerificationMagicLink,
   GenerateVerificationMagicLink,
-} from "../../adapters/primary/config";
+} from "../../adapters/primary/config/createGenerateVerificationMagicLink";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";

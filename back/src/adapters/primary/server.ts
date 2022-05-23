@@ -7,8 +7,9 @@ import {
 } from "../../domain/auth/jwt";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { createLogger } from "../../utils/logger";
-import { AppConfig } from "./appConfig";
-import { createAppDependencies, Repositories } from "./config";
+import { AppConfig } from "./config/appConfig";
+import { createAppDependencies } from "./config/createAppDependencies";
+import { Repositories } from "./config/repositoriesConfig";
 import { createAdminRouter } from "./routers/createAdminRouter";
 import { createAgenciesRouter } from "./routers/createAgenciesRouter";
 import { createApiKeyAuthRouter } from "./routers/createApiKeyAuthRouter";

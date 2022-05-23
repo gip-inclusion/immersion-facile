@@ -2,7 +2,8 @@ import { z } from "zod";
 import { NarrowEvent } from "../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../domain/core/eventBus/events";
 import { keys } from "shared/src/utils";
-import { AppDependencies, UseCases } from "./config";
+import type { AppDependencies } from "./config/createAppDependencies";
+import { UseCases } from "./config/createUseCases";
 
 type DomainUseCase = UseCases[keyof UseCases];
 

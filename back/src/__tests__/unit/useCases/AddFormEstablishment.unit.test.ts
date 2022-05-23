@@ -4,7 +4,7 @@ import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
 } from "../../../_testBuilders/test.helpers";
-import { createInMemoryUow } from "../../../adapters/primary/config";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   ConflictError,

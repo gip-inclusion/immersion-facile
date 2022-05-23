@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import { AgencyConfig } from "shared/src/agency/agency.dto";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "shared/src/routes";
 import { allRoles } from "shared/src/tokens/MagicLinkPayload";
 import { zTrimmedString } from "shared/src/zodUtils";
+import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";

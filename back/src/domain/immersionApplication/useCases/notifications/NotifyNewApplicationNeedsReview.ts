@@ -1,4 +1,3 @@
-import type { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import { AgencyConfig } from "shared/src/agency/agency.dto";
 import {
   ApplicationStatus,
@@ -6,6 +5,7 @@ import {
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "shared/src/routes";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
+import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";

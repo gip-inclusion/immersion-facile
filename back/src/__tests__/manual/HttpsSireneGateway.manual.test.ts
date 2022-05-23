@@ -1,4 +1,4 @@
-import { AppConfig } from "../../adapters/primary/appConfig";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";

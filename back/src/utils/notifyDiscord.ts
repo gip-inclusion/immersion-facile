@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AppConfig } from "../adapters/primary/appConfig";
+import { AppConfig } from "../adapters/primary/config/appConfig";
 
 const discordSizeLimit = 1950;
 

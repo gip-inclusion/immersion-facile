@@ -9,7 +9,7 @@ import {
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
-import { AppConfig } from "../appConfig";
+import { AppConfig } from "../config/appConfig";
 
 const maxQpsSireneApi = 0.25;
 

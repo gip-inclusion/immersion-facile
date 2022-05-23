@@ -8,7 +8,7 @@ import {
 import { createLogger } from "../../../utils/logger";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
-import { AppConfig } from "../appConfig";
+import { AppConfig } from "../config/appConfig";
 
 const logger = createLogger(__filename);
 

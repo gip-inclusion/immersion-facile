@@ -1,6 +1,6 @@
 import supertest from "supertest";
-import { AppConfig } from "../adapters/primary/appConfig";
-import type { Repositories } from "../adapters/primary/config";
+import { AppConfig } from "../adapters/primary/config/appConfig";
+import { Repositories } from "../adapters/primary/config/repositoriesConfig";
 import { createApp } from "../adapters/primary/server";
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import type { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";

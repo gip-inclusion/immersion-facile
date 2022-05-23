@@ -1,4 +1,4 @@
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
+import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import {

@@ -7,7 +7,7 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
-import { AppConfig } from "../appConfig";
+import { AppConfig } from "../config/appConfig";
 
 const updateAllPeAgenciesScript = async () => {
   const config = AppConfig.createFromEnv();

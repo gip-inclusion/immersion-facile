@@ -7,7 +7,7 @@ import {
   siretRoute,
 } from "shared/src/routes";
 import { createLogger } from "../../../utils/logger";
-import { AppDependencies } from "../config";
+import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
 const logger = createLogger(__filename);

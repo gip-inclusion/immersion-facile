@@ -1,4 +1,4 @@
-import { AppConfig } from "../../adapters/primary/appConfig";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { HttpPeAgenciesReferential } from "../../adapters/secondary/immersionOffer/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../adapters/secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";

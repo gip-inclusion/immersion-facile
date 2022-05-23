@@ -1,6 +1,6 @@
 import * as fse from "fs-extra";
 import * as path from "path";
-import { AppConfig } from "../adapters/primary/appConfig";
+import { AppConfig } from "../adapters/primary/config/appConfig";
 
 export const temporaryStoragePath = async (filepath = ""): Promise<string> => {
   const storageRoot: string = AppConfig.createFromEnv()?.storageRoot;

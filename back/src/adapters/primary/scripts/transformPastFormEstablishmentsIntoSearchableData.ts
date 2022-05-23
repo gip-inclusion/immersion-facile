@@ -18,8 +18,8 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
-import { AppConfig } from "../appConfig";
-import { createPgUow } from "../config";
+import { AppConfig } from "../config/appConfig";
+import { createPgUow } from "../config/uowConfig";
 
 const maxQpsApiAdresse = 5;
 const maxQpsSireneApi = 0.25;

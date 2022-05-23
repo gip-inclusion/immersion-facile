@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { AppConfig } from "../../adapters/primary/appConfig";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { HttpLaBonneBoiteAPI } from "../../adapters/secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { PoleEmploiAccessTokenGateway } from "../../adapters/secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";

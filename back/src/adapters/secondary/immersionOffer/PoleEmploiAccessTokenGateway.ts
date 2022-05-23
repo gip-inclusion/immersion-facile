@@ -15,7 +15,7 @@ import {
   logAxiosError,
 } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
-import { AccessTokenConfig } from "../../primary/appConfig";
+import { AccessTokenConfig } from "../../primary/config/appConfig";
 
 const logger = createLogger(__filename);
 export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {

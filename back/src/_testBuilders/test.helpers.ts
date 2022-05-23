@@ -1,5 +1,5 @@
 import { addDays as dateFnsAddDays, format } from "date-fns";
-import type { GenerateVerificationMagicLink } from "../adapters/primary/config";
+import { GenerateVerificationMagicLink } from "../adapters/primary/config/createGenerateVerificationMagicLink";
 import { EventBus } from "../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
 import { Role } from "shared/src/tokens/MagicLinkPayload";

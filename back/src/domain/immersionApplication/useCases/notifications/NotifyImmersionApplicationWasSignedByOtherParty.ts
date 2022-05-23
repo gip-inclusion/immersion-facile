@@ -1,7 +1,7 @@
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "shared/src/routes";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
+import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";

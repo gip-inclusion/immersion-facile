@@ -1,5 +1,5 @@
 import { makeGenerateJwt, makeVerifyJwt } from "../../../domain/auth/jwt";
-import { AppConfig } from "../../../adapters/primary/appConfig";
+import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import {
   BadRequestError,
   NotFoundError,

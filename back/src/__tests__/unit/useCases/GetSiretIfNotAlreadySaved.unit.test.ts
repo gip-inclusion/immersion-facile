@@ -4,7 +4,7 @@ import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
 } from "../../../_testBuilders/test.helpers";
-import { createInMemoryUow } from "../../../adapters/primary/config";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";

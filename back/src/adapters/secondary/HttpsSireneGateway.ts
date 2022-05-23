@@ -16,7 +16,7 @@ import {
   logAxiosError,
 } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
-import { AxiosConfig } from "../primary/appConfig";
+import { AxiosConfig } from "../primary/config/appConfig";
 
 const logger = createLogger(__filename);
 

@@ -12,8 +12,9 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { InMemoryEmailGateway } from "../../secondary/InMemoryEmailGateway";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../../secondary/SendinblueEmailGateway";
-import { AppConfig } from "../appConfig";
-import { createPgUow, makeGenerateEditFormEstablishmentUrl } from "../config";
+import { AppConfig } from "../config/appConfig";
+import { makeGenerateEditFormEstablishmentUrl } from "../config/makeGenerateEditFormEstablishmentUrl";
+import { createPgUow } from "../config/uowConfig";
 
 const NB_MONTHS_BEFORE_SUGGEST = 6;
 

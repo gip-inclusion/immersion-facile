@@ -1,7 +1,7 @@
 import { parseISO } from "date-fns";
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "shared/src/routes";
+import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";

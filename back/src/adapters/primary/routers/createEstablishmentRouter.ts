@@ -7,7 +7,7 @@ import {
   requestEmailToUpdateFormRoute,
   retrieveEstablishmentFormRouteWithApiKey,
 } from "shared/src/routes";
-import { AppDependencies } from "../config";
+import type { AppDependencies } from "../config/createAppDependencies";
 import { UnauthorizedError } from "../helpers/httpErrors";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 

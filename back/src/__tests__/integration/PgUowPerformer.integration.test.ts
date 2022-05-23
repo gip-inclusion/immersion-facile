@@ -1,5 +1,5 @@
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { createPgUow } from "../../adapters/primary/config";
+import { createPgUow } from "../../adapters/primary/config/uowConfig";
 import { PgUowPerformer } from "../../adapters/secondary/pg/PgUowPerformer";
 import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
 import { Pool, PoolClient } from "pg";

@@ -164,7 +164,7 @@ Adding new counters is very simple, just follow the example in [merge request 32
 
 # Working with `AppConfig`
 
-The [appConfig.ts](./src/adapters/primary/appConfig.ts) file encapsulates all configuration parameters used by the immersion facile back-end, such as feature flags, api keys, signing/encryption keys, etc. Basically anything that we want to be able to modify without code changes or that should remain secret.
+The [appConfig.ts](src/adapters/primary/config/appConfig.ts) file encapsulates all configuration parameters used by the immersion facile back-end, such as feature flags, api keys, signing/encryption keys, etc. Basically anything that we want to be able to modify without code changes or that should remain secret.
 
 In normal operation (i.e. normal server startup outside of automated tests), the config is read from environment variables, which can be defined in `.env` files or in as CI/CD variables in the GitLab settings.
 
@@ -203,7 +203,7 @@ private get myNewMultipleChoiceParameter() {
 
 ## Instantiation
 
-An [AppConfig](./src/adapters/primary/appConfig.ts) instance must be provided to `createApp()` (in [server.ts](./src/adapters/primary/server.ts)) in order to create a new instance of the back-end server. This is typically done as follows:
+An [AppConfig](src/adapters/primary/config/appConfig.ts) instance must be provided to `createApp()` (in [server.ts](./src/adapters/primary/server.ts)) in order to create a new instance of the back-end server. This is typically done as follows:
 
 1. **Server startup**: [startServer.ts](src/adapters/primary/scripts/startServer.ts) creates an instance that populated from the environment variables after taking into account the `back/.env` file.
 
@@ -244,7 +244,7 @@ An [AppConfig](./src/adapters/primary/appConfig.ts) instance must be provided to
 
 ## Overriding parameters in tests
 
-Use the appropriate `with...()` or `enable...()` method in [AppConfigBuilder.ts](./src/_testBuilders/AppConfigBuilder.ts), or create a new one if the one you need doesn't exist yet. Note that the variable name used in [AppConfigBuilder.ts](./src/_testBuilders/AppConfigBuilder.ts) must match the one used in [appConfig.ts](./src/adapters/primary/appConfig.ts). (We couldn't think of a simple way to avoid this. :-( Suggestions are welcome.)
+Use the appropriate `with...()` or `enable...()` method in [AppConfigBuilder.ts](./src/_testBuilders/AppConfigBuilder.ts), or create a new one if the one you need doesn't exist yet. Note that the variable name used in [AppConfigBuilder.ts](./src/_testBuilders/AppConfigBuilder.ts) must match the one used in [appConfig.ts](src/adapters/primary/config/appConfig.ts). (We couldn't think of a simple way to avoid this. :-( Suggestions are welcome.)
 
 Example usage:
 

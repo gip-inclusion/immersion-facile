@@ -11,8 +11,11 @@ import {
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
-import { AppConfig } from "../appConfig";
-import { createGetPgPoolFn, createRepositories } from "../config";
+import { AppConfig } from "../config/appConfig";
+import {
+  createGetPgPoolFn,
+  createRepositories,
+} from "../config/repositoriesConfig";
 
 const logger = createLogger(__filename);
 const MAX_QPS_SIRENE__AND_ADDRESS_API = 0.49;
@@ -53,6 +56,7 @@ const main = async () => {
   const repositories = await createRepositories(
     config,
     createGetPgPoolFn(config),
+    clock,
   );
 
   const updateEstablishmentsFromSireneAPI =

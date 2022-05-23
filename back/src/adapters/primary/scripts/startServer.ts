@@ -1,5 +1,5 @@
 import { createLogger } from "../../../utils/logger";
-import { AppConfig } from "../appConfig";
+import { AppConfig } from "../config/appConfig";
 import { createApp } from "../server";
 
 const logger = createLogger(__filename);
