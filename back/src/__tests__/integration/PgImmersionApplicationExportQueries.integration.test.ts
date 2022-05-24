@@ -83,9 +83,9 @@ describe("Pg implementation of ImmersionApplicationExportQueries", () => {
             immersionApplicationEntity.properties.immersionAppellation
               .appellationLabel,
           status: immersionApplicationEntity.status,
-          dateEnd: "20/01/2021",
-          dateStart: "15/01/2021",
-          dateSubmission: "10/01/2021",
+          dateEnd: new Date("2021-01-20").toISOString(),
+          dateStart: new Date("2021-01-15").toISOString(),
+          dateSubmission: new Date("2021-01-10").toISOString(),
         })._props,
       );
     });
