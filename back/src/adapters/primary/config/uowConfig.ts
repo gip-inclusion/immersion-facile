@@ -67,7 +67,9 @@ export const createInMemoryUow = (repositories?: Repositories) => {
     agencyRepo:
       (repositories?.agency as InMemoryAgencyRepository) ??
       new InMemoryAgencyRepository(),
-    reportingGateway: new InMemoryReportingGateway(),
+    reportingGateway:
+      (repositories?.reportingGateway as InMemoryReportingGateway) ??
+      new InMemoryReportingGateway(),
   };
 };
 

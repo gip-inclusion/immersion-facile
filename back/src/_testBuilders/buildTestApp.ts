@@ -29,6 +29,7 @@ import {
 } from "../domain/auth/jwt";
 import { InMemoryOutboxQueries } from "../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
+import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
 
 export type InMemoryRepositories = {
   outbox: InMemoryOutboxRepository;
@@ -50,6 +51,7 @@ export type InMemoryRepositories = {
   postalCodeDepartmentRegion: PostalCodeDepartmentRegionQueries;
   getApiConsumerById: GetApiConsumerById;
   getFeatureFlags: GetFeatureFlags;
+  reportingGateway: InMemoryReportingGateway;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
@@ -90,6 +92,7 @@ export const buildTestApp = async (
     LA_BONNE_BOITE_GATEWAY: "IN_MEMORY",
     PASS_EMPLOI_GATEWAY: "IN_MEMORY",
     EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
+    REPORTING_GATEWAY: "EXCEL",
     ...appConfigOverrides?.configParams,
   }).build();
 

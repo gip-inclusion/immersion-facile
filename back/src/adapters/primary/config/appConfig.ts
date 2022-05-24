@@ -36,6 +36,14 @@ export class AppConfig {
     this.getBooleanVariable = makeGetBooleanVariable(env);
   }
 
+  public get reporting() {
+    return throwIfNotInArray({
+      processEnv: this.env,
+      variableName: "REPORTING_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "EXCEL"],
+    });
+  }
+
   public get nodeEnv() {
     return throwIfNotInArray({
       processEnv: this.env,

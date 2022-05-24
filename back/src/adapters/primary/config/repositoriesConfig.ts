@@ -40,6 +40,8 @@ import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
 import { PgPostalCodeDepartmentRegionQueries } from "../../secondary/pg/PgPostalCodeDepartmentRegionQueries";
 import { PgRomeRepository } from "../../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/PgSearchMadeRepository";
+import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
+import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
 import { SendinblueEmailGateway } from "../../secondary/SendinblueEmailGateway";
 import { StubEstablishmentExportQueries } from "../../secondary/StubEstablishmentExportQueries";
 import { StubImmersionApplicationExportQueries } from "../../secondary/StubImmersionApplicationExportQueries";
@@ -198,6 +200,10 @@ export const createRepositories = async (
       config.repositories === "PG"
         ? makePgGetFeatureFlags(await getPgPoolFn().connect())
         : makeStubGetFeatureFlags(),
+    reportingGateway:
+      config.reporting === "EXCEL"
+        ? new ExcelReportingGateway()
+        : new InMemoryReportingGateway(),
   };
 };
 
