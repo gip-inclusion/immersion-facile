@@ -1,4 +1,5 @@
 import {
+  ConflictError,
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
@@ -49,13 +50,21 @@ const validateConventionAndCreateImmersionAssessmentEntity = async (
   uow: UnitOfWork,
   dto: ImmersionAssessmentDto,
 ): Promise<ImmersionAssessmentEntity> => {
-  const convention = await uow.immersionApplicationRepo.getById(
-    dto.conventionId,
-  );
+  const conventionId = dto.conventionId;
+  const convention = await uow.immersionApplicationRepo.getById(conventionId);
 
   if (!convention)
     throw new NotFoundError(
-      `Did not found convention with id: ${dto.conventionId}`,
+      `Did not found convention with id: ${conventionId}`,
+    );
+
+  const assessment = await uow.immersionAssessmentRepository.getByConventionId(
+    conventionId,
+  );
+
+  if (assessment)
+    throw new ConflictError(
+      `Cannot create an assessment as one already exists for convention with id : ${conventionId}`,
     );
 
   return createImmersionAssessmentEntity(dto, convention);
@@ -65,10 +74,11 @@ const throwForbiddenIfNotAllow = (
   dto: ImmersionAssessmentDto,
   magicLinkPayload: MagicLinkPayload,
 ) => {
-  if (
-    !magicLinkPayload ||
-    magicLinkPayload.role !== "establishment" ||
-    dto.conventionId !== magicLinkPayload.applicationId
-  )
-    throw new ForbiddenError();
+  if (!magicLinkPayload) throw new ForbiddenError("No magic link provided");
+  if (magicLinkPayload.role !== "establishment")
+    throw new ForbiddenError("Only an establishment can create an assessment");
+  if (dto.conventionId !== magicLinkPayload.applicationId)
+    throw new ForbiddenError(
+      "Convention provided in DTO is not the same as application linked to it",
+    );
 };

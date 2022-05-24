@@ -1,6 +1,16 @@
 import { PoolClient } from "pg";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { AssessmentStatus } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
 import { ImmersionAssessmentEntity } from "../../../domain/immersionAssessment/entities/ImmersionAssessmentEntity";
 import { ImmersionAssessmentRepository } from "../../../domain/immersionAssessment/ports/ImmersionAssessmentRepository";
+
+interface PgImmersionAssessment {
+  id: string;
+  status: AssessmentStatus;
+  convention_id: string;
+  establishment_feedback: string;
+}
 
 export class PgImmersionAssessmentRepository
   implements ImmersionAssessmentRepository
@@ -23,6 +33,29 @@ export class PgImmersionAssessmentRepository
 
         throw error;
       });
+  }
+
+  public async getByConventionId(
+    conventionId: ImmersionApplicationId,
+  ): Promise<ImmersionAssessmentEntity | undefined> {
+    const result = await this.client.query<PgImmersionAssessment>(
+      "SELECT * FROM immersion_assessments WHERE convention_id = $1",
+      [conventionId],
+    );
+    const pgAssessment = result.rows[0];
+    if (!pgAssessment) return;
+
+    const dto = immersionAssessmentSchema.parse({
+      id: pgAssessment.id,
+      conventionId: pgAssessment.convention_id,
+      establishmentFeedback: pgAssessment.establishment_feedback,
+      status: pgAssessment.status,
+    });
+
+    return {
+      _entityName: "ImmersionAssessment",
+      ...dto,
+    };
   }
 }
 

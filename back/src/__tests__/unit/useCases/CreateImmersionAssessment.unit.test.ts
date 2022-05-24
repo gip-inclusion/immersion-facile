@@ -1,14 +1,15 @@
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {
+  expectArraysToEqual,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
-  expectTypeToMatchAndEqual,
   makeTestCreateNewEvent,
 } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
+  ConflictError,
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
@@ -18,21 +19,22 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { CreateImmersionAssessment } from "../../../domain/immersionAssessment/useCases/CreateImmersionAssessment";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ImmersionAssessmentEntity } from "../../../domain/immersionAssessment/entities/ImmersionAssessmentEntity";
 
-const applicationId = "conventionId";
+const conventionId = "conventionId";
 
 const immersionAssessment: ImmersionAssessmentDto = {
   id: "123",
   status: "FINISHED",
   establishmentFeedback: "Ca c'est bien passé",
-  conventionId: applicationId,
+  conventionId,
 };
 
 const immersionApplicationBuilder =
-  new ImmersionApplicationEntityBuilder().withId(applicationId);
+  new ImmersionApplicationEntityBuilder().withId(conventionId);
 
 const validPayload = {
-  applicationId,
+  applicationId: conventionId,
   role: "establishment",
 } as MagicLinkPayload;
 
@@ -51,6 +53,7 @@ describe("CreateImmersionAssessment", () => {
     uowPerformer = new InMemoryUowPerformer(uow);
     const convention = immersionApplicationBuilder
       .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withId(conventionId)
       .build();
     immersionApplicationRepository.setImmersionApplications({
       [convention.id]: convention,
@@ -65,7 +68,7 @@ describe("CreateImmersionAssessment", () => {
   it("throws forbidden if no magicLink payload is provided", async () => {
     await expectPromiseToFailWithError(
       createImmersionAssessment.execute(immersionAssessment),
-      new ForbiddenError(),
+      new ForbiddenError("No magic link provided"),
     );
   });
 
@@ -73,18 +76,21 @@ describe("CreateImmersionAssessment", () => {
     await expectPromiseToFailWithError(
       createImmersionAssessment.execute(immersionAssessment, {
         applicationId: "otherId",
+        role: "establishment",
       } as MagicLinkPayload),
-      new ForbiddenError(),
+      new ForbiddenError(
+        "Convention provided in DTO is not the same as application linked to it",
+      ),
     );
   });
 
   it("throws forbidden if magicLink role is not establishment", async () => {
     await expectPromiseToFailWithError(
       createImmersionAssessment.execute(immersionAssessment, {
-        applicationId,
+        applicationId: conventionId,
         role: "beneficiary",
       } as MagicLinkPayload),
-      new ForbiddenError(),
+      new ForbiddenError("Only an establishment can create an assessment"),
     );
   });
 
@@ -99,7 +105,7 @@ describe("CreateImmersionAssessment", () => {
     );
   });
 
-  it("throws bad request if the convention is not in validated", async () => {
+  it("throws bad request if the convention status is not Accepted by validator", async () => {
     const convention = immersionApplicationBuilder
       .withStatus("IN_REVIEW")
       .build();
@@ -115,10 +121,27 @@ describe("CreateImmersionAssessment", () => {
     );
   });
 
+  it("if the assessment already exists for the convention", async () => {
+    immersionAssessmentRepository.setAssessments([
+      { ...immersionAssessment, _entityName: "ImmersionAssessment" },
+    ]);
+    await expectPromiseToFailWithError(
+      createImmersionAssessment.execute(immersionAssessment, validPayload),
+      new ConflictError(
+        `Cannot create an assessment as one already exists for convention with id : ${conventionId}`,
+      ),
+    );
+  });
+
   it("should save the ImmersionAssessment", async () => {
     await createImmersionAssessment.execute(immersionAssessment, validPayload);
-    expectTypeToMatchAndEqual(immersionAssessmentRepository.assessments, [
-      { ...immersionAssessment, _tag: "Entity" },
+    const expectedImmersionEntity: ImmersionAssessmentEntity = {
+      ...immersionAssessment,
+      _entityName: "ImmersionAssessment",
+    };
+
+    expectArraysToEqual(immersionAssessmentRepository.assessments, [
+      expectedImmersionEntity,
     ]);
   });
 

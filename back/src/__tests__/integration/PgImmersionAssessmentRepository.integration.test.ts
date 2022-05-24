@@ -5,6 +5,7 @@ import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/Immersion
 import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
+  expectTypeToMatchAndEqual,
 } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
@@ -18,7 +19,7 @@ const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
   .build();
 
 const assessment: ImmersionAssessmentEntity = {
-  _tag: "Entity",
+  _entityName: "ImmersionAssessment",
   id: "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb",
   status: "FINISHED",
   establishmentFeedback: "Ca s'est bien passé",
@@ -80,6 +81,27 @@ describe("PgImmersionAssessmentRepository", () => {
         establishment_feedback: assessment.establishmentFeedback,
         convention_id: assessment.conventionId,
       });
+    });
+  });
+
+  describe("getByConventionId", () => {
+    it("returns undefined if no convention where found", async () => {
+      const notFoundImmersion =
+        await immersionAssessmentRepository.getByConventionId(
+          "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
+        );
+
+      expect(notFoundImmersion).toBeUndefined();
+    });
+
+    it("returns assesment found", async () => {
+      await immersionAssessmentRepository.save(assessment);
+      const assessmentInDb =
+        await immersionAssessmentRepository.getByConventionId(
+          assessment.conventionId,
+        );
+
+      expectTypeToMatchAndEqual(assessmentInDb, assessment);
     });
   });
 });

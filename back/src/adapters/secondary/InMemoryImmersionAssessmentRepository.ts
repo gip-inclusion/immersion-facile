@@ -1,3 +1,4 @@
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { ImmersionAssessmentEntity } from "../../domain/immersionAssessment/entities/ImmersionAssessmentEntity";
 import { ImmersionAssessmentRepository } from "../../domain/immersionAssessment/ports/ImmersionAssessmentRepository";
 
@@ -8,6 +9,14 @@ export class InMemoryImmersionAssessmentRepository
 
   public async save(assessment: ImmersionAssessmentEntity): Promise<void> {
     this._assessments.push(assessment);
+  }
+
+  public async getByConventionId(
+    conventionId: ImmersionApplicationId,
+  ): Promise<ImmersionAssessmentEntity | undefined> {
+    return this._assessments.find(
+      (assessment) => assessment.conventionId === conventionId,
+    );
   }
 
   // test purpose

@@ -18,11 +18,14 @@ export class UnauthorizedError extends HttpError {
   }
 }
 
+const makeForbiddenMessage = (reason?: string): string =>
+  reason ? `Forbidden : ${reason}` : "Accès refusé";
+
 export class ForbiddenError extends HttpError {
   httpCode = 403;
 
-  constructor() {
-    super("Accès refusé");
+  constructor(reason?: string) {
+    super(makeForbiddenMessage(reason));
     Object.setPrototypeOf(this, ForbiddenError.prototype);
   }
 }
