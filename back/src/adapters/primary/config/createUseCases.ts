@@ -31,6 +31,7 @@ import { SignImmersionApplication } from "../../../domain/immersionApplication/u
 import { UpdateImmersionApplication } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { ValidateImmersionApplication } from "../../../domain/immersionApplication/useCases/ValidateImmersionApplication";
+import { CreateImmersionAssessment } from "../../../domain/immersionAssessment/useCases/CreateImmersionAssessment";
 import { AddAgency } from "../../../domain/immersionOffer/useCases/AddAgency";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
@@ -77,6 +78,10 @@ export const createUseCases = (
   const adresseAPI = new HttpAdresseAPI(noRateLimit, noRetries);
 
   return {
+    createImmersionAssessment: new CreateImmersionAssessment(
+      uowPerformer,
+      createNewEvent,
+    ),
     addImmersionApplication: new AddImmersionApplication(
       uowPerformer,
       createNewEvent,

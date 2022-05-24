@@ -12,6 +12,7 @@ import { InMemoryEstablishmentAggregateRepository } from "../../secondary/immers
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionApplicationRepository } from "../../secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { makeStubGetFeatureFlags } from "../../secondary/makeStubGetFeatureFlags";
@@ -22,6 +23,7 @@ import { PgEstablishmentExportQueries } from "../../secondary/pg/PgEstablishment
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionApplicationExportQueries } from "../../secondary/pg/PgImmersionApplicationExportQueries";
 import { PgImmersionApplicationRepository } from "../../secondary/pg/PgImmersionApplicationRepository";
+import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
 import { PgOutboxQueries } from "../../secondary/pg/PgOutboxQueries";
 import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
 import { PgPostalCodeDepartmentRegionQueries } from "../../secondary/pg/PgPostalCodeDepartmentRegionQueries";
@@ -42,6 +44,7 @@ export const createInMemoryUow = (repositories?: Repositories) => {
     new InMemoryOutboxRepository();
   const outboxQueries = new InMemoryOutboxQueries(outboxRepo);
   return {
+    immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
     romeRepo: repositories?.rome ?? new InMemoryRomeRepository(),
     outboxRepo,
     outboxQueries,
@@ -74,9 +77,11 @@ export const createInMemoryUow = (repositories?: Repositories) => {
 };
 
 // for typechecking only
-const _isAssignable = (inMemory: InMemoryUnitOfWork): UnitOfWork => inMemory;
+const _isAssignable = (inMemoryUow: InMemoryUnitOfWork): UnitOfWork =>
+  inMemoryUow;
 
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
+  immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
   romeRepo: new PgRomeRepository(client),
   outboxRepo: new PgOutboxRepository(client),
   outboxQueries: new PgOutboxQueries(client),
