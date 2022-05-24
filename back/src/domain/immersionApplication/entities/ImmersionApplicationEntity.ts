@@ -5,8 +5,8 @@ export class ImmersionApplicationEntity {
   private constructor(public readonly properties: ImmersionApplicationDto) {}
 
   public static create(dto: ImmersionApplicationDto) {
-    immersionApplicationSchema.parse(dto);
-    return new ImmersionApplicationEntity(dto);
+    const entity = immersionApplicationSchema.parse(dto);
+    return new ImmersionApplicationEntity(entity);
   }
 
   public toDto() {

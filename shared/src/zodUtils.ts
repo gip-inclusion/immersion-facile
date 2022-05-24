@@ -1,3 +1,4 @@
+import { pipe } from "ramda";
 import { z } from "zod";
 
 export const zString = z
@@ -11,9 +12,14 @@ export const zTrimmedString = zString
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, "Obligatoire");
 
-export const zEmail = zString
-  .nonempty("Obligatoire")
-  .email("Veuillez saisir une adresse e-mail valide");
+const toLowerCase = (str: string) => str.toLowerCase();
+const removeAccents = (str: string) =>
+  str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+export const zEmail = z.preprocess(
+  pipe(zString.parse, removeAccents, toLowerCase),
+  z.string().email("Veuillez saisir une adresse e-mail valide"),
+);
 
 export const zBoolean = z.boolean({
   required_error: "Obligatoire",

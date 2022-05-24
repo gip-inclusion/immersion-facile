@@ -24,6 +24,16 @@ export class ImmersionApplicationEntityBuilder
     );
   }
 
+  public withEmail(email: string) {
+    return new ImmersionApplicationEntityBuilder(
+      ImmersionApplicationEntity.create(
+        new ImmersionApplicationDtoBuilder(this.entity.toDto())
+          .withEmail(email)
+          .build(),
+      ),
+    );
+  }
+
   public withAgencyId(id: AgencyId) {
     return new ImmersionApplicationEntityBuilder(
       ImmersionApplicationEntity.create(

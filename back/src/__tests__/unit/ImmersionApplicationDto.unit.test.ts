@@ -3,6 +3,7 @@ import {
   DATE_SUBMISSION,
   ImmersionApplicationDtoBuilder,
 } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { addDays } from "../../_testBuilders/test.helpers";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
@@ -11,6 +12,14 @@ describe("immersionApplicationDtoSchema", () => {
   it("accepts valid immersionApplication", () => {
     const immersionApplication = new ImmersionApplicationDtoBuilder().build();
     expectImmersionApplicationDtoToBeValid(immersionApplication);
+  });
+
+  it("ignores accents and case on emails", () => {
+    const immersionApplication = new ImmersionApplicationEntityBuilder()
+      .withEmail("Jérôme_Truc@associés.fr")
+      .build();
+
+    expect(immersionApplication.toDto().email).toBe("jerome_truc@associes.fr");
   });
 
   it("rejects equal applicant and mentor emails", () => {
