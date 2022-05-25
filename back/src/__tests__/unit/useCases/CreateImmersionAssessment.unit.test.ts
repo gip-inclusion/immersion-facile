@@ -29,10 +29,9 @@ import { CreateImmersionAssessment } from "../../../domain/immersionAssessment/u
 const conventionId = "conventionId";
 
 const immersionAssessment: ImmersionAssessmentDto = {
-  id: "123",
+  conventionId,
   status: "FINISHED",
   establishmentFeedback: "Ca c'est bien passé",
-  conventionId,
 };
 
 const immersionApplicationEntityBuilder =

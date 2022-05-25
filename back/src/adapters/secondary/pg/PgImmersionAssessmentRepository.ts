@@ -6,9 +6,8 @@ import { ImmersionAssessmentEntity } from "../../../domain/immersionAssessment/e
 import { ImmersionAssessmentRepository } from "../../../domain/immersionAssessment/ports/ImmersionAssessmentRepository";
 
 interface PgImmersionAssessment {
-  id: string;
-  status: AssessmentStatus;
   convention_id: string;
+  status: AssessmentStatus;
   establishment_feedback: string;
 }
 
@@ -18,14 +17,14 @@ export class PgImmersionAssessmentRepository
   constructor(private client: PoolClient) {}
 
   public async save(assessment: ImmersionAssessmentEntity): Promise<void> {
-    const { id, status, conventionId, establishmentFeedback } = assessment;
+    const { status, conventionId, establishmentFeedback } = assessment;
 
     await this.client
       .query(
         `INSERT INTO immersion_assessments(
-        id, status, convention_id, establishment_feedback
-      ) VALUES($1, $2, $3, $4)`,
-        [id, status, conventionId, establishmentFeedback],
+        convention_id, status, establishment_feedback
+      ) VALUES($1, $2, $3)`,
+        [conventionId, status, establishmentFeedback],
       )
       .catch((error) => {
         if (error?.message.includes(noConventionMatchingErrorMessage))
@@ -46,7 +45,6 @@ export class PgImmersionAssessmentRepository
     if (!pgAssessment) return;
 
     const dto = immersionAssessmentSchema.parse({
-      id: pgAssessment.id,
       conventionId: pgAssessment.convention_id,
       establishmentFeedback: pgAssessment.establishment_feedback,
       status: pgAssessment.status,

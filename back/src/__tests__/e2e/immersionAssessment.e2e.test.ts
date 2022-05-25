@@ -4,22 +4,24 @@ import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 
+const conventionId = "my-convention-id";
+
 describe("Immersion assessment routes", () => {
   describe(`POST /auth/${immersionAssessmentRoute}/:jwt`, () => {
     it("returns 200 if the jwt is valid", async () => {
       const { request, generateMagicLinkJwt, reposAndGateways } =
         await buildTestApp();
-      const applicationId = "my-convention-id";
+
       const jwt = generateMagicLinkJwt(
         createMagicLinkPayload(
-          applicationId,
+          conventionId,
           "establishment",
           "establishment@company.fr",
         ),
       );
 
       const convention = new ImmersionApplicationEntityBuilder()
-        .withId(applicationId)
+        .withId(conventionId)
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .build();
 
@@ -28,8 +30,7 @@ describe("Immersion assessment routes", () => {
       });
 
       const assessment: ImmersionAssessmentDto = {
-        id: "my-immersion-assessment-id",
-        conventionId: applicationId,
+        conventionId,
         status: "ABANDONED",
         establishmentFeedback: "The guy left after one day",
       };
@@ -44,10 +45,8 @@ describe("Immersion assessment routes", () => {
 
     it("fails with 401 if jwt is not valid", async () => {
       const { request } = await buildTestApp();
-      const applicationId = "my-convention-id";
       const assessment: ImmersionAssessmentDto = {
-        id: "my-immersion-assessment-id",
-        conventionId: applicationId,
+        conventionId,
         status: "ABANDONED",
         establishmentFeedback: "The guy left after one day",
       };

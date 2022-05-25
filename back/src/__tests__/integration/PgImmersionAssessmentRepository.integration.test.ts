@@ -20,10 +20,9 @@ const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
 
 const assessment: ImmersionAssessmentEntity = {
   _entityName: "ImmersionAssessment",
-  id: "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb",
+  conventionId,
   status: "FINISHED",
   establishmentFeedback: "Ca s'est bien passé",
-  conventionId,
 };
 
 describe("PgImmersionAssessmentRepository", () => {
@@ -70,13 +69,9 @@ describe("PgImmersionAssessmentRepository", () => {
 
     it("when all is good", async () => {
       await immersionAssessmentRepository.save(assessment);
-      const inDb = await client.query(
-        "SELECT * FROM immersion_assessments WHERE id = $1",
-        [assessment.id],
-      );
+      const inDb = await client.query("SELECT * FROM immersion_assessments");
       expect(inDb.rows).toHaveLength(1);
       expectObjectsToMatch(inDb.rows[0], {
-        id: assessment.id,
         status: assessment.status,
         establishment_feedback: assessment.establishmentFeedback,
         convention_id: assessment.conventionId,
@@ -94,7 +89,7 @@ describe("PgImmersionAssessmentRepository", () => {
       expect(notFoundImmersion).toBeUndefined();
     });
 
-    it("returns assesment found", async () => {
+    it("returns assessment found", async () => {
       await immersionAssessmentRepository.save(assessment);
       const assessmentInDb =
         await immersionAssessmentRepository.getByConventionId(

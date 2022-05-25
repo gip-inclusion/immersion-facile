@@ -25,9 +25,6 @@ export const createImmersionAssessmentEntity = (
 
   return {
     _entityName: "ImmersionAssessment",
-    id: dto.id,
-    conventionId: dto.conventionId,
-    establishmentFeedback: dto.establishmentFeedback,
-    status: dto.status,
+    ...dto,
   };
 };
