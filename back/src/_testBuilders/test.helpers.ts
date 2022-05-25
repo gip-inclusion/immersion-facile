@@ -1,11 +1,12 @@
 import { addDays as dateFnsAddDays, format } from "date-fns";
+import { partition } from "ramda";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateVerificationMagicLink } from "../adapters/primary/config/createGenerateVerificationMagicLink";
 import { CustomClock } from "../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import { EventBus, makeCreateNewEvent } from "../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
-import { Role } from "shared/src/tokens/MagicLinkPayload";
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 export const expectPromiseToFailWith = async (
   promise: Promise<unknown>,
@@ -92,4 +93,15 @@ export const expectArraysToEqualIgnoringOrder = <T>(
 ) => {
   expect(actual).toHaveLength(expected.length);
   expect(actual).toEqual(expect.arrayContaining(expected));
+};
+
+export const splitCasesBetweenPassingAndFailing = <T>(
+  cases: readonly T[],
+  passing: readonly T[],
+): [T[], T[]] => {
+  const [accepted, failing] = partition(
+    (status: T) => passing.includes(status),
+    cases,
+  );
+  return [accepted, failing];
 };

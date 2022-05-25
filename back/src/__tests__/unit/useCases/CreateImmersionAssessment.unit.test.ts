@@ -1,10 +1,16 @@
+import {
+  ApplicationStatus,
+  validApplicationStatus,
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {
   expectArraysToEqual,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   makeTestCreateNewEvent,
+  splitCasesBetweenPassingAndFailing,
 } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -13,13 +19,12 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../../adapters/secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { CreateImmersionAssessment } from "../../../domain/immersionAssessment/useCases/CreateImmersionAssessment";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ImmersionAssessmentEntity } from "../../../domain/immersionAssessment/entities/ImmersionAssessmentEntity";
+import { CreateImmersionAssessment } from "../../../domain/immersionAssessment/useCases/CreateImmersionAssessment";
 
 const conventionId = "conventionId";
 
@@ -30,7 +35,7 @@ const immersionAssessment: ImmersionAssessmentDto = {
   conventionId,
 };
 
-const immersionApplicationBuilder =
+const immersionApplicationEntityBuilder =
   new ImmersionApplicationEntityBuilder().withId(conventionId);
 
 const validPayload = {
@@ -51,7 +56,7 @@ describe("CreateImmersionAssessment", () => {
     immersionApplicationRepository = uow.immersionApplicationRepo;
     outboxRepository = uow.outboxRepo;
     uowPerformer = new InMemoryUowPerformer(uow);
-    const convention = immersionApplicationBuilder
+    const convention = immersionApplicationEntityBuilder
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withId(conventionId)
       .build();
@@ -105,23 +110,7 @@ describe("CreateImmersionAssessment", () => {
     );
   });
 
-  it("throws bad request if the convention status is not Accepted by validator", async () => {
-    const convention = immersionApplicationBuilder
-      .withStatus("IN_REVIEW")
-      .build();
-    immersionApplicationRepository.setImmersionApplications({
-      [convention.id]: convention,
-    });
-
-    await expectPromiseToFailWithError(
-      createImmersionAssessment.execute(immersionAssessment, validPayload),
-      new BadRequestError(
-        "Cannot create an assessment for which the convention has not been validated, status was IN_REVIEW",
-      ),
-    );
-  });
-
-  it("if the assessment already exists for the convention", async () => {
+  it("throws ConflictError if the assessment already exists for the convention", async () => {
     immersionAssessmentRepository.setAssessments([
       { ...immersionAssessment, _entityName: "ImmersionAssessment" },
     ]);
@@ -133,17 +122,55 @@ describe("CreateImmersionAssessment", () => {
     );
   });
 
-  it("should save the ImmersionAssessment", async () => {
-    await createImmersionAssessment.execute(immersionAssessment, validPayload);
-    const expectedImmersionEntity: ImmersionAssessmentEntity = {
-      ...immersionAssessment,
-      _entityName: "ImmersionAssessment",
-    };
+  const [passingStatuses, failingStatuses] =
+    splitCasesBetweenPassingAndFailing<ApplicationStatus>(
+      validApplicationStatus,
+      ["ACCEPTED_BY_VALIDATOR", "VALIDATED"],
+    );
 
-    expectArraysToEqual(immersionAssessmentRepository.assessments, [
-      expectedImmersionEntity,
-    ]);
-  });
+  it.each(failingStatuses.map((status) => ({ status })))(
+    "throws bad request if the convention status is $status",
+    async ({ status }) => {
+      const convention = immersionApplicationEntityBuilder
+        .withStatus(status)
+        .build();
+      immersionApplicationRepository.setImmersionApplications({
+        [convention.id]: convention,
+      });
+
+      await expectPromiseToFailWithError(
+        createImmersionAssessment.execute(immersionAssessment, validPayload),
+        new BadRequestError(
+          `Cannot create an assessment for which the convention has not been validated, status was ${status}`,
+        ),
+      );
+    },
+  );
+
+  it.each(passingStatuses.map((status) => ({ status })))(
+    "should save the ImmersionAssessment if convention has status $status",
+    async ({ status }) => {
+      const convention = immersionApplicationEntityBuilder
+        .withStatus(status)
+        .build();
+      immersionApplicationRepository.setImmersionApplications({
+        [convention.id]: convention,
+      });
+
+      await createImmersionAssessment.execute(
+        immersionAssessment,
+        validPayload,
+      );
+
+      const expectedImmersionEntity: ImmersionAssessmentEntity = {
+        ...immersionAssessment,
+        _entityName: "ImmersionAssessment",
+      };
+      expectArraysToEqual(immersionAssessmentRepository.assessments, [
+        expectedImmersionEntity,
+      ]);
+    },
+  );
 
   it("should dispatch an ImmersionAssessmentCreated event", async () => {
     await createImmersionAssessment.execute(immersionAssessment, validPayload);
