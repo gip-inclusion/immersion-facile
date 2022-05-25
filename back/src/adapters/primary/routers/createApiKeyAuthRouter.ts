@@ -26,7 +26,7 @@ const counterFormEstablishmentCaller = new promClient.Counter({
 export const createApiKeyAuthRouter = (deps: AppDependencies) => {
   const authenticatedRouter = Router({ mergeParams: true });
 
-  authenticatedRouter.use(deps.apiKeyAuthMiddleware);
+  authenticatedRouter.use(deps.apiKeyAuthMiddlewareV0);
 
   authenticatedRouter.route(`/${searchImmersionRoute}`).post(async (req, res) =>
     sendHttpResponse(req, res, async () => {

@@ -5,8 +5,6 @@ export const immersionOffersApiAuthRoute__v0 = "immersion-offers";
 export const immersionOffersRoute = "immersion-offers";
 export const extractConventionsExcelRoute = "extract-demande-immersion-excel";
 export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments
-export const editEstablishmentFormRouteWithApiKey__v0 =
-  "edit-establishment-form"; // Becomes PUT /v1/form-establishments
 export const validateConventionRoute = "validate-demande";
 export const generateMagicLinkRoute = "generate-magic-link";
 export const renewMagicLinkRoute = "renew-magic-link";

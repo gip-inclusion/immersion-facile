@@ -8,7 +8,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
   // search route is in createApiKeyAuthRouter
   const searchRouterWithAuth = Router({ mergeParams: true });
 
-  searchRouterWithAuth.use(deps.apiKeyAuthMiddleware);
+  searchRouterWithAuth.use(deps.apiKeyAuthMiddlewareV0);
 
   searchRouterWithAuth
     .route(`/${searchImmersionRoute__v0}`)

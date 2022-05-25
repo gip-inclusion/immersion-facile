@@ -58,7 +58,7 @@ describe("Route to post form establishments from front (hence, without API key)"
   });
 });
 
-describe("Route to post addEstablishmentFormRouteWithApiKey", () => {
+describe("Route to add an establishment form with API key (for exemple for un-jeune-une-solution)", () => {
   // from external
   describe("v0", () => {
     // we don't want to use variables from src/routes.ts so that we can check if contract breaks
@@ -109,7 +109,7 @@ describe("Route to post addEstablishmentFormRouteWithApiKey", () => {
         ],
       };
 
-      const jwt = generateApiJwt({ id: "my-id" });
+      const jwt = generateApiJwt({ id: "my-authorized-id" });
 
       const response = await request
         .post(`/immersion-offers`)
@@ -124,13 +124,60 @@ describe("Route to post addEstablishmentFormRouteWithApiKey", () => {
   describe("v1", () => {
     it("forbids access to route if no api consumer", async () => {
       const { request } = await buildTestApp();
-
       const response = await request.post(`/v1/form-establishments`).send({});
+      expect(response.body).toEqual({ error: "forbidden: unauthenticated" });
+      expect(response.status).toBe(401);
+    });
 
+    it("forbids access to route if invalid jwt", async () => {
+      const { request } = await buildTestApp();
+      const response = await request
+        .post(`/v1/form-establishments`)
+        .set("Authorization", "jwt-invalid")
+        .send({});
+      expect(response.body).toEqual({ error: "forbidden: incorrect Jwt" });
+      expect(response.status).toBe(401);
+    });
+
+    it("forbids adding establishment from unauthorized api consumer", async () => {
+      const { request, generateApiJwt } = await buildTestApp();
+      const jwt = generateApiJwt({ id: "my-unknown-id" });
+      const response = await request
+        .post(`/v1/form-establishments`)
+        .set("Authorization", jwt)
+        .send({});
+
+      expect(response.body).toEqual({ error: "forbidden: consumer not found" });
       expect(response.status).toBe(403);
     });
 
-    it("support adding establishment from known api consumer", async () => {
+    it("forbids access to route if id is unauthorized", async () => {
+      const { request, generateApiJwt } = await buildTestApp();
+      const jwt = generateApiJwt({ id: "my-unauthorized-id" });
+      const response = await request
+        .post(`/v1/form-establishments`)
+        .set("Authorization", jwt)
+        .send({});
+      expect(response.body).toEqual({
+        error: "forbidden: unauthorised consumer Id",
+      });
+      expect(response.status).toBe(403);
+    });
+
+    it("forbids access to route if token has expired", async () => {
+      const { request, generateApiJwt } = await buildTestApp();
+      const jwt = generateApiJwt({ id: "my-outdated-id" });
+      const response = await request
+        .post(`/v1/form-establishments`)
+        .set("Authorization", jwt)
+        .send({});
+      expect(response.body).toEqual({
+        error: "forbidden: expired token",
+      });
+      expect(response.status).toBe(403);
+    });
+
+    it("support adding establishment from known api consumer (for exemple Un Jeune Une Solution)", async () => {
       const { request, generateApiJwt } = await buildTestApp();
 
       const formEstablishmentDtoPublicV1: FormEstablishmentDtoPublicV1 =
@@ -138,7 +185,7 @@ describe("Route to post addEstablishmentFormRouteWithApiKey", () => {
           .withSiret(TEST_ESTABLISHMENT1_SIRET)
           .build();
 
-      const jwt = generateApiJwt({ id: "my-id" });
+      const jwt = generateApiJwt({ id: "my-authorized-id" });
 
       const response = await request
         .post(`/v1/form-establishments`)

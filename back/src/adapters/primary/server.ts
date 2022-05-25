@@ -23,6 +23,7 @@ import { createTechnicalRouter } from "./routers/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
 import { createApiKeyAuthRouterV1 } from "./routers/createApiKeyAuthRouter.v1";
+import { Clock } from "../../domain/core/ports/Clock";
 
 const logger = createLogger(__filename);
 
@@ -39,6 +40,7 @@ export const createApp = async (
   eventCrawler: EventCrawler;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
+  clock: Clock;
 }> => {
   const app = express();
   const router = Router();
@@ -75,5 +77,6 @@ export const createApp = async (
     eventCrawler: deps.eventCrawler,
     generateApiJwt: deps.generateApiJwt,
     generateMagicLinkJwt: deps.generateMagicLinkJwt,
+    clock: deps.clock,
   };
 };

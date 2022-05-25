@@ -51,7 +51,8 @@ const createIncTotalCountForRequest =
       authorisationStatus,
     });
 
-export const createApiKeyAuthMiddleware = (
+// should be deleted when all consumer migrate to v1
+export const createApiKeyAuthMiddlewareV0 = (
   getApiConsumerById: GetApiConsumerById,
   clock: Clock,
   config: AppConfig,
@@ -109,21 +110,81 @@ export const createApiKeyAuthMiddleware = (
   };
 };
 
-export const createJwtAuthMiddleware = (
+const responseError = (res: Response, message: string, status = 403) =>
+  res.status(status).json({ error: `forbidden: ${message}` });
+
+export const createApiKeyAuthMiddlewareV1 = (
+  getApiConsumerById: GetApiConsumerById,
+  clock: Clock,
+  config: AppConfig,
+) => {
+  const verifyJwt = makeVerifyJwt<WithApiConsumerId>(config.apiJwtPublicKey);
+
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const incTotalCountForRequest = createIncTotalCountForRequest(req);
+    if (!req.headers.authorization) {
+      incTotalCountForRequest({ authorisationStatus: "unauthenticated" });
+      return responseError(res, "unauthenticated", 401);
+    }
+
+    try {
+      const { id } = verifyJwt(req.headers.authorization);
+      const apiConsumer = await getApiConsumerById(id);
+
+      if (!apiConsumer) {
+        incTotalCountForRequest({
+          authorisationStatus: "consumerNotFound",
+        });
+        return responseError(res, "consumer not found");
+      }
+
+      if (!apiConsumer.isAuthorized) {
+        incTotalCountForRequest({
+          authorisationStatus: "unauthorisedId",
+          consumerName: apiConsumer.consumer,
+        });
+        return responseError(res, "unauthorised consumer Id");
+      }
+
+      if (apiConsumer.expirationDate < clock.now()) {
+        incTotalCountForRequest({
+          authorisationStatus: "expiredToken",
+          consumerName: apiConsumer.consumer,
+        });
+        return responseError(res, "expired token");
+      }
+
+      // only if the user is known, and the id authorized, and not expired we add apiConsumer payload to the request:
+      incTotalCountForRequest({
+        consumerName: apiConsumer.consumer,
+        authorisationStatus: "authorised",
+      });
+
+      req.apiConsumer = apiConsumer;
+      return next();
+    } catch (_) {
+      incTotalCountForRequest({
+        authorisationStatus: "incorrectJwt",
+      });
+      return responseError(res, "incorrect Jwt", 401);
+    }
+  };
+};
+
+export const createMagicLinkAuthMiddleware = (
   config: AppConfig,
   payloadKey: PayloadKey,
 ) => {
   const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(config);
 
   return (req: Request, res: Response, next: NextFunction) => {
-    const pathComponents = req.path.split("/");
-    const maybeJwt = pathComponents[pathComponents.length - 1];
+    const maybeJwt = req.headers.authorization;
     if (!maybeJwt) {
-      sendAuthenticationError(res, new Error("impossible to authenticate"));
+      return responseError(res, "unauthenticated", 401);
     }
-
     try {
-      const payload = verifyJwt(maybeJwt as string); // TODO : check that if exp > now, it throws 401
+      const payload = verifyJwt(maybeJwt);
+      // TODO : check that if exp > now, it throws 401
       const currentJwtVersion = currentJwtVersions[payloadKey];
 
       if (!payload.version || payload.version < currentJwtVersion) {
@@ -180,7 +241,7 @@ const sendAuthenticationError = (res: Response, err: Error) => {
   logger.error({ err }, "authentication failed");
   res.status(401);
   return res.json({
-    message: "Provided token is invalid",
+    error: "Provided token is invalid",
   });
 };
 

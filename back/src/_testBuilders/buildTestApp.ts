@@ -107,6 +107,7 @@ export const buildTestApp = async (
     eventCrawler: rawEventCrawler,
     generateApiJwt,
     generateMagicLinkJwt,
+    clock,
   } = await createApp(appConfig);
 
   const request = supertest(app);
@@ -122,6 +123,7 @@ export const buildTestApp = async (
     appConfig,
     generateApiJwt,
     generateMagicLinkJwt,
+    clock,
   };
 };
 

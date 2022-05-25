@@ -1,23 +1,24 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
-import { editEstablishmentFormRouteWithApiKey__v0 } from "shared/src/routes";
+import { formEstablishmentsRoute } from "shared/src/routes";
 import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { makeGenerateJwt } from "../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { subYears } from "date-fns";
 
 describe("Route to post edited form establishments", () => {
   it("Throws 401 if not authenticated", async () => {
     const { request } = await buildTestApp();
 
-    const response = await request
-      .post(`/${editEstablishmentFormRouteWithApiKey__v0}/dummyJwt`)
-      .send({});
+    const response = await request.put(`/${formEstablishmentsRoute}`).send({});
 
     // Assert
+    expect(response.body).toEqual({ error: "forbidden: unauthenticated" });
     expect(response.status).toBe(401);
   });
-  it("Throws 401 if Jwt is incorrect", async () => {
+
+  it("Throws 401 if Jwt is generated from wrong private key", async () => {
     const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
     const { request } = await buildTestApp();
     const generateJwtWithWrongKey = makeGenerateJwt(config.apiJwtPrivateKey); // Private Key is the wrong one !
@@ -29,14 +30,48 @@ describe("Route to post edited form establishments", () => {
         now: new Date(),
       }),
     );
-
     const response = await request
-      .post(`/${editEstablishmentFormRouteWithApiKey__v0}/${wrongJwt}`)
+      .put(`/${formEstablishmentsRoute}`)
+      .set("Authorization", wrongJwt)
       .send({});
 
     // Assert
+    expect(response.body).toEqual({ error: "Provided token is invalid" });
     expect(response.status).toBe(401);
   });
+  it("Throws 401 if jwt is malformed", async () => {
+    const { request } = await buildTestApp();
+    const response = await request
+      .put(`/${formEstablishmentsRoute}`)
+      .set("Authorization", "malformed-jwt")
+      .send({});
+    // Assert
+    expect(response.body).toEqual({ error: "Provided token is invalid" });
+    expect(response.status).toBe(401);
+  });
+
+  it("Throws 401 if Jwt is expired", async () => {
+    const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
+    const { request, clock } = await buildTestApp();
+    const generateJwtWithWrongKey = makeGenerateJwt(config.apiJwtPrivateKey); // Private Key is the wrong one !
+
+    const wrongJwt = generateJwtWithWrongKey(
+      createEstablishmentMagicLinkPayload({
+        siret: "12345678901234",
+        durationDays: 1,
+        now: subYears(clock.now(), 1),
+      }),
+    );
+    const response = await request
+      .put(`/${formEstablishmentsRoute}`)
+      .set("Authorization", wrongJwt)
+      .send({});
+
+    // Assert
+    expect(response.body).toEqual({ error: "Provided token is invalid" });
+    expect(response.status).toBe(401);
+  });
+
   it("Supports posting already existing form establisment when authenticated", async () => {
     // Prepare
     const { request, reposAndGateways, generateMagicLinkJwt } =
@@ -60,7 +95,8 @@ describe("Route to post edited form establishments", () => {
       .withSiret(TEST_ESTABLISHMENT1_SIRET)
       .build();
     const response = await request
-      .post(`/${editEstablishmentFormRouteWithApiKey__v0}/${validJwt}`)
+      .put(`/${formEstablishmentsRoute}`)
+      .set("Authorization", validJwt)
       .send(formEstablishment);
 
     // Assert

@@ -1,7 +1,6 @@
-import { Router } from "express";
+import { Request, Router } from "express";
 import {
   contactEstablishmentRoute,
-  editEstablishmentFormRouteWithApiKey__v0,
   formAlreadyExistsRoute,
   formEstablishmentsRoute,
   requestEmailToUpdateFormRoute,
@@ -64,30 +63,33 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   establishmentRouterWithJwt.use(deps.establishmentJwtAuthMiddleware);
 
   establishmentRouterWithJwt
-    .route(`/${formEstablishmentsRoute}/:jwt`)
+    .route(`/${formEstablishmentsRoute}`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req.payloads?.establishment) throw new UnauthorizedError();
+        const establishmentPayload = getEstablishmentPayload(req);
         return deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
           undefined,
-          req.payloads.establishment,
+          establishmentPayload,
         );
       }),
     );
 
   establishmentRouterWithJwt
-    .route(`/${editEstablishmentFormRouteWithApiKey__v0}/:jwt`)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, () => {
-        if (!req.payloads?.establishment) throw new UnauthorizedError();
-        return deps.useCases.editFormEstablishment.execute(
+    .route(`/${formEstablishmentsRoute}`)
+    .put(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.editFormEstablishment.execute(
           req.body,
-          req.payloads.establishment,
-        );
-      }),
+          getEstablishmentPayload(req),
+        ),
+      ),
     );
 
   establishmentRouter.use(establishmentRouterWithJwt);
 
   return establishmentRouter;
 };
+
+// this considers the jwt checks have been made by the middleware
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const getEstablishmentPayload = (req: Request) => req.payloads!.establishment;
