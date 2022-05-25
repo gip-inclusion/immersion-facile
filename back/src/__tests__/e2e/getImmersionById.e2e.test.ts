@@ -19,7 +19,7 @@ import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 import { getImmersionOfferByIdRoute__v0 } from "shared/src/routes";
 import { SearchImmersionResultPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 
-const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
+const authorizedApiKeyId = "my-authorized-id";
 const immersionOfferId = "78000403200019-B1805";
 const immersionOfferRome = "B1805";
 

@@ -604,7 +604,7 @@ export class PgEstablishmentAggregateRepository
       await this.client.query(
         `WITH 
           unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ),
-          filtered_immersion_offers AS (SELECT siret, JSON_AGG(JSON_BUILD_OBJECT('romeCode', rome_code, 'score', score, 'id', uuid, 'appellationCode', rome_appellation::text, 'createdAt',  to_char(created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))) as immersionOffers
+          filtered_immersion_offers AS (SELECT siret, JSON_AGG(JSON_BUILD_OBJECT('romeCode', rome_code, 'score', score, 'appellationCode', rome_appellation::text, 'createdAt',  to_char(created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))) as immersionOffers
              FROM immersion_offers WHERE siret = $1 GROUP BY siret)
         SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'establishment', JSON_BUILD_OBJECT(

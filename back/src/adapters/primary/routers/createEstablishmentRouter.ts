@@ -6,7 +6,6 @@ import {
   requestEmailToUpdateFormRoute,
 } from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
-import { UnauthorizedError } from "../helpers/httpErrors";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
 export const createEstablishmentRouter = (deps: AppDependencies) => {
@@ -60,15 +59,15 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   const establishmentRouterWithJwt = Router({ mergeParams: true });
 
   // Routes WITH jwt auth
-  establishmentRouterWithJwt.use(deps.establishmentJwtAuthMiddleware);
+  establishmentRouterWithJwt.use(deps.establishmentMagicLinkAuthMiddleware);
 
   establishmentRouterWithJwt
-    .route(`/${formEstablishmentsRoute}`)
+    .route(`/${formEstablishmentsRoute}/:siret`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () => {
         const establishmentPayload = getEstablishmentPayload(req);
         return deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
-          undefined,
+          req.params.siret,
           establishmentPayload,
         );
       }),

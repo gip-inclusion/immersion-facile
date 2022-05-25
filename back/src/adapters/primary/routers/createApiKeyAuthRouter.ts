@@ -1,9 +1,9 @@
 import { Router } from "express";
 import promClient from "prom-client";
 import {
-  getImmersionOfferByIdRoute,
-  searchImmersionRoute,
-  immersionOffersApiAuthRoute,
+  getImmersionOfferByIdRoute__v0,
+  searchImmersionRoute__v0,
+  immersionOffersApiAuthRoute__v0,
 } from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
@@ -28,25 +28,27 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
 
   authenticatedRouter.use(deps.apiKeyAuthMiddlewareV0);
 
-  authenticatedRouter.route(`/${searchImmersionRoute}`).post(async (req, res) =>
-    sendHttpResponse(req, res, async () => {
-      const searchImmersionRequest = searchImmersionRequestPublicV0ToDomain(
-        req.body,
-      );
-      await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
-        searchImmersionRequest,
-      );
-      return (
-        await deps.useCases.searchImmersion.execute(
+  authenticatedRouter
+    .route(`/${searchImmersionRoute__v0}`)
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        const searchImmersionRequest = searchImmersionRequestPublicV0ToDomain(
+          req.body,
+        );
+        await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
           searchImmersionRequest,
-          req.apiConsumer,
-        )
-      ).map(domainToSearchImmersionResultPublicV0);
-    }),
-  );
+        );
+        return (
+          await deps.useCases.searchImmersion.execute(
+            searchImmersionRequest,
+            req.apiConsumer,
+          )
+        ).map(domainToSearchImmersionResultPublicV0);
+      }),
+    );
 
   authenticatedRouter
-    .route(`/${getImmersionOfferByIdRoute}/:id`)
+    .route(`/${getImmersionOfferByIdRoute__v0}/:id`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         domainToSearchImmersionResultPublicV0(
@@ -58,7 +60,7 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
       ),
     );
   authenticatedRouter
-    .route(`/${immersionOffersApiAuthRoute}`)
+    .route(`/${immersionOffersApiAuthRoute__v0}`)
     .post(async (req, res) => {
       counterFormEstablishmentCaller.inc({
         referer: req.get("Referrer"),

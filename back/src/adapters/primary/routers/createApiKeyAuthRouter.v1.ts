@@ -8,7 +8,6 @@ import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 import {
   ForbiddenError,
-  UnauthorizedError,
   validateAndParseZodSchema,
 } from "../helpers/httpErrors";
 import { pipeWithValue } from "shared/src/pipeWithValue";
@@ -45,29 +44,6 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
       );
     });
   });
-  publicV1Router
-    .route(`/${formEstablishmentsRoute}/:jwt`)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () => {
-        if (!req.payloads?.establishment) throw new UnauthorizedError();
-        return deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
-          undefined,
-          req.payloads.establishment,
-        );
-      }),
-    );
-
-  publicV1Router
-    .route(`/${formEstablishmentsRoute}/:jwt`)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, () => {
-        if (!req.payloads?.establishment) throw new UnauthorizedError();
-        return deps.useCases.editFormEstablishment.execute(
-          req.body,
-          req.payloads.establishment,
-        );
-      }),
-    );
 
   // Immersion offers routes
   publicV1Router.route(`/${immersionOffersRoute}`).get(async (req, res) =>

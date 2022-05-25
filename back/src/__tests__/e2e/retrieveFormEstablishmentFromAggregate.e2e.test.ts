@@ -39,9 +39,9 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         now: new Date(),
       }),
     );
-    const response = await request.get(
-      `/${formEstablishmentsRoute}/${validJwt}`,
-    );
+    const response = await request
+      .get(`/${formEstablishmentsRoute}/${siret}`)
+      .set("Authorization", validJwt);
 
     // Assert
     expect(response.body).toMatchObject({

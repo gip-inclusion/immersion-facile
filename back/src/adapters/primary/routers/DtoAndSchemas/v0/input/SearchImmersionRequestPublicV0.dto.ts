@@ -12,5 +12,10 @@ export const searchImmersionRequestPublicV0ToDomain = (
   publicV0: SearchImmersionRequestPublicV0,
 ): SearchImmersionQueryParamsDto => {
   const { location, ...rest } = publicV0;
-  return { ...rest, longitude: location.lon, latitude: location.lat };
+  return {
+    ...rest,
+    longitude: location.lon,
+    latitude: location.lat,
+    sortedBy: "distance",
+  };
 };

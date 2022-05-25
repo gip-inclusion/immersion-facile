@@ -31,6 +31,7 @@ import {
 import { InMemoryOutboxQueries } from "../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
+import { Clock } from "../domain/core/ports/Clock";
 import { InMemoryConventionQueries } from "../adapters/secondary/InMemoryConventionQueries";
 
 export type InMemoryRepositories = {
@@ -69,6 +70,7 @@ export type TestAppAndDeps = {
   appConfig: AppConfig;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
+  clock: Clock;
 };
 
 export const buildTestApp = async (

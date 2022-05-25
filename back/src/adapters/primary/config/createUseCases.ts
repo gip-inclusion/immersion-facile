@@ -194,7 +194,6 @@ export const createUseCases = (
         repositories.immersionOffer,
         repositories.laBonneBoiteRequest,
         repositories.laBonneBoiteAPI,
-        uuidGenerator,
         clock,
       ),
     requestEditFormEstablishment: new RequestEditFormEstablishment(

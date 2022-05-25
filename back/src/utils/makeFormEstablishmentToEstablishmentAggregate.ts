@@ -16,9 +16,8 @@ import { notifyAndThrowErrorDiscord } from "./notifyDiscord";
 const offerFromFormScore = 10;
 
 const appelationToImmersionOfferEntity =
-  (uuidGenerator: UuidGenerator, clock: Clock) =>
+  (clock: Clock) =>
   ({ romeCode, appellationCode }: AppellationDto): ImmersionOfferEntityV2 => ({
-    id: uuidGenerator.new(),
     romeCode,
     appellationCode,
     score: offerFromFormScore,
@@ -74,7 +73,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
 
     const immersionOffers: ImmersionOfferEntityV2[] =
       formEstablishment.appellations.map(
-        appelationToImmersionOfferEntity(uuidGenerator, clock),
+        appelationToImmersionOfferEntity(clock),
       );
 
     const establishment: EstablishmentEntityV2 = {

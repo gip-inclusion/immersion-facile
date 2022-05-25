@@ -177,9 +177,9 @@ const beneficiarySignsApplication = async (
   beneficiarySignJwt: string,
   initialConvention: ConventionDto,
 ) => {
-  const response = await request.post(
-    `/auth/${signConventionRoute}/${beneficiarySignJwt}`,
-  );
+  const response = await request
+    .post(`/auth/${signConventionRoute}/${initialImmersionApplication.id}`)
+    .set("Authorization", beneficiarySignJwt);
 
   expect(response.status).toBe(200);
 
@@ -211,7 +211,8 @@ const establishmentSignsApplication = async (
   initialConvention: ConventionDto,
 ) => {
   await request
-    .post(`/auth/${signConventionRoute}/${establishmentSignJwt}`)
+    .post(`/auth/${signConventionRoute}/${initialImmersionApplication.id}`)
+    .set("Authorization", establishmentSignJwt)
     .expect(200);
 
   expectOnlyOneImmersionThatIsEqual(
@@ -246,7 +247,10 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     status: "ACCEPTED_BY_VALIDATOR",
   };
   await request
-    .post(`/auth/${updateConventionStatusRoute}/${validatorReviewJwt}`)
+    .post(
+      `/auth/${updateConventionStatusRoute}/${initialImmersionApplication.id}`,
+    )
+    .set("Authorization", validatorReviewJwt)
     .send(params)
     .expect(200);
 

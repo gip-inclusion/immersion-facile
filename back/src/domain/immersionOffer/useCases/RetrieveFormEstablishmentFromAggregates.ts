@@ -1,26 +1,31 @@
-import { z } from "zod";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  BadRequestError,
+  ForbiddenError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { SiretDto, siretSchema } from "shared/src/siret";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
-  void,
+  SiretDto,
   FormEstablishmentDto,
   EstablishmentJwtPayload
 > {
-  inputSchema = z.void();
+  inputSchema = siretSchema;
 
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
 
   protected async _execute(
-    _: void,
+    siret: SiretDto,
     uow: UnitOfWork,
-    { siret }: EstablishmentJwtPayload,
+    { siret: siretFromJwt }: EstablishmentJwtPayload,
   ) {
+    if (siret !== siretFromJwt) throw new ForbiddenError();
+
     const establishmentAggregate =
       await uow.establishmentAggregateRepo.getEstablishmentAggregateBySiret(
         siret,

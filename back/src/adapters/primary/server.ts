@@ -24,6 +24,7 @@ import { subscribeToEvents } from "./subscribeToEvents";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
 import { createApiKeyAuthRouterV1 } from "./routers/createApiKeyAuthRouter.v1";
 import { Clock } from "../../domain/core/ports/Clock";
+import { createSearchImmersionRouter } from "./routers/createSearchImmersionRouter";
 
 const logger = createLogger(__filename);
 
@@ -53,6 +54,9 @@ export const createApp = async (
   const deps = await createAppDependencies(config);
 
   app.use(router);
+
+  app.use(createSearchImmersionRouter(deps));
+
   // Those routes must be defined BEFORE the others
   app.use("/auth", createMagicLinkRouter(deps));
   app.use("/admin", createAdminRouter(deps));

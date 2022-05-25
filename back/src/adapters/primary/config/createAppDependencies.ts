@@ -8,8 +8,9 @@ import {
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import {
-  createApiKeyAuthMiddleware,
-  createJwtAuthMiddleware,
+  createApiKeyAuthMiddlewareV0,
+  createApiKeyAuthMiddlewareV1,
+  createMagicLinkAuthMiddleware,
 } from "../authMiddleware";
 import { AppConfig } from "./appConfig";
 import { createAuthChecker } from "./createAuthChecker";
@@ -63,15 +64,20 @@ export const createAppDependencies = async (config: AppConfig) => {
     ),
     repositories,
     authChecker: createAuthChecker(config),
-    applicationJwtAuthMiddleware: createJwtAuthMiddleware(
+    applicationMagicLinkAuthMiddleware: createMagicLinkAuthMiddleware(
       config,
       "application",
     ),
-    establishmentJwtAuthMiddleware: createJwtAuthMiddleware(
+    establishmentMagicLinkAuthMiddleware: createMagicLinkAuthMiddleware(
       config,
       "establishment",
     ),
-    apiKeyAuthMiddleware: await createApiKeyAuthMiddleware(
+    apiKeyAuthMiddlewareV0: await createApiKeyAuthMiddlewareV0(
+      repositories.getApiConsumerById,
+      clock,
+      config,
+    ),
+    apiKeyAuthMiddleware: await createApiKeyAuthMiddlewareV1(
       repositories.getApiConsumerById,
       clock,
       config,
@@ -84,5 +90,6 @@ export const createAppDependencies = async (config: AppConfig) => {
       repositories.outboxQueries,
       eventBus,
     ),
+    clock,
   };
 };

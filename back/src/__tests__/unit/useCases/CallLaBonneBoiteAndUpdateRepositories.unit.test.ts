@@ -233,7 +233,6 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
         useCase,
         laBonneBoiteAPI,
         establishmentAggregateRepository,
-        uuidGenerator,
         clock,
       } = await prepareUseCase();
       const alreadyExistingAggregateFromLBB =
@@ -264,7 +263,6 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
           .withStars(5)
           .build(),
       ]);
-      uuidGenerator.setNextUuid("newOfferUuid");
       const newOffercreatedAt = new Date("2022-05-18");
       clock.setNextDate(newOffercreatedAt);
 
@@ -280,7 +278,6 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
             immersionOffers: [
               alreadyExistingAggregateFromLBB.immersionOffers[0],
               {
-                id: "newOfferUuid",
                 romeCode: newRome,
                 score: 5,
                 createdAt: newOffercreatedAt,

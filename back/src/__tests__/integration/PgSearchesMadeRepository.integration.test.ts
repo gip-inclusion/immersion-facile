@@ -90,7 +90,7 @@ describe("PgSearchesMadeRepository", () => {
       lon: 6.17602,
       needsToBeSearched: true,
       sortedBy: "date",
-      voluntary_to_immersion: true,
+      voluntaryToImmersion: true,
       apiConsumerName: "passeEmploi",
     });
     await pgSearchesMadeRepository.insertSearchMade({

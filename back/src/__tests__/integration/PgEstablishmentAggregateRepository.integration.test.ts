@@ -353,7 +353,6 @@ describe("Postgres implementation of immersion offer repository", () => {
       );
 
       await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        testUid1,
         formSiret,
         informationGeographiqueRome, // Matching
         searchedPosition, // Establishment position matching
@@ -391,12 +390,10 @@ describe("Postgres implementation of immersion offer repository", () => {
         },
       });
       await insertImmersionOffer({
-        uuid: testUid1,
         romeCode: searchMadeWithRome.rome!,
         siret: closeSiret,
       });
       await insertImmersionOffer({
-        uuid: testUid2,
         romeCode: searchMadeWithRome.rome!,
         siret: farSiret,
       });
@@ -430,13 +427,11 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       await Promise.all([
         insertImmersionOffer({
-          uuid: testUid1,
           romeCode: searchMadeWithRome.rome!,
           siret: recentOfferSiret,
           offerCreatedAt: new Date("2022-05-05"),
         }),
         insertImmersionOffer({
-          uuid: testUid2,
           romeCode: searchMadeWithRome.rome!,
           siret: oldOfferSiret,
           offerCreatedAt: new Date("2022-05-02"),
@@ -1633,9 +1628,9 @@ describe("Postgres implementation of immersion offer repository", () => {
     offerCreatedAt?: Date;
   }) => {
     const insertQuery = `INSERT INTO immersion_offers (
-      uuid, rome_code, siret, score, rome_appellation, created_at
+    rome_code, siret, score, rome_appellation, created_at
     ) VALUES
-     ($1, $2, $3, $4, $5, $6)`;
+     ($1, $2, $3, $4, $5)`;
     const defaultScore = 4;
     const defaultOfferCreatedAt = new Date("2022-01-08");
 

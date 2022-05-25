@@ -173,7 +173,8 @@ describe("/demandes-immersion route", () => {
 
         // GETting the created application succeeds.
         await request
-          .get(`/auth/${conventionsRoute}/${jwt}`)
+          .get(`/auth/${conventionsRoute}/${convention.id}`)
+          .set("Authorization", jwt)
           .expect(200, convention);
       });
 
@@ -190,7 +191,8 @@ describe("/demandes-immersion route", () => {
         const jwt = generateJwt(payload);
 
         // GETting the created application 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
-        await request.get(`/auth/${conventionsRoute}/${jwt}`).expect(403, {
+        await request.get(`/auth/${conventionsRoute}/${convention.id}`)
+          .set("Authorization", jwt).expect(403, {
           message: "Le lien magique est périmé",
           needsNewMagicLink: true,
         });
@@ -221,7 +223,8 @@ describe("/demandes-immersion route", () => {
       );
 
       await request
-        .post(`/auth/${conventionsRoute}/${jwt}`)
+        .post(`/auth/${conventionsRoute}/${convention.id}`)
+        .set("Authorization", jwt)
         .send(updatedConvention)
         .expect(200);
 
@@ -233,17 +236,17 @@ describe("/demandes-immersion route", () => {
     });
 
     it("Fetching unknown application IDs fails with 404 Not Found", async () => {
-      const link = generateJwt(
-        createConventionMagicLinkPayload(
-          "unknown-demande-immersion-id",
-          "beneficiary",
-          "some email",
-        ),
+      const unknownId = "unknown-demande-immersion-id";
+      const jwt = generateJwt(
+        createConventionMagicLinkPayload(unknownId, "beneficiary", "some email"),
       );
-      await request.get(`/${conventionsRoute}/${link}`).expect(404);
+      await request
+        .get(`/${conventionsRoute}/anything`)
+        .set("Authorization", jwt)
+        .expect(404);
 
       await request
-        .get(`/admin/${conventionsRoute}/unknown-demande-immersion-id`)
+        .get(`/admin/${conventionsRoute}/${unknownId}`)
         .auth("e2e_tests", "e2e")
         .expect(404);
     });
@@ -254,7 +257,7 @@ describe("/demandes-immersion route", () => {
         .withId(unknownId)
         .build();
 
-      const link = generateJwt(
+      const jwt = generateJwt(
         createConventionMagicLinkPayload(
           unknownId,
           "beneficiary",
@@ -263,7 +266,8 @@ describe("/demandes-immersion route", () => {
       );
 
       await request
-        .post(`/${conventionsRoute}/${link}`)
+        .post(`/${conventionsRoute}/${unknownId}`)
+        .set("Authorization", jwt)
         .send(conventionWithUnknownId)
         .expect(404);
     });
@@ -326,39 +330,21 @@ describe("/update-application-status route", () => {
     );
     await request
       .post(`/auth/${updateConventionStatusRoute}/${counsellorJwt}`)
+      .set("Authorization", counsellorJwt)
       .send({ status: "REJECTED", justification: "test-justification" })
       .expect(200);
   });
 
-  // Skip: Currently no configuration returns 400. Reenable this test if one is added.
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip("Returns error 400 for invalid requests", async () => {
-    // An establishment tries to change it to DRAFT but fails.
-    const establishmentJwt = generateJwt(
-      createConventionMagicLinkPayload(
-        conventionId,
-        "establishment",
-        convention.mentorEmail,
-      ),
-    );
+  it("Returns error 401 if no JWT", async () => {
     await request
-      .post(`/auth/${updateConventionStatusRoute}/${establishmentJwt}`)
-      .send({ status: "DRAFT" })
-      .expect(400);
-
-    // An admin tries to change it to VALIDATED but fails.
-    const adminJwt = generateJwt(
-      createConventionMagicLinkPayload(conventionId, "admin", "admin@if.fr"),
-    );
-    await request
-      .post(`/auth/${updateConventionStatusRoute}/${adminJwt}`)
+      .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
       .send({ status: "VALIDATED" })
-      .expect(400);
+      .expect(401);
   });
 
   it("Returns error 403 for unauthorized requests", async () => {
-    // An establishment tries to validate the application, but fails.
-    const establishmentJwt = generateJwt(
+    // A tutor tries to validate the application, but fails.
+    const tutorJwt = generateJwt(
       createConventionMagicLinkPayload(
         conventionId,
         "establishment",
@@ -366,13 +352,14 @@ describe("/update-application-status route", () => {
       ),
     );
     await request
-      .post(`/auth/${updateConventionStatusRoute}/${establishmentJwt}`)
+      .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
+      .set("Authorization", tutorJwt)
       .send({ status: "VALIDATED" })
       .expect(403);
   });
 
   it("Returns error 404 for unknown application ids", async () => {
-    const jwt = generateJwt(
+    const counsellorJwt = generateJwt(
       createConventionMagicLinkPayload(
         "unknown_application_id",
         "counsellor",
@@ -380,7 +367,8 @@ describe("/update-application-status route", () => {
       ),
     );
     await request
-      .post(`/auth/${updateConventionStatusRoute}/${jwt}`)
+      .post(`/auth/${updateConventionStatusRoute}/unknown_application_id`)
+      .set("Authorization", counsellorJwt)
       .send({ status: "ACCEPTED_BY_COUNSELLOR" })
       .expect(404); // Not found
   });

@@ -21,10 +21,11 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 const secretariatRome = "M1607";
 const boulangerRome = "D1102";
 
-const searchInMetzParams: SearchImmersionRequestDto = {
+const searchInMetzParams: SearchImmersionQueryParamsDto = {
   distance_km: 30,
   longitude: 6.17602,
   latitude: 49.119146,
+  sortedBy: "distance",
 };
 
 const insertLBBAggregate = async (
@@ -162,7 +163,7 @@ describe("SearchImmersionUseCase", () => {
 
     const response = await searchImmersion.execute({
       ...searchInMetzParams,
-      voluntary_to_immersion: true,
+      voluntaryToImmersion: true,
       sortedBy: "distance",
     });
 

@@ -19,7 +19,7 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
   ): Observable<SearchImmersionResultDto[]> {
     return ajax
       .get<SearchImmersionResultDto[]>(
-        `/${prefix}/v1/${immersionOffersRoute}?${queryParamsAsString<SearchImmersionQueryParamsDto>(
+        `/${prefix}/${immersionOffersRoute}?${queryParamsAsString<SearchImmersionQueryParamsDto>(
           searchParams,
         )}`,
       )

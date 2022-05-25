@@ -33,7 +33,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
   it("throws an error if there is no establishment with this siret", async () => {
     const { useCase } = prepareUseCase();
     await expectPromiseToFailWithError(
-      useCase.execute(undefined, jwtPayload),
+      useCase.execute(jwtPayload.siret, jwtPayload),
       new BadRequestError(
         "No establishment found with siret 12345678901234 and form data source. ",
       ),
@@ -54,7 +54,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     ]);
     // Act and assert
     await expectPromiseToFailWithError(
-      useCase.execute(undefined, jwtPayload),
+      useCase.execute(jwtPayload.siret, jwtPayload),
       new BadRequestError(
         "No establishment found with siret 12345678901234 and form data source. ",
       ),
@@ -80,7 +80,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         .build(),
     ]);
     // Act
-    const retrievedForm = await useCase.execute(undefined, jwtPayload);
+    const retrievedForm = await useCase.execute(jwtPayload.siret, jwtPayload);
 
     // Assert
     expect(retrievedForm).toBeDefined();

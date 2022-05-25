@@ -14,4 +14,5 @@ export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryPara
       z.number().positive("'distance_km' doit être > 0"),
     ),
     voluntaryToImmersion: zPreprocessedBoolean().optional(),
+    sortedBy: z.enum(["distance", "date"]),
   });

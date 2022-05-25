@@ -48,8 +48,14 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     jwt: string,
   ): Promise<FormEstablishmentDto> {
     const httpResponse = await axios.get(
-      `/${prefix}/${formEstablishmentsRoute}/${jwt}`,
+      `/${prefix}/${formEstablishmentsRoute}/${jwt}`, // TODO Should it be siret instead of jwt ?
+      {
+        headers: {
+          Authorization: jwt,
+        },
+      },
     );
+
     return httpResponse.data;
   }
 
@@ -57,9 +63,10 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     establishment: FormEstablishmentDto,
     jwt: string,
   ): Promise<void> {
-    await axios.put(
-      `/${prefix}/${formEstablishmentsRoute}/${jwt}`,
-      establishment,
-    );
+    await axios.put(`/${prefix}/${formEstablishmentsRoute}`, establishment, {
+      headers: {
+        Authorization: jwt,
+      },
+    });
   }
 }

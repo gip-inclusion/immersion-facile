@@ -12,7 +12,7 @@ import { sendHttpResponse } from "../helpers/sendHttpResponse";
 export const createMagicLinkRouter = (deps: AppDependencies) => {
   const authenticatedRouter = Router({ mergeParams: true });
 
-  authenticatedRouter.use(deps.applicationJwtAuthMiddleware);
+  authenticatedRouter.use(deps.applicationMagicLinkAuthMiddleware);
 
   authenticatedRouter
     .route(`/${immersionAssessmentRoute}/:jwt`)

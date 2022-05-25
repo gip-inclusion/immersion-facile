@@ -24,16 +24,20 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .build();
     const appAndDeps = await buildTestApp();
 
-    const { establishmentJwt } =
-      await beneficiarySubmitsApplicationForTheFirstTime(
-        appAndDeps,
-        validConvention,
-      );
+    const { tutorJwt } = await beneficiarySubmitsApplicationForTheFirstTime(
+      appAndDeps,
+      validConvention,
+    );
 
-    await expectEstablishmentRequiresChanges(appAndDeps, establishmentJwt, {
-      justification: "change something which is wrong",
-      status: "DRAFT",
-    });
+    await expectEstablishmentRequiresChanges(
+      appAndDeps,
+      tutorJwt,
+      validImmersionApplication.id,
+      {
+        justification: "change something which is wrong",
+        status: "DRAFT",
+      },
+    );
     // could test edition and sign but it is similar to addImmersionApplicationAndSendMails e2e tests
   });
 });
@@ -65,23 +69,25 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const beneficiaryJwt = expectJwtInMagicLinkAndGetIt(
     beneficiarySignEmail.params.magicLink,
   );
-  const establishmentJwt = expectJwtInMagicLinkAndGetIt(
+  const tutorJwt = expectJwtInMagicLinkAndGetIt(
     establishmentSignEmail.params.magicLink,
   );
 
   return {
     beneficiaryJwt,
-    establishmentJwt,
+    tutorJwt,
   };
 };
 
 const expectEstablishmentRequiresChanges = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
   establishmentJwt: string,
+  immersionApplicationId: string,
   { status, justification }: UpdateConventionStatusRequestDto,
 ) => {
   await request
-    .post(`/auth/${updateConventionStatusRoute}/${establishmentJwt}`)
+    .post(`/auth/${updateConventionStatusRoute}/${immersionApplicationId}`)
+    .set("Authorization", establishmentJwt)
     .send({ status, justification });
 
   await eventCrawler.processNewEvents();

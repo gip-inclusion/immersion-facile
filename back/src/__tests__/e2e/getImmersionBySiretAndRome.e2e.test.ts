@@ -19,7 +19,7 @@ import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOffe
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 import { SearchImmersionResultPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 
-const authorizedApiKeyId = "e82e79da-5ee0-4ef5-82ab-1f527ef10a59";
+const authorizedApiKeyId = "my-authorized-id";
 const immersionOfferRome = "B1805";
 const immersionOfferSiret = "78000403200019";
 
@@ -61,7 +61,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
   it("rejects unauthenticated requests", async () => {
     await request
       .get(`/v1/immersion-offers/${immersionOfferSiret}/${immersionOfferRome}`)
-      .expect(403);
+      .expect(401);
   });
 
   it("accepts valid authenticated requests", async () => {
