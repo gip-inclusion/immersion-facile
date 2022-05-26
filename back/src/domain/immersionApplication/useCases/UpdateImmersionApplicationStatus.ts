@@ -5,11 +5,12 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import {
   ApplicationStatus,
+  ImmersionApplicationId,
   UpdateImmersionApplicationStatusRequestDto,
   WithImmersionApplicationId,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { statusTransitionConfigs } from "shared/src/immersionApplicationStatusTransitions";
-import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { MagicLinkPayload, Role } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
@@ -21,9 +22,13 @@ import { updateImmersionApplicationStatusRequestSchema } from "shared/src/Immers
 
 const logger = createLogger(__filename);
 
-const domainTopicByTargetStatusMap: Partial<
-  Record<ApplicationStatus, DomainTopic>
+const domainTopicByTargetStatusMap: Record<
+  ApplicationStatus,
+  DomainTopic | null
 > = {
+  READY_TO_SIGN: null,
+  PARTIALLY_SIGNED: "ImmersionApplicationPartiallySigned",
+  IN_REVIEW: "ImmersionApplicationFullySigned",
   ACCEPTED_BY_COUNSELLOR: "ImmersionApplicationAcceptedByCounsellor",
   ACCEPTED_BY_VALIDATOR: "ImmersionApplicationAcceptedByValidator",
   VALIDATED: "FinalImmersionApplicationValidationByAdmin",
@@ -51,6 +56,62 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     { applicationId, role }: MagicLinkPayload,
   ): Promise<WithImmersionApplicationId> {
     logger.debug({ status, applicationId, role });
+    const immersionApplication =
+      await this.getImmersionStatusOrThrowIfNotAllowed(
+        status,
+        role,
+        applicationId,
+      );
+    const updatedEntity = ImmersionApplicationEntity.create({
+      ...immersionApplication.toDto(),
+      ...(status === "REJECTED" && { rejectionJustification: justification }),
+      ...(status === "DRAFT" && {
+        enterpriseAccepted: false,
+        beneficiaryAccepted: false,
+      }),
+      status,
+    });
+
+    const updatedId =
+      await this.immersionApplicationRepository.updateImmersionApplication(
+        updatedEntity,
+      );
+    if (!updatedId) throw new NotFoundError(updatedId);
+
+    const domainTopic = domainTopicByTargetStatusMap[status];
+    if (!domainTopic) return { id: updatedId };
+
+    const event = this.createEvent(updatedEntity, domainTopic, justification);
+    await this.outboxRepository.save(event);
+    return { id: updatedId };
+  }
+
+  private createEvent(
+    updatedEntity: ImmersionApplicationEntity,
+    domainTopic: DomainTopic,
+    justification?: string,
+  ) {
+    if (domainTopic === "ImmersionApplicationRequiresModification")
+      return this.createNewEvent({
+        topic: domainTopic,
+        payload: {
+          application: updatedEntity.toDto(),
+          reason: justification ?? "",
+          roles: ["beneficiary", "establishment"],
+        },
+      });
+
+    return this.createNewEvent({
+      topic: domainTopic,
+      payload: updatedEntity.toDto(),
+    });
+  }
+
+  private async getImmersionStatusOrThrowIfNotAllowed(
+    status: ApplicationStatus,
+    role: Role,
+    applicationId: ImmersionApplicationId,
+  ): Promise<ImmersionApplicationEntity> {
     const statusTransitionConfig = statusTransitionConfigs[status];
 
     if (!statusTransitionConfig.validRoles.includes(role))
@@ -64,54 +125,11 @@ export class UpdateImmersionApplicationStatus extends UseCase<
       !statusTransitionConfig.validInitialStatuses.includes(
         immersionApplication.status,
       )
-    ) {
+    )
       throw new BadRequestError(
         `Cannot go from status '${immersionApplication.status}' to '${status}'`,
       );
-    }
 
-    const updatedEntity = ImmersionApplicationEntity.create({
-      ...immersionApplication.toDto(),
-      status,
-      rejectionJustification: status === "REJECTED" ? justification : undefined,
-
-      // Invalidate signatures when the application is sent back to the beneficiary.
-      beneficiaryAccepted:
-        status === "DRAFT"
-          ? false
-          : immersionApplication.toDto().beneficiaryAccepted,
-      enterpriseAccepted:
-        status === "DRAFT"
-          ? false
-          : immersionApplication.toDto().enterpriseAccepted,
-    });
-    const updatedId =
-      await this.immersionApplicationRepository.updateImmersionApplication(
-        updatedEntity,
-      );
-    if (!updatedId) throw new NotFoundError(updatedId);
-
-    const domainTopic = domainTopicByTargetStatusMap[status];
-    if (domainTopic) {
-      let event = undefined;
-      if (domainTopic === "ImmersionApplicationRequiresModification") {
-        event = this.createNewEvent({
-          topic: domainTopic,
-          payload: {
-            application: updatedEntity.toDto(),
-            reason: justification ?? "",
-            roles: ["beneficiary", "establishment"],
-          },
-        });
-      } else {
-        event = this.createNewEvent({
-          topic: domainTopic,
-          payload: updatedEntity.toDto(),
-        });
-      }
-      await this.outboxRepository.save(event);
-    }
-
-    return { id: updatedId };
+    return immersionApplication;
   }
 }
