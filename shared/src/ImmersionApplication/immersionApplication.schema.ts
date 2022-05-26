@@ -5,8 +5,8 @@ import { agencyIdSchema } from "../agency/agency.schema";
 import { siretSchema } from "../siret";
 import {
   emailAndMentorEmailAreDifferent,
-  mustBeSignedByBeneficiaryBeforeReview,
-  mustBeSignedByEstablishmentBeforeReview,
+  mustBeSignedByBeneficiary,
+  mustBeSignedByEstablishment,
   startDateIsBeforeEndDate,
   underMaxDuration,
 } from "../immersionApplicationRefinement";
@@ -99,11 +99,11 @@ export const immersionApplicationSchema: z.Schema<ImmersionApplicationDto> = z
     message: "Votre adresse e-mail doit être différente de celle du tuteur",
     path: ["mentorEmail"],
   })
-  .refine(mustBeSignedByBeneficiaryBeforeReview, {
+  .refine(mustBeSignedByBeneficiary, {
     message: "La confirmation de votre accord est obligatoire.",
     path: ["beneficiaryAccepted"],
   })
-  .refine(mustBeSignedByEstablishmentBeforeReview, {
+  .refine(mustBeSignedByEstablishment, {
     message: "La confirmation de votre accord est obligatoire.",
     path: ["enterpriseAccepted"],
   });
@@ -174,11 +174,11 @@ export const immersionApplicationUkraineSchema: z.Schema<ImmersionApplicationDto
       message: "Votre adresse e-mail doit être différente de celle du tuteur",
       path: ["mentorEmail"],
     })
-    .refine(mustBeSignedByBeneficiaryBeforeReview, {
+    .refine(mustBeSignedByBeneficiary, {
       message: "La confirmation de votre accord est obligatoire.",
       path: ["beneficiaryAccepted"],
     })
-    .refine(mustBeSignedByEstablishmentBeforeReview, {
+    .refine(mustBeSignedByEstablishment, {
       message: "La confirmation de votre accord est obligatoire.",
       path: ["enterpriseAccepted"],
     });

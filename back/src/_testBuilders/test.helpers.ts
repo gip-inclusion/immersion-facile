@@ -69,7 +69,7 @@ export const expectArraysToEqual = <T>(actual: T[], expected: T[]) => {
 };
 
 export const expectTypeToMatchAndEqual = <T>(actual: T, expected: T) => {
-  expect(actual).toStrictEqual(expected);
+  expect(actual).toEqual(expected);
 };
 
 export const expectObjectsToMatch = <T extends Record<any, unknown>>(

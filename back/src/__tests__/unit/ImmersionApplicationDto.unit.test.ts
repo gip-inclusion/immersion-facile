@@ -5,8 +5,13 @@ import {
 } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { addDays } from "../../_testBuilders/test.helpers";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import {
+  ApplicationStatus,
+  ImmersionApplicationDto,
+  validApplicationStatus,
+} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
+import { splitCasesBetweenPassingAndFailing } from "./useCases/UpdateImmersionApplicationStatus.testHelpers";
 
 describe("immersionApplicationDtoSchema", () => {
   it("accepts valid immersionApplication", () => {
@@ -129,6 +134,36 @@ describe("immersionApplicationDtoSchema", () => {
       .build();
 
     expectImmersionApplicationDtoToBeValid(immersionApplication);
+  });
+
+  describe("status that are available without signatures", () => {
+    const [allowWithoutSignature, failingWithoutSignature] =
+      splitCasesBetweenPassingAndFailing<ApplicationStatus>(
+        validApplicationStatus,
+        ["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED", "REJECTED", "CANCELLED"],
+      );
+
+    it.each(allowWithoutSignature.map((status) => ({ status })))(
+      "WITHOUT signatures, a convention CAN be $status",
+      ({ status }) => {
+        const immersionApplication = new ImmersionApplicationDtoBuilder()
+          .withStatus(status)
+          .notSigned()
+          .build();
+        expectImmersionApplicationDtoToBeValid(immersionApplication);
+      },
+    );
+
+    it.each(failingWithoutSignature.map((status) => ({ status })))(
+      "WITHOUT signatures, a convention CANNOT be $status",
+      ({ status }) => {
+        const immersionApplication = new ImmersionApplicationDtoBuilder()
+          .withStatus(status)
+          .notSigned()
+          .build();
+        expectImmersionApplicationDtoToBeInvalid(immersionApplication);
+      },
+    );
   });
 });
 

@@ -20,7 +20,7 @@ export abstract class UseCase<
   ): Promise<Output> {
     let validParams: Input;
     try {
-      validParams = this.inputSchema.parse(params);
+      validParams = validateAndParseZodSchema(this.inputSchema, params);
     } catch (e) {
       throw new BadRequestError(e);
     }

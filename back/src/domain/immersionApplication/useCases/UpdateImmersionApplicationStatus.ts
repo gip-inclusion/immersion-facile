@@ -62,6 +62,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
         role,
         applicationId,
       );
+
     const updatedEntity = ImmersionApplicationEntity.create({
       ...immersionApplication.toDto(),
       ...(status === "REJECTED" && { rejectionJustification: justification }),

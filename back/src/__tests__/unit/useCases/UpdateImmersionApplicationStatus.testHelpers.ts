@@ -46,14 +46,19 @@ type ImmersionApplicationDomainTopic = ExtractFromDomainTopics<
 
 type SetupInitialStateParams = {
   initialStatus: ApplicationStatus;
+  alreadySigned?: boolean;
 };
 
 export const setupInitialState = async ({
   initialStatus,
+  alreadySigned = true,
 }: SetupInitialStateParams) => {
-  const originalImmersionApplication = new ImmersionApplicationDtoBuilder()
-    .withStatus(initialStatus)
-    .build();
+  const immersionBuilder = new ImmersionApplicationDtoBuilder().withStatus(
+    initialStatus,
+  );
+  const originalImmersionApplication = alreadySigned
+    ? immersionBuilder.build()
+    : immersionBuilder.notSigned().build();
 
   const immersionApplicationRepository =
     new InMemoryImmersionApplicationRepository();
@@ -231,7 +236,7 @@ const makeTestRejectsStatusUpdate =
     );
   };
 
-const splitCasesBetweenPassingAndFailing = <T>(
+export const splitCasesBetweenPassingAndFailing = <T>(
   cases: readonly T[],
   passing: readonly T[],
 ): [T[], T[]] => partition((status: T) => passing.includes(status), cases);

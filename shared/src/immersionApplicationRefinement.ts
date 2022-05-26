@@ -32,16 +32,17 @@ const statusesAllowedWithoutSign: ApplicationStatus[] = [
   "READY_TO_SIGN",
   "PARTIALLY_SIGNED",
   "REJECTED",
+  "CANCELLED",
 ];
 
-export const mustBeSignedByBeneficiaryBeforeReview = (params: {
+export const mustBeSignedByBeneficiary = (params: {
   beneficiaryAccepted: boolean;
   status: ApplicationStatus;
 }) =>
   statusesAllowedWithoutSign.includes(params.status) ||
   params.beneficiaryAccepted;
 
-export const mustBeSignedByEstablishmentBeforeReview = (params: {
+export const mustBeSignedByEstablishment = (params: {
   enterpriseAccepted: boolean;
   status: ApplicationStatus;
 }) =>

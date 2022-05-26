@@ -1,11 +1,12 @@
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
+import { validateAndParseZodSchema } from "../../../adapters/primary/helpers/httpErrors";
 
 export class ImmersionApplicationEntity {
   private constructor(public readonly properties: ImmersionApplicationDto) {}
 
   public static create(dto: ImmersionApplicationDto) {
-    const entity = immersionApplicationSchema.parse(dto);
+    const entity = validateAndParseZodSchema(immersionApplicationSchema, dto);
     return new ImmersionApplicationEntity(entity);
   }
 
