@@ -3,15 +3,15 @@ import {
   ListImmersionApplicationRequestDto,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { UseCase } from "../../core/UseCase";
-import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRepository";
 import { listImmersionApplicationRequestDtoSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
+import { ImmersionApplicationQueries } from "../ports/ImmersionApplicationQueries";
 
 export class ListImmersionApplication extends UseCase<
   ListImmersionApplicationRequestDto,
   ImmersionApplicationDto[]
 > {
   constructor(
-    private readonly immersionApplicationRepository: ImmersionApplicationRepository,
+    private readonly immersionApplicationQueries: ImmersionApplicationQueries,
   ) {
     super();
   }
@@ -22,8 +22,7 @@ export class ListImmersionApplication extends UseCase<
     status,
     agencyId,
   }: ListImmersionApplicationRequestDto) {
-    const entities =
-      await this.immersionApplicationRepository.getLatestUpdated();
+    const entities = await this.immersionApplicationQueries.getLatestUpdated();
     return entities
       .map((entity) => entity.toDto())
       .filter((dto) => !status || dto.status === status)

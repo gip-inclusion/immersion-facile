@@ -22,7 +22,6 @@ import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
 import { AgencyConfigBuilder } from "./AgencyConfigBuilder";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
-import { ImmersionApplicationExportQueries } from "../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
 import { EstablishmentExportQueries } from "../domain/establishment/ports/EstablishmentExportQueries";
 import { PostalCodeDepartmentRegionQueries } from "../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import {
@@ -32,6 +31,7 @@ import {
 import { InMemoryOutboxQueries } from "../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
+import { InMemoryImmersionApplicationQueries } from "../adapters/secondary/InMemoryImmersionApplicationQueries";
 
 export type InMemoryRepositories = {
   conventionPoleEmploiAdvisor: InMemoryConventionPoleEmploiAdvisorRepository;
@@ -41,6 +41,7 @@ export type InMemoryRepositories = {
   agency: InMemoryAgencyRepository;
   formEstablishment: InMemoryFormEstablishmentRepository;
   immersionApplication: InMemoryImmersionApplicationRepository;
+  immersionApplicationQueries: InMemoryImmersionApplicationQueries;
   searchesMade: InMemorySearchMadeRepository;
   rome: InMemoryRomeRepository;
   email: InMemoryEmailGateway;
@@ -49,7 +50,6 @@ export type InMemoryRepositories = {
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;
   passEmploiGateway: InMemoryPassEmploiGateway;
-  immersionApplicationExport: ImmersionApplicationExportQueries;
   establishmentExport: EstablishmentExportQueries;
   postalCodeDepartmentRegion: PostalCodeDepartmentRegionQueries;
   getApiConsumerById: GetApiConsumerById;

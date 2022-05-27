@@ -12,20 +12,6 @@ export class PgImmersionApplicationRepository
 {
   constructor(private client: PoolClient) {}
 
-  public async getLatestUpdated(): Promise<ImmersionApplicationEntity[]> {
-    const pgResult = await this.client.query(
-      `SELECT *, vad.*
-       FROM immersion_applications 
-       LEFT JOIN view_appellations_dto AS vad 
-         ON vad.appellation_code = immersion_applications.immersion_appellation
-       ORDER BY immersion_applications.updated_at DESC
-       LIMIT 10`,
-    );
-    return pgResult.rows.map((pgImmersionApplication) =>
-      this.pgToEntity(pgImmersionApplication),
-    );
-  }
-
   public async getById(
     applicationId: ImmersionApplicationId,
   ): Promise<ImmersionApplicationEntity | undefined> {
@@ -41,7 +27,7 @@ export class PgImmersionApplicationRepository
     const pgImmersionApplication = pgResult.rows[0];
     if (!pgImmersionApplication) return;
 
-    return this.pgToEntity(pgImmersionApplication);
+    return pgImmersionApplicationRowToEntity(pgImmersionApplication);
   }
 
   public async save(
@@ -80,45 +66,45 @@ export class PgImmersionApplicationRepository
     await this.client.query(query, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, workConditions]);
     return immersionApplicationEntity.id;
   }
-
-  pgToEntity(params: Record<any, any>): ImmersionApplicationEntity {
-    return ImmersionApplicationEntity.create({
-      id: params.id,
-      status: params.status,
-      email: params.email,
-      firstName: params.first_name,
-      lastName: params.last_name,
-      phone: optional(params.phone),
-      postalCode: optional(params.postal_code),
-      emergencyContact: optional(params.emergency_contact),
-      emergencyContactPhone: optional(params.emergency_contact_phone),
-      agencyId: params.agency_id,
-      dateSubmission: toDateString(params.date_submission),
-      dateStart: toDateString(params.date_start),
-      dateEnd: toDateString(params.date_end),
-      siret: params.siret,
-      businessName: params.business_name,
-      mentor: params.mentor,
-      mentorPhone: params.mentor_phone,
-      mentorEmail: params.mentor_email,
-      schedule: params.schedule,
-      workConditions: optional(params.work_conditions),
-      individualProtection: params.individual_protection,
-      sanitaryPrevention: params.sanitary_prevention,
-      // prettier-ignore
-      sanitaryPreventionDescription: optional(params.sanitary_prevention_description),
-      immersionAddress: optional(params.immersion_address),
-      immersionObjective: params.immersion_objective,
-      immersionAppellation: {
-        romeCode: params.rome_code,
-        romeLabel: params.rome_label,
-        appellationCode: params.appellation_code.toString(),
-        appellationLabel: params.appellation_label,
-      },
-      immersionActivities: params.immersion_activities,
-      immersionSkills: optional(params.immersion_skills),
-      beneficiaryAccepted: params.beneficiary_accepted,
-      enterpriseAccepted: params.enterprise_accepted,
-    });
-  }
 }
+
+export const pgImmersionApplicationRowToEntity = (
+  params: Record<any, any>,
+): ImmersionApplicationEntity => ImmersionApplicationEntity.create({
+    id: params.id,
+    status: params.status,
+    email: params.email,
+    firstName: params.first_name,
+    lastName: params.last_name,
+    phone: optional(params.phone),
+    postalCode: optional(params.postal_code),
+    emergencyContact: optional(params.emergency_contact),
+    emergencyContactPhone: optional(params.emergency_contact_phone),
+    agencyId: params.agency_id,
+    dateSubmission: toDateString(params.date_submission),
+    dateStart: toDateString(params.date_start),
+    dateEnd: toDateString(params.date_end),
+    siret: params.siret,
+    businessName: params.business_name,
+    mentor: params.mentor,
+    mentorPhone: params.mentor_phone,
+    mentorEmail: params.mentor_email,
+    schedule: params.schedule,
+    workConditions: optional(params.work_conditions),
+    individualProtection: params.individual_protection,
+    sanitaryPrevention: params.sanitary_prevention,
+    // prettier-ignore
+    sanitaryPreventionDescription: optional(params.sanitary_prevention_description),
+    immersionAddress: optional(params.immersion_address),
+    immersionObjective: params.immersion_objective,
+    immersionAppellation: {
+      romeCode: params.rome_code,
+      romeLabel: params.rome_label,
+      appellationCode: params.appellation_code.toString(),
+      appellationLabel: params.appellation_label,
+    },
+    immersionActivities: params.immersion_activities,
+    immersionSkills: optional(params.immersion_skills),
+    beneficiaryAccepted: params.beneficiary_accepted,
+    enterpriseAccepted: params.enterprise_accepted,
+  });

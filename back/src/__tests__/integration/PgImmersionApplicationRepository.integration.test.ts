@@ -26,6 +26,7 @@ describe("PgImmersionApplicationRepository", () => {
   });
 
   beforeEach(async () => {
+    await client.query("DELETE FROM immersion_assessments");
     await client.query("DELETE FROM immersion_applications");
     immersionApplicationRepository = new PgImmersionApplicationRepository(
       client,
@@ -57,29 +58,6 @@ describe("PgImmersionApplicationRepository", () => {
         immersionApplicationEntity.id,
       ),
     ).toEqual(immersionApplicationEntity);
-  });
-  it("Gets saved immersion", async () => {
-    const idA: ImmersionApplicationId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
-    const immersionApplicationEntityA = new ImmersionApplicationEntityBuilder()
-      .withId(idA)
-      .build();
-
-    const idB: ImmersionApplicationId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
-    const immersionApplicationEntityB = new ImmersionApplicationEntityBuilder()
-      .withId(idB)
-      .build();
-
-    await immersionApplicationRepository.save(immersionApplicationEntityA);
-    await immersionApplicationRepository.save(immersionApplicationEntityB);
-
-    const resultA = await immersionApplicationRepository.getById(idA);
-    expect(resultA).toEqual(immersionApplicationEntityA);
-
-    const resultAll = await immersionApplicationRepository.getLatestUpdated();
-    expect(resultAll).toEqual([
-      immersionApplicationEntityB,
-      immersionApplicationEntityA,
-    ]);
   });
 
   it("Updates an already saved immersion", async () => {

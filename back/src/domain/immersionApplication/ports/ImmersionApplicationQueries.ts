@@ -1,7 +1,9 @@
+import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRawBeforeExportVO } from "../valueObjects/ImmersionApplicationRawBeforeExportVO";
 
-export interface ImmersionApplicationExportQueries {
+export interface ImmersionApplicationQueries {
   getAllApplicationsForExport: () => Promise<
     ImmersionApplicationRawBeforeExportVO[]
   >;
+  getLatestUpdated: () => Promise<ImmersionApplicationEntity[]>;
 }

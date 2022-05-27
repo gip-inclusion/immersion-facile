@@ -21,6 +21,7 @@ import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyReposito
 import { InMemoryDocumentGateway } from "../../secondary/InMemoryDocumentGateway";
 import { InMemoryEmailGateway } from "../../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
+import { InMemoryImmersionApplicationQueries } from "../../secondary/InMemoryImmersionApplicationQueries";
 import { InMemoryImmersionApplicationRepository } from "../../secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryPeConnectGateway } from "../../secondary/InMemoryPeConnectGateway";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
@@ -34,7 +35,7 @@ import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgEstablishmentExportQueries } from "../../secondary/pg/PgEstablishmentExportQueries";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
-import { PgImmersionApplicationExportQueries } from "../../secondary/pg/PgImmersionApplicationExportQueries";
+import { PgImmersionApplicationQueries } from "../../secondary/pg/PgImmersionApplicationQueries";
 import { PgImmersionApplicationRepository } from "../../secondary/pg/PgImmersionApplicationRepository";
 import { PgLaBonneBoiteRequestRepository } from "../../secondary/pg/PgLaBonneBoiteRequestRepository";
 import { PgOutboxQueries } from "../../secondary/pg/PgOutboxQueries";
@@ -46,7 +47,6 @@ import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingG
 import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
 import { SendinblueEmailGateway } from "../../secondary/SendinblueEmailGateway";
 import { StubEstablishmentExportQueries } from "../../secondary/StubEstablishmentExportQueries";
-import { StubImmersionApplicationExportQueries } from "../../secondary/StubImmersionApplicationExportQueries";
 import { StubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";
 
@@ -97,16 +97,19 @@ export const createRepositories = async (
       ? new PgOutboxQueries(await getPgPoolFn().connect())
       : new InMemoryOutboxQueries(outboxRepo);
 
-  return {
-    immersionApplication:
-      config.repositories === "PG"
-        ? new PgImmersionApplicationRepository(await getPgPoolFn().connect())
-        : new InMemoryImmersionApplicationRepository(),
+  const immersionApplicationRepo =
+    config.repositories === "PG"
+      ? new PgImmersionApplicationRepository(await getPgPoolFn().connect())
+      : new InMemoryImmersionApplicationRepository();
 
-    immersionApplicationExport:
-      config.repositories === "PG"
-        ? new PgImmersionApplicationExportQueries(await getPgPoolFn().connect())
-        : StubImmersionApplicationExportQueries,
+  const immersionApplicationRepoQueries =
+    immersionApplicationRepo instanceof PgImmersionApplicationRepository
+      ? new PgImmersionApplicationQueries(await getPgPoolFn().connect())
+      : new InMemoryImmersionApplicationQueries(immersionApplicationRepo);
+
+  return {
+    immersionApplication: immersionApplicationRepo,
+    immersionApplicationQueries: immersionApplicationRepoQueries,
 
     establishmentExport:
       config.repositories === "PG"

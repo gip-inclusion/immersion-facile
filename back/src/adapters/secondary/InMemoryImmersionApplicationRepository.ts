@@ -8,7 +8,7 @@ const logger = createLogger(__filename);
 export class InMemoryImmersionApplicationRepository
   implements ImmersionApplicationRepository
 {
-  private _immersionApplications: Record<string, ImmersionApplicationEntity> =
+  public _immersionApplications: Record<string, ImmersionApplicationEntity> =
     {};
 
   public async save(
@@ -21,11 +21,6 @@ export class InMemoryImmersionApplicationRepository
     this._immersionApplications[immersionApplicationEntity.id] =
       immersionApplicationEntity;
     return immersionApplicationEntity.id;
-  }
-
-  public async getLatestUpdated() {
-    logger.info("getAll");
-    return Object.values(this._immersionApplications);
   }
 
   public async getById(id: ImmersionApplicationId) {

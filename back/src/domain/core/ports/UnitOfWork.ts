@@ -7,7 +7,7 @@ import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { GetFeatureFlags } from "./GetFeatureFlags";
 import { OutboxRepository } from "./OutboxRepository";
 import { ImmersionApplicationRepository } from "../../immersionApplication/ports/ImmersionApplicationRepository";
-import { ImmersionApplicationExportQueries } from "../../immersionApplication/ports/ImmersionApplicationExportQueries";
+import { ImmersionApplicationQueries } from "../../immersionApplication/ports/ImmersionApplicationQueries";
 import { EstablishmentExportQueries } from "../../establishment/ports/EstablishmentExportQueries";
 import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { OutboxQueries } from "./OutboxQueries";
@@ -24,7 +24,7 @@ export type UnitOfWork = {
   establishmentAggregateRepo: EstablishmentAggregateRepository;
   immersionApplicationRepo: ImmersionApplicationRepository;
   establishmentExportQueries: EstablishmentExportQueries;
-  immersionApplicationExportQueries: ImmersionApplicationExportQueries;
+  immersionApplicationQueries: ImmersionApplicationQueries;
   postalCodeDepartmentRegionQueries: PostalCodeDepartmentRegionQueries;
   reportingGateway: ReportingGateway;
   getFeatureFlags: GetFeatureFlags;

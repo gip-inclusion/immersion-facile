@@ -25,6 +25,7 @@ import {
   ImmersionApplicationId,
   validApplicationStatus,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";
 
 describe("Update immersionApplication", () => {
   let updateImmersionApplication: UpdateImmersionApplication;
@@ -79,7 +80,9 @@ describe("Update immersionApplication", () => {
       });
       expect(id).toEqual(updatedImmersionApplication.id);
 
-      const storedInRepo = await immersionApplicationRepo.getLatestUpdated();
+      const storedInRepo = await new InMemoryImmersionApplicationQueries(
+        immersionApplicationRepo,
+      ).getLatestUpdated();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
         updatedImmersionApplication,
       ]);

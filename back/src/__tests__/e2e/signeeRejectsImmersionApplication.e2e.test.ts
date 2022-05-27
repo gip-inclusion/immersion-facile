@@ -4,7 +4,6 @@ import {
   expectObjectsToMatch,
   expectJwtInMagicLinkAndGetIt,
 } from "../../_testBuilders/test.helpers";
-import { ImmersionApplicationRepository } from "../../domain/immersionApplication/ports/ImmersionApplicationRepository";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -14,6 +13,7 @@ import {
   immersionApplicationsRoute,
   updateApplicationStatusRoute,
 } from "shared/src/routes";
+import { ImmersionApplicationQueries } from "../../domain/immersionApplication/ports/ImmersionApplicationQueries";
 
 const adminEmail = "admin@email.fr";
 
@@ -48,7 +48,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     .expect(200);
 
   await expectStoreImmersionToHaveStatus(
-    reposAndGateways.immersionApplication,
+    reposAndGateways.immersionApplicationQueries,
     "READY_TO_SIGN",
   );
 
@@ -98,7 +98,7 @@ const expectEstablishmentRequiresChanges = async (
   ]);
 
   await expectStoreImmersionToHaveStatus(
-    reposAndGateways.immersionApplication,
+    reposAndGateways.immersionApplicationQueries,
     "DRAFT",
   );
 
@@ -119,10 +119,11 @@ const expectEstablishmentRequiresChanges = async (
 };
 
 const expectStoreImmersionToHaveStatus = async (
-  applicationRepo: ImmersionApplicationRepository,
+  applicationQueries: ImmersionApplicationQueries,
   expectedStatus: ApplicationStatus,
 ) => {
-  const savedImmersionApplications = await applicationRepo.getLatestUpdated();
+  const savedImmersionApplications =
+    await applicationQueries.getLatestUpdated();
   expect(savedImmersionApplications).toHaveLength(1);
   expectObjectsToMatch(savedImmersionApplications[0].toDto(), {
     status: expectedStatus,

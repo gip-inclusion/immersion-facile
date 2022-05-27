@@ -16,7 +16,7 @@ export class ExportImmersionApplicationsReport extends TransactionalUseCase<stri
     uow: UnitOfWork,
   ): Promise<void> {
     const report = pipeWithValue(
-      await uow.immersionApplicationExportQueries.getAllApplicationsForExport(),
+      await uow.immersionApplicationQueries.getAllApplicationsForExport(),
       map((immersionApplicationRawBeforeExportVO) =>
         immersionApplicationRawBeforeExportVO.toImmersionApplicationReadyForExportVO(),
       ),

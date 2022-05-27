@@ -5,6 +5,7 @@ import { AgencyId } from "shared/src/agency/agency.dto";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { validApplicationStatus } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";
 
 const agencyIds: AgencyId[] = [
   "11111111-1111-1111-1111-111111111111",
@@ -15,10 +16,12 @@ const agencyIds: AgencyId[] = [
 describe("List Immersion Applications", () => {
   let listImmersionApplication: ListImmersionApplication;
   let repository: InMemoryImmersionApplicationRepository;
+  let queries: InMemoryImmersionApplicationQueries;
 
   beforeEach(() => {
     repository = new InMemoryImmersionApplicationRepository();
-    listImmersionApplication = new ListImmersionApplication(repository);
+    queries = new InMemoryImmersionApplicationQueries(repository);
+    listImmersionApplication = new ListImmersionApplication(queries);
   });
 
   describe("When the repository is empty", () => {

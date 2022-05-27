@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
-import { PgImmersionApplicationExportQueries } from "../../adapters/secondary/pg/PgImmersionApplicationExportQueries";
+import { PgImmersionApplicationQueries } from "../../adapters/secondary/pg/PgImmersionApplicationQueries";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
@@ -8,11 +8,12 @@ import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationRawBeforeExportVO } from "../../domain/immersionApplication/valueObjects/ImmersionApplicationRawBeforeExportVO";
+import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 
-describe("Pg implementation of ImmersionApplicationExportQueries", () => {
+describe("Pg implementation of ImmersionApplicationQueries", () => {
   let pool: Pool;
   let client: PoolClient;
-  let exportQueries: PgImmersionApplicationExportQueries;
+  let immersionApplicationQueries: PgImmersionApplicationQueries;
   let agencyRepo: PgAgencyRepository;
   let immersionApplicationRepo: PgImmersionApplicationRepository;
 
@@ -22,9 +23,10 @@ describe("Pg implementation of ImmersionApplicationExportQueries", () => {
   });
 
   beforeEach(async () => {
+    await client.query("DELETE FROM immersion_assessments");
     await client.query("DELETE FROM immersion_applications");
     await client.query("DELETE FROM agencies");
-    exportQueries = new PgImmersionApplicationExportQueries(client);
+    immersionApplicationQueries = new PgImmersionApplicationQueries(client);
     agencyRepo = new PgAgencyRepository(client);
     immersionApplicationRepo = new PgImmersionApplicationRepository(client);
   });
@@ -61,7 +63,7 @@ describe("Pg implementation of ImmersionApplicationExportQueries", () => {
 
       // Act
       const actualExport: ImmersionApplicationRawBeforeExportVO[] =
-        await exportQueries.getAllApplicationsForExport();
+        await immersionApplicationQueries.getAllApplicationsForExport();
 
       const {
         agencyId,
@@ -88,6 +90,35 @@ describe("Pg implementation of ImmersionApplicationExportQueries", () => {
           dateSubmission: new Date("2021-01-10").toISOString(),
         })._props,
       );
+    });
+  });
+  describe("PG implementation of method getLatestUpdated", () => {
+    beforeEach(async () => {
+      const agencyRepository = new PgAgencyRepository(client);
+      await agencyRepository.insert(AgencyConfigBuilder.create().build());
+    });
+    it("Gets saved immersion", async () => {
+      const idA: ImmersionApplicationId =
+        "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
+      const immersionApplicationEntityA =
+        new ImmersionApplicationEntityBuilder().withId(idA).build();
+
+      const idB: ImmersionApplicationId =
+        "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+      const immersionApplicationEntityB =
+        new ImmersionApplicationEntityBuilder().withId(idB).build();
+
+      await immersionApplicationRepo.save(immersionApplicationEntityA);
+      await immersionApplicationRepo.save(immersionApplicationEntityB);
+
+      const resultA = await immersionApplicationRepo.getById(idA);
+      expect(resultA).toEqual(immersionApplicationEntityA);
+
+      const resultAll = await immersionApplicationQueries.getLatestUpdated();
+      expect(resultAll).toEqual([
+        immersionApplicationEntityB,
+        immersionApplicationEntityA,
+      ]);
     });
   });
 });

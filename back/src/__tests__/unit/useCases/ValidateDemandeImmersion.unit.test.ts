@@ -19,18 +19,21 @@ import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
+import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";
 
 describe("Validate immersionApplication", () => {
   let validateImmersionApplication: ValidateImmersionApplication;
   let outboxRepository: InMemoryOutboxRepository;
   let outboxQueries: InMemoryOutboxQueries;
   let repository: InMemoryImmersionApplicationRepository;
+  let queries: InMemoryImmersionApplicationQueries;
   let createNewEvent: CreateNewEvent;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
     repository = new InMemoryImmersionApplicationRepository();
+    queries = new InMemoryImmersionApplicationQueries(repository);
     outboxRepository = new InMemoryOutboxRepository();
     outboxQueries = new InMemoryOutboxQueries(outboxRepository);
     clock = new CustomClock();
@@ -69,7 +72,7 @@ describe("Validate immersionApplication", () => {
       });
       expect(id).toEqual(immersionApplicationEntity.id);
 
-      const storedInRepo = await repository.getLatestUpdated();
+      const storedInRepo = await queries.getLatestUpdated();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
         expectedImmersionApplication,
       ]);
@@ -92,7 +95,7 @@ describe("Validate immersionApplication", () => {
       );
 
       // And the immersion application is still DRAFT
-      const storedInRepo = await repository.getLatestUpdated();
+      const storedInRepo = await queries.getLatestUpdated();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
         immersionApplicationEntity.toDto(),
       ]);

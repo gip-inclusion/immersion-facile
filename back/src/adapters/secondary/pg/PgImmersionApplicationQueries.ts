@@ -1,10 +1,12 @@
 import { PoolClient } from "pg";
-import { ImmersionApplicationExportQueries } from "../../../domain/immersionApplication/ports/ImmersionApplicationExportQueries";
+import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+import { ImmersionApplicationQueries } from "../../../domain/immersionApplication/ports/ImmersionApplicationQueries";
 import { ImmersionApplicationRawBeforeExportVO } from "../../../domain/immersionApplication/valueObjects/ImmersionApplicationRawBeforeExportVO";
+import { pgImmersionApplicationRowToEntity } from "./PgImmersionApplicationRepository";
 import { optional } from "./pgUtils";
 
-export class PgImmersionApplicationExportQueries
-  implements ImmersionApplicationExportQueries
+export class PgImmersionApplicationQueries
+  implements ImmersionApplicationQueries
 {
   constructor(private client: PoolClient) {}
   public async getAllApplicationsForExport(): Promise<
@@ -43,6 +45,19 @@ export class PgImmersionApplicationExportQueries
           siret: row.siret,
           workConditions: optional(row.work_conditions),
         }),
+    );
+  }
+  public async getLatestUpdated(): Promise<ImmersionApplicationEntity[]> {
+    const pgResult = await this.client.query(
+      `SELECT *, vad.*
+       FROM immersion_applications 
+       LEFT JOIN view_appellations_dto AS vad 
+         ON vad.appellation_code = immersion_applications.immersion_appellation
+       ORDER BY immersion_applications.updated_at DESC
+       LIMIT 10`,
+    );
+    return pgResult.rows.map((pgImmersionApplication) =>
+      pgImmersionApplicationRowToEntity(pgImmersionApplication),
     );
   }
 }

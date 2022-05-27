@@ -99,7 +99,7 @@ export const createUseCases = (
         config.immersionFacileBaseUrl,
       ),
     listImmersionApplication: new ListImmersionApplication(
-      repositories.immersionApplication,
+      repositories.immersionApplicationQueries,
     ),
     exportImmersionApplicationsAsExcelArchive:
       new ExportImmersionApplicationsReport(uowPerformer),

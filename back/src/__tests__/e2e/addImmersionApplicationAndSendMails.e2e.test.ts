@@ -40,7 +40,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
     expectResponseBody(res, { id: validImmersionApplication.id });
     expect(
-      await reposAndGateways.immersionApplication.getLatestUpdated(),
+      await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
     ).toEqual([ImmersionApplicationEntity.create(validImmersionApplication)]);
     expectEventsInOutbox(reposAndGateways.outbox, [
       {
@@ -146,7 +146,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     .expect(200);
 
   expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.immersionApplication.getLatestUpdated(),
+    await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
     immersionApplication,
   );
 
@@ -189,7 +189,7 @@ const beneficiarySignsApplication = async (
   expect(response.status).toBe(200);
 
   expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.immersionApplication.getLatestUpdated(),
+    await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
     {
       ...initialImmersionApplication,
       status: "PARTIALLY_SIGNED",
@@ -220,7 +220,7 @@ const establishmentSignsApplication = async (
     .expect(200);
 
   expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.immersionApplication.getLatestUpdated(),
+    await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
     {
       ...initialImmersionApplication,
       status: "IN_REVIEW",
@@ -256,7 +256,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     .expect(200);
 
   expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.immersionApplication.getLatestUpdated(),
+    await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
     {
       ...initialImmersionApplication,
       status: "ACCEPTED_BY_VALIDATOR",

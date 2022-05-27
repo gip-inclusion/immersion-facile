@@ -22,6 +22,7 @@ import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { validApplicationStatus } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";
 
 describe("Add immersionApplication", () => {
   let addImmersionApplication: AddImmersionApplication;
@@ -72,7 +73,9 @@ describe("Add immersionApplication", () => {
       id: validImmersionApplication.id,
     });
 
-    const storedInRepo = await applicationRepository.getLatestUpdated();
+    const storedInRepo = await new InMemoryImmersionApplicationQueries(
+      applicationRepository,
+    ).getLatestUpdated();
     expect(storedInRepo).toHaveLength(1);
     expect(storedInRepo[0].toDto()).toEqual(validImmersionApplication);
     expectDomainEventsToBeInOutbox([
