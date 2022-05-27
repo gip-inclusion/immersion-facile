@@ -2,6 +2,7 @@ import { PoolClient } from "pg";
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationQueries } from "../../../domain/immersionApplication/ports/ImmersionApplicationQueries";
 import { ImmersionApplicationRawBeforeExportVO } from "../../../domain/immersionApplication/valueObjects/ImmersionApplicationRawBeforeExportVO";
+import { ImmersionAssessmentEmailParams } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { pgImmersionApplicationRowToEntity } from "./PgImmersionApplicationRepository";
 import { optional } from "./pgUtils";
 
@@ -59,5 +60,22 @@ export class PgImmersionApplicationQueries
     return pgResult.rows.map((pgImmersionApplication) =>
       pgImmersionApplicationRowToEntity(pgImmersionApplication),
     );
+  }
+  public async getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
+    dateEnd: Date,
+  ): Promise<ImmersionAssessmentEmailParams[]> {
+    const pgResult = await this.client.query(
+      `SELECT JSON_BUILD_OBJECT(
+              'immersionId', id, 
+              'beneficiaryFirstName', first_name, 
+              'beneficiaryLastName', last_name,
+              'mentorName', mentor, 
+              'mentorEmail', mentor_email) AS params
+       FROM immersion_applications 
+       WHERE date_end::date = $1
+       AND id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithImmersionAssessmentCreationLinkSent' )`,
+      [dateEnd],
+    );
+    return pgResult.rows.map((row) => row.params);
   }
 }

@@ -20,6 +20,11 @@ echo "Running $0 $@ (pwd: $(pwd))"
 #  pipeline in cron format. Default: daily at midnight.
 : "${ESTABLISHMENT_SUGGEST_FORM_EDITION:=0 0 * * *}"
 
+
+#  EMAIL_WITH_ASSESSMENT_CREATION_LINK (optional): The execution schedule for the establishment-backfill
+#  pipeline in cron format. Default: daily at midnight.
+: "${EMAIL_WITH_ASSESSMENT_CREATION_LINK:=0 0 * * *}"
+
 # Create logdir if it doesn't already exist.
 if [[ ! -d $LOGDIR ]]; then
   mkdir -p $LOGDIR && chmod 755 $LOGDIR
@@ -35,6 +40,9 @@ $ESTABLISHMENT_UPDATE_FROM_SIRENE cd /app && npm run start-update-establishments
 
 # Pipeline: trigger-suggest-edit-form-establishment-every-6-months
 $ESTABLISHMENT_SUGGEST_FORM_EDITION cd /app && npm run trigger-suggest-edit-form-establishment-every-6-months >> $LOGDIR/trigger-suggest-edit-form-establishment-every-6-months.log 2>&1
+
+# Pipeline: trigger-sending-emails-with-assessment-creation-link
+$EMAIL_WITH_ASSESSMENT_CREATION_LINK cd /app && npm run trigger-sending-emails-with-assessment-creation-link >> $LOGDIR/trigger-sending-emails-with-assessment-creation-link.log 2>&1
 
 EOT
 

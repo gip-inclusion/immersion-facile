@@ -1,3 +1,4 @@
+import { ImmersionAssessmentEmailParams } from "../../immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { ImmersionApplicationEntity } from "../entities/ImmersionApplicationEntity";
 import { ImmersionApplicationRawBeforeExportVO } from "../valueObjects/ImmersionApplicationRawBeforeExportVO";
 
@@ -6,4 +7,7 @@ export interface ImmersionApplicationQueries {
     ImmersionApplicationRawBeforeExportVO[]
   >;
   getLatestUpdated: () => Promise<ImmersionApplicationEntity[]>;
+  getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink: (
+    dateEnd: Date,
+  ) => Promise<ImmersionAssessmentEmailParams[]>;
 }

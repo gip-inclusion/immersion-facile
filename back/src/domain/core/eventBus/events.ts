@@ -1,5 +1,8 @@
 import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
-import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import {
+  EstablishmentJwtPayload,
+  ConventionJwtPayload,
+} from "shared/src/tokens/MagicLinkPayload";
 import { Flavor } from "shared/src/typeFlavors";
 import {
   ImmersionApplicationRequiresModificationPayload,
@@ -72,7 +75,9 @@ export type DomainEvent =
   | GenericEvent<"NewAgencyAdded", Agency>
 
   // IMMERSION ASSESSMENT related
-  | GenericEvent<"ImmersionAssessmentCreated", ImmersionAssessmentDto>;
+  | GenericEvent<"ImmersionAssessmentCreated", ImmersionAssessmentDto>
+  // prettier-ignore
+  | GenericEvent<"EmailWithImmersionAssessmentCreationLinkSent", ConventionJwtPayload>;
 
 export type DomainTopic = DomainEvent["topic"];
 

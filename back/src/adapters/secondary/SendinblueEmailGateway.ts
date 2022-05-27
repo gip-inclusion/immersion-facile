@@ -107,6 +107,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/26/message-setup
   SUGGEST_EDIT_FORM_ESTABLISHMENT: 26,
+
+  // https://my.sendinblue.com/camp/template/27/message-setup
+  CREATE_IMMERSION_ASSESSMENT: 27,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -121,6 +124,29 @@ export class SendinblueEmailGateway implements EmailGateway {
       apiKey,
     );
     return new SendinblueEmailGateway(apiInstance);
+  }
+
+  public async sendImmersionAssessmentCreationLink(
+    recipient: string,
+    params: {
+      beneficiaryFirstName: string;
+      beneficiaryLastName: string;
+      mentorName: string;
+      immersionAssessmentCreationLink: string;
+    },
+  ) {
+    await this.sendTransacEmail(
+      "CREATE_IMMERSION_ASSESSMENT",
+      [recipient],
+      {
+        BENIFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+        BENIFICIARY_LAST_NAME: params.beneficiaryLastName,
+        MENTOR_NAME: params.mentorName,
+        IMMERSION_ASSESSMENT_CREATION_LINK:
+          params.immersionAssessmentCreationLink,
+      },
+      [],
+    );
   }
 
   public async sendFormEstablishmentEditionSuggestion(

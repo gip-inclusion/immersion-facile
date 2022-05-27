@@ -11,6 +11,7 @@
     "free-quarantined-form-establishments-with-correct-siret": "ts-node src/adapters/primary/scripts/freeQuarantinedFormEstablishmentsWithCorrectSiret.ts",
     "transform-past-form-establishments-into-searchable-data": "ts-node src/adapters/primary/scripts/transformPastFormEstablishmentsIntoSearchableData.ts",
     "trigger-suggest-edit-form-establishment-every-6-months": "ts-node src/adapters/primary/scripts/triggerSuggestEditFormEstablishmentEvery6Months.ts",
+    "trigger-sending-emails-with-assessment-creation-link": "ts-node src/adapters/primary/scripts/triggerSendingEmailsWithAssessmentCreationLink.ts",
     "generate-api-key": "ts-node src/adapters/primary/scripts/generateApiKey.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts",
     "test:e2e": "jest --watchAll --testRegex=.e2e.test.ts",

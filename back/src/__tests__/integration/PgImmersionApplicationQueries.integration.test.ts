@@ -9,6 +9,11 @@ import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationRawBeforeExportVO } from "../../domain/immersionApplication/valueObjects/ImmersionApplicationRawBeforeExportVO";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
+import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
+import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
+import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
+import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 
 describe("Pg implementation of ImmersionApplicationQueries", () => {
   let pool: Pool;
@@ -118,6 +123,69 @@ describe("Pg implementation of ImmersionApplicationQueries", () => {
         immersionApplicationEntityB,
         immersionApplicationEntityA,
       ]);
+    });
+  });
+
+  describe("PG implementation of method getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink", () => {
+    beforeEach(async () => {
+      const agencyRepository = new PgAgencyRepository(client);
+      await agencyRepository.insert(AgencyBuilder.create().build());
+      await client.query("DELETE FROM outbox_failures");
+      await client.query("DELETE FROM outbox_publications");
+      await client.query("DELETE FROM outbox");
+    });
+    it("Gets all email params of immersion ending at given date that did not received any assessment link yet", async () => {
+      // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
+      const immersionApplicationRepo = new PgImmersionApplicationRepository(
+        client,
+      );
+      const outboxRepo = new PgOutboxRepository(client);
+      const immersionEndingThe14th = new ImmersionApplicationEntityBuilder()
+        .withId("aaaaac14-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+        .withDateStartAndDateEnd("2022-05-01", "2022-05-14")
+        .build();
+      const immersion1EndingThe15th = new ImmersionApplicationEntityBuilder()
+        .withId("aaaaac15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+        .withDateStartAndDateEnd("2022-05-01", "2022-05-15")
+        .build();
+      const immersion2EndingThe15th = new ImmersionApplicationEntityBuilder()
+        .withId("bbbbbc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+        .withDateStartAndDateEnd("2022-05-01", "2022-05-15")
+        .build();
+      await Promise.all(
+        [
+          immersionEndingThe14th,
+          immersion1EndingThe15th,
+          immersion2EndingThe15th,
+        ].map((params) => immersionApplicationRepo.save(params)),
+      );
+
+      const createNewEvent = makeCreateNewEvent({
+        clock: new RealClock(),
+        uuidGenerator: new UuidV4Generator(),
+      });
+      const eventEmailSentToImmersion1 = createNewEvent({
+        topic: "EmailWithImmersionAssessmentCreationLinkSent",
+        payload: { id: immersion1EndingThe15th.id, exp: 1, iat: 1, version: 1 },
+      });
+      await outboxRepo.save(eventEmailSentToImmersion1);
+
+      // Act
+      const queryResults =
+        await immersionApplicationQueries.getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
+          new Date("2022-05-15"),
+        );
+
+      // Assert
+      expect(queryResults).toHaveLength(1);
+      const expectedResult: ImmersionAssessmentEmailParams = {
+        immersionId: immersion2EndingThe15th.id,
+        mentorEmail: immersion2EndingThe15th.properties.mentorEmail,
+        mentorName: immersion2EndingThe15th.properties.mentor,
+        beneficiaryFirstName: immersion2EndingThe15th.properties.firstName,
+        beneficiaryLastName: immersion2EndingThe15th.properties.lastName,
+      };
+      expect(queryResults[0]).toEqual(expectedResult);
     });
   });
 });

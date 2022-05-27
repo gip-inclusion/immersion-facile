@@ -165,9 +165,19 @@ export type EmailType =
   | "CONTACT_IN_PERSON_INSTRUCTIONS"
   | "EDIT_FORM_ESTABLISHMENT_LINK"
   | "SUGGEST_EDIT_FORM_ESTABLISHMENT"
-  | "SHARE_DRAFT_APPLICATION_BY_LINK";
+  | "SHARE_DRAFT_APPLICATION_BY_LINK"
+  | "CREATE_IMMERSION_ASSESSMENT";
 
 export interface EmailGateway {
+  sendImmersionAssessmentCreationLink: (
+    recipient: string,
+    params: {
+      beneficiaryFirstName: string;
+      beneficiaryLastName: string;
+      mentorName: string;
+      immersionAssessmentCreationLink: string;
+    },
+  ) => Promise<void>;
   sendRequestedEditFormEstablishmentLink: (
     recipient: string,
     copy: string[],

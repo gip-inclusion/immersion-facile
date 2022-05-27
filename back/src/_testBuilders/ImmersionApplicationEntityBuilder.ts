@@ -76,6 +76,16 @@ export class ImmersionApplicationEntityBuilder
     );
   }
 
+  public withDateStartAndDateEnd(dateStart: string, dateEnd: string) {
+    return new ImmersionApplicationEntityBuilder(
+      ImmersionApplicationEntity.create({
+        ...this.entity.toDto(),
+        dateEnd,
+        dateStart,
+      }),
+    );
+  }
+
   public build() {
     return this.entity;
   }

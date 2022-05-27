@@ -1,6 +1,7 @@
 import { NotEmptyArray } from "../utils";
 import * as crypto from "crypto";
 import { SiretDto } from "../siret";
+import { ImmersionApplicationId } from "../ImmersionApplication/ImmersionApplication.dto";
 
 export type JwtPayloads = {
   application?: MagicLinkPayload;
@@ -52,7 +53,7 @@ export const createMagicLinkPayload = (
   nowFn = Date.now,
   iat: number = Math.round(nowFn() / 1000),
   exp: number = iat + durationDays * 24 * 3600,
-  version = currentJwtVersions.application
+  version = currentJwtVersions.application,
 ) => ({
   version,
   applicationId,
@@ -62,11 +63,18 @@ export const createMagicLinkPayload = (
   emailHash: emailHashForMagicLink(email),
 });
 
-export type EstablishmentJwtPayload = {
-  siret: string;
+type JwtPayload = {
   iat: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
   exp: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
   version: number;
+};
+
+export type EstablishmentJwtPayload = JwtPayload & {
+  siret: string;
+};
+
+export type ConventionJwtPayload = JwtPayload & {
+  id: ImmersionApplicationId;
 };
 
 export const createEstablishmentJwtPayload = ({
@@ -83,6 +91,26 @@ export const createEstablishmentJwtPayload = ({
 
   return {
     siret,
+    iat,
+    exp,
+    version: currentJwtVersions.establishment,
+  };
+};
+
+export const createConventionJwtPayload = ({
+  id,
+  durationDays,
+  now,
+}: {
+  id: ImmersionApplicationId;
+  durationDays: number;
+  now: Date;
+}): ConventionJwtPayload => {
+  const iat = Math.round(now.getTime() / 1000);
+  const exp = iat + durationDays * 24 * 3600;
+
+  return {
+    id,
     iat,
     exp,
     version: currentJwtVersions.establishment,
