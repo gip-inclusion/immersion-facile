@@ -48,6 +48,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.immersionApplicationsToSign}`,
   ),
+  immersionAssessment: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.immersionAssessment}`,
+  ),
   landingEstablishment: defineRoute("/accueil-etablissement"),
   renewMagicLink: defineRoute(
     {

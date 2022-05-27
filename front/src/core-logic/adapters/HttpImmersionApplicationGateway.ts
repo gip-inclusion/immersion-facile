@@ -23,12 +23,19 @@ import {
 } from "shared/src/routes";
 import { ShareLinkByEmailDTO } from "shared/src/ShareLinkByEmailDTO";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
+import { from, Observable } from "rxjs";
 
 const prefix = "api";
 
 export class HttpImmersionApplicationGateway
   implements ImmersionApplicationGateway
 {
+  retreiveFromToken(
+    payload: string,
+  ): Observable<ImmersionApplicationDto | undefined> {
+    return from(this.getMagicLink(payload));
+  }
+
   public async add(
     immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<string> {

@@ -16,6 +16,7 @@ import { ENV } from "src/environmentVariables";
 import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
 import { EstablishmentFormPage } from "../pages/Establishment/EstablishmentFormPage";
 import { HomePage } from "../pages/home/HomePage";
+import { ImmersionAssessmentPage } from "../pages/immersionAssessment/ImmersionAssessmentPage";
 import { useRoute } from "./routes";
 
 const { frontEnvType } = ENV;
@@ -66,6 +67,9 @@ export const Router = () => {
       )}
       {route.name === "immersionApplicationsToSign" && (
         <ImmersionApplicationSignPage route={route} />
+      )}
+      {route.name === "immersionAssessment" && (
+        <ImmersionAssessmentPage route={route} />
       )}
       {route.name === "renewMagicLink" && (
         <RenewExpiredLinkPage route={route} />

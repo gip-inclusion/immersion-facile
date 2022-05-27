@@ -11,12 +11,15 @@ import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { homeEstablishmentSlice } from "src/infra/gateway/EstablishmentUiGateway/homeEstablishmentSlice";
+import { immersionConventionEpics } from "../domain/immersionConvention/immersionConvention.epics";
+import { immersionConventionSlice } from "../domain/immersionConvention/immersionConvention.slice";
 
 const allEpics: any[] = [
   ...searchEpics,
   ...siretEpics,
   fetchFeatureFlagsEpic,
   romeAutocompleteEpic,
+  ...immersionConventionEpics,
 ];
 
 const rootEpic: Epic = (action$, store$, dependencies) =>
@@ -34,6 +37,7 @@ const rootReducer = combineReducers({
   [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
   [homeEstablishmentSlice.name]: homeEstablishmentSlice.reducer,
+  [immersionConventionSlice.name]: immersionConventionSlice.reducer,
 });
 
 export type StoreProps = {

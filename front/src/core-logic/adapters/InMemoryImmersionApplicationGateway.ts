@@ -12,11 +12,28 @@ import {
 import { ShareLinkByEmailDTO } from "shared/src/ShareLinkByEmailDTO";
 import { MagicLinkPayload, Role } from "shared/src/tokens/MagicLinkPayload";
 import { sleep } from "shared/src/utils";
+import { Observable, Subject, from } from "rxjs";
 
 export class InMemoryImmersionApplicationGateway
   implements ImmersionApplicationGateway
 {
+  private _immersionApplications: { [id: string]: ImmersionApplicationDto } =
+    {};
+  private _agencies: { [id: string]: AgencyInListDto } = {};
+
+  public immersionConvention$ = new Subject<
+    ImmersionApplicationDto | undefined
+  >();
+
   public constructor(private simulatedLatency?: number) {}
+
+  retreiveFromToken(
+    jwt: string,
+  ): Observable<ImmersionApplicationDto | undefined> {
+    return this.simulatedLatency
+      ? from(this.getMagicLink(jwt))
+      : this.immersionConvention$;
+  }
 
   public async add(
     immersionApplication: ImmersionApplicationDto,
@@ -36,7 +53,6 @@ export class InMemoryImmersionApplicationGateway
   // Same as GET above, but using a magic link
   public async getMagicLink(jwt: string): Promise<ImmersionApplicationDto> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
-
     const payload = decodeJwt<MagicLinkPayload>(jwt);
     return this._immersionApplications[payload.applicationId];
   }
@@ -130,8 +146,4 @@ export class InMemoryImmersionApplicationGateway
   ): Promise<boolean> {
     return true;
   }
-
-  private _immersionApplications: { [id: string]: ImmersionApplicationDto } =
-    {};
-  private _agencies: { [id: string]: AgencyInListDto } = {};
 }

@@ -42,7 +42,7 @@ export const establishmentGateway: EstablishmentGateway =
     : new HttpEstablishmentGateway();
 
 const inMemoryImmersionApplicationGateway =
-  new InMemoryImmersionApplicationGateway();
+  new InMemoryImmersionApplicationGateway(500);
 
 const getInMemorySiretGatewayThroughBack = () =>
   new InMemorySiretGatewayThroughBack({

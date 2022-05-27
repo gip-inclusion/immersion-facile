@@ -45,6 +45,7 @@ export const frontRoutes = {
   immersionApplicationsToValidate: "verification",
   immersionApplicationsToSign: "verifier-et-signer",
   immersionApplicationsRoute: "demande-immersion",
+  immersionAssessment: "bilan-immersion",
   editFormEstablishmentRoute: "edition-etablissement",
   magicLinkRenewal: "refraichir-lien",
 };
