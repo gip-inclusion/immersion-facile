@@ -7,6 +7,7 @@ import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { ExportEstablishmentsAsExcelArchive } from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
+import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
 import { LinkUserPeConnectAccount } from "../../../domain/generic/peConnect/useCases/linkUserPeConnectAccount";
 import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
 import { ExportImmersionApplicationsReport } from "../../../domain/immersionApplication/useCases/ExportImmersionApplicationsReport";
@@ -78,6 +79,7 @@ export const createUseCases = (
   const adresseAPI = new HttpAdresseAPI(noRateLimit, noRetries);
 
   return {
+    uploadFile: new UploadFile(uowPerformer, repositories.documentGateway),
     createImmersionAssessment: new CreateImmersionAssessment(
       uowPerformer,
       createNewEvent,

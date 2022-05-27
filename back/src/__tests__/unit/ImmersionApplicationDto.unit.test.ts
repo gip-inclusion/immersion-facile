@@ -4,17 +4,20 @@ import {
   ImmersionApplicationDtoBuilder,
 } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { addDays } from "../../_testBuilders/test.helpers";
+import {
+  addDays,
+  splitCasesBetweenPassingAndFailing,
+} from "../../_testBuilders/test.helpers";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
   validApplicationStatus,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
-import { splitCasesBetweenPassingAndFailing } from "./useCases/UpdateImmersionApplicationStatus.testHelpers";
 
 describe("immersionApplicationDtoSchema", () => {
   it("accepts valid immersionApplication", () => {
+    /**/
     const immersionApplication = new ImmersionApplicationDtoBuilder().build();
     expectImmersionApplicationDtoToBeValid(immersionApplication);
   });

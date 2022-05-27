@@ -18,6 +18,7 @@ import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/InMemo
 import { InMemorySearchMadeRepository } from "../../secondary/immersionOffer/InMemorySearchMadeRepository";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
+import { InMemoryDocumentGateway } from "../../secondary/InMemoryDocumentGateway";
 import { InMemoryEmailGateway } from "../../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionApplicationRepository } from "../../secondary/InMemoryImmersionApplicationRepository";
@@ -26,6 +27,7 @@ import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemorySireneGateway } from "../../secondary/InMemorySireneGateway";
 import { makeStubGetApiConsumerById } from "../../secondary/makeStubGetApiConsumerById";
 import { makeStubGetFeatureFlags } from "../../secondary/makeStubGetFeatureFlags";
+import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { makePgGetApiConsumerById } from "../../secondary/pg/makePgGetApiConsumerById";
 import { makePgGetFeatureFlags } from "../../secondary/pg/makePgGetFeatureFlags";
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
@@ -204,6 +206,11 @@ export const createRepositories = async (
       config.reporting === "EXCEL"
         ? new ExcelReportingGateway()
         : new InMemoryReportingGateway(),
+    documentGateway:
+      config.documentGateway === "MINIO"
+        ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          new MinioDocumentGateway(config.minioParams!)
+        : new InMemoryDocumentGateway(),
   };
 };
 

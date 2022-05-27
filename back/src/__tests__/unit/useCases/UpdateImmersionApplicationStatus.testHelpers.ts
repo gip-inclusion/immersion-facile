@@ -1,6 +1,8 @@
-import { partition } from "ramda";
 import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import {
+  expectPromiseToFailWithError,
+  splitCasesBetweenPassingAndFailing,
+} from "../../../_testBuilders/test.helpers";
 import {
   BadRequestError,
   ForbiddenError,
@@ -236,11 +238,6 @@ const makeTestRejectsStatusUpdate =
     );
   };
 
-export const splitCasesBetweenPassingAndFailing = <T>(
-  cases: readonly T[],
-  passing: readonly T[],
-): [T[], T[]] => partition((status: T) => passing.includes(status), cases);
-
 interface TestAllCaseProps {
   targetStatus: ApplicationStatus;
   expectedDomainTopic: ImmersionApplicationDomainTopic;
@@ -253,6 +250,7 @@ interface TestAllCaseProps {
 export const testForAllRolesAndInitialStatusCases = ({
   allowedRoles,
   expectedDomainTopic,
+
   updatedFields = {},
   justification,
   allowedInitialStatuses,

@@ -7,7 +7,7 @@ import {
   ProcessEnv,
   throwIfNotInArray,
 } from "shared/src/envHelpers";
-import { MinioParams } from "../secondary/MinioDocumentGateway";
+import type { MinioParams } from "../../secondary/MinioDocumentGateway";
 
 export type AccessTokenConfig = {
   clientId: string;

@@ -98,10 +98,4 @@ export const expectArraysToEqualIgnoringOrder = <T>(
 export const splitCasesBetweenPassingAndFailing = <T>(
   cases: readonly T[],
   passing: readonly T[],
-): [T[], T[]] => {
-  const [accepted, failing] = partition(
-    (status: T) => passing.includes(status),
-    cases,
-  );
-  return [accepted, failing];
-};
+): [T[], T[]] => partition((status: T) => passing.includes(status), cases);
