@@ -2,8 +2,8 @@ import { PoolClient } from "pg";
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { AssessmentStatus } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
-import { ImmersionAssessmentEntity } from "../../../domain/immersionAssessment/entities/ImmersionAssessmentEntity";
-import { ImmersionAssessmentRepository } from "../../../domain/immersionAssessment/ports/ImmersionAssessmentRepository";
+import { ImmersionAssessmentEntity } from "../../../domain/immersionOffer/entities/ImmersionAssessmentEntity";
+import { ImmersionAssessmentRepository } from "../../../domain/immersionOffer/ports/ImmersionAssessmentRepository";
 
 interface PgImmersionAssessment {
   convention_id: string;

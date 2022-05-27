@@ -1,6 +1,6 @@
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { ImmersionAssessmentEntity } from "../../domain/immersionAssessment/entities/ImmersionAssessmentEntity";
-import { ImmersionAssessmentRepository } from "../../domain/immersionAssessment/ports/ImmersionAssessmentRepository";
+import { ImmersionAssessmentEntity } from "../../domain/immersionOffer/entities/ImmersionAssessmentEntity";
+import { ImmersionAssessmentRepository } from "../../domain/immersionOffer/ports/ImmersionAssessmentRepository";
 
 export class InMemoryImmersionAssessmentRepository
   implements ImmersionAssessmentRepository

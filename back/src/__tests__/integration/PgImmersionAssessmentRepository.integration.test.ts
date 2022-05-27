@@ -10,7 +10,7 @@ import {
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
 import { PgImmersionAssessmentRepository } from "../../adapters/secondary/pg/PgImmersionAssessmentRepository";
-import { ImmersionAssessmentEntity } from "../../domain/immersionAssessment/entities/ImmersionAssessmentEntity";
+import { ImmersionAssessmentEntity } from "../../domain/immersionOffer/entities/ImmersionAssessmentEntity";
 
 const conventionId = "aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa";
 
