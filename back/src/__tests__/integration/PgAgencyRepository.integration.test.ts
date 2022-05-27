@@ -54,7 +54,6 @@ describe("PgAgencyRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM immersion_assessments");
     await client.query("DELETE FROM immersion_applications");
     await client.query("DELETE FROM agencies");
     agencyRepository = new PgAgencyRepository(client);

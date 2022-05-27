@@ -70,7 +70,8 @@ export class PgImmersionApplicationRepository
 
 export const pgImmersionApplicationRowToEntity = (
   params: Record<any, any>,
-): ImmersionApplicationEntity => ImmersionApplicationEntity.create({
+): ImmersionApplicationEntity =>
+  ImmersionApplicationEntity.create({
     id: params.id,
     status: params.status,
     email: params.email,

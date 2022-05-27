@@ -26,7 +26,6 @@ describe("PgImmersionApplicationRepository", () => {
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM immersion_assessments");
     await client.query("DELETE FROM immersion_applications");
     immersionApplicationRepository = new PgImmersionApplicationRepository(
       client,

@@ -23,7 +23,6 @@ describe("Pg implementation of ImmersionApplicationQueries", () => {
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM immersion_assessments");
     await client.query("DELETE FROM immersion_applications");
     await client.query("DELETE FROM agencies");
     immersionApplicationQueries = new PgImmersionApplicationQueries(client);
