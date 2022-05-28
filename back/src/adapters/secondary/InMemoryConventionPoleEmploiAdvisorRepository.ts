@@ -1,26 +1,11 @@
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import {
-  ConventionPoleEmploiUserAdvisorEntityClosed,
-  ConventionPoleEmploiUserAdvisorEntityOpen,
-} from "../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
 import { ConventionPoleEmploiAdvisorRepository } from "../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
-import { PeExternalId } from "../../domain/peConnect/port/PeConnectGateway";
+import {
+  ConventionPoleEmploiUserAdvisorEntity,
+  PeExternalId,
+  PoleEmploiUserAdvisorDTO,
+} from "../../domain/peConnect/dto/PeConnect.dto";
 import { NotFoundError } from "../primary/helpers/httpErrors";
-
-type ConventionPoleEmploiUserAdvisorEntity =
-  | ConventionPoleEmploiUserAdvisorEntityOpen
-  | ConventionPoleEmploiUserAdvisorEntityClosed;
-
-const matchPeExternalId =
-  (peExternalId: string) =>
-  (conventionPoleEmploiUserAdvisor: ConventionPoleEmploiUserAdvisorEntity) =>
-    conventionPoleEmploiUserAdvisor.userPeExternalId === peExternalId;
-const isEntity = (
-  e: ConventionPoleEmploiUserAdvisorEntityOpen | undefined,
-): e is ConventionPoleEmploiUserAdvisorEntityOpen => !!e;
-const isOpenEntity = (
-  entity: ConventionPoleEmploiUserAdvisorEntity & { conventionId?: string },
-) => entity.conventionId === null;
 
 export class InMemoryConventionPoleEmploiAdvisorRepository
   implements ConventionPoleEmploiAdvisorRepository
@@ -29,29 +14,44 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
     [];
 
   public async openSlotForNextConvention(
-    conventionPoleEmploiUserAdvisorEntity: ConventionPoleEmploiUserAdvisorEntityOpen,
+    conventionPoleEmploiUserAdvisorEntity: PoleEmploiUserAdvisorDTO,
   ): Promise<void> {
-    this._conventionPoleEmploiUsersAdvisors.push(
-      conventionPoleEmploiUserAdvisorEntity,
-    );
-  }
-
-  public async associateConventionAndUserAdvisor(
-    immersionApplicationId: ImmersionApplicationId,
-    peExternalId: PeExternalId,
-  ): Promise<void> {
-    const entity: ConventionPoleEmploiUserAdvisorEntityOpen =
-      await this.getAlreadyOpenIfExist(peExternalId);
-    this.upsertWithClosedConvention(entity, {
-      ...entity,
-      conventionId: immersionApplicationId,
+    this._conventionPoleEmploiUsersAdvisors.push({
+      ...conventionPoleEmploiUserAdvisorEntity,
+      conventionId: "",
     });
   }
 
+  public async associateConventionAndUserAdvisor(
+    conventionId: ImmersionApplicationId,
+    peExternalId: PeExternalId,
+  ): Promise<void> {
+    const entity: ConventionPoleEmploiUserAdvisorEntity =
+      await this.getAlreadyOpenIfExist(peExternalId);
+    this.upsertWithClosedConvention(entity, {
+      ...entity,
+      conventionId,
+    });
+  }
+
+  //test purposes only
+  public get conventionPoleEmploiUsersAdvisors() {
+    return this._conventionPoleEmploiUsersAdvisors;
+  }
+
+  private upsertWithClosedConvention = (
+    oldEntity: ConventionPoleEmploiUserAdvisorEntity,
+    newEntity: ConventionPoleEmploiUserAdvisorEntity,
+  ): void => {
+    this._conventionPoleEmploiUsersAdvisors[
+      this._conventionPoleEmploiUsersAdvisors.indexOf(oldEntity)
+    ] = newEntity;
+  };
+
   private async getAlreadyOpenIfExist(
     peExternalId: PeExternalId,
-  ): Promise<ConventionPoleEmploiUserAdvisorEntityOpen> {
-    const entity: ConventionPoleEmploiUserAdvisorEntityOpen | undefined =
+  ): Promise<ConventionPoleEmploiUserAdvisorEntity> {
+    const entity: ConventionPoleEmploiUserAdvisorEntity | undefined =
       this._conventionPoleEmploiUsersAdvisors
         .filter(matchPeExternalId(peExternalId))
         .find(isOpenEntity);
@@ -63,17 +63,16 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
 
     return entity;
   }
-
-  public get conventionPoleEmploiUsersAdvisors() {
-    return this._conventionPoleEmploiUsersAdvisors;
-  }
-
-  private upsertWithClosedConvention = (
-    oldEntity: ConventionPoleEmploiUserAdvisorEntityOpen,
-    newEntity: ConventionPoleEmploiUserAdvisorEntityClosed,
-  ): void => {
-    this._conventionPoleEmploiUsersAdvisors[
-      this._conventionPoleEmploiUsersAdvisors.indexOf(oldEntity)
-    ] = newEntity;
-  };
 }
+
+const matchPeExternalId =
+  (peExternalId: string) =>
+  (conventionPoleEmploiUserAdvisor: ConventionPoleEmploiUserAdvisorEntity) =>
+    conventionPoleEmploiUserAdvisor.userPeExternalId === peExternalId;
+
+const isEntity = (
+  e: PoleEmploiUserAdvisorDTO | undefined,
+): e is PoleEmploiUserAdvisorDTO => !!e;
+
+const isOpenEntity = (entity: ConventionPoleEmploiUserAdvisorEntity) =>
+  entity.conventionId === "";

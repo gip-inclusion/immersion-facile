@@ -1,5 +1,3 @@
-// // eslint-disable-next-line @typescript-eslint/no-namespace
-
 declare namespace Express {
   type JwtPayloads = import("shared/src/tokens/MagicLinkPayload").JwtPayloads;
   type ApiConsumer =

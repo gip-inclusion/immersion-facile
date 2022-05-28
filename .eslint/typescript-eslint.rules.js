@@ -1,10 +1,16 @@
 module.exports = {
-  //actual config from legacy eslint
   "@typescript-eslint/explicit-function-return-type": "off",
   "@typescript-eslint/explicit-module-boundary-types": "off",
   "@typescript-eslint/no-explicit-any": "off",
-
-  //added from here
+  "@typescript-eslint/no-floating-promises": [
+    "error",
+    {
+      ignoreVoid: false,
+      ignoreIIFE: false,
+    },
+  ],
+  "@typescript-eslint/no-namespace": "off",
+  "@typescript-eslint/no-non-null-assertion": "error",
   "@typescript-eslint/no-unused-vars": [
     "error",
     {
@@ -17,16 +23,9 @@ module.exports = {
       ignoreRestSiblings: true,
     },
   ],
-  "@typescript-eslint/no-non-null-assertion": "error",
+
   "@typescript-eslint/require-await": "error",
   "@typescript-eslint/return-await": "error",
-  "@typescript-eslint/no-floating-promises": [
-    "error",
-    {
-      ignoreVoid: false,
-      ignoreIIFE: false,
-    },
-  ],
 };
 
 const toAddBitsByBits = {

@@ -1,16 +1,12 @@
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { ConventionPoleEmploiUserAdvisorEntityOpen } from "../entities/ConventionPoleEmploiAdvisorEntity";
-import { PeExternalId } from "./PeConnectGateway";
+import { PeExternalId, PoleEmploiUserAdvisorDTO } from "../dto/PeConnect.dto";
 
 export interface ConventionPoleEmploiAdvisorRepository {
   openSlotForNextConvention: (
-    advisor: ConventionPoleEmploiUserAdvisorEntityOpen,
+    advisor: PoleEmploiUserAdvisorDTO,
   ) => Promise<void>;
   associateConventionAndUserAdvisor: (
-    immersionApplicationId: ImmersionApplicationId,
-    peExternalId: PeExternalId,
+    conventionId: ImmersionApplicationId,
+    userPeExternalId: PeExternalId,
   ) => Promise<void>;
-  /*getAlreadyOpenIfExist: (
-    peExternalId: PeExternalId,
-  ) => Promise<ConventionPoleEmploiUserAdvisorEntityOpen>;*/
 }

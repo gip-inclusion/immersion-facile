@@ -3,22 +3,17 @@ import { frontRoutes } from "shared/src/routes";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
 import { z } from "../../../../node_modules/zod";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { ConventionPoleEmploiAdvisorEntity } from "../entities/ConventionPoleEmploiAdvisorEntity";
 import {
-  ConventionPoleEmploiAdvisorEntity,
-  ConventionPoleEmploiUserAdvisorEntityOpen,
+  ConventionPeConnectFields,
+  toPartialConventionDto,
   PoleEmploiUserAdvisorDTO,
-} from "../entities/ConventionPoleEmploiAdvisorEntity";
-import {
-  ImmersionApplicationPeConnectFields,
-  PeConnectGateway,
-  peConnectUserInfoToImmersionApplicationDto,
-} from "../port/PeConnectGateway";
+} from "../dto/PeConnect.dto";
+import { PeConnectGateway } from "../port/PeConnectGateway";
 
 export type LinkPoleEmploiAdvisorAndRedirectToConventionDepedencies = {
   uowPerformer: UnitOfWorkPerformer;
-  uuidGenerator: UuidGenerator;
   peConnectGateway: PeConnectGateway;
   baseUrlForRedirect: AbsoluteUrl;
 };
@@ -29,7 +24,6 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
 > {
   inputSchema = z.string();
 
-  private readonly uuidGenerator: UuidGenerator;
   private readonly peConnectGateway: PeConnectGateway;
   private readonly baseUrlForRedirect: AbsoluteUrl;
 
@@ -37,7 +31,6 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     dependencies: LinkPoleEmploiAdvisorAndRedirectToConventionDepedencies,
   ) {
     super(dependencies.uowPerformer);
-    this.uuidGenerator = dependencies.uuidGenerator;
     this.peConnectGateway = dependencies.peConnectGateway;
     this.baseUrlForRedirect = dependencies.baseUrlForRedirect;
   }
@@ -56,22 +49,13 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
       });
 
     await uow.conventionPoleEmploiAdvisorRepo.openSlotForNextConvention(
-      toOpenedEntity(this.uuidGenerator, poleEmploiUserAdvisor),
+      poleEmploiUserAdvisor,
     );
 
-    const peQueryParams =
-      queryParamsAsString<ImmersionApplicationPeConnectFields>(
-        peConnectUserInfoToImmersionApplicationDto(user),
-      );
+    const peQueryParams = queryParamsAsString<ConventionPeConnectFields>(
+      toPartialConventionDto(user),
+    );
 
     return `${this.baseUrlForRedirect}/${frontRoutes.immersionApplicationsRoute}?${peQueryParams}`;
   }
 }
-
-const toOpenedEntity = (
-  uuidGenerator: UuidGenerator,
-  poleEmploiUserAdvisor: PoleEmploiUserAdvisorDTO,
-): ConventionPoleEmploiUserAdvisorEntityOpen => ({
-  ...poleEmploiUserAdvisor,
-  id: uuidGenerator.new(),
-});

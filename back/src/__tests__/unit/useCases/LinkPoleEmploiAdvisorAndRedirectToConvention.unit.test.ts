@@ -1,14 +1,13 @@
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryPeConnectGateway } from "../../../adapters/secondary/InMemoryPeConnectGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ConventionPoleEmploiUserAdvisorEntityOpen } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
 import {
+  ConventionPoleEmploiUserAdvisorEntity,
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
-} from "../../../domain/peConnect/port/PeConnectGateway";
+} from "../../../domain/peConnect/dto/PeConnect.dto";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 
 describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
@@ -18,8 +17,8 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   let conventionPoleEmploiAdvisorRepo: InMemoryConventionPoleEmploiAdvisorRepository;
 
   const baseurl = "https://plop";
-  const conventionPoleEmploiUserAdvisorEntityUuid =
-    "aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa";
+  const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
+  const emptyConventionId = "";
 
   beforeEach(() => {
     const uow = createInMemoryUow();
@@ -27,14 +26,11 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
     uowPerformer = new InMemoryUowPerformer({
       ...uow,
     });
-    peConnectGateway = new InMemoryPeConnectGateway("https://plop");
+    peConnectGateway = new InMemoryPeConnectGateway(baseurl);
 
-    const uuidGenerator = new TestUuidGenerator();
-    uuidGenerator.setNextUuid(conventionPoleEmploiUserAdvisorEntityUuid);
     linkPoleEmploiAdvisorAndRedirectToConvention =
       new LinkPoleEmploiAdvisorAndRedirectToConvention({
         uowPerformer,
-        uuidGenerator,
         peConnectGateway,
         baseUrlForRedirect: baseurl,
       });
@@ -49,13 +45,13 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       ]);
       const authorizationCode = "123";
 
-      const expectedConventionPoleEmploiAdvisorEntity: ConventionPoleEmploiUserAdvisorEntityOpen =
+      const expectedConventionPoleEmploiAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity =
         {
-          id: conventionPoleEmploiUserAdvisorEntityUuid,
+          conventionId: emptyConventionId,
           email: "jane.smith@pole-emploi.net",
           firstName: "Jane",
           lastName: "Smith",
-          userPeExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
+          userPeExternalId,
           type: "PLACEMENT",
         };
 
@@ -82,13 +78,13 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       ]);
       const authorizationCode = "123";
 
-      const expectedConventionPoleEmploiAdvisorEntity: ConventionPoleEmploiUserAdvisorEntityOpen =
+      const expectedConventionPoleEmploiAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity =
         {
-          id: conventionPoleEmploiUserAdvisorEntityUuid,
+          conventionId: emptyConventionId,
           email: "jane.smith@pole-emploi.net",
           firstName: "Jane",
           lastName: "Smith",
-          userPeExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
+          userPeExternalId,
           type: "PLACEMENT",
         };
 
@@ -104,6 +100,40 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       expectTypeToMatchAndEqual(
         conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors[0],
         expectedConventionPoleEmploiAdvisorEntity,
+      );
+    });
+
+    it("should prefer to have a CAPEMPLOI if user have both PLACEMENT and CAPEMPLOI advisors", async () => {
+      peConnectGateway.setUser(peUser);
+      peConnectGateway.setAdvisors([
+        peIndemnisationAdvisor,
+        pePlacementAdvisor,
+        peCapemploiAdvisor,
+      ]);
+      const authorizationCode = "123";
+
+      const expectedConventionPoleEmploiUserAdvisor: ConventionPoleEmploiUserAdvisorEntity =
+        {
+          conventionId: emptyConventionId,
+          email: "elsa.oldenburg@pole-emploi.net",
+          firstName: "Elsa",
+          lastName: "Oldenburg",
+          userPeExternalId,
+          type: "CAPEMPLOI",
+        };
+
+      const urlWithQueryParams =
+        await linkPoleEmploiAdvisorAndRedirectToConvention.execute(
+          authorizationCode,
+        );
+
+      expect(urlWithQueryParams).toBe(
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe`,
+      );
+
+      expectTypeToMatchAndEqual(
+        conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors[0],
+        expectedConventionPoleEmploiUserAdvisor,
       );
     });
   });
@@ -132,4 +162,12 @@ const peIndemnisationAdvisor: ExternalPeConnectAdvisor = {
   nom: "Dupont",
   prenom: "Jean",
   type: "INDEMNISATION",
+};
+
+const peCapemploiAdvisor: ExternalPeConnectAdvisor = {
+  civilite: "0",
+  mail: "elsa.oldenburg@pole-emploi.net",
+  nom: "Oldenburg",
+  prenom: "Elsa",
+  type: "CAPEMPLOI",
 };

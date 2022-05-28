@@ -95,7 +95,6 @@ export const createUseCases = (
     linkPoleEmploiAdvisorAndRedirectToConvention:
       new LinkPoleEmploiAdvisorAndRedirectToConvention({
         uowPerformer,
-        uuidGenerator,
         peConnectGateway: repositories.peConnectGateway,
         baseUrlForRedirect: config.immersionFacileBaseUrl,
       }),

@@ -8,19 +8,19 @@ import supertest, { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { createApp } from "../../adapters/primary/server";
 import {
-  AccessToken,
+  AccessTokenDto,
   ExternalAccessToken,
-  externalAccessTokenSchema,
-  PeConnectOAuthGetTokenWithCodeGrantPayload,
   toAccessToken,
-} from "../../domain/peConnect/port/PeConnectGateway";
+} from "../../domain/peConnect/dto/AccessToken.dto";
+import { ExternalPeConnectOAuthGetTokenWithCodeGrantPayload } from "../../domain/peConnect/dto/PeConnect.dto";
+import { externalAccessTokenSchema } from "../../domain/peConnect/port/PeConnect.schema";
 import {
   createAxiosInstance,
   PrettyAxiosResponseError,
 } from "../../utils/axiosUtils";
 
 const mockedBehavioursWithInvalidSchemaError =
-  () => async (): Promise<AccessToken> => {
+  () => async (): Promise<AccessTokenDto> => {
     const invalidTokenData: ExternalAccessToken = {
       access_token: "A token value",
       expires_in: -1,
@@ -37,18 +37,19 @@ const mockedBehavioursWithInvalidSchemaError =
 
 const mockedBehavioursWithHttpError =
   () => async (authorization_code: string) => {
-    const getAccessTokenPayload: PeConnectOAuthGetTokenWithCodeGrantPayload = {
-      grant_type: "authorization_code",
-      code: authorization_code,
-      client_id: "BLIP",
-      client_secret: "BLOP",
-      redirect_uri: "https://immersion-facile.beta.gouv.fr/api/pe-connect",
-    };
+    const getAccessTokenPayload: ExternalPeConnectOAuthGetTokenWithCodeGrantPayload =
+      {
+        grant_type: "authorization_code",
+        code: authorization_code,
+        client_id: "BLIP",
+        client_secret: "BLOP",
+        redirect_uri: "https://immersion-facile.beta.gouv.fr/api/pe-connect",
+      };
 
     const response = await createAxiosInstance()
       .post(
         "https://authentification-candidat.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Findividu",
-        queryParamsAsString<PeConnectOAuthGetTokenWithCodeGrantPayload>(
+        queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
           getAccessTokenPayload,
         ),
         {
