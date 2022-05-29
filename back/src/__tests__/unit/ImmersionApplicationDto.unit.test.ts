@@ -22,12 +22,12 @@ describe("immersionApplicationDtoSchema", () => {
     expectImmersionApplicationDtoToBeValid(immersionApplication);
   });
 
-  it("ignores accents and case on emails", () => {
+  it("ignores accents on emails", () => {
     const immersionApplication = new ImmersionApplicationEntityBuilder()
       .withEmail("Jérôme_Truc@associés.fr")
       .build();
 
-    expect(immersionApplication.toDto().email).toBe("jerome_truc@associes.fr");
+    expect(immersionApplication.toDto().email).toBe("Jerome_Truc@associes.fr");
   });
 
   it("rejects equal applicant and mentor emails", () => {

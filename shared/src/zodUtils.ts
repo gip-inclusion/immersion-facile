@@ -12,12 +12,11 @@ export const zTrimmedString = zString
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, "Obligatoire");
 
-const toLowerCase = (str: string) => str.toLowerCase();
 const removeAccents = (str: string) =>
   str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
 export const zEmail = z.preprocess(
-  pipe(zString.parse, removeAccents, toLowerCase),
+  pipe(zString.parse, removeAccents),
   z.string().email("Veuillez saisir une adresse e-mail valide"),
 );
 

@@ -1,11 +1,12 @@
 import { Logger } from "pino";
+import { toLower } from "ramda";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 
 export class AllowListEmailFilter implements EmailFilter {
   private readonly allowedEmails: Set<string>;
 
   constructor(allowedEmailList: string[]) {
-    this.allowedEmails = new Set(allowedEmailList);
+    this.allowedEmails = new Set(allowedEmailList.map(toLower));
   }
 
   public async withAllowedRecipients(
@@ -14,7 +15,7 @@ export class AllowListEmailFilter implements EmailFilter {
     logger: Logger,
   ): Promise<void> {
     const allowedRecipients = recipients.filter((email) => {
-      if (this.allowedEmails.has(email)) {
+      if (this.allowedEmails.has(email.toLowerCase())) {
         return true;
       } else {
         logger.info(`Skipped sending email to: ${email}`);

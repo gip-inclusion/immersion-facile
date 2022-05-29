@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import { trim } from "ramda";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import {
@@ -279,4 +280,7 @@ const parseInteger = (str: string | undefined, defaultValue: number): number =>
 
 // Format: <string>,<string>,...
 const parseStringList = (str: string | undefined, separator = ","): string[] =>
-  (str || "").split(separator).filter((el) => !!el);
+  (str || "")
+    .split(separator)
+    .map(trim)
+    .filter((el) => !!el);

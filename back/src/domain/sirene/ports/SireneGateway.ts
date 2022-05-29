@@ -32,7 +32,7 @@ export abstract class SireneGateway {
     return this._get(siret, includeClosedEstablishments).catch((error) => {
       const serviceName = "Sirene API";
       logger.error({ siret, error }, "Error fetching siret");
-      if (error.initialError.status === 429)
+      if (error?.initialError?.status === 429)
         throw new TooManyRequestApiError(serviceName);
       throw new UnavailableApiError(serviceName);
     });
