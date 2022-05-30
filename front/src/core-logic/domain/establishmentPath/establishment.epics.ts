@@ -1,5 +1,9 @@
-import { filter, map, switchMap } from "rxjs";
+import { filter, map, switchMap, tap } from "rxjs";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import {
+  SiretAction,
+  siretSlice,
+} from "src/core-logic/domain/siret/siret.slice";
 import {
   ActionOfSlice,
   AppEpic,
@@ -22,4 +26,25 @@ const requestEstablishmentModification: AppEpic<EstablishmentAction> = (
     map(establishmentSlice.actions.sendModificationLinkSucceeded),
   );
 
-export const establishmentEpics = [requestEstablishmentModification];
+const redirectToEstablishmentFormPageEpic: AppEpic<
+  EstablishmentAction | SiretAction
+> = (action$, state$, { navigationGateway }) =>
+  action$.pipe(
+    filter(siretSlice.actions.siretInfoSucceeded.match),
+    filter(
+      () =>
+        state$.value.establishment.status ===
+        "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
+    ),
+    tap((action) => {
+      if (typeof action.payload !== "string") {
+        navigationGateway.navigateToEstablishmentForm(action.payload.siret);
+      }
+    }),
+    map(() => establishmentSlice.actions.navigatedAwayFromHome()),
+  );
+
+export const establishmentEpics = [
+  requestEstablishmentModification,
+  redirectToEstablishmentFormPageEpic,
+];

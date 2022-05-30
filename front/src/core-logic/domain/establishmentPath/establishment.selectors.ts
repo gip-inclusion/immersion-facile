@@ -1,5 +1,9 @@
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-export const modifyEstablishmentLinkSentSelector = createRootSelector(
-  (state) => state.establishment.linkSent,
+const wasModifyLinkSentSelector = createRootSelector(
+  (state) => state.establishment.status === "LINK_SENT",
 );
+
+export const establishmentSelectors = {
+  wasModifyLinkSent: wasModifyLinkSentSelector,
+};

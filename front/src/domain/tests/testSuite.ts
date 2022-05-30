@@ -1,5 +1,5 @@
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
-import { InMemoryEstablishmentUiGateway } from "src/infra/gateway/EstablishmentUiGateway/InMemoryEstablishmentUiGateway";
+import { InMemoryNavigationGateway } from "src/core-logic/adapters/InMemoryNavigationGateway";
 import { InMemoryEstablishmentGateway } from "../../core-logic/adapters/InMemoryEstablishmentGateway";
 import { ApplicationPrimaryController } from "../../core-logic/ports/primaryController/ApplicationPrimaryController";
 import {
@@ -20,7 +20,7 @@ function makeAcceptanceTestApplication() {
       siretGatewayThroughBack: dependencies.siretGatewayThroughBack,
       establishments: new InMemoryEstablishmentGateway(),
       event: new InMemoryEventGateway(primaryController),
-      navigation: new InMemoryEstablishmentUiGateway(),
+      navigation: new InMemoryNavigationGateway(),
     },
     repositories: {},
     primaryController,

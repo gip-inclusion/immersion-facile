@@ -1,4 +1,4 @@
-import { expectObjectToMatch } from "shared/src/expectToEqual";
+import { expectObjectsToMatch } from "shared/src/expectToEqual";
 import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import {
@@ -73,7 +73,7 @@ describe("Immersion Application slice", () => {
   const expectImmersionConventionState = (
     immersionConventionState: Partial<ImmersionConventionState>,
   ) => {
-    expectObjectToMatch(
+    expectObjectsToMatch(
       store.getState().immersionConvention,
       immersionConventionState,
     );

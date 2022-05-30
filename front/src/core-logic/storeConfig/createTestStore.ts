@@ -7,6 +7,7 @@ import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemory
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
+import { InMemoryNavigationGateway } from "src/core-logic/adapters/InMemoryNavigationGateway";
 import { InMemorySiretGatewayThroughBack } from "../adapters/InMemorySiretGatewayThroughBack";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 
@@ -22,6 +23,7 @@ export interface TestDependencies {
   romeAutocompleteGateway: InMemoryRomeAutocompleteGateway;
   minSearchResultsToPreventRefetch: number;
   scheduler: VirtualTimeScheduler;
+  navigationGateway: InMemoryNavigationGateway;
 }
 
 export const createTestStore = (
@@ -40,6 +42,7 @@ export const createTestStore = (
     agencyGateway: new InMemoryAgencyGateway(),
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),
     scheduler: new VirtualTimeScheduler(),
+    navigationGateway: new InMemoryNavigationGateway(),
   };
 
   preloadedState &&

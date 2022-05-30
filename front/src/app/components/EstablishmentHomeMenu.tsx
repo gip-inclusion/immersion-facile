@@ -1,9 +1,9 @@
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import React, { useState } from "react";
-import { useSiretFetcher } from "src/app/utils/fetchEstablishmentInfoBySiret";
-import { modifyEstablishmentLinkSentSelector } from "src/core-logic/domain/establishmentPath/establishment.selectors";
+import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { isSiretAlreadySavedSelector } from "src/core-logic/domain/siret/siret.selectors";
 import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
+import { useSiretFetcher } from "src/hooks/siret.hooks";
 import { HomeButton } from "src/uiComponents/Button";
 import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 import { Link } from "src/uiComponents/Link";
@@ -18,7 +18,9 @@ export const EstablishmentHomeMenu = () => {
   });
   const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
   const isSiretAlreadySaved = useAppSelector(isSiretAlreadySavedSelector);
-  const modifyLinkWasSent = useAppSelector(modifyEstablishmentLinkSentSelector);
+  const modifyLinkWasSent = useAppSelector(
+    establishmentSelectors.wasModifyLinkSent,
+  );
 
   const [startEstablishmentPath, startEstablishmentPathUpdate] =
     useState<boolean>(false);

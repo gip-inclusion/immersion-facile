@@ -1,4 +1,6 @@
 import { expectObjectsToMatch } from "shared/src/expectToEqual";
+import { GetSiretResponseDto, SiretDto } from "shared/src/siret";
+import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import {
   createTestStore,
@@ -16,8 +18,42 @@ describe("Establishment", () => {
     ({ store, dependencies } = storeAndDeps);
   });
 
+  it("reflects when user wants to input siret", () => {
+    store.dispatch(establishmentSlice.actions.gotReady());
+    expectEstablishmentStateToMatch({
+      status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
+    });
+  });
+
+  it("does not trigger navigation when siret is requested if status is not 'READY_FOR_LINK_REQUEST_OR_REDIRECTION'", () => {
+    store.dispatch(
+      siretSlice.actions.siretInfoSucceeded({
+        siret: "123",
+      } as GetSiretResponseDto),
+    );
+    expectNavigationToEstablishmentFormPageToHaveBeenTriggered(null);
+  });
+
+  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION'", () => {
+    ({ store, dependencies } = createTestStore(
+      {
+        establishment: {
+          status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
+          isLoading: false,
+        },
+      },
+      "skip",
+    ));
+    store.dispatch(
+      siretSlice.actions.siretInfoSucceeded({
+        siret: "123",
+      } as GetSiretResponseDto),
+    );
+    expectNavigationToEstablishmentFormPageToHaveBeenTriggered("123");
+  });
+
   it("send modification link", () => {
-    expectEstablishmentStateToMatch({ isLoading: false, linkSent: false });
+    expectEstablishmentStateToMatch({ isLoading: false, status: "IDLE" });
     store.dispatch(
       establishmentSlice.actions.sendModificationLinkRequested("siret-123"),
     );
@@ -25,21 +61,41 @@ describe("Establishment", () => {
     dependencies.establishmentGateway.establishmentModificationResponse$.next(
       undefined,
     );
-    expectEstablishmentStateToMatch({ isLoading: false, linkSent: true });
+    expectEstablishmentStateToMatch({
+      isLoading: false,
+      status: "LINK_SENT",
+    });
+    expect(establishmentSelectors.wasModifyLinkSent(store.getState())).toBe(
+      true,
+    );
   });
 
   it("forgets modification link was sent if siret changes", () => {
-    ({ store } = createTestStore(
+    ({ store, dependencies } = createTestStore(
       {
-        establishment: { linkSent: true, isLoading: false },
+        establishment: {
+          isLoading: false,
+          status: "LINK_SENT",
+        },
       },
       "skip",
     ));
     store.dispatch(siretSlice.actions.siretModified("1234"));
-    expectEstablishmentStateToMatch({ linkSent: false, isLoading: false });
+    expectEstablishmentStateToMatch({
+      isLoading: false,
+      status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
+    });
   });
 
   const expectEstablishmentStateToMatch = (
     expected: Partial<EstablishmentState>,
   ) => expectObjectsToMatch(store.getState().establishment, expected);
+
+  const expectNavigationToEstablishmentFormPageToHaveBeenTriggered = (
+    siretOfRoute: SiretDto | null,
+  ) => {
+    expect(dependencies.navigationGateway.navigatedToEstablishmentForm).toBe(
+      siretOfRoute,
+    );
+  };
 });

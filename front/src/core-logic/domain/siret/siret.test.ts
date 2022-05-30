@@ -1,4 +1,3 @@
-import { Store } from "@reduxjs/toolkit";
 import { GetSiretResponseDto } from "shared/src/siret";
 import {
   siretErrorSelector,
@@ -16,10 +15,10 @@ import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
-import { RootState } from "src/core-logic/storeConfig/store";
+import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("Siret validation and fetching", () => {
-  let store: Store<RootState>;
+  let store: ReduxStore;
   let dependencies: TestDependencies;
 
   beforeEach(() => {

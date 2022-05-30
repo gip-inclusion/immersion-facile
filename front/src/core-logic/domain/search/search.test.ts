@@ -1,4 +1,5 @@
-import { Store } from "@reduxjs/toolkit";
+import { expectToEqual } from "shared/src/expectToEqual";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   searchSlice,
@@ -8,9 +9,7 @@ import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
-import { RootState } from "src/core-logic/storeConfig/store";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { expectToEqual } from "shared/src/expectToEqual";
+import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 // prettier-ignore
 const formSearchResult1 = { siret: "form1", rome: "A", voluntaryToImmersion: true} as SearchImmersionResultDto
@@ -20,7 +19,7 @@ const formSearchResult2 = { siret: "form2", rome: "A", voluntaryToImmersion: tru
 const lbbSearchResult = { siret: "lbb1", rome: "A", voluntaryToImmersion: false } as SearchImmersionResultDto
 
 describe("search epic", () => {
-  let store: Store<RootState>;
+  let store: ReduxStore;
   let dependencies: TestDependencies;
 
   beforeEach(() => {

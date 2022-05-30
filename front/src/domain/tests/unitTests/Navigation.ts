@@ -32,10 +32,9 @@ const theEstablishmentUiGatewayNavigateToEstablishementFormWithSiret =
   (application: ClientTestApplication): void =>
     it(`${gherkin} application navigates to the Register Establishement Form with siret ${siret}.`, () => {
       if (isGiven(gherkin))
-        application.gateways.navigation.navigateToEstablishementFormState =
-          siret;
+        application.gateways.navigation.navigatedToEstablishmentForm = siret;
       expect(
-        application.gateways.navigation.navigateToEstablishementFormState,
+        application.gateways.navigation.navigatedToEstablishmentForm,
       ).toEqual(siret);
     });
 
@@ -52,9 +51,8 @@ const theEstablishmentUiGatewayDoNotNavigateToEstablishementForm =
   (application: ClientTestApplication): void =>
     it(`${gherkin} application do not navigate to the Register Establishement Form.`, () => {
       if (isGiven(gherkin))
-        application.gateways.navigation.navigateToEstablishementFormState =
-          false;
+        application.gateways.navigation.navigatedToEstablishmentForm = null;
       expect(
-        application.gateways.navigation.navigateToEstablishementFormState,
+        application.gateways.navigation.navigatedToEstablishmentForm,
       ).toEqual(false);
     });

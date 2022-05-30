@@ -78,7 +78,7 @@ export class VerifySiretUseCase extends UseCase {
           .then((isEstablishmentRegistered) =>
             isEstablishmentRegistered
               ? this.callToActionChanged("MODIFY_ESTABLISHEMENT")
-              : this.establishmentUiGateway.navigateToEstablishementForm(
+              : this.establishmentUiGateway.navigateToEstablishmentForm(
                   siretInfo.siret,
                 ),
           )

@@ -4,7 +4,6 @@ import { ImmersionFooter } from "src/app/components/ImmersionFooter";
 import { ImmersionHomeMenu } from "src/app/components/ImmersionHomeMenu";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import { ENV } from "src/environmentVariables";
-import { clientApplication } from "src/infra/application/application";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 
 const { frontEnvType } = ENV;
@@ -32,7 +31,7 @@ export const HomePage = () => (
           style={{ minWidth: "420px" }}
         >
           <ImmersionHomeMenu />
-          <EstablishmentHomeMenu clientApplication={clientApplication} />
+          <EstablishmentHomeMenu />
         </div>
       </section>
       <HomeImmersionHowTo />

@@ -1,15 +1,14 @@
-import { Store } from "@reduxjs/toolkit";
+import { FeatureFlags } from "shared/src/featureFlags";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
-import { RootState } from "src/core-logic/storeConfig/store";
-import { FeatureFlags } from "shared/src/featureFlags";
+import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("feature flag slice", () => {
-  let store: Store<RootState>;
+  let store: ReduxStore;
   let dependencies: TestDependencies;
 
   beforeEach(() => {

@@ -23,18 +23,20 @@ import { InMemorySiretGatewayThroughBack } from "src/core-logic/adapters/InMemor
 import { InMemoryTechnicalGateway } from "src/core-logic/adapters/InMemoryTechnicalGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
+import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
+import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
-import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
 import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import { ENV } from "src/environmentVariables";
 import { HttpAgencyGateway } from "src/infra/gateway/AgencyGateway/HttpAgencyGateway";
 import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
-import { HttpImmersionAssessmentGateway } from "../../core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
-import { ImmersionAssessmentGateway } from "../../core-logic/ports/ImmersionAssessmentGateway";
+import { ReactNavigationGateway } from "src/core-logic/adapters/ReactNavigationGateway";
+import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
+import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 
 export const establishmentGateway: EstablishmentGateway =
   ENV.gateway === "IN_MEMORY"
@@ -106,6 +108,8 @@ export const romeAutocompleteGateway: RomeAutocompleteGateway =
     ? new InMemoryRomeAutocompleteGateway(seedRomeDtos, 500)
     : new HttpRomeAutocompleteGateway();
 
+const navigationGateway = new ReactNavigationGateway();
+
 export const immersionAssessmentGateway: ImmersionAssessmentGateway =
   ENV.gateway === "IN_MEMORY"
     ? new SimulateImmersionAssessmentGateway()
@@ -123,6 +127,7 @@ export type Dependencies = {
   romeAutocompleteGateway: RomeAutocompleteGateway;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
+  navigationGateway: NavigationGateway;
 };
 
 export const store = createStore({
@@ -138,5 +143,6 @@ export const store = createStore({
     minSearchResultsToPreventRefetch: 10,
     scheduler: asyncScheduler,
     immersionAssessmentGateway,
+    navigationGateway,
   },
 });
