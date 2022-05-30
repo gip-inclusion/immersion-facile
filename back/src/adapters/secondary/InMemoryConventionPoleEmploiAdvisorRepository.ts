@@ -14,12 +14,11 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
     [];
 
   public async openSlotForNextConvention(
-    conventionPoleEmploiUserAdvisorEntity: PoleEmploiUserAdvisorDTO,
+    conventionPoleEmploiUserAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity,
   ): Promise<void> {
-    this._conventionPoleEmploiUsersAdvisors.push({
-      ...conventionPoleEmploiUserAdvisorEntity,
-      conventionId: "",
-    });
+    this._conventionPoleEmploiUsersAdvisors.push(
+      conventionPoleEmploiUserAdvisorEntity,
+    );
   }
 
   public async associateConventionAndUserAdvisor(

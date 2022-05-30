@@ -1,21 +1,12 @@
-import { zString, zTrimmedString } from "shared/src/zodUtils";
+import { makezTrimmedString, zTrimmedString } from "shared/src/zodUtils";
 import { z } from "zod";
-import { ExternalAccessToken } from "../dto/AccessToken.dto";
 import {
-  conventionPoleEmploiAdvisorTypes,
+  conventionPoleEmploiAdvisors,
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
   peExternalAdvisorsTypes,
   PoleEmploiUserAdvisorDTO,
 } from "../dto/PeConnect.dto";
-
-export const externalAccessTokenSchema: z.Schema<ExternalAccessToken> =
-  z.object({
-    access_token: zString
-      .transform((s) => s.trim())
-      .refine((s) => s.length > 0, "Le format du token peConnect est invalide"),
-    expires_in: z.number().min(1, "Ce token est déja expiré"),
-  });
 
 export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
   z.object({
@@ -46,19 +37,12 @@ export const externalPeConnectAdvisorsSchema: z.Schema<
 // typer avec { [key: string]: any } cause une erreur sur les schema au z.object(...)
 const shape = {
   userPeExternalId: z.string().uuid(),
-  firstName: z
-    .string()
-    .transform((s) => s.trim())
-    .refine(
-      (s) => s.length > 0,
-      "Le prénom du conseiller ne peut pas être vide",
-    ),
-  lastName: z
-    .string()
-    .transform((s) => s.trim())
-    .refine((s) => s.length > 0, "Le nom du conseiller ne peut pas être vide"),
+  firstName: makezTrimmedString(
+    "Le prénom du conseiller ne peut pas être vide",
+  ),
+  lastName: makezTrimmedString("Le nom du conseiller ne peut pas être vide"),
   email: z.string().email("L'email du conseiller est invalide"),
-  type: z.enum(conventionPoleEmploiAdvisorTypes),
+  type: z.enum(conventionPoleEmploiAdvisors),
 };
 
 export const poleEmploiUserAdvisorEntitySchema: z.Schema<PoleEmploiUserAdvisorDTO> =

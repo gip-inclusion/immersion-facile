@@ -9,7 +9,7 @@ module.exports = {
       ignoreIIFE: false,
     },
   ],
-  "@typescript-eslint/no-namespace": "off",
+  "@typescript-eslint/no-namespace": "error",
   "@typescript-eslint/no-non-null-assertion": "error",
   "@typescript-eslint/no-unused-vars": [
     "error",

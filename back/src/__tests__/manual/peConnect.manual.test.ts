@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/require-await */
-// Those are mocked test because real calls to pole emploi api can only be made thought production domain registered with pole emploi
 import { AxiosResponse } from "axios";
-import { secondsToMilliseconds } from "date-fns";
-import { FeatureFlags } from "shared/src/featureFlags";
-import { queryParamsAsString } from "shared/src/utils/queryParams";
-import supertest, { SuperTest, Test } from "supertest";
+// Those are mocked test because real calls to pole emploi api can only be made thought production domain registered with pole emploi
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { createApp } from "../../adapters/primary/server";
 import {
@@ -13,11 +9,15 @@ import {
   toAccessToken,
 } from "../../domain/peConnect/dto/AccessToken.dto";
 import { ExternalPeConnectOAuthGetTokenWithCodeGrantPayload } from "../../domain/peConnect/dto/PeConnect.dto";
-import { externalAccessTokenSchema } from "../../domain/peConnect/port/PeConnect.schema";
+import { externalAccessTokenSchema } from "../../domain/peConnect/port/AccessToken.schema";
 import {
   createAxiosInstance,
   PrettyAxiosResponseError,
 } from "../../utils/axiosUtils";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
+import secondsToMilliseconds from "date-fns/secondsToMilliseconds";
+import { FeatureFlags } from "shared/src/featureFlags";
+import supertest, { SuperTest, Test } from "supertest";
 
 const mockedBehavioursWithInvalidSchemaError =
   () => async (): Promise<AccessTokenDto> => {

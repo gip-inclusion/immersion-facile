@@ -9,6 +9,7 @@ import {
   ExternalPeConnectUser,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
+import { conventionPoleEmploiAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
 
 describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   let linkPoleEmploiAdvisorAndRedirectToConvention: LinkPoleEmploiAdvisorAndRedirectToConvention;
@@ -18,22 +19,19 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
 
   const baseurl = "https://plop";
   const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-  const emptyConventionId = "";
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepo;
-    uowPerformer = new InMemoryUowPerformer({
-      ...uow,
-    });
+    uowPerformer = new InMemoryUowPerformer(uow);
     peConnectGateway = new InMemoryPeConnectGateway(baseurl);
 
     linkPoleEmploiAdvisorAndRedirectToConvention =
-      new LinkPoleEmploiAdvisorAndRedirectToConvention({
+      new LinkPoleEmploiAdvisorAndRedirectToConvention(
         uowPerformer,
         peConnectGateway,
-        baseUrlForRedirect: baseurl,
-      });
+        baseurl,
+      );
   });
 
   describe("Pe Connect correctly identify user", () => {
@@ -46,14 +44,13 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const authorizationCode = "123";
 
       const expectedConventionPoleEmploiAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity =
-        {
-          conventionId: emptyConventionId,
+        conventionPoleEmploiAdvisorFromDto({
           email: "jane.smith@pole-emploi.net",
           firstName: "Jane",
           lastName: "Smith",
           userPeExternalId,
           type: "PLACEMENT",
-        };
+        });
 
       const urlWithQueryParams =
         await linkPoleEmploiAdvisorAndRedirectToConvention.execute(
@@ -79,14 +76,13 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const authorizationCode = "123";
 
       const expectedConventionPoleEmploiAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity =
-        {
-          conventionId: emptyConventionId,
+        conventionPoleEmploiAdvisorFromDto({
           email: "jane.smith@pole-emploi.net",
           firstName: "Jane",
           lastName: "Smith",
           userPeExternalId,
           type: "PLACEMENT",
-        };
+        });
 
       const urlWithQueryParams =
         await linkPoleEmploiAdvisorAndRedirectToConvention.execute(
@@ -113,14 +109,13 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const authorizationCode = "123";
 
       const expectedConventionPoleEmploiUserAdvisor: ConventionPoleEmploiUserAdvisorEntity =
-        {
-          conventionId: emptyConventionId,
+        conventionPoleEmploiAdvisorFromDto({
           email: "elsa.oldenburg@pole-emploi.net",
           firstName: "Elsa",
           lastName: "Oldenburg",
           userPeExternalId,
           type: "CAPEMPLOI",
-        };
+        });
 
       const urlWithQueryParams =
         await linkPoleEmploiAdvisorAndRedirectToConvention.execute(

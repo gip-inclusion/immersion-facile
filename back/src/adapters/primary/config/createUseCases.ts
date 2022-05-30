@@ -93,11 +93,11 @@ export const createUseCases = (
       repositories.immersionApplication,
     ),
     linkPoleEmploiAdvisorAndRedirectToConvention:
-      new LinkPoleEmploiAdvisorAndRedirectToConvention({
+      new LinkPoleEmploiAdvisorAndRedirectToConvention(
         uowPerformer,
-        peConnectGateway: repositories.peConnectGateway,
-        baseUrlForRedirect: config.immersionFacileBaseUrl,
-      }),
+        repositories.peConnectGateway,
+        config.immersionFacileBaseUrl,
+      ),
     listImmersionApplication: new ListImmersionApplication(
       repositories.immersionApplication,
     ),

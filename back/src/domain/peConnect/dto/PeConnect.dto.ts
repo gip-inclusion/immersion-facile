@@ -1,16 +1,20 @@
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { EntityFromDto } from "../../core/EntityFromDto";
 
 export type PoleEmploiUserAdvisorDTO = {
   userPeExternalId: string;
   firstName: string;
   lastName: string;
   email: string;
-  type: ConventionPoleEmploiAdvisorTypes;
+  type: ConventionPoleEmploiAdvisor;
 };
 
-export type ConventionPoleEmploiUserAdvisorEntity = {
-  conventionId: string;
-} & PoleEmploiUserAdvisorDTO;
+export type ConventionPoleEmploiUserAdvisorEntity = EntityFromDto<
+  {
+    conventionId: string;
+  } & PoleEmploiUserAdvisorDTO,
+  "ConventionPoleEmploiAdvisor"
+>;
 
 export type PeConnectUserDTO = {
   email: string;
@@ -31,21 +35,17 @@ export type ConventionPeConnectFields = Pick<
   "email" | "firstName" | "lastName"
 >;
 
-export const conventionPoleEmploiAdvisorTypes = [
-  "PLACEMENT",
-  "CAPEMPLOI",
-] as const;
-
-export type AdvisorTypes = typeof peExternalAdvisorsTypes[number];
-
 export const peExternalAdvisorsTypes = [
   "INDEMNISATION",
   "PLACEMENT",
   "CAPEMPLOI",
 ] as const;
 
-// TODO Améliorer le verrouillage de la compatibilité des types ?
-type ConventionPoleEmploiAdvisorTypes = Omit<AdvisorTypes, "INDEMNISATION">; //= typeof conventionPoleEmploiAdvisorTypes[number];
+export type AdvisorTypes = typeof peExternalAdvisorsTypes[number];
+
+type ConventionPoleEmploiAdvisor = Omit<AdvisorTypes, "INDEMNISATION">;
+
+export const conventionPoleEmploiAdvisors = ["PLACEMENT", "CAPEMPLOI"] as const;
 
 export const toPeConnectAdvisorDTO = (
   fromApi: ExternalPeConnectAdvisor,

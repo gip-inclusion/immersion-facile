@@ -58,8 +58,8 @@ export const PrettyAxiosResponseError = (message: string, error: any): Error =>
     JSON.stringify(
       {
         _message: message,
-        status: `${error.response.status}`,
-        body: error.response.data,
+        status: `${error?.response?.status}`,
+        body: error?.response?.data,
       },
       null,
       2,

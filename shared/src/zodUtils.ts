@@ -1,5 +1,5 @@
 import { pipe } from "ramda";
-import { z } from "zod";
+import { z, ZodTypeAny } from "zod";
 
 export const zString = z
   .string({
@@ -11,6 +11,9 @@ export const zString = z
 export const zTrimmedString = zString
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, "Obligatoire");
+
+export const makezTrimmedString = (message: string) =>
+  zString.transform((s) => s.trim()).refine((s) => s.length > 0, message);
 
 const removeAccents = (str: string) =>
   str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");

@@ -16,8 +16,8 @@ import {
   toPeConnectAdvisorDTO,
   toPeConnectUserDTO,
 } from "../../domain/peConnect/dto/PeConnect.dto";
+import { externalAccessTokenSchema } from "../../domain/peConnect/port/AccessToken.schema";
 import {
-  externalAccessTokenSchema,
   externalPeConnectAdvisorsSchema,
   externalPeConnectUserSchema,
 } from "../../domain/peConnect/port/PeConnect.schema";

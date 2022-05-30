@@ -17,8 +17,8 @@ import {
   toPeConnectAdvisorDTO,
   toPeConnectUserDTO,
 } from "../../domain/peConnect/dto/PeConnect.dto";
+import { externalAccessTokenSchema } from "../../domain/peConnect/port/AccessToken.schema";
 import {
-  externalAccessTokenSchema,
   externalPeConnectAdvisorsSchema,
   externalPeConnectUserSchema,
 } from "../../domain/peConnect/port/PeConnect.schema";
@@ -29,6 +29,7 @@ import {
 } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
 import { AccessTokenConfig } from "../primary/config/appConfig";
+import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";
 
 const _logger = createLogger(__filename);
 
@@ -52,12 +53,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   }
 
   public async oAuthGetAccessTokenThroughAuthorizationCode(
-    authorization_code: string,
+    authorizationCode: string,
   ): Promise<AccessTokenDto> {
     const getAccessTokenPayload: ExternalPeConnectOAuthGetTokenWithCodeGrantPayload =
       {
         grant_type: "authorization_code",
-        code: authorization_code,
+        code: authorizationCode,
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
         redirect_uri: ApiPeConnectUrls.REGISTERED_REDIRECT_URL,
@@ -78,8 +79,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         throw PrettyAxiosResponseError("PeConnect Failure", error);
       });
 
-    const externalAccessToken: ExternalAccessToken =
-      externalAccessTokenSchema.parse(response.data);
+    const externalAccessToken: ExternalAccessToken = validateAndParseZodSchema(
+      externalAccessTokenSchema,
+      response.data,
+    );
 
     return toAccessToken(externalAccessToken);
   }
@@ -95,8 +98,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         throw PrettyAxiosResponseError("PeConnect Failure", error);
       });
 
-    const externalUser: ExternalPeConnectUser =
-      externalPeConnectUserSchema.parse(response.data);
+    const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
+      externalPeConnectUserSchema,
+      response.data,
+    );
 
     return toPeConnectUserDTO(externalUser);
   }
@@ -113,8 +118,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         throw PrettyAxiosResponseError("PeConnect Failure", error);
       });
 
-    const advisors: ExternalPeConnectAdvisor[] =
-      externalPeConnectAdvisorsSchema.parse(response.data);
+    const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
+      externalPeConnectAdvisorsSchema,
+      response.data,
+    );
 
     return advisors.map(toPeConnectAdvisorDTO);
   }

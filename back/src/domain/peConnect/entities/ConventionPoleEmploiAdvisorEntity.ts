@@ -1,20 +1,27 @@
 import {
+  ConventionPoleEmploiUserAdvisorEntity,
   PeConnectAdvisorDTO,
   PeUserAndAdvisors,
   PoleEmploiUserAdvisorDTO,
   toConventionPoleEmploiAdvisorDTO,
 } from "../dto/PeConnect.dto";
 
-export namespace ConventionPoleEmploiAdvisorEntity {
-  export const createFromUserAndAdvisors = ({
+export const conventionPoleEmploiAdvisorFromDto = (
+  dto: PoleEmploiUserAdvisorDTO,
+): ConventionPoleEmploiUserAdvisorEntity => ({
+  ...dto,
+  conventionId: "",
+  _entityName: "ConventionPoleEmploiAdvisor",
+});
+
+export const poleEmploiUserAdvisorDTOFromUserAndAdvisors = ({
+  user,
+  advisors,
+}: PeUserAndAdvisors): PoleEmploiUserAdvisorDTO =>
+  toConventionPoleEmploiAdvisorDTO({
     user,
-    advisors,
-  }: PeUserAndAdvisors): PoleEmploiUserAdvisorDTO =>
-    toConventionPoleEmploiAdvisorDTO({
-      user,
-      advisor: choosePreferredAdvisor(advisors),
-    });
-}
+    advisor: choosePreferredAdvisor(advisors),
+  });
 
 const preferCapEmploiPredicate = (
   a: PeConnectAdvisorDTO,
@@ -31,5 +38,8 @@ const choosePreferredAdvisor = (
     .filter(onlyValidAdvisorsForImmersion)
     .sort(preferCapEmploiPredicate);
 
-  return sortedAdvisors[0];
+  const preferredAdvisor = sortedAdvisors.at(0);
+  if (!preferredAdvisor) throw new Error("No valid advisor for the user");
+
+  return preferredAdvisor;
 };
