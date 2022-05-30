@@ -2,15 +2,11 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/app/config/dependencies";
-import {
-  featureFlagsSlice,
-  fetchFeatureFlagsEpic,
-} from "src/core-logic/domain/featureFlags/featureFlags.slice";
-import {
-  romeAutocompleteEpic,
-  romeAutocompleteSlice,
-} from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
-import { searchEpics } from "src/core-logic/domain/search/search.epic";
+import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
+import { fetchFeatureFlagsEpic } from "src/core-logic/domain/featureFlags/featureFlags.epics";
+import { romeAutocompleteEpic } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.epics";
+import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
+import { searchEpics } from "src/core-logic/domain/search/search.epics";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";

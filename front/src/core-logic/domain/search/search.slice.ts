@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
 import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { OmitFromExistingKeys } from "shared/src/utils";
@@ -56,5 +55,3 @@ export const searchSlice = createSlice({
     },
   },
 });
-
-export type SearchAction = ActionOfSlice<typeof searchSlice>;

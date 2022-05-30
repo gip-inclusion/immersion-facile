@@ -1,9 +1,11 @@
 import { concatWith, filter, map, of, switchMap, take } from "rxjs";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import {
-  SearchAction,
-  searchSlice,
-} from "src/core-logic/domain/search/search.slice";
-import { AppEpic } from "src/core-logic/storeConfig/redux.helpers";
+  ActionOfSlice,
+  AppEpic,
+} from "src/core-logic/storeConfig/redux.helpers";
+
+type SearchAction = ActionOfSlice<typeof searchSlice>;
 
 type SearchEpic = AppEpic<SearchAction>;
 
