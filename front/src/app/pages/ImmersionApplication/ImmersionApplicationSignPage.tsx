@@ -12,6 +12,7 @@ import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 import { MagicLinkPayload, Role } from "shared/src/tokens/MagicLinkPayload";
+import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
 import { ApplicationFormFields } from "./ApplicationFormFields";
@@ -50,8 +51,11 @@ export const ImmersionApplicationSignPage = ({ route }: SignFormProps) => {
         }
         jwt={route.params.jwt}
       >
-        {(response) => (
-          <SignFormSpecific response={response} jwt={route.params.jwt} />
+        {(immersionApplication) => (
+          <SignFormSpecific
+            immersionApplication={immersionApplication}
+            jwt={route.params.jwt}
+          />
         )}
       </ApiDataContainer>
     </>
@@ -59,11 +63,15 @@ export const ImmersionApplicationSignPage = ({ route }: SignFormProps) => {
 };
 
 type SignFormSpecificProps = {
-  response: ImmersionApplicationDto | null;
+  immersionApplication: ImmersionApplicationDto | null;
   jwt: string;
 };
 
-const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
+const SignFormSpecific = ({
+  immersionApplication,
+  jwt,
+}: SignFormSpecificProps) => {
+  useExistingSiret(immersionApplication?.siret);
   const [initialValues, setInitialValues] =
     useState<Partial<ImmersionApplicationDto> | null>(null);
   const [signeeName, setSigneeName] = useState<string | undefined>();
@@ -75,20 +83,20 @@ const SignFormSpecific = ({ response, jwt }: SignFormSpecificProps) => {
   >(null);
 
   useEffect(() => {
-    if (!response) return;
-    const [role, name] = extractRoleAndName(jwt, response);
+    if (!immersionApplication) return;
+    const [role, name] = extractRoleAndName(jwt, immersionApplication);
     setSigneeName(name);
     setSigneeRole(role);
     // Uncheck the checkbox.
     if (role === "beneficiary") {
-      setAlreadySigned(response.beneficiaryAccepted);
+      setAlreadySigned(immersionApplication.beneficiaryAccepted);
     } else if (role === "establishment") {
-      setAlreadySigned(response.enterpriseAccepted);
+      setAlreadySigned(immersionApplication.enterpriseAccepted);
     }
-    setInitialValues(response);
-  }, [!!response]);
+    setInitialValues(immersionApplication);
+  }, [!!immersionApplication]);
 
-  if (!response) return <p>Chargement en cours...</p>;
+  if (!immersionApplication) return <p>Chargement en cours...</p>;
 
   return (
     <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">

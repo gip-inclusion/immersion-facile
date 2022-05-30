@@ -1,12 +1,12 @@
 import { useField } from "formik";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { GetSiretResponseDto } from "shared/src/siret";
+import { GetSiretResponseDto, SiretDto } from "shared/src/siret";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import {
-  siretStateSelector,
-  siretErrorSelector,
   currentSiretSelector,
+  siretErrorSelector,
+  siretStateSelector,
 } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
@@ -69,4 +69,12 @@ export const useInitialSiret = (siret?: string) => {
       dispatch(siretSlice.actions.siretModified(siret));
     }
   }, []);
+};
+
+export const useExistingSiret = (siret?: SiretDto | null) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (siret) dispatch(siretSlice.actions.siretModified(siret));
+  }, [siret]);
 };

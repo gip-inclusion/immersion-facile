@@ -11,7 +11,7 @@ import {
   useInitialSiret,
   useSiretFetcher,
   useSiretRelatedField,
-} from "src/app/utils/fetchEstablishmentInfoBySiret";
+} from "src/hooks/siret.hooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ENV } from "src/environmentVariables";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";

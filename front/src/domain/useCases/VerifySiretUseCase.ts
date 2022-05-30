@@ -27,6 +27,7 @@ export class VerifySiretUseCase extends UseCase {
       ? this.onSiret(event)
       : this.callToActionChanged("NOTHING");
   }
+
   private callToActionChanged(
     callToAction: EstablishementCallToAction,
   ): Promise<void> {
@@ -52,6 +53,7 @@ export class VerifySiretUseCase extends UseCase {
       )
       .catch(() => this.callToActionChanged("ERROR_UNEXPECTED_ERROR"));
   }
+
   private onMissingSiretInfo(siretInfo: GetSiretInfoError): Promise<void> {
     return this.callToActionChanged(
       siretInfo === "SIRENE API not available."

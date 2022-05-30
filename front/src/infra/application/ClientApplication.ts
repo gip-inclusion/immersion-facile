@@ -34,6 +34,7 @@ export class ClientApplication {
     this.eventBus = gateways.event;
     this.store = store;
   }
+
   onEvent(event: ApplicationEvent) {
     this.eventBus.onEvent(event);
   }

@@ -1,4 +1,3 @@
-// ceci est un autre fichier
 import { useDispatch } from "react-redux";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 

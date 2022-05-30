@@ -16,7 +16,7 @@ import { PeConnect } from "src/app/pages/ImmersionApplication/PeConnect";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 import { toDateString } from "shared/src/utils/date";
-import { useInitialSiret } from "src/app/utils/fetchEstablishmentInfoBySiret";
+import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Title } from "src/uiComponents/Title";
 import { ApplicationFormFields } from "./ApplicationFormFields";
@@ -30,8 +30,8 @@ export const ImmersionApplicationForm = ({
   properties,
   routeParams = {},
 }: ImmersionApplicationFormProps) => {
-  useInitialSiret(properties.siret);
   const [initialValues, setInitialValues] = useState(properties);
+  useExistingSiret(initialValues.siret);
   const [submitFeedback, setSubmitFeedback] = useState<
     SuccessFeedbackKind | Error | null
   >(null);

@@ -12,10 +12,7 @@ import {
 } from "src/app/components/RadioGroup";
 import { ApplicationFormKeysInUrl } from "src/app/routing/route-params";
 import { routes, useRoute } from "src/app/routing/routes";
-import {
-  useSiretFetcher,
-  useSiretRelatedField,
-} from "src/app/utils/fetchEstablishmentInfoBySiret";
+import { useSiretFetcher, useSiretRelatedField } from "src/hooks/siret.hooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
