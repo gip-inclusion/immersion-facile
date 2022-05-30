@@ -1,4 +1,5 @@
 import axios from "axios";
+import { from, Observable } from "rxjs";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import {
@@ -32,11 +33,19 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     );
     return httpResponse.data;
   }
+
   public async requestEstablishmentModification(
     siret: SiretDto,
   ): Promise<void> {
     await axios.get(`/${prefix}/${requestEmailToUpdateFormRoute}/${siret}`);
   }
+
+  public requestEstablishmentModificationObservable(
+    siret: SiretDto,
+  ): Observable<void> {
+    return from(this.requestEstablishmentModification(siret));
+  }
+
   public async getFormEstablishmentFromJwt(
     jwt: string,
   ): Promise<FormEstablishmentDto> {
@@ -45,6 +54,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     );
     return httpResponse.data;
   }
+
   public async updateFormEstablishment(
     establishment: FormEstablishmentDto,
     jwt: string,

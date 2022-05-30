@@ -16,6 +16,11 @@ export const siretErrorSelector = createRootSelector((state) =>
   state.siret.error ? errorTranslations[state.siret.error] : null,
 );
 
+export const isSiretAlreadySavedSelector = createRootSelector(
+  (state) =>
+    state.siret.error === "Establishment with this siret is already in our DB",
+);
+
 const errorTranslations: Record<GetSiretInfoError | InvalidSiretError, string> =
   {
     "Missing establishment on SIRENE API.":

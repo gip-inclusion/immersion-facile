@@ -2,12 +2,17 @@ import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway"
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { SiretDto } from "shared/src/siret";
 import { sleep } from "shared/src/utils";
+import { BehaviorSubject, Observable, of, Subject, tap } from "rxjs";
 
 export class InMemoryEstablishmentGateway implements EstablishmentGateway {
+  private simulateBack = false;
   public constructor(
     public _existingEstablishmentSirets: SiretDto[] = [],
     public _currentEstablishmentModifyRequest: SiretDto | undefined = undefined,
-  ) {}
+    simulateBack = false,
+  ) {
+    this.simulateBack = simulateBack;
+  }
 
   public async addFormEstablishment(
     immersionOffer: FormEstablishmentDto,
@@ -30,6 +35,16 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
     siret: SiretDto,
   ): Promise<void> {
     this._currentEstablishmentModifyRequest = siret;
+  }
+
+  public establishmentModificationResponse$ = new Subject<void>();
+
+  public requestEstablishmentModificationObservable(
+    _siret: SiretDto,
+  ): Observable<void> {
+    return this.simulateBack
+      ? of(undefined)
+      : this.establishmentModificationResponse$;
   }
 
   public async getFormEstablishmentFromJwt(

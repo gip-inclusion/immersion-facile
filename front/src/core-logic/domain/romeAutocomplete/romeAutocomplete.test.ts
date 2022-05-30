@@ -14,7 +14,7 @@ import {
 import {
   fastForwardObservables,
   triggerTests,
-} from "src/core-logic/domain/test.helpers";
+} from "src/core-logic/domain/testHelpers/test.helpers";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 
 describe("Rome Autocomplete", () => {

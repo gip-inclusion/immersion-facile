@@ -38,11 +38,11 @@ import { ImmersionAssessmentGateway } from "../../core-logic/ports/ImmersionAsse
 
 export const establishmentGateway: EstablishmentGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryEstablishmentGateway([
-        "12345678901238",
-        "12345678901239",
-        "12345678901237",
-      ])
+    ? new InMemoryEstablishmentGateway(
+        ["12345678901238", "12345678901239", "12345678901237"],
+        undefined,
+        true,
+      )
     : new HttpEstablishmentGateway();
 
 const inMemoryImmersionApplicationGateway =

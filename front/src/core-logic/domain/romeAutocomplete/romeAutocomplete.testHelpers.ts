@@ -2,7 +2,7 @@ import { Store } from "@reduxjs/toolkit";
 import { RomeCode } from "shared/src/rome";
 import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";
 import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
-import { createScenarioUnitTest } from "src/core-logic/domain/test.helpers";
+import { createScenarioUnitTest } from "src/core-logic/domain/testHelpers/test.helpers";
 import {
   StoreAndDeps,
   TestDependencies,

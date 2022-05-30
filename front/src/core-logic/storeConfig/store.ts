@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/app/config/dependencies";
+import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { fetchFeatureFlagsEpic } from "src/core-logic/domain/featureFlags/featureFlags.epics";
 import { romeAutocompleteEpic } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.epics";
@@ -11,12 +12,14 @@ import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { homeEstablishmentSlice } from "src/infra/gateway/EstablishmentUiGateway/homeEstablishmentSlice";
+import { establishmentSlice } from "../domain/establishmentPath/establishment.slice";
 import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersionAssessment.epics";
 import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
 import { immersionConventionEpics } from "../domain/immersionConvention/immersionConvention.epics";
 import { immersionConventionSlice } from "../domain/immersionConvention/immersionConvention.slice";
 
 const allEpics: any[] = [
+  ...establishmentEpics,
   ...searchEpics,
   ...siretEpics,
   fetchFeatureFlagsEpic,
@@ -40,6 +43,7 @@ const rootReducer = combineReducers({
   [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
   [homeEstablishmentSlice.name]: homeEstablishmentSlice.reducer,
+  [establishmentSlice.name]: establishmentSlice.reducer,
   [immersionConventionSlice.name]: immersionConventionSlice.reducer,
   [immersionAssessmentSlice.name]: immersionAssessmentSlice.reducer,
 });
