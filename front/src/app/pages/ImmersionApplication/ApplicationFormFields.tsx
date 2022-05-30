@@ -138,7 +138,7 @@ export const ApplicationFormFields = ({
       {isFrozen && isSignatureMode && (
         <SignOnlyMessage isAlreadySigned={alreadySubmitted ?? false} />
       )}
-      <input type="hidden" name="peExternalIdentity" />
+      <input type="hidden" name="federatedIdentity" />
       <FormSectionTitle>1. Coordonnées du bénéficiaire</FormSectionTitle>
       <TextInput
         label="Email *"

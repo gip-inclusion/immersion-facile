@@ -48,6 +48,9 @@ export const immersionApplicationInitialValuesFromUrl = ({
     status: "DRAFT" as ApplicationStatus,
     dateSubmission: toDateString(startOfToday()),
 
+    //Federated Identity
+    federatedIdentity: params.federatedIdentity ?? "",
+
     // Participant
     email: params.email ?? "",
     firstName: params.firstName ?? "",

@@ -54,6 +54,7 @@ export type ImmersionApplicationDto = {
   immersionSkills?: string;
   beneficiaryAccepted: boolean;
   enterpriseAccepted: boolean;
+  federatedIdentity?: string
 };
 
 export type WithImmersionApplicationId = {

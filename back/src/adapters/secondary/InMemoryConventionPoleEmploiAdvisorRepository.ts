@@ -38,6 +38,14 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
     return this._conventionPoleEmploiUsersAdvisors;
   }
 
+  public setConventionPoleEmploiUsersAdvisor(
+    conventionPoleEmploiUserAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity,
+  ) {
+    this._conventionPoleEmploiUsersAdvisors.push(
+      conventionPoleEmploiUserAdvisorEntity,
+    );
+  }
+
   private upsertWithClosedConvention = (
     oldEntity: ConventionPoleEmploiUserAdvisorEntity,
     newEntity: ConventionPoleEmploiUserAdvisorEntity,

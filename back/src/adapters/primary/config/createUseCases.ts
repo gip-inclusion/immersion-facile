@@ -47,6 +47,7 @@ import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/use
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
+import { AssociateFederatedIdentityPeConnect } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
@@ -79,6 +80,8 @@ export const createUseCases = (
   const adresseAPI = new HttpAdresseAPI(noRateLimit, noRetries);
 
   return {
+    associateFederatedIdentityPeConnect:
+      new AssociateFederatedIdentityPeConnect(uowPerformer),
     uploadFile: new UploadFile(uowPerformer, repositories.documentGateway),
     createImmersionAssessment: new CreateImmersionAssessment(
       uowPerformer,

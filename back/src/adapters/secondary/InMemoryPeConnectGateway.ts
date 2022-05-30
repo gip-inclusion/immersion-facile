@@ -11,11 +11,12 @@ import {
   ExternalPeConnectUser,
   PeConnectAdvisorDto,
   PeConnectUserDto,
-  toPartialConventionDto,
   PeUserAndAdvisors,
+  toPartialConventionDtoWithPeIdentity,
   toPeConnectAdvisorDto,
   toPeConnectUserDto,
 } from "../../domain/peConnect/dto/PeConnect.dto";
+
 import { externalAccessTokenSchema } from "../../domain/peConnect/port/AccessToken.schema";
 import {
   externalPeConnectAdvisorsSchema,
@@ -64,7 +65,7 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
     //We would then be redirected on our /demande-immersion url with the associated urlencoded payload
 
     const queryParams = queryParamsAsString<ConventionPeConnectFields>(
-      toPartialConventionDto(toPeConnectUserDto(mockedUserInfo)),
+      toPartialConventionDtoWithPeIdentity(toPeConnectUserDto(mockedUserInfo)),
     );
 
     return `${this.baseUrl}/${frontRoutes.immersionApplicationsRoute}?${queryParams}`;

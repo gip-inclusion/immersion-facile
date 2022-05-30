@@ -43,7 +43,7 @@ export type PeConnectAdvisorEntity = EntityFromDto<
 
 export type ConventionPeConnectFields = Pick<
   ImmersionApplicationDto,
-  "email" | "firstName" | "lastName"
+  "email" | "firstName" | "lastName" | "federatedIdentity"
 >;
 
 export const peExternalAdvisorsTypes = [
@@ -88,12 +88,13 @@ export const toConventionPoleEmploiAdvisorDto = ({
   userPeExternalId: user.peExternalId,
 });
 
-export const toPartialConventionDto = (
+export const toPartialConventionDtoWithPeIdentity = (
   peConnectUserInfo: PeConnectUserDto,
 ): ConventionPeConnectFields => ({
   email: peConnectUserInfo.email,
   firstName: peConnectUserInfo.firstName,
   lastName: peConnectUserInfo.lastName,
+  federatedIdentity: `peConnect:${peConnectUserInfo.peExternalId}`,
 });
 
 export type PeUserAndAdvisors = {

@@ -7,7 +7,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import {
   ConventionPeConnectFields,
   ConventionPoleEmploiUserAdvisorEntity,
-  toPartialConventionDto,
+  toPartialConventionDtoWithPeIdentity,
 } from "../dto/PeConnect.dto";
 import {
   conventionPoleEmploiAdvisorFromDto,
@@ -49,7 +49,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     );
 
     const peQueryParams = queryParamsAsString<ConventionPeConnectFields>(
-      toPartialConventionDto(user),
+      toPartialConventionDtoWithPeIdentity(user),
     );
 
     return `${this.baseUrlForRedirect}/${frontRoutes.immersionApplicationsRoute}?${peQueryParams}`;

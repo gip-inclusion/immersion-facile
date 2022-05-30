@@ -16,6 +16,8 @@ export type ApplicationFormKeysInUrl =
   keyof typeof immersionApplicationValuesFromUrl;
 
 export const immersionApplicationValuesFromUrl = {
+  federatedIdentity: param.query.optional.string,
+
   email: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,

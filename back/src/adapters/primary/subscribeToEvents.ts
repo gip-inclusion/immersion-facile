@@ -25,6 +25,7 @@ const getUseCasesByTopics = (
     useCases.confirmToMentorThatApplicationCorrectlySubmittedRequestSignature,
     useCases.notifyToTeamApplicationSubmittedByBeneficiary,
     useCases.notifyToAgencyApplicationSubmitted,
+    //useCases.associateFederatedIdentityPeConnect,
   ],
   ImmersionApplicationPartiallySigned: [
     useCases.notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty,
