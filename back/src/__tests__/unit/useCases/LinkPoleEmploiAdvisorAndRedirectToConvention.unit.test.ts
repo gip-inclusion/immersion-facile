@@ -9,7 +9,7 @@ import {
   ExternalPeConnectUser,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
-import { conventionPoleEmploiAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
+import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
 
 describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   let linkPoleEmploiAdvisorAndRedirectToConvention: LinkPoleEmploiAdvisorAndRedirectToConvention;
@@ -46,7 +46,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const authorizationCode = "123";
 
       const expectedConventionPoleEmploiAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity =
-        conventionPoleEmploiAdvisorFromDto({
+        conventionPoleEmploiUserAdvisorFromDto({
           email: "jane.smith@pole-emploi.net",
           firstName: "Jane",
           lastName: "Smith",
@@ -73,7 +73,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       ]);
 
       const expectedConventionPoleEmploiUserAdvisor: ConventionPoleEmploiUserAdvisorEntity =
-        conventionPoleEmploiAdvisorFromDto({
+        conventionPoleEmploiUserAdvisorFromDto({
           email: "elsa.oldenburg@pole-emploi.net",
           firstName: "Elsa",
           lastName: "Oldenburg",

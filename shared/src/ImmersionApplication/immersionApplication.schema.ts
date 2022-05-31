@@ -27,6 +27,7 @@ import { dateRegExp } from "../utils/date";
 import { allRoles } from "../tokens/MagicLinkPayload";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import { peConnectPrefixSchema } from "../federatedIdentities/federatedIdentity.schema";
 
 export const immersionApplicationIdSchema: z.ZodSchema<ImmersionApplicationId> =
   zTrimmedString;
@@ -86,7 +87,9 @@ export const immersionApplicationSchema: z.Schema<ImmersionApplicationDto> = z
     immersionSkills: z.string().optional(),
     beneficiaryAccepted: zBoolean,
     enterpriseAccepted: zBoolean,
+    federatedIdentity: peConnectPrefixSchema.optional(),
   })
+  .strict()
   .refine(startDateIsBeforeEndDate, {
     message: "La date de fin doit être après la date de début.",
     path: ["dateEnd"],

@@ -107,8 +107,6 @@ export type PeUserAndAdvisor = {
   user: PeConnectUserDto;
 };
 
-export type PeExternalId = string;
-
 // External contract from https://pole-emploi.io/data/api/pole-emploi-connect
 export type ExternalPeConnectUser = {
   email: string;

@@ -2,10 +2,10 @@ import { ImmersionApplicationId } from "shared/src/ImmersionApplication/Immersio
 import { ConventionPoleEmploiAdvisorRepository } from "../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
-  PeExternalId,
   PoleEmploiUserAdvisorDto,
 } from "../../domain/peConnect/dto/PeConnect.dto";
 import { NotFoundError } from "../primary/helpers/httpErrors";
+import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
 
 export class InMemoryConventionPoleEmploiAdvisorRepository
   implements ConventionPoleEmploiAdvisorRepository

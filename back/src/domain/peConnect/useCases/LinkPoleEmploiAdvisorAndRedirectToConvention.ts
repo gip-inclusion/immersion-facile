@@ -10,7 +10,7 @@ import {
   toPartialConventionDtoWithPeIdentity,
 } from "../dto/PeConnect.dto";
 import {
-  conventionPoleEmploiAdvisorFromDto,
+  conventionPoleEmploiUserAdvisorFromDto,
   poleEmploiUserAdvisorDTOFromUserAndAdvisors,
 } from "../entities/ConventionPoleEmploiAdvisorEntity";
 import { PeConnectGateway } from "../port/PeConnectGateway";
@@ -37,7 +37,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
       authorizationCode,
     );
     const poleEmploiUserAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity =
-      conventionPoleEmploiAdvisorFromDto(
+      conventionPoleEmploiUserAdvisorFromDto(
         poleEmploiUserAdvisorDTOFromUserAndAdvisors({
           user,
           advisors,

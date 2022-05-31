@@ -7,7 +7,7 @@ import {
   toConventionPoleEmploiAdvisorDto,
 } from "../dto/PeConnect.dto";
 
-export const conventionPoleEmploiAdvisorFromDto = (
+export const conventionPoleEmploiUserAdvisorFromDto = (
   dto: PoleEmploiUserAdvisorDto,
 ): ConventionPoleEmploiUserAdvisorEntity => ({
   ...dto,

@@ -5,6 +5,7 @@ import { Flavor } from "../typeFlavors";
 
 import { Role } from "../tokens/MagicLinkPayload";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
 
 export type ApplicationStatus = typeof validApplicationStatus[number];
 export const validApplicationStatus = [
@@ -54,7 +55,7 @@ export type ImmersionApplicationDto = {
   immersionSkills?: string;
   beneficiaryAccepted: boolean;
   enterpriseAccepted: boolean;
-  federatedIdentity?: string
+  federatedIdentity?: FederatedIdentity;
 };
 
 export type WithImmersionApplicationId = {

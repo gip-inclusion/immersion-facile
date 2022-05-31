@@ -1,8 +1,6 @@
+import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import {
-  ConventionPoleEmploiUserAdvisorEntity,
-  PeExternalId,
-} from "../dto/PeConnect.dto";
+import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
 
 export interface ConventionPoleEmploiAdvisorRepository {
   openSlotForNextConvention: (

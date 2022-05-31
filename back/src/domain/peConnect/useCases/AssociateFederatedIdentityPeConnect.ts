@@ -1,40 +1,32 @@
-import { z } from "zod";
+import {
+  PeConnectIdentity,
+  toPeExternalId,
+} from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export type ConventionIdAndFederatedIdentity = {
-  conventionId: string;
-  federatedIdentity: string;
-};
-
-export class AssociateFederatedIdentityPeConnect extends TransactionalUseCase<ConventionIdAndFederatedIdentity> {
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    //private createNewEvent: CreateNewEvent,
-  ) {
+export class AssociateFederatedIdentityPeConnect extends TransactionalUseCase<ImmersionApplicationDto> {
+  constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
 
-  inputSchema = z.object({
-    conventionId: z.string().uuid(),
-    federatedIdentity: z.string(),
-  });
+  inputSchema = immersionApplicationSchema;
 
   public async _execute(
-    conventionAndIdentity: ConventionIdAndFederatedIdentity,
+    convention: ImmersionApplicationDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    if (!federatedIdentityIsPeConnect(conventionAndIdentity.federatedIdentity))
-      return;
+    if (!isPeConnectIdentity(convention?.federatedIdentity)) return;
 
     await uow.conventionPoleEmploiAdvisorRepo.associateConventionAndUserAdvisor(
-      conventionAndIdentity.conventionId,
-      conventionAndIdentity.federatedIdentity,
+      convention.id,
+      toPeExternalId(convention.federatedIdentity),
     );
   }
 }
 
-const federatedIdentityIsPeConnect = (
-  federatedIdentity: string | undefined,
-): federatedIdentity is string =>
-  (federatedIdentity ?? "").startsWith("peConnect:");
+const isPeConnectIdentity = (
+  peConnectIdentity: PeConnectIdentity | undefined,
+): peConnectIdentity is PeConnectIdentity => !!peConnectIdentity;
