@@ -1,14 +1,15 @@
 import { asyncScheduler, SchedulerLike } from "rxjs";
+import { SimulateImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulateImmersionAssessmentGateway";
+
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/HttpEstablishmentGateway";
-import { HttpTechnicalGateway } from "src/core-logic/adapters/HttpTechnicalGateway";
 import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/HttpSiretGatewayThroughBack";
+import { HttpTechnicalGateway } from "src/core-logic/adapters/HttpTechnicalGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
-import { InMemoryTechnicalGateway } from "src/core-logic/adapters/InMemoryTechnicalGateway";
 import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
 import {
   InMemoryImmersionSearchGateway,
@@ -19,18 +20,21 @@ import {
   seedRomeDtos,
 } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
 import { InMemorySiretGatewayThroughBack } from "src/core-logic/adapters/InMemorySiretGatewayThroughBack";
+import { InMemoryTechnicalGateway } from "src/core-logic/adapters/InMemoryTechnicalGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
-import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
+import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
 import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import { ENV } from "src/environmentVariables";
 import { HttpAgencyGateway } from "src/infra/gateway/AgencyGateway/HttpAgencyGateway";
 import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
+import { HttpImmersionAssessmentGateway } from "../../core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
+import { ImmersionAssessmentGateway } from "../../core-logic/ports/ImmersionAssessmentGateway";
 
 export const establishmentGateway: EstablishmentGateway =
   ENV.gateway === "IN_MEMORY"
@@ -102,7 +106,13 @@ export const romeAutocompleteGateway: RomeAutocompleteGateway =
     ? new InMemoryRomeAutocompleteGateway(seedRomeDtos, 500)
     : new HttpRomeAutocompleteGateway();
 
+export const immersionAssessmentGateway: ImmersionAssessmentGateway =
+  ENV.gateway === "IN_MEMORY"
+    ? new SimulateImmersionAssessmentGateway()
+    : new HttpImmersionAssessmentGateway();
+
 export type Dependencies = {
+  immersionAssessmentGateway: ImmersionAssessmentGateway;
   siretGatewayThroughBack: SiretGatewayThroughBack;
   agencyGateway: AgencyGateway;
   apiAdresseGateway: ApiAdresseGateway;
@@ -127,5 +137,6 @@ export const store = createStore({
     romeAutocompleteGateway,
     minSearchResultsToPreventRefetch: 10,
     scheduler: asyncScheduler,
+    immersionAssessmentGateway,
   },
 });

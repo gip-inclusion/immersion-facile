@@ -8,8 +8,10 @@ import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemor
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
 import { InMemorySiretGatewayThroughBack } from "../adapters/InMemorySiretGatewayThroughBack";
+import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 
 export interface TestDependencies {
+  immersionAssessmentGateway: TestImmersionAssessmentGateway;
   siretGatewayThroughBack: InMemorySiretGatewayThroughBack;
   agencyGateway: InMemoryAgencyGateway;
   apiAdresseGateway: InMemoryApiAdresseGateway;
@@ -27,6 +29,7 @@ export const createTestStore = (
   message?: "skip" | string,
 ) => {
   const dependencies: TestDependencies = {
+    immersionAssessmentGateway: new TestImmersionAssessmentGateway(),
     siretGatewayThroughBack: new InMemorySiretGatewayThroughBack(),
     immersionSearchGateway: new InMemoryImmersionSearchGateway(),
     minSearchResultsToPreventRefetch: 2,
