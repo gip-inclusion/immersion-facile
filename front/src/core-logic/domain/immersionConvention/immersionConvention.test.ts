@@ -1,7 +1,7 @@
 import { expectObjectToMatch } from "shared/src/expectToEqual";
 
 import { reasonableSchedule } from "shared/src/ScheduleSchema";
-import { ImmersionApplicationDto } from "src/../../shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import {
   createTestStore,
   TestDependencies,

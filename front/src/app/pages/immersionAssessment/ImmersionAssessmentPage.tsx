@@ -12,11 +12,17 @@ import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immers
 import { RadioGroupForField } from "src/app/components/RadioGroup";
 import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
+import {
+  immersionAssessmentErrorSelector,
+  immersionAssessmentStatusSelector,
+} from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
 import { immersionAssessmentSlice } from "src/core-logic/domain/immersionAssessment/immersionAssessment.slice";
 import { conventionStateSelector } from "src/core-logic/domain/immersionConvention/immersionConvention.selectors";
 import { immersionConventionSlice } from "src/core-logic/domain/immersionConvention/immersionConvention.slice";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { Button } from "src/uiComponents/Button";
+import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
+import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
@@ -36,12 +42,14 @@ const useImmersionApplication = (jwt: string) => {
   }, []);
 };
 
-const useImmersionAssessment = () => {
+const useImmersionAssessment = (jwt: string) => {
   const dispatch = useDispatch();
 
   return {
     createAssessment: (assessment: ImmersionAssessmentDto): void => {
-      dispatch(immersionAssessmentSlice.actions.creationRequested(assessment));
+      dispatch(
+        immersionAssessmentSlice.actions.creationRequested({ assessment, jwt }),
+      );
     },
   };
 };
@@ -50,16 +58,20 @@ export const ImmersionAssessmentPage = ({
   route,
 }: ImmersionAssessmentProps) => {
   useImmersionApplication(route.params.jwt);
-  const { createAssessment } = useImmersionAssessment();
-  const { convention, isLoading, error } = useAppSelector(
-    conventionStateSelector,
-  );
-
+  const { createAssessment } = useImmersionAssessment(route.params.jwt);
+  const {
+    convention,
+    isLoading,
+    error: conventionFetchError,
+  } = useAppSelector(conventionStateSelector);
+  const assessmentError = useAppSelector(immersionAssessmentErrorSelector);
+  const assessmentStatus = useAppSelector(immersionAssessmentStatusSelector);
   return (
     <>
       <h1>Bilan de l'immersion</h1>
       {isLoading && <CircularProgress />}
-      {error && <div>{error}</div>}
+      {conventionFetchError && <div>{conventionFetchError}</div>}
+
       {convention && (
         <>
           <FormAccordion immersionApplication={convention} />
@@ -91,7 +103,24 @@ export const ImmersionAssessmentPage = ({
                       }))}
                     />
                   </div>
-                  <Button type="submit">Envoyer</Button>
+                  <Button
+                    type="submit"
+                    disable={
+                      assessmentStatus !== "Idle" || assessmentError !== null
+                    }
+                  >
+                    Envoyer
+                  </Button>
+                  {assessmentError && (
+                    <ErrorMessage title="Erreur">
+                      {assessmentError}
+                    </ErrorMessage>
+                  )}
+                  {assessmentStatus === "Success" && (
+                    <SuccessMessage title={"Bilan envoyé"}>
+                      Le bilan a bien été envoyé au conseiller
+                    </SuccessMessage>
+                  )}
                 </div>
               </Form>
             )}

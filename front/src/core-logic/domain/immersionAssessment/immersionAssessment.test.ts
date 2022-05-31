@@ -1,12 +1,18 @@
-import { expectObjectToMatch } from "shared/src/expectToEqual";
+import { expectObjectToMatch, expectToEqual } from "shared/src/expectToEqual";
+import { useAppSelector } from "src/app/utils/reduxHooks";
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
+  immersionAssessmentErrorSelector,
+  immersionAssessmentStatusSelector,
+} from "./immersionAssessment.selectors";
+import {
   immersionAssessmentSlice,
   ImmersionAssessmentState,
+  ImmersionAssessmentUIStatus,
 } from "./immersionAssessment.slice";
 
 describe("Immersion Assessment slice", () => {
@@ -18,43 +24,55 @@ describe("Immersion Assessment slice", () => {
   });
 
   it("immersion assessment creation requested - success", () => {
-    expectImmersionAssessmentStateToMatch({ isLoading: false, error: null });
+    expectStatusToBe("Idle");
     store.dispatch(
       immersionAssessmentSlice.actions.creationRequested({
-        conventionId: "23465",
-        status: "ABANDONED",
-        establishmentFeedback: "my feedback",
+        assessment: {
+          conventionId: "23465",
+          status: "ABANDONED",
+          establishmentFeedback: "my feedback",
+        },
+        jwt: "",
       }),
     );
-    expectImmersionAssessmentStateToMatch({ isLoading: true });
+    expectStatusToBe("Loading");
     feedGatewayWithCreationSuccess();
-    expectImmersionAssessmentStateToMatch({ isLoading: false, error: null });
+    expectStatusToBe("Success");
+    expectErrorToBe(null);
   });
 
   it("immersion assessment creation requested - error on backend", () => {
     const backendError: Error = new Error("Backend Error");
-    expectImmersionAssessmentStateToMatch({ isLoading: false, error: null });
+    expectStatusToBe("Idle");
     store.dispatch(
       immersionAssessmentSlice.actions.creationRequested({
-        conventionId: "23465",
-        status: "ABANDONED",
-        establishmentFeedback: "my feedback",
+        assessment: {
+          conventionId: "23465",
+          status: "ABANDONED",
+          establishmentFeedback: "my feedback",
+        },
+        jwt: "",
       }),
     );
-    expectImmersionAssessmentStateToMatch({ isLoading: true });
+    expectStatusToBe("Loading");
     feedGatewayWithCreationError(backendError);
-    expectImmersionAssessmentStateToMatch({
-      isLoading: false,
-      error: backendError.message,
-    });
+    expectStatusToBe("Idle");
+    expectErrorToBe(backendError.message);
   });
 
-  const expectImmersionAssessmentStateToMatch = (
-    immersionAssessmentState: Partial<ImmersionAssessmentState>,
+  const expectStatusToBe = (
+    immersionAssessmentStatus: ImmersionAssessmentUIStatus,
   ) => {
-    expectObjectToMatch(
-      store.getState().immersionAssessment,
-      immersionAssessmentState,
+    expectToEqual(
+      immersionAssessmentStatusSelector(store.getState()),
+      immersionAssessmentStatus,
+    );
+  };
+
+  const expectErrorToBe = (expectedErrorMessage: string | null) => {
+    expectToEqual(
+      immersionAssessmentErrorSelector(store.getState()),
+      expectedErrorMessage,
     );
   };
 

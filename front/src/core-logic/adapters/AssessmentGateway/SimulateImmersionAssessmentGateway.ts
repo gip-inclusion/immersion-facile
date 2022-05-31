@@ -1,13 +1,21 @@
-import { Observable, of, delay } from "rxjs";
-import { ImmersionAssessmentDto } from "src/../../shared/src/immersionAssessment/ImmersionAssessmentDto";
-import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
+import { Observable, of, delay, throwError } from "rxjs";
+import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import {
+  AssessmentAndJwt,
+  ImmersionAssessmentGateway,
+} from "src/core-logic/ports/ImmersionAssessmentGateway";
+
+export const failedId = "failed-id";
+export const failedIdError = new Error("Failed Id");
 
 export class SimulateImmersionAssessmentGateway
   implements ImmersionAssessmentGateway
 {
   constructor(private latency: number = 0) {}
 
-  createAssessment(_payload: ImmersionAssessmentDto): Observable<void> {
-    return of(undefined).pipe(delay(this.latency));
+  createAssessment({ assessment }: AssessmentAndJwt): Observable<void> {
+    return assessment.conventionId === failedId
+      ? throwError(failedIdError)
+      : of(undefined).pipe(delay(this.latency));
   }
 }

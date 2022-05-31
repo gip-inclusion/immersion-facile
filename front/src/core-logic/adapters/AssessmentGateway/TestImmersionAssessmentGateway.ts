@@ -1,11 +1,13 @@
 import { Observable, Subject } from "rxjs";
-import { ImmersionAssessmentDto } from "src/../../shared/src/immersionAssessment/ImmersionAssessmentDto";
-import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
+import {
+  AssessmentAndJwt,
+  ImmersionAssessmentGateway,
+} from "src/core-logic/ports/ImmersionAssessmentGateway";
 
 export class TestImmersionAssessmentGateway
   implements ImmersionAssessmentGateway
 {
-  createAssessment(_payload: ImmersionAssessmentDto): Observable<void> {
+  createAssessment(_params: AssessmentAndJwt): Observable<void> {
     return this.creationResponse$;
   }
 

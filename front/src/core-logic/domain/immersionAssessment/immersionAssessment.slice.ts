@@ -1,13 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { AssessmentAndJwt } from "src/core-logic/ports/ImmersionAssessmentGateway";
+
+export type ImmersionAssessmentUIStatus = "Idle" | "Loading" | "Success";
 
 export interface ImmersionAssessmentState {
-  isLoading: boolean;
+  status: ImmersionAssessmentUIStatus;
   error: string | null;
 }
 
 const initialState: ImmersionAssessmentState = {
-  isLoading: false,
+  status: "Idle",
   error: null,
 };
 
@@ -15,17 +18,14 @@ export const immersionAssessmentSlice = createSlice({
   name: "immersionAssessment",
   initialState,
   reducers: {
-    creationRequested: (
-      state,
-      _action: PayloadAction<ImmersionAssessmentDto>,
-    ) => {
-      state.isLoading = true;
+    creationRequested: (state, _action: PayloadAction<AssessmentAndJwt>) => {
+      state.status = "Loading";
     },
     creationSucceeded: (state) => {
-      state.isLoading = false;
+      state.status = "Success";
     },
     creationFailed: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
+      state.status = "Idle";
       state.error = action.payload;
     },
   },
