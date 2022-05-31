@@ -1029,6 +1029,18 @@ describe("Postgres implementation of immersion offer repository", () => {
   });
 
   describe("Pg implementation of method getSiretOfEstablishmentsFromFormSource", () => {
+    it("Returns empty lists if no siret provided", async () => {
+      const actualSiretsGroupedByDataSource =
+        await pgEstablishmentAggregateRepository.groupEstablishmentSiretsByDataSource(
+          [],
+        );
+      // Assert
+      expect(actualSiretsGroupedByDataSource).toEqual({
+        form: [],
+        api_labonneboite: [],
+      });
+    });
+
     it("Returns empty lists if no establishments in repository", async () => {
       const actualSiretsGroupedByDataSource =
         await pgEstablishmentAggregateRepository.groupEstablishmentSiretsByDataSource(

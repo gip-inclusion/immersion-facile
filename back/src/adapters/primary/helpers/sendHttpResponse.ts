@@ -16,10 +16,12 @@ const handleResponseError = (req: Request, res: Response, error: any) => {
     }
     res.status(error.httpCode);
   } else {
+    const stack = JSON.stringify(error.stack, null, 2);
     logger.error(
       {
         error,
         errorMessage: error.message,
+        stack,
         request: {
           path: req.path,
           method: req.method,
@@ -28,10 +30,12 @@ const handleResponseError = (req: Request, res: Response, error: any) => {
       },
       "Unhandled error",
     );
+
     notifyObjectDiscord({
       _message: `Unhandled Error : ${error.message}`,
       routePath: req.path,
       routeMethod: req.method,
+      stack,
     });
     res.status(500);
   }

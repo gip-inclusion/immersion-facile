@@ -15,7 +15,7 @@ export class PgLaBonneBoiteRequestRepository
     await this.client.query(
       `INSERT INTO lbb_requests (
          requested_at, rome, lat, lon, distance_km, result
-       ) VALUES ($1, $2, $3, $4, $5, $6) `,
+       ) VALUES ($1, $2, $3, $4, $5, $6)`,
       [
         laBonneBoiteRequest.requestedAt,
         laBonneBoiteRequest.params.rome,
@@ -26,6 +26,7 @@ export class PgLaBonneBoiteRequestRepository
       ],
     );
   }
+
   public async getClosestRequestParamsWithThisRomeSince({
     rome: thisRome,
     position: thisPosition,

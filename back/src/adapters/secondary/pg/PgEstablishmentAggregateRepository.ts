@@ -525,6 +525,12 @@ export class PgEstablishmentAggregateRepository
   public async groupEstablishmentSiretsByDataSource(
     sirets: SiretDto[],
   ): Promise<Record<DataSource, SiretDto[]>> {
+    if (!sirets.length)
+      return {
+        api_labonneboite: [],
+        form: [],
+      };
+
     const query = format(
       `
       WITH grouped_sirets AS (SELECT data_source, JSONB_AGG(siret) AS sirets

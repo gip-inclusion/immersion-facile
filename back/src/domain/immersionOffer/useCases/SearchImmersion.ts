@@ -2,12 +2,15 @@ import promClient from "prom-client";
 import { SearchImmersionRequestDto } from "shared/src/searchImmersion/SearchImmersionRequest.dto";
 import { searchImmersionRequestSchema } from "shared/src/searchImmersion/SearchImmersionRequest.schema";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { createLogger } from "../../../utils/logger";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { SearchMadeRepository } from "../ports/SearchMadeRepository";
+
+const logger = createLogger(__filename);
 
 const histogramSearchImmersionStoredCount = new promClient.Histogram({
   name: "search_immersion_stored_result_count",
@@ -54,8 +57,7 @@ export class SearchImmersion extends UseCase<
 
     await this.searchesMadeRepository.insertSearchMade(searchMadeEntity);
 
-    //eslint-disable-next-line no-console
-    console.time("searchImmersionQueryDuration");
+    const dateStartQuery = new Date();
     const resultsFromStorage =
       await this.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
         {
@@ -64,8 +66,12 @@ export class SearchImmersion extends UseCase<
           maxResults: 100,
         },
       );
-    //eslint-disable-next-line no-console
-    console.timeEnd("searchImmersionQueryDuration");
+    const dateEndQuery = new Date();
+
+    logger.debug(
+      { duration_ms: dateEndQuery.getTime() - dateStartQuery.getTime() },
+      "searchImmersionQueryDuration",
+    );
 
     histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);
 

@@ -83,48 +83,51 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
     await this.laBonneBoiteRequestRepository.insertLaBonneBoiteRequest(
       lbbRequestEntity,
     );
-    if (relevantCompanies) {
-      const lbbSirets = relevantCompanies.map(prop("siret"));
-      const siretGroupedByDataSource =
-        await this.establishmentAggregateRepository.groupEstablishmentSiretsByDataSource(
-          lbbSirets,
-        );
-      const existingEstablishments = [
-        ...(siretGroupedByDataSource.api_labonneboite ?? []),
-        ...(siretGroupedByDataSource.form ?? []),
-      ];
-      const newRelevantCompanies = relevantCompanies.filter(
-        (company) => !existingEstablishments.includes(company.siret),
+
+    if (!relevantCompanies || relevantCompanies.length === 0) return;
+
+    const lbbSirets = relevantCompanies.map(prop("siret"));
+    const siretGroupedByDataSource =
+      await this.establishmentAggregateRepository.groupEstablishmentSiretsByDataSource(
+        lbbSirets,
       );
-      await this.insertRelevantCompaniesInRepositories(newRelevantCompanies);
 
-      if (!siretGroupedByDataSource.api_labonneboite) return;
+    const existingEstablishments = [
+      ...(siretGroupedByDataSource.api_labonneboite ?? []),
+      ...(siretGroupedByDataSource.form ?? []),
+    ];
+    const newRelevantCompanies = relevantCompanies.filter(
+      (company) => !existingEstablishments.includes(company.siret),
+    );
 
-      const existingCompaniesWithSameRome =
-        await this.establishmentAggregateRepository.getSiretsOfEstablishmentsWithRomeCode(
-          requestParams.rome,
-        );
-      const existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome =
-        siretGroupedByDataSource.api_labonneboite.filter(
-          (siret) => !existingCompaniesWithSameRome.includes(siret),
-        );
+    await this.insertRelevantCompaniesInRepositories(newRelevantCompanies);
 
-      const immersionOffersWithSiretsToAdd: OfferWithSiret[] =
-        existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome.map((siret) => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it's siret is within relevantCompanies
-          const company = relevantCompanies.find(propEq("siret", siret))!;
-          return {
-            siret: company.siret,
-            id: this.uuidGenerator.new(),
-            createdAt: this.clock.now(),
-            romeCode: company.props.matched_rome_code,
-            score: company.props.stars,
-          };
-        });
-      await this.establishmentAggregateRepository.createImmersionOffersToEstablishments(
-        immersionOffersWithSiretsToAdd,
+    if (!siretGroupedByDataSource.api_labonneboite) return;
+
+    const existingCompaniesWithSameRome =
+      await this.establishmentAggregateRepository.getSiretsOfEstablishmentsWithRomeCode(
+        requestParams.rome,
       );
-    }
+    const existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome =
+      siretGroupedByDataSource.api_labonneboite.filter(
+        (siret) => !existingCompaniesWithSameRome.includes(siret),
+      );
+
+    const immersionOffersWithSiretsToAdd: OfferWithSiret[] =
+      existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome.map((siret) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it's siret is within relevantCompanies
+        const company = relevantCompanies.find(propEq("siret", siret))!;
+        return {
+          siret: company.siret,
+          id: this.uuidGenerator.new(),
+          createdAt: this.clock.now(),
+          romeCode: company.props.matched_rome_code,
+          score: company.props.stars,
+        };
+      });
+    await this.establishmentAggregateRepository.createImmersionOffersToEstablishments(
+      immersionOffersWithSiretsToAdd,
+    );
   }
 
   private async requestLaBonneBoite(
