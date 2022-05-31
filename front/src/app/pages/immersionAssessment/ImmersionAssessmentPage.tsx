@@ -1,8 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { Form, Formik } from "formik";
 import { identity } from "ramda";
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import React from "react";
 import {
   AssessmentStatus,
   assessmentStatuses,
@@ -16,9 +15,7 @@ import {
   immersionAssessmentErrorSelector,
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
-import { immersionAssessmentSlice } from "src/core-logic/domain/immersionAssessment/immersionAssessment.slice";
 import { conventionStateSelector } from "src/core-logic/domain/immersionConvention/immersionConvention.selectors";
-import { immersionConventionSlice } from "src/core-logic/domain/immersionConvention/immersionConvention.slice";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { Button } from "src/uiComponents/Button";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
@@ -26,33 +23,14 @@ import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
+import { useImmersionApplication } from "../../../hooks/immersionApplication";
+import { useImmersionAssessment } from "../../../hooks/immersionAssessment";
 
 type ImmersionAssessmentRoute = Route<typeof routes.immersionAssessment>;
 
 interface ImmersionAssessmentProps {
   route: ImmersionAssessmentRoute;
 }
-
-const useImmersionApplication = (jwt: string) => {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(
-      immersionConventionSlice.actions.immersionConventionRequested(jwt),
-    );
-  }, []);
-};
-
-const useImmersionAssessment = (jwt: string) => {
-  const dispatch = useDispatch();
-
-  return {
-    createAssessment: (assessment: ImmersionAssessmentDto): void => {
-      dispatch(
-        immersionAssessmentSlice.actions.creationRequested({ assessment, jwt }),
-      );
-    },
-  };
-};
 
 export const ImmersionAssessmentPage = ({
   route,
