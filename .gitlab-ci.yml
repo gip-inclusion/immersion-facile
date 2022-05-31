@@ -8,7 +8,7 @@ variables:
   PG_TEST_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB
   STORAGE_ROOT: /storage
 
-image: node:16.5-buster
+image: node:16.15-buster
 
 stages:
 #  - build
