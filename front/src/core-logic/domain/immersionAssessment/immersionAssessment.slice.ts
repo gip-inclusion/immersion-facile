@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { AssessmentAndJwt } from "src/core-logic/ports/ImmersionAssessmentGateway";
 
 export type ImmersionAssessmentUIStatus = "Idle" | "Loading" | "Success";

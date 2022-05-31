@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { immersionAssessmentRoute } from "shared/src/routes";
 import {
   AssessmentAndJwt,

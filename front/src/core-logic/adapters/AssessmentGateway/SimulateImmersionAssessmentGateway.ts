@@ -1,5 +1,4 @@
-import { Observable, of, delay, throwError } from "rxjs";
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { delay, Observable, of, throwError } from "rxjs";
 import {
   AssessmentAndJwt,
   ImmersionAssessmentGateway,

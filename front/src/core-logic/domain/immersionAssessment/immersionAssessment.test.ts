@@ -1,5 +1,4 @@
-import { expectObjectToMatch, expectToEqual } from "shared/src/expectToEqual";
-import { useAppSelector } from "src/app/utils/reduxHooks";
+import { expectToEqual } from "shared/src/expectToEqual";
 import {
   createTestStore,
   TestDependencies,
@@ -11,7 +10,6 @@ import {
 } from "./immersionAssessment.selectors";
 import {
   immersionAssessmentSlice,
-  ImmersionAssessmentState,
   ImmersionAssessmentUIStatus,
 } from "./immersionAssessment.slice";
 
