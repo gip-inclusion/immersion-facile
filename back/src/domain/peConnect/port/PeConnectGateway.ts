@@ -1,8 +1,8 @@
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
-  PeConnectAdvisorDTO,
-  PeConnectUserDTO,
+  PeConnectAdvisorDto,
+  PeConnectUserDto,
   PeUserAndAdvisors,
 } from "../dto/PeConnect.dto";
 
@@ -12,11 +12,11 @@ export interface PeConnectGateway {
     authorizationCode: string,
   ) => Promise<AccessTokenDto>;
 
-  getUserInfo: (accesstoken: AccessTokenDto) => Promise<PeConnectUserDTO>;
+  getUserInfo: (accesstoken: AccessTokenDto) => Promise<PeConnectUserDto>;
 
   getAdvisorsInfo: (
     accesstoken: AccessTokenDto,
-  ) => Promise<PeConnectAdvisorDTO[]>;
+  ) => Promise<PeConnectAdvisorDto[]>;
 
   getUserAndAdvisors: (authorizationCode: string) => Promise<PeUserAndAdvisors>;
 }

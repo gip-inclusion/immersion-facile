@@ -3,7 +3,7 @@ import { ImmersionApplicationId } from "shared/src/ImmersionApplication/Immersio
 import { ConventionPoleEmploiAdvisorRepository } from "../../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import {
   PeExternalId,
-  PoleEmploiUserAdvisorDTO,
+  PoleEmploiUserAdvisorDto,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 
 const CONVENTION_ID_DEFAULT_UUID = "00000000-0000-0000-0000-000000000000";
@@ -31,7 +31,7 @@ export class PgConventionPoleEmploiAdvisorRepository
   }
 
   public async openSlotForNextConvention(
-    conventionPoleEmploiUserAdvisorEntity: PoleEmploiUserAdvisorDTO,
+    conventionPoleEmploiUserAdvisorEntity: PoleEmploiUserAdvisorDto,
   ): Promise<void> {
     const { userPeExternalId, firstName, lastName, email, type } =
       conventionPoleEmploiUserAdvisorEntity;

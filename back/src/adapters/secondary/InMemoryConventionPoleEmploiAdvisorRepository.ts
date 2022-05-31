@@ -3,7 +3,7 @@ import { ConventionPoleEmploiAdvisorRepository } from "../../domain/peConnect/po
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeExternalId,
-  PoleEmploiUserAdvisorDTO,
+  PoleEmploiUserAdvisorDto,
 } from "../../domain/peConnect/dto/PeConnect.dto";
 import { NotFoundError } from "../primary/helpers/httpErrors";
 
@@ -70,8 +70,8 @@ const matchPeExternalId =
     conventionPoleEmploiUserAdvisor.userPeExternalId === peExternalId;
 
 const isEntity = (
-  e: PoleEmploiUserAdvisorDTO | undefined,
-): e is PoleEmploiUserAdvisorDTO => !!e;
+  e: PoleEmploiUserAdvisorDto | undefined,
+): e is PoleEmploiUserAdvisorDto => !!e;
 
 const isOpenEntity = (entity: ConventionPoleEmploiUserAdvisorEntity) =>
   entity.conventionId === "";

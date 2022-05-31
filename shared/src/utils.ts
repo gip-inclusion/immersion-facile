@@ -21,6 +21,9 @@ export const removeAtIndex = <T>(array: T[], indexToRemove: number): T[] => [
 export type TypeFromTuple<T extends unknown[]> = T[number];
 
 export type NotEmptyArray<T> = [T, ...T[]];
+
+export type ExcludeFromExisting<T extends string, K extends T> = Exclude<T, K>
+
 export type OmitFromExistingKeys<
   T extends Record<string, unknown>,
   K extends keyof T,

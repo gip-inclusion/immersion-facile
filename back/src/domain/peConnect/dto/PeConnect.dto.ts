@@ -1,7 +1,8 @@
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ExcludeFromExisting, NotEmptyArray } from "shared/src/utils";
 import { EntityFromDto } from "../../core/EntityFromDto";
 
-export type PoleEmploiUserAdvisorDTO = {
+export type PoleEmploiUserAdvisorDto = {
   userPeExternalId: string;
   firstName: string;
   lastName: string;
@@ -12,23 +13,33 @@ export type PoleEmploiUserAdvisorDTO = {
 export type ConventionPoleEmploiUserAdvisorEntity = EntityFromDto<
   {
     conventionId: string;
-  } & PoleEmploiUserAdvisorDTO,
+  } & PoleEmploiUserAdvisorDto,
   "ConventionPoleEmploiAdvisor"
 >;
 
-export type PeConnectUserDTO = {
+export type PeConnectUserDto = {
   email: string;
   firstName: string;
   lastName: string;
   peExternalId: string;
 };
 
-export type PeConnectAdvisorDTO = {
+export type PeConnectAdvisorDto = {
   email: string;
   firstName: string;
   lastName: string;
-  type: AdvisorTypes;
+  type: AdvisorKind;
 };
+
+export type PeConnectAdvisorEntity = EntityFromDto<
+  {
+    email: string;
+    firstName: string;
+    lastName: string;
+    type: ConventionPoleEmploiAdvisor;
+  },
+  "PeConnectAdvisorEntity"
+>;
 
 export type ConventionPeConnectFields = Pick<
   ImmersionApplicationDto,
@@ -41,40 +52,44 @@ export const peExternalAdvisorsTypes = [
   "CAPEMPLOI",
 ] as const;
 
-export type AdvisorTypes = typeof peExternalAdvisorsTypes[number];
+export type AdvisorKind = typeof peExternalAdvisorsTypes[number];
 
-type ConventionPoleEmploiAdvisor = Omit<AdvisorTypes, "INDEMNISATION">;
+type ConventionPoleEmploiAdvisor = ExcludeFromExisting<
+  AdvisorKind,
+  "INDEMNISATION"
+>;
 
-export const conventionPoleEmploiAdvisors = ["PLACEMENT", "CAPEMPLOI"] as const;
+export const conventionPoleEmploiAdvisors: NotEmptyArray<ConventionPoleEmploiAdvisor> =
+  ["PLACEMENT", "CAPEMPLOI"];
 
-export const toPeConnectAdvisorDTO = (
+export const toPeConnectAdvisorDto = (
   fromApi: ExternalPeConnectAdvisor,
-): PeConnectAdvisorDTO => ({
+): PeConnectAdvisorDto => ({
   email: fromApi.mail,
   firstName: fromApi.prenom,
   lastName: fromApi.nom,
   type: fromApi.type,
 });
 
-export const toPeConnectUserDTO = (
+export const toPeConnectUserDto = (
   fromApi: ExternalPeConnectUser,
-): PeConnectUserDTO => ({
+): PeConnectUserDto => ({
   email: fromApi.email,
   firstName: fromApi.given_name,
   lastName: fromApi.family_name,
   peExternalId: fromApi.idIdentiteExterne,
 });
 
-export const toConventionPoleEmploiAdvisorDTO = ({
+export const toConventionPoleEmploiAdvisorDto = ({
   user,
   advisor,
-}: PeUserAndAdvisor): PoleEmploiUserAdvisorDTO => ({
+}: PeUserAndAdvisor): PoleEmploiUserAdvisorDto => ({
   ...advisor,
   userPeExternalId: user.peExternalId,
 });
 
 export const toPartialConventionDto = (
-  peConnectUserInfo: PeConnectUserDTO,
+  peConnectUserInfo: PeConnectUserDto,
 ): ConventionPeConnectFields => ({
   email: peConnectUserInfo.email,
   firstName: peConnectUserInfo.firstName,
@@ -82,13 +97,13 @@ export const toPartialConventionDto = (
 });
 
 export type PeUserAndAdvisors = {
-  advisors: PeConnectAdvisorDTO[];
-  user: PeConnectUserDTO;
+  advisors: PeConnectAdvisorDto[];
+  user: PeConnectUserDto;
 };
 
 export type PeUserAndAdvisor = {
-  advisor: PeConnectAdvisorDTO;
-  user: PeConnectUserDTO;
+  advisor: PeConnectAdvisorEntity;
+  user: PeConnectUserDto;
 };
 
 export type PeExternalId = string;
@@ -109,7 +124,7 @@ export type ExternalPeConnectAdvisor = {
   prenom: string;
   civilite: string;
   mail: string;
-  type: AdvisorTypes;
+  type: AdvisorKind;
 };
 
 // External contract from https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token

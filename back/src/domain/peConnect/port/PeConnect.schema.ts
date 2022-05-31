@@ -5,7 +5,7 @@ import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
   peExternalAdvisorsTypes,
-  PoleEmploiUserAdvisorDTO,
+  PoleEmploiUserAdvisorDto,
 } from "../dto/PeConnect.dto";
 
 export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
@@ -45,10 +45,10 @@ const shape = {
   type: z.enum(conventionPoleEmploiAdvisors),
 };
 
-export const poleEmploiUserAdvisorEntitySchema: z.Schema<PoleEmploiUserAdvisorDTO> =
+export const poleEmploiUserAdvisorEntitySchema: z.Schema<PoleEmploiUserAdvisorDto> =
   z.object(shape);
 
-export const PoleEmploiUserAdvisorDTOSchema: z.Schema<PoleEmploiUserAdvisorDTO> =
+export const PoleEmploiUserAdvisorDTOSchema: z.Schema<PoleEmploiUserAdvisorDto> =
   z
     .object({
       id: z.string().uuid(),

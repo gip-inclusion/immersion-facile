@@ -9,13 +9,13 @@ import {
 import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
-  PeConnectAdvisorDTO,
+  PeConnectAdvisorDto,
   ExternalPeConnectOAuthGetTokenWithCodeGrantPayload,
   ExternalPeConnectOAuthGrantPayload,
-  PeConnectUserDTO,
+  PeConnectUserDto,
   PeUserAndAdvisors,
-  toPeConnectAdvisorDTO,
-  toPeConnectUserDTO,
+  toPeConnectAdvisorDto,
+  toPeConnectUserDto,
 } from "../../domain/peConnect/dto/PeConnect.dto";
 import { externalAccessTokenSchema } from "../../domain/peConnect/port/AccessToken.schema";
 import {
@@ -89,7 +89,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
   public async getUserInfo(
     accessToken: AccessTokenDto,
-  ): Promise<PeConnectUserDTO> {
+  ): Promise<PeConnectUserDto> {
     const response = await createAxiosInstance()
       .get(ApiPeConnectUrls.PECONNECT_USER_INFO, {
         headers: headersWithAuthPeAccessToken(accessToken),
@@ -103,12 +103,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       response.data,
     );
 
-    return toPeConnectUserDTO(externalUser);
+    return toPeConnectUserDto(externalUser);
   }
 
   public async getAdvisorsInfo(
     accessToken: AccessTokenDto,
-  ): Promise<PeConnectAdvisorDTO[]> {
+  ): Promise<PeConnectAdvisorDto[]> {
     const response = await createAxiosInstance()
       .get(ApiPeConnectUrls.PECONNECT_ADVISORS_INFO, {
         headers: headersWithAuthPeAccessToken(accessToken),
@@ -123,7 +123,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       response.data,
     );
 
-    return advisors.map(toPeConnectAdvisorDTO);
+    return advisors.map(toPeConnectAdvisorDto);
   }
 
   public async getUserAndAdvisors(

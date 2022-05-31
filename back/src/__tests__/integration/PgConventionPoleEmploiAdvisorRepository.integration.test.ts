@@ -6,7 +6,7 @@ import { expectObjectsToMatch } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../adapters/secondary/pg/PgConventionPoleEmploiAdvisorRepository";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
-import { PoleEmploiUserAdvisorDTO } from "../../domain/peConnect/dto/PeConnect.dto";
+import { PoleEmploiUserAdvisorDto } from "../../domain/peConnect/dto/PeConnect.dto";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
 const userPeExternalId = "aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaad";
@@ -15,7 +15,7 @@ const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
   .withId(conventionId)
   .build();
 
-const poleEmploiFirstUserAdvisor: PoleEmploiUserAdvisorDTO = {
+const poleEmploiFirstUserAdvisor: PoleEmploiUserAdvisorDto = {
   userPeExternalId,
   firstName: "Jean",
   lastName: "Dupont",
@@ -23,7 +23,7 @@ const poleEmploiFirstUserAdvisor: PoleEmploiUserAdvisorDTO = {
   type: "PLACEMENT",
 };
 
-const poleEmploiUpdatedUserAdvisor: PoleEmploiUserAdvisorDTO = {
+const poleEmploiUpdatedUserAdvisor: PoleEmploiUserAdvisorDto = {
   userPeExternalId,
   firstName: "Jeanne",
   lastName: "Delamare",

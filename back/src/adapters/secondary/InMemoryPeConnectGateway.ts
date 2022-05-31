@@ -9,12 +9,12 @@ import {
   ConventionPeConnectFields,
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
-  PeConnectAdvisorDTO,
-  PeConnectUserDTO,
+  PeConnectAdvisorDto,
+  PeConnectUserDto,
   toPartialConventionDto,
   PeUserAndAdvisors,
-  toPeConnectAdvisorDTO,
-  toPeConnectUserDTO,
+  toPeConnectAdvisorDto,
+  toPeConnectUserDto,
 } from "../../domain/peConnect/dto/PeConnect.dto";
 import { externalAccessTokenSchema } from "../../domain/peConnect/port/AccessToken.schema";
 import {
@@ -64,7 +64,7 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
     //We would then be redirected on our /demande-immersion url with the associated urlencoded payload
 
     const queryParams = queryParamsAsString<ConventionPeConnectFields>(
-      toPartialConventionDto(toPeConnectUserDTO(mockedUserInfo)),
+      toPartialConventionDto(toPeConnectUserDto(mockedUserInfo)),
     );
 
     return `${this.baseUrl}/${frontRoutes.immersionApplicationsRoute}?${queryParams}`;
@@ -72,19 +72,19 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
 
   async getAdvisorsInfo(
     _accesstoken: AccessTokenDto,
-  ): Promise<PeConnectAdvisorDTO[]> {
+  ): Promise<PeConnectAdvisorDto[]> {
     const externalMockedAdvisors = externalPeConnectAdvisorsSchema.parse(
       this._advisors,
     );
 
-    return externalMockedAdvisors.map(toPeConnectAdvisorDTO);
+    return externalMockedAdvisors.map(toPeConnectAdvisorDto);
   }
 
-  async getUserInfo(_accesstoken: AccessTokenDto): Promise<PeConnectUserDTO> {
+  async getUserInfo(_accesstoken: AccessTokenDto): Promise<PeConnectUserDto> {
     const mockedExternaluser: ExternalPeConnectUser =
       externalPeConnectUserSchema.parse(this._user);
 
-    return toPeConnectUserDTO(mockedExternaluser);
+    return toPeConnectUserDto(mockedExternaluser);
   }
 
   async getUserAndAdvisors(
