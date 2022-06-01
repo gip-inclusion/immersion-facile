@@ -1,6 +1,6 @@
 import { asyncScheduler, SchedulerLike } from "rxjs";
-import { SimulateImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulateImmersionAssessmentGateway";
-
+import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
+import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/HttpEstablishmentGateway";
 import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
@@ -19,24 +19,23 @@ import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,
 } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
-import { InMemorySiretGatewayThroughBack } from "src/core-logic/adapters/InMemorySiretGatewayThroughBack";
 import { InMemoryTechnicalGateway } from "src/core-logic/adapters/InMemoryTechnicalGateway";
+import { ReactNavigationGateway } from "src/core-logic/adapters/ReactNavigationGateway";
+import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SimulatedSiretGatewayThroughBack";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
-import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
-import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
+import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
+import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
 import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import { ENV } from "src/environmentVariables";
 import { HttpAgencyGateway } from "src/infra/gateway/AgencyGateway/HttpAgencyGateway";
 import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
-import { ReactNavigationGateway } from "src/core-logic/adapters/ReactNavigationGateway";
-import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
-import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 
 export const establishmentGateway: EstablishmentGateway =
   ENV.gateway === "IN_MEMORY"
@@ -50,8 +49,8 @@ export const establishmentGateway: EstablishmentGateway =
 const inMemoryImmersionApplicationGateway =
   new InMemoryImmersionApplicationGateway(500);
 
-const getInMemorySiretGatewayThroughBack = () =>
-  new InMemorySiretGatewayThroughBack({
+const getSimulatedSiretGatewayThroughBack = () =>
+  new SimulatedSiretGatewayThroughBack(500, {
     12345678901238: {
       siret: "12345678901238",
       businessName: "",
@@ -75,7 +74,7 @@ const getInMemorySiretGatewayThroughBack = () =>
 
 export const siretGatewayThroughBack =
   ENV.gateway === "IN_MEMORY"
-    ? getInMemorySiretGatewayThroughBack()
+    ? getSimulatedSiretGatewayThroughBack()
     : new HttpSiretGatewayThroughBack();
 
 export const immersionApplicationGateway: ImmersionApplicationGateway =
@@ -112,7 +111,7 @@ const navigationGateway = new ReactNavigationGateway();
 
 export const immersionAssessmentGateway: ImmersionAssessmentGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new SimulateImmersionAssessmentGateway()
+    ? new SimulatedImmersionAssessmentGateway()
     : new HttpImmersionAssessmentGateway();
 
 export type Dependencies = {

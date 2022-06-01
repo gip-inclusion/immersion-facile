@@ -10,9 +10,9 @@ import {
 } from "../ports/SiretGatewayThroughBack";
 import { expectToEqual } from "shared/src/expectToEqual";
 import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
-import { InMemorySiretGatewayThroughBack } from "./InMemorySiretGatewayThroughBack";
+import { SimulatedSiretGatewayThroughBack } from "./SimulatedSiretGatewayThroughBack";
 
-const inMemory = new InMemorySiretGatewayThroughBack({
+const inMemory = new SimulatedSiretGatewayThroughBack(0, {
   "12345678901234": {
     businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
     businessName: "MA P'TITE BOITE",

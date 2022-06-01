@@ -7,7 +7,7 @@ import {
 export const failedId = "failed-id";
 export const failedIdError = new Error("Failed Id");
 
-export class SimulateImmersionAssessmentGateway
+export class SimulatedImmersionAssessmentGateway
   implements ImmersionAssessmentGateway
 {
   constructor(private latency: number = 0) {}

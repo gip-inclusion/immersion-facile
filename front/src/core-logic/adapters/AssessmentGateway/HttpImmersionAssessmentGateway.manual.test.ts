@@ -5,8 +5,8 @@ import { HttpImmersionAssessmentGateway } from "./HttpImmersionAssessmentGateway
 import {
   failedId,
   failedIdError,
-  SimulateImmersionAssessmentGateway,
-} from "./SimulateImmersionAssessmentGateway";
+  SimulatedImmersionAssessmentGateway,
+} from "./SimulatedImmersionAssessmentGateway";
 
 const expectPromiseToFailWithError = async (
   promise: Promise<unknown>,
@@ -15,7 +15,7 @@ const expectPromiseToFailWithError = async (
   await expect(promise).rejects.toThrow(expectedError);
 };
 
-const simulated = new SimulateImmersionAssessmentGateway();
+const simulated = new SimulatedImmersionAssessmentGateway();
 const http = new HttpImmersionAssessmentGateway("http://localhost:1234");
 
 const immersionAssessmentGateways: ImmersionAssessmentGateway[] = [

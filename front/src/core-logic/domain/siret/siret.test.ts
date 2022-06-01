@@ -71,15 +71,16 @@ describe("Siret validation and fetching", () => {
     });
   });
 
+  const establishmentFetched = {
+    siret: "11110000111100",
+    businessName: "Existing open business on Sirene Corp.",
+    businessAddress: "",
+    isOpen: true,
+  };
+
   describe("Siret fetching when a 14 digit siret is provided", () => {
     it("fetches correctly and keeps the returned establishment", () => {
       dispatchSiretModified("11110000111100");
-      const establishmentFetched = {
-        siret: "11110000111100",
-        businessName: "Existing open business on Sirene Corp.",
-        businessAddress: "",
-        isOpen: true,
-      };
       feedSirenGatewayThroughBackWith(establishmentFetched);
       expectEstablishmentToEqual(establishmentFetched);
       expectOnly_getSirenInfoIfNotAlreadySaved_toHaveBeenCalled();
@@ -115,14 +116,7 @@ describe("Siret validation and fetching", () => {
       setStoreWithInitialSiretState({
         shouldFetchEvenIfAlreadySaved: true,
       });
-
       dispatchSiretModified("11110000111100");
-      const establishmentFetched = {
-        siret: "11110000111100",
-        businessName: "Existing open business on Sirene Corp.",
-        businessAddress: "",
-        isOpen: true,
-      };
       feedSirenGatewayThroughBackWith(establishmentFetched);
       expectEstablishmentToEqual(establishmentFetched);
       expectOnly_getSirenInfoObservable_toHaveBeenCalled();

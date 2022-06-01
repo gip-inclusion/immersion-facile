@@ -8,12 +8,12 @@ import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemor
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/InMemoryNavigationGateway";
-import { InMemorySiretGatewayThroughBack } from "../adapters/InMemorySiretGatewayThroughBack";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
+import { TestSiretGatewayThroughBack } from "../adapters/TestSiretGatewayThroughBack";
 
 export interface TestDependencies {
   immersionAssessmentGateway: TestImmersionAssessmentGateway;
-  siretGatewayThroughBack: InMemorySiretGatewayThroughBack;
+  siretGatewayThroughBack: TestSiretGatewayThroughBack;
   agencyGateway: InMemoryAgencyGateway;
   apiAdresseGateway: InMemoryApiAdresseGateway;
   technicalGateway: InMemoryTechnicalGateway;
@@ -32,7 +32,7 @@ export const createTestStore = (
 ) => {
   const dependencies: TestDependencies = {
     immersionAssessmentGateway: new TestImmersionAssessmentGateway(),
-    siretGatewayThroughBack: new InMemorySiretGatewayThroughBack(),
+    siretGatewayThroughBack: new TestSiretGatewayThroughBack(),
     immersionSearchGateway: new InMemoryImmersionSearchGateway(),
     minSearchResultsToPreventRefetch: 2,
     establishmentGateway: new InMemoryEstablishmentGateway(),
