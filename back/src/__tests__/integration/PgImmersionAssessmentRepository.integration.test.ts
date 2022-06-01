@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {
@@ -36,7 +36,7 @@ describe("PgImmersionAssessmentRepository", () => {
     await client.query("DELETE FROM immersion_applications");
     await client.query("DELETE FROM agencies");
     const agencyRepository = new PgAgencyRepository(client);
-    await agencyRepository.insert(AgencyConfigBuilder.create().build());
+    await agencyRepository.insert(AgencyBuilder.create().build());
     const immersionApplicationRepository = new PgImmersionApplicationRepository(
       client,
     );

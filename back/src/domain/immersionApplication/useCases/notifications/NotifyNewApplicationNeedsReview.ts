@@ -1,4 +1,4 @@
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import {
   ApplicationStatus,
   ImmersionApplicationDto,
@@ -28,11 +28,11 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
   public async _execute(
     immersionApplicationDto: ImmersionApplicationDto,
   ): Promise<void> {
-    const agencyConfig = await this.agencyRepository.getById(
+    const agency = await this.agencyRepository.getById(
       immersionApplicationDto.agencyId,
     );
 
-    if (!agencyConfig) {
+    if (!agency) {
       logger.error(
         { agencyId: immersionApplicationDto.agencyId },
         "No Agency Config found for this agency code",
@@ -42,7 +42,7 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
 
     const recipients = determineRecipients(
       immersionApplicationDto.status,
-      agencyConfig,
+      agency,
     );
     logger.debug(
       "immersionApplicationDto.status : " + immersionApplicationDto.status,
@@ -105,27 +105,27 @@ type Recipients = {
 
 const determineRecipients = (
   status: ApplicationStatus,
-  agencyConfig: AgencyConfig,
+  agency: Agency,
 ): Recipients | undefined => {
-  const hasCounsellorEmails = agencyConfig.counsellorEmails.length > 0;
-  const hasValidatorEmails = agencyConfig.validatorEmails.length > 0;
-  const hasAdminEmails = agencyConfig.adminEmails.length > 0;
+  const hasCounsellorEmails = agency.counsellorEmails.length > 0;
+  const hasValidatorEmails = agency.validatorEmails.length > 0;
+  const hasAdminEmails = agency.adminEmails.length > 0;
 
   switch (status) {
     case "IN_REVIEW": {
       if (hasCounsellorEmails)
-        return { role: "counsellor", emails: agencyConfig.counsellorEmails };
+        return { role: "counsellor", emails: agency.counsellorEmails };
       if (hasValidatorEmails)
-        return { role: "validator", emails: agencyConfig.validatorEmails };
+        return { role: "validator", emails: agency.validatorEmails };
       return;
     }
     case "ACCEPTED_BY_COUNSELLOR":
       return hasValidatorEmails
-        ? { role: "validator", emails: agencyConfig.validatorEmails }
+        ? { role: "validator", emails: agency.validatorEmails }
         : undefined;
     case "ACCEPTED_BY_VALIDATOR":
       return hasAdminEmails
-        ? { role: "admin", emails: agencyConfig.adminEmails }
+        ? { role: "admin", emails: agency.adminEmails }
         : undefined;
     default:
       // This notification may fire when using the /debug/populate route, with

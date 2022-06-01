@@ -6,7 +6,7 @@ import {
   AgencyId,
   AgencyInListDto,
   AgencyPublicDisplayDto,
-  CreateAgencyConfig,
+  CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
 import { listAgenciesResponseSchema } from "shared/src/agency/agency.schema";
@@ -32,7 +32,7 @@ export class HttpAgencyGateway implements AgencyGateway {
       );
   }
 
-  public async addAgency(createAgencyParams: CreateAgencyConfig) {
+  public async addAgency(createAgencyParams: CreateAgencyDto) {
     await axios.post(`/${prefix}/${agenciesRoute}`, createAgencyParams);
   }
 

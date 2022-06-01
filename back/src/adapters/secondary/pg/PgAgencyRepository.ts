@@ -1,7 +1,7 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { AgencyRepository } from "../../../domain/immersionApplication/ports/AgencyRepository";
-import { AgencyConfig, AgencyId } from "shared/src/agency/agency.dto";
+import { Agency, AgencyId } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { createLogger } from "../../../utils/logger";
 import { optional } from "./pgUtils";
@@ -11,7 +11,7 @@ const logger = createLogger(__filename);
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private client: PoolClient) {}
 
-  public async getAllActive(): Promise<AgencyConfig[]> {
+  public async getAllActive(): Promise<Agency[]> {
     const pgResult = await this.client.query(
       "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, agency_siret, code\
        FROM public.agencies\
@@ -23,7 +23,7 @@ export class PgAgencyRepository implements AgencyRepository {
   public async getNearby(
     searchPosition: LatLonDto,
     distance_km: number,
-  ): Promise<AgencyConfig[]> {
+  ): Promise<Agency[]> {
     if (typeof distance_km !== "number")
       throw new Error("distance_km must be a number");
 
@@ -67,7 +67,7 @@ export class PgAgencyRepository implements AgencyRepository {
     return pgToEntity(first);
   }
 
-  public async getById(id: AgencyId): Promise<AgencyConfig | undefined> {
+  public async getById(id: AgencyId): Promise<Agency | undefined> {
     const pgResult = await this.client.query(
       "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position\
       FROM public.agencies\
@@ -81,7 +81,7 @@ export class PgAgencyRepository implements AgencyRepository {
     return pgToEntity(pgAgency);
   }
 
-  public async insert(agency: AgencyConfig): Promise<AgencyId | undefined> {
+  public async insert(agency: Agency): Promise<AgencyId | undefined> {
     const query = `INSERT INTO public.agencies(
       id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, position
     ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s)`;
@@ -99,7 +99,7 @@ export class PgAgencyRepository implements AgencyRepository {
     return agency.id;
   }
 
-  public async update(agency: AgencyConfig): Promise<void> {
+  public async update(agency: Agency): Promise<void> {
     const query = `UPDATE public.agencies SET
       name = $2,
       status = $3 ,
@@ -137,7 +137,7 @@ export class PgAgencyRepository implements AgencyRepository {
 const STPointStringFromPosition = (position: LatLonDto) =>
   `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
 
-const entityToPgArray = (agency: AgencyConfig): any[] => [
+const entityToPgArray = (agency: Agency): any[] => [
   agency.id,
   agency.name,
   agency.status,
@@ -154,7 +154,7 @@ const entityToPgArray = (agency: AgencyConfig): any[] => [
   agency.code,
 ];
 
-const pgToEntity = (params: Record<any, any>): AgencyConfig => ({
+const pgToEntity = (params: Record<any, any>): Agency => ({
   id: params.id,
   name: params.name,
   status: params.status,

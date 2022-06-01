@@ -15,7 +15,7 @@ import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
-import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
 import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
@@ -23,7 +23,7 @@ import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,
 } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 const validImmersionApplication: ImmersionApplicationDto =
@@ -31,26 +31,26 @@ const validImmersionApplication: ImmersionApplicationDto =
 
 const counsellorEmail = "counsellor@email.fr";
 
-const defaultAgencyConfig = AgencyConfigBuilder.create(
+const defaultAgency = AgencyBuilder.create(
   validImmersionApplication.agencyId,
 ).build();
 
 describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   let emailFilter: EmailFilter;
   let emailGw: InMemoryEmailGateway;
-  let agencyConfig: AgencyConfig;
+  let agency: Agency;
 
   beforeEach(() => {
     emailFilter = new AlwaysAllowEmailFilter();
     emailGw = new InMemoryEmailGateway();
-    agencyConfig = defaultAgencyConfig;
+    agency = defaultAgency;
   });
 
   const createUseCase = () =>
     new NotifyAllActorsOfFinalApplicationValidation(
       emailFilter,
       emailGw,
-      new InMemoryAgencyRepository([agencyConfig]),
+      new InMemoryAgencyRepository([agency]),
     );
 
   it("Sends no emails when allowList is enforced and empty", async () => {
@@ -70,7 +70,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [validImmersionApplication.email],
       sentEmails[0],
-      agencyConfig,
+      agency,
       validImmersionApplication,
     );
   });
@@ -88,13 +88,13 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [validImmersionApplication.mentorEmail],
       sentEmails[0],
-      agencyConfig,
+      agency,
       validImmersionApplication,
     );
   });
 
   it("Sends confirmation email to counsellor when on allowList", async () => {
-    agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+    agency = new AgencyBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
     emailFilter = new AllowListEmailFilter([counsellorEmail]);
@@ -107,13 +107,13 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     expectEmailFinalValidationConfirmationMatchingImmersionApplication(
       [counsellorEmail],
       sentEmails[0],
-      agencyConfig,
+      agency,
       validImmersionApplication,
     );
   });
 
   it("Sends confirmation email to beneficiary, mentor, and counsellor when on allowList", async () => {
-    agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+    agency = new AgencyBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
     emailFilter = new AllowListEmailFilter([
@@ -134,13 +134,13 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         counsellorEmail,
       ],
       sentEmails[0],
-      agencyConfig,
+      agency,
       validImmersionApplication,
     );
   });
 
   it("Sends confirmation email to beneficiary, mentor, and counsellor when unrestricted email sending is allowed", async () => {
-    agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+    agency = new AgencyBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
     await createUseCase().execute(validImmersionApplication);
@@ -155,14 +155,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         counsellorEmail,
       ],
       sentEmails[0],
-      agencyConfig,
+      agency,
       validImmersionApplication,
     );
   });
 });
 
 describe("getValidatedApplicationFinalConfirmationParams", () => {
-  const agencyConfig = new AgencyConfigBuilder(defaultAgencyConfig)
+  const agency = new AgencyBuilder(defaultAgency)
     .withQuestionnaireUrl("testQuestionnaireUrl")
     .withSignature("testSignature")
     .build();
@@ -194,12 +194,12 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       immersionSkills: application.immersionSkills ?? "Non renseigné",
       sanitaryPrevention: "sanitaryPreventionDescription",
       individualProtection: "oui",
-      questionnaireUrl: agencyConfig.questionnaireUrl,
-      signature: agencyConfig.signature,
+      questionnaireUrl: agency.questionnaireUrl,
+      signature: agency.signature,
     };
 
     expect(
-      getValidatedApplicationFinalConfirmationParams(agencyConfig, application),
+      getValidatedApplicationFinalConfirmationParams(agency, application),
     ).toEqual(expectedParams);
   });
 
@@ -213,7 +213,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .build();
 
     const actualParms = getValidatedApplicationFinalConfirmationParams(
-      agencyConfig,
+      agency,
       application,
     );
 
@@ -228,7 +228,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .build();
 
     const actualParms = getValidatedApplicationFinalConfirmationParams(
-      agencyConfig,
+      agency,
       application,
     );
 
@@ -241,7 +241,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .build();
 
     const actualParms = getValidatedApplicationFinalConfirmationParams(
-      agencyConfig,
+      agency,
       application,
     );
 

@@ -5,7 +5,7 @@ import {
   AgencyInListDto,
   AgencyKind,
   agencyKindList,
-  CreateAgencyConfig,
+  CreateAgencyDto,
   ListAgenciesRequestDto,
   WithAgencyId,
 } from "./agency.dto";
@@ -34,7 +34,7 @@ export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
     position: latLonSchema.optional(),
   });
 
-export const agencyConfigSchema: z.ZodSchema<CreateAgencyConfig> = z.object({
+export const agencySchema: z.ZodSchema<CreateAgencyDto> = z.object({
   id: agencyIdSchema,
   name: zString,
   kind: agencyKindSchema,

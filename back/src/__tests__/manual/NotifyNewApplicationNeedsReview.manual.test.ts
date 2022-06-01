@@ -7,7 +7,7 @@ import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgenc
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
 import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
@@ -26,7 +26,7 @@ const validImmersionApplication: ImmersionApplicationDto =
 describe("Notify To 2 Counsellors that an application is available", () => {
   let emailGw: SendinblueEmailGateway;
   let generateMagicLinkFn: GenerateVerificationMagicLink;
-  let agencyConfig;
+  let agency;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
@@ -41,14 +41,10 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       "jeanfrancois.macresy+beneficiary@gmail.com",
     ];
 
-    agencyConfig = AgencyConfigBuilder.create(
-      validImmersionApplication.agencyId,
-    )
+    agency = AgencyBuilder.create(validImmersionApplication.agencyId)
       .withCounsellorEmails(counsellorEmails)
       .build();
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository([
-      agencyConfig,
-    ]);
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository([agency]);
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,
@@ -66,16 +62,12 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       "jean-francois.macresy@beta.gouv.fr",
     ];
 
-    agencyConfig = AgencyConfigBuilder.create(
-      validImmersionApplication.agencyId,
-    )
+    agency = AgencyBuilder.create(validImmersionApplication.agencyId)
       .withCounsellorEmails(counsellorEmails)
       .build();
 
     validImmersionApplication.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository([
-      agencyConfig,
-    ]);
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository([agency]);
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,
@@ -91,15 +83,11 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       "jean-francois.macresy@beta.gouv.fr",
     ];
 
-    agencyConfig = AgencyConfigBuilder.create(
-      validImmersionApplication.agencyId,
-    )
+    agency = AgencyBuilder.create(validImmersionApplication.agencyId)
       .withValidatorEmails(validationEmails)
       .build();
     validImmersionApplication.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository([
-      agencyConfig,
-    ]);
+    const inMemoryAgencyRepository = new InMemoryAgencyRepository([agency]);
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       emailGw,
       inMemoryAgencyRepository,

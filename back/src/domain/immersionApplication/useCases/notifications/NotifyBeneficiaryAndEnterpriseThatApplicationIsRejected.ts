@@ -1,4 +1,4 @@
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
@@ -23,24 +23,20 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Use
   inputSchema = immersionApplicationSchema;
 
   public async _execute(dto: ImmersionApplicationDto): Promise<void> {
-    const agencyConfig = await this.agencyRepository.getById(dto.agencyId);
-    if (!agencyConfig) {
+    const agency = await this.agencyRepository.getById(dto.agencyId);
+    if (!agency) {
       throw new Error(
         `Unable to send mail. No agency config found for ${dto.agencyId}`,
       );
     }
 
-    const recipients = [
-      dto.email,
-      dto.mentorEmail,
-      ...agencyConfig.counsellorEmails,
-    ];
+    const recipients = [dto.email, dto.mentorEmail, ...agency.counsellorEmails];
     await this.emailFilter.withAllowedRecipients(
       recipients,
       (recipients) =>
         this.emailGateway.sendRejectedApplicationNotification(
           recipients,
-          getRejectedApplicationNotificationParams(dto, agencyConfig),
+          getRejectedApplicationNotificationParams(dto, agency),
         ),
       logger,
     );
@@ -49,13 +45,13 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Use
 
 const getRejectedApplicationNotificationParams = (
   dto: ImmersionApplicationDto,
-  agencyConfig: AgencyConfig,
+  agency: Agency,
 ): RejectedApplicationNotificationParams => ({
   beneficiaryFirstName: dto.firstName,
   beneficiaryLastName: dto.lastName,
   businessName: dto.businessName,
   rejectionReason: dto.rejectionJustification || "",
-  signature: agencyConfig.signature,
-  agency: agencyConfig.name,
+  signature: agency.signature,
+  agency: agency.name,
   immersionProfession: dto.immersionAppellation.appellationLabel,
 });

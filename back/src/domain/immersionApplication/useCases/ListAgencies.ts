@@ -1,5 +1,5 @@
 import {
-  AgencyConfig,
+  Agency,
   AgencyInListDto,
   ListAgenciesRequestDto,
 } from "shared/src/agency/agency.dto";
@@ -21,17 +21,17 @@ export class ListAgencies extends UseCase<
   public async _execute({
     position,
   }: ListAgenciesRequestDto): Promise<AgencyInListDto[]> {
-    const agencyConfigs = await this.getAgenciesConfig(position);
-    return agencyConfigs.map(agencyConfigToAgencyDto);
+    const agencies = await this.getAgencies(position);
+    return agencies.map(agencyToAgencyInListDto);
   }
 
-  private getAgenciesConfig(position?: LatLonDto): Promise<AgencyConfig[]> {
+  private getAgencies(position?: LatLonDto): Promise<Agency[]> {
     if (position) return this.agencyRepository.getNearby(position, 100);
     return this.agencyRepository.getAllActive();
   }
 }
 
-const agencyConfigToAgencyDto = (config: AgencyConfig): AgencyInListDto => ({
+const agencyToAgencyInListDto = (config: Agency): AgencyInListDto => ({
   id: config.id,
   name: config.name,
   position: {

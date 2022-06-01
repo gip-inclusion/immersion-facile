@@ -1,5 +1,5 @@
 import { parseISO } from "date-fns";
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import {
   calculateTotalImmersionHoursBetweenDate,
   prettyPrintLegacySchedule,
@@ -34,8 +34,8 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
       "------------- Entering execute.",
     );
 
-    const agencyConfig = await this.agencyRepository.getById(dto.agencyId);
-    if (!agencyConfig) {
+    const agency = await this.agencyRepository.getById(dto.agencyId);
+    if (!agency) {
       throw new Error(
         `Unable to send mail. No agency config found for ${dto.agencyId}`,
       );
@@ -44,8 +44,8 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
     const recipients = [
       dto.email,
       dto.mentorEmail,
-      ...agencyConfig.counsellorEmails,
-      ...agencyConfig.validatorEmails,
+      ...agency.counsellorEmails,
+      ...agency.validatorEmails,
     ];
 
     await this.emailFilter.withAllowedRecipients(
@@ -53,7 +53,7 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
       (recipients) =>
         this.emailGateway.sendValidatedApplicationFinalConfirmation(
           recipients,
-          getValidatedApplicationFinalConfirmationParams(agencyConfig, dto),
+          getValidatedApplicationFinalConfirmationParams(agency, dto),
         ),
       logger,
     );
@@ -62,7 +62,7 @@ export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<Immersi
 
 // Visible for testing.
 export const getValidatedApplicationFinalConfirmationParams = (
-  agencyConfig: AgencyConfig,
+  agency: Agency,
   dto: ImmersionApplicationDto,
 ): ValidatedApplicationFinalConfirmationParams => ({
   totalHours: calculateTotalImmersionHoursBetweenDate({
@@ -90,7 +90,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
       ? dto.sanitaryPreventionDescription
       : "non",
   individualProtection: dto.individualProtection ? "oui" : "non",
-  questionnaireUrl: agencyConfig.questionnaireUrl,
-  signature: agencyConfig.signature,
+  questionnaireUrl: agency.questionnaireUrl,
+  signature: agency.signature,
   workConditions: dto.workConditions,
 });

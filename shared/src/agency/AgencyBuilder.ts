@@ -1,8 +1,8 @@
-import { AgencyConfig, AgencyStatus, AgencyId, AgencyKind } from "./agency.dto";
+import { Agency, AgencyStatus, AgencyId, AgencyKind } from "./agency.dto";
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { Builder } from "../Builder";
 
-const emptyAgency: AgencyConfig = {
+const emptyAgency: Agency = {
   id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   name: "empty-name",
   status: "active",
@@ -19,100 +19,100 @@ const emptyAgency: AgencyConfig = {
   },
 };
 
-export class AgencyConfigBuilder implements Builder<AgencyConfig> {
+export class AgencyBuilder implements Builder<Agency> {
   // Initializes all feature flags to be off.
-  public constructor(readonly agency: AgencyConfig) {}
+  public constructor(readonly agency: Agency) {}
 
   public static create(id?: AgencyId) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...emptyAgency,
       ...(id ? { id } : {}),
     });
   }
 
   public static empty() {
-    return new AgencyConfigBuilder({ ...emptyAgency });
+    return new AgencyBuilder({ ...emptyAgency });
   }
 
   public withId(id: AgencyId) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       id,
     });
   }
 
   public withName(name: string) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       name,
     });
   }
 
   public withKind(kind: AgencyKind) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       kind,
     });
   }
 
   public withStatus(status: AgencyStatus) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       status,
     });
   }
 
   public withAddress(address: string) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       address,
     });
   }
 
   public withCounsellorEmails(counsellorEmails: string[]) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       counsellorEmails,
     });
   }
 
   public withValidatorEmails(validatorEmails: string[]) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       validatorEmails,
     });
   }
 
   public withAdminEmails(adminEmails: string[]) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       adminEmails,
     });
   }
 
   public withQuestionnaireUrl(questionnaireUrl: string) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       questionnaireUrl,
     });
   }
 
   public withLogoUrl(logoUrl?: AbsoluteUrl) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       logoUrl,
     });
   }
 
   public withSignature(signature: string) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       signature,
     });
   }
 
   public withPosition(lat: number, lon: number) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       position: {
         lat,
@@ -122,14 +122,14 @@ export class AgencyConfigBuilder implements Builder<AgencyConfig> {
   }
 
   public withAgencySiret(siret: string) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       agencySiret: siret,
     });
   }
 
   public withCode(code: string) {
-    return new AgencyConfigBuilder({
+    return new AgencyBuilder({
       ...this.agency,
       code,
     });

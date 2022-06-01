@@ -4,7 +4,7 @@ import { PgImmersionApplicationQueries } from "../../adapters/secondary/pg/PgImm
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationRawBeforeExportVO } from "../../domain/immersionApplication/valueObjects/ImmersionApplicationRawBeforeExportVO";
@@ -38,7 +38,7 @@ describe("Pg implementation of ImmersionApplicationQueries", () => {
     it("retrieves all immersion applications exports", async () => {
       // Prepare
       const appleAgencyId = "11111111-1111-1111-1111-111111111111";
-      const appleAgency = AgencyConfigBuilder.create(appleAgencyId)
+      const appleAgency = AgencyBuilder.create(appleAgencyId)
         .withName("apple")
         .build();
 
@@ -94,7 +94,7 @@ describe("Pg implementation of ImmersionApplicationQueries", () => {
   describe("PG implementation of method getLatestUpdated", () => {
     beforeEach(async () => {
       const agencyRepository = new PgAgencyRepository(client);
-      await agencyRepository.insert(AgencyConfigBuilder.create().build());
+      await agencyRepository.insert(AgencyBuilder.create().build());
     });
     it("Gets saved immersion", async () => {
       const idA: ImmersionApplicationId =

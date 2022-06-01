@@ -1,9 +1,9 @@
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
-import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
 import { expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../_testBuilders/emailAssertions";
 import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import {
@@ -18,7 +18,7 @@ const rejectedImmersionApplication = new ImmersionApplicationDtoBuilder()
 const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
 const signature = "test-signature";
 
-const defaultAgencyConfig = AgencyConfigBuilder.create(
+const defaultAgency = AgencyBuilder.create(
   rejectedImmersionApplication.agencyId,
 )
   .withName("test-agency-name")
@@ -29,11 +29,11 @@ const defaultAgencyConfig = AgencyConfigBuilder.create(
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
   let emailGw: InMemoryEmailGateway;
   let emailFilter: EmailFilter;
-  let agencyConfig: AgencyConfig;
+  let agency: Agency;
 
   beforeEach(() => {
     emailFilter = new AlwaysAllowEmailFilter();
-    agencyConfig = defaultAgencyConfig;
+    agency = defaultAgency;
     emailGw = new InMemoryEmailGateway();
   });
 
@@ -41,7 +41,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
       emailFilter,
       emailGw,
-      new InMemoryAgencyRepository([agencyConfig]),
+      new InMemoryAgencyRepository([agency]),
     );
 
   it("Sends rejection email to beneficiary, mentor, and counsellor", async () => {
@@ -58,7 +58,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
         ...counsellorEmails,
       ],
       rejectedImmersionApplication,
-      agencyConfig,
+      agency,
     );
   });
 
@@ -90,7 +90,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
         ...counsellorEmails,
       ],
       rejectedImmersionApplication,
-      agencyConfig,
+      agency,
     );
   });
 });

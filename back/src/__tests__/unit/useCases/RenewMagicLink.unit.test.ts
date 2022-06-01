@@ -9,9 +9,9 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -30,12 +30,12 @@ import {
 const validImmersionApplication: ImmersionApplicationDto =
   new ImmersionApplicationEntityBuilder().build().toDto();
 
-const defaultAgencyConfig = AgencyConfigBuilder.create(
+const defaultAgency = AgencyBuilder.create(
   validImmersionApplication.agencyId,
 ).build();
 
 describe("RenewMagicLink use case", () => {
-  let agencyConfig: AgencyConfig;
+  let agency: Agency;
   let applicationRepository: InMemoryImmersionApplicationRepository;
   let outboxRepository: InMemoryOutboxRepository;
   let clock: CustomClock;
@@ -47,14 +47,14 @@ describe("RenewMagicLink use case", () => {
   let generateJwtFn: GenerateMagicLinkJwt;
 
   beforeEach(() => {
-    agencyConfig = defaultAgencyConfig;
+    agency = defaultAgency;
     applicationRepository = new InMemoryImmersionApplicationRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
     clock.setNextDate(new Date());
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
-    agencyRepository = new InMemoryAgencyRepository([agencyConfig]);
+    agencyRepository = new InMemoryAgencyRepository([agency]);
 
     const entity = new ImmersionApplicationEntityBuilder().build();
     applicationRepository.setImmersionApplications({ [entity.id]: entity });

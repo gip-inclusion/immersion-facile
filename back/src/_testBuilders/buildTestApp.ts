@@ -19,7 +19,7 @@ import { InMemoryRomeRepository } from "../adapters/secondary/InMemoryRomeReposi
 import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
 import { GetApiConsumerById } from "../domain/core/ports/GetApiConsumerById";
 import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
-import { AgencyConfigBuilder } from "../../../shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "../../../shared/src/agency/AgencyBuilder";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { EstablishmentExportQueries } from "../domain/establishment/ports/EstablishmentExportQueries";
@@ -77,9 +77,7 @@ export const buildTestApp = async (
   const adminEmail = "admin@email.fr";
   const validImmersionApplication =
     new ImmersionApplicationDtoBuilder().build();
-  const agencyConfig = AgencyConfigBuilder.create(
-    validImmersionApplication.agencyId,
-  )
+  const agency = AgencyBuilder.create(validImmersionApplication.agencyId)
     .withName("TEST-name")
     .withAdminEmails([adminEmail])
     .withQuestionnaireUrl("TEST-questionnaireUrl")
@@ -116,7 +114,7 @@ export const buildTestApp = async (
   const eventCrawler = rawEventCrawler as BasicEventCrawler;
   const reposAndGateways = repositories as InMemoryRepositories;
 
-  await reposAndGateways.agency.insert(agencyConfig);
+  await reposAndGateways.agency.insert(agency);
 
   return {
     request,

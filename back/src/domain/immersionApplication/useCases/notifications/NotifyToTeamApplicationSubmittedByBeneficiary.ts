@@ -36,20 +36,20 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary extends UseCase<Immer
       "------------- Entering execute.",
     );
 
-    const agencyConfig = await this.agencyRepository.getById(agencyId);
-    if (!agencyConfig) {
+    const agency = await this.agencyRepository.getById(agencyId);
+    if (!agency) {
       throw new Error(
         `Unable to send mail. No agency config found for ${agencyId}`,
       );
     }
 
-    if (agencyConfig.adminEmails.length < 1) {
+    if (agency.adminEmails.length < 1) {
       logger.info({ demandeId: id, agencyId }, "No adminEmail.");
       return;
     }
 
     await Promise.all(
-      agencyConfig.adminEmails.map((email) =>
+      agency.adminEmails.map((email) =>
         this.emailGateway.sendNewApplicationAdminNotification([email], {
           demandeId: id,
           firstName,
@@ -57,7 +57,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary extends UseCase<Immer
           dateStart: parseISO(dateStart).toLocaleDateString("fr"),
           dateEnd: parseISO(dateEnd).toLocaleDateString("fr"),
           businessName,
-          agencyName: agencyConfig.name,
+          agencyName: agency.name,
           magicLink: this.generateMagicLinkFn(
             id,
             "admin",

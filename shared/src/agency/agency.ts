@@ -1,14 +1,10 @@
-import {
-  AgencyConfig,
-  AgencyPublicDisplayDto,
-  CreateAgencyConfig,
-} from "./agency.dto";
+import { Agency, AgencyPublicDisplayDto, CreateAgencyDto } from "./agency.dto";
 
 export const toAgencyPublicDisplayDto = (
-  agencyConfig: AgencyConfig | CreateAgencyConfig,
+  agency: Agency | CreateAgencyDto,
 ): AgencyPublicDisplayDto => ({
-  id: agencyConfig.id,
-  name: agencyConfig.name,
-  address: agencyConfig.address,
-  position: agencyConfig.position,
+  id: agency.id,
+  name: agency.name,
+  address: agency.address,
+  position: agency.position,
 });

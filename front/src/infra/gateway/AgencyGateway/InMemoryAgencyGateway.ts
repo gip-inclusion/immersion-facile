@@ -6,12 +6,12 @@ import {
   AgencyId,
   AgencyInListDto,
   AgencyPublicDisplayDto,
-  CreateAgencyConfig,
+  CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 
-const TEST_AGENCIES: Record<string, CreateAgencyConfig> = {
+const TEST_AGENCIES: Record<string, CreateAgencyDto> = {
   "test-agency-1-front": {
     id: "test-agency-1-front",
     name: "Test Agency 1 (front)",
@@ -29,9 +29,9 @@ const TEST_AGENCIES: Record<string, CreateAgencyConfig> = {
 };
 
 export class InMemoryAgencyGateway implements AgencyGateway {
-  private _agencies: Record<string, CreateAgencyConfig> = TEST_AGENCIES;
+  private _agencies: Record<string, CreateAgencyDto> = TEST_AGENCIES;
 
-  async addAgency(agency: CreateAgencyConfig) {
+  async addAgency(agency: CreateAgencyDto) {
     this._agencies[agency.id] = agency;
   }
 

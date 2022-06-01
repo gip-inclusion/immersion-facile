@@ -1,4 +1,4 @@
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import { exportImmersionApplicationsExcelRoute } from "shared/src/routes";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
@@ -11,7 +11,7 @@ describe("/export-demande-immersions-excel", () => {
 
   it("works when authenticated", async () => {
     const { request, reposAndGateways } = await buildTestApp();
-    const linkedAgency: AgencyConfig = (
+    const linkedAgency: Agency = (
       await reposAndGateways.agency.getAllActive()
     )[0];
     const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()

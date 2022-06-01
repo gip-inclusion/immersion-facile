@@ -13,11 +13,11 @@ import {
   AddAgency,
   defaultQuestionnaireUrl,
 } from "../../../domain/immersionApplication/useCases/AddAgency";
-import { CreateAgencyConfig } from "shared/src/agency/agency.dto";
+import { CreateAgencyDto } from "shared/src/agency/agency.dto";
 
 const defaultAdminEmail = "myAdmin@mail.com";
 
-const parisMissionLocaleParams: CreateAgencyConfig = {
+const parisMissionLocaleParams: CreateAgencyDto = {
   id: "some-id",
   address: "paris",
   counsellorEmails: ["counsellor@mail.com"],
@@ -79,7 +79,7 @@ describe("AddAgency use case", () => {
   });
 
   it("uses default questionnaire url when none is provided", async () => {
-    const poleEmploiParis: CreateAgencyConfig = {
+    const poleEmploiParis: CreateAgencyDto = {
       ...parisMissionLocaleParams,
       questionnaireUrl: "",
     };

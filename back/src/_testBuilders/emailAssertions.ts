@@ -1,5 +1,5 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import {
@@ -20,10 +20,10 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
     recipient: string;
     immersionApplication: ImmersionApplicationDto;
     magicLink: string;
-    agencyConfig: AgencyConfig;
+    agency: Agency;
   },
 ) => {
-  const { recipient, immersionApplication, magicLink, agencyConfig } = params;
+  const { recipient, immersionApplication, magicLink, agency } = params;
   const { id, firstName, lastName, dateStart, dateEnd, businessName } =
     immersionApplication;
 
@@ -37,7 +37,7 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
       dateStart,
       dateEnd,
       businessName,
-      agencyName: agencyConfig.name,
+      agencyName: agency.name,
       magicLink,
     },
     cc: [],
@@ -74,17 +74,17 @@ export const expectEmailFinalValidationConfirmationMatchingImmersionApplication 
   (
     recipients: string[],
     templatedEmail: TemplatedEmail,
-    agencyConfig: AgencyConfig | undefined,
+    agency: Agency | undefined,
     immersionApplication: ImmersionApplicationDto,
   ) => {
-    if (!agencyConfig) {
+    if (!agency) {
       fail("missing agency config");
     }
     expectTemplatedEmailToEqual(templatedEmail, {
       type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
       recipients,
       params: getValidatedApplicationFinalConfirmationParams(
-        agencyConfig,
+        agency,
         immersionApplication,
       ),
       cc: [],
@@ -107,12 +107,12 @@ export const expectedEmailImmersionApplicationReviewMatchingImmersionApplication
   (
     templatedEmail: TemplatedEmail,
     recipient: string,
-    agencyConfig: AgencyConfig | undefined,
+    agency: Agency | undefined,
     immersionApplication: ImmersionApplicationDto,
     magicLink: string,
     possibleRoleAction: string,
   ) => {
-    if (!agencyConfig) {
+    if (!agency) {
       fail("missing agency config");
     }
     expectTemplatedEmailToEqual(templatedEmail, {
@@ -133,7 +133,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
   dto: ImmersionApplicationDto,
-  agencyConfig: AgencyConfig,
+  agency: Agency,
 ) => {
   expectTemplatedEmailToEqual(templatedEmail, {
     type: "REJECTED_APPLICATION_NOTIFICATION",
@@ -143,8 +143,8 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
       beneficiaryLastName: dto.lastName,
       businessName: dto.businessName,
       rejectionReason: dto.rejectionJustification || "",
-      signature: agencyConfig.signature,
-      agency: agencyConfig.name,
+      signature: agency.signature,
+      agency: agency.name,
       immersionProfession: dto.immersionAppellation.appellationLabel,
     },
     cc: [],
@@ -156,7 +156,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationModificationIsRe
     templatedEmail: TemplatedEmail,
     recipients: string[],
     dto: ImmersionApplicationDto,
-    agencyConfig: AgencyConfig,
+    agency: Agency,
     reason: string,
   ) => {
     expectTemplatedEmailToEqual(templatedEmail, {
@@ -167,8 +167,8 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationModificationIsRe
         beneficiaryLastName: dto.lastName,
         businessName: dto.businessName,
         reason,
-        signature: agencyConfig.signature,
-        agency: agencyConfig.name,
+        signature: agency.signature,
+        agency: agency.name,
         immersionProfession: dto.immersionAppellation,
       },
       cc: [],

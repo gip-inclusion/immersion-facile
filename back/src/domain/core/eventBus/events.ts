@@ -7,7 +7,7 @@ import {
 } from "../../immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import type { DateStr } from "../ports/Clock";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
@@ -69,7 +69,7 @@ export type DomainEvent =
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", EstablishmentAggregate>
 
   // AGENCY RELATED
-  | GenericEvent<"NewAgencyAdded", AgencyConfig>
+  | GenericEvent<"NewAgencyAdded", Agency>
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"ImmersionAssessmentCreated", ImmersionAssessmentDto>;

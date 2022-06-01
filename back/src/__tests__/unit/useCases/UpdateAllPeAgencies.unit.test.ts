@@ -5,7 +5,7 @@ import { InMemoryPeAgenciesReferential } from "../../../adapters/secondary/immer
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { defaultQuestionnaireUrl } from "../../../domain/immersionApplication/useCases/AddAgency";
 import { UpdateAllPeAgencies } from "../../../domain/immersionApplication/useCases/UpdateAllPeAgencies";
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 
 const adminMail = "admin@mail.com";
 
@@ -64,7 +64,7 @@ describe("UpdateAllPeAgencies use case", () => {
           contact: { ...peReferentialAgency.contact, email: commonEmail },
         },
       ]);
-      const initialAgencyConfig: AgencyConfig = {
+      const initialAgency: Agency = {
         id: "some-uuid",
         name: "Agence Pôle emploi Molsheim",
         counsellorEmails: [],
@@ -80,13 +80,13 @@ describe("UpdateAllPeAgencies use case", () => {
         kind: "pole-emploi",
         status: "active",
       };
-      agencyRepository.setAgencies([initialAgencyConfig]);
+      agencyRepository.setAgencies([initialAgency]);
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
       expectTypeToMatchAndEqual(agencyRepository.agencies, [
         {
-          ...initialAgencyConfig,
+          ...initialAgency,
           validatorEmails: [commonEmail],
           address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
           position: {
@@ -107,7 +107,7 @@ describe("UpdateAllPeAgencies use case", () => {
           contact: { ...peReferentialAgency.contact, email: commonEmail },
         },
       ]);
-      const initialAgencyConfig: AgencyConfig = {
+      const initialAgency: Agency = {
         id: "some-uuid",
         name: "Agence Pôle emploi Molsheim",
         counsellorEmails: [commonEmail],
@@ -123,13 +123,13 @@ describe("UpdateAllPeAgencies use case", () => {
         kind: "pole-emploi",
         status: "active",
       };
-      agencyRepository.setAgencies([initialAgencyConfig]);
+      agencyRepository.setAgencies([initialAgency]);
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
       expectTypeToMatchAndEqual(agencyRepository.agencies, [
         {
-          ...initialAgencyConfig,
+          ...initialAgency,
           counsellorEmails: [commonEmail],
           validatorEmails: [],
           address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
@@ -145,7 +145,7 @@ describe("UpdateAllPeAgencies use case", () => {
 
     it("if PE agency is very close by", async () => {
       peAgenciesReferential.setPeAgencies([peReferentialAgency]);
-      const initialAgencyConfig: AgencyConfig = {
+      const initialAgency: Agency = {
         id: "some-uuid",
         name: "Agence Pôle emploi Molsheim",
         counsellorEmails: [],
@@ -161,15 +161,15 @@ describe("UpdateAllPeAgencies use case", () => {
         kind: "pole-emploi",
         status: "active",
       };
-      agencyRepository.setAgencies([initialAgencyConfig]);
+      agencyRepository.setAgencies([initialAgency]);
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
       expectTypeToMatchAndEqual(agencyRepository.agencies, [
         {
-          ...initialAgencyConfig,
+          ...initialAgency,
           validatorEmails: [
-            ...initialAgencyConfig.validatorEmails,
+            ...initialAgency.validatorEmails,
             "molsheim@pole-emploi.fr",
           ],
           address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
@@ -186,7 +186,7 @@ describe("UpdateAllPeAgencies use case", () => {
 
   it("if existing agency is not of kind pole-emploi it should not be considered, and a new one should be created", async () => {
     peAgenciesReferential.setPeAgencies([peReferentialAgency]);
-    const initialAgencyConfig: AgencyConfig = {
+    const initialAgency: Agency = {
       id: "some-uuid",
       name: "Agence Pôle emploi Molsheim",
       counsellorEmails: [],
@@ -202,12 +202,12 @@ describe("UpdateAllPeAgencies use case", () => {
       kind: "mission-locale",
       status: "active",
     };
-    agencyRepository.setAgencies([initialAgencyConfig]);
+    agencyRepository.setAgencies([initialAgency]);
     uuid.setNextUuid("other-uuid");
     await updateAllPeAgencies.execute();
 
     expectTypeToMatchAndEqual(agencyRepository.agencies, [
-      initialAgencyConfig,
+      initialAgency,
       {
         id: "other-uuid",
         name: "Agence Pôle emploi MOLSHEIM",

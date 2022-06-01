@@ -1,19 +1,19 @@
-import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { ListAgencies } from "../../../domain/immersionApplication/useCases/ListAgencies";
 
-const agency1 = AgencyConfigBuilder.empty()
+const agency1 = AgencyBuilder.empty()
   .withId("11111111-1111-1111-1111-111111111111")
   .withName("agency1")
   .build();
 
-const agency2 = AgencyConfigBuilder.empty()
+const agency2 = AgencyBuilder.empty()
   .withId("22222222-2222-2222-2222-222222222222")
   .withName("agency2")
   .withPosition(10, 10)
   .build();
 
-const agencyInReview = AgencyConfigBuilder.empty()
+const agencyInReview = AgencyBuilder.empty()
   .withId("33333333-3333-3333-3333-333333333333")
   .withName("agency3")
   .withStatus("needsReview")
@@ -62,7 +62,7 @@ describe("ListAgencies", () => {
     const agencies = [];
     for (let i = 0; i < 100; i++) {
       agencies.push(
-        AgencyConfigBuilder.empty()
+        AgencyBuilder.empty()
           .withId(i.toString())
           .withName("agency " + i)
           .withPosition(i, i)

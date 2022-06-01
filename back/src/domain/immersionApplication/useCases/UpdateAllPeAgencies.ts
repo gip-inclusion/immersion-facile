@@ -1,4 +1,4 @@
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { z } from "zod";
 import { AppLogger } from "../../core/ports/AppLogger";
@@ -75,7 +75,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
 
       switch (matchedNearbyAgencies.length) {
         case 0: {
-          const newAgency = this.convertToAgencyConfig(peReferentialAgency);
+          const newAgency = this.convertToAgency(peReferentialAgency);
           await this.agencyRepository.insert(newAgency);
           counts.added++;
           break;
@@ -113,9 +113,9 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
     );
   }
 
-  private convertToAgencyConfig(
+  private convertToAgency(
     peReferentialAgency: PeAgencyFromReferenciel,
-  ): AgencyConfig {
+  ): Agency {
     return {
       id: this.uuid.new(),
       name: peReferentialAgency.libelleEtendu,
@@ -136,7 +136,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
 
   private async getNearestPeAgencies(
     peReferentialAgency: PeAgencyFromReferenciel,
-  ): Promise<AgencyConfig[]> {
+  ): Promise<Agency[]> {
     const agencies = await this.agencyRepository.getNearby(
       {
         lon: peReferentialAgency.adressePrincipale.gpsLon,
@@ -149,7 +149,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
 
   private async getAgencyWhereEmailMatches(
     peReferentialAgency: PeAgencyFromReferenciel,
-  ): Promise<AgencyConfig | undefined> {
+  ): Promise<Agency | undefined> {
     if (!peReferentialAgency.contact?.email) return;
 
     const result = await this.agencyRepository.getAgencyWhereEmailMatches(
@@ -160,10 +160,10 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
   }
 
   private async updateAgency(
-    existingAgency: AgencyConfig,
+    existingAgency: Agency,
     peReferentialAgency: PeAgencyFromReferenciel,
   ): Promise<void> {
-    const updatedAgency: AgencyConfig = {
+    const updatedAgency: Agency = {
       ...existingAgency,
       ...normalizeAddressAndPosition(peReferentialAgency),
       ...updateEmails({

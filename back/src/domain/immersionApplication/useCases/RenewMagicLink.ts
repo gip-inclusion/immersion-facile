@@ -113,8 +113,8 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
 
     const dto = immersionApplicationEntity.toDto();
 
-    const agencyConfig = await this.agencyRepository.getById(dto.agencyId);
-    if (!agencyConfig) {
+    const agency = await this.agencyRepository.getById(dto.agencyId);
+    if (!agency) {
       logger.error(
         { agencyId: dto.agencyId },
         "No Agency Config found for this agency code",
@@ -134,10 +134,10 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
         emails = [dto.email];
         break;
       case "counsellor":
-        emails = agencyConfig.counsellorEmails;
+        emails = agency.counsellorEmails;
         break;
       case "validator":
-        emails = agencyConfig.validatorEmails;
+        emails = agency.validatorEmails;
         break;
       case "establishment":
         emails = [dto.mentorEmail];

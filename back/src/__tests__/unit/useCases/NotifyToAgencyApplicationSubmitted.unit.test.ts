@@ -6,7 +6,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { NewApplicationAdminNotificationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
 import { frontRoutes } from "shared/src/routes";
 import { OmitFromExistingKeys } from "shared/src/utils";
-import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
 import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import {
   expectTypeToMatchAndEqual,
@@ -18,14 +18,12 @@ const councellorEmail = "councellor@email.fr";
 const councellorEmail2 = "councellor2@email.fr";
 const validatorEmail = "validator@mail.com";
 
-const agencyConfigWithCounsellors = AgencyConfigBuilder.create(
-  "agency-with-councellors",
-)
+const agencyWithCounsellors = AgencyBuilder.create("agency-with-councellors")
   .withCounsellorEmails([councellorEmail, councellorEmail2])
   .withName("test-agency-name")
   .build();
 
-const agencyWithOnlyValidator = AgencyConfigBuilder.create(
+const agencyWithOnlyValidator = AgencyBuilder.create(
   "agency-with-only-validator",
 )
   .withValidatorEmails([validatorEmail])
@@ -42,7 +40,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     const emailFilter = new AlwaysAllowEmailFilter();
     agencyRepository = new InMemoryAgencyRepository();
     agencyRepository.setAgencies([
-      agencyConfigWithCounsellors,
+      agencyWithCounsellors,
       agencyWithOnlyValidator,
     ]);
 
@@ -61,7 +59,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
 
   it("Sends notification email to agency counsellor when it is initially submitted", async () => {
     const validImmersionApplication = new ImmersionApplicationDtoBuilder()
-      .withAgencyId(agencyConfigWithCounsellors.id)
+      .withAgencyId(agencyWithCounsellors.id)
       .build();
     await notifyToAgencyApplicationSubmitted.execute(validImmersionApplication);
 
@@ -71,7 +69,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       NewApplicationAdminNotificationParams,
       "magicLink"
     > = {
-      agencyName: agencyConfigWithCounsellors.name,
+      agencyName: agencyWithCounsellors.name,
       businessName: validImmersionApplication.businessName,
       dateEnd: validImmersionApplication.dateEnd,
       dateStart: validImmersionApplication.dateStart,
@@ -125,7 +123,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       NewApplicationAdminNotificationParams,
       "magicLink"
     > = {
-      agencyName: agencyConfigWithCounsellors.name,
+      agencyName: agencyWithCounsellors.name,
       businessName: validImmersionApplication.businessName,
       dateEnd: validImmersionApplication.dateEnd,
       dateStart: validImmersionApplication.dateStart,

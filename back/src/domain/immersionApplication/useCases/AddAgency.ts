@@ -1,5 +1,5 @@
-import { AgencyConfig, CreateAgencyConfig } from "shared/src/agency/agency.dto";
-import { agencyConfigSchema } from "shared/src/agency/agency.schema";
+import { Agency, CreateAgencyDto } from "shared/src/agency/agency.dto";
+import { agencySchema } from "shared/src/agency/agency.schema";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -7,8 +7,8 @@ import { TransactionalUseCase } from "../../core/UseCase";
 export const defaultQuestionnaireUrl =
   "https://docs.google.com/document/d/1pjsCZbu0CarBCR0GVJ1AmIgwkxGIsD6T/edit";
 
-export class AddAgency extends TransactionalUseCase<CreateAgencyConfig, void> {
-  inputSchema = agencyConfigSchema;
+export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
+  inputSchema = agencySchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -19,10 +19,10 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyConfig, void> {
   }
 
   protected async _execute(
-    params: CreateAgencyConfig,
+    params: CreateAgencyDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const agencyConfig: AgencyConfig = {
+    const agency: Agency = {
       ...params,
       adminEmails: [this.defaultAdminEmail],
       status: "needsReview",
@@ -31,11 +31,11 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyConfig, void> {
 
     const newAgencyAddEvent = this.createNewEvent({
       topic: "NewAgencyAdded",
-      payload: agencyConfig,
+      payload: agency,
     });
 
     await Promise.all([
-      uow.agencyRepo.insert(agencyConfig),
+      uow.agencyRepo.insert(agency),
       uow.outboxRepo.save(newAgencyAddEvent),
     ]);
   }

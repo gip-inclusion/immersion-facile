@@ -18,12 +18,12 @@ import {
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import {
   ImmersionApplicationDto,
   RenewMagicLinkRequestDto,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
 import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
@@ -47,7 +47,7 @@ describe("Magic link renewal flow", () => {
   let eventCrawler: BasicEventCrawler;
   let emailFilter: EmailFilter;
   let sentEmails: TemplatedEmail[];
-  let agencyConfig: AgencyConfig;
+  let agency: Agency;
   let renewMagicLink: RenewMagicLink;
   let deliverRenewedMagicLink: DeliverRenewedMagicLink;
   let config: AppConfig;
@@ -68,15 +68,13 @@ describe("Magic link renewal flow", () => {
 
     emailFilter = new AlwaysAllowEmailFilter();
 
-    agencyConfig = AgencyConfigBuilder.create(
-      validImmersionApplication.agencyId,
-    )
+    agency = AgencyBuilder.create(validImmersionApplication.agencyId)
       .withName("TEST-name")
       .withAdminEmails([adminEmail])
       .withQuestionnaireUrl("TEST-questionnaireUrl")
       .withSignature("TEST-signature")
       .build();
-    const agencyRepository = new InMemoryAgencyRepository([agencyConfig]);
+    const agencyRepository = new InMemoryAgencyRepository([agency]);
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
     generateJwtFn = makeGenerateJwt(config.magicLinkJwtPrivateKey);

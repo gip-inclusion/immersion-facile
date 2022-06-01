@@ -3,7 +3,7 @@ import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgenc
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
-import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
+import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
 import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { AllowListEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 
@@ -30,7 +30,7 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
     const config = AppConfig.createFromEnv();
     emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
     agencyRepository = new InMemoryAgencyRepository([
-      AgencyConfigBuilder.create(validImmersionApplication.agencyId)
+      AgencyBuilder.create(validImmersionApplication.agencyId)
         .withCounsellorEmails([counsellorEmail])
         .build(),
     ]);

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AgencyConfig } from "shared/src/agency/agency.dto";
+import { Agency } from "shared/src/agency/agency.dto";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "shared/src/routes";
 import { allRoles } from "shared/src/tokens/MagicLinkPayload";
@@ -57,10 +57,8 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     reason,
     roles,
   }: ImmersionApplicationRequiresModificationPayload): Promise<void> {
-    const agencyConfig = await this.agencyRepository.getById(
-      application.agencyId,
-    );
-    if (!agencyConfig) {
+    const agency = await this.agencyRepository.getById(application.agencyId);
+    if (!agency) {
       throw new Error(
         `Unable to send mail. No agency config found for ${application.agencyId}`,
       );
@@ -88,7 +86,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
             [email],
             getModificationRequestApplicationNotificationParams(
               application,
-              agencyConfig,
+              agency,
               reason,
               this.generateMagicLinkFn(
                 application.id,
@@ -106,7 +104,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
 
 const getModificationRequestApplicationNotificationParams = (
   dto: ImmersionApplicationDto,
-  agencyConfig: AgencyConfig,
+  agency: Agency,
   reason: string,
   magicLink: string,
 ): ModificationRequestApplicationNotificationParams => ({
@@ -114,8 +112,8 @@ const getModificationRequestApplicationNotificationParams = (
   beneficiaryLastName: dto.lastName,
   businessName: dto.businessName,
   reason,
-  signature: agencyConfig.signature,
-  agency: agencyConfig.name,
+  signature: agency.signature,
+  agency: agency.name,
   immersionAppellation: dto.immersionAppellation,
   magicLink,
 });

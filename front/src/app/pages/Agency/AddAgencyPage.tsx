@@ -13,9 +13,9 @@ import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import {
   AgencyKind,
   agencyKindList,
-  CreateAgencyConfig,
+  CreateAgencyDto,
 } from "shared/src/agency/agency.dto";
-import { agencyConfigSchema } from "shared/src/agency/agency.schema";
+import { agencySchema } from "shared/src/agency/agency.schema";
 import { zEmail } from "shared/src/zodUtils";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button } from "src/uiComponents/Button";
@@ -27,7 +27,7 @@ import { Title } from "src/uiComponents/Title";
 import { v4 as uuidV4 } from "uuid";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 
-const initialValues: CreateAgencyConfig = {
+const initialValues: CreateAgencyDto = {
   id: uuidV4(),
   kind: "pole-emploi",
   name: "",
@@ -43,12 +43,12 @@ const initialValues: CreateAgencyConfig = {
   signature: "",
 };
 
-type KeysExceptId = Exclude<keyof CreateAgencyConfig, "id">;
+type KeysExceptId = Exclude<keyof CreateAgencyDto, "id">;
 
-const getName = (name: keyof CreateAgencyConfig) => name;
+const getName = (name: keyof CreateAgencyDto) => name;
 
 // prettier-ignore
-type MakeTypedSetField = (setFieldValue: FormikHelpers<CreateAgencyConfig>["setFieldValue"]) => <K extends KeysExceptId>(fieldName: K) => (fieldValue: CreateAgencyConfig[K]) => void
+type MakeTypedSetField = (setFieldValue: FormikHelpers<CreateAgencyDto>["setFieldValue"]) => <K extends KeysExceptId>(fieldName: K) => (fieldValue: CreateAgencyDto[K]) => void
 const makeTypedSetField: MakeTypedSetField =
   (setFieldValue) => (fieldName) => (fieldValue) =>
     setFieldValue(fieldName, fieldValue);
@@ -65,7 +65,7 @@ export const AddAgencyPage = () => {
         <Title>Ajout d'organisme encadrant les PMSMP</Title>
         <Formik
           initialValues={initialValues}
-          validationSchema={toFormikValidationSchema(agencyConfigSchema)}
+          validationSchema={toFormikValidationSchema(agencySchema)}
           onSubmit={(values) =>
             agencyGateway
               .addAgency({
