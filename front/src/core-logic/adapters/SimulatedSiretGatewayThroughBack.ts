@@ -5,6 +5,7 @@ import {
   conflictErrorSiret,
   GetSiretResponseDto,
   SiretDto,
+  siretSchema,
   tooManySirenRequestsSiret,
 } from "shared/src/siret";
 import { sleep } from "shared/src/utils";
@@ -45,7 +46,9 @@ export class SimulatedSiretGatewayThroughBack
     return this.getSiretInfoObservable(siret);
   }
 
-  private simulatedResponse(siret: SiretDto): GetSiretInfo {
+  private simulatedResponse(rawSiret: SiretDto): GetSiretInfo {
+    const siret = siretSchema.parse(rawSiret);
+
     if (siret === tooManySirenRequestsSiret)
       return tooManiSirenRequestsSiretErrorMessage;
     if (siret === apiSirenNotAvailableSiret)

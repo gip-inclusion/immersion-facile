@@ -1,4 +1,4 @@
-import { filter, iif, map, Observable, of, switchMap } from "rxjs";
+import { catchError, filter, iif, map, Observable, of, switchMap } from "rxjs";
 import { SiretDto, siretSchema } from "shared/src/siret";
 import {
   SiretAction,
@@ -54,6 +54,9 @@ const getSiretEpic: AppEpic<SiretAction> = (
       typeof siretResult === "string"
         ? siretSlice.actions.siretInfoFailed(siretResult)
         : siretSlice.actions.siretInfoSucceeded(siretResult),
+    ),
+    catchError((error) =>
+      of(siretSlice.actions.siretInfoFailed(error.message)),
     ),
   );
 };

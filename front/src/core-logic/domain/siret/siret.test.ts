@@ -94,6 +94,12 @@ describe("Siret validation and fetching", () => {
       );
     });
 
+    it("fetches correctly and keeps the handles unexpected error", () => {
+      dispatchSiretModified("11110000111100");
+      feedSirenGatewayThroughBackWithError(new Error("Oups ! Failed"));
+      expectSiretErrorToBe("Oups ! Failed");
+    });
+
     it("does not fetch if the featureFlag to fetch siret is off", () => {
       ({ store, dependencies } = createTestStore(
         {
@@ -157,6 +163,10 @@ describe("Siret validation and fetching", () => {
 
   const feedSirenGatewayThroughBackWith = (response: GetSiretInfo) => {
     dependencies.siretGatewayThroughBack.siretInfo$.next(response);
+  };
+
+  const feedSirenGatewayThroughBackWithError = (error: Error) => {
+    dependencies.siretGatewayThroughBack.siretInfo$.error(error);
   };
 
   const expectOnly_getSirenInfoIfNotAlreadySaved_toHaveBeenCalled = () => {

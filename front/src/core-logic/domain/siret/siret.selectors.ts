@@ -12,24 +12,26 @@ export const currentSiretSelector = createSelector(
   (state) => state.currentSiret,
 );
 
-export const siretErrorSelector = createRootSelector((state) =>
-  state.siret.error ? errorTranslations[state.siret.error] : null,
-);
+export const siretErrorSelector = createRootSelector((state): string | null => {
+  if (!state.siret.error) return null;
+  return errorTranslations[state.siret.error] ?? state.siret.error;
+});
 
 export const isSiretAlreadySavedSelector = createRootSelector(
   (state) =>
     state.siret.error === "Establishment with this siret is already in our DB",
 );
 
-const errorTranslations: Record<GetSiretInfoError | InvalidSiretError, string> =
-  {
-    "Missing establishment on SIRENE API.":
-      "Nous n'avons pas trouvé d'établissement correspondant à votre SIRET.",
-    "SIRENE API not available.":
-      "Le service de vérification du SIRET est indisponible.",
-    "SIRET must be 14 digits": "Le SIRET doit être composé de 14 chiffres",
-    "Establishment with this siret is already in our DB":
-      "Cet établissement est déjà référencé",
-    "Too many requests on SIRENE API.":
-      "Le service de vérification du SIRET a reçu trop d'appels.",
-  };
+const errorTranslations: Partial<
+  Record<GetSiretInfoError | InvalidSiretError, string>
+> = {
+  "Missing establishment on SIRENE API.":
+    "Nous n'avons pas trouvé d'établissement correspondant à votre SIRET.",
+  "SIRENE API not available.":
+    "Le service de vérification du SIRET est indisponible.",
+  "SIRET must be 14 digits": "Le SIRET doit être composé de 14 chiffres",
+  "Establishment with this siret is already in our DB":
+    "Cet établissement est déjà référencé",
+  "Too many requests on SIRENE API.":
+    "Le service de vérification du SIRET a reçu trop d'appels.",
+};
