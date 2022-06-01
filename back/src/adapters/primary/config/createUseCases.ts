@@ -31,8 +31,8 @@ import { SignImmersionApplication } from "../../../domain/immersionApplication/u
 import { UpdateImmersionApplication } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
 import { ValidateImmersionApplication } from "../../../domain/immersionApplication/useCases/ValidateImmersionApplication";
-import { CreateImmersionAssessment } from "../../../domain/immersionOffer/useCases/CreateImmersionAssessment";
-import { AddAgency } from "../../../domain/immersionOffer/useCases/AddAgency";
+import { CreateImmersionAssessment } from "../../../domain/immersionApplication/useCases/CreateImmersionAssessment";
+import { AddAgency } from "../../../domain/immersionApplication/useCases/AddAgency";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
@@ -42,7 +42,7 @@ import { GetImmersionOfferBySiretAndRome } from "../../../domain/immersionOffer/
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
-import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/immersionOffer/useCases/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
+import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/immersionOffer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";

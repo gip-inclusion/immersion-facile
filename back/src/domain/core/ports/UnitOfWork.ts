@@ -2,7 +2,7 @@ import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/Conv
 import { AgencyRepository } from "../../immersionApplication/ports/AgencyRepository";
 import { FormEstablishmentRepository } from "../../immersionOffer/ports/FormEstablishmentRepository";
 import { EstablishmentAggregateRepository } from "../../immersionOffer/ports/EstablishmentAggregateRepository";
-import { ImmersionAssessmentRepository } from "../../immersionOffer/ports/ImmersionAssessmentRepository";
+import { ImmersionAssessmentRepository } from "../../immersionApplication/ports/ImmersionAssessmentRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { GetFeatureFlags } from "./GetFeatureFlags";
 import { OutboxRepository } from "./OutboxRepository";

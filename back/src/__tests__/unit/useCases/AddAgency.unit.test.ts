@@ -12,7 +12,7 @@ import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import {
   AddAgency,
   defaultQuestionnaireUrl,
-} from "../../../domain/immersionOffer/useCases/AddAgency";
+} from "../../../domain/immersionApplication/useCases/AddAgency";
 import { CreateAgencyConfig } from "shared/src/agency/agency.dto";
 
 const defaultAdminEmail = "myAdmin@mail.com";

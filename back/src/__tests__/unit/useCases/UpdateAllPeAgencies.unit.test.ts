@@ -3,8 +3,8 @@ import { ConsoleAppLogger } from "../../../adapters/secondary/core/ConsoleAppLog
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryPeAgenciesReferential } from "../../../adapters/secondary/immersionOffer/InMemoryPeAgenciesReferential";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { defaultQuestionnaireUrl } from "../../../domain/immersionOffer/useCases/AddAgency";
-import { UpdateAllPeAgencies } from "../../../domain/immersionOffer/useCases/UpdateAllPeAgencies";
+import { defaultQuestionnaireUrl } from "../../../domain/immersionApplication/useCases/AddAgency";
+import { UpdateAllPeAgencies } from "../../../domain/immersionApplication/useCases/UpdateAllPeAgencies";
 import { AgencyConfig } from "shared/src/agency/agency.dto";
 
 const adminMail = "admin@mail.com";

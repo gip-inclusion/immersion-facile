@@ -4,11 +4,11 @@ import { z } from "zod";
 import { AppLogger } from "../../core/ports/AppLogger";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { UseCase } from "../../core/UseCase";
-import { AgencyRepository } from "../../immersionApplication/ports/AgencyRepository";
+import { AgencyRepository } from "../ports/AgencyRepository";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
-} from "../ports/PeAgenciesReferential";
+} from "../../immersionOffer/ports/PeAgenciesReferential";
 import { defaultQuestionnaireUrl } from "./AddAgency";
 
 // this use case is used only in one script (not in the back app)

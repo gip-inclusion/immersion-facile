@@ -2,7 +2,7 @@ import { ApplicationStatus } from "shared/src/ImmersionApplication/ImmersionAppl
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { EntityFromDto } from "../../core/EntityFromDto";
-import { ImmersionApplicationEntity } from "../../immersionApplication/entities/ImmersionApplicationEntity";
+import { ImmersionApplicationEntity } from "./ImmersionApplicationEntity";
 
 export type ImmersionAssessmentEntity = EntityFromDto<
   ImmersionAssessmentDto,

@@ -2,7 +2,7 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryPassEmploiGateway } from "../../../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { PassEmploiNotificationParams } from "../../../domain/immersionOffer/ports/PassEmploiGateway";
-import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/immersionOffer/useCases/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
+import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/immersionOffer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";

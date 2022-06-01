@@ -23,8 +23,8 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../../adapters/secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ImmersionAssessmentEntity } from "../../../domain/immersionOffer/entities/ImmersionAssessmentEntity";
-import { CreateImmersionAssessment } from "../../../domain/immersionOffer/useCases/CreateImmersionAssessment";
+import { ImmersionAssessmentEntity } from "../../../domain/immersionApplication/entities/ImmersionAssessmentEntity";
+import { CreateImmersionAssessment } from "../../../domain/immersionApplication/useCases/CreateImmersionAssessment";
 
 const conventionId = "conventionId";
 

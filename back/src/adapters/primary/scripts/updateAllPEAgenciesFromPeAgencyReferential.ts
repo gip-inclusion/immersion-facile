@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { UpdateAllPeAgencies } from "../../../domain/immersionOffer/useCases/UpdateAllPeAgencies";
+import { UpdateAllPeAgencies } from "../../../domain/immersionApplication/useCases/UpdateAllPeAgencies";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
