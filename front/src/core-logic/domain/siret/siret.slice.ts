@@ -40,14 +40,13 @@ export const siretSlice = createSlice({
     siretInfoRequested: (state, _action: PayloadAction<string>) => {
       state.isSearching = true;
     },
-    siretInfoSucceeded: (
-      state,
-      action: PayloadAction<GetSiretResponseDto | GetSiretInfoError>,
-    ) => {
+    siretInfoSucceeded: (state, action: PayloadAction<GetSiretResponseDto>) => {
       state.isSearching = false;
-      typeof action.payload === "string"
-        ? (state.error = action.payload)
-        : (state.establishment = action.payload);
+      state.establishment = action.payload;
+    },
+    siretInfoFailed: (state, action: PayloadAction<GetSiretInfoError>) => {
+      state.isSearching = false;
+      state.error = action.payload;
     },
   },
 });

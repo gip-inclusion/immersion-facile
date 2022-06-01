@@ -1,3 +1,4 @@
+import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SimulatedSiretGatewayThroughBack";
 import { ClientGateways } from "src/core-logic/ports/ClientGateways";
 import { ClientRepositories } from "src/core-logic/ports/ClientRepositories";
 import { ApplicationPrimaryController } from "src/core-logic/ports/primaryController/ApplicationPrimaryController";
@@ -11,7 +12,8 @@ import {
 import { ClientApplication } from "./ClientApplication";
 const primaryController = new ApplicationPrimaryController(store);
 const gateways: ClientGateways = {
-  siretGatewayThroughBack,
+  siretGatewayThroughBack:
+    siretGatewayThroughBack as SimulatedSiretGatewayThroughBack,
   establishments: establishmentGateway,
   navigation: new ReactNavigationGateway(),
   event: new InMemoryEventGateway(primaryController),

@@ -37,27 +37,35 @@ const getSiretEpic: AppEpic<SiretAction> = (
   action$,
   state$,
   { siretGatewayThroughBack },
-) =>
-  action$.pipe(
+) => {
+  const getSiret = makeGetSiret(siretGatewayThroughBack);
+
+  return action$.pipe(
     filter(siretSlice.actions.siretInfoRequested.match),
-    switchMap((action) => {
-      const getSiret = makeGetSiret(
+    switchMap((action) =>
+      getSiret(
         state$.value.siret.shouldFetchEvenIfAlreadySaved,
-        siretGatewayThroughBack,
-      );
-
-      return getSiret(action.payload).pipe(
-        map(siretSlice.actions.siretInfoSucceeded),
-      );
-    }),
+        action.payload,
+      ),
+    ),
+    // the condition on siretResult type should not be handled here but in the gateway
+    // (with an errored observable, caught here with catchError())
+    map<GetSiretInfo, SiretAction>((siretResult) =>
+      typeof siretResult === "string"
+        ? siretSlice.actions.siretInfoFailed(siretResult)
+        : siretSlice.actions.siretInfoSucceeded(siretResult),
+    ),
   );
+};
 
-const makeGetSiret = (
-  shouldFetchEvenIfAlreadySaved: boolean,
-  siretGatewayThroughBack: SiretGatewayThroughBack,
-): ((siret: SiretDto) => Observable<GetSiretInfo>) =>
-  shouldFetchEvenIfAlreadySaved
-    ? (siret) => siretGatewayThroughBack.getSiretInfoObservable(siret)
-    : (siret) => siretGatewayThroughBack.getSiretInfoIfNotAlreadySaved(siret);
+const makeGetSiret =
+  (siretGatewayThroughBack: SiretGatewayThroughBack) =>
+  (
+    shouldFetchEvenIfAlreadySaved: boolean,
+    siret: SiretDto,
+  ): Observable<GetSiretInfo> =>
+    shouldFetchEvenIfAlreadySaved
+      ? siretGatewayThroughBack.getSiretInfoObservable(siret)
+      : siretGatewayThroughBack.getSiretInfoIfNotAlreadySaved(siret);
 
 export const siretEpics = [triggerSiretFetchEpic, getSiretEpic];

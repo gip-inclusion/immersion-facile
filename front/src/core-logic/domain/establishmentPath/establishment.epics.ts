@@ -36,11 +36,9 @@ const redirectToEstablishmentFormPageEpic: AppEpic<
         state$.value.establishment.status ===
         "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
     ),
-    tap((action) => {
-      if (typeof action.payload !== "string") {
-        navigationGateway.navigateToEstablishmentForm(action.payload.siret);
-      }
-    }),
+    tap((action) =>
+      navigationGateway.navigateToEstablishmentForm(action.payload.siret),
+    ),
     map(() => establishmentSlice.actions.navigatedAwayFromHome()),
   );
 

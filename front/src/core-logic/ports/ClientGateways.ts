@@ -1,10 +1,10 @@
+import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SimulatedSiretGatewayThroughBack";
 import { EstablishmentGateway } from "./EstablishmentGateway";
 import { NavigationGateway } from "./NavigationGateway";
 import { EventGateway } from "./EventGateway";
-import { SiretGatewayThroughBack } from "./SiretGatewayThroughBack";
 
 export interface ClientGateways {
-  siretGatewayThroughBack: SiretGatewayThroughBack;
+  siretGatewayThroughBack: SimulatedSiretGatewayThroughBack;
   establishments: EstablishmentGateway;
   navigation: NavigationGateway;
   event: EventGateway;
