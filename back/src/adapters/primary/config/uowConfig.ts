@@ -5,15 +5,15 @@ import {
 } from "../../../domain/core/ports/UnitOfWork";
 import { EstablishmentExportQueries } from "../../../domain/establishment/ports/EstablishmentExportQueries";
 import { PostalCodeDepartmentRegionQueries } from "../../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
-import { ImmersionApplicationQueries } from "../../../domain/immersionApplication/ports/ImmersionApplicationQueries";
+import { ConventionQueries } from "../../../domain/convention/ports/ConventionQueries";
 import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
-import { InMemoryImmersionApplicationQueries } from "../../secondary/InMemoryImmersionApplicationQueries";
-import { InMemoryImmersionApplicationRepository } from "../../secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
+import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
@@ -24,8 +24,8 @@ import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgCo
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgEstablishmentExportQueries } from "../../secondary/pg/PgEstablishmentExportQueries";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
-import { PgImmersionApplicationQueries } from "../../secondary/pg/PgImmersionApplicationQueries";
-import { PgImmersionApplicationRepository } from "../../secondary/pg/PgImmersionApplicationRepository";
+import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
+import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
 import { PgOutboxQueries } from "../../secondary/pg/PgOutboxQueries";
 import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
@@ -58,15 +58,15 @@ export const createInMemoryUow = (repositories?: Repositories) => {
     establishmentAggregateRepo:
       (repositories?.immersionOffer as InMemoryEstablishmentAggregateRepository) ??
       new InMemoryEstablishmentAggregateRepository(),
-    immersionApplicationRepo:
-      (repositories?.immersionApplication as InMemoryImmersionApplicationRepository) ??
-      new InMemoryImmersionApplicationRepository(),
+    conventionRepository:
+      (repositories?.convention as InMemoryConventionRepository) ??
+      new InMemoryConventionRepository(),
     establishmentExportQueries:
       (repositories?.establishmentExport as EstablishmentExportQueries) ??
       StubEstablishmentExportQueries,
-    immersionApplicationQueries:
-      (repositories?.immersionApplicationQueries as ImmersionApplicationQueries) ??
-      InMemoryImmersionApplicationQueries,
+    conventionQueries:
+      (repositories?.conventionQueries as ConventionQueries) ??
+      InMemoryConventionQueries,
     postalCodeDepartmentRegionQueries:
       (repositories?.postalCodeDepartmentRegion as PostalCodeDepartmentRegionQueries) ??
       StubPostalCodeDepartmentRegionQueries,
@@ -95,9 +95,9 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   agencyRepo: new PgAgencyRepository(client),
   formEstablishmentRepo: new PgFormEstablishmentRepository(client),
   establishmentAggregateRepo: new PgEstablishmentAggregateRepository(client),
-  immersionApplicationRepo: new PgImmersionApplicationRepository(client),
+  conventionRepository: new PgConventionRepository(client),
   establishmentExportQueries: new PgEstablishmentExportQueries(client),
-  immersionApplicationQueries: new PgImmersionApplicationQueries(client),
+  conventionQueries: new PgConventionQueries(client),
   postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
     client,
   ),

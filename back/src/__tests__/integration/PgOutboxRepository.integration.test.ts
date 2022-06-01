@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
@@ -44,12 +44,12 @@ describe("PgOutboxRepository", () => {
   });
 
   it("saves an event with published data", async () => {
-    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+    const convention = new ConventionDtoBuilder().build();
     clock.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const alreadyProcessedEvent = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: immersionApplication,
+      payload: convention,
       publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
     });
 
@@ -65,10 +65,10 @@ describe("PgOutboxRepository", () => {
   it("saves a new event to be processed, then adds a failing publication, then a working one", async () => {
     // prepare
     uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
-    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+    const convention = new ConventionDtoBuilder().build();
     const event = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: immersionApplication,
+      payload: convention,
     });
 
     // act (when event does not exist in db)
@@ -128,10 +128,10 @@ describe("PgOutboxRepository", () => {
   it("sets was_quarantined for quarantined event types", async () => {
     // prepare
     uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
-    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+    const convention = new ConventionDtoBuilder().build();
     const event = createNewEvent({
       topic: quarantinedTopic,
-      payload: immersionApplication,
+      payload: convention,
     });
 
     // act
@@ -147,12 +147,12 @@ describe("PgOutboxRepository", () => {
   });
 
   it("sets to quarantined event if the event is already in db with publications", async () => {
-    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+    const convention = new ConventionDtoBuilder().build();
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     clock.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const eventFailedToRerun = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: immersionApplication,
+      payload: convention,
       publications: [
         {
           publishedAt: "2021-11-15T08:00:00.000Z",
@@ -169,19 +169,16 @@ describe("PgOutboxRepository", () => {
         },
       ],
     });
-    const quarantinedImmersionApplication = {
+    const quarantinedConvention = {
       ...eventFailedToRerun,
       wasQuarantined: true,
     };
     await storeInOutbox([eventFailedToRerun]);
 
-    await outboxRepository.save(quarantinedImmersionApplication);
+    await outboxRepository.save(quarantinedConvention);
     const storedEventRows = await getAllEventsStored();
     expect(storedEventRows).toHaveLength(2);
-    expectStoredRowsToMatchEvent(
-      storedEventRows,
-      quarantinedImmersionApplication,
-    );
+    expectStoredRowsToMatchEvent(storedEventRows, quarantinedConvention);
   });
 
   const storeInOutbox = async (events: DomainEvent[]) => {

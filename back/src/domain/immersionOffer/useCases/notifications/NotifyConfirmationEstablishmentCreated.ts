@@ -3,7 +3,7 @@ import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstabl
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../../immersionApplication/ports/EmailGateway";
+import { EmailGateway } from "../../../convention/ports/EmailGateway";
 
 const logger = createLogger(__filename);
 
@@ -22,7 +22,7 @@ export class NotifyConfirmationEstablishmentCreated extends UseCase<FormEstablis
     await this.emailFilter.withAllowedRecipients(
       [formEstablishment.businessContact.email],
       ([establishmentContactEmail]) =>
-        this.emailGateway.sendNewEstablismentContactConfirmation(
+        this.emailGateway.sendNewEstablishmentContactConfirmation(
           establishmentContactEmail,
           formEstablishment.businessContact.copyEmails,
           { ...formEstablishment },

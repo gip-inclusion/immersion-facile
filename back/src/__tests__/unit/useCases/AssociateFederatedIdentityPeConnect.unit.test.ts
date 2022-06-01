@@ -1,6 +1,5 @@
 import { PeConnectIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
@@ -28,16 +27,15 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       conventionPoleEmploiUserAdvisorFromDto(userAdvisorDto),
     );
 
-    const immersionDtoFromEvent: ImmersionApplicationDto =
-      new ImmersionApplicationDtoBuilder()
-        .withId(conventionId)
-        .withFederatedIdentity(
-          "Does not start with peConnect:" as PeConnectIdentity,
-        )
-        .build();
+    const conventionDtoFromEvent = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withFederatedIdentity(
+        "Does not start with peConnect:" as PeConnectIdentity,
+      )
+      .build();
 
     await expect(
-      associatePeConnectFederatedIdentity.execute(immersionDtoFromEvent),
+      associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent),
     ).rejects.toThrow(BadRequestError);
   });
 
@@ -46,13 +44,12 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       conventionPoleEmploiUserAdvisorFromDto(userAdvisorDto),
     );
 
-    const immersionDtoFromEvent: ImmersionApplicationDto =
-      new ImmersionApplicationDtoBuilder()
-        .withId(conventionId)
-        .withFederatedIdentity(`peConnect:${userPeExternalId}`)
-        .build();
+    const conventionDtoFromEvent = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withFederatedIdentity(`peConnect:${userPeExternalId}`)
+      .build();
 
-    await associatePeConnectFederatedIdentity.execute(immersionDtoFromEvent);
+    await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);
 
     expect(
       conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,

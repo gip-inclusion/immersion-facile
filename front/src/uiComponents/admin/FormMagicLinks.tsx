@@ -1,13 +1,11 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { immersionApplicationGateway } from "src/app/config/dependencies";
+import { conventionGateway } from "src/app/config/dependencies";
 import { frontRoutes } from "shared/src/routes";
 import { allRoles, Role } from "shared/src/tokens/MagicLinkPayload";
 import { FormAccordionProps } from "./FormAccordion";
 
 // Component to show the magic links picker
-export const FormMagicLinks = ({
-  immersionApplication,
-}: FormAccordionProps) => {
+export const FormMagicLinks = ({ convention }: FormAccordionProps) => {
   const [role, setRole] = useState(allRoles[0]);
   const [route, setRoute] = useState(
     Object.keys(frontRoutes)[0] as keyof typeof frontRoutes,
@@ -17,8 +15,8 @@ export const FormMagicLinks = ({
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    immersionApplicationGateway
-      .generateMagicLink(immersionApplication.id, role, expired)
+    conventionGateway
+      .generateMagicLink(convention.id, role, expired)
       .then(
         (jwt) =>
           `${location.protocol}//${location.host}/${frontRoutes[route]}/?jwt=${jwt}`,

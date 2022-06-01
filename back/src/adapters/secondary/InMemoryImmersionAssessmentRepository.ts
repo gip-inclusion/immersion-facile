@@ -1,6 +1,6 @@
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { ImmersionAssessmentEntity } from "../../domain/immersionApplication/entities/ImmersionAssessmentEntity";
-import { ImmersionAssessmentRepository } from "../../domain/immersionApplication/ports/ImmersionAssessmentRepository";
+import { ConventionId } from "shared/src/convention/convention.dto";
+import { ImmersionAssessmentEntity } from "../../domain/convention/entities/ImmersionAssessmentEntity";
+import { ImmersionAssessmentRepository } from "../../domain/convention/ports/ImmersionAssessmentRepository";
 
 export class InMemoryImmersionAssessmentRepository
   implements ImmersionAssessmentRepository
@@ -12,7 +12,7 @@ export class InMemoryImmersionAssessmentRepository
   }
 
   public async getByConventionId(
-    conventionId: ImmersionApplicationId,
+    conventionId: ConventionId,
   ): Promise<ImmersionAssessmentEntity | undefined> {
     return this._assessments.find(
       (assessment) => assessment.conventionId === conventionId,

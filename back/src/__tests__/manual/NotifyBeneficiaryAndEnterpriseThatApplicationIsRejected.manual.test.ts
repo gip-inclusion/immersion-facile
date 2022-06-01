@@ -1,10 +1,10 @@
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
-import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
-import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
-import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { AllowListEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
@@ -14,7 +14,7 @@ import { AllowListEmailFilter } from "../../adapters/secondary/core/EmailFilterI
 // Requires the following environment variables to be set for the tests to pass:
 // - SENDINBLUE_API_KEY
 
-const validImmersionApplication = new ImmersionApplicationDtoBuilder()
+const validConvention = new ConventionDtoBuilder()
   .withEmail("jean-francois.macresy@beta.gouv.fr")
   .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
   .build();
@@ -30,23 +30,22 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
     const config = AppConfig.createFromEnv();
     emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
     agencyRepository = new InMemoryAgencyRepository([
-      AgencyBuilder.create(validImmersionApplication.agencyId)
+      AgencyDtoBuilder.create(validConvention.agencyId)
         .withCounsellorEmails([counsellorEmail])
         .build(),
     ]);
-    validImmersionApplication.status = "REJECTED";
-    validImmersionApplication.rejectionJustification = rejectionJustification;
+    validConvention.status = "REJECTED";
+    validConvention.rejectionJustification = rejectionJustification;
   });
 
   //eslint-disable-next-line jest/expect-expect
   it("Sends rejection email", async () => {
-    validImmersionApplication.mentorEmail = "jeanfrancois.macresy@gmail.com";
-    validImmersionApplication.email =
-      "jeanfrancois.macresy+beneficiary@gmail.com";
+    validConvention.mentorEmail = "jeanfrancois.macresy@gmail.com";
+    validConvention.email = "jeanfrancois.macresy+beneficiary@gmail.com";
 
     const emailFilter = new AllowListEmailFilter([
-      validImmersionApplication.mentorEmail,
-      validImmersionApplication.email,
+      validConvention.mentorEmail,
+      validConvention.email,
       counsellorEmail,
     ]);
 
@@ -58,7 +57,7 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
       );
 
     await notifyBeneficiaryAndEnterpriseThatApplicationIsRejected.execute(
-      validImmersionApplication,
+      validConvention,
     );
   });
 });

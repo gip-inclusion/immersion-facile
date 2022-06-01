@@ -1,31 +1,32 @@
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
 import { UseCase } from "../../core/UseCase";
-import { EmailGateway } from "../../immersionApplication/ports/EmailGateway";
+import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionId } from "shared/src/convention/convention.dto";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { addDays } from "date-fns";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { ImmersionApplicationQueries } from "../../immersionApplication/ports/ImmersionApplicationQueries";
+import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
 
 const logger = createLogger(__filename);
 
 export type ImmersionAssessmentEmailParams = {
-  immersionId: ImmersionApplicationId;
+  immersionId: ConventionId;
   mentorName: string;
   mentorEmail: string;
   beneficiaryFirstName: string;
   beneficiaryLastName: string;
 };
+
 export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
   inputSchema = z.void();
 
   constructor(
     private outboxRepo: OutboxRepository,
-    private applicationQueries: ImmersionApplicationQueries,
+    private conventionQueries: ConventionQueries,
     private emailGateway: EmailGateway,
     private clock: Clock,
     private generateConventionMagicLink: GenerateConventionMagicLink,
@@ -38,12 +39,12 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
     const now = this.clock.now();
     const tomorrow = addDays(now, 1);
     const assessmentEmailParamsOfImmersionEndingTomorrow =
-      await this.applicationQueries.getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
+      await this.conventionQueries.getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
         tomorrow,
       );
     if (assessmentEmailParamsOfImmersionEndingTomorrow.length === 0) return;
 
-    const errors: Record<ImmersionApplicationId, any> = {};
+    const errors: Record<ConventionId, any> = {};
     await Promise.all(
       assessmentEmailParamsOfImmersionEndingTomorrow.map(
         async (immersionEndingTomorrow) => {
@@ -91,7 +92,7 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
   }
 
   private notifyDiscord(
-    errors: Record<ImmersionApplicationId, any>,
+    errors: Record<ConventionId, any>,
     numberOfAssessmentEndingTomorrow: number,
   ) {
     const nSendingEmailFailures = Object.keys(errors).length;

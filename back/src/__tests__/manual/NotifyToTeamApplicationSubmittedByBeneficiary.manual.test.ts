@@ -2,8 +2,8 @@ import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { createGenerateConventionMagicLink } from "../../adapters/primary/config/createGenerateConventionMagicLink";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
-import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
-import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/convention/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
@@ -12,7 +12,7 @@ import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/
 // Requires the following environment variables to be set for the tests to pass:
 // - SENDINBLUE_API_KEY
 
-const validImmersionApplication = new ImmersionApplicationDtoBuilder()
+const validConvention = new ConventionDtoBuilder()
   .withEmail("jean-francois.macresy@beta.gouv.fr")
   .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
   .build();
@@ -35,12 +35,11 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
 
   // eslint-disable-next-line jest/expect-expect
   it("Sends no emails when allowList and unrestrictedEmailSendingAgencies is empty", async () => {
-    validImmersionApplication.mentorEmail = "jeanfrancois.macresy@gmail.com";
-    validImmersionApplication.email =
-      "jeanfrancois.macresy+beneficiary@gmail.com";
+    validConvention.mentorEmail = "jeanfrancois.macresy@gmail.com";
+    validConvention.email = "jeanfrancois.macresy+beneficiary@gmail.com";
 
     await notifyToTeamApplicationSubmittedByBeneficiary.execute(
-      validImmersionApplication,
+      validConvention,
     );
   });
 });

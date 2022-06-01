@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { immersionApplicationGateway } from "src/app/config/dependencies";
+import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { InfoMessage } from "src/uiComponents/form/InfoMessage";
@@ -15,7 +15,7 @@ interface AdminVerificationProps {
 }
 
 export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
-  const [form, setForm] = useState<ImmersionApplicationDto | null>(null);
+  const [form, setForm] = useState<ConventionDto | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -27,7 +27,7 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
     REJECTED:
       "Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise.",
     ACCEPTED_BY_COUNSELLOR:
-      "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la convention.",
+      "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la Convention.",
     ACCEPTED_BY_VALIDATOR:
       "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail au bénéficiaire et à l'entreprise.",
     VALIDATED:
@@ -48,7 +48,7 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
 
   const validationDisabled = () => !form || form.status !== "IN_REVIEW";
   useEffect(() => {
-    immersionApplicationGateway
+    conventionGateway
       .backofficeGet(id)
       .then((data) => {
         setForm(data);
@@ -75,7 +75,7 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
     if (!form) return;
     setSubmitting(true);
 
-    immersionApplicationGateway
+    conventionGateway
       .validate(form.id)
       .then(() => {
         setSuccessMessage(successMessageByStatus[form.status]);
@@ -96,7 +96,7 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
       {form && (
         <>
           {infoMessage && <InfoMessage title="Attention" text={infoMessage} />}
-          <FormAccordion immersionApplication={form} />
+          <FormAccordion convention={form} />
           {!validationDisabled() && (
             <button
               className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"

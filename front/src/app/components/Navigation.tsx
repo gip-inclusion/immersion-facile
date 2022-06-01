@@ -9,7 +9,7 @@ export const Navigation = () => {
     <nav>
       <a {...routes.home().link}>Home</a>
       {" - "}
-      <a {...routes.immersionApplication().link}>Demande immersion</a>
+      <a {...routes.convention().link}>Demande immersion</a>
       {" - "}
       {featureFlags.enableAdminUi && <a {...routes.admin().link}>Backoffice</a>}
       {featureFlags.enableAdminUi && " - "}

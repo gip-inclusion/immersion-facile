@@ -1,5 +1,5 @@
 import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionId } from "shared/src/convention/convention.dto";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
 
 export interface ConventionPoleEmploiAdvisorRepository {
@@ -7,7 +7,7 @@ export interface ConventionPoleEmploiAdvisorRepository {
     advisor: ConventionPoleEmploiUserAdvisorEntity,
   ) => Promise<void>;
   associateConventionAndUserAdvisor: (
-    conventionId: ImmersionApplicationId,
+    conventionId: ConventionId,
     userPeExternalId: PeExternalId,
   ) => Promise<void>;
 }

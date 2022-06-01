@@ -1,6 +1,6 @@
 import { addDays as dateFnsAddDays, format } from "date-fns";
 import { partition } from "ramda";
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionId } from "shared/src/convention/convention.dto";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateConventionMagicLink } from "../adapters/primary/config/createGenerateConventionMagicLink";
 import { CustomClock } from "../adapters/secondary/core/ClockImplementations";
@@ -53,7 +53,7 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLink = ({
   role,
   targetRoute,
 }: {
-  id: ImmersionApplicationId;
+  id: ConventionId;
   role: Role;
   targetRoute: string;
 }) => `http://fake-magic-link/${id}/${targetRoute}/${role}`;

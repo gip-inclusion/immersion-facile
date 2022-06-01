@@ -2,7 +2,7 @@ import { VirtualTimeScheduler } from "rxjs";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
 import { InMemoryTechnicalGateway } from "src/core-logic/adapters/InMemoryTechnicalGateway";
-import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
+import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
@@ -18,7 +18,7 @@ export interface TestDependencies {
   apiAdresseGateway: InMemoryApiAdresseGateway;
   technicalGateway: InMemoryTechnicalGateway;
   establishmentGateway: InMemoryEstablishmentGateway;
-  immersionApplicationGateway: InMemoryImmersionApplicationGateway;
+  conventionGateway: InMemoryConventionGateway;
   immersionSearchGateway: InMemoryImmersionSearchGateway;
   romeAutocompleteGateway: InMemoryRomeAutocompleteGateway;
   minSearchResultsToPreventRefetch: number;
@@ -36,7 +36,7 @@ export const createTestStore = (
     immersionSearchGateway: new InMemoryImmersionSearchGateway(),
     minSearchResultsToPreventRefetch: 2,
     establishmentGateway: new InMemoryEstablishmentGateway(),
-    immersionApplicationGateway: new InMemoryImmersionApplicationGateway(),
+    conventionGateway: new InMemoryConventionGateway(),
     apiAdresseGateway: new InMemoryApiAdresseGateway(),
     technicalGateway: new InMemoryTechnicalGateway(),
     agencyGateway: new InMemoryAgencyGateway(),

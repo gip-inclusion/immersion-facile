@@ -2,11 +2,11 @@ import { parseISO } from "date-fns";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
-import { ValidatedApplicationFinalConfirmationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
+import { ValidatedConventionFinalConfirmationParams } from "../../../domain/convention/ports/EmailGateway";
 import {
   getValidatedApplicationFinalConfirmationParams,
   NotifyAllActorsOfFinalApplicationValidation,
-} from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+} from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import {
   LegacyScheduleDto,
   reasonableSchedule,
@@ -15,30 +15,29 @@ import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
-import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
-import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
-import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
+import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../_testBuilders/emailAssertions";
+import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,
 } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { Agency } from "shared/src/agency/agency.dto";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { AgencyDto } from "shared/src/agency/agency.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 
-const validImmersionApplication: ImmersionApplicationDto =
-  new ImmersionApplicationEntityBuilder().build().toDto();
+const validConvention: ConventionDto = new ConventionEntityBuilder()
+  .build()
+  .toDto();
 
 const counsellorEmail = "counsellor@email.fr";
 
-const defaultAgency = AgencyBuilder.create(
-  validImmersionApplication.agencyId,
-).build();
+const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
 
 describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   let emailFilter: EmailFilter;
   let emailGw: InMemoryEmailGateway;
-  let agency: Agency;
+  let agency: AgencyDto;
 
   beforeEach(() => {
     emailFilter = new AlwaysAllowEmailFilter();
@@ -55,120 +54,110 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
   it("Sends no emails when allowList is enforced and empty", async () => {
     emailFilter = new AllowListEmailFilter([]);
-    await createUseCase().execute(validImmersionApplication);
+    await createUseCase().execute(validConvention);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
 
   it("Sends confirmation email to beneficiary when on allowList", async () => {
-    emailFilter = new AllowListEmailFilter([validImmersionApplication.email]);
+    emailFilter = new AllowListEmailFilter([validConvention.email]);
 
-    await createUseCase().execute(validImmersionApplication);
+    await createUseCase().execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
-    expectEmailFinalValidationConfirmationMatchingImmersionApplication(
-      [validImmersionApplication.email],
+    expectEmailFinalValidationConfirmationMatchingConvention(
+      [validConvention.email],
       sentEmails[0],
       agency,
-      validImmersionApplication,
+      validConvention,
     );
   });
 
   it("Sends confirmation email to mentor when on allowList", async () => {
-    emailFilter = new AllowListEmailFilter([
-      validImmersionApplication.mentorEmail,
-    ]);
+    emailFilter = new AllowListEmailFilter([validConvention.mentorEmail]);
 
-    await createUseCase().execute(validImmersionApplication);
+    await createUseCase().execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
-    expectEmailFinalValidationConfirmationMatchingImmersionApplication(
-      [validImmersionApplication.mentorEmail],
+    expectEmailFinalValidationConfirmationMatchingConvention(
+      [validConvention.mentorEmail],
       sentEmails[0],
       agency,
-      validImmersionApplication,
+      validConvention,
     );
   });
 
   it("Sends confirmation email to counsellor when on allowList", async () => {
-    agency = new AgencyBuilder(defaultAgency)
+    agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
     emailFilter = new AllowListEmailFilter([counsellorEmail]);
 
-    await createUseCase().execute(validImmersionApplication);
+    await createUseCase().execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
-    expectEmailFinalValidationConfirmationMatchingImmersionApplication(
+    expectEmailFinalValidationConfirmationMatchingConvention(
       [counsellorEmail],
       sentEmails[0],
       agency,
-      validImmersionApplication,
+      validConvention,
     );
   });
 
   it("Sends confirmation email to beneficiary, mentor, and counsellor when on allowList", async () => {
-    agency = new AgencyBuilder(defaultAgency)
+    agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
     emailFilter = new AllowListEmailFilter([
       counsellorEmail,
-      validImmersionApplication.email,
-      validImmersionApplication.mentorEmail,
+      validConvention.email,
+      validConvention.mentorEmail,
     ]);
 
-    await createUseCase().execute(validImmersionApplication);
+    await createUseCase().execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
-    expectEmailFinalValidationConfirmationMatchingImmersionApplication(
-      [
-        validImmersionApplication.email,
-        validImmersionApplication.mentorEmail,
-        counsellorEmail,
-      ],
+    expectEmailFinalValidationConfirmationMatchingConvention(
+      [validConvention.email, validConvention.mentorEmail, counsellorEmail],
       sentEmails[0],
       agency,
-      validImmersionApplication,
+      validConvention,
     );
   });
 
   it("Sends confirmation email to beneficiary, mentor, and counsellor when unrestricted email sending is allowed", async () => {
-    agency = new AgencyBuilder(defaultAgency)
+    agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
-    await createUseCase().execute(validImmersionApplication);
+    await createUseCase().execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
-    expectEmailFinalValidationConfirmationMatchingImmersionApplication(
-      [
-        validImmersionApplication.email,
-        validImmersionApplication.mentorEmail,
-        counsellorEmail,
-      ],
+    expectEmailFinalValidationConfirmationMatchingConvention(
+      [validConvention.email, validConvention.mentorEmail, counsellorEmail],
       sentEmails[0],
       agency,
-      validImmersionApplication,
+      validConvention,
     );
   });
 });
 
 describe("getValidatedApplicationFinalConfirmationParams", () => {
-  const agency = new AgencyBuilder(defaultAgency)
+  const agency = new AgencyDtoBuilder(defaultAgency)
     .withQuestionnaireUrl("testQuestionnaireUrl")
     .withSignature("testSignature")
     .build();
 
   it("simple application", () => {
-    const application = new ImmersionApplicationDtoBuilder()
+    const application = new ConventionDtoBuilder()
       .withImmersionAddress("immersionAddress")
       .withSanitaryPrevention(true)
       .withSanitaryPreventionDescription("sanitaryPreventionDescription")
@@ -176,7 +165,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .withSchedule(reasonableSchedule)
       .build();
 
-    const expectedParams: ValidatedApplicationFinalConfirmationParams = {
+    const expectedParams: ValidatedConventionFinalConfirmationParams = {
       totalHours: 56,
       beneficiaryFirstName: application.firstName,
       beneficiaryLastName: application.lastName,
@@ -208,7 +197,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       workdays: ["lundi"],
       description: "legacyScheduleDescription",
     };
-    const application = new ImmersionApplicationDtoBuilder()
+    const application = new ConventionDtoBuilder()
       .withLegacySchedule(legacySchedule)
       .build();
 
@@ -223,7 +212,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
   });
 
   it("prints correct sanitaryPreventionMessage when missing", () => {
-    const application = new ImmersionApplicationDtoBuilder()
+    const application = new ConventionDtoBuilder()
       .withSanitaryPrevention(false)
       .build();
 
@@ -236,7 +225,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
   });
 
   it("prints correct individualProtection when missing", () => {
-    const application = new ImmersionApplicationDtoBuilder()
+    const application = new ConventionDtoBuilder()
       .withIndividualProtection(false)
       .build();
 

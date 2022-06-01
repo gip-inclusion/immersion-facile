@@ -1,26 +1,24 @@
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
-import { Agency } from "shared/src/agency/agency.dto";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
-import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
+import { AgencyDto } from "shared/src/agency/agency.dto";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
+import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
 import { expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../_testBuilders/emailAssertions";
-import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
 import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,
 } from "../../../adapters/secondary/core/EmailFilterImplementations";
 
-const rejectedImmersionApplication = new ImmersionApplicationDtoBuilder()
+const rejectedConvention = new ConventionDtoBuilder()
   .withStatus("REJECTED")
   .withRejectionJustification("test-rejection-justification")
   .build();
 const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
 const signature = "test-signature";
 
-const defaultAgency = AgencyBuilder.create(
-  rejectedImmersionApplication.agencyId,
-)
+const defaultAgency = AgencyDtoBuilder.create(rejectedConvention.agencyId)
   .withName("test-agency-name")
   .withCounsellorEmails(counsellorEmails)
   .withSignature(signature)
@@ -29,7 +27,7 @@ const defaultAgency = AgencyBuilder.create(
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
   let emailGw: InMemoryEmailGateway;
   let emailFilter: EmailFilter;
-  let agency: Agency;
+  let agency: AgencyDto;
 
   beforeEach(() => {
     emailFilter = new AlwaysAllowEmailFilter();
@@ -45,7 +43,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     );
 
   it("Sends rejection email to beneficiary, mentor, and counsellor", async () => {
-    await createUseCase().execute(rejectedImmersionApplication);
+    await createUseCase().execute(rejectedConvention);
 
     const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);
@@ -53,18 +51,18 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
       sentEmails[0],
       [
-        rejectedImmersionApplication.email,
-        rejectedImmersionApplication.mentorEmail,
+        rejectedConvention.email,
+        rejectedConvention.mentorEmail,
         ...counsellorEmails,
       ],
-      rejectedImmersionApplication,
+      rejectedConvention,
       agency,
     );
   });
 
   it("Sends no emails when allowList is enforced and empty", async () => {
     emailFilter = new AllowListEmailFilter([]);
-    await createUseCase().execute(rejectedImmersionApplication);
+    await createUseCase().execute(rejectedConvention);
 
     const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(0);
@@ -72,12 +70,12 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
 
   it("Sends rejection email to beneficiary, mentor, and counsellor when on allowList", async () => {
     emailFilter = new AllowListEmailFilter([
-      rejectedImmersionApplication.email,
-      rejectedImmersionApplication.mentorEmail,
+      rejectedConvention.email,
+      rejectedConvention.mentorEmail,
       ...counsellorEmails,
     ]);
 
-    await createUseCase().execute(rejectedImmersionApplication);
+    await createUseCase().execute(rejectedConvention);
 
     const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);
@@ -85,11 +83,11 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
       sentEmails[0],
       [
-        rejectedImmersionApplication.email,
-        rejectedImmersionApplication.mentorEmail,
+        rejectedConvention.email,
+        rejectedConvention.mentorEmail,
         ...counsellorEmails,
       ],
-      rejectedImmersionApplication,
+      rejectedConvention,
       agency,
     );
   });

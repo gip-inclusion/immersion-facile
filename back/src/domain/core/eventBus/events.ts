@@ -2,15 +2,15 @@ import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment"
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { Flavor } from "shared/src/typeFlavors";
 import {
-  ImmersionApplicationRequiresModificationPayload,
+  ConventionRequiresModificationPayload,
   RenewMagicLinkPayload,
-} from "../../immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+} from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import type { DateStr } from "../ports/Clock";
 import {
-  ImmersionApplicationDto,
-  WithImmersionApplicationId,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { Agency } from "shared/src/agency/agency.dto";
+  ConventionDto,
+  WithConventionId,
+} from "shared/src/convention/convention.dto";
+import { AgencyDto } from "shared/src/agency/agency.dto";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
@@ -40,23 +40,23 @@ export type DomainEvent =
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
   // prettier-ignore
-  | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ImmersionApplicationDto>
+  | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ConventionDto>
   // prettier-ignore
-  | GenericEvent<"ImmersionApplicationPartiallySigned", ImmersionApplicationDto>
+  | GenericEvent<"ImmersionApplicationPartiallySigned", ConventionDto>
   // prettier-ignore
-  | GenericEvent<"ImmersionApplicationFullySigned", ImmersionApplicationDto>
+  | GenericEvent<"ImmersionApplicationFullySigned", ConventionDto>
   // prettier-ignore
-  | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ImmersionApplicationDto>
+  | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ConventionDto>
   // prettier-ignore
-  | GenericEvent<"ImmersionApplicationAcceptedByValidator", ImmersionApplicationDto>
+  | GenericEvent<"ImmersionApplicationAcceptedByValidator", ConventionDto>
   // prettier-ignore
-  | GenericEvent<"FinalImmersionApplicationValidationByAdmin", ImmersionApplicationDto>
+  | GenericEvent<"FinalImmersionApplicationValidationByAdmin", ConventionDto>
 
   // UNHAPPY PATHS
-  | GenericEvent<"ImmersionApplicationRejected", ImmersionApplicationDto>
-  | GenericEvent<"ImmersionApplicationCancelled", ImmersionApplicationDto>
+  | GenericEvent<"ImmersionApplicationRejected", ConventionDto>
+  | GenericEvent<"ImmersionApplicationCancelled", ConventionDto>
   // prettier-ignore
-  | GenericEvent<"ImmersionApplicationRequiresModification", ImmersionApplicationRequiresModificationPayload>
+  | GenericEvent<"ImmersionApplicationRequiresModification", ConventionRequiresModificationPayload>
 
   // MAGIC LINK RENEWAL
   | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>
@@ -72,12 +72,12 @@ export type DomainEvent =
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", EstablishmentAggregate>
 
   // AGENCY RELATED
-  | GenericEvent<"NewAgencyAdded", Agency>
+  | GenericEvent<"NewAgencyAdded", AgencyDto>
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"ImmersionAssessmentCreated", ImmersionAssessmentDto>
   // prettier-ignore
-  | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithImmersionApplicationId>;
+  | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionId>;
 
 export type DomainTopic = DomainEvent["topic"];
 

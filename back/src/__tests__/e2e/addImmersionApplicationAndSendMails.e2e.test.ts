@@ -1,9 +1,9 @@
 import supertest from "supertest";
 import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
 import {
-  ImmersionApplicationDtoBuilder,
+  ConventionDtoBuilder,
   VALID_EMAILS,
-} from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+} from "shared/src/convention/ConventionDtoBuilder";
 import {
   expectTypeToMatchAndEqual,
   expectJwtInMagicLinkAndGetIt,
@@ -14,38 +14,37 @@ import {
   TemplatedEmail,
 } from "../../adapters/secondary/InMemoryEmailGateway";
 import { DomainEvent } from "../../domain/core/eventBus/events";
-import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+import { ConventionEntity } from "../../domain/convention/entities/ConventionEntity";
 import {
-  ImmersionApplicationDto,
-  UpdateImmersionApplicationStatusRequestDto,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+  ConventionDto,
+  UpdateConventionStatusRequestDto,
+} from "shared/src/convention/convention.dto";
 import {
-  immersionApplicationsRoute,
-  signApplicationRoute,
-  updateApplicationStatusRoute,
+  conventionsRoute,
+  signConventionRoute,
+  updateConventionStatusRoute,
 } from "shared/src/routes";
 
 const adminEmail = "admin@email.fr";
 const validatorEmail = "validator@mail.com";
 
-describe("Add immersionApplication Notifications, then checks the mails are sent (trigerred by events)", () => {
+describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid app in repository with full express app", async () => {
-    const validImmersionApplication =
-      new ImmersionApplicationDtoBuilder().build();
+    const validConvention = new ConventionDtoBuilder().build();
     const { request, reposAndGateways, eventCrawler } = await buildTestApp();
 
     const res = await request
-      .post(`/${immersionApplicationsRoute}`)
-      .send(validImmersionApplication);
+      .post(`/${conventionsRoute}`)
+      .send(validConvention);
 
-    expectResponseBody(res, { id: validImmersionApplication.id });
-    expect(
-      await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
-    ).toEqual([ImmersionApplicationEntity.create(validImmersionApplication)]);
+    expectResponseBody(res, { id: validConvention.id });
+    expect(await reposAndGateways.conventionQueries.getLatestUpdated()).toEqual(
+      [ConventionEntity.create(validConvention)],
+    );
     expectEventsInOutbox(reposAndGateways.outbox, [
       {
         topic: "ImmersionApplicationSubmittedByBeneficiary",
-        payload: validImmersionApplication,
+        payload: validConvention,
         publications: [],
       },
     ]);
@@ -54,15 +53,15 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
     expectSentEmails(reposAndGateways.email, [
       {
-        type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
-        recipients: [validImmersionApplication.email],
+        type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+        recipients: [validConvention.email],
       },
       {
-        type: "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
-        recipients: [validImmersionApplication.mentorEmail],
+        type: "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+        recipients: [validConvention.mentorEmail],
       },
       {
-        type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
+        type: "NEW_CONVENTION_ADMIN_NOTIFICATION",
         recipients: ["admin@email.fr"],
       },
     ]);
@@ -70,14 +69,14 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
   // eslint-disable-next-line jest/expect-expect
   it("Scenario: application submitted, then signed, then validated", async () => {
-    const initialImmersionApplication = new ImmersionApplicationDtoBuilder()
+    const initialConvention = new ConventionDtoBuilder()
       .notSigned()
       .withStatus("READY_TO_SIGN")
       .build();
 
     const appAndDeps = await buildTestApp();
     const agency = await appAndDeps.reposAndGateways.agency.getById(
-      initialImmersionApplication.agencyId,
+      initialConvention.agencyId,
     );
 
     if (!agency) throw new Error("Test agency not found with this id");
@@ -89,25 +88,25 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     const { beneficiarySignJwt, establishmentSignJwt } =
       await beneficiarySubmitsApplicationForTheFirstTime(
         appAndDeps,
-        initialImmersionApplication,
+        initialConvention,
       );
 
     await beneficiarySignsApplication(
       appAndDeps,
       beneficiarySignJwt,
-      initialImmersionApplication,
+      initialConvention,
     );
 
     const { validatorReviewJwt } = await establishmentSignsApplication(
       appAndDeps,
       establishmentSignJwt,
-      initialImmersionApplication,
+      initialConvention,
     );
 
     await validatorValidatesApplicationWhichTriggersConventionToBeSent(
       appAndDeps,
       validatorReviewJwt,
-      initialImmersionApplication,
+      initialConvention,
     );
 
     // REVIEW : RAJOUTER EXPECT A FAIRE !!!
@@ -138,16 +137,13 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
-  immersionApplication: ImmersionApplicationDto,
+  convention: ConventionDto,
 ) => {
-  await request
-    .post(`/${immersionApplicationsRoute}`)
-    .send(immersionApplication)
-    .expect(200);
+  await request.post(`/${conventionsRoute}`).send(convention).expect(200);
 
   expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
-    immersionApplication,
+    await reposAndGateways.conventionQueries.getLatestUpdated(),
+    convention,
   );
 
   await eventCrawler.processNewEvents();
@@ -180,18 +176,18 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 const beneficiarySignsApplication = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
   beneficiarySignJwt: string,
-  initialImmersionApplication: ImmersionApplicationDto,
+  initialConvention: ConventionDto,
 ) => {
   const response = await request.post(
-    `/auth/${signApplicationRoute}/${beneficiarySignJwt}`,
+    `/auth/${signConventionRoute}/${beneficiarySignJwt}`,
   );
 
   expect(response.status).toBe(200);
 
   expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
+    await reposAndGateways.conventionQueries.getLatestUpdated(),
     {
-      ...initialImmersionApplication,
+      ...initialConvention,
       status: "PARTIALLY_SIGNED",
       beneficiaryAccepted: true,
       enterpriseAccepted: false,
@@ -213,16 +209,16 @@ const beneficiarySignsApplication = async (
 const establishmentSignsApplication = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
   establishmentSignJwt: string,
-  initialImmersionApplication: ImmersionApplicationDto,
+  initialConvention: ConventionDto,
 ) => {
   await request
-    .post(`/auth/${signApplicationRoute}/${establishmentSignJwt}`)
+    .post(`/auth/${signConventionRoute}/${establishmentSignJwt}`)
     .expect(200);
 
   expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
+    await reposAndGateways.conventionQueries.getLatestUpdated(),
     {
-      ...initialImmersionApplication,
+      ...initialConvention,
       status: "IN_REVIEW",
       beneficiaryAccepted: true,
       enterpriseAccepted: true,
@@ -245,20 +241,20 @@ const establishmentSignsApplication = async (
 const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
   validatorReviewJwt: string,
-  initialImmersionApplication: ImmersionApplicationDto,
+  initialConvention: ConventionDto,
 ) => {
-  const params: UpdateImmersionApplicationStatusRequestDto = {
+  const params: UpdateConventionStatusRequestDto = {
     status: "ACCEPTED_BY_VALIDATOR",
   };
   await request
-    .post(`/auth/${updateApplicationStatusRoute}/${validatorReviewJwt}`)
+    .post(`/auth/${updateConventionStatusRoute}/${validatorReviewJwt}`)
     .send(params)
     .expect(200);
 
   expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.immersionApplicationQueries.getLatestUpdated(),
+    await reposAndGateways.conventionQueries.getLatestUpdated(),
     {
-      ...initialImmersionApplication,
+      ...initialConvention,
       status: "ACCEPTED_BY_VALIDATOR",
       beneficiaryAccepted: true,
       enterpriseAccepted: true,
@@ -272,7 +268,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
   expectTypeToMatchAndEqual(
     needsToTriggerConventionSentEmail.type,
-    "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
+    "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
   );
   expect(needsToTriggerConventionSentEmail.recipients).toEqual([
     "beneficiary@email.fr",
@@ -282,8 +278,8 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 };
 
 const expectOnlyOneImmersionThatIsEqual = (
-  actualEntities: ImmersionApplicationEntity[],
-  expectedDto: ImmersionApplicationDto,
+  actualEntities: ConventionEntity[],
+  expectedDto: ConventionDto,
 ) => {
   expect(actualEntities).toHaveLength(1);
   expectTypeToMatchAndEqual(actualEntities[0].toDto(), expectedDto);

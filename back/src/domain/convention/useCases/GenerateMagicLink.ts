@@ -1,0 +1,47 @@
+import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { GenerateMagicLinkJwt } from "../../auth/jwt";
+import { UseCase } from "../../core/UseCase";
+import {
+  GenerateMagicLinkRequestDto,
+  GenerateMagicLinkResponseDto,
+} from "shared/src/convention/convention.dto";
+import { generateMagicLinkRequestSchema } from "shared/src/convention/convention.schema";
+
+export class GenerateMagicLink extends UseCase<
+  GenerateMagicLinkRequestDto,
+  GenerateMagicLinkResponseDto
+> {
+  constructor(private readonly generateMagicLinkJwt: GenerateMagicLinkJwt) {
+    super();
+  }
+
+  inputSchema = generateMagicLinkRequestSchema;
+
+  //eslint-disable-next-line @typescript-eslint/require-await
+  public async _execute({
+    applicationId,
+    role,
+    expired,
+  }: GenerateMagicLinkRequestDto) {
+    const twoDaysAgo = Math.round((Date.now() - 48 * 3600 * 1000) / 1000);
+
+    const payload = expired
+      ? createConventionMagicLinkPayload(
+          applicationId,
+          role,
+          "backoffice administrator",
+          1,
+          undefined,
+          undefined,
+          twoDaysAgo,
+        )
+      : createConventionMagicLinkPayload(
+          applicationId,
+          role,
+          "backoffice administrator",
+        );
+    return {
+      jwt: this.generateMagicLinkJwt(payload),
+    };
+  }
+}

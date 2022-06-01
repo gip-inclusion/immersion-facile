@@ -1,7 +1,11 @@
-import { Agency, AgencyPublicDisplayDto, CreateAgencyDto } from "./agency.dto";
+import {
+  AgencyDto,
+  AgencyPublicDisplayDto,
+  CreateAgencyDto,
+} from "./agency.dto";
 
 export const toAgencyPublicDisplayDto = (
-  agency: Agency | CreateAgencyDto,
+  agency: AgencyDto | CreateAgencyDto,
 ): AgencyPublicDisplayDto => ({
   id: agency.id,
   name: agency.name,

@@ -16,7 +16,7 @@ import { createApiKeyAuthRouter } from "./routers/createApiKeyAuthRouter";
 import { createEstablishmentRouter } from "./routers/createEstablishmentRouter";
 import { createExcelExportRouter } from "./routers/createExcelExportRouter";
 import { createFormCompletionRouter } from "./routers/createFormCompletionRouter";
-import { createImmersionApplicationRouter } from "./routers/createImmersionApplicationRouter";
+import { createConventionRouter } from "./routers/createConventionRouter";
 import { createMagicLinkRouter } from "./routers/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/createPeConnectRouter";
 import { createTechnicalRouter } from "./routers/createTechnicalRouter";
@@ -58,7 +58,7 @@ export const createApp = async (
   // ----
   app.use(createFormCompletionRouter(deps));
   app.use(createTechnicalRouter(deps));
-  app.use(createImmersionApplicationRouter(deps));
+  app.use(createConventionRouter(deps));
   app.use(createAgenciesRouter(deps));
   app.use(createExcelExportRouter(deps));
   app.use(createPeConnectRouter(deps));

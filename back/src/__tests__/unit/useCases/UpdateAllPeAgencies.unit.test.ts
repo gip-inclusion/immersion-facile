@@ -3,9 +3,9 @@ import { ConsoleAppLogger } from "../../../adapters/secondary/core/ConsoleAppLog
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryPeAgenciesReferential } from "../../../adapters/secondary/immersionOffer/InMemoryPeAgenciesReferential";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { defaultQuestionnaireUrl } from "../../../domain/immersionApplication/useCases/AddAgency";
-import { UpdateAllPeAgencies } from "../../../domain/immersionApplication/useCases/UpdateAllPeAgencies";
-import { Agency } from "shared/src/agency/agency.dto";
+import { defaultQuestionnaireUrl } from "../../../domain/convention/useCases/AddAgency";
+import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
+import { AgencyDto } from "shared/src/agency/agency.dto";
 
 const adminMail = "admin@mail.com";
 
@@ -64,7 +64,7 @@ describe("UpdateAllPeAgencies use case", () => {
           contact: { ...peReferentialAgency.contact, email: commonEmail },
         },
       ]);
-      const initialAgency: Agency = {
+      const initialAgency: AgencyDto = {
         id: "some-uuid",
         name: "Agence Pôle emploi Molsheim",
         counsellorEmails: [],
@@ -107,7 +107,7 @@ describe("UpdateAllPeAgencies use case", () => {
           contact: { ...peReferentialAgency.contact, email: commonEmail },
         },
       ]);
-      const initialAgency: Agency = {
+      const initialAgency: AgencyDto = {
         id: "some-uuid",
         name: "Agence Pôle emploi Molsheim",
         counsellorEmails: [commonEmail],
@@ -145,7 +145,7 @@ describe("UpdateAllPeAgencies use case", () => {
 
     it("if PE agency is very close by", async () => {
       peAgenciesReferential.setPeAgencies([peReferentialAgency]);
-      const initialAgency: Agency = {
+      const initialAgency: AgencyDto = {
         id: "some-uuid",
         name: "Agence Pôle emploi Molsheim",
         counsellorEmails: [],
@@ -186,7 +186,7 @@ describe("UpdateAllPeAgencies use case", () => {
 
   it("if existing agency is not of kind pole-emploi it should not be considered, and a new one should be created", async () => {
     peAgenciesReferential.setPeAgencies([peReferentialAgency]);
-    const initialAgency: Agency = {
+    const initialAgency: AgencyDto = {
       id: "some-uuid",
       name: "Agence Pôle emploi Molsheim",
       counsellorEmails: [],

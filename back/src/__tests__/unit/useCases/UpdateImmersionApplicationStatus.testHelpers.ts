@@ -1,4 +1,4 @@
-import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
 import {
   expectPromiseToFailWithError,
   splitCasesBetweenPassingAndFailing,
@@ -12,20 +12,21 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import {
   makeCreateNewEvent,
   NarrowEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
-import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
-import { ImmersionApplicationRequiresModificationPayload } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
+import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
+import { ConventionRequiresModificationPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
 import {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-  validApplicationStatus,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+  ConventionStatus,
+  ConventionDto,
+  allConventionStatuses,
+  ConventionId,
+} from "shared/src/convention/convention.dto";
 import {
   allRoles,
   createConventionMagicLinkPayload,
@@ -34,7 +35,7 @@ import {
 
 type ExtractFromDomainTopics<T extends DomainTopic> = Extract<DomainTopic, T>;
 
-type ImmersionApplicationDomainTopic = ExtractFromDomainTopics<
+type ConventionDomainTopic = ExtractFromDomainTopics<
   | "ImmersionApplicationSubmittedByBeneficiary"
   | "ImmersionApplicationPartiallySigned"
   | "ImmersionApplicationFullySigned"
@@ -47,7 +48,7 @@ type ImmersionApplicationDomainTopic = ExtractFromDomainTopics<
 > | null; // null is used to indicate that no domain event should be sent
 
 type SetupInitialStateParams = {
-  initialStatus: ApplicationStatus;
+  initialStatus: ConventionStatus;
   alreadySigned?: boolean;
 };
 
@@ -55,65 +56,59 @@ export const setupInitialState = async ({
   initialStatus,
   alreadySigned = true,
 }: SetupInitialStateParams) => {
-  const immersionBuilder = new ImmersionApplicationDtoBuilder().withStatus(
-    initialStatus,
-  );
-  const originalImmersionApplication = alreadySigned
+  const immersionBuilder = new ConventionDtoBuilder().withStatus(initialStatus);
+  const originalConvention = alreadySigned
     ? immersionBuilder.build()
     : immersionBuilder.notSigned().build();
 
-  const immersionApplicationRepository =
-    new InMemoryImmersionApplicationRepository();
+  const conventionRepository = new InMemoryConventionRepository();
   const outboxRepository = new InMemoryOutboxRepository();
   const createNewEvent = makeCreateNewEvent({
     clock: new CustomClock(),
     uuidGenerator: new TestUuidGenerator(),
   });
 
-  const updateImmersionApplicationStatus = new UpdateImmersionApplicationStatus(
-    immersionApplicationRepository,
+  const updateConventionStatus = new UpdateImmersionApplicationStatus(
+    conventionRepository,
     createNewEvent,
     outboxRepository,
   );
 
-  await immersionApplicationRepository.save(
-    ImmersionApplicationEntity.create(originalImmersionApplication),
-  );
+  await conventionRepository.save(ConventionEntity.create(originalConvention));
   return {
-    originalImmersionApplication,
-    updateImmersionApplicationStatus,
-    immersionApplicationRepository,
+    originalConvention,
+    updateConventionStatus,
+    conventionRepository,
     outboxRepository,
   };
 };
 
 type ExecuteUseCaseParams = {
-  applicationId: string;
+  conventionId: ConventionId;
   role: Role;
   email: string;
-  targetStatus: ApplicationStatus;
+  targetStatus: ConventionStatus;
   justification?: string;
-  updateImmersionApplicationStatus: UpdateImmersionApplicationStatus;
-  immersionApplicationRepository: InMemoryImmersionApplicationRepository;
+  updateConventionStatus: UpdateImmersionApplicationStatus;
+  conventionRepository: InMemoryConventionRepository;
 };
 
-export const executeUpdateApplicationStatusUseCase = async ({
-  applicationId,
+export const executeUpdateConventionStatusUseCase = async ({
+  conventionId,
   role,
   email,
   targetStatus,
   justification,
-  updateImmersionApplicationStatus,
-  immersionApplicationRepository,
-}: ExecuteUseCaseParams): Promise<ImmersionApplicationDto> => {
-  const response = await updateImmersionApplicationStatus.execute(
+  updateConventionStatus,
+  conventionRepository,
+}: ExecuteUseCaseParams): Promise<ConventionDto> => {
+  const response = await updateConventionStatus.execute(
     { status: targetStatus, justification },
-    createConventionMagicLinkPayload(applicationId, role, email),
+    createConventionMagicLinkPayload(conventionId, role, email),
   );
-  expect(response.id).toEqual(applicationId);
-  const storedImmersionApplication =
-    await immersionApplicationRepository.getById(applicationId);
-  return storedImmersionApplication.toDto();
+  expect(response.id).toEqual(conventionId);
+  const storedConvention = await conventionRepository.getById(conventionId);
+  return storedConvention.toDto();
 };
 
 const expectNewEvent = async <T extends DomainTopic>(
@@ -130,13 +125,13 @@ const expectNewEvent = async <T extends DomainTopic>(
 
 type TestAcceptNewStatusParams = {
   role: Role;
-  initialStatus: ApplicationStatus;
+  initialStatus: ConventionStatus;
 };
 
 type TestAcceptExpectation = {
-  targetStatus: ApplicationStatus;
-  expectedDomainTopic: ImmersionApplicationDomainTopic;
-  updatedFields?: Partial<ImmersionApplicationDto>;
+  targetStatus: ConventionStatus;
+  expectedDomainTopic: ConventionDomainTopic;
+  updatedFields?: Partial<ConventionDto>;
   justification?: string;
 };
 
@@ -149,34 +144,33 @@ const makeTestAcceptsStatusUpdate =
   }: TestAcceptExpectation) =>
   async ({ role, initialStatus }: TestAcceptNewStatusParams) => {
     const {
-      originalImmersionApplication,
-      updateImmersionApplicationStatus,
-      immersionApplicationRepository,
+      originalConvention,
+      updateConventionStatus,
+      conventionRepository,
       outboxRepository,
     } = await setupInitialState({
       initialStatus,
     });
-    const storedImmersionApplication =
-      await executeUpdateApplicationStatusUseCase({
-        applicationId: originalImmersionApplication.id,
-        role,
-        email: "test@test.fr",
-        targetStatus,
-        justification,
-        updateImmersionApplicationStatus,
-        immersionApplicationRepository,
-      });
+    const storedConvention = await executeUpdateConventionStatusUseCase({
+      conventionId: originalConvention.id,
+      role,
+      email: "test@test.fr",
+      targetStatus,
+      justification,
+      updateConventionStatus,
+      conventionRepository,
+    });
 
-    const expectedImmersionApplication: ImmersionApplicationDto = {
-      ...originalImmersionApplication,
+    const expectedConvention: ConventionDto = {
+      ...originalConvention,
       status: targetStatus,
       ...updatedFields,
     };
-    expect(storedImmersionApplication).toEqual(expectedImmersionApplication);
+    expect(storedConvention).toEqual(expectedConvention);
 
     if (expectedDomainTopic === "ImmersionApplicationRequiresModification") {
-      const payload: ImmersionApplicationRequiresModificationPayload = {
-        application: expectedImmersionApplication,
+      const payload: ConventionRequiresModificationPayload = {
+        convention: expectedConvention,
         reason: justification ?? "was not provided",
         roles: ["beneficiary", "establishment"],
       };
@@ -194,7 +188,7 @@ const makeTestAcceptsStatusUpdate =
         expectedDomainTopic,
         {
           topic: expectedDomainTopic,
-          payload: expectedImmersionApplication,
+          payload: expectedConvention,
         },
         outboxRepository,
       );
@@ -203,12 +197,12 @@ const makeTestAcceptsStatusUpdate =
 
 type TestRejectsNewStatusParams = {
   role: Role;
-  initialStatus: ApplicationStatus;
+  initialStatus: ConventionStatus;
   expectedError: UnauthorizedError | BadRequestError;
 };
 
 type TestRejectsExpectation = {
-  targetStatus: ApplicationStatus;
+  targetStatus: ConventionStatus;
 };
 
 const makeTestRejectsStatusUpdate =
@@ -218,33 +212,30 @@ const makeTestRejectsStatusUpdate =
     initialStatus,
     expectedError,
   }: TestRejectsNewStatusParams) => {
-    const {
-      originalImmersionApplication,
-      updateImmersionApplicationStatus,
-      immersionApplicationRepository,
-    } = await setupInitialState({
-      initialStatus,
-    });
+    const { originalConvention, updateConventionStatus, conventionRepository } =
+      await setupInitialState({
+        initialStatus,
+      });
     await expectPromiseToFailWithError(
-      executeUpdateApplicationStatusUseCase({
-        applicationId: originalImmersionApplication.id,
+      executeUpdateConventionStatusUseCase({
+        conventionId: originalConvention.id,
         role,
         targetStatus,
         email: "test@test.fr",
-        updateImmersionApplicationStatus,
-        immersionApplicationRepository,
+        updateConventionStatus,
+        conventionRepository,
       }),
       expectedError,
     );
   };
 
 interface TestAllCaseProps {
-  targetStatus: ApplicationStatus;
-  expectedDomainTopic: ImmersionApplicationDomainTopic;
-  updatedFields?: Partial<ImmersionApplicationDto>;
+  targetStatus: ConventionStatus;
+  expectedDomainTopic: ConventionDomainTopic;
+  updatedFields?: Partial<ConventionDto>;
   justification?: string;
   allowedRoles: Role[];
-  allowedInitialStatuses: ApplicationStatus[];
+  allowedInitialStatuses: ConventionStatus[];
 }
 
 export const testForAllRolesAndInitialStatusCases = ({
@@ -260,8 +251,8 @@ export const testForAllRolesAndInitialStatusCases = ({
     splitCasesBetweenPassingAndFailing<Role>(allRoles, allowedRoles);
 
   const [authorizedInitialStatuses, forbiddenInitalStatuses] =
-    splitCasesBetweenPassingAndFailing<ApplicationStatus>(
-      validApplicationStatus,
+    splitCasesBetweenPassingAndFailing<ConventionStatus>(
+      allConventionStatuses,
       allowedInitialStatuses,
     );
 

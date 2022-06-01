@@ -5,7 +5,7 @@ import { NotEmptyArray, RequireField } from "../utils";
 
 export type AgencyStatus = "active" | "closed" | "needsReview" | "from-api-PE";
 
-export type Agency = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
+export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
   kind: AgencyKind;
   status: AgencyStatus;
   adminEmails: string[];

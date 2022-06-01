@@ -15,7 +15,7 @@ import {
   immersionAssessmentErrorSelector,
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
-import { conventionStateSelector } from "src/core-logic/domain/immersionConvention/immersionConvention.selectors";
+import { conventionStateSelector } from "src/core-logic/domain/convention/convention.selectors";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { Button } from "src/uiComponents/Button";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
@@ -23,7 +23,7 @@ import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
-import { useImmersionApplication } from "../../../hooks/immersionApplication";
+import { useConvention } from "../../../hooks/convention";
 import { useImmersionAssessment } from "../../../hooks/immersionAssessment";
 
 type ImmersionAssessmentRoute = Route<typeof routes.immersionAssessment>;
@@ -35,7 +35,7 @@ interface ImmersionAssessmentProps {
 export const ImmersionAssessmentPage = ({
   route,
 }: ImmersionAssessmentProps) => {
-  useImmersionApplication(route.params.jwt);
+  useConvention(route.params.jwt);
   const { createAssessment } = useImmersionAssessment(route.params.jwt);
   const {
     convention,
@@ -52,7 +52,7 @@ export const ImmersionAssessmentPage = ({
 
       {convention && (
         <>
-          <FormAccordion immersionApplication={convention} />
+          <FormAccordion convention={convention} />
           <Formik
             initialValues={identity<ImmersionAssessmentDto>({
               conventionId: convention.id,

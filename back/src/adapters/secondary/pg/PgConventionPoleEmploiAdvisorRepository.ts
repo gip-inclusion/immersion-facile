@@ -1,5 +1,5 @@
 import { PoolClient } from "pg";
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionId } from "shared/src/convention/convention.dto";
 import { ConventionPoleEmploiAdvisorRepository } from "../../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { PoleEmploiUserAdvisorDto } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
@@ -12,7 +12,7 @@ export class PgConventionPoleEmploiAdvisorRepository
   constructor(private client: PoolClient) {}
 
   public async associateConventionAndUserAdvisor(
-    conventionId: ImmersionApplicationId,
+    conventionId: ConventionId,
     peExternalId: PeExternalId,
   ): Promise<void> {
     const pgResult = await this.client.query(
@@ -25,7 +25,7 @@ export class PgConventionPoleEmploiAdvisorRepository
     );
 
     if (pgResult.rowCount != 1)
-      throw new Error("Association between convention and userAdvisor failed");
+      throw new Error("Association between Convention and userAdvisor failed");
   }
 
   public async openSlotForNextConvention(

@@ -1,6 +1,6 @@
 import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
-import { Agency } from "shared/src/agency/agency.dto";
-import { getValidatedApplicationFinalConfirmationParams } from "../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { AgencyDto } from "shared/src/agency/agency.dto";
+import { getValidatedApplicationFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   ContactEstablishmentByMailDto,
@@ -11,24 +11,24 @@ import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entiti
 import { ContactEstablishmentByPhoneDto } from "shared/src/contactEstablishment";
 import { fakeGenerateMagicLinkUrlFn } from "./test.helpers";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 
-export const expectEmailAdminNotificationMatchingImmersionApplication = (
+export const expectEmailAdminNotificationMatchingConvention = (
   templatedEmail: TemplatedEmail,
   params: {
     recipient: string;
-    immersionApplication: ImmersionApplicationDto;
+    convention: ConventionDto;
     magicLink: string;
-    agency: Agency;
+    agency: AgencyDto;
   },
 ) => {
-  const { recipient, immersionApplication, magicLink, agency } = params;
+  const { recipient, convention, magicLink, agency } = params;
   const { id, firstName, lastName, dateStart, dateEnd, businessName } =
-    immersionApplication;
+    convention;
 
   expectTemplatedEmailToEqual(templatedEmail, {
-    type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
+    type: "NEW_CONVENTION_ADMIN_NOTIFICATION",
     recipients: [recipient],
     params: {
       demandeId: id,
@@ -44,16 +44,12 @@ export const expectEmailAdminNotificationMatchingImmersionApplication = (
   });
 };
 
-export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication =
-  (
-    templatedEmail: TemplatedEmail,
-    immersionApplication: ImmersionApplicationDto,
-  ) => {
-    const { email, id, firstName, lastName, businessName } =
-      immersionApplication;
+export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingConvention =
+  (templatedEmail: TemplatedEmail, convention: ConventionDto) => {
+    const { email, id, firstName, lastName, businessName } = convention;
 
     expectTemplatedEmailToEqual(templatedEmail, {
-      type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [email],
       params: {
         beneficiaryFirstName: firstName,
@@ -61,7 +57,7 @@ export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersion
         magicLink: fakeGenerateMagicLinkUrlFn({
           id,
           role: "beneficiary",
-          targetRoute: frontRoutes.immersionApplicationsToSign,
+          targetRoute: frontRoutes.conventionToSign,
           email,
         }),
         businessName,
@@ -70,26 +66,22 @@ export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersion
     });
   };
 
-export const expectEmailFinalValidationConfirmationMatchingImmersionApplication =
-  (
-    recipients: string[],
-    templatedEmail: TemplatedEmail,
-    agency: Agency | undefined,
-    immersionApplication: ImmersionApplicationDto,
-  ) => {
-    if (!agency) {
-      fail("missing agency config");
-    }
-    expectTemplatedEmailToEqual(templatedEmail, {
-      type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
-      recipients,
-      params: getValidatedApplicationFinalConfirmationParams(
-        agency,
-        immersionApplication,
-      ),
-      cc: [],
-    });
-  };
+export const expectEmailFinalValidationConfirmationMatchingConvention = (
+  recipients: string[],
+  templatedEmail: TemplatedEmail,
+  agency: AgencyDto | undefined,
+  convention: ConventionDto,
+) => {
+  if (!agency) {
+    fail("missing agency config");
+  }
+  expectTemplatedEmailToEqual(templatedEmail, {
+    type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+    recipients,
+    params: getValidatedApplicationFinalConfirmationParams(agency, convention),
+    cc: [],
+  });
+};
 
 export const expectedEmailEstablishmentCreatedReviewMatchingEstablisment = (
   templatedEmail: TemplatedEmail,
@@ -103,40 +95,39 @@ export const expectedEmailEstablishmentCreatedReviewMatchingEstablisment = (
   });
 };
 
-export const expectedEmailImmersionApplicationReviewMatchingImmersionApplication =
-  (
-    templatedEmail: TemplatedEmail,
-    recipient: string,
-    agency: Agency | undefined,
-    immersionApplication: ImmersionApplicationDto,
-    magicLink: string,
-    possibleRoleAction: string,
-  ) => {
-    if (!agency) {
-      fail("missing agency config");
-    }
-    expectTemplatedEmailToEqual(templatedEmail, {
-      type: "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-      recipients: [recipient],
-      params: {
-        beneficiaryFirstName: immersionApplication.firstName,
-        beneficiaryLastName: immersionApplication.lastName,
-        businessName: immersionApplication.businessName,
-        magicLink,
-        possibleRoleAction,
-      },
-      cc: [],
-    });
-  };
+export const expectedEmailConventionReviewMatchingConvention = (
+  templatedEmail: TemplatedEmail,
+  recipient: string,
+  agency: AgencyDto | undefined,
+  convention: ConventionDto,
+  magicLink: string,
+  possibleRoleAction: string,
+) => {
+  if (!agency) {
+    fail("missing agency config");
+  }
+  expectTemplatedEmailToEqual(templatedEmail, {
+    type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+    recipients: [recipient],
+    params: {
+      beneficiaryFirstName: convention.firstName,
+      beneficiaryLastName: convention.lastName,
+      businessName: convention.businessName,
+      magicLink,
+      possibleRoleAction,
+    },
+    cc: [],
+  });
+};
 
 export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
-  dto: ImmersionApplicationDto,
-  agency: Agency,
+  dto: ConventionDto,
+  agency: AgencyDto,
 ) => {
   expectTemplatedEmailToEqual(templatedEmail, {
-    type: "REJECTED_APPLICATION_NOTIFICATION",
+    type: "REJECTED_CONVENTION_NOTIFICATION",
     recipients,
     params: {
       beneficiaryFirstName: dto.firstName,
@@ -155,12 +146,12 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationModificationIsRe
   (
     templatedEmail: TemplatedEmail,
     recipients: string[],
-    dto: ImmersionApplicationDto,
-    agency: Agency,
+    dto: ConventionDto,
+    agency: AgencyDto,
     reason: string,
   ) => {
     expectTemplatedEmailToEqual(templatedEmail, {
-      type: "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION",
+      type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
       recipients,
       params: {
         beneficiaryFirstName: dto.firstName,

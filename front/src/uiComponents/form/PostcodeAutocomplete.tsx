@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { apiAdresseGateway } from "src/app/config/dependencies";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { TextInput } from "src/uiComponents/form/TextInput";
 
@@ -16,7 +16,7 @@ export const PostcodeAutocomplete = ({
   disabled,
   onFound,
 }: PostcodeAutocompleteProps) => {
-  const name: keyof ImmersionApplicationDto = "postalCode";
+  const name: keyof ConventionDto = "postalCode";
   const [{ value }] = useField<string>({ name });
   const [error, setError] = useState<any | null>(null);
 

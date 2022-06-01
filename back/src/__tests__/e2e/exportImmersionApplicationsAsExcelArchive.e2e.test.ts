@@ -1,29 +1,29 @@
-import { Agency } from "shared/src/agency/agency.dto";
-import { exportImmersionApplicationsExcelRoute } from "shared/src/routes";
+import { AgencyDto } from "shared/src/agency/agency.dto";
+import { exportConventionsExcelRoute } from "shared/src/routes";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
 
 describe("/export-demande-immersions-excel", () => {
   it("fails with 401 without authentication", async () => {
     const { request } = await buildTestApp();
-    await request.get(`/${exportImmersionApplicationsExcelRoute}`).expect(401);
+    await request.get(`/${exportConventionsExcelRoute}`).expect(401);
   });
 
   it("works when authenticated", async () => {
     const { request, reposAndGateways } = await buildTestApp();
-    const linkedAgency: Agency = (
+    const linkedAgency: AgencyDto = (
       await reposAndGateways.agency.getAllActive()
     )[0];
-    const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
+    const conventionEntity = new ConventionEntityBuilder()
       .withAgencyId(linkedAgency.id)
       .build();
 
-    reposAndGateways.immersionApplication.setImmersionApplications({
-      [immersionApplicationEntity.id]: immersionApplicationEntity,
+    reposAndGateways.convention.setConventions({
+      [conventionEntity.id]: conventionEntity,
     });
 
     const result = await request
-      .get(`/${exportImmersionApplicationsExcelRoute}`)
+      .get(`/${exportConventionsExcelRoute}`)
       .auth("e2e_tests", "e2e");
 
     expect(result.status).toBe(200);

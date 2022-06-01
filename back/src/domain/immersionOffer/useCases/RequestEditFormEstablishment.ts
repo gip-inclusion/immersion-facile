@@ -5,7 +5,7 @@ import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { EmailGateway } from "../../immersionApplication/ports/EmailGateway";
+import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { isAfter } from "date-fns";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 

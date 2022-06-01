@@ -1,21 +1,21 @@
 import { addDays, format } from "date-fns";
 import { frenchFirstNames } from "src/helpers/namesList";
 import { AgencyInListDto } from "shared/src/agency/agency.dto";
-import { IMMERSION_APPLICATION_TEMPLATE } from "shared/src/ImmersionApplication/immersionApplication";
+import { IMMERSION_APPLICATION_TEMPLATE } from "shared/src/convention/convention";
 import {
-  ImmersionApplicationDto,
-  validApplicationStatus,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+  ConventionDto,
+  allConventionStatuses,
+} from "shared/src/convention/convention.dto";
 
 export const generateApplication = (
   i: number,
   agencies: AgencyInListDto[],
-): ImmersionApplicationDto => {
+): ConventionDto => {
   const firstName =
     frenchFirstNames[Math.floor(Math.random() * frenchFirstNames.length)];
   const status =
-    validApplicationStatus[
-      Math.floor(Math.random() * validApplicationStatus.length)
+    allConventionStatuses[
+      Math.floor(Math.random() * allConventionStatuses.length)
     ];
   let beneficiaryAccepted = true;
   let enterpriseAccepted = true;

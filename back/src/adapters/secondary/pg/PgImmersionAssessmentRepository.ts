@@ -1,9 +1,9 @@
 import { PoolClient } from "pg";
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionId } from "shared/src/convention/convention.dto";
 import { AssessmentStatus } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
-import { ImmersionAssessmentEntity } from "../../../domain/immersionApplication/entities/ImmersionAssessmentEntity";
-import { ImmersionAssessmentRepository } from "../../../domain/immersionApplication/ports/ImmersionAssessmentRepository";
+import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
+import { ImmersionAssessmentRepository } from "../../../domain/convention/ports/ImmersionAssessmentRepository";
 
 interface PgImmersionAssessment {
   convention_id: string;
@@ -35,7 +35,7 @@ export class PgImmersionAssessmentRepository
   }
 
   public async getByConventionId(
-    conventionId: ImmersionApplicationId,
+    conventionId: ConventionId,
   ): Promise<ImmersionAssessmentEntity | undefined> {
     const result = await this.client.query<PgImmersionAssessment>(
       "SELECT * FROM immersion_assessments WHERE convention_id = $1",

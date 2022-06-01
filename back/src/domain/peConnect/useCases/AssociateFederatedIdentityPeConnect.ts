@@ -2,20 +2,20 @@ import {
   PeConnectIdentity,
   toPeExternalId,
 } from "shared/src/federatedIdentities/federatedIdentity.dto";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
+import { ConventionDto } from "shared/src/convention/convention.dto";
+import { conventionSchema } from "shared/src/convention/convention.schema";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<ImmersionApplicationDto> {
+export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<ConventionDto> {
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
 
-  inputSchema = immersionApplicationSchema;
+  inputSchema = conventionSchema;
 
   public async _execute(
-    convention: ImmersionApplicationDto,
+    convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
     if (!isPeConnectIdentity(convention?.federatedIdentity)) return;

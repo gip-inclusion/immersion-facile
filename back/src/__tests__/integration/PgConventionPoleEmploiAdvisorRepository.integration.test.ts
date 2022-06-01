@@ -1,17 +1,17 @@
 import { Pool, PoolClient } from "pg";
-import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
 import { expectObjectsToMatch } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../adapters/secondary/pg/PgConventionPoleEmploiAdvisorRepository";
-import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
+import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
 import { PoleEmploiUserAdvisorDto } from "../../domain/peConnect/dto/PeConnect.dto";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
 const userPeExternalId = "aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaad";
 
-const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
+const conventionEntity = new ConventionEntityBuilder()
   .withId(conventionId)
   .build();
 
@@ -46,11 +46,9 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     await client.query("DELETE FROM immersion_applications");
     await client.query("DELETE FROM agencies");
     const agencyRepository = new PgAgencyRepository(client);
-    await agencyRepository.insert(AgencyBuilder.create().build());
-    const immersionApplicationRepository = new PgImmersionApplicationRepository(
-      client,
-    );
-    await immersionApplicationRepository.save(immersionApplicationEntity);
+    await agencyRepository.insert(AgencyDtoBuilder.create().build());
+    const conventionRepository = new PgConventionRepository(client);
+    await conventionRepository.save(conventionEntity);
   });
 
   afterAll(async () => {
@@ -111,7 +109,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
           userPeExternalId,
         ),
       ).rejects.toThrow(
-        new Error("Association between convention and userAdvisor failed"),
+        new Error("Association between Convention and userAdvisor failed"),
       );
     });
 

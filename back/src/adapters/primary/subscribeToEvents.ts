@@ -21,33 +21,33 @@ const getUseCasesByTopics = (
 ): UseCaseSubscriptionsByTopics => ({
   // "Happy case" for immersion application.
   ImmersionApplicationSubmittedByBeneficiary: [
-    useCases.confirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature,
-    useCases.confirmToMentorThatApplicationCorrectlySubmittedRequestSignature,
-    useCases.notifyToTeamApplicationSubmittedByBeneficiary,
-    useCases.notifyToAgencyApplicationSubmitted,
+    useCases.confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature,
+    useCases.confirmToMentorThatConventionCorrectlySubmittedRequestSignature,
+    useCases.notifyToTeamConventionSubmittedByBeneficiary,
+    useCases.notifyToAgencyConventionSubmitted,
     useCases.associatePeConnectFederatedIdentity,
   ],
   ImmersionApplicationPartiallySigned: [
-    useCases.notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty,
+    useCases.notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty,
   ],
-  ImmersionApplicationFullySigned: [useCases.notifyNewApplicationNeedsReview],
+  ImmersionApplicationFullySigned: [useCases.notifyNewConventionNeedsReview],
   ImmersionApplicationAcceptedByCounsellor: [
-    useCases.notifyNewApplicationNeedsReview,
+    useCases.notifyNewConventionNeedsReview,
   ],
   ImmersionApplicationAcceptedByValidator: [
-    useCases.notifyAllActorsOfFinalApplicationValidation,
+    useCases.notifyAllActorsOfFinalConventionValidation,
   ],
 
   FinalImmersionApplicationValidationByAdmin: [
-    useCases.notifyAllActorsOfFinalApplicationValidation,
+    useCases.notifyAllActorsOfFinalConventionValidation,
   ],
 
   // Edge cases for immersion application.
   ImmersionApplicationRequiresModification: [
-    useCases.notifyBeneficiaryAndEnterpriseThatApplicationNeedsModifications,
+    useCases.notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications,
   ],
   ImmersionApplicationRejected: [
-    useCases.notifyBeneficiaryAndEnterpriseThatApplicationIsRejected,
+    useCases.notifyBeneficiaryAndEnterpriseThatConventionIsRejected,
   ],
   ImmersionApplicationCancelled: [],
 

@@ -1,12 +1,12 @@
 import React from "react";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { Accordion } from "./Accordion";
 import { FormAccordionProps as FormAccordeonProps } from "./FormAccordion";
 import { TextCell } from "./TextCell";
 
 type FieldForFormDetails = {
   title: string;
-  key: keyof ImmersionApplicationDto;
+  key: keyof ConventionDto;
 };
 
 // TODO(stk): show schedule, individual protection, signature status, upload date
@@ -44,14 +44,14 @@ const allFields = [
   { listTitle: "Tuteur", fields: mentorFields },
 ];
 
-export const FormDetails = ({ immersionApplication }: FormAccordeonProps) => (
+export const FormDetails = ({ convention }: FormAccordeonProps) => (
   <div className="static-application-container">
     {allFields.map(({ listTitle, fields }) => (
       <Accordion title={listTitle} key={listTitle}>
         {fields.map(({ title, key }) => (
           <TextCell
             title={title}
-            contents={JSON.stringify(immersionApplication[key])}
+            contents={JSON.stringify(convention[key])}
             key={key}
           />
         ))}

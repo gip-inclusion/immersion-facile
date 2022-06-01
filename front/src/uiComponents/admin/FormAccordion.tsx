@@ -2,9 +2,9 @@ import { formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
 import React from "react";
 import type {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+  ConventionStatus,
+  ConventionDto,
+} from "shared/src/convention/convention.dto";
 import { FormDetails } from "./FormDetails";
 
 const beforeAfterString = (date: string) => {
@@ -18,10 +18,10 @@ const beforeAfterString = (date: string) => {
 };
 
 export interface FormAccordionProps {
-  immersionApplication: ImmersionApplicationDto;
+  convention: ConventionDto;
 }
 
-const getPrefix = (status: ApplicationStatus) => {
+const getPrefix = (status: ConventionStatus) => {
   switch (status) {
     case "DRAFT":
       return "[📕 BROUILLON]";
@@ -46,7 +46,7 @@ const getPrefix = (status: ApplicationStatus) => {
   return "[⁉️ STATUS DE LA DEMANDE INDÉFINI]";
 };
 
-export const FormAccordion = ({ immersionApplication }: FormAccordionProps) => {
+export const FormAccordion = ({ convention }: FormAccordionProps) => {
   const {
     status,
     lastName,
@@ -54,7 +54,7 @@ export const FormAccordion = ({ immersionApplication }: FormAccordionProps) => {
     businessName,
     dateStart,
     dateEnd: _,
-  } = immersionApplication;
+  } = convention;
 
   const title =
     `${getPrefix(status)} ` +
@@ -64,7 +64,7 @@ export const FormAccordion = ({ immersionApplication }: FormAccordionProps) => {
   return (
     <div style={{ padding: "0.5rem" }}>
       <h5 style={{ margin: "2rem 4rem" }}>{title}</h5>
-      <FormDetails immersionApplication={immersionApplication} />
+      <FormDetails convention={convention} />
     </div>
   );
 };

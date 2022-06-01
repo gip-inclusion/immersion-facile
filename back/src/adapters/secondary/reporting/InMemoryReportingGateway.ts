@@ -1,16 +1,15 @@
 import {
   ArchivedReport,
-  ImmersionApplicationsExportByAgency,
+  ConventionExportByAgency,
   ReportingGateway,
 } from "../../../domain/core/ports/ReportingGateway";
 
 export class InMemoryReportingGateway implements ReportingGateway {
-  async exportImmersionApplications(
-    report: ArchivedReport<ImmersionApplicationsExportByAgency>,
+  async exportConventions(
+    report: ArchivedReport<ConventionExportByAgency>,
   ): Promise<void> {
     this.expectedReport = report;
   }
-  public expectedReport:
-    | ArchivedReport<ImmersionApplicationsExportByAgency>
-    | undefined = undefined;
+  public expectedReport: ArchivedReport<ConventionExportByAgency> | undefined =
+    undefined;
 }

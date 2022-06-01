@@ -5,20 +5,20 @@ import type {
   ContactByPhoneInstructionsParams,
   EmailType,
   EnterpriseSignatureRequestNotificationParams,
-  ModificationRequestApplicationNotificationParams,
-  NewApplicationAdminNotificationParams,
-  NewApplicationBeneficiaryConfirmationParams,
-  NewApplicationMentorConfirmationParams,
-  NewImmersionApplicationReviewForEligibilityOrValidationParams,
-  RejectedApplicationNotificationParams,
+  ConventionModificationRequestNotificationParams,
+  NewConventionAdminNotificationParams,
+  NewConventionBeneficiaryConfirmationParams,
+  NewConventionMentorConfirmationParams,
+  NewConventionReviewForEligibilityOrValidationParams,
+  RejectedConventionNotificationParams,
   SendRenewedMagicLinkParams,
   SignedByOtherPartyNotificationParams,
-  ValidatedApplicationFinalConfirmationParams,
-} from "../../domain/immersionApplication/ports/EmailGateway";
+  ValidatedConventionFinalConfirmationParams,
+} from "../../domain/convention/ports/EmailGateway";
 import {
   EmailGateway,
-  ShareDraftApplicationByLinkParams,
-} from "../../domain/immersionApplication/ports/EmailGateway";
+  ShareDraftConventionByLinkParams,
+} from "../../domain/convention/ports/EmailGateway";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { createLogger } from "../../utils/logger";
 
@@ -82,7 +82,7 @@ export class InMemoryEmailGateway implements EmailGateway {
     });
   }
 
-  public async sendNewEstablismentContactConfirmation(
+  public async sendNewEstablishmentContactConfirmation(
     recipient: string,
     copy: string[],
     formEstablishmentDto: FormEstablishmentDto,
@@ -99,116 +99,116 @@ export class InMemoryEmailGateway implements EmailGateway {
     });
   }
 
-  public async sendNewApplicationBeneficiaryConfirmation(
+  public async sendNewConventionBeneficiaryConfirmation(
     recipient: string,
-    params: NewApplicationBeneficiaryConfirmationParams,
+    params: NewConventionBeneficiaryConfirmationParams,
   ): Promise<void> {
     logger.info(
       { recipient, params },
       "sendNewApplicationBeneficiaryConfirmation",
     );
     this.sentEmails.push({
-      type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
+      type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
       recipients: [recipient],
       cc: [],
       params,
     });
   }
 
-  public async sendNewApplicationMentorConfirmation(
+  public async sendNewConventionMentorConfirmation(
     recipient: string,
-    params: NewApplicationMentorConfirmationParams,
+    params: NewConventionMentorConfirmationParams,
   ): Promise<void> {
     logger.info({ recipient, params }, "sendNewApplicationMentorConfirmation");
     this.sentEmails.push({
-      type: "NEW_APPLICATION_MENTOR_CONFIRMATION",
+      type: "NEW_CONVENTION_MENTOR_CONFIRMATION",
       recipients: [recipient],
       cc: [],
       params,
     });
   }
 
-  public async sendNewApplicationAdminNotification(
+  public async sendNewConventionAdminNotification(
     recipients: string[],
-    params: NewApplicationAdminNotificationParams,
+    params: NewConventionAdminNotificationParams,
   ): Promise<void> {
     logger.info({ recipients, params }, "sendNewApplicationAdminNotification");
     this.sentEmails.push({
-      type: "NEW_APPLICATION_ADMIN_NOTIFICATION",
+      type: "NEW_CONVENTION_ADMIN_NOTIFICATION",
       recipients,
       params,
       cc: [],
     });
   }
 
-  public async sendNewApplicationAgencyNotification(
+  public async sendNewConventionAgencyNotification(
     recipients: string[],
-    params: NewApplicationAdminNotificationParams,
+    params: NewConventionAdminNotificationParams,
   ): Promise<void> {
     logger.info({ recipients, params }, "sendNewApplicationAgencyNotification");
     this.sentEmails.push({
-      type: "NEW_APPLICATION_AGENCY_NOTIFICATION",
+      type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
       recipients,
       params,
       cc: [],
     });
   }
 
-  public async sendNewApplicationForReviewNotification(
+  public async sendNewConventionForReviewNotification(
     recipients: string[],
-    params: NewImmersionApplicationReviewForEligibilityOrValidationParams,
+    params: NewConventionReviewForEligibilityOrValidationParams,
   ): Promise<void> {
     logger.info(
       { recipients, params },
       "sendNewApplicationForReviewNotification",
     );
     this.sentEmails.push({
-      type: "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+      type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
       recipients,
       params,
       cc: [],
     });
   }
 
-  public async sendValidatedApplicationFinalConfirmation(
+  public async sendValidatedConventionFinalConfirmation(
     recipients: string[],
-    params: ValidatedApplicationFinalConfirmationParams,
+    params: ValidatedConventionFinalConfirmationParams,
   ): Promise<void> {
     logger.info(
       { recipients, params },
       "sendValidatedApplicationFinalConfirmation",
     );
     this.sentEmails.push({
-      type: "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
+      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients,
       params,
       cc: [],
     });
   }
 
-  public async sendRejectedApplicationNotification(
+  public async sendRejectedConventionNotification(
     recipients: string[],
-    params: RejectedApplicationNotificationParams,
+    params: RejectedConventionNotificationParams,
   ): Promise<void> {
     logger.info({ recipients, params }, "sendRejecteddApplicationNotification");
     this.sentEmails.push({
-      type: "REJECTED_APPLICATION_NOTIFICATION",
+      type: "REJECTED_CONVENTION_NOTIFICATION",
       recipients,
       params,
       cc: [],
     });
   }
 
-  public async sendModificationRequestApplicationNotification(
+  public async sendConventionModificationRequestNotification(
     recipients: string[],
-    params: ModificationRequestApplicationNotificationParams,
+    params: ConventionModificationRequestNotificationParams,
   ): Promise<void> {
     logger.info(
       { recipients, params },
       "sendModificationRequestApplicationNotification",
     );
     this.sentEmails.push({
-      type: "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION",
+      type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
       recipients,
       params,
       cc: [],
@@ -250,7 +250,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendBeneficiarySignatureRequestNotification",
     );
     this.sentEmails.push({
-      type: "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
       cc: [],
       params,
@@ -266,7 +266,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendEnterpriseSignatureRequestNotification",
     );
     this.sentEmails.push({
-      type: "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+      type: "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
       cc: [],
       params,
@@ -313,13 +313,13 @@ export class InMemoryEmailGateway implements EmailGateway {
     });
   }
 
-  public async sendShareDraftApplicationByLink(
+  public async sendShareDraftConventionByLink(
     recipient: string,
-    params: ShareDraftApplicationByLinkParams,
+    params: ShareDraftConventionByLinkParams,
   ): Promise<void> {
     logger.info({ recipient, params }, "sendShareDraftApplicationByLinkParams");
     this.sentEmails.push({
-      type: "SHARE_DRAFT_APPLICATION_BY_LINK",
+      type: "SHARE_DRAFT_CONVENTION_BY_LINK",
       recipients: [recipient],
       cc: [],
       params,

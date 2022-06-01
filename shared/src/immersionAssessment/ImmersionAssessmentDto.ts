@@ -1,10 +1,10 @@
-import { ImmersionApplicationId } from "../ImmersionApplication/ImmersionApplication.dto";
+import { ConventionId } from "../convention/convention.dto";
 
 export type AssessmentStatus = typeof assessmentStatuses[number];
 export const assessmentStatuses = ["ABANDONED", "FINISHED"] as const;
 
 export interface ImmersionAssessmentDto {
-  conventionId: ImmersionApplicationId;
+  conventionId: ConventionId;
   status: AssessmentStatus;
   establishmentFeedback: string;
 }

@@ -2,42 +2,40 @@ import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryReportingGateway } from "../../../adapters/secondary/reporting/InMemoryReportingGateway";
 
-import { ExportImmersionApplicationsReport } from "../../../domain/immersionApplication/useCases/ExportImmersionApplicationsReport";
+import { ExportImmersionApplicationsReport } from "../../../domain/convention/useCases/ExportImmersionApplicationsReport";
 
-import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 
 const prepareUseCase = () => {
   const reportingGateway = new InMemoryReportingGateway();
-  const immersionApplicationRepo = new InMemoryImmersionApplicationRepository();
-  const immersionApplicationQueries = new InMemoryImmersionApplicationQueries(
-    immersionApplicationRepo,
-  );
+  const conventionRepository = new InMemoryConventionRepository();
+  const conventionQueries = new InMemoryConventionQueries(conventionRepository);
   const uowPerformer = new InMemoryUowPerformer({
     ...createInMemoryUow(),
     reportingGateway,
-    immersionApplicationQueries,
+    conventionQueries,
   });
   const useCase = new ExportImmersionApplicationsReport(uowPerformer);
 
-  return { useCase, reportingGateway, immersionApplicationRepo };
+  return { useCase, reportingGateway, conventionRepository };
 };
 describe("ExportImmersionApplicationsReport", () => {
   it("exports the immersion application grouped by agencies in the reporting gateway", async () => {
-    const { useCase, reportingGateway, immersionApplicationRepo } =
+    const { useCase, reportingGateway, conventionRepository } =
       prepareUseCase();
     // Prepare
-    immersionApplicationRepo._immersionApplications = {
-      "id-immersion-agency-nantes": new ImmersionApplicationEntityBuilder()
+    conventionRepository._conventions = {
+      "id-immersion-agency-nantes": new ConventionEntityBuilder()
         .withId("id-immersion-agency-nantes")
         .withAgencyId("nantes")
         .build(),
-      "id-immersion-agency-lyon": new ImmersionApplicationEntityBuilder()
+      "id-immersion-agency-lyon": new ConventionEntityBuilder()
         .withId("id-immersion-agency-lyon")
         .withAgencyId("lyon")
         .build(),
-      "id2-immersion-agency-lyon": new ImmersionApplicationEntityBuilder()
+      "id2-immersion-agency-lyon": new ConventionEntityBuilder()
         .withId("id2-immersion-agency-lyon")
         .withAgencyId("lyon")
         .build(),

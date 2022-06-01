@@ -8,31 +8,31 @@ import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { ExportEstablishmentsAsExcelArchive } from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
-import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
-import { ExportImmersionApplicationsReport } from "../../../domain/immersionApplication/useCases/ExportImmersionApplicationsReport";
-import { GenerateMagicLink } from "../../../domain/immersionApplication/useCases/GenerateMagicLink";
-import { GetAgencyPublicInfoById } from "../../../domain/immersionApplication/useCases/GetAgencyPublicInfoById";
-import { GetImmersionApplication } from "../../../domain/immersionApplication/useCases/GetImmersionApplication";
-import { ListAgencies } from "../../../domain/immersionApplication/useCases/ListAgencies";
-import { ListImmersionApplication } from "../../../domain/immersionApplication/useCases/ListImmersionApplication";
-import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
-import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/immersionApplication/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
-import { DeliverRenewedMagicLink } from "../../../domain/immersionApplication/useCases/notifications/DeliverRenewedMagicLink";
-import { NotifyAllActorsOfFinalApplicationValidation } from "../../../domain/immersionApplication/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/immersionApplication/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
-import { NotifyNewApplicationNeedsReview } from "../../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
-import { NotifyToAgencyApplicationSubmitted } from "../../../domain/immersionApplication/useCases/notifications/NotifyToAgencyApplicationSubmitted";
-import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
-import { RenewMagicLink } from "../../../domain/immersionApplication/useCases/RenewMagicLink";
-import { ShareApplicationLinkByEmail } from "../../../domain/immersionApplication/useCases/ShareApplicationLinkByEmail";
-import { SignImmersionApplication } from "../../../domain/immersionApplication/useCases/SignImmersionApplication";
-import { UpdateImmersionApplication } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplication";
-import { UpdateImmersionApplicationStatus } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplicationStatus";
-import { ValidateImmersionApplication } from "../../../domain/immersionApplication/useCases/ValidateImmersionApplication";
-import { CreateImmersionAssessment } from "../../../domain/immersionApplication/useCases/CreateImmersionAssessment";
-import { AddAgency } from "../../../domain/immersionApplication/useCases/AddAgency";
+import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
+import { ExportImmersionApplicationsReport } from "../../../domain/convention/useCases/ExportImmersionApplicationsReport";
+import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
+import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
+import { GetImmersionApplication } from "../../../domain/convention/useCases/GetImmersionApplication";
+import { ListAgencies } from "../../../domain/convention/useCases/ListAgencies";
+import { ListImmersionApplication } from "../../../domain/convention/useCases/ListImmersionApplication";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
+import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
+import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
+import { NotifyAllActorsOfFinalApplicationValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/convention/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
+import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
+import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
+import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../../domain/convention/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
+import { RenewMagicLink } from "../../../domain/convention/useCases/RenewMagicLink";
+import { ShareApplicationLinkByEmail } from "../../../domain/convention/useCases/ShareApplicationLinkByEmail";
+import { SignImmersionApplication } from "../../../domain/convention/useCases/SignImmersionApplication";
+import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
+import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
+import { ValidateImmersionApplication } from "../../../domain/convention/useCases/ValidateImmersionApplication";
+import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
+import { AddAgency } from "../../../domain/convention/useCases/AddAgency";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
@@ -87,52 +87,51 @@ export const createUseCases = (
       uowPerformer,
       createNewEvent,
     ),
-    addImmersionApplication: new AddImmersionApplication(
+    addConvention: new AddImmersionApplication(
       uowPerformer,
       createNewEvent,
       getSiret,
     ),
-    getImmersionApplication: new GetImmersionApplication(
-      repositories.immersionApplication,
-    ),
+    getConvention: new GetImmersionApplication(repositories.convention),
     linkPoleEmploiAdvisorAndRedirectToConvention:
       new LinkPoleEmploiAdvisorAndRedirectToConvention(
         uowPerformer,
         repositories.peConnectGateway,
         config.immersionFacileBaseUrl,
       ),
-    listImmersionApplication: new ListImmersionApplication(
-      repositories.immersionApplicationQueries,
+    listConventions: new ListImmersionApplication(
+      repositories.conventionQueries,
     ),
-    exportImmersionApplicationsAsExcelArchive:
-      new ExportImmersionApplicationsReport(uowPerformer),
+    exportConventionsAsExcelArchive: new ExportImmersionApplicationsReport(
+      uowPerformer,
+    ),
 
     exportEstablishmentsAsExcelArchive: new ExportEstablishmentsAsExcelArchive(
       uowPerformer,
     ),
 
-    updateImmersionApplication: new UpdateImmersionApplication(
+    updateConvention: new UpdateImmersionApplication(
       uowPerformer,
       createNewEvent,
     ),
-    validateImmersionApplication: new ValidateImmersionApplication(
-      repositories.immersionApplication,
+    validateConvention: new ValidateImmersionApplication(
+      repositories.convention,
       createNewEvent,
       repositories.outbox,
     ),
-    updateImmersionApplicationStatus: new UpdateImmersionApplicationStatus(
-      repositories.immersionApplication,
+    updateConventionStatus: new UpdateImmersionApplicationStatus(
+      repositories.convention,
       createNewEvent,
       repositories.outbox,
     ),
-    signImmersionApplication: new SignImmersionApplication(
-      repositories.immersionApplication,
+    signConvention: new SignImmersionApplication(
+      repositories.convention,
       createNewEvent,
       repositories.outbox,
     ),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewMagicLink: new RenewMagicLink(
-      repositories.immersionApplication,
+      repositories.convention,
       createNewEvent,
       repositories.outbox,
       repositories.agency,
@@ -225,48 +224,48 @@ export const createUseCases = (
     getAgencyPublicInfoById: new GetAgencyPublicInfoById(repositories.agency),
 
     // notifications
-    confirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature:
+    confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature:
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
         emailFilter,
         repositories.email,
         generateMagicLinkFn,
       ),
-    confirmToMentorThatApplicationCorrectlySubmittedRequestSignature:
+    confirmToMentorThatConventionCorrectlySubmittedRequestSignature:
       new ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature(
         emailFilter,
         repositories.email,
         generateMagicLinkFn,
       ),
-    notifyAllActorsOfFinalApplicationValidation:
+    notifyAllActorsOfFinalConventionValidation:
       new NotifyAllActorsOfFinalApplicationValidation(
         emailFilter,
         repositories.email,
         repositories.agency,
       ),
-    notifyNewApplicationNeedsReview: new NotifyNewApplicationNeedsReview(
+    notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
       repositories.email,
       repositories.agency,
       generateMagicLinkFn,
     ),
-    notifyToTeamApplicationSubmittedByBeneficiary:
+    notifyToTeamConventionSubmittedByBeneficiary:
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         repositories.email,
         repositories.agency,
         generateMagicLinkFn,
       ),
-    notifyToAgencyApplicationSubmitted: new NotifyToAgencyApplicationSubmitted(
+    notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
       uowPerformer,
       emailFilter,
       repositories.email,
       generateMagicLinkFn,
     ),
-    notifyBeneficiaryAndEnterpriseThatApplicationIsRejected:
+    notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
       new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
         emailFilter,
         repositories.email,
         repositories.agency,
       ),
-    notifyBeneficiaryAndEnterpriseThatApplicationNeedsModifications:
+    notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
       new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
         emailFilter,
         repositories.email,
@@ -287,15 +286,13 @@ export const createUseCases = (
       emailFilter,
       repositories.email,
     ),
-    notifyBeneficiaryOrEnterpriseThatApplicationWasSignedByOtherParty:
+    notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty:
       new NotifyImmersionApplicationWasSignedByOtherParty(
         emailFilter,
         repositories.email,
         generateMagicLinkFn,
       ),
-    shareApplicationByEmail: new ShareApplicationLinkByEmail(
-      repositories.email,
-    ),
+    shareConventionByEmail: new ShareApplicationLinkByEmail(repositories.email),
     addAgency: new AddAgency(
       uowPerformer,
       createNewEvent,

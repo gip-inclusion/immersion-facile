@@ -1,20 +1,20 @@
-import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
 import {
   expectTypeToMatchAndEqual,
   fakeGenerateMagicLinkUrlFn,
 } from "../../../_testBuilders/test.helpers";
 import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { SignedByOtherPartyNotificationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
-import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/immersionApplication/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { SignedByOtherPartyNotificationParams } from "../../../domain/convention/ports/EmailGateway";
+import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/convention/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { frontRoutes } from "shared/src/routes";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
 
 const beneficiaryEmail = "beneficiary@mail.com";
 const mentorEmail = "mentor@mail.com";
 
-const immersionApplicationBuilder = new ImmersionApplicationDtoBuilder()
+const conventionBuilder = new ConventionDtoBuilder()
   .withFirstName("Benoit")
   .withLastName("Martin")
   .withMentor("Tom Tuteur")
@@ -42,15 +42,13 @@ describe("NotifyImmersionApplicationWasSignedByOtherParty", () => {
   });
 
   it("should send an email to the establishment notifying that the beneficiary signed", async () => {
-    const immersionApplicationSignedByBeneficiary = immersionApplicationBuilder
+    const conventionSignedByBeneficiary = conventionBuilder
       .signedByBeneficiary()
       .build();
 
-    await notifySignedByOtherParty.execute(
-      immersionApplicationSignedByBeneficiary,
-    );
+    await notifySignedByOtherParty.execute(conventionSignedByBeneficiary);
 
-    expectEmailSentToOtherParty(immersionApplicationSignedByBeneficiary, {
+    expectEmailSentToOtherParty(conventionSignedByBeneficiary, {
       recipientRole: "establishment",
       recipientEmail: mentorEmail,
       existingSignatureName: "Benoit MARTIN",
@@ -58,22 +56,21 @@ describe("NotifyImmersionApplicationWasSignedByOtherParty", () => {
   });
 
   it("should send an email to the beneficiary notifying that the establishment signed", async () => {
-    const immersionApplicationSignedByEstablishment =
-      immersionApplicationBuilder.signedByEnterprise().build();
+    const conventionSignedByEstablishment = conventionBuilder
+      .signedByEnterprise()
+      .build();
 
-    await notifySignedByOtherParty.execute(
-      immersionApplicationSignedByEstablishment,
-    );
+    await notifySignedByOtherParty.execute(conventionSignedByEstablishment);
 
-    expectEmailSentToOtherParty(immersionApplicationSignedByEstablishment, {
+    expectEmailSentToOtherParty(conventionSignedByEstablishment, {
       recipientRole: "beneficiary",
       recipientEmail: beneficiaryEmail,
-      existingSignatureName: immersionApplicationSignedByEstablishment.mentor,
+      existingSignatureName: conventionSignedByEstablishment.mentor,
     });
   });
 
   const expectEmailSentToOtherParty = (
-    application: ImmersionApplicationDto,
+    application: ConventionDto,
     {
       existingSignatureName,
       recipientEmail,
@@ -92,7 +89,7 @@ describe("NotifyImmersionApplicationWasSignedByOtherParty", () => {
       magicLink: fakeGenerateMagicLinkUrlFn({
         id: application.id,
         role: recipientRole,
-        targetRoute: frontRoutes.immersionApplicationsToSign,
+        targetRoute: frontRoutes.conventionToSign,
         email: mentorEmail,
       }),
       mentor: application.mentor,

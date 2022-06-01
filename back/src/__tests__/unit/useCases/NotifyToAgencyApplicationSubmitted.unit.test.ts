@@ -3,27 +3,27 @@ import { AlwaysAllowEmailFilter } from "../../../adapters/secondary/core/EmailFi
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { NewApplicationAdminNotificationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
+import { NewConventionAdminNotificationParams } from "../../../domain/convention/ports/EmailGateway";
 import { frontRoutes } from "shared/src/routes";
 import { OmitFromExistingKeys } from "shared/src/utils";
-import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
-import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
+import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
 import {
   expectTypeToMatchAndEqual,
   fakeGenerateMagicLinkUrlFn,
 } from "../../../_testBuilders/test.helpers";
-import { NotifyToAgencyApplicationSubmitted } from "../../../domain/immersionApplication/useCases/notifications/NotifyToAgencyApplicationSubmitted";
+import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
 
 const councellorEmail = "councellor@email.fr";
 const councellorEmail2 = "councellor2@email.fr";
 const validatorEmail = "validator@mail.com";
 
-const agencyWithCounsellors = AgencyBuilder.create("agency-with-councellors")
+const agencyWithCounsellors = AgencyDtoBuilder.create("agency-with-councellors")
   .withCounsellorEmails([councellorEmail, councellorEmail2])
   .withName("test-agency-name")
   .build();
 
-const agencyWithOnlyValidator = AgencyBuilder.create(
+const agencyWithOnlyValidator = AgencyDtoBuilder.create(
   "agency-with-only-validator",
 )
   .withValidatorEmails([validatorEmail])
@@ -58,51 +58,51 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
   });
 
   it("Sends notification email to agency counsellor when it is initially submitted", async () => {
-    const validImmersionApplication = new ImmersionApplicationDtoBuilder()
+    const validConvention = new ConventionDtoBuilder()
       .withAgencyId(agencyWithCounsellors.id)
       .build();
-    await notifyToAgencyApplicationSubmitted.execute(validImmersionApplication);
+    await notifyToAgencyApplicationSubmitted.execute(validConvention);
 
     const sentEmails = emailGateway.getSentEmails();
 
     const expectedParams: OmitFromExistingKeys<
-      NewApplicationAdminNotificationParams,
+      NewConventionAdminNotificationParams,
       "magicLink"
     > = {
       agencyName: agencyWithCounsellors.name,
-      businessName: validImmersionApplication.businessName,
-      dateEnd: validImmersionApplication.dateEnd,
-      dateStart: validImmersionApplication.dateStart,
-      demandeId: validImmersionApplication.id,
-      firstName: validImmersionApplication.firstName,
-      lastName: validImmersionApplication.lastName,
+      businessName: validConvention.businessName,
+      dateEnd: validConvention.dateEnd,
+      dateStart: validConvention.dateStart,
+      demandeId: validConvention.id,
+      firstName: validConvention.firstName,
+      lastName: validConvention.lastName,
     };
 
     expectTypeToMatchAndEqual(sentEmails, [
       {
-        type: "NEW_APPLICATION_AGENCY_NOTIFICATION",
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
         cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({
-            id: validImmersionApplication.id,
+            id: validConvention.id,
             role: "counsellor",
-            targetRoute: frontRoutes.immersionApplicationsToValidate,
+            targetRoute: frontRoutes.conventionToValidate,
             email: councellorEmail2,
           }),
         },
       },
       {
-        type: "NEW_APPLICATION_AGENCY_NOTIFICATION",
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail2],
         cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({
-            id: validImmersionApplication.id,
+            id: validConvention.id,
             role: "counsellor",
-            targetRoute: frontRoutes.immersionApplicationsToValidate,
+            targetRoute: frontRoutes.conventionToValidate,
             email: councellorEmail2,
           }),
         },
@@ -111,38 +111,38 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
   });
 
   it("Sends notification email to agency validator when it is initially submitted, and agency has no counsellor", async () => {
-    const validImmersionApplication = new ImmersionApplicationDtoBuilder()
+    const validConvention = new ConventionDtoBuilder()
       .withAgencyId(agencyWithOnlyValidator.id)
       .build();
 
-    await notifyToAgencyApplicationSubmitted.execute(validImmersionApplication);
+    await notifyToAgencyApplicationSubmitted.execute(validConvention);
 
     const sentEmails = emailGateway.getSentEmails();
 
     const expectedParams: OmitFromExistingKeys<
-      NewApplicationAdminNotificationParams,
+      NewConventionAdminNotificationParams,
       "magicLink"
     > = {
       agencyName: agencyWithCounsellors.name,
-      businessName: validImmersionApplication.businessName,
-      dateEnd: validImmersionApplication.dateEnd,
-      dateStart: validImmersionApplication.dateStart,
-      demandeId: validImmersionApplication.id,
-      firstName: validImmersionApplication.firstName,
-      lastName: validImmersionApplication.lastName,
+      businessName: validConvention.businessName,
+      dateEnd: validConvention.dateEnd,
+      dateStart: validConvention.dateStart,
+      demandeId: validConvention.id,
+      firstName: validConvention.firstName,
+      lastName: validConvention.lastName,
     };
 
     expectTypeToMatchAndEqual(sentEmails, [
       {
-        type: "NEW_APPLICATION_AGENCY_NOTIFICATION",
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [validatorEmail],
         cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({
-            id: validImmersionApplication.id,
+            id: validConvention.id,
             role: "validator",
-            targetRoute: frontRoutes.immersionApplicationsToValidate,
+            targetRoute: frontRoutes.conventionToValidate,
             email: validatorEmail,
           }),
         },

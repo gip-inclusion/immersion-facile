@@ -229,7 +229,7 @@ An [AppConfig](src/adapters/primary/config/appConfig.ts) instance must be provid
 
    NOTE: [AppConfigBuilder.ts](./src/_testBuilders/AppConfigBuilder.ts) initializes the config with test-specific defaults, such backoffice credentials and JWT keys.
 
-3. **integration tests** (special case): These sometimes rely on environment variables to create secondary adapters (e.g. a `PgImmersionApplicationRepository`).
+3. **integration tests** (special case): These sometimes rely on environment variables to create secondary adapters (e.g. a `PgConventionRepository`).
 
    Example usage:
 

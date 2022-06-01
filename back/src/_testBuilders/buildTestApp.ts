@@ -13,15 +13,15 @@ import { InMemoryConventionPoleEmploiAdvisorRepository } from "../adapters/secon
 import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
 import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
-import type { InMemoryImmersionApplicationRepository } from "../adapters/secondary/InMemoryImmersionApplicationRepository";
+import type { InMemoryConventionRepository } from "../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/InMemoryPeConnectGateway";
 import { InMemoryRomeRepository } from "../adapters/secondary/InMemoryRomeRepository";
 import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
 import { GetApiConsumerById } from "../domain/core/ports/GetApiConsumerById";
 import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
-import { AgencyBuilder } from "../../../shared/src/agency/AgencyBuilder";
+import { AgencyDtoBuilder } from "../../../shared/src/agency/AgencyDtoBuilder";
 import { AppConfigBuilder } from "./AppConfigBuilder";
-import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { EstablishmentExportQueries } from "../domain/establishment/ports/EstablishmentExportQueries";
 import { PostalCodeDepartmentRegionQueries } from "../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import {
@@ -31,7 +31,7 @@ import {
 import { InMemoryOutboxQueries } from "../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
-import { InMemoryImmersionApplicationQueries } from "../adapters/secondary/InMemoryImmersionApplicationQueries";
+import { InMemoryConventionQueries } from "../adapters/secondary/InMemoryConventionQueries";
 
 export type InMemoryRepositories = {
   conventionPoleEmploiAdvisor: InMemoryConventionPoleEmploiAdvisorRepository;
@@ -40,8 +40,8 @@ export type InMemoryRepositories = {
   immersionOffer: InMemoryEstablishmentAggregateRepository;
   agency: InMemoryAgencyRepository;
   formEstablishment: InMemoryFormEstablishmentRepository;
-  immersionApplication: InMemoryImmersionApplicationRepository;
-  immersionApplicationQueries: InMemoryImmersionApplicationQueries;
+  convention: InMemoryConventionRepository;
+  conventionQueries: InMemoryConventionQueries;
   searchesMade: InMemorySearchMadeRepository;
   rome: InMemoryRomeRepository;
   email: InMemoryEmailGateway;
@@ -75,9 +75,8 @@ export const buildTestApp = async (
   appConfigOverrides?: AppConfig,
 ): Promise<TestAppAndDeps> => {
   const adminEmail = "admin@email.fr";
-  const validImmersionApplication =
-    new ImmersionApplicationDtoBuilder().build();
-  const agency = AgencyBuilder.create(validImmersionApplication.agencyId)
+  const validConvention = new ConventionDtoBuilder().build();
+  const agency = AgencyDtoBuilder.create(validConvention.agencyId)
     .withName("TEST-name")
     .withAdminEmails([adminEmail])
     .withQuestionnaireUrl("TEST-questionnaireUrl")

@@ -3,14 +3,14 @@ import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/Assessme
 import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/HttpEstablishmentGateway";
-import { HttpImmersionApplicationGateway } from "src/core-logic/adapters/HttpImmersionApplicationGateway";
+import { HttpConventionGateway } from "src/core-logic/adapters/HttpConventionGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/HttpSiretGatewayThroughBack";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/HttpTechnicalGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
-import { InMemoryImmersionApplicationGateway } from "src/core-logic/adapters/InMemoryImmersionApplicationGateway";
+import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
 import {
   InMemoryImmersionSearchGateway,
   seedSearchResults,
@@ -24,7 +24,7 @@ import { ReactNavigationGateway } from "src/core-logic/adapters/ReactNavigationG
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SimulatedSiretGatewayThroughBack";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
-import { ImmersionApplicationGateway } from "src/core-logic/ports/ImmersionApplicationGateway";
+import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
@@ -46,8 +46,7 @@ export const establishmentGateway: EstablishmentGateway =
       )
     : new HttpEstablishmentGateway();
 
-const inMemoryImmersionApplicationGateway =
-  new InMemoryImmersionApplicationGateway(500);
+const inMemoryConventionGateway = new InMemoryConventionGateway(500);
 
 const getSimulatedSiretGatewayThroughBack = () =>
   new SimulatedSiretGatewayThroughBack(500, {
@@ -77,10 +76,10 @@ export const siretGatewayThroughBack =
     ? getSimulatedSiretGatewayThroughBack()
     : new HttpSiretGatewayThroughBack();
 
-export const immersionApplicationGateway: ImmersionApplicationGateway =
+export const conventionGateway: ConventionGateway =
   ENV.gateway === "IN_MEMORY"
-    ? inMemoryImmersionApplicationGateway
-    : new HttpImmersionApplicationGateway();
+    ? inMemoryConventionGateway
+    : new HttpConventionGateway();
 
 export const immersionSearchGateway: ImmersionSearchGateway =
   ENV.gateway === "IN_MEMORY"
@@ -121,7 +120,7 @@ export type Dependencies = {
   apiAdresseGateway: ApiAdresseGateway;
   technicalGateway: TechnicalGateway;
   establishmentGateway: EstablishmentGateway;
-  immersionApplicationGateway: ImmersionApplicationGateway;
+  conventionGateway: ConventionGateway;
   immersionSearchGateway: ImmersionSearchGateway;
   romeAutocompleteGateway: RomeAutocompleteGateway;
   minSearchResultsToPreventRefetch: number;
@@ -136,7 +135,7 @@ export const store = createStore({
     apiAdresseGateway,
     technicalGateway,
     establishmentGateway,
-    immersionApplicationGateway,
+    conventionGateway,
     immersionSearchGateway,
     romeAutocompleteGateway,
     minSearchResultsToPreventRefetch: 10,

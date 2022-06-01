@@ -1,6 +1,6 @@
 import { frontRoutes } from "shared/src/routes";
 import { createRouter, defineRoute, param } from "type-route";
-import { immersionApplicationValuesFromUrl } from "./route-params";
+import { conventionValuesFromUrl } from "./route-params";
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute("/ajouter-prescripteur"),
@@ -30,23 +30,23 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     (params) => `/etablissement/${params.consumer}`,
   ),
   home: defineRoute("/"),
-  immersionApplication: defineRoute(
-    { jwt: param.query.optional.string, ...immersionApplicationValuesFromUrl },
+  convention: defineRoute(
+    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
     () => "/demande-immersion",
   ),
-  immersionApplicationForUkraine: defineRoute(
+  conventionForUkraine: defineRoute(
     {
-      ...immersionApplicationValuesFromUrl,
+      ...conventionValuesFromUrl,
     },
     () => `/demande-immersion/lesentreprises-sengagent-ukraine`,
   ),
-  immersionApplicationsToValidate: defineRoute(
+  conventionToValidate: defineRoute(
     { jwt: param.query.string },
-    () => `/${frontRoutes.immersionApplicationsToValidate}`,
+    () => `/${frontRoutes.conventionToValidate}`,
   ),
-  immersionApplicationsToSign: defineRoute(
+  conventionToSign: defineRoute(
     { jwt: param.query.string },
-    () => `/${frontRoutes.immersionApplicationsToSign}`,
+    () => `/${frontRoutes.conventionToSign}`,
   ),
   immersionAssessment: defineRoute(
     { jwt: param.query.string },

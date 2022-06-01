@@ -2,11 +2,11 @@ import { Pool, PoolClient } from "pg";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
-import { Agency } from "shared/src/agency/agency.dto";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { AgencyDto } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 
-const agency1builder = AgencyBuilder.create(
+const agency1builder = AgencyDtoBuilder.create(
   "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
 )
   .withName("agency1")
@@ -19,7 +19,7 @@ const agency1builder = AgencyBuilder.create(
   .withSignature("The team of agency1")
   .withLogoUrl("http://logo.agency1.fr");
 
-const agency2builder = AgencyBuilder.create(
+const agency2builder = AgencyDtoBuilder.create(
   "22222222-2222-2222-2222-222222222222",
 )
   .withName("agency2")
@@ -31,7 +31,7 @@ const agency2builder = AgencyBuilder.create(
   .withQuestionnaireUrl("http://questionnaire.agency2.fr")
   .withSignature("The team of agency2");
 
-const inactiveAgency = AgencyBuilder.create(
+const inactiveAgency = AgencyDtoBuilder.create(
   "55555555-5555-5555-5555-555555555555",
 )
   .withStatus("needsReview")
@@ -83,8 +83,8 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("getAll", () => {
-    let agency1: Agency;
-    let agency2: Agency;
+    let agency1: AgencyDto;
+    let agency2: AgencyDto;
     beforeEach(() => {
       agency1 = agency1builder.build();
       agency2 = agency2builder.build();
@@ -161,7 +161,7 @@ describe("PgAgencyRepository", () => {
         .withPosition(48.179552, 6.441447)
         .build();
 
-      const dijonAgency = AgencyBuilder.create(
+      const dijonAgency = AgencyDtoBuilder.create(
         "33333333-3333-3333-3333-333333333333",
       )
         .withName("Dijon agency")
@@ -192,8 +192,8 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("insert", () => {
-    let agency1: Agency;
-    let agency2: Agency;
+    let agency1: AgencyDto;
+    let agency2: AgencyDto;
     beforeEach(() => {
       agency1 = agency1builder.build();
       agency2 = agency2builder.build();
@@ -253,5 +253,5 @@ describe("PgAgencyRepository", () => {
   });
 });
 
-const sortById = (agencies: Agency[]): Agency[] =>
+const sortById = (agencies: AgencyDto[]): AgencyDto[] =>
   [...agencies].sort((a, b) => (a.id < b.id ? -1 : 1));

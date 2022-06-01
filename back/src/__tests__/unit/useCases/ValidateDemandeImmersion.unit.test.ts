@@ -2,11 +2,11 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
-import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
-import { ValidateImmersionApplication } from "../../../domain/immersionApplication/useCases/ValidateImmersionApplication";
-import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
+import { ValidateImmersionApplication } from "../../../domain/convention/useCases/ValidateImmersionApplication";
+import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import {
   CreateNewEvent,
@@ -16,98 +16,89 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
-import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";
+import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 
-describe("Validate immersionApplication", () => {
-  let validateImmersionApplication: ValidateImmersionApplication;
+describe("Validate Convention", () => {
+  let validateConvention: ValidateImmersionApplication;
   let outboxRepository: InMemoryOutboxRepository;
   let outboxQueries: InMemoryOutboxQueries;
-  let repository: InMemoryImmersionApplicationRepository;
-  let queries: InMemoryImmersionApplicationQueries;
+  let repository: InMemoryConventionRepository;
+  let queries: InMemoryConventionQueries;
   let createNewEvent: CreateNewEvent;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    repository = new InMemoryImmersionApplicationRepository();
-    queries = new InMemoryImmersionApplicationQueries(repository);
+    repository = new InMemoryConventionRepository();
+    queries = new InMemoryConventionQueries(repository);
     outboxRepository = new InMemoryOutboxRepository();
     outboxQueries = new InMemoryOutboxQueries(outboxRepository);
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-    validateImmersionApplication = new ValidateImmersionApplication(
+    validateConvention = new ValidateImmersionApplication(
       repository,
       createNewEvent,
       outboxRepository,
     );
   });
 
-  describe("When the immersionApplication is valid", () => {
-    it("validates the immersionApplication in the repository", async () => {
-      const immersionApplication: Record<string, ImmersionApplicationEntity> =
-        {};
-      const immersionApplicationEntity = ImmersionApplicationEntity.create(
-        new ImmersionApplicationDtoBuilder().withStatus("IN_REVIEW").build(),
+  describe("When the Convention is valid", () => {
+    it("validates the Convention in the repository", async () => {
+      const convention: Record<string, ConventionEntity> = {};
+      const conventionEntity = ConventionEntity.create(
+        new ConventionDtoBuilder().withStatus("IN_REVIEW").build(),
       );
-      immersionApplication[immersionApplicationEntity.id] =
-        immersionApplicationEntity;
-      repository.setImmersionApplications(immersionApplication);
+      convention[conventionEntity.id] = conventionEntity;
+      repository.setConventions(convention);
 
-      const { id } = await validateImmersionApplication.execute(
-        immersionApplicationEntity.id,
-      );
-      const expectedImmersionApplication: ImmersionApplicationDto = {
-        ...immersionApplicationEntity.toDto(),
+      const { id } = await validateConvention.execute(conventionEntity.id);
+      const expectedConvention: ConventionDto = {
+        ...conventionEntity.toDto(),
         status: "VALIDATED",
       };
 
       await expectEventSavedInOutbox(outboxQueries, {
         topic: "FinalImmersionApplicationValidationByAdmin",
-        payload: expectedImmersionApplication,
+        payload: expectedConvention,
       });
-      expect(id).toEqual(immersionApplicationEntity.id);
+      expect(id).toEqual(conventionEntity.id);
 
       const storedInRepo = await queries.getLatestUpdated();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        expectedImmersionApplication,
+        expectedConvention,
       ]);
     });
   });
 
-  describe("When the immersionApplication is still draft", () => {
+  describe("When the Convention is still draft", () => {
     it("throws bad request error", async () => {
-      const immersionApplications: Record<string, ImmersionApplicationEntity> =
-        {};
-      const immersionApplicationEntity =
-        new ImmersionApplicationEntityBuilder().build();
-      immersionApplications[immersionApplicationEntity.id] =
-        immersionApplicationEntity;
-      repository.setImmersionApplications(immersionApplications);
+      const conventions: Record<string, ConventionEntity> = {};
+      const conventionEntity = new ConventionEntityBuilder().build();
+      conventions[conventionEntity.id] = conventionEntity;
+      repository.setConventions(conventions);
 
       await expectPromiseToFailWithError(
-        validateImmersionApplication.execute(immersionApplicationEntity.id),
-        new BadRequestError(immersionApplicationEntity.id),
+        validateConvention.execute(conventionEntity.id),
+        new BadRequestError(conventionEntity.id),
       );
 
       // And the immersion application is still DRAFT
       const storedInRepo = await queries.getLatestUpdated();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        immersionApplicationEntity.toDto(),
+        conventionEntity.toDto(),
       ]);
     });
   });
 
-  describe("When no immersionApplication with id exists", () => {
+  describe("When no Convention with id exists", () => {
     it("throws NotFoundError", async () => {
       await expectPromiseToFailWithError(
-        validateImmersionApplication.execute(
-          "unknown_immersion_application_id",
-        ),
+        validateConvention.execute("unknown_immersion_application_id"),
         new NotFoundError("unknown_immersion_application_id"),
       );
     });

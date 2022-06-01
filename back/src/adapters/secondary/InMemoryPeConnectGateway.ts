@@ -68,7 +68,7 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
       toPartialConventionDtoWithPeIdentity(toPeConnectUserDto(mockedUserInfo)),
     );
 
-    return `${this.baseUrl}/${frontRoutes.immersionApplicationsRoute}?${queryParams}`;
+    return `${this.baseUrl}/${frontRoutes.conventionRoute}?${queryParams}`;
   }
 
   async getAdvisorsInfo(

@@ -12,20 +12,20 @@ import type {
   ContactInPersonInstructionsParams,
   EmailType,
   EnterpriseSignatureRequestNotificationParams,
-  ModificationRequestApplicationNotificationParams,
-  NewApplicationAdminNotificationParams,
-  NewApplicationBeneficiaryConfirmationParams,
-  NewApplicationMentorConfirmationParams,
-  NewImmersionApplicationReviewForEligibilityOrValidationParams,
-  RejectedApplicationNotificationParams,
+  ConventionModificationRequestNotificationParams,
+  NewConventionAdminNotificationParams,
+  NewConventionBeneficiaryConfirmationParams,
+  NewConventionMentorConfirmationParams,
+  NewConventionReviewForEligibilityOrValidationParams,
+  RejectedConventionNotificationParams,
   SendRenewedMagicLinkParams,
   SignedByOtherPartyNotificationParams,
-  ValidatedApplicationFinalConfirmationParams,
-} from "../../domain/immersionApplication/ports/EmailGateway";
+  ValidatedConventionFinalConfirmationParams,
+} from "../../domain/convention/ports/EmailGateway";
 import {
   EmailGateway,
-  ShareDraftApplicationByLinkParams,
-} from "../../domain/immersionApplication/ports/EmailGateway";
+  ShareDraftConventionByLinkParams,
+} from "../../domain/convention/ports/EmailGateway";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { createLogger } from "../../utils/logger";
 import { notifyObjectDiscord } from "../../utils/notifyDiscord";
@@ -52,28 +52,28 @@ const counterSendTransactEmailError = new promClient.Counter({
 
 const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/10/message-setup
-  NEW_APPLICATION_ADMIN_NOTIFICATION: 10, // v2
+  NEW_CONVENTION_ADMIN_NOTIFICATION: 10, // v2
 
   // https://my.sendinblue.com/camp/template/27/message-setup
-  NEW_APPLICATION_AGENCY_NOTIFICATION: 27,
+  NEW_CONVENTION_AGENCY_NOTIFICATION: 27,
 
   // https://my.sendinblue.com/camp/template/4/message-setup
-  NEW_APPLICATION_BENEFICIARY_CONFIRMATION: 4, // v1
+  NEW_CONVENTION_BENEFICIARY_CONFIRMATION: 4, // v1
 
   // https://my.sendinblue.com/camp/template/5/message-setup
-  NEW_APPLICATION_MENTOR_CONFIRMATION: 5, // v1
+  NEW_CONVENTION_MENTOR_CONFIRMATION: 5, // v1
 
   // https://my.sendinblue.com/camp/template/6/message-setup
-  VALIDATED_APPLICATION_FINAL_CONFIRMATION: 6,
+  VALIDATED_CONVENTION_FINAL_CONFIRMATION: 6,
 
   // https://my.sendinblue.com/camp/template/9/message-setup
-  REJECTED_APPLICATION_NOTIFICATION: 9,
+  REJECTED_CONVENTION_NOTIFICATION: 9,
 
   // https://my.sendinblue.com/camp/template/13/message-setup
-  MODIFICATION_REQUEST_APPLICATION_NOTIFICATION: 13,
+  CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: 13,
 
   // https://my.sendinblue.com/camp/template/11/message-setup
-  NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: 11,
+  NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: 11,
 
   // https://my.sendinblue.com/camp/template/14/message-setup
   MAGIC_LINK_RENEWAL: 14,
@@ -85,10 +85,10 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION: 16, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
 
   // https://my.sendinblue.com/camp/template/18/message-setup
-  NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE: 18,
+  NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE: 18,
 
   // https://my.sendinblue.com/camp/template/19/message-setup
-  NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE: 19,
+  NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE: 19,
 
   // https://my.sendinblue.com/camp/template/20/message-setup
   CONTACT_BY_EMAIL_REQUEST: 20,
@@ -100,7 +100,7 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   CONTACT_IN_PERSON_INSTRUCTIONS: 22,
 
   // https://my.sendinblue.com/camp/template/24/message-setup
-  SHARE_DRAFT_APPLICATION_BY_LINK: 24,
+  SHARE_DRAFT_CONVENTION_BY_LINK: 24,
 
   // https://my.sendinblue.com/camp/template/25/message-setup
   EDIT_FORM_ESTABLISHMENT_LINK: 25,
@@ -179,7 +179,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendNewEstablismentContactConfirmation(
+  public async sendNewEstablishmentContactConfirmation(
     recipient: string,
     copy: string[],
     formEstablishmentDto: FormEstablishmentDto,
@@ -196,12 +196,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendNewApplicationBeneficiaryConfirmation(
+  public async sendNewConventionBeneficiaryConfirmation(
     recipient: string,
-    params: NewApplicationBeneficiaryConfirmationParams,
+    params: NewConventionBeneficiaryConfirmationParams,
   ): Promise<void> {
     await this.sendTransacEmail(
-      "NEW_APPLICATION_BENEFICIARY_CONFIRMATION",
+      "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
       [recipient],
       {
         DEMANDE_ID: params.demandeId,
@@ -211,12 +211,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendNewApplicationMentorConfirmation(
+  public async sendNewConventionMentorConfirmation(
     recipient: string,
-    params: NewApplicationMentorConfirmationParams,
+    params: NewConventionMentorConfirmationParams,
   ): Promise<void> {
     await this.sendTransacEmail(
-      "NEW_APPLICATION_MENTOR_CONFIRMATION",
+      "NEW_CONVENTION_MENTOR_CONFIRMATION",
       [recipient],
       {
         DEMANDE_ID: params.demandeId,
@@ -227,12 +227,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendNewApplicationAdminNotification(
+  public async sendNewConventionAdminNotification(
     recipients: string[],
-    params: NewApplicationAdminNotificationParams,
+    params: NewConventionAdminNotificationParams,
   ) {
     await this.sendTransacEmail(
-      "NEW_APPLICATION_ADMIN_NOTIFICATION",
+      "NEW_CONVENTION_ADMIN_NOTIFICATION",
       recipients,
       {
         DEMANDE_ID: params.demandeId,
@@ -247,12 +247,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendNewApplicationAgencyNotification(
+  public async sendNewConventionAgencyNotification(
     recipients: string[],
-    params: NewApplicationAdminNotificationParams,
+    params: NewConventionAdminNotificationParams,
   ) {
     await this.sendTransacEmail(
-      "NEW_APPLICATION_AGENCY_NOTIFICATION",
+      "NEW_CONVENTION_AGENCY_NOTIFICATION",
       recipients,
       {
         DEMANDE_ID: params.demandeId,
@@ -267,12 +267,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendValidatedApplicationFinalConfirmation(
+  public async sendValidatedConventionFinalConfirmation(
     recipients: string[],
-    params: ValidatedApplicationFinalConfirmationParams,
+    params: ValidatedConventionFinalConfirmationParams,
   ): Promise<void> {
     await this.sendTransacEmail(
-      "VALIDATED_APPLICATION_FINAL_CONFIRMATION",
+      "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients,
       {
         TOTAL_HOURS: params.totalHours,
@@ -298,12 +298,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendRejectedApplicationNotification(
+  public async sendRejectedConventionNotification(
     recipients: string[],
-    params: RejectedApplicationNotificationParams,
+    params: RejectedConventionNotificationParams,
   ): Promise<void> {
     await this.sendTransacEmail(
-      "REJECTED_APPLICATION_NOTIFICATION",
+      "REJECTED_CONVENTION_NOTIFICATION",
       recipients,
       {
         BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
@@ -316,12 +316,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendModificationRequestApplicationNotification(
+  public async sendConventionModificationRequestNotification(
     recipients: string[],
-    params: ModificationRequestApplicationNotificationParams,
+    params: ConventionModificationRequestNotificationParams,
   ): Promise<void> {
     await this.sendTransacEmail(
-      "MODIFICATION_REQUEST_APPLICATION_NOTIFICATION",
+      "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
       recipients,
       {
         AGENCY: params.agency,
@@ -335,12 +335,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendNewApplicationForReviewNotification(
+  public async sendNewConventionForReviewNotification(
     recipients: string[],
-    params: NewImmersionApplicationReviewForEligibilityOrValidationParams,
+    params: NewConventionReviewForEligibilityOrValidationParams,
   ): Promise<void> {
     await this.sendTransacEmail(
-      "NEW_APPLICATION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+      "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
       recipients,
       {
         BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
@@ -385,7 +385,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     params: BeneficiarySignatureRequestNotificationParams,
   ): Promise<void> {
     await this.sendTransacEmail(
-      "NEW_APPLICATION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
       [recipient],
       {
         MAGIC_LINK: params.magicLink,
@@ -401,7 +401,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     params: EnterpriseSignatureRequestNotificationParams,
   ): Promise<void> {
     await this.sendTransacEmail(
-      "NEW_APPLICATION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+      "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
       [recipient],
       {
         MAGIC_LINK: params.magicLink,
@@ -463,18 +463,14 @@ export class SendinblueEmailGateway implements EmailGateway {
     });
   }
 
-  public async sendShareDraftApplicationByLink(
+  public async sendShareDraftConventionByLink(
     recipient: string,
-    params: ShareDraftApplicationByLinkParams,
+    params: ShareDraftConventionByLinkParams,
   ): Promise<void> {
-    await this.sendTransacEmail(
-      "SHARE_DRAFT_APPLICATION_BY_LINK",
-      [recipient],
-      {
-        ADDITIONAL_DETAILS: params.additional_details,
-        APPLICATION_FORM_LINK: params.application_form_url,
-      },
-    );
+    await this.sendTransacEmail("SHARE_DRAFT_CONVENTION_BY_LINK", [recipient], {
+      ADDITIONAL_DETAILS: params.additionalDetails,
+      APPLICATION_FORM_LINK: params.conventionFormUrl,
+    });
   }
 
   private async sendTransacEmail(

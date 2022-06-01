@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
@@ -13,7 +12,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       foreignKeys: {
         columns: "convention_id",
         references: "immersion_applications(id)",
-        onDelete: "CASCADE", // If an convention is deleted, will delete the referencing assessment
+        onDelete: "CASCADE", // If a Convention is deleted, will delete the referencing assessment
       },
     },
   );

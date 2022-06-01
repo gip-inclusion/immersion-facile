@@ -4,7 +4,7 @@
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import {
-  executeUpdateApplicationStatusUseCase,
+  executeUpdateConventionStatusUseCase,
   setupInitialState,
   testForAllRolesAndInitialStatusCases,
 } from "./UpdateImmersionApplicationStatus.testHelpers";
@@ -122,16 +122,16 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   it("fails for unknown application ids", async () => {
-    const { updateImmersionApplicationStatus, immersionApplicationRepository } =
+    const { updateConventionStatus, conventionRepository } =
       await setupInitialState({ initialStatus: "IN_REVIEW" });
     await expectPromiseToFailWithError(
-      executeUpdateApplicationStatusUseCase({
-        applicationId: "unknown_application_id",
+      executeUpdateConventionStatusUseCase({
+        conventionId: "unknown_application_id",
         role: "admin",
         email: "test@test.fr",
         targetStatus: "VALIDATED",
-        updateImmersionApplicationStatus,
-        immersionApplicationRepository,
+        updateConventionStatus,
+        conventionRepository,
       }),
       new NotFoundError("unknown_application_id"),
     );

@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   calculateTotalImmersionHoursBetweenDate,
@@ -11,7 +11,7 @@ import { Accordion } from "./Accordion";
 import { FormAccordionProps } from "./FormAccordion";
 import { TextCell } from "./TextCell";
 
-type ImmersionField = keyof ImmersionApplicationDto;
+type ImmersionField = keyof ConventionDto;
 type FieldsToLabel = Partial<Record<ImmersionField, string>>;
 
 const enterpriseFields: FieldsToLabel = {
@@ -63,19 +63,17 @@ const allFields: FieldsAndTitle[] = [
   { listTitle: "Tuteur", fields: mentorFields },
 ];
 
-export const FormDetails = ({ immersionApplication }: FormAccordionProps) => {
-  const scheduleText = immersionApplication.legacySchedule
-    ? immersionApplication.legacySchedule.description
-    : prettyPrintSchedule(immersionApplication.schedule);
+export const FormDetails = ({ convention }: FormAccordionProps) => {
+  const scheduleText = convention.legacySchedule
+    ? convention.legacySchedule.description
+    : prettyPrintSchedule(convention.schedule);
 
   const buildContent = (field: ImmersionField): ReactNode => {
-    const value = immersionApplication[field];
+    const value = convention[field];
     if (field === "schedule")
       return <div style={{ whiteSpace: "pre" }}>{scheduleText}</div>;
     if (field === "sanitaryPrevention") {
-      return value
-        ? immersionApplication.sanitaryPreventionDescription ?? "✅"
-        : "❌";
+      return value ? convention.sanitaryPreventionDescription ?? "✅" : "❌";
     }
     if (field === "immersionAppellation")
       return (value as AppellationDto).appellationLabel;
@@ -90,7 +88,7 @@ export const FormDetails = ({ immersionApplication }: FormAccordionProps) => {
         <Accordion title={listTitle} key={listTitle}>
           {keys(fields).map(
             (field) =>
-              immersionApplication[field] && (
+              convention[field] && (
                 <TextCell
                   title={
                     /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
@@ -105,17 +103,15 @@ export const FormDetails = ({ immersionApplication }: FormAccordionProps) => {
             <>
               <TextCell
                 title="Heures hebdomadaires"
-                contents={calculateWeeklyHoursFromSchedule(
-                  immersionApplication.schedule,
-                )}
+                contents={calculateWeeklyHoursFromSchedule(convention.schedule)}
                 key="weeklyHours"
               />
               <TextCell
                 title="Nombre total d'heures"
                 contents={calculateTotalImmersionHoursBetweenDate({
-                  dateStart: immersionApplication.dateStart,
-                  dateEnd: immersionApplication.dateEnd,
-                  schedule: immersionApplication.schedule,
+                  dateStart: convention.dateStart,
+                  dateEnd: convention.dateEnd,
+                  schedule: convention.schedule,
                 })}
                 key="totalHours"
               />

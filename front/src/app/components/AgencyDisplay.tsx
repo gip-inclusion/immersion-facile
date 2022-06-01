@@ -3,7 +3,7 @@ import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { agencyGateway } from "src/app/config/dependencies";
 import { AgencyId, AgencyInListDto } from "shared/src/agency/agency.dto";
-import type { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import type { ConventionDto } from "shared/src/convention/convention.dto";
 import { LatLonDto } from "shared/src/latLon";
 
 import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
@@ -26,7 +26,7 @@ export const AgencyDisplay = ({
   description,
   agencyId,
 }: AgencyDisplayProps) => {
-  const name: keyof ImmersionApplicationDto = "agencyId";
+  const name: keyof ConventionDto = "agencyId";
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>({ name });
 

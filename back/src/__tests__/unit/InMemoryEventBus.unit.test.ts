@@ -9,12 +9,12 @@ import type {
   EventFailure,
 } from "../../domain/core/eventBus/events";
 import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
-import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 const domainEvt: DomainEvent = {
   id: "anId",
   topic: "ImmersionApplicationSubmittedByBeneficiary",
-  payload: new ImmersionApplicationDtoBuilder().build(),
+  payload: new ConventionDtoBuilder().build(),
   occurredAt: "a date",
   wasQuarantined: false,
   publications: [],

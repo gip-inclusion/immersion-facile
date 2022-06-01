@@ -1,5 +1,5 @@
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
-import { GenerateMagicLink } from "../../../domain/immersionApplication/useCases/GenerateMagicLink";
+import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 import {
   createConventionMagicLinkPayload,
   ConventionMagicLinkPayload,

@@ -1,36 +1,36 @@
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
-import { GetImmersionApplication } from "../../../domain/immersionApplication/useCases/GetImmersionApplication";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { GetImmersionApplication } from "../../../domain/convention/useCases/GetImmersionApplication";
+import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
-describe("Get ImmersionApplication", () => {
-  let getImmersionApplication: GetImmersionApplication;
-  let repository: InMemoryImmersionApplicationRepository;
+describe("Get Convention", () => {
+  let getConvention: GetImmersionApplication;
+  let repository: InMemoryConventionRepository;
 
   beforeEach(() => {
-    repository = new InMemoryImmersionApplicationRepository();
-    getImmersionApplication = new GetImmersionApplication(repository);
+    repository = new InMemoryConventionRepository();
+    getConvention = new GetImmersionApplication(repository);
   });
 
-  describe("When the ImmersionApplication does not exist", () => {
+  describe("When the Convention does not exist", () => {
     it("throws NotFoundError", async () => {
       await expectPromiseToFailWithError(
-        getImmersionApplication.execute({ id: "unknown_demande_immersion_id" }),
+        getConvention.execute({ id: "unknown_demande_immersion_id" }),
         new NotFoundError("unknown_demande_immersion_id"),
       );
     });
   });
 
-  describe("When a ImmersionApplication is stored", () => {
-    it("returns the ImmersionApplication", async () => {
-      const entity = new ImmersionApplicationEntityBuilder().build();
-      repository.setImmersionApplications({ [entity.id]: entity });
+  describe("When a Convention is stored", () => {
+    it("returns the Convention", async () => {
+      const entity = new ConventionEntityBuilder().build();
+      repository.setConventions({ [entity.id]: entity });
 
-      const immersionApplication = await getImmersionApplication.execute({
+      const convention = await getConvention.execute({
         id: entity.id,
       });
-      expect(immersionApplication).toEqual(entity.toDto());
+      expect(convention).toEqual(entity.toDto());
     });
   });
 });

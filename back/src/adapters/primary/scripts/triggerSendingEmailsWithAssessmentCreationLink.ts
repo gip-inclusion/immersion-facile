@@ -4,7 +4,7 @@ import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionO
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/InMemoryEmailGateway";
-import { PgImmersionApplicationQueries } from "../../secondary/pg/PgImmersionApplicationQueries";
+import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
 import { SendinblueEmailGateway } from "../../secondary/SendinblueEmailGateway";
 import { AppConfig } from "../config/appConfig";
@@ -19,7 +19,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   });
   const client = await pool.connect();
   const outboxRepository = new PgOutboxRepository(client);
-  const applicationQueries = new PgImmersionApplicationQueries(client);
+  const conventionQueries = new PgConventionQueries(client);
 
   const emailGateway =
     config.emailGateway === "SENDINBLUE"
@@ -30,7 +30,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const sendEmailsWithAssessmentCreationLink =
     new SendEmailsWithAssessmentCreationLink(
       outboxRepository,
-      applicationQueries,
+      conventionQueries,
       emailGateway,
       clock,
       createGenerateConventionMagicLink(config),

@@ -1,4 +1,4 @@
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionId } from "shared/src/convention/convention.dto";
 import { ConventionPoleEmploiAdvisorRepository } from "../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
@@ -22,7 +22,7 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
   }
 
   public async associateConventionAndUserAdvisor(
-    conventionId: ImmersionApplicationId,
+    conventionId: ConventionId,
     peExternalId: PeExternalId,
   ): Promise<void> {
     const entity: ConventionPoleEmploiUserAdvisorEntity =

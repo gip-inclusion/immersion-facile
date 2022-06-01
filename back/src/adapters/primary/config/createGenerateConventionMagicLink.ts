@@ -1,4 +1,4 @@
-import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionId } from "shared/src/convention/convention.dto";
 import {
   createConventionMagicLinkPayload,
   Role,
@@ -19,7 +19,7 @@ export const createGenerateConventionMagicLink = (config: AppConfig) => {
     targetRoute,
     email,
   }: {
-    id: ImmersionApplicationId;
+    id: ConventionId;
     role: Role;
     targetRoute: string;
     email: string;

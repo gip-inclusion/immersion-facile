@@ -1,15 +1,15 @@
-import { ImmersionApplicationReadyForExportVO } from "../../immersionApplication/valueObjects/ImmersionApplicationReadyForExportVO";
+import { ConventionReadyForExportVO } from "../../convention/valueObjects/ConventionReadyForExportVO";
 
 export type ArchivedReport<T> = {
   report: T;
   archivePath: string;
 };
-export type ImmersionApplicationsExportByAgency = Record<
+export type ConventionExportByAgency = Record<
   string,
-  ImmersionApplicationReadyForExportVO[]
+  ConventionReadyForExportVO[]
 >;
 export interface ReportingGateway {
-  exportImmersionApplications(
-    report: ArchivedReport<ImmersionApplicationsExportByAgency>,
+  exportConventions(
+    report: ArchivedReport<ConventionExportByAgency>,
   ): Promise<void>;
 }

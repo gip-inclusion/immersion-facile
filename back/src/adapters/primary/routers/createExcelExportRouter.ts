@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   exportEstablismentsExcelRoute,
-  exportImmersionApplicationsExcelRoute,
+  exportConventionsExcelRoute,
 } from "shared/src/routes";
 import { capitalize } from "shared/src/utils/string";
 import { temporaryStoragePath } from "../../../utils/filesystemUtils";
@@ -13,14 +13,14 @@ export const createExcelExportRouter = (deps: AppDependencies) => {
   const excelExportRouter = Router({ mergeParams: true });
 
   excelExportRouter
-    .route(`/${exportImmersionApplicationsExcelRoute}`)
+    .route(`/${exportConventionsExcelRoute}`)
     .get(async (req, res) =>
       sendZipResponse(
         req,
         res,
         async () => {
           const archivePath = await temporaryStoragePath("exportAgencies.zip");
-          await deps.useCases.exportImmersionApplicationsAsExcelArchive.execute(
+          await deps.useCases.exportConventionsAsExcelArchive.execute(
             archivePath,
           );
           return archivePath;

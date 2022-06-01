@@ -1,4 +1,4 @@
-import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -10,7 +10,7 @@ import {
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeStubGetFeatureFlags } from "../../../adapters/secondary/makeStubGetFeatureFlags";
 import {
@@ -19,20 +19,19 @@ import {
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
-import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
-import { AddImmersionApplication } from "../../../domain/immersionApplication/useCases/AddImmersionApplication";
-import { validApplicationStatus } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";
+import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
+import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
+import { allConventionStatuses } from "shared/src/convention/convention.dto";
+import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 
-describe("Add immersionApplication", () => {
-  let addImmersionApplication: AddImmersionApplication;
-  let applicationRepository: InMemoryImmersionApplicationRepository;
+describe("Add Convention", () => {
+  let addConvention: AddImmersionApplication;
+  let conventionRepository: InMemoryConventionRepository;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
   let outboxRepository: InMemoryOutboxRepository;
-  const validImmersionApplication =
-    new ImmersionApplicationDtoBuilder().build();
+  const validConvention = new ConventionDtoBuilder().build();
   let stubGetSiret: StubGetSiret;
   let getFeatureFlags: GetFeatureFlags;
   let uowPerformer: InMemoryUowPerformer;
@@ -42,7 +41,7 @@ describe("Add immersionApplication", () => {
       enableAdminUi: false,
       enableInseeApi: true,
     });
-    applicationRepository = new InMemoryImmersionApplicationRepository();
+    conventionRepository = new InMemoryConventionRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
@@ -51,10 +50,10 @@ describe("Add immersionApplication", () => {
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
       outboxRepo: outboxRepository,
-      immersionApplicationRepo: applicationRepository,
+      conventionRepository,
       getFeatureFlags,
     });
-    addImmersionApplication = new AddImmersionApplication(
+    addConvention = new AddImmersionApplication(
       uowPerformer,
       createNewEvent,
       stubGetSiret,
@@ -67,70 +66,64 @@ describe("Add immersionApplication", () => {
     clock.setNextDate(occurredAt);
     uuidGenerator.setNextUuid(id);
 
-    expect(
-      await addImmersionApplication.execute(validImmersionApplication),
-    ).toEqual({
-      id: validImmersionApplication.id,
+    expect(await addConvention.execute(validConvention)).toEqual({
+      id: validConvention.id,
     });
 
-    const storedInRepo = await new InMemoryImmersionApplicationQueries(
-      applicationRepository,
+    const storedInRepo = await new InMemoryConventionQueries(
+      conventionRepository,
     ).getLatestUpdated();
     expect(storedInRepo).toHaveLength(1);
-    expect(storedInRepo[0].toDto()).toEqual(validImmersionApplication);
+    expect(storedInRepo[0].toDto()).toEqual(validConvention);
     expectDomainEventsToBeInOutbox([
       {
         id,
         occurredAt: occurredAt.toISOString(),
         topic: "ImmersionApplicationSubmittedByBeneficiary",
-        payload: validImmersionApplication,
+        payload: validConvention,
         publications: [],
         wasQuarantined: false,
       },
     ]);
   });
 
-  it("rejects applications where the ID is already in use", async () => {
-    await applicationRepository.save(
-      ImmersionApplicationEntity.create(validImmersionApplication),
-    );
+  it("rejects conventions where the ID is already in use", async () => {
+    await conventionRepository.save(ConventionEntity.create(validConvention));
 
     await expectPromiseToFailWithError(
-      addImmersionApplication.execute(validImmersionApplication),
-      new ConflictError(validImmersionApplication.id),
+      addConvention.execute(validConvention),
+      new ConflictError(validConvention.id),
     );
   });
 
   describe("Status validation", () => {
     // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021
     it("allows applications submitted as DRAFT", async () => {
-      expect(
-        await addImmersionApplication.execute(validImmersionApplication),
-      ).toEqual({
-        id: validImmersionApplication.id,
+      expect(await addConvention.execute(validConvention)).toEqual({
+        id: validConvention.id,
       });
     });
 
     it("allows applications submitted as READY_TO_SIGN", async () => {
       expect(
-        await addImmersionApplication.execute({
-          ...validImmersionApplication,
+        await addConvention.execute({
+          ...validConvention,
           status: "READY_TO_SIGN",
         }),
       ).toEqual({
-        id: validImmersionApplication.id,
+        id: validConvention.id,
       });
     });
 
     it("rejects applications if the status is not DRAFT or READY_TO_SIGN", async () => {
-      for (const status of validApplicationStatus) {
+      for (const status of allConventionStatuses) {
         // eslint-disable-next-line jest/no-if
         if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;
         }
         await expectPromiseToFailWithError(
-          addImmersionApplication.execute({
-            ...validImmersionApplication,
+          addConvention.execute({
+            ...validConvention,
             status,
           }),
           new ForbiddenError(),
@@ -150,24 +143,22 @@ describe("Add immersionApplication", () => {
           getFeatureFlags: getFeatureFlagsWithInseeByPass,
         });
         stubGetSiret.setNextResponse({
-          siret: validImmersionApplication.siret,
+          siret: validConvention.siret,
           businessName: "INACTIVE BUSINESS",
           businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
           naf: { code: "78.3Z", nomenclature: "Ref2" },
           isOpen: false,
         });
 
-        expect(
-          await addImmersionApplication.execute(validImmersionApplication),
-        ).toEqual({
-          id: validImmersionApplication.id,
+        expect(await addConvention.execute(validConvention)).toEqual({
+          id: validConvention.id,
         });
       });
     });
 
     it("rejects applications with SIRETs that don't correspond to active businesses", async () => {
       stubGetSiret.setNextResponse({
-        siret: validImmersionApplication.siret,
+        siret: validConvention.siret,
         businessName: "INACTIVE BUSINESS",
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
         naf: { code: "78.3Z", nomenclature: "Ref2" },
@@ -175,26 +166,24 @@ describe("Add immersionApplication", () => {
       });
 
       await expectPromiseToFailWithError(
-        addImmersionApplication.execute(validImmersionApplication),
+        addConvention.execute(validConvention),
         new BadRequestError(
-          `Ce SIRET (${validImmersionApplication.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
+          `Ce SIRET (${validConvention.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
         ),
       );
     });
 
     it("accepts applications with SIRETs that  correspond to active businesses", async () => {
       stubGetSiret.setNextResponse({
-        siret: validImmersionApplication.siret,
+        siret: validConvention.siret,
         businessName: "ACTIVE BUSINESS",
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
         naf: { code: "78.3Z", nomenclature: "Ref2" },
         isOpen: true,
       });
 
-      expect(
-        await addImmersionApplication.execute(validImmersionApplication),
-      ).toEqual({
-        id: validImmersionApplication.id,
+      expect(await addConvention.execute(validConvention)).toEqual({
+        id: validConvention.id,
       });
     });
 
@@ -203,7 +192,7 @@ describe("Add immersionApplication", () => {
       stubGetSiret.setErrorForNextCall(error);
 
       await expectPromiseToFailWithError(
-        addImmersionApplication.execute(validImmersionApplication),
+        addConvention.execute(validConvention),
         error,
       );
     });

@@ -7,7 +7,7 @@ import {
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeStubGetFeatureFlags } from "../../../adapters/secondary/makeStubGetFeatureFlags";
 import {
@@ -16,27 +16,27 @@ import {
 } from "../../../domain/core/eventBus/EventBus";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
-import { UpdateImmersionApplication } from "../../../domain/immersionApplication/useCases/UpdateImmersionApplication";
-import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
+import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
+import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
 import {
-  ImmersionApplicationId,
-  validApplicationStatus,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";
+  ConventionId,
+  allConventionStatuses,
+} from "shared/src/convention/convention.dto";
+import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 
-describe("Update immersionApplication", () => {
-  let updateImmersionApplication: UpdateImmersionApplication;
-  let immersionApplicationRepo: InMemoryImmersionApplicationRepository;
+describe("Update Convention", () => {
+  let updateConvention: UpdateImmersionApplication;
+  let conventionRepository: InMemoryConventionRepository;
   let outboxRepo: OutboxRepository;
   let createNewEvent: CreateNewEvent;
   let getFeatureFlags: GetFeatureFlags;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
-    immersionApplicationRepo = new InMemoryImmersionApplicationRepository();
+    conventionRepository = new InMemoryConventionRepository();
     outboxRepo = new InMemoryOutboxRepository();
     createNewEvent = makeCreateNewEvent({
       clock: new CustomClock(),
@@ -50,56 +50,51 @@ describe("Update immersionApplication", () => {
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
       outboxRepo,
-      immersionApplicationRepo,
+      conventionRepository,
       getFeatureFlags,
     });
 
-    updateImmersionApplication = new UpdateImmersionApplication(
+    updateConvention = new UpdateImmersionApplication(
       uowPerformer,
       createNewEvent,
     );
   });
 
-  describe("When the immersionApplication is valid", () => {
-    it("updates the immersionApplication in the repository", async () => {
-      const immersionApplications: Record<string, ImmersionApplicationEntity> =
-        {};
-      const immersionApplicationEntity =
-        new ImmersionApplicationEntityBuilder().build();
-      immersionApplications[immersionApplicationEntity.id] =
-        immersionApplicationEntity;
-      immersionApplicationRepo.setImmersionApplications(immersionApplications);
+  describe("When the Convention is valid", () => {
+    it("updates the Convention in the repository", async () => {
+      const conventions: Record<string, ConventionEntity> = {};
+      const conventionEntity = new ConventionEntityBuilder().build();
+      conventions[conventionEntity.id] = conventionEntity;
+      conventionRepository.setConventions(conventions);
 
-      const updatedImmersionApplication = new ImmersionApplicationDtoBuilder()
+      const updatedConvention = new ConventionDtoBuilder()
         .withEmail("new@email.fr")
         .build();
 
-      const { id } = await updateImmersionApplication.execute({
-        id: updatedImmersionApplication.id,
-        immersionApplication: updatedImmersionApplication,
+      const { id } = await updateConvention.execute({
+        id: updatedConvention.id,
+        convention: updatedConvention,
       });
-      expect(id).toEqual(updatedImmersionApplication.id);
+      expect(id).toEqual(updatedConvention.id);
 
-      const storedInRepo = await new InMemoryImmersionApplicationQueries(
-        immersionApplicationRepo,
+      const storedInRepo = await new InMemoryConventionQueries(
+        conventionRepository,
       ).getLatestUpdated();
       expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        updatedImmersionApplication,
+        updatedConvention,
       ]);
     });
   });
 
-  describe("When no immersionApplication with id exists", () => {
+  describe("When no Convention with id exists", () => {
     it("throws NotFoundError", async () => {
       const id = "40400000000000404";
-      const validImmersionApplication = new ImmersionApplicationDtoBuilder()
-        .withId(id)
-        .build();
+      const validConvention = new ConventionDtoBuilder().withId(id).build();
 
       await expectPromiseToFailWithError(
-        updateImmersionApplication.execute({
+        updateConvention.execute({
           id,
-          immersionApplication: validImmersionApplication,
+          convention: validConvention,
         }),
         new NotFoundError(id),
       );
@@ -109,79 +104,75 @@ describe("Update immersionApplication", () => {
   describe("When previous state is not draft (testing with READY_TO_SIGN)", () => {
     it("throws Bad request", async () => {
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
-      const updatedImmersionApplication = new ImmersionApplicationDtoBuilder()
+      const updatedConvention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
         .build();
 
       await expectPromiseToFailWithError(
-        updateImmersionApplication.execute({
-          id: updatedImmersionApplication.id,
-          immersionApplication: updatedImmersionApplication,
+        updateConvention.execute({
+          id: updatedConvention.id,
+          convention: updatedConvention,
         }),
-        new BadRequestError(updatedImmersionApplication.id),
+        new BadRequestError(updatedConvention.id),
       );
     });
   });
 
   describe("Status validation", () => {
-    let id: ImmersionApplicationId;
+    let id: ConventionId;
     beforeEach(() => {
-      const immersionApplications: Record<string, ImmersionApplicationEntity> =
-        {};
-      const immersionApplicationEntity =
-        new ImmersionApplicationEntityBuilder().build();
-      immersionApplications[immersionApplicationEntity.id] =
-        immersionApplicationEntity;
-      immersionApplicationRepo.setImmersionApplications(immersionApplications);
-      id = immersionApplicationEntity.id;
+      const conventions: Record<string, ConventionEntity> = {};
+      const conventionEntity = new ConventionEntityBuilder().build();
+      conventions[conventionEntity.id] = conventionEntity;
+      conventionRepository.setConventions(conventions);
+      id = conventionEntity.id;
     });
 
     // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021
     it("allows applications submitted as DRAFT", async () => {
-      const validImmersionApplication = new ImmersionApplicationDtoBuilder()
-        .withId(id)
-        .build();
+      const validConvention = new ConventionDtoBuilder().withId(id).build();
 
       expect(
-        await updateImmersionApplication.execute({
-          immersionApplication: validImmersionApplication,
-          id: validImmersionApplication.id,
+        await updateConvention.execute({
+          convention: validConvention,
+          id: validConvention.id,
         }),
       ).toEqual({
-        id: validImmersionApplication.id,
+        id: validConvention.id,
       });
     });
 
     it("allows applications submitted as READY_TO_SIGN", async () => {
-      const inReviewImmersionApplication = new ImmersionApplicationDtoBuilder()
+      const inReviewConvention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
         .withId(id)
         .build();
 
       expect(
-        await updateImmersionApplication.execute({
-          immersionApplication: inReviewImmersionApplication,
-          id: inReviewImmersionApplication.id,
+        await updateConvention.execute({
+          convention: inReviewConvention,
+          id: inReviewConvention.id,
         }),
       ).toEqual({
-        id: inReviewImmersionApplication.id,
+        id: inReviewConvention.id,
       });
     });
 
     it("rejects applications if the status is not DRAFT or READY_TO_SIGN", async () => {
-      for (const status of validApplicationStatus) {
+      for (const status of allConventionStatuses) {
         // eslint-disable-next-line jest/no-if
         if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;
         }
-        const immersionApplication = new ImmersionApplicationDtoBuilder()
+        const convention = new ConventionDtoBuilder()
           .withStatus(status)
           .withId(id)
           .build();
+
         await expectPromiseToFailWithError(
-          updateImmersionApplication.execute({
-            immersionApplication,
-            id: immersionApplication.id,
+          updateConvention.execute({
+            convention,
+            id: convention.id,
           }),
           new ForbiddenError(),
         );

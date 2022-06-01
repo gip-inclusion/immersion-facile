@@ -24,7 +24,7 @@ export const ImmersionHomeMenu = () => (
         Trouver une entreprise accueillante <SearchIcon />
       </a>
       <a
-        {...routes.immersionApplication().link}
+        {...routes.convention().link}
         className="no-underline shadow-none bg-immersionRed py-3 px-2 rounded-md text-white font-semibold  w-full text-center h-15 text-sm "
       >
         J'ai trouvé mon immersion,

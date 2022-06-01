@@ -1,11 +1,11 @@
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
-import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
-import { ListImmersionApplication } from "../../../domain/immersionApplication/useCases/ListImmersionApplication";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
+import { ListImmersionApplication } from "../../../domain/convention/useCases/ListImmersionApplication";
 import { AgencyId } from "shared/src/agency/agency.dto";
-import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { validApplicationStatus } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";
+import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
+import { allConventionStatuses } from "shared/src/convention/convention.dto";
+import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 
 const agencyIds: AgencyId[] = [
   "11111111-1111-1111-1111-111111111111",
@@ -14,36 +14,36 @@ const agencyIds: AgencyId[] = [
 ];
 
 describe("List Immersion Applications", () => {
-  let listImmersionApplication: ListImmersionApplication;
-  let repository: InMemoryImmersionApplicationRepository;
-  let queries: InMemoryImmersionApplicationQueries;
+  let listConventions: ListImmersionApplication;
+  let repository: InMemoryConventionRepository;
+  let queries: InMemoryConventionQueries;
 
   beforeEach(() => {
-    repository = new InMemoryImmersionApplicationRepository();
-    queries = new InMemoryImmersionApplicationQueries(repository);
-    listImmersionApplication = new ListImmersionApplication(queries);
+    repository = new InMemoryConventionRepository();
+    queries = new InMemoryConventionQueries(repository);
+    listConventions = new ListImmersionApplication(queries);
   });
 
   describe("When the repository is empty", () => {
     it("returns empty list", async () => {
-      const immersionApplications = await listImmersionApplication.execute({
+      const conventions = await listConventions.execute({
         status: undefined,
         agencyId: undefined,
       });
-      expect(immersionApplications).toEqual([]);
+      expect(conventions).toEqual([]);
     });
   });
 
-  describe("When a immersionApplication is stored", () => {
-    it("returns the immersionApplication", async () => {
-      const entity = new ImmersionApplicationEntityBuilder().build();
-      repository.setImmersionApplications({ form_id: entity });
+  describe("When a Convention is stored", () => {
+    it("returns the Convention", async () => {
+      const entity = new ConventionEntityBuilder().build();
+      repository.setConventions({ form_id: entity });
 
-      const immersionApplications = await listImmersionApplication.execute({
+      const conventions = await listConventions.execute({
         status: undefined,
         agencyId: undefined,
       });
-      expect(immersionApplications).toEqual([entity.toDto()]);
+      expect(conventions).toEqual([entity.toDto()]);
     });
   });
 
@@ -52,13 +52,13 @@ describe("List Immersion Applications", () => {
 
     // Populate the DB with 1 record of with all possible statuses and a set of agency ids.
     beforeEach(() => {
-      const entities: ImmersionApplicationEntity[] = [];
+      const entities: ConventionEntity[] = [];
 
-      validApplicationStatus.forEach((status) => {
+      allConventionStatuses.forEach((status) => {
         agencyIds.forEach((agencyId) => {
           entities.push(
-            ImmersionApplicationEntity.create(
-              new ImmersionApplicationDtoBuilder()
+            ConventionEntity.create(
+              new ConventionDtoBuilder()
                 .withAgencyId(agencyId)
                 .withStatus(status)
                 .withId(`id-${applicationCount}`)
@@ -69,7 +69,7 @@ describe("List Immersion Applications", () => {
         });
       });
 
-      repository.setImmersionApplications(
+      repository.setConventions(
         entities.reduce(
           (dict, entity) => ({ ...dict, [entity.id as string]: entity }),
           {},
@@ -78,45 +78,43 @@ describe("List Immersion Applications", () => {
     });
 
     it("without filters returns all applications", async () => {
-      const immersionApplications = await listImmersionApplication.execute({
+      const conventions = await listConventions.execute({
         status: undefined,
         agencyId: undefined,
       });
-      expect(immersionApplications).toHaveLength(applicationCount);
+      expect(conventions).toHaveLength(applicationCount);
     });
 
     it("with agency filter returns all applications of the agency", async () => {
-      const immersionApplications = await listImmersionApplication.execute({
+      const conventions = await listConventions.execute({
         status: undefined,
         agencyId: agencyIds[0],
       });
-      expect(immersionApplications).toHaveLength(validApplicationStatus.length);
-      immersionApplications.forEach((entity) => {
+      expect(conventions).toHaveLength(allConventionStatuses.length);
+      conventions.forEach((entity) => {
         expect(entity.agencyId).toEqual(agencyIds[0]);
       });
     });
 
     it("with status filter returns all applications with a given status", async () => {
-      const immersionApplications = await listImmersionApplication.execute({
-        status: validApplicationStatus[0],
+      const conventions = await listConventions.execute({
+        status: allConventionStatuses[0],
         agencyId: undefined,
       });
-      expect(immersionApplications).toHaveLength(agencyIds.length);
-      immersionApplications.forEach((entity) => {
-        expect(entity.status).toEqual(validApplicationStatus[0]);
+      expect(conventions).toHaveLength(agencyIds.length);
+      conventions.forEach((entity) => {
+        expect(entity.status).toEqual(allConventionStatuses[0]);
       });
     });
 
     it("with multiple filters, applies all filters as logical AND", async () => {
-      const immersionApplications = await listImmersionApplication.execute({
-        status: validApplicationStatus[0],
+      const conventions = await listConventions.execute({
+        status: allConventionStatuses[0],
         agencyId: agencyIds[0],
       });
-      expect(immersionApplications).toHaveLength(1);
-      expect(immersionApplications[0].status).toEqual(
-        validApplicationStatus[0],
-      );
-      expect(immersionApplications[0].agencyId).toEqual(agencyIds[0]);
+      expect(conventions).toHaveLength(1);
+      expect(conventions[0].status).toEqual(allConventionStatuses[0]);
+      expect(conventions[0].agencyId).toEqual(agencyIds[0]);
     });
   });
 });

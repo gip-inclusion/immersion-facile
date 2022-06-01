@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { PgOutboxQueries } from "../../adapters/secondary/pg/PgOutboxQueries";
@@ -45,24 +45,24 @@ describe("PgOutboxQueries for crawling purposes", () => {
     // prepare
     uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
     clock.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
-    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+    const convention = new ConventionDtoBuilder().build();
     const event1 = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: immersionApplication,
+      payload: convention,
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     clock.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const event2 = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: immersionApplication,
+      payload: convention,
     });
 
     clock.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const alreadyProcessedEvent = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: immersionApplication,
+      payload: convention,
       publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
     });
 
@@ -70,7 +70,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
     const quarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
-      payload: immersionApplication,
+      payload: convention,
     });
 
     await storeInOutbox([
@@ -91,17 +91,17 @@ describe("PgOutboxQueries for crawling purposes", () => {
     // prepare
     uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
     clock.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
-    const immersionApplication = new ImmersionApplicationDtoBuilder().build();
+    const convention = new ConventionDtoBuilder().build();
     const event1 = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: immersionApplication,
+      payload: convention,
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     clock.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const eventFailedToRerun = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: immersionApplication,
+      payload: convention,
       publications: [
         {
           publishedAt: "2021-11-15T08:00:00.000Z",
@@ -123,7 +123,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const withFailureButEventuallySuccessfulEvent = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: immersionApplication,
+      payload: convention,
       publications: [
         {
           publishedAt: "2021-11-15T06:00:00.000Z",
@@ -139,7 +139,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
     const failedButQuarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
-      payload: immersionApplication,
+      payload: convention,
       publications: [
         {
           publishedAt: "2021-11-15T09:00:00.000Z",

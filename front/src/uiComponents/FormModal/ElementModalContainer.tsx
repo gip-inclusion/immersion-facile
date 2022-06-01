@@ -1,6 +1,6 @@
 import { Modal, ModalClose, ModalContent } from "@dataesr/react-dsfr";
 import React, { useReducer } from "react";
-import ModalTitle from "src/app/pages/ImmersionApplication/ModalTitleOverride";
+import ModalTitle from "src/app/pages/Convention/ModalTitleOverride";
 
 type ModalState = {
   isOpen: boolean;

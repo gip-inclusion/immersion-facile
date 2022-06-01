@@ -14,8 +14,8 @@ import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { establishmentSlice } from "../domain/establishmentPath/establishment.slice";
 import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersionAssessment.epics";
 import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
-import { immersionConventionEpics } from "../domain/immersionConvention/immersionConvention.epics";
-import { immersionConventionSlice } from "../domain/immersionConvention/immersionConvention.slice";
+import { conventionEpics } from "../domain/convention/convention.epics";
+import { conventionSlice } from "../domain/convention/convention.slice";
 
 const allEpics: any[] = [
   ...establishmentEpics,
@@ -23,7 +23,7 @@ const allEpics: any[] = [
   ...siretEpics,
   fetchFeatureFlagsEpic,
   romeAutocompleteEpic,
-  ...immersionConventionEpics,
+  ...conventionEpics,
   ...immersionAssessmentEpics,
 ];
 
@@ -42,7 +42,7 @@ const rootReducer = combineReducers({
   [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
   [establishmentSlice.name]: establishmentSlice.reducer,
-  [immersionConventionSlice.name]: immersionConventionSlice.reducer,
+  [conventionSlice.name]: conventionSlice.reducer,
   [immersionAssessmentSlice.name]: immersionAssessmentSlice.reducer,
 });
 

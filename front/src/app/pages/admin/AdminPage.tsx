@@ -2,17 +2,17 @@ import React, { useEffect, useState } from "react";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import { EstablishmentExportConfigDto } from "shared/src/establishmentExport/establishmentExport.dto";
 import {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-  validApplicationStatus,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+  ConventionStatus,
+  ConventionDto,
+  allConventionStatuses,
+} from "shared/src/convention/convention.dto";
 import {
   exportEstablismentsExcelRoute,
-  exportImmersionApplicationsExcelRoute,
+  exportConventionsExcelRoute,
 } from "shared/src/routes";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
-import { immersionApplicationGateway } from "src/app/config/dependencies";
+import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ArrayDropdown } from "src/uiComponents/admin/ArrayDropdown";
@@ -32,12 +32,10 @@ const buildExportEstablishmentRoute = (params: EstablishmentExportConfigDto) =>
 
 export const AdminPage = ({ route }: AdminProps) => {
   const featureFlags = useFeatureFlags();
-  const [immersionApplications, setImmersionApplications] = useState<
-    ImmersionApplicationDto[]
-  >([]);
+  const [conventions, setConventions] = useState<ConventionDto[]>([]);
 
   const [statusFilter, setStatusFilter] = useState<
-    ApplicationStatus | undefined
+    ConventionStatus | undefined
   >();
 
   const agency =
@@ -46,13 +44,13 @@ export const AdminPage = ({ route }: AdminProps) => {
       : undefined;
 
   const filterChanged = (selectedIndex: number, _selectedLabel: string) => {
-    setImmersionApplications([]);
-    setStatusFilter(validApplicationStatus[selectedIndex]);
+    setConventions([]);
+    setStatusFilter(allConventionStatuses[selectedIndex]);
   };
 
   useEffect(() => {
-    immersionApplicationGateway.getAll(agency, statusFilter).then(
-      (applications) => setImmersionApplications(applications),
+    conventionGateway.getAll(agency, statusFilter).then(
+      (applications) => setConventions(applications),
       (error: any) => {
         // eslint-disable-next-line no-console
         console.log("getFormEstablishmentFromJwt", error);
@@ -78,7 +76,7 @@ export const AdminPage = ({ route }: AdminProps) => {
             </div>
             <a
               className="fr-link"
-              href={`/api/${exportImmersionApplicationsExcelRoute}`}
+              href={`/api/${exportConventionsExcelRoute}`}
               target="_blank"
             >
               Exporter les demandes d'immersion par agences
@@ -189,17 +187,17 @@ export const AdminPage = ({ route }: AdminProps) => {
                     >
                       <p>filtres</p>
                       <ArrayDropdown
-                        labels={[...validApplicationStatus]}
+                        labels={[...allConventionStatuses]}
                         didPick={filterChanged}
                       />
                     </div>
 
                     <ul className="fr-accordions-group">
-                      {immersionApplications.map((item) => (
+                      {conventions.map((item) => (
                         <li key={item.id}>
-                          <FormAccordion immersionApplication={item} />
+                          <FormAccordion convention={item} />
                           {route.name === "admin" && (
-                            <FormMagicLinks immersionApplication={item} />
+                            <FormMagicLinks convention={item} />
                           )}
                           <hr />
                         </li>

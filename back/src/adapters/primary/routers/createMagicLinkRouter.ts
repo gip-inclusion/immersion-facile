@@ -1,9 +1,9 @@
 import { Router } from "express";
 import {
-  immersionApplicationsRoute,
+  conventionsRoute,
   immersionAssessmentRoute,
-  signApplicationRoute,
-  updateApplicationStatusRoute,
+  signConventionRoute,
+  updateConventionStatusRoute,
 } from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { UnauthorizedError } from "../helpers/httpErrors";
@@ -26,11 +26,11 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     );
 
   authenticatedRouter
-    .route(`/${immersionApplicationsRoute}/:jwt`)
+    .route(`/${conventionsRoute}/:jwt`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req.payloads?.application) throw new UnauthorizedError();
-        return deps.useCases.getImmersionApplication.execute({
+        return deps.useCases.getConvention.execute({
           id: req.payloads.application.applicationId,
         });
       }),
@@ -38,19 +38,19 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req.payloads?.application) throw new UnauthorizedError();
-        return deps.useCases.updateImmersionApplication.execute({
+        return deps.useCases.updateConvention.execute({
           id: req.payloads.application.applicationId,
-          immersionApplication: req.body,
+          convention: req.body,
         });
       }),
     );
 
   authenticatedRouter
-    .route(`/${updateApplicationStatusRoute}/:jwt`)
+    .route(`/${updateConventionStatusRoute}/:jwt`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req?.payloads?.application) throw new UnauthorizedError();
-        return deps.useCases.updateImmersionApplicationStatus.execute(
+        return deps.useCases.updateConventionStatus.execute(
           req.body,
           req.payloads.application,
         );
@@ -58,11 +58,11 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     );
 
   authenticatedRouter
-    .route(`/${signApplicationRoute}/:jwt`)
+    .route(`/${signConventionRoute}/:jwt`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req?.payloads?.application) throw new UnauthorizedError();
-        return deps.useCases.signImmersionApplication.execute(
+        return deps.useCases.signConvention.execute(
           undefined,
           req.payloads.application,
         );

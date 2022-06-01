@@ -7,36 +7,35 @@ import {
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
-import { Agency } from "shared/src/agency/agency.dto";
+import { AgencyDto } from "shared/src/agency/agency.dto";
 import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
+import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
-import { RenewMagicLink } from "../../../domain/immersionApplication/useCases/RenewMagicLink";
+import { RenewMagicLink } from "../../../domain/convention/useCases/RenewMagicLink";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
-import { RenewMagicLinkPayload } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { RenewMagicLinkPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import {
-  ImmersionApplicationDto,
+  ConventionDto,
   RenewMagicLinkRequestDto,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+} from "shared/src/convention/convention.dto";
 
-const validImmersionApplication: ImmersionApplicationDto =
-  new ImmersionApplicationEntityBuilder().build().toDto();
+const validConvention: ConventionDto = new ConventionEntityBuilder()
+  .build()
+  .toDto();
 
-const defaultAgency = AgencyBuilder.create(
-  validImmersionApplication.agencyId,
-).build();
+const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
 
 describe("RenewMagicLink use case", () => {
-  let agency: Agency;
-  let applicationRepository: InMemoryImmersionApplicationRepository;
+  let agency: AgencyDto;
+  let conventionRepository: InMemoryConventionRepository;
   let outboxRepository: InMemoryOutboxRepository;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
@@ -48,7 +47,7 @@ describe("RenewMagicLink use case", () => {
 
   beforeEach(() => {
     agency = defaultAgency;
-    applicationRepository = new InMemoryImmersionApplicationRepository();
+    conventionRepository = new InMemoryConventionRepository();
     outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
     clock.setNextDate(new Date());
@@ -56,8 +55,8 @@ describe("RenewMagicLink use case", () => {
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     agencyRepository = new InMemoryAgencyRepository([agency]);
 
-    const entity = new ImmersionApplicationEntityBuilder().build();
-    applicationRepository.setImmersionApplications({ [entity.id]: entity });
+    const entity = new ConventionEntityBuilder().build();
+    conventionRepository.setConventions({ [entity.id]: entity });
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
     generateJwtFn = makeGenerateJwt(config.magicLinkJwtPrivateKey);
@@ -65,7 +64,7 @@ describe("RenewMagicLink use case", () => {
 
   const createUseCase = () =>
     new RenewMagicLink(
-      applicationRepository,
+      conventionRepository,
       createNewEvent,
       outboxRepository,
       agencyRepository,
@@ -94,13 +93,13 @@ describe("RenewMagicLink use case", () => {
 
   it("requires a known agency id", async () => {
     const storedUnknownId = "some unknown agency id";
-    const entity = new ImmersionApplicationEntityBuilder()
+    const entity = new ConventionEntityBuilder()
       .withAgencyId(storedUnknownId)
       .build();
-    applicationRepository.setImmersionApplications({ [entity.id]: entity });
+    conventionRepository.setConventions({ [entity.id]: entity });
 
     const payload = createConventionMagicLinkPayload(
-      validImmersionApplication.id,
+      validConvention.id,
       "counsellor",
       "some email",
     );
@@ -119,7 +118,7 @@ describe("RenewMagicLink use case", () => {
   // Admins use non-magic-link based authentication, so no need to renew these.
   it("Refuses to generate admin magic links", async () => {
     const payload = createConventionMagicLinkPayload(
-      validImmersionApplication.id,
+      validConvention.id,
       "admin",
       "some email",
     );
@@ -137,7 +136,7 @@ describe("RenewMagicLink use case", () => {
 
   it("requires a link format that includes %jwt% string", async () => {
     const payload = createConventionMagicLinkPayload(
-      validImmersionApplication.id,
+      validConvention.id,
       "counsellor",
       "some email",
     );
@@ -155,9 +154,9 @@ describe("RenewMagicLink use case", () => {
 
   it("Posts an event to deliver a correct JWT for correct responses", async () => {
     const expiredPayload = createConventionMagicLinkPayload(
-      validImmersionApplication.id,
+      validConvention.id,
       "beneficiary",
-      validImmersionApplication.email,
+      validConvention.email,
     );
 
     const request: RenewMagicLinkRequestDto = {
@@ -171,9 +170,7 @@ describe("RenewMagicLink use case", () => {
     const renewalEvent = outboxRepository.events[0];
     expect(renewalEvent.topic).toBe("MagicLinkRenewalRequested");
     const dispatchedPayload = renewalEvent.payload as RenewMagicLinkPayload;
-    expect(dispatchedPayload["emails"]).toEqual([
-      validImmersionApplication.email,
-    ]);
+    expect(dispatchedPayload["emails"]).toEqual([validConvention.email]);
     const ml = dispatchedPayload.magicLink;
     expect(ml.startsWith("immersionfacile.fr/")).toBeTruthy();
     const jwt = ml.replace("immersionfacile.fr/", "");

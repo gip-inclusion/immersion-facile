@@ -227,19 +227,19 @@ type ValidationSteps = "oneStep" | "twoSteps";
 
 const numberOfStepsOptions: Array<{ label: string; value: ValidationSteps }> = [
   {
-    label: "1: La convention est examinée et validée par la même personne",
+    label: "1: La Convention est examinée et validée par la même personne",
     value: "oneStep",
   },
   {
     label:
-      "2: La convention est examinée par une personne puis validée par quelqu’un d’autre",
+      "2: La Convention est examinée par une personne puis validée par quelqu’un d’autre",
     value: "twoSteps",
   },
 ];
 
 const descriptionByValidationSteps: Record<ValidationSteps, string> = {
   oneStep:
-    "Les personnes ou emails génériques suivants recevront les demandes de convention à valider.",
+    "Les personnes ou emails génériques suivants recevront les demandes de Convention à valider.",
   twoSteps:
     "Les personnes ou emails génériques suivants valideront les conventions préalablement examinées.",
 };

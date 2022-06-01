@@ -1,7 +1,7 @@
 import { NotEmptyArray } from "../utils";
 import * as crypto from "crypto";
 import { SiretDto } from "../siret";
-import { ImmersionApplicationId } from "../ImmersionApplication/ImmersionApplication.dto";
+import { ConventionId } from "../convention/convention.dto";
 
 export type JwtPayloads = {
   application?: ConventionMagicLinkPayload;
@@ -35,7 +35,7 @@ export const allRoles: NotEmptyArray<Role> = [
 
 export type ConventionMagicLinkPayload = {
   version: number; //< Positive integer.
-  applicationId: ImmersionApplicationId;
+  applicationId: ConventionId;
   role: Role;
   iat: number; //< issued at : number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
   exp: number; //< expired at : number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
@@ -46,7 +46,7 @@ export const emailHashForMagicLink = (str: string) =>
   crypto.createHash("md5").update(str).digest("hex");
 
 export const createConventionMagicLinkPayload = (
-  applicationId: ImmersionApplicationId,
+  applicationId: ConventionId,
   role: Role,
   email: string,
   durationDays = 31,

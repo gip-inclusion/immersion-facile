@@ -1,14 +1,14 @@
-import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
+import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
 import { AgencyInListDto, AgencyId } from "shared/src/agency/agency.dto";
 import { createLogger } from "../../utils/logger";
-import { Agency } from "shared/src/agency/agency.dto";
+import { AgencyDto } from "shared/src/agency/agency.dto";
 import { values } from "ramda";
 import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
 import { LatLonDto } from "shared/src/latLon";
 
 const logger = createLogger(__filename);
 
-const testAgencies: Agency[] = [
+const testAgencies: AgencyDto[] = [
   {
     id: "immersion-facile-agency",
     name: "Immersion Facile Agency (back)",
@@ -76,21 +76,21 @@ const testAgencies: Agency[] = [
 ];
 
 export class InMemoryAgencyRepository implements AgencyRepository {
-  private _agencies: { [id: string]: Agency } = {};
+  private _agencies: { [id: string]: AgencyDto } = {};
 
-  constructor(agencyList: Agency[] = testAgencies) {
+  constructor(agencyList: AgencyDto[] = testAgencies) {
     agencyList.forEach((agency) => {
       this._agencies[agency.id] = agency;
     });
     logger.info(this._agencies);
   }
 
-  public async getById(id: AgencyId): Promise<Agency | undefined> {
+  public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
     logger.info({ id, configs: this._agencies }, "getById");
     return this._agencies[id];
   }
 
-  public async getNearby(position: LatLonDto): Promise<Agency[]> {
+  public async getNearby(position: LatLonDto): Promise<AgencyDto[]> {
     logger.info({ position, configs: this._agencies }, "getNearby");
     return Object.values(this._agencies)
       .filter(isAgencyActive)
@@ -98,14 +98,14 @@ export class InMemoryAgencyRepository implements AgencyRepository {
       .slice(0, 20);
   }
 
-  public async getAllActive(): Promise<Agency[]> {
+  public async getAllActive(): Promise<AgencyDto[]> {
     logger.info({ configs: this._agencies }, "getAll");
     return Object.values(this._agencies).filter(isAgencyActive);
   }
 
   public async getAgencyWhereEmailMatches(
     email: string,
-  ): Promise<Agency | undefined> {
+  ): Promise<AgencyDto | undefined> {
     return Object.values(this._agencies).filter(
       (agency) =>
         agency.validatorEmails.includes(email) ||
@@ -113,14 +113,14 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     )[0];
   }
 
-  public async insert(config: Agency): Promise<AgencyId | undefined> {
+  public async insert(config: AgencyDto): Promise<AgencyId | undefined> {
     logger.info({ config, configs: this._agencies }, "insert");
     if (this._agencies[config.id]) return undefined;
     this._agencies[config.id] = config;
     return config.id;
   }
 
-  public async update(agency: Agency) {
+  public async update(agency: AgencyDto) {
     if (!this._agencies[agency.id]) {
       throw new Error(`Agency ${agency.id} does not exist`);
     }
@@ -132,11 +132,11 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   }
 
   // test purpose only
-  get agencies(): Agency[] {
+  get agencies(): AgencyDto[] {
     return values(this._agencies);
   }
 
-  setAgencies(agencyList: Agency[]) {
+  setAgencies(agencyList: AgencyDto[]) {
     this._agencies = {};
     agencyList.forEach((agency) => {
       this._agencies[agency.id] = agency;
@@ -144,7 +144,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   }
 }
 
-const isAgencyActive = (agency: Agency) => agency.status === "active";
+const isAgencyActive = (agency: AgencyDto) => agency.status === "active";
 
 const sortByNearestFrom =
   (position: LatLonDto) => (a: AgencyInListDto, b: AgencyInListDto) =>

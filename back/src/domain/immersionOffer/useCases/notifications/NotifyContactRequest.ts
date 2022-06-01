@@ -5,7 +5,7 @@ import {
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../../immersionApplication/ports/EmailGateway";
+import { EmailGateway } from "../../../convention/ports/EmailGateway";
 import { EstablishmentAggregateRepository } from "../../ports/EstablishmentAggregateRepository";
 
 const logger = createLogger(__filename);

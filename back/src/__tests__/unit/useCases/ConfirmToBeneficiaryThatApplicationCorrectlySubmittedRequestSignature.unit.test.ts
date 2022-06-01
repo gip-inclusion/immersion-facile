@@ -1,19 +1,20 @@
-import { expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
+import { expectEmailBeneficiaryConfirmationSignatureRequestMatchingConvention } from "../../../_testBuilders/emailAssertions";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
-import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,
 } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/immersionApplication/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
+import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
-import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 
-const validImmersionApplication: ImmersionApplicationDto =
-  new ImmersionApplicationEntityBuilder().build().toDto();
+const validConvention: ConventionDto = new ConventionEntityBuilder()
+  .build()
+  .toDto();
 
-describe("Add immersionApplication Notifications", () => {
+describe("Add Convention Notifications", () => {
   let emailGw: InMemoryEmailGateway;
   let emailFilter: EmailFilter;
 
@@ -31,33 +32,33 @@ describe("Add immersionApplication Notifications", () => {
 
   it("Sends no emails when allowList empty", async () => {
     emailFilter = new AllowListEmailFilter([]);
-    await createUseCase().execute(validImmersionApplication);
+    await createUseCase().execute(validConvention);
     expect(emailGw.getSentEmails()).toHaveLength(0);
   });
 
   it("Sends confirmation email to beneficiary when on allowList", async () => {
-    emailFilter = new AllowListEmailFilter([validImmersionApplication.email]);
+    emailFilter = new AllowListEmailFilter([validConvention.email]);
 
-    await createUseCase().execute(validImmersionApplication);
+    await createUseCase().execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
-    expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication(
+    expectEmailBeneficiaryConfirmationSignatureRequestMatchingConvention(
       sentEmails[0],
-      validImmersionApplication,
+      validConvention,
     );
   });
 
   it("Sends confirmation email when unrestricted email sending is enabled", async () => {
-    await createUseCase().execute(validImmersionApplication);
+    await createUseCase().execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
-    expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersionApplication(
+    expectEmailBeneficiaryConfirmationSignatureRequestMatchingConvention(
       sentEmails[0],
-      validImmersionApplication,
+      validConvention,
     );
   });
 });

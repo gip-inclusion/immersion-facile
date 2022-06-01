@@ -21,8 +21,8 @@ import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyReposito
 import { InMemoryDocumentGateway } from "../../secondary/InMemoryDocumentGateway";
 import { InMemoryEmailGateway } from "../../secondary/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
-import { InMemoryImmersionApplicationQueries } from "../../secondary/InMemoryImmersionApplicationQueries";
-import { InMemoryImmersionApplicationRepository } from "../../secondary/InMemoryImmersionApplicationRepository";
+import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
+import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
 import { InMemoryPeConnectGateway } from "../../secondary/InMemoryPeConnectGateway";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemorySireneGateway } from "../../secondary/InMemorySireneGateway";
@@ -35,8 +35,8 @@ import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgEstablishmentExportQueries } from "../../secondary/pg/PgEstablishmentExportQueries";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
-import { PgImmersionApplicationQueries } from "../../secondary/pg/PgImmersionApplicationQueries";
-import { PgImmersionApplicationRepository } from "../../secondary/pg/PgImmersionApplicationRepository";
+import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
+import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
 import { PgLaBonneBoiteRequestRepository } from "../../secondary/pg/PgLaBonneBoiteRequestRepository";
 import { PgOutboxQueries } from "../../secondary/pg/PgOutboxQueries";
 import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
@@ -97,19 +97,19 @@ export const createRepositories = async (
       ? new PgOutboxQueries(await getPgPoolFn().connect())
       : new InMemoryOutboxQueries(outboxRepo);
 
-  const immersionApplicationRepo =
+  const conventionRepository =
     config.repositories === "PG"
-      ? new PgImmersionApplicationRepository(await getPgPoolFn().connect())
-      : new InMemoryImmersionApplicationRepository();
+      ? new PgConventionRepository(await getPgPoolFn().connect())
+      : new InMemoryConventionRepository();
 
-  const immersionApplicationRepoQueries =
-    immersionApplicationRepo instanceof PgImmersionApplicationRepository
-      ? new PgImmersionApplicationQueries(await getPgPoolFn().connect())
-      : new InMemoryImmersionApplicationQueries(immersionApplicationRepo);
+  const conventionRepositoryQueries =
+    conventionRepository instanceof PgConventionRepository
+      ? new PgConventionQueries(await getPgPoolFn().connect())
+      : new InMemoryConventionQueries(conventionRepository);
 
   return {
-    immersionApplication: immersionApplicationRepo,
-    immersionApplicationQueries: immersionApplicationRepoQueries,
+    convention: conventionRepository,
+    conventionQueries: conventionRepositoryQueries,
 
     establishmentExport:
       config.repositories === "PG"

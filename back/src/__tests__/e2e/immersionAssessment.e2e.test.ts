@@ -2,9 +2,9 @@ import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/Immersion
 import { immersionAssessmentRoute } from "shared/src/routes";
 import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
 
-const conventionId = "my-convention-id";
+const conventionId = "my-Convention-id";
 
 describe("Immersion assessment routes", () => {
   describe(`POST /auth/${immersionAssessmentRoute}/:jwt`, () => {
@@ -20,12 +20,12 @@ describe("Immersion assessment routes", () => {
         ),
       );
 
-      const convention = new ImmersionApplicationEntityBuilder()
+      const convention = new ConventionEntityBuilder()
         .withId(conventionId)
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .build();
 
-      reposAndGateways.immersionApplication.setImmersionApplications({
+      reposAndGateways.convention.setConventions({
         [convention.id]: convention,
       });
 

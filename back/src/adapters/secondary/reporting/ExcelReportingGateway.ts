@@ -2,22 +2,21 @@ import { Column } from "exceljs";
 
 import {
   ArchivedReport,
-  ImmersionApplicationsExportByAgency,
+  ConventionExportByAgency,
   ReportingGateway,
 } from "../../../domain/core/ports/ReportingGateway";
 import { Archive } from "../../../domain/generic/archive/port/Archive";
 import { Workbook } from "../../../domain/generic/excel/port/Workbook";
-import { ImmersionApplicationReadyForExportVO } from "../../../domain/immersionApplication/valueObjects/ImmersionApplicationReadyForExportVO";
+import { ConventionReadyForExportVO } from "../../../domain/convention/valueObjects/ConventionReadyForExportVO";
 import { retrieveParentDirectory } from "../../../utils/filesystemUtils";
 
 export class ExcelReportingGateway implements ReportingGateway {
-  async exportImmersionApplications({
+  async exportConventions({
     report,
     archivePath,
-  }: ArchivedReport<ImmersionApplicationsExportByAgency>): Promise<void> {
+  }: ArchivedReport<ConventionExportByAgency>): Promise<void> {
     const workbookTitles = Object.keys(report);
-    const workbookColumnsOptions =
-      this.immersionApplicationExportColumnsOptions();
+    const workbookColumnsOptions = this.conventionExportColumnsOptions();
     const createdFilenames = await Promise.all(
       workbookTitles.map((agencyId: string) =>
         this.toWorkbook(
@@ -31,7 +30,7 @@ export class ExcelReportingGateway implements ReportingGateway {
     await zipArchive.addFiles(createdFilenames, { removeOriginal: true });
   }
 
-  private immersionApplicationExportColumnsOptions() {
+  private conventionExportColumnsOptions() {
     const businessColumnMappingRules: Partial<Column>[] = [
       { header: "Statut", key: "status", width: 20 },
       {
@@ -167,14 +166,14 @@ export class ExcelReportingGateway implements ReportingGateway {
   }
   private toWorkbook(
     workbookTitle: string,
-    immersionApplications: ImmersionApplicationReadyForExportVO[],
+    conventions: ConventionReadyForExportVO[],
     excelColumFormatConfig: Partial<Column>[],
-  ): Workbook<ImmersionApplicationReadyForExportVO> {
+  ): Workbook<ConventionReadyForExportVO> {
     return new Workbook()
       .withTitle(workbookTitle)
       .withSheet()
       .withConditionalFormatting("main", {
-        ref: `B2:C${immersionApplications.length}`,
+        ref: `B2:C${conventions.length}`,
         rules: [
           {
             priority: 0,
@@ -205,6 +204,6 @@ export class ExcelReportingGateway implements ReportingGateway {
         ],
       })
       .withCustomFieldsHeaders(excelColumFormatConfig)
-      .withPayload(immersionApplications);
+      .withPayload(conventions);
   }
 }

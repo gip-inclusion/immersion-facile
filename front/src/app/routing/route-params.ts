@@ -12,12 +12,10 @@ const appellationDtoSerializer: ValueSerializer<AppellationDto> = {
   stringify: (appellationDto) => JSON.stringify(appellationDto),
 };
 
-export type ApplicationFormKeysInUrl =
-  keyof typeof immersionApplicationValuesFromUrl;
+export type ConventionFormKeysInUrl = keyof typeof conventionValuesFromUrl;
 
-export const immersionApplicationValuesFromUrl = {
+export const conventionValuesFromUrl = {
   federatedIdentity: param.query.optional.string,
-
   email: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,

@@ -1,25 +1,25 @@
 import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
-import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   expectObjectsToMatch,
   expectJwtInMagicLinkAndGetIt,
 } from "../../_testBuilders/test.helpers";
 import {
-  ApplicationStatus,
-  ImmersionApplicationDto,
-  UpdateImmersionApplicationStatusRequestDto,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+  ConventionStatus,
+  ConventionDto,
+  UpdateConventionStatusRequestDto,
+} from "shared/src/convention/convention.dto";
 import {
-  immersionApplicationsRoute,
-  updateApplicationStatusRoute,
+  conventionsRoute,
+  updateConventionStatusRoute,
 } from "shared/src/routes";
-import { ImmersionApplicationQueries } from "../../domain/immersionApplication/ports/ImmersionApplicationQueries";
+import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
 
 const adminEmail = "admin@email.fr";
 
-describe("Add immersionApplication Notifications, then checks the mails are sent (trigerred by events)", () => {
+describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid applications in the repository, and ask for establishment edition", async () => {
-    const validImmersionApplication = new ImmersionApplicationDtoBuilder()
+    const validConvention = new ConventionDtoBuilder()
       .withStatus("READY_TO_SIGN")
       .build();
     const appAndDeps = await buildTestApp();
@@ -27,7 +27,7 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
     const { establishmentJwt } =
       await beneficiarySubmitsApplicationForTheFirstTime(
         appAndDeps,
-        validImmersionApplication,
+        validConvention,
       );
 
     await expectEstablishmentRequiresChanges(appAndDeps, establishmentJwt, {
@@ -40,15 +40,12 @@ describe("Add immersionApplication Notifications, then checks the mails are sent
 
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
-  immersionApplication: ImmersionApplicationDto,
+  convention: ConventionDto,
 ) => {
-  await request
-    .post(`/${immersionApplicationsRoute}`)
-    .send(immersionApplication)
-    .expect(200);
+  await request.post(`/${conventionsRoute}`).send(convention).expect(200);
 
   await expectStoreImmersionToHaveStatus(
-    reposAndGateways.immersionApplicationQueries,
+    reposAndGateways.conventionQueries,
     "READY_TO_SIGN",
   );
 
@@ -57,8 +54,8 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = reposAndGateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(3);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
-    [immersionApplication.email],
-    [immersionApplication.mentorEmail],
+    [convention.email],
+    [convention.mentorEmail],
     [adminEmail],
   ]);
 
@@ -81,10 +78,10 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 const expectEstablishmentRequiresChanges = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
   establishmentJwt: string,
-  { status, justification }: UpdateImmersionApplicationStatusRequestDto,
+  { status, justification }: UpdateConventionStatusRequestDto,
 ) => {
   await request
-    .post(`/auth/${updateApplicationStatusRoute}/${establishmentJwt}`)
+    .post(`/auth/${updateConventionStatusRoute}/${establishmentJwt}`)
     .send({ status, justification });
 
   await eventCrawler.processNewEvents();
@@ -98,7 +95,7 @@ const expectEstablishmentRequiresChanges = async (
   ]);
 
   await expectStoreImmersionToHaveStatus(
-    reposAndGateways.immersionApplicationQueries,
+    reposAndGateways.conventionQueries,
     "DRAFT",
   );
 
@@ -119,13 +116,12 @@ const expectEstablishmentRequiresChanges = async (
 };
 
 const expectStoreImmersionToHaveStatus = async (
-  applicationQueries: ImmersionApplicationQueries,
-  expectedStatus: ApplicationStatus,
+  applicationQueries: ConventionQueries,
+  expectedStatus: ConventionStatus,
 ) => {
-  const savedImmersionApplications =
-    await applicationQueries.getLatestUpdated();
-  expect(savedImmersionApplications).toHaveLength(1);
-  expectObjectsToMatch(savedImmersionApplications[0].toDto(), {
+  const savedConvention = await applicationQueries.getLatestUpdated();
+  expect(savedConvention).toHaveLength(1);
+  expectObjectsToMatch(savedConvention[0].toDto(), {
     status: expectedStatus,
   });
 };

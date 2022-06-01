@@ -1,20 +1,20 @@
 import { Pool, PoolClient } from "pg";
-import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
+import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
 import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
 } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
-import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
+import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
 import { PgImmersionAssessmentRepository } from "../../adapters/secondary/pg/PgImmersionAssessmentRepository";
-import { ImmersionAssessmentEntity } from "../../domain/immersionApplication/entities/ImmersionAssessmentEntity";
+import { ImmersionAssessmentEntity } from "../../domain/convention/entities/ImmersionAssessmentEntity";
 
 const conventionId = "aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa";
 
-const immersionApplicationEntity = new ImmersionApplicationEntityBuilder()
+const conventionEntity = new ConventionEntityBuilder()
   .withId(conventionId)
   .build();
 
@@ -36,11 +36,9 @@ describe("PgImmersionAssessmentRepository", () => {
     await client.query("DELETE FROM immersion_applications");
     await client.query("DELETE FROM agencies");
     const agencyRepository = new PgAgencyRepository(client);
-    await agencyRepository.insert(AgencyBuilder.create().build());
-    const immersionApplicationRepository = new PgImmersionApplicationRepository(
-      client,
-    );
-    await immersionApplicationRepository.save(immersionApplicationEntity);
+    await agencyRepository.insert(AgencyDtoBuilder.create().build());
+    const conventionRepository = new PgConventionRepository(client);
+    await conventionRepository.save(conventionEntity);
   });
 
   afterAll(async () => {
@@ -54,7 +52,7 @@ describe("PgImmersionAssessmentRepository", () => {
   });
 
   describe("save", () => {
-    it("fails to save when it does not match an existing convention", async () => {
+    it("fails to save when it does not match an existing Convention", async () => {
       await expectPromiseToFailWithError(
         immersionAssessmentRepository.save({
           ...assessment,
@@ -79,7 +77,7 @@ describe("PgImmersionAssessmentRepository", () => {
   });
 
   describe("getByConventionId", () => {
-    it("returns undefined if no convention where found", async () => {
+    it("returns undefined if no Convention where found", async () => {
       const notFoundImmersion =
         await immersionAssessmentRepository.getByConventionId(
           "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
