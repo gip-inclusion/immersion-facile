@@ -9,7 +9,7 @@ import type {
   EventFailure,
 } from "../../domain/core/eventBus/events";
 import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 
 const domainEvt: DomainEvent = {
   id: "anId",

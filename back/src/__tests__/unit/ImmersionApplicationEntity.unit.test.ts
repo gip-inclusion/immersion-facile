@@ -5,7 +5,7 @@ import {
   DATE_START,
   DATE_END,
   ImmersionApplicationDtoBuilder,
-} from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+} from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 describe("ImmersionApplicationIdEntity", () => {

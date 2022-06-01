@@ -30,7 +30,9 @@ front:
     - pnpm config set store-dir .pnpm-store
   script:
     - pnpm install --frozen-lockfile
-    - cd front
+    - cd shared
+    - pnpm includecheck
+    - cd ../front
     - pnpm includecheck
     - pnpm format:check
     - pnpm lint

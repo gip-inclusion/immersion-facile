@@ -1,8 +1,8 @@
 import { AgencyId } from "shared/src/agency/agency.dto";
 import { ImmersionApplicationEntity } from "../domain/immersionApplication/entities/ImmersionApplicationEntity";
-import { Builder } from "./Builder";
-import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
-import { ScheduleDto } from "shared/src/ScheduleSchema";
+import { Builder } from "shared/src/Builder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
+import { ScheduleDto } from "shared/src/schedule/ScheduleSchema";
 import {
   ApplicationStatus,
   ImmersionApplicationId,

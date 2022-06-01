@@ -3,7 +3,7 @@ import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
 import {
   ImmersionApplicationDtoBuilder,
   VALID_EMAILS,
-} from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+} from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import {
   expectTypeToMatchAndEqual,
   expectJwtInMagicLinkAndGetIt,

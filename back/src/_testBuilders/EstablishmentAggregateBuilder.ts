@@ -5,7 +5,7 @@ import {
   EstablishmentEntityV2,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { Builder } from "./Builder";
+import { Builder } from "shared/src/Builder";
 import { ContactEntityV2Builder } from "./ContactEntityV2Builder";
 import { EstablishmentEntityV2Builder } from "./EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "./ImmersionOfferEntityV2Builder";

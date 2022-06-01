@@ -3,9 +3,9 @@ import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailG
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { AgencyConfig } from "shared/src/agency/agency.dto";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
-import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
+import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
 import { expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../_testBuilders/emailAssertions";
-import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,

@@ -3,7 +3,7 @@ import {
   ApplicationStatus,
   ImmersionApplicationDto,
 } from "./ImmersionApplication.dto";
-import { reasonableSchedule } from "../ScheduleSchema";
+import { reasonableSchedule } from "../schedule/ScheduleSchema";
 
 const getNewStatus = (
   enterpriseAccepted: boolean,

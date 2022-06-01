@@ -3,7 +3,7 @@ import {
   calculateTotalImmersionHoursBetweenDate,
   calculateWeeklyHoursFromSchedule,
   prettyPrintDayFromSchedule,
-} from "shared/src/ScheduleUtils";
+} from "shared/src/schedule/ScheduleUtils";
 import type { ImmersionApplicationReadyForExportVO } from "./ImmersionApplicationReadyForExportVO";
 import slugify from "slugify";
 import { format } from "date-fns";

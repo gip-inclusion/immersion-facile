@@ -4,7 +4,7 @@ import {
   calculateTotalImmersionHoursBetweenDate,
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
-} from "shared/src/ScheduleUtils";
+} from "shared/src/schedule/ScheduleUtils";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";

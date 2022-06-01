@@ -10,7 +10,7 @@ import {
   ApplicationStatus,
   ImmersionApplicationDto,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { reasonableSchedule } from "shared/src/ScheduleSchema";
+import { reasonableSchedule } from "shared/src/schedule/ScheduleSchema";
 import { toDateString } from "shared/src/utils/date";
 import { v4 as uuidV4 } from "uuid";
 

@@ -17,7 +17,7 @@ import {
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 
 let request: SuperTest<Test>;

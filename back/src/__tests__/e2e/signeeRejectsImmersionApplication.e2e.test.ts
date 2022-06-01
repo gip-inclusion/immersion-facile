@@ -1,5 +1,5 @@
 import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import {
   expectObjectsToMatch,
   expectJwtInMagicLinkAndGetIt,

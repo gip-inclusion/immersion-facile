@@ -19,9 +19,9 @@ import { InMemoryRomeRepository } from "../adapters/secondary/InMemoryRomeReposi
 import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
 import { GetApiConsumerById } from "../domain/core/ports/GetApiConsumerById";
 import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
-import { AgencyConfigBuilder } from "./AgencyConfigBuilder";
+import { AgencyConfigBuilder } from "../../../shared/src/agency/AgencyConfigBuilder";
 import { AppConfigBuilder } from "./AppConfigBuilder";
-import { ImmersionApplicationDtoBuilder } from "./ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { EstablishmentExportQueries } from "../domain/establishment/ports/EstablishmentExportQueries";
 import { PostalCodeDepartmentRegionQueries } from "../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import {

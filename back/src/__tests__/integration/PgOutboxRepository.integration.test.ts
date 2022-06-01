@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import {

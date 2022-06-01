@@ -1,6 +1,6 @@
 import { FieldHookConfig, useField } from "formik";
 import React from "react";
-import { ScheduleDto } from "shared/src/ScheduleSchema";
+import { ScheduleDto } from "shared/src/schedule/ScheduleSchema";
 import { HourPicker } from "./HourPicker";
 import { WeekdayPicker } from "./WeekdayPicker";
 

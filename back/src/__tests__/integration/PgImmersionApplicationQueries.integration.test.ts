@@ -4,9 +4,9 @@ import { PgImmersionApplicationQueries } from "../../adapters/secondary/pg/PgImm
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
+import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationRawBeforeExportVO } from "../../domain/immersionApplication/valueObjects/ImmersionApplicationRawBeforeExportVO";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 

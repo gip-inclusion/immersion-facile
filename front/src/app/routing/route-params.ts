@@ -1,5 +1,5 @@
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { ScheduleDto } from "shared/src/ScheduleSchema";
+import { ScheduleDto } from "shared/src/schedule/ScheduleSchema";
 import { param, ValueSerializer } from "type-route";
 
 const scheduleSerializer: ValueSerializer<ScheduleDto> = {

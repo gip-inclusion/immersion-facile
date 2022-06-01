@@ -1,6 +1,6 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
-import { ScheduleDto } from "shared/src/ScheduleSchema";
+import { ScheduleDto } from "shared/src/schedule/ScheduleSchema";
 import { ButtonAdd } from "src/uiComponents/ButtonAdd";
 import { DeleteButton } from "src/uiComponents/DeleteButton";
 import { WeekdayDropdown } from "./WeekdayDropdown";

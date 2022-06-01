@@ -1,7 +1,7 @@
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { createPgUow } from "../../adapters/primary/config/uowConfig";
 import { PgUowPerformer } from "../../adapters/secondary/pg/PgUowPerformer";
-import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
+import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { Pool, PoolClient } from "pg";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";

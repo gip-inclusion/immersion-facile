@@ -10,14 +10,14 @@ import {
 import {
   LegacyScheduleDto,
   reasonableSchedule,
-} from "shared/src/ScheduleSchema";
+} from "shared/src/schedule/ScheduleSchema";
 import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
-} from "shared/src/ScheduleUtils";
-import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
+} from "shared/src/schedule/ScheduleUtils";
+import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
 import { expectEmailFinalValidationConfirmationMatchingImmersionApplication } from "../../../_testBuilders/emailAssertions";
-import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {
   AllowListEmailFilter,

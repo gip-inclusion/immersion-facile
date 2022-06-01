@@ -3,8 +3,8 @@ import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgenc
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { AgencyRepository } from "../../domain/immersionApplication/ports/AgencyRepository";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/immersionApplication/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
-import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { AllowListEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using

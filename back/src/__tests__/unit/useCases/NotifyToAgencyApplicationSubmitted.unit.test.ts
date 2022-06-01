@@ -6,8 +6,8 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { NewApplicationAdminNotificationParams } from "../../../domain/immersionApplication/ports/EmailGateway";
 import { frontRoutes } from "shared/src/routes";
 import { OmitFromExistingKeys } from "shared/src/utils";
-import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
-import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import {
   expectTypeToMatchAndEqual,
   fakeGenerateMagicLinkUrlFn,

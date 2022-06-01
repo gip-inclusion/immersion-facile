@@ -2,7 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
+import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
 import { AgencyConfig } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 

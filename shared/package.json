@@ -1,5 +1,8 @@
 {
   "name": "shared",
+  "scripts": {
+    "includecheck": "./check_includes.sh"
+  },
   "devDependencies": {
     "@types/ramda": "^0.28.1"
   },

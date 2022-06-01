@@ -4,12 +4,12 @@ import {
   emptySchedule,
   reasonableSchedule,
   ScheduleDto,
-} from "shared/src/ScheduleSchema";
+} from "shared/src/schedule/ScheduleSchema";
 import {
   calculateWeeklyHoursFromSchedule,
   checkSchedule,
   maxPermittedHoursPerWeek,
-} from "shared/src/ScheduleUtils";
+} from "shared/src/schedule/ScheduleUtils";
 import { BoolRadioPicker } from "./BoolRadioPicker";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import "./SchedulePicker.css";

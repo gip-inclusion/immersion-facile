@@ -1,4 +1,4 @@
-import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
+import { FormEstablishmentDtoBuilder } from "../../../../../shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import {
   expectObjectsToMatch,

@@ -22,7 +22,7 @@ import {
   validApplicationStatus,
   WithImmersionApplicationId,
 } from "./ImmersionApplication.dto";
-import { LegacyScheduleDto, ScheduleDto } from "../ScheduleSchema";
+import { LegacyScheduleDto, ScheduleDto } from "../schedule/ScheduleSchema";
 import { dateRegExp } from "../utils/date";
 import { allRoles } from "../tokens/MagicLinkPayload";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";

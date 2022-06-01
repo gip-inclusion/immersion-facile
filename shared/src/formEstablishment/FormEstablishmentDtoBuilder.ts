@@ -1,12 +1,11 @@
-import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import {
+  BusinessContactDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
-} from "shared/src/formEstablishment/FormEstablishment.dto";
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-
-import { SiretDto } from "shared/src/siret";
-import { Builder } from "./Builder";
+} from "./FormEstablishment.dto";
+import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { SiretDto } from "../siret";
+import { Builder } from "../Builder";
 
 const validFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
@@ -102,7 +101,7 @@ export class FormEstablishmentDtoBuilder
       appellations,
     });
   }
-  public withBusinessContact(businessContact: ContactEntityV2) {
+  public withBusinessContact(businessContact: BusinessContactDto) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, businessContact });
   }
   public build() {

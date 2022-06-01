@@ -1,12 +1,12 @@
 import { Pool, PoolClient } from "pg";
-import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
+import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgImmersionApplicationRepository } from "../../adapters/secondary/pg/PgImmersionApplicationRepository";
 import { ImmersionApplicationEntity } from "../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 
 describe("PgImmersionApplicationRepository", () => {
   let pool: Pool;

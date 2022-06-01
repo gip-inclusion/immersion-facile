@@ -2,7 +2,7 @@ import {
   DATE_START,
   DATE_SUBMISSION,
   ImmersionApplicationDtoBuilder,
-} from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+} from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {
   addDays,

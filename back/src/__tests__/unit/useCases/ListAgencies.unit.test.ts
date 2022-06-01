@@ -1,4 +1,4 @@
-import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
+import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { ListAgencies } from "../../../domain/immersionApplication/useCases/ListAgencies";
 

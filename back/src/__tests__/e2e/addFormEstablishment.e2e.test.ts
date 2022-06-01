@@ -1,5 +1,5 @@
 import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
-import { FormEstablishmentDtoBuilder } from "../../_testBuilders/FormEstablishmentDtoBuilder";
+import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { FormEstablishmentDtoPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";

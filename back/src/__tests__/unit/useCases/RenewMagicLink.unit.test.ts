@@ -11,7 +11,7 @@ import { InMemoryImmersionApplicationRepository } from "../../../adapters/second
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
 import { AgencyConfig } from "shared/src/agency/agency.dto";
 import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { AgencyConfigBuilder } from "../../../_testBuilders/AgencyConfigBuilder";
+import { AgencyConfigBuilder } from "../../../../../shared/src/agency/AgencyConfigBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";

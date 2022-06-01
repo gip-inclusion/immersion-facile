@@ -1,7 +1,6 @@
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { AgencyConfig, AgencyStatus } from "shared/src/agency/agency.dto";
-import { AgencyId, AgencyKind } from "shared/src/agency/agency.dto";
-import { Builder } from "./Builder";
+import { AgencyConfig, AgencyStatus, AgencyId, AgencyKind } from "./agency.dto";
+import { AbsoluteUrl } from "../AbsoluteUrl";
+import { Builder } from "../Builder";
 
 const emptyAgency: AgencyConfig = {
   id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",

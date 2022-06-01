@@ -3,7 +3,7 @@ import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailG
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { NotifyConfirmationEstablishmentCreated as NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { expectedEmailEstablishmentCreatedReviewMatchingEstablisment } from "../../../_testBuilders/emailAssertions";
-import { FormEstablishmentDtoBuilder } from "../../../_testBuilders/FormEstablishmentDtoBuilder";
+import { FormEstablishmentDtoBuilder } from "../../../../../shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 
 describe("NotifyConfirmationEstablismentCreated", () => {
   const validEstablishment = FormEstablishmentDtoBuilder.valid().build();

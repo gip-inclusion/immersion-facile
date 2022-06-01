@@ -23,8 +23,8 @@ import {
   ImmersionApplicationDto,
   RenewMagicLinkRequestDto,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
-import { ImmersionApplicationDtoBuilder } from "../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";

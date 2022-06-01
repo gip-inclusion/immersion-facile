@@ -4,7 +4,7 @@ import {
   NumberEmployeesRange,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { NafDto } from "shared/src/naf";
-import { Builder } from "./Builder";
+import { Builder } from "shared/src/Builder";
 import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { LatLonDto } from "shared/src/latLon";
 

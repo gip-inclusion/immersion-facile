@@ -2,7 +2,7 @@ import { InMemoryImmersionApplicationRepository } from "../../../adapters/second
 import { ImmersionApplicationEntity } from "../../../domain/immersionApplication/entities/ImmersionApplicationEntity";
 import { ListImmersionApplication } from "../../../domain/immersionApplication/useCases/ListImmersionApplication";
 import { AgencyId } from "shared/src/agency/agency.dto";
-import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
+import { ImmersionApplicationDtoBuilder } from "../../../../../shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { validApplicationStatus } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { InMemoryImmersionApplicationQueries } from "../../../adapters/secondary/InMemoryImmersionApplicationQueries";

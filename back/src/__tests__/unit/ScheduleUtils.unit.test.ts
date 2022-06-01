@@ -1,11 +1,11 @@
-import { weekdays } from "shared/src/ScheduleSchema";
+import { weekdays } from "shared/src/schedule/ScheduleSchema";
 import {
   calculateTotalImmersionHoursBetweenDate,
   convertToFrenchNamedDays,
   isArrayOfWeekdays,
   prettyPrintSchedule,
-} from "shared/src/ScheduleUtils";
-import { ScheduleDtoBuilder } from "../../_testBuilders/ScheduleDtoBuilder";
+} from "shared/src/schedule/ScheduleUtils";
+import { ScheduleDtoBuilder } from "shared/src/schedule/ScheduleDtoBuilder";
 
 const complexSchedule = new ScheduleDtoBuilder()
   .withComplexSchedule([

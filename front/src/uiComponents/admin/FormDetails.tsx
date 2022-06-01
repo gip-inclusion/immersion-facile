@@ -5,7 +5,7 @@ import {
   calculateTotalImmersionHoursBetweenDate,
   calculateWeeklyHoursFromSchedule,
   prettyPrintSchedule,
-} from "shared/src/ScheduleUtils";
+} from "shared/src/schedule/ScheduleUtils";
 import { keys } from "shared/src/utils";
 import { Accordion } from "./Accordion";
 import { FormAccordionProps } from "./FormAccordion";

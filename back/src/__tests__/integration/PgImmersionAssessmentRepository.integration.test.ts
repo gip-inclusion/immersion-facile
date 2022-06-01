@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { AgencyConfigBuilder } from "../../_testBuilders/AgencyConfigBuilder";
+import { AgencyConfigBuilder } from "shared/src/agency/AgencyConfigBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {

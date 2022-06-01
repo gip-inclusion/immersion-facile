@@ -2,7 +2,7 @@ import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImpleme
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { ImmersionOfferId } from "shared/src/ImmersionOfferId";
 import { RomeCode } from "shared/src/rome";
-import { Builder } from "./Builder";
+import { Builder } from "shared/src/Builder";
 
 const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {
   id: "13df03a5-a2a5-430a-b558-ed3e2f03512d",
