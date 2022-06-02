@@ -1,7 +1,6 @@
 import axios from "axios";
 import { map, Observable } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
-import { AgencyGateway } from "src/domain/ports/AgencyGateway";
 import {
   AgencyId,
   AgencyInListDto,
@@ -16,6 +15,7 @@ import {
   agencyImmersionFacileIdRoute,
   agencyPublicInfoByIdRoute,
 } from "shared/src/routes";
+import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const prefix = "api";
 

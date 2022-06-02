@@ -11,7 +11,6 @@ import { searchEpics } from "src/core-logic/domain/search/search.epics";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
-import { homeEstablishmentSlice } from "src/infra/gateway/EstablishmentUiGateway/homeEstablishmentSlice";
 import { establishmentSlice } from "../domain/establishmentPath/establishment.slice";
 import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersionAssessment.epics";
 import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
@@ -42,7 +41,6 @@ const rootReducer = combineReducers({
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
   [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
-  [homeEstablishmentSlice.name]: homeEstablishmentSlice.reducer,
   [establishmentSlice.name]: establishmentSlice.reducer,
   [immersionConventionSlice.name]: immersionConventionSlice.reducer,
   [immersionAssessmentSlice.name]: immersionAssessmentSlice.reducer,

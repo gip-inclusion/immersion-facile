@@ -1,6 +1,6 @@
 import { values } from "ramda";
 import { Observable, of } from "rxjs";
-import { AgencyGateway } from "src/domain/ports/AgencyGateway";
+import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
 import {
   AgencyId,

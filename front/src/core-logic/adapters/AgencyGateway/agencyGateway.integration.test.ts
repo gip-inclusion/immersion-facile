@@ -1,7 +1,7 @@
 import { firstValueFrom, Observable } from "rxjs";
-import { AgencyGateway } from "src/domain/ports/AgencyGateway";
-import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
+import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
 import { AgencyId } from "shared/src/agency/agency.dto";
+import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const adapters: AgencyGateway[] = [
   new InMemoryAgencyGateway(),

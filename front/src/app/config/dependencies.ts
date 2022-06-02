@@ -32,10 +32,10 @@ import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGa
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
-import { AgencyGateway } from "src/domain/ports/AgencyGateway";
+import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ENV } from "src/environmentVariables";
-import { HttpAgencyGateway } from "src/infra/gateway/AgencyGateway/HttpAgencyGateway";
-import { InMemoryAgencyGateway } from "src/infra/gateway/AgencyGateway/InMemoryAgencyGateway";
+import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
+import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
 
 export const establishmentGateway: EstablishmentGateway =
   ENV.gateway === "IN_MEMORY"

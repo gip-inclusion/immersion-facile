@@ -1,4 +1,4 @@
-import { AgencyGateway } from "src/domain/ports/AgencyGateway";
+import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export const getAgencyIdBehavior$ = (agencyGateway: AgencyGateway) =>
   agencyGateway.getImmersionFacileAgencyId();
