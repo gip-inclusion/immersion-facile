@@ -1,6 +1,6 @@
 import { PeConnectIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { ZodError } from "zod";
+import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
@@ -8,7 +8,6 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { PoleEmploiUserAdvisorDto } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
 import { AssociateFederatedIdentityPeConnect } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
-import { ImmersionApplicationDtoBuilder } from "../../../_testBuilders/ImmersionApplicationDtoBuilder";
 
 describe("AssociateFederatedIdentityPeConnect", () => {
   let associateFederatedIdentityPeConnect: AssociateFederatedIdentityPeConnect;

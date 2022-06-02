@@ -13,6 +13,7 @@ import {
 import { reasonableSchedule } from "shared/src/schedule/ScheduleSchema";
 import { toDateString } from "shared/src/utils/date";
 import { v4 as uuidV4 } from "uuid";
+import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
 
 const { frontEnvType } = ENV;
 
@@ -49,7 +50,9 @@ export const immersionApplicationInitialValuesFromUrl = ({
     dateSubmission: toDateString(startOfToday()),
 
     //Federated Identity
-    federatedIdentity: params.federatedIdentity ?? "",
+    federatedIdentity: params.federatedIdentity as
+      | FederatedIdentity
+      | undefined,
 
     // Participant
     email: params.email ?? "",
@@ -89,7 +92,9 @@ export const immersionApplicationInitialValuesFromUrl = ({
     beneficiaryAccepted: false,
     enterpriseAccepted: false,
   };
+
   if (frontEnvType === "DEV") return devPrefilledValues(emptyForm);
+
   return emptyForm;
 };
 
@@ -97,6 +102,7 @@ const devPrefilledValues = (
   emptyForm: ImmersionApplicationPresentation,
 ): ImmersionApplicationPresentation => ({
   ...emptyForm,
+
   // Participant
   email: emptyForm.email || "sylvanie@monemail.fr",
   firstName: emptyForm.firstName || "Sylvanie",

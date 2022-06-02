@@ -9,9 +9,9 @@ import {
   ApplicationStatus,
   ImmersionApplicationDto,
   ImmersionApplicationId,
-} from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+} from "./ImmersionApplication.dto";
+import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 export const VALID_EMAILS = [

@@ -1,10 +1,8 @@
 import { PoolClient } from "pg";
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { ConventionPoleEmploiAdvisorRepository } from "../../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
-import {
-  PeExternalId,
-  PoleEmploiUserAdvisorDto,
-} from "../../../domain/peConnect/dto/PeConnect.dto";
+import { PoleEmploiUserAdvisorDto } from "../../../domain/peConnect/dto/PeConnect.dto";
+import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
 
 const CONVENTION_ID_DEFAULT_UUID = "00000000-0000-0000-0000-000000000000";
 
