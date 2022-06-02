@@ -7,22 +7,20 @@ import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { PoleEmploiUserAdvisorDto } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
-import { AssociateFederatedIdentityPeConnect } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
+import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
 
-describe("AssociateFederatedIdentityPeConnect", () => {
-  let associateFederatedIdentityPeConnect: AssociateFederatedIdentityPeConnect;
+describe("AssociatePeConnectFederatedIdentity", () => {
+  let associatePeConnectFederatedIdentity: AssociatePeConnectFederatedIdentity;
   let uowPerformer: InMemoryUowPerformer;
   let conventionPoleEmploiAdvisorRepo: InMemoryConventionPoleEmploiAdvisorRepository;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepo;
-    uowPerformer = new InMemoryUowPerformer({
-      ...uow,
-    });
+    uowPerformer = new InMemoryUowPerformer(uow);
 
-    associateFederatedIdentityPeConnect =
-      new AssociateFederatedIdentityPeConnect(uowPerformer);
+    associatePeConnectFederatedIdentity =
+      new AssociatePeConnectFederatedIdentity(uowPerformer);
   });
 
   it("should not associate convention and federated identity if the federated identity does not match format", async () => {
@@ -39,7 +37,7 @@ describe("AssociateFederatedIdentityPeConnect", () => {
         .build();
 
     await expect(
-      associateFederatedIdentityPeConnect.execute(immersionDtoFromEvent),
+      associatePeConnectFederatedIdentity.execute(immersionDtoFromEvent),
     ).rejects.toThrow(BadRequestError);
   });
 
@@ -54,7 +52,7 @@ describe("AssociateFederatedIdentityPeConnect", () => {
         .withFederatedIdentity(`peConnect:${userPeExternalId}`)
         .build();
 
-    await associateFederatedIdentityPeConnect.execute(immersionDtoFromEvent);
+    await associatePeConnectFederatedIdentity.execute(immersionDtoFromEvent);
 
     expect(
       conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,

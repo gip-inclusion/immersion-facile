@@ -7,7 +7,7 @@ import { immersionApplicationSchema } from "shared/src/ImmersionApplication/imme
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export class AssociateFederatedIdentityPeConnect extends TransactionalUseCase<ImmersionApplicationDto> {
+export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<ImmersionApplicationDto> {
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }

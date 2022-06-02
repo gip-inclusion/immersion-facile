@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "lib": ["esNext"],
-    "module": "CommonJS",
+    "moduleResolution": "Node",
     "strict": true,
     "strictNullChecks": true,
     "esModuleInterop": true,
@@ -10,7 +10,5 @@
     "skipLibCheck": true /* Skip type checking of declaration files. */,
     "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
     "typeRoots": ["./src/types", "./node_modules/@types"],
-    "paths": {
-    }
   }
 }
