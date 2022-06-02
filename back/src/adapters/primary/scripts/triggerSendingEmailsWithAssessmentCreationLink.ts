@@ -8,7 +8,7 @@ import { PgImmersionApplicationQueries } from "../../secondary/pg/PgImmersionApp
 import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
 import { SendinblueEmailGateway } from "../../secondary/SendinblueEmailGateway";
 import { AppConfig } from "../config/appConfig";
-import { makeGenerateCreateAssessmentUrl } from "../config/makeGenerateCreateAssessmentUrl";
+import { createGenerateConventionMagicLink } from "../config/createGenerateConventionMagicLink";
 
 const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const config = AppConfig.createFromEnv();
@@ -33,7 +33,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
       applicationQueries,
       emailGateway,
       clock,
-      makeGenerateCreateAssessmentUrl(config),
+      createGenerateConventionMagicLink(config),
       makeCreateNewEvent({ clock, uuidGenerator: new UuidV4Generator() }),
     );
 

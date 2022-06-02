@@ -1,11 +1,13 @@
 import type {
   EstablishmentJwtPayload,
-  MagicLinkPayload,
+  ConventionMagicLinkPayload,
 } from "shared/src/tokens/MagicLinkPayload";
 
 // jwt decode logic comming from : https://github.com/gustavo0197/react-jwt/blob/master/src/jwt/index.ts
 
-export const decodeJwt = <T extends MagicLinkPayload | EstablishmentJwtPayload>(
+export const decodeJwt = <
+  T extends ConventionMagicLinkPayload | EstablishmentJwtPayload,
+>(
   jwtToken: string,
 ): T => {
   try {

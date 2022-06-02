@@ -3,7 +3,7 @@ import {
   validApplicationStatus,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
-import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import {
   expectArraysToEqual,
@@ -40,7 +40,7 @@ const immersionApplicationEntityBuilder =
 const validPayload = {
   applicationId: conventionId,
   role: "establishment",
-} as MagicLinkPayload;
+} as ConventionMagicLinkPayload;
 
 describe("CreateImmersionAssessment", () => {
   let outboxRepository: InMemoryOutboxRepository;
@@ -81,7 +81,7 @@ describe("CreateImmersionAssessment", () => {
       createImmersionAssessment.execute(immersionAssessment, {
         applicationId: "otherId",
         role: "establishment",
-      } as MagicLinkPayload),
+      } as ConventionMagicLinkPayload),
       new ForbiddenError(
         "Convention provided in DTO is not the same as application linked to it",
       ),
@@ -93,7 +93,7 @@ describe("CreateImmersionAssessment", () => {
       createImmersionAssessment.execute(immersionAssessment, {
         applicationId: conventionId,
         role: "beneficiary",
-      } as MagicLinkPayload),
+      } as ConventionMagicLinkPayload),
       new ForbiddenError("Only an establishment can create an assessment"),
     );
   });

@@ -1,7 +1,7 @@
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "shared/src/routes";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
@@ -14,7 +14,7 @@ export class NotifyImmersionApplicationWasSignedByOtherParty extends UseCase<Imm
   constructor(
     private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
     super();
   }
@@ -29,12 +29,12 @@ export class NotifyImmersionApplicationWasSignedByOtherParty extends UseCase<Imm
     const { recipientEmail, existingSignatureName } =
       getMailParamsDependingOnRole(recipientRole, application);
 
-    const magicLink = this.generateMagicLinkFn(
-      application.id,
-      recipientRole,
-      frontRoutes.immersionApplicationsToSign,
-      recipientEmail,
-    );
+    const magicLink = this.generateMagicLinkFn({
+      id: application.id,
+      role: recipientRole,
+      targetRoute: frontRoutes.immersionApplicationsToSign,
+      email: recipientEmail,
+    });
 
     await this.emailFilter.withAllowedRecipients(
       [recipientEmail],

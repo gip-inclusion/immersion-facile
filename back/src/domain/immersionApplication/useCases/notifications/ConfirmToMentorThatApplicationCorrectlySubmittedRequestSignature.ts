@@ -1,4 +1,4 @@
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 import { createLogger } from "../../../../utils/logger";
@@ -13,7 +13,7 @@ export class ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature ex
   constructor(
     private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
     super();
   }
@@ -44,12 +44,12 @@ export class ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature ex
           {
             beneficiaryFirstName: firstName,
             beneficiaryLastName: lastName,
-            magicLink: this.generateMagicLinkFn(
-              application.id,
-              "establishment",
-              frontRoutes.immersionApplicationsToSign,
-              mentorEmail,
-            ),
+            magicLink: this.generateMagicLinkFn({
+              id: application.id,
+              role: "establishment",
+              targetRoute: frontRoutes.immersionApplicationsToSign,
+              email: mentorEmail,
+            }),
             businessName,
             mentorName: mentor,
           },

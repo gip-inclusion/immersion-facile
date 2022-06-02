@@ -1,4 +1,4 @@
-import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateMagicLinkJwt } from "../../auth/jwt";
 import { UseCase } from "../../core/UseCase";
 import {
@@ -26,7 +26,7 @@ export class GenerateMagicLink extends UseCase<
     const twoDaysAgo = Math.round((Date.now() - 48 * 3600 * 1000) / 1000);
 
     const payload = expired
-      ? createMagicLinkPayload(
+      ? createConventionMagicLinkPayload(
           applicationId,
           role,
           "backoffice administrator",
@@ -35,7 +35,11 @@ export class GenerateMagicLink extends UseCase<
           undefined,
           twoDaysAgo,
         )
-      : createMagicLinkPayload(applicationId, role, "backoffice administrator");
+      : createConventionMagicLinkPayload(
+          applicationId,
+          role,
+          "backoffice administrator",
+        );
     return {
       jwt: this.generateMagicLinkJwt(payload),
     };

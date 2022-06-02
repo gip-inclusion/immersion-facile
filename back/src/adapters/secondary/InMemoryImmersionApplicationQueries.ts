@@ -6,7 +6,7 @@ import { ImmersionApplicationEntity } from "../../domain/immersionApplication/en
 import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { propEq } from "ramda";
-import { ConventionJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { WithImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 
 const logger = createLogger(__filename);
 
@@ -65,7 +65,7 @@ export class InMemoryImmersionApplicationQueries
           .filter(
             propEq("topic", "EmailWithImmersionAssessmentCreationLinkSent"),
           )
-          .map((event) => (event.payload as ConventionJwtPayload).id)
+          .map((event) => (event.payload as WithImmersionApplicationId).id)
       : [];
     return Object.values(this.applicationRepository._immersionApplications)
       .filter(

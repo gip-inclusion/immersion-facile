@@ -2,7 +2,7 @@ import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
 import { editEstablishmentFormRouteWithApiKey } from "shared/src/routes";
-import { createEstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { makeGenerateJwt } from "../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 
@@ -23,7 +23,7 @@ describe("Route to post edited form establishments", () => {
     const generateJwtWithWrongKey = makeGenerateJwt(config.apiJwtPrivateKey); // Private Key is the wrong one !
 
     const wrongJwt = generateJwtWithWrongKey(
-      createEstablishmentJwtPayload({
+      createEstablishmentMagicLinkPayload({
         siret: "12345678901234",
         durationDays: 1,
         now: new Date(),
@@ -43,7 +43,7 @@ describe("Route to post edited form establishments", () => {
       await buildTestApp();
 
     const validJwt = generateMagicLinkJwt(
-      createEstablishmentJwtPayload({
+      createEstablishmentMagicLinkPayload({
         siret: TEST_ESTABLISHMENT1_SIRET,
         durationDays: 1,
         now: new Date(),

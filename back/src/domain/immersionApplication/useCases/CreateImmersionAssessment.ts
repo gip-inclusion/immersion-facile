@@ -8,7 +8,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
-import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import {
   createImmersionAssessmentEntity,
   ImmersionAssessmentEntity,
@@ -27,7 +27,7 @@ export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAss
   public async _execute(
     dto: ImmersionAssessmentDto,
     uow: UnitOfWork,
-    magicLinkPayload: MagicLinkPayload,
+    magicLinkPayload: ConventionMagicLinkPayload,
   ): Promise<void> {
     throwForbiddenIfNotAllow(dto, magicLinkPayload);
 
@@ -72,7 +72,7 @@ const validateConventionAndCreateImmersionAssessmentEntity = async (
 
 const throwForbiddenIfNotAllow = (
   dto: ImmersionAssessmentDto,
-  magicLinkPayload: MagicLinkPayload,
+  magicLinkPayload: ConventionMagicLinkPayload,
 ) => {
   if (!magicLinkPayload) throw new ForbiddenError("No magic link provided");
   if (magicLinkPayload.role !== "establishment")

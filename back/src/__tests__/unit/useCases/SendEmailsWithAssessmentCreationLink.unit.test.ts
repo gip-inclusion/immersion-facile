@@ -1,4 +1,5 @@
-import { ConventionJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
+import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -24,17 +25,22 @@ const prepareUseCase = () => {
   const uuidGenerator = new UuidV4Generator();
   const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-  const generateCreateImmersionAssessmentUrl = (
-    payload: ConventionJwtPayload,
-  ) =>
-    `www.immersion-facile.fr/immersion-assessment?jwt=jwtOfImmersion[${payload.id}]`;
+  const generateConventionMagicLink = ({
+    id,
+  }: {
+    id: ImmersionApplicationId;
+    role: Role;
+    targetRoute: string;
+    email: string;
+  }) =>
+    `www.immersion-facile.fr/immersion-assessment?jwt=jwtOfImmersion[${id}]`;
 
   const useCase = new SendEmailsWithAssessmentCreationLink(
     outboxRepo,
     applicationQueries,
     emailGateway,
     clock,
-    generateCreateImmersionAssessmentUrl,
+    generateConventionMagicLink,
     createNewEvent,
   );
   return {
@@ -116,7 +122,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
         .build();
     await applicationRepo.save(immersionApplicationEndingTomorrow);
     await outboxRepo.save({
-      topic: "EmailWithImmersionAssessmentCreationLinkSent",
+      topic: "EmailWithLinkToCreateAssessmentSent",
       payload: { id: "immersion-ending-tommorow-id" },
     } as DomainEvent);
 

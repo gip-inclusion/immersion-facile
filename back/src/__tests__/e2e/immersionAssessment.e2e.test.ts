@@ -1,6 +1,6 @@
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { immersionAssessmentRoute } from "shared/src/routes";
-import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 
@@ -13,7 +13,7 @@ describe("Immersion assessment routes", () => {
         await buildTestApp();
 
       const jwt = generateMagicLinkJwt(
-        createMagicLinkPayload(
+        createConventionMagicLinkPayload(
           conventionId,
           "establishment",
           "establishment@company.fr",

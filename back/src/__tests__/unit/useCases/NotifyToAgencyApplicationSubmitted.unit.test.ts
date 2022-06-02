@@ -85,12 +85,12 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         cc: [],
         params: {
           ...expectedParams,
-          magicLink: fakeGenerateMagicLinkUrlFn(
-            validImmersionApplication.id,
-            "counsellor",
-            frontRoutes.immersionApplicationsToValidate,
-            councellorEmail,
-          ),
+          magicLink: fakeGenerateMagicLinkUrlFn({
+            id: validImmersionApplication.id,
+            role: "counsellor",
+            targetRoute: frontRoutes.immersionApplicationsToValidate,
+            email: councellorEmail2,
+          }),
         },
       },
       {
@@ -99,12 +99,12 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         cc: [],
         params: {
           ...expectedParams,
-          magicLink: fakeGenerateMagicLinkUrlFn(
-            validImmersionApplication.id,
-            "counsellor",
-            frontRoutes.immersionApplicationsToValidate,
-            councellorEmail2,
-          ),
+          magicLink: fakeGenerateMagicLinkUrlFn({
+            id: validImmersionApplication.id,
+            role: "counsellor",
+            targetRoute: frontRoutes.immersionApplicationsToValidate,
+            email: councellorEmail2,
+          }),
         },
       },
     ]);
@@ -139,12 +139,12 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         cc: [],
         params: {
           ...expectedParams,
-          magicLink: fakeGenerateMagicLinkUrlFn(
-            validImmersionApplication.id,
-            "validator",
-            frontRoutes.immersionApplicationsToValidate,
-            validatorEmail,
-          ),
+          magicLink: fakeGenerateMagicLinkUrlFn({
+            id: validImmersionApplication.id,
+            role: "validator",
+            targetRoute: frontRoutes.immersionApplicationsToValidate,
+            email: validatorEmail,
+          }),
         },
       },
     ]);

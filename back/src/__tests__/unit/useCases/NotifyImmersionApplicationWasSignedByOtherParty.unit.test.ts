@@ -89,12 +89,12 @@ describe("NotifyImmersionApplicationWasSignedByOtherParty", () => {
       beneficiaryLastName: application.lastName,
       existingSignatureName,
       immersionProfession: application.immersionAppellation.appellationLabel,
-      magicLink: fakeGenerateMagicLinkUrlFn(
-        application.id,
-        recipientRole,
-        frontRoutes.immersionApplicationsToSign,
-        mentorEmail,
-      ),
+      magicLink: fakeGenerateMagicLinkUrlFn({
+        id: application.id,
+        role: recipientRole,
+        targetRoute: frontRoutes.immersionApplicationsToSign,
+        email: mentorEmail,
+      }),
       mentor: application.mentor,
       businessName: application.businessName,
     };

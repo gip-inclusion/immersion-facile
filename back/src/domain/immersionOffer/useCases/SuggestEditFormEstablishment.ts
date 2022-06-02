@@ -1,5 +1,5 @@
 import { SiretDto, siretSchema } from "shared/src/siret";
-import { createEstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateEditFormEstablishmentUrl } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
@@ -32,7 +32,7 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     const now = this.clock.now();
 
-    const payload = createEstablishmentJwtPayload({
+    const payload = createEstablishmentMagicLinkPayload({
       siret,
       now,
       durationDays: 2,

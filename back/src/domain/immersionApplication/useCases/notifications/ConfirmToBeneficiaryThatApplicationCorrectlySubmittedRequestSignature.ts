@@ -1,4 +1,4 @@
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 import { createLogger } from "../../../../utils/logger";
@@ -13,7 +13,7 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignatu
   constructor(
     private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
     super();
   }
@@ -41,12 +41,12 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignatu
         this.emailGateway.sendBeneficiarySignatureRequestNotification(email, {
           beneficiaryFirstName: firstName,
           beneficiaryLastName: lastName,
-          magicLink: this.generateMagicLinkFn(
-            application.id,
-            "beneficiary",
-            frontRoutes.immersionApplicationsToSign,
+          magicLink: this.generateMagicLinkFn({
+            id: application.id,
+            role: "beneficiary",
+            targetRoute: frontRoutes.immersionApplicationsToSign,
             email,
-          ),
+          }),
           businessName,
         }),
       logger,

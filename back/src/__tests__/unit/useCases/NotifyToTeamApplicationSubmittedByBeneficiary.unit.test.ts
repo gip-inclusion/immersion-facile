@@ -59,12 +59,12 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
           "fr",
         ),
       },
-      magicLink: fakeGenerateMagicLinkUrlFn(
-        validImmersionApplication.id,
-        "admin",
-        frontRoutes.immersionApplicationsToValidate,
-        "admin@if.fr",
-      ),
+      magicLink: fakeGenerateMagicLinkUrlFn({
+        id: validImmersionApplication.id,
+        role: "admin",
+        targetRoute: frontRoutes.immersionApplicationsToValidate,
+        email: "admin@if.fr",
+      }),
       agency,
     });
   });

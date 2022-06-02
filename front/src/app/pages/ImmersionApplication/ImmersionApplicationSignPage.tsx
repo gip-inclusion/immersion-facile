@@ -11,7 +11,10 @@ import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { immersionApplicationSchema } from "shared/src/ImmersionApplication/immersionApplication.schema";
-import { MagicLinkPayload, Role } from "shared/src/tokens/MagicLinkPayload";
+import {
+  ConventionMagicLinkPayload,
+  Role,
+} from "shared/src/tokens/MagicLinkPayload";
 import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
@@ -27,7 +30,7 @@ const extractRoleAndName = (
   jwt: string,
   application: ImmersionApplicationDto,
 ): [Role, string] => {
-  const payload = decodeJwt<MagicLinkPayload>(jwt);
+  const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
   const role = payload.role;
   const name =
     role === "beneficiary"

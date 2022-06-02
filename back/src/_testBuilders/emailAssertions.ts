@@ -58,12 +58,12 @@ export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingImmersion
       params: {
         beneficiaryFirstName: firstName,
         beneficiaryLastName: lastName,
-        magicLink: fakeGenerateMagicLinkUrlFn(
+        magicLink: fakeGenerateMagicLinkUrlFn({
           id,
-          "beneficiary",
-          frontRoutes.immersionApplicationsToSign,
+          role: "beneficiary",
+          targetRoute: frontRoutes.immersionApplicationsToSign,
           email,
-        ),
+        }),
         businessName,
       },
       cc: [],

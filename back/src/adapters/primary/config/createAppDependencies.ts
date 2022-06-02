@@ -14,7 +14,7 @@ import {
 import { AppConfig } from "./appConfig";
 import { createAuthChecker } from "./createAuthChecker";
 import { createEventCrawler } from "./createEventCrawler";
-import { createGenerateVerificationMagicLink } from "./createGenerateVerificationMagicLink";
+import { createGenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { createUseCases } from "./createUseCases";
 import { createGetPgPoolFn, createRepositories } from "./repositoriesConfig";
 import { createUowPerformer } from "./uowConfig";
@@ -45,7 +45,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const uowPerformer = createUowPerformer(config, getPgPoolFn, repositories);
   const generateApiJwt = makeGenerateJwt(config.apiJwtPrivateKey);
   const generateMagicLinkJwt = makeGenerateJwt(config.magicLinkJwtPrivateKey);
-  const generateMagicLinkFn = createGenerateVerificationMagicLink(config);
+  const generateMagicLinkFn = createGenerateConventionMagicLink(config);
   const emailFilter = config.skipEmailAllowlist
     ? new AlwaysAllowEmailFilter()
     : new AllowListEmailFilter(config.emailAllowList);

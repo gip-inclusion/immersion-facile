@@ -13,7 +13,7 @@ import {
   validateImmersionApplicationRoute,
 } from "shared/src/routes";
 import {
-  createMagicLinkPayload,
+  createConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
@@ -198,7 +198,7 @@ describe("/demandes-immersion route", () => {
       });
 
       it("redirects expired magic links to a renewal page", async () => {
-        const payload = createMagicLinkPayload(
+        const payload = createConventionMagicLinkPayload(
           immersionApplication.id,
           "beneficiary",
           immersionApplication.email,
@@ -235,7 +235,7 @@ describe("/demandes-immersion route", () => {
       };
 
       const jwt = generateJwt(
-        createMagicLinkPayload(
+        createConventionMagicLinkPayload(
           immersionApplication.id,
           "beneficiary",
           immersionApplication.email,
@@ -256,7 +256,7 @@ describe("/demandes-immersion route", () => {
 
     it("Fetching unknown application IDs fails with 404 Not Found", async () => {
       const link = generateJwt(
-        createMagicLinkPayload(
+        createConventionMagicLinkPayload(
           "unknown-demande-immersion-id",
           "beneficiary",
           "some email",
@@ -278,7 +278,11 @@ describe("/demandes-immersion route", () => {
         new ImmersionApplicationDtoBuilder().withId(unknownId).build();
 
       const link = generateJwt(
-        createMagicLinkPayload(unknownId, "beneficiary", "some email"),
+        createConventionMagicLinkPayload(
+          unknownId,
+          "beneficiary",
+          "some email",
+        ),
       );
 
       await request
@@ -337,7 +341,11 @@ describe("/update-application-status route", () => {
   it("Succeeds for rejected application", async () => {
     // A counsellor rejects the application.
     const counsellorJwt = generateJwt(
-      createMagicLinkPayload(applicationId, "counsellor", "counsellor@pe.fr"),
+      createConventionMagicLinkPayload(
+        applicationId,
+        "counsellor",
+        "counsellor@pe.fr",
+      ),
     );
     await request
       .post(`/auth/${updateApplicationStatusRoute}/${counsellorJwt}`)
@@ -350,7 +358,7 @@ describe("/update-application-status route", () => {
   it.skip("Returns error 400 for invalid requests", async () => {
     // An establishment tries to change it to DRAFT but fails.
     const establishmentJwt = generateJwt(
-      createMagicLinkPayload(
+      createConventionMagicLinkPayload(
         applicationId,
         "establishment",
         immersionApplication.mentorEmail,
@@ -363,7 +371,7 @@ describe("/update-application-status route", () => {
 
     // An admin tries to change it to VALIDATED but fails.
     const adminJwt = generateJwt(
-      createMagicLinkPayload(applicationId, "admin", "admin@if.fr"),
+      createConventionMagicLinkPayload(applicationId, "admin", "admin@if.fr"),
     );
     await request
       .post(`/auth/${updateApplicationStatusRoute}/${adminJwt}`)
@@ -374,7 +382,7 @@ describe("/update-application-status route", () => {
   it("Returns error 403 for unauthorized requests", async () => {
     // An establishment tries to validate the application, but fails.
     const establishmentJwt = generateJwt(
-      createMagicLinkPayload(
+      createConventionMagicLinkPayload(
         applicationId,
         "establishment",
         immersionApplication.mentorEmail,
@@ -388,7 +396,7 @@ describe("/update-application-status route", () => {
 
   it("Returns error 404 for unknown application ids", async () => {
     const jwt = generateJwt(
-      createMagicLinkPayload(
+      createConventionMagicLinkPayload(
         "unknown_application_id",
         "counsellor",
         "counsellor@pe.fr",

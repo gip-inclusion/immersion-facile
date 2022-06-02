@@ -54,7 +54,7 @@ import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
 import { AppConfig } from "./appConfig";
-import { GenerateVerificationMagicLink } from "./createGenerateVerificationMagicLink";
+import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
 import { Repositories } from "./repositoriesConfig";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
@@ -65,7 +65,7 @@ export const createUseCases = (
   config: AppConfig,
   repositories: Repositories,
   generateJwtFn: GenerateMagicLinkJwt,
-  generateMagicLinkFn: GenerateVerificationMagicLink,
+  generateMagicLinkFn: GenerateConventionMagicLink,
   emailFilter: EmailFilter,
   uowPerformer: UnitOfWorkPerformer,
   clock: Clock,

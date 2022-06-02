@@ -165,8 +165,8 @@ describe("Pg implementation of ImmersionApplicationQueries", () => {
         uuidGenerator: new UuidV4Generator(),
       });
       const eventEmailSentToImmersion1 = createNewEvent({
-        topic: "EmailWithImmersionAssessmentCreationLinkSent",
-        payload: { id: immersion1EndingThe15th.id, exp: 1, iat: 1, version: 1 },
+        topic: "EmailWithLinkToCreateAssessmentSent",
+        payload: { id: immersion1EndingThe15th.id },
       });
       await outboxRepo.save(eventEmailSentToImmersion1);
 

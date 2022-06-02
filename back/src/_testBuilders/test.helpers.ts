@@ -2,7 +2,7 @@ import { addDays as dateFnsAddDays, format } from "date-fns";
 import { partition } from "ramda";
 import { ImmersionApplicationId } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
-import { GenerateVerificationMagicLink } from "../adapters/primary/config/createGenerateVerificationMagicLink";
+import { GenerateConventionMagicLink } from "../adapters/primary/config/createGenerateConventionMagicLink";
 import { CustomClock } from "../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import { EventBus, makeCreateNewEvent } from "../domain/core/eventBus/EventBus";
@@ -48,11 +48,15 @@ export const spyOnTopic = (
   return publishedEvents;
 };
 
-export const fakeGenerateMagicLinkUrlFn: GenerateVerificationMagicLink = (
-  applicationId: ImmersionApplicationId,
-  role: Role,
-  targetRoute: string,
-) => `http://fake-magic-link/${applicationId}/${targetRoute}/${role}`;
+export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLink = ({
+  id,
+  role,
+  targetRoute,
+}: {
+  id: ImmersionApplicationId;
+  role: Role;
+  targetRoute: string;
+}) => `http://fake-magic-link/${id}/${targetRoute}/${role}`;
 
 export const makeTestCreateNewEvent = () => {
   const clock = new CustomClock();

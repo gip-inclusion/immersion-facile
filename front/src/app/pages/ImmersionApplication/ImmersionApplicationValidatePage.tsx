@@ -4,7 +4,10 @@ import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ApplicationStatus } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { statusTransitionConfigs } from "shared/src/immersionApplicationStatusTransitions";
-import { MagicLinkPayload, Role } from "shared/src/tokens/MagicLinkPayload";
+import {
+  ConventionMagicLinkPayload,
+  Role,
+} from "shared/src/tokens/MagicLinkPayload";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
@@ -33,7 +36,7 @@ export const ImmersionApplicationValidatePage = ({
   route,
 }: VerificationPageProps) => {
   const jwt = route.params.jwt;
-  const { role } = decodeJwt<MagicLinkPayload>(jwt);
+  const { role } = decodeJwt<ConventionMagicLinkPayload>(jwt);
 
   const [successMessage, setSuccessMessage] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<string>();

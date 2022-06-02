@@ -4,7 +4,7 @@ import { ImmersionApplicationDto } from "shared/src/ImmersionApplication/Immersi
 import { frontRoutes } from "shared/src/routes";
 import { allRoles } from "shared/src/tokens/MagicLinkPayload";
 import { zTrimmedString } from "shared/src/zodUtils";
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
@@ -45,7 +45,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
     private readonly agencyRepository: AgencyRepository,
-    private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
     super();
   }
@@ -88,12 +88,12 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
               application,
               agency,
               reason,
-              this.generateMagicLinkFn(
-                application.id,
+              this.generateMagicLinkFn({
+                id: application.id,
                 role,
-                frontRoutes.immersionApplicationsRoute,
+                targetRoute: frontRoutes.immersionApplicationsRoute,
                 email,
-              ),
+              }),
             ),
           ),
         logger,

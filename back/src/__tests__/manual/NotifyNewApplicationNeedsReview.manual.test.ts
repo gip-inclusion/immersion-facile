@@ -1,8 +1,8 @@
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import {
-  createGenerateVerificationMagicLink,
-  GenerateVerificationMagicLink,
-} from "../../adapters/primary/config/createGenerateVerificationMagicLink";
+  createGenerateConventionMagicLink,
+  GenerateConventionMagicLink,
+} from "../../adapters/primary/config/createGenerateConventionMagicLink";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { NotifyNewApplicationNeedsReview } from "../../domain/immersionApplication/useCases/notifications/NotifyNewApplicationNeedsReview";
@@ -25,13 +25,13 @@ const validImmersionApplication: ImmersionApplicationDto =
 
 describe("Notify To 2 Counsellors that an application is available", () => {
   let emailGw: SendinblueEmailGateway;
-  let generateMagicLinkFn: GenerateVerificationMagicLink;
+  let generateMagicLinkFn: GenerateConventionMagicLink;
   let agency;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
-    generateMagicLinkFn = createGenerateVerificationMagicLink(config);
+    generateMagicLinkFn = createGenerateConventionMagicLink(config);
   });
 
   //eslint-disable-next-line jest/expect-expect

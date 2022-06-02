@@ -28,7 +28,7 @@ import {
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import {
   allRoles,
-  createMagicLinkPayload,
+  createConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
 
@@ -108,7 +108,7 @@ export const executeUpdateApplicationStatusUseCase = async ({
 }: ExecuteUseCaseParams): Promise<ImmersionApplicationDto> => {
   const response = await updateImmersionApplicationStatus.execute(
     { status: targetStatus, justification },
-    createMagicLinkPayload(applicationId, role, email),
+    createConventionMagicLinkPayload(applicationId, role, email),
   );
   expect(response.id).toEqual(applicationId);
   const storedImmersionApplication =

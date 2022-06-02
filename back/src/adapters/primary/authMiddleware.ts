@@ -9,7 +9,7 @@ import {
 import {
   currentJwtVersions,
   EstablishmentJwtPayload,
-  MagicLinkPayload,
+  ConventionMagicLinkPayload,
   PayloadKey,
   PayloadOption,
 } from "shared/src/tokens/MagicLinkPayload";
@@ -138,7 +138,7 @@ export const createJwtAuthMiddleware = (
 
       switch (payloadKey) {
         case "application":
-          req.payloads = { application: payload as MagicLinkPayload };
+          req.payloads = { application: payload as ConventionMagicLinkPayload };
           break;
         case "establishment":
           req.payloads = { establishment: payload as EstablishmentJwtPayload };
@@ -154,7 +154,7 @@ export const createJwtAuthMiddleware = (
 
       next();
     } catch (err: any) {
-      const unsafePayload = jwt.decode(maybeJwt) as MagicLinkPayload;
+      const unsafePayload = jwt.decode(maybeJwt) as ConventionMagicLinkPayload;
       if (err instanceof TokenExpiredError) {
         logger.warn(
           { token: maybeJwt, payload: unsafePayload },

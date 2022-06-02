@@ -64,12 +64,12 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           email,
           agency,
           validImmersionApplication,
-          fakeGenerateMagicLinkUrlFn(
-            validImmersionApplication.id,
-            "counsellor",
-            frontRoutes.immersionApplicationsToValidate,
+          fakeGenerateMagicLinkUrlFn({
+            id: validImmersionApplication.id,
+            role: "counsellor",
+            targetRoute: frontRoutes.immersionApplicationsToValidate,
             email,
-          ),
+          }),
           "en vérifier l'éligibilité",
         );
       }
@@ -95,12 +95,12 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           email,
           agency,
           validImmersionApplication,
-          fakeGenerateMagicLinkUrlFn(
-            validImmersionApplication.id,
-            "validator",
-            frontRoutes.immersionApplicationsToValidate,
+          fakeGenerateMagicLinkUrlFn({
+            id: validImmersionApplication.id,
+            role: "validator",
+            targetRoute: frontRoutes.immersionApplicationsToValidate,
             email,
-          ),
+          }),
           "en considérer la validation",
         );
       }
@@ -153,12 +153,12 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           email,
           agency,
           validImmersionApplication,
-          fakeGenerateMagicLinkUrlFn(
-            validImmersionApplication.id,
-            "validator",
-            frontRoutes.immersionApplicationsToValidate,
+          fakeGenerateMagicLinkUrlFn({
+            id: validImmersionApplication.id,
+            role: "validator",
+            targetRoute: frontRoutes.immersionApplicationsToValidate,
             email,
-          ),
+          }),
           "en considérer la validation",
         );
       }
@@ -204,12 +204,12 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         adminEmail,
         agency,
         validImmersionApplication,
-        fakeGenerateMagicLinkUrlFn(
-          validImmersionApplication.id,
-          "admin",
-          frontRoutes.immersionApplicationsToValidate,
-          adminEmail,
-        ),
+        fakeGenerateMagicLinkUrlFn({
+          id: validImmersionApplication.id,
+          role: "admin",
+          targetRoute: frontRoutes.immersionApplicationsToValidate,
+          email: adminEmail,
+        }),
         "en considérer la validation",
       );
     });

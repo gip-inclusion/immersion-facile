@@ -27,7 +27,7 @@ import { AgencyBuilder } from "shared/src/agency/AgencyBuilder";
 import { ImmersionApplicationDtoBuilder } from "shared/src/ImmersionApplication/ImmersionApplicationDtoBuilder";
 import { RenewMagicLink } from "../../domain/immersionApplication/useCases/RenewMagicLink";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
-import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ImmersionApplicationEntityBuilder } from "../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
@@ -100,7 +100,7 @@ describe("Magic link renewal flow", () => {
       deliverRenewedMagicLink.execute(event.payload),
     );
 
-    const payload = createMagicLinkPayload(
+    const payload = createConventionMagicLinkPayload(
       validImmersionApplication.id,
       "beneficiary",
       validImmersionApplication.email,

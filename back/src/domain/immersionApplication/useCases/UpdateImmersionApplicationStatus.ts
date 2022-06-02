@@ -10,7 +10,10 @@ import {
   WithImmersionApplicationId,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { statusTransitionConfigs } from "shared/src/immersionApplicationStatusTransitions";
-import { MagicLinkPayload, Role } from "shared/src/tokens/MagicLinkPayload";
+import {
+  ConventionMagicLinkPayload,
+  Role,
+} from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
@@ -53,7 +56,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
 
   public async _execute(
     { status, justification }: UpdateImmersionApplicationStatusRequestDto,
-    { applicationId, role }: MagicLinkPayload,
+    { applicationId, role }: ConventionMagicLinkPayload,
   ): Promise<WithImmersionApplicationId> {
     logger.debug({ status, applicationId, role });
     const immersionApplication =

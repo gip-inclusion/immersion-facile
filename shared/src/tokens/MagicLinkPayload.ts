@@ -4,7 +4,7 @@ import { SiretDto } from "../siret";
 import { ImmersionApplicationId } from "../ImmersionApplication/ImmersionApplication.dto";
 
 export type JwtPayloads = {
-  application?: MagicLinkPayload;
+  application?: ConventionMagicLinkPayload;
   establishment?: EstablishmentJwtPayload;
 };
 
@@ -33,9 +33,9 @@ export const allRoles: NotEmptyArray<Role> = [
   "admin",
 ];
 
-export type MagicLinkPayload = {
+export type ConventionMagicLinkPayload = {
   version: number; //< Positive integer.
-  applicationId: string;
+  applicationId: ImmersionApplicationId;
   role: Role;
   iat: number; //< issued at : number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
   exp: number; //< expired at : number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
@@ -45,8 +45,8 @@ export type MagicLinkPayload = {
 export const emailHashForMagicLink = (str: string) =>
   crypto.createHash("md5").update(str).digest("hex");
 
-export const createMagicLinkPayload = (
-  applicationId: string,
+export const createConventionMagicLinkPayload = (
+  applicationId: ImmersionApplicationId,
   role: Role,
   email: string,
   durationDays = 31,
@@ -54,7 +54,7 @@ export const createMagicLinkPayload = (
   iat: number = Math.round(nowFn() / 1000),
   exp: number = iat + durationDays * 24 * 3600,
   version = currentJwtVersions.application,
-) => ({
+): ConventionMagicLinkPayload => ({
   version,
   applicationId,
   role,
@@ -73,11 +73,7 @@ export type EstablishmentJwtPayload = JwtPayload & {
   siret: string;
 };
 
-export type ConventionJwtPayload = JwtPayload & {
-  id: ImmersionApplicationId;
-};
-
-export const createEstablishmentJwtPayload = ({
+export const createEstablishmentMagicLinkPayload = ({
   siret,
   durationDays,
   now,
@@ -91,26 +87,6 @@ export const createEstablishmentJwtPayload = ({
 
   return {
     siret,
-    iat,
-    exp,
-    version: currentJwtVersions.establishment,
-  };
-};
-
-export const createConventionJwtPayload = ({
-  id,
-  durationDays,
-  now,
-}: {
-  id: ImmersionApplicationId;
-  durationDays: number;
-  now: Date;
-}): ConventionJwtPayload => {
-  const iat = Math.round(now.getTime() / 1000);
-  const exp = iat + durationDays * 24 * 3600;
-
-  return {
-    id,
     iat,
     exp,
     version: currentJwtVersions.establishment,

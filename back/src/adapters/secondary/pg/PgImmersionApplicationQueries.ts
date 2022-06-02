@@ -73,7 +73,7 @@ export class PgImmersionApplicationQueries
               'mentorEmail', mentor_email) AS params
        FROM immersion_applications 
        WHERE date_end::date = $1
-       AND id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithImmersionAssessmentCreationLinkSent' )`,
+       AND id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )`,
       [dateEnd],
     );
     return pgResult.rows.map((row) => row.params);

@@ -5,7 +5,7 @@ import {
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { frontRoutes } from "shared/src/routes";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
@@ -18,7 +18,7 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly agencyRepository: AgencyRepository,
-    private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
     super();
   }
@@ -72,12 +72,12 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ImmersionApplicatio
       recipients.emails.map((email) =>
         this.emailGateway.sendNewApplicationForReviewNotification([email], {
           businessName: immersionApplicationDto.businessName,
-          magicLink: this.generateMagicLinkFn(
-            immersionApplicationDto.id,
-            recipients.role,
-            frontRoutes.immersionApplicationsToValidate,
+          magicLink: this.generateMagicLinkFn({
+            id: immersionApplicationDto.id,
+            role: recipients.role,
+            targetRoute: frontRoutes.immersionApplicationsToValidate,
             email,
-          ),
+          }),
           beneficiaryFirstName: immersionApplicationDto.firstName,
           beneficiaryLastName: immersionApplicationDto.lastName,
           possibleRoleAction:

@@ -3,13 +3,13 @@ import {
   BadRequestError,
   validateAndParseZodSchema,
 } from "../../adapters/primary/helpers/httpErrors";
-import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
 export abstract class UseCase<
   Input,
   Output = void,
-  JWTPayload = MagicLinkPayload,
+  JWTPayload = ConventionMagicLinkPayload,
 > {
   protected abstract inputSchema: z.ZodSchema<Input>;
 
@@ -38,7 +38,7 @@ export abstract class UseCase<
 export abstract class TransactionalUseCase<
   Input,
   Output = void,
-  JWTPayload = MagicLinkPayload,
+  JWTPayload = ConventionMagicLinkPayload,
 > {
   protected abstract inputSchema: z.ZodSchema<Input>;
   protected constructor(private uowPerformer: UnitOfWorkPerformer) {}

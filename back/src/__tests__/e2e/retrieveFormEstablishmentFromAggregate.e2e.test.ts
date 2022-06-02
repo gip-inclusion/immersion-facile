@@ -1,7 +1,7 @@
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
 import { retrieveEstablishmentFormRouteWithApiKey } from "shared/src/routes";
-import { createEstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 
@@ -35,7 +35,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     // Act
     const validJwt = generateMagicLinkJwt(
-      createEstablishmentJwtPayload({
+      createEstablishmentMagicLinkPayload({
         siret,
         durationDays: 1,
         now: new Date(),

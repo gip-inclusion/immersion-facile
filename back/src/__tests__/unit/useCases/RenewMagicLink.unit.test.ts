@@ -10,7 +10,7 @@ import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAg
 import { InMemoryImmersionApplicationRepository } from "../../../adapters/secondary/InMemoryImmersionApplicationRepository";
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
 import { Agency } from "shared/src/agency/agency.dto";
-import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { AgencyBuilder } from "../../../../../shared/src/agency/AgencyBuilder";
 import { ImmersionApplicationEntityBuilder } from "../../../_testBuilders/ImmersionApplicationEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
@@ -75,7 +75,7 @@ describe("RenewMagicLink use case", () => {
     );
 
   it("requires a valid application id", async () => {
-    const payload = createMagicLinkPayload(
+    const payload = createConventionMagicLinkPayload(
       "not-a-valid-id",
       "counsellor",
       "some email",
@@ -99,7 +99,7 @@ describe("RenewMagicLink use case", () => {
       .build();
     applicationRepository.setImmersionApplications({ [entity.id]: entity });
 
-    const payload = createMagicLinkPayload(
+    const payload = createConventionMagicLinkPayload(
       validImmersionApplication.id,
       "counsellor",
       "some email",
@@ -118,7 +118,7 @@ describe("RenewMagicLink use case", () => {
 
   // Admins use non-magic-link based authentication, so no need to renew these.
   it("Refuses to generate admin magic links", async () => {
-    const payload = createMagicLinkPayload(
+    const payload = createConventionMagicLinkPayload(
       validImmersionApplication.id,
       "admin",
       "some email",
@@ -136,7 +136,7 @@ describe("RenewMagicLink use case", () => {
   });
 
   it("requires a link format that includes %jwt% string", async () => {
-    const payload = createMagicLinkPayload(
+    const payload = createConventionMagicLinkPayload(
       validImmersionApplication.id,
       "counsellor",
       "some email",
@@ -154,7 +154,7 @@ describe("RenewMagicLink use case", () => {
   });
 
   it("Posts an event to deliver a correct JWT for correct responses", async () => {
-    const expiredPayload = createMagicLinkPayload(
+    const expiredPayload = createConventionMagicLinkPayload(
       validImmersionApplication.id,
       "beneficiary",
       validImmersionApplication.email,

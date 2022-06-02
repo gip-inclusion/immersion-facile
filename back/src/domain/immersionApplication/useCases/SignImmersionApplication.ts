@@ -4,7 +4,7 @@ import {
   ApplicationStatus,
   WithImmersionApplicationId,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
-import { MagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
@@ -39,7 +39,7 @@ export class SignImmersionApplication extends UseCase<
 
   public async _execute(
     _: void,
-    { applicationId, role }: MagicLinkPayload,
+    { applicationId, role }: ConventionMagicLinkPayload,
   ): Promise<WithImmersionApplicationId> {
     logger.debug({ applicationId, role });
 

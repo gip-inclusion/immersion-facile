@@ -1,4 +1,4 @@
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { EmailFilter } from "../../../core/ports/EmailFilter";
 import {
@@ -25,7 +25,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
     super(uowPerformer);
   }
@@ -85,12 +85,12 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
                 demandeId: application.id,
                 firstName: application.firstName,
                 lastName: application.lastName,
-                magicLink: this.generateMagicLinkFn(
-                  application.id,
+                magicLink: this.generateMagicLinkFn({
+                  id: application.id,
                   role,
-                  frontRoutes.immersionApplicationsToValidate,
-                  counsellorEmail,
-                ),
+                  targetRoute: frontRoutes.immersionApplicationsToValidate,
+                  email: counsellorEmail,
+                }),
               },
             ),
           ),

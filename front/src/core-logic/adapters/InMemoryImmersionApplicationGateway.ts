@@ -10,9 +10,12 @@ import {
   WithImmersionApplicationId,
 } from "shared/src/ImmersionApplication/ImmersionApplication.dto";
 import { ShareLinkByEmailDTO } from "shared/src/ShareLinkByEmailDTO";
-import { MagicLinkPayload, Role } from "shared/src/tokens/MagicLinkPayload";
 import { sleep } from "shared/src/utils";
 import { Observable, Subject, from } from "rxjs";
+import {
+  ConventionMagicLinkPayload,
+  Role,
+} from "src/../../shared/src/tokens/MagicLinkPayload";
 
 export class InMemoryImmersionApplicationGateway
   implements ImmersionApplicationGateway
@@ -53,7 +56,7 @@ export class InMemoryImmersionApplicationGateway
   // Same as GET above, but using a magic link
   public async getMagicLink(jwt: string): Promise<ImmersionApplicationDto> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
-    const payload = decodeJwt<MagicLinkPayload>(jwt);
+    const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
     return this._immersionApplications[payload.applicationId];
   }
 
@@ -80,7 +83,7 @@ export class InMemoryImmersionApplicationGateway
     immersionApplication: ImmersionApplicationDto,
     jwt: string,
   ): Promise<string> {
-    const payload = decodeJwt<MagicLinkPayload>(jwt);
+    const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
 
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._immersionApplications[payload.applicationId] = immersionApplication;
@@ -91,7 +94,7 @@ export class InMemoryImmersionApplicationGateway
     { status, justification: _ }: UpdateImmersionApplicationStatusRequestDto,
     jwt: string,
   ): Promise<WithImmersionApplicationId> {
-    const payload = decodeJwt<MagicLinkPayload>(jwt);
+    const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._immersionApplications[payload.applicationId] = {
       ...this._immersionApplications[payload.applicationId],
@@ -104,7 +107,7 @@ export class InMemoryImmersionApplicationGateway
     jwt: string,
   ): Promise<WithImmersionApplicationId> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
-    const payload = decodeJwt<MagicLinkPayload>(jwt);
+    const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
     const application = this._immersionApplications[payload.applicationId];
     this._immersionApplications[payload.applicationId] =
       signApplicationDtoWithRole(application, payload.role);

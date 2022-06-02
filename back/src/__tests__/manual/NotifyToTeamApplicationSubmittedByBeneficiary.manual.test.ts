@@ -1,5 +1,5 @@
 import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { createGenerateVerificationMagicLink } from "../../adapters/primary/config/createGenerateVerificationMagicLink";
+import { createGenerateConventionMagicLink } from "../../adapters/primary/config/createGenerateConventionMagicLink";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/immersionApplication/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
@@ -29,7 +29,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         emailGw,
         agencyRepo,
-        createGenerateVerificationMagicLink(config),
+        createGenerateConventionMagicLink(config),
       );
   });
 

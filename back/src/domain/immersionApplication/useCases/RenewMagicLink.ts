@@ -2,7 +2,7 @@ import { ImmersionApplicationId } from "shared/src/ImmersionApplication/Immersio
 import jwt from "jsonwebtoken";
 import {
   emailHashForMagicLink,
-  MagicLinkPayload,
+  ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
 import {
@@ -18,7 +18,7 @@ import { ImmersionApplicationRepository } from "../ports/ImmersionApplicationRep
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { AgencyRepository } from "../ports/AgencyRepository";
 import { createLogger } from "../../../utils/logger";
-import { createMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
 import { TokenExpiredError } from "jsonwebtoken";
@@ -82,7 +82,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     } catch (err: any) {
       // If this JWT is signed by us but expired, deal with it.
       if (err instanceof TokenExpiredError) {
-        payloadToExtract = jwt.decode(expiredJwt) as MagicLinkPayload;
+        payloadToExtract = jwt.decode(expiredJwt) as ConventionMagicLinkPayload;
       } else {
         // Perhaps this is a JWT that is signed by a compromised key.
         try {
@@ -150,7 +150,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
       if (!emailHash || emailHashForMagicLink(email) === emailHash) {
         foundHit = true;
         const jwt = this.generateMagicLinkJwt(
-          createMagicLinkPayload(
+          createConventionMagicLinkPayload(
             applicationId,
             role,
             email,

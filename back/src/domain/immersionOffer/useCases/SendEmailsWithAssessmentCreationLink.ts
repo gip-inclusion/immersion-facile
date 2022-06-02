@@ -1,5 +1,3 @@
-import { createConventionJwtPayload } from "shared/src/tokens/MagicLinkPayload";
-import { GenerateCreateImmersionAssessmentUrl } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
 import { UseCase } from "../../core/UseCase";
@@ -11,6 +9,7 @@ import { createLogger } from "../../../utils/logger";
 import { addDays } from "date-fns";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { ImmersionApplicationQueries } from "../../immersionApplication/ports/ImmersionApplicationQueries";
+import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
 
 const logger = createLogger(__filename);
 
@@ -29,7 +28,7 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
     private applicationQueries: ImmersionApplicationQueries,
     private emailGateway: EmailGateway,
     private clock: Clock,
-    private generateCreateImmersionAssessmentUrl: GenerateCreateImmersionAssessmentUrl,
+    private generateConventionMagicLink: GenerateConventionMagicLink,
     private createNewEvent: CreateNewEvent,
   ) {
     super();
@@ -49,7 +48,6 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
       assessmentEmailParamsOfImmersionEndingTomorrow.map(
         async (immersionEndingTomorrow) => {
           await this._sendOneEmailWithImmersionAssessmentCreationLink(
-            now,
             immersionEndingTomorrow,
           ).catch((error: any) => {
             errors[immersionEndingTomorrow.immersionId] = error;
@@ -65,16 +63,14 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
     );
   }
   private async _sendOneEmailWithImmersionAssessmentCreationLink(
-    now: Date,
     immersionAssessmentEmailParams: ImmersionAssessmentEmailParams,
   ) {
-    const payload = createConventionJwtPayload({
+    const immersionAssessmentCreationLink = this.generateConventionMagicLink({
       id: immersionAssessmentEmailParams.immersionId,
-      now,
-      durationDays: 15,
+      email: immersionAssessmentEmailParams.mentorEmail,
+      role: "establishment",
+      targetRoute: "",
     });
-    const immersionAssessmentCreationLink =
-      this.generateCreateImmersionAssessmentUrl(payload);
 
     await this.emailGateway.sendImmersionAssessmentCreationLink(
       immersionAssessmentEmailParams.mentorEmail,
@@ -88,8 +84,8 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
     );
 
     const event = this.createNewEvent({
-      topic: "EmailWithImmersionAssessmentCreationLinkSent",
-      payload,
+      topic: "EmailWithLinkToCreateAssessmentSent",
+      payload: { id: immersionAssessmentEmailParams.immersionId },
     });
     await this.outboxRepo.save(event);
   }

@@ -1,13 +1,13 @@
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
 import { GenerateMagicLink } from "../../../domain/immersionApplication/useCases/GenerateMagicLink";
 import {
-  createMagicLinkPayload,
-  MagicLinkPayload,
+  createConventionMagicLinkPayload,
+  ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
 
 const generateJwtFn: GenerateMagicLinkJwt = (payload) => {
-  const { applicationId, role, iat } = payload as MagicLinkPayload;
+  const { applicationId, role, iat } = payload as ConventionMagicLinkPayload;
   return applicationId + ";" + role + ";" + iat;
 };
 
@@ -31,7 +31,7 @@ describe("Generate magic links", () => {
       });
 
       expect(result).toEqual({
-        jwt: generateJwtFn(createMagicLinkPayload(id, role, email)),
+        jwt: generateJwtFn(createConventionMagicLinkPayload(id, role, email)),
       });
     });
   });

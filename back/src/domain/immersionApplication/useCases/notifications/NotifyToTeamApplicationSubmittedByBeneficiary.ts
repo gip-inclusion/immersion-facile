@@ -1,6 +1,6 @@
 import { parseISO } from "date-fns";
 import { frontRoutes } from "shared/src/routes";
-import { GenerateVerificationMagicLink } from "../../../../adapters/primary/config/createGenerateVerificationMagicLink";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
@@ -13,7 +13,7 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary extends UseCase<Immer
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly agencyRepository: AgencyRepository,
-    private readonly generateMagicLinkFn: GenerateVerificationMagicLink,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
     super();
   }
@@ -58,12 +58,12 @@ export class NotifyToTeamApplicationSubmittedByBeneficiary extends UseCase<Immer
           dateEnd: parseISO(dateEnd).toLocaleDateString("fr"),
           businessName,
           agencyName: agency.name,
-          magicLink: this.generateMagicLinkFn(
+          magicLink: this.generateMagicLinkFn({
             id,
-            "admin",
-            frontRoutes.immersionApplicationsToValidate,
+            role: "admin",
+            targetRoute: frontRoutes.immersionApplicationsToValidate,
             email,
-          ),
+          }),
         }),
       ),
     );
