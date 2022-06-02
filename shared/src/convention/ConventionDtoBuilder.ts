@@ -9,11 +9,13 @@ import {
   ConventionStatus,
   ConventionDto,
   ConventionId,
+  ConventionExternalId,
 } from "./convention.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+export const CONVENTION_EXTERNAL_ID = "00000000001";
 export const VALID_EMAILS = [
   "beneficiary@email.fr",
   "establishment@example.com",
@@ -30,6 +32,7 @@ export const VALID_PHONES = [
 
 const validConvention: ConventionDto = {
   id: DEMANDE_IMMERSION_ID,
+  externalId: CONVENTION_EXTERNAL_ID,
   status: "DRAFT",
   postalCode: "75001",
   agencyId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -117,7 +120,11 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withId(id: ConventionId): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, id });
   }
-
+  public withExternalId(
+    externalId: ConventionExternalId,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, externalId });
+  }
   public withAgencyId(agencyId: AgencyId): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, agencyId });
   }

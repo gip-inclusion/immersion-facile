@@ -11,11 +11,12 @@ import {
   ConventionStatus,
   ConventionDto,
   WithConventionId,
+  ConventionDtoWithoutExternalId,
 } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 
 export class AddImmersionApplication extends TransactionalUseCase<
-  ConventionDto,
+  ConventionDtoWithoutExternalId,
   WithConventionId
 > {
   constructor(
@@ -46,9 +47,9 @@ export class AddImmersionApplication extends TransactionalUseCase<
       await rejectsSiretIfNotAnOpenCompany(this.getSiret, conventionDto.siret);
     }
 
-    const id = await uow.conventionRepository.save(conventionDto);
+    const externalId = await uow.conventionRepository.save(conventionDto);
 
-    if (!id) throw new ConflictError(conventionDto.id);
+    if (!externalId) throw new ConflictError(conventionDto.id);
 
     const event = this.createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
@@ -56,6 +57,6 @@ export class AddImmersionApplication extends TransactionalUseCase<
     });
     await uow.outboxRepo.save(event);
 
-    return { id };
+    return { id: conventionDto.id };
   }
 }

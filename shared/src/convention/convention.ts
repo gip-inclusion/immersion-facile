@@ -47,6 +47,7 @@ export const signConventionDtoWithRole = (
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
   id: "fake-test-id",
+  externalId: "00000000001",
   status: "DRAFT",
   email: "esteban@ocon.fr",
   phone: "+33012345678",

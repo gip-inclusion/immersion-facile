@@ -26,8 +26,9 @@ export const validatedConventionStatuses: ConventionStatus[] = [
 ];
 
 export type ConventionId = Flavor<string, "ConventionId">;
+export type ConventionExternalId = Flavor<string, "ConventionExternalId">;
 
-export type ConventionDto = {
+export type ConventionDtoWithoutExternalId = {
   id: ConventionId;
   status: ConventionStatus;
   rejectionJustification?: string;
@@ -61,6 +62,10 @@ export type ConventionDto = {
   beneficiaryAccepted: boolean;
   enterpriseAccepted: boolean;
   federatedIdentity?: FederatedIdentity;
+};
+
+export type ConventionDto = ConventionDtoWithoutExternalId & {
+  externalId: ConventionExternalId;
 };
 
 export type WithConventionId = {

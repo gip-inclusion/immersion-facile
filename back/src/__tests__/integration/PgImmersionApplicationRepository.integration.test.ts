@@ -25,6 +25,9 @@ describe("PgConventionRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM immersion_applications");
+    await client.query(
+      "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
+    );
     conventionRepository = new PgConventionRepository(client);
   });
 
@@ -32,11 +35,12 @@ describe("PgConventionRepository", () => {
     const convention = new ConventionDtoBuilder()
       .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
       .build();
-    await conventionRepository.save(convention);
+    const externalId = await conventionRepository.save(convention);
 
-    expect(await conventionRepository.getById(convention.id)).toEqual(
-      convention,
-    );
+    expect(await conventionRepository.getById(convention.id)).toEqual({
+      ...convention,
+      externalId,
+    });
   });
 
   it("Adds a new convention with field workConditions undefined", async () => {
@@ -44,20 +48,22 @@ describe("PgConventionRepository", () => {
       .withoutWorkCondition()
       .build();
 
-    await conventionRepository.save(convention);
+    const externalId = await conventionRepository.save(convention);
 
-    expect(await conventionRepository.getById(convention.id)).toEqual(
-      convention,
-    );
+    expect(await conventionRepository.getById(convention.id)).toEqual({
+      ...convention,
+      externalId,
+    });
   });
 
   it("Updates an already saved immersion", async () => {
     const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
     const convention = new ConventionDtoBuilder().withId(idA).build();
-    await conventionRepository.save(convention);
+    const externalId = await conventionRepository.save(convention);
 
     const updatedConvention = new ConventionDtoBuilder()
       .withId(idA)
+      .withExternalId(externalId)
       .withStatus("VALIDATED")
       .withEmail("someUpdated@email.com")
       .withDateEnd("2021-01-20")

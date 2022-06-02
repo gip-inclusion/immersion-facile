@@ -27,7 +27,11 @@ describe("Pg implementation of ConventionQueries", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM immersion_applications");
+    await client.query(
+      "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
+    );
     await client.query("DELETE FROM agencies");
+
     conventionQueries = new PgConventionQueries(client);
     agencyRepo = new PgAgencyRepository(client);
     conventionRepository = new PgConventionRepository(client);
@@ -72,6 +76,7 @@ describe("Pg implementation of ConventionQueries", () => {
         sanitaryPrevention,
         sanitaryPreventionDescription,
         immersionAppellation,
+        externalId,
         ...filteredProperties
       } = convention;
       // Assert
@@ -100,14 +105,17 @@ describe("Pg implementation of ConventionQueries", () => {
       const idB: ConventionId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
       const conventionB = new ConventionDtoBuilder().withId(idB).build();
 
-      await conventionRepository.save(conventionA);
-      await conventionRepository.save(conventionB);
+      const externalIdA = await conventionRepository.save(conventionA);
+      const externalIdB = await conventionRepository.save(conventionB);
 
       const resultA = await conventionRepository.getById(idA);
-      expect(resultA).toEqual(conventionA);
+      expect(resultA).toEqual({ ...conventionA, externalId: externalIdA });
 
       const resultAll = await conventionQueries.getLatestUpdated();
-      expect(resultAll).toEqual([conventionB, conventionA]);
+      expect(resultAll).toEqual([
+        { ...conventionB, externalId: externalIdB },
+        { ...conventionA, externalId: externalIdA },
+      ]);
     });
   });
 

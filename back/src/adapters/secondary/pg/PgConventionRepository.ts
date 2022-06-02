@@ -2,8 +2,10 @@ import { format } from "date-fns";
 import { PoolClient } from "pg";
 import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
 import {
-  ConventionDto,
   ConventionId,
+  ConventionExternalId,
+  ConventionDto,
+  ConventionDtoWithoutExternalId,
 } from "shared/src/convention/convention.dto";
 import { optional } from "./pgUtils";
 
@@ -16,10 +18,12 @@ export class PgConventionRepository implements ConventionRepository {
     conventionId: ConventionId,
   ): Promise<ConventionDto | undefined> {
     const pgResult = await this.client.query(
-      `SELECT *, vad.*
+      `SELECT *, vad.*, cei.external_id
        FROM immersion_applications
        LEFT JOIN view_appellations_dto AS vad 
        ON vad.appellation_code = immersion_applications.immersion_appellation
+       LEFT JOIN convention_external_ids AS cei
+       ON cei.convention_id = immersion_applications.id
        WHERE id = $1 `,
       [conventionId],
     );
@@ -31,20 +35,27 @@ export class PgConventionRepository implements ConventionRepository {
   }
 
   public async save(
-    convention: ConventionDto,
-  ): Promise<ConventionId | undefined> {
+    convention: ConventionDtoWithoutExternalId,
+  ): Promise<ConventionExternalId> {
     // prettier-ignore
     const { id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions } =
       convention
 
-    const query = `INSERT INTO immersion_applications(
+    const query_insert_application = `INSERT INTO immersion_applications(
         id, status, email, first_name, last_name, phone, emergency_contact, emergency_contact_phone, agency_id, date_submission, date_start, date_end, siret, business_name, mentor, mentor_phone, mentor_email, schedule, individual_protection,
         sanitary_prevention, sanitary_prevention_description, immersion_address, immersion_objective, immersion_appellation, immersion_activities, immersion_skills, beneficiary_accepted, enterprise_accepted, postal_code, work_conditions
       ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30)`;
 
     // prettier-ignore
-    await this.client.query(query, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions]);
-    return convention.id;
+    await this.client.query(query_insert_application, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions]);
+
+    const query_insert_external_id = `INSERT INTO convention_external_ids(convention_id) VALUES($1) RETURNING external_id;`;
+    const convention_external_id = await this.client.query(
+      query_insert_external_id,
+      [id],
+    );
+
+    return convention_external_id.rows[0].external_id;
   }
 
   public async update(
@@ -72,6 +83,7 @@ export const pgConventionRowToDto = (
   params: Record<any, any>,
 ): ConventionDto => ({
   id: params.id,
+  externalId: params.external_id,
   status: params.status,
   email: params.email,
   firstName: params.first_name,
