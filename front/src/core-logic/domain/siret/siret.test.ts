@@ -104,12 +104,10 @@ describe("Siret validation and fetching", () => {
       ({ store, dependencies } = createTestStore(
         {
           featureFlags: {
-            featureFlags: {
-              enableInseeApi: false,
-              enableAdminUi: true,
-              enablePeConnectApi: false,
-              enableLogoUpload: false,
-            },
+            enableInseeApi: false,
+            enableAdminUi: true,
+            enablePeConnectApi: false,
+            enableLogoUpload: false,
           },
         },
         "skip",

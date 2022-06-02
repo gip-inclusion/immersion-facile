@@ -26,7 +26,7 @@ const triggerSiretFetchEpic: AppEpic<SiretAction> = (action$, state$) =>
       iif(
         () => shouldTriggerSearch(action.payload),
         of(siretSlice.actions.siretInfoRequested(action.payload)).pipe(
-          filter(() => state$.value.featureFlags.featureFlags.enableInseeApi),
+          filter(() => state$.value.featureFlags.enableInseeApi),
         ),
         of(siretSlice.actions.siretWasNotValid()),
       ),
