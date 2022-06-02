@@ -70,23 +70,6 @@ describe("Establishment", () => {
     );
   });
 
-  it("forgets modification link was sent if siret changes", () => {
-    ({ store, dependencies } = createTestStore(
-      {
-        establishment: {
-          isLoading: false,
-          status: "LINK_SENT",
-        },
-      },
-      "skip",
-    ));
-    store.dispatch(siretSlice.actions.siretModified("1234"));
-    expectEstablishmentStateToMatch({
-      isLoading: false,
-      status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
-    });
-  });
-
   const expectEstablishmentStateToMatch = (
     expected: Partial<EstablishmentState>,
   ) => expectObjectsToMatch(store.getState().establishment, expected);

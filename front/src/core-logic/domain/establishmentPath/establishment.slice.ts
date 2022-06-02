@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SiretDto } from "shared/src/siret";
-import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
 type EstablishmentUiStatus =
   | "IDLE"
@@ -37,11 +36,5 @@ export const establishmentSlice = createSlice({
       state.isLoading = false;
       state.status = "LINK_SENT";
     },
-  },
-  extraReducers: (builder) => {
-    // LINK_SENT is forgotten if the siret is modified
-    builder.addCase(siretSlice.actions.siretModified.type, (state) => {
-      state.status = "READY_FOR_LINK_REQUEST_OR_REDIRECTION";
-    });
   },
 });
