@@ -2,3 +2,4 @@ packages:
   - "front"
   - "back"
   - "shared"
+  - "libs/*"

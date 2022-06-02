@@ -1,5 +1,10 @@
 {
   "name": "root",
   "version": "1.0.0",
-  "workspaces": ["front", "back", "shared"]
+  "workspaces": [
+    "front",
+    "back",
+    "shared",
+    "libs/*"
+  ]
 }
