@@ -19,7 +19,6 @@ export const Button = ({
   level = "primary",
 }: SubmitButtonProps) => {
   const isSecondary = level === "secondary" ? "fr-btn--secondary" : "";
-
   return (
     <button
       className={`fr-btn ${isSecondary} ${className}`}
