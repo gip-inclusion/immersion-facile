@@ -20,8 +20,9 @@ export const ConventionFormProfession = ({
 }: ConventionFormProfessionProps) => {
   const name: keyof ConventionDto = "immersionAppellation";
 
-  const [{ value }, _, { setValue }] =
-    useField<ConventionDto["immersionAppellation"]>(name);
+  const [{ value }, _, { setValue }] = useField<
+    ConventionDto["immersionAppellation"] | undefined
+  >(name);
 
   if (disabled)
     return (
@@ -29,7 +30,7 @@ export const ConventionFormProfession = ({
         label={label}
         name={name}
         disabled
-        value={value.appellationLabel}
+        value={value?.appellationLabel}
       />
     );
 
