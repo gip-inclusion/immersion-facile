@@ -1,13 +1,14 @@
-import checked from "/checked.svg";
 import React from "react";
+import { Image } from "../image/Image";
 
 type CardProps = {
+  svg: string;
   boldText: string;
   text: string;
 };
-export const Card = ({ boldText, text }: CardProps) => (
+export const Card = ({ svg, boldText, text }: CardProps) => (
   <div className="p-2 m-2 w-48 bg-blue-50 rounded flex flex-col items-center">
-    <img src={checked} alt="checked-icon" height="10px" />
+    <Image url={svg} alt="checked-icon" height="10px" />
     <div className="text-immersionBlue-dark font-semibold text-center">
       {boldText}
     </div>

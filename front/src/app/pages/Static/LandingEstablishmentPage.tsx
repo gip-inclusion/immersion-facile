@@ -1,15 +1,16 @@
 import bubbles from "/bulles.svg";
+import checked from "/checked.svg";
 import greatings from "/greatings.png";
 import tandem from "/tandem.png";
 import React from "react";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { BulletPoint } from "src/uiComponents/BulletPoint";
-import { Card } from "src/uiComponents/Card";
 import { Colored } from "src/uiComponents/Colored";
 import { EstablishmentImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { Statistic } from "src/uiComponents/Statistic";
 import { Title } from "react-design-system/src/immersionFacile/text/Title";
+import { Card } from "react-design-system/src/immersionFacile/card/Card";
 
 export const LandingEstablishmentPage = () => (
   <HeaderFooterLayout>
@@ -66,18 +67,22 @@ export const LandingEstablishmentPage = () => (
         style={{ minWidth: "420px" }}
       >
         <Card
+          svg={checked}
           boldText="Faire connaître vos métiers"
           text="et l'environnement de travail"
         />
         <Card
+          svg={checked}
           boldText="Évaluer les candidats potentiels"
           text="en situation professionnelle réelle"
         />
         <Card
+          svg={checked}
           boldText="Pré-sourcer des profils invisibles"
           text="en cas de recrutement classique"
         />
         <Card
+          svg={checked}
           boldText="Renforcer une démarche inclusive"
           text="au sein des équipes"
         />
