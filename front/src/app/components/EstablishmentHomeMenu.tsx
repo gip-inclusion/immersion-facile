@@ -4,13 +4,13 @@ import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/
 import { isSiretAlreadySavedSelector } from "src/core-logic/domain/siret/siret.selectors";
 import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
 import { useSiretFetcher } from "src/hooks/siret.hooks";
-import { HomeButton } from "src/uiComponents/Button";
 import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 import { Link } from "src/uiComponents/Link";
 import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSubTitle";
 import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
 import { routes } from "../routing/routes";
 import { useAppSelector } from "../utils/reduxHooks";
+import { HomeButton } from "react-design-system/src/immersionFacile/buttons/HomeButton";
 
 export const EstablishmentHomeMenu = () => {
   const { currentSiret, updateSiret, siretError } = useSiretFetcher({

@@ -4,7 +4,7 @@ import {
   ConventionStatus,
   ConventionDto,
 } from "shared/src/convention/convention.dto";
-import { Button } from "react-design-system/src/immersionFacile/button/Button";
+import { Button } from "react-design-system/src/immersionFacile/buttons/Button";
 
 export type VerificationActionButtonProps = {
   convention?: ConventionDto;

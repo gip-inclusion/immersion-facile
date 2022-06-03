@@ -4,7 +4,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { notEqual } from "shared/src/ramdaExtensions/notEqual";
 import { OmitFromExistingKeys } from "shared/src/utils";
-import { Button } from "react-design-system/src/immersionFacile/button/Button";
+import { Button } from "react-design-system/src/immersionFacile/buttons/Button";
 import { z } from "zod";
 
 const immersionBlue = "#3458a2";

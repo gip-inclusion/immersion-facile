@@ -3,7 +3,7 @@ import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { Route } from "type-route";
-import { Button } from "react-design-system/src/immersionFacile/button/Button";
+import { Button } from "react-design-system/src/immersionFacile/buttons/Button";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewMagicLink>;

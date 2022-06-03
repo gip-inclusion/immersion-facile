@@ -6,7 +6,7 @@ import {
   contactEstablishmentByPhoneSchema,
 } from "shared/src/contactEstablishment";
 import { SiretDto } from "shared/src/siret";
-import { Button } from "react-design-system/src/immersionFacile/button/Button";
+import { Button } from "react-design-system/src/immersionFacile/buttons/Button";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 
