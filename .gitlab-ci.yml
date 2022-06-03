@@ -218,3 +218,27 @@ deploy_on_prod:
       sleep 60;
       echo \"Checking server health...\";
       curl --fail --output /dev/null http://localhost:80/api/"
+
+notify-staging-deployed:
+  image: alpine:latest
+  only:
+    - staging
+  stage: deploy
+  needs:
+    - deploy_on_staging
+  before_script:
+    - apk add --update curl && rm -rf /var/cache/apk/*
+  script:
+    - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La STAGING a été déployée https://immersion-staging.beta.pole-emploi.fr"}' $DISCORD_WEBHOOK_STAGING_DEPLOYED
+
+notify-prod-deployed:
+  image: alpine:latest
+  only:
+    - main
+  stage: deploy
+  needs:
+    - deploy_on_prod
+  before_script:
+    - apk add --update curl && rm -rf /var/cache/apk/*
+  script:
+    - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La PRODUCTION a été déployée https://immersion-facile.beta.gouv.fr"}' $DISCORD_WEBHOOK_PROD_DEPLOYED
