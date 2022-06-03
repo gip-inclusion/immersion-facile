@@ -8,6 +8,7 @@ import {
 } from "shared/src/routes";
 import { createLogger } from "../../../utils/logger";
 import type { AppDependencies } from "../config/createAppDependencies";
+import { validateAndParseZodSchema } from "../helpers/httpErrors";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
 const logger = createLogger(__filename);
@@ -27,7 +28,10 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
   formCompletionRouter.route(`/${romeRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
       logger.info(req);
-      const query = romeAutocompleteInputSchema.parse(req.query);
+      const query = validateAndParseZodSchema(
+        romeAutocompleteInputSchema,
+        req.query,
+      );
       return deps.useCases.romeSearch.execute(query.searchText);
     }),
   );

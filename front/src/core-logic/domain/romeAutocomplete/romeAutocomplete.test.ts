@@ -83,4 +83,12 @@ describe("Rome Autocomplete", () => {
       thenIsSearchingIs(false),
     ]);
   });
+
+  describe("does not trigger search if text is less than 3 characters ignoring white spaces", () => {
+    triggerTests(createTestStore(), [
+      whenSearchTextIsProvided("b  "),
+      fastForwardObservables("waits 400ms"),
+      thenIsSearchingIs(false),
+    ]);
+  });
 });
