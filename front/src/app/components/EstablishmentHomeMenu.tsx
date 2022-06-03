@@ -10,7 +10,7 @@ import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSub
 import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
 import { routes } from "../routing/routes";
 import { useAppSelector } from "../utils/reduxHooks";
-import { HomeButton } from "react-design-system/src/immersionFacile/buttons/HomeButton";
+import { HomeButton } from "react-design-system/src/immersionFacile/components/buttons/HomeButton";
 
 export const EstablishmentHomeMenu = () => {
   const { currentSiret, updateSiret, siretError } = useSiretFetcher({

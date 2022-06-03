@@ -3,8 +3,8 @@ import homeVideoImage from "/home_video_image.jpg";
 import React from "react";
 import { BulletPoint } from "./BulletPoint";
 import { Colored } from "./Colored";
-import { Title } from "react-design-system/src/immersionFacile/text/Title";
-import { SubTitle } from "react-design-system/src/immersionFacile/text/SubTitle";
+import { Title } from "react-design-system/src/immersionFacile/components/text/Title";
+import { SubTitle } from "react-design-system/src/immersionFacile/components/text/SubTitle";
 
 type ImmersionHowToProps = {
   videoUrl: string;

@@ -9,7 +9,7 @@ import { ConventionFormFieldsUkraine } from "src/app/pages/Convention/Convention
 import { ConventionPresentation } from "src/app/pages/Convention/ConventionPage";
 import { conventionUkraineSchema } from "shared/src/convention/convention.schema";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
-import { Title } from "react-design-system/src/immersionFacile/text/Title";
+import { Title } from "react-design-system/src/immersionFacile/components/text/Title";
 
 type ConventionFormProps = {
   properties: ConventionPresentation;

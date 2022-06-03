@@ -1,12 +1,12 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
+import { imagePrefix } from "../../storyPrefixes";
 import { Image, ImageProps } from "./Image";
-
 const Component = Image;
-
+const prefix = imagePrefix;
 const argTypes: Partial<ArgTypes<ImageProps>> | undefined = {};
 export default {
-  title: `Immersion Facilité/${Component.name}`,
+  title: `${prefix}${Component.name}`,
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

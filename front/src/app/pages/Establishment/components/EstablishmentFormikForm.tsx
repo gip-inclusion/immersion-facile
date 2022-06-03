@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { SiretDto } from "shared/src/siret";
-import { HomeButton } from "react-design-system/src/immersionFacile/buttons/HomeButton";
+import { HomeButton } from "react-design-system/src/immersionFacile/components/buttons/HomeButton";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";

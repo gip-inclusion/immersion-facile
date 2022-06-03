@@ -18,12 +18,12 @@ import {
 import { agencySchema } from "shared/src/agency/agency.schema";
 import { zEmail } from "shared/src/zodUtils";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
-import { Button } from "react-design-system/src/immersionFacile/buttons/Button";
+import { Button } from "react-design-system/src/immersionFacile/components/buttons/Button";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
-import { Title } from "react-design-system/src/immersionFacile/text/Title";
+import { Title } from "react-design-system/src/immersionFacile/components/text/Title";
 import { v4 as uuidV4 } from "uuid";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 

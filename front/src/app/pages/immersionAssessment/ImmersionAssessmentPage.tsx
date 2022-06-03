@@ -21,12 +21,12 @@ import {
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
 import { conventionStateSelector } from "src/core-logic/domain/convention/convention.selectors";
-import { Button } from "react-design-system/src/immersionFacile/buttons/Button";
+import { Button } from "react-design-system/src/immersionFacile/components/buttons/Button";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
-import { Title } from "src/uiComponents/Title";
+import { Title } from "react-design-system/src/immersionFacile/components/text/Title";
 import { Route } from "type-route";
 import { useConvention } from "src/hooks/convention";
 import { useImmersionAssessment } from "src/hooks/immersionAssessment";

@@ -1,12 +1,12 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
+import { cardPrefix } from "../../storyPrefixes";
 import { Card, CardProps } from "./Card";
-
 const Component = Card;
-
+const prefix = cardPrefix;
 const argTypes: Partial<ArgTypes<CardProps>> | undefined = {};
 export default {
-  title: `Immersion Facilité/${Component.name}`,
+  title: `${prefix}${Component.name}`,
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;
