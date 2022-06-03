@@ -67,22 +67,22 @@ export const LandingEstablishmentPage = () => (
         style={{ minWidth: "420px" }}
       >
         <Card
-          svg={checked}
+          imageUrl={checked}
           boldText="Faire connaître vos métiers"
           text="et l'environnement de travail"
         />
         <Card
-          svg={checked}
+          imageUrl={checked}
           boldText="Évaluer les candidats potentiels"
           text="en situation professionnelle réelle"
         />
         <Card
-          svg={checked}
+          imageUrl={checked}
           boldText="Pré-sourcer des profils invisibles"
           text="en cas de recrutement classique"
         />
         <Card
-          svg={checked}
+          imageUrl={checked}
           boldText="Renforcer une démarche inclusive"
           text="au sein des équipes"
         />
