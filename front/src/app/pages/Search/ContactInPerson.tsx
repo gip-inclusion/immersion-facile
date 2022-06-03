@@ -6,7 +6,7 @@ import {
   contactEstablishmentInPersonSchema,
 } from "shared/src/contactEstablishment";
 import { SiretDto } from "shared/src/siret";
-import { Button } from "src/uiComponents/Button";
+import { Button } from "react-design-system/src/immersionFacile/button/Button";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 

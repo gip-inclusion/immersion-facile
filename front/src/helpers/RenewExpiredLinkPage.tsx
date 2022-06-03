@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
-import { Button } from "src/uiComponents/Button";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { Route } from "type-route";
+import { Button } from "react-design-system/src/immersionFacile/button/Button";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewMagicLink>;
