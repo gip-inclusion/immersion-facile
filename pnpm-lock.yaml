@@ -230,6 +230,7 @@ importers:
   libs/react-design-system:
     specifiers:
       '@babel/core': ^7.18.2
+      '@gouvfr/dsfr': ^1.5.1
       '@storybook/addon-actions': ^6.5.6
       '@storybook/addon-essentials': ^6.5.6
       '@storybook/addon-interactions': ^6.5.6
@@ -249,6 +250,7 @@ importers:
       webpack: '>=2.0.0'
     devDependencies:
       '@babel/core': 7.18.2
+      '@gouvfr/dsfr': 1.5.1
       '@storybook/addon-actions': 6.5.6_sfoxds7t5ydpegc3knd667wn6m
       '@storybook/addon-essentials': 6.5.6_zziqyydoj5gk5253tvozfz5dhy
       '@storybook/addon-interactions': 6.5.6_vwdntcuu62m3mfyj65vx2ixvuq
@@ -3091,6 +3093,11 @@ packages:
     resolution: {integrity: sha512-11TYlm2nqJVN7VezjManBNUy/O3o/nJ5X9F1N6wkstf0x0N6Ucmtys4yTCPdC036AHqQj7X3v/OwIuvSUDOx5A==}
     engines: {node: '>=14.18.0'}
     dev: false
+
+  /@gouvfr/dsfr/1.5.1:
+    resolution: {integrity: sha512-z0o1zD3zAzF3CTGWev2tSLHPv8yk52xq6QOuEuGulGfIze5N/Y3W+ScT+dKyZG8y/aOyX9T+O9wYnNH5XIGb0g==}
+    engines: {node: '>=14.18.0'}
+    dev: true
 
   /@humanwhocodes/config-array/0.9.5:
     resolution: {integrity: sha512-ObyMyWxZiCu/yTisA7uzx81s40xR2fD5Cg/2Kq7G02ajkNubJf6BopgDTmDyc3U7sXpNKM8cYOw7s7Tyr+DnCw==}
