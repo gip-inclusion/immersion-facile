@@ -5,12 +5,12 @@ import { isSiretAlreadySavedSelector } from "src/core-logic/domain/siret/siret.s
 import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
 import { useSiretFetcher } from "src/hooks/siret.hooks";
 import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
-import { Link } from "src/uiComponents/Link";
 import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSubTitle";
 import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
 import { routes } from "../routing/routes";
 import { useAppSelector } from "../utils/reduxHooks";
 import { HomeButton } from "react-design-system/src/immersionFacile/components/buttons/HomeButton";
+import { Link } from "react-design-system/src/immersionFacile/components/link/Link";
 
 export const EstablishmentHomeMenu = () => {
   const { currentSiret, updateSiret, siretError } = useSiretFetcher({

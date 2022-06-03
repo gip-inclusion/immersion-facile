@@ -1,6 +1,6 @@
 import React from "react";
 import { Link as LinkRoute } from "type-route";
-interface LinkContract {
+export interface LinkContract {
   text: string;
   url: LinkRoute;
 }
