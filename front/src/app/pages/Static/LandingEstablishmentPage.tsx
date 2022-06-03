@@ -9,7 +9,7 @@ import { Card } from "src/uiComponents/Card";
 import { Colored } from "src/uiComponents/Colored";
 import { EstablishmentImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { Statistic } from "src/uiComponents/Statistic";
-import { Title } from "src/uiComponents/Title";
+import { Title } from "react-design-system/src/immersionFacile/text/Title";
 
 export const LandingEstablishmentPage = () => (
   <HeaderFooterLayout>

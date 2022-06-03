@@ -23,7 +23,7 @@ import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
-import { Title } from "src/uiComponents/Title";
+import { Title } from "react-design-system/src/immersionFacile/text/Title";
 import { v4 as uuidV4 } from "uuid";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 

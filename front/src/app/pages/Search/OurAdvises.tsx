@@ -1,6 +1,7 @@
 import { Accordion, AccordionItem } from "@dataesr/react-dsfr";
 import React from "react";
-import { SubTitle, Title } from "src/uiComponents/Title";
+import { Title } from "react-design-system/src/immersionFacile/text/Title";
+import { SubTitle } from "react-design-system/src/immersionFacile/text/SubTitle";
 
 export const OurAdvises = () => (
   <div className="flex justify-center items-center flex-col">

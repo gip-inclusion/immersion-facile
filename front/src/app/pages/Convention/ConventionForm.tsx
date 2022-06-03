@@ -18,7 +18,7 @@ import { conventionSchema } from "shared/src/convention/convention.schema";
 import { toDateString } from "shared/src/utils/date";
 import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
-import { Title } from "src/uiComponents/Title";
+import { Title } from "react-design-system/src/immersionFacile/text/Title";
 import { ConventionFormFields } from "./ConventionFormFields";
 
 type ConventionFormProps = {
