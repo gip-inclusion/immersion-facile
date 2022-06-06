@@ -110,8 +110,8 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/26/message-setup
   SUGGEST_EDIT_FORM_ESTABLISHMENT: 26,
 
-  // https://my.sendinblue.com/camp/template/27/message-setup
-  CREATE_IMMERSION_ASSESSMENT: 27,
+  // https://my.sendinblue.com/camp/template/41/message-setup
+  CREATE_IMMERSION_ASSESSMENT: 41,
 
   // https://my.sendinblue.com/camp/template/39/message-setup
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: 39,
