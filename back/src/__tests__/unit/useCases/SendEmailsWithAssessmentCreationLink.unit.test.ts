@@ -25,13 +25,13 @@ const prepareUseCase = () => {
 
   const generateConventionMagicLink = ({
     id,
+    targetRoute,
   }: {
     id: ConventionId;
     role: Role;
     targetRoute: string;
     email: string;
-  }) =>
-    `www.immersion-facile.fr/immersion-assessment?jwt=jwtOfImmersion[${id}]`;
+  }) => `www.immersion-facile.fr/${targetRoute}?jwt=jwtOfImmersion[${id}]`;
 
   const useCase = new SendEmailsWithAssessmentCreationLink(
     outboxRepo,
@@ -89,7 +89,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     ]);
 
     expect(sentEmails[0].params).toEqual({
-      immersionAssessmentCreationLink: `www.immersion-facile.fr/immersion-assessment?jwt=jwtOfImmersion[immersion-ending-tommorow-id]`,
+      immersionAssessmentCreationLink: `www.immersion-facile.fr/bilan-immersion?jwt=jwtOfImmersion[immersion-ending-tommorow-id]`,
       mentorName: immersionApplicationEndingTomorrow.properties.mentor,
       beneficiaryFirstName:
         immersionApplicationEndingTomorrow.properties.firstName,

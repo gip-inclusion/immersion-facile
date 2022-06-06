@@ -1,3 +1,4 @@
+import { frontRoutes } from "shared/src/routes";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
 import { UseCase } from "../../core/UseCase";
@@ -70,7 +71,7 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
       id: immersionAssessmentEmailParams.immersionId,
       email: immersionAssessmentEmailParams.mentorEmail,
       role: "establishment",
-      targetRoute: "",
+      targetRoute: frontRoutes.immersionAssessment,
     });
 
     await this.emailGateway.sendImmersionAssessmentCreationLink(

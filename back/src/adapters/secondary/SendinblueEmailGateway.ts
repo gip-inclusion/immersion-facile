@@ -139,8 +139,8 @@ export class SendinblueEmailGateway implements EmailGateway {
       "CREATE_IMMERSION_ASSESSMENT",
       [recipient],
       {
-        BENIFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-        BENIFICIARY_LAST_NAME: params.beneficiaryLastName,
+        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
         MENTOR_NAME: params.mentorName,
         IMMERSION_ASSESSMENT_CREATION_LINK:
           params.immersionAssessmentCreationLink,
