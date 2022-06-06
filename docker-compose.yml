@@ -30,7 +30,7 @@ services:
       - ESTABLISHMENT_UPDATE_FROM_SIRENE
     volumes:
       - ./docker-data/pipelines:/var/lib/pipelines
-      - ./.env:/app/.env
+      - ./.env:/app/back/.env
 
   nginx:
     restart: unless-stopped
