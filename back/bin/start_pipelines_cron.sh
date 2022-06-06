@@ -34,6 +34,7 @@ fi
 cat <<EOT > $CRONFILE
 SHELL=/bin/bash
 PATH=$PATH
+NODE_ENV=production
 
 # Pipeline: update-establishments-from-sirene
 $ESTABLISHMENT_UPDATE_FROM_SIRENE cd /app/back && pnpm start-update-establishments-from-sirene >> $LOGDIR/update-establishments-from-sirene.log 2>&1
