@@ -1,8 +1,16 @@
 import { PoolClient } from "pg";
 import { ConventionId } from "shared/src/convention/convention.dto";
-import { ConventionPoleEmploiAdvisorRepository } from "../../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
-import { PoleEmploiUserAdvisorDto } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import {
+  ConventionPoleEmploiUserAdvisorDto,
+  ConventionPoleEmploiUserAdvisorEntity,
+  PoleEmploiUserAdvisorDto,
+} from "../../../domain/peConnect/dto/PeConnect.dto";
+import {
+  ConventionAndPeExternalIds,
+  ConventionPoleEmploiAdvisorRepository,
+} from "../../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
+import { conventionPoleEmploiUserAdvisorDtoSchema } from "../../../domain/peConnect/port/PeConnect.schema";
 
 const CONVENTION_ID_DEFAULT_UUID = "00000000-0000-0000-0000-000000000000";
 
@@ -14,7 +22,7 @@ export class PgConventionPoleEmploiAdvisorRepository
   public async associateConventionAndUserAdvisor(
     conventionId: ConventionId,
     peExternalId: PeExternalId,
-  ): Promise<void> {
+  ): Promise<ConventionAndPeExternalIds> {
     const pgResult = await this.client.query(
       `
       UPDATE partners_pe_connect
@@ -26,6 +34,11 @@ export class PgConventionPoleEmploiAdvisorRepository
 
     if (pgResult.rowCount != 1)
       throw new Error("Association between Convention and userAdvisor failed");
+
+    return {
+      conventionId,
+      peExternalId,
+    };
   }
 
   public async openSlotForNextConvention(
@@ -43,7 +56,56 @@ export class PgConventionPoleEmploiAdvisorRepository
       type,
     ]);
   }
+
+  public async getByConventionId(
+    conventionId: ConventionId,
+  ): Promise<ConventionPoleEmploiUserAdvisorEntity> {
+    const pgResult = await this.client.query(
+      `SELECT *
+       FROM partners_pe_connect
+       WHERE convention_id = $1`,
+      [conventionId],
+    );
+
+    return toConventionPoleEmploiUserAdvisorEntity(
+      conventionPoleEmploiUserAdvisorDtoSchema.parse(
+        toConventionPoleEmploiUserAdvisorDTO(pgResult.rows[0]),
+      ),
+    );
+  }
 }
+
+type RawResults = {
+  user_pe_external_id: any;
+  convention_id: any;
+  first_name: any;
+  last_name: any;
+  email: any;
+  type: any;
+};
+
+const toConventionPoleEmploiUserAdvisorDTO = ({
+  user_pe_external_id,
+  convention_id,
+  first_name,
+  last_name,
+  email,
+  type,
+}: RawResults): ConventionPoleEmploiUserAdvisorDto => ({
+  userPeExternalId: user_pe_external_id,
+  conventionId: convention_id,
+  firstName: first_name,
+  lastName: last_name,
+  email,
+  type,
+});
+
+const toConventionPoleEmploiUserAdvisorEntity = (
+  dto: ConventionPoleEmploiUserAdvisorDto,
+): ConventionPoleEmploiUserAdvisorEntity => ({
+  ...dto,
+  _entityName: "ConventionPoleEmploiAdvisor",
+});
 
 // On primary key conflict we update the data columns (firstname, lastname, email, type) with the new values.
 // (the special EXCLUDED table is used to reference values originally proposed for insertion)

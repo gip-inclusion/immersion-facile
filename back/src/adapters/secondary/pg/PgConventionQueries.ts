@@ -46,6 +46,7 @@ export class PgConventionQueries implements ConventionQueries {
         }),
     );
   }
+
   public async getLatestUpdated(): Promise<ConventionEntity[]> {
     const pgResult = await this.client.query(
       `SELECT *, vad.*

@@ -14,7 +14,10 @@ import type {
   SendRenewedMagicLinkParams,
   SignedByOtherPartyNotificationParams,
   ValidatedConventionFinalConfirmationParams,
+  PoleEmploiAdvisorOnConventionAssociationParams,
+  PoleEmploiAdvisorOnConventionFullysignedParams,
 } from "../../domain/convention/ports/EmailGateway";
+
 import {
   EmailGateway,
   ShareDraftConventionByLinkParams,
@@ -320,6 +323,38 @@ export class InMemoryEmailGateway implements EmailGateway {
     logger.info({ recipient, params }, "sendShareDraftApplicationByLinkParams");
     this.sentEmails.push({
       type: "SHARE_DRAFT_CONVENTION_BY_LINK",
+      recipients: [recipient],
+      cc: [],
+      params,
+    });
+  }
+
+  public async sendToPoleEmploiAdvisorOnConventionAssociation(
+    recipient: string,
+    params: PoleEmploiAdvisorOnConventionAssociationParams,
+  ): Promise<void> {
+    logger.info(
+      { recipient, params },
+      "sendToPoleEmploiAdvisorOnConventionAssociation",
+    );
+    this.sentEmails.push({
+      type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION",
+      recipients: [recipient],
+      cc: [],
+      params,
+    });
+  }
+
+  public async sendToPoleEmploiAdvisorOnConventionFullySigned(
+    recipient: string,
+    params: PoleEmploiAdvisorOnConventionFullysignedParams,
+  ): Promise<void> {
+    logger.info(
+      { recipient, params },
+      "sendToPoleEmploiAdvisorOnConventionFullySigned",
+    );
+    this.sentEmails.push({
+      type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
       recipients: [recipient],
       cc: [],
       params,

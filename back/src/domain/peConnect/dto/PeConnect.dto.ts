@@ -10,10 +10,12 @@ export type PoleEmploiUserAdvisorDto = {
   type: ConventionPoleEmploiAdvisor;
 };
 
+export type ConventionPoleEmploiUserAdvisorDto = {
+  conventionId: string;
+} & PoleEmploiUserAdvisorDto;
+
 export type ConventionPoleEmploiUserAdvisorEntity = EntityFromDto<
-  {
-    conventionId: string;
-  } & PoleEmploiUserAdvisorDto,
+  ConventionPoleEmploiUserAdvisorDto,
   "ConventionPoleEmploiAdvisor"
 >;
 

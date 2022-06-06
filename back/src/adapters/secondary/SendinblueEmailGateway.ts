@@ -21,6 +21,8 @@ import type {
   SendRenewedMagicLinkParams,
   SignedByOtherPartyNotificationParams,
   ValidatedConventionFinalConfirmationParams,
+  PoleEmploiAdvisorOnConventionAssociationParams,
+  PoleEmploiAdvisorOnConventionFullysignedParams,
 } from "../../domain/convention/ports/EmailGateway";
 import {
   EmailGateway,
@@ -110,6 +112,12 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/27/message-setup
   CREATE_IMMERSION_ASSESSMENT: 27,
+
+  // https://my.sendinblue.com/camp/template/39/message-setup
+  POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: 39,
+
+  // https://my.sendinblue.com/camp/template/42/message-setup
+  POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: 42,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -471,6 +479,48 @@ export class SendinblueEmailGateway implements EmailGateway {
       ADDITIONAL_DETAILS: params.additionalDetails,
       APPLICATION_FORM_LINK: params.conventionFormUrl,
     });
+  }
+
+  public async sendToPoleEmploiAdvisorOnConventionAssociation(
+    recipient: string,
+    params: PoleEmploiAdvisorOnConventionAssociationParams,
+  ): Promise<void> {
+    await this.sendTransacEmail(
+      "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION",
+      [recipient],
+      {
+        ADVISOR_FIRST_NAME: params.advisorFirstName,
+        ADVISOR_LAST_NAME: params.advisorLastName,
+        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+        BENEFICIARY_EMAIL: params.beneficiaryEmail,
+        DATE_START: params.dateStart,
+        DATE_END: params.dateEnd,
+        BUSINESS_NAME: params.businessName,
+        IMMERSION_ADDRESS: params.immersionAddress,
+      },
+    );
+  }
+
+  public async sendToPoleEmploiAdvisorOnConventionFullySigned(
+    recipient: string,
+    params: PoleEmploiAdvisorOnConventionFullysignedParams,
+  ): Promise<void> {
+    await this.sendTransacEmail(
+      "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
+      [recipient],
+      {
+        ADVISOR_FIRST_NAME: params.advisorFirstName,
+        ADVISOR_LAST_NAME: params.advisorLastName,
+        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
+        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
+        BENEFICIARY_EMAIL: params.beneficiaryEmail,
+        DATE_START: params.dateStart,
+        DATE_END: params.dateEnd,
+        BUSINESS_NAME: params.businessName,
+        IMMERSION_ADDRESS: params.immersionAddress,
+      },
+    );
   }
 
   private async sendTransacEmail(

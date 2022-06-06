@@ -2,6 +2,11 @@ import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.d
 import { ConventionId } from "shared/src/convention/convention.dto";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
 
+export type ConventionAndPeExternalIds = {
+  conventionId: ConventionId;
+  peExternalId: PeExternalId;
+};
+
 export interface ConventionPoleEmploiAdvisorRepository {
   openSlotForNextConvention: (
     advisor: ConventionPoleEmploiUserAdvisorEntity,
@@ -9,5 +14,9 @@ export interface ConventionPoleEmploiAdvisorRepository {
   associateConventionAndUserAdvisor: (
     conventionId: ConventionId,
     userPeExternalId: PeExternalId,
-  ) => Promise<void>;
+  ) => Promise<ConventionAndPeExternalIds>;
+
+  getByConventionId: (
+    conventionId: ConventionId,
+  ) => Promise<ConventionPoleEmploiUserAdvisorEntity>;
 }

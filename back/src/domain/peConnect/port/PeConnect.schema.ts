@@ -2,11 +2,12 @@ import { makezTrimmedString, zTrimmedString } from "shared/src/zodUtils";
 import { z } from "zod";
 import {
   conventionPoleEmploiAdvisors,
+  ConventionPoleEmploiUserAdvisorDto,
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
   peExternalAdvisorsTypes,
-  PoleEmploiUserAdvisorDto,
 } from "../dto/PeConnect.dto";
+import { ConventionAndPeExternalIds } from "./ConventionPoleEmploiAdvisorRepository";
 
 export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
   z.object({
@@ -33,24 +34,20 @@ export const externalPeConnectAdvisorsSchema: z.Schema<
   ExternalPeConnectAdvisor[]
 > = z.array(externalPeConnectAdvisorSchema);
 
-// TODO on peut typer ça ??? s.ZodAny | z.ZodString | z.ZodEffect<any, any, any>
-// typer avec { [key: string]: any } cause une erreur sur les schema au z.object(...)
-const shape = {
-  userPeExternalId: z.string().uuid(),
-  firstName: makezTrimmedString(
-    "Le prénom du conseiller ne peut pas être vide",
-  ),
-  lastName: makezTrimmedString("Le nom du conseiller ne peut pas être vide"),
-  email: z.string().email("L'email du conseiller est invalide"),
-  type: z.enum(conventionPoleEmploiAdvisors),
-};
+export const conventionPoleEmploiUserAdvisorDtoSchema: z.Schema<ConventionPoleEmploiUserAdvisorDto> =
+  z.object({
+    userPeExternalId: z.string().uuid(),
+    conventionId: z.string().uuid(),
+    firstName: makezTrimmedString(
+      "Le prénom du conseiller ne peut pas être vide",
+    ),
+    lastName: makezTrimmedString("Le nom du conseiller ne peut pas être vide"),
+    email: z.string().email("L'email du conseiller est invalide"),
+    type: z.enum(conventionPoleEmploiAdvisors),
+  });
 
-export const poleEmploiUserAdvisorEntitySchema: z.Schema<PoleEmploiUserAdvisorDto> =
-  z.object(shape);
-
-export const PoleEmploiUserAdvisorDTOSchema: z.Schema<PoleEmploiUserAdvisorDto> =
-  z
-    .object({
-      id: z.string().uuid(),
-    })
-    .merge(z.object(shape));
+export const conventionPoleEmploiUserAdvisorIdsSchema: z.Schema<ConventionAndPeExternalIds> =
+  z.object({
+    peExternalId: z.string().uuid(),
+    conventionId: z.string().uuid(),
+  });

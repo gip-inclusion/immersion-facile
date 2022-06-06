@@ -67,6 +67,10 @@ const validConvention: ConventionDto = {
 export class ConventionDtoBuilder implements Builder<ConventionDto> {
   constructor(private dto: ConventionDto = validConvention) {}
 
+  public withBusinessName(businessName: string): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, businessName });
+  }
+
   public withEmail(email: string): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, email });
   }

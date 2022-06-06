@@ -47,6 +47,33 @@ export type ValidatedConventionFinalConfirmationParams = {
   workConditions?: string;
 };
 
+export type PoleEmploiAdvisorOnConventionFullysignedParams = {
+  advisorFirstName: string;
+  advisorLastName: string;
+  immersionAddress: string;
+  beneficiaryFirstName: string;
+  beneficiaryLastName: string;
+  beneficiaryEmail: string;
+  dateStart: string;
+  dateEnd: string;
+  businessName: string;
+  magicLink: string;
+};
+
+export type PoleEmploiAdvisorOnConventionAssociationParams = {
+  advisorFirstName: string;
+  advisorLastName: string;
+  //advisorType: string;
+  immersionAddress: string;
+  beneficiaryFirstName: string;
+  beneficiaryLastName: string;
+  beneficiaryEmail: string;
+  dateStart: string;
+  dateEnd: string;
+  businessName: string;
+  magicLink: string;
+};
+
 export type RejectedConventionNotificationParams = {
   beneficiaryFirstName: string;
   beneficiaryLastName: string;
@@ -155,6 +182,8 @@ export type EmailType =
   | "VALIDATED_CONVENTION_FINAL_CONFIRMATION"
   | "REJECTED_CONVENTION_NOTIFICATION"
   | "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION"
+  | "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION"
+  | "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED"
   | "MAGIC_LINK_RENEWAL"
   | "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION"
   | "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION"
@@ -224,6 +253,14 @@ export interface EmailGateway {
   sendNewConventionForReviewNotification: (
     recipient: string[],
     params: NewConventionReviewForEligibilityOrValidationParams,
+  ) => Promise<void>;
+  sendToPoleEmploiAdvisorOnConventionAssociation: (
+    recipient: string,
+    params: PoleEmploiAdvisorOnConventionAssociationParams,
+  ) => Promise<void>;
+  sendToPoleEmploiAdvisorOnConventionFullySigned: (
+    recipient: string,
+    params: PoleEmploiAdvisorOnConventionFullysignedParams,
   ) => Promise<void>;
   sendRenewedMagicLink: (
     recipient: string[],

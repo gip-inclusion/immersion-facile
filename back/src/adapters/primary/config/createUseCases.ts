@@ -48,6 +48,7 @@ import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersi
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
+import { NotifyPoleEmploiUserAdvisorOnConventionAssociation } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionAssociation";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
@@ -58,6 +59,7 @@ import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
 import { Repositories } from "./repositoriesConfig";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
+import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 
 export type UseCases = ReturnType<typeof createUseCases>;
 
@@ -81,7 +83,7 @@ export const createUseCases = (
 
   return {
     associatePeConnectFederatedIdentity:
-      new AssociatePeConnectFederatedIdentity(uowPerformer),
+      new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),
     uploadFile: new UploadFile(uowPerformer, repositories.documentGateway),
     createImmersionAssessment: new CreateImmersionAssessment(
       uowPerformer,
@@ -288,6 +290,20 @@ export const createUseCases = (
     ),
     notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty:
       new NotifyImmersionApplicationWasSignedByOtherParty(
+        emailFilter,
+        repositories.email,
+        generateMagicLinkFn,
+      ),
+    notifyPoleEmploiUserAdvisorOnAssociation:
+      new NotifyPoleEmploiUserAdvisorOnConventionAssociation(
+        uowPerformer,
+        emailFilter,
+        repositories.email,
+        generateMagicLinkFn,
+      ),
+    notifyPoleEmploiUserAdvisorOnConventionFullySigned:
+      new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
+        uowPerformer,
         emailFilter,
         repositories.email,
         generateMagicLinkFn,

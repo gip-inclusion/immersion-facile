@@ -30,7 +30,10 @@ const getUseCasesByTopics = (
   ImmersionApplicationPartiallySigned: [
     useCases.notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty,
   ],
-  ImmersionApplicationFullySigned: [useCases.notifyNewConventionNeedsReview],
+  ImmersionApplicationFullySigned: [
+    useCases.notifyNewConventionNeedsReview,
+    useCases.notifyPoleEmploiUserAdvisorOnConventionFullySigned,
+  ],
   ImmersionApplicationAcceptedByCounsellor: [
     useCases.notifyNewConventionNeedsReview,
   ],
@@ -50,6 +53,11 @@ const getUseCasesByTopics = (
     useCases.notifyBeneficiaryAndEnterpriseThatConventionIsRejected,
   ],
   ImmersionApplicationCancelled: [],
+
+  // ImmersionApplication Federated Identities
+  PeConnectFederatedIdentityAssociated: [
+    useCases.notifyPoleEmploiUserAdvisorOnAssociation,
+  ],
 
   // Establishment form related
   FormEstablishmentAdded: [

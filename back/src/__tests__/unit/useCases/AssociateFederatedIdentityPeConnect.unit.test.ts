@@ -7,19 +7,30 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { PoleEmploiUserAdvisorDto } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
+import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 
 describe("AssociatePeConnectFederatedIdentity", () => {
   let associatePeConnectFederatedIdentity: AssociatePeConnectFederatedIdentity;
   let uowPerformer: InMemoryUowPerformer;
   let conventionPoleEmploiAdvisorRepo: InMemoryConventionPoleEmploiAdvisorRepository;
+  let outboxRepo: InMemoryOutboxRepository;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepo;
+    outboxRepo = uow.outboxRepo;
     uowPerformer = new InMemoryUowPerformer(uow);
 
+    const clock = new CustomClock();
+    const uuidGenerator = new TestUuidGenerator();
+    const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+
     associatePeConnectFederatedIdentity =
-      new AssociatePeConnectFederatedIdentity(uowPerformer);
+      new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent);
   });
 
   it("should not associate convention and federated identity if the federated identity does not match format", async () => {
@@ -59,6 +70,33 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors[0]
         .conventionId,
     ).toBe(conventionId);
+  });
+
+  it("should save event PeConnectFederatedIdentityAssociated", async () => {
+    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor(
+      conventionPoleEmploiUserAdvisorFromDto(userAdvisorDto),
+    );
+
+    const conventionDtoFromEvent = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withFederatedIdentity(`peConnect:${userPeExternalId}`)
+      .build();
+
+    await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);
+
+    expect(
+      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+    ).toHaveLength(1);
+
+    // outbox rep
+    expect(outboxRepo.events).toHaveLength(1);
+    expectObjectsToMatch(outboxRepo.events[0], {
+      topic: "PeConnectFederatedIdentityAssociated",
+      payload: {
+        conventionId,
+        peExternalId: userPeExternalId,
+      },
+    });
   });
 });
 

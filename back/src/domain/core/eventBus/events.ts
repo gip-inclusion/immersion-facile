@@ -1,19 +1,20 @@
+import { AgencyDto } from "shared/src/agency/agency.dto";
 import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
+import {
+  ConventionDto,
+  WithConventionId,
+} from "shared/src/convention/convention.dto";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { Flavor } from "shared/src/typeFlavors";
 import {
   ConventionRequiresModificationPayload,
   RenewMagicLinkPayload,
 } from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import type { DateStr } from "../ports/Clock";
-import {
-  ConventionDto,
-  WithConventionId,
-} from "shared/src/convention/convention.dto";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { ConventionAndPeExternalIds } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
+import type { DateStr } from "../ports/Clock";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
 
@@ -77,7 +78,11 @@ export type DomainEvent =
   // IMMERSION ASSESSMENT related
   | GenericEvent<"ImmersionAssessmentCreated", ImmersionAssessmentDto>
   // prettier-ignore
-  | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionId>;
+  | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionId>
+
+  // PECONNECT related
+  // prettier-ignore
+  | GenericEvent<"PeConnectFederatedIdentityAssociated", ConventionAndPeExternalIds>;
 
 export type DomainTopic = DomainEvent["topic"];
 
