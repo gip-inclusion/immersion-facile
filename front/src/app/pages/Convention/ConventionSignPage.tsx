@@ -1,5 +1,11 @@
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
+import { ConventionDto } from "shared/src/convention/convention.dto";
+import { conventionSchema } from "shared/src/convention/convention.schema";
+import {
+  ConventionMagicLinkPayload,
+  Role,
+} from "shared/src/tokens/MagicLinkPayload";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import {
   SubmitFeedback,
@@ -9,13 +15,9 @@ import { conventionGateway } from "src/app/config/dependencies";
 import { ApiDataContainer } from "src/app/pages/admin/ApiDataContainer";
 import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
-import {
-  ConventionMagicLinkPayload,
-  Role,
-} from "shared/src/tokens/MagicLinkPayload";
 import { useExistingSiret } from "src/hooks/siret.hooks";
+import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
+import { InfoMessage } from "src/uiComponents/form/InfoMessage";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
 import { ConventionFormFields } from "./ConventionFormFields";
@@ -93,113 +95,154 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
 
   if (!convention) return <p>Chargement en cours...</p>;
 
+  if (convention.status === "REJECTED")
+    return (
+      <ConventionRejectedMessage>
+        {convention.rejectionJustification}
+      </ConventionRejectedMessage>
+    );
+
+  if (convention.status === "DRAFT")
+    return <ConventionNeedsModificationMessage jwt={jwt} />;
+
   return (
-    <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
-      <div className="fr-col-lg-8 fr-p-2w">
-        <h2>
-          Formulaire pour conventionner une période de mise en situation
-          professionnelle (PMSMP)
-        </h2>
+    <SignPageLayout>
+      <h2>
+        Formulaire pour conventionner une période de mise en situation
+        professionnelle (PMSMP)
+      </h2>
 
-        <div className="fr-text">
-          Voici la demande de convention que vous venez de compléter. <br />
-          Relisez la bien et si cela vous convient, signez la avec le bouton "je
-          signe cette demande" <br />
-          <p className="fr-text--xs">
-            Ce formulaire vaut équivalence du CERFA 13912 * 04
-          </p>
-        </div>
+      <div className="fr-text">
+        Voici la demande de convention que vous venez de compléter. <br />
+        Relisez la bien et si cela vous convient, signez la avec le bouton "je
+        signe cette demande" <br />
+        <p className="fr-text--xs">
+          Ce formulaire vaut équivalence du CERFA 13912 * 04
+        </p>
+      </div>
 
-        {initialValues && (
-          <>
-            <Formik
-              enableReinitialize={true}
-              initialValues={initialValues}
-              validationSchema={toFormikValidationSchema(conventionSchema)}
-              onSubmit={async (values, { setSubmitting, setErrors }) => {
+      {initialValues && (
+        <>
+          <Formik
+            enableReinitialize={true}
+            initialValues={initialValues}
+            validationSchema={toFormikValidationSchema(conventionSchema)}
+            onSubmit={async (values, { setSubmitting, setErrors }) => {
+              try {
+                // Confirm checkbox
+                const conditionsAccepted =
+                  signeeRole === "beneficiary"
+                    ? values.beneficiaryAccepted
+                    : values.enterpriseAccepted;
+                if (!conditionsAccepted) {
+                  setErrors({
+                    beneficiaryAccepted:
+                      signeeRole === "beneficiary"
+                        ? "Engagement est obligatoire"
+                        : undefined,
+                    enterpriseAccepted:
+                      signeeRole === "establishment"
+                        ? "Engagement est obligatoire"
+                        : undefined,
+                  });
+                  setSubmitting(false);
+                  return;
+                }
+
+                await conventionGateway.signApplication(jwt);
+
+                setSubmitFeedback("signedSuccessfully");
+
+                setAlreadySigned(true);
+              } catch (e: any) {
+                //eslint-disable-next-line no-console
+                console.log("onSubmitError", e);
+                setSubmitFeedback(e);
+              } finally {
+                setSubmitting(false);
+              }
+            }}
+          >
+            {(props) => {
+              const rejectWithMessageForm = async (): Promise<void> => {
+                const justification = prompt(
+                  "Précisez la raison et la modification nécessaire *",
+                )?.trim();
+
+                if (justification === null || justification === undefined)
+                  return;
+                if (justification === "") return rejectWithMessageForm();
+
                 try {
-                  // Confirm checkbox
-                  const conditionsAccepted =
-                    signeeRole === "beneficiary"
-                      ? values.beneficiaryAccepted
-                      : values.enterpriseAccepted;
-                  if (!conditionsAccepted) {
-                    setErrors({
-                      beneficiaryAccepted:
-                        signeeRole === "beneficiary"
-                          ? "Engagement est obligatoire"
-                          : undefined,
-                      enterpriseAccepted:
-                        signeeRole === "establishment"
-                          ? "Engagement est obligatoire"
-                          : undefined,
-                    });
-                    setSubmitting(false);
-                    return;
-                  }
-
-                  await conventionGateway.signApplication(jwt);
-
-                  setSubmitFeedback("signedSuccessfully");
-
-                  setAlreadySigned(true);
+                  await conventionGateway.updateStatus(
+                    { status: "DRAFT", justification },
+                    jwt,
+                  );
+                  setSubmitFeedback("modificationsAsked");
                 } catch (e: any) {
                   //eslint-disable-next-line no-console
-                  console.log("onSubmitError", e);
+                  console.log("updateStatus Error", e);
                   setSubmitFeedback(e);
-                } finally {
-                  setSubmitting(false);
                 }
-              }}
-            >
-              {(props) => {
-                const rejectWithMessageForm = async (): Promise<void> => {
-                  const justification = prompt(
-                    "Précisez la raison et la modification nécessaire *",
-                  )?.trim();
+              };
 
-                  if (justification === null || justification === undefined)
-                    return;
-                  if (justification === "") return rejectWithMessageForm();
+              return (
+                <div>
+                  <form
+                    onReset={props.handleReset}
+                    onSubmit={props.handleSubmit}
+                  >
+                    <ConventionFormFields
+                      isFrozen={true}
+                      isSignOnly={true}
+                      isSignatureEnterprise={signeeRole === "establishment"}
+                      signeeName={signeeName}
+                      alreadySubmitted={alreadySigned}
+                      onRejectForm={rejectWithMessageForm}
+                    />
 
-                  try {
-                    await conventionGateway.updateStatus(
-                      { status: "DRAFT", justification },
-                      jwt,
-                    );
-                    setSubmitFeedback("modificationsAsked");
-                  } catch (e: any) {
-                    //eslint-disable-next-line no-console
-                    console.log("updateStatus Error", e);
-                    setSubmitFeedback(e);
-                  }
-                };
-
-                return (
-                  <div>
-                    <form
-                      onReset={props.handleReset}
-                      onSubmit={props.handleSubmit}
-                    >
-                      <ConventionFormFields
-                        isFrozen={true}
-                        isSignOnly={true}
-                        isSignatureEnterprise={signeeRole === "establishment"}
-                        signeeName={signeeName}
-                        alreadySubmitted={alreadySigned}
-                        onRejectForm={rejectWithMessageForm}
-                      />
-
-                      <SubmitFeedback submitFeedback={submitFeedback} />
-                    </form>
-                  </div>
-                );
-              }}
-            </Formik>
-          </>
-        )}
-        {!initialValues && <p>Loading</p>}
-      </div>
-    </div>
+                    <SubmitFeedback submitFeedback={submitFeedback} />
+                  </form>
+                </div>
+              );
+            }}
+          </Formik>
+        </>
+      )}
+      {!initialValues && <p>Loading</p>}
+    </SignPageLayout>
   );
 };
+
+const ConventionRejectedMessage: React.FC = ({ children }) => (
+  <SignPageLayout>
+    <br />
+    <ErrorMessage title="Désolé : votre demande d'immersion a été rejeté">
+      Votre demande d'immersion a été refusé pour la raison suivante :
+      <span className="block italic">{children ?? "- Non renseigné -"}</span>
+      Veuillez contacter votre conseiller pour plus d'informations.
+    </ErrorMessage>
+  </SignPageLayout>
+);
+
+const ConventionNeedsModificationMessage = (props: { jwt: string }) => (
+  <SignPageLayout>
+    <br />
+    <InfoMessage title="Des modifications ont été demandées sur votre demande">
+      Vous ne pouvez pas encore signer votre demande d'immersion car des
+      modifications ont été réclamées par votre conseiller (Vous avez du
+      recevoir un mail précisant les changements a effectuer).
+      <span className="block">
+        <a {...routes.convention({ jwt: props.jwt }).link}>
+          Cliquez ici pour aller à la page d'édition
+        </a>
+      </span>
+    </InfoMessage>
+  </SignPageLayout>
+);
+
+const SignPageLayout: React.FC = ({ children }) => (
+  <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+    <div className="fr-col-lg-8 fr-p-2w">{children}</div>
+  </div>
+);

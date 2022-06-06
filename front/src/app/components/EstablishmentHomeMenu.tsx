@@ -42,15 +42,15 @@ export const EstablishmentHomeMenu = () => {
       <div className="flex flex-col w-full h-full items-center justify-center">
         {!startEstablishmentPath ? (
           <>
-            <HomeButton
-              onClick={() => startEstablishmentPathUpdate(true)}
-              children="Référencer votre entreprise"
-            />
+            <HomeButton onClick={() => startEstablishmentPathUpdate(true)}>
+              Référencer votre entreprise
+            </HomeButton>
             <HomeButton
               type="secondary"
               onClick={() => startEstablishmentPathUpdate(true)}
-              children="Modifier votre entreprise"
-            />
+            >
+              Modifier votre entreprise
+            </HomeButton>
           </>
         ) : (
           <>

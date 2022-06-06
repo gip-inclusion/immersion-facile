@@ -95,7 +95,9 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
       <div>Admin Verification Page</div>
       {form && (
         <>
-          {infoMessage && <InfoMessage title="Attention" text={infoMessage} />}
+          {infoMessage && (
+            <InfoMessage title="Attention">{infoMessage}</InfoMessage>
+          )}
           <FormAccordion convention={form} />
           {!validationDisabled() && (
             <button

@@ -1,15 +1,15 @@
 import React from "react";
 
 interface InfoMessageProps {
-  text: string;
   title: string;
+  children: React.ReactNode;
 }
 
-export const InfoMessage = ({ text, title }: InfoMessageProps) => (
+export const InfoMessage = ({ children, title }: InfoMessageProps) => (
   <>
     <div role="alert" className="fr-alert fr-alert--info">
       <p className="fr-alert__title">{title}</p>
-      <p>{text}</p>
+      <p>{children}</p>
     </div>
   </>
 );

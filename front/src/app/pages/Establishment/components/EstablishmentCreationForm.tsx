@@ -121,10 +121,9 @@ const CreationSiretRelatedInputs = () => {
       )}
       {requestEmailToEditFormError && (
         <>
-          <InfoMessage
-            title="La demande de modification n'a pas aboutie."
-            text={requestEmailToEditFormError}
-          />
+          <InfoMessage title="La demande de modification n'a pas aboutie.">
+            {requestEmailToEditFormError}
+          </InfoMessage>
           <br />
         </>
       )}
