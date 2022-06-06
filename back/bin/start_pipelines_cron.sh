@@ -36,13 +36,13 @@ SHELL=/bin/bash
 PATH=$PATH
 
 # Pipeline: update-establishments-from-sirene
-$ESTABLISHMENT_UPDATE_FROM_SIRENE cd /app && npm run start-update-establishments-from-sirene >> $LOGDIR/update-establishments-from-sirene.log 2>&1
+$ESTABLISHMENT_UPDATE_FROM_SIRENE cd /app/back && pnpm start-update-establishments-from-sirene >> $LOGDIR/update-establishments-from-sirene.log 2>&1
 
 # Pipeline: trigger-suggest-edit-form-establishment-every-6-months
-$ESTABLISHMENT_SUGGEST_FORM_EDITION cd /app && npm run trigger-suggest-edit-form-establishment-every-6-months >> $LOGDIR/trigger-suggest-edit-form-establishment-every-6-months.log 2>&1
+$ESTABLISHMENT_SUGGEST_FORM_EDITION cd /app/back && pnpm trigger-suggest-edit-form-establishment-every-6-months >> $LOGDIR/trigger-suggest-edit-form-establishment-every-6-months.log 2>&1
 
 # Pipeline: trigger-sending-emails-with-assessment-creation-link
-$EMAIL_WITH_ASSESSMENT_CREATION_LINK cd /app && npm run trigger-sending-emails-with-assessment-creation-link >> $LOGDIR/trigger-sending-emails-with-assessment-creation-link.log 2>&1
+$EMAIL_WITH_ASSESSMENT_CREATION_LINK cd /app/back && pnpm trigger-sending-emails-with-assessment-creation-link >> $LOGDIR/trigger-sending-emails-with-assessment-creation-link.log 2>&1
 
 EOT
 

@@ -43,6 +43,11 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
       await this.conventionQueries.getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
         tomorrow,
       );
+    logger.info(
+      `[${now.toISOString()}]: About to send assessment email to ${
+        assessmentEmailParamsOfImmersionEndingTomorrow.length
+      } establishments`,
+    );
     if (assessmentEmailParamsOfImmersionEndingTomorrow.length === 0) return;
 
     const errors: Record<ConventionId, any> = {};
