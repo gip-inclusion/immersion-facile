@@ -9,8 +9,7 @@ import { BulletPoint } from "src/uiComponents/BulletPoint";
 import { Colored } from "src/uiComponents/Colored";
 import { EstablishmentImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { Statistic } from "src/uiComponents/Statistic";
-import { Title } from "react-design-system/src/immersionFacile/components/text/Title";
-import { Card } from "react-design-system/src/immersionFacile/components/card/Card";
+import { Title, Card } from "react-design-system/immersionFacile";
 
 export const LandingEstablishmentPage = () => (
   <HeaderFooterLayout>

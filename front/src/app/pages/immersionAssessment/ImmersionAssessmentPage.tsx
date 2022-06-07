@@ -21,7 +21,7 @@ import {
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
 import { conventionStateSelector } from "src/core-logic/domain/convention/convention.selectors";
-import { Button } from "react-design-system/src/immersionFacile/components/buttons/Button";
+import { Button } from "react-design-system/immersionFacile";
 import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
 import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { TextInput } from "src/uiComponents/form/TextInput";

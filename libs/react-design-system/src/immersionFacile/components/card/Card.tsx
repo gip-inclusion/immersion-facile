@@ -6,6 +6,7 @@ export type CardProps = {
   boldText: string;
   text: string;
 };
+
 export const Card = ({ imageUrl, boldText, text }: CardProps) => (
   <div className="p-2 m-2 w-48 bg-blue-50 rounded flex flex-col items-center">
     <Image url={imageUrl} alt="checked-icon" height="10px" />

@@ -1,5 +1,6 @@
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import React, { useState } from "react";
+import { HomeButton, Link } from "react-design-system/immersionFacile";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { isSiretAlreadySavedSelector } from "src/core-logic/domain/siret/siret.selectors";
 import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
@@ -9,9 +10,6 @@ import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSub
 import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
 import { routes } from "../routing/routes";
 import { useAppSelector } from "../utils/reduxHooks";
-import { HomeButton } from "react-design-system/src/immersionFacile/components/buttons/HomeButton";
-import { Link } from "react-design-system/src/immersionFacile/components/link/Link";
-
 export const EstablishmentHomeMenu = () => {
   const { currentSiret, updateSiret, siretError } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: false,

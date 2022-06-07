@@ -5,6 +5,7 @@ export type ImageProps = {
   alt: string;
   height: string;
 };
+
 export const Image = ({ url, alt, height }: ImageProps) => (
   <img src={url} alt={alt} height={height} />
 );
