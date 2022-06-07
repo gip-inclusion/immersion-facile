@@ -116,7 +116,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   };
 
   const pePlacementAdvisor: ExternalPeConnectAdvisor = {
-    civilite: "0",
+    civilite: "2",
     mail: "jane.smith@pole-emploi.net",
     nom: "Smith",
     prenom: "Jane",
@@ -132,7 +132,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   };
 
   const peCapemploiAdvisor: ExternalPeConnectAdvisor = {
-    civilite: "0",
+    civilite: "2",
     mail: "elsa.oldenburg@pole-emploi.net",
     nom: "Oldenburg",
     prenom: "Elsa",

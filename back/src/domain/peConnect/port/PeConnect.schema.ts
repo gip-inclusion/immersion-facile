@@ -25,7 +25,7 @@ export const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> 
   z.object({
     nom: zTrimmedString,
     prenom: zTrimmedString,
-    civilite: z.enum(["0", "1"]),
+    civilite: z.enum(["1", "2"]),
     mail: z.string().email("L'addresse email du conseillé doit être valide"),
     type: z.enum(peExternalAdvisorsTypes),
   });

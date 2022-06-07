@@ -45,7 +45,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       scope: peConnectNeededScopes(this.config.clientId),
     };
 
-    return `https://${
+    return `${
       ApiPeConnectUrls.OAUTH2_AUTH_CODE_STEP_1
     }?${queryParamsAsString<ExternalPeConnectOAuthGrantPayload>(
       authorizationCodePayload,
