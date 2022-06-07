@@ -6,10 +6,13 @@ import { expectObjectsToMatch } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../adapters/secondary/pg/PgConventionPoleEmploiAdvisorRepository";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
-import { PoleEmploiUserAdvisorDto } from "../../domain/peConnect/dto/PeConnect.dto";
+import {
+  ConventionPoleEmploiUserAdvisorEntity,
+  PoleEmploiUserAdvisorDto,
+} from "../../domain/peConnect/dto/PeConnect.dto";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
-const userPeExternalId = "aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaad";
+const userPeExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
 
 const conventionEntity = new ConventionEntityBuilder()
   .withId(conventionId)
@@ -127,6 +130,32 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
       expectObjectsToMatch(inDb.rows[0], {
         user_pe_external_id: poleEmploiFirstUserAdvisor.userPeExternalId,
         convention_id: conventionId,
+      });
+    });
+  });
+
+  describe("retreive pole emploi user advisor", () => {
+    it("should get the convention Advisor by the convention id", async () => {
+      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
+        poleEmploiFirstUserAdvisor,
+      );
+      await conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
+        conventionId,
+        userPeExternalId,
+      );
+
+      const conventionAdvisor: ConventionPoleEmploiUserAdvisorEntity =
+        await conventionPoleEmploiAdvisorRepository.getByConventionId(
+          conventionId,
+        );
+
+      expectObjectsToMatch(conventionAdvisor, {
+        userPeExternalId: poleEmploiFirstUserAdvisor.userPeExternalId,
+        conventionId,
+        firstName: poleEmploiFirstUserAdvisor.firstName,
+        lastName: poleEmploiFirstUserAdvisor.lastName,
+        email: poleEmploiFirstUserAdvisor.email,
+        type: poleEmploiFirstUserAdvisor.type,
       });
     });
   });

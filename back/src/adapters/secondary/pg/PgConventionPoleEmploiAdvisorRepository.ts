@@ -78,8 +78,8 @@ export class PgConventionPoleEmploiAdvisorRepository
 type RawResults = {
   user_pe_external_id: any;
   convention_id: any;
-  first_name: any;
-  last_name: any;
+  firstname: any;
+  lastname: any;
   email: any;
   type: any;
 };
@@ -87,15 +87,15 @@ type RawResults = {
 const toConventionPoleEmploiUserAdvisorDTO = ({
   user_pe_external_id,
   convention_id,
-  first_name,
-  last_name,
+  firstname,
+  lastname,
   email,
   type,
 }: RawResults): ConventionPoleEmploiUserAdvisorDto => ({
   userPeExternalId: user_pe_external_id,
   conventionId: convention_id,
-  firstName: first_name,
-  lastName: last_name,
+  firstName: firstname,
+  lastName: lastname,
   email,
   type,
 });
