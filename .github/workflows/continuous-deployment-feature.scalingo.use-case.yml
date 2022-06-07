@@ -106,37 +106,37 @@ jobs:
       - name: Install pnpm dependencies
         run: pnpm i --frozen-lockfile
 
-#  build:
-#    needs:
-#      - dependencies
-#
-#    runs-on: ubuntu-latest
-#    env:
-#      working-directory: ./front
-#
-#    steps:
-#      - name: Retrieve the branch files
-#        uses: actions/checkout@v3
-#
-#      - name: Retreives dependencies
-#        uses: actions/cache@v3
-#        with:
-#          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-#          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
-#
-#      - name: Build
-#        run: |
-#          vite build
-#          ls -la
-#
-#  validation:
-#    needs:
-#      - dependencies
-#
-#    uses: ./.github/workflows/validation-front.yml
-#      with:
-#        cache-path: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-#        cache-key: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+  build:
+    needs:
+      - dependencies
+
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./front
+
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retreives dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+
+      - name: Build
+        run: |
+          vite build
+          ls -la
+
+  validation:
+    needs:
+      - dependencies
+
+    uses: ./.github/workflows/validation-front.yml
+      with:
+        cache-path: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+        cache-key: ${{ needs.dependencies.outputs.pnpm_cache_key }}
 
 #  deploy:
 #    needs:
