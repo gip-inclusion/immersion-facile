@@ -23,6 +23,7 @@ jobs:
       addon-plan-postgresql: ${{ steps.addon-plan-postgresql.outputs.value }}
       deployment-owner-type: ${{ steps.deployment-owner-type.outputs.value }}
       is-discord-hooked: ${{ steps.is-discord-hooked.outputs.value }}
+
     runs-on: ubuntu-latest
     steps:
       - name: Node version from env variable
@@ -68,6 +69,10 @@ jobs:
     needs:
       - dynamic-variables
 
+    outputs:
+      pnpm_cache_path: ${{ steps.pnpm-cache.outputs.path }}
+      pnpm_cache_key: ${{ steps.pnpm-cache.outputs.key }}
+
     steps:
       - name: Retrieve the branch files
         uses: actions/checkout@v3
@@ -79,16 +84,17 @@ jobs:
           version: 7
           run_install: false
 
-      - name: Get pnpm store directory
+      - name: Expose pnpm cache configurationstore directory
         id: pnpm-cache
         run: |
-          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+          echo "::set-output name=path::$(pnpm store path)"
+          echo "::set-output name=key::${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}"
 
       - uses: actions/cache@v3
         name: Setup pnpm cache
         with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ${{ steps.pnpm-cache.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.key }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
@@ -115,7 +121,8 @@ jobs:
       - name: Retreives dependencies
         uses: actions/cache@v3
         with:
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
 
       - name: Build
         run: |
@@ -125,7 +132,11 @@ jobs:
   validation:
     needs:
       - dependencies
+
     uses: ./.github/workflows/validation-front.yml
+      with:
+        cache-path: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+        cache-key: ${{ needs.dependencies.outputs.pnpm_cache_key }}
 
 #  deploy:
 #    needs:
