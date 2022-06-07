@@ -1,6 +1,6 @@
 import React from "react";
 
-type DeleteButtonProps = {
+export type ButtonDeleteProps = {
   isHidden?: boolean;
   disabled?: boolean;
   classname?: string;
@@ -8,13 +8,13 @@ type DeleteButtonProps = {
   onClick: () => void;
 };
 
-export const DeleteButton = ({
+export const ButtonDelete = ({
   isHidden = false,
   disabled = false,
   classname = "",
   style = {},
   onClick,
-}: DeleteButtonProps) => (
+}: ButtonDeleteProps) => (
   <button
     type="button"
     style={{

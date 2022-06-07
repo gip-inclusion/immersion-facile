@@ -1,8 +1,7 @@
 import { ErrorMessage } from "formik";
 import React from "react";
 import { TimePeriodDto } from "shared/src/schedule/ScheduleSchema";
-import { ButtonAdd } from "src/uiComponents/ButtonAdd";
-import { DeleteButton } from "src/uiComponents/DeleteButton";
+import { ButtonDelete, ButtonAdd } from "react-design-system/immersionFacile";
 
 type HourPickerProps = {
   name: string;
@@ -92,7 +91,7 @@ export const HourPicker = ({
                   />
                 </div>
 
-                {!disabled && <DeleteButton onClick={() => remove(index)} />}
+                {!disabled && <ButtonDelete onClick={() => remove(index)} />}
               </div>
             </div>
           );

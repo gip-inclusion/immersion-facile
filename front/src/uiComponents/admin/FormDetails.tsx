@@ -7,7 +7,7 @@ import {
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
 import { keys } from "shared/src/utils";
-import { Accordion } from "./Accordion";
+import { Accordion } from "react-design-system/immersionFacile";
 import { FormAccordionProps } from "./FormAccordion";
 import { TextCell } from "./TextCell";
 

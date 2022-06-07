@@ -6,6 +6,7 @@ import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
+import { ErrorMessage, InfoMessage } from "react-design-system/immersionFacile";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import {
   SubmitFeedback,
@@ -16,8 +17,6 @@ import { ApiDataContainer } from "src/app/pages/admin/ApiDataContainer";
 import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { useExistingSiret } from "src/hooks/siret.hooks";
-import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
-import { InfoMessage } from "src/uiComponents/form/InfoMessage";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
 import { ConventionFormFields } from "./ConventionFormFields";

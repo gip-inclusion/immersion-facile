@@ -15,9 +15,12 @@ import {
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ENV } from "src/environmentVariables";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
-import { Button } from "react-design-system/immersionFacile";
-import { InfoMessage } from "src/uiComponents/form/InfoMessage";
-import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
+import {
+  Button,
+  InfoMessage,
+  SuccessMessage,
+} from "react-design-system/immersionFacile";
+
 import {
   TextInput,
   TextInputControlled,

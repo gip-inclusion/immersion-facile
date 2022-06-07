@@ -1,6 +1,6 @@
 import React from "react";
 
-type ButtonAddProps = {
+export type ButtonAddProps = {
   onClick: () => void;
   children: string;
   style?: React.CSSProperties;

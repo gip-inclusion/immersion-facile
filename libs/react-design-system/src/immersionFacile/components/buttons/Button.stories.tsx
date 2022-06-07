@@ -1,15 +1,14 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
 import { ButtonProperties } from "src/designSystemFrance/button/Button";
-import { buttonPrefix } from "../../storyPrefixes";
+import { buttonPrefix } from ".";
 import { Button } from "./Button";
 
 const Component = Button;
-const prefix = buttonPrefix;
 const argTypes: Partial<ArgTypes<ButtonProperties>> | undefined = {};
 
 export default {
-  title: `${prefix}${Component.name}`,
+  title: `${buttonPrefix}${Component.name}`,
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

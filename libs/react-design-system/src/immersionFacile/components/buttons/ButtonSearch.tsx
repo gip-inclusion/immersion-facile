@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 
-type SearchButtonProps = {
+export type ButtonSearchProps = {
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean;
@@ -9,14 +9,14 @@ type SearchButtonProps = {
   type?: "submit" | "button" | "reset";
 };
 
-export const SearchButton = ({
+export const ButtonSearch = ({
   children,
   disabled,
   dark,
   onClick,
   className,
   type = "button",
-}: SearchButtonProps) => (
+}: ButtonSearchProps) => (
   <button
     onClick={onClick}
     className={

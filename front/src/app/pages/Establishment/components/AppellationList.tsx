@@ -2,7 +2,7 @@ import { useField } from "formik";
 import React from "react";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { removeAtIndex } from "shared/src/utils";
-import { ButtonAdd } from "src/uiComponents/ButtonAdd";
+import { ButtonAdd } from "react-design-system/src/immersionFacile/components/buttons/ButtonAdd";
 import { FormEstablishmentAppellation } from "./FormEstablishmentAppellation";
 
 type AppellationListProps = {

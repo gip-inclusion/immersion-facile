@@ -2,7 +2,7 @@ import { useField } from "formik";
 import React from "react";
 import { AppellationAutocomplete } from "src/app/components/AppellationAutocomplete";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { DeleteButton } from "src/uiComponents/DeleteButton";
+import { ButtonDelete } from "react-design-system/immersionFacile";
 
 type ProfessionProps = {
   name: string;
@@ -27,7 +27,7 @@ export const FormEstablishmentAppellation = ({
         initialValue={value}
         setFormValue={setValue}
       />
-      <DeleteButton onClick={onDelete} classname={"absolute top-1 right-1"} />
+      <ButtonDelete onClick={onDelete} classname={"absolute top-1 right-1"} />
     </div>
   );
 };

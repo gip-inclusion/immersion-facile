@@ -1,6 +1,6 @@
 import React from "react";
 import { ConventionDto } from "shared/src/convention/convention.dto";
-import { Accordion } from "./Accordion";
+import { Accordion } from "react-design-system/immersionFacile";
 import { FormAccordionProps as FormAccordeonProps } from "./FormAccordion";
 import { TextCell } from "./TextCell";
 

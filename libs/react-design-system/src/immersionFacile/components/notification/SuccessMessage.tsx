@@ -1,6 +1,6 @@
 import React from "react";
 
-interface SuccessMessageProps {
+export interface SuccessMessageProps {
   title: string;
   children: React.ReactNode;
 }

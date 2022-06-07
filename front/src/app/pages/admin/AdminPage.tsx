@@ -15,11 +15,11 @@ import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHea
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { ArrayDropdown } from "src/uiComponents/admin/ArrayDropdown";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
 import { Route } from "type-route";
 import "./Admin.css";
+import { ArrayDropdown } from "react-design-system/immersionFacile";
 
 interface AdminProps {
   route: Route<typeof routes.admin> | Route<typeof routes.agencyAdmin>;

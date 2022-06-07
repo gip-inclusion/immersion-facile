@@ -1,9 +1,9 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
 import { ScheduleDto } from "shared/src/schedule/ScheduleSchema";
-import { ButtonAdd } from "src/uiComponents/ButtonAdd";
-import { DeleteButton } from "src/uiComponents/DeleteButton";
+import { ButtonAdd } from "react-design-system/src/immersionFacile/components/buttons/ButtonAdd";
 import { WeekdayDropdown } from "./WeekdayDropdown";
+import { ButtonDelete } from "react-design-system/immersionFacile";
 
 type WeekdayPickerProps = {
   schedule: number[][];
@@ -82,7 +82,7 @@ export const WeekdayPicker = ({
                   />
                 </div>
                 {!disabled && (
-                  <DeleteButton
+                  <ButtonDelete
                     isHidden={!isRemovable}
                     disabled={!isRemovable}
                     onClick={() => remove(index)}

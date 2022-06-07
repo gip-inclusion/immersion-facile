@@ -1,14 +1,13 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { imagePrefix } from "../../storyPrefixes";
+import { imagePrefix } from ".";
 import { Image, ImageProps } from "./Image";
 
 const Component = Image;
-const prefix = imagePrefix;
 const argTypes: Partial<ArgTypes<ImageProps>> | undefined = {};
 
 export default {
-  title: `${prefix}${Component.name}`,
+  title: `${imagePrefix}${Component.name}`,
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

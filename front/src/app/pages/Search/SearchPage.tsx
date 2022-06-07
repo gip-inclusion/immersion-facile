@@ -10,10 +10,10 @@ import { useAppSelector } from "src/app/utils/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
-import { SearchButton } from "src/uiComponents/SearchButton";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import { OurAdvises } from "./OurAdvises";
 import { SearchResultPanel } from "./SearchResultPanel";
+import { ButtonSearch } from "react-design-system/immersionFacile";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initiallySelectedIndex = 3; // to get 10 km radius by default
@@ -84,7 +84,7 @@ export const SearchPage = () => {
                       options={radiusOptions.map((n) => `${n} km`)}
                     />
                   </div>
-                  <SearchButton
+                  <ButtonSearch
                     className="mt-12"
                     dark
                     disabled={
@@ -97,7 +97,7 @@ export const SearchPage = () => {
                       <SearchIcon />
                       Rechercher
                     </div>
-                  </SearchButton>
+                  </ButtonSearch>
                 </div>
               </Form>
             )}

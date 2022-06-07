@@ -1,12 +1,14 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
+import {
+  ButtonHome,
+  ErrorMessage,
+  SuccessMessage,
+} from "react-design-system/immersionFacile";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { SiretDto } from "shared/src/siret";
-import { HomeButton } from "react-design-system/immersionFacile";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
-import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
-import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { AppellationList } from "./AppellationList";
 import { BusinessContact } from "./BusinessContact";
@@ -175,7 +177,7 @@ export const EstablishmentFormikForm = ({
             <br />
             {isEditing === true && (
               <>
-                <HomeButton
+                <ButtonHome
                   onClick={(_) => {
                     window.open(mailtoHref(initialValues.siret));
                   }}
@@ -183,7 +185,7 @@ export const EstablishmentFormikForm = ({
                   width={null}
                 >
                   Supprimer votre entreprise
-                </HomeButton>
+                </ButtonHome>
                 <p>
                   Si vous avez besoin d'aide, envoyez-nous un email: <br />
                   contact@immersion-facile.beta.gouv.fr

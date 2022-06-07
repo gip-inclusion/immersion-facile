@@ -2,6 +2,7 @@ import arrow from "/fleche.svg";
 import React, { ReactNode } from "react";
 
 type WithNumAndColor = { num?: number; red?: boolean };
+
 const ArrowOrNumber = ({ num, red }: WithNumAndColor) => {
   const background = red ? "bg-red-100" : "bg-blue-100";
   const textColor = red ? "text-immersionRed-dark" : "text-immersionBlue-dark";

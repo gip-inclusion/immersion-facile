@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
+import {
+  ErrorMessage,
+  InfoMessage,
+  SuccessMessage,
+} from "react-design-system/immersionFacile";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
-import { ConventionDto } from "shared/src/convention/convention.dto";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
-import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
-import { InfoMessage } from "src/uiComponents/form/InfoMessage";
-import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { Route } from "type-route";
 
 // Temporary "final verification" page for the admin to re-verify the form.

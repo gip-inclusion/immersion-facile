@@ -1,14 +1,17 @@
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import React from "react";
-import { HomeButton, Link } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { Section } from "src/app/components/Section";
+import {
+  ButtonHome,
+  Link,
+  ImmersionTextField,
+} from "react-design-system/immersionFacile";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import { isSiretAlreadySavedSelector } from "src/core-logic/domain/siret/siret.selectors";
 import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
 import { useSiretFetcher } from "src/hooks/siret.hooks";
-import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
 import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSubTitle";
 import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
 import { routes } from "../routing/routes";
@@ -43,21 +46,21 @@ export const EstablishmentHomeMenu = () => {
       <div className="flex flex-col w-full h-full items-center justify-center">
         {!isReadyForRequestOrRedirection ? (
           <>
-            <HomeButton
+            <ButtonHome
               onClick={() => {
                 dispatch(establishmentSlice.actions.gotReady());
               }}
             >
               Référencer votre entreprise
-            </HomeButton>
-            <HomeButton
+            </ButtonHome>
+            <ButtonHome
               type="secondary"
               onClick={() => {
                 dispatch(establishmentSlice.actions.gotReady());
               }}
             >
               Modifier votre entreprise
-            </HomeButton>
+            </ButtonHome>
           </>
         ) : (
           <>
@@ -115,8 +118,8 @@ const ModifyEstablishmentRequestForMailUpdate = ({
     <span className="text-immersionBlue-dark  text-center text-xs pb-2">
       Nous avons bien trouvé votre établissement dans notre base de donnée.
     </span>
-    <HomeButton type="secondary" onClick={onClick}>
+    <ButtonHome type="secondary" onClick={onClick}>
       Recevoir le mail de modification
-    </HomeButton>
+    </ButtonHome>
   </>
 );

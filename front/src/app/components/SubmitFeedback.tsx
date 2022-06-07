@@ -1,6 +1,8 @@
 import React from "react";
-import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
-import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
+import {
+  ErrorMessage,
+  SuccessMessage,
+} from "react-design-system/immersionFacile";
 
 export type SuccessFeedbackKind =
   | "justSubmitted"

@@ -9,11 +9,13 @@ import {
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
 import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
-import { ErrorMessage } from "src/uiComponents/form/ErrorMessage";
-import { SuccessMessage } from "src/uiComponents/form/SuccessMessage";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { VerificationActionButton } from "./VerificationActionButton";
+import {
+  ErrorMessage,
+  SuccessMessage,
+} from "react-design-system/immersionFacile";
 
 type VerificationPageProps = {
   route: Route<typeof routes.conventionToValidate>;

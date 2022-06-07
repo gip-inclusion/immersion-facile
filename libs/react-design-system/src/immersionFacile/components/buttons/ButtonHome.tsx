@@ -5,7 +5,7 @@ type HomeButtonTypes = "primary" | "secondary" | "error";
 export type HomeButtonProps = {
   disable?: boolean;
   onClick?: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void | Promise<void>;
   children: ReactNode;
   className?: string;
@@ -19,7 +19,7 @@ export const buttonClassnames: Record<HomeButtonTypes, string> = {
   error: "bg-immersionRed text-white shadow-none mt-1 mb-2",
 };
 
-export const HomeButton = ({
+export const ButtonHome = ({
   onClick,
   disable,
   children,

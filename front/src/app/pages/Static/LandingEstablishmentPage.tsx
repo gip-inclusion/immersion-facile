@@ -6,10 +6,9 @@ import React from "react";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { BulletPoint } from "src/uiComponents/BulletPoint";
-import { Colored } from "src/uiComponents/Colored";
 import { EstablishmentImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { Statistic } from "src/uiComponents/Statistic";
-import { Title, Card } from "react-design-system/immersionFacile";
+import { Title, Card, Colored } from "react-design-system/immersionFacile";
 
 export const LandingEstablishmentPage = () => (
   <HeaderFooterLayout>

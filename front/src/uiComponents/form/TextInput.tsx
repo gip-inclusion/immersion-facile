@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React, { useEffect } from "react";
-import { ImmersionTextField } from "src/uiComponents/form/ImmersionTextField";
+import { ImmersionTextField } from "react-design-system/immersionFacile";
 
 type TextInputProps = {
   label: string;
