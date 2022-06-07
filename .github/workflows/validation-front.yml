@@ -31,8 +31,8 @@ jobs:
       - name: Retrieve dependencies
         uses: actions/cache@v3
         with:
-          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+          key: ${{ inputs.cache-key }}
+          path: ${{ inputs.cache-path }}
 
         - name: Check compilation
           run: tsc --noEmit
@@ -46,8 +46,8 @@ jobs:
       - name: Retrieve dependencies
         uses: actions/cache@v3
         with:
-          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+          key: ${{ inputs.cache-key }}
+          path: ${{ inputs.cache-path }}
 
       - name: Execute tests
         run: jest --passWithNoTests --verbose --testRegex='^((?!(integration|manual)).)*.test.ts$'
@@ -61,8 +61,8 @@ jobs:
       - name: Retrieve dependencies
         uses: actions/cache@v3
         with:
-          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+          key: ${{ inputs.cache-key }}
+          path: ${{ inputs.cache-path }}
 
       - name: eslint
         run: eslint ./src --fix
@@ -76,8 +76,8 @@ jobs:
       - name: Retrieve dependencies
         uses: actions/cache@v3
         with:
-          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+          key: ${{ inputs.cache-key }}
+          path: ${{ inputs.cache-path }}
 
       - name: prettier check
         run: prettier --check src
