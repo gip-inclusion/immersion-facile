@@ -134,9 +134,9 @@ jobs:
       - dependencies
 
     uses: ./.github/workflows/validation-front.yml
-      with:
-        cache-path: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-        cache-key: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+    with:
+      cache-path: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+      cache-key: ${{ needs.dependencies.outputs.pnpm_cache_key }}
 
 #  deploy:
 #    needs:

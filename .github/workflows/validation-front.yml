@@ -34,8 +34,8 @@ jobs:
           key: ${{ inputs.cache-key }}
           path: ${{ inputs.cache-path }}
 
-        - name: Check compilation
-          run: tsc --noEmit
+      - name: Check compilation
+        run: tsc --noEmit
 
   test:
     runs-on: ubuntu-latest
