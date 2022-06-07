@@ -15,7 +15,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   authenticatedRouter.use(deps.applicationMagicLinkAuthMiddleware);
 
   authenticatedRouter
-    .route(`/${immersionAssessmentRoute}/:jwt`)
+    .route(`/${immersionAssessmentRoute}`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.createImmersionAssessment.execute(

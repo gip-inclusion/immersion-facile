@@ -22,13 +22,9 @@ export class HttpImmersionAssessmentGateway
   createAssessment({ jwt, assessment }: AssessmentAndJwt): Observable<void> {
     return from(
       this.axiosInstance
-        .post<void>(
-          `/auth/${immersionAssessmentRoute}/${jwt}`,
-          assessment,
-          // {
-          //   headers: { Authorization: jwt },
-          // }
-        )
+        .post<void>(`/auth/${immersionAssessmentRoute}`, assessment, {
+          headers: { Authorization: jwt },
+        })
         .then(({ data }) => data),
     );
   }

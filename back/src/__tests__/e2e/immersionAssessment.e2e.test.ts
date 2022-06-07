@@ -36,7 +36,8 @@ describe("Immersion assessment routes", () => {
       };
 
       const response = await request
-        .post(`/auth/${immersionAssessmentRoute}/${jwt}`)
+        .post(`/auth/${immersionAssessmentRoute}`)
+        .set("Authorization", jwt)
         .send(assessment);
 
       expect(response.body).toEqual({ success: true });
@@ -52,10 +53,11 @@ describe("Immersion assessment routes", () => {
       };
 
       const response = await request
-        .post(`/auth/${immersionAssessmentRoute}/invalid-jwt`)
+        .post(`/auth/${immersionAssessmentRoute}`)
+        .set("Authorization", "invalid-jwt")
         .send(assessment);
 
-      expect(response.body).toEqual({ message: "Provided token is invalid" });
+      expect(response.body).toEqual({ error: "Provided token is invalid" });
       expect(response.status).toBe(401);
     });
   });
