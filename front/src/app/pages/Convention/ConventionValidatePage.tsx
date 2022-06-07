@@ -12,10 +12,7 @@ import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { VerificationActionButton } from "./VerificationActionButton";
-import {
-  Notification,
-  SuccessMessage,
-} from "react-design-system/immersionFacile";
+import { Notification } from "react-design-system/immersionFacile";
 
 type VerificationPageProps = {
   route: Route<typeof routes.conventionToValidate>;
@@ -153,7 +150,9 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
               )}
 
               {successMessage && (
-                <SuccessMessage title="Succès">{successMessage}</SuccessMessage>
+                <Notification type="success" title="Succès">
+                  {successMessage}
+                </Notification>
               )}
             </div>
           </div>

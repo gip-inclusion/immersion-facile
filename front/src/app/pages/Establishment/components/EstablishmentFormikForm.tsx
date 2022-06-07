@@ -1,10 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import {
-  ButtonHome,
-  Notification,
-  SuccessMessage,
-} from "react-design-system/immersionFacile";
+import { ButtonHome, Notification } from "react-design-system/immersionFacile";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { SiretDto } from "shared/src/siret";
@@ -161,10 +157,10 @@ export const EstablishmentFormikForm = ({
                 </>
               )}
               {isSuccess && (
-                <SuccessMessage title="Succès de l'envoi">
+                <Notification type="success" title="Succès de l'envoi">
                   Succès. Nous avons bien enregistré les informations concernant
                   votre entreprise.
-                </SuccessMessage>
+                </Notification>
               )}
               {!isSuccess && (
                 <button

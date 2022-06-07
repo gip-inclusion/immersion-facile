@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  Notification,
-  SuccessMessage,
-} from "react-design-system/immersionFacile";
+import { Notification } from "react-design-system/immersionFacile";
 
 export type SuccessFeedbackKind =
   | "justSubmitted"
@@ -27,9 +24,9 @@ export const SubmitFeedback = ({ submitFeedback }: SubmitFeedbackProps) => {
           {getErrorMessage(submitFeedback)}
         </Notification>
       ) : (
-        <SuccessMessage title="Succès de l'envoi">
+        <Notification type="success" title="Succès de l'envoi">
           {messageByKind[submitFeedback]}
-        </SuccessMessage>
+        </Notification>
       )}
     </>
   );

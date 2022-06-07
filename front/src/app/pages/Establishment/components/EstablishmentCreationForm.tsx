@@ -15,11 +15,7 @@ import {
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ENV } from "src/environmentVariables";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
-import {
-  Button,
-  InfoMessage,
-  SuccessMessage,
-} from "react-design-system/immersionFacile";
+import { Button, Notification } from "react-design-system/immersionFacile";
 
 import {
   TextInput,
@@ -117,16 +113,19 @@ const CreationSiretRelatedInputs = () => {
           </div>
         )}
       {requestEmailToEditFormSucceed && (
-        <SuccessMessage title="Succès de la demande">
+        <Notification type="success" title="Succès de la demande">
           Succès. Un mail a été envoyé au référent de cet établissement avec un
           lien permettant la mise à jour des informations.
-        </SuccessMessage>
+        </Notification>
       )}
       {requestEmailToEditFormError && (
         <>
-          <InfoMessage title="La demande de modification n'a pas aboutie.">
+          <Notification
+            type="info"
+            title="La demande de modification n'a pas aboutie."
+          >
             {requestEmailToEditFormError}
-          </InfoMessage>
+          </Notification>
           <br />
         </>
       )}

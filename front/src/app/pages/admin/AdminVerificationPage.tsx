@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Notification,
-  InfoMessage,
-  SuccessMessage,
-} from "react-design-system/immersionFacile";
+import { Notification } from "react-design-system/immersionFacile";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
@@ -98,7 +94,9 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
       {form && (
         <>
           {infoMessage && (
-            <InfoMessage title="Attention">{infoMessage}</InfoMessage>
+            <Notification type="info" title="Attention">
+              {infoMessage}
+            </Notification>
           )}
           <FormAccordion convention={form} />
           {!validationDisabled() && (
@@ -112,9 +110,9 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
             </button>
           )}
           {successMessage && (
-            <SuccessMessage title="Succès">
+            <Notification type="success" title="Succès">
               <p>{successMessage}</p>
-            </SuccessMessage>
+            </Notification>
           )}
         </>
       )}

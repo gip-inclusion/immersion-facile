@@ -6,7 +6,7 @@ import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
-import { Notification, InfoMessage } from "react-design-system/immersionFacile";
+import { Notification } from "react-design-system/immersionFacile";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import {
   SubmitFeedback,
@@ -224,7 +224,10 @@ const ConventionRejectedMessage = () => (
 const ConventionNeedsModificationMessage = (props: { jwt: string }) => (
   <SignPageLayout>
     <br />
-    <InfoMessage title="Des modifications ont été demandées sur votre demande">
+    <Notification
+      type="info"
+      title="Des modifications ont été demandées sur votre demande"
+    >
       Vous ne pouvez pas encore signer votre demande d'immersion car des
       modifications ont été réclamées par votre conseiller (Vous avez reçu un
       mail précisant les changements à effectuer).
@@ -233,7 +236,7 @@ const ConventionNeedsModificationMessage = (props: { jwt: string }) => (
           Cliquez ici pour aller à la page d'édition
         </a>
       </span>
-    </InfoMessage>
+    </Notification>
   </SignPageLayout>
 );
 
