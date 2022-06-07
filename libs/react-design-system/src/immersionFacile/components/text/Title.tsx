@@ -1,6 +1,6 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-export type TitleProps = { children: string; red?: boolean };
+export type TitleProps = { children: ReactNode; red?: boolean };
 
 export const Title = ({ children, red }: TitleProps) => (
   <div
