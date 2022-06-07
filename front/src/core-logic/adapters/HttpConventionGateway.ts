@@ -49,9 +49,9 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public async getMagicLink(jwt: string): Promise<ConventionDto> {
-    const response = await axios.get(
-      `/${prefix}/auth/${conventionsRoute}/${jwt}`,
-    );
+    const response = await axios.get(`/${prefix}/auth/${conventionsRoute}/id`, {
+      headers: { Authorization: jwt },
+    });
     return response.data;
   }
 
