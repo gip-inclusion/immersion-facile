@@ -32,7 +32,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     await expectEstablishmentRequiresChanges(
       appAndDeps,
       tutorJwt,
-      validImmersionApplication.id,
+      validConvention.id,
       {
         justification: "change something which is wrong",
         status: "DRAFT",

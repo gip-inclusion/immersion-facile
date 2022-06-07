@@ -36,6 +36,7 @@ export class ImmersionOfferEntityV2Builder
       createdAt,
     });
   }
+
   build() {
     return this.entity;
   }

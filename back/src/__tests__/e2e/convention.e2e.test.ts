@@ -191,11 +191,13 @@ describe("/demandes-immersion route", () => {
         const jwt = generateJwt(payload);
 
         // GETting the created application 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
-        await request.get(`/auth/${conventionsRoute}/${convention.id}`)
-          .set("Authorization", jwt).expect(403, {
-          message: "Le lien magique est périmé",
-          needsNewMagicLink: true,
-        });
+        await request
+          .get(`/auth/${conventionsRoute}/${convention.id}`)
+          .set("Authorization", jwt)
+          .expect(403, {
+            message: "Le lien magique est périmé",
+            needsNewMagicLink: true,
+          });
       });
     });
 
@@ -238,7 +240,11 @@ describe("/demandes-immersion route", () => {
     it("Fetching unknown application IDs fails with 404 Not Found", async () => {
       const unknownId = "unknown-demande-immersion-id";
       const jwt = generateJwt(
-        createConventionMagicLinkPayload(unknownId, "beneficiary", "some email"),
+        createConventionMagicLinkPayload(
+          unknownId,
+          "beneficiary",
+          "some email",
+        ),
       );
       await request
         .get(`/${conventionsRoute}/anything`)

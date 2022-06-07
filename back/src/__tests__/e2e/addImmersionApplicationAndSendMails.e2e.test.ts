@@ -178,7 +178,7 @@ const beneficiarySignsApplication = async (
   initialConvention: ConventionDto,
 ) => {
   const response = await request
-    .post(`/auth/${signConventionRoute}/${initialImmersionApplication.id}`)
+    .post(`/auth/${signConventionRoute}/${initialConvention.id}`)
     .set("Authorization", beneficiarySignJwt);
 
   expect(response.status).toBe(200);
@@ -211,7 +211,7 @@ const establishmentSignsApplication = async (
   initialConvention: ConventionDto,
 ) => {
   await request
-    .post(`/auth/${signConventionRoute}/${initialImmersionApplication.id}`)
+    .post(`/auth/${signConventionRoute}/${initialConvention.id}`)
     .set("Authorization", establishmentSignJwt)
     .expect(200);
 
@@ -247,9 +247,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     status: "ACCEPTED_BY_VALIDATOR",
   };
   await request
-    .post(
-      `/auth/${updateConventionStatusRoute}/${initialImmersionApplication.id}`,
-    )
+    .post(`/auth/${updateConventionStatusRoute}/${initialConvention.id}`)
     .set("Authorization", validatorReviewJwt)
     .send(params)
     .expect(200);

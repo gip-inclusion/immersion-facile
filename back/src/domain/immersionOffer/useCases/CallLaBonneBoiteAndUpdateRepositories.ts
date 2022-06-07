@@ -111,21 +111,20 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
         (siret) => !existingCompaniesWithSameRome.includes(siret),
       );
 
-      const immersionOffersWithSiretsToAdd: OfferWithSiret[] =
-        existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome.map((siret) => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it's siret is within relevantCompanies
-          const company = relevantCompanies.find(propEq("siret", siret))!;
-          return {
-            siret: company.siret,
-            createdAt: this.clock.now(),
-            romeCode: company.props.matched_rome_code,
-            score: company.props.stars,
-          };
-        });
-      await this.establishmentAggregateRepository.createImmersionOffersToEstablishments(
-        immersionOffersWithSiretsToAdd,
-      );
-
+    const immersionOffersWithSiretsToAdd: OfferWithSiret[] =
+      existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome.map((siret) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it's siret is within relevantCompanies
+        const company = relevantCompanies.find(propEq("siret", siret))!;
+        return {
+          siret: company.siret,
+          createdAt: this.clock.now(),
+          romeCode: company.props.matched_rome_code,
+          score: company.props.stars,
+        };
+      });
+    await this.establishmentAggregateRepository.createImmersionOffersToEstablishments(
+      immersionOffersWithSiretsToAdd,
+    );
   }
 
   private async requestLaBonneBoite(

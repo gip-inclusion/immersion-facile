@@ -1299,7 +1299,6 @@ describe("Postgres implementation of immersion offer repository", () => {
         .withAddress("2 RUE JACQUARD 69120 VAULX-EN-VELIN")
         .build();
       const offerWithRomeButNoAppellation = new ImmersionOfferEntityV2Builder()
-        .withNewId()
         .withRomeCode("H2102")
         .build();
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
@@ -1328,7 +1327,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         name: establishment.name,
         customizedName: establishment.customizedName,
         voluntaryToImmersion: establishment.voluntaryToImmersion,
-        location: establishment.position,
+        position: establishment.position,
         address: establishment.address,
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         city: "VAULX-EN-VELIN",
