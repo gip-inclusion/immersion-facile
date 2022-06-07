@@ -1,0 +1,70 @@
+name: Reusable Validation Workflow
+
+on:
+  workflow_call:
+
+jobs:
+  includecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: eslint
+        run: ./check_includes.sh
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+        - name: Check compilation
+          run: tsc --noEmit
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: Execute tests
+        run: jest --passWithNoTests --verbose --testRegex='^((?!(integration|manual)).)*.test.ts$'
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: eslint
+        run: eslint ./src --fix
+
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: prettier check
+        run: prettier --check src
