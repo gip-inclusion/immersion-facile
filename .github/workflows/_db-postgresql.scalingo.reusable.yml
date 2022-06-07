@@ -1,0 +1,64 @@
+# This is a Work In Progress
+name: Reusable Scalingo Postgresql Addon Workflow
+
+on:
+  workflow_call:
+    inputs:
+      application-full-name:
+        required: true
+        type: string
+
+      #If using extentions => PostGIS extension requires at least a “Starter 512M” plan to work. (ref : https://doc.scalingo.com/databases/postgresql/extensions)
+      addon-plan-postgresql:
+        required: true
+        type: string
+
+      reference-application-name:
+        required: false
+        type: string
+
+
+    secrets:
+      SCALINGO_API_TOKEN:
+        required: true
+
+
+jobs:
+  addon-postgresql:
+    name: Add the postgresql addon if not present
+    runs-on: ubuntu-latest
+    container:
+      image: rcambonie/scalingo-cli
+
+    steps:
+      - name: Login with api-token
+        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN }}
+
+      - name: Add the postgresql addon
+        run: if (( $(scalingo -app ${{ inputs.application-full-name }} | grep -c PostgreSQL) == 0 )); then scalingo --app ${{ inputs.application-full-name }} addons-add postgresql ${{ inputs.addon-plan-postgresql }}; else echo 'addon exists already'; fi
+
+  restore-db-from-reference-dump:
+    name: Dump and restore the production database to the feature app
+    if: ${{ inputs.application-full-name != inputs.reference-application-name }}
+    runs-on: ubuntu-latest
+    needs:
+      - addon-postgresql
+    container:
+      image: rcambonie/scalingo-cli
+
+    steps:
+      - name: Save the feature app database url string
+        id: feature-app-database-url
+        run : |
+          TARGET_DATABASE_URL=$(scalingo --app ${{ inputs.application-full-name }} env | grep SCALINGO_POSTGRESQL_URL)
+          TARGET_DATABASE_URL=${TARGET_URL//SCALINGO_POSTGRESQL_URL=/}
+            echo "::set-output name=target-database-url::$TARGET_DATABASE_URL"
+
+      #TODO Add a transformation script (anonymisation ?) between dump and restore
+      - name: Restore from prod dump
+        run: scalingo --app ${{ inputs.reference-application-name }} run bash -c "dbclient-fetcher psql && \
+         pg_dump --clean --if-exists --format c --no-owner --no-privileges --no-comments --exclude-schema 'information_schema' --exclude-schema '^pg_*' --dbname $DATABASE_URL --file dump.pgsql && \
+         pg_restore --clean --if-exists --no-owner --no-privileges --no-comments --dbname ${{ steps.feature-app-database-url.outputs.target-database-url }} --file dump.pgsql"
+
+
+

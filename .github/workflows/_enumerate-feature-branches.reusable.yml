@@ -1,0 +1,25 @@
+name: Reusable enumerate branches that match feature/* pattern as JSON string array
+
+on:
+  workflow_call:
+    outputs:
+      branches:
+        description: 'Array of branches that match the feature/* pattern'
+        value: ${{ jobs.enumerate-feature-branches.outputs.branches }}
+
+jobs:
+  enumerate-feature-branches:
+    runs-on: ubuntu-latest
+    outputs:
+      branches: ${{ steps.enumerate-feature-branches.outputs.branches }}
+    steps:
+      - name: Retrieve all branches
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Enumerate all branches that match a 'feature/*' pattern
+        id: enumerate-feature-branches
+        run: |
+          FEATURES_BRANCHES=$(git branch -r | gawk 'match($0, /feature\/(.+)/, captureGroup) { printf "\"%s\",",captureGroup[1]} ')
+          ${FEATURES_BRANCHES:0:-1}
+          echo '::set-output name=branches::['$FEATURES_BRANCHES']'
