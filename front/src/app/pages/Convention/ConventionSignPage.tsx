@@ -95,13 +95,7 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
 
   if (!convention) return <p>Chargement en cours...</p>;
 
-  if (convention.status === "REJECTED")
-    return (
-      <ConventionRejectedMessage>
-        {convention.rejectionJustification}
-      </ConventionRejectedMessage>
-    );
-
+  if (convention.status === "REJECTED") return <ConventionRejectedMessage />;
   if (convention.status === "DRAFT")
     return <ConventionNeedsModificationMessage jwt={jwt} />;
 
@@ -214,13 +208,13 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
   );
 };
 
-const ConventionRejectedMessage: React.FC = ({ children }) => (
+const ConventionRejectedMessage = () => (
   <SignPageLayout>
     <br />
-    <ErrorMessage title="Désolé : votre demande d'immersion a été rejeté">
-      Votre demande d'immersion a été refusé pour la raison suivante :
-      <span className="block italic">{children ?? "- Non renseigné -"}</span>
-      Veuillez contacter votre conseiller pour plus d'informations.
+    <ErrorMessage title="Désolé : votre demande d'immersion a été refusée">
+      Votre demande d'immersion a été refusée. Vous avez reçu un mail vous en
+      donnant les raisons.
+      <p>Veuillez contacter votre conseiller pour plus d'informations.</p>
     </ErrorMessage>
   </SignPageLayout>
 );
@@ -230,8 +224,8 @@ const ConventionNeedsModificationMessage = (props: { jwt: string }) => (
     <br />
     <InfoMessage title="Des modifications ont été demandées sur votre demande">
       Vous ne pouvez pas encore signer votre demande d'immersion car des
-      modifications ont été réclamées par votre conseiller (Vous avez du
-      recevoir un mail précisant les changements a effectuer).
+      modifications ont été réclamées par votre conseiller (Vous avez reçu un
+      mail précisant les changements à effectuer).
       <span className="block">
         <a {...routes.convention({ jwt: props.jwt }).link}>
           Cliquez ici pour aller à la page d'édition

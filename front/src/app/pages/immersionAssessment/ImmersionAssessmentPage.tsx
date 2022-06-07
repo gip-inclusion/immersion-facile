@@ -10,7 +10,9 @@ import {
 } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
 import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { toDisplayedDate } from "shared/src/utils/date";
 import { RadioGroupForField } from "src/app/components/RadioGroup";
+import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
@@ -64,80 +66,76 @@ export const ImmersionAssessmentPage = ({
     convention?.status === "VALIDATED";
 
   return (
-    <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
-      <div className="fr-col-lg-8 fr-p-2w">
-        <Title>Bilan de l'immersion</Title>
-        {isLoading && <CircularProgress />}
-        {conventionFetchError && <div>{conventionFetchError}</div>}
-        {convention && !canCreateAssessment && (
-          <ErrorMessage title="Votre convention n'est pas prête à recevoir un bilan">
-            Seule une convention entièrement validée peut recevoir un bilan
-          </ErrorMessage>
-        )}
-        {canCreateAssessment && (
-          <div className="">
-            <ImmersionDescription convention={convention} />
-            <Formik
-              initialValues={identity<ImmersionAssessmentDto>({
-                conventionId: convention.id,
-                status: null as unknown as AssessmentStatus,
-                establishmentFeedback: "",
-              })}
-              validationSchema={toFormikValidationSchema(
-                immersionAssessmentSchema,
-              )}
-              onSubmit={createAssessment}
-            >
-              {() => (
-                <Form>
-                  <div className="flex flex-col m-auto items-center">
-                    <div className="flex items-center justify-between flex-wrap">
-                      <RadioGroupForField
-                        label=""
-                        name={getName("status")}
-                        options={assessmentStatuses.map((value) => ({
-                          value,
-                          label: labels[value],
-                        }))}
-                      />
-                      <div
-                        className="flex-1 pl-4"
-                        style={{ minWidth: "20rem", maxWidth: "34rem" }}
-                      >
-                        <TextInput
-                          multiline={true}
-                          label="Comment s'est passé l'immersion ?"
-                          name={getName("establishmentFeedback")}
-                        />
-                      </div>
-                    </div>
-                    <Button
-                      className="w-40"
-                      type="submit"
-                      disable={
-                        assessmentStatus !== "Idle" || assessmentError !== null
-                      }
-                    >
-                      Envoyer
-                    </Button>
-                    {assessmentError && (
-                      <ErrorMessage title="Erreur">
-                        {assessmentError}
-                      </ErrorMessage>
-                    )}
-                    {assessmentStatus === "Success" && (
-                      <SuccessMessage title={"Bilan envoyé"}>
-                        Le bilan a bien été envoyé au conseiller
-                      </SuccessMessage>
-                    )}
+    <HeaderFooterLayout>
+      <Title>
+        Bilan de l'immersion{" "}
+        {convention ? `de ${convention.firstName} ${convention.lastName}` : ""}
+      </Title>
+      {isLoading && <CircularProgress />}
+      {conventionFetchError && <div>{conventionFetchError}</div>}
+      {convention && !canCreateAssessment && (
+        <ErrorMessage title="Votre convention n'est pas prête à recevoir un bilan">
+          Seule une convention entièrement validée peut recevoir un bilan
+        </ErrorMessage>
+      )}
+      {canCreateAssessment && (
+        <div className="px-2 md:pl-20">
+          <ImmersionDescription convention={convention} />
+          <Formik
+            initialValues={identity<ImmersionAssessmentDto>({
+              conventionId: convention.id,
+              status: null as unknown as AssessmentStatus,
+              establishmentFeedback: "",
+            })}
+            validationSchema={toFormikValidationSchema(
+              immersionAssessmentSchema,
+            )}
+            onSubmit={createAssessment}
+          >
+            {() => (
+              <Form>
+                <div className="flex flex-col">
+                  <RadioGroupForField
+                    label=""
+                    name={getName("status")}
+                    options={assessmentStatuses.map((value) => ({
+                      value,
+                      label: labels[value],
+                    }))}
+                  />
+                  <div style={{ minWidth: "20rem", maxWidth: "34rem" }}>
+                    <TextInput
+                      multiline={true}
+                      label="Comment s'est passée l'immersion ?"
+                      name={getName("establishmentFeedback")}
+                    />
                   </div>
-                </Form>
-              )}
-            </Formik>
-          </div>
-        )}
-      </div>
-    </div>
+                  <Button
+                    className="w-28"
+                    type="submit"
+                    disable={
+                      assessmentStatus !== "Idle" || assessmentError !== null
+                    }
+                  >
+                    Envoyer
+                  </Button>
+                  {assessmentError && (
+                    <ErrorMessage title="Erreur">
+                      {assessmentError}
+                    </ErrorMessage>
+                  )}
+                  {assessmentStatus === "Success" && (
+                    <SuccessMessage title={"Bilan envoyé"}>
+                      Le bilan a bien été envoyé au conseiller
+                    </SuccessMessage>
+                  )}
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      )}
+    </HeaderFooterLayout>
   );
 };
 
@@ -146,17 +144,16 @@ const ImmersionDescription = ({
 }: {
   convention: ConventionDto;
 }) => (
-  <div>
-    <p>
-      L'immersion de{" "}
-      <Bold>
-        {convention.firstName} {convention.lastName}
-      </Bold>{" "}
-      auprès de l'établissement <Bold>{convention.businessName}</Bold> qui a eu
-      lieu du <Bold>{convention.dateStart} </Bold>au{" "}
-      <Bold>{convention.dateEnd}</Bold> touche à sa fin.
-    </p>
-  </div>
+  <p>
+    L'immersion de{" "}
+    <Bold>
+      {convention.firstName} {convention.lastName}
+    </Bold>{" "}
+    auprès de l'établissement <Bold>{convention.businessName}</Bold> qui a eu
+    lieu du <Bold>{toDisplayedDate(new Date(convention.dateStart))} </Bold>au{" "}
+    <Bold>{toDisplayedDate(new Date(convention.dateEnd))}</Bold> touche à sa
+    fin.
+  </p>
 );
 
 const Bold: React.FC = ({ children }) => (
@@ -165,6 +162,6 @@ const Bold: React.FC = ({ children }) => (
 
 const getName = (name: keyof ImmersionAssessmentDto) => name;
 const labels: Record<AssessmentStatus, string> = {
-  ABANDONED: "Le bénéficiaire a abandonné l'immersion",
   FINISHED: "Le bénéficiaire a suivi son immersion jusqu'à la fin",
+  ABANDONED: "Le bénéficiaire a abandonné l'immersion",
 };
