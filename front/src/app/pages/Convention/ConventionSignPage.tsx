@@ -6,7 +6,7 @@ import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
-import { ErrorMessage, InfoMessage } from "react-design-system/immersionFacile";
+import { Notification, InfoMessage } from "react-design-system/immersionFacile";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import {
   SubmitFeedback,
@@ -210,11 +210,14 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
 const ConventionRejectedMessage = () => (
   <SignPageLayout>
     <br />
-    <ErrorMessage title="Désolé : votre demande d'immersion a été refusée">
+    <Notification
+      type="error"
+      title="Désolé : votre demande d'immersion a été refusée"
+    >
       Votre demande d'immersion a été refusée. Vous avez reçu un mail vous en
       donnant les raisons.
       <p>Veuillez contacter votre conseiller pour plus d'informations.</p>
-    </ErrorMessage>
+    </Notification>
   </SignPageLayout>
 );
 

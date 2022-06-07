@@ -2,7 +2,7 @@ import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import {
   ButtonHome,
-  ErrorMessage,
+  Notification,
   SuccessMessage,
 } from "react-design-system/immersionFacile";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
@@ -151,9 +151,12 @@ export const EstablishmentFormikForm = ({
               <br />
               {submitError && (
                 <>
-                  <ErrorMessage title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. ">
+                  <Notification
+                    type="error"
+                    title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. "
+                  >
                     {errorMessage}
-                  </ErrorMessage>
+                  </Notification>
                   <br />
                 </>
               )}

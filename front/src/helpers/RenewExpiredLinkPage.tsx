@@ -3,7 +3,7 @@ import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 
 import { Route } from "type-route";
-import { Button, ErrorMessage } from "react-design-system/immersionFacile";
+import { Button, Notification } from "react-design-system/immersionFacile";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewMagicLink>;
@@ -63,14 +63,17 @@ export const RenewExpiredLinkContent = ({
 
       {requestSuccessful && (
         <p>
-          Votre demande est enregistrée. Vous recevra une message avec le
+          Votre demande est enregistrée. Vous recevrez un message avec le
           nouveau lien dans quelques instants.{" "}
         </p>
       )}
       {errorMessage && (
-        <ErrorMessage title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement.">
+        <Notification
+          type="error"
+          title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement."
+        >
           {errorMessage}
-        </ErrorMessage>
+        </Notification>
       )}
     </>
   );

@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  ErrorMessage,
+  Notification,
   SuccessMessage,
 } from "react-design-system/immersionFacile";
 
@@ -20,9 +20,12 @@ export const SubmitFeedback = ({ submitFeedback }: SubmitFeedbackProps) => {
   return (
     <>
       {submitFeedback instanceof Error ? (
-        <ErrorMessage title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement">
+        <Notification
+          type="error"
+          title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement"
+        >
           {getErrorMessage(submitFeedback)}
-        </ErrorMessage>
+        </Notification>
       ) : (
         <SuccessMessage title="Succès de l'envoi">
           {messageByKind[submitFeedback]}

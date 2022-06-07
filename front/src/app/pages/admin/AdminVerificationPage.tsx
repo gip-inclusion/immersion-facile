@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  ErrorMessage,
+  Notification,
   InfoMessage,
   SuccessMessage,
 } from "react-design-system/immersionFacile";
@@ -119,7 +119,9 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
         </>
       )}
       {error && (
-        <ErrorMessage title="Erreur de serveur">{error.message}</ErrorMessage>
+        <Notification type="error" title="Erreur de serveur">
+          {error.message}
+        </Notification>
       )}
     </>
   );

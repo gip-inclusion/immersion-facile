@@ -28,8 +28,7 @@ import { useImmersionAssessment } from "src/hooks/immersionAssessment";
 import {
   Button,
   Title,
-  ErrorMessage,
-  SuccessMessage,
+  Notification,
 } from "react-design-system/immersionFacile";
 import { toDisplayedDate } from "shared/src/utils/date";
 
@@ -76,9 +75,12 @@ export const ImmersionAssessmentPage = ({
       {isLoading && <CircularProgress />}
       {conventionFetchError && <div>{conventionFetchError}</div>}
       {convention && !canCreateAssessment && (
-        <ErrorMessage title="Votre convention n'est pas prête à recevoir un bilan">
+        <Notification
+          type="error"
+          title="Votre convention n'est pas prête à recevoir un bilan"
+        >
           Seule une convention entièrement validée peut recevoir un bilan
-        </ErrorMessage>
+        </Notification>
       )}
       {canCreateAssessment && (
         <div className="px-2 md:pl-20">
@@ -122,14 +124,14 @@ export const ImmersionAssessmentPage = ({
                     Envoyer
                   </Button>
                   {assessmentError && (
-                    <ErrorMessage title="Erreur">
+                    <Notification type="error" title="Erreur">
                       {assessmentError}
-                    </ErrorMessage>
+                    </Notification>
                   )}
                   {assessmentStatus === "Success" && (
-                    <SuccessMessage title={"Bilan envoyé"}>
+                    <Notification type="success" title={"Bilan envoyé"}>
                       Le bilan a bien été envoyé au conseiller
-                    </SuccessMessage>
+                    </Notification>
                   )}
                 </div>
               </Form>

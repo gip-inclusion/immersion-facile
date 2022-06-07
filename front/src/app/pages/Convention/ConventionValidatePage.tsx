@@ -13,7 +13,7 @@ import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { VerificationActionButton } from "./VerificationActionButton";
 import {
-  ErrorMessage,
+  Notification,
   SuccessMessage,
 } from "react-design-system/immersionFacile";
 
@@ -144,9 +144,12 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
               )}
 
               {errorMessage && (
-                <ErrorMessage title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. Veuillez réessayer ultérieurement">
+                <Notification
+                  type="error"
+                  title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. Veuillez réessayer ultérieurement"
+                >
                   {errorMessage}
-                </ErrorMessage>
+                </Notification>
               )}
 
               {successMessage && (
