@@ -11,6 +11,8 @@ on:
         required: true
         type: string
 
+env:
+  working-directory: ./front
 
 jobs:
   includecheck:
@@ -19,7 +21,8 @@ jobs:
       - name: Retrieve the branch files
         uses: actions/checkout@v3
 
-      - name: eslint
+      - name: Check include script
+        working-directory: front
         run: ./check_includes.sh
 
   typecheck:
@@ -31,11 +34,27 @@ jobs:
       - name: Retrieve dependencies
         uses: actions/cache@v3
         with:
-          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+          key: ${{ inputs.cache-key }}
+          path: ${{ inputs.cache-path }}
 
-        - name: Check compilation
-          run: tsc --noEmit
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Setup node ${{ inputs.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install pnpm dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Check compilation
+        working-directory: front
+        run: pnpm run typecheck
 
   test:
     runs-on: ubuntu-latest
@@ -46,11 +65,27 @@ jobs:
       - name: Retrieve dependencies
         uses: actions/cache@v3
         with:
-          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+          key: ${{ inputs.cache-key }}
+          path: ${{ inputs.cache-path }}
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Setup node ${{ inputs.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install pnpm dependencies
+        run: pnpm i --frozen-lockfile
 
       - name: Execute tests
-        run: jest --passWithNoTests --verbose --testRegex='^((?!(integration|manual)).)*.test.ts$'
+        working-directory: front
+        run: pnpm run test
 
   lint:
     runs-on: ubuntu-latest
@@ -61,11 +96,27 @@ jobs:
       - name: Retrieve dependencies
         uses: actions/cache@v3
         with:
-          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+          key: ${{ inputs.cache-key }}
+          path: ${{ inputs.cache-path }}
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Setup node ${{ inputs.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install pnpm dependencies
+        run: pnpm i --frozen-lockfile
 
       - name: eslint
-        run: eslint ./src --fix
+        working-directory: front
+        run: pnpm run lint
 
   prettier:
     runs-on: ubuntu-latest
@@ -76,8 +127,24 @@ jobs:
       - name: Retrieve dependencies
         uses: actions/cache@v3
         with:
-          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
-          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+          key: ${{ inputs.cache-key }}
+          path: ${{ inputs.cache-path }}
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Setup node ${{ inputs.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install pnpm dependencies
+        run: pnpm i --frozen-lockfile
 
       - name: prettier check
-        run: prettier --check src
+        working-directory: front
+        run: pnpm run format:check
