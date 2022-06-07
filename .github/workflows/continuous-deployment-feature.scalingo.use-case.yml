@@ -7,9 +7,6 @@ name: CD-Feature application on scalingo
 
 on:
   workflow_dispatch:
-#  push:
-#    branches:
-#      - feature/*
 
 env:
   application-name: 'immersion-facile'
@@ -25,8 +22,8 @@ jobs:
       reference-application-name: ${{ steps.reference-application-name.outputs.value }}
       addon-plan-postgresql: ${{ steps.addon-plan-postgresql.outputs.value }}
       deployment-owner-type: ${{ steps.deployment-owner-type.outputs.value }}
-      is-mattermost-hooked: ${{ steps.is-mattermost-hooked.outputs.value }}
       is-discord-hooked: ${{ steps.is-discord-hooked.outputs.value }}
+
     runs-on: ubuntu-latest
     steps:
       - name: Node version from env variable
@@ -54,12 +51,6 @@ jobs:
           POSTGRESQL_PLAN=$(echo ${{ env.addon-plan-postgresql }})
           echo "::set-output name=value::$POSTGRESQL_PLAN"          
 
-      - name: Has a mattermost webhook for notification been defined
-        id: is-mattermost-hooked
-        run: |
-          IS_HOOKED=${{ secrets.MATTERMOST_NOTIFY_HOOK_URL != '' }}
-          echo "::set-output name=value::$IS_HOOKED"
-
       - name: Has a discord webhook for notification been defined
         id: is-discord-hooked
         run: |
@@ -74,80 +65,114 @@ jobs:
 
 
   dependencies:
+    runs-on: ubuntu-latest
     needs:
       - dynamic-variables
-    uses: ./.github/workflows/_dependencies.reusable.yml
-    with:
-      node-version: ${{ needs.dynamic-variables.outputs.node-version }}
 
-  build:
-    needs: dependencies
-    runs-on: ubuntu-latest
+    outputs:
+      pnpm_cache_path: ${{ steps.pnpm-cache.outputs.path }}
+      pnpm_cache_key: ${{ steps.pnpm-cache.outputs.key }}
+
     steps:
       - name: Retrieve the branch files
         uses: actions/checkout@v3
 
-      - name: Retrieve dependencies
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Expose pnpm cache configurationstore directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=path::$(pnpm store path)"
+          echo "::set-output name=key::${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}"
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.key }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Setup node ${{ inputs.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install pnpm dependencies
+        run: pnpm i --frozen-lockfile
+
+  build:
+    needs:
+      - dependencies
+
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./front
+
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retreives dependencies
         uses: actions/cache@v3
         with:
-          key: node_modules-${{ hashFiles('yarn.lock') }}
-          path: node_modules
+          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
 
       - name: Build
-        run: yarn build
+        run: |
+          vite build
+          ls -la
 
   validation:
-    needs: dependencies
-    uses: ./.github/workflows/_validation.reusable.yml
-
-  deploy:
     needs:
-      - dynamic-variables
-      - build
-      - validation
-    uses: ./.github/workflows/_deploy-application.scalingo.reusable.yml
-    with:
-      application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
-      scalingo-remote-domain-url: 'git@ssh.osc-fr1.scalingo.com'
-      scalingo-ssh-host-domain: 'ssh.osc-fr1.scalingo.com'
-    secrets:
-      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+      - dependencies
 
-  additional-services:
-    needs:
-      - dynamic-variables
-      - deploy
-    uses: ./.github/workflows/_db-postgresql.scalingo.reusable.yml
-    with:
-      application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
-      reference-application-name: ${{ needs.dynamic-variables.outputs.reference-application-name }}
-      addon-plan-postgresql : ${{ needs.dynamic-variables.outputs.addon-plan-postgresql }}
-    secrets:
-      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+    uses: ./.github/workflows/validation-front.yml
+      with:
+        cache-path: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+        cache-key: ${{ needs.dependencies.outputs.pnpm_cache_key }}
 
-  notify-mattermost:
-    if: ${{ needs.dynamic-variables.outputs.is-mattermost-hooked == 'true' }}
-    needs:
-      - dynamic-variables
-      - deploy
-      - additional-services
-    uses: ./.github/workflows/_notify-deployment.mattermost.reusable.yml
-    with:
-      application-full-name: ${{ needs.dynamic-variables.outputs.application-environment-slug }}
-      deployed-domain: ${{ needs.deploy.outputs.deployed-domain }}
-    secrets:
-      MATTERMOST_NOTIFY_HOOK_URL: ${{ secrets.MATTERMOST_NOTIFY_HOOK_URL }}
-
-  notify-discord:
-    if: ${{ needs.dynamic-variables.outputs.is-discord-hooked == 'true' }}
-    needs:
-      - dynamic-variables
-      - deploy
-      - additional-services
-    uses: ./.github/workflows/_notify-deployment.discord.reusable.yml
-    with:
-      deployer-name: "Scalingo Deployer"
-      application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
-      deployed-domain: ${{ needs.dynamic-variables.outputs.deployed-domain }}
-    secrets:
-      DISCORD_NOTIFY_HOOK_URL: ${{ secrets.DISCORD_NOTIFY_HOOK_URL }}
+#  deploy:
+#    needs:
+#      - dynamic-variables
+#      - build
+#      - validation
+#    uses: ./.github/workflows/_deploy-application.scalingo.reusable.yml
+#    with:
+#      application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
+#      scalingo-remote-domain-url: 'git@ssh.osc-fr1.scalingo.com'
+#      scalingo-ssh-host-domain: 'ssh.osc-fr1.scalingo.com'
+#    secrets:
+#      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+#
+#  additional-services:
+#    needs:
+#      - dynamic-variables
+#      - deploy
+#    uses: ./.github/workflows/_db-postgresql.scalingo.reusable.yml
+#    with:
+#      application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
+#      reference-application-name: ${{ needs.dynamic-variables.outputs.reference-application-name }}
+#      addon-plan-postgresql : ${{ needs.dynamic-variables.outputs.addon-plan-postgresql }}
+#    secrets:
+#      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+#
+#  notify-discord:
+#    if: ${{ needs.dynamic-variables.outputs.is-discord-hooked == 'true' }}
+#    needs:
+#      - dynamic-variables
+#      - deploy
+#      - additional-services
+#    uses: ./.github/workflows/_notify-deployment.discord.reusable.yml
+#    with:
+#      deployer-name: "Scalingo Deployer"
+#      application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
+#      deployed-domain: ${{ needs.dynamic-variables.outputs.deployed-domain }}
+#    secrets:
+#      DISCORD_NOTIFY_HOOK_URL: ${{ secrets.DISCORD_NOTIFY_HOOK_URL }}

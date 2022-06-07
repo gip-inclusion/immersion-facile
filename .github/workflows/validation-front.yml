@@ -1,0 +1,83 @@
+name: Reusable Validation Workflow
+
+on:
+  workflow_call:
+    inputs:
+      cache-path:
+        required: true
+        type: string
+
+      cache-key:
+        required: true
+        type: string
+
+
+jobs:
+  includecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: eslint
+        run: ./check_includes.sh
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+
+        - name: Check compilation
+          run: tsc --noEmit
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+
+      - name: Execute tests
+        run: jest --passWithNoTests --verbose --testRegex='^((?!(integration|manual)).)*.test.ts$'
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+
+      - name: eslint
+        run: eslint ./src --fix
+
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve the branch files
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ needs.dependencies.outputs.pnpm_cache_path }}
+          path: ${{ needs.dependencies.outputs.pnpm_cache_key }}
+
+      - name: prettier check
+        run: prettier --check src
