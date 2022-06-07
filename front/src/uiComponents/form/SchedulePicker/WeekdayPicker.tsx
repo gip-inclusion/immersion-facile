@@ -1,9 +1,8 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
 import { ScheduleDto } from "shared/src/schedule/ScheduleSchema";
-import { ButtonAdd } from "react-design-system/src/immersionFacile/components/buttons/ButtonAdd";
+import { ButtonAdd, ButtonDelete } from "react-design-system/immersionFacile";
 import { WeekdayDropdown } from "./WeekdayDropdown";
-import { ButtonDelete } from "react-design-system/immersionFacile";
 
 type WeekdayPickerProps = {
   schedule: number[][];
