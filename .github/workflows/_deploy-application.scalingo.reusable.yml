@@ -30,9 +30,12 @@ jobs:
       - name: Login with api-token
         run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN }}
 
-#TODO Better readability for condition ?
-      - name: Create the application with its specific environment if it does not exist
-        run: if (( $(scalingo apps | grep -c ${{ inputs.application-full-name }}) == 0 )); then scalingo create ${{ inputs.application-full-name }}; else echo 'app exists already'; fi
+      - name: Create the application with its specific environment if it does not exist (trimmed to the scalingo limit of 47 characters)
+        run: |
+          set +e
+          APP_ALREADY_EXIST=$(scalingo apps | grep -c ${{ inputs.application-full-name }})
+          set -e
+          if [[ $APP_ALREADY_EXIST -eq 0 ]]; then scalingo create ${{ inputs.application-full-name }}; else echo 'app exists already'; fi
 
       - name: Generate transient ssh-keys then add the public key to the logged account for deployment
         run: |
@@ -53,8 +56,20 @@ jobs:
     runs-on: ubuntu-latest
     needs: create-app-and-environment
     steps:
-      - name: Retrieve project files for current branch
-        uses: actions/checkout@v3
+#      - name: Retrieve project files for current branch
+#        uses: actions/checkout@v3
+
+      - name: We should only have server.js / package.json and dist
+        uses: actions/download-artifact@v3
+        with:
+          name: build-bundle
+          path: ./dist
+
+      - name: Move server.js and package.json at the root level
+        run: |
+          mv ./dist/server.js ./server.js
+          mv ./dist/package.json ./package.json
+
       - name: Initialise a local git repository for deployment (a scalingo deployment is a push to their remote)
         run: |
           rm -rf .git
