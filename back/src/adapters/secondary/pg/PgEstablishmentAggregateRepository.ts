@@ -512,11 +512,13 @@ export class PgEstablishmentAggregateRepository
     const immersionSearchResultDtos =
       await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
-      SELECT siret, io.rome_code, rome_label, COALESCE(json_agg(appellation_label) FILTER (WHERE appellation_label IS NOT NULL), '[]') AS appellation_labels, null AS distance_m, 1 AS row_number
-      FROM immersion_offers AS io
-      LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = io.rome_appellation 
-      WHERE io.siret = $1 AND io.rome_code = $2
-      GROUP BY (siret, io.rome_code, rome_label)`,
+        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, COALESCE(json_agg(pad.libelle_appellation_long) 
+        FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels, null AS distance_m, 1 AS row_number
+        FROM immersion_offers AS io
+        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.rome_appellation 
+        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
+        WHERE io.siret = $1 AND io.rome_code = $2
+        GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
         [siret, rome],
       );
     return immersionSearchResultDtos[0];
@@ -588,7 +590,9 @@ export class PgEstablishmentAggregateRepository
       // TODO : find a way to return 'undefined' instead of 'null' from query
       customizedName: optional(row.search_immersion_result.customizedName),
       contactMode: optional(row.search_immersion_result.contactMode),
-      contactDetails: optional(row.search_immersion_result.contactDetails),
+      contactDetails: row.search_immersion_result.contactDetails?.id
+        ? row.search_immersion_result.contactDetails
+        : undefined,
       distance_m: optional(row.search_immersion_result.distance_m),
       numberOfEmployeeRange: optional(
         row.search_immersion_result.numberOfEmployeeRange,

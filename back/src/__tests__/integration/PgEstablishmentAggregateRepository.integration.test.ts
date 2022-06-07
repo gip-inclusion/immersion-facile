@@ -1261,7 +1261,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         ),
       ).toBeUndefined();
     });
-    it("Returns reconstructed SearchImmersionResultDto for given siret and rome", async () => {
+    it("Returns reconstructed SearchImmersionResultDto for given siret and rome when appellation is specified", async () => {
       // Prepare
       const siret = "12345678901234";
       const boulangerRome = "D1102";
@@ -1334,6 +1334,55 @@ describe("Postgres implementation of immersion offer repository", () => {
         },
       });
     });
+    it("Returns reconstructed SearchImmersionResultDto for given siret and rome when no appellation and no contact is specified", async () => {
+      // Prepare
+      const siret = "12345678901234";
+      const establishment = new EstablishmentEntityV2Builder()
+        .withSiret(siret)
+        .withCustomizedName("La boulangerie de Lucie")
+        .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
+        .withAddress("2 RUE JACQUARD 69120 VAULX-EN-VELIN")
+        .build();
+      const offerWithRomeButNoAppellation = new ImmersionOfferEntityV2Builder()
+        .withNewId()
+        .withRomeCode("H2102")
+        .build();
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(establishment)
+          .withImmersionOffers([offerWithRomeButNoAppellation])
+          .withoutContact()
+          .build(),
+      ]);
+
+      // Act
+      const actualSearchResultDto =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
+          siret,
+          "H2102",
+        );
+
+      // Assert
+      expectTypeToMatchAndEqual(actualSearchResultDto, {
+        rome: "H2102",
+        romeLabel: "Conduite d'équipement de production alimentaire",
+        appellationLabels: [],
+        naf: establishment.nafDto.code,
+        nafLabel: "Fabrication de pain et de pâtisserie fraîche",
+        siret,
+        name: establishment.name,
+        customizedName: establishment.customizedName,
+        voluntaryToImmersion: establishment.voluntaryToImmersion,
+        location: establishment.position,
+        address: establishment.address,
+        numberOfEmployeeRange: establishment.numberEmployeesRange,
+        city: "VAULX-EN-VELIN",
+        contactMode: undefined,
+        distance_m: undefined,
+        contactDetails: undefined,
+      });
+    });
+
     describe("Pg implementation of method  getEstablishmentAggregateBySiret", () => {
       const siret = "12345678901234";
       it("Returns undefined if no aggregate exists with given siret", async () => {
