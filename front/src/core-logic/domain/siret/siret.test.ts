@@ -108,6 +108,7 @@ describe("Siret validation and fetching", () => {
             enableAdminUi: true,
             enablePeConnectApi: false,
             enableLogoUpload: false,
+            areFeatureFlagsLoading: true,
           },
         },
         "skip",

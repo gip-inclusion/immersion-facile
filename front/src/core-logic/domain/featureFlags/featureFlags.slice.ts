@@ -1,11 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { FeatureFlags } from "shared/src/featureFlags";
 
-const initialState: FeatureFlags = {
+export type FeatureFlagState = FeatureFlags & {
+  areFeatureFlagsLoading: boolean;
+};
+
+const initialState: FeatureFlagState = {
   enableAdminUi: false,
   enableInseeApi: true,
   enablePeConnectApi: false,
   enableLogoUpload: false,
+  areFeatureFlagsLoading: true,
 };
 
 export const featureFlagsSlice = createSlice({
@@ -13,7 +18,12 @@ export const featureFlagsSlice = createSlice({
   initialState,
   reducers: {
     retrieveFeatureFlagsRequested: (state) => state,
-    retrieveFeatureFlagsSucceeded: (_, action: PayloadAction<FeatureFlags>) =>
-      action.payload,
+    retrieveFeatureFlagsSucceeded: (
+      _,
+      action: PayloadAction<FeatureFlags>,
+    ) => ({
+      ...action.payload,
+      areFeatureFlagsLoading: false,
+    }),
   },
 });

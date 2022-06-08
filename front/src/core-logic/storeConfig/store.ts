@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/app/config/dependencies";
+import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { fetchFeatureFlagsEpic } from "src/core-logic/domain/featureFlags/featureFlags.epics";
@@ -44,6 +45,7 @@ const rootReducer = combineReducers({
   [establishmentSlice.name]: establishmentSlice.reducer,
   [conventionSlice.name]: conventionSlice.reducer,
   [immersionAssessmentSlice.name]: immersionAssessmentSlice.reducer,
+  [authSlice.name]: authSlice.reducer,
 });
 
 export type StoreProps = {

@@ -1,13 +1,16 @@
 import React from "react";
+import { HomeButton } from "react-design-system";
+import { useDispatch } from "react-redux";
 import { Section } from "src/app/components/Section";
-import { PeConnectButton } from "src/app/pages/Convention/PeConnect";
+import { PeConnectButton } from "src/app/pages/Convention/PeConnectButton";
 import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
 import { routes } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { LinkWithButtonStyle } from "./LinkWithButtonStyle";
+import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 
 export const InitiateConventionCard = () => {
   const { enablePeConnectApi } = useFeatureFlags();
+  const dispatch = useDispatch();
 
   return (
     <Section type="candidate">
@@ -24,13 +27,22 @@ export const InitiateConventionCard = () => {
             <PeConnectButton />
             <span className="pt-4">ou bien</span>
             <p className="text-center text-sm py-3">
-              Je suis accompagné par une autre structure:
+              Je suis accompagné par une autre structure :
             </p>
           </>
         )}
-        <LinkWithButtonStyle {...routes.search().link}>
+        {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
+        <HomeButton
+          type="error"
+          onClick={() => {
+            dispatch(
+              authSlice.actions.federatedIdentityProvided("noIdentityProvider"),
+            );
+            routes.convention().push();
+          }}
+        >
           Je demande une convention
-        </LinkWithButtonStyle>
+        </HomeButton>
       </div>
     </Section>
   );

@@ -12,7 +12,6 @@ import {
   undefinedIfEmptyString,
 } from "src/app/pages/Convention/conventionHelpers";
 import { ConventionPresentation } from "src/app/pages/Convention/ConventionPage";
-import { PeConnect } from "src/app/pages/Convention/PeConnect";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 import { toDateString } from "shared/src/utils/date";
@@ -91,8 +90,6 @@ export const ConventionForm = ({
             Ce formulaire vaut équivalence du CERFA 13912 * 04
           </p>
         </div>
-
-        <PeConnect />
 
         <Formik
           enableReinitialize={true}

@@ -1,12 +1,11 @@
 import { Flavor } from "../typeFlavors";
 
-export type FederatedIdentity = PeConnectIdentity;
+export type FederatedIdentity = PeConnectIdentity | NoIdentityProvider;
 
-export type PeExternalId = Flavor<string, "peExternalId">;
+export type PeExternalId = Flavor<string, "PeExternalId">;
 
-type PeConnectPrefix = "peConnect:";
-
-export type PeConnectIdentity = `${PeConnectPrefix}${string}`;
+export type PeConnectIdentity = `peConnect:${string}`;
+type NoIdentityProvider = `noIdentityProvider`;
 
 export const toPeExternalId = (
   federatedIdentity: PeConnectIdentity,
