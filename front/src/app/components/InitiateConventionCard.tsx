@@ -4,13 +4,14 @@ import { useDispatch } from "react-redux";
 import { Section } from "src/app/components/Section";
 import { PeConnectButton } from "src/app/pages/Convention/PeConnectButton";
 import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
-import { routes } from "src/app/routing/routes";
+import { routes, useRoute } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 
 export const InitiateConventionCard = () => {
   const { enablePeConnectApi } = useFeatureFlags();
   const dispatch = useDispatch();
+  const currentRoute = useRoute();
 
   return (
     <Section type="candidate">
@@ -38,7 +39,7 @@ export const InitiateConventionCard = () => {
             dispatch(
               authSlice.actions.federatedIdentityProvided("noIdentityProvider"),
             );
-            routes.convention().push();
+            if (currentRoute.name !== "convention") routes.convention().push();
           }}
         >
           Je demande une convention
