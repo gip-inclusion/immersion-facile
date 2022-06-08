@@ -6,6 +6,7 @@ import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAg
 import { defaultQuestionnaireUrl } from "../../../domain/convention/useCases/AddAgency";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { AgencyDto } from "shared/src/agency/agency.dto";
+import { PeAgencyFromReferenciel } from "../../../domain/immersionOffer/ports/PeAgenciesReferential";
 
 const adminMail = "admin@mail.com";
 
@@ -48,7 +49,7 @@ describe("UpdateAllPeAgencies use case", () => {
         signature: "L'équipe de l'Agence Pôle emploi MOLSHEIM",
         questionnaireUrl: defaultQuestionnaireUrl,
         agencySiret: "13000548120984",
-        code: "GRE0187",
+        codeSafir: "63019",
         kind: "pole-emploi",
         status: "from-api-PE",
       },
@@ -94,7 +95,7 @@ describe("UpdateAllPeAgencies use case", () => {
             lat: 48.532571,
           },
           agencySiret: "13000548120984",
-          code: "GRE0187",
+          codeSafir: "63019",
         },
       ]);
     });
@@ -138,7 +139,7 @@ describe("UpdateAllPeAgencies use case", () => {
             lat: 48.532571,
           },
           agencySiret: "13000548120984",
-          code: "GRE0187",
+          codeSafir: "63019",
         },
       ]);
     });
@@ -178,13 +179,13 @@ describe("UpdateAllPeAgencies use case", () => {
             lat: 48.532571,
           },
           agencySiret: "13000548120984",
-          code: "GRE0187",
+          codeSafir: "63019",
         },
       ]);
     });
   });
 
-  it("if existing agency is not of kind pole-emploi it should not be considered, and a new one should be created", async () => {
+  it("if existing agency is not of kind pole-emploi or is of kind 'from-api-PE' it should not be considered, and a new one should be created", async () => {
     peAgenciesReferential.setPeAgencies([peReferentialAgency]);
     const initialAgency: AgencyDto = {
       id: "some-uuid",
@@ -222,7 +223,7 @@ describe("UpdateAllPeAgencies use case", () => {
         signature: "L'équipe de l'Agence Pôle emploi MOLSHEIM",
         questionnaireUrl: defaultQuestionnaireUrl,
         agencySiret: "13000548120984",
-        code: "GRE0187",
+        codeSafir: "63019",
         kind: "pole-emploi",
         status: "from-api-PE",
       },
@@ -230,8 +231,9 @@ describe("UpdateAllPeAgencies use case", () => {
   });
 });
 
-const peReferentialAgency = {
+const peReferentialAgency: PeAgencyFromReferenciel = {
   code: "GRE0187",
+  codeSafir: "63019",
   libelle: "MOLSHEIM",
   libelleEtendu: "Agence Pôle emploi MOLSHEIM",
   type: "APE",

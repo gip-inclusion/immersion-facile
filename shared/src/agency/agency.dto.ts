@@ -10,7 +10,7 @@ export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
   status: AgencyStatus;
   adminEmails: string[];
   agencySiret?: string;
-  code?: string;
+  codeSafir?: string;
 };
 
 export type AgencyId = Flavor<string, "AgencyId">;

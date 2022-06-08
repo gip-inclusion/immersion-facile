@@ -4,6 +4,7 @@ export interface PeAgenciesReferential {
 
 export type PeAgencyFromReferenciel = {
   code: string;
+  codeSafir: string;
   libelle: string;
   libelleEtendu: string;
   type: string;

@@ -83,12 +83,13 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("getAll", () => {
-    let agency1: AgencyDto;
-    let agency2: AgencyDto;
-    beforeEach(() => {
-      agency1 = agency1builder.build();
-      agency2 = agency2builder.build();
-    });
+    const agency1 = agency1builder.build();
+    const agency2 = agency2builder.build();
+    const agencyAddedFromPeReferenciel = agency1builder
+      .withId("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee")
+      .withName("Agency from PE referenciel")
+      .withStatus("from-api-PE")
+      .build();
 
     it("returns empty list for empty table", async () => {
       const agencies = await agencyRepository.getAllActive();
@@ -98,11 +99,16 @@ describe("PgAgencyRepository", () => {
       await Promise.all([
         agencyRepository.insert(agency1),
         agencyRepository.insert(agency2),
+        agencyRepository.insert(agencyAddedFromPeReferenciel),
         agencyRepository.insert(inactiveAgency),
       ]);
 
       const agencies = await agencyRepository.getAllActive();
-      expect(sortById(agencies)).toEqual([agency2, agency1]);
+      expect(sortById(agencies)).toEqual([
+        agency2,
+        agency1,
+        agencyAddedFromPeReferenciel,
+      ]);
     });
   });
 
@@ -195,7 +201,10 @@ describe("PgAgencyRepository", () => {
     let agency1: AgencyDto;
     let agency2: AgencyDto;
     beforeEach(() => {
-      agency1 = agency1builder.build();
+      agency1 = agency1builder
+        .withAgencySiret("11110000111100")
+        .withCodeSafir("123")
+        .build();
       agency2 = agency2builder.build();
     });
     it("inserts unknown entities", async () => {
@@ -225,7 +234,7 @@ describe("PgAgencyRepository", () => {
         .withPosition(41, 3)
         .withValidatorEmails(["updated@mail.com"])
         .withAgencySiret("11110000111100")
-        .withCode("CODE_123")
+        .withCodeSafir("CODE_123")
         .build();
 
       await agencyRepository.update(updatedAgency1);

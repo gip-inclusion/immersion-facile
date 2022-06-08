@@ -37,13 +37,10 @@ describe("AddAgency use case", () => {
   let addAgency: AddAgency;
 
   beforeEach(() => {
-    outboxRepo = new InMemoryOutboxRepository();
-    agencyRepo = new InMemoryAgencyRepository();
-    uowPerformer = new InMemoryUowPerformer({
-      ...createInMemoryUow(),
-      outboxRepo,
-      agencyRepo,
-    });
+    const uow = createInMemoryUow();
+    outboxRepo = uow.outboxRepo;
+    agencyRepo = uow.agencyRepo;
+    uowPerformer = new InMemoryUowPerformer(uow);
     const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });

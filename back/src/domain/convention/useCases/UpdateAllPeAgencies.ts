@@ -11,6 +11,16 @@ import {
 } from "../../immersionOffer/ports/PeAgenciesReferential";
 import { defaultQuestionnaireUrl } from "./AddAgency";
 
+const counts = {
+  added: 0,
+  hasNoEmail: 0,
+  matchedEmail: 0,
+  matchedNearby: 0,
+  toManyMatch: 0,
+  total: 0,
+  updated: 0,
+};
+
 // this use case is used only in one script (not in the back app)
 export class UpdateAllPeAgencies extends UseCase<void, void> {
   constructor(
@@ -35,15 +45,6 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
       peReferentialAgencies.length,
       " agencies",
     );
-
-    const counts = {
-      added: 0,
-      hasNoEmail: 0,
-      matchedEmail: 0,
-      matchedNearby: 0,
-      toManyMatch: 0,
-      total: 0,
-    };
 
     this.logger.info(
       "Total number of active agencies in DB before script : ",
@@ -82,10 +83,9 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
         }
 
         case 1: {
-          await this.updateAgency(
-            matchedNearbyAgencies[0],
-            peReferentialAgency,
-          );
+          const matchedAgency = matchedNearbyAgencies[0];
+          if (matchedAgency.status === "from-api-PE") break;
+          await this.updateAgency(matchedAgency, peReferentialAgency);
           counts.matchedNearby++;
           break;
         }
@@ -127,7 +127,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
       ...normalizeAddressAndPosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
       questionnaireUrl: defaultQuestionnaireUrl,
-      code: peReferentialAgency.code,
+      codeSafir: peReferentialAgency.codeSafir,
       agencySiret: peReferentialAgency.siret,
       kind: "pole-emploi",
       status: "from-api-PE",
@@ -163,6 +163,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
     existingAgency: AgencyDto,
     peReferentialAgency: PeAgencyFromReferenciel,
   ): Promise<void> {
+    counts.updated++;
     const updatedAgency: AgencyDto = {
       ...existingAgency,
       ...normalizeAddressAndPosition(peReferentialAgency),
@@ -172,7 +173,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
         newEmail: peReferentialAgency.contact?.email,
       }),
       agencySiret: peReferentialAgency.siret,
-      code: peReferentialAgency.code,
+      codeSafir: peReferentialAgency.codeSafir,
     };
     await this.agencyRepository.update(updatedAgency);
   }

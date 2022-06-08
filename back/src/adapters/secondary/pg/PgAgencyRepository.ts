@@ -13,9 +13,9 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getAllActive(): Promise<AgencyDto[]> {
     const pgResult = await this.client.query(
-      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, agency_siret, code\
+      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, agency_siret, code_safir\
        FROM public.agencies\
-       WHERE status = 'active'",
+       WHERE status IN ('active', 'from-api-PE')",
     );
     return pgResult.rows.map(pgToEntity);
   }
@@ -55,7 +55,7 @@ export class PgAgencyRepository implements AgencyRepository {
       "CAST(counsellor_emails AS text) ILIKE '%' || $1 || '%'";
 
     const pgResult = await this.client.query(
-      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code
+      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir
        FROM public.agencies
        WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
       [email],
@@ -83,8 +83,8 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
     const query = `INSERT INTO public.agencies(
-      id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, position
-    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s)`;
+      id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, position, agency_siret, code_safir
+    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L)`;
     try {
       await this.client.query(format(query, ...entityToPgArray(agency)));
     } catch (error: any) {
@@ -113,7 +113,8 @@ export class PgAgencyRepository implements AgencyRepository {
       logo_url = $11,
       position = ST_GeographyFromText($12),
       agency_siret = $13,
-      code = $14
+      code_safir = $14,
+      updated_at = NOW()
     WHERE id = $1`;
 
     const params = entityToPgArray(agency);
@@ -151,7 +152,7 @@ const entityToPgArray = (agency: AgencyDto): any[] => [
   agency.logoUrl,
   STPointStringFromPosition(agency.position),
   agency.agencySiret,
-  agency.code,
+  agency.codeSafir,
 ];
 
 const pgToEntity = (params: Record<any, any>): AgencyDto => ({
@@ -168,7 +169,7 @@ const pgToEntity = (params: Record<any, any>): AgencyDto => ({
   logoUrl: optional(params.logo_url),
   position: parseGeoJson(params.position),
   agencySiret: optional(params.agency_siret),
-  code: optional(params.code),
+  codeSafir: optional(params.code_safir),
 });
 
 export const parseGeoJson = (raw: string): LatLonDto => {

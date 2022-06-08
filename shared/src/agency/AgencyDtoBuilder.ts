@@ -128,10 +128,10 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withCode(code: string) {
+  public withCodeSafir(code: string) {
     return new AgencyDtoBuilder({
       ...this.agency,
-      code,
+      codeSafir: code,
     });
   }
 
