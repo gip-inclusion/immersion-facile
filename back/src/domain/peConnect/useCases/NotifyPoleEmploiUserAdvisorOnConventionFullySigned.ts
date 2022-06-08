@@ -1,6 +1,9 @@
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
-import { PeConnectIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import {
+  FederatedIdentity,
+  PeConnectIdentity,
+} from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { frontRoutes } from "shared/src/routes";
 import { createLogger } from "../../../utils/logger";
 import { EmailFilter } from "../../core/ports/EmailFilter";
@@ -75,5 +78,5 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
 }
 
 const isPeConnectIdentity = (
-  peConnectIdentity: PeConnectIdentity | undefined,
+  peConnectIdentity: FederatedIdentity | undefined,
 ): peConnectIdentity is PeConnectIdentity => !!peConnectIdentity;

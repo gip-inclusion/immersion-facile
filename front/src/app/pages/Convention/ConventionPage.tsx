@@ -31,12 +31,12 @@ export type ConventionPresentation = Exclude<
 };
 
 export const ConventionPage = ({ route }: ConventionPageProps) => (
-    <HeaderFooterLayout>
-      <ConventionFormContainerLayout>
-        <PageContent route={route} />
-      </ConventionFormContainerLayout>
-    </HeaderFooterLayout>
-  );
+  <HeaderFooterLayout>
+    <ConventionFormContainerLayout>
+      <PageContent route={route} />
+    </ConventionFormContainerLayout>
+  </HeaderFooterLayout>
+);
 
 const PageContent = ({ route }: ConventionPageProps) => {
   const { enablePeConnectApi, areFeatureFlagsLoading } = useFeatureFlags();

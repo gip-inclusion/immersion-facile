@@ -1,4 +1,5 @@
 import {
+  FederatedIdentity,
   PeConnectIdentity,
   toPeExternalId,
 } from "shared/src/federatedIdentities/federatedIdentity.dto";
@@ -49,5 +50,5 @@ export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<Co
 }
 
 const isPeConnectIdentity = (
-  peConnectIdentity: PeConnectIdentity | undefined,
+  peConnectIdentity: FederatedIdentity | undefined,
 ): peConnectIdentity is PeConnectIdentity => !!peConnectIdentity;

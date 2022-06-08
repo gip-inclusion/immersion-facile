@@ -49,6 +49,17 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent),
     ).rejects.toThrow(BadRequestError);
   });
+  it("should not associate convention if no federatedIdentity is provided", async () => {
+    const conventionDtoFromEvent = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .build();
+
+    await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent),
+      expect(
+        conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+      ).toHaveLength(0);
+    await expect(outboxRepo.events).toHaveLength(0);
+  });
 
   it("should associate convention and federated identity if the federated identity match format", async () => {
     conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor(
