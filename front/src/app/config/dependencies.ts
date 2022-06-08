@@ -19,7 +19,7 @@ import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,
 } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
-import { InMemoryTechnicalGateway } from "src/core-logic/adapters/InMemoryTechnicalGateway";
+import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 import { ReactNavigationGateway } from "src/core-logic/adapters/ReactNavigationGateway";
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SimulatedSiretGatewayThroughBack";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
@@ -93,7 +93,7 @@ export const apiAdresseGateway: ApiAdresseGateway =
 
 export const technicalGateway: TechnicalGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryTechnicalGateway()
+    ? new SimulatedTechnicalGateway()
     : new HttpTechnicalGateway();
 
 export const agencyGateway: AgencyGateway =

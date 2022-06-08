@@ -2,6 +2,27 @@ import React from "react";
 import { loginPeConnect } from "shared/src/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 
+export const PeConnectButton = () => (
+  <div className="pe-connect flex justify-center">
+    <a href={`/api/${loginPeConnect}`} className="button-pe-connect" title="">
+      <img
+        className="icon-pe-connect"
+        src="/pe-connect-barre-nav-b.svg"
+        alt=""
+        width="300"
+        height="75"
+      />
+      <img
+        className="icon-pe-connect-hover"
+        src="/pe-connect-barre-nav-b-o.svg"
+        alt=""
+        width="300"
+        height="75"
+      />
+    </a>
+  </div>
+);
+
 export const PeConnect = () => {
   const featureFlags = useFeatureFlags();
 
@@ -16,29 +37,7 @@ export const PeConnect = () => {
           </b>
         </p>
       </div>
-
-      <div className="pe-connect flex justify-center">
-        <a
-          href={`/api/${loginPeConnect}`}
-          className="button-pe-connect"
-          title=""
-        >
-          <img
-            className="icon-pe-connect"
-            src="/pe-connect-barre-nav-b.svg"
-            alt=""
-            width="300"
-            height="75"
-          />
-          <img
-            className="icon-pe-connect-hover"
-            src="/pe-connect-barre-nav-b-o.svg"
-            alt=""
-            width="300"
-            height="75"
-          />
-        </a>
-      </div>
+      <PeConnectButton />
     </>
   );
 };

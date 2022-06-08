@@ -15,9 +15,6 @@ export const fetchFeatureFlagsEpic: Epic<
 > = (action$, _state$, { technicalGateway }) =>
   action$.pipe(
     filter(featureFlagsSlice.actions.retrieveFeatureFlagsRequested.match),
-    switchMap(() =>
-      technicalGateway
-        .getAllFeatureFlags()
-        .pipe(map(featureFlagsSlice.actions.retrieveFeatureFlagsSucceeded)),
-    ),
+    switchMap(() => technicalGateway.getAllFeatureFlags()),
+    map(featureFlagsSlice.actions.retrieveFeatureFlagsSucceeded),
   );

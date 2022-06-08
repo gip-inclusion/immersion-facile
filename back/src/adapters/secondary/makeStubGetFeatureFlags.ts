@@ -4,7 +4,7 @@ import { FeatureFlags } from "shared/src/featureFlags";
 const defaultFlags: FeatureFlags = {
   enableAdminUi: true,
   enableInseeApi: true,
-  enablePeConnectApi: false,
+  enablePeConnectApi: true,
   enableLogoUpload: false,
 };
 

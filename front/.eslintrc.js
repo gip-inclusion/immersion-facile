@@ -34,7 +34,7 @@ module.exports = {
       },
     },
     {
-      files: ["**/InMemory*.ts"],
+      files: ["**/InMemory*.ts", "**/Test*.ts", "**/Simulated*.ts"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
         tsconfigRootDir: __dirname,

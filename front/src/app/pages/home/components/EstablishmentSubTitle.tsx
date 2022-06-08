@@ -17,7 +17,7 @@ export const EstablishmentSubTitle = ({
         ? "text-immersionBlue-dark"
         : "text-immersionRed-dark"
     }  text-center`}
-    style={{ maxWidth: "16rem" }}
+    style={{ maxWidth: "18rem" }}
   >
     {text}
   </div>

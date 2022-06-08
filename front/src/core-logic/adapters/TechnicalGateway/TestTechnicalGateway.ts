@@ -3,7 +3,7 @@ import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { FeatureFlags } from "shared/src/featureFlags";
 
-export class InMemoryTechnicalGateway implements TechnicalGateway {
+export class TestTechnicalGateway implements TechnicalGateway {
   private _featureFlags$ = new Subject<FeatureFlags>();
 
   getAllFeatureFlags = () => this._featureFlags$;

@@ -1,6 +1,7 @@
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import React, { useState } from "react";
 import { HomeButton, Link } from "react-design-system/immersionFacile";
+import { Section } from "src/app/components/Section";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { isSiretAlreadySavedSelector } from "src/core-logic/domain/siret/siret.selectors";
 import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
@@ -23,16 +24,15 @@ export const EstablishmentHomeMenu = () => {
   const [startEstablishmentPath, startEstablishmentPathUpdate] =
     useState<boolean>(false);
 
+  const styleType = "establishment";
+
   return (
-    <div
-      className={`flex flex-col items-center justify-center border-2 border-blue-200 rounded px-4 p-1 m-2 w-48 bg-blue-50  `}
-      style={{ width: "400px", height: "250px" }}
-    >
+    <Section type={styleType} className="max-h-[300px]">
       <div className="flex flex-col">
-        <EstablishmentTitle type={"establishment"} text="ENTREPRISE" />
+        <EstablishmentTitle type={styleType} text="ENTREPRISE" />
         {!modifyLinkWasSent && (
           <EstablishmentSubTitle
-            type={"establishment"}
+            type={styleType}
             text="Vos équipes souhaitent accueillir en immersion professionnelle ?"
           />
         )}
@@ -70,9 +70,14 @@ export const EstablishmentHomeMenu = () => {
         )}
       </div>
       {!modifyLinkWasSent && (
-        <Link text="En savoir plus" url={routes.landingEstablishment().link} />
+        <div className="pb-4">
+          <Link
+            text="En savoir plus"
+            url={routes.landingEstablishment().link}
+          />
+        </div>
       )}
-    </div>
+    </Section>
   );
 };
 

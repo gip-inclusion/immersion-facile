@@ -1,8 +1,9 @@
 import React from "react";
 import { EstablishmentHomeMenu } from "src/app/components/EstablishmentHomeMenu";
 import { ImmersionFooter } from "src/app/components/ImmersionFooter";
-import { ImmersionHomeMenu } from "src/app/components/ImmersionHomeMenu";
+import { FindImmersionHomeMenu } from "src/app/components/FindImmersionHomeMenu";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
+import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
 import { ENV } from "src/environmentVariables";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 
@@ -30,7 +31,10 @@ export const HomePage = () => (
           className="flex flex-wrap justify-center "
           style={{ minWidth: "420px" }}
         >
-          <ImmersionHomeMenu />
+          <div>
+            <FindImmersionHomeMenu />
+            <InitiateConventionCard />
+          </div>
           <EstablishmentHomeMenu />
         </div>
       </section>

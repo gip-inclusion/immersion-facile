@@ -1,7 +1,7 @@
 import { VirtualTimeScheduler } from "rxjs";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
-import { InMemoryTechnicalGateway } from "src/core-logic/adapters/InMemoryTechnicalGateway";
+import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
@@ -16,7 +16,7 @@ export interface TestDependencies {
   siretGatewayThroughBack: TestSiretGatewayThroughBack;
   agencyGateway: InMemoryAgencyGateway;
   apiAdresseGateway: InMemoryApiAdresseGateway;
-  technicalGateway: InMemoryTechnicalGateway;
+  technicalGateway: TestTechnicalGateway;
   establishmentGateway: InMemoryEstablishmentGateway;
   conventionGateway: InMemoryConventionGateway;
   immersionSearchGateway: InMemoryImmersionSearchGateway;
@@ -38,7 +38,7 @@ export const createTestStore = (
     establishmentGateway: new InMemoryEstablishmentGateway(),
     conventionGateway: new InMemoryConventionGateway(),
     apiAdresseGateway: new InMemoryApiAdresseGateway(),
-    technicalGateway: new InMemoryTechnicalGateway(),
+    technicalGateway: new TestTechnicalGateway(),
     agencyGateway: new InMemoryAgencyGateway(),
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),
     scheduler: new VirtualTimeScheduler(),
