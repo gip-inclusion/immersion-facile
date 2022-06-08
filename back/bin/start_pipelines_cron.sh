@@ -12,18 +12,18 @@ echo "Running $0 $@ (pwd: $(pwd))"
 #  overwritten.
 : "${CRONFILE:?Variable not set or empty}"
 
-#  ESTABLISHMENT_UPDATE_FROM_SIRENE (optional): The execution schedule for the establishment-backfill
-#  pipeline in cron format. Default: daily at midnight.
-: "${ESTABLISHMENT_UPDATE_FROM_SIRENE:=0 0 * * *}"
+#  ESTABLISHMENT_UPDATE_FROM_SIRENE (optional).
+#  pipeline in cron format. Default: daily at 00:.
+: "${ESTABLISHMENT_UPDATE_FROM_SIRENE:=14 0 * * *}"
 
-#  ESTABLISHMENT_SUGGEST_FORM_EDITION (optional): The execution schedule for the establishment-backfill
-#  pipeline in cron format. Default: daily at midnight.
-: "${ESTABLISHMENT_SUGGEST_FORM_EDITION:=0 0 * * *}"
+#  ESTABLISHMENT_SUGGEST_FORM_EDITION (optional).
+#  pipeline in cron format. Default: daily at 00:08
+: "${ESTABLISHMENT_SUGGEST_FORM_EDITION:=8 0 * * *}"
 
 
-#  EMAIL_WITH_ASSESSMENT_CREATION_LINK (optional): The execution schedule for the establishment-backfill
-#  pipeline in cron format. Default: daily at midnight.
-: "${EMAIL_WITH_ASSESSMENT_CREATION_LINK:=0 0 * * *}"
+#  EMAIL_WITH_ASSESSMENT_CREATION_LINK (optional).
+#  pipeline in cron format. Default: daily at 23h53
+: "${EMAIL_WITH_ASSESSMENT_CREATION_LINK:=53 23 * * *}"
 
 # Create logdir if it doesn't already exist.
 if [[ ! -d $LOGDIR ]]; then
