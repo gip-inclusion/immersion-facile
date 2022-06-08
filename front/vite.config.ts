@@ -1,6 +1,6 @@
 import react from "@vitejs/plugin-react";
-import {resolve} from "path";
-import {defineConfig} from "vite";
+import { resolve } from "path";
+import { defineConfig } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -19,7 +19,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react/jsx-runtime'],
+    include: ["react/jsx-runtime"],
   },
   server: {
     proxy: {

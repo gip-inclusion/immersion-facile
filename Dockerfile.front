@@ -3,6 +3,7 @@ RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7.0.0-rc.9
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
 COPY shared/package.json /app/shared/
+COPY libs/react-design-system/package.json /app/libs/react-design-system/
 COPY front/package.json /app/front/
 COPY back/package.json /app/back/
 
@@ -11,6 +12,7 @@ WORKDIR /app
 RUN pnpm install --frozen-lockfile
 
 COPY ./shared/ /app/shared
+COPY ./libs/react-design-system/ /app/libs/react-design-system
 
 # front only
 FROM builder
