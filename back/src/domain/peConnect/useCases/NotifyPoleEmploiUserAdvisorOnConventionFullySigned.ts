@@ -1,17 +1,14 @@
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
-import {
-  FederatedIdentity,
-  PeConnectIdentity,
-} from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { frontRoutes } from "shared/src/routes";
+import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../utils/logger";
+import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { EmailFilter } from "../../core/ports/EmailFilter";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
-import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { isPeConnectIdentity } from "../entities/ConventionPoleEmploiAdvisorEntity";
 
 const logger = createLogger(__filename);
 
@@ -76,7 +73,3 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
     );
   }
 }
-
-const isPeConnectIdentity = (
-  peConnectIdentity: FederatedIdentity | undefined,
-): peConnectIdentity is PeConnectIdentity => !!peConnectIdentity;

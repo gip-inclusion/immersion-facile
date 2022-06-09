@@ -5,7 +5,7 @@ export type FederatedIdentity = PeConnectIdentity | NoIdentityProvider;
 export type PeExternalId = Flavor<string, "PeExternalId">;
 
 export type PeConnectIdentity = `peConnect:${string}`;
-type NoIdentityProvider = `noIdentityProvider`;
+export type NoIdentityProvider = `noIdentityProvider`;
 
 export const toPeExternalId = (
   federatedIdentity: PeConnectIdentity,

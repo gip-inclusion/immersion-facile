@@ -54,6 +54,14 @@ const PageContent = ({ route }: ConventionPageProps) => {
 
   if (areFeatureFlagsLoading) return <CircularProgress />;
 
+  if (route.params?.jwt !== "")
+    return (
+      <ConventionForm
+        properties={conventionInitialValuesFromUrl(route)}
+        routeParams={route.params}
+      />
+    );
+
   if (enablePeConnectApi && !connectedWith)
     return (
       <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">

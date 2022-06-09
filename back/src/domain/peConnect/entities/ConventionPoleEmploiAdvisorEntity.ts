@@ -1,4 +1,8 @@
 import {
+  FederatedIdentity,
+  PeConnectIdentity,
+} from "shared/src/federatedIdentities/federatedIdentity.dto";
+import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeConnectAdvisorDto,
   PeConnectAdvisorEntity,
@@ -45,3 +49,8 @@ const choosePreferredAdvisor = (
 
   return preferredAdvisor;
 };
+
+export const isPeConnectIdentity = (
+  peConnectIdentity: FederatedIdentity | undefined,
+): peConnectIdentity is PeConnectIdentity =>
+  !!peConnectIdentity && peConnectIdentity !== "noIdentityProvider";

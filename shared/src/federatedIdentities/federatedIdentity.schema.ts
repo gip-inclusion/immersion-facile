@@ -1,6 +1,8 @@
 import { z } from "zod";
-import { PeConnectIdentity } from "./federatedIdentity.dto";
+import { NoIdentityProvider, PeConnectIdentity } from "./federatedIdentity.dto";
+
+const noIdentityProvider: NoIdentityProvider = "noIdentityProvider";
 
 export const peConnectPrefixSchema = z
-  .string()
-  .regex(/^peConnect:.+?$/) as z.Schema<PeConnectIdentity>;
+  .enum([noIdentityProvider])
+  .or(z.string().regex(/^peConnect:.+?$/) as z.Schema<PeConnectIdentity>);

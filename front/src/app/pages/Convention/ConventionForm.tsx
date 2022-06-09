@@ -15,6 +15,8 @@ import { ConventionPresentation } from "src/app/pages/Convention/ConventionPage"
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 import { toDateString } from "shared/src/utils/date";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Title } from "react-design-system/immersionFacile";
@@ -29,7 +31,12 @@ export const ConventionForm = ({
   properties,
   routeParams = {},
 }: ConventionFormProps) => {
-  const [initialValues, setInitialValues] = useState(properties);
+  const federatedIdentity = useAppSelector(authSelectors.connectedWith);
+  const [initialValues, setInitialValues] = useState<ConventionPresentation>({
+    ...properties,
+    federatedIdentity:
+      properties.federatedIdentity ?? federatedIdentity ?? undefined,
+  });
   useExistingSiret(initialValues.siret);
   const [submitFeedback, setSubmitFeedback] = useState<
     SuccessFeedbackKind | Error | null

@@ -4,6 +4,7 @@ import type {
   ConventionStatus,
   ConventionDto,
 } from "shared/src/convention/convention.dto";
+import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { AgencyDisplay } from "src/app/components/AgencyDisplay";
 import { AgencySelector } from "src/app/components/AgencySelector";
 import {
@@ -204,12 +205,10 @@ export const ConventionFormFields = ({
       />
       <FormSectionTitle>
         2. Coordonnées de l'entreprise
-        {!isFrozen && (
-          <>
-            <CopyLink />
-            <ShareLinkByEmail />
-          </>
-        )}
+        <ShareActions
+          isFrozen={isFrozen}
+          federatedIdentity={values.federatedIdentity}
+        />
       </FormSectionTitle>
       <h4>
         Les questions suivantes doivent être complétées avec la personne qui
@@ -260,12 +259,10 @@ export const ConventionFormFields = ({
       />
       <FormSectionTitle>
         3. Conditions d’accueil de l’immersion professionnelle
-        {!isFrozen && (
-          <>
-            <CopyLink />
-            <ShareLinkByEmail />
-          </>
-        )}
+        <ShareActions
+          isFrozen={isFrozen}
+          federatedIdentity={values.federatedIdentity}
+        />
       </FormSectionTitle>
       <DateInput
         label="Date de début de l'immersion *"
@@ -495,5 +492,19 @@ const makeValuesToWatchInUrl = (values: ConventionDto) => {
   return keysToWatch.reduce(
     (acc, watchedKey) => ({ ...acc, [watchedKey]: values[watchedKey] }),
     {} as Partial<ConventionDto>,
+  );
+};
+
+const ShareActions = (props: {
+  isFrozen?: boolean;
+  federatedIdentity?: FederatedIdentity;
+}) => {
+  if (props.isFrozen) return null;
+  if (props.federatedIdentity !== "noIdentityProvider") return null;
+  return (
+    <>
+      <CopyLink />
+      <ShareLinkByEmail />
+    </>
   );
 };

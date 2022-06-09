@@ -1,13 +1,10 @@
-import {
-  FederatedIdentity,
-  PeConnectIdentity,
-  toPeExternalId,
-} from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { toPeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { isPeConnectIdentity } from "../entities/ConventionPoleEmploiAdvisorEntity";
 import { ConventionAndPeExternalIds } from "../port/ConventionPoleEmploiAdvisorRepository";
 import { createLogger } from "../../../utils/logger";
 
@@ -48,7 +45,3 @@ export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<Co
     await uow.outboxRepo.save(event);
   }
 }
-
-const isPeConnectIdentity = (
-  peConnectIdentity: FederatedIdentity | undefined,
-): peConnectIdentity is PeConnectIdentity => !!peConnectIdentity;
