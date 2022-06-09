@@ -35,7 +35,7 @@ export class PgAgencyRepository implements AgencyRepository {
         
       FROM public.agencies
       
-      WHERE status = 'active' AND ST_Distance(${STPointStringFromPosition(
+      WHERE status IN ('active', 'from-api-PE') AND ST_Distance(${STPointStringFromPosition(
         searchPosition,
       )}, position) <= ${distance_km * 1000}
       

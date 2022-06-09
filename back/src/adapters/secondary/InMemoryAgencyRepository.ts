@@ -1,5 +1,9 @@
 import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
-import { AgencyInListDto, AgencyId } from "shared/src/agency/agency.dto";
+import {
+  AgencyInListDto,
+  AgencyId,
+  AgencyStatus,
+} from "shared/src/agency/agency.dto";
 import { createLogger } from "../../utils/logger";
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import { values } from "ramda";
@@ -144,7 +148,10 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   }
 }
 
-const isAgencyActive = (agency: AgencyDto) => agency.status === "active";
+const activeStatuses: AgencyStatus[] = ["active", "from-api-PE"];
+
+const isAgencyActive = (agency: AgencyDto) =>
+  activeStatuses.includes(agency.status);
 
 const sortByNearestFrom =
   (position: LatLonDto) => (a: AgencyInListDto, b: AgencyInListDto) =>

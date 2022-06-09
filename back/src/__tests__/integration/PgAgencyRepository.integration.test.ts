@@ -156,7 +156,7 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("getNearby", () => {
-    it("returns only agencies which are less than certain distance", async () => {
+    it("returns only active agencies which are less than certain distance", async () => {
       const nancyAgency = agency1builder
         .withName("Nancy agency")
         .withPosition(48.697851, 6.20157)
@@ -165,6 +165,7 @@ describe("PgAgencyRepository", () => {
       const epinalAgency = agency2builder
         .withName("Epinal agency")
         .withPosition(48.179552, 6.441447)
+        .withStatus("from-api-PE")
         .build();
 
       const dijonAgency = AgencyDtoBuilder.create(
