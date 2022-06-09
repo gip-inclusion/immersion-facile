@@ -7,6 +7,7 @@ import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { Route } from "type-route";
+import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { defaultInitialValue } from "./components/defaultInitialValue";
 import {
   EstablishmentFormikForm,
@@ -18,44 +19,18 @@ export const EstablishmentEditionFormPage = ({
   route,
 }: {
   route: Route<typeof routes.editFormEstablishment>;
-}) => {
-  const [initialValues, setInitialValues] = useState<FormEstablishmentDto>({
-    source: "immersion-facile",
-    ...defaultInitialValue(),
-  });
-
-  useEffect(() => {
-    if (!route.params.jwt) return;
-    establishmentGateway.getFormEstablishmentFromJwt(route.params.jwt).then(
-      (savedValues) => setInitialValues({ ...initialValues, ...savedValues }),
-      (error: any) => {
-        // eslint-disable-next-line no-console
-        console.error("getFormEstablishmentFromJwt", error);
-      },
-    );
-  }, [route.params.jwt]);
-
-  if (!route.params.jwt) {
-    return <p>Lien non valide</p>;
-  }
-
-  return (
-    <EstablishmentFormikForm
-      initialValues={initialValues}
-      saveForm={(data) =>
-        establishmentGateway.updateFormEstablishment(
-          { ...data },
-          route.params.jwt,
-        )
-      }
-      isEditing
-    >
-      <EditionSiretRelatedInputs
-        businessAddress={initialValues.businessAddress}
-      />
-    </EstablishmentFormikForm>
-  );
-};
+}) => (
+  <ApiDataContainer
+    callApi={() =>
+      establishmentGateway.getFormEstablishmentFromJwt(route.params.jwt)
+    }
+    jwt={route.params.jwt}
+  >
+    {(formEstablishment) => (
+      <Form formEstablishment={formEstablishment} route={route} />
+    )}
+  </ApiDataContainer>
+);
 
 const EditionSiretRelatedInputs = ({
   businessAddress,
@@ -83,5 +58,43 @@ const EditionSiretRelatedInputs = ({
         setFormValue={(address) => setAddressValue(address.label)}
       />
     </>
+  );
+};
+
+type FormProps = {
+  formEstablishment: FormEstablishmentDto | null;
+  route: Route<typeof routes.editFormEstablishment>;
+};
+
+const Form = ({ formEstablishment, route }: FormProps) => {
+  const [formEstablishmentState, setInitialValues] =
+    useState<FormEstablishmentDto>({
+      source: "immersion-facile",
+      ...defaultInitialValue(),
+    });
+
+  useEffect(() => {
+    if (formEstablishment) setInitialValues(formEstablishment);
+  }, [route.params.jwt]);
+
+  if (!route.params.jwt) {
+    return <p>Lien non valide</p>;
+  }
+
+  return (
+    <EstablishmentFormikForm
+      initialValues={formEstablishmentState}
+      saveForm={(data) =>
+        establishmentGateway.updateFormEstablishment(
+          { ...data },
+          route.params.jwt,
+        )
+      }
+      isEditing
+    >
+      <EditionSiretRelatedInputs
+        businessAddress={formEstablishmentState.businessAddress}
+      />
+    </EstablishmentFormikForm>
   );
 };
