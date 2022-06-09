@@ -65,12 +65,42 @@ jobs:
           name: build-bundle
           path: ./dist
 
-      - name: Move server.js and package.json at the root level
+      - name: Release - Generate minimalist server.js to serve static files
         run: |
-          mv ./dist/server.js ./server.js
-          mv ./dist/package.json ./package.json
+          touch server.js
+          CONTENT=$(cat << EOF
+          var express = require('express');
+  
+          var app = express();
+          var directory = '/' + (process.env.STATIC_DIR || 'dist')
+          app.use(express.static(__dirname + directory));
+            
+          var port = process.env.PORT || 3000;
+          app.listen(port, function () {
+            console.log('Listening on', port);
+          });
+          EOF
+          )
+          echo "$CONTENT" >> server.js
 
-      - name: Initialise a local git repository for deployment (a scalingo deployment is a push to their remote)
+      - name: Release - Generate minimalist package.json to install express
+        run: |
+          touch package.json
+          CONTENT=$(cat << EOF
+          {
+            "version": "immersion-front",
+            "scripts": {
+              "start": "node server.js"
+            },
+            "dependencies": {
+            "express": "^4.18.1"
+            }
+          }
+          EOF
+          )
+          echo "$CONTENT" >> package.json
+
+      - name: Release - Initialise a local git repository for deployment (a scalingo deployment is a push to their remote)
         run: |
           rm -rf .git
           git config --global init.defaultBranch master
@@ -87,7 +117,7 @@ jobs:
           echo "${{ needs.create-app-and-environment.outputs.deployer-private-ssh-key }}" > ~/.ssh/id_rsa
           ssh-keyscan -H ssh.osc-fr1.scalingo.com >> ~/.ssh/known_hosts
 
-      - name: Push to deploy
+      - name: Deploy - Push to deploy
         run: |
           git push scalingo -f
 

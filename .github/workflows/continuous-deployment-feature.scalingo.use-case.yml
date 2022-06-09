@@ -143,12 +143,6 @@ jobs:
         run: |
           VITE_GATEWAY=IN_MEMORY pnpm run build
 
-      - name: Release
-        working-directory: front
-        run: |
-          mv test/* dist
-          ls -la dist
-
       - name: Upload build bundle as artifact
         uses: actions/upload-artifact@v3
         with:

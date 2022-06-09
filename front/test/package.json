@@ -1,9 +1,0 @@
-{
-  "version": "immersion-front",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.1"
-  }
-}
