@@ -12,7 +12,6 @@ import { ConventionFormKeysInUrl } from "src/app/routing/route-params";
 import { routes, useRoute } from "src/app/routing/routes";
 import { useSiretFetcher, useSiretRelatedField } from "src/hooks/siret.hooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { DateInput } from "src/uiComponents/form/DateInput";
 import {
@@ -25,6 +24,7 @@ import {
 } from "src/uiComponents/form/TextInput";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
 import { ConventionFormProfession } from "./ConventionFormProfession";
+import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 
 const FrozenMessage = () => (
   <>

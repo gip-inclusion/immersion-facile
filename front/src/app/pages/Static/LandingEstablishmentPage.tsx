@@ -3,12 +3,17 @@ import checked from "/checked.svg";
 import greatings from "/greatings.png";
 import tandem from "/tandem.png";
 import React from "react";
+import arrow from "/fleche.svg";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
-import { BulletPoint } from "src/uiComponents/BulletPoint";
 import { EstablishmentImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { Statistic } from "src/uiComponents/Statistic";
-import { Title, Card, Colored } from "react-design-system/immersionFacile";
+import {
+  Title,
+  Card,
+  Colored,
+  BulletPointArrow,
+} from "react-design-system/immersionFacile";
 
 export const LandingEstablishmentPage = () => (
   <HeaderFooterLayout>
@@ -106,21 +111,21 @@ export const LandingEstablishmentPage = () => (
           }}
         />
         <div className="flex-1 max-w-md" style={{ minWidth: "250px" }}>
-          <BulletPoint>
+          <BulletPointArrow arrowSvgUrl={arrow}>
             C'est une <Colored>période courte et non rémunérée</Colored> en
             entreprise.
-          </BulletPoint>
-          <BulletPoint>
+          </BulletPointArrow>
+          <BulletPointArrow arrowSvgUrl={arrow}>
             Cela permet de <Colored>découvrir un métier</Colored> et un
             environnement de travail tout en vérifiant des compétences et
             aptitudes auprès d'un professionnel en activité.
-          </BulletPoint>
-          <BulletPoint>
+          </BulletPointArrow>
+          <BulletPointArrow arrowSvgUrl={arrow}>
             Le bénéficiaire <Colored>conserve son statut initial</Colored> et
             est couvert par un prescripteur (Pôle emploi, Cap Emploi, Mission
             Locale, etc) grâce à la{" "}
             <a {...routes.convention().link}>signature d'une convention</a>.
-          </BulletPoint>
+          </BulletPointArrow>
         </div>
       </div>
     </section>

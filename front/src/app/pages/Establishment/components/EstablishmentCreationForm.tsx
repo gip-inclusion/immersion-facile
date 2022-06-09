@@ -14,7 +14,6 @@ import {
 } from "src/hooks/siret.hooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ENV } from "src/environmentVariables";
-import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button, Notification } from "react-design-system/immersionFacile";
 
 import {
@@ -27,6 +26,7 @@ import {
   getLabelAndName,
   getMandatoryLabelAndName,
 } from "./EstablishmentFormikForm";
+import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;

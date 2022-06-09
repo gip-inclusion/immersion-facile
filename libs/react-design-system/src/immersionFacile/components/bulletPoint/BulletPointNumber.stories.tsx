@@ -1,15 +1,20 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { Title, TitleProps } from "./Title";
+import { bulletPointPrefix } from ".";
+import {
+  BulletPointNumber,
+  BulletPointNumberProperties,
+} from "./BulletPointNumber";
 
-const Component = Title;
+const Component = BulletPointNumber;
+const argTypes: Partial<ArgTypes<BulletPointNumberProperties>> | undefined = {};
 
-const argTypes: Partial<ArgTypes<TitleProps>> | undefined = {};
 export default {
-  title: `Immersion Facilité/${Component.name}`,
+  title: `${bulletPointPrefix}${Component.name}`,
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;
+
 const template: ComponentStory<typeof Component> = (args) => (
   <Component {...args} />
 );

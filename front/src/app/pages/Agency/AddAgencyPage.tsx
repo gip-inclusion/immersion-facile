@@ -17,7 +17,6 @@ import {
 } from "shared/src/agency/agency.dto";
 import { agencySchema } from "shared/src/agency/agency.schema";
 import { zEmail } from "shared/src/zodUtils";
-import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { Button, Title } from "react-design-system/immersionFacile";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
@@ -25,6 +24,7 @@ import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { v4 as uuidV4 } from "uuid";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 
 const initialValues: CreateAgencyDto = {
   id: uuidV4(),

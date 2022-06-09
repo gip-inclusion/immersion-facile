@@ -8,12 +8,12 @@ import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { SearchInput, useSearchUseCase } from "src/hooks/search.hooks";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import { OurAdvises } from "./OurAdvises";
 import { SearchResultPanel } from "./SearchResultPanel";
 import { ButtonSearch } from "react-design-system/immersionFacile";
+import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initiallySelectedIndex = 3; // to get 10 km radius by default

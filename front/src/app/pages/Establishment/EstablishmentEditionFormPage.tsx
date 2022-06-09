@@ -5,7 +5,7 @@ import { establishmentGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
+import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
