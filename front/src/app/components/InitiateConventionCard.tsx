@@ -1,5 +1,5 @@
 import React from "react";
-import { HomeButton } from "react-design-system";
+import { ButtonHome } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { Section } from "src/app/components/Section";
 import { PeConnectButton } from "src/app/pages/Convention/PeConnectButton";
@@ -33,7 +33,7 @@ export const InitiateConventionCard = () => {
           </>
         )}
         {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
-        <HomeButton
+        <ButtonHome
           type="error"
           onClick={() => {
             dispatch(
@@ -43,7 +43,7 @@ export const InitiateConventionCard = () => {
           }}
         >
           Je demande une convention
-        </HomeButton>
+        </ButtonHome>
       </div>
     </Section>
   );
