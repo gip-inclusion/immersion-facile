@@ -18,7 +18,6 @@ import {
   NarrowEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
-import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
 import { ConventionRequiresModificationPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
 import {
@@ -74,7 +73,7 @@ export const setupInitialState = async ({
     outboxRepository,
   );
 
-  await conventionRepository.save(ConventionEntity.create(originalConvention));
+  await conventionRepository.save(originalConvention);
   return {
     originalConvention,
     updateConventionStatus,
@@ -108,7 +107,7 @@ export const executeUpdateConventionStatusUseCase = async ({
   );
   expect(response.id).toEqual(conventionId);
   const storedConvention = await conventionRepository.getById(conventionId);
-  return storedConvention.toDto();
+  return storedConvention;
 };
 
 const expectNewEvent = async <T extends DomainTopic>(

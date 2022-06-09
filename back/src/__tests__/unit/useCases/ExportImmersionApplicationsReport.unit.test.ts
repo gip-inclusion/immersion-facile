@@ -6,7 +6,7 @@ import { ExportImmersionApplicationsReport } from "../../../domain/convention/us
 
 import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 const prepareUseCase = () => {
   const reportingGateway = new InMemoryReportingGateway();
@@ -27,15 +27,15 @@ describe("ExportImmersionApplicationsReport", () => {
       prepareUseCase();
     // Prepare
     conventionRepository._conventions = {
-      "id-immersion-agency-nantes": new ConventionEntityBuilder()
+      "id-immersion-agency-nantes": new ConventionDtoBuilder()
         .withId("id-immersion-agency-nantes")
         .withAgencyId("nantes")
         .build(),
-      "id-immersion-agency-lyon": new ConventionEntityBuilder()
+      "id-immersion-agency-lyon": new ConventionDtoBuilder()
         .withId("id-immersion-agency-lyon")
         .withAgencyId("lyon")
         .build(),
-      "id2-immersion-agency-lyon": new ConventionEntityBuilder()
+      "id2-immersion-agency-lyon": new ConventionDtoBuilder()
         .withId("id2-immersion-agency-lyon")
         .withAgencyId("lyon")
         .build(),

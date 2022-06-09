@@ -3,10 +3,8 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
 import { ValidateImmersionApplication } from "../../../domain/convention/useCases/ValidateImmersionApplication";
 import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import {
   CreateNewEvent,
@@ -49,16 +47,15 @@ describe("Validate Convention", () => {
 
   describe("When the Convention is valid", () => {
     it("validates the Convention in the repository", async () => {
-      const convention: Record<string, ConventionEntity> = {};
-      const conventionEntity = ConventionEntity.create(
-        new ConventionDtoBuilder().withStatus("IN_REVIEW").build(),
-      );
-      convention[conventionEntity.id] = conventionEntity;
-      repository.setConventions(convention);
+      const convention = new ConventionDtoBuilder()
+        .withStatus("IN_REVIEW")
+        .build();
 
-      const { id } = await validateConvention.execute(conventionEntity.id);
+      repository.setConventions({ [convention.id]: convention });
+
+      const { id } = await validateConvention.execute(convention.id);
       const expectedConvention: ConventionDto = {
-        ...conventionEntity.toDto(),
+        ...convention,
         status: "VALIDATED",
       };
 
@@ -66,32 +63,26 @@ describe("Validate Convention", () => {
         topic: "FinalImmersionApplicationValidationByAdmin",
         payload: expectedConvention,
       });
-      expect(id).toEqual(conventionEntity.id);
+      expect(id).toEqual(convention.id);
 
       const storedInRepo = await queries.getLatestUpdated();
-      expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        expectedConvention,
-      ]);
+      expect(storedInRepo).toEqual([expectedConvention]);
     });
   });
 
   describe("When the Convention is still draft", () => {
     it("throws bad request error", async () => {
-      const conventions: Record<string, ConventionEntity> = {};
-      const conventionEntity = new ConventionEntityBuilder().build();
-      conventions[conventionEntity.id] = conventionEntity;
-      repository.setConventions(conventions);
+      const convention = new ConventionDtoBuilder().build();
+      repository.setConventions({ [convention.id]: convention });
 
       await expectPromiseToFailWithError(
-        validateConvention.execute(conventionEntity.id),
-        new BadRequestError(conventionEntity.id),
+        validateConvention.execute(convention.id),
+        new BadRequestError(convention.id),
       );
 
       // And the immersion application is still DRAFT
       const storedInRepo = await queries.getLatestUpdated();
-      expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        conventionEntity.toDto(),
-      ]);
+      expect(storedInRepo).toEqual([convention]);
     });
   });
 

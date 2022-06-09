@@ -3,13 +3,13 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import {
+  ConventionDto,
   ConventionId,
   WithConventionId,
 } from "shared/src/convention/convention.dto";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
-import { ConventionEntity } from "../entities/ConventionEntity";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { conventionIdSchema } from "shared/src/convention/convention.schema";
 
@@ -28,23 +28,24 @@ export class ValidateImmersionApplication extends UseCase<
   inputSchema = conventionIdSchema;
 
   public async _execute(id: ConventionId): Promise<WithConventionId> {
-    const conventionEntity = await this.conventionRepository.getById(id);
-    if (!conventionEntity) throw new NotFoundError(id);
+    const convention = await this.conventionRepository.getById(id);
+    if (!convention) throw new NotFoundError(id);
 
-    if (conventionEntity.toDto().status !== "IN_REVIEW")
-      throw new BadRequestError(id);
+    if (convention.status !== "IN_REVIEW") throw new BadRequestError(id);
 
-    const validatedEntity = ConventionEntity.create({
-      ...conventionEntity.toDto(),
+    const validatedConvention: ConventionDto = {
+      ...convention,
       status: "VALIDATED",
-    });
+    };
 
-    const updatedId = await this.conventionRepository.update(validatedEntity);
+    const updatedId = await this.conventionRepository.update(
+      validatedConvention,
+    );
     if (!updatedId) throw new NotFoundError(updatedId);
 
     const event = this.createNewEvent({
       topic: "FinalImmersionApplicationValidationByAdmin",
-      payload: validatedEntity.toDto(),
+      payload: validatedConvention,
     });
 
     await this.outboxRepository.save(event);

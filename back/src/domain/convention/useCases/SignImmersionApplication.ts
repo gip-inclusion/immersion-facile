@@ -10,7 +10,6 @@ import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
-import { ConventionEntity } from "../entities/ConventionEntity";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { signConventionDtoWithRole } from "shared/src/convention/convention";
 
@@ -40,23 +39,20 @@ export class SignImmersionApplication extends UseCase<void, WithConventionId> {
   ): Promise<WithConventionId> {
     logger.debug({ applicationId, role });
 
-    const applicationEntity = await this.conventionRepository.getById(
+    const conventionDto = await this.conventionRepository.getById(
       applicationId,
     );
-    if (!applicationEntity) throw new NotFoundError(applicationId);
-    const application = applicationEntity.toDto();
-    const signedApplication = signConventionDtoWithRole(application, role);
+    if (!conventionDto) throw new NotFoundError(applicationId);
+    const signedConvention = signConventionDtoWithRole(conventionDto, role);
 
-    const signedEntity = ConventionEntity.create(signedApplication);
-
-    const signedId = await this.conventionRepository.update(signedEntity);
+    const signedId = await this.conventionRepository.update(signedConvention);
     if (!signedId) throw new NotFoundError(signedId);
 
-    const domainTopic = domainTopicByTargetStatusMap[signedApplication.status];
+    const domainTopic = domainTopicByTargetStatusMap[signedConvention.status];
     if (domainTopic) {
       const event = this.createNewEvent({
         topic: domainTopic,
-        payload: signedEntity.toDto(),
+        payload: signedConvention,
       });
       await this.outboxRepository.save(event);
     }

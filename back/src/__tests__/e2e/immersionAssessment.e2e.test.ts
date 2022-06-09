@@ -1,8 +1,8 @@
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { immersionAssessmentRoute } from "shared/src/routes";
 import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
 
 const conventionId = "my-Convention-id";
 
@@ -20,7 +20,7 @@ describe("Immersion assessment routes", () => {
         ),
       );
 
-      const convention = new ConventionEntityBuilder()
+      const convention = new ConventionDtoBuilder()
         .withId(conventionId)
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .build();

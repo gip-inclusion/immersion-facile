@@ -11,7 +11,6 @@ import {
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { ConventionEntity } from "../entities/ConventionEntity";
 import { updateConventionRequestSchema } from "shared/src/convention/convention.schema";
 
 export class UpdateImmersionApplication extends TransactionalUseCase<
@@ -40,8 +39,6 @@ export class UpdateImmersionApplication extends TransactionalUseCase<
       throw new ForbiddenError();
     }
 
-    const conventionEntity = ConventionEntity.create(params.convention);
-
     const currentApplication = await uow.conventionRepository.getById(
       params.id,
     );
@@ -49,7 +46,7 @@ export class UpdateImmersionApplication extends TransactionalUseCase<
     if (currentApplication.status != "DRAFT") {
       throw new BadRequestError(currentApplication.status);
     }
-    const id = await uow.conventionRepository.update(conventionEntity);
+    const id = await uow.conventionRepository.update(params.convention);
     if (!id) throw new NotFoundError(params.id);
 
     if (params.convention.status === minimalValidStatus) {

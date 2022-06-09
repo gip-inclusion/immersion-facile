@@ -16,7 +16,6 @@ import {
 import { NotifyPoleEmploiUserAdvisorOnConventionAssociation } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionAssociation";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
 import { OmitFromExistingKeys } from "shared/src/utils";
 import { PoleEmploiAdvisorOnConventionAssociationParams } from "../../../domain/convention/ports/EmailGateway";
 import { frontRoutes } from "shared/src/routes";
@@ -84,9 +83,8 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
       .withBusinessName("Boulangerie Les Echarts")
       .build();
 
-    const conventionEntity = ConventionEntity.create(conventionDto);
     conventionRepository.setConventions({
-      [conventionEntity.id]: conventionEntity,
+      [conventionDto.id]: conventionDto,
     });
 
     const conventionPoleEmploiAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
@@ -130,7 +128,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({
-            id: conventionEntity.id,
+            id: conventionDto.id,
             role: "counsellor",
             targetRoute: frontRoutes.conventionToValidate,
             email: conventionPoleEmploiAdvisor.email,

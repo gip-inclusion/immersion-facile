@@ -1,8 +1,8 @@
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { frontRoutes } from "shared/src/routes";
 import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
-import { ConventionEntity } from "../../convention/entities/ConventionEntity";
 import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { EmailFilter } from "../../core/ports/EmailFilter";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -35,12 +35,10 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
       ),
     ]);
 
-    if (!isConventionEntity(convention))
+    if (!isConventionDto(convention))
       throw new NotFoundError(
         "There is no convention associated with this user pole emploi advisor",
       );
-
-    const dto = convention.toDto();
 
     await this.emailFilter.withAllowedRecipients(
       [conventionUserAdvisor.email],
@@ -52,14 +50,14 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
               {
                 advisorFirstName: conventionUserAdvisor.firstName,
                 advisorLastName: conventionUserAdvisor.lastName,
-                businessName: dto.businessName,
-                dateEnd: dto.dateEnd,
-                dateStart: dto.dateStart,
-                beneficiaryFirstName: dto.firstName,
-                beneficiaryLastName: dto.lastName,
-                beneficiaryEmail: dto.email,
+                businessName: convention.businessName,
+                dateEnd: convention.dateEnd,
+                dateStart: convention.dateStart,
+                beneficiaryFirstName: convention.firstName,
+                beneficiaryLastName: convention.lastName,
+                beneficiaryEmail: convention.email,
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                immersionAddress: dto.immersionAddress!,
+                immersionAddress: convention.immersionAddress!,
                 magicLink: this.generateMagicLinkFn({
                   id: convention.id,
                   role: "counsellor",
@@ -76,6 +74,6 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
   }
 }
 
-const isConventionEntity = (
-  conventionEntity: ConventionEntity | undefined,
-): conventionEntity is ConventionEntity => !!conventionEntity;
+const isConventionDto = (
+  conventionDto: ConventionDto | undefined,
+): conventionDto is ConventionDto => !!conventionDto;

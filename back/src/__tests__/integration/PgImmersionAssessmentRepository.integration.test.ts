@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -14,9 +14,7 @@ import { ImmersionAssessmentEntity } from "../../domain/convention/entities/Imme
 
 const conventionId = "aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa";
 
-const conventionEntity = new ConventionEntityBuilder()
-  .withId(conventionId)
-  .build();
+const convention = new ConventionDtoBuilder().withId(conventionId).build();
 
 const assessment: ImmersionAssessmentEntity = {
   _entityName: "ImmersionAssessment",
@@ -38,7 +36,7 @@ describe("PgImmersionAssessmentRepository", () => {
     const agencyRepository = new PgAgencyRepository(client);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
     const conventionRepository = new PgConventionRepository(client);
-    await conventionRepository.save(conventionEntity);
+    await conventionRepository.save(convention);
   });
 
   afterAll(async () => {

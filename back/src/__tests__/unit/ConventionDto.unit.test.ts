@@ -1,9 +1,8 @@
 import {
   DATE_START,
   DATE_SUBMISSION,
-  ConventionDtoBuilder,
 } from "shared/src/convention/ConventionDtoBuilder";
-import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   addDays,
   splitCasesBetweenPassingAndFailing,
@@ -23,11 +22,11 @@ describe("conventionDtoSchema", () => {
   });
 
   it("ignores accents on emails", () => {
-    const convention = new ConventionEntityBuilder()
+    const convention = new ConventionDtoBuilder()
       .withEmail("Jérôme_Truc@associés.fr")
       .build();
-
-    expect(convention.toDto().email).toBe("Jerome_Truc@associes.fr");
+    const parsedConvention = conventionSchema.parse(convention);
+    expect(parsedConvention.email).toBe("Jerome_Truc@associes.fr");
   });
 
   it("rejects equal applicant and mentor emails", () => {

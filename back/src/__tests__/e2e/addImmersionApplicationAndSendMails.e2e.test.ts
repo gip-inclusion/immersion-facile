@@ -14,7 +14,6 @@ import {
   TemplatedEmail,
 } from "../../adapters/secondary/InMemoryEmailGateway";
 import { DomainEvent } from "../../domain/core/eventBus/events";
-import { ConventionEntity } from "../../domain/convention/entities/ConventionEntity";
 import {
   ConventionDto,
   UpdateConventionStatusRequestDto,
@@ -39,7 +38,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     expectResponseBody(res, { id: validConvention.id });
     expect(await reposAndGateways.conventionQueries.getLatestUpdated()).toEqual(
-      [ConventionEntity.create(validConvention)],
+      [validConvention],
     );
     expectEventsInOutbox(reposAndGateways.outbox, [
       {
@@ -278,9 +277,9 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 };
 
 const expectOnlyOneImmersionThatIsEqual = (
-  actualEntities: ConventionEntity[],
+  actualDtos: ConventionDto[],
   expectedDto: ConventionDto,
 ) => {
-  expect(actualEntities).toHaveLength(1);
-  expectTypeToMatchAndEqual(actualEntities[0].toDto(), expectedDto);
+  expect(actualDtos).toHaveLength(1);
+  expectTypeToMatchAndEqual(actualDtos[0], expectedDto);
 };

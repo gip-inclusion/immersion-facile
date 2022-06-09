@@ -107,20 +107,18 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     const { emailHash, role, applicationId } =
       extractDataFromExpiredJwt(payloadToExtract);
 
-    const conventionEntity = await this.conventionRepository.getById(
+    const conventionDto = await this.conventionRepository.getById(
       applicationId,
     );
-    if (!conventionEntity) throw new NotFoundError(applicationId);
+    if (!conventionDto) throw new NotFoundError(applicationId);
 
-    const dto = conventionEntity.toDto();
-
-    const agency = await this.agencyRepository.getById(dto.agencyId);
+    const agency = await this.agencyRepository.getById(conventionDto.agencyId);
     if (!agency) {
       logger.error(
-        { agencyId: dto.agencyId },
+        { agencyId: conventionDto.agencyId },
         "No Agency Config found for this agency code",
       );
-      throw new BadRequestError(dto.agencyId);
+      throw new BadRequestError(conventionDto.agencyId);
     }
 
     if (!linkFormat.includes("%jwt%")) {
@@ -132,7 +130,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
       case "admin":
         throw new BadRequestError("L'admin n'a pas de liens magiques.");
       case "beneficiary":
-        emails = [dto.email];
+        emails = [conventionDto.email];
         break;
       case "counsellor":
         emails = agency.counsellorEmails;
@@ -141,7 +139,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
         emails = agency.validatorEmails;
         break;
       case "establishment":
-        emails = [dto.mentorEmail];
+        emails = [conventionDto.mentorEmail];
         break;
     }
 

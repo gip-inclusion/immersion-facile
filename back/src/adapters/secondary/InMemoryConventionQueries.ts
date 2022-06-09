@@ -1,5 +1,6 @@
 import { propEq } from "ramda";
 import {
+  ConventionDto,
   validatedConventionStatuses,
   WithConventionId,
 } from "shared/src/convention/convention.dto";
@@ -9,7 +10,6 @@ import { ConventionQueries } from "../../domain/convention/ports/ConventionQueri
 import { ConventionRawBeforeExportVO } from "../../domain/convention/valueObjects/ConventionRawBeforeExportVO";
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
-import { ConventionEntity } from "../../domain/convention/entities/ConventionEntity";
 
 const logger = createLogger(__filename);
 
@@ -19,7 +19,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly outboxRepository?: InMemoryOutboxRepository,
   ) {}
 
-  public async getLatestUpdated(): Promise<ConventionEntity[]> {
+  public async getLatestUpdated(): Promise<ConventionDto[]> {
     logger.info("getAll");
     return Object.values(this.conventionRepository._conventions);
   }
@@ -28,9 +28,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
     ConventionRawBeforeExportVO[]
   > {
     return Object.values(this.conventionRepository._conventions).map(
-      (entity) => {
-        const dto = entity.toDto();
-        return new ConventionRawBeforeExportVO({
+      (dto) =>
+        new ConventionRawBeforeExportVO({
           agencyName: `TEST_AGENCY_NAME_WITH_ID_${dto.agencyId}`,
           status: dto.status,
           postalCode: dto.postalCode,
@@ -54,8 +53,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
           schedule: dto.schedule,
           siret: dto.siret,
           workConditions: dto.workConditions,
-        });
-      },
+        }),
     );
   }
 
@@ -70,17 +68,16 @@ export class InMemoryConventionQueries implements ConventionQueries {
     return Object.values(this.conventionRepository._conventions)
       .filter(
         (convention) =>
-          new Date(convention.properties.dateEnd).getDate() ===
-            dateEnd.getDate() &&
+          new Date(convention.dateEnd).getDate() === dateEnd.getDate() &&
           validatedConventionStatuses.includes(convention.status) &&
           !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
       )
       .map((convention) => ({
         immersionId: convention.id,
-        mentorName: convention.properties.mentor,
-        mentorEmail: convention.properties.mentorEmail,
-        beneficiaryFirstName: convention.properties.firstName,
-        beneficiaryLastName: convention.properties.lastName,
+        mentorName: convention.mentor,
+        mentorEmail: convention.mentorEmail,
+        beneficiaryFirstName: convention.firstName,
+        beneficiaryLastName: convention.lastName,
       }));
   }
 }

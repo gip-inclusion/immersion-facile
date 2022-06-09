@@ -7,7 +7,6 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
-import { ConventionEntity } from "../entities/ConventionEntity";
 import {
   ConventionStatus,
   ConventionDto,
@@ -42,16 +41,14 @@ export class AddImmersionApplication extends TransactionalUseCase<
       throw new ForbiddenError();
     }
 
-    const applicationEntity = ConventionEntity.create(conventionDto);
-
     const featureFlags = await uow.getFeatureFlags();
     if (featureFlags.enableInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(this.getSiret, conventionDto.siret);
     }
 
-    const id = await uow.conventionRepository.save(applicationEntity);
+    const id = await uow.conventionRepository.save(conventionDto);
 
-    if (!id) throw new ConflictError(applicationEntity.id);
+    if (!id) throw new ConflictError(conventionDto.id);
 
     const event = this.createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",

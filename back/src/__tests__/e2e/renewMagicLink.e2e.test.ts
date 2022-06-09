@@ -28,7 +28,6 @@ import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder
 import { RenewMagicLink } from "../../domain/convention/useCases/RenewMagicLink";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { InMemoryOutboxQueries } from "../../adapters/secondary/core/InMemoryOutboxQueries";
@@ -91,7 +90,7 @@ describe("Magic link renewal flow", () => {
 
     deliverRenewedMagicLink = new DeliverRenewedMagicLink(emailFilter, emailGw);
 
-    const entity = new ConventionEntityBuilder().build();
+    const entity = new ConventionDtoBuilder().build();
     conventionRepository.setConventions({ [entity.id]: entity });
   });
 

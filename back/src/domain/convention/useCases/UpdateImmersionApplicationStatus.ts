@@ -8,6 +8,7 @@ import {
   ConventionId,
   UpdateConventionStatusRequestDto,
   WithConventionId,
+  ConventionDto,
 } from "shared/src/convention/convention.dto";
 import { statusTransitionConfigs } from "shared/src/convention/conventionStatusTransitions";
 import {
@@ -19,7 +20,6 @@ import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
-import { ConventionEntity } from "../entities/ConventionEntity";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { updateConventionStatusRequestSchema } from "shared/src/convention/convention.schema";
 
@@ -65,29 +65,29 @@ export class UpdateImmersionApplicationStatus extends UseCase<
       applicationId,
     );
 
-    const updatedEntity = ConventionEntity.create({
-      ...convention.toDto(),
+    const updatedDto = {
+      ...convention,
       ...(status === "REJECTED" && { rejectionJustification: justification }),
       ...(status === "DRAFT" && {
         enterpriseAccepted: false,
         beneficiaryAccepted: false,
       }),
       status,
-    });
+    };
 
-    const updatedId = await this.conventionRepository.update(updatedEntity);
+    const updatedId = await this.conventionRepository.update(updatedDto);
     if (!updatedId) throw new NotFoundError(updatedId);
 
     const domainTopic = domainTopicByTargetStatusMap[status];
     if (!domainTopic) return { id: updatedId };
 
-    const event = this.createEvent(updatedEntity, domainTopic, justification);
+    const event = this.createEvent(updatedDto, domainTopic, justification);
     await this.outboxRepository.save(event);
     return { id: updatedId };
   }
 
   private createEvent(
-    updatedEntity: ConventionEntity,
+    updatedDto: ConventionDto,
     domainTopic: DomainTopic,
     justification?: string,
   ) {
@@ -95,7 +95,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
       return this.createNewEvent({
         topic: domainTopic,
         payload: {
-          convention: updatedEntity.toDto(),
+          convention: updatedDto,
           reason: justification ?? "",
           roles: ["beneficiary", "establishment"],
         },
@@ -103,7 +103,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
 
     return this.createNewEvent({
       topic: domainTopic,
-      payload: updatedEntity.toDto(),
+      payload: updatedDto,
     });
   }
 
@@ -111,7 +111,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     status: ConventionStatus,
     role: Role,
     applicationId: ConventionId,
-  ): Promise<ConventionEntity> {
+  ): Promise<ConventionDto> {
     const statusTransitionConfig = statusTransitionConfigs[status];
 
     if (!statusTransitionConfig.validRoles.includes(role))

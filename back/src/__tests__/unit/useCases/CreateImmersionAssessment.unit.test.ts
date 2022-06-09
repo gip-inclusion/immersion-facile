@@ -4,7 +4,6 @@ import {
 } from "shared/src/convention/convention.dto";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import {
   expectArraysToEqual,
   expectObjectsToMatch,
@@ -25,6 +24,7 @@ import { InMemoryImmersionAssessmentRepository } from "../../../adapters/seconda
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 const conventionId = "conventionId";
 
@@ -34,7 +34,7 @@ const immersionAssessment: ImmersionAssessmentDto = {
   establishmentFeedback: "Ca c'est bien passé",
 };
 
-const conventionEntityBuilder = new ConventionEntityBuilder().withId(
+const ConventionDtoBuilderWithId = new ConventionDtoBuilder().withId(
   conventionId,
 );
 
@@ -56,8 +56,9 @@ describe("CreateImmersionAssessment", () => {
     conventionRepository = uow.conventionRepository;
     outboxRepository = uow.outboxRepo;
     uowPerformer = new InMemoryUowPerformer(uow);
-    const convention = conventionEntityBuilder
-      .withStatus("ACCEPTED_BY_VALIDATOR")
+    const convention = ConventionDtoBuilderWithId.withStatus(
+      "ACCEPTED_BY_VALIDATOR",
+    )
       .withId(conventionId)
       .build();
     conventionRepository.setConventions({
@@ -131,7 +132,7 @@ describe("CreateImmersionAssessment", () => {
   it.each(failingStatuses.map((status) => ({ status })))(
     "throws bad request if the Convention status is $status",
     async ({ status }) => {
-      const convention = conventionEntityBuilder.withStatus(status).build();
+      const convention = ConventionDtoBuilderWithId.withStatus(status).build();
       conventionRepository.setConventions({
         [convention.id]: convention,
       });
@@ -148,7 +149,7 @@ describe("CreateImmersionAssessment", () => {
   it.each(passingStatuses.map((status) => ({ status })))(
     "should save the ImmersionAssessment if Convention has status $status",
     async ({ status }) => {
-      const convention = conventionEntityBuilder.withStatus(status).build();
+      const convention = ConventionDtoBuilderWithId.withStatus(status).build();
       conventionRepository.setConventions({
         [convention.id]: convention,
       });

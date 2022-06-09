@@ -17,18 +17,15 @@ import {
 } from "shared/src/schedule/ScheduleUtils";
 import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../_testBuilders/emailAssertions";
-import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,
 } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import { ConventionDto } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
-const validConvention: ConventionDto = new ConventionEntityBuilder()
-  .build()
-  .toDto();
+const validConvention: ConventionDto = new ConventionDtoBuilder().build();
 
 const counsellorEmail = "counsellor@email.fr";
 

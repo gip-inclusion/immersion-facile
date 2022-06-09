@@ -125,6 +125,12 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withStatus(status: ConventionStatus): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, status });
   }
+  public validated(): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      status: "ACCEPTED_BY_VALIDATOR",
+    });
+  }
 
   public withImmersionAddress(immersionAddress: string): ConventionDtoBuilder {
     return new ConventionDtoBuilder({

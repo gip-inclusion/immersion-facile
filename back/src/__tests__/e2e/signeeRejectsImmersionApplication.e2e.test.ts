@@ -121,7 +121,7 @@ const expectStoreImmersionToHaveStatus = async (
 ) => {
   const savedConvention = await applicationQueries.getLatestUpdated();
   expect(savedConvention).toHaveLength(1);
-  expectObjectsToMatch(savedConvention[0].toDto(), {
+  expectObjectsToMatch(savedConvention[0], {
     status: expectedStatus,
   });
 };

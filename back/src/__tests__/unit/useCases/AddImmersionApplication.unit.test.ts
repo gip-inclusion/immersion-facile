@@ -19,7 +19,6 @@ import {
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
-import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
 import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
 import { allConventionStatuses } from "shared/src/convention/convention.dto";
 import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
@@ -74,7 +73,7 @@ describe("Add Convention", () => {
       conventionRepository,
     ).getLatestUpdated();
     expect(storedInRepo).toHaveLength(1);
-    expect(storedInRepo[0].toDto()).toEqual(validConvention);
+    expect(storedInRepo[0]).toEqual(validConvention);
     expectDomainEventsToBeInOutbox([
       {
         id,
@@ -88,7 +87,7 @@ describe("Add Convention", () => {
   });
 
   it("rejects conventions where the ID is already in use", async () => {
-    await conventionRepository.save(ConventionEntity.create(validConvention));
+    await conventionRepository.save(validConvention);
 
     await expectPromiseToFailWithError(
       addConvention.execute(validConvention),

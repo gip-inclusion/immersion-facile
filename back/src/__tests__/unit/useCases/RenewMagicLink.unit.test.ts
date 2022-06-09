@@ -12,7 +12,6 @@ import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import {
@@ -26,10 +25,9 @@ import {
   ConventionDto,
   RenewMagicLinkRequestDto,
 } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
-const validConvention: ConventionDto = new ConventionEntityBuilder()
-  .build()
-  .toDto();
+const validConvention: ConventionDto = new ConventionDtoBuilder().build();
 
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
 
@@ -55,7 +53,7 @@ describe("RenewMagicLink use case", () => {
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     agencyRepository = new InMemoryAgencyRepository([agency]);
 
-    const entity = new ConventionEntityBuilder().build();
+    const entity = new ConventionDtoBuilder().build();
     conventionRepository.setConventions({ [entity.id]: entity });
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
@@ -93,7 +91,7 @@ describe("RenewMagicLink use case", () => {
 
   it("requires a known agency id", async () => {
     const storedUnknownId = "some unknown agency id";
-    const entity = new ConventionEntityBuilder()
+    const entity = new ConventionDtoBuilder()
       .withAgencyId(storedUnknownId)
       .build();
     conventionRepository.setConventions({ [entity.id]: entity });

@@ -1,7 +1,7 @@
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { GetImmersionApplication } from "../../../domain/convention/useCases/GetImmersionApplication";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 describe("Get Convention", () => {
@@ -24,13 +24,13 @@ describe("Get Convention", () => {
 
   describe("When a Convention is stored", () => {
     it("returns the Convention", async () => {
-      const entity = new ConventionEntityBuilder().build();
+      const entity = new ConventionDtoBuilder().build();
       repository.setConventions({ [entity.id]: entity });
 
       const convention = await getConvention.execute({
         id: entity.id,
       });
-      expect(convention).toEqual(entity.toDto());
+      expect(convention).toEqual(entity);
     });
   });
 });

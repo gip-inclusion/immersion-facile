@@ -1,15 +1,17 @@
-import { ConventionEntity } from "../../domain/convention/entities/ConventionEntity";
 import { ConventionRepository } from "../../domain/convention/ports/ConventionRepository";
 import { createLogger } from "../../utils/logger";
-import { ConventionId } from "shared/src/convention/convention.dto";
+import {
+  ConventionDto,
+  ConventionId,
+} from "shared/src/convention/convention.dto";
 
 const logger = createLogger(__filename);
 
 export class InMemoryConventionRepository implements ConventionRepository {
-  public _conventions: Record<string, ConventionEntity> = {};
+  public _conventions: Record<string, ConventionDto> = {};
 
   public async save(
-    convention: ConventionEntity,
+    convention: ConventionDto,
   ): Promise<ConventionId | undefined> {
     logger.info({ convention }, "save");
     if (this._conventions[convention.id]) {
@@ -24,7 +26,7 @@ export class InMemoryConventionRepository implements ConventionRepository {
     return this._conventions[id];
   }
 
-  public async update(convention: ConventionEntity) {
+  public async update(convention: ConventionDto) {
     logger.info({ convention }, "updateConvention");
     const id = convention.id;
     if (!this._conventions[id]) return;
@@ -35,7 +37,7 @@ export class InMemoryConventionRepository implements ConventionRepository {
 
   // for test purpose
 
-  setConventions(conventions: Record<string, ConventionEntity>) {
+  setConventions(conventions: Record<string, ConventionDto>) {
     this._conventions = conventions;
   }
 }

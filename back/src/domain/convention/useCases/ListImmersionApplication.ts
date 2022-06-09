@@ -19,7 +19,6 @@ export class ListImmersionApplication extends UseCase<
   public async _execute({ status, agencyId }: ListConventionsRequestDto) {
     const entities = await this.conventionQueries.getLatestUpdated();
     return entities
-      .map((entity) => entity.toDto())
       .filter((dto) => !status || dto.status === status)
       .filter((dto) => !agencyId || dto.agencyId === agencyId);
   }

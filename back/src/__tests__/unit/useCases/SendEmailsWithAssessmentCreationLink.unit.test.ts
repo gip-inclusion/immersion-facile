@@ -10,7 +10,7 @@ import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemo
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 const prepareUseCase = () => {
   const conventionRepo = new InMemoryConventionRepository();
@@ -63,20 +63,15 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
 
     clock.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
 
-    const immersionApplicationEndingTomorrow = new ConventionEntityBuilder()
-      .withDateStartAndDateEnd(
-        "2021-05-13T10:00:00.000Z",
-        "2021-05-16T10:00:00.000Z",
-      )
+    const immersionApplicationEndingTomorrow = new ConventionDtoBuilder()
+      .withDateStart("2021-05-13T10:00:00.000Z")
+      .withDateEnd("2021-05-16T10:00:00.000Z")
       .withId("immersion-ending-tommorow-id")
       .validated()
       .build();
 
-    const immersionApplicationEndingYesterday = new ConventionEntityBuilder()
-      .withDateStartAndDateEnd(
-        "2021-05-11T10:00:00.000Z",
-        "2021-05-14T10:00:00.000Z",
-      )
+    const immersionApplicationEndingYesterday = new ConventionDtoBuilder()
+      .withDateEnd("2021-05-14T10:00:00.000Z")
       .validated()
       .build();
 
@@ -91,16 +86,14 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     expect(sentEmails).toHaveLength(1);
     expect(sentEmails[0].type).toBe("CREATE_IMMERSION_ASSESSMENT");
     expect(sentEmails[0].recipients).toEqual([
-      immersionApplicationEndingTomorrow.properties.mentorEmail,
+      immersionApplicationEndingTomorrow.mentorEmail,
     ]);
 
     expect(sentEmails[0].params).toEqual({
       immersionAssessmentCreationLink: `www.immersion-facile.fr/bilan-immersion?jwt=jwtOfImmersion[immersion-ending-tommorow-id]`,
-      mentorName: immersionApplicationEndingTomorrow.properties.mentor,
-      beneficiaryFirstName:
-        immersionApplicationEndingTomorrow.properties.firstName,
-      beneficiaryLastName:
-        immersionApplicationEndingTomorrow.properties.lastName,
+      mentorName: immersionApplicationEndingTomorrow.mentor,
+      beneficiaryFirstName: immersionApplicationEndingTomorrow.firstName,
+      beneficiaryLastName: immersionApplicationEndingTomorrow.lastName,
     });
     expect(outboxRepo.events).toHaveLength(1);
     expect(outboxRepo.events[0].payload).toMatchObject({
@@ -114,11 +107,8 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
 
     clock.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
 
-    const immersionApplicationEndingTomorrow = new ConventionEntityBuilder()
-      .withDateStartAndDateEnd(
-        "2021-05-13T10:00:00.000Z",
-        "2021-05-16T10:00:00.000Z",
-      )
+    const immersionApplicationEndingTomorrow = new ConventionDtoBuilder()
+      .withDateEnd("2021-05-16T10:00:00.000Z")
       .validated()
       .withId("immersion-ending-tommorow-id")
       .build();

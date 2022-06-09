@@ -21,6 +21,6 @@ export class GetImmersionApplication extends UseCase<
     const convention = await this.conventionRepository.getById(id);
     if (!convention || convention.status === "CANCELLED")
       throw new NotFoundError(id);
-    return convention.toDto();
+    return convention;
   }
 }

@@ -2,10 +2,8 @@ import { Pool, PoolClient } from "pg";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
-import { ConventionEntity } from "../../domain/convention/entities/ConventionEntity";
 import { ConventionId } from "shared/src/convention/convention.dto";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 describe("PgConventionRepository", () => {
@@ -30,47 +28,43 @@ describe("PgConventionRepository", () => {
     conventionRepository = new PgConventionRepository(client);
   });
 
-  it("Adds a new ConventionEntity", async () => {
-    const conventionEntity = new ConventionEntityBuilder()
+  it("Adds a new convention", async () => {
+    const convention = new ConventionDtoBuilder()
       .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
       .build();
-    await conventionRepository.save(conventionEntity);
+    await conventionRepository.save(convention);
 
-    expect(await conventionRepository.getById(conventionEntity.id)).toEqual(
-      conventionEntity,
+    expect(await conventionRepository.getById(convention.id)).toEqual(
+      convention,
     );
   });
 
-  it("Adds a new ConventionEntity with field workConditions undefined", async () => {
-    const conventionEntity = new ConventionEntityBuilder()
+  it("Adds a new convention with field workConditions undefined", async () => {
+    const convention = new ConventionDtoBuilder()
       .withoutWorkCondition()
       .build();
 
-    await conventionRepository.save(conventionEntity);
+    await conventionRepository.save(convention);
 
-    expect(await conventionRepository.getById(conventionEntity.id)).toEqual(
-      conventionEntity,
+    expect(await conventionRepository.getById(convention.id)).toEqual(
+      convention,
     );
   });
 
   it("Updates an already saved immersion", async () => {
     const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
-    const conventionEntity = new ConventionEntityBuilder().withId(idA).build();
-    await conventionRepository.save(conventionEntity);
+    const convention = new ConventionDtoBuilder().withId(idA).build();
+    await conventionRepository.save(convention);
 
-    const updatedConventionEntity = ConventionEntity.create(
-      new ConventionDtoBuilder()
-        .withId(idA)
-        .withStatus("VALIDATED")
-        .withEmail("someUpdated@email.com")
-        .withDateEnd("2021-01-20")
-        .build(),
-    );
+    const updatedConvention = new ConventionDtoBuilder()
+      .withId(idA)
+      .withStatus("VALIDATED")
+      .withEmail("someUpdated@email.com")
+      .withDateEnd("2021-01-20")
+      .build();
 
-    await conventionRepository.update(updatedConventionEntity);
+    await conventionRepository.update(updatedConvention);
 
-    expect(await conventionRepository.getById(idA)).toEqual(
-      updatedConventionEntity,
-    );
+    expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
   });
 });

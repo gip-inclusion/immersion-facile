@@ -9,7 +9,6 @@ import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
 import { PoleEmploiAdvisorOnConventionFullysignedParams } from "../../../domain/convention/ports/EmailGateway";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
@@ -79,9 +78,8 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       .withBusinessName("Boulangerie Les Echarts")
       .build();
 
-    const conventionEntity = ConventionEntity.create(conventionDtoFromEvent);
     conventionRepository.setConventions({
-      [conventionEntity.id]: conventionEntity,
+      [conventionDtoFromEvent.id]: conventionDtoFromEvent,
     });
 
     const conventionPoleEmploiAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
@@ -124,7 +122,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({
-            id: conventionEntity.id,
+            id: conventionDtoFromEvent.id,
             role: "counsellor",
             targetRoute: frontRoutes.conventionToValidate,
             email: conventionPoleEmploiAdvisor.email,

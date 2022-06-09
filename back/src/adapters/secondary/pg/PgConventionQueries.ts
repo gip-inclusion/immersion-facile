@@ -1,9 +1,9 @@
 import { PoolClient } from "pg";
-import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ConventionQueries } from "../../../domain/convention/ports/ConventionQueries";
 import { ConventionRawBeforeExportVO } from "../../../domain/convention/valueObjects/ConventionRawBeforeExportVO";
 import { ImmersionAssessmentEmailParams } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
-import { pgConventionRowToEntity } from "./PgConventionRepository";
+import { pgConventionRowToDto } from "./PgConventionRepository";
 import { optional } from "./pgUtils";
 import format from "pg-format";
 import { validatedConventionStatuses } from "shared/src/convention/convention.dto";
@@ -49,7 +49,7 @@ export class PgConventionQueries implements ConventionQueries {
     );
   }
 
-  public async getLatestUpdated(): Promise<ConventionEntity[]> {
+  public async getLatestUpdated(): Promise<ConventionDto[]> {
     const pgResult = await this.client.query(
       `SELECT *, vad.*
        FROM immersion_applications 
@@ -59,7 +59,7 @@ export class PgConventionQueries implements ConventionQueries {
        LIMIT 10`,
     );
 
-    return pgResult.rows.map(pgConventionRowToEntity);
+    return pgResult.rows.map(pgConventionRowToDto);
   }
   public async getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
     dateEnd: Date,

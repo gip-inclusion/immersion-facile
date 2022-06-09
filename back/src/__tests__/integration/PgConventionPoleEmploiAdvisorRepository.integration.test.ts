@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { expectObjectsToMatch } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../adapters/secondary/pg/PgConventionPoleEmploiAdvisorRepository";
@@ -14,9 +14,7 @@ import {
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
 const userPeExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
 
-const conventionEntity = new ConventionEntityBuilder()
-  .withId(conventionId)
-  .build();
+const convention = new ConventionDtoBuilder().withId(conventionId).build();
 
 const poleEmploiFirstUserAdvisor: PoleEmploiUserAdvisorDto = {
   userPeExternalId,
@@ -51,7 +49,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     const agencyRepository = new PgAgencyRepository(client);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
     const conventionRepository = new PgConventionRepository(client);
-    await conventionRepository.save(conventionEntity);
+    await conventionRepository.save(convention);
   });
 
   afterAll(async () => {

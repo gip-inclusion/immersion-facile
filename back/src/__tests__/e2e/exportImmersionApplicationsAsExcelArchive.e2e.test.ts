@@ -1,7 +1,7 @@
 import { AgencyDto } from "shared/src/agency/agency.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { exportConventionsExcelRoute } from "shared/src/routes";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
 
 describe("/export-demande-immersions-excel", () => {
   it("fails with 401 without authentication", async () => {
@@ -14,12 +14,12 @@ describe("/export-demande-immersions-excel", () => {
     const linkedAgency: AgencyDto = (
       await reposAndGateways.agency.getAllActive()
     )[0];
-    const conventionEntity = new ConventionEntityBuilder()
+    const convention = new ConventionDtoBuilder()
       .withAgencyId(linkedAgency.id)
       .build();
 
     reposAndGateways.convention.setConventions({
-      [conventionEntity.id]: conventionEntity,
+      [convention.id]: convention,
     });
 
     const result = await request

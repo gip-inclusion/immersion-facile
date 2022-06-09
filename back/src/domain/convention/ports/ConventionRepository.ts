@@ -1,12 +1,10 @@
-import { ConventionId } from "shared/src/convention/convention.dto";
-import { ConventionEntity } from "../entities/ConventionEntity";
+import {
+  ConventionDto,
+  ConventionId,
+} from "shared/src/convention/convention.dto";
 
 export interface ConventionRepository {
-  save: (
-    conventionEntity: ConventionEntity,
-  ) => Promise<ConventionId | undefined>;
-  getById: (id: ConventionId) => Promise<ConventionEntity | undefined>;
-  update: (
-    conventionEntity: ConventionEntity,
-  ) => Promise<ConventionId | undefined>;
+  save: (conventionDto: ConventionDto) => Promise<ConventionId | undefined>;
+  getById: (id: ConventionId) => Promise<ConventionDto | undefined>;
+  update: (conventionDto: ConventionDto) => Promise<ConventionId | undefined>;
 }

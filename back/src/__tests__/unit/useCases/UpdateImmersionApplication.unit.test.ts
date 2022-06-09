@@ -18,12 +18,11 @@ import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
 import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
 import {
   ConventionId,
   allConventionStatuses,
+  ConventionDto,
 } from "shared/src/convention/convention.dto";
 import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 
@@ -62,9 +61,9 @@ describe("Update Convention", () => {
 
   describe("When the Convention is valid", () => {
     it("updates the Convention in the repository", async () => {
-      const conventions: Record<string, ConventionEntity> = {};
-      const conventionEntity = new ConventionEntityBuilder().build();
-      conventions[conventionEntity.id] = conventionEntity;
+      const conventions: Record<string, ConventionDto> = {};
+      const convention = new ConventionDtoBuilder().build();
+      conventions[convention.id] = convention;
       conventionRepository.setConventions(conventions);
 
       const updatedConvention = new ConventionDtoBuilder()
@@ -80,9 +79,7 @@ describe("Update Convention", () => {
       const storedInRepo = await new InMemoryConventionQueries(
         conventionRepository,
       ).getLatestUpdated();
-      expect(storedInRepo.map((entity) => entity.toDto())).toEqual([
-        updatedConvention,
-      ]);
+      expect(storedInRepo).toEqual([updatedConvention]);
     });
   });
 
@@ -121,11 +118,11 @@ describe("Update Convention", () => {
   describe("Status validation", () => {
     let id: ConventionId;
     beforeEach(() => {
-      const conventions: Record<string, ConventionEntity> = {};
-      const conventionEntity = new ConventionEntityBuilder().build();
-      conventions[conventionEntity.id] = conventionEntity;
+      const conventions: Record<string, ConventionDto> = {};
+      const convention = new ConventionDtoBuilder().build();
+      conventions[convention.id] = convention;
       conventionRepository.setConventions(conventions);
-      id = conventionEntity.id;
+      id = convention.id;
     });
 
     // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021

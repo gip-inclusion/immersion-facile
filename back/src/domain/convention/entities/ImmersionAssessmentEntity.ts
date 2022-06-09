@@ -1,8 +1,10 @@
-import { ConventionStatus } from "shared/src/convention/convention.dto";
+import {
+  ConventionDto,
+  ConventionStatus,
+} from "shared/src/convention/convention.dto";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { EntityFromDto } from "../../core/EntityFromDto";
-import { ConventionEntity } from "./ConventionEntity";
 
 export type ImmersionAssessmentEntity = EntityFromDto<
   ImmersionAssessmentDto,
@@ -16,7 +18,7 @@ const acceptedConventionStatuses: ConventionStatus[] = [
 
 export const createImmersionAssessmentEntity = (
   dto: ImmersionAssessmentDto,
-  convention: ConventionEntity,
+  convention: ConventionDto,
 ): ImmersionAssessmentEntity => {
   if (!acceptedConventionStatuses.includes(convention.status))
     throw new BadRequestError(

@@ -2,13 +2,11 @@ import { Pool, PoolClient } from "pg";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionQueries } from "../../adapters/secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
-import { ConventionEntity } from "../../domain/convention/entities/ConventionEntity";
 import { ConventionId } from "shared/src/convention/convention.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { ConventionRawBeforeExportVO } from "../../domain/convention/valueObjects/ConventionRawBeforeExportVO";
-import { ConventionEntityBuilder } from "../../_testBuilders/ConventionEntityBuilder";
 import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
@@ -49,19 +47,17 @@ describe("Pg implementation of ConventionQueries", () => {
 
       const ConventionId: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
 
-      const conventionEntity: ConventionEntity = ConventionEntity.create(
-        new ConventionDtoBuilder()
-          .withId(ConventionId)
-          .withDateStart(new Date("2021-01-15").toISOString())
-          .withDateEnd(new Date("2021-01-20").toISOString())
-          .withDateSubmission(new Date("2021-01-10").toISOString())
-          .withAgencyId(appleAgencyId)
-          .withoutWorkCondition()
-          .build(),
-      );
+      const convention = new ConventionDtoBuilder()
+        .withId(ConventionId)
+        .withDateStart(new Date("2021-01-15").toISOString())
+        .withDateEnd(new Date("2021-01-20").toISOString())
+        .withDateSubmission(new Date("2021-01-10").toISOString())
+        .withAgencyId(appleAgencyId)
+        .withoutWorkCondition()
+        .build();
 
       await agencyRepo.insert(appleAgency);
-      await conventionRepository.save(conventionEntity);
+      await conventionRepository.save(convention);
 
       // Act
       const actualExport: ConventionRawBeforeExportVO[] =
@@ -77,15 +73,14 @@ describe("Pg implementation of ConventionQueries", () => {
         sanitaryPreventionDescription,
         immersionAppellation,
         ...filteredProperties
-      } = conventionEntity.properties;
+      } = convention;
       // Assert
       expect(actualExport[0]._props).toStrictEqual(
         new ConventionRawBeforeExportVO({
           ...filteredProperties,
           agencyName: appleAgency.name,
-          immersionProfession:
-            conventionEntity.properties.immersionAppellation.appellationLabel,
-          status: conventionEntity.status,
+          immersionProfession: convention.immersionAppellation.appellationLabel,
+          status: convention.status,
           dateEnd: new Date("2021-01-20").toISOString(),
           dateStart: new Date("2021-01-15").toISOString(),
           dateSubmission: new Date("2021-01-10").toISOString(),
@@ -100,23 +95,19 @@ describe("Pg implementation of ConventionQueries", () => {
     });
     it("Gets saved immersion", async () => {
       const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
-      const conventionEntityA = new ConventionEntityBuilder()
-        .withId(idA)
-        .build();
+      const conventionA = new ConventionDtoBuilder().withId(idA).build();
 
       const idB: ConventionId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
-      const conventionEntityB = new ConventionEntityBuilder()
-        .withId(idB)
-        .build();
+      const conventionB = new ConventionDtoBuilder().withId(idB).build();
 
-      await conventionRepository.save(conventionEntityA);
-      await conventionRepository.save(conventionEntityB);
+      await conventionRepository.save(conventionA);
+      await conventionRepository.save(conventionB);
 
       const resultA = await conventionRepository.getById(idA);
-      expect(resultA).toEqual(conventionEntityA);
+      expect(resultA).toEqual(conventionA);
 
       const resultAll = await conventionQueries.getLatestUpdated();
-      expect(resultAll).toEqual([conventionEntityB, conventionEntityA]);
+      expect(resultAll).toEqual([conventionB, conventionA]);
     });
   });
 
@@ -132,25 +123,25 @@ describe("Pg implementation of ConventionQueries", () => {
       // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
       const conventionRepo = new PgConventionRepository(client);
       const outboxRepo = new PgOutboxRepository(client);
-      const validatedImmersionEndingThe14th = new ConventionEntityBuilder()
+      const validatedImmersionEndingThe14th = new ConventionDtoBuilder()
         .withId("aaaaac14-9c0a-aaaa-aa6d-6aa9ad38aaaa")
         .validated()
-        .withDateStartAndDateEnd("2022-05-01", "2022-05-14")
+        .withDateEnd("2022-05-14")
         .build();
       const validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail =
-        new ConventionEntityBuilder()
+        new ConventionDtoBuilder()
           .withId("aaaaac15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
           .validated()
-          .withDateStartAndDateEnd("2022-05-01", "2022-05-15")
+          .withDateEnd("2022-05-15")
           .build();
-      const validatedImmersionEndingThe15th = new ConventionEntityBuilder()
+      const validatedImmersionEndingThe15th = new ConventionDtoBuilder()
         .withId("bbbbbc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
         .validated()
-        .withDateStartAndDateEnd("2022-05-01", "2022-05-15")
+        .withDateEnd("2022-05-15")
         .build();
-      const ongoingImmersionEndingThe15th = new ConventionEntityBuilder()
+      const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
         .withId("cccccc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
-        .withDateStartAndDateEnd("2022-05-01", "2022-05-15")
+        .withDateEnd("2022-05-15")
         .withStatus("IN_REVIEW")
         .build();
       await Promise.all(
@@ -184,12 +175,10 @@ describe("Pg implementation of ConventionQueries", () => {
       expect(queryResults).toHaveLength(1);
       const expectedResult: ImmersionAssessmentEmailParams = {
         immersionId: validatedImmersionEndingThe15th.id,
-        mentorEmail: validatedImmersionEndingThe15th.properties.mentorEmail,
-        mentorName: validatedImmersionEndingThe15th.properties.mentor,
-        beneficiaryFirstName:
-          validatedImmersionEndingThe15th.properties.firstName,
-        beneficiaryLastName:
-          validatedImmersionEndingThe15th.properties.lastName,
+        mentorEmail: validatedImmersionEndingThe15th.mentorEmail,
+        mentorName: validatedImmersionEndingThe15th.mentor,
+        beneficiaryFirstName: validatedImmersionEndingThe15th.firstName,
+        beneficiaryLastName: validatedImmersionEndingThe15th.lastName,
       };
       expect(queryResults[0]).toEqual(expectedResult);
     });

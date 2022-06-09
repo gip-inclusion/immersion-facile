@@ -1,7 +1,6 @@
 import { expectEmailBeneficiaryConfirmationSignatureRequestMatchingConvention } from "../../../_testBuilders/emailAssertions";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
 import {
   AllowListEmailFilter,
   AlwaysAllowEmailFilter,
@@ -9,10 +8,9 @@ import {
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 import { ConventionDto } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
-const validConvention: ConventionDto = new ConventionEntityBuilder()
-  .build()
-  .toDto();
+const validConvention: ConventionDto = new ConventionDtoBuilder().build();
 
 describe("Add Convention Notifications", () => {
   let emailGw: InMemoryEmailGateway;

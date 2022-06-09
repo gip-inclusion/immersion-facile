@@ -1,10 +1,11 @@
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { ConventionEntity } from "../../../domain/convention/entities/ConventionEntity";
 import { ListImmersionApplication } from "../../../domain/convention/useCases/ListImmersionApplication";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
-import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntityBuilder";
-import { allConventionStatuses } from "shared/src/convention/convention.dto";
+import {
+  allConventionStatuses,
+  ConventionDto,
+} from "shared/src/convention/convention.dto";
 import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 
 const agencyIds: AgencyId[] = [
@@ -36,14 +37,14 @@ describe("List Immersion Applications", () => {
 
   describe("When a Convention is stored", () => {
     it("returns the Convention", async () => {
-      const entity = new ConventionEntityBuilder().build();
-      repository.setConventions({ form_id: entity });
+      const convention = new ConventionDtoBuilder().build();
+      repository.setConventions({ form_id: convention });
 
       const conventions = await listConventions.execute({
         status: undefined,
         agencyId: undefined,
       });
-      expect(conventions).toEqual([entity.toDto()]);
+      expect(conventions).toEqual([convention]);
     });
   });
 
@@ -52,18 +53,16 @@ describe("List Immersion Applications", () => {
 
     // Populate the DB with 1 record of with all possible statuses and a set of agency ids.
     beforeEach(() => {
-      const entities: ConventionEntity[] = [];
+      const entities: ConventionDto[] = [];
 
       allConventionStatuses.forEach((status) => {
         agencyIds.forEach((agencyId) => {
           entities.push(
-            ConventionEntity.create(
-              new ConventionDtoBuilder()
-                .withAgencyId(agencyId)
-                .withStatus(status)
-                .withId(`id-${applicationCount}`)
-                .build(),
-            ),
+            new ConventionDtoBuilder()
+              .withAgencyId(agencyId)
+              .withStatus(status)
+              .withId(`id-${applicationCount}`)
+              .build(),
           );
           applicationCount++;
         });

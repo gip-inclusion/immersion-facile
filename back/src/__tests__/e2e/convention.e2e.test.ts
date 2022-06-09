@@ -1,5 +1,4 @@
 import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
-import { ConventionEntity } from "../../domain/convention/entities/ConventionEntity";
 import {
   currentJwtVersions,
   emailHashForMagicLink,
@@ -33,10 +32,9 @@ const initializeSystemUnderTest = async (
 ) => {
   const { app, repositories, generateMagicLinkJwt } = await createApp(config);
   if (withImmersionStored) {
-    const entity = ConventionEntity.create(convention);
     const conventionRepository =
       repositories.convention as InMemoryConventionRepository;
-    conventionRepository.setConventions({ [entity.id]: entity });
+    conventionRepository.setConventions({ [convention.id]: convention });
   }
   request = supertest(app);
   generateJwt = generateMagicLinkJwt;
