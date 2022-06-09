@@ -1,5 +1,6 @@
 import React from "react";
 import { ComplexScheduleDto } from "shared/src/schedule/ScheduleSchema";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 type DayPickerProps = {
   complexSchedule: ComplexScheduleDto;
@@ -19,29 +20,65 @@ export const DayPicker = ({
   return (
     <>
       <div className="day-picker">
-        {weekDays.map((name, index) => {
-          let className = "numberCircle";
-          if (complexSchedule[index].length > 0) {
-            className += " filled";
-          }
-
-          if (index === selectedIndex) {
-            className = "numberCircle selected";
-          }
-
-          return (
-            <button
-              type="button"
-              className={className}
-              onClick={() => onChange(index)}
-              key={"weekdaybtn" + index}
-              disabled={disabled}
-            >
-              <div>{name}</div>
-            </button>
-          );
-        })}
+        {weekDays.map((name, index) => (
+          <DayCircle
+            key={index}
+            name={name}
+            dayStatus={getDayStatus(complexSchedule, index, selectedIndex)}
+            disabled={disabled}
+            onClick={() => onChange(index)}
+          />
+        ))}
       </div>
     </>
+  );
+};
+
+type DayStatus = "empty" | "hasTime" | "isSelected";
+
+const getDayStatus = (
+  schedule: ComplexScheduleDto,
+  index: number,
+  selectedIndex: number,
+): DayStatus => {
+  if (selectedIndex === index) return "isSelected";
+  if (schedule[index].length > 0) return "hasTime";
+  return "empty";
+};
+
+type DayCircleProps = {
+  dayStatus: DayStatus;
+  onClick: () => void;
+  disabled?: boolean;
+  name: string;
+};
+
+const DayCircle = ({ dayStatus, onClick, disabled, name }: DayCircleProps) => {
+  if (dayStatus === "hasTime")
+    return (
+      <div className="relative">
+        <button
+          type="button"
+          className={`numberCircle bg-green-100`}
+          onClick={onClick}
+          disabled={disabled}
+        >
+          <div>{name}</div>
+        </button>
+        <div className="absolute -top-2 right-0">
+          <CheckCircleIcon sx={{ color: "#07b601" }} fontSize="small" />
+        </div>
+      </div>
+    );
+
+  return (
+    <button
+      type="button"
+      className={`numberCircle ${dayStatus === "isSelected" ? "selected" : ""}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <div>{name}</div>
+    </button>
   );
 };
