@@ -182,6 +182,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       individualProtection: "oui",
       questionnaireUrl: agency.questionnaireUrl,
       signature: agency.signature,
+      workConditions: application.workConditions,
     };
 
     expect(

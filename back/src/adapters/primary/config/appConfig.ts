@@ -115,6 +115,22 @@ export class AppConfig {
     return this.throwIfNotDefined("PASS_EMPLOI_KEY");
   }
 
+  public get poleEmploiGateway() {
+    return throwIfNotInArray({
+      processEnv: this.env,
+      variableName: "POLE_EMPLOI_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+    });
+  }
+
+  public get poleEmploiUrl() {
+    return this.throwIfNotDefined("PASS_EMPLOI_URL");
+  }
+
+  public get poleEmploiKey() {
+    return this.throwIfNotDefined("PASS_EMPLOI_KEY");
+  }
+
   public get sireneHttpsConfig(): AxiosConfig {
     return {
       endpoint: this.throwIfNotDefined("SIRENE_ENDPOINT"),

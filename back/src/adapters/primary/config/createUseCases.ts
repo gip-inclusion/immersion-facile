@@ -60,6 +60,7 @@ import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEsta
 import { Repositories } from "./repositoriesConfig";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
+import { NotifyPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/notifications/NotifyPoleEmploiOnConventionUpdates";
 
 export type UseCases = ReturnType<typeof createUseCases>;
 
@@ -307,6 +308,8 @@ export const createUseCases = (
         repositories.email,
         generateMagicLinkFn,
       ),
+    notifyPoleEmploiOnConventionUpdates:
+      new NotifyPoleEmploiOnConventionUpdates(repositories.poleEmploiGateway),
     shareConventionByEmail: new ShareApplicationLinkByEmail(repositories.email),
     addAgency: new AddAgency(
       uowPerformer,

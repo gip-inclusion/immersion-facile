@@ -23,6 +23,7 @@ import {
   WithConventionId,
   ConventionExternalId,
   ConventionDtoWithoutExternalId,
+  conventionObjectiveOptions,
 } from "./convention.dto";
 import { LegacyScheduleDto, ScheduleDto } from "../schedule/ScheduleSchema";
 import { dateRegExp } from "../utils/date";
@@ -46,10 +47,7 @@ const conventionWithoutExternalIdZObject = z.object({
   email: zEmail,
   firstName: zTrimmedString,
   lastName: zTrimmedString,
-  phone: z
-    .string()
-    .regex(phoneRegExp, "Numéro de téléphone incorrect")
-    .optional(),
+  phone: z.string().regex(phoneRegExp, "Numéro de téléphone incorrect"),
   postalCode: z
     .string()
     .regex(stringOfNumbers)
@@ -79,12 +77,12 @@ const conventionWithoutExternalIdZObject = z.object({
   workConditions: z.string().optional(),
   individualProtection: zBoolean,
   sanitaryPrevention: zBoolean,
-  sanitaryPreventionDescription: z.string().optional(),
-  immersionAddress: addressWithPostalCodeSchema.optional(),
-  immersionObjective: zString,
+  sanitaryPreventionDescription: z.string(),
+  immersionAddress: addressWithPostalCodeSchema,
+  immersionObjective: z.enum(conventionObjectiveOptions),
   immersionAppellation: appellationDtoSchema,
   immersionActivities: zTrimmedString,
-  immersionSkills: z.string().optional(),
+  immersionSkills: z.string(),
   beneficiaryAccepted: zBoolean,
   enterpriseAccepted: zBoolean,
   federatedIdentity: peConnectPrefixSchema.optional(),

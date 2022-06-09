@@ -33,6 +33,7 @@ import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/
 import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
 import { Clock } from "../domain/core/ports/Clock";
 import { InMemoryConventionQueries } from "../adapters/secondary/InMemoryConventionQueries";
+import { InMemoryPoleEmploiGateway } from "../adapters/secondary/InMemoryPoleEmploiGateway";
 
 export type InMemoryRepositories = {
   conventionPoleEmploiAdvisor: InMemoryConventionPoleEmploiAdvisorRepository;
@@ -51,6 +52,7 @@ export type InMemoryRepositories = {
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;
   passEmploiGateway: InMemoryPassEmploiGateway;
+  poleEmploiGateway: InMemoryPoleEmploiGateway;
   establishmentExport: EstablishmentExportQueries;
   postalCodeDepartmentRegion: PostalCodeDepartmentRegionQueries;
   getApiConsumerById: GetApiConsumerById;

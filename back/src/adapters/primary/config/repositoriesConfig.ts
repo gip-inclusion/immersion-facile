@@ -49,6 +49,8 @@ import { SendinblueEmailGateway } from "../../secondary/SendinblueEmailGateway";
 import { StubEstablishmentExportQueries } from "../../secondary/StubEstablishmentExportQueries";
 import { StubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";
+import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/HttpPoleEmploiGateway";
+import { InMemoryPoleEmploiGateway } from "../../secondary/InMemoryPoleEmploiGateway";
 
 const logger = createLogger(__filename);
 
@@ -194,6 +196,11 @@ export const createRepositories = async (
       config.peConnectGateway === "HTTPS"
         ? new HttpPeConnectGateway(config.poleEmploiAccessTokenConfig)
         : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl),
+
+    poleEmploiGateway:
+      config.poleEmploiGateway === "HTTPS"
+        ? new HttpPoleEmploiGateway(config.poleEmploiUrl, config.poleEmploiKey)
+        : new InMemoryPoleEmploiGateway(),
 
     postalCodeDepartmentRegion:
       config.repositories === "PG"

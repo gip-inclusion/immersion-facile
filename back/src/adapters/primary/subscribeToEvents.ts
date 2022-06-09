@@ -26,6 +26,7 @@ const getUseCasesByTopics = (
     useCases.notifyToTeamConventionSubmittedByBeneficiary,
     useCases.notifyToAgencyConventionSubmitted,
     useCases.associatePeConnectFederatedIdentity,
+    useCases.notifyPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationPartiallySigned: [
     useCases.notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty,
@@ -33,24 +34,30 @@ const getUseCasesByTopics = (
   ImmersionApplicationFullySigned: [
     useCases.notifyNewConventionNeedsReview,
     useCases.notifyPoleEmploiUserAdvisorOnConventionFullySigned,
+    useCases.notifyPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationAcceptedByCounsellor: [
     useCases.notifyNewConventionNeedsReview,
+    useCases.notifyPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationAcceptedByValidator: [
     useCases.notifyAllActorsOfFinalConventionValidation,
+    useCases.notifyPoleEmploiOnConventionUpdates,
   ],
 
   FinalImmersionApplicationValidationByAdmin: [
     useCases.notifyAllActorsOfFinalConventionValidation,
+    useCases.notifyPoleEmploiOnConventionUpdates,
   ],
 
   // Edge cases for immersion application.
   ImmersionApplicationRequiresModification: [
     useCases.notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications,
+    useCases.notifyPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationRejected: [
     useCases.notifyBeneficiaryAndEnterpriseThatConventionIsRejected,
+    useCases.notifyPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationCancelled: [],
 

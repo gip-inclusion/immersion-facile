@@ -77,6 +77,7 @@ describe("Pg implementation of ConventionQueries", () => {
         sanitaryPreventionDescription,
         immersionAppellation,
         externalId,
+        immersionAddress,
         ...filteredProperties
       } = convention;
       // Assert

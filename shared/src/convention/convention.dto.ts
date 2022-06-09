@@ -28,6 +28,14 @@ export const validatedConventionStatuses: ConventionStatus[] = [
 export type ConventionId = Flavor<string, "ConventionId">;
 export type ConventionExternalId = Flavor<string, "ConventionExternalId">;
 
+export const conventionObjectiveOptions = [
+  "Confirmer un projet professionnel",
+  "Découvrir un métier ou un secteur d'activité",
+  "Initier une démarche de recrutement",
+] as const;
+
+export type ImmersionObjective = typeof conventionObjectiveOptions[number];
+
 export type ConventionDtoWithoutExternalId = {
   id: ConventionId;
   status: ConventionStatus;
@@ -35,7 +43,7 @@ export type ConventionDtoWithoutExternalId = {
   email: string;
   firstName: string;
   lastName: string;
-  phone?: string;
+  phone: string;
   postalCode?: string;
   emergencyContact?: string;
   emergencyContactPhone?: string;
@@ -53,12 +61,12 @@ export type ConventionDtoWithoutExternalId = {
   workConditions?: string;
   individualProtection: boolean;
   sanitaryPrevention: boolean;
-  sanitaryPreventionDescription?: string;
-  immersionAddress?: string;
-  immersionObjective?: string;
+  sanitaryPreventionDescription: string;
+  immersionAddress: string;
+  immersionObjective: ImmersionObjective;
   immersionAppellation: AppellationDto;
   immersionActivities: string;
-  immersionSkills?: string;
+  immersionSkills: string;
   beneficiaryAccepted: boolean;
   enterpriseAccepted: boolean;
   federatedIdentity?: FederatedIdentity;

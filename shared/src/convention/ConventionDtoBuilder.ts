@@ -10,6 +10,7 @@ import {
   ConventionDto,
   ConventionId,
   ConventionExternalId,
+  ImmersionObjective,
 } from "./convention.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
@@ -40,6 +41,7 @@ const validConvention: ConventionDto = {
   phone: VALID_PHONES[0],
   firstName: "Esteban",
   lastName: "Ocon",
+  immersionAddress: "169 boulevard de la villette, 75010 Paris",
   emergencyContact: "Clariss Ocon",
   emergencyContactPhone: "0663567896",
   dateSubmission: DATE_SUBMISSION,
@@ -218,7 +220,12 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       federatedIdentity,
     });
   }
-
+  withoutFederatedIdentity(): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      federatedIdentity: undefined,
+    });
+  }
   public notSigned() {
     return new ConventionDtoBuilder({
       ...this.dto,
@@ -238,6 +245,15 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({
       ...this.dto,
       enterpriseAccepted: true,
+    });
+  }
+
+  public withImmersionObjective(
+    immersionObjective: ImmersionObjective,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      immersionObjective,
     });
   }
 

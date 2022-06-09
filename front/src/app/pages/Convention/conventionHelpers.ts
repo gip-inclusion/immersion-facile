@@ -9,6 +9,7 @@ import { ENV } from "src/environmentVariables";
 import {
   ConventionStatus,
   ConventionDto,
+  ImmersionObjective,
 } from "shared/src/convention/convention.dto";
 import { reasonableSchedule } from "shared/src/schedule/ScheduleSchema";
 import { toDateString } from "shared/src/utils/date";
@@ -79,7 +80,9 @@ export const conventionInitialValuesFromUrl = ({
     sanitaryPreventionDescription: params.sanitaryPreventionDescription ?? "",
 
     // Immersion
-    immersionObjective: params.immersionObjective ?? "",
+    immersionObjective: params.immersionObjective as
+      | ImmersionObjective
+      | undefined,
     immersionAppellation: params.immersionAppellation,
     immersionActivities: params.immersionActivities ?? "",
     immersionSkills: params.immersionSkills ?? "",
@@ -127,7 +130,7 @@ const devPrefilledValues = (
     emptyForm.sanitaryPreventionDescription || "Aucunes",
 
   // Immersion
-  immersionObjective: emptyForm.immersionObjective || "",
+  immersionObjective: emptyForm.immersionObjective,
   immersionAppellation: emptyForm.immersionAppellation || {
     romeLabel: "Boulanger / Boulangère",
     appellationLabel: "Boulangerie",

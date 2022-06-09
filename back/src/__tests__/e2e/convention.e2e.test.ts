@@ -3,9 +3,8 @@ import {
   currentJwtVersions,
   emailHashForMagicLink,
 } from "shared/src/tokens/MagicLinkPayload";
-import supertest, { SuperTest, Test } from "supertest";
+import { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { createApp } from "../../adapters/primary/server";
 import {
   conventionsRoute,
   updateConventionStatusRoute,
@@ -18,11 +17,22 @@ import {
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
+import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
+import {
+  buildTestApp,
+  InMemoryRepositories,
+  TestAppAndDeps,
+} from "../../_testBuilders/buildTestApp";
 
 let request: SuperTest<Test>;
 let generateJwt: GenerateMagicLinkJwt;
+let eventCrawler: BasicEventCrawler;
+let reposAndGateways: InMemoryRepositories;
 
-const convention = new ConventionDtoBuilder().withStatus("IN_REVIEW").build();
+const convention = new ConventionDtoBuilder()
+  .withStatus("IN_REVIEW")
+  .withFederatedIdentity("peConnect:some-id")
+  .build();
 
 const conventionId = convention.id;
 
@@ -30,13 +40,21 @@ const initializeSystemUnderTest = async (
   config: AppConfig,
   { withImmersionStored }: { withImmersionStored: boolean },
 ) => {
-  const { app, repositories, generateMagicLinkJwt } = await createApp(config);
+  const {
+    eventCrawler: testEventCrawler,
+    reposAndGateways: testReposAndGateways,
+    request: testRequest,
+    generateMagicLinkJwt,
+  }: TestAppAndDeps = await buildTestApp(config);
+  eventCrawler = testEventCrawler;
+  request = testRequest;
+  reposAndGateways = testReposAndGateways;
+
   if (withImmersionStored) {
     const conventionRepository =
-      repositories.convention as InMemoryConventionRepository;
+      reposAndGateways.convention as InMemoryConventionRepository;
     conventionRepository.setConventions({ [convention.id]: convention });
   }
-  request = supertest(app);
   generateJwt = generateMagicLinkJwt;
 };
 
@@ -331,7 +349,7 @@ describe("/update-application-status route", () => {
     });
   });
 
-  it("Succeeds for rejected application", async () => {
+  it("Succeeds for rejected application and notifies Pole Emploi", async () => {
     // A counsellor rejects the application.
     const counsellorJwt = generateJwt(
       createConventionMagicLinkPayload(
@@ -345,6 +363,12 @@ describe("/update-application-status route", () => {
       .set("Authorization", counsellorJwt)
       .send({ status: "REJECTED", justification: "test-justification" })
       .expect(200);
+
+    await eventCrawler.processNewEvents();
+
+    const notifications = reposAndGateways.poleEmploiGateway.notifications;
+    expect(notifications).toHaveLength(1);
+    expect(notifications[0].statut).toBe("REJECTED");
   });
 
   it("Returns error 401 if no JWT", async () => {
