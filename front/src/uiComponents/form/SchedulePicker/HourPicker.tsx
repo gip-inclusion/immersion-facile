@@ -53,7 +53,7 @@ export const HourPicker = ({
 
           return (
             <div key={name + index}>
-              <div className="time-wrapper">
+              <div className="flex p-1 items-end">
                 <div className="date-or-time-block">
                   <div>Début</div>
                   <input

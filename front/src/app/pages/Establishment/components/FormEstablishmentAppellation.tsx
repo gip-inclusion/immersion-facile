@@ -16,18 +16,17 @@ export const FormEstablishmentAppellation = ({
   const [{ value }, _, { setValue }] = useField<AppellationDto>(name);
 
   return (
-    <div
-      className={"relative"}
-      style={{
-        margin: "15px 20px",
-      }}
-    >
-      <AppellationAutocomplete
-        title="Rechercher un métier *"
-        initialValue={value}
-        setFormValue={setValue}
-      />
-      <ButtonDelete onClick={onDelete} classname={"absolute top-1 right-1"} />
+    <div className="flex items-end my-5">
+      <div className="flex-1">
+        <AppellationAutocomplete
+          title="Rechercher un métier *"
+          initialValue={value}
+          setFormValue={setValue}
+        />
+      </div>
+      <div>
+        <ButtonDelete onClick={onDelete} />
+      </div>
     </div>
   );
 };

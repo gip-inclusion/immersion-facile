@@ -46,11 +46,6 @@
   margin: auto 10px;
 }
 
-.time-wrapper {
-  display: flex;
-  padding: 5px;
-}
-
 .date-or-time-block {
   min-width: 135px;
   margin: auto 10px;

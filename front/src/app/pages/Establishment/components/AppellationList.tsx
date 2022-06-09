@@ -22,9 +22,7 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
   };
 
   return (
-    <div
-      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-    >
+    <div className="flex flex-col items-center">
       <div className="w-full">
         {title && <h5 className="text-lg font-semibold mt-6">{title}</h5>}
         {professions.map(({ appellationCode }, index) => (

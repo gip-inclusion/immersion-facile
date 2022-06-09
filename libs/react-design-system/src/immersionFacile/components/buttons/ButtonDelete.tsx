@@ -1,31 +1,23 @@
 import React from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
 
 export type ButtonDeleteProps = {
-  isHidden?: boolean;
   disabled?: boolean;
-  classname?: string;
-  style?: { [key: string]: string };
+  isHidden?: boolean;
+  className?: string;
   onClick: () => void;
 };
 
 export const ButtonDelete = ({
-  isHidden = false,
   disabled = false,
-  classname = "",
-  style = {},
+  className = "",
   onClick,
+  isHidden,
 }: ButtonDeleteProps) => (
-  <button
-    type="button"
-    style={{
-      color: "#E10600",
-      backgroundColor: "transparent",
-      ...style,
-    }}
-    className={`fr-fi-close-circle-line ${
-      isHidden ? "hidden" : ""
-    } ${classname}`}
-    disabled={disabled}
-    onClick={onClick}
-  />
+  <span className={`${isHidden ? "invisible" : ""} ${className}`}>
+    <IconButton aria-label="delete" disabled={disabled} onClick={onClick}>
+      <DeleteIcon sx={{ color: "#3458a2" }} />
+    </IconButton>
+  </span>
 );
