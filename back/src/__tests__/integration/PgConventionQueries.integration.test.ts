@@ -128,27 +128,37 @@ describe("Pg implementation of ConventionQueries", () => {
       await client.query("DELETE FROM outbox_publications");
       await client.query("DELETE FROM outbox");
     });
-    it("Gets all email params of immersion ending at given date that did not received any assessment link yet", async () => {
+    it("Gets all email params of validated immersions ending at given date that did not received any assessment link yet", async () => {
       // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
       const conventionRepo = new PgConventionRepository(client);
       const outboxRepo = new PgOutboxRepository(client);
-      const immersionEndingThe14th = new ConventionEntityBuilder()
+      const validatedImmersionEndingThe14th = new ConventionEntityBuilder()
         .withId("aaaaac14-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+        .validated()
         .withDateStartAndDateEnd("2022-05-01", "2022-05-14")
         .build();
-      const immersion1EndingThe15th = new ConventionEntityBuilder()
-        .withId("aaaaac15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+      const validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail =
+        new ConventionEntityBuilder()
+          .withId("aaaaac15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+          .validated()
+          .withDateStartAndDateEnd("2022-05-01", "2022-05-15")
+          .build();
+      const validatedImmersionEndingThe15th = new ConventionEntityBuilder()
+        .withId("bbbbbc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+        .validated()
         .withDateStartAndDateEnd("2022-05-01", "2022-05-15")
         .build();
-      const immersion2EndingThe15th = new ConventionEntityBuilder()
-        .withId("bbbbbc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+      const ongoingImmersionEndingThe15th = new ConventionEntityBuilder()
+        .withId("cccccc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
         .withDateStartAndDateEnd("2022-05-01", "2022-05-15")
+        .withStatus("IN_REVIEW")
         .build();
       await Promise.all(
         [
-          immersionEndingThe14th,
-          immersion1EndingThe15th,
-          immersion2EndingThe15th,
+          validatedImmersionEndingThe14th,
+          validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail,
+          validatedImmersionEndingThe15th,
+          ongoingImmersionEndingThe15th,
         ].map((params) => conventionRepo.save(params)),
       );
 
@@ -158,7 +168,9 @@ describe("Pg implementation of ConventionQueries", () => {
       });
       const eventEmailSentToImmersion1 = createNewEvent({
         topic: "EmailWithLinkToCreateAssessmentSent",
-        payload: { id: immersion1EndingThe15th.id },
+        payload: {
+          id: validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.id,
+        },
       });
       await outboxRepo.save(eventEmailSentToImmersion1);
 
@@ -171,11 +183,13 @@ describe("Pg implementation of ConventionQueries", () => {
       // Assert
       expect(queryResults).toHaveLength(1);
       const expectedResult: ImmersionAssessmentEmailParams = {
-        immersionId: immersion2EndingThe15th.id,
-        mentorEmail: immersion2EndingThe15th.properties.mentorEmail,
-        mentorName: immersion2EndingThe15th.properties.mentor,
-        beneficiaryFirstName: immersion2EndingThe15th.properties.firstName,
-        beneficiaryLastName: immersion2EndingThe15th.properties.lastName,
+        immersionId: validatedImmersionEndingThe15th.id,
+        mentorEmail: validatedImmersionEndingThe15th.properties.mentorEmail,
+        mentorName: validatedImmersionEndingThe15th.properties.mentor,
+        beneficiaryFirstName:
+          validatedImmersionEndingThe15th.properties.firstName,
+        beneficiaryLastName:
+          validatedImmersionEndingThe15th.properties.lastName,
       };
       expect(queryResults[0]).toEqual(expectedResult);
     });

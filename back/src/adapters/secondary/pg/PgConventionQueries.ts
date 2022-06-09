@@ -5,6 +5,8 @@ import { ConventionRawBeforeExportVO } from "../../../domain/convention/valueObj
 import { ImmersionAssessmentEmailParams } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { pgConventionRowToEntity } from "./PgConventionRepository";
 import { optional } from "./pgUtils";
+import format from "pg-format";
+import { validatedConventionStatuses } from "shared/src/convention/convention.dto";
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private client: PoolClient) {}
@@ -63,7 +65,8 @@ export class PgConventionQueries implements ConventionQueries {
     dateEnd: Date,
   ): Promise<ImmersionAssessmentEmailParams[]> {
     const pgResult = await this.client.query(
-      `SELECT JSON_BUILD_OBJECT(
+      format(
+        `SELECT JSON_BUILD_OBJECT(
               'immersionId', id, 
               'beneficiaryFirstName', first_name, 
               'beneficiaryLastName', last_name,
@@ -71,7 +74,10 @@ export class PgConventionQueries implements ConventionQueries {
               'mentorEmail', mentor_email) AS params
        FROM immersion_applications 
        WHERE date_end::date = $1
+       AND status IN (%1$L)
        AND id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )`,
+        validatedConventionStatuses,
+      ),
       [dateEnd],
     );
     return pgResult.rows.map((row) => row.params);

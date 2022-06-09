@@ -20,6 +20,11 @@ export const allConventionStatuses = [
   "CANCELLED",
 ] as const;
 
+export const validatedConventionStatuses: ConventionStatus[] = [
+  "ACCEPTED_BY_VALIDATOR",
+  "VALIDATED",
+];
+
 export type ConventionId = Flavor<string, "ConventionId">;
 
 export type ConventionDto = {

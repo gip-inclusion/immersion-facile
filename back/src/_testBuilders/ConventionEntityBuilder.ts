@@ -48,7 +48,15 @@ export class ConventionEntityBuilder implements Builder<ConventionEntity> {
       ),
     );
   }
-
+  public validated() {
+    return new ConventionEntityBuilder(
+      ConventionEntity.create(
+        new ConventionDtoBuilder(this.entity.toDto())
+          .withStatus("ACCEPTED_BY_VALIDATOR")
+          .build(),
+      ),
+    );
+  }
   public withSchedule(schedule: ScheduleDto) {
     return new ConventionEntityBuilder(
       ConventionEntity.create(

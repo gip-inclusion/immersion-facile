@@ -14,8 +14,12 @@ import { ConventionEntityBuilder } from "../../../_testBuilders/ConventionEntity
 
 const prepareUseCase = () => {
   const conventionRepo = new InMemoryConventionRepository();
-  const conventionQueries = new InMemoryConventionQueries(conventionRepo);
   const outboxRepo = new InMemoryOutboxRepository();
+
+  const conventionQueries = new InMemoryConventionQueries(
+    conventionRepo,
+    outboxRepo,
+  );
   const outboxQueries = new InMemoryOutboxQueries(outboxRepo);
 
   const clock = new CustomClock();
@@ -65,6 +69,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
         "2021-05-16T10:00:00.000Z",
       )
       .withId("immersion-ending-tommorow-id")
+      .validated()
       .build();
 
     const immersionApplicationEndingYesterday = new ConventionEntityBuilder()
@@ -72,6 +77,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
         "2021-05-11T10:00:00.000Z",
         "2021-05-14T10:00:00.000Z",
       )
+      .validated()
       .build();
 
     await applicationRepo.save(immersionApplicationEndingTomorrow);
@@ -113,12 +119,13 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
         "2021-05-13T10:00:00.000Z",
         "2021-05-16T10:00:00.000Z",
       )
+      .validated()
       .withId("immersion-ending-tommorow-id")
       .build();
     await applicationRepo.save(immersionApplicationEndingTomorrow);
     await outboxRepo.save({
       topic: "EmailWithLinkToCreateAssessmentSent",
-      payload: { id: "immersion-ending-tommorow-id" },
+      payload: { id: immersionApplicationEndingTomorrow.id },
     } as DomainEvent);
 
     // Act
@@ -126,6 +133,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
 
     // Assert
     const sentEmails = emailGateway.getSentEmails();
-    expect(sentEmails).toHaveLength(1);
+    expect(sentEmails).toHaveLength(0);
+    expect(outboxRepo.events).toHaveLength(1);
   });
 });

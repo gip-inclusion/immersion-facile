@@ -1,5 +1,8 @@
 import { propEq } from "ramda";
-import { WithConventionId } from "shared/src/convention/convention.dto";
+import {
+  validatedConventionStatuses,
+  WithConventionId,
+} from "shared/src/convention/convention.dto";
 import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../utils/logger";
 import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
@@ -61,9 +64,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
   ): Promise<ImmersionAssessmentEmailParams[]> {
     const immersionIdsThatAlreadyGotAnEmail = this.outboxRepository
       ? Object.values(this.outboxRepository._events)
-          .filter(
-            propEq("topic", "EmailWithImmersionAssessmentCreationLinkSent"),
-          )
+          .filter(propEq("topic", "EmailWithLinkToCreateAssessmentSent"))
           .map((event) => (event.payload as WithConventionId).id)
       : [];
     return Object.values(this.conventionRepository._conventions)
@@ -71,6 +72,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
         (convention) =>
           new Date(convention.properties.dateEnd).getDate() ===
             dateEnd.getDate() &&
+          validatedConventionStatuses.includes(convention.status) &&
           !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
       )
       .map((convention) => ({
