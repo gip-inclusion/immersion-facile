@@ -1,8 +1,10 @@
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import React, { useState } from "react";
+import React from "react";
 import { HomeButton, Link } from "react-design-system/immersionFacile";
+import { useDispatch } from "react-redux";
 import { Section } from "src/app/components/Section";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
+import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import { isSiretAlreadySavedSelector } from "src/core-logic/domain/siret/siret.selectors";
 import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
 import { useSiretFetcher } from "src/hooks/siret.hooks";
@@ -16,13 +18,14 @@ export const EstablishmentHomeMenu = () => {
     shouldFetchEvenIfAlreadySaved: false,
   });
   const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
+  const dispatch = useDispatch();
   const isSiretAlreadySaved = useAppSelector(isSiretAlreadySavedSelector);
   const modifyLinkWasSent = useAppSelector(
     establishmentSelectors.wasModifyLinkSent,
   );
-
-  const [startEstablishmentPath, startEstablishmentPathUpdate] =
-    useState<boolean>(false);
+  const isReadyForRequestOrRedirection = useAppSelector(
+    establishmentSelectors.isReadyForLinkRequestOrRedirection,
+  );
 
   const styleType = "establishment";
 
@@ -38,14 +41,20 @@ export const EstablishmentHomeMenu = () => {
         )}
       </div>
       <div className="flex flex-col w-full h-full items-center justify-center">
-        {!startEstablishmentPath ? (
+        {!isReadyForRequestOrRedirection ? (
           <>
-            <HomeButton onClick={() => startEstablishmentPathUpdate(true)}>
+            <HomeButton
+              onClick={() => {
+                dispatch(establishmentSlice.actions.gotReady());
+              }}
+            >
               Référencer votre entreprise
             </HomeButton>
             <HomeButton
               type="secondary"
-              onClick={() => startEstablishmentPathUpdate(true)}
+              onClick={() => {
+                dispatch(establishmentSlice.actions.gotReady());
+              }}
             >
               Modifier votre entreprise
             </HomeButton>
