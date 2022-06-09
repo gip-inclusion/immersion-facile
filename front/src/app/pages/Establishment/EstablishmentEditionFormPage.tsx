@@ -1,6 +1,5 @@
 import { useField } from "formik";
-import React, { useEffect, useState } from "react";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import React from "react";
 import { establishmentGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
@@ -8,7 +7,6 @@ import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
-import { defaultInitialValue } from "./components/defaultInitialValue";
 import {
   EstablishmentFormikForm,
   getLabelAndName,
@@ -26,9 +24,29 @@ export const EstablishmentEditionFormPage = ({
     }
     jwt={route.params.jwt}
   >
-    {(formEstablishment) => (
-      <Form formEstablishment={formEstablishment} route={route} />
-    )}
+    {(formEstablishment) => {
+      if (!formEstablishment)
+        return <p>Données de formulaire d'établissement indisponibles</p>;
+      if (!route.params.jwt) {
+        return <p>Lien non valide</p>;
+      }
+      return (
+        <EstablishmentFormikForm
+          initialValues={formEstablishment}
+          saveForm={(data) =>
+            establishmentGateway.updateFormEstablishment(
+              { ...data },
+              route.params.jwt,
+            )
+          }
+          isEditing
+        >
+          <EditionSiretRelatedInputs
+            businessAddress={formEstablishment.businessAddress}
+          />
+        </EstablishmentFormikForm>
+      );
+    }}
   </ApiDataContainer>
 );
 
@@ -58,43 +76,5 @@ const EditionSiretRelatedInputs = ({
         setFormValue={(address) => setAddressValue(address.label)}
       />
     </>
-  );
-};
-
-type FormProps = {
-  formEstablishment: FormEstablishmentDto | null;
-  route: Route<typeof routes.editFormEstablishment>;
-};
-
-const Form = ({ formEstablishment, route }: FormProps) => {
-  const [formEstablishmentState, setInitialValues] =
-    useState<FormEstablishmentDto>({
-      source: "immersion-facile",
-      ...defaultInitialValue(),
-    });
-
-  useEffect(() => {
-    if (formEstablishment) setInitialValues(formEstablishment);
-  }, [route.params.jwt]);
-
-  if (!route.params.jwt) {
-    return <p>Lien non valide</p>;
-  }
-
-  return (
-    <EstablishmentFormikForm
-      initialValues={formEstablishmentState}
-      saveForm={(data) =>
-        establishmentGateway.updateFormEstablishment(
-          { ...data },
-          route.params.jwt,
-        )
-      }
-      isEditing
-    >
-      <EditionSiretRelatedInputs
-        businessAddress={formEstablishmentState.businessAddress}
-      />
-    </EstablishmentFormikForm>
   );
 };
