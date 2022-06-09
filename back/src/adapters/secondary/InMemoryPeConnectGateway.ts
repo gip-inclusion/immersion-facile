@@ -1,18 +1,16 @@
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { frontRoutes } from "shared/src/routes";
+import { peConnect } from "shared/src/routes";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
 import {
   AccessTokenDto,
   toAccessToken,
 } from "../../domain/peConnect/dto/AccessToken.dto";
 import {
-  ConventionPeConnectFields,
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
   PeConnectAdvisorDto,
   PeConnectUserDto,
   PeUserAndAdvisors,
-  toPartialConventionDtoWithPeIdentity,
   toPeConnectAdvisorDto,
   toPeConnectUserDto,
 } from "../../domain/peConnect/dto/PeConnect.dto";
@@ -25,9 +23,7 @@ import {
 import { PeConnectGateway } from "../../domain/peConnect/port/PeConnectGateway";
 
 export class InMemoryPeConnectGateway implements PeConnectGateway {
-  private _user: ExternalPeConnectUser = {
-    default: "this should have been erased",
-  } as unknown as ExternalPeConnectUser;
+  private _user: ExternalPeConnectUser = mockedUser;
 
   private _advisors: ExternalPeConnectAdvisor[] = [];
 
@@ -46,36 +42,18 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
 
   // This mocks the full external flow and not only the first redirect on https://authentification-candidat.pole-emploi.fr/connexion/oauth2/authorize
   oAuthGetAuthorizationCodeRedirectUrl(): AbsoluteUrl {
-    /*
-     * mocking full external oath2 flow with authorization_code grant type
-     * First we would log into the external entity account and receive an authorization code.
-     * We would then exchange this code against an access token
-     * This token let us call the api user authenticated routes to get its data
-     */
-    const mockedUserInfo: ExternalPeConnectUser =
-      externalPeConnectUserSchema.parse({
-        sub: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
-        gender: "male",
-        family_name: "John",
-        given_name: "Doe",
-        email: "john.doe@gmail.com",
-        idIdentiteExterne: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
-      });
+    const queryParams = queryParamsAsString<{ code: string }>({
+      code: "trust-me-i-am-a-valid-code",
+    });
 
-    //We would then be redirected on our /demande-immersion url with the associated urlencoded payload
-
-    const queryParams = queryParamsAsString<ConventionPeConnectFields>(
-      toPartialConventionDtoWithPeIdentity(toPeConnectUserDto(mockedUserInfo)),
-    );
-
-    return `${this.baseUrl}/${frontRoutes.conventionRoute}?${queryParams}`;
+    return `${this.baseUrl}/${peConnect}?${queryParams}`;
   }
 
   async getAdvisorsInfo(
     _accesstoken: AccessTokenDto,
   ): Promise<PeConnectAdvisorDto[]> {
     const externalMockedAdvisors = externalPeConnectAdvisorsSchema.parse(
-      this._advisors,
+      this._advisors.length != 0 ? this._advisors : [mockedValidAdvisor],
     );
 
     return externalMockedAdvisors.map(toPeConnectAdvisorDto);
@@ -106,3 +84,20 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
     this._advisors.push(...advisors);
   }
 }
+
+const mockedUser: ExternalPeConnectUser = {
+  sub: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
+  gender: "male",
+  family_name: "Doe",
+  given_name: "John",
+  email: "john.doe@gmail.com",
+  idIdentiteExterne: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
+};
+
+const mockedValidAdvisor: ExternalPeConnectAdvisor = {
+  civilite: "2",
+  mail: "elsa.oldenburg@pole-emploi.net",
+  prenom: "Elsa",
+  nom: "Oldenburg",
+  type: "CAPEMPLOI",
+};

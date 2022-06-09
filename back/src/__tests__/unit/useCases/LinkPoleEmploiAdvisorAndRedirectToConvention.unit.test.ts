@@ -91,7 +91,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       );
     });
 
-    it("the user info and federated indentity are present in the redirect url query parameters", async () => {
+    it("the user info and federated identity are present in the redirect url query parameters", async () => {
       peConnectGateway.setUser(peUser);
       peConnectGateway.setAdvisors([pePlacementAdvisor]);
 
