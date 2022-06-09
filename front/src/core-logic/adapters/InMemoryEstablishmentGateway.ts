@@ -50,6 +50,15 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
   public async getFormEstablishmentFromJwt(
     jwt: string,
   ): Promise<FormEstablishmentDto> {
+    if (jwt === "renew")
+      throw {
+        response: {
+          status: 403,
+          data: {
+            needsNewMagicLink: true,
+          },
+        },
+      };
     return {
       siret: "12345678901234",
       source: "immersion-facile",
