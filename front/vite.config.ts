@@ -17,6 +17,7 @@ export default defineConfig({
         main: resolve(__dirname, "index.html"),
       },
     },
+    sourcemap: true,
   },
   optimizeDeps: {
     include: ["react/jsx-runtime"],
