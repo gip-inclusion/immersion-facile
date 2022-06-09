@@ -54,7 +54,7 @@ const PageContent = ({ route }: ConventionPageProps) => {
 
   if (areFeatureFlagsLoading) return <CircularProgress />;
 
-  if (route.params?.jwt !== "")
+  if (route.params.jwt)
     return (
       <ConventionForm
         properties={conventionInitialValuesFromUrl(route)}
