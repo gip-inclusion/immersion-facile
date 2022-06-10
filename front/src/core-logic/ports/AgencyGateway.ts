@@ -9,10 +9,10 @@ import {
 import { LatLonDto } from "shared/src/latLon";
 
 export interface AgencyGateway {
-  addAgency: (params: CreateAgencyDto) => Promise<void>;
+  addAgency(agency: CreateAgencyDto): Promise<void>;
 
-  listAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
-
+  listAllAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
+  listPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
   getAgencyPublicInfoById(
     agencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto>;

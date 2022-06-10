@@ -8,6 +8,13 @@ import type { ConventionDto } from "shared/src/convention/convention.dto";
 import { LatLonDto } from "shared/src/latLon";
 
 import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
+import { useFeatureFlags } from "../utils/useFeatureFlags";
+import { FeatureFlagState } from "src/core-logic/domain/featureFlags/featureFlags.slice";
+import {
+  FederatedIdentity,
+  isPeConnectIdentity,
+} from "src/../../shared/src/federatedIdentities/federatedIdentity.dto";
+import { useConnectedWith } from "src/hooks/connectedWith";
 
 const placeholderAgency: AgencyInListDto = {
   id: "",
@@ -36,13 +43,27 @@ export const AgencySelector = ({
   const [loadingError, setLoadingError] = useState(false);
   const [position, setPosition] = useState<LatLonDto | null>(null);
   const [agencies, setAgencies] = useState([placeholderAgency]);
+  const featureFlags = useFeatureFlags();
+  const connectedWith = useConnectedWith();
 
   useEffect(() => {
     if (!position) return;
 
     setIsLoading(true);
-    agencyGateway
-      .listAgencies(position)
+
+    const isPeOnly = (
+      useFeatureFlags: FeatureFlagState,
+      connectedWith: FederatedIdentity | null,
+    ): boolean =>
+      useFeatureFlags.enablePeConnectApi &&
+      connectedWith &&
+      isPeConnectIdentity(connectedWith)
+        ? true
+        : false;
+    const agenciesRetreiver = isPeOnly(featureFlags, connectedWith)
+      ? agencyGateway.listPeAgencies
+      : agencyGateway.listAllAgencies;
+    agenciesRetreiver(position)
       .then((agencies) => {
         setAgencies([
           {

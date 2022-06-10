@@ -10,3 +10,7 @@ export type NoIdentityProvider = `noIdentityProvider`;
 export const toPeExternalId = (
   federatedIdentity: PeConnectIdentity,
 ): PeExternalId => federatedIdentity.substring("peConnect:".length);
+
+export const isPeConnectIdentity = (
+  federatedIdentity: FederatedIdentity,
+): boolean => federatedIdentity !== "noIdentityProvider";

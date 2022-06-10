@@ -46,9 +46,21 @@ export class HttpAgencyGateway implements AgencyGateway {
     ).data;
   }
 
-  public async listAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
+  public async listAllAgencies(
+    position: LatLonDto,
+  ): Promise<AgencyInListDto[]> {
     const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
-      params: position,
+      params: { position },
+    });
+    return listAgenciesResponseSchema.parse(httpResponse.data);
+  }
+
+  public async listPeAgencies(position: {
+    lat: number;
+    lon: number;
+  }): Promise<AgencyInListDto[]> {
+    const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
+      params: { position, peOnly: true },
     });
     return listAgenciesResponseSchema.parse(httpResponse.data);
   }
