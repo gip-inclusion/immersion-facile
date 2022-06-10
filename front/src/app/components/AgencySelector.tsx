@@ -15,7 +15,23 @@ import {
   isPeConnectIdentity,
 } from "src/../../shared/src/federatedIdentities/federatedIdentity.dto";
 import { useConnectedWith } from "src/hooks/connectedWith";
-
+const isPeOnly = (
+  useFeatureFlags: FeatureFlagState,
+  connectedWith: FederatedIdentity | null,
+): boolean =>
+  useFeatureFlags.enablePeConnectApi &&
+  connectedWith &&
+  isPeConnectIdentity(connectedWith)
+    ? true
+    : false;
+const agenciesRetreiver = (
+  position: LatLonDto,
+  featureFlags: FeatureFlagState,
+  connectedWith: FederatedIdentity | null,
+) =>
+  isPeOnly(featureFlags, connectedWith)
+    ? agencyGateway.listPeAgencies(position)
+    : agencyGateway.listAllAgencies(position);
 const placeholderAgency: AgencyInListDto = {
   id: "",
   name: "Veuillez indiquer un code postal",
@@ -45,25 +61,17 @@ export const AgencySelector = ({
   const [agencies, setAgencies] = useState([placeholderAgency]);
   const featureFlags = useFeatureFlags();
   const connectedWith = useConnectedWith();
-
+  /*
+  const fakeFederatedEntity: PeConnectIdentity = "peConnect:3216545674657";
+  const fakeAction =
+    authSlice.actions.federatedIdentityProvided(fakeFederatedEntity);
+    */
   useEffect(() => {
     if (!position) return;
 
     setIsLoading(true);
-
-    const isPeOnly = (
-      useFeatureFlags: FeatureFlagState,
-      connectedWith: FederatedIdentity | null,
-    ): boolean =>
-      useFeatureFlags.enablePeConnectApi &&
-      connectedWith &&
-      isPeConnectIdentity(connectedWith)
-        ? true
-        : false;
-    const agenciesRetreiver = isPeOnly(featureFlags, connectedWith)
-      ? agencyGateway.listPeAgencies
-      : agencyGateway.listAllAgencies;
-    agenciesRetreiver(position)
+    console.log("connectedWith", connectedWith);
+    agenciesRetreiver(position, featureFlags, connectedWith)
       .then((agencies) => {
         setAgencies([
           {

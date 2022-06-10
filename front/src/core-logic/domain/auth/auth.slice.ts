@@ -17,6 +17,7 @@ export const authSlice = createSlice({
       state,
       action: PayloadAction<FederatedIdentity>,
     ) => {
+      console.log(action.payload);
       state.connectedWith = action.payload;
     },
   },

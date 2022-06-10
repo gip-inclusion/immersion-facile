@@ -6,6 +6,7 @@ import {
   AgencyInListDto,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
+  ListAgenciesRequestDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
 import { listAgenciesResponseSchema } from "shared/src/agency/agency.schema";
@@ -59,9 +60,17 @@ export class HttpAgencyGateway implements AgencyGateway {
     lat: number;
     lon: number;
   }): Promise<AgencyInListDto[]> {
-    const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
-      params: { position, peOnly: true },
-    });
+    const httpResponse = await axios.get<AgencyInListDto>(
+      `/${prefix}/${agenciesRoute}`,
+      {
+        params: { position, peOnly: true } as ListAgenciesRequestDto,
+      },
+    );
     return listAgenciesResponseSchema.parse(httpResponse.data);
   }
 }
+/*
+const fakeFederatedEntity: PeConnectIdentity = "peConnect:3216545674657";
+const fakeAction =
+  authSlice.actions.federatedIdentityProvided(fakeFederatedEntity);
+*/

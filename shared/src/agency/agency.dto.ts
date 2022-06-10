@@ -49,6 +49,7 @@ export type AgencyKind =
 
 export type ListAgenciesRequestDto = {
   position?: LatLonDto;
+  peOnly?: boolean;
 };
 
 export type AgencyPublicDisplayDto = Pick<
