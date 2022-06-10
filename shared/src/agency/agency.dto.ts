@@ -47,9 +47,11 @@ export type AgencyKind =
   | "structure-IAE"
   | "autre";
 
+type ListAgenciesRequestFilter = "peOnly" | "peExcluded";
+
 export type ListAgenciesRequestDto = {
   position?: LatLonDto;
-  peOnly?: boolean;
+  filter?: ListAgenciesRequestFilter;
 };
 
 export type AgencyPublicDisplayDto = Pick<

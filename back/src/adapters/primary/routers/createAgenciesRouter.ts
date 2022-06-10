@@ -21,7 +21,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
             lat: parseFloat(query.position?.lat as any),
             lon: parseFloat(query.position?.lon as any),
           } as any,
-          peOnly: query.peOnly,
+          filter: query.filter,
         });
       }),
     )
