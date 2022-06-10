@@ -1,6 +1,7 @@
 import React from "react";
 import { ButtonHome } from "react-design-system";
 import { useDispatch } from "react-redux";
+import { PeConnectIdentity } from "src/../../shared/src/federatedIdentities/federatedIdentity.dto";
 import { Section } from "src/app/components/Section";
 import { PeConnectButton } from "src/app/pages/Convention/PeConnectButton";
 import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
@@ -36,8 +37,13 @@ export const InitiateConventionCard = () => {
         <ButtonHome
           type="error"
           onClick={() => {
+            const fakeFederatedEntity: PeConnectIdentity =
+              "peConnect:3216545674657";
+            const fakeAction =
+              authSlice.actions.federatedIdentityProvided(fakeFederatedEntity);
             dispatch(
-              authSlice.actions.federatedIdentityProvided("noIdentityProvider"),
+              //authSlice.actions.federatedIdentityProvided("noIdentityProvider"),
+              fakeAction,
             );
             if (currentRoute.name !== "convention") routes.convention().push();
           }}

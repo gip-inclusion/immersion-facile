@@ -69,8 +69,3 @@ export class HttpAgencyGateway implements AgencyGateway {
     return listAgenciesResponseSchema.parse(httpResponse.data);
   }
 }
-/*
-const fakeFederatedEntity: PeConnectIdentity = "peConnect:3216545674657";
-const fakeAction =
-  authSlice.actions.federatedIdentityProvided(fakeFederatedEntity);
-*/
