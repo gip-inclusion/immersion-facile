@@ -10,7 +10,12 @@ import {
   WithAgencyId,
 } from "./agency.dto";
 import { latLonSchema } from "../latLon";
-import { zEmail, zString, zTrimmedString } from "../zodUtils";
+import {
+  zEmail,
+  zPreprocessedNumber,
+  zString,
+  zTrimmedString,
+} from "../zodUtils";
 
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
 
@@ -31,7 +36,9 @@ const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 
 export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
   z.object({
-    position: latLonSchema.optional(),
+    lat: zPreprocessedNumber(),
+    lon: zPreprocessedNumber(),
+    filter: z.enum(["peOnly", "peExcluded"]).optional(),
   });
 
 export const agencySchema: z.ZodSchema<CreateAgencyDto> = z.object({

@@ -48,18 +48,18 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public listAllAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
-    const request: ListAgenciesRequestDto = { position };
+    const request: ListAgenciesRequestDto = { ...position };
     return this.getAgencies(request);
   }
 
   public listPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
-    const request: ListAgenciesRequestDto = { position, filter: "peOnly" };
+    const request: ListAgenciesRequestDto = { ...position, filter: "peOnly" };
     return this.getAgencies(request);
   }
 
   public listNonPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
     const request: ListAgenciesRequestDto = {
-      position,
+      ...position,
       filter: "peExcluded",
     };
     return this.getAgencies(request);

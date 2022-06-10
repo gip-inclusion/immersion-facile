@@ -50,7 +50,8 @@ export type AgencyKind =
 type ListAgenciesRequestFilter = "peOnly" | "peExcluded";
 
 export type ListAgenciesRequestDto = {
-  position?: LatLonDto;
+  lat?: number;
+  lon?: number;
   filter?: ListAgenciesRequestFilter;
 };
 
