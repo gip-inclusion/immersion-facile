@@ -3,7 +3,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { useDebounce } from "src/app/utils/useDebounce";
 import { AddressWithCoordinates } from "src/core-logic/ports/ApiAdresseGateway";
 import { getAddressesFromApi } from "./getAddressesFromApi";
-import { AutocompleteInput } from "./AutocompleteInput";
+import { AutocompleteInput } from "react-design-system/immersionFacile";
 
 export type AddressAutocompleteProps = {
   label: string;
