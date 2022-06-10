@@ -123,21 +123,15 @@ const isDefaultAgencyOnAgenciesAndEnabled = (
   agencies: AgencyInListDto[],
 ) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);
 
-const isPeOnly = (
-  enablePeConnectApi: boolean,
-  connectedWith: FederatedIdentity | null,
-): boolean =>
-  enablePeConnectApi && connectedWith && isPeConnectIdentity(connectedWith)
-    ? true
-    : false;
-
 const agenciesRetreiver = (
   position: LatLonDto,
   enablePeConnectApi: boolean,
   connectedWith: FederatedIdentity | null,
 ) =>
-  isPeOnly(enablePeConnectApi, connectedWith)
-    ? agencyGateway.listPeAgencies(position)
+  enablePeConnectApi
+    ? connectedWith && isPeConnectIdentity(connectedWith)
+      ? agencyGateway.listPeAgencies(position)
+      : agencyGateway.listNonPeAgencies(position)
     : agencyGateway.listAllAgencies(position);
 
 const placeholderAgency: AgencyInListDto = {

@@ -47,25 +47,32 @@ export class HttpAgencyGateway implements AgencyGateway {
     ).data;
   }
 
-  public async listAllAgencies(
-    position: LatLonDto,
-  ): Promise<AgencyInListDto[]> {
-    const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
-      params: { position },
-    });
-    return listAgenciesResponseSchema.parse(httpResponse.data);
+  public listAllAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
+    const request: ListAgenciesRequestDto = { position };
+    return this.getAgencies(request);
   }
 
-  public async listPeAgencies(position: {
-    lat: number;
-    lon: number;
-  }): Promise<AgencyInListDto[]> {
-    const httpResponse = await axios.get<AgencyInListDto>(
-      `/${prefix}/${agenciesRoute}`,
-      {
-        params: { position, peOnly: true } as ListAgenciesRequestDto,
-      },
-    );
-    return listAgenciesResponseSchema.parse(httpResponse.data);
+  public listPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
+    const request: ListAgenciesRequestDto = { position, filter: "peOnly" };
+    return this.getAgencies(request);
+  }
+
+  public listNonPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
+    const request: ListAgenciesRequestDto = {
+      position,
+      filter: "peExcluded",
+    };
+    return this.getAgencies(request);
+  }
+
+  private getAgencies(
+    request: ListAgenciesRequestDto,
+  ): Promise<AgencyInListDto[]> {
+    return axios
+      .get<AgencyInListDto>(`/${prefix}/${agenciesRoute}`, {
+        params: request as ListAgenciesRequestDto,
+      })
+      .then((data) => listAgenciesResponseSchema.parse(data))
+      .catch((error) => Promise.reject(error));
   }
 }

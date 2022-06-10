@@ -12,6 +12,7 @@ export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
 
   listAllAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
+  listNonPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
   listPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
   getAgencyPublicInfoById(
     agencyId: WithAgencyId,
