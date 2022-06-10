@@ -65,14 +65,12 @@ export class HttpAgencyGateway implements AgencyGateway {
     return this.getAgencies(request);
   }
 
-  private getAgencies(
+  private async getAgencies(
     request: ListAgenciesRequestDto,
   ): Promise<AgencyInListDto[]> {
-    return axios
-      .get<AgencyInListDto>(`/${prefix}/${agenciesRoute}`, {
-        params: request as ListAgenciesRequestDto,
-      })
-      .then((data) => listAgenciesResponseSchema.parse(data))
-      .catch((error) => Promise.reject(error));
+    const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
+      params: request,
+    });
+    return listAgenciesResponseSchema.parse(httpResponse.data);
   }
 }
