@@ -1,42 +1,18 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { Agencies } from "src/app/components/Agency";
-import { agencyGateway } from "src/app/config/dependencies";
 import { AgencyId, AgencyInListDto } from "shared/src/agency/agency.dto";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
 import { LatLonDto } from "shared/src/latLon";
-
-import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
-import { useFeatureFlags } from "../utils/useFeatureFlags";
-import { FeatureFlagState } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import {
   FederatedIdentity,
   isPeConnectIdentity,
 } from "src/../../shared/src/federatedIdentities/federatedIdentity.dto";
+import { Agencies } from "src/app/components/Agency";
+import { agencyGateway } from "src/app/config/dependencies";
 import { useConnectedWith } from "src/hooks/connectedWith";
-const isPeOnly = (
-  useFeatureFlags: FeatureFlagState,
-  connectedWith: FederatedIdentity | null,
-): boolean =>
-  useFeatureFlags.enablePeConnectApi &&
-  connectedWith &&
-  isPeConnectIdentity(connectedWith)
-    ? true
-    : false;
-const agenciesRetreiver = (
-  position: LatLonDto,
-  featureFlags: FeatureFlagState,
-  connectedWith: FederatedIdentity | null,
-) =>
-  isPeOnly(featureFlags, connectedWith)
-    ? agencyGateway.listPeAgencies(position)
-    : agencyGateway.listAllAgencies(position);
-const placeholderAgency: AgencyInListDto = {
-  id: "",
-  name: "Veuillez indiquer un code postal",
-  position: { lat: 0, lon: 0 },
-};
+import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
+import { useFeatureFlags } from "../utils/useFeatureFlags";
 
 type AgencySelectorProps = {
   label: string;
@@ -59,35 +35,22 @@ export const AgencySelector = ({
   const [loadingError, setLoadingError] = useState(false);
   const [position, setPosition] = useState<LatLonDto | null>(null);
   const [agencies, setAgencies] = useState([placeholderAgency]);
-  const featureFlags = useFeatureFlags();
+  const { enablePeConnectApi } = useFeatureFlags();
   const connectedWith = useConnectedWith();
-  /*
-  const fakeFederatedEntity: PeConnectIdentity = "peConnect:3216545674657";
-  const fakeAction =
-    authSlice.actions.federatedIdentityProvided(fakeFederatedEntity);
-    */
   useEffect(() => {
     if (!position) return;
 
     setIsLoading(true);
-    console.log("connectedWith", connectedWith);
-    agenciesRetreiver(position, featureFlags, connectedWith)
+    agenciesRetreiver(position, enablePeConnectApi, connectedWith)
       .then((agencies) => {
-        setAgencies([
-          {
-            id: "",
-            name: "",
-            position: {
-              lat: 0,
-              lon: 0,
-            },
-          },
-          ...agencies,
-        ]);
+        setAgencies([emptyAgency, ...agencies]);
         if (
-          !disabled &&
           defaultAgencyId &&
-          agencies.map((agency) => agency.id).includes(defaultAgencyId)
+          isDefaultAgencyOnAgenciesAndEnabled(
+            disabled,
+            defaultAgencyId,
+            agencies,
+          )
         )
           setValue(defaultAgencyId);
         setLoaded(true);
@@ -152,4 +115,42 @@ export const AgencySelector = ({
       )}
     </div>
   );
+};
+
+const isDefaultAgencyOnAgenciesAndEnabled = (
+  disabled: boolean | undefined,
+  defaultAgencyId: string,
+  agencies: AgencyInListDto[],
+) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);
+
+const isPeOnly = (
+  enablePeConnectApi: boolean,
+  connectedWith: FederatedIdentity | null,
+): boolean =>
+  enablePeConnectApi && connectedWith && isPeConnectIdentity(connectedWith)
+    ? true
+    : false;
+
+const agenciesRetreiver = (
+  position: LatLonDto,
+  enablePeConnectApi: boolean,
+  connectedWith: FederatedIdentity | null,
+) =>
+  isPeOnly(enablePeConnectApi, connectedWith)
+    ? agencyGateway.listPeAgencies(position)
+    : agencyGateway.listAllAgencies(position);
+
+const placeholderAgency: AgencyInListDto = {
+  id: "",
+  name: "Veuillez indiquer un code postal",
+  position: { lat: 0, lon: 0 },
+};
+
+const emptyAgency: AgencyInListDto = {
+  id: "",
+  name: "",
+  position: {
+    lat: 0,
+    lon: 0,
+  },
 };
