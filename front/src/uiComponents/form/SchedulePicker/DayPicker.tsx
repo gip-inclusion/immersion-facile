@@ -59,14 +59,15 @@ const DayCircle = ({ dayStatus, onClick, disabled, name }: DayCircleProps) => {
       <div className="relative">
         <button
           type="button"
-          className={`numberCircle bg-green-100`}
+          className={`numberCircle `}
+          style={{ backgroundColor: "#B8FEC9" }}
           onClick={onClick}
           disabled={disabled}
         >
           <div>{name}</div>
         </button>
         <div className="absolute -top-2 right-0">
-          <CheckCircleIcon sx={{ color: "#07b601" }} fontSize="small" />
+          <CheckCircleIcon sx={{ color: "#1F8D49" }} fontSize="small" />
         </div>
       </div>
     );

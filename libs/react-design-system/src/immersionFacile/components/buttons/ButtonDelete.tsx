@@ -17,7 +17,7 @@ export const ButtonDelete = ({
 }: ButtonDeleteProps) => (
   <span className={`${isHidden ? "invisible" : ""} ${className}`}>
     <IconButton aria-label="delete" disabled={disabled} onClick={onClick}>
-      <DeleteIcon sx={{ color: "#3458a2" }} />
+      <DeleteIcon sx={{ color: "#000091" }} />
     </IconButton>
   </span>
 );

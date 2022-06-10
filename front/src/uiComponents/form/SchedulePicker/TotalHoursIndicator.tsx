@@ -20,7 +20,7 @@ type TotalHoursIndicatorProps = {
 export const TotalHoursIndicator = ({
   totalHours,
 }: TotalHoursIndicatorProps) => {
-  const normalColor = "#008941";
+  const normalColor = "#1F8D49";
   const badColor = "#E10600";
   return (
     <p>
