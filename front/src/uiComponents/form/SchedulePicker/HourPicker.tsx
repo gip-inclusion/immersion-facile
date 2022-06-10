@@ -16,8 +16,8 @@ export const HourPicker = ({
   disabled,
 }: HourPickerProps) => {
   const add = () => {
-    let start = "9:00";
-    let end = "17:00";
+    let start = "--:--";
+    let end = "--:--";
     if (schedule.length > 0) {
       // Autofill next period as end of current period + 1h,
       // w/ duration of 1h.
@@ -28,7 +28,6 @@ export const HourPicker = ({
         end = (endH + 2).toString() + ":00";
       }
     }
-
     schedule.push({ start, end });
     onValueChange(schedule);
   };
