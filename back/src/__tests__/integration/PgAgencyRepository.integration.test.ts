@@ -82,9 +82,11 @@ describe("PgAgencyRepository", () => {
     });
   });
 
-  describe("getAll", () => {
-    const agency1 = agency1builder.build();
-    const agency2 = agency2builder.build();
+  describe("getAllActive", () => {
+    const agency1PE = agency1builder.withKind("pole-emploi").build();
+    const agency2MissionLocale = agency2builder
+      .withKind("mission-locale")
+      .build();
     const agencyAddedFromPeReferenciel = agency1builder
       .withId("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee")
       .withName("Agency from PE referenciel")
@@ -97,18 +99,27 @@ describe("PgAgencyRepository", () => {
     });
     it("returns all agencies", async () => {
       await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agency2),
+        agencyRepository.insert(agency1PE),
+        agencyRepository.insert(agency2MissionLocale),
         agencyRepository.insert(agencyAddedFromPeReferenciel),
         agencyRepository.insert(inactiveAgency),
       ]);
 
       const agencies = await agencyRepository.getAllActive();
       expect(sortById(agencies)).toEqual([
-        agency2,
-        agency1,
+        agency2MissionLocale,
+        agency1PE,
         agencyAddedFromPeReferenciel,
       ]);
+    });
+    it("if agencyKindFilter = 'peOnly', returns only pe agencies", async () => {
+      await Promise.all([
+        agencyRepository.insert(agency1PE),
+        agencyRepository.insert(agency2MissionLocale),
+      ]);
+
+      const agencies = await agencyRepository.getAllActive("peOnly");
+      expect(sortById(agencies)).toEqual([agency1PE]);
     });
   });
 
@@ -155,7 +166,11 @@ describe("PgAgencyRepository", () => {
     });
   });
 
-  describe("getNearby", () => {
+  describe("getAllActiveNearby", () => {
+    const placeStanislasPosition: LatLonDto = {
+      lat: 48.693339,
+      lon: 6.182858,
+    };
     it("returns only active agencies which are less than certain distance", async () => {
       const nancyAgency = agency1builder
         .withName("Nancy agency")
@@ -175,11 +190,6 @@ describe("PgAgencyRepository", () => {
         .withPosition(47.365086, 5.051027)
         .build();
 
-      const placeStanislasPosition: LatLonDto = {
-        lat: 48.693339,
-        lon: 6.182858,
-      };
-
       await Promise.all([
         agencyRepository.insert(nancyAgency),
         agencyRepository.insert(epinalAgency),
@@ -188,13 +198,74 @@ describe("PgAgencyRepository", () => {
       ]);
 
       // Act
-      const agencies = await agencyRepository.getNearby(
+      const agencies = await agencyRepository.getAllActiveNearby(
         placeStanislasPosition,
         100,
       );
 
       // Assert
       expect(agencies).toEqual([nancyAgency, epinalAgency]);
+    });
+
+    it("if agencyKindFilter is 'peOnly', it returns only agencies of pe kind", async () => {
+      const peNancyAgency = agency1builder
+        .withName("Nancy PE agency")
+        .withKind("pole-emploi")
+        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
+        .withStatus("active")
+        .build();
+
+      const capEmploiNancyAgency = agency2builder
+        .withName("Nancy CAP EMPLOI agency")
+        .withKind("cap-emploi")
+        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
+        .withStatus("active")
+        .build();
+
+      await Promise.all([
+        agencyRepository.insert(peNancyAgency),
+        agencyRepository.insert(capEmploiNancyAgency),
+      ]);
+
+      // Act
+      const agencies = await agencyRepository.getAllActiveNearby(
+        placeStanislasPosition,
+        100,
+        "peOnly",
+      );
+
+      // Assert
+      expect(agencies).toEqual([peNancyAgency]);
+    });
+    it("if agencyKindFilter is 'peExcluded', it returns all agencies except those from PE", async () => {
+      const peNancyAgency = agency1builder
+        .withName("Nancy PE agency")
+        .withKind("pole-emploi")
+        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
+        .withStatus("active")
+        .build();
+
+      const capEmploiNancyAgency = agency2builder
+        .withName("Nancy CAP EMPLOI agency")
+        .withKind("cap-emploi")
+        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
+        .withStatus("active")
+        .build();
+
+      await Promise.all([
+        agencyRepository.insert(peNancyAgency),
+        agencyRepository.insert(capEmploiNancyAgency),
+      ]);
+
+      // Act
+      const agencies = await agencyRepository.getAllActiveNearby(
+        placeStanislasPosition,
+        100,
+        "peExcluded",
+      );
+
+      // Assert
+      expect(agencies).toEqual([capEmploiNancyAgency]);
     });
   });
 

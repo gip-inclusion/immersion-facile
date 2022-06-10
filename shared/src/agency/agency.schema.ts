@@ -36,8 +36,8 @@ const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 
 export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
   z.object({
-    lat: zPreprocessedNumber(),
-    lon: zPreprocessedNumber(),
+    lat: zPreprocessedNumber().optional(),
+    lon: zPreprocessedNumber().optional(),
     filter: z.enum(["peOnly", "peExcluded"]).optional(),
   });
 

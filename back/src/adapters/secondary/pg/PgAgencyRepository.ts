@@ -1,28 +1,45 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { AgencyRepository } from "../../../domain/convention/ports/AgencyRepository";
-import { AgencyDto, AgencyId } from "shared/src/agency/agency.dto";
+import {
+  AgencyDto,
+  AgencyId,
+  AgencyKindFilter,
+} from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { createLogger } from "../../../utils/logger";
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
+const makeAgencyKindFiterSQL = (
+  agencyKindFilter?: AgencyKindFilter,
+): string => {
+  if (!agencyKindFilter) return "";
+  return agencyKindFilter === "peOnly"
+    ? "AND kind = 'pole-emploi'"
+    : "AND kind != 'pole-emploi'";
+};
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private client: PoolClient) {}
 
-  public async getAllActive(): Promise<AgencyDto[]> {
+  public async getAllActive(
+    agencyKindFilter?: AgencyKindFilter,
+  ): Promise<AgencyDto[]> {
     const pgResult = await this.client.query(
-      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, agency_siret, code_safir\
+      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, agency_siret, code_safir\
        FROM public.agencies\
-       WHERE status IN ('active', 'from-api-PE')",
+       WHERE status IN ('active', 'from-api-PE') ${makeAgencyKindFiterSQL(
+         agencyKindFilter,
+       )}`,
     );
     return pgResult.rows.map(pgToEntity);
   }
 
-  public async getNearby(
+  public async getAllActiveNearby(
     searchPosition: LatLonDto,
     distance_km: number,
+    agencyKindFilter?: AgencyKindFilter,
   ): Promise<AgencyDto[]> {
     if (typeof distance_km !== "number")
       throw new Error("distance_km must be a number");
@@ -37,9 +54,8 @@ export class PgAgencyRepository implements AgencyRepository {
       
       WHERE status IN ('active', 'from-api-PE') AND ST_Distance(${STPointStringFromPosition(
         searchPosition,
-      )}, position) <= ${distance_km * 1000}
-      
-      
+      )}, position) <= ${distance_km * 1000} 
+      ${makeAgencyKindFiterSQL(agencyKindFilter)}
       ORDER BY dist
       LIMIT 20`,
     );

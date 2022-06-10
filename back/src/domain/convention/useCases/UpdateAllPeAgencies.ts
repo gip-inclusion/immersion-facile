@@ -137,7 +137,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
   private async getNearestPeAgencies(
     peReferentialAgency: PeAgencyFromReferenciel,
   ): Promise<AgencyDto[]> {
-    const agencies = await this.agencyRepository.getNearby(
+    const agencies = await this.agencyRepository.getAllActiveNearby(
       {
         lon: peReferentialAgency.adressePrincipale.gpsLon,
         lat: peReferentialAgency.adressePrincipale.gpsLat,

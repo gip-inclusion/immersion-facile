@@ -1,4 +1,8 @@
-import { AgencyDto, AgencyId } from "shared/src/agency/agency.dto";
+import {
+  AgencyDto,
+  AgencyId,
+  AgencyKindFilter,
+} from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 
 export interface AgencyRepository {
@@ -6,7 +10,11 @@ export interface AgencyRepository {
   update: (config: AgencyDto) => Promise<void>;
   getById: (id: AgencyId) => Promise<AgencyDto | undefined>;
   getImmersionFacileIdByKind: () => Promise<AgencyId>;
-  getNearby: (position: LatLonDto, distance_km: number) => Promise<AgencyDto[]>;
+  getAllActiveNearby: (
+    position: LatLonDto,
+    distance_km: number,
+    agencyKindFilter?: AgencyKindFilter,
+  ) => Promise<AgencyDto[]>;
   getAgencyWhereEmailMatches: (email: string) => Promise<AgencyDto | undefined>;
-  getAllActive: () => Promise<AgencyDto[]>;
+  getAllActive: (agencyKindFilter?: AgencyKindFilter) => Promise<AgencyDto[]>;
 }

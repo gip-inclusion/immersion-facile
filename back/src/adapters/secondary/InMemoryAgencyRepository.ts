@@ -3,6 +3,7 @@ import {
   AgencyInListDto,
   AgencyId,
   AgencyStatus,
+  AgencyKindFilter,
 } from "shared/src/agency/agency.dto";
 import { createLogger } from "../../utils/logger";
 import { AgencyDto } from "shared/src/agency/agency.dto";
@@ -94,17 +95,25 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return this._agencies[id];
   }
 
-  public async getNearby(position: LatLonDto): Promise<AgencyDto[]> {
-    logger.info({ position, configs: this._agencies }, "getNearby");
-    return Object.values(this._agencies)
+  public async getAllActiveNearby(
+    position: LatLonDto,
+    _distance_km: number,
+    agencyKindFilter?: AgencyKindFilter,
+  ): Promise<AgencyDto[]> {
+    logger.info({ position, configs: this._agencies }, "getAllActiveNearby");
+    const activeAgenciesNearby = Object.values(this._agencies)
       .filter(isAgencyActive)
       .sort(sortByNearestFrom(position))
       .slice(0, 20);
+    return filterAgenciesByKind(activeAgenciesNearby, agencyKindFilter);
   }
 
-  public async getAllActive(): Promise<AgencyDto[]> {
+  public async getAllActive(
+    agencyKindFilter?: AgencyKindFilter,
+  ): Promise<AgencyDto[]> {
     logger.info({ configs: this._agencies }, "getAll");
-    return Object.values(this._agencies).filter(isAgencyActive);
+    const activeAgencies = Object.values(this._agencies).filter(isAgencyActive);
+    return filterAgenciesByKind(activeAgencies, agencyKindFilter);
   }
 
   public async getAgencyWhereEmailMatches(
@@ -153,6 +162,10 @@ const activeStatuses: AgencyStatus[] = ["active", "from-api-PE"];
 const isAgencyActive = (agency: AgencyDto) =>
   activeStatuses.includes(agency.status);
 
+const isAgencyPE = (agency: AgencyDto) => agency.kind === "pole-emploi";
+
+const isAgencyNotPE = (agency: AgencyDto) => agency.kind !== "pole-emploi";
+
 const sortByNearestFrom =
   (position: LatLonDto) => (a: AgencyInListDto, b: AgencyInListDto) =>
     distanceBetweenCoordinatesInMeters(
@@ -167,3 +180,13 @@ const sortByNearestFrom =
       position.lat,
       position.lon,
     );
+
+const filterAgenciesByKind = (
+  agencies: AgencyDto[],
+  agencyKindFilter?: AgencyKindFilter,
+) => {
+  if (!agencyKindFilter) return agencies;
+  return agencyKindFilter === "peOnly"
+    ? agencies.filter(isAgencyPE)
+    : agencies.filter(isAgencyNotPE);
+};

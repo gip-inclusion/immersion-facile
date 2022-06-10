@@ -81,7 +81,8 @@ describe("ListAgencies", () => {
     const listAgencies = new ListAgencies(repository);
 
     const nearestAgencies = await listAgencies.execute({
-      position: { lat: 20, lon: 20 },
+      lat: 20,
+      lon: 20,
     });
     expect(nearestAgencies).toHaveLength(20);
     expect(nearestAgencies[0].id).toBe("20");

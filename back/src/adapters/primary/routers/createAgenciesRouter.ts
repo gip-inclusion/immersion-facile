@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { ListAgenciesRequestDto } from "shared/src/agency/agency.dto";
 import {
   agenciesRoute,
   agencyPublicInfoByIdRoute,
@@ -14,16 +13,9 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   agenciesRouter
     .route(`/${agenciesRoute}`)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const query: ListAgenciesRequestDto = req.query;
-        return deps.useCases.listAgencies.execute({
-          position: {
-            lat: parseFloat(query.position?.lat as any),
-            lon: parseFloat(query.position?.lon as any),
-          } as any,
-          filter: query.filter,
-        });
-      }),
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.listAgencies.execute(req.query as any),
+      ),
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>

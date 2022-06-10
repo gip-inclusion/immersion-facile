@@ -1,6 +1,7 @@
 import {
   AgencyDto,
   AgencyInListDto,
+  AgencyKindFilter,
   ListAgenciesRequestDto,
 } from "shared/src/agency/agency.dto";
 import { listAgenciesRequestSchema } from "shared/src/agency/agency.schema";
@@ -19,15 +20,28 @@ export class ListAgencies extends UseCase<
   inputSchema = listAgenciesRequestSchema;
 
   public async _execute({
-    position,
+    lon,
+    lat,
+    filter,
   }: ListAgenciesRequestDto): Promise<AgencyInListDto[]> {
-    const agencies = await this.getAgencies(position);
+    const agencies = await this.getAgencies(
+      lon && lat ? { lon, lat } : undefined,
+      filter,
+    );
     return agencies.map(agencyToAgencyInListDto);
   }
 
-  private getAgencies(position?: LatLonDto): Promise<AgencyDto[]> {
-    if (position) return this.agencyRepository.getNearby(position, 100);
-    return this.agencyRepository.getAllActive();
+  private getAgencies(
+    position?: LatLonDto,
+    agencyKindFilter?: AgencyKindFilter,
+  ): Promise<AgencyDto[]> {
+    if (position)
+      return this.agencyRepository.getAllActiveNearby(
+        position,
+        100,
+        agencyKindFilter,
+      );
+    return this.agencyRepository.getAllActive(agencyKindFilter);
   }
 }
 
