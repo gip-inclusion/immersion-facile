@@ -1,15 +1,19 @@
+import { ConventionId } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
 import { InMemoryPoleEmploiGateway } from "../../../adapters/secondary/InMemoryPoleEmploiGateway";
-import { PoleEmploiConvention } from "../../../domain/convention/ports/PoleEmploiGateway";
-import { NotifyPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/notifications/NotifyPoleEmploiOnConventionUpdates";
+import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 
 const prepareUseCase = () => {
   const poleEmploiGateWay = new InMemoryPoleEmploiGateway();
-  const useCase = new NotifyPoleEmploiOnConventionUpdates(poleEmploiGateWay);
+  const useCase = new BroadcastToPoleEmploiOnConventionUpdates(
+    poleEmploiGateWay,
+  );
 
   return { useCase, poleEmploiGateWay };
 };
-describe("Notify pole-emploi", () => {
+
+describe("Broadcasts events to pole-emploi", () => {
   it("Skips conventions without federated id", async () => {
     // Prepare
     const { useCase, poleEmploiGateWay } = prepareUseCase();
@@ -28,8 +32,13 @@ describe("Notify pole-emploi", () => {
     // Prepare
     const { useCase, poleEmploiGateWay } = prepareUseCase();
 
+    const peExternalId = "peExternalId";
+    const immersionConventionId: ConventionId = "immersionConventionId";
+
     // Act
     const convention = new ConventionDtoBuilder()
+      .withId(immersionConventionId)
+      .withExternalId(peExternalId)
       .withFederatedIdentity("peConnect:some-id")
       .withDateStart("2021-05-13T10:00:00.000Z")
       .withDateEnd("2021-05-14T10:30:00.000Z") // Lasts 1 day and half an hour, ie. 24.5 hours
@@ -40,14 +49,13 @@ describe("Notify pole-emploi", () => {
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
-    const partialExpectedPoleEmploiConvention: Partial<PoleEmploiConvention> = {
+    expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
+      id: peExternalId,
+      originalId: immersionConventionId,
       objectifDeImmersion: 2,
-      dureeImmersion: 24.5,
+      dureeImmersion: "24.5",
       dateDebut: "2021-05-13T10:00:00.000Z",
       dateFin: "2021-05-14T10:30:00.000Z",
-    };
-    expect(poleEmploiGateWay.notifications[0]).toMatchObject(
-      partialExpectedPoleEmploiConvention,
-    );
+    });
   });
 });

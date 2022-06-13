@@ -19,7 +19,7 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   "Découvrir un métier ou un secteur d'activité": 3,
 };
 
-export class NotifyPoleEmploiOnConventionUpdates extends UseCase<
+export class BroadcastToPoleEmploiOnConventionUpdates extends UseCase<
   ConventionDto,
   void
 > {
@@ -37,11 +37,12 @@ export class NotifyPoleEmploiOnConventionUpdates extends UseCase<
         new Date(convention.dateEnd),
         new Date(convention.dateStart),
       ) / 60;
+
     const poleEmploiConvention: PoleEmploiConvention = {
-      id: convention.id,
-      peConventionId: convention.externalId,
+      id: convention.externalId,
+      originalId: convention.id,
       peConnectId: convention.federatedIdentity,
-      statut: convention.status,
+      status: convention.status,
       email: convention.email,
       telephone: convention.phone,
       prenom: convention.firstName,
@@ -49,7 +50,7 @@ export class NotifyPoleEmploiOnConventionUpdates extends UseCase<
       dateDemande: convention.dateSubmission,
       dateDebut: convention.dateStart,
       dateFin: convention.dateEnd,
-      dureeImmersion: roundDifferenceInHours,
+      dureeImmersion: roundDifferenceInHours.toString(),
       raisonSociale: convention.businessName,
       siret: convention.siret,
       nomPrenomFonctionTuteur: convention.mentor,

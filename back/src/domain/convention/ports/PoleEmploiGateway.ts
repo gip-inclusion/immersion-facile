@@ -1,10 +1,10 @@
 import { DateStr } from "../../core/ports/Clock";
 
 export type PoleEmploiConvention = {
-  id: string; // exemple: 31bd445d-54fa-4b53-8875-0ada1673fe3c
-  peConventionId: string; // id numérique sur 11 caratères
+  id: string; // id numérique sur 11 caratères
+  originalId: string; // exemple: 31bd445d-54fa-4b53-8875-0ada1673fe3c
   peConnectId: string; // nécessaire pour se connecter avec PE-UX
-  statut: string;
+  status: string; // changed until PE is ready to accept "statut"
   email: string;
   telephone?: string;
   prenom: string;
@@ -12,7 +12,7 @@ export type PoleEmploiConvention = {
   dateDemande: DateStr;
   dateDebut: DateStr;
   dateFin: DateStr;
-  dureeImmersion: number; // Ex : 20.75 (pour 20h45min)
+  dureeImmersion: string; // Ex : 20.75 (pour 20h45min) -> should be number but until PE is ready we convert it to string
   raisonSociale: string;
   siret: string;
   nomPrenomFonctionTuteur: string;
