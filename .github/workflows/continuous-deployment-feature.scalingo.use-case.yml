@@ -23,6 +23,7 @@ jobs:
       deployment-owner-type: ${{ steps.deployment-owner-type.outputs.value }}
       is-discord-hooked: ${{ steps.is-discord-hooked.outputs.value }}
       deployed-domain: ${{ steps.deployed-domain.outputs.value }}
+      deployed-app-name: ${{ steps.deployed-app-name.outputs.value }}
 
     runs-on: ubuntu-latest
     steps:
@@ -63,6 +64,12 @@ jobs:
         run: |
           DEPLOYED_DOMAIN=${{ steps.application-name.outputs.value }}.osc-fr1.scalingo.io
           echo "::set-output name=value::$DEPLOYED_DOMAIN"
+
+      - name: Deployed friendly app name domain url
+        id: deployed-app-name
+        run: |
+          DEPLOYED_APP_NAME=$(echo $BRANCH_SHORT_REF)
+          echo "::set-output name=value::$DEPLOYED_APP_NAME"
 
 
   dependencies:
@@ -181,6 +188,6 @@ jobs:
     with:
       deployer-name: "Scalingo Deployer"
       application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
-      deployed-domain: ${{ needs.dynamic-variables.outputs.deployed-domain }}
+      deployed-domain: ${{ needs.dynamic-variables.outputs.deployed-app-name }}
     secrets:
       DISCORD_NOTIFY_HOOK_URL: ${{ secrets.DISCORD_NOTIFY_HOOK_URL }}

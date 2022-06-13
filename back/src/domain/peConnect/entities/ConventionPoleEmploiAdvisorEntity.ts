@@ -6,6 +6,7 @@ import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeConnectAdvisorDto,
   PeConnectAdvisorEntity,
+  PeConnectUserDto,
   PeUserAndAdvisors,
   PoleEmploiUserAdvisorDto,
   toConventionPoleEmploiAdvisorDto,
@@ -25,7 +26,7 @@ export const poleEmploiUserAdvisorDTOFromUserAndAdvisors = ({
 }: PeUserAndAdvisors): PoleEmploiUserAdvisorDto =>
   toConventionPoleEmploiAdvisorDto({
     user,
-    advisor: choosePreferredAdvisor(advisors),
+    advisor: choosePreferredAdvisor(advisors, user),
   });
 
 const preferCapEmploiPredicate = (
@@ -39,13 +40,17 @@ const onlyValidAdvisorsForImmersion = (
 
 const choosePreferredAdvisor = (
   advisors: PeConnectAdvisorDto[],
+  user: PeConnectUserDto,
 ): PeConnectAdvisorEntity => {
   const sortedValidAdvisors: PeConnectAdvisorEntity[] = advisors
     .filter(onlyValidAdvisorsForImmersion)
     .sort(preferCapEmploiPredicate);
 
   const preferredAdvisor = sortedValidAdvisors.at(0);
-  if (!preferredAdvisor) throw new Error("No valid advisor for the user");
+  if (!preferredAdvisor)
+    throw new Error(
+      `No valid advisor for the user ${user.email} ${user.firstName} ${user.lastName} ${user.peExternalId}`,
+    );
 
   return preferredAdvisor;
 };
