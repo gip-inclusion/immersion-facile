@@ -76,7 +76,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         },
       )
       .catch((error) => {
-        throw PrettyAxiosResponseError("PeConnect Failure", error);
+        throw PrettyAxiosResponseError(
+          "PeConnect Get Access Token Failure",
+          error,
+        );
       });
 
     const externalAccessToken: ExternalAccessToken = validateAndParseZodSchema(
@@ -95,7 +98,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         headers: headersWithAuthPeAccessToken(accessToken),
       })
       .catch((error) => {
-        throw PrettyAxiosResponseError("PeConnect Failure", error);
+        throw PrettyAxiosResponseError(
+          "PeConnect Get User Info Failure",
+          error,
+        );
       });
 
     const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
@@ -115,7 +121,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         timeout: secondsToMilliseconds(10),
       })
       .catch((error) => {
-        throw PrettyAxiosResponseError("PeConnect Failure", error);
+        throw PrettyAxiosResponseError(
+          "PeConnect Get Advisor Info Failure",
+          error,
+        );
       });
 
     const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
