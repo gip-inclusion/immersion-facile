@@ -130,7 +130,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: conventionDto.id,
             role: "counsellor",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.conventionToSign,
             email: conventionPoleEmploiAdvisor.email,
           }),
         },

@@ -49,7 +49,9 @@ const choosePreferredAdvisor = (
   const preferredAdvisor = sortedValidAdvisors.at(0);
   if (!preferredAdvisor)
     throw new Error(
-      `No valid advisor for the user ${user.email} ${user.firstName} ${user.lastName} ${user.peExternalId}`,
+      `No valid advisor for the user ${user.email} ${user.firstName} ${
+        user.lastName
+      } ${user.peExternalId} | advisors ${JSON.stringify(advisors, null, 2)} `,
     );
 
   return preferredAdvisor;

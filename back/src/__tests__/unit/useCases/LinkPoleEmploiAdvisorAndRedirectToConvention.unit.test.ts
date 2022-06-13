@@ -8,8 +8,8 @@ import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
-import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
+import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 
 describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   let linkPoleEmploiAdvisorAndRedirectToConvention: LinkPoleEmploiAdvisorAndRedirectToConvention;
