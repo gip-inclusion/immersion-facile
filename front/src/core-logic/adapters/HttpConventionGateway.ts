@@ -8,10 +8,7 @@ import {
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared/src/convention/convention.dto";
-import {
-  conventionSchema,
-  withConventionIdSchema,
-} from "shared/src/convention/convention.schema";
+import { withConventionIdSchema } from "shared/src/convention/convention.schema";
 import {
   generateMagicLinkRoute,
   conventionShareRoute,
@@ -33,7 +30,6 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public async add(conventionDto: ConventionDto): Promise<string> {
-    conventionSchema.parse(conventionDto);
     const httpResponse = await axios.post(
       `/${prefix}/${conventionsRoute}`,
       conventionDto,
@@ -70,7 +66,6 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public async update(conventionDto: ConventionDto): Promise<string> {
-    conventionSchema.parse(conventionDto);
     const httpResponse = await axios.post(
       `/${prefix}/${conventionsRoute}/${conventionDto.id}`,
       conventionDto,
@@ -84,10 +79,10 @@ export class HttpConventionGateway implements ConventionGateway {
     conventionDto: ConventionDto,
     jwt: string,
   ): Promise<string> {
-    conventionSchema.parse(conventionDto);
     const httpResponse = await axios.post(
       `/${prefix}/auth/${conventionsRoute}/${jwt}`,
       conventionDto,
+      { headers: { authorization: jwt } },
     );
     const updateConventionResponse = withConventionIdSchema.parse(
       httpResponse.data,
@@ -102,6 +97,7 @@ export class HttpConventionGateway implements ConventionGateway {
     const httpResponse = await axios.post(
       `/${prefix}/auth/${updateConventionStatusRoute}/${jwt}`,
       params,
+      { headers: { Authorization: jwt } },
     );
 
     return withConventionIdSchema.parse(httpResponse.data);
@@ -110,6 +106,8 @@ export class HttpConventionGateway implements ConventionGateway {
   public async signApplication(jwt: string): Promise<WithConventionId> {
     const httpResponse = await axios.post(
       `/${prefix}/auth/${signConventionRoute}/${jwt}`,
+      undefined,
+      { headers: { authorization: jwt } },
     );
 
     return withConventionIdSchema.parse(httpResponse.data);

@@ -40,6 +40,7 @@ const legacyScheduleSchema: z.ZodSchema<LegacyScheduleDto> = z.any();
 
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
+  externalId: externalConventionIdSchema.optional(),
   status: z.enum(allConventionStatuses),
   rejectionJustification: z.string().optional(),
   email: zEmail,
@@ -47,7 +48,7 @@ const conventionWithoutExternalIdZObject = z.object({
   lastName: zTrimmedString,
   phone: z
     .string()
-    .regex(phoneRegExp, "Numero de téléphone incorrect")
+    .regex(phoneRegExp, "Numéro de téléphone incorrect")
     .optional(),
   postalCode: z
     .string()
