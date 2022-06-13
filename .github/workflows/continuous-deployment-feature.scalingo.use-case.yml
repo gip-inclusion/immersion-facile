@@ -187,7 +187,7 @@ jobs:
     uses: ./.github/workflows/_notify-deployment.discord.reusable.yml
     with:
       deployer-name: "Scalingo Deployer"
-      application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
-      deployed-domain: ${{ needs.dynamic-variables.outputs.deployed-app-name }}
+      application-full-name: ${{ needs.dynamic-variables.outputs.deployed-app-name }}
+      deployed-domain: ${{ needs.dynamic-variables.outputs.deployed-domain }}
     secrets:
       DISCORD_NOTIFY_HOOK_URL: ${{ secrets.DISCORD_NOTIFY_HOOK_URL }}
