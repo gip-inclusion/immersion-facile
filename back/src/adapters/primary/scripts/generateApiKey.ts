@@ -25,10 +25,16 @@ const expirationDate = addYears(createdAt, 2);
 const authorisedNames: ApiConsumerName[] = [
   "passeEmploi",
   "unJeuneUneSolution",
+  "diagoriente",
 ];
 
 const getNameOrThrow = (name: string): ApiConsumerName => {
-  if (!name) throw new Error("please provide consumerName");
+  if (!name)
+    throw new Error(
+      `please provide consumerName, expecting one of: ${authorisedNames.join(
+        " | ",
+      )}`,
+    );
   const consumerName = name as ApiConsumerName;
   if (authorisedNames.includes(consumerName)) return consumerName;
   throw new Error(
