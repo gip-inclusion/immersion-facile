@@ -65,7 +65,7 @@ export type ConventionDtoWithoutExternalId = {
 };
 
 export type ConventionDto = ConventionDtoWithoutExternalId & {
-  externalId: ConventionExternalId;
+  externalId?: ConventionExternalId;
 };
 
 export type WithConventionId = {
