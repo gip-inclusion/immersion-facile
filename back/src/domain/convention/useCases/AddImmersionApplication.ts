@@ -9,11 +9,10 @@ import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAn
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 import {
   ConventionStatus,
-  ConventionDto,
   WithConventionId,
   ConventionDtoWithoutExternalId,
 } from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
+import { conventionWithoutExternalIdSchema } from "shared/src/convention/convention.schema";
 
 export class AddImmersionApplication extends TransactionalUseCase<
   ConventionDtoWithoutExternalId,
@@ -27,36 +26,41 @@ export class AddImmersionApplication extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = conventionSchema;
+  inputSchema = conventionWithoutExternalIdSchema;
 
   public async _execute(
-    conventionDto: ConventionDto,
+    createConventionParams: ConventionDtoWithoutExternalId,
     uow: UnitOfWork,
   ): Promise<WithConventionId> {
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
     if (
-      conventionDto.status != "DRAFT" &&
-      conventionDto.status != minimalValidStatus
+      createConventionParams.status != "DRAFT" &&
+      createConventionParams.status != minimalValidStatus
     ) {
       throw new ForbiddenError();
     }
 
     const featureFlags = await uow.getFeatureFlags();
     if (featureFlags.enableInseeApi) {
-      await rejectsSiretIfNotAnOpenCompany(this.getSiret, conventionDto.siret);
+      await rejectsSiretIfNotAnOpenCompany(
+        this.getSiret,
+        createConventionParams.siret,
+      );
     }
 
-    const externalId = await uow.conventionRepository.save(conventionDto);
-
-    if (!externalId) throw new ConflictError(conventionDto.id);
+    const externalId = await uow.conventionRepository.save(
+      createConventionParams,
+    );
+    if (!externalId) throw new ConflictError(createConventionParams.id);
 
     const event = this.createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
-      payload: conventionDto,
+      payload: { ...createConventionParams, externalId },
     });
+
     await uow.outboxRepo.save(event);
 
-    return { id: conventionDto.id };
+    return { id: createConventionParams.id };
   }
 }

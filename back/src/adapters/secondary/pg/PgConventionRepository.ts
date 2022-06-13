@@ -55,7 +55,7 @@ export class PgConventionRepository implements ConventionRepository {
       [id],
     );
 
-    return convention_external_id.rows[0].external_id;
+    return convention_external_id.rows[0].external_id.toString();
   }
 
   public async update(
@@ -83,7 +83,7 @@ export const pgConventionRowToDto = (
   params: Record<any, any>,
 ): ConventionDto => ({
   id: params.id,
-  externalId: params.external_id,
+  externalId: params.external_id.toString(),
   status: params.status,
   email: params.email,
   firstName: params.first_name,

@@ -40,7 +40,6 @@ const legacyScheduleSchema: z.ZodSchema<LegacyScheduleDto> = z.any();
 
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
-  externalId: externalConventionIdSchema,
   status: z.enum(allConventionStatuses),
   rejectionJustification: z.string().optional(),
   email: zEmail,

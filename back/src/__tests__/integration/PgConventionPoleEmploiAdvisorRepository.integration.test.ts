@@ -49,7 +49,8 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     const agencyRepository = new PgAgencyRepository(client);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
     const conventionRepository = new PgConventionRepository(client);
-    await conventionRepository.save(convention);
+    const { externalId, ...createConventionParams } = convention;
+    await conventionRepository.save(createConventionParams);
   });
 
   afterAll(async () => {

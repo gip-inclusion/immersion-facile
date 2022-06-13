@@ -6,8 +6,8 @@ import {
 } from "../../_testBuilders/test.helpers";
 import {
   ConventionStatus,
-  ConventionDto,
   UpdateConventionStatusRequestDto,
+  ConventionDtoWithoutExternalId,
 } from "shared/src/convention/convention.dto";
 import {
   conventionsRoute,
@@ -22,11 +22,12 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     const validConvention = new ConventionDtoBuilder()
       .withStatus("READY_TO_SIGN")
       .build();
+    const { externalId, ...createConventionParams } = validConvention;
     const appAndDeps = await buildTestApp();
 
     const { tutorJwt } = await beneficiarySubmitsApplicationForTheFirstTime(
       appAndDeps,
-      validConvention,
+      createConventionParams,
     );
 
     await expectEstablishmentRequiresChanges(
@@ -44,9 +45,12 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
-  convention: ConventionDto,
+  createConventionParams: ConventionDtoWithoutExternalId,
 ) => {
-  await request.post(`/${conventionsRoute}`).send(convention).expect(200);
+  await request
+    .post(`/${conventionsRoute}`)
+    .send(createConventionParams)
+    .expect(200);
 
   await expectStoreImmersionToHaveStatus(
     reposAndGateways.conventionQueries,
@@ -58,8 +62,8 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = reposAndGateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(3);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
-    [convention.email],
-    [convention.mentorEmail],
+    [createConventionParams.email],
+    [createConventionParams.mentorEmail],
     [adminEmail],
   ]);
 

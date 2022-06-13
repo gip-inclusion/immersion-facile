@@ -35,12 +35,17 @@ describe("PgConventionRepository", () => {
     const convention = new ConventionDtoBuilder()
       .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
       .build();
-    const externalId = await conventionRepository.save(convention);
+    const { externalId, ...createConventionParams } = convention;
+
+    const savedExternalId = await conventionRepository.save(
+      createConventionParams,
+    );
 
     expect(await conventionRepository.getById(convention.id)).toEqual({
       ...convention,
-      externalId,
+      externalId: savedExternalId,
     });
+    expect(typeof savedExternalId).toBe("string");
   });
 
   it("Adds a new convention with field workConditions undefined", async () => {

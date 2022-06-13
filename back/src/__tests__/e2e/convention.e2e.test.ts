@@ -123,6 +123,7 @@ describe("/demandes-immersion route", () => {
 
     it("Creating a valid application succeeds", async () => {
       const convention = new ConventionDtoBuilder().build();
+      const { externalId, ...createConventionParams } = convention;
 
       // GET /demandes-immersion returns an empty list.
       await request
@@ -133,7 +134,7 @@ describe("/demandes-immersion route", () => {
       // POSTing a valid application succeeds.
       await request
         .post(`/${conventionsRoute}`)
-        .send(convention)
+        .send(createConventionParams)
         .expect(200, { id: convention.id });
 
       // GETting the created application succeeds.
@@ -145,6 +146,8 @@ describe("/demandes-immersion route", () => {
 
     describe("Getting an application", () => {
       const convention = new ConventionDtoBuilder().build();
+      const { externalId, ...createConventionParams } =
+        new ConventionDtoBuilder().build();
 
       beforeEach(async () => {
         // GET /demandes-immersion returns an empty list.
@@ -156,7 +159,7 @@ describe("/demandes-immersion route", () => {
         // POSTing a valid application succeeds.
         await request
           .post(`/${conventionsRoute}`)
-          .send(convention)
+          .send(createConventionParams)
           .expect(200, { id: convention.id });
       });
 
@@ -203,11 +206,12 @@ describe("/demandes-immersion route", () => {
 
     it("Updating an existing application succeeds", async () => {
       const convention = new ConventionDtoBuilder().build();
+      const { externalId, ...createConventionParams } = convention;
 
       // POSTing a valid application succeeds.
       await request
         .post(`/${conventionsRoute}`)
-        .send(convention)
+        .send(createConventionParams)
         .expect(200, { id: convention.id });
 
       // POSTing an updated application to the same id succeeds.
@@ -262,6 +266,7 @@ describe("/demandes-immersion route", () => {
       const conventionWithUnknownId = new ConventionDtoBuilder()
         .withId(unknownId)
         .build();
+      const { externalId, ...createConventionParams } = conventionWithUnknownId;
 
       const jwt = generateJwt(
         createConventionMagicLinkPayload(
@@ -274,24 +279,25 @@ describe("/demandes-immersion route", () => {
       await request
         .post(`/${conventionsRoute}/${unknownId}`)
         .set("Authorization", jwt)
-        .send(conventionWithUnknownId)
+        .send(createConventionParams)
         .expect(404);
     });
 
     it("Creating an application with an existing ID fails with 409 Conflict", async () => {
       const convention = new ConventionDtoBuilder().build();
+      const { externalId, ...createConventionParams } = convention;
 
       // POSTing a valid application succeeds.
       await request
         .post(`/${conventionsRoute}`)
-        .send(convention)
+        .send(createConventionParams)
         .expect(200, { id: convention.id });
 
       // POSTing a another valid application with the same ID fails.
       await request
         .post(`/${conventionsRoute}`)
         .send({
-          ...convention,
+          ...createConventionParams,
           email: "another@email.fr",
         })
         .expect(409);

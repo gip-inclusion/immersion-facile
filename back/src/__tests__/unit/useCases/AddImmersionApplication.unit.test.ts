@@ -1,4 +1,4 @@
-import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -31,6 +31,8 @@ describe("Add Convention", () => {
   let createNewEvent: CreateNewEvent;
   let outboxRepository: InMemoryOutboxRepository;
   const validConvention = new ConventionDtoBuilder().build();
+  const { externalId, ...validConventionParams } = validConvention;
+
   let stubGetSiret: StubGetSiret;
   let getFeatureFlags: GetFeatureFlags;
   let uowPerformer: InMemoryUowPerformer;
@@ -64,9 +66,10 @@ describe("Add Convention", () => {
     const id = "eventId";
     clock.setNextDate(occurredAt);
     uuidGenerator.setNextUuid(id);
+    conventionRepository.setNextExternalId("00000000001");
 
-    expect(await addConvention.execute(validConvention)).toEqual({
-      id: validConvention.id,
+    expect(await addConvention.execute(validConventionParams)).toEqual({
+      id: validConventionParams.id,
     });
 
     const storedInRepo = await new InMemoryConventionQueries(
@@ -87,30 +90,30 @@ describe("Add Convention", () => {
   });
 
   it("rejects conventions where the ID is already in use", async () => {
-    await conventionRepository.save(validConvention);
+    await conventionRepository.save(validConventionParams);
 
     await expectPromiseToFailWithError(
-      addConvention.execute(validConvention),
-      new ConflictError(validConvention.id),
+      addConvention.execute(validConventionParams),
+      new ConflictError(validConventionParams.id),
     );
   });
 
   describe("Status validation", () => {
     // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021
     it("allows applications submitted as DRAFT", async () => {
-      expect(await addConvention.execute(validConvention)).toEqual({
-        id: validConvention.id,
+      expect(await addConvention.execute(validConventionParams)).toEqual({
+        id: validConventionParams.id,
       });
     });
 
     it("allows applications submitted as READY_TO_SIGN", async () => {
       expect(
         await addConvention.execute({
-          ...validConvention,
+          ...validConventionParams,
           status: "READY_TO_SIGN",
         }),
       ).toEqual({
-        id: validConvention.id,
+        id: validConventionParams.id,
       });
     });
 
@@ -122,7 +125,7 @@ describe("Add Convention", () => {
         }
         await expectPromiseToFailWithError(
           addConvention.execute({
-            ...validConvention,
+            ...validConventionParams,
             status,
           }),
           new ForbiddenError(),
@@ -142,22 +145,22 @@ describe("Add Convention", () => {
           getFeatureFlags: getFeatureFlagsWithInseeByPass,
         });
         stubGetSiret.setNextResponse({
-          siret: validConvention.siret,
+          siret: validConventionParams.siret,
           businessName: "INACTIVE BUSINESS",
           businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
           naf: { code: "78.3Z", nomenclature: "Ref2" },
           isOpen: false,
         });
 
-        expect(await addConvention.execute(validConvention)).toEqual({
-          id: validConvention.id,
+        expect(await addConvention.execute(validConventionParams)).toEqual({
+          id: validConventionParams.id,
         });
       });
     });
 
     it("rejects applications with SIRETs that don't correspond to active businesses", async () => {
       stubGetSiret.setNextResponse({
-        siret: validConvention.siret,
+        siret: validConventionParams.siret,
         businessName: "INACTIVE BUSINESS",
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
         naf: { code: "78.3Z", nomenclature: "Ref2" },
@@ -165,24 +168,24 @@ describe("Add Convention", () => {
       });
 
       await expectPromiseToFailWithError(
-        addConvention.execute(validConvention),
+        addConvention.execute(validConventionParams),
         new BadRequestError(
-          `Ce SIRET (${validConvention.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
+          `Ce SIRET (${validConventionParams.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
         ),
       );
     });
 
     it("accepts applications with SIRETs that  correspond to active businesses", async () => {
       stubGetSiret.setNextResponse({
-        siret: validConvention.siret,
+        siret: validConventionParams.siret,
         businessName: "ACTIVE BUSINESS",
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
         naf: { code: "78.3Z", nomenclature: "Ref2" },
         isOpen: true,
       });
 
-      expect(await addConvention.execute(validConvention)).toEqual({
-        id: validConvention.id,
+      expect(await addConvention.execute(validConventionParams)).toEqual({
+        id: validConventionParams.id,
       });
     });
 
@@ -191,7 +194,7 @@ describe("Add Convention", () => {
       stubGetSiret.setErrorForNextCall(error);
 
       await expectPromiseToFailWithError(
-        addConvention.execute(validConvention),
+        addConvention.execute(validConventionParams),
         error,
       );
     });

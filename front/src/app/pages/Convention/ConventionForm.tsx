@@ -13,7 +13,7 @@ import {
 } from "src/app/pages/Convention/conventionHelpers";
 import { ConventionPresentation } from "src/app/pages/Convention/ConventionPage";
 import { ConventionDto } from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
+import { conventionWithoutExternalIdSchema } from "shared/src/convention/convention.schema";
 import { toDateString } from "shared/src/utils/date";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -101,16 +101,19 @@ export const ConventionForm = ({
         <Formik
           enableReinitialize={true}
           initialValues={initialValues}
-          validationSchema={toFormikValidationSchema(conventionSchema)}
+          validationSchema={toFormikValidationSchema(
+            conventionWithoutExternalIdSchema,
+          )}
           onSubmit={async (values, { setSubmitting }) => {
             try {
-              const conventionParsed = conventionSchema.parse(values);
-              const convention: ConventionDto = {
+              const conventionParsed =
+                conventionWithoutExternalIdSchema.parse(values);
+              const convention = {
                 ...conventionParsed,
                 workConditions: undefinedIfEmptyString(
                   conventionParsed.workConditions,
                 ),
-              };
+              } as ConventionDto;
 
               await createOrUpdateConvention(routeParams, convention);
               setInitialValues(convention);

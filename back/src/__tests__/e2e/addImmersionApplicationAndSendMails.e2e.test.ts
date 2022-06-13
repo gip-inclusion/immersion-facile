@@ -30,11 +30,12 @@ const validatorEmail = "validator@mail.com";
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid app in repository with full express app", async () => {
     const validConvention = new ConventionDtoBuilder().build();
+    const { externalId, ...validConventionParams } = validConvention;
     const { request, reposAndGateways, eventCrawler } = await buildTestApp();
 
     const res = await request
       .post(`/${conventionsRoute}`)
-      .send(validConvention);
+      .send(validConventionParams);
 
     expectResponseBody(res, { id: validConvention.id });
     expect(await reposAndGateways.conventionQueries.getLatestUpdated()).toEqual(
@@ -138,7 +139,12 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
   convention: ConventionDto,
 ) => {
-  await request.post(`/${conventionsRoute}`).send(convention).expect(200);
+  const { externalId, ...createConventionParams } = convention;
+  const result = await request
+    .post(`/${conventionsRoute}`)
+    .send(createConventionParams);
+
+  expect(result.status).toBe(200);
 
   expectOnlyOneImmersionThatIsEqual(
     await reposAndGateways.conventionQueries.getLatestUpdated(),
