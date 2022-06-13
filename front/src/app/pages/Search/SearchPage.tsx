@@ -13,7 +13,6 @@ import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import { OurAdvises } from "./OurAdvises";
 import { SearchResultPanel } from "./SearchResultPanel";
-import { ButtonSearch } from "react-design-system/immersionFacile";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initiallySelectedIndex = 3; // to get 10 km radius by default
@@ -84,9 +83,10 @@ export const SearchPage = () => {
                       options={radiusOptions.map((n) => `${n} km`)}
                     />
                   </div>
-                  <ButtonSearch
-                    className="mt-12"
-                    dark
+                  <button
+                    className={
+                      "px-16 py-2 text-white flex justify-around font-semibold mt-12 rounded-md bg-immersionRed-veryDark"
+                    }
                     disabled={
                       searchStatus === "initialFetch" ||
                       searchStatus === "extraFetch"
@@ -97,7 +97,7 @@ export const SearchPage = () => {
                       <SearchIcon />
                       Rechercher
                     </div>
-                  </ButtonSearch>
+                  </button>
                 </div>
               </Form>
             )}

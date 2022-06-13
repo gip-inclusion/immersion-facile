@@ -5,7 +5,6 @@ import { DistanceIcon } from "src/icons/DistanceIcon";
 import { TrefleIcon } from "src/icons/TrefleIcon";
 import { ContactMethod } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { ButtonSearch } from "react-design-system/immersionFacile";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;
@@ -80,13 +79,19 @@ export const EnterpriseSearchResult = ({
         {address.toLocaleLowerCase()}
       </SearchResultInfo>
       <hr className="pb-2" />
-      <ButtonSearch onClick={onButtonClick} disabled={disableButton}>
+      <button
+        className={
+          "px-16 py-2 text-white flex justify-around font-semibold mt-12 rounded-md bg-immersionRed-light"
+        }
+        onClick={onButtonClick}
+        disabled={disableButton}
+      >
         {contactMode === "PHONE" ||
         contactMode === "EMAIL" ||
         contactMode === "IN_PERSON"
           ? "Contacter l'entreprise"
           : "Tentez votre chance"}
-      </ButtonSearch>
+      </button>
     </div>
   );
 };
