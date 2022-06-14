@@ -53,15 +53,15 @@ export const formEstablishmentSchemaPublicV0: z.Schema<FormEstablishmentDtoPubli
         .min(1, "Spécifiez au moins 1 métier"),
       businessContacts: z
         .array(businessContactSchemaPublicV0, {
-          required_error: "Contact métier obligatoire",
+          required_error: "Contact obligatoire",
         })
         .length(1, "Spécifiez 1 seul référent"),
       preferredContactMethods: z
         .array(z.enum(validContactMethodsV0), {
-          required_error: "Contact obligatoire",
+          required_error: "Mode de contact obligatoire",
         })
         .length(1, "Spécifiez un mode de contact"),
       isSearchable: zBoolean,
     },
-    { required_error: "Formulaire d'établissement obligatoire" },
+    { required_error: "Veuillez compléter le formulaire" },
   );

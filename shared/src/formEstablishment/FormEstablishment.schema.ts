@@ -58,5 +58,5 @@ export const formEstablishmentSchema = z.object(
     businessContact: businessContactSchema,
     isSearchable: zBoolean,
   },
-  { required_error: "Formulaire d'établissement obligatoire" },
+  { required_error: "Veuillez compléter le formulaire" },
 );

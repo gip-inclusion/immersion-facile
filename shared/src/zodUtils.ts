@@ -3,14 +3,14 @@ import { z, preprocess } from "zod";
 
 export const zString = z
   .string({
-    required_error: "Chaine de caractère obligatoire",
+    required_error: "Obligatoire",
     invalid_type_error: "Une chaine de caractères est attendue",
   })
-  .nonempty("Chaine de caractère obligatoire");
+  .nonempty("Obligatoire");
 
 export const zTrimmedString = zString
   .transform((s) => s.trim())
-  .refine((s) => s.length > 0, "Tableau de caractère Obligatoire");
+  .refine((s) => s.length > 0, "Obligatoire");
 
 export const makezTrimmedString = (message: string) =>
   zString.transform((s) => s.trim()).refine((s) => s.length > 0, message);
@@ -24,7 +24,7 @@ export const zEmail = z.preprocess(
 );
 
 export const zBoolean = z.boolean({
-  required_error: "Condition obligatoire",
+  required_error: "Sélection obligatoire",
   invalid_type_error: "Un booléen est attendu",
 });
 
