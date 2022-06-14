@@ -18,23 +18,28 @@ module.exports = {
       parser: "@typescript-eslint/parser",
       parserOptions: {
         tsconfigRootDir: __dirname,
-        project: ["./tsconfig.json"],
+        project: [
+          "./front/tsconfig.json",
+          "./back/tsconfig.json",
+          "./shared/tsconfig.json",
+          "./libs/react-design-system/tsconfig.json",
+        ],
         ecmaVersion: 2020,
         sourceType: "module",
       },
       plugins: ["@typescript-eslint" /*'rxjs'*/],
       rules: {
-        ...require("../.eslint/eslint.rules"),
-        ...require("../.eslint/typescript-eslint.rules"),
-        //...require('../.eslint/eslint.rules'),
-        //...require('../.eslint/typescript-eslint.rules'),
-        //...require('../.eslint/angular-eslint.rules'),
-        //...require('../.eslint/rxjs-eslint.rules'),
-        //...require('../.eslint/rxjs-angular-eslint.rules')
+        ...require("./.eslint/eslint.rules"),
+        ...require("./.eslint/typescript-eslint.rules"),
+        //...require('./.eslint/eslint.rules'),
+        //...require('./.eslint/typescript-eslint.rules'),
+        //...require('./.eslint/angular-eslint.rules'),
+        //...require('./.eslint/rxjs-eslint.rules'),
+        //...require('./.eslint/rxjs-angular-eslint.rules')
       },
     },
     {
-      files: ["**/InMemory*.ts", "**/Test*.ts", "**/Simulated*.ts"],
+      files: ["**/InMemory*.ts", "**/*Stub*.ts", "**/pg/migrations/*.ts"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
         tsconfigRootDir: __dirname,
@@ -56,8 +61,8 @@ module.exports = {
       plugins: ["jest"],
       rules: {
         //...require("./.eslint/eslint-test.rules"),
-        ...require("../.eslint/typescript-eslint-test.rules"),
-        ...require("../.eslint/jest-eslint.rules"),
+        ...require("./.eslint/typescript-eslint-test.rules"),
+        ...require("./.eslint/jest-eslint.rules"),
       },
     },
     /*{

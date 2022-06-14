@@ -6,5 +6,12 @@
     "back",
     "shared",
     "libs/*"
-  ]
+  ],
+  "scripts": {
+    "lint:back": "eslint back/src --fix",
+    "lint:front": "eslint front/src --fix",
+    "lint:shared": "eslint shared/src --fix",
+    "lint:libs": "eslint libs/ --fix",
+    "lint": "eslint ./**/src/ --fix"
+  }
 }

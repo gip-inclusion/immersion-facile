@@ -13,7 +13,7 @@
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck && npm run lint",
-    "lint": "eslint ./src --fix"
+    "lint": "pnpm -w run lint:front"
   },
   "dependencies": {
     "@dataesr/react-dsfr": "^1.0.5",

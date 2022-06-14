@@ -1,7 +1,8 @@
 {
   "name": "shared",
   "scripts": {
-    "includecheck": "./check_includes.sh"
+    "includecheck": "./check_includes.sh",
+    "lint": "pnpm -w run lint:shared"
   },
   "devDependencies": {
     "@types/ramda": "^0.28.1"

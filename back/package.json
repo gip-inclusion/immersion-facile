@@ -26,7 +26,7 @@
     "fullcheck": "npm run includecheck && npm run format && npm run lint && npm run test && npm run typecheck",
     "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck",
     "migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",
-    "lint": "eslint ./src --fix"
+    "lint": "pnpm -w run lint:back"
   },
   "keywords": [],
   "author": "",

@@ -12,6 +12,7 @@ export class SimulatedTechnicalGateway implements TechnicalGateway {
       enableAdminUi: true,
     });
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   uploadFile = async (file: File): Promise<AbsoluteUrl> => {
     // eslint-disable-next-line no-console
     console.log("file uploaded : ", file);

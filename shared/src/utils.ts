@@ -1,5 +1,4 @@
 // TODO: find the standard for gouv.fr phone verification
-import { partition } from "ramda";
 
 export const phoneRegExp = /^\+?[0-9]+$/;
 export const stringOfNumbers = /^\+?[0-9]+$/;
@@ -22,7 +21,7 @@ export type TypeFromTuple<T extends unknown[]> = T[number];
 
 export type NotEmptyArray<T> = [T, ...T[]];
 
-export type ExcludeFromExisting<T extends string, K extends T> = Exclude<T, K>
+export type ExcludeFromExisting<T extends string, K extends T> = Exclude<T, K>;
 
 export type OmitFromExistingKeys<
   T extends Record<string, unknown>,
