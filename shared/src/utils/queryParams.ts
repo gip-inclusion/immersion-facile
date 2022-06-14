@@ -16,7 +16,9 @@ export const queryParamsAsString = <Q extends QueryParams<RawQueryParams>>(
     reduce<keyof Q, string[]>(
       (acc: string[], param) => [
         ...acc,
-        `${param}=${encodeURI(queryParams[param].toString())}`,
+        ...(queryParams[param]
+          ? [`${param.toString()}=${encodeURI(queryParams[param].toString())}`]
+          : []),
       ],
       [],
     ),

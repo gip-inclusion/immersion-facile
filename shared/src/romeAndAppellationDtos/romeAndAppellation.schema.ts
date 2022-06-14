@@ -32,8 +32,18 @@ export const romeAutocompleteInputSchema: z.Schema<RomeSearchInput> = z.object({
 });
 
 const matchRangeSchema: z.Schema<MatchRangeDto> = z.object({
-  startIndexInclusive: z.number({ required_error: "Obligatoire" }).min(0).int(),
-  endIndexExclusive: z.number({ required_error: "Obligatoire" }).min(0).int(),
+  startIndexInclusive: z
+    .number({
+      required_error: "Début d'intervalle obligatoire",
+    })
+    .min(0)
+    .int(),
+  endIndexExclusive: z
+    .number({
+      required_error: "Fin d'intervalle obligatoire",
+    })
+    .min(0)
+    .int(),
 });
 
 export const AppellationMatchSchema: z.Schema<AppellationMatchDto> = z.object(
@@ -41,9 +51,9 @@ export const AppellationMatchSchema: z.Schema<AppellationMatchDto> = z.object(
     appellation: appellationDtoSchema,
     matchRanges: z.array(matchRangeSchema),
   },
-  { required_error: "Obligatoire" },
+  { required_error: "Appelation obligatoire" },
 );
 
 export const appellationSearchResponseSchema = z.array(AppellationMatchSchema, {
-  required_error: "Obligatoire",
+  required_error: "Recherche d'appelation obligatoire",
 });

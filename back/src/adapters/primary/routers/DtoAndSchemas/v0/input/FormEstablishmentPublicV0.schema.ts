@@ -52,12 +52,16 @@ export const formEstablishmentSchemaPublicV0: z.Schema<FormEstablishmentDtoPubli
         .array(professionSchemaPublicV0)
         .min(1, "Spécifiez au moins 1 métier"),
       businessContacts: z
-        .array(businessContactSchemaPublicV0, { required_error: "Obligatoire" })
+        .array(businessContactSchemaPublicV0, {
+          required_error: "businessContactSchemaPublicV0 Obligatoire",
+        })
         .length(1, "Spécifiez 1 seul référent"),
       preferredContactMethods: z
-        .array(z.enum(validContactMethodsV0), { required_error: "Obligatoire" })
+        .array(z.enum(validContactMethodsV0), {
+          required_error: "validContactMethodsV0 Obligatoire",
+        })
         .length(1, "Spécifiez un mode de contact"),
       isSearchable: zBoolean,
     },
-    { required_error: "Obligatoire" },
+    { required_error: "formEstablishmentSchemaPublicV0 Obligatoire" },
   );

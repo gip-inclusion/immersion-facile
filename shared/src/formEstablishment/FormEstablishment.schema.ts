@@ -7,7 +7,6 @@ import { NotEmptyArray, phoneRegExp } from "../utils";
 import { zBoolean, zEmail, zString, zTrimmedString } from "../zodUtils";
 import {
   BusinessContactDto,
-  FormEstablishmentDto,
   FormEstablishmentSource,
   ImmersionContactInEstablishmentId,
   ContactMethod,
@@ -59,5 +58,5 @@ export const formEstablishmentSchema = z.object(
     businessContact: businessContactSchema,
     isSearchable: zBoolean,
   },
-  { required_error: "Obligatoire" },
+  { required_error: "Formulaire d'établissement obligatoire" },
 );

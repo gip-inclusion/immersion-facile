@@ -30,7 +30,7 @@ export const ImmersionTextField = ({
   error,
   className,
   placeholder,
-  description = "Default description",
+  description,
   label,
   multiline,
   disabled,

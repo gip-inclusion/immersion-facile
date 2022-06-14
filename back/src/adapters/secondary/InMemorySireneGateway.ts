@@ -76,6 +76,7 @@ export const TEST_ESTABLISHMENT3 = new SireneEstablishmentVO({
     activitePrincipaleUniteLegale: "85.59A",
     nomenclatureActivitePrincipaleUniteLegale: "Ref2",
     trancheEffectifsUniteLegale: "01",
+    etatAdministratifUniteLegale: "A",
   },
   adresseEtablissement: {
     numeroVoieEtablissement: "20",
