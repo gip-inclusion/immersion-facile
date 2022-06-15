@@ -5,8 +5,8 @@ import {
 } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class TestSiretGatewayThroughBack implements SiretGatewayThroughBack {
-  getSiretInfo(): Promise<GetSiretInfo> {
-    throw new Error("Method not implemented. Should be deleted soon.");
+  isSiretAlreadyInSaved(): Observable<boolean> {
+    return this.isSiretInDb$;
   }
 
   getSiretInfoIfNotAlreadySaved(): Observable<GetSiretInfo> {
@@ -14,11 +14,12 @@ export class TestSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return this.siretInfo$;
   }
 
-  getSiretInfoObservable(): Observable<GetSiretInfo> {
+  getSiretInfo(): Observable<GetSiretInfo> {
     this.getSiretInfoObservableCallCount++;
     return this.siretInfo$;
   }
 
+  public isSiretInDb$ = new Subject<boolean>();
   public siretInfo$ = new Subject<GetSiretInfo>();
   public getSiretInfoObservableCallCount = 0;
   public getSiretInfoIfNotAlreadySavedCallCount = 0;

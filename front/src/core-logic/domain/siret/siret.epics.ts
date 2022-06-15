@@ -68,7 +68,7 @@ const makeGetSiret =
     siret: SiretDto,
   ): Observable<GetSiretInfo> =>
     shouldFetchEvenIfAlreadySaved
-      ? siretGatewayThroughBack.getSiretInfoObservable(siret)
+      ? siretGatewayThroughBack.getSiretInfo(siret)
       : siretGatewayThroughBack.getSiretInfoIfNotAlreadySaved(siret);
 
 export const siretEpics = [triggerSiretFetchEpic, getSiretEpic];

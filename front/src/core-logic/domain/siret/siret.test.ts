@@ -100,7 +100,19 @@ describe("Siret validation and fetching", () => {
       expectSiretErrorToBe("Oups ! Failed");
     });
 
-    it("does not fetch if the featureFlag to fetch siret is off", () => {
+    it("when 'withAlreadySavedCheck' is false, fetches correctly but calls the relevant route", () => {
+      setStoreWithInitialSiretState({
+        shouldFetchEvenIfAlreadySaved: true,
+      });
+      dispatchSiretModified("11110000111100");
+      feedSirenGatewayThroughBackWith(establishmentFetched);
+      expectEstablishmentToEqual(establishmentFetched);
+      expectOnly_getSirenInfoObservable_toHaveBeenCalled();
+    });
+  });
+
+  describe("When enableInseeApi feature flag is OFF", () => {
+    it("does not fetch the siret", () => {
       ({ store, dependencies } = createTestStore(
         {
           featureFlags: {
@@ -115,16 +127,6 @@ describe("Siret validation and fetching", () => {
       ));
       dispatchSiretModified("11110000111100");
       expectIsSearchingToBe(false);
-    });
-
-    it("when 'withAlreadySavedCheck' is false, fetches correctly but calls the relevant route", () => {
-      setStoreWithInitialSiretState({
-        shouldFetchEvenIfAlreadySaved: true,
-      });
-      dispatchSiretModified("11110000111100");
-      feedSirenGatewayThroughBackWith(establishmentFetched);
-      expectEstablishmentToEqual(establishmentFetched);
-      expectOnly_getSirenInfoObservable_toHaveBeenCalled();
     });
   });
 

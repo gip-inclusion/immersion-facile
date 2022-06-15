@@ -1,6 +1,10 @@
 import axios, { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
-import { getSiretIfNotSavedRoute, siretRoute } from "shared/src/routes";
+import {
+  formAlreadyExistsRoute,
+  getSiretIfNotSavedRoute,
+  siretRoute,
+} from "shared/src/routes";
 import { SiretDto } from "shared/src/siret";
 import {
   GetSiretInfo,
@@ -22,19 +26,27 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     });
   }
 
-  public getSiretInfo(siret: SiretDto): Promise<GetSiretInfo> {
-    return this.axiosInstance
-      .get(`/${siretRoute}/${siret}`)
-      .then((response) => response.data)
-      .catch((error) => {
-        const errorMessage = errorMessageByCode[error?.response?.status];
-        if (!errorMessage) throw error;
-        return errorMessage;
-      });
+  isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean> {
+    return from(
+      this.axiosInstance
+        .get(`/${formAlreadyExistsRoute}/${siret}`)
+        .then((response) => response.data),
+    );
   }
 
-  public getSiretInfoObservable(siret: SiretDto): Observable<GetSiretInfo> {
-    return from(this.getSiretInfo(siret));
+  // public isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean> {}
+
+  public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
+    return from(
+      this.axiosInstance
+        .get(`/${siretRoute}/${siret}`)
+        .then((response) => response.data)
+        .catch((error) => {
+          const errorMessage = errorMessageByCode[error?.response?.status];
+          if (!errorMessage) throw error;
+          return errorMessage;
+        }),
+    );
   }
 
   public getSiretInfoIfNotAlreadySaved(
