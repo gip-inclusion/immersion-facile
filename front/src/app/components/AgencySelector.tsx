@@ -12,19 +12,21 @@ import { Agencies } from "src/app/components/Agency";
 import { agencyGateway } from "src/app/config/dependencies";
 import { useConnectedWith } from "src/hooks/connectedWith";
 import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
-import { useFeatureFlags } from "../utils/useFeatureFlags";
 
 type AgencySelectorProps = {
   label: string;
   description?: string;
   disabled?: boolean;
   defaultAgencyId?: string;
+  shouldListAll: boolean;
 };
+
 export const AgencySelector = ({
   label,
   description,
   disabled,
   defaultAgencyId,
+  shouldListAll,
 }: AgencySelectorProps) => {
   const name: keyof ConventionDto = "agencyId";
   const [{ value, onBlur }, { touched, error }, { setValue }] =
@@ -35,13 +37,17 @@ export const AgencySelector = ({
   const [loadingError, setLoadingError] = useState(false);
   const [position, setPosition] = useState<LatLonDto | null>(null);
   const [agencies, setAgencies] = useState([placeholderAgency]);
-  const { enablePeConnectApi } = useFeatureFlags();
   const connectedWith = useConnectedWith();
+
   useEffect(() => {
     if (!position) return;
 
     setIsLoading(true);
-    agenciesRetreiver(position, enablePeConnectApi, connectedWith)
+    agenciesRetriever({
+      shouldListAll,
+      position,
+      connectedWith,
+    })
       .then((agencies) => {
         setAgencies([emptyAgency, ...agencies]);
         if (
@@ -123,14 +129,20 @@ const isDefaultAgencyOnAgenciesAndEnabled = (
   agencies: AgencyInListDto[],
 ) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);
 
-const agenciesRetreiver = (
-  position: LatLonDto,
-  enablePeConnectApi: boolean,
-  connectedWith: FederatedIdentity | null,
-) =>
-  enablePeConnectApi && connectedWith && isPeConnectIdentity(connectedWith)
+const agenciesRetriever = ({
+  position,
+  shouldListAll,
+  connectedWith,
+}: {
+  position: LatLonDto;
+  shouldListAll: boolean;
+  connectedWith: FederatedIdentity | null;
+}) => {
+  if (shouldListAll) return agencyGateway.listAllAgencies(position);
+  return connectedWith && isPeConnectIdentity(connectedWith)
     ? agencyGateway.listPeAgencies(position)
-    : agencyGateway.listAllAgencies(position);
+    : agencyGateway.listNonPeAgencies(position);
+};
 
 const placeholderAgency: AgencyInListDto = {
   id: "",

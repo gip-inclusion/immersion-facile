@@ -95,7 +95,7 @@ export const ConventionFormFields = ({
     submitForm,
     values,
   } = useFormikContext<ConventionDto>();
-  const featureFlags = useFeatureFlags();
+  const { enableInseeApi, enablePeConnectApi } = useFeatureFlags();
   const isSiretFetcherDisabled = values.status !== "DRAFT";
   const {
     establishmentInfo,
@@ -185,6 +185,7 @@ export const ConventionFormFields = ({
           label="Votre structure d'accompagnement *"
           disabled={isFrozen}
           defaultAgencyId={values.agencyId}
+          shouldListAll={enablePeConnectApi}
         />
       )}
       <TextInput
@@ -230,7 +231,7 @@ export const ConventionFormFields = ({
         type="text"
         placeholder=""
         description=""
-        disabled={featureFlags.enableInseeApi}
+        disabled={enableInseeApi}
       />
       <TextInput
         label="Indiquez le prénom, nom et fonction du tuteur *"
