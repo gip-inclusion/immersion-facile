@@ -45,10 +45,11 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
   }
 
   public async getFormEstablishmentFromJwt(
+    siret: SiretDto,
     jwt: string,
   ): Promise<FormEstablishmentDto> {
     const httpResponse = await axios.get(
-      `/${prefix}/${formEstablishmentsRoute}/${jwt}`, // TODO Should it be siret instead of jwt ?
+      `/${prefix}/${formEstablishmentsRoute}/${siret}`,
       {
         headers: {
           Authorization: jwt,

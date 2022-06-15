@@ -1,8 +1,10 @@
 import { useField } from "formik";
 import React from "react";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { establishmentGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { Route } from "type-route";
@@ -20,7 +22,10 @@ export const EstablishmentEditionFormPage = ({
 }) => (
   <ApiDataContainer
     callApi={() =>
-      establishmentGateway.getFormEstablishmentFromJwt(route.params.jwt)
+      establishmentGateway.getFormEstablishmentFromJwt(
+        decodeJwt<EstablishmentJwtPayload>(route.params.jwt).siret,
+        route.params.jwt,
+      )
     }
     jwt={route.params.jwt}
   >

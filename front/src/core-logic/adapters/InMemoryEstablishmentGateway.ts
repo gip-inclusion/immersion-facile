@@ -48,6 +48,7 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
   }
 
   public async getFormEstablishmentFromJwt(
+    _siret: string,
     jwt: string,
   ): Promise<FormEstablishmentDto> {
     if (jwt === "renew")
