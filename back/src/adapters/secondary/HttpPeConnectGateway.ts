@@ -52,7 +52,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     )}`;
   }
 
-  public async oAuthGetAccessTokenThroughAuthorizationCode(
+  private async oAuthGetAccessTokenThroughAuthorizationCode(
     authorizationCode: string,
   ): Promise<AccessTokenDto> {
     const getAccessTokenPayload: ExternalPeConnectOAuthGetTokenWithCodeGrantPayload =
@@ -90,7 +90,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     return toAccessToken(externalAccessToken);
   }
 
-  public async getUserInfo(
+  private async getUserInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectUserDto> {
     const response = await createAxiosInstance()
@@ -112,7 +112,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     return toPeConnectUserDto(externalUser);
   }
 
-  public async getAdvisorsInfo(
+  private async getAdvisorsInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectAdvisorDto[]> {
     const response = await createAxiosInstance()

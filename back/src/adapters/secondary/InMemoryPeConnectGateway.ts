@@ -1,10 +1,7 @@
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { peConnect } from "shared/src/routes";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
-import {
-  AccessTokenDto,
-  toAccessToken,
-} from "../../domain/peConnect/dto/AccessToken.dto";
+import { AccessTokenDto } from "../../domain/peConnect/dto/AccessToken.dto";
 import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
@@ -15,7 +12,6 @@ import {
   toPeConnectUserDto,
 } from "../../domain/peConnect/dto/PeConnect.dto";
 
-import { externalAccessTokenSchema } from "../../domain/peConnect/port/AccessToken.schema";
 import {
   externalPeConnectAdvisorsSchema,
   externalPeConnectUserSchema,
@@ -28,17 +24,6 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
   private _advisors: ExternalPeConnectAdvisor[] = [];
 
   constructor(private baseUrl: AbsoluteUrl) {}
-
-  async oAuthGetAccessTokenThroughAuthorizationCode(
-    _authorizationCode: string,
-  ): Promise<AccessTokenDto> {
-    return toAccessToken(
-      externalAccessTokenSchema.parse({
-        access_token: "ejhlgjdkljeklgjlkjekljzklejekljsklfj",
-        expires_in: 59,
-      }),
-    );
-  }
 
   // This mocks the full external flow and not only the first redirect on https://authentification-candidat.pole-emploi.fr/connexion/oauth2/authorize
   oAuthGetAuthorizationCodeRedirectUrl(): AbsoluteUrl {

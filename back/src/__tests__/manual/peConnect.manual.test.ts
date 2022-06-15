@@ -18,6 +18,7 @@ import { queryParamsAsString } from "shared/src/utils/queryParams";
 import secondsToMilliseconds from "date-fns/secondsToMilliseconds";
 import { FeatureFlags } from "shared/src/featureFlags";
 import supertest, { SuperTest, Test } from "supertest";
+import { HttpPeConnectGateway } from "../../adapters/secondary/HttpPeConnectGateway";
 
 const mockedBehavioursWithInvalidSchemaError =
   () => async (): Promise<AccessTokenDto> => {
@@ -68,19 +69,40 @@ const mockedBehavioursWithHttpError =
     return toAccessToken(externalAccessToken);
   };
 
+const prepareAppWithMockedPeConnect = async (
+  mockedOAuthAccessToken: (
+    authorization_code: string,
+  ) => Promise<AccessTokenDto>,
+) => {
+  const { app, repositories } = await createAppWithMockedGateway();
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  repositories.getFeatureFlags = async (): Promise<FeatureFlags> =>
+    ({ enablePeConnectApi: true } as FeatureFlags);
+  // eslint-disable-next-line @typescript-eslint/require-await
+
+  repositories.peConnectGateway = {
+    ...repositories.peConnectGateway,
+    oAuthGetAccessTokenThroughAuthorizationCode: mockedOAuthAccessToken,
+  } as unknown as HttpPeConnectGateway;
+
+  return app;
+};
+const createAppWithMockedGateway = async () => {
+  const { app, repositories } = await createApp(new AppConfigBuilder().build());
+  repositories.peConnectGateway = {
+    ...repositories.peConnectGateway,
+    oAuthGetAccessTokenThroughAuthorizationCode:
+      mockedBehavioursWithHttpError(),
+  } as unknown as HttpPeConnectGateway;
+  return { app, repositories };
+};
+
 describe("/pe-connect", () => {
   it("verify that an error in the axios response is handled", async () => {
-    //Arrange
-    const { app, repositories } = await createApp(
-      new AppConfigBuilder().build(),
+    const app = await prepareAppWithMockedPeConnect(
+      mockedBehavioursWithHttpError(),
     );
-    // eslint-disable-next-line @typescript-eslint/require-await
-    repositories.getFeatureFlags = async (): Promise<FeatureFlags> =>
-      ({ enablePeConnectApi: true } as FeatureFlags);
-    // eslint-disable-next-line @typescript-eslint/require-await
-
-    repositories.peConnectGateway.oAuthGetAccessTokenThroughAuthorizationCode =
-      mockedBehavioursWithHttpError();
 
     const request: SuperTest<Test> = supertest(app);
     const response = await request.get("/pe-connect?code=12345678");
@@ -99,17 +121,9 @@ describe("/pe-connect", () => {
   });
 
   it("verify that an error in the axios response data (external api contract) is handled", async () => {
-    //Arrange
-    const { app, repositories } = await createApp(
-      new AppConfigBuilder().build(),
+    const app = prepareAppWithMockedPeConnect(
+      mockedBehavioursWithInvalidSchemaError(),
     );
-    // eslint-disable-next-line @typescript-eslint/require-await
-    repositories.getFeatureFlags = async (): Promise<FeatureFlags> =>
-      ({ enablePeConnectApi: true } as FeatureFlags);
-    // eslint-disable-next-line @typescript-eslint/require-await
-
-    repositories.peConnectGateway.oAuthGetAccessTokenThroughAuthorizationCode =
-      mockedBehavioursWithInvalidSchemaError();
 
     const request: SuperTest<Test> = supertest(app);
     const response = await request.get("/pe-connect?code=12345678");
