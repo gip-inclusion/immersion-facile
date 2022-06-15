@@ -8,12 +8,12 @@ import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
 export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
   fieldFromInfo: K,
-  establishmentInfos: GetSiretResponseDto | undefined,
   options?: {
     fieldToUpdate?: string;
     disabled?: boolean;
   },
 ) => {
+  const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const [{ value: _ }, { touched }, { setValue }] = useField<
     GetSiretResponseDto[K]
   >({
@@ -35,21 +35,24 @@ type SiretFetcherOptions = {
 export const useSiretFetcher = ({
   shouldFetchEvenIfAlreadySaved,
 }: SiretFetcherOptions) => {
-  const siretState = useAppSelector(siretSelectors.siretState);
+  const currentSiret = useAppSelector(siretSelectors.currentSiret);
+  const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const siretError = useAppSelector(siretSelectors.siretError);
+  const isFetching = useAppSelector(siretSelectors.isFetching);
+  const storeShouldFetchEvenIfAlreadySaved = useAppSelector(
+    siretSelectors.shouldFetchEvenIfAlreadySaved,
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (
-      shouldFetchEvenIfAlreadySaved !== siretState.shouldFetchEvenIfAlreadySaved
-    )
+    if (shouldFetchEvenIfAlreadySaved !== storeShouldFetchEvenIfAlreadySaved)
       dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
-  }, [siretState.shouldFetchEvenIfAlreadySaved]);
+  }, [storeShouldFetchEvenIfAlreadySaved]);
 
   return {
-    currentSiret: siretState.currentSiret,
-    establishmentInfo: siretState.establishment ?? undefined,
-    isFetchingSiret: siretState.isSearching,
+    currentSiret,
+    establishmentInfos: establishmentInfos ?? undefined,
+    isFetchingSiret: isFetching,
     siretError: siretError ?? undefined,
     updateSiret: (newSiret: string) =>
       dispatch(siretSlice.actions.siretModified(newSiret)),

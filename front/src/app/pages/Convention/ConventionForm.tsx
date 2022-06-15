@@ -20,7 +20,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Title } from "react-design-system/immersionFacile";
-import { ConventionFormFields } from "./ConventionFormFields";
+import { ConventionFormFields } from "./ConventionFields/ConventionFormFields";
 
 type ConventionFormProps = {
   properties: ConventionPresentation;

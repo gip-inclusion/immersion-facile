@@ -151,27 +151,21 @@ describe("Siret validation and fetching", () => {
     store.dispatch(siretSlice.actions.siretModified(siret));
 
   const expectShouldFetchEvenIfAlreadySavedToBe = (expected: boolean) => {
-    expect(
-      siretSelectors.siretState(store.getState()).shouldFetchEvenIfAlreadySaved,
-    ).toBe(expected);
+    expect(siretSelectors.shouldFetchEvenIfAlreadySaved(store.getState())).toBe(
+      expected,
+    );
   };
 
   const expectCurrentSiretToBe = (expected: string) => {
-    expect(siretSelectors.siretState(store.getState()).currentSiret).toBe(
-      expected,
-    );
+    expect(siretSelectors.currentSiret(store.getState())).toBe(expected);
   };
 
   const expectIsSearchingToBe = (expected: boolean) => {
-    expect(siretSelectors.siretState(store.getState()).isSearching).toBe(
-      expected,
-    );
+    expect(siretSelectors.isFetching(store.getState())).toBe(expected);
   };
 
   const expectEstablishmentToEqual = (expected: GetSiretResponseDto | null) => {
-    expect(siretSelectors.siretState(store.getState()).establishment).toBe(
-      expected,
-    );
+    expect(siretSelectors.establishmentInfos(store.getState())).toBe(expected);
   };
 
   const expectSiretErrorToBe = (expected: string | null) => {

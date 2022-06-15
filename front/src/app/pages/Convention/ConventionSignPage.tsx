@@ -19,7 +19,7 @@ import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
-import { ConventionFormFields } from "./ConventionFormFields";
+import { ConventionFormFields } from "./ConventionFields/ConventionFormFields";
 
 type SignFormRoute = Route<typeof routes.conventionToSign>;
 

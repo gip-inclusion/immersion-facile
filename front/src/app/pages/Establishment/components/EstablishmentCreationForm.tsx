@@ -59,7 +59,7 @@ export const EstablishmentCreationForm = ({
 const CreationSiretRelatedInputs = () => {
   const {
     currentSiret,
-    establishmentInfo,
+    establishmentInfos,
     isFetchingSiret,
     siretError,
     updateSiret,
@@ -70,9 +70,9 @@ const CreationSiretRelatedInputs = () => {
   const [requestEmailToEditFormError, setRequestEmailToEditFormError] =
     useState<string | null>(null);
 
-  useSiretRelatedField("businessName", establishmentInfo);
-  useSiretRelatedField("businessAddress", establishmentInfo);
-  useSiretRelatedField("naf", establishmentInfo);
+  useSiretRelatedField("businessName");
+  useSiretRelatedField("businessAddress");
+  useSiretRelatedField("naf");
   const featureFlags = useFeatureFlags();
 
   const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
@@ -139,7 +139,7 @@ const CreationSiretRelatedInputs = () => {
         disabled={isFetchingSiret}
       />
       <AddressAutocomplete
-        initialSearchTerm={establishmentInfo?.businessAddress}
+        initialSearchTerm={establishmentInfos?.businessAddress}
         label={businessLabelAndName.label}
         setFormValue={(address) => setAddressValue(address.label)}
         disabled={isFetchingSiret}

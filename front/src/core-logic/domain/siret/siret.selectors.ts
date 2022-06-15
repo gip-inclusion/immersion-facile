@@ -1,12 +1,26 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { prop } from "ramda";
 import { InvalidSiretError } from "src/core-logic/domain/siret/siret.slice";
 import { GetSiretInfoError } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-const siretState = createRootSelector(prop("siret"));
+const siretState = createRootSelector(({ siret }) => siret);
 
-const currentSiret = createSelector(siretState, prop("currentSiret"));
+const currentSiret = createSelector(
+  siretState,
+  ({ currentSiret }) => currentSiret,
+);
+
+const establishmentInfos = createSelector(
+  siretState,
+  ({ establishment }) => establishment,
+);
+
+const isFetching = createSelector(siretState, ({ isSearching }) => isSearching);
+
+const shouldFetchEvenIfAlreadySaved = createSelector(
+  siretState,
+  ({ shouldFetchEvenIfAlreadySaved }) => shouldFetchEvenIfAlreadySaved,
+);
 
 const siretError = createSelector(siretState, ({ error }): string | null => {
   if (!error) return null;
@@ -17,13 +31,6 @@ const isSiretAlreadySaved = createSelector(
   siretState,
   ({ error }) => error === "Establishment with this siret is already in our DB",
 );
-
-export const siretSelectors = {
-  isSiretAlreadySaved,
-  siretError,
-  currentSiret,
-  siretState,
-};
 
 const errorTranslations: Partial<
   Record<GetSiretInfoError | InvalidSiretError, string>
@@ -37,4 +44,13 @@ const errorTranslations: Partial<
     "Cet établissement est déjà référencé",
   "Too many requests on SIRENE API.":
     "Le service de vérification du SIRET a reçu trop d'appels.",
+};
+
+export const siretSelectors = {
+  isSiretAlreadySaved,
+  siretError,
+  currentSiret,
+  establishmentInfos,
+  isFetching,
+  shouldFetchEvenIfAlreadySaved,
 };

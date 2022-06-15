@@ -1,4 +1,4 @@
-import { FieldHookConfig, useField } from "formik";
+import { useField } from "formik";
 import React from "react";
 import {
   emptySchedule,
@@ -17,7 +17,7 @@ import { SimpleSchedulePicker } from "./SimpleSchedulePicker";
 import { TotalHoursIndicator } from "./TotalHoursIndicator";
 
 // Function that can be used as `validate` in Formik.
-export function scheduleValidator(value: ScheduleDto): string | void {
+function scheduleValidator(value: ScheduleDto): string | void {
   const totalHours = calculateWeeklyHoursFromSchedule(value);
 
   if (totalHours > maxPermittedHoursPerWeek) {
@@ -30,11 +30,16 @@ export function scheduleValidator(value: ScheduleDto): string | void {
 }
 
 type SchedulePickerProps = {
+  name: string;
   setFieldValue: (schedule: ScheduleDto) => void;
   disabled?: boolean;
-} & FieldHookConfig<ScheduleDto>;
+};
+
 export const SchedulePicker = (props: SchedulePickerProps) => {
-  const [field, meta] = useField(props);
+  const [field, meta] = useField<ScheduleDto>({
+    name: props.name,
+    validate: scheduleValidator,
+  });
 
   return (
     <>
