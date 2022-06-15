@@ -1,26 +1,29 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { prop } from "ramda";
 import { InvalidSiretError } from "src/core-logic/domain/siret/siret.slice";
 import { GetSiretInfoError } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-export const siretStateSelector = createRootSelector(
-  ({ siret: { error, ...rest } }) => rest,
-);
+const siretState = createRootSelector(prop("siret"));
 
-export const currentSiretSelector = createSelector(
-  siretStateSelector,
-  (state) => state.currentSiret,
-);
+const currentSiret = createSelector(siretState, prop("currentSiret"));
 
-export const siretErrorSelector = createRootSelector((state): string | null => {
-  if (!state.siret.error) return null;
-  return errorTranslations[state.siret.error] ?? state.siret.error;
+const siretError = createSelector(siretState, ({ error }): string | null => {
+  if (!error) return null;
+  return errorTranslations[error] ?? error;
 });
 
-export const isSiretAlreadySavedSelector = createRootSelector(
-  (state) =>
-    state.siret.error === "Establishment with this siret is already in our DB",
+const isSiretAlreadySaved = createSelector(
+  siretState,
+  ({ error }) => error === "Establishment with this siret is already in our DB",
 );
+
+export const siretSelectors = {
+  isSiretAlreadySaved,
+  siretError,
+  currentSiret,
+  siretState,
+};
 
 const errorTranslations: Partial<
   Record<GetSiretInfoError | InvalidSiretError, string>

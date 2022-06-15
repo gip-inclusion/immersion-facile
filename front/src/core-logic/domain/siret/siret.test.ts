@@ -1,8 +1,5 @@
 import { GetSiretResponseDto } from "shared/src/siret";
-import {
-  siretErrorSelector,
-  siretStateSelector,
-} from "src/core-logic/domain/siret/siret.selectors";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import {
   siretSlice,
   SiretState,
@@ -155,24 +152,30 @@ describe("Siret validation and fetching", () => {
 
   const expectShouldFetchEvenIfAlreadySavedToBe = (expected: boolean) => {
     expect(
-      siretStateSelector(store.getState()).shouldFetchEvenIfAlreadySaved,
+      siretSelectors.siretState(store.getState()).shouldFetchEvenIfAlreadySaved,
     ).toBe(expected);
   };
 
   const expectCurrentSiretToBe = (expected: string) => {
-    expect(siretStateSelector(store.getState()).currentSiret).toBe(expected);
+    expect(siretSelectors.siretState(store.getState()).currentSiret).toBe(
+      expected,
+    );
   };
 
   const expectIsSearchingToBe = (expected: boolean) => {
-    expect(siretStateSelector(store.getState()).isSearching).toBe(expected);
+    expect(siretSelectors.siretState(store.getState()).isSearching).toBe(
+      expected,
+    );
   };
 
   const expectEstablishmentToEqual = (expected: GetSiretResponseDto | null) => {
-    expect(siretStateSelector(store.getState()).establishment).toBe(expected);
+    expect(siretSelectors.siretState(store.getState()).establishment).toBe(
+      expected,
+    );
   };
 
   const expectSiretErrorToBe = (expected: string | null) => {
-    expect(siretErrorSelector(store.getState())).toBe(expected);
+    expect(siretSelectors.siretError(store.getState())).toBe(expected);
   };
 
   const feedSirenGatewayThroughBackWith = (response: GetSiretInfo) => {

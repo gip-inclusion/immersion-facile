@@ -9,7 +9,7 @@ import {
 } from "react-design-system/immersionFacile";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
-import { isSiretAlreadySavedSelector } from "src/core-logic/domain/siret/siret.selectors";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
 import { useSiretFetcher } from "src/hooks/siret.hooks";
 import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSubTitle";
@@ -22,7 +22,9 @@ export const EstablishmentHomeMenu = () => {
   });
   const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
   const dispatch = useDispatch();
-  const isSiretAlreadySaved = useAppSelector(isSiretAlreadySavedSelector);
+  const isSiretAlreadySaved = useAppSelector(
+    siretSelectors.isSiretAlreadySaved,
+  );
   const modifyLinkWasSent = useAppSelector(
     establishmentSelectors.wasModifyLinkSent,
   );
