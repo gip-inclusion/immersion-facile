@@ -8,7 +8,6 @@ import {
   siretSchema,
   tooManySirenRequestsSiret,
 } from "shared/src/siret";
-import { sleep } from "shared/src/utils";
 import {
   GetSiretInfo,
   sirenApiMissingEstablishmentMessage,

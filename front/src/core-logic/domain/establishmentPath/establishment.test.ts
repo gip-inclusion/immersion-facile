@@ -9,6 +9,13 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { establishmentSlice, EstablishmentState } from "./establishment.slice";
 
+const establishmentFetched = {
+  siret: "11110000111100",
+  businessName: "Existing open business on Sirene Corp.",
+  businessAddress: "",
+  isOpen: true,
+};
+
 describe("Establishment", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
@@ -44,12 +51,35 @@ describe("Establishment", () => {
       },
       "skip",
     ));
-    store.dispatch(
-      siretSlice.actions.siretInfoSucceeded({
-        siret: "123",
-      } as GetSiretResponseDto),
+    store.dispatch(siretSlice.actions.siretModified("10002000300040"));
+    dependencies.siretGatewayThroughBack.siretInfo$.next(establishmentFetched);
+    expectNavigationToEstablishmentFormPageToHaveBeenTriggered(
+      "10002000300040",
     );
-    expectNavigationToEstablishmentFormPageToHaveBeenTriggered("123");
+  });
+
+  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION', event if insee feature flag is OFF", () => {
+    ({ store, dependencies } = createTestStore(
+      {
+        establishment: {
+          status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
+          isLoading: false,
+        },
+        featureFlags: {
+          enableInseeApi: false,
+          enableAdminUi: true,
+          enablePeConnectApi: false,
+          enableLogoUpload: false,
+          areFeatureFlagsLoading: false,
+        },
+      },
+      "skip",
+    ));
+    store.dispatch(siretSlice.actions.siretModified("10002000300040"));
+    dependencies.siretGatewayThroughBack.isSiretInDb$.next(false);
+    expectNavigationToEstablishmentFormPageToHaveBeenTriggered(
+      "10002000300040",
+    );
   });
 
   it("send modification link", () => {

@@ -111,8 +111,15 @@ describe("Siret validation and fetching", () => {
     });
   });
 
+  it("toggles shouldFetchEvenIfAlreadySaved and clears establishment and errors", () => {
+    store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+    expectSiretErrorToBe(null);
+    store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+    expectShouldFetchEvenIfAlreadySavedToBe(false);
+  });
+
   describe("When enableInseeApi feature flag is OFF", () => {
-    it("does not fetch the siret", () => {
+    beforeEach(() => {
       ({ store, dependencies } = createTestStore(
         {
           featureFlags: {
@@ -120,21 +127,27 @@ describe("Siret validation and fetching", () => {
             enableAdminUi: true,
             enablePeConnectApi: false,
             enableLogoUpload: false,
-            areFeatureFlagsLoading: true,
+            areFeatureFlagsLoading: false,
           },
         },
         "skip",
       ));
-      dispatchSiretModified("11110000111100");
-      expectIsSearchingToBe(false);
     });
-  });
 
-  it("toggles shouldFetchEvenIfAlreadySaved and clears establishment and errors", () => {
-    store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
-    expectSiretErrorToBe(null);
-    store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
-    expectShouldFetchEvenIfAlreadySavedToBe(false);
+    it("when it is already in db, displays accordingly", () => {
+      dispatchSiretModified("11110000111100");
+      expectIsSearchingToBe(true);
+      feedSiretInDbWith(true);
+      expectSiretErrorToBe("Cet établissement est déjà référencé");
+    });
+
+    it("when it is already NOT in db it should not fetch siret", () => {
+      dispatchSiretModified("11110000111100");
+      expectIsSearchingToBe(true);
+      feedSiretInDbWith(false);
+      expectSiretErrorToBe(null);
+      expectEstablishmentToEqual(null);
+    });
   });
 
   const dispatchSiretModified = (siret: string) =>
@@ -168,6 +181,10 @@ describe("Siret validation and fetching", () => {
 
   const feedSirenGatewayThroughBackWithError = (error: Error) => {
     dependencies.siretGatewayThroughBack.siretInfo$.error(error);
+  };
+
+  const feedSiretInDbWith = (isInDb: boolean) => {
+    dependencies.siretGatewayThroughBack.isSiretInDb$.next(isInDb);
   };
 
   const expectOnly_getSirenInfoIfNotAlreadySaved_toHaveBeenCalled = () => {

@@ -44,6 +44,10 @@ export const siretSlice = createSlice({
       state.isSearching = false;
       state.establishment = action.payload;
     },
+    siretInfoDisabledAndNoMatchInDbFound: (state) => {
+      state.isSearching = false;
+      state.establishment = null;
+    },
     siretInfoFailed: (state, action: PayloadAction<GetSiretInfoError>) => {
       state.isSearching = false;
       state.error = action.payload;

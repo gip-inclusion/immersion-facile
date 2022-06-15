@@ -30,14 +30,20 @@ const redirectToEstablishmentFormPageEpic: AppEpic<
   EstablishmentAction | SiretAction
 > = (action$, state$, { navigationGateway }) =>
   action$.pipe(
-    filter(siretSlice.actions.siretInfoSucceeded.match),
+    filter(
+      (action) =>
+        siretSlice.actions.siretInfoSucceeded.match(action) ||
+        siretSlice.actions.siretInfoDisabledAndNoMatchInDbFound.match(action),
+    ),
     filter(
       () =>
         state$.value.establishment.status ===
         "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
     ),
-    tap((action) =>
-      navigationGateway.navigateToEstablishmentForm(action.payload.siret),
+    tap(() =>
+      navigationGateway.navigateToEstablishmentForm(
+        state$.value.siret.currentSiret,
+      ),
     ),
     map(() => establishmentSlice.actions.navigatedAwayFromHome()),
   );

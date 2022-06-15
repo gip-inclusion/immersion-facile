@@ -19,15 +19,13 @@ const shouldTriggerSearch = (candidate: string) => {
   }
 };
 
-const triggerSiretFetchEpic: AppEpic<SiretAction> = (action$, state$) =>
+const triggerSiretFetchEpic: AppEpic<SiretAction> = (action$) =>
   action$.pipe(
     filter(siretSlice.actions.siretModified.match),
     switchMap((action) =>
       iif(
         () => shouldTriggerSearch(action.payload),
-        of(siretSlice.actions.siretInfoRequested(action.payload)).pipe(
-          filter(() => state$.value.featureFlags.enableInseeApi),
-        ),
+        of(siretSlice.actions.siretInfoRequested(action.payload)),
         of(siretSlice.actions.siretWasNotValid()),
       ),
     ),
@@ -43,18 +41,22 @@ const getSiretEpic: AppEpic<SiretAction> = (
   return action$.pipe(
     filter(siretSlice.actions.siretInfoRequested.match),
     switchMap((action) =>
-      getSiret(
-        state$.value.siret.shouldFetchEvenIfAlreadySaved,
-        action.payload,
-      ),
+      getSiret({
+        enableInseeApi: state$.value.featureFlags.enableInseeApi,
+        shouldFetchEvenIfAlreadySaved:
+          state$.value.siret.shouldFetchEvenIfAlreadySaved,
+        siret: action.payload,
+      }),
     ),
     // the condition on siretResult type should not be handled here but in the gateway
     // (with an errored observable, caught here with catchError())
-    map<GetSiretInfo, SiretAction>((siretResult) =>
-      typeof siretResult === "string"
+    map<GetSiretInfo | null, SiretAction>((siretResult) => {
+      if (siretResult === null)
+        return siretSlice.actions.siretInfoDisabledAndNoMatchInDbFound();
+      return typeof siretResult === "string"
         ? siretSlice.actions.siretInfoFailed(siretResult)
-        : siretSlice.actions.siretInfoSucceeded(siretResult),
-    ),
+        : siretSlice.actions.siretInfoSucceeded(siretResult);
+    }),
     catchError((error) =>
       of(siretSlice.actions.siretInfoFailed(error.message)),
     ),
@@ -63,12 +65,30 @@ const getSiretEpic: AppEpic<SiretAction> = (
 
 const makeGetSiret =
   (siretGatewayThroughBack: SiretGatewayThroughBack) =>
-  (
-    shouldFetchEvenIfAlreadySaved: boolean,
-    siret: SiretDto,
-  ): Observable<GetSiretInfo> =>
-    shouldFetchEvenIfAlreadySaved
+  ({
+    enableInseeApi,
+    shouldFetchEvenIfAlreadySaved,
+    siret,
+  }: {
+    enableInseeApi: boolean;
+    shouldFetchEvenIfAlreadySaved: boolean;
+    siret: SiretDto;
+  }): Observable<GetSiretInfo | null> => {
+    if (!enableInseeApi) {
+      return siretGatewayThroughBack
+        .isSiretAlreadyInSaved(siret)
+        .pipe(
+          map((isAlreadySaved) =>
+            isAlreadySaved
+              ? "Establishment with this siret is already in our DB"
+              : null,
+          ),
+        );
+    }
+
+    return shouldFetchEvenIfAlreadySaved
       ? siretGatewayThroughBack.getSiretInfo(siret)
       : siretGatewayThroughBack.getSiretInfoIfNotAlreadySaved(siret);
+  };
 
 export const siretEpics = [triggerSiretFetchEpic, getSiretEpic];
