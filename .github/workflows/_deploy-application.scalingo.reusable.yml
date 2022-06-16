@@ -100,6 +100,23 @@ jobs:
           )
           echo "$CONTENT" >> package.json
 
+      - name: Release - Generate minimalist .htaccess for spa entrypoint
+        run: |
+          touch .htaccess
+          HTACCESS=$(cat << EOF
+          RewriteEngine On
+          DirectoryIndex index.html
+          RewriteCond %{REQUEST_FILENAME} !-d
+          RewriteCond %{REQUEST_FILENAME} !-f
+          RewriteRule . index.html [L]
+          
+          <FilesMatch "index\.html">
+          Header set Cache-Control "max-age=60, private, proxy-revalidate"
+          </FilesMatch>
+          EOF
+          )
+          echo "$HTACCESS" >> .htaccess
+
       - name: Release - Initialise a local git repository for deployment (a scalingo deployment is a push to their remote)
         run: |
           rm -rf .git
