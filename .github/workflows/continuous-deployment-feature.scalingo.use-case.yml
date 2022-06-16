@@ -68,7 +68,7 @@ jobs:
       - name: Deployed friendly app name domain url
         id: deployed-app-name
         run: |
-          DEPLOYED_APP_NAME=$(echo $BRANCH_SHORT_REF)
+          DEPLOYED_APP_NAME=$(echo ${{ github.event.ref }} | cut -d'/' -f 4)
           echo "::set-output name=value::$DEPLOYED_APP_NAME"
 
 

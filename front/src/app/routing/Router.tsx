@@ -3,6 +3,7 @@ import { SearchDebugPage } from "src/app/components/SearchDebugPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AdminVerificationPage } from "src/app/pages/admin/AdminVerificationPage";
 import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
+import { ErrorRedirectPage } from "src/app/pages/Error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/Establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/Establishment/EstablishmentFormPageForExternals";
 import { ConventionPage } from "src/app/pages/Convention/ConventionPage";
@@ -47,6 +48,7 @@ export const Router = () => {
       {route.name === "editFormEstablishment" && (
         <EstablishmentEditionFormPage route={route} />
       )}
+      {route.name === "errorRedirect" && <ErrorRedirectPage route={route} />}
       {route.name === "formEstablishment" && (
         <EstablishmentFormPage route={route} />
       )}

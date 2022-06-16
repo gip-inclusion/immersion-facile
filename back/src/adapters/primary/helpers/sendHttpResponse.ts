@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
 import { AuthChecker } from "../../../domain/auth/AuthChecker";
 import { deleteFileAndParentFolder } from "../../../utils/filesystemUtils";
 import { createLogger } from "../../../utils/logger";
@@ -74,6 +75,15 @@ export const sendHttpResponse = async (
   }
 };
 
+type RedirectErrorQueryParams =
+  | {
+      title: string;
+      message: string;
+    }
+  | {
+      kind: string;
+    };
+
 export const sendRedirectResponse = async (
   req: Request,
   res: Response,
@@ -87,7 +97,25 @@ export const sendRedirectResponse = async (
     res.status(302);
     return res.redirect(redirectUrl);
   } catch (error: any) {
-    handleResponseError(req, res, error);
+    const message: string = error?.message ?? error.toString();
+    console.log("MESSAGE", message);
+    const toObject = JSON.parse(message);
+
+    const queryParams = toObject.kind
+      ? {
+          kind: toObject.kind,
+        }
+      : {
+          title: toObject.title ?? "Une erreur est survenue",
+          message:
+            toObject.message ??
+            error.message ??
+            "Si vous êtes bloqués dans votre démarches n'hésitez pas à contacter directement l'équipe Immersion Facilité !",
+        };
+
+    const toQueryParam =
+      queryParamsAsString<RedirectErrorQueryParams>(queryParams);
+    res.redirect(`http://localhost:3000/error?${toQueryParam}`);
   }
 };
 

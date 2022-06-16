@@ -21,6 +21,14 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.editFormEstablishmentRoute}`,
   ),
+  errorRedirect: defineRoute(
+    {
+      title: param.query.optional.string,
+      message: param.query.optional.string,
+      kind: param.query.optional.string,
+    },
+    () => "/error",
+  ),
   formEstablishment: defineRoute(
     { siret: param.query.optional.string },
     () => "/etablissement",

@@ -24,7 +24,11 @@ export const createConventionRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.addConvention.execute(req.body),
       ),
-    )
+    );
+
+  // THIS IS CALLED FOR THE ADMIN PAGE AND NOT WHEN CLICKING TO DEMAND AN IMMERSION !
+  conventionRouter
+    .route(`/${conventionsRoute}`)
     .get(async (req, res) =>
       sendHttpResponse(
         req,

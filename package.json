@@ -8,6 +8,10 @@
     "libs/*"
   ],
   "scripts": {
+    "back": "pnpm --dir back",
+    "front": "pnpm --dir front",
+    "shared": "pnpm --dir shared",
+
     "lint:back": "eslint back/src --fix",
     "lint:front": "eslint front/src --fix",
     "lint:shared": "eslint shared/src --fix",
