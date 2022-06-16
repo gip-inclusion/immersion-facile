@@ -128,10 +128,8 @@ const agenciesRetreiver = (
   enablePeConnectApi: boolean,
   connectedWith: FederatedIdentity | null,
 ) =>
-  enablePeConnectApi
-    ? connectedWith && isPeConnectIdentity(connectedWith)
-      ? agencyGateway.listPeAgencies(position)
-      : agencyGateway.listNonPeAgencies(position)
+  enablePeConnectApi && connectedWith && isPeConnectIdentity(connectedWith)
+    ? agencyGateway.listPeAgencies(position)
     : agencyGateway.listAllAgencies(position);
 
 const placeholderAgency: AgencyInListDto = {
