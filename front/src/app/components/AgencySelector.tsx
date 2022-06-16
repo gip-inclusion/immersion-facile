@@ -141,7 +141,9 @@ const agenciesRetriever = ({
   if (shouldListAll) return agencyGateway.listAllAgencies(position);
   return connectedWith && isPeConnectIdentity(connectedWith)
     ? agencyGateway.listPeAgencies(position)
-    : agencyGateway.listNonPeAgencies(position);
+    : agencyGateway.listAllAgencies(position);
+  // : agencyGateway.listNonPeAgencies(position);
+  // -> for easy revert when new page is ready
 };
 
 const placeholderAgency: AgencyInListDto = {

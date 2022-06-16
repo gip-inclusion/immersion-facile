@@ -9,7 +9,7 @@ import { ConventionFormProfession } from "src/app/pages/Convention/ConventionFor
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { useSiretRelatedField } from "src/hooks/siret.hooks";
-import { AddressAutocomplete } from "src/uiComponents/AddressAutocomplete";
+import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { DateInput } from "src/uiComponents/form/DateInput";
 import { SchedulePicker } from "src/uiComponents/form/SchedulePicker/SchedulePicker";
 import { TextInput } from "src/uiComponents/form/TextInput";

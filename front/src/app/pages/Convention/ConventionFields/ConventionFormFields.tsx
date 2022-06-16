@@ -60,7 +60,7 @@ export const ConventionFormFields = ({
           label="Votre structure d'accompagnement *"
           disabled={isFrozen}
           defaultAgencyId={values.agencyId}
-          shouldListAll={enablePeConnectApi}
+          shouldListAll={!enablePeConnectApi}
         />
       )}
       <BeneficiaryCommonFields disabled={isFrozen} />
