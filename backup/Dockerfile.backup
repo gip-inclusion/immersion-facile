@@ -23,8 +23,10 @@ RUN apt-get update && \
 ARG ENV_TYPE=${ENV_TYPE:-production}
 ENV ENV_TYPE=$ENV_TYPE
 
+RUN mkdir -p /home/backup
+
 RUN [ "$ENV_TYPE" != "production" ] && COMMENT="#"; \
-    echo "${COMMENT}30 3 * * * root bash -c \"/home/backup/BACKUP.sh >>/home/backup/backup.log\"" >/etc/cron.d/backup;
+    echo "${COMMENT}30 3 * * * root bash -c \"/home/script/BACKUP.sh >>/home/backup/backup.log\"" >/etc/cron.d/backup;
 
 WORKDIR /home/backup
 

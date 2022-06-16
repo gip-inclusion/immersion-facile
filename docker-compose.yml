@@ -77,7 +77,7 @@ services:
         - ENV_TYPE=${ENV_TYPE:-develop}
         - TIMEZONE=${TIMEZONE:-Europe/Paris}
     volumes:
-      - ./backup/home/backup:/home/backup
+      - ./backup/script:/home/script
       - ./:/home/docker
       - ${MNT:-/mnt}:/mnt
 
