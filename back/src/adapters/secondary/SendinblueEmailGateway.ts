@@ -498,6 +498,7 @@ export class SendinblueEmailGateway implements EmailGateway {
         DATE_END: params.dateEnd,
         BUSINESS_NAME: params.businessName,
         IMMERSION_ADDRESS: params.immersionAddress,
+        MAGIC_LINK: params.magicLink,
       },
     );
   }
@@ -519,6 +520,7 @@ export class SendinblueEmailGateway implements EmailGateway {
         DATE_END: params.dateEnd,
         BUSINESS_NAME: params.businessName,
         IMMERSION_ADDRESS: params.immersionAddress,
+        MAGIC_LINK: params.magicLink,
       },
     );
   }
