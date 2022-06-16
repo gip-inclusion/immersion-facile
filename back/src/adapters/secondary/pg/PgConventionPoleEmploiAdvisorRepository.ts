@@ -59,13 +59,15 @@ export class PgConventionPoleEmploiAdvisorRepository
 
   public async getByConventionId(
     conventionId: ConventionId,
-  ): Promise<ConventionPoleEmploiUserAdvisorEntity> {
+  ): Promise<ConventionPoleEmploiUserAdvisorEntity | undefined> {
     const pgResult = await this.client.query(
       `SELECT *
        FROM partners_pe_connect
        WHERE convention_id = $1`,
       [conventionId],
     );
+
+    if (pgResult.rows.length === 0) return;
 
     return toConventionPoleEmploiUserAdvisorEntity(
       conventionPoleEmploiUserAdvisorDtoSchema.parse(

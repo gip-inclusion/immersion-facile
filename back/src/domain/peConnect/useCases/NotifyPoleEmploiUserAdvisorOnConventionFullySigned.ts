@@ -8,7 +8,6 @@ import { EmailFilter } from "../../core/ports/EmailFilter";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
-import { isPeConnectIdentity } from "../entities/ConventionPoleEmploiAdvisorEntity";
 
 const logger = createLogger(__filename);
 
@@ -25,20 +24,21 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
   inputSchema = conventionSchema;
 
   public async _execute(
-    convention: ConventionDto,
+    conventionFromEvent: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    if (!isPeConnectIdentity(convention?.federatedIdentity)) {
+    const conventionUserAdvisor:
+      | ConventionPoleEmploiUserAdvisorEntity
+      | undefined = await uow.conventionPoleEmploiAdvisorRepo.getByConventionId(
+      conventionFromEvent.id,
+    );
+
+    if (!conventionUserAdvisor) {
       logger.info(
-        `Convention ${convention.id} federated identity is not of format peConnect, aborting NotifyPoleEmploiUserAdvisorOnConventionFullySigned use case`,
+        `Convention ${conventionFromEvent.id} federated identity is not of format peConnect, aborting NotifyPoleEmploiUserAdvisorOnConventionFullySigned use case`,
       );
       return;
     }
-
-    const conventionUserAdvisor: ConventionPoleEmploiUserAdvisorEntity =
-      await uow.conventionPoleEmploiAdvisorRepo.getByConventionId(
-        convention.id,
-      );
 
     await this.emailFilter.withAllowedRecipients(
       [conventionUserAdvisor.email],
@@ -50,16 +50,16 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
               {
                 advisorFirstName: conventionUserAdvisor.firstName,
                 advisorLastName: conventionUserAdvisor.lastName,
-                businessName: convention.businessName,
-                dateEnd: convention.dateEnd,
-                dateStart: convention.dateStart,
-                beneficiaryFirstName: convention.firstName,
-                beneficiaryLastName: convention.lastName,
-                beneficiaryEmail: convention.email,
+                businessName: conventionFromEvent.businessName,
+                dateEnd: conventionFromEvent.dateEnd,
+                dateStart: conventionFromEvent.dateStart,
+                beneficiaryFirstName: conventionFromEvent.firstName,
+                beneficiaryLastName: conventionFromEvent.lastName,
+                beneficiaryEmail: conventionFromEvent.email,
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                immersionAddress: convention.immersionAddress!,
+                immersionAddress: conventionFromEvent.immersionAddress!,
                 magicLink: this.generateMagicLinkFn({
-                  id: convention.id,
+                  id: conventionFromEvent.id,
                   role: "counsellor",
                   targetRoute: frontRoutes.conventionToValidate,
                   email: advisorEmail,

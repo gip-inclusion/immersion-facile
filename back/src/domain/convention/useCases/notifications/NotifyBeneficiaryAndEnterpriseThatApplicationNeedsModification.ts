@@ -66,7 +66,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
 
       if (!email) {
         throw new Error(
-          "unexpected role for beneficiary/enterprise modificaton request notification: " +
+          "unexpected role for beneficiary/enterprise modification request notification: " +
             role,
         );
       }

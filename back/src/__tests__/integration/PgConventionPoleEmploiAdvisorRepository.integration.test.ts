@@ -134,6 +134,16 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
   });
 
   describe("retreive pole emploi user advisor", () => {
+    it("should return undefined if no convention Advisor", async () => {
+      const conventionAdvisor:
+        | ConventionPoleEmploiUserAdvisorEntity
+        | undefined = await conventionPoleEmploiAdvisorRepository.getByConventionId(
+        conventionId,
+      );
+
+      expect(conventionAdvisor).toBeUndefined();
+    });
+
     it("should get the convention Advisor by the convention id", async () => {
       await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
         poleEmploiFirstUserAdvisor,
@@ -143,12 +153,13 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
         userPeExternalId,
       );
 
-      const conventionAdvisor: ConventionPoleEmploiUserAdvisorEntity =
-        await conventionPoleEmploiAdvisorRepository.getByConventionId(
-          conventionId,
-        );
+      const conventionAdvisor:
+        | ConventionPoleEmploiUserAdvisorEntity
+        | undefined = await conventionPoleEmploiAdvisorRepository.getByConventionId(
+        conventionId,
+      );
 
-      expectObjectsToMatch(conventionAdvisor, {
+      expectObjectsToMatch(conventionAdvisor!, {
         userPeExternalId: poleEmploiFirstUserAdvisor.userPeExternalId,
         conventionId,
         firstName: poleEmploiFirstUserAdvisor.firstName,

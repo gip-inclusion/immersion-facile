@@ -18,5 +18,5 @@ export interface ConventionPoleEmploiAdvisorRepository {
 
   getByConventionId: (
     conventionId: ConventionId,
-  ) => Promise<ConventionPoleEmploiUserAdvisorEntity>;
+  ) => Promise<ConventionPoleEmploiUserAdvisorEntity | undefined>;
 }

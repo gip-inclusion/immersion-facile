@@ -71,6 +71,26 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
     );
   });
 
+  it("should throw an error if the convention advisor is not found", async () => {
+    const conventionDto = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .build();
+
+    conventionRepository.setConventions({
+      [conventionDto.id]: conventionDto,
+    });
+
+    await expectPromiseToFailWithError(
+      notifyPoleEmploiUserAdvisorOnAssociation.execute({
+        conventionId,
+        peExternalId: userPeExternalId,
+      }),
+      new NotFoundError(
+        "There is no open pole emploi advisor entity linked to this user conventionId",
+      ),
+    );
+  });
+
   it("should send email with the correct params", async () => {
     const conventionDto = new ConventionDtoBuilder()
       .withId(conventionId)

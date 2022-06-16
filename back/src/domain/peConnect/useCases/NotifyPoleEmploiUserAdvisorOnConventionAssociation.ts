@@ -7,6 +7,7 @@ import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { EmailFilter } from "../../core/ports/EmailFilter";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
 import { ConventionAndPeExternalIds } from "../port/ConventionPoleEmploiAdvisorRepository";
 import { conventionPoleEmploiUserAdvisorIdsSchema } from "../port/PeConnect.schema";
 
@@ -38,6 +39,11 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
     if (!isConventionDto(convention))
       throw new NotFoundError(
         "There is no convention associated with this user pole emploi advisor",
+      );
+
+    if (!isDefinedConventionUserAdvisor(conventionUserAdvisor))
+      throw new NotFoundError(
+        "There is no open pole emploi advisor entity linked to this user conventionId",
       );
 
     await this.emailFilter.withAllowedRecipients(
@@ -77,3 +83,8 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
 const isConventionDto = (
   conventionDto: ConventionDto | undefined,
 ): conventionDto is ConventionDto => !!conventionDto;
+
+const isDefinedConventionUserAdvisor = (
+  conventionAdvisor: ConventionPoleEmploiUserAdvisorEntity | undefined,
+): conventionAdvisor is ConventionPoleEmploiUserAdvisorEntity =>
+  !!conventionAdvisor;
