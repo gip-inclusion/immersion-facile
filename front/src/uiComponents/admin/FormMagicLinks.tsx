@@ -2,10 +2,13 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { conventionGateway } from "src/app/config/dependencies";
 import { frontRoutes } from "shared/src/routes";
 import { allRoles, Role } from "shared/src/tokens/MagicLinkPayload";
-import { FormAccordionProps } from "./FormAccordion";
+import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
+import { WithBackground } from "src/uiComponents/admin/WithBackground";
 
 // Component to show the magic links picker
-export const FormMagicLinks = ({ convention }: FormAccordionProps) => {
+export const FormMagicLinks = ({
+  convention,
+}: ConventionFormAccordionProps) => {
   const [role, setRole] = useState(allRoles[0]);
   const [route, setRoute] = useState(
     Object.keys(frontRoutes)[0] as keyof typeof frontRoutes,
@@ -38,62 +41,55 @@ export const FormMagicLinks = ({ convention }: FormAccordionProps) => {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: "30px",
-          backgroundColor: "#E5E5F4",
-          padding: "10px",
-        }}
-      >
-        <select
-          className="fr-select"
-          id="roles-dropdown"
-          name="select"
-          key="roles-dropdown"
-          onChange={handleRolesDropdownChange}
-          style={{ width: "190px" }}
-        >
-          {allRoles.map((role) => (
-            <option value={role} key={role}>
-              {role}
-            </option>
-          ))}
-        </select>
+      <WithBackground>
+        <>
+          <select
+            className="fr-select"
+            id="roles-dropdown"
+            name="select"
+            key="roles-dropdown"
+            onChange={handleRolesDropdownChange}
+            style={{ width: "190px" }}
+          >
+            {allRoles.map((role) => (
+              <option value={role} key={role}>
+                {role}
+              </option>
+            ))}
+          </select>
 
-        <select
-          className="fr-select"
-          id="routes-dropdown"
-          name="select"
-          key="routes-dropdown"
-          onChange={handleRouteDropdownChange}
-          style={{ width: "330px" }}
-        >
-          {Object.keys(frontRoutes).map((route) => (
-            <option value={route} key={route}>
-              {route}
-            </option>
-          ))}
-        </select>
+          <select
+            className="fr-select"
+            id="routes-dropdown"
+            name="select"
+            key="routes-dropdown"
+            onChange={handleRouteDropdownChange}
+            style={{ width: "330px" }}
+          >
+            {Object.keys(frontRoutes).map((route) => (
+              <option value={route} key={route}>
+                {route}
+              </option>
+            ))}
+          </select>
 
-        <label>
-          <input
-            type="checkbox"
-            checked={expired}
-            onChange={() => {
-              setExpired(!expired);
-            }}
-            style={{ appearance: "checkbox" }}
-          />
-          Expired
-        </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={expired}
+              onChange={() => {
+                setExpired(!expired);
+              }}
+              style={{ appearance: "checkbox" }}
+            />
+            Expired
+          </label>
 
-        {!link && <p>⌛️ generating... </p>}
+          {!link && <p>⌛️ generating... </p>}
 
-        {link && <a href={link}>Lien Magique</a>}
-      </div>
+          {link && <a href={link}>Lien Magique</a>}
+        </>
+      </WithBackground>
     </>
   );
 };

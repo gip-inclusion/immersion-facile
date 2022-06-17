@@ -3,7 +3,7 @@ import { Notification } from "react-design-system/immersionFacile";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
-import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
+import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
 import { Route } from "type-route";
 
 // Temporary "final verification" page for the admin to re-verify the form.
@@ -98,7 +98,7 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
               {infoMessage}
             </Notification>
           )}
-          <FormAccordion convention={form} />
+          <ConventionFormAccordion convention={form} />
           {!validationDisabled() && (
             <button
               className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"

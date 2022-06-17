@@ -16,9 +16,16 @@ import {
 } from "shared/src/tokens/MagicLinkPayload";
 import { sleep } from "shared/src/utils";
 import { Observable, Subject, from } from "rxjs";
+import { ConventionDtoBuilder } from "src/../../shared/src/convention/ConventionDtoBuilder";
+
+const CONVENTION_DRAFT_TEST = new ConventionDtoBuilder()
+  .withStatus("DRAFT")
+  .build();
 
 export class InMemoryConventionGateway implements ConventionGateway {
-  private _conventions: { [id: string]: ConventionDto } = {};
+  private _conventions: { [id: string]: ConventionDto } = {
+    [CONVENTION_DRAFT_TEST.id]: CONVENTION_DRAFT_TEST,
+  };
   private _agencies: { [id: string]: AgencyInListDto } = {};
 
   public convention$ = new Subject<ConventionDto | undefined>();
@@ -113,12 +120,10 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return id;
   }
 
-  public async generateMagicLink(
-    _: ConventionId,
-    _role: Role,
-  ): Promise<string> {
+  public async generateMagicLink(_: ConventionId, role: Role): Promise<string> {
     // TODO: generate actual JWTs here
-    throw new Error("500 Not Implemented In InMemory Gateway");
+    // throw new Error("500 Not Implemented In InMemory Gateway");
+    return `magic/link/with/role/${role}`;
   }
 
   public async renewMagicLink(

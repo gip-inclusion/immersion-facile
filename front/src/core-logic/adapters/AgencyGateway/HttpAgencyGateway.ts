@@ -2,6 +2,7 @@ import axios from "axios";
 import { map, Observable } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
 import {
+  AgencyDto,
   AgencyId,
   AgencyInListDto,
   AgencyPublicDisplayDto,
@@ -65,6 +66,13 @@ export class HttpAgencyGateway implements AgencyGateway {
     return this.getAgencies(request);
   }
 
+  public listAgenciesNeedingReview(): Promise<AgencyDto[]> {
+    throw new Error("Method not implemented.");
+  }
+
+  public validateAgency(_agencyId: AgencyId): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
   private async getAgencies(
     request: ListAgenciesRequestDto,
   ): Promise<AgencyInListDto[]> {

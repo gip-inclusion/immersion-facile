@@ -21,7 +21,7 @@ const emptyAgency: AgencyDto = {
 
 export class AgencyDtoBuilder implements Builder<AgencyDto> {
   // Initializes all feature flags to be off.
-  public constructor(readonly agency: AgencyDto) {}
+  public constructor(readonly agency: AgencyDto = emptyAgency) {}
 
   public static create(id?: AgencyId) {
     return new AgencyDtoBuilder({

@@ -1,0 +1,69 @@
+import React, { ReactNode } from "react";
+import { keys } from "shared/src/utils";
+import {
+  AgencyDto,
+  AgencyStatus,
+} from "src/../../shared/src/agency/agency.dto";
+import { TextCell } from "./TextCell";
+
+type AgencyField = keyof AgencyDto;
+type FieldsToLabel = Partial<Record<AgencyField, string>>;
+
+const agencyFieldToLabel: FieldsToLabel = {
+  id: "ID",
+  name: "Nom",
+  kind: "Type d'agence",
+  status: "Statut",
+  address: "Adresse",
+  position: "Position",
+  counsellorEmails: "Emails des conseillers",
+  validatorEmails: "Emails des validateurs",
+  questionnaireUrl: "URL du questionnaire",
+  logoUrl: "URL du logo",
+  signature: "Signature",
+  adminEmails: "Adresses emails administrateurs",
+  agencySiret: "Siret",
+  codeSafir: "Code Safir",
+};
+
+const formatAgencyStatus = (status: AgencyStatus) => {
+  switch (status) {
+    case "closed":
+      return "❌ FERMÉE";
+    case "needsReview":
+      return "📙 À VALIDER";
+    case "active":
+      return "✅  ACTIVE";
+    case "from-api-PE":
+      return "👩‍💼 API PE";
+  }
+  return "⁉️ STATUT INDÉFINI";
+};
+
+export const AgencyDetails = ({ agency }: { agency: AgencyDto }) => {
+  const buildContent = (field: AgencyField): ReactNode => {
+    const value = agency[field];
+    if (field === "status") return formatAgencyStatus(agency.status);
+    if (typeof value === "string") return value;
+    if (typeof value === "boolean") return value ? "✅" : "❌";
+    return JSON.stringify(value);
+  };
+
+  return (
+    <div>
+      {keys(agencyFieldToLabel).map(
+        (field) =>
+          agency[field] && (
+            <TextCell
+              title={
+                /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
+                agencyFieldToLabel[field]!
+              }
+              contents={buildContent(field)}
+              key={field}
+            />
+          ),
+      )}
+    </div>
+  );
+};

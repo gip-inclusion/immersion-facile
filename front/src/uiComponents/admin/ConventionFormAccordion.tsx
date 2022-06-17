@@ -5,7 +5,7 @@ import type {
   ConventionStatus,
   ConventionDto,
 } from "shared/src/convention/convention.dto";
-import { FormDetails } from "./FormDetails";
+import { ConnventionFormDetails } from "./ConventionFormDetails";
 
 const beforeAfterString = (date: string) => {
   const eventDate = new Date(date);
@@ -17,7 +17,7 @@ const beforeAfterString = (date: string) => {
   });
 };
 
-export interface FormAccordionProps {
+export interface ConventionFormAccordionProps {
   convention: ConventionDto;
 }
 
@@ -46,7 +46,9 @@ const getPrefix = (status: ConventionStatus) => {
   return "[⁉️ STATUS DE LA DEMANDE INDÉFINI]";
 };
 
-export const FormAccordion = ({ convention }: FormAccordionProps) => {
+export const ConventionFormAccordion = ({
+  convention,
+}: ConventionFormAccordionProps) => {
   const {
     status,
     lastName,
@@ -64,7 +66,7 @@ export const FormAccordion = ({ convention }: FormAccordionProps) => {
   return (
     <div style={{ padding: "0.5rem" }}>
       <h5 style={{ margin: "2rem 4rem" }}>{title}</h5>
-      <FormDetails convention={convention} />
+      <ConnventionFormDetails convention={convention} />
     </div>
   );
 };

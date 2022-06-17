@@ -1,7 +1,7 @@
 import React from "react";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { Accordion } from "react-design-system/immersionFacile";
-import { FormAccordionProps as FormAccordeonProps } from "./FormAccordion";
+import { ConventionFormAccordionProps as FormAccordeonProps } from "./ConventionFormAccordion";
 import { TextCell } from "./TextCell";
 
 type FieldForFormDetails = {

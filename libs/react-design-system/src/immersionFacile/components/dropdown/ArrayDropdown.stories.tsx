@@ -4,7 +4,7 @@ import { dropdownPrefix } from ".";
 import { ArrayDropdown, ArrayDropdownProps } from "./ArrayDropdown";
 
 const Component = ArrayDropdown;
-const argTypes: Partial<ArgTypes<ArrayDropdownProps>> | undefined = {};
+const argTypes: Partial<ArgTypes<ArrayDropdownProps<string>>> | undefined = {};
 
 export default {
   title: `${dropdownPrefix}${Component.name}`,
@@ -18,5 +18,18 @@ const componentStory: ComponentStory<typeof Component> = (args) => (
 
 export const Default = componentStory.bind({});
 Default.args = {
-  labels: ["SOME LABEL 1", "SOME LABEL 2"],
+  options: ["SOME LABEL 1", "SOME LABEL 2"],
+  allowEmpty: true,
+};
+
+export const WhenEmptyAllowed = componentStory.bind({});
+WhenEmptyAllowed.args = {
+  options: ["SOME LABEL 1", "SOME LABEL 2"],
+  allowEmpty: true,
+};
+
+export const WhenEmptyNotAllowed = componentStory.bind({});
+WhenEmptyAllowed.args = {
+  options: ["SOME LABEL 1", "SOME LABEL 2"],
+  allowEmpty: false,
 };

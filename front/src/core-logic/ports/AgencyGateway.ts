@@ -1,5 +1,6 @@
 import { Observable } from "rxjs";
 import {
+  AgencyDto,
   AgencyId,
   AgencyInListDto,
   AgencyPublicDisplayDto,
@@ -14,6 +15,8 @@ export interface AgencyGateway {
   listAllAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
   listNonPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
   listPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
+  listAgenciesNeedingReview(): Promise<AgencyDto[]>;
+  validateAgency(agencyId: AgencyId): Promise<void>;
   getAgencyPublicInfoById(
     agencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto>;

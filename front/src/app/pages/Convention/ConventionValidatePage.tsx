@@ -8,7 +8,7 @@ import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
-import { FormAccordion } from "src/uiComponents/admin/FormAccordion";
+import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { VerificationActionButton } from "./VerificationActionButton";
@@ -68,7 +68,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
               flexDirection: "column",
             }}
           >
-            <FormAccordion convention={convention} />
+            <ConventionFormAccordion convention={convention} />
             <div>
               {isAllowedTransition(status, "REJECTED", role) && (
                 <VerificationActionButton

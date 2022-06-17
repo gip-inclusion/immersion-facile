@@ -2,6 +2,7 @@ import { Observable, of } from "rxjs";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
 import {
+  AgencyDto,
   AgencyId,
   AgencyInListDto,
   AgencyPublicDisplayDto,
@@ -10,73 +11,83 @@ import {
 } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { values } from "ramda";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { propEq, propNotEq } from "src/../../shared/src/ramdaExtensions/propEq";
 
-const MISSION_LOCAL_AGENCY: CreateAgencyDto = {
-  id: "test-agency-1-front",
-  name: "Test Agency 1 (front)",
-  address: "Paris",
-  counsellorEmails: [],
-  validatorEmails: [],
-  kind: "mission-locale",
-  questionnaireUrl: "www.questionnaireMissionLocale.com",
-  signature: "Mon agence",
-  position: {
-    lat: 1.0,
-    lon: 2.0,
-  },
-};
-const PE_AGENCY: CreateAgencyDto = {
-  id: "PE-test-agency-2-front",
-  name: "Test Agency 2 PE (front)",
-  address: "Paris",
-  counsellorEmails: [],
-  validatorEmails: [],
-  kind: "pole-emploi",
-  questionnaireUrl: "www.PE.com",
-  signature: "Mon agence PE",
-  position: {
-    lat: 1.0,
-    lon: 2.0,
-  },
-};
-const TEST_NONPE_AGENCIES: Record<string, CreateAgencyDto> = {
-  [MISSION_LOCAL_AGENCY.id]: MISSION_LOCAL_AGENCY,
-};
-const TEST_PE_AGENCIES: Record<string, CreateAgencyDto> = {
-  [PE_AGENCY.id]: PE_AGENCY,
-};
+const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
+  .withId("test-agency-1-front")
+  .withName("Test Agency 1 (front)")
+  .withAddress("Paris")
+  .withQuestionnaireUrl("www.questionnaireMissionLocale.com")
+  .withKind("mission-locale")
+  .withStatus("active")
+  .build();
+
+const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
+  .withId("PE-test-agency-2-front")
+  .withName("Test Agency 2 PE (front)")
+  .withAddress("Paris")
+  .withQuestionnaireUrl("www.PE.com")
+  .withKind("pole-emploi")
+  .withSignature("Mon agence PE")
+  .withStatus("active")
+  .build();
+
+const AGENCY_3_NEEDING_REVIEW = new AgencyDtoBuilder()
+  .withId("PE-test-agency-3-front")
+  .withName("Test Agency 3 (front)")
+  .withStatus("needsReview")
+  .build();
+
+const AGENCY_4_NEEDING_REVIEW = new AgencyDtoBuilder()
+  .withId("PE-test-agency-4-front")
+  .withName("Test Agency 4 (front)")
+  .withStatus("needsReview")
+  .build();
 
 export class InMemoryAgencyGateway implements AgencyGateway {
-  private _nonPeAgencies: Record<string, CreateAgencyDto> = TEST_NONPE_AGENCIES;
-  private _peAgencies: Record<string, CreateAgencyDto> = TEST_PE_AGENCIES;
+  private _agencies: Record<string, AgencyDto> = {
+    [MISSION_LOCAL_AGENCY_ACTIVE.id]: MISSION_LOCAL_AGENCY_ACTIVE,
+    [PE_AGENCY_ACTIVE.id]: PE_AGENCY_ACTIVE,
+    [AGENCY_3_NEEDING_REVIEW.id]: AGENCY_3_NEEDING_REVIEW,
+    [AGENCY_4_NEEDING_REVIEW.id]: AGENCY_4_NEEDING_REVIEW,
+  };
 
-  async addAgency(agency: CreateAgencyDto) {
-    if (agency.kind === "pole-emploi") this._peAgencies[agency.id] = agency;
-    else this._nonPeAgencies[agency.id] = agency;
+  async addAgency(createAgencyDto: CreateAgencyDto) {
+    this._agencies[createAgencyDto.id] = {
+      ...createAgencyDto,
+      status: "needsReview",
+      adminEmails: [],
+      questionnaireUrl: createAgencyDto.questionnaireUrl ?? "",
+    };
   }
 
   async listAllAgencies(_position: LatLonDto): Promise<AgencyInListDto[]> {
-    return values({ ...this._nonPeAgencies, ...this._peAgencies });
+    return values(this._agencies);
   }
 
   async listPeAgencies(_position: LatLonDto): Promise<AgencyInListDto[]> {
-    return values(this._peAgencies);
+    return values(this._agencies).filter(propEq("kind", "pole-emploi"));
   }
 
   async listNonPeAgencies(_position: LatLonDto): Promise<AgencyInListDto[]> {
-    return values(this._nonPeAgencies);
+    return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
+  }
+
+  async listAgenciesNeedingReview(): Promise<AgencyDto[]> {
+    return values(this._agencies).filter(propEq("status", "needsReview"));
+  }
+
+  async validateAgency(agencyId: AgencyId): Promise<void> {
+    this._agencies[agencyId].status = "active";
   }
 
   async getAgencyPublicInfoById(
-    agencyId: WithAgencyId,
+    withAgencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto> {
-    const nonPeAgency: CreateAgencyDto | undefined =
-      this._nonPeAgencies[agencyId.id];
-    if (nonPeAgency) return toAgencyPublicDisplayDto(nonPeAgency);
-    const peAgency: CreateAgencyDto | undefined =
-      this._nonPeAgencies[agencyId.id];
-    if (peAgency) return toAgencyPublicDisplayDto(peAgency);
-    throw new Error(`Missing agency with id ${agencyId.id}.`);
+    const agency = this._agencies[withAgencyId.id];
+    if (agency) return toAgencyPublicDisplayDto(agency);
+    throw new Error(`Missing agency with id ${withAgencyId.id}.`);
   }
 
   getImmersionFacileAgencyId(): Observable<AgencyId> {

@@ -8,7 +8,7 @@ import {
 } from "shared/src/schedule/ScheduleUtils";
 import { keys } from "shared/src/utils";
 import { Accordion } from "react-design-system/immersionFacile";
-import { FormAccordionProps } from "./FormAccordion";
+import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
 import { TextCell } from "./TextCell";
 
 type ImmersionField = keyof ConventionDto;
@@ -63,7 +63,9 @@ const allFields: FieldsAndTitle[] = [
   { listTitle: "Tuteur", fields: mentorFields },
 ];
 
-export const FormDetails = ({ convention }: FormAccordionProps) => {
+export const ConnventionFormDetails = ({
+  convention,
+}: ConventionFormAccordionProps) => {
   const scheduleText = convention.legacySchedule
     ? convention.legacySchedule.description
     : prettyPrintSchedule(convention.schedule);
