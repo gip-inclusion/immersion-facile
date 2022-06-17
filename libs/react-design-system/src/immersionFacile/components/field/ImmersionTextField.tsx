@@ -22,7 +22,7 @@ export interface ImmersionTextFieldProps {
 }
 
 export const ImmersionTextField = ({
-  value = "Default value",
+  value,
   type,
   onBlur,
   onChange,

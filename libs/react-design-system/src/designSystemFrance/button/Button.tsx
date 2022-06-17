@@ -80,6 +80,7 @@ const defineEmphasis = (emphasis: Emphasis) => {
   };
   return supportedEmphasis[emphasis];
 };
+// eslint-disable-next-line no-console
 const defaultClickCallback = () => console.log("Unused Button Click!");
 const defaultStyle = (): React.CSSProperties => ({
   margin: "5px",
