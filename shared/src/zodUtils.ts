@@ -15,12 +15,14 @@ export const zTrimmedString = zString
 export const makezTrimmedString = (message: string) =>
   zString.transform((s) => s.trim()).refine((s) => s.length > 0, message);
 
-const removeAccents = (str: string) =>
-  str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const removeAccents = (value: unknown) => {
+  if (typeof value !== "string") return value;
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
 
 export const zEmail = z.preprocess(
-  pipe(zString.parse, removeAccents),
-  z.string().email("Veuillez saisir une adresse e-mail valide"),
+  removeAccents,
+  zString.email("Veuillez saisir une adresse e-mail valide"),
 );
 
 export const zBoolean = z.boolean({
