@@ -22,10 +22,15 @@ const shouldFetchEvenIfAlreadySaved = createSelector(
   ({ shouldFetchEvenIfAlreadySaved }) => shouldFetchEvenIfAlreadySaved,
 );
 
-const siretError = createSelector(siretState, ({ error }): string | null => {
-  if (!error) return null;
-  return errorTranslations[error] ?? error;
-});
+const siretRawError = createSelector(siretState, ({ error }) => error);
+
+const siretErrorToDisplay = createSelector(
+  siretRawError,
+  (error): string | null => {
+    if (!error) return null;
+    return errorTranslations[error] ?? error;
+  },
+);
 
 const isSiretAlreadySaved = createSelector(
   siretState,
@@ -48,7 +53,8 @@ const errorTranslations: Partial<
 
 export const siretSelectors = {
   isSiretAlreadySaved,
-  siretError,
+  siretErrorToDisplay,
+  siretRawError,
   currentSiret,
   establishmentInfos,
   isFetching,

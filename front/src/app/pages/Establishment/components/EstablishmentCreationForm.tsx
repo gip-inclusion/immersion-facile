@@ -61,7 +61,8 @@ const CreationSiretRelatedInputs = () => {
     currentSiret,
     establishmentInfos,
     isFetchingSiret,
-    siretError,
+    siretErrorToDisplay,
+    siretRawError,
     updateSiret,
   } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: false });
   const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
@@ -87,11 +88,11 @@ const CreationSiretRelatedInputs = () => {
         {...getMandatoryLabelAndName("siret")}
         value={currentSiret}
         setValue={updateSiret}
-        error={siretError}
+        error={siretErrorToDisplay}
         placeholder="362 521 879 00034"
         disabled={isFetchingSiret}
       />
-      {siretError === "Establishment with this siret is already in our DB" &&
+      {siretRawError === "Establishment with this siret is already in our DB" &&
         !requestEmailToEditFormSucceed && (
           <div>
             Cette entreprise a déjà été référencée.

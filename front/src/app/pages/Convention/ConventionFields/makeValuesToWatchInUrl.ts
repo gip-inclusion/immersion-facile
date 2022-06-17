@@ -40,9 +40,8 @@ export const makeValuesToWatchInUrl = (values: ConventionDto) => {
   );
 };
 
-export const makeValuesToWatchInUrlForUkraine = (values: ConventionDto) => {
-  return commonKeysToWatch.reduce(
+export const makeValuesToWatchInUrlForUkraine = (values: ConventionDto) =>
+  commonKeysToWatch.reduce(
     (acc, watchedKey) => ({ ...acc, [watchedKey]: values[watchedKey] }),
     {} as Partial<ConventionDto>,
   );
-};

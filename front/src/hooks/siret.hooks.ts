@@ -37,7 +37,10 @@ export const useSiretFetcher = ({
 }: SiretFetcherOptions) => {
   const currentSiret = useAppSelector(siretSelectors.currentSiret);
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
-  const siretError = useAppSelector(siretSelectors.siretError);
+  const siretErrorToDisplay = useAppSelector(
+    siretSelectors.siretErrorToDisplay,
+  );
+  const siretRawError = useAppSelector(siretSelectors.siretRawError);
   const isFetching = useAppSelector(siretSelectors.isFetching);
   const storeShouldFetchEvenIfAlreadySaved = useAppSelector(
     siretSelectors.shouldFetchEvenIfAlreadySaved,
@@ -53,7 +56,8 @@ export const useSiretFetcher = ({
     currentSiret,
     establishmentInfos: establishmentInfos ?? undefined,
     isFetchingSiret: isFetching,
-    siretError: siretError ?? undefined,
+    siretErrorToDisplay: siretErrorToDisplay ?? undefined,
+    siretRawError,
     updateSiret: (newSiret: string) =>
       dispatch(siretSlice.actions.siretModified(newSiret)),
   };

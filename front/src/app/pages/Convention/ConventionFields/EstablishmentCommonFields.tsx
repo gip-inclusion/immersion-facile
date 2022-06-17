@@ -14,7 +14,7 @@ export const EstablishmentCommonFields = ({
   disabled: undefined | boolean;
 }) => {
   const { enableInseeApi } = useFeatureFlags();
-  const { updateSiret, currentSiret, siretError, isFetchingSiret } =
+  const { updateSiret, currentSiret, siretErrorToDisplay, isFetchingSiret } =
     useSiretFetcher({
       shouldFetchEvenIfAlreadySaved: true,
     });
@@ -29,7 +29,7 @@ export const EstablishmentCommonFields = ({
       <TextInputControlled
         value={currentSiret}
         setValue={updateSiret}
-        error={siretError}
+        error={siretErrorToDisplay}
         label="Indiquez le SIRET de la structure d'accueil *"
         name="siret"
         placeholder="362 521 879 00034"

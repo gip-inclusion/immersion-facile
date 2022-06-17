@@ -17,7 +17,7 @@ import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle"
 import { routes } from "../routing/routes";
 import { useAppSelector } from "../utils/reduxHooks";
 export const EstablishmentHomeMenu = () => {
-  const { currentSiret, updateSiret, siretError } = useSiretFetcher({
+  const { currentSiret, updateSiret, siretErrorToDisplay } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: false,
   });
   const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
@@ -71,7 +71,7 @@ export const EstablishmentHomeMenu = () => {
               name="siret"
               value={currentSiret}
               placeholder="SIRET de votre entreprise"
-              error={isSiretAlreadySaved ? "" : siretError}
+              error={isSiretAlreadySaved ? "" : siretErrorToDisplay}
               onChange={(e) => updateSiret(e.target.value)}
             />
             {isSiretAlreadySaved && !modifyLinkWasSent && (

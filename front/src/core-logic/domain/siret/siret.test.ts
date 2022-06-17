@@ -169,7 +169,7 @@ describe("Siret validation and fetching", () => {
   };
 
   const expectSiretErrorToBe = (expected: string | null) => {
-    expect(siretSelectors.siretError(store.getState())).toBe(expected);
+    expect(siretSelectors.siretErrorToDisplay(store.getState())).toBe(expected);
   };
 
   const feedSirenGatewayThroughBackWith = (response: GetSiretInfo) => {
