@@ -89,7 +89,8 @@ export const conventionInitialValuesFromUrl = ({
     enterpriseAccepted: false,
   };
 
-  if (frontEnvType === "DEV") return devPrefilledValues(emptyForm);
+  if (frontEnvType === "DEV" && ENV.PREFILLED_FORMS)
+    return devPrefilledValues(emptyForm);
 
   return emptyForm;
 };
