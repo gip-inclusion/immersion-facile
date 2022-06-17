@@ -1,5 +1,4 @@
-import Tab from './Tab';
-import TabButton from './TabButton';
-import Tabs from './Tabs';
+import Tab from "./Tab";
+import Tabs from "./Tabs";
 
-export {Tab, TabButton, Tabs};
+export { Tab, Tabs };

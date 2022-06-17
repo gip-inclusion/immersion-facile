@@ -42,7 +42,7 @@ export const FormMagicLinks = ({
   return (
     <>
       <WithBackground>
-        <>
+        <div className="flex justify-evenly">
           <select
             className="fr-select"
             id="roles-dropdown"
@@ -88,7 +88,7 @@ export const FormMagicLinks = ({
           {!link && <p>⌛️ generating... </p>}
 
           {link && <a href={link}>Lien Magique</a>}
-        </>
+        </div>
       </WithBackground>
     </>
   );

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { AgencyDto, AgencyId } from "shared/src/agency/agency.dto";
-import { EstablishmentExportConfigDto } from "shared/src/establishmentExport/establishmentExport.dto";
+import {
+  DepartmentOrRegion,
+  EstablishmentExportConfigDto,
+  FormSourceProvider,
+} from "shared/src/establishmentExport/establishmentExport.dto";
 import {
   ConventionStatus,
   ConventionDto,
@@ -20,7 +24,7 @@ import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
 import { prop } from "ramda";
 import { Route } from "type-route";
 import "./Admin.css";
-import { ArrayDropdown } from "react-design-system/immersionFacile";
+import { ArrayDropdown, DsfrTitle } from "react-design-system/immersionFacile";
 import { Tabs, Tab } from "@dataesr/react-dsfr";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import { AgencyDetails } from "src/uiComponents/admin/AgencyDetails";
@@ -69,60 +73,98 @@ export const AdminPage = ({ route }: AdminProps) => {
   );
 };
 
-const DataExportTab = () => (
-  <div className="flex flex-col gap-1">
-    <Link
-      text="Les conventions par agences"
-      href={`/api/${exportConventionsExcelRoute}`}
-    />
+const DataExportTab = () => {
+  const [
+    conventionExportSelectedGroupKey,
+    setConventionExportSelectedGroupKey,
+  ] = useState<DepartmentOrRegion>("region");
 
-    <Link
-      text="Les entreprises référencées par région avec aggrégation
-      des métiers"
-      href={buildExportEstablishmentRoute({
-        aggregateProfession: true,
-        groupKey: "region",
-        sourceProvider: "all",
-      })}
-    />
-    <Link
-      text="Les entreprises référencées par département avec
-      aggrégation des métiers"
-      href={buildExportEstablishmentRoute({
-        aggregateProfession: true,
-        groupKey: "department",
-        sourceProvider: "all",
-      })}
-    />
-    <Link
-      text="Les entreprises référencées par région sans aggrégation
-      des métiers"
-      href={buildExportEstablishmentRoute({
-        aggregateProfession: false,
-        groupKey: "region",
-        sourceProvider: "all",
-      })}
-    />
-    <Link
-      text="Les entreprises référencées par la cci (region) avec aggrégation
-      des métiers"
-      href={buildExportEstablishmentRoute({
-        aggregateProfession: false,
-        groupKey: "region",
-        sourceProvider: "cci",
-      })}
-    />
-    <Link
-      text="Les entreprises référencées par la unJeuneUneSolution (region) avec aggrégation
-      des métiers"
-      href={buildExportEstablishmentRoute({
-        aggregateProfession: true,
-        groupKey: "region",
-        sourceProvider: "unJeuneUneSolution",
-      })}
-    />
-  </div>
-);
+  const [
+    conventionExportSelectedSourceProvider,
+    setConventionExportSelectedSourceProvider,
+  ] = useState<FormSourceProvider>("all");
+
+  return (
+    <div className="flex flex-col gap-1">
+      <div>
+        <DsfrTitle level={5} text="Les conventions" />
+        <Link
+          text="Les conventions par agences"
+          href={`/api/${exportConventionsExcelRoute}`}
+        />
+      </div>
+      <div>
+        <DsfrTitle level={5} text="Les entreprises référencées" />
+        <WithBackground>
+          <div className="w-2/3">
+            <ArrayDropdown
+              label="Sélectionner un groupement"
+              options={["region", "department"]}
+              onSelect={(selectedGroupKey) => {
+                if (selectedGroupKey) {
+                  setConventionExportSelectedGroupKey(selectedGroupKey);
+                }
+              }}
+              allowEmpty={false}
+              defaultSelectedOption={conventionExportSelectedGroupKey}
+            />
+            <ArrayDropdown
+              label="Sélectionner une source"
+              options={[
+                "all",
+                "immersion-facile",
+                "cci",
+                "cma",
+                "lesentreprises-sengagent",
+                "unJeuneUneSolution",
+                "testConsumer",
+              ]}
+              onSelect={(selectedSourceProvider) => {
+                if (selectedSourceProvider) {
+                  setConventionExportSelectedSourceProvider(
+                    selectedSourceProvider,
+                  );
+                }
+              }}
+              allowEmpty={false}
+              defaultSelectedOption={conventionExportSelectedSourceProvider}
+            />
+          </div>
+        </WithBackground>
+
+        <Link
+          text={`${
+            conventionExportSelectedSourceProvider === "all"
+              ? "Toutes les entreprises référencées"
+              : "Les entreprises de source " +
+                conventionExportSelectedSourceProvider
+          } par ${conventionExportSelectedGroupKey} sans aggrégation
+      des métiers`}
+          href={buildExportEstablishmentRoute({
+            aggregateProfession: false,
+            groupKey: conventionExportSelectedGroupKey,
+            sourceProvider: conventionExportSelectedSourceProvider,
+          })}
+        />
+
+        <Link
+          text={`${
+            conventionExportSelectedSourceProvider === "all"
+              ? "Toutes les entreprises référencées"
+              : "Les entreprises de source " +
+                conventionExportSelectedSourceProvider
+          } par ${conventionExportSelectedGroupKey} avec aggrégation
+      des métiers`}
+          href={buildExportEstablishmentRoute({
+            aggregateProfession: true,
+            groupKey: conventionExportSelectedGroupKey,
+            sourceProvider: conventionExportSelectedSourceProvider,
+          })}
+        />
+      </div>
+    </div>
+  );
+};
 
 const ConventionTab = ({ route }: AdminProps) => {
   const [conventions, setConventions] = useState<ConventionDto[]>([]);
@@ -152,20 +194,21 @@ const ConventionTab = ({ route }: AdminProps) => {
   }, [statusFilter]);
   return (
     <div>
-      <div className="fr-h5">Gérer les conventions</div>
+      <DsfrTitle level={5} text="Gérer les conventions" />
       {
         <>
           <WithBackground>
-            <>
-              <div className="font-semibold">Sélectionner un statut </div>
+            <div className="w-2/3">
               <ArrayDropdown
+                label="Sélectionner un statut"
                 options={[...allConventionStatuses]}
                 onSelect={filterChanged}
                 allowEmpty={false}
                 defaultSelectedOption={"IN_REVIEW"}
               />
-            </>
+            </div>
           </WithBackground>
+
           <ul className="fr-accordions-group">
             {conventions.map((item) => (
               <li key={item.id}>
@@ -262,17 +305,17 @@ const AgencyTab = () => {
   };
   return (
     <div>
-      <div className="fr-h5">Activer des agences</div>
+      <DsfrTitle level={5} text="Activer des agences" />
       <WithBackground>
-        <>
-          <div className="font-semibold">Sélectionner une agence </div>
+        <div className="w-2/3">
           <ArrayDropdown
+            label="Sélectionner une agence"
             options={agenciesNeedingReview.map(prop("name"))}
             onSelect={filterChanged}
             allowEmpty={true}
             defaultSelectedOption={selectedAgency?.name}
           />
-        </>
+        </div>
       </WithBackground>
       {selectedAgency && (
         <div className="p-4 flex flex-col gap-4">

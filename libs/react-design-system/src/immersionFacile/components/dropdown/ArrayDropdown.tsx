@@ -5,6 +5,7 @@ export interface ArrayDropdownProps<T extends string> {
   onSelect: (option?: T) => void;
   defaultSelectedOption?: T;
   allowEmpty: boolean;
+  label?: string;
 }
 
 export const ArrayDropdown = <T extends string>({
@@ -12,6 +13,7 @@ export const ArrayDropdown = <T extends string>({
   onSelect,
   defaultSelectedOption,
   allowEmpty,
+  label,
 }: ArrayDropdownProps<T>) => {
   const displayOptions: (T | "")[] = allowEmpty ? ["", ...options] : options;
 
@@ -26,7 +28,8 @@ export const ArrayDropdown = <T extends string>({
     throw new Error(`No label at index ${index}`);
   };
   return (
-    <>
+    <div className="flex gap-4 items-center font-medium justify-between">
+      {label && <label className="fr-label">{label}</label>}
       <select
         className="fr-select"
         id="roles-dropdown"
@@ -45,6 +48,6 @@ export const ArrayDropdown = <T extends string>({
           </option>
         ))}
       </select>
-    </>
+    </div>
   );
 };
