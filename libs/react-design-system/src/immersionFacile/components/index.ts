@@ -10,3 +10,4 @@ export * from "./link";
 export * from "./notification";
 export * from "./text";
 export * from "./bulletPoint";
+export * from "./tabs";

@@ -5,7 +5,7 @@ import type {
   ConventionStatus,
   ConventionDto,
 } from "shared/src/convention/convention.dto";
-import { ConnventionFormDetails } from "./ConventionFormDetails";
+import { ConnventionFormDetails as ConventionFormDetails } from "./ConventionFormDetails";
 
 const beforeAfterString = (date: string) => {
   const eventDate = new Date(date);
@@ -66,7 +66,7 @@ export const ConventionFormAccordion = ({
   return (
     <div style={{ padding: "0.5rem" }}>
       <h5 style={{ margin: "2rem 4rem" }}>{title}</h5>
-      <ConnventionFormDetails convention={convention} />
+      <ConventionFormDetails convention={convention} />
     </div>
   );
 };

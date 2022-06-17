@@ -121,8 +121,6 @@ export class InMemoryConventionGateway implements ConventionGateway {
   }
 
   public async generateMagicLink(_: ConventionId, role: Role): Promise<string> {
-    // TODO: generate actual JWTs here
-    // throw new Error("500 Not Implemented In InMemory Gateway");
     return `magic/link/with/role/${role}`;
   }
 
