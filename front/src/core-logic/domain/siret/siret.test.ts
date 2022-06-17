@@ -108,9 +108,18 @@ describe("Siret validation and fetching", () => {
     });
   });
 
-  it("toggles shouldFetchEvenIfAlreadySaved and clears establishment and errors", () => {
+  it("toggles shouldFetchEvenIfAlreadySaved and clears to default siret state", () => {
+    setStoreWithInitialSiretState({
+      currentSiret: "10002000300040",
+      error: "Establishment with this siret is already in our DB",
+      establishment: { siret: "yolo" } as GetSiretResponseDto,
+    });
+    expectShouldFetchEvenIfAlreadySavedToBe(false);
     store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+    expectShouldFetchEvenIfAlreadySavedToBe(true);
     expectSiretErrorToBe(null);
+    expectEstablishmentToEqual(null);
+    expectCurrentSiretToBe("");
     store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
     expectShouldFetchEvenIfAlreadySavedToBe(false);
   });
