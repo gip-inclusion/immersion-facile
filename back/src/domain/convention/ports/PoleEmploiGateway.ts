@@ -22,6 +22,7 @@ export type PoleEmploiConvention = {
   protectionIndividuelle: boolean;
   preventionSanitaire: boolean;
   descriptionPreventionSanitaire: string;
+  descriptionProtectionIndividuelle: string; // Will always be empty since we do not have this field, but until PE is ready we keep it
   objectifDeImmersion: 1 | 2 | 3;
   codeRome: string;
   codeAppellation: string;
@@ -29,6 +30,7 @@ export type PoleEmploiConvention = {
   competencesObservees: string;
   signatureBeneficiaire: boolean;
   signatureEntreprise: boolean;
+  enseigne: string;
 };
 
 export interface PoleEmploiGateway {

@@ -17,8 +17,8 @@ const referencielAgencesPE = new HttpPeAgenciesReferential(
 );
 
 describe("HttpReferencielAgencesPe", () => {
-  it("Should return all `companies` susceptible to offer immerison of given rome located within the geographical area", async () => {
+  it("Should return PE agencies", async () => {
     const a = await referencielAgencesPE.getPeAgencies();
-    expect(a).toBe("yolo");
+    expect(a.length).toBeGreaterThan(10);
   });
 });

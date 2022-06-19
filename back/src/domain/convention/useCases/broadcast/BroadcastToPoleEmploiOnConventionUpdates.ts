@@ -60,6 +60,8 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends UseCase<
       protectionIndividuelle: convention.individualProtection,
       preventionSanitaire: convention.sanitaryPrevention,
       descriptionPreventionSanitaire: convention.sanitaryPreventionDescription,
+      descriptionProtectionIndividuelle: "",
+      enseigne: "", // TODO : decide whether to remove this field, to add agency name to our conventionDTO, or make a request to retrieve it here.
       objectifDeImmersion:
         conventionObjectiveToObjectifDeImmersion[convention.immersionObjective],
       codeRome: convention.immersionAppellation.romeCode,

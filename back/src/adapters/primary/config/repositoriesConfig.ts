@@ -51,6 +51,7 @@ import { StubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPosta
 import { AppConfig } from "./appConfig";
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/InMemoryPoleEmploiGateway";
+import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
 
 const logger = createLogger(__filename);
 
@@ -108,6 +109,20 @@ export const createRepositories = async (
     conventionRepository instanceof PgConventionRepository
       ? new PgConventionQueries(await getPgPoolFn().connect())
       : new InMemoryConventionQueries(conventionRepository);
+
+  const cachingAccessTokenGateway = [
+    config.laBonneBoiteGateway,
+    config.poleEmploiGateway,
+  ].includes("HTTPS")
+    ? new CachingAccessTokenGateway(
+        new PoleEmploiAccessTokenGateway(
+          config.poleEmploiAccessTokenConfig,
+          noRateLimit,
+          noRetries,
+        ),
+        clock,
+      )
+    : new InMemoryAccessTokenGateway();
 
   return {
     convention: conventionRepository,
@@ -174,14 +189,7 @@ export const createRepositories = async (
     laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteAPI(
-            new CachingAccessTokenGateway(
-              new PoleEmploiAccessTokenGateway(
-                config.poleEmploiAccessTokenConfig,
-                noRateLimit,
-                noRetries,
-              ),
-              clock,
-            ),
+            cachingAccessTokenGateway,
             config.poleEmploiClientId,
             noRateLimit,
             noRetries,
@@ -199,7 +207,12 @@ export const createRepositories = async (
 
     poleEmploiGateway:
       config.poleEmploiGateway === "HTTPS"
-        ? new HttpPoleEmploiGateway(config.poleEmploiUrl, config.poleEmploiKey)
+        ? new HttpPoleEmploiGateway(
+            cachingAccessTokenGateway,
+            config.poleEmploiClientId,
+            noRateLimit,
+            noRetries,
+          )
         : new InMemoryPoleEmploiGateway(),
 
     postalCodeDepartmentRegion:
