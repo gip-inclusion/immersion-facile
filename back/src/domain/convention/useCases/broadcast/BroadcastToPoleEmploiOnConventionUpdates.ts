@@ -39,7 +39,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends UseCase<
       ) / 60;
 
     const poleEmploiConvention: PoleEmploiConvention = {
-      id: convention.externalId,
+      id: convention.externalId || "no-external-id",
       originalId: convention.id,
       peConnectId: convention.federatedIdentity,
       status: convention.status,

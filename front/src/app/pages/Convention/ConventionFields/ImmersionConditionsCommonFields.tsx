@@ -3,7 +3,6 @@ import React from "react";
 import {
   ConventionDto,
   conventionObjectiveOptions,
-  ImmersionObjective,
 } from "shared/src/convention/convention.dto";
 import {
   BoolRadioGroup,
@@ -17,15 +16,6 @@ import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutoco
 import { DateInput } from "src/uiComponents/form/DateInput";
 import { SchedulePicker } from "src/uiComponents/form/SchedulePicker/SchedulePicker";
 import { TextInput } from "src/uiComponents/form/TextInput";
-
-const conventionObjectiveToObjectifDeImmersion: Record<
-  ImmersionObjective,
-  1 | 2 | 3
-> = {
-  "Initier une démarche de recrutement": 1,
-  "Confirmer un projet professionnel": 2,
-  "Découvrir un métier ou un secteur d'activité": 3,
-};
 
 export const ImmersionConditionsCommonFields = ({
   disabled,
