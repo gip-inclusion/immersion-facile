@@ -24,7 +24,10 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
+    emailGw = SendinblueEmailGateway.create(
+      config.sendinblueApiKey,
+      (_) => true,
+    );
     notifyToTeamApplicationSubmittedByBeneficiary =
       new NotifyToTeamApplicationSubmittedByBeneficiary(
         emailGw,

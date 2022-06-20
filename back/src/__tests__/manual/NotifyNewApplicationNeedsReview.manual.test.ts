@@ -29,7 +29,10 @@ describe("Notify To 2 Counsellors that an application is available", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
+    emailGw = SendinblueEmailGateway.create(
+      config.sendinblueApiKey,
+      (_) => true,
+    );
     generateMagicLinkFn = createGenerateConventionMagicLink(config);
   });
 

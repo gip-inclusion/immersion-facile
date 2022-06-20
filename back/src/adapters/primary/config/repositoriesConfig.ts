@@ -158,7 +158,10 @@ export const createRepositories = async (
 
     email:
       config.emailGateway === "SENDINBLUE"
-        ? SendinblueEmailGateway.create(config.sendinblueApiKey)
+        ? SendinblueEmailGateway.create(
+            config.sendinblueApiKey,
+            makeEmailAllowListPredicate(config),
+          )
         : new InMemoryEmailGateway(),
 
     rome: await createRomeRepository(config, getPgPoolFn),
@@ -216,6 +219,13 @@ export const createRepositories = async (
         : new InMemoryDocumentGateway(),
   };
 };
+
+export const makeEmailAllowListPredicate = (
+  config: AppConfig,
+): ((recipient: string) => boolean) =>
+  config.skipEmailAllowlist
+    ? (_recipient: string) => true
+    : (recipient: string): boolean => config.emailAllowList.includes(recipient);
 
 const createRomeRepository = async (
   config: AppConfig,

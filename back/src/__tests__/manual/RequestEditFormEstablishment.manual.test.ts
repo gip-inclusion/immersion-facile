@@ -50,6 +50,7 @@ describe("RequestEditFormEstablishment", () => {
     const uowPerformer = new InMemoryUowPerformer(unitOfWork);
     const emailGateway: SendinblueEmailGateway = SendinblueEmailGateway.create(
       config.sendinblueApiKey,
+      (_) => true,
     );
     const generateEditFormEstablishmentUrl =
       makeGenerateEditFormEstablishmentUrl(config);

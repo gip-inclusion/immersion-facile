@@ -123,15 +123,20 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 export class SendinblueEmailGateway implements EmailGateway {
   private constructor(
     private readonly apiInstance: SibApiV3Sdk.TransactionalEmailsApi,
+    private readonly emailAllowListPredicate: (recipient: string) => boolean,
   ) {}
 
-  public static create(apiKey: string): SendinblueEmailGateway {
+  public static create(
+    apiKey: string,
+    emailAllowListPredicate: (recipient: string) => boolean,
+  ): SendinblueEmailGateway {
     const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     apiInstance.setApiKey(
       SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
       apiKey,
     );
-    return new SendinblueEmailGateway(apiInstance);
+
+    return new SendinblueEmailGateway(apiInstance, emailAllowListPredicate);
   }
 
   public async sendImmersionAssessmentCreationLink(
@@ -531,15 +536,24 @@ export class SendinblueEmailGateway implements EmailGateway {
     params: any,
     carbonCopy: string[] = [],
   ) {
+    const filteredRecipients = recipients
+      .filter(this.emailAllowListPredicate)
+      .map((email): SendSmtpEmailTo => ({ email }));
+    if (filteredRecipients.length === 0) return;
+
+    const filteredCarbonCopy: string[] = carbonCopy.filter(
+      this.emailAllowListPredicate,
+    );
+
     const baseEmailConfig: SendSmtpEmail = {
       templateId: emailTypeToTemplateId[emailType],
-      to: recipients.map((email): SendSmtpEmailTo => ({ email })),
+      to: filteredRecipients,
       params,
     };
 
     const fullEmailConfig = addCarbonCopyFieldIfNeeded(
       baseEmailConfig,
-      carbonCopy,
+      filteredCarbonCopy,
     );
 
     try {

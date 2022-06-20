@@ -9,6 +9,7 @@ import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
 import { SendinblueEmailGateway } from "../../secondary/SendinblueEmailGateway";
 import { AppConfig } from "../config/appConfig";
 import { createGenerateConventionMagicLink } from "../config/createGenerateConventionMagicLink";
+import { makeEmailAllowListPredicate } from "../config/repositoriesConfig";
 
 const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const config = AppConfig.createFromEnv();
@@ -23,7 +24,10 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
 
   const emailGateway =
     config.emailGateway === "SENDINBLUE"
-      ? SendinblueEmailGateway.create(config.sendinblueApiKey)
+      ? SendinblueEmailGateway.create(
+          config.sendinblueApiKey,
+          makeEmailAllowListPredicate(config),
+        )
       : new InMemoryEmailGateway();
 
   const clock = new RealClock();

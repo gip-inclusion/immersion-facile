@@ -28,7 +28,10 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    emailGw = SendinblueEmailGateway.create(config.sendinblueApiKey);
+    emailGw = SendinblueEmailGateway.create(
+      config.sendinblueApiKey,
+      (_) => true,
+    );
     agencyRepository = new InMemoryAgencyRepository([
       AgencyDtoBuilder.create(validConvention.agencyId)
         .withCounsellorEmails([counsellorEmail])

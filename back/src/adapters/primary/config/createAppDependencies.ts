@@ -47,6 +47,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const generateApiJwt = makeGenerateJwt(config.apiJwtPrivateKey);
   const generateMagicLinkJwt = makeGenerateJwt(config.magicLinkJwtPrivateKey);
   const generateMagicLinkFn = createGenerateConventionMagicLink(config);
+
   const emailFilter = config.skipEmailAllowlist
     ? new AlwaysAllowEmailFilter()
     : new AllowListEmailFilter(config.emailAllowList);

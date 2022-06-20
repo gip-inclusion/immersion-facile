@@ -15,6 +15,7 @@ import { SendinblueEmailGateway } from "../../secondary/SendinblueEmailGateway";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/makeGenerateEditFormEstablishmentUrl";
 import { createPgUow } from "../config/uowConfig";
+import { makeEmailAllowListPredicate } from "../config/repositoriesConfig";
 
 const NB_MONTHS_BEFORE_SUGGEST = 6;
 
@@ -61,7 +62,10 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
 
   const emailGateway =
     config.emailGateway === "SENDINBLUE"
-      ? SendinblueEmailGateway.create(config.sendinblueApiKey)
+      ? SendinblueEmailGateway.create(
+          config.sendinblueApiKey,
+          makeEmailAllowListPredicate(config),
+        )
       : new InMemoryEmailGateway();
 
   const suggestEditFormEstablishment = new SuggestEditFormEstablishment(
