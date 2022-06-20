@@ -19,7 +19,17 @@ const shouldTriggerSearch = (candidate: string) => {
   }
 };
 
-const triggerSiretFetchEpic: AppEpic<SiretAction> = (action$) =>
+type SiretEpic = AppEpic<SiretAction>;
+
+const toggleShouldFetchEvenIfAlreadySaved: SiretEpic = (action$, state$) =>
+  action$.pipe(
+    filter(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved.match),
+    map(() =>
+      siretSlice.actions.siretModified(state$.value.siret.currentSiret),
+    ),
+  );
+
+const triggerSiretFetchEpic: SiretEpic = (action$) =>
   action$.pipe(
     filter(siretSlice.actions.siretModified.match),
     switchMap((action) =>
@@ -31,7 +41,7 @@ const triggerSiretFetchEpic: AppEpic<SiretAction> = (action$) =>
     ),
   );
 
-const getSiretEpic: AppEpic<SiretAction> = (
+const getSiretEpic: SiretEpic = (
   action$,
   state$,
   { siretGatewayThroughBack },
@@ -91,4 +101,8 @@ const makeGetSiret =
       : siretGatewayThroughBack.getSiretInfoIfNotAlreadySaved(siret);
   };
 
-export const siretEpics = [triggerSiretFetchEpic, getSiretEpic];
+export const siretEpics = [
+  triggerSiretFetchEpic,
+  getSiretEpic,
+  toggleShouldFetchEvenIfAlreadySaved,
+];

@@ -108,20 +108,23 @@ describe("Siret validation and fetching", () => {
     });
   });
 
-  it("toggles shouldFetchEvenIfAlreadySaved and clears to default siret state", () => {
-    setStoreWithInitialSiretState({
-      currentSiret: "10002000300040",
-      error: "Establishment with this siret is already in our DB",
-      establishment: { siret: "yolo" } as GetSiretResponseDto,
+  describe("When toggling 'shouldFetchEvenIfAlreadySaved'", () => {
+    it("clears error and establishment, and calls siretModified with new toggle mode", () => {
+      setStoreWithInitialSiretState({
+        currentSiret: "10002000300040",
+        error: "Establishment with this siret is already in our DB",
+        establishment: { siret: "yolo" } as GetSiretResponseDto,
+      });
+      expectShouldFetchEvenIfAlreadySavedToBe(false);
+      store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+      expectShouldFetchEvenIfAlreadySavedToBe(true);
+      expectSiretErrorToBe(null);
+      expectEstablishmentToEqual(null);
+      expectCurrentSiretToBe("10002000300040");
+      store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+      expectShouldFetchEvenIfAlreadySavedToBe(false);
+      expectIsSearchingToBe(true);
     });
-    expectShouldFetchEvenIfAlreadySavedToBe(false);
-    store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
-    expectShouldFetchEvenIfAlreadySavedToBe(true);
-    expectSiretErrorToBe(null);
-    expectEstablishmentToEqual(null);
-    expectCurrentSiretToBe("");
-    store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
-    expectShouldFetchEvenIfAlreadySavedToBe(false);
   });
 
   describe("When enableInseeApi feature flag is OFF", () => {
