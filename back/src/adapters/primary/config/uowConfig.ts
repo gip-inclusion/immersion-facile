@@ -1,4 +1,5 @@
 import { PoolClient } from "pg";
+import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -17,7 +18,6 @@ import { InMemoryConventionRepository } from "../../secondary/InMemoryConvention
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
-import { makeStubGetFeatureFlags } from "../../secondary/makeStubGetFeatureFlags";
 import { makePgGetFeatureFlags } from "../../secondary/pg/makePgGetFeatureFlags";
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgConventionPoleEmploiAdvisorRepository";

@@ -16,6 +16,7 @@ const defaultFeatureFlags: FeatureFlags = {
   enableInseeApi: true,
   enablePeConnectApi: false,
   enableLogoUpload: false,
+  enablePeConventionBroadcast: false,
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -23,6 +24,7 @@ const flagsFromApi: FeatureFlags = {
   enableInseeApi: true,
   enablePeConnectApi: true,
   enableLogoUpload: false,
+  enablePeConventionBroadcast: true,
 };
 
 describe("feature flag slice", () => {

@@ -1,3 +1,4 @@
+import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { FormEstablishmentDtoBuilder } from "../../../../../shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import {
@@ -14,7 +15,6 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeStubGetFeatureFlags } from "../../../adapters/secondary/makeStubGetFeatureFlags";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";

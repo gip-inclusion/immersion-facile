@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
@@ -27,7 +28,6 @@ import { InMemoryPeConnectGateway } from "../../secondary/InMemoryPeConnectGatew
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemorySireneGateway } from "../../secondary/InMemorySireneGateway";
 import { makeStubGetApiConsumerById } from "../../secondary/makeStubGetApiConsumerById";
-import { makeStubGetFeatureFlags } from "../../secondary/makeStubGetFeatureFlags";
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { makePgGetApiConsumerById } from "../../secondary/pg/makePgGetApiConsumerById";
 import { makePgGetFeatureFlags } from "../../secondary/pg/makePgGetFeatureFlags";

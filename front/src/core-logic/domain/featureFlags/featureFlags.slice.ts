@@ -10,6 +10,7 @@ const initialState: FeatureFlagState = {
   enableInseeApi: true,
   enablePeConnectApi: false,
   enableLogoUpload: false,
+  enablePeConventionBroadcast: false,
   areFeatureFlagsLoading: true,
 };
 

@@ -1,16 +1,11 @@
 import { Observable, of } from "rxjs";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { FeatureFlags } from "shared/src/featureFlags";
+import { FeatureFlags, makeStubFeatureFlags } from "shared/src/featureFlags";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class SimulatedTechnicalGateway implements TechnicalGateway {
   getAllFeatureFlags = (): Observable<FeatureFlags> =>
-    of({
-      enableLogoUpload: false,
-      enableInseeApi: true,
-      enablePeConnectApi: true,
-      enableAdminUi: true,
-    });
+    of(makeStubFeatureFlags());
 
   // eslint-disable-next-line @typescript-eslint/require-await
   uploadFile = async (file: File): Promise<AbsoluteUrl> => {

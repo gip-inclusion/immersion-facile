@@ -1,3 +1,4 @@
+import { makeStubFeatureFlags } from "shared/src/featureFlags";
 import { GetSiretResponseDto } from "shared/src/siret";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import {
@@ -132,10 +133,7 @@ describe("Siret validation and fetching", () => {
       ({ store, dependencies } = createTestStore(
         {
           featureFlags: {
-            enableInseeApi: false,
-            enableAdminUi: true,
-            enablePeConnectApi: false,
-            enableLogoUpload: false,
+            ...makeStubFeatureFlags({ enableInseeApi: false }),
             areFeatureFlagsLoading: false,
           },
         },

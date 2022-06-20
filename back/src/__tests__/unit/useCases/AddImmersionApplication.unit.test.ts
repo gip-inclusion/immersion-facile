@@ -1,4 +1,5 @@
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -12,7 +13,6 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeStubGetFeatureFlags } from "../../../adapters/secondary/makeStubGetFeatureFlags";
 import {
   CreateNewEvent,
   makeCreateNewEvent,

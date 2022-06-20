@@ -1,4 +1,5 @@
 import { expectObjectsToMatch } from "shared/src/expectToEqual";
+import { makeStubFeatureFlags } from "shared/src/featureFlags";
 import { GetSiretResponseDto, SiretDto } from "shared/src/siret";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
@@ -66,10 +67,7 @@ describe("Establishment", () => {
           isLoading: false,
         },
         featureFlags: {
-          enableInseeApi: false,
-          enableAdminUi: true,
-          enablePeConnectApi: false,
-          enableLogoUpload: false,
+          ...makeStubFeatureFlags({ enableInseeApi: false }),
           areFeatureFlagsLoading: false,
         },
       },

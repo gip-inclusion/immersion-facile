@@ -1,3 +1,4 @@
+import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -9,7 +10,6 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeStubGetFeatureFlags } from "../../../adapters/secondary/makeStubGetFeatureFlags";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
