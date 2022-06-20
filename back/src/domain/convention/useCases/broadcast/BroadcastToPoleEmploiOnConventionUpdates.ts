@@ -4,7 +4,11 @@ import {
   ImmersionObjective,
 } from "shared/src/convention/convention.dto";
 import { z } from "zod";
-import { UseCase } from "../../../core/UseCase";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   PoleEmploiConvention,
   PoleEmploiGateway,
@@ -19,17 +23,25 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   "Découvrir un métier ou un secteur d'activité": 3,
 };
 
-export class BroadcastToPoleEmploiOnConventionUpdates extends UseCase<
+export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCase<
   ConventionDto,
   void
 > {
   inputSchema = z.any(); // No need of a validation schema here since this use-case is only called from the our domain
 
-  constructor(private poleEmploiGateway: PoleEmploiGateway) {
-    super();
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    private poleEmploiGateway: PoleEmploiGateway,
+  ) {
+    super(uowPerformer);
   }
 
-  public async _execute(convention: ConventionDto): Promise<void> {
+  public async _execute(
+    convention: ConventionDto,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    const { enablePeConventionBroadcast } = await uow.getFeatureFlags();
+    if (!enablePeConventionBroadcast) return;
     if (!convention.federatedIdentity) return;
 
     const roundDifferenceInHours =

@@ -6,6 +6,7 @@ const defaultFlags: FeatureFlags = {
   enableInseeApi: true,
   enablePeConnectApi: true,
   enableLogoUpload: false,
+  enablePeConventionBroadcast: true,
 };
 
 export const makeStubGetFeatureFlags =

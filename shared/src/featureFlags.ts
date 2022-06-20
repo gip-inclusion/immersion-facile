@@ -3,4 +3,5 @@ export type FeatureFlags = {
   enableInseeApi: boolean;
   enablePeConnectApi: boolean;
   enableLogoUpload: boolean;
+  enablePeConventionBroadcast: boolean;
 };

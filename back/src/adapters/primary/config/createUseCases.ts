@@ -310,6 +310,7 @@ export const createUseCases = (
       ),
     notifyPoleEmploiOnConventionUpdates:
       new BroadcastToPoleEmploiOnConventionUpdates(
+        uowPerformer,
         repositories.poleEmploiGateway,
       ),
     shareConventionByEmail: new ShareApplicationLinkByEmail(repositories.email),

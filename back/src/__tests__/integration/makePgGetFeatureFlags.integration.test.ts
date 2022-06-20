@@ -29,6 +29,7 @@ describe("PG getFeatureFlags", () => {
       enableAdminUi: true,
       enablePeConnectApi: true,
       enableLogoUpload: false,
+      enablePeConventionBroadcast: true,
     };
 
     await insertFeatureFlagsInTable(expectedFeatureFlags);
@@ -40,6 +41,7 @@ describe("PG getFeatureFlags", () => {
       enableAdminUi: true,
       enablePeConnectApi: true,
       enableLogoUpload: false,
+      enablePeConventionBroadcast: true,
     });
   });
 
