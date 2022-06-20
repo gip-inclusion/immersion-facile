@@ -1,3 +1,5 @@
+import { AbsoluteUrl, absoluteUrlSchema } from "./AbsoluteUrl";
+
 export type ProcessEnv = { [key: string]: string | undefined };
 
 type ThrowIfNotInArrayParams<T> = {
@@ -30,6 +32,14 @@ export const makeThrowIfNotDefined =
     const value = processEnv[variableName];
     if (!value) throw new Error(`Expected ${variableName} to be Defined`);
     return value;
+  };
+
+export const makeThrowIfNotAbsoluteUrl =
+  (processEnv: ProcessEnv) =>
+  <T extends string>(variableName: T): AbsoluteUrl => {
+    const value = processEnv[variableName];
+    if (!value) throw new Error(`Expected ${variableName} to be Defined`);
+    return absoluteUrlSchema.parse(value);
   };
 
 /*

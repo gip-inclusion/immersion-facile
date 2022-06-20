@@ -1,4 +1,5 @@
 import { AxiosInstance } from "axios";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
 import {
   PeAgenciesReferential,
@@ -9,17 +10,17 @@ import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
-const referencielAgenceUrl =
-  "https://api.emploi-store.fr/partenaire/referentielagences/v1/agences";
-
 export class HttpPeAgenciesReferential implements PeAgenciesReferential {
   private axios: AxiosInstance;
+  private readonly referencielAgenceUrl: AbsoluteUrl;
 
   constructor(
+    peApiUrl: AbsoluteUrl,
     private readonly accessTokenGateway: AccessTokenGateway,
     private readonly poleEmploiClientId: string,
   ) {
     this.axios = createAxiosInstance(logger);
+    this.referencielAgenceUrl = `${peApiUrl}/partenaire/referentielagences/v1/agences`;
   }
 
   async getPeAgencies(): Promise<PeAgencyFromReferenciel[]> {
@@ -29,7 +30,7 @@ export class HttpPeAgenciesReferential implements PeAgenciesReferential {
 
     if (!accessToken) throw new Error("No access token");
 
-    const result = await this.axios.get(referencielAgenceUrl + "", {
+    const result = await this.axios.get(this.referencielAgenceUrl, {
       headers: {
         Authorization: `Bearer ${accessToken.access_token}`,
       },

@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
 import { secondsToMilliseconds } from "date-fns";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
@@ -61,15 +62,17 @@ const deduplicateLaBonneBoiteCompanies = (
 
 const MAX_PAGE_SIZE = 100;
 export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
-  private urlGetCompany =
-    "https://api.emploi-store.fr/partenaire/labonneboite/v1/company/";
+  private urlGetCompany: AbsoluteUrl;
 
   constructor(
+    readonly peApiUrl: AbsoluteUrl,
     private readonly accessTokenGateway: AccessTokenGateway,
     private readonly poleEmploiClientId: string,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
-  ) {}
+  ) {
+    this.urlGetCompany = `${peApiUrl}/partenaire/labonneboite/v1/company/`;
+  }
 
   public async searchCompanies(
     searchParams: LaBonneBoiteRequestParams,

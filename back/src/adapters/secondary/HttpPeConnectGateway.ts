@@ -34,19 +34,27 @@ import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";
 const _logger = createLogger(__filename);
 
 export class HttpPeConnectGateway implements PeConnectGateway {
-  public constructor(private readonly config: AccessTokenConfig) {}
+  private ApiPeConnectUrls: ReturnType<typeof makeApiPeConnectUrls>;
+
+  public constructor(private readonly config: AccessTokenConfig) {
+    this.ApiPeConnectUrls = makeApiPeConnectUrls({
+      peAuthCandidatUrl: config.peAuthCandidatUrl,
+      immersionBaseUrl: config.immersionFacileBaseUrl,
+      peApiUrl: config.peApiUrl,
+    });
+  }
 
   public oAuthGetAuthorizationCodeRedirectUrl(): AbsoluteUrl {
     const authorizationCodePayload: ExternalPeConnectOAuthGrantPayload = {
       response_type: "code",
       client_id: this.config.clientId,
       realm: "/individu",
-      redirect_uri: ApiPeConnectUrls.REGISTERED_REDIRECT_URL,
+      redirect_uri: this.ApiPeConnectUrls.REGISTERED_REDIRECT_URL,
       scope: peConnectNeededScopes(this.config.clientId),
     };
 
     return `${
-      ApiPeConnectUrls.OAUTH2_AUTH_CODE_STEP_1
+      this.ApiPeConnectUrls.OAUTH2_AUTH_CODE_STEP_1
     }?${queryParamsAsString<ExternalPeConnectOAuthGrantPayload>(
       authorizationCodePayload,
     )}`;
@@ -61,12 +69,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         code: authorizationCode,
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
-        redirect_uri: ApiPeConnectUrls.REGISTERED_REDIRECT_URL,
+        redirect_uri: this.ApiPeConnectUrls.REGISTERED_REDIRECT_URL,
       };
 
     const response = await createAxiosInstance(_logger)
       .post(
-        ApiPeConnectUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
+        this.ApiPeConnectUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
         queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
           getAccessTokenPayload,
         ),
@@ -94,7 +102,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     accessToken: AccessTokenDto,
   ): Promise<PeConnectUserDto> {
     const response = await createAxiosInstance()
-      .get(ApiPeConnectUrls.PECONNECT_USER_INFO, {
+      .get(this.ApiPeConnectUrls.PECONNECT_USER_INFO, {
         headers: headersWithAuthPeAccessToken(accessToken),
       })
       .catch((error) => {
@@ -116,7 +124,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     accessToken: AccessTokenDto,
   ): Promise<PeConnectAdvisorDto[]> {
     const response = await createAxiosInstance()
-      .get(ApiPeConnectUrls.PECONNECT_ADVISORS_INFO, {
+      .get(this.ApiPeConnectUrls.PECONNECT_ADVISORS_INFO, {
         headers: headersWithAuthPeAccessToken(accessToken),
         timeout: secondsToMilliseconds(10),
       })
@@ -159,18 +167,17 @@ type PeConnectUrlTargets =
   | "PECONNECT_USER_INFO"
   | "PECONNECT_ADVISORS_INFO";
 
-const ApiPeConnectUrls: Record<PeConnectUrlTargets, AbsoluteUrl> = {
-  OAUTH2_AUTH_CODE_STEP_1:
-    "https://authentification-candidat.pole-emploi.fr/connexion/oauth2/authorize",
-  OAUTH2_ACCESS_TOKEN_STEP_2:
-    "https://authentification-candidat.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Findividu",
-  REGISTERED_REDIRECT_URL:
-    "https://immersion-facile.beta.gouv.fr/api/pe-connect",
-  PECONNECT_USER_INFO:
-    "https://api.emploi-store.fr/partenaire/peconnect-individu/v1/userinfo",
-  PECONNECT_ADVISORS_INFO:
-    "https://api.emploi-store.fr/partenaire/peconnect-conseillers/v1/contactspe/conseillers",
-};
+const makeApiPeConnectUrls = (params: {
+  peAuthCandidatUrl: AbsoluteUrl;
+  peApiUrl: AbsoluteUrl;
+  immersionBaseUrl: string;
+}): Record<PeConnectUrlTargets, AbsoluteUrl> => ({
+  OAUTH2_AUTH_CODE_STEP_1: `${params.peAuthCandidatUrl}/connexion/oauth2/authorize`,
+  OAUTH2_ACCESS_TOKEN_STEP_2: `${params.peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
+  REGISTERED_REDIRECT_URL: `https://${params.immersionBaseUrl}/api/pe-connect`,
+  PECONNECT_USER_INFO: `${params.peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
+  PECONNECT_ADVISORS_INFO: `${params.peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
+});
 
 const peConnectNeededScopes = (clientId: string): string =>
   [

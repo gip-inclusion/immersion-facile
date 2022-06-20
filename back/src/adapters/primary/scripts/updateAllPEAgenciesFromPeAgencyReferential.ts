@@ -18,6 +18,7 @@ const updateAllPeAgenciesScript = async () => {
   );
 
   const httpPeAgenciesReferential = new HttpPeAgenciesReferential(
+    config.peApiUrl,
     accessTokenGateway,
     config.poleEmploiClientId,
   );

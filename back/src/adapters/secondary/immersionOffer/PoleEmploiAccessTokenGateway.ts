@@ -20,7 +20,7 @@ import { AccessTokenConfig } from "../../primary/config/appConfig";
 const logger = createLogger(__filename);
 export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
   public constructor(
-    private readonly config: AccessTokenConfig,
+    private readonly accessTokenConfig: AccessTokenConfig,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
   ) {}
@@ -28,8 +28,8 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
   public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
     const dataAccessToken = querystring.stringify({
       grant_type: "client_credentials",
-      client_id: this.config.clientId,
-      client_secret: this.config.clientSecret,
+      client_id: this.accessTokenConfig.clientId,
+      client_secret: this.accessTokenConfig.clientSecret,
       scope,
     });
     const headers = {
@@ -40,7 +40,7 @@ export class PoleEmploiAccessTokenGateway implements AccessTokenGateway {
       try {
         const response = await this.rateLimiter.whenReady(() =>
           createAxiosInstance(logger).post(
-            "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Fpartenaire",
+            `${this.accessTokenConfig.peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
             dataAccessToken,
             { headers, timeout: secondsToMilliseconds(10) },
           ),

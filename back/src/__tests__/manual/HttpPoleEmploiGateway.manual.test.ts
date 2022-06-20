@@ -14,6 +14,7 @@ const accessTokenGateway = new PoleEmploiAccessTokenGateway(
 
 const getAPI = () =>
   new HttpPoleEmploiGateway(
+    config.peApiUrl,
     accessTokenGateway,
     config.poleEmploiClientId,
     noRateLimit,

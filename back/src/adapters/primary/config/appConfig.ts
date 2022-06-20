@@ -4,6 +4,7 @@ import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import {
   makeGetBooleanVariable,
+  makeThrowIfNotAbsoluteUrl,
   makeThrowIfNotDefined,
   ProcessEnv,
   throwIfNotInArray,
@@ -11,6 +12,10 @@ import {
 import type { MinioParams } from "../../secondary/MinioDocumentGateway";
 
 export type AccessTokenConfig = {
+  immersionFacileBaseUrl: AbsoluteUrl;
+  peApiUrl: AbsoluteUrl;
+  peAuthCandidatUrl: AbsoluteUrl;
+  peEnterpriseUrl: AbsoluteUrl;
   clientId: string;
   clientSecret: string;
 };
@@ -23,6 +28,7 @@ export type AxiosConfig = {
 // See "Working with AppConfig" in back/README.md for more details.
 export class AppConfig {
   private readonly throwIfNotDefined;
+  private readonly throwIfNotAbsoluteUrl;
   private readonly getBooleanVariable;
 
   public static createFromEnv(
@@ -35,6 +41,7 @@ export class AppConfig {
 
   private constructor(private readonly env: ProcessEnv) {
     this.throwIfNotDefined = makeThrowIfNotDefined(env);
+    this.throwIfNotAbsoluteUrl = makeThrowIfNotAbsoluteUrl(env);
     this.getBooleanVariable = makeGetBooleanVariable(env);
   }
 
@@ -178,8 +185,24 @@ export class AppConfig {
     return this.throwIfNotDefined("POLE_EMPLOI_CLIENT_ID");
   }
 
+  public get peApiUrl(): AbsoluteUrl {
+    return this.throwIfNotAbsoluteUrl("POLE_EMPLOI_API_URL");
+  }
+  public get peAuthCandidatUrl(): AbsoluteUrl {
+    return this.throwIfNotAbsoluteUrl(
+      "POLE_EMPLOI_AUTHENTIFICATION_CANDIDAT_URL",
+    );
+  }
+  public get peEnterpriseUrl(): AbsoluteUrl {
+    return this.throwIfNotAbsoluteUrl("POLE_EMPLOI_ENTREPRISE_URL");
+  }
+
   public get poleEmploiAccessTokenConfig(): AccessTokenConfig {
     return {
+      immersionFacileBaseUrl: this.immersionFacileBaseUrl,
+      peApiUrl: this.peApiUrl,
+      peAuthCandidatUrl: this.peAuthCandidatUrl,
+      peEnterpriseUrl: this.peEnterpriseUrl,
       clientId: this.poleEmploiClientId,
       clientSecret: this.throwIfNotDefined("POLE_EMPLOI_CLIENT_SECRET"),
     };

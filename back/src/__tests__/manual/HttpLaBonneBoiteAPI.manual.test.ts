@@ -16,6 +16,7 @@ const accessTokenGateway = new PoleEmploiAccessTokenGateway(
 
 const getAPI = () =>
   new HttpLaBonneBoiteAPI(
+    config.peApiUrl,
     accessTokenGateway,
     config.poleEmploiClientId,
     noRateLimit,

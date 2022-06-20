@@ -189,6 +189,7 @@ export const createRepositories = async (
     laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteAPI(
+            config.peApiUrl,
             cachingAccessTokenGateway,
             config.poleEmploiClientId,
             noRateLimit,
@@ -208,6 +209,7 @@ export const createRepositories = async (
     poleEmploiGateway:
       config.poleEmploiGateway === "HTTPS"
         ? new HttpPoleEmploiGateway(
+            config.peApiUrl,
             cachingAccessTokenGateway,
             config.poleEmploiClientId,
             noRateLimit,

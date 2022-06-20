@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
 import secondsToMilliseconds from "date-fns/secondsToMilliseconds";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import {
   PoleEmploiGateway,
   PoleEmploiConvention,
@@ -21,15 +22,17 @@ import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 const logger = createLogger(__filename);
 
 export class HttpPoleEmploiGateway implements PoleEmploiGateway {
-  private url =
-    "https://api.emploi-store.fr/partenaire/immersion-pro/v1/demandes-immersion";
+  private peConventionBroadcastUrl: AbsoluteUrl;
 
   constructor(
+    readonly peApiUrl: AbsoluteUrl,
     private readonly accessTokenGateway: AccessTokenGateway,
     private readonly poleEmploiClientId: string,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
-  ) {}
+  ) {
+    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/immersion-pro/v1/demandes-immersion`;
+  }
 
   public async notifyOnConventionUpdated(
     poleEmploiConvention: PoleEmploiConvention,
@@ -44,6 +47,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
       );
     }
   }
+
   private async postPoleEmploiConvention(
     poleEmploiConvention: PoleEmploiConvention,
   ): Promise<AxiosResponse<void>> {
@@ -54,7 +58,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           const accessToken = await this.accessTokenGateway.getAccessToken(
             `application_${this.poleEmploiClientId} echangespmsmp api_immersion-prov1`, // application_${this.poleEmploiClientId}
           );
-          return axios.post(this.url, {
+          return axios.post(this.peConventionBroadcastUrl, {
             headers: {
               Authorization: `Bearer ${accessToken.access_token}`,
             },

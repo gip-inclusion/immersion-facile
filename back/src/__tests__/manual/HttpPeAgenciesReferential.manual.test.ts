@@ -12,6 +12,7 @@ const accessTokenGateway = new PoleEmploiAccessTokenGateway(
 );
 
 const referencielAgencesPE = new HttpPeAgenciesReferential(
+  config.peApiUrl,
   accessTokenGateway,
   config.poleEmploiClientId,
 );
