@@ -55,8 +55,11 @@ const peConvention: PoleEmploiConvention = {
 };
 
 describe("HttpPoleEmploiGateway", () => {
-  it("Should succeed posting a well formated convention", async () => {
+  it("Should succeed posting a well formatted convention", async () => {
     const api = getAPI();
-    expect(await api.notifyOnConventionUpdated(peConvention)).not.toThrow();
+
+    await expect(
+      api.notifyOnConventionUpdated(peConvention),
+    ).resolves.not.toThrow();
   });
 });

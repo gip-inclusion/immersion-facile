@@ -56,16 +56,21 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         const axios = createAxiosInstance(logger);
         const response = await this.rateLimiter.whenReady(async () => {
           const accessToken = await this.accessTokenGateway.getAccessToken(
-            `application_${this.poleEmploiClientId} echangespmsmp api_immersion-prov1`, // application_${this.poleEmploiClientId}
+            `echangespmsmp api_immersion-prov1`,
           );
-          return axios.post(this.peConventionBroadcastUrl, {
-            headers: {
-              Authorization: `Bearer ${accessToken.access_token}`,
-            },
-            timeout: secondsToMilliseconds(10),
+
+          return axios.post(
+            this.peConventionBroadcastUrl,
             poleEmploiConvention,
-          });
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken.access_token}`,
+              },
+              timeout: secondsToMilliseconds(10),
+            },
+          );
         });
+
         return response;
       } catch (error: any) {
         if (isRetryableError(logger, error)) throw new RetryableError(error);
