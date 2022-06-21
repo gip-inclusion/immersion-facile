@@ -170,11 +170,11 @@ type PeConnectUrlTargets =
 const makeApiPeConnectUrls = (params: {
   peAuthCandidatUrl: AbsoluteUrl;
   peApiUrl: AbsoluteUrl;
-  immersionBaseUrl: string;
+  immersionBaseUrl: AbsoluteUrl;
 }): Record<PeConnectUrlTargets, AbsoluteUrl> => ({
   OAUTH2_AUTH_CODE_STEP_1: `${params.peAuthCandidatUrl}/connexion/oauth2/authorize`,
   OAUTH2_ACCESS_TOKEN_STEP_2: `${params.peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
-  REGISTERED_REDIRECT_URL: `https://${params.immersionBaseUrl}/api/pe-connect`,
+  REGISTERED_REDIRECT_URL: `${params.immersionBaseUrl}/api/pe-connect`,
   PECONNECT_USER_INFO: `${params.peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
   PECONNECT_ADVISORS_INFO: `${params.peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
 });
