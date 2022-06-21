@@ -16,7 +16,7 @@ export interface SiretState {
 const initialState: SiretState = {
   currentSiret: "",
   isSearching: false,
-  shouldFetchEvenIfAlreadySaved: false,
+  shouldFetchEvenIfAlreadySaved: true,
   establishment: null,
   error: null,
 };

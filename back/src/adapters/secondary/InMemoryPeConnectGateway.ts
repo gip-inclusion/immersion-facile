@@ -31,7 +31,7 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
       code: "trust-me-i-am-a-valid-code",
     });
 
-    return `${this.baseUrl}/${peConnect}?${queryParams}`;
+    return `${this.baseUrl}/api/${peConnect}?${queryParams}`;
   }
 
   async getAdvisorsInfo(

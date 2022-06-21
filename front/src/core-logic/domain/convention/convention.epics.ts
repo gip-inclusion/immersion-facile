@@ -7,7 +7,9 @@ import { conventionSlice } from "./convention.slice";
 
 type ConventionAction = ActionOfSlice<typeof conventionSlice>;
 
-const getConventionEpic: AppEpic<ConventionAction> = (
+type ConventionEpic = AppEpic<ConventionAction>;
+
+const getConventionEpic: ConventionEpic = (
   action$,
   _state$,
   { conventionGateway },

@@ -1,8 +1,9 @@
 import { useFormikContext } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
 import { AgencyDisplay } from "src/app/components/AgencyDisplay";
 import { AgencySelector } from "src/app/components/AgencySelector";
+import { deviceRepository } from "src/app/config/dependencies";
 import { BeneficiaryCommonFields } from "src/app/pages/Convention/ConventionFields/BeneficiaryCommonFields";
 import { EstablishmentCommonFields } from "src/app/pages/Convention/ConventionFields/EstablishmentCommonFields";
 import { ImmersionConditionsCommonFields } from "src/app/pages/Convention/ConventionFields/ImmersionConditionsCommonFields";
@@ -34,6 +35,10 @@ export const ConventionFormFields = ({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onRejectForm = async () => {},
 }: ConventionFieldsProps) => {
+  useEffect(() => {
+    deviceRepository.delete("partialConvention");
+  }, []);
+
   const { errors, submitCount, isSubmitting, submitForm, values } =
     useFormikContext<ConventionDto>();
   const { enablePeConnectApi } = useFeatureFlags();

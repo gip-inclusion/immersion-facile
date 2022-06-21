@@ -19,7 +19,7 @@ import {
   immersionAssessmentErrorSelector,
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
-import { conventionStateSelector } from "src/core-logic/domain/convention/convention.selectors";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
@@ -48,7 +48,7 @@ export const ImmersionAssessmentPage = ({
     convention,
     isLoading,
     error: conventionFetchError,
-  } = useAppSelector(conventionStateSelector);
+  } = useAppSelector(conventionSelectors.conventionState);
   const assessmentError = useAppSelector(immersionAssessmentErrorSelector);
   const assessmentStatus = useAppSelector(immersionAssessmentStatusSelector);
 

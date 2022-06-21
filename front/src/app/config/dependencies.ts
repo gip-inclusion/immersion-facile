@@ -1,6 +1,7 @@
 import { asyncScheduler, SchedulerLike } from "rxjs";
 import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
 import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
+import { createLocalStorageDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createLocalStorageDeviceRepository";
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/HttpEstablishmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/HttpConventionGateway";
@@ -36,6 +37,8 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ENV } from "src/environmentVariables";
 import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
+
+export const deviceRepository = createLocalStorageDeviceRepository();
 
 export const establishmentGateway: EstablishmentGateway =
   ENV.gateway === "IN_MEMORY"
@@ -123,9 +126,9 @@ export type Dependencies = {
   conventionGateway: ConventionGateway;
   immersionSearchGateway: ImmersionSearchGateway;
   romeAutocompleteGateway: RomeAutocompleteGateway;
+  navigationGateway: NavigationGateway;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
-  navigationGateway: NavigationGateway;
 };
 
 export const store = createStore({

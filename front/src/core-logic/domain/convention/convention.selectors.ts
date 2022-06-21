@@ -1,3 +1,7 @@
 import type { RootState } from "src/core-logic/storeConfig/store";
 
-export const conventionStateSelector = (state: RootState) => state.convention;
+const conventionState = (state: RootState) => state.convention;
+
+export const conventionSelectors = {
+  conventionState,
+};

@@ -78,6 +78,9 @@ describe("Siret validation and fetching", () => {
 
   describe("Siret fetching when a 14 digit siret is provided", () => {
     it("fetches correctly and keeps the returned establishment", () => {
+      setStoreWithInitialSiretState({
+        shouldFetchEvenIfAlreadySaved: false,
+      });
       dispatchSiretModified("11110000111100");
       feedSirenGatewayThroughBackWith(establishmentFetched);
       expectEstablishmentToEqual(establishmentFetched);
@@ -99,9 +102,6 @@ describe("Siret validation and fetching", () => {
     });
 
     it("when 'withAlreadySavedCheck' is false, fetches correctly but calls the relevant route", () => {
-      setStoreWithInitialSiretState({
-        shouldFetchEvenIfAlreadySaved: true,
-      });
       dispatchSiretModified("11110000111100");
       feedSirenGatewayThroughBackWith(establishmentFetched);
       expectEstablishmentToEqual(establishmentFetched);
@@ -116,14 +116,14 @@ describe("Siret validation and fetching", () => {
         error: "Establishment with this siret is already in our DB",
         establishment: { siret: "yolo" } as GetSiretResponseDto,
       });
-      expectShouldFetchEvenIfAlreadySavedToBe(false);
-      store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
       expectShouldFetchEvenIfAlreadySavedToBe(true);
+      store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+      expectShouldFetchEvenIfAlreadySavedToBe(false);
       expectSiretErrorToBe(null);
       expectEstablishmentToEqual(null);
       expectCurrentSiretToBe("10002000300040");
       store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
-      expectShouldFetchEvenIfAlreadySavedToBe(false);
+      expectShouldFetchEvenIfAlreadySavedToBe(true);
       expectIsSearchingToBe(true);
     });
   });
@@ -199,15 +199,11 @@ describe("Siret validation and fetching", () => {
       dependencies.siretGatewayThroughBack
         .getSiretInfoIfNotAlreadySavedCallCount,
     ).toBe(1);
-    expect(
-      dependencies.siretGatewayThroughBack.getSiretInfoObservableCallCount,
-    ).toBe(0);
+    expect(dependencies.siretGatewayThroughBack.getSiretInfoCallCount).toBe(0);
   };
 
   const expectOnly_getSirenInfoObservable_toHaveBeenCalled = () => {
-    expect(
-      dependencies.siretGatewayThroughBack.getSiretInfoObservableCallCount,
-    ).toBe(1);
+    expect(dependencies.siretGatewayThroughBack.getSiretInfoCallCount).toBe(1);
     expect(
       dependencies.siretGatewayThroughBack
         .getSiretInfoIfNotAlreadySavedCallCount,

@@ -1,5 +1,9 @@
 import { addDays, startOfToday } from "date-fns";
-import { conventionGateway } from "src/app/config/dependencies";
+import { keys } from "ramda";
+import {
+  conventionGateway,
+  deviceRepository,
+} from "src/app/config/dependencies";
 import {
   ConventionPageRoute,
   ConventionPresentation,
@@ -36,12 +40,14 @@ export const isConventionFrozen = (
 export const undefinedIfEmptyString = (text?: string): string | undefined =>
   text || undefined;
 
-export const conventionInitialValuesFromUrl = ({
-  params,
-}:
-  | ConventionPageRoute
-  | ConventionUkrainePageRoute): ConventionPresentation => {
-  const emptyForm = {
+export const conventionInitialValuesFromUrl = (
+  route: ConventionPageRoute | ConventionUkrainePageRoute,
+): ConventionPresentation => {
+  const dataFromDevice = deviceRepository.get("partialConvention") ?? {};
+
+  const params = mergeObjectsExceptEmptyString(dataFromDevice, route.params);
+
+  const initialFormWithStoredAndUrlParams = {
     id: uuidV4(),
     status: "DRAFT" as ConventionStatus,
     dateSubmission: toDateString(startOfToday()),
@@ -93,9 +99,9 @@ export const conventionInitialValuesFromUrl = ({
   };
 
   if (frontEnvType === "DEV" && ENV.PREFILLED_FORMS)
-    return devPrefilledValues(emptyForm);
+    return devPrefilledValues(initialFormWithStoredAndUrlParams);
 
-  return emptyForm;
+  return initialFormWithStoredAndUrlParams;
 };
 
 const devPrefilledValues = (
@@ -144,3 +150,20 @@ const devPrefilledValues = (
   beneficiaryAccepted: false,
   enterpriseAccepted: false,
 });
+
+const mergeObjectsExceptEmptyString = <T>(
+  partialObj: Partial<T>,
+  priorityObj: T,
+): T => {
+  const allkeys = [
+    ...new Set([...keys(priorityObj), ...keys(partialObj)]),
+  ] as (keyof T)[];
+
+  return allkeys.reduce((acc, key) => {
+    const prioritaryValue = priorityObj[key];
+    return {
+      ...acc,
+      [key]: prioritaryValue ? prioritaryValue : partialObj[key],
+    };
+  }, {} as T);
+};

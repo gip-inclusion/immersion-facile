@@ -1,7 +1,10 @@
+import { keys } from "ramda";
 import React from "react";
 import { ButtonHome } from "react-design-system";
 import { useDispatch } from "react-redux";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { Section } from "src/app/components/Section";
+import { deviceRepository } from "src/app/config/dependencies";
 import { PeConnectButton } from "src/app/pages/Convention/PeConnectButton";
 import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
 import { routes, useRoute } from "src/app/routing/routes";
@@ -25,7 +28,21 @@ export const InitiateConventionCard = () => {
             <p className="text-center text-sm py-3">
               Je suis inscrit à Pôle Emploi, je demande une convention avec :
             </p>
-            <PeConnectButton />
+            <PeConnectButton
+              onClick={() => {
+                if (currentRoute.name === "convention") {
+                  const { federatedIdentity, ...partialConvention } =
+                    currentRoute.params;
+
+                  if (keys(partialConvention).length) {
+                    deviceRepository.set(
+                      "partialConvention",
+                      partialConvention as Partial<ConventionDto>,
+                    );
+                  }
+                }
+              }}
+            />
             <span className="pt-4">ou bien</span>
             <p className="text-center text-sm py-3">
               Je suis accompagné par une autre structure :

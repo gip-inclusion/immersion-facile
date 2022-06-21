@@ -15,12 +15,12 @@ export class TestSiretGatewayThroughBack implements SiretGatewayThroughBack {
   }
 
   getSiretInfo(): Observable<GetSiretInfo> {
-    this.getSiretInfoObservableCallCount++;
+    this.getSiretInfoCallCount++;
     return this.siretInfo$;
   }
 
   public isSiretInDb$ = new Subject<boolean>();
   public siretInfo$ = new Subject<GetSiretInfo>();
-  public getSiretInfoObservableCallCount = 0;
+  public getSiretInfoCallCount = 0;
   public getSiretInfoIfNotAlreadySavedCallCount = 0;
 }

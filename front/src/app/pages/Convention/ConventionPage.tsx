@@ -2,6 +2,7 @@ import { CircularProgress } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { OmitFromExistingKeys } from "shared/src/utils";
 import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { ConventionForm } from "src/app/pages/Convention/ConventionForm";
@@ -22,7 +23,7 @@ interface ConventionPageProps {
   route: ConventionPageRoute;
 }
 
-export type ConventionPresentation = Exclude<
+export type ConventionPresentation = OmitFromExistingKeys<
   Partial<ConventionDto>,
   "id" | "rejectionJustification" | "legacySchedule"
 > & {

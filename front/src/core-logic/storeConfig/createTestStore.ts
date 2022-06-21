@@ -1,13 +1,13 @@
 import { VirtualTimeScheduler } from "rxjs";
-import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
-import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
-import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
-import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
-import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
-import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
-import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
+import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
+import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
+import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
+import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/InMemoryNavigationGateway";
+import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
+import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
+import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/TestSiretGatewayThroughBack";
 
@@ -21,9 +21,9 @@ export interface TestDependencies {
   conventionGateway: InMemoryConventionGateway;
   immersionSearchGateway: InMemoryImmersionSearchGateway;
   romeAutocompleteGateway: InMemoryRomeAutocompleteGateway;
-  minSearchResultsToPreventRefetch: number;
-  scheduler: VirtualTimeScheduler;
   navigationGateway: InMemoryNavigationGateway;
+  scheduler: VirtualTimeScheduler;
+  minSearchResultsToPreventRefetch: number;
 }
 
 export const createTestStore = (
@@ -34,15 +34,15 @@ export const createTestStore = (
     immersionAssessmentGateway: new TestImmersionAssessmentGateway(),
     siretGatewayThroughBack: new TestSiretGatewayThroughBack(),
     immersionSearchGateway: new InMemoryImmersionSearchGateway(),
-    minSearchResultsToPreventRefetch: 2,
     establishmentGateway: new InMemoryEstablishmentGateway(),
     conventionGateway: new InMemoryConventionGateway(),
     apiAdresseGateway: new InMemoryApiAdresseGateway(),
     technicalGateway: new TestTechnicalGateway(),
     agencyGateway: new InMemoryAgencyGateway(),
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),
-    scheduler: new VirtualTimeScheduler(),
     navigationGateway: new InMemoryNavigationGateway(),
+    scheduler: new VirtualTimeScheduler(),
+    minSearchResultsToPreventRefetch: 2,
   };
 
   preloadedState &&

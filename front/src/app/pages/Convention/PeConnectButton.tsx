@@ -1,9 +1,18 @@
 import React from "react";
 import { loginPeConnect } from "shared/src/routes";
 
-export const PeConnectButton = () => (
+export const PeConnectButton = ({
+  onClick,
+}: {
+  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+}) => (
   <div className="pe-connect flex justify-center">
-    <a href={`/api/${loginPeConnect}`} className="button-pe-connect" title="">
+    <a
+      onClick={onClick}
+      href={`/api/${loginPeConnect}`}
+      className="button-pe-connect"
+      title=""
+    >
       <img
         className="icon-pe-connect"
         src="/pe-connect-barre-nav-b.svg"
