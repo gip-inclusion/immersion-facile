@@ -30,6 +30,7 @@ const getUseCasesByTopics = (
   ],
   ImmersionApplicationPartiallySigned: [
     useCases.notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty,
+    useCases.notifyPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationFullySigned: [
     useCases.notifyNewConventionNeedsReview,
@@ -59,7 +60,7 @@ const getUseCasesByTopics = (
     useCases.notifyBeneficiaryAndEnterpriseThatConventionIsRejected,
     useCases.notifyPoleEmploiOnConventionUpdates,
   ],
-  ImmersionApplicationCancelled: [],
+  ImmersionApplicationCancelled: [useCases.notifyPoleEmploiOnConventionUpdates],
 
   // ImmersionApplication Federated Identities
   PeConnectFederatedIdentityAssociated: [
