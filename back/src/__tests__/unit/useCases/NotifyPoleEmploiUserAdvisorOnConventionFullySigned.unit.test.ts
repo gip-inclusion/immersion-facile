@@ -123,7 +123,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: conventionDtoFromEvent.id,
-            role: "counsellor",
+            role: "validator",
             targetRoute: frontRoutes.conventionToValidate,
             email: conventionPoleEmploiAdvisor.email,
           }),

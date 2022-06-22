@@ -66,7 +66,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
                 immersionAddress: convention.immersionAddress!,
                 magicLink: this.generateMagicLinkFn({
                   id: convention.id,
-                  role: "counsellor",
+                  role: "validator",
                   targetRoute: frontRoutes.conventionToValidate,
                   email: advisorEmail,
                 }),

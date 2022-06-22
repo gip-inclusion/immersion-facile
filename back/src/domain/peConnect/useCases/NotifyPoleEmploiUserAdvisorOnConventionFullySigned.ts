@@ -60,7 +60,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
                 immersionAddress: conventionFromEvent.immersionAddress!,
                 magicLink: this.generateMagicLinkFn({
                   id: conventionFromEvent.id,
-                  role: "counsellor",
+                  role: "validator",
                   targetRoute: frontRoutes.conventionToValidate,
                   email: advisorEmail,
                 }),
