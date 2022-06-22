@@ -54,6 +54,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     return this.retryStrategy.apply(async () => {
       try {
         const axios = createAxiosInstance(logger);
+        logger.info(poleEmploiConvention, "Sending convention to PE");
         const response = await this.rateLimiter.whenReady(async () => {
           const accessToken = await this.accessTokenGateway.getAccessToken(
             `echangespmsmp api_immersion-prov1`,
@@ -70,9 +71,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             },
           );
         });
-
+        logger.info(response.status, "Response status from PE");
         return response;
       } catch (error: any) {
+        logger.info(error, "Error from PE");
         if (isRetryableError(logger, error)) throw new RetryableError(error);
         logAxiosError(logger, error);
         throw error;
