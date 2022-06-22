@@ -67,7 +67,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
                 magicLink: this.generateMagicLinkFn({
                   id: convention.id,
                   role: "counsellor",
-                  targetRoute: frontRoutes.conventionToSign,
+                  targetRoute: frontRoutes.conventionToValidate,
                   email: advisorEmail,
                 }),
               },
