@@ -31,7 +31,7 @@ export const agencyKindList: NotEmptyArray<
   "autre",
 ];
 
-export type AgencyInListDto = {
+export type AgencyWithPositionDto = {
   id: AgencyId;
   name: string;
   position: LatLonDto;
@@ -49,7 +49,7 @@ export type AgencyKind =
 
 export type AgencyKindFilter = "peOnly" | "peExcluded";
 
-export type ListAgenciesRequestDto = {
+export type ListAgenciesWithPositionRequestDto = {
   lon?: number;
   lat?: number;
   filter?: AgencyKindFilter;

@@ -1,6 +1,6 @@
 import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
 import {
-  AgencyInListDto,
+  AgencyWithPositionDto,
   AgencyId,
   AgencyStatus,
   AgencyKindFilter,
@@ -167,7 +167,8 @@ const isAgencyPE = (agency: AgencyDto) => agency.kind === "pole-emploi";
 const isAgencyNotPE = (agency: AgencyDto) => agency.kind !== "pole-emploi";
 
 const sortByNearestFrom =
-  (position: LatLonDto) => (a: AgencyInListDto, b: AgencyInListDto) =>
+  (position: LatLonDto) =>
+  (a: AgencyWithPositionDto, b: AgencyWithPositionDto) =>
     distanceBetweenCoordinatesInMeters(
       a.position.lat,
       a.position.lon,

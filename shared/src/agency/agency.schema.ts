@@ -2,11 +2,11 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
   AgencyId,
-  AgencyInListDto,
+  AgencyWithPositionDto,
   AgencyKind,
   agencyKindList,
   CreateAgencyDto,
-  ListAgenciesRequestDto,
+  ListAgenciesWithPositionRequestDto,
   WithAgencyId,
 } from "./agency.dto";
 import { latLonSchema } from "../latLon";
@@ -23,18 +23,19 @@ export const withAgencyIdSchema: z.Schema<WithAgencyId> = z.object({
   id: agencyIdSchema,
 });
 
-export const agencyInListSchema: z.ZodSchema<AgencyInListDto> = z.object({
-  id: agencyIdSchema,
-  name: z.string(),
-  position: latLonSchema,
-});
+export const agencyWithPositionSchema: z.ZodSchema<AgencyWithPositionDto> =
+  z.object({
+    id: agencyIdSchema,
+    name: z.string(),
+    position: latLonSchema,
+  });
 
-export const listAgenciesResponseSchema: z.ZodSchema<AgencyInListDto[]> =
-  z.array(agencyInListSchema);
+export const listAgenciesResponseSchema: z.ZodSchema<AgencyWithPositionDto[]> =
+  z.array(agencyWithPositionSchema);
 
 const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 
-export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
+export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesWithPositionRequestDto> =
   z.object({
     lat: zPreprocessedNumber().optional(),
     lon: zPreprocessedNumber().optional(),

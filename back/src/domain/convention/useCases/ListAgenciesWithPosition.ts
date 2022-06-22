@@ -1,17 +1,17 @@
 import {
   AgencyDto,
-  AgencyInListDto,
+  AgencyWithPositionDto,
   AgencyKindFilter,
-  ListAgenciesRequestDto,
+  ListAgenciesWithPositionRequestDto,
 } from "shared/src/agency/agency.dto";
 import { listAgenciesRequestSchema } from "shared/src/agency/agency.schema";
 import { LatLonDto } from "shared/src/latLon";
 import { UseCase } from "../../core/UseCase";
 import { AgencyRepository } from "../ports/AgencyRepository";
 
-export class ListAgencies extends UseCase<
-  ListAgenciesRequestDto,
-  AgencyInListDto[]
+export class ListAgenciesWithPosition extends UseCase<
+  ListAgenciesWithPositionRequestDto,
+  AgencyWithPositionDto[]
 > {
   constructor(readonly agencyRepository: AgencyRepository) {
     super();
@@ -23,12 +23,12 @@ export class ListAgencies extends UseCase<
     lon,
     lat,
     filter,
-  }: ListAgenciesRequestDto): Promise<AgencyInListDto[]> {
+  }: ListAgenciesWithPositionRequestDto): Promise<AgencyWithPositionDto[]> {
     const agencies = await this.getAgencies(
       lon && lat ? { lon, lat } : undefined,
       filter,
     );
-    return agencies.map(agencyToAgencyInListDto);
+    return agencies.map(agencyToAgencyWithPositionDto);
   }
 
   private getAgencies(
@@ -45,7 +45,9 @@ export class ListAgencies extends UseCase<
   }
 }
 
-const agencyToAgencyInListDto = (config: AgencyDto): AgencyInListDto => ({
+const agencyToAgencyWithPositionDto = (
+  config: AgencyDto,
+): AgencyWithPositionDto => ({
   id: config.id,
   name: config.name,
   position: {

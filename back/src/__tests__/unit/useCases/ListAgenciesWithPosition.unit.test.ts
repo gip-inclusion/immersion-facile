@@ -1,6 +1,6 @@
-import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { ListAgencies } from "../../../domain/convention/useCases/ListAgencies";
+import { ListAgenciesWithPosition } from "../../../domain/convention/useCases/ListAgenciesWithPosition";
 
 const agency1 = AgencyDtoBuilder.empty()
   .withId("11111111-1111-1111-1111-111111111111")
@@ -30,7 +30,7 @@ const agencyAddedFromPeReferencial = AgencyDtoBuilder.empty()
 describe("ListAgencies", () => {
   it("returns empty list when the repository is empty", async () => {
     const repository = new InMemoryAgencyRepository([]);
-    const listAgencies = new ListAgencies(repository);
+    const listAgencies = new ListAgenciesWithPosition(repository);
 
     const agencies = await listAgencies.execute({});
     expect(agencies).toEqual([]);
@@ -43,7 +43,7 @@ describe("ListAgencies", () => {
       agencyInReview,
       agencyAddedFromPeReferencial,
     ]);
-    const listAgencies = new ListAgencies(repository);
+    const listAgencies = new ListAgenciesWithPosition(repository);
 
     const agencies = await listAgencies.execute({});
     expect(agencies).toEqual([
@@ -78,7 +78,7 @@ describe("ListAgencies", () => {
     }
 
     const repository = new InMemoryAgencyRepository(agencies);
-    const listAgencies = new ListAgencies(repository);
+    const listAgencies = new ListAgenciesWithPosition(repository);
 
     const nearestAgencies = await listAgencies.execute({
       lat: 20,

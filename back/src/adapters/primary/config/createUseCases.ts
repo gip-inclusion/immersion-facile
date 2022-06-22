@@ -13,7 +13,7 @@ import { ExportImmersionApplicationsReport } from "../../../domain/convention/us
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetImmersionApplication } from "../../../domain/convention/useCases/GetImmersionApplication";
-import { ListAgencies } from "../../../domain/convention/useCases/ListAgencies";
+import { ListAgenciesWithPosition } from "../../../domain/convention/useCases/ListAgenciesWithPosition";
 import { ListImmersionApplication } from "../../../domain/convention/useCases/ListImmersionApplication";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
@@ -222,7 +222,7 @@ export const createUseCases = (
     romeSearch: new RomeSearch(uowPerformer),
 
     // agencies
-    listAgencies: new ListAgencies(repositories.agency),
+    listAgencies: new ListAgenciesWithPosition(repositories.agency),
     getAgencyPublicInfoById: new GetAgencyPublicInfoById(repositories.agency),
 
     // notifications
