@@ -19,9 +19,9 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   ImmersionObjective,
   1 | 2 | 3
 > = {
-  "Initier une démarche de recrutement": 1,
+  "Découvrir un métier ou un secteur d'activité": 1,
   "Confirmer un projet professionnel": 2,
-  "Découvrir un métier ou un secteur d'activité": 3,
+  "Initier une démarche de recrutement": 3,
 };
 
 const conventionStatusToPoleEmploiStatus: Record<ConventionStatus, string> = {

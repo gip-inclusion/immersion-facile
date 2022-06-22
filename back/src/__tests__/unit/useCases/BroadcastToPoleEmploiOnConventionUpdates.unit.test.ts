@@ -74,17 +74,17 @@ describe("Broadcasts events to pole-emploi", () => {
       enablePeConventionBroadcast: true,
     });
 
+    const peExternalId = "peExternalId";
     const immersionConventionId: ConventionId = "immersionConventionId";
 
     // Act
     const convention = new ConventionDtoBuilder()
       .withId(immersionConventionId)
-      .withExternalId("1")
-      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withExternalId(peExternalId)
       .withFederatedIdentity("peConnect:some-id")
-      .withDateStart("2021-05-13")
-      .withDateEnd("2021-05-14T00:30:00.000Z") // Lasts 1 day and half an hour, ie. 24.5 hours
-      .withImmersionObjective("Confirmer un projet professionnel")
+      .withDateStart("2021-05-13T10:00:00.000Z")
+      .withDateEnd("2021-05-14T10:30:00.000Z") // Lasts 1 day and half an hour, ie. 24.5 hours
+      .withImmersionObjective("Initier une démarche de recrutement")
       .build();
 
     await useCase.execute(convention);
@@ -92,14 +92,12 @@ describe("Broadcasts events to pole-emploi", () => {
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
     expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
-      id: "00000000001",
-      peConnectId: "some-id",
+      id: peExternalId,
       originalId: immersionConventionId,
-      objectifDeImmersion: 2,
+      objectifDeImmersion: 3,
       dureeImmersion: "24.5",
-      dateDebut: "2021-05-13T00:00:00.000Z",
-      dateFin: "2021-05-14T00:30:00.000Z",
-      status: "DEMANDE_VALIDÉE",
+      dateDebut: "2021-05-13T10:00:00.000Z",
+      dateFin: "2021-05-14T10:30:00.000Z",
     });
   });
 });
