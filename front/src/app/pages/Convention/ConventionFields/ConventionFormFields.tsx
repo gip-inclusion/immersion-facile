@@ -21,7 +21,7 @@ type ConventionFieldsProps = {
   isSignOnly?: boolean;
   isSignatureEnterprise?: boolean; //< Ignored if !isSignOnly. Determines who's signing (enterprise or beneficiary)
   signeeName?: string; //< Ignored if !isSignOnly. Name of the person signing.
-  alreadySubmitted?: boolean;
+  alreadySigned?: boolean;
   onRejectForm?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
 };
 
@@ -30,7 +30,7 @@ export const ConventionFormFields = ({
   isSignOnly: isSignatureMode,
   isSignatureEnterprise,
   signeeName,
-  alreadySubmitted,
+  alreadySigned,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onRejectForm = async () => {},
 }: ConventionFieldsProps) => {
@@ -44,9 +44,7 @@ export const ConventionFormFields = ({
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}
       {isFrozen && isSignatureMode && (
-        <ConventionSignOnlyMessage
-          isAlreadySigned={alreadySubmitted ?? false}
-        />
+        <ConventionSignOnlyMessage isAlreadySigned={alreadySigned ?? false} />
       )}
       <input type="hidden" name="federatedIdentity" />
       <FormSectionTitle>1. Coordonnées du bénéficiaire</FormSectionTitle>
@@ -105,7 +103,7 @@ export const ConventionFormFields = ({
       )}
       {isSignatureMode && (
         <>
-          {alreadySubmitted ? (
+          {alreadySigned ? (
             <p>Vous avez signé la convention.</p>
           ) : (
             <SignatureActions

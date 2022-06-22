@@ -13,6 +13,7 @@ import {
   SuccessFeedbackKind,
 } from "src/app/components/SubmitFeedback";
 import { conventionGateway } from "src/app/config/dependencies";
+import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { ApiDataContainer } from "src/app/pages/admin/ApiDataContainer";
 import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
@@ -29,21 +30,49 @@ interface SignFormProps {
 
 const extractRoleAndName = (
   jwt: string,
-  application: ConventionDto,
+  convention: ConventionDto,
 ): [Role, string] => {
   const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
   const role = payload.role;
   const name =
     role === "beneficiary"
-      ? `${application.lastName.toUpperCase()} ${application.firstName}`
-      : `${application.mentor}`;
+      ? `${convention.lastName.toUpperCase()} ${convention.firstName}`
+      : `${convention.mentor}`;
   return [role, name];
 };
 
+const signeeAllowRoles: Role[] = ["beneficiary", "establishment"];
+
 export const ConventionSignPage = ({ route }: SignFormProps) => {
   if (!route.params.jwt) {
-    return <p>Lien non valide</p>;
+    return (
+      <HeaderFooterLayout>
+        <p>Lien non valide</p>;
+      </HeaderFooterLayout>
+    );
   }
+
+  const payload = decodeJwt<ConventionMagicLinkPayload>(route.params.jwt);
+
+  if (!signeeAllowRoles.includes(payload.role))
+    return (
+      <HeaderFooterLayout>
+        <div className="p-5">
+          <Notification title="Utilisateur incorrect" type="error">
+            Seul le bénéficiaire ou le mentor peuvent signer la convention. Le
+            lien que vous avez utilisé n'est destiné ni à un bénéficiaire ni à
+            un tuteur.
+            <br />
+            <br />
+            N'hésitez pas à nous contacter pour nous signaler comment ce lien
+            vous est parvenu :{" "}
+            <a href="mailto:contact@immersion-facile.beta.gouv.fr">
+              contact@immersion-facile.beta.gouv.fr
+            </a>
+          </Notification>
+        </div>
+      </HeaderFooterLayout>
+    );
 
   return (
     <>
@@ -190,7 +219,7 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                       isSignOnly={true}
                       isSignatureEnterprise={signeeRole === "establishment"}
                       signeeName={signeeName}
-                      alreadySubmitted={alreadySigned}
+                      alreadySigned={alreadySigned}
                       onRejectForm={rejectWithMessageForm}
                     />
 

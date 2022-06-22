@@ -1,10 +1,16 @@
 import { z } from "zod";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import {
   ConventionStatus,
   WithConventionId,
 } from "shared/src/convention/convention.dto";
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import {
+  ConventionMagicLinkPayload,
+  Role,
+} from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
@@ -22,6 +28,8 @@ const domainTopicByTargetStatusMap: Partial<
   IN_REVIEW: "ImmersionApplicationFullySigned",
 };
 
+const roleAllowToSign: Role[] = ["establishment", "beneficiary"];
+
 export class SignImmersionApplication extends UseCase<void, WithConventionId> {
   constructor(
     private readonly conventionRepository: ConventionRepository,
@@ -38,6 +46,10 @@ export class SignImmersionApplication extends UseCase<void, WithConventionId> {
     { applicationId, role }: ConventionMagicLinkPayload,
   ): Promise<WithConventionId> {
     logger.debug({ applicationId, role });
+    if (!roleAllowToSign.includes(role))
+      throw new ForbiddenError(
+        "Only Beneficiary or Mentor are allowed to sign convention",
+      );
 
     const conventionDto = await this.conventionRepository.getById(
       applicationId,
