@@ -1,6 +1,7 @@
 import { differenceInMinutes } from "date-fns";
 import {
   ConventionDto,
+  ConventionStatus,
   ImmersionObjective,
 } from "shared/src/convention/convention.dto";
 import { z } from "zod";
@@ -21,6 +22,27 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   "Initier une démarche de recrutement": 1,
   "Confirmer un projet professionnel": 2,
   "Découvrir un métier ou un secteur d'activité": 3,
+};
+
+const conventionStatusToPoleEmploiStatus: Record<ConventionStatus, string> = {
+  READY_TO_SIGN: "A_SIGNER",
+  PARTIALLY_SIGNED: "PARTIELLEMENT_SIGNÉ",
+  IN_REVIEW: "DEMANDE_A_ETUDIER",
+  ACCEPTED_BY_COUNSELLOR: "DEMANDE_ELIGIBLE",
+  ACCEPTED_BY_VALIDATOR: "DEMANDE_VALIDÉE",
+
+  // n'est plus utilisé
+  VALIDATED: "ENVOI_DE_CONVENTION_VALIDÉE_PAR_ADMIN",
+
+  // si demande de modifications
+  DRAFT: "BROUILLON",
+  // si rejeté
+  REJECTED: "REJETÉ",
+  CANCELLED: "ANNULÉ",
+
+  // // à venir potentiellement
+  // ABANDONNED: "ABANDONNÉ",
+  // CONVENTION_SENT: "CONVENTION_ENVOYÉE",
 };
 
 export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCase<
@@ -51,17 +73,19 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       ) / 60;
 
     const poleEmploiConvention: PoleEmploiConvention = {
-      id: convention.externalId || "no-external-id",
+      id: convention.externalId
+        ? convention.externalId.padStart(11, "0")
+        : "no-external-id",
       originalId: convention.id,
-      peConnectId: convention.federatedIdentity,
-      status: convention.status,
+      peConnectId: convention.federatedIdentity.replace("peConnect:", ""),
+      status: conventionStatusToPoleEmploiStatus[convention.status],
       email: convention.email,
       telephone: convention.phone,
       prenom: convention.firstName,
       nom: convention.lastName,
-      dateDemande: convention.dateSubmission,
-      dateDebut: convention.dateStart,
-      dateFin: convention.dateEnd,
+      dateDemande: new Date(convention.dateSubmission).toISOString(),
+      dateDebut: new Date(convention.dateStart).toISOString(),
+      dateFin: new Date(convention.dateEnd).toISOString(),
       dureeImmersion: roundDifferenceInHours.toString(),
       raisonSociale: convention.businessName,
       siret: convention.siret,

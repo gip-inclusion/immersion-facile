@@ -368,7 +368,7 @@ describe("/update-application-status route", () => {
 
     const notifications = reposAndGateways.poleEmploiGateway.notifications;
     expect(notifications).toHaveLength(1);
-    expect(notifications[0].status).toBe("REJECTED");
+    expect(notifications[0].status).toBe("REJETÉ");
   });
 
   it("Returns error 401 if no JWT", async () => {
