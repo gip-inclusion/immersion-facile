@@ -308,7 +308,7 @@ export const createUseCases = (
         repositories.email,
         generateMagicLinkFn,
       ),
-    notifyPoleEmploiOnConventionUpdates:
+    broadcastToPoleEmploiOnConventionUpdates:
       new BroadcastToPoleEmploiOnConventionUpdates(
         uowPerformer,
         repositories.poleEmploiGateway,

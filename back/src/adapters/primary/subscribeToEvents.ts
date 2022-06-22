@@ -26,41 +26,43 @@ const getUseCasesByTopics = (
     useCases.notifyToTeamConventionSubmittedByBeneficiary,
     useCases.notifyToAgencyConventionSubmitted,
     useCases.associatePeConnectFederatedIdentity,
-    useCases.notifyPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationPartiallySigned: [
     useCases.notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty,
-    useCases.notifyPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationFullySigned: [
     useCases.notifyNewConventionNeedsReview,
     useCases.notifyPoleEmploiUserAdvisorOnConventionFullySigned,
-    useCases.notifyPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationAcceptedByCounsellor: [
     useCases.notifyNewConventionNeedsReview,
-    useCases.notifyPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationAcceptedByValidator: [
     useCases.notifyAllActorsOfFinalConventionValidation,
-    useCases.notifyPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
 
   FinalImmersionApplicationValidationByAdmin: [
     useCases.notifyAllActorsOfFinalConventionValidation,
-    useCases.notifyPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
 
   // Edge cases for immersion application.
   ImmersionApplicationRequiresModification: [
     useCases.notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications,
-    useCases.notifyPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationRejected: [
     useCases.notifyBeneficiaryAndEnterpriseThatConventionIsRejected,
-    useCases.notifyPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
-  ImmersionApplicationCancelled: [useCases.notifyPoleEmploiOnConventionUpdates],
+  ImmersionApplicationCancelled: [
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
+  ],
 
   // ImmersionApplication Federated Identities
   PeConnectFederatedIdentityAssociated: [
