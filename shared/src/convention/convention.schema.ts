@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { zBoolean, zEmail, zString, zTrimmedString } from "../zodUtils";
+import {
+  zBoolean,
+  zEmail,
+  zString,
+  zStringPossiblyEmpty,
+  zTrimmedString,
+} from "../zodUtils";
 import { phoneRegExp, stringOfNumbers } from "../utils";
 import { agencyIdSchema } from "../agency/agency.schema";
 import { siretSchema } from "../siret";
@@ -77,12 +83,12 @@ const conventionWithoutExternalIdZObject = z.object({
   workConditions: z.string().optional(),
   individualProtection: zBoolean,
   sanitaryPrevention: zBoolean,
-  sanitaryPreventionDescription: z.string(),
+  sanitaryPreventionDescription: zStringPossiblyEmpty,
   immersionAddress: addressWithPostalCodeSchema,
   immersionObjective: z.enum(conventionObjectiveOptions),
   immersionAppellation: appellationDtoSchema,
   immersionActivities: zTrimmedString,
-  immersionSkills: z.string(),
+  immersionSkills: zStringPossiblyEmpty,
   beneficiaryAccepted: zBoolean,
   enterpriseAccepted: zBoolean,
   federatedIdentity: peConnectPrefixSchema.optional(),

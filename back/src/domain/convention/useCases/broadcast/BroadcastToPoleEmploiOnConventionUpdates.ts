@@ -72,8 +72,6 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       protectionIndividuelle: convention.individualProtection,
       preventionSanitaire: convention.sanitaryPrevention,
       descriptionPreventionSanitaire: convention.sanitaryPreventionDescription,
-      descriptionProtectionIndividuelle: "",
-      enseigne: "", // TODO : decide whether to remove this field, to add agency name to our conventionDTO, or make a request to retrieve it here.
       objectifDeImmersion:
         conventionObjectiveToObjectifDeImmersion[convention.immersionObjective],
       codeRome: convention.immersionAppellation.romeCode,
@@ -82,6 +80,9 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       competencesObservees: convention.immersionSkills,
       signatureBeneficiaire: convention.beneficiaryAccepted,
       signatureEntreprise: convention.enterpriseAccepted,
+
+      descriptionProtectionIndividuelle: "",
+      enseigne: "", // TODO : decide whether to remove this field, to add agency name to our conventionDTO, or make a request to retrieve it here.
     };
 
     await this.poleEmploiGateway.notifyOnConventionUpdated(

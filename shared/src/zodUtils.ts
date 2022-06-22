@@ -1,4 +1,3 @@
-import { pipe } from "ramda";
 import { z, preprocess } from "zod";
 
 export const zString = z
@@ -6,7 +5,11 @@ export const zString = z
     required_error: "Obligatoire",
     invalid_type_error: "Une chaine de caractères est attendue",
   })
-  .nonempty("Obligatoire");
+  .min(1, "Obligatoire");
+
+export const zStringPossiblyEmpty = zString
+  .optional()
+  .or(z.literal("")) as z.Schema<string>;
 
 export const zTrimmedString = zString
   .transform((s) => s.trim())
