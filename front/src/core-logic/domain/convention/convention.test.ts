@@ -17,50 +17,48 @@ describe("Convention slice", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  describe("Fetching a convention", () => {
-    it("stores null as Convention without an immersion application matching in backend", () => {
-      expectConventionState({
-        isLoading: false,
-        convention: null,
-      });
-      store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
-      expectConventionState({ isLoading: true });
-      feedGatewayWithConvention(undefined);
-      expectConventionState({
-        convention: null,
-        isLoading: false,
-      });
+  it("stores null as Convention without an immersion application matching in backend", () => {
+    expectConventionState({
+      isLoading: false,
+      convention: null,
     });
-
-    it("stores the Convention if one matches in backend", () => {
-      const convention = new ConventionDtoBuilder().build();
-      expectConventionState({
-        isLoading: false,
-        convention: null,
-      });
-      store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
-      expectConventionState({ isLoading: true });
-      feedGatewayWithConvention(convention);
-      expectConventionState({
-        convention,
-        isLoading: false,
-      });
+    store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
+    expectConventionState({ isLoading: true });
+    feedGatewayWithConvention(undefined);
+    expectConventionState({
+      convention: null,
+      isLoading: false,
     });
+  });
 
-    it("stores error if failure during fetch", () => {
-      expectConventionState({
-        isLoading: false,
-        convention: null,
-        error: null,
-      });
-      store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
-      expectConventionState({ isLoading: true });
-      feedGatewayWithError(new Error("I failed !"));
-      expectConventionState({
-        convention: null,
-        isLoading: false,
-        error: "I failed !",
-      });
+  it("stores the Convention if one matches in backend", () => {
+    const convention = new ConventionDtoBuilder().build();
+    expectConventionState({
+      isLoading: false,
+      convention: null,
+    });
+    store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
+    expectConventionState({ isLoading: true });
+    feedGatewayWithConvention(convention);
+    expectConventionState({
+      convention,
+      isLoading: false,
+    });
+  });
+
+  it("stores error if failure during fetch", () => {
+    expectConventionState({
+      isLoading: false,
+      convention: null,
+      error: null,
+    });
+    store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
+    expectConventionState({ isLoading: true });
+    feedGatewayWithError(new Error("I failed !"));
+    expectConventionState({
+      convention: null,
+      isLoading: false,
+      error: "I failed !",
     });
   });
 

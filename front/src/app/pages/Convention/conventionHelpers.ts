@@ -45,7 +45,10 @@ export const conventionInitialValuesFromUrl = (
 ): ConventionPresentation => {
   const dataFromDevice = deviceRepository.get("partialConvention") ?? {};
 
-  const params = mergeObjectsExceptEmptyString(dataFromDevice, route.params);
+  const params = mergeObjectsExceptEmptyString(
+    dataFromDevice,
+    route.params as Partial<ConventionPresentation>,
+  );
 
   const initialFormWithStoredAndUrlParams = {
     id: uuidV4(),
@@ -153,17 +156,17 @@ const devPrefilledValues = (
 
 const mergeObjectsExceptEmptyString = <T>(
   partialObj: Partial<T>,
-  priorityObj: T,
-): T => {
-  const allkeys = [
+  priorityObj: Partial<T>,
+): Partial<T> => {
+  const allKeys = [
     ...new Set([...keys(priorityObj), ...keys(partialObj)]),
   ] as (keyof T)[];
 
-  return allkeys.reduce((acc, key) => {
-    const prioritaryValue = priorityObj[key];
+  return allKeys.reduce((acc, key) => {
+    const priorityValue = priorityObj[key];
     return {
       ...acc,
-      [key]: prioritaryValue ? prioritaryValue : partialObj[key],
+      [key]: priorityValue ? priorityValue : partialObj[key],
     };
   }, {} as T);
 };
