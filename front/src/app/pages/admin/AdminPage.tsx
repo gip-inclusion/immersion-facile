@@ -15,7 +15,7 @@ export const AdminPage = ({ route }: { route: AdminRoute }) => (
       <div className="fr-col-lg-8 fr-p-2w mt-4" style={{ width: "95%" }}>
         <Tabs
           content={{
-            Contentions: <ConventionTab route={route} />,
+            Conventions: <ConventionTab route={route} />,
             Agences: <AgencyTab />,
             "Export de données": <DataExportTab />,
           }}
