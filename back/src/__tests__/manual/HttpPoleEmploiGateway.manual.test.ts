@@ -33,7 +33,7 @@ const peConvention: PoleEmploiConvention = {
   dateFin: "2022-06-01T12:00:00",
   descriptionPreventionSanitaire: "",
   descriptionProtectionIndividuelle: "",
-  dureeImmersion: " 80,50",
+  dureeImmersion: "80.50",
   email: "jean.profite@erole.com",
   emailTuteur: "john.doe@disney.com",
   enseigne: "AgenceDeGlace",

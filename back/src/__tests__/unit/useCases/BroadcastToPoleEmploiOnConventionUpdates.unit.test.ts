@@ -82,7 +82,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withExternalId("1")
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withFederatedIdentity("peConnect:some-id")
-      .withDateStart("2021-05-13")
+      .withDateStart("2021-05-12")
       .withDateEnd("2021-05-14T00:30:00.000Z") //
       .withImmersionObjective("Initier une démarche de recrutement")
       .build();
@@ -96,8 +96,8 @@ describe("Broadcasts events to pole-emploi", () => {
       peConnectId: "some-id",
       originalId: immersionConventionId,
       objectifDeImmersion: 3,
-      dureeImmersion: "24.5",
-      dateDebut: "2021-05-13T00:00:00.000Z",
+      dureeImmersion: "21",
+      dateDebut: "2021-05-12T00:00:00.000Z",
       dateFin: "2021-05-14T00:30:00.000Z",
       status: "DEMANDE_VALIDÉE",
     });

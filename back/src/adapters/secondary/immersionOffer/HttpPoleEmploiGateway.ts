@@ -60,7 +60,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             `echangespmsmp api_immersion-prov1`,
           );
 
-          const peResponse = axios.post(
+          const peResponse = await axios.post(
             this.peConventionBroadcastUrl,
             poleEmploiConvention,
             {
@@ -70,7 +70,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
               timeout: secondsToMilliseconds(10),
             },
           );
-          logger.info(peResponse, "Response from PE");
+          logger.info({ status: peResponse.status }, "Response status from PE");
           return peResponse;
         });
         return response;

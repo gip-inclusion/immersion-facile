@@ -1,9 +1,9 @@
-import { differenceInMinutes } from "date-fns";
 import {
   ConventionDto,
   ConventionStatus,
   ImmersionObjective,
 } from "shared/src/convention/convention.dto";
+import { calculateTotalImmersionHoursBetweenDate } from "shared/src/schedule/ScheduleUtils";
 import { z } from "zod";
 import {
   UnitOfWork,
@@ -66,11 +66,11 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     if (!enablePeConventionBroadcast) return;
     if (!convention.federatedIdentity) return;
 
-    const roundDifferenceInHours =
-      differenceInMinutes(
-        new Date(convention.dateEnd),
-        new Date(convention.dateStart),
-      ) / 60;
+    const totalHours = calculateTotalImmersionHoursBetweenDate({
+      schedule: convention.schedule,
+      dateStart: convention.dateStart,
+      dateEnd: convention.dateEnd,
+    });
 
     const poleEmploiConvention: PoleEmploiConvention = {
       id: convention.externalId
@@ -86,7 +86,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       dateDemande: new Date(convention.dateSubmission).toISOString(),
       dateDebut: new Date(convention.dateStart).toISOString(),
       dateFin: new Date(convention.dateEnd).toISOString(),
-      dureeImmersion: roundDifferenceInHours.toString(),
+      dureeImmersion: totalHours.toString(),
       raisonSociale: convention.businessName,
       siret: convention.siret,
       nomPrenomFonctionTuteur: convention.mentor,
