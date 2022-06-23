@@ -30,6 +30,7 @@ import {
 import { createLogger } from "../../utils/logger";
 import { AccessTokenConfig } from "../primary/config/appConfig";
 import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";
+import { ManagedRedirectError } from "../primary/helpers/redirectErrors";
 
 const _logger = createLogger(__filename);
 
@@ -83,7 +84,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           timeout: secondsToMilliseconds(10),
         },
       )
-      .catch((error) => {
+      .catch((error: any) => {
+        if (isInvalidGrantError(error))
+          throw new ManagedRedirectError("peConnectInvalidGrant");
+
         throw PrettyAxiosResponseError(
           "PeConnect Get Access Token Failure",
           error,
@@ -106,6 +110,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         headers: headersWithAuthPeAccessToken(accessToken),
       })
       .catch((error) => {
+        if (!error || error.status === undefined)
+          throw new ManagedRedirectError("peConnectNoValidUser");
+
         throw PrettyAxiosResponseError(
           "PeConnect Get User Info Failure",
           error,
@@ -129,6 +136,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         timeout: secondsToMilliseconds(10),
       })
       .catch((error) => {
+        if (!error || error.status === undefined)
+          throw new ManagedRedirectError("peConnectNoValidAdvisor");
+
         throw PrettyAxiosResponseError(
           "PeConnect Get Advisor Info Failure",
           error,
@@ -201,3 +211,7 @@ const headersWithAuthPeAccessToken = (
 const headersUrlEncoded = (): { [key: string]: string } => ({
   "Content-Type": "application/x-www-form-urlencoded",
 });
+
+const isInvalidGrantError = (error: any): boolean =>
+  error?.response?.status === "400" &&
+  error?.response?.data?.error === "invalid_grant";

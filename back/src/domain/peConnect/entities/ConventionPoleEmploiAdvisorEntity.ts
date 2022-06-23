@@ -2,11 +2,11 @@ import {
   FederatedIdentity,
   PeConnectIdentity,
 } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { ManagedRedirectError } from "../../../adapters/primary/helpers/redirectErrors";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeConnectAdvisorDto,
   PeConnectAdvisorEntity,
-  PeConnectUserDto,
   PeUserAndAdvisors,
   PoleEmploiUserAdvisorDto,
   toConventionPoleEmploiAdvisorDto,
@@ -26,7 +26,7 @@ export const poleEmploiUserAdvisorDTOFromUserAndAdvisors = ({
 }: PeUserAndAdvisors): PoleEmploiUserAdvisorDto =>
   toConventionPoleEmploiAdvisorDto({
     user,
-    advisor: choosePreferredAdvisor(advisors, user),
+    advisor: choosePreferredAdvisor(advisors),
   });
 
 const preferCapEmploiPredicate = (
@@ -40,7 +40,6 @@ const onlyValidAdvisorsForImmersion = (
 
 const choosePreferredAdvisor = (
   advisors: PeConnectAdvisorDto[],
-  user: PeConnectUserDto,
 ): PeConnectAdvisorEntity => {
   const sortedValidAdvisors: PeConnectAdvisorEntity[] = advisors
     .filter(onlyValidAdvisorsForImmersion)
@@ -48,11 +47,7 @@ const choosePreferredAdvisor = (
 
   const preferredAdvisor = sortedValidAdvisors.at(0);
   if (!preferredAdvisor)
-    throw new Error(
-      `No valid advisor for the user ${user.email} ${user.firstName} ${
-        user.lastName
-      } ${user.peExternalId} | advisors ${JSON.stringify(advisors, null, 2)} `,
-    );
+    throw new ManagedRedirectError("peConnectNoValidAdvisor");
 
   return preferredAdvisor;
 };

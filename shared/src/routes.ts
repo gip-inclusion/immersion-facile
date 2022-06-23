@@ -1,3 +1,13 @@
+export const frontRoutes = {
+  conventionToValidate: "verification",
+  conventionToSign: "verifier-et-signer",
+  conventionRoute: "demande-immersion",
+  immersionAssessment: "bilan-immersion",
+  editFormEstablishmentRoute: "edition-etablissement",
+  magicLinkRenewal: "refraichir-lien",
+  error: "error",
+};
+
 export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments
 export const agenciesRoute = "agencies";
 export const agencyImmersionFacileIdRoute = "immersion-facile-agency-id";
@@ -11,16 +21,6 @@ export const exportEstablismentsExcelRoute = "export-establishments";
 export const extractConventionsExcelRoute = "extract-demande-immersion-excel";
 export const formAlreadyExistsRoute = "form-already-exists";
 export const formEstablishmentsRoute = "form-establishments";
-
-export const frontRoutes = {
-  conventionToValidate: "verification",
-  conventionToSign: "verifier-et-signer",
-  conventionRoute: "demande-immersion",
-  immersionAssessment: "bilan-immersion",
-  editFormEstablishmentRoute: "edition-etablissement",
-  magicLinkRenewal: "refraichir-lien",
-};
-
 export const generateMagicLinkRoute = "generate-magic-link";
 export const getFeatureFlags = "feature-flags";
 export const getImmersionOfferByIdRoute__v0 = "get-immersion-by-id"; // Will be removed.

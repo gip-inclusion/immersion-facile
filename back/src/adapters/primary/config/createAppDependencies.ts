@@ -1,4 +1,6 @@
 import promClient from "prom-client";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { frontRoutes } from "shared/src/routes";
 import { makeGenerateJwt } from "../../../domain/auth/jwt";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
@@ -12,6 +14,10 @@ import {
   createApiKeyAuthMiddlewareV1,
   createMagicLinkAuthMiddleware,
 } from "../authMiddleware";
+import {
+  makeHandleManagedRedirectResponseError,
+  makeHandleRawRedirectResponseError,
+} from "../helpers/handleRedirectResponseError";
 import { AppConfig } from "./appConfig";
 import { createAuthChecker } from "./createAuthChecker";
 import { createEventCrawler } from "./createEventCrawler";
@@ -52,6 +58,14 @@ export const createAppDependencies = async (config: AppConfig) => {
     ? new AlwaysAllowEmailFilter()
     : new AllowListEmailFilter(config.emailAllowList);
 
+  const redirectErrorUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}/${frontRoutes.error}`;
+  const errorHandlers = {
+    handleManagedRedirectResponseError:
+      makeHandleManagedRedirectResponseError(redirectErrorUrl),
+    handleRawRedirectResponseError:
+      makeHandleRawRedirectResponseError(redirectErrorUrl),
+  };
+
   return {
     useCases: createUseCases(
       config,
@@ -69,6 +83,7 @@ export const createAppDependencies = async (config: AppConfig) => {
       config,
       "application",
     ),
+    errorHandlers,
     establishmentMagicLinkAuthMiddleware: createMagicLinkAuthMiddleware(
       config,
       "establishment",

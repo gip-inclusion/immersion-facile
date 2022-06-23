@@ -1,7 +1,17 @@
 import React, { ReactNode } from "react";
+
+import {
+  ManagedRedirectErrorKinds,
+  managedRedirectErrorKinds,
+} from "shared/src/errors/managedErrors";
+import { ContainerLayout } from "src/app/layouts/ContainerLayout";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { Route } from "type-route";
+import { PEConnectInvalidGrantError } from "./PEConnectInvalidGrantError";
+import { PEConnectNoAuthorisation } from "./PEConnectNoAuthorisation";
+import { PEConnectNoValidAdvisor } from "./PEConnectNoValidAdvisor";
+import { PEConnectNoValidUser } from "./PEConnectNoValidUser";
 
 export type ErrorRedirectRoute = Route<typeof routes.errorRedirect>;
 
@@ -9,47 +19,50 @@ interface ErrorRedirectProps {
   route: ErrorRedirectRoute;
 }
 
+const managedErrors: Record<ManagedRedirectErrorKinds, () => JSX.Element> = {
+  peConnectNoAuthorisation: PEConnectNoAuthorisation,
+  peConnectNoValidAdvisor: PEConnectNoValidAdvisor,
+  peConnectNoValidUser: PEConnectNoValidUser,
+  peConnectInvalidGrant: PEConnectInvalidGrantError,
+};
+
 export const ErrorRedirectPage = ({ route }: ErrorRedirectProps) => (
-  <HeaderFooterLayout>{renderer({ route })}</HeaderFooterLayout>
+  <HeaderFooterLayout>
+    <ContainerLayout>{renderer({ route })}</ContainerLayout>
+  </HeaderFooterLayout>
 );
+
+const renderer = ({ route }: ErrorRedirectProps): ReactNode => {
+  const kind: string | undefined = route.params.kind;
+
+  if (!isManagedError(kind)) {
+    const properties = propertiesFromUrl(route);
+    return <RedirectErrorFromUrl {...properties} />;
+  }
+
+  return managedErrors[kind]();
+};
 
 type RedirectErrorProps = {
   message: string;
   title: string;
-  //params: { [key: string]: string | number };
 };
 
-const renderer = ({ route }: ErrorRedirectProps): ReactNode => {
-  const kind = route.params.kind ?? "default";
-  const properties = propertiesFromUrl(route);
-
-  if (kind === 'peConnectInvalidGrant')
-    return <InvalidPEConnectGrantError />
-
-  return <NotificationError {...properties} />;
+const isManagedError = (
+  kind: string | undefined,
+): kind is ManagedRedirectErrorKinds => {
+  if (!kind) return false;
+  return managedRedirectErrorKinds.includes(kind as ManagedRedirectErrorKinds);
 };
 
-const NotificationError = (error: RedirectErrorProps) => (
+const RedirectErrorFromUrl = (error: RedirectErrorProps) => (
   <div role="alert" className={`fr-alert fr-alert--error`}>
     <p className="fr-alert__title">{error.title}</p>
     {`${error.message}`}
   </div>
 );
 
-const InvalidPEConnectGrantError = () => (
-  <div role="alert" className={`fr-alert fr-alert--error`}>
-    <p className="fr-alert__title">
-      Le code d'autorisation donnée par Pôle emploi ne permet pas de vous
-      identifier.
-    </p>
-    Le code authorisation donnée par pole emploi ne permet pas d'avoir accès aux
-    droit nécessaires pour lier votre compte. Vous pouvez quand même demander
-    une immersion sans récupérer les informations de Pole emploi connect en
-    indiquant l'agence qui vous accompagnes.
-  </div>
-);
-
 const propertiesFromUrl = (route: ErrorRedirectRoute): RedirectErrorProps => ({
-  message: route.params.message ?? "Si seulement on en savait plus",
+  message: route.params.message ?? "Une erreur inattendue est survenue",
   title: route.params.title ?? "Une erreur est survenue",
 });
