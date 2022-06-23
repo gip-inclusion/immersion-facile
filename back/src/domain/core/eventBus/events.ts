@@ -99,5 +99,6 @@ export const eventToDebugInfo = (event: DomainEvent) => {
     publishCount,
   };
 };
+
 export const eventsToDebugInfo = (events: DomainEvent[]) =>
   events.map(eventToDebugInfo);

@@ -24,6 +24,7 @@ describe("PgConventionRepository", () => {
   });
 
   beforeEach(async () => {
+    await client.query("DELETE FROM partners_pe_connect");
     await client.query("DELETE FROM immersion_applications");
     await client.query(
       "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
@@ -49,15 +50,22 @@ describe("PgConventionRepository", () => {
   });
 
   it("Adds a new convention with field workConditions undefined", async () => {
+    const peConnectId = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = new ConventionDtoBuilder()
       .withoutWorkCondition()
       .build();
+
+    await client.query(
+      `INSERT INTO partners_pe_connect(user_pe_external_id, convention_id, firstname, lastname, email, type)
+    VALUES('${peConnectId}', '${convention.id}', 'John', 'Doe', 'john@mail.com', 'PLACEMENT')`,
+    );
 
     const externalId = await conventionRepository.save(convention);
 
     expect(await conventionRepository.getById(convention.id)).toEqual({
       ...convention,
       externalId,
+      federatedIdentity: `peConnect:${peConnectId}`,
     });
   });
 

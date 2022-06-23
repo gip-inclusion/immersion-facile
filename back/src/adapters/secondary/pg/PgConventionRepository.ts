@@ -18,12 +18,14 @@ export class PgConventionRepository implements ConventionRepository {
     conventionId: ConventionId,
   ): Promise<ConventionDto | undefined> {
     const pgResult = await this.client.query(
-      `SELECT *, vad.*, cei.external_id
+      `SELECT immersion_applications.*, vad.*, cei.external_id, partners.user_pe_external_id
        FROM immersion_applications
        LEFT JOIN view_appellations_dto AS vad 
-       ON vad.appellation_code = immersion_applications.immersion_appellation
+        ON vad.appellation_code = immersion_applications.immersion_appellation
        LEFT JOIN convention_external_ids AS cei
-       ON cei.convention_id = immersion_applications.id
+        ON cei.convention_id = immersion_applications.id
+       LEFT JOIN partners_pe_connect AS partners
+        ON partners.convention_id = id
        WHERE id = $1 `,
       [conventionId],
     );
@@ -119,4 +121,7 @@ export const pgConventionRowToDto = (
   immersionSkills: optional(params.immersion_skills),
   beneficiaryAccepted: params.beneficiary_accepted,
   enterpriseAccepted: params.enterprise_accepted,
+  ...(params.user_pe_external_id && {
+    federatedIdentity: `peConnect:${params.user_pe_external_id}`,
+  }),
 });
