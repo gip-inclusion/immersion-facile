@@ -61,6 +61,7 @@ import { Repositories } from "./repositoriesConfig";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
+import { PrivateListAgencies } from "../../../domain/convention/useCases/PrivateListAgencies";
 
 export type UseCases = ReturnType<typeof createUseCases>;
 
@@ -222,7 +223,8 @@ export const createUseCases = (
     romeSearch: new RomeSearch(uowPerformer),
 
     // agencies
-    listAgencies: new ListAgenciesWithPosition(repositories.agency),
+    listAgenciesWithPosition: new ListAgenciesWithPosition(repositories.agency),
+    privateListAgencies: new PrivateListAgencies(repositories.agency),
     getAgencyPublicInfoById: new GetAgencyPublicInfoById(repositories.agency),
 
     // notifications

@@ -4,6 +4,8 @@ import {
   AgencyId,
   AgencyStatus,
   AgencyKindFilter,
+  GetAgenciesFilter as GetAgenciesFilters,
+  AgencyPositionFilter,
 } from "shared/src/agency/agency.dto";
 import { createLogger } from "../../utils/logger";
 import { AgencyDto } from "shared/src/agency/agency.dto";
@@ -95,25 +97,26 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return this._agencies[id];
   }
 
-  public async getAllActiveNearby(
-    position: LatLonDto,
-    _distance_km: number,
-    agencyKindFilter?: AgencyKindFilter,
-  ): Promise<AgencyDto[]> {
-    logger.info({ position, configs: this._agencies }, "getAllActiveNearby");
-    const activeAgenciesNearby = Object.values(this._agencies)
-      .filter(isAgencyActive)
-      .sort(sortByNearestFrom(position))
-      .slice(0, 20);
-    return filterAgenciesByKind(activeAgenciesNearby, agencyKindFilter);
-  }
+  public async getAgencies({
+    filters = {},
+    limit,
+  }: {
+    filters?: GetAgenciesFilters;
+    limit?: number;
+  }): Promise<AgencyDto[]> {
+    logger.info({ configs: this._agencies }, "getAgencies");
+    const filterPredicate = (agency: AgencyDto) =>
+      ![
+        agencyIsOfKind(agency, filters?.kind),
+        agencyIsOfPosition(agency, filters?.position),
+        agencyIsOfStatus(agency, filters?.status),
+      ].includes(false);
 
-  public async getAllActive(
-    agencyKindFilter?: AgencyKindFilter,
-  ): Promise<AgencyDto[]> {
-    logger.info({ configs: this._agencies }, "getAll");
-    const activeAgencies = Object.values(this._agencies).filter(isAgencyActive);
-    return filterAgenciesByKind(activeAgencies, agencyKindFilter);
+    const filteredAgencies = Object.values(this._agencies)
+      .filter(filterPredicate)
+      .slice(0, limit);
+    if (!filters?.position) return filteredAgencies;
+    return filteredAgencies.sort(sortByNearestFrom(filters.position.position));
   }
 
   public async getAgencyWhereEmailMatches(
@@ -157,11 +160,6 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   }
 }
 
-const activeStatuses: AgencyStatus[] = ["active", "from-api-PE"];
-
-const isAgencyActive = (agency: AgencyDto) =>
-  activeStatuses.includes(agency.status);
-
 const isAgencyPE = (agency: AgencyDto) => agency.kind === "pole-emploi";
 
 const isAgencyNotPE = (agency: AgencyDto) => agency.kind !== "pole-emploi";
@@ -182,12 +180,36 @@ const sortByNearestFrom =
       position.lon,
     );
 
-const filterAgenciesByKind = (
-  agencies: AgencyDto[],
+const agencyIsOfKind = (
+  agency: AgencyDto,
   agencyKindFilter?: AgencyKindFilter,
-) => {
-  if (!agencyKindFilter) return agencies;
+): boolean => {
+  if (!agencyKindFilter) return true;
   return agencyKindFilter === "peOnly"
-    ? agencies.filter(isAgencyPE)
-    : agencies.filter(isAgencyNotPE);
+    ? isAgencyPE(agency)
+    : isAgencyNotPE(agency);
+};
+
+const agencyIsOfStatus = (
+  agency: AgencyDto,
+  statuses?: AgencyStatus[],
+): boolean => {
+  if (!statuses) return true;
+  return statuses.includes(agency.status);
+};
+
+const agencyIsOfPosition = (
+  agency: AgencyDto,
+  positionFilter?: AgencyPositionFilter,
+): boolean => {
+  if (!positionFilter) return true;
+  return (
+    distanceBetweenCoordinatesInMeters(
+      agency.position.lat,
+      agency.position.lon,
+      positionFilter.position.lat,
+      positionFilter.position.lon,
+    ) <
+    positionFilter.distance_km * 1000
+  );
 };

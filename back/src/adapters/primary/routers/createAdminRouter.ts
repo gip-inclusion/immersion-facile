@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { generateMagicLinkRoute, conventionsRoute } from "shared/src/routes";
+import { AgencyDto, AgencyId } from "shared/src/agency/agency.dto";
+import {
+  generateMagicLinkRoute,
+  conventionsRoute,
+  agenciesRoute,
+} from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
@@ -30,6 +35,32 @@ export const createAdminRouter = (deps: AppDependencies) => {
       deps.authChecker,
     ),
   );
+  // GET admin/agencies?status=needsReview
+  adminRouter
+    .route(`/${agenciesRoute}`)
+    .get(async (req, res) =>
+      sendHttpResponse(
+        req,
+        res,
+        () => deps.useCases.privateListAgencies.execute(req.query),
+        deps.authChecker,
+      ),
+    );
+
+  // PATCH admin/agencies/:id
+  // adminRouter.route(`/${agenciesRoute}/:agencyId`).patch(async (req, res) =>
+  //   sendHttpResponse(
+  //     req,
+  //     res,
+  //     () => {
+  //       const useCaseParams: Partial<Pick<AgencyDto, "status">> & {
+  //         id: AgencyId;
+  //       } = { id: req.params.agencyId, ...req.body };
+  //       return deps.useCases.updateAgency.execute(useCaseParams);
+  //     },
+  //     deps.authChecker,
+  //   ),
+  // );
 
   return adminRouter;
 };

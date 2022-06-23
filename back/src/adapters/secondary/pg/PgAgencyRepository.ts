@@ -5,6 +5,9 @@ import {
   AgencyDto,
   AgencyId,
   AgencyKindFilter,
+  AgencyPositionFilter,
+  AgencyStatus,
+  GetAgenciesFilter,
 } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { createLogger } from "../../../utils/logger";
@@ -14,52 +17,63 @@ const logger = createLogger(__filename);
 
 const makeAgencyKindFiterSQL = (
   agencyKindFilter?: AgencyKindFilter,
-): string => {
-  if (!agencyKindFilter) return "";
+): string | undefined => {
+  if (!agencyKindFilter) return;
   return agencyKindFilter === "peOnly"
-    ? "AND kind = 'pole-emploi'"
-    : "AND kind != 'pole-emploi'";
+    ? "kind = 'pole-emploi'"
+    : "kind != 'pole-emploi'";
 };
+
+const makePositionFiterSQL = (
+  positionFilter?: AgencyPositionFilter,
+): string | undefined => {
+  if (!positionFilter) return;
+  if (typeof positionFilter.distance_km !== "number")
+    throw new Error("distance_km must be a number");
+  return `ST_Distance(${STPointStringFromPosition(
+    positionFilter.position,
+  )}, position) <= ${positionFilter.distance_km * 1000}`;
+};
+
+const makeStatusFiterSQL = (
+  statusFilter?: AgencyStatus[],
+): string | undefined => {
+  if (!statusFilter) return;
+  return format("status IN (%1$L)", statusFilter);
+};
+
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private client: PoolClient) {}
 
-  public async getAllActive(
-    agencyKindFilter?: AgencyKindFilter,
-  ): Promise<AgencyDto[]> {
+  public async getAgencies({
+    filters = {},
+    limit,
+  }: {
+    filters?: GetAgenciesFilter;
+    limit?: number;
+  }): Promise<AgencyDto[]> {
+    const filtersSQL = [
+      makeAgencyKindFiterSQL(filters.kind),
+      makePositionFiterSQL(filters.position),
+      makeStatusFiterSQL(filters.status),
+    ].filter((clause) => !!clause);
+
+    const whereClause =
+      filtersSQL.length > 0 ? `WHERE ${filtersSQL.join(" AND ")}` : "";
+    const limitClause = limit ? `LIMIT ${limit}` : "";
+    const sortClause = filters.position
+      ? `ORDER BY ST_Distance(${STPointStringFromPosition(
+          filters.position.position,
+        )}, position)`
+      : "";
+
     const pgResult = await this.client.query(
-      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, agency_siret, code_safir\
-       FROM public.agencies\
-       WHERE status IN ('active', 'from-api-PE') ${makeAgencyKindFiterSQL(
-         agencyKindFilter,
-       )}`,
+      `SELECT *, ST_AsGeoJSON(position) AS position
+       FROM public.agencies 
+       ${whereClause}
+       ${limitClause}
+       ${sortClause}`,
     );
-    return pgResult.rows.map(pgToEntity);
-  }
-
-  public async getAllActiveNearby(
-    searchPosition: LatLonDto,
-    distance_km: number,
-    agencyKindFilter?: AgencyKindFilter,
-  ): Promise<AgencyDto[]> {
-    if (typeof distance_km !== "number")
-      throw new Error("distance_km must be a number");
-
-    const pgResult = await this.client.query(
-      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,
-        ST_Distance(${STPointStringFromPosition(
-          searchPosition,
-        )}, position) as dist
-        
-      FROM public.agencies
-      
-      WHERE status IN ('active', 'from-api-PE') AND ST_Distance(${STPointStringFromPosition(
-        searchPosition,
-      )}, position) <= ${distance_km * 1000} 
-      ${makeAgencyKindFiterSQL(agencyKindFilter)}
-      ORDER BY dist
-      LIMIT 20`,
-    );
-
     return pgResult.rows.map(pgToEntity);
   }
 

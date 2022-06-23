@@ -46,6 +46,7 @@ describe("ListAgencies", () => {
     const listAgencies = new ListAgenciesWithPosition(repository);
 
     const agencies = await listAgencies.execute({});
+    expect(agencies).toHaveLength(3);
     expect(agencies).toEqual([
       {
         id: agency1.id,
@@ -72,7 +73,7 @@ describe("ListAgencies", () => {
         AgencyDtoBuilder.empty()
           .withId(i.toString())
           .withName("agency " + i)
-          .withPosition(i, i)
+          .withPosition(20 + 0.01 * i, 20)
           .build(),
       );
     }
@@ -85,6 +86,6 @@ describe("ListAgencies", () => {
       lon: 20,
     });
     expect(nearestAgencies).toHaveLength(20);
-    expect(nearestAgencies[0].id).toBe("20");
+    expect(nearestAgencies[0].id).toBe("0");
   });
 });

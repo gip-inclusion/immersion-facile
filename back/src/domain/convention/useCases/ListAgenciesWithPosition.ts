@@ -3,6 +3,7 @@ import {
   AgencyWithPositionDto,
   AgencyKindFilter,
   ListAgenciesWithPositionRequestDto,
+  activeAgencyStatuses,
 } from "shared/src/agency/agency.dto";
 import { listAgenciesRequestSchema } from "shared/src/agency/agency.schema";
 import { LatLonDto } from "shared/src/latLon";
@@ -24,24 +25,30 @@ export class ListAgenciesWithPosition extends UseCase<
     lat,
     filter,
   }: ListAgenciesWithPositionRequestDto): Promise<AgencyWithPositionDto[]> {
-    const agencies = await this.getAgencies(
+    const agencies = await this.getActiveAgencies(
       lon && lat ? { lon, lat } : undefined,
       filter,
     );
     return agencies.map(agencyToAgencyWithPositionDto);
   }
 
-  private getAgencies(
+  private getActiveAgencies(
     position?: LatLonDto,
     agencyKindFilter?: AgencyKindFilter,
   ): Promise<AgencyDto[]> {
-    if (position)
-      return this.agencyRepository.getAllActiveNearby(
-        position,
-        100,
-        agencyKindFilter,
-      );
-    return this.agencyRepository.getAllActive(agencyKindFilter);
+    return this.agencyRepository.getAgencies({
+      filters: {
+        position: position
+          ? {
+              distance_km: 100,
+              position,
+            }
+          : undefined,
+        kind: agencyKindFilter,
+        status: activeAgencyStatuses,
+      },
+      limit: 20,
+    });
   }
 }
 

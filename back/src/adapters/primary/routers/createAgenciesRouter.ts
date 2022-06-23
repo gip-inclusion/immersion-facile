@@ -14,7 +14,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
     .route(`/${agenciesRoute}`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
-        deps.useCases.listAgencies.execute(req.query as any),
+        deps.useCases.listAgenciesWithPosition.execute(req.query as any),
       ),
     )
     .post(async (req, res) =>

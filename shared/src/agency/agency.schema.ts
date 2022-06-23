@@ -8,6 +8,9 @@ import {
   CreateAgencyDto,
   ListAgenciesWithPositionRequestDto,
   WithAgencyId,
+  PrivateListAgenciesRequestDto,
+  allAgencyStatuses,
+  AgencyDto,
 } from "./agency.dto";
 import { latLonSchema } from "../latLon";
 import {
@@ -42,7 +45,7 @@ export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesWithPositionRequ
     filter: z.enum(["peOnly", "peExcluded"]).optional(),
   });
 
-export const agencySchema: z.ZodSchema<CreateAgencyDto> = z.object({
+export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z.object({
   id: agencyIdSchema,
   name: zString,
   kind: agencyKindSchema,
@@ -54,3 +57,27 @@ export const agencySchema: z.ZodSchema<CreateAgencyDto> = z.object({
   signature: zString,
   logoUrl: absoluteUrlSchema.optional(),
 });
+
+const agencyStatusSchema = z.enum(allAgencyStatuses);
+
+export const agencySchema: z.ZodSchema<AgencyDto> = z.object({
+  id: agencyIdSchema,
+  name: zString,
+  kind: agencyKindSchema,
+  status: agencyStatusSchema,
+  address: zString,
+  position: latLonSchema,
+  counsellorEmails: z.array(zEmail),
+  validatorEmails: z.array(zEmail).min(1),
+  questionnaireUrl: zString,
+  signature: zString,
+  logoUrl: absoluteUrlSchema.optional(),
+  adminEmails: z.array(zString),
+  agencySiret: zString.optional(),
+  codeSafir: zString.optional(),
+});
+
+export const privateListAgenciesRequestSchema: z.ZodSchema<PrivateListAgenciesRequestDto> =
+  z.object({
+    status: agencyStatusSchema.optional(),
+  });

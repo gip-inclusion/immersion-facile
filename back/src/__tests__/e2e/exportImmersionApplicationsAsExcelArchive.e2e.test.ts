@@ -12,7 +12,7 @@ describe("/export-demande-immersions-excel", () => {
   it("works when authenticated", async () => {
     const { request, reposAndGateways } = await buildTestApp();
     const linkedAgency: AgencyDto = (
-      await reposAndGateways.agency.getAllActive()
+      await reposAndGateways.agency.getAgencies({})
     )[0];
     const convention = new ConventionDtoBuilder()
       .withAgencyId(linkedAgency.id)

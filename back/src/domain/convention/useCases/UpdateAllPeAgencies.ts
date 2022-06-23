@@ -1,4 +1,4 @@
-import { AgencyDto } from "shared/src/agency/agency.dto";
+import { activeAgencyStatuses, AgencyDto } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { z } from "zod";
 import { AppLogger } from "../../core/ports/AppLogger";
@@ -48,7 +48,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
 
     this.logger.info(
       "Total number of active agencies in DB before script : ",
-      (await this.agencyRepository.getAllActive()).length,
+      (await this.agencyRepository.getAgencies({})).length,
     );
 
     for (const peReferentialAgency of peReferentialAgencies) {
@@ -137,13 +137,18 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
   private async getNearestPeAgencies(
     peReferentialAgency: PeAgencyFromReferenciel,
   ): Promise<AgencyDto[]> {
-    const agencies = await this.agencyRepository.getAllActiveNearby(
-      {
-        lon: peReferentialAgency.adressePrincipale.gpsLon,
-        lat: peReferentialAgency.adressePrincipale.gpsLat,
+    const agencies = await this.agencyRepository.getAgencies({
+      filters: {
+        status: activeAgencyStatuses,
+        position: {
+          position: {
+            lon: peReferentialAgency.adressePrincipale.gpsLon,
+            lat: peReferentialAgency.adressePrincipale.gpsLat,
+          },
+          distance_km: 0.2,
+        },
       },
-      0.2,
-    );
+    });
     return agencies.filter((agency) => agency.kind === "pole-emploi");
   }
 

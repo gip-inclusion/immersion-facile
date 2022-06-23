@@ -3,7 +3,7 @@ import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { AgencyDto } from "shared/src/agency/agency.dto";
+import { activeAgencyStatuses, AgencyDto } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 
 const agency1builder = AgencyDtoBuilder.create(
@@ -82,7 +82,7 @@ describe("PgAgencyRepository", () => {
     });
   });
 
-  describe("getAllActive", () => {
+  describe("getAgencies", () => {
     const agency1PE = agency1builder.withKind("pole-emploi").build();
     const agency2MissionLocale = agency2builder
       .withKind("mission-locale")
@@ -94,10 +94,10 @@ describe("PgAgencyRepository", () => {
       .build();
 
     it("returns empty list for empty table", async () => {
-      const agencies = await agencyRepository.getAllActive();
+      const agencies = await agencyRepository.getAgencies({});
       expect(agencies).toEqual([]);
     });
-    it("returns all agencies", async () => {
+    it("returns all agencies filtered on statuses", async () => {
       await Promise.all([
         agencyRepository.insert(agency1PE),
         agencyRepository.insert(agency2MissionLocale),
@@ -105,7 +105,9 @@ describe("PgAgencyRepository", () => {
         agencyRepository.insert(inactiveAgency),
       ]);
 
-      const agencies = await agencyRepository.getAllActive();
+      const agencies = await agencyRepository.getAgencies({
+        filters: { status: activeAgencyStatuses },
+      });
       expect(sortById(agencies)).toEqual([
         agency2MissionLocale,
         agency1PE,
@@ -118,7 +120,9 @@ describe("PgAgencyRepository", () => {
         agencyRepository.insert(agency2MissionLocale),
       ]);
 
-      const agencies = await agencyRepository.getAllActive("peOnly");
+      const agencies = await agencyRepository.getAgencies({
+        filters: { kind: "peOnly" },
+      });
       expect(sortById(agencies)).toEqual([agency1PE]);
     });
   });
@@ -166,7 +170,7 @@ describe("PgAgencyRepository", () => {
     });
   });
 
-  describe("getAllActiveNearby", () => {
+  describe("to get agencies near by a given location", () => {
     const placeStanislasPosition: LatLonDto = {
       lat: 48.693339,
       lon: 6.182858,
@@ -180,7 +184,6 @@ describe("PgAgencyRepository", () => {
       const epinalAgency = agency2builder
         .withName("Epinal agency")
         .withPosition(48.179552, 6.441447)
-        .withStatus("from-api-PE")
         .build();
 
       const dijonAgency = AgencyDtoBuilder.create(
@@ -198,10 +201,15 @@ describe("PgAgencyRepository", () => {
       ]);
 
       // Act
-      const agencies = await agencyRepository.getAllActiveNearby(
-        placeStanislasPosition,
-        100,
-      );
+      const agencies = await agencyRepository.getAgencies({
+        filters: {
+          position: {
+            position: placeStanislasPosition,
+            distance_km: 100,
+          },
+          status: activeAgencyStatuses,
+        },
+      });
 
       // Assert
       expect(agencies).toEqual([nancyAgency, epinalAgency]);
@@ -228,11 +236,15 @@ describe("PgAgencyRepository", () => {
       ]);
 
       // Act
-      const agencies = await agencyRepository.getAllActiveNearby(
-        placeStanislasPosition,
-        100,
-        "peOnly",
-      );
+      const agencies = await agencyRepository.getAgencies({
+        filters: {
+          position: {
+            position: placeStanislasPosition,
+            distance_km: 100,
+          },
+          kind: "peOnly",
+        },
+      });
 
       // Assert
       expect(agencies).toEqual([peNancyAgency]);
@@ -258,11 +270,15 @@ describe("PgAgencyRepository", () => {
       ]);
 
       // Act
-      const agencies = await agencyRepository.getAllActiveNearby(
-        placeStanislasPosition,
-        100,
-        "peExcluded",
-      );
+      const agencies = await agencyRepository.getAgencies({
+        filters: {
+          position: {
+            position: placeStanislasPosition,
+            distance_km: 100,
+          },
+          kind: "peExcluded",
+        },
+      });
 
       // Assert
       expect(agencies).toEqual([capEmploiNancyAgency]);
@@ -280,15 +296,15 @@ describe("PgAgencyRepository", () => {
       agency2 = agency2builder.build();
     });
     it("inserts unknown entities", async () => {
-      expect(await agencyRepository.getAllActive()).toHaveLength(0);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
       await agencyRepository.insert(agency1);
-      const allActiveAgencies = await agencyRepository.getAllActive();
+      const allActiveAgencies = await agencyRepository.getAgencies({});
       expect(allActiveAgencies).toHaveLength(1);
       expect(allActiveAgencies[0]).toEqual(agency1);
 
       await agencyRepository.insert(agency2);
-      expect(await agencyRepository.getAllActive()).toHaveLength(2);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(2);
     });
   });
 
@@ -296,10 +312,10 @@ describe("PgAgencyRepository", () => {
     const agency1 = agency1builder.withPosition(40, 2).build();
 
     it("updates entities", async () => {
-      expect(await agencyRepository.getAllActive()).toHaveLength(0);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
       await agencyRepository.insert(agency1);
-      expect(await agencyRepository.getAllActive()).toHaveLength(1);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
 
       const updatedAgency1 = agency1builder
         .withName("Updated agency")
@@ -310,7 +326,7 @@ describe("PgAgencyRepository", () => {
         .build();
 
       await agencyRepository.update(updatedAgency1);
-      const inDb = await agencyRepository.getAllActive();
+      const inDb = await agencyRepository.getAgencies({});
       expect(inDb).toHaveLength(1);
       expectTypeToMatchAndEqual(inDb[0], updatedAgency1);
     });
@@ -321,10 +337,10 @@ describe("PgAgencyRepository", () => {
 
     const agency1b = agency1builder.withName("agency1b").build();
 
-    expect(await agencyRepository.getAllActive()).toHaveLength(0);
+    expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
     await agencyRepository.insert(agency1a);
-    expect(await agencyRepository.getAllActive()).toHaveLength(1);
+    expect(await agencyRepository.getAgencies({})).toHaveLength(1);
 
     const id1b = await agencyRepository.insert(agency1b);
     expect(id1b).toBeUndefined();

@@ -3,7 +3,13 @@ import { LatLonDto } from "../latLon";
 import { Flavor } from "../typeFlavors";
 import { NotEmptyArray, RequireField } from "../utils";
 
-export type AgencyStatus = "active" | "closed" | "needsReview" | "from-api-PE";
+export type AgencyStatus = typeof allAgencyStatuses[number];
+export const allAgencyStatuses = [
+  "active",
+  "closed",
+  "needsReview",
+  "from-api-PE",
+] as const;
 
 export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
   kind: AgencyKind;
@@ -47,12 +53,29 @@ export type AgencyKind =
   | "structure-IAE"
   | "autre";
 
+export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
+
 export type AgencyKindFilter = "peOnly" | "peExcluded";
+
+export type AgencyPositionFilter = {
+  position: LatLonDto;
+  distance_km: number;
+};
+
+export type GetAgenciesFilter = {
+  position?: AgencyPositionFilter;
+  kind?: AgencyKindFilter;
+  status?: AgencyStatus[];
+};
 
 export type ListAgenciesWithPositionRequestDto = {
   lon?: number;
   lat?: number;
   filter?: AgencyKindFilter;
+};
+
+export type PrivateListAgenciesRequestDto = {
+  status?: AgencyStatus;
 };
 
 export type AgencyPublicDisplayDto = Pick<

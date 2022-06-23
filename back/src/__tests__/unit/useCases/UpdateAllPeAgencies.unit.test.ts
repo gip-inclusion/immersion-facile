@@ -154,8 +154,8 @@ describe("UpdateAllPeAgencies use case", () => {
         adminEmails: ["someAdmin@mail.com"],
         address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
         position: {
-          lon: 7,
-          lat: 49,
+          lon: 7.51213,
+          lat: 48.532571324,
         },
         signature: "L'équipe de l'Agence Pôle emploi Molsheim",
         questionnaireUrl: "some-url",
