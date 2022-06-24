@@ -1,6 +1,6 @@
-import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { expectObjectsToMatch } from "shared/src/expectToEqual";
+import { ConventionReadDto } from "src/../../shared/src/convention/convention.dto";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   createTestStore,
@@ -33,15 +33,16 @@ describe("Convention slice", () => {
 
   it("stores the Convention if one matches in backend", () => {
     const convention = new ConventionDtoBuilder().build();
+    const conventionRead = { ...convention, agencyName: "agency" };
     expectConventionState({
       isLoading: false,
       convention: null,
     });
     store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
     expectConventionState({ isLoading: true });
-    feedGatewayWithConvention(convention);
+    feedGatewayWithConvention(conventionRead);
     expectConventionState({
-      convention,
+      convention: conventionRead,
       isLoading: false,
     });
   });
@@ -73,7 +74,9 @@ describe("Convention slice", () => {
     dependencies.conventionGateway.convention$.error(error);
   };
 
-  const feedGatewayWithConvention = (convention: ConventionDto | undefined) => {
+  const feedGatewayWithConvention = (
+    convention: ConventionReadDto | undefined,
+  ) => {
     dependencies.conventionGateway.convention$.next(convention);
   };
 });

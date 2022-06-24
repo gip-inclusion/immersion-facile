@@ -1,8 +1,10 @@
 import { propEq } from "ramda";
 import {
-  ConventionDto,
   validatedConventionStatuses,
   WithConventionId,
+  ListConventionsRequestDto,
+  ConventionReadDto,
+  ConventionId,
 } from "shared/src/convention/convention.dto";
 import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
 import { ConventionRawBeforeExport } from "../../domain/convention/useCases/ExportConventionsReport";
@@ -11,6 +13,7 @@ import { createLogger } from "../../utils/logger";
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
+export const TEST_AGENCY_NAME = "TEST_AGENCY_NAME";
 const logger = createLogger(__filename);
 
 export class InMemoryConventionQueries implements ConventionQueries {
@@ -19,9 +22,30 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly outboxRepository?: InMemoryOutboxRepository,
   ) {}
 
-  public async getLatestUpdated(): Promise<ConventionDto[]> {
+  public async getLatestConventions({
+    status,
+    agencyId,
+  }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
     logger.info("getAll");
-    return Object.values(this.conventionRepository._conventions);
+    return Object.values(this.conventionRepository._conventions)
+      .filter((dto) => !status || dto.status === status)
+      .filter((dto) => !agencyId || dto.agencyId === agencyId)
+      .map((dto) => ({ ...dto, agencyName: TEST_AGENCY_NAME }));
+  }
+
+  public async getConventionById(
+    id: ConventionId,
+  ): Promise<ConventionReadDto | undefined> {
+    logger.info("getAll");
+    const storedConvention = this.conventionRepository.conventions.find(
+      propEq("id", id),
+    );
+    return (
+      storedConvention && {
+        ...storedConvention,
+        agencyName: TEST_AGENCY_NAME,
+      }
+    );
   }
 
   public async getAllConventionsForExport(): Promise<

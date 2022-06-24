@@ -21,7 +21,6 @@ import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
 import { allConventionStatuses } from "shared/src/convention/convention.dto";
-import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 
 describe("Add Convention", () => {
   let addConvention: AddImmersionApplication;
@@ -72,10 +71,7 @@ describe("Add Convention", () => {
       id: validConventionParams.id,
     });
 
-    const storedInRepo = await new InMemoryConventionQueries(
-      conventionRepository,
-    ).getLatestUpdated();
-    expect(storedInRepo).toHaveLength(1);
+    const storedInRepo = conventionRepository.conventions;
     expect(storedInRepo[0]).toEqual(validConvention);
     expectDomainEventsToBeInOutbox([
       {

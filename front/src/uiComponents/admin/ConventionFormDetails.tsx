@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import { ConventionReadDto } from "shared/src/convention/convention.dto";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   calculateTotalImmersionHoursBetweenDate,
@@ -11,12 +11,17 @@ import { Accordion } from "react-design-system/immersionFacile";
 import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
 import { TextCell } from "./TextCell";
 
-type ImmersionField = keyof ConventionDto;
-type FieldsToLabel = Partial<Record<ImmersionField, string>>;
+type ConventionField = keyof ConventionReadDto;
+type FieldsToLabel = Partial<Record<ConventionField, string>>;
 
 const enterpriseFields: FieldsToLabel = {
   businessName: "Entreprise",
   siret: "Siret",
+};
+
+const agencyFields: FieldsToLabel = {
+  agencyName: "Nom de la structure",
+  dateValidation: "Date de validation",
 };
 
 const mentorFields: FieldsToLabel = {
@@ -61,12 +66,13 @@ const allFields: FieldsAndTitle[] = [
   { listTitle: "Bénéficiaire", fields: candidateFields },
   { listTitle: "Entreprise", fields: enterpriseFields },
   { listTitle: "Tuteur", fields: mentorFields },
+  { listTitle: "Agence", fields: agencyFields },
 ];
 
 export const ConnventionFormDetails = ({
   convention,
 }: ConventionFormAccordionProps) => {
-  const buildContent = (field: ImmersionField): ReactNode => {
+  const buildContent = (field: ConventionField): ReactNode => {
     const value = convention[field];
     if (field === "schedule")
       return (

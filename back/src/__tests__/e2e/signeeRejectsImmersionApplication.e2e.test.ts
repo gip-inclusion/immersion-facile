@@ -13,7 +13,7 @@ import {
   conventionsRoute,
   updateConventionStatusRoute,
 } from "shared/src/routes";
-import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
+import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
 
 const adminEmail = "admin@email.fr";
 
@@ -53,7 +53,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     .expect(200);
 
   await expectStoreImmersionToHaveStatus(
-    reposAndGateways.conventionQueries,
+    reposAndGateways.convention,
     "READY_TO_SIGN",
   );
 
@@ -104,10 +104,7 @@ const expectEstablishmentRequiresChanges = async (
     ["establishment@example.com"],
   ]);
 
-  await expectStoreImmersionToHaveStatus(
-    reposAndGateways.conventionQueries,
-    "DRAFT",
-  );
+  expectStoreImmersionToHaveStatus(reposAndGateways.convention, "DRAFT");
 
   const beneficiaryEditEmail = sentEmails[3];
   const establishmentEditEmail = sentEmails[4];
@@ -125,11 +122,11 @@ const expectEstablishmentRequiresChanges = async (
   };
 };
 
-const expectStoreImmersionToHaveStatus = async (
-  applicationQueries: ConventionQueries,
+const expectStoreImmersionToHaveStatus = (
+  conventionRepo: InMemoryConventionRepository,
   expectedStatus: ConventionStatus,
 ) => {
-  const savedConvention = await applicationQueries.getLatestUpdated();
+  const savedConvention = conventionRepo.conventions;
   expect(savedConvention).toHaveLength(1);
   expectObjectsToMatch(savedConvention[0], {
     status: expectedStatus,

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ArrayDropdown, DsfrTitle } from "react-design-system/immersionFacile";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import {
+  ConventionReadDto,
   allConventionStatuses,
-  ConventionDto,
   ConventionStatus,
 } from "shared/src/convention/convention.dto";
 import { conventionGateway } from "src/app/config/dependencies";
@@ -17,7 +17,7 @@ import "./Admin.css";
 
 export const ConventionTab = ({ route }: { route: AdminRoute }) => {
   const adminToken = useAppSelector(adminSelectors.token);
-  const [conventions, setConventions] = useState<ConventionDto[]>([]);
+  const [conventions, setConventions] = useState<ConventionReadDto[]>([]);
 
   const [statusFilter, setStatusFilter] = useState<
     ConventionStatus | undefined

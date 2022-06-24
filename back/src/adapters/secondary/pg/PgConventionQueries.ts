@@ -1,7 +1,9 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import {
-  ConventionDto,
+  ConventionId,
+  ConventionReadDto,
+  ListConventionsRequestDto,
   validatedConventionStatuses,
 } from "shared/src/convention/convention.dto";
 import { ConventionQueries } from "../../../domain/convention/ports/ConventionQueries";
@@ -52,20 +54,30 @@ export class PgConventionQueries implements ConventionQueries {
     }));
   }
 
-  public async getLatestUpdated(): Promise<ConventionDto[]> {
-    const pgResult = await this.client.query(
-      `SELECT *, vad.*, cei.external_id
-       FROM conventions 
-       LEFT JOIN view_appellations_dto AS vad 
-         ON vad.appellation_code = conventions.immersion_appellation
-        LEFT JOIN convention_external_ids AS cei
-         ON cei.convention_id = conventions.id
-       ORDER BY conventions.updated_at DESC
-       LIMIT 10`,
-    );
+  public async getLatestConventions({
+    status,
+    agencyId,
+  }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
+    const filtersSQL = [
+      status && format("c.status = %1$L", status),
+      agencyId && format("c.agency_id::text = %1$L", agencyId),
+    ].filter((clause) => !!clause);
 
-    return pgResult.rows.map(pgConventionRowToDto);
+    const whereClause =
+      filtersSQL.length > 0 ? `WHERE ${filtersSQL.join(" AND ")}` : "";
+    const orderByClause = "ORDER BY date_validation DESC";
+    const limit = 10;
+    return this.getConventionsWhere(whereClause, orderByClause, limit);
   }
+
+  public async getConventionById(
+    id: ConventionId,
+  ): Promise<ConventionReadDto | undefined> {
+    return (
+      await this.getConventionsWhere(format("WHERE c.id::text = %1$L", id))
+    ).at(0);
+  }
+
   public async getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
     dateEnd: Date,
   ): Promise<ImmersionAssessmentEmailParams[]> {
@@ -86,5 +98,28 @@ export class PgConventionQueries implements ConventionQueries {
       [dateEnd],
     );
     return pgResult.rows.map((row) => row.params);
+  }
+
+  private async getConventionsWhere(
+    whereClause: string,
+    orderByCause?: string,
+    limit?: number,
+  ) {
+    const query = `
+    SELECT 
+      c.*, vad.*,
+      agencies.name AS agency_name
+      FROM conventions AS c 
+      LEFT JOIN agencies ON agencies.id = c.agency_id
+      LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = c.immersion_appellation
+      LEFT JOIN partners_pe_connect AS partners ON partners.convention_id = c.id
+    ${whereClause}
+    ${orderByCause ?? ""}
+    ${limit ? "LIMIT " + limit : ""}`;
+    const pgResult = await this.client.query(query);
+    return pgResult.rows.map((row) => ({
+      ...pgConventionRowToDto(row),
+      agencyName: row.agency_name,
+    }));
   }
 }

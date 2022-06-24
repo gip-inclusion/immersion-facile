@@ -1,17 +1,27 @@
 import { Pool, PoolClient } from "pg";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { ConventionId } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionQueries } from "../../adapters/secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
+import {
+  ConventionId,
+  ConventionReadDto,
+} from "shared/src/convention/convention.dto";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
 import { ConventionRawBeforeExport } from "../../domain/convention/useCases/ExportConventionsReport";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import {
+  expectArraysToEqualIgnoringOrder,
+  expectTypeToMatchAndEqual,
+} from "../../_testBuilders/test.helpers";
+
+const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
+const idB: ConventionId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 
 describe("Pg implementation of ConventionQueries", () => {
   let pool: Pool;
@@ -94,29 +104,52 @@ describe("Pg implementation of ConventionQueries", () => {
       });
     });
   });
-  describe("PG implementation of method getLatestUpdated", () => {
-    beforeEach(async () => {
-      const agencyRepository = new PgAgencyRepository(client);
-      await agencyRepository.insert(AgencyDtoBuilder.create().build());
+  describe("PG implementation of method getConventionById", () => {
+    it("Returns undefined if no convention with such id", async () => {
+      expect(await conventionQueries.getConventionById(idA)).toBeUndefined();
     });
-    it("Gets saved immersion", async () => {
-      const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
-      const conventionA = new ConventionDtoBuilder().withId(idA).build();
+    it("Retrieves a convention by id exists", async () => {
+      // Prepare
+      const expectedConventionRead = await insertAgencyAndConvention(
+        idA,
+        idA,
+        "agency A",
+      );
 
-      const idB: ConventionId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
-      const conventionB = new ConventionDtoBuilder().withId(idB).build();
+      // Act
+      const result = await conventionQueries.getConventionById(idA);
 
-      const externalIdA = await conventionRepository.save(conventionA);
-      const externalIdB = await conventionRepository.save(conventionB);
-
-      const resultA = await conventionRepository.getById(idA);
-      expect(resultA).toEqual({ ...conventionA, externalId: externalIdA });
-
-      const resultAll = await conventionQueries.getLatestUpdated();
-      expect(resultAll).toEqual([
-        { ...conventionB, externalId: externalIdB },
-        { ...conventionA, externalId: externalIdA },
+      // Assert
+      expectTypeToMatchAndEqual(result, expectedConventionRead);
+    });
+  });
+  describe("PG implementation of method getLatestUpdated", () => {
+    it("Gets all saved conventionAdminDtos", async () => {
+      // Prepare
+      const insertedConventionReadDtos = await Promise.all([
+        insertAgencyAndConvention(idA, idA, "agency A"),
+        insertAgencyAndConvention(idB, idB, "agency B"),
       ]);
+      // Act
+      const resultAll = await conventionQueries.getLatestConventions({});
+
+      // Assert
+      expectArraysToEqualIgnoringOrder(resultAll, insertedConventionReadDtos);
+    });
+    it("Gets only convention of a given agency", async () => {
+      // Prepare
+      const insertedConventionReadDtos = await Promise.all([
+        insertAgencyAndConvention(idA, idA, "agency A"),
+        insertAgencyAndConvention(idB, idB, "agency B"),
+      ]);
+
+      // Act
+      const resultAll = await conventionQueries.getLatestConventions({
+        agencyId: idA,
+      });
+
+      // Assert
+      expect(resultAll).toEqual([insertedConventionReadDtos[0]]);
     });
   });
 
@@ -192,4 +225,21 @@ describe("Pg implementation of ConventionQueries", () => {
       expect(queryResults[0]).toEqual(expectedResult);
     });
   });
+  const insertAgencyAndConvention = async (
+    conventionId: ConventionId,
+    agencyId: string,
+    agencyName: string,
+  ): Promise<ConventionReadDto> => {
+    const agency = AgencyDtoBuilder.create()
+      .withId(agencyId)
+      .withName(agencyName)
+      .build();
+    const { externalId, ...convention } = new ConventionDtoBuilder()
+      .withAgencyId(agencyId)
+      .withId(conventionId)
+      .build();
+    await agencyRepo.insert(agency);
+    await conventionRepository.save(convention);
+    return { ...convention, agencyName };
+  };
 });

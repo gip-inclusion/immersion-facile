@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import { ConventionReadDto } from "shared/src/convention/convention.dto";
 
 export interface ConventionState {
   isLoading: boolean;
-  convention: ConventionDto | null;
+  convention: ConventionReadDto | null;
   error: string | null;
 }
 
@@ -22,7 +22,7 @@ export const conventionSlice = createSlice({
     },
     conventionSucceeded: (
       state,
-      action: PayloadAction<ConventionDto | undefined>,
+      action: PayloadAction<ConventionReadDto | undefined>,
     ) => {
       state.convention = action.payload ?? null;
       state.isLoading = false;

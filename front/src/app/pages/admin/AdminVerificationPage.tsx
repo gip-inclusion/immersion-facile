@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Notification } from "react-design-system/immersionFacile";
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import { ConventionReadDto } from "shared/src/convention/convention.dto";
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
@@ -13,7 +13,7 @@ interface AdminVerificationProps {
 }
 
 export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
-  const [form, setForm] = useState<ConventionDto | null>(null);
+  const [convention, setConvention] = useState<ConventionReadDto | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -44,14 +44,15 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
       "Attention! Cette demande d'immersion est à statut 'annulée', l'opération que vous venez d'effectuer ne semble pas avoir été appliquée. Veuillez réésayer ou consulter l'équipe Immérsion Facilitée",
   };
 
-  const validationDisabled = () => !form || form.status !== "IN_REVIEW";
+  const validationDisabled = () =>
+    !convention || convention.status !== "IN_REVIEW";
   useEffect(() => {
     conventionGateway
-      .backofficeGet(id)
+      .getById(id)
       .then((data) => {
-        setForm(data);
-        if (form) {
-          switch (form.status) {
+        setConvention(data);
+        if (convention) {
+          switch (convention.status) {
             case "DRAFT":
               setInfoMessage(
                 "La demande n'est pas encore prête pour validation",
@@ -70,15 +71,15 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
   }, []);
 
   const sendValidationRequest = () => {
-    if (!form) return;
+    if (!convention) return;
     setSubmitting(true);
 
     conventionGateway
-      .validate(form.id)
+      .validate(convention.id)
       .then(() => {
-        setSuccessMessage(successMessageByStatus[form.status]);
+        setSuccessMessage(successMessageByStatus[convention.status]);
 
-        setForm({ ...form, status: "VALIDATED" });
+        setConvention({ ...convention, status: "VALIDATED" });
       })
       .catch((err: React.SetStateAction<Error | null>) => {
         setError(err);
@@ -91,14 +92,14 @@ export const AdminVerificationPage = ({ route }: AdminVerificationProps) => {
   return (
     <>
       <div>Admin Verification Page</div>
-      {form && (
+      {convention && (
         <>
           {infoMessage && (
             <Notification type="info" title="Attention">
               {infoMessage}
             </Notification>
           )}
-          <ConventionFormAccordion convention={form} />
+          <ConventionFormAccordion convention={convention} />
           {!validationDisabled() && (
             <button
               className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"

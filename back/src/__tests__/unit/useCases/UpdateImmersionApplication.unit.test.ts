@@ -26,7 +26,6 @@ import {
   allConventionStatuses,
   ConventionDto,
 } from "shared/src/convention/convention.dto";
-import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 
 describe("Update Convention", () => {
   let updateConvention: UpdateImmersionApplication;
@@ -78,11 +77,7 @@ describe("Update Convention", () => {
         convention: updatedConvention,
       });
       expect(id).toEqual(updatedConvention.id);
-
-      const storedInRepo = await new InMemoryConventionQueries(
-        conventionRepository,
-      ).getLatestUpdated();
-      expect(storedInRepo).toEqual([updatedConvention]);
+      expect(conventionRepository.conventions).toEqual([updatedConvention]);
     });
   });
 

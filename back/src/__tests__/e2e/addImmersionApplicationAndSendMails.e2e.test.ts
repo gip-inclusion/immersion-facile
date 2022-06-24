@@ -38,9 +38,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .send(validConventionParams);
 
     expectResponseBody(res, { id: validConvention.id });
-    expect(await reposAndGateways.conventionQueries.getLatestUpdated()).toEqual(
-      [validConvention],
-    );
+    expect(
+      await reposAndGateways.convention.getById(validConvention.id),
+    ).toEqual(validConvention);
     expectEventsInOutbox(reposAndGateways.outbox, [
       {
         topic: "ImmersionApplicationSubmittedByBeneficiary",
@@ -147,8 +147,8 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   expect(result.status).toBe(200);
 
-  expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.conventionQueries.getLatestUpdated(),
+  expectTypeToMatchAndEqual(
+    await reposAndGateways.convention.getById(convention.id),
     convention,
   );
 
@@ -190,8 +190,8 @@ const beneficiarySignsApplication = async (
 
   expect(response.status).toBe(200);
 
-  expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.conventionQueries.getLatestUpdated(),
+  expectTypeToMatchAndEqual(
+    await reposAndGateways.convention.getById(initialConvention.id),
     {
       ...initialConvention,
       status: "PARTIALLY_SIGNED",
@@ -222,8 +222,8 @@ const establishmentSignsApplication = async (
     .set("Authorization", establishmentSignJwt)
     .expect(200);
 
-  expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.conventionQueries.getLatestUpdated(),
+  expectTypeToMatchAndEqual(
+    await reposAndGateways.convention.getById(initialConvention.id),
     {
       ...initialConvention,
       status: "IN_REVIEW",
@@ -263,8 +263,8 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     .send(params)
     .expect(200);
 
-  expectOnlyOneImmersionThatIsEqual(
-    await reposAndGateways.conventionQueries.getLatestUpdated(),
+  expectTypeToMatchAndEqual(
+    await reposAndGateways.convention.getById(initialConvention.id),
     {
       ...initialConvention,
       status: "ACCEPTED_BY_VALIDATOR",
@@ -288,12 +288,4 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     "establishment@example.com",
     validatorEmail,
   ]);
-};
-
-const expectOnlyOneImmersionThatIsEqual = (
-  actualDtos: ConventionDto[],
-  expectedDto: ConventionDto,
-) => {
-  expect(actualDtos).toHaveLength(1);
-  expectTypeToMatchAndEqual(actualDtos[0], expectedDto);
 };

@@ -10,9 +10,9 @@ import { CreateImmersionAssessment } from "../../../domain/convention/useCases/C
 import { ExportConventionsReport } from "../../../domain/convention/useCases/ExportConventionsReport";
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
-import { GetImmersionApplication } from "../../../domain/convention/useCases/GetImmersionApplication";
+import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { ListAgenciesWithPosition } from "../../../domain/convention/useCases/ListAgenciesWithPosition";
-import { ListImmersionApplication } from "../../../domain/convention/useCases/ListImmersionApplication";
+import { ListAdminConventions } from "../../../domain/convention/useCases/ListAdminConventions";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
@@ -110,14 +110,14 @@ export const createUseCases = (
       generateAdminJwt,
       () => sleep(config.nodeEnv !== "test" ? 500 : 0),
     ),
-    getConvention: new GetImmersionApplication(repositories.convention),
+    getConvention: new GetConvention(repositories.conventionQueries),
     linkPoleEmploiAdvisorAndRedirectToConvention:
       new LinkPoleEmploiAdvisorAndRedirectToConvention(
         uowPerformer,
         repositories.peConnectGateway,
         config.immersionFacileBaseUrl,
       ),
-    listConventions: new ListImmersionApplication(
+    listAdminConventions: new ListAdminConventions(
       repositories.conventionQueries,
     ),
     exportConventionsAsExcelArchive: new ExportConventionsReport(uowPerformer),

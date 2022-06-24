@@ -76,6 +76,10 @@ export type ConventionDto = ConventionDtoWithoutExternalId & {
   externalId: ConventionExternalId;
 };
 
+export type ConventionReadDto = ConventionDtoWithoutExternalId & {
+  agencyName: string;
+};
+
 export type WithConventionId = {
   id: ConventionId;
 };

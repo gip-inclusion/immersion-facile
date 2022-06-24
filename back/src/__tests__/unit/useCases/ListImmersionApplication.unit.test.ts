@@ -1,8 +1,9 @@
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { ListImmersionApplication } from "../../../domain/convention/useCases/ListImmersionApplication";
+import { ListAdminConventions } from "../../../domain/convention/useCases/ListAdminConventions";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
 import {
+  ConventionReadDto,
   allConventionStatuses,
   ConventionDto,
 } from "shared/src/convention/convention.dto";
@@ -15,14 +16,14 @@ const agencyIds: AgencyId[] = [
 ];
 
 describe("List Immersion Applications", () => {
-  let listConventions: ListImmersionApplication;
+  let listConventions: ListAdminConventions;
   let repository: InMemoryConventionRepository;
   let queries: InMemoryConventionQueries;
 
   beforeEach(() => {
     repository = new InMemoryConventionRepository();
     queries = new InMemoryConventionQueries(repository);
-    listConventions = new ListImmersionApplication(queries);
+    listConventions = new ListAdminConventions(queries);
   });
 
   describe("When the repository is empty", () => {
@@ -40,11 +41,14 @@ describe("List Immersion Applications", () => {
       const convention = new ConventionDtoBuilder().build();
       repository.setConventions({ form_id: convention });
 
-      const conventions = await listConventions.execute({
+      const listedAdminConventions = await listConventions.execute({
         status: undefined,
         agencyId: undefined,
       });
-      expect(conventions).toEqual([convention]);
+      const expectedAdminConvention: ConventionReadDto[] = [
+        { ...convention, agencyName: "TEST_AGENCY_NAME" },
+      ];
+      expect(listedAdminConventions).toEqual(expectedAdminConvention);
     });
   });
 

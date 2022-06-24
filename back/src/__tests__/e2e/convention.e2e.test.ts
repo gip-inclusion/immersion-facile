@@ -24,6 +24,7 @@ import {
   InMemoryRepositories,
   TestAppAndDeps,
 } from "../../_testBuilders/buildTestApp";
+import { TEST_AGENCY_NAME } from "../../adapters/secondary/InMemoryConventionQueries";
 
 let request: SuperTest<Test>;
 let generateJwt: GenerateMagicLinkJwt;
@@ -91,7 +92,10 @@ describe("convention e2e", () => {
           await request
             .get(`/admin/${conventionsRoute}/${convention.id}`)
             .set("Authorization", adminToken)
-            .expect(200, validatedConvention);
+            .expect(200, {
+              ...validatedConvention,
+              agencyName: TEST_AGENCY_NAME,
+            });
         });
 
         it("Validating applications without credentials fails with 401 Unauthorized", async () => {
@@ -103,7 +107,7 @@ describe("convention e2e", () => {
           await request
             .get(`/admin/${conventionsRoute}/${convention.id}`)
             .set("Authorization", adminToken)
-            .expect(200, convention);
+            .expect(200, { ...convention, agencyName: TEST_AGENCY_NAME });
         });
 
         it("Validating applications with invalid credentials fails with 403 Forbidden", async () => {
@@ -116,7 +120,7 @@ describe("convention e2e", () => {
           await request
             .get(`/admin/${conventionsRoute}/${convention.id}`)
             .set("Authorization", adminToken)
-            .expect(200, convention);
+            .expect(200, { ...convention, agencyName: TEST_AGENCY_NAME });
         });
 
         it("Validating non-existent application with valid credentials fails with 404", async () => {
@@ -131,7 +135,10 @@ describe("convention e2e", () => {
           await request
             .get(`/admin/${conventionsRoute}/${convention.id}`)
             .set("Authorization", adminToken)
-            .expect(200, convention);
+            .expect(200, {
+              ...convention,
+              agencyName: TEST_AGENCY_NAME,
+            });
         });
       });
     });
@@ -170,7 +177,10 @@ describe("convention e2e", () => {
         await request
           .get(`/admin/${conventionsRoute}/${convention.id}`)
           .set("Authorization", adminToken)
-          .expect(200, convention);
+          .expect(200, {
+            ...convention,
+            agencyName: TEST_AGENCY_NAME,
+          });
       });
 
       describe("Getting an application", () => {
@@ -207,7 +217,10 @@ describe("convention e2e", () => {
           await request
             .get(`/auth/${conventionsRoute}/${convention.id}`)
             .set("Authorization", jwt)
-            .expect(200, convention);
+            .expect(200, {
+              ...convention,
+              agencyName: TEST_AGENCY_NAME,
+            });
         });
 
         it("redirects expired magic links to a renewal page", async () => {
@@ -268,7 +281,10 @@ describe("convention e2e", () => {
         await request
           .get(`/admin/${conventionsRoute}/${convention.id}`)
           .set("Authorization", adminToken)
-          .expect(200, updatedConvention);
+          .expect(200, {
+            ...updatedConvention,
+            agencyName: TEST_AGENCY_NAME,
+          });
       });
 
       it("Fetching unknown application IDs fails with 404 Not Found", async () => {

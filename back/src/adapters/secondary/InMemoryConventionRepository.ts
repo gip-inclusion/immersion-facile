@@ -50,4 +50,7 @@ export class InMemoryConventionRepository implements ConventionRepository {
   setNextExternalId(externalId: ConventionExternalId) {
     this._nextExternalId = externalId;
   }
+  get conventions() {
+    return Object.values(this._conventions);
+  }
 }

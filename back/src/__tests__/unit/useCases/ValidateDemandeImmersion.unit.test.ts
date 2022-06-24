@@ -17,21 +17,18 @@ import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
-import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 
 describe("Validate Convention", () => {
   let validateConvention: ValidateImmersionApplication;
   let outboxRepository: InMemoryOutboxRepository;
   let outboxQueries: InMemoryOutboxQueries;
   let repository: InMemoryConventionRepository;
-  let queries: InMemoryConventionQueries;
   let createNewEvent: CreateNewEvent;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
     repository = new InMemoryConventionRepository();
-    queries = new InMemoryConventionQueries(repository);
     outboxRepository = new InMemoryOutboxRepository();
     outboxQueries = new InMemoryOutboxQueries(outboxRepository);
     clock = new CustomClock();
@@ -65,7 +62,7 @@ describe("Validate Convention", () => {
       });
       expect(id).toEqual(convention.id);
 
-      const storedInRepo = await queries.getLatestUpdated();
+      const storedInRepo = repository.conventions;
       expect(storedInRepo).toEqual([expectedConvention]);
     });
   });
@@ -81,7 +78,7 @@ describe("Validate Convention", () => {
       );
 
       // And the immersion application is still DRAFT
-      const storedInRepo = await queries.getLatestUpdated();
+      const storedInRepo = repository.conventions;
       expect(storedInRepo).toEqual([convention]);
     });
   });

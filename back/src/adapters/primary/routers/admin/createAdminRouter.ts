@@ -76,7 +76,7 @@ export const createAdminRouter = (deps: AppDependencies) => {
     .route(`/${conventionsRoute}`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.listConventions.execute(req.query),
+        deps.useCases.listAdminConventions.execute(req.query),
       ),
     );
 
