@@ -119,9 +119,8 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
     });
 
 export const conventionSchema: z.Schema<ConventionDto> =
-  // TODO: remove the optional when all convention have external ID (existing convention are over, or a solution is found to handle the F***** externalId)
   conventionWithoutExternalIdZObject
-    .merge(z.object({ externalId: externalConventionIdSchema.optional() }))
+    .merge(z.object({ externalId: externalConventionIdSchema }))
     .strict()
     .refine(startDateIsBeforeEndDate, {
       message: "La date de fin doit être après la date de début.",
