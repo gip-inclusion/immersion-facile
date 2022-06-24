@@ -1,5 +1,13 @@
 import { addDays, startOfToday } from "date-fns";
-import { keys } from "ramda";
+import {
+  ConventionDto,
+  ConventionStatus,
+  ImmersionObjective,
+} from "shared/src/convention/convention.dto";
+import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { reasonableSchedule } from "shared/src/schedule/ScheduleSchema";
+import { toDateString } from "shared/src/utils/date";
+import { mergeObjectsExceptFalsyValues } from "shared/src/utils/mergeObjectsExpectFalsyValues";
 import {
   conventionGateway,
   deviceRepository,
@@ -10,15 +18,7 @@ import {
 } from "src/app/pages/Convention/ConventionPage";
 import { ConventionUkrainePageRoute } from "src/app/pages/Convention/ConventionPageForUkraine";
 import { ENV } from "src/environmentVariables";
-import {
-  ConventionStatus,
-  ConventionDto,
-  ImmersionObjective,
-} from "shared/src/convention/convention.dto";
-import { reasonableSchedule } from "shared/src/schedule/ScheduleSchema";
-import { toDateString } from "shared/src/utils/date";
 import { v4 as uuidV4 } from "uuid";
-import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
 
 const { frontEnvType } = ENV;
 
@@ -45,7 +45,7 @@ export const conventionInitialValuesFromUrl = (
 ): ConventionPresentation => {
   const dataFromDevice = deviceRepository.get("partialConvention") ?? {};
 
-  const params = mergeObjectsExceptEmptyString(
+  const params = mergeObjectsExceptFalsyValues(
     dataFromDevice,
     route.params as Partial<ConventionPresentation>,
   );
@@ -153,20 +153,3 @@ const devPrefilledValues = (
   beneficiaryAccepted: false,
   enterpriseAccepted: false,
 });
-
-const mergeObjectsExceptEmptyString = <T>(
-  partialObj: Partial<T>,
-  priorityObj: Partial<T>,
-): Partial<T> => {
-  const allKeys = [
-    ...new Set([...keys(priorityObj), ...keys(partialObj)]),
-  ] as (keyof T)[];
-
-  return allKeys.reduce((acc, key) => {
-    const priorityValue = priorityObj[key];
-    return {
-      ...acc,
-      [key]: priorityValue ? priorityValue : partialObj[key],
-    };
-  }, {} as T);
-};

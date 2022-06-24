@@ -5,11 +5,24 @@ import { useDispatch } from "react-redux";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { Section } from "src/app/components/Section";
 import { deviceRepository } from "src/app/config/dependencies";
+import { ConventionPageRoute } from "src/app/pages/Convention/ConventionPage";
 import { PeConnectButton } from "src/app/pages/Convention/PeConnectButton";
 import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
 import { routes, useRoute } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+
+const storeConventionRouteParamsOnDevice = (
+  routeParams: ConventionPageRoute["params"],
+) => {
+  const { federatedIdentity, ...partialConvention } = routeParams;
+  if (keys(partialConvention).length) {
+    deviceRepository.set(
+      "partialConvention",
+      partialConvention as Partial<ConventionDto>,
+    );
+  }
+};
 
 export const InitiateConventionCard = () => {
   const { enablePeConnectApi } = useFeatureFlags();
@@ -30,17 +43,8 @@ export const InitiateConventionCard = () => {
             </p>
             <PeConnectButton
               onClick={() => {
-                if (currentRoute.name === "convention") {
-                  const { federatedIdentity, ...partialConvention } =
-                    currentRoute.params;
-
-                  if (keys(partialConvention).length) {
-                    deviceRepository.set(
-                      "partialConvention",
-                      partialConvention as Partial<ConventionDto>,
-                    );
-                  }
-                }
+                if (currentRoute.name === "convention")
+                  storeConventionRouteParamsOnDevice(currentRoute.params);
               }}
             />
             <span className="pt-4">ou bien</span>
