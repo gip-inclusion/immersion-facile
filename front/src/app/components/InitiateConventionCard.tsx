@@ -47,6 +47,13 @@ export const InitiateConventionCard = () => {
                   storeConventionRouteParamsOnDevice(currentRoute.params);
               }}
             />
+            <a
+              className="small mt-1"
+              href="https://candidat.pole-emploi.fr/compte/identifiant/choixcontact"
+              target="_blank"
+            >
+              Je ne connais pas mes identifiants
+            </a>
             <span className="pt-4">ou bien</span>
             <p className="text-center text-sm py-3">
               Je suis accompagné par une autre structure :
