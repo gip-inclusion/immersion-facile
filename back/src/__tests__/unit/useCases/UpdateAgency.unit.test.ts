@@ -50,9 +50,8 @@ describe("Update agency", () => {
     // Assert
     expect(agencyRepo.agencies[0].status).toBe("active");
     expect(outboxRepo.events[0]).toMatchObject({
-      id: "event-uuid",
+      id: nextUuid,
       topic: "AgencyActivated",
-      occurredAt: "2022-01-01T09:00:00.000Z",
       payload: { ...existingAgency, status: "active" },
     });
   });

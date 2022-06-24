@@ -120,8 +120,8 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/42/message-setup
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: 42,
 
-  //TODO TODO TODO
-  AGENCY_WAS_ACTIVATED: 43,
+  // https://my.sendinblue.com/camp/template/42/message-setup
+  AGENCY_WAS_ACTIVATED: 48,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
