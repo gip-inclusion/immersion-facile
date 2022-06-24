@@ -3,16 +3,20 @@ import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
 import {
+  RetryableError,
+  RetryStrategy,
+} from "../../domain/core/ports/RetryStrategy";
+import {
   AccessTokenDto,
   ExternalAccessToken,
   toAccessToken,
 } from "../../domain/peConnect/dto/AccessToken.dto";
 import {
   ExternalPeConnectAdvisor,
-  ExternalPeConnectUser,
-  PeConnectAdvisorDto,
   ExternalPeConnectOAuthGetTokenWithCodeGrantPayload,
   ExternalPeConnectOAuthGrantPayload,
+  ExternalPeConnectUser,
+  PeConnectAdvisorDto,
   PeConnectUserDto,
   PeUserAndAdvisors,
   toPeConnectAdvisorDto,
@@ -26,6 +30,7 @@ import {
 import { PeConnectGateway } from "../../domain/peConnect/port/PeConnectGateway";
 import {
   createAxiosInstance,
+  isRetryableError,
   PrettyAxiosResponseError,
 } from "../../utils/axiosUtils";
 import type { AxiosInstance } from "axios";
@@ -41,7 +46,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   private axiosInstance: AxiosInstance;
 
   public constructor(
-    private readonly config: AccessTokenConfig, // private readonly retryStrategy: RetryStrategy,
+    private readonly config: AccessTokenConfig,
+    private readonly retryStrategy: RetryStrategy,
   ) {
     this.axiosInstance = createAxiosInstance(logger);
     this.ApiPeConnectUrls = makeApiPeConnectUrls({
@@ -79,7 +85,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         redirect_uri: this.ApiPeConnectUrls.REGISTERED_REDIRECT_URL,
       };
 
-    const response = await createAxiosInstance(logger)
+    const response = await this.axiosInstance
       .post(
         this.ApiPeConnectUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
         queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
@@ -124,67 +130,83 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     accessToken: AccessTokenDto,
   ): Promise<PeConnectUserDto> {
     const trackId = stringToMd5(accessToken.value);
-    const response = await this.axiosInstance
-      .get(this.ApiPeConnectUrls.PECONNECT_USER_INFO, {
-        headers: headersWithAuthPeAccessToken(accessToken),
-      })
-      .catch((error) => {
-        logger.error({ trackId, error }, "GetUserInfo PE Error");
+    return this.retryStrategy.apply(async () => {
+      try {
+        const response = await this.axiosInstance
+          .get(this.ApiPeConnectUrls.PECONNECT_USER_INFO, {
+            headers: headersWithAuthPeAccessToken(accessToken),
+          })
+          .catch((error) => {
+            logger.error({ trackId, error }, "GetUserInfo PE Error");
 
-        if (!error || error.status === undefined)
-          throw new ManagedRedirectError("peConnectNoValidUser", error);
+            if (!error || error.status === undefined)
+              throw new ManagedRedirectError("peConnectNoValidUser", error);
+            throw error;
+          });
 
+        const body = response.data;
+
+        logger.info({ trackId, body }, "GetUserInfo PE Response");
+
+        const bodyFromPeFixed = body === "" ? [] : body; // this is because PE does not respect their own contracts and sends "" instead of []
+
+        const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
+          externalPeConnectUserSchema,
+          bodyFromPeFixed,
+        );
+
+        return toPeConnectUserDto(externalUser);
+      } catch (error: any) {
+        if (isRetryableError(logger, error)) throw new RetryableError(error);
         throw PrettyAxiosResponseError(
           "PeConnect Get User Info Failure",
           error,
         );
-      });
-
-    const body = response.data;
-
-    logger.info({ trackId, body }, "GetUserInfo PE Response");
-
-    const bodyFromPeFixed = body === "" ? [] : body; // this is because PE does not respect their own contracts and sends "" instead of []
-
-    const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
-      externalPeConnectUserSchema,
-      bodyFromPeFixed,
-    );
-
-    return toPeConnectUserDto(externalUser);
+      }
+    });
   }
 
   private async getAdvisorsInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectAdvisorDto[]> {
     const trackId = stringToMd5(accessToken.value);
-    const response = await createAxiosInstance()
-      .get(this.ApiPeConnectUrls.PECONNECT_ADVISORS_INFO, {
-        headers: headersWithAuthPeAccessToken(accessToken),
-        timeout: secondsToMilliseconds(10),
-      })
-      .catch((error) => {
-        logger.error({ trackId, error }, "GetAdvisorsInfo PE Error");
-        if (!error || error.status === undefined)
-          throw new ManagedRedirectError("peConnectNoValidAdvisor", error);
+    return this.retryStrategy.apply(async () => {
+      try {
+        const response = await createAxiosInstance()
+          .get(this.ApiPeConnectUrls.PECONNECT_ADVISORS_INFO, {
+            headers: headersWithAuthPeAccessToken(accessToken),
+            timeout: secondsToMilliseconds(10),
+          })
+          .catch((error) => {
+            logger.error({ trackId, error }, "GetAdvisorsInfo PE Error");
+            if (!error || error.status === undefined)
+              throw new ManagedRedirectError("peConnectNoValidAdvisor", error);
 
+            throw PrettyAxiosResponseError(
+              "PeConnect Get Advisor Info Failure",
+              error,
+            );
+          });
+
+        logger.info(
+          { trackId, body: response.data },
+          "GetAdvisorsInfo PE Response",
+        );
+
+        const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
+          externalPeConnectAdvisorsSchema,
+          response.data,
+        );
+
+        return advisors.map(toPeConnectAdvisorDto);
+      } catch (error: any) {
+        if (isRetryableError(logger, error)) throw new RetryableError(error);
         throw PrettyAxiosResponseError(
-          "PeConnect Get Advisor Info Failure",
+          "PeConnect Get User Info Failure",
           error,
         );
-      });
-
-    logger.info(
-      { trackId, body: response.data },
-      "GetAdvisorsInfo PE Response",
-    );
-
-    const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
-      externalPeConnectAdvisorsSchema,
-      response.data,
-    );
-
-    return advisors.map(toPeConnectAdvisorDto);
+      }
+    });
   }
 
   public async getUserAndAdvisors(
@@ -192,6 +214,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   ): Promise<PeUserAndAdvisors> {
     const accessToken: AccessTokenDto =
       await this.oAuthGetAccessTokenThroughAuthorizationCode(authorizationCode);
+
     const [user, advisors] = await Promise.all([
       this.getUserInfo(accessToken),
       this.getAdvisorsInfo(accessToken),

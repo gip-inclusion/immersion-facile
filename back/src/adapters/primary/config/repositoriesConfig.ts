@@ -1,11 +1,13 @@
 import { Pool } from "pg";
 import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
+import { random, sleep } from "shared/src/utils";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import { createLogger } from "../../../utils/logger";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
+import { ExponentialBackoffRetryStrategy } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
 import { HttpPeConnectGateway } from "../../secondary/HttpPeConnectGateway";
@@ -206,7 +208,16 @@ export const createRepositories = async (
 
     peConnectGateway:
       config.peConnectGateway === "HTTPS"
-        ? new HttpPeConnectGateway(config.poleEmploiAccessTokenConfig)
+        ? new HttpPeConnectGateway(
+            config.poleEmploiAccessTokenConfig,
+            new ExponentialBackoffRetryStrategy(
+              3_000,
+              15_0000,
+              clock,
+              sleep,
+              random,
+            ),
+          )
         : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl),
 
     poleEmploiGateway:
