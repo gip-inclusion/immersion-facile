@@ -8,6 +8,7 @@ import {
   AgencyPositionFilter,
   AgencyStatus,
   GetAgenciesFilter,
+  PartialAgencyDto,
 } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { createLogger } from "../../../utils/logger";
@@ -129,28 +130,28 @@ export class PgAgencyRepository implements AgencyRepository {
     return agency.id;
   }
 
-  public async update(agency: AgencyDto): Promise<void> {
+  public async update(agency: PartialAgencyDto): Promise<void> {
     const query = `UPDATE public.agencies SET
-      name = $2,
-      status = $3 ,
-      kind = $4,
-      address = $5,
-      counsellor_emails = $6,
-      validator_emails = $7,
-      admin_emails = $8,
-      questionnaire_url = $9,
-      email_signature = $10,
-      logo_url = $11,
-      position = ST_GeographyFromText($12),
-      agency_siret = $13,
-      code_safir = $14,
+      name = COALESCE(%2$L, name),
+      status = COALESCE(%3$L, status),
+      kind= COALESCE(%4$L, kind),
+      address= COALESCE(%5$L, address),
+      counsellor_emails= COALESCE(%6$L, counsellor_emails),
+      validator_emails= COALESCE(%7$L, validator_emails),
+      admin_emails= COALESCE(%8$L, admin_emails),
+      questionnaire_url= COALESCE(%9$L, questionnaire_url),
+      email_signature = COALESCE(%10$L, email_signature),
+      logo_url = COALESCE(%11$L, logo_url),
+      ${agency.position ? "position = ST_GeographyFromText(%12$L)," : ""}
+      agency_siret = COALESCE(%13$L, agency_siret),
+      code_safir = COALESCE(%14$L, code_safir),
       updated_at = NOW()
-    WHERE id = $1`;
+    WHERE id = %1$L`;
 
     const params = entityToPgArray(agency);
-    params[11] = `POINT(${agency.position.lon} ${agency.position.lat})`;
-
-    await this.client.query(query, params);
+    params[11] =
+      agency.position && `POINT(${agency.position.lon} ${agency.position.lat})`;
+    await this.client.query(format(query, ...params));
   }
 
   async getImmersionFacileIdByKind(): Promise<AgencyId> {
@@ -168,19 +169,19 @@ export class PgAgencyRepository implements AgencyRepository {
 const STPointStringFromPosition = (position: LatLonDto) =>
   `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
 
-const entityToPgArray = (agency: AgencyDto): any[] => [
+const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
   agency.id,
   agency.name,
   agency.status,
   agency.kind,
   agency.address,
-  JSON.stringify(agency.counsellorEmails),
-  JSON.stringify(agency.validatorEmails),
-  JSON.stringify(agency.adminEmails),
+  agency.counsellorEmails && JSON.stringify(agency.counsellorEmails),
+  agency.validatorEmails && JSON.stringify(agency.validatorEmails),
+  agency.adminEmails && JSON.stringify(agency.adminEmails),
   agency.questionnaireUrl,
   agency.signature,
   agency.logoUrl,
-  STPointStringFromPosition(agency.position),
+  agency.position && STPointStringFromPosition(agency.position),
   agency.agencySiret,
   agency.codeSafir,
 ];

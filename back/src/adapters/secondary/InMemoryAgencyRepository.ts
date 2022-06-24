@@ -6,6 +6,7 @@ import {
   AgencyKindFilter,
   GetAgenciesFilter as GetAgenciesFilters,
   AgencyPositionFilter,
+  PartialAgencyDto,
 } from "shared/src/agency/agency.dto";
 import { createLogger } from "../../utils/logger";
 import { AgencyDto } from "shared/src/agency/agency.dto";
@@ -136,11 +137,11 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return config.id;
   }
 
-  public async update(agency: AgencyDto) {
+  public async update(agency: PartialAgencyDto) {
     if (!this._agencies[agency.id]) {
       throw new Error(`Agency ${agency.id} does not exist`);
     }
-    this._agencies[agency.id] = agency;
+    this._agencies[agency.id] = { ...this._agencies[agency.id], ...agency };
   }
 
   public async getImmersionFacileIdByKind(): Promise<AgencyId> {

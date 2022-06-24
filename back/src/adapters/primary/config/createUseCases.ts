@@ -62,6 +62,8 @@ import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/u
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/PrivateListAgencies";
+import { UpdateAgency } from "../../../domain/convention/useCases/UpdateAgency";
+import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
 
 export type UseCases = ReturnType<typeof createUseCases>;
 
@@ -226,7 +228,9 @@ export const createUseCases = (
     listAgenciesWithPosition: new ListAgenciesWithPosition(repositories.agency),
     privateListAgencies: new PrivateListAgencies(repositories.agency),
     getAgencyPublicInfoById: new GetAgencyPublicInfoById(repositories.agency),
-
+    sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
+      repositories.email,
+    ),
     // notifications
     confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature:
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
@@ -321,5 +325,6 @@ export const createUseCases = (
       createNewEvent,
       config.defaultAdminEmail,
     ),
+    updateAgency: new UpdateAgency(uowPerformer, createNewEvent),
   };
 };

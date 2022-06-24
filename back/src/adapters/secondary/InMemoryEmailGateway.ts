@@ -16,6 +16,7 @@ import type {
   ValidatedConventionFinalConfirmationParams,
   PoleEmploiAdvisorOnConventionAssociationParams,
   PoleEmploiAdvisorOnConventionFullysignedParams,
+  AgencyWasActivatedParams,
 } from "../../domain/convention/ports/EmailGateway";
 
 import {
@@ -356,6 +357,18 @@ export class InMemoryEmailGateway implements EmailGateway {
     this.sentEmails.push({
       type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
       recipients: [recipient],
+      cc: [],
+      params,
+    });
+  }
+  public async sendAgencyWasActivated(
+    recipients: string[],
+    params: AgencyWasActivatedParams,
+  ): Promise<void> {
+    logger.info({ recipients, params }, "sendAgencyWasActivated");
+    this.sentEmails.push({
+      type: "AGENCY_WAS_ACTIVATED",
+      recipients,
       cc: [],
       params,
     });

@@ -173,6 +173,11 @@ export type ShareDraftConventionByLinkParams = {
   conventionFormUrl: string; //< APPLICATION_FORM_LINK
 };
 
+// AGENCY_WAS_ACTIVATED
+export type AgencyWasActivatedParams = {
+  agencyName: string;
+};
+
 export type EmailType =
   | "NEW_CONVENTION_BENEFICIARY_CONFIRMATION"
   | "NEW_CONVENTION_MENTOR_CONFIRMATION"
@@ -195,7 +200,8 @@ export type EmailType =
   | "EDIT_FORM_ESTABLISHMENT_LINK"
   | "SUGGEST_EDIT_FORM_ESTABLISHMENT"
   | "SHARE_DRAFT_CONVENTION_BY_LINK"
-  | "CREATE_IMMERSION_ASSESSMENT";
+  | "CREATE_IMMERSION_ASSESSMENT"
+  | "AGENCY_WAS_ACTIVATED";
 
 export interface EmailGateway {
   sendImmersionAssessmentCreationLink: (
@@ -294,5 +300,9 @@ export interface EmailGateway {
   sendShareDraftConventionByLink: (
     recipient: string,
     params: ShareDraftConventionByLinkParams,
+  ) => Promise<void>;
+  sendAgencyWasActivated: (
+    recipients: string[],
+    params: AgencyWasActivatedParams,
   ) => Promise<void>;
 }

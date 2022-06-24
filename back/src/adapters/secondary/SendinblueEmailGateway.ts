@@ -23,6 +23,7 @@ import type {
   ValidatedConventionFinalConfirmationParams,
   PoleEmploiAdvisorOnConventionAssociationParams,
   PoleEmploiAdvisorOnConventionFullysignedParams,
+  AgencyWasActivatedParams,
 } from "../../domain/convention/ports/EmailGateway";
 import {
   EmailGateway,
@@ -118,6 +119,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/42/message-setup
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: 42,
+
+  //TODO TODO TODO
+  AGENCY_WAS_ACTIVATED: 43,
 };
 
 export class SendinblueEmailGateway implements EmailGateway {
@@ -528,6 +532,15 @@ export class SendinblueEmailGateway implements EmailGateway {
         MAGIC_LINK: params.magicLink,
       },
     );
+  }
+
+  public async sendAgencyWasActivated(
+    recipients: string[],
+    params: AgencyWasActivatedParams,
+  ): Promise<void> {
+    await this.sendTransacEmail("AGENCY_WAS_ACTIVATED", recipients, {
+      AGENCY_NAME: params.agencyName,
+    });
   }
 
   private async sendTransacEmail(

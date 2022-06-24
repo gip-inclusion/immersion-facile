@@ -309,9 +309,12 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("update", () => {
-    const agency1 = agency1builder.withPosition(40, 2).build();
+    const agency1 = agency1builder
+      .withPosition(40, 2)
+      .withStatus("needsReview")
+      .build();
 
-    it("updates entities", async () => {
+    it("updates the entire entity", async () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
       await agencyRepository.insert(agency1);
@@ -329,6 +332,20 @@ describe("PgAgencyRepository", () => {
       const inDb = await agencyRepository.getAgencies({});
       expect(inDb).toHaveLength(1);
       expectTypeToMatchAndEqual(inDb[0], updatedAgency1);
+    });
+    it("updates the only some fields", async () => {
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
+
+      await agencyRepository.insert(agency1);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
+
+      await agencyRepository.update({
+        id: agency1.id,
+        status: "active",
+      });
+      const inDb = await agencyRepository.getAgencies({});
+      expect(inDb).toHaveLength(1);
+      expectTypeToMatchAndEqual(inDb[0], { ...agency1, status: "active" });
     });
   });
 

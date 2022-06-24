@@ -19,6 +19,8 @@ export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
   codeSafir?: string;
 };
 
+export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
+
 export type AgencyId = Flavor<string, "AgencyId">;
 
 export type WithAgencyId = {
@@ -82,6 +84,11 @@ export type AgencyPublicDisplayDto = Pick<
   CreateAgencyDto,
   "id" | "name" | "address" | "position" | "logoUrl"
 >;
+
+export type UpdateAgencyRequestDto = Partial<Pick<AgencyDto, "status">> & {
+  // | "name" | "logoUrl" | "address" (coming soon.)
+  id: AgencyId;
+};
 
 export type CreateAgencyDto = {
   id: AgencyId;

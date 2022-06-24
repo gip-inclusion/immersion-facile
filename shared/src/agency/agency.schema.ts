@@ -11,6 +11,7 @@ import {
   PrivateListAgenciesRequestDto,
   allAgencyStatuses,
   AgencyDto,
+  UpdateAgencyRequestDto,
 } from "./agency.dto";
 import { latLonSchema } from "../latLon";
 import {
@@ -79,5 +80,11 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z.object({
 
 export const privateListAgenciesRequestSchema: z.ZodSchema<PrivateListAgenciesRequestDto> =
   z.object({
+    status: agencyStatusSchema.optional(),
+  });
+
+export const updateAgencyRequestSchema: z.ZodSchema<UpdateAgencyRequestDto> =
+  z.object({
+    id: agencyIdSchema,
     status: agencyStatusSchema.optional(),
   });

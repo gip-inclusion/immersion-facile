@@ -1,11 +1,21 @@
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { agenciesRoute } from "shared/src/routes";
-import supertest, { SuperTest, Test } from "supertest";
-import { createApp } from "../../adapters/primary/server";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { SuperTest, Test } from "supertest";
+import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
+import {
+  buildTestApp,
+  InMemoryRepositories,
+} from "../../_testBuilders/buildTestApp";
 
 describe("/agencies route", () => {
   let request: SuperTest<Test>;
+  let reposAndGateways: InMemoryRepositories;
+  let eventCrawler: BasicEventCrawler;
+
+  beforeEach(async () => {
+    ({ request, reposAndGateways, eventCrawler } = await buildTestApp());
+  });
+
   const agency1ActiveNearBy = AgencyDtoBuilder.create("test-agency-1")
     .withName("Test Agency 1")
     .withStatus("active")
@@ -23,33 +33,23 @@ describe("/agencies route", () => {
     .withStatus("active")
     .withPosition(1, 2)
     .build();
-
   const agency4NeedsReview = AgencyDtoBuilder.create("test-agency-4")
     .withName("Test Agency 4")
     .withStatus("needsReview")
+    .withValidatorEmails(["emmanuelle@email.com"])
     .build();
 
-  beforeEach(async () => {
-    const { app, repositories } = await createApp(
-      new AppConfigBuilder().build(),
-    );
-    request = supertest(app);
-
-    // Prepare
-    const agencyRepo = repositories.agency;
-
-    await Promise.all(
-      [
-        agency1ActiveNearBy,
-        agency2ActiveNearBy,
-        agency3ActiveFarAway,
-        agency4NeedsReview,
-      ].map(async (agencyDto) => agencyRepo.insert(agencyDto)),
-    );
-  });
-
-  describe("public route", () => {
+  describe("public route to get agencies with name and position given filters", () => {
     it("returns agency list with name and position nearby a given position", async () => {
+      // Prepare
+      await Promise.all(
+        [
+          agency1ActiveNearBy,
+          agency2ActiveNearBy,
+          agency3ActiveFarAway,
+          agency4NeedsReview,
+        ].map(async (agencyDto) => reposAndGateways.agency.insert(agencyDto)),
+      );
       // Act and asseer
       await request.get(`/agencies?lat=10.123&lon=10.123`).expect(200, [
         {
@@ -65,13 +65,41 @@ describe("/agencies route", () => {
       ]);
     });
   });
-  describe("private route", () => {
-    it("Returns all agency dto with a given status", async () => {
+  describe("private route to get agencies full dto given filters", () => {
+    it("Returns all agency dtos with a given status", async () => {
+      // Prepare
+      await Promise.all(
+        [agency1ActiveNearBy, agency4NeedsReview].map(async (agencyDto) =>
+          reposAndGateways.agency.insert(agencyDto),
+        ),
+      );
       // Getting the application succeeds and shows that it's validated.
       await request
         .get(`/admin/${agenciesRoute}?status=needsReview`)
         .auth("e2e_tests", "e2e")
         .expect(200, [agency4NeedsReview]);
+    });
+  });
+
+  describe("private route to update an agency", () => {
+    it("Updates the agency, sends an email to validators and returns code 200", async () => {
+      // Prepare
+      await reposAndGateways.agency.insert(agency4NeedsReview);
+
+      // Act and assert
+      await request
+        .patch(`/admin/${agenciesRoute}/test-agency-4`)
+        .auth("e2e_tests", "e2e")
+        .send({ status: "active" })
+        .expect(200);
+
+      expect(
+        (await reposAndGateways.agency.getById("test-agency-4"))?.status,
+      ).toBe("active");
+      expect(reposAndGateways.outbox.events).toHaveLength(1);
+
+      await eventCrawler.processNewEvents();
+      expect(reposAndGateways.email.getSentEmails()).toHaveLength(1);
     });
   });
 });
