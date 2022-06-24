@@ -1,8 +1,8 @@
 import React from "react";
-import { AgencyInListDto } from "shared/src/agency/agency.dto";
+import { AgencyWithPositionDto } from "shared/src/agency/agency.dto";
 
 export type AgenciesProps = {
-  agencies: AgencyInListDto[];
+  agencies: AgencyWithPositionDto[];
 };
 
 export const Agencies = ({ agencies }: AgenciesProps) => (

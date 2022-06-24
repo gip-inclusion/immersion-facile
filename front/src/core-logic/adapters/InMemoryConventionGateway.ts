@@ -1,6 +1,6 @@
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
-import { AgencyId, AgencyInListDto } from "shared/src/agency/agency.dto";
+import { AgencyId, AgencyWithPositionDto } from "shared/src/agency/agency.dto";
 import { signConventionDtoWithRole } from "shared/src/convention/convention";
 import {
   ConventionStatus,
@@ -26,7 +26,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   private _conventions: { [id: string]: ConventionDto } = {
     [CONVENTION_DRAFT_TEST.id]: CONVENTION_DRAFT_TEST,
   };
-  private _agencies: { [id: string]: AgencyInListDto } = {};
+  private _agencies: { [id: string]: AgencyWithPositionDto } = {};
 
   public convention$ = new Subject<ConventionDto | undefined>();
 

@@ -4,10 +4,12 @@ import { ajax, AjaxResponse } from "rxjs/ajax";
 import {
   AgencyDto,
   AgencyId,
-  AgencyInListDto,
+  AgencyWithPositionDto,
   AgencyPublicDisplayDto,
+  AgencyStatus,
   CreateAgencyDto,
-  ListAgenciesRequestDto,
+  ListAgenciesWithPositionRequestDto,
+  UpdateAgencyRequestDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
 import { listAgenciesResponseSchema } from "shared/src/agency/agency.schema";
@@ -48,34 +50,55 @@ export class HttpAgencyGateway implements AgencyGateway {
     ).data;
   }
 
-  public listAllAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
-    const request: ListAgenciesRequestDto = { ...position };
+  public listAllAgenciesWithPosition(
+    position: LatLonDto,
+  ): Promise<AgencyWithPositionDto[]> {
+    const request: ListAgenciesWithPositionRequestDto = { ...position };
     return this.getAgencies(request);
   }
 
-  public listPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
-    const request: ListAgenciesRequestDto = { ...position, filter: "peOnly" };
+  public listPeAgencies(position: LatLonDto): Promise<AgencyWithPositionDto[]> {
+    const request: ListAgenciesWithPositionRequestDto = {
+      ...position,
+      filter: "peOnly",
+    };
     return this.getAgencies(request);
   }
 
-  public listNonPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]> {
-    const request: ListAgenciesRequestDto = {
+  public listNonPeAgencies(
+    position: LatLonDto,
+  ): Promise<AgencyWithPositionDto[]> {
+    const request: ListAgenciesWithPositionRequestDto = {
       ...position,
       filter: "peExcluded",
     };
     return this.getAgencies(request);
   }
 
-  public listAgenciesNeedingReview(): Promise<AgencyDto[]> {
-    throw new Error("Method not implemented.");
+  public async listAgenciesNeedingReview(): Promise<AgencyDto[]> {
+    const needsReviewStatus: AgencyStatus = "needsReview";
+    // const httpResponse = await axios.get(
+    //   `/${prefix}/admin/${agenciesRoute}?status=${needsReviewStatus}`,
+    // );
+    const httpResponse = await axios.get(`/${prefix}/admin/${agenciesRoute}`, {
+      params: { status: needsReviewStatus },
+    });
+    return httpResponse.data;
   }
 
-  public validateAgency(_agencyId: AgencyId): Promise<void> {
-    throw new Error("Method not implemented.");
+  public async validateAgency(agencyId: AgencyId): Promise<void> {
+    const { id, ...validateAgencyParams }: UpdateAgencyRequestDto = {
+      id: agencyId,
+      status: "active",
+    };
+    await axios.patch(
+      `/${prefix}/admin/${agenciesRoute}/${agencyId}`,
+      validateAgencyParams,
+    );
   }
   private async getAgencies(
-    request: ListAgenciesRequestDto,
-  ): Promise<AgencyInListDto[]> {
+    request: ListAgenciesWithPositionRequestDto,
+  ): Promise<AgencyWithPositionDto[]> {
     const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
       params: request,
     });

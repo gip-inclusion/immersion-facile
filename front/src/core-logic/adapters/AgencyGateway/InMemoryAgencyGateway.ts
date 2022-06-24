@@ -4,7 +4,7 @@ import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
 import {
   AgencyDto,
   AgencyId,
-  AgencyInListDto,
+  AgencyWithPositionDto,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   WithAgencyId,
@@ -62,15 +62,19 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     };
   }
 
-  async listAllAgencies(_position: LatLonDto): Promise<AgencyInListDto[]> {
+  async listAllAgenciesWithPosition(
+    _position: LatLonDto,
+  ): Promise<AgencyWithPositionDto[]> {
     return values(this._agencies);
   }
 
-  async listPeAgencies(_position: LatLonDto): Promise<AgencyInListDto[]> {
+  async listPeAgencies(_position: LatLonDto): Promise<AgencyWithPositionDto[]> {
     return values(this._agencies).filter(propEq("kind", "pole-emploi"));
   }
 
-  async listNonPeAgencies(_position: LatLonDto): Promise<AgencyInListDto[]> {
+  async listNonPeAgencies(
+    _position: LatLonDto,
+  ): Promise<AgencyWithPositionDto[]> {
     return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
   }
 

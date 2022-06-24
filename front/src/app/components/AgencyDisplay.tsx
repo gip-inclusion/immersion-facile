@@ -2,14 +2,14 @@ import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { agencyGateway } from "src/app/config/dependencies";
-import { AgencyId, AgencyInListDto } from "shared/src/agency/agency.dto";
+import { AgencyId, AgencyWithPositionDto } from "shared/src/agency/agency.dto";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
 import { LatLonDto } from "shared/src/latLon";
 
 import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
 import { Agencies } from "./Agency";
 
-const placeholderAgency: AgencyInListDto = {
+const placeholderAgency: AgencyWithPositionDto = {
   id: "",
   name: "Veuillez indiquer un code postal",
   position: { lat: 0, lon: 0 },

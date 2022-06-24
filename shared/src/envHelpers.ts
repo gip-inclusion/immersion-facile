@@ -39,7 +39,13 @@ export const makeThrowIfNotAbsoluteUrl =
   <T extends string>(variableName: T): AbsoluteUrl => {
     const value = processEnv[variableName];
     if (!value) throw new Error(`Expected ${variableName} to be Defined`);
-    return absoluteUrlSchema.parse(value);
+    try {
+      return absoluteUrlSchema.parse(value);
+    } catch (_error) {
+      throw new Error(
+        `Provided value ${value} for ${variableName} is not an absolute url.`,
+      );
+    }
   };
 
 /*

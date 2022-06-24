@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { AgencyId, AgencyInListDto } from "shared/src/agency/agency.dto";
+import { AgencyId, AgencyWithPositionDto } from "shared/src/agency/agency.dto";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
 import { LatLonDto } from "shared/src/latLon";
 import {
@@ -126,7 +126,7 @@ export const AgencySelector = ({
 const isDefaultAgencyOnAgenciesAndEnabled = (
   disabled: boolean | undefined,
   defaultAgencyId: string,
-  agencies: AgencyInListDto[],
+  agencies: AgencyWithPositionDto[],
 ) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);
 
 const agenciesRetriever = ({
@@ -138,21 +138,21 @@ const agenciesRetriever = ({
   shouldListAll: boolean;
   connectedWith: FederatedIdentity | null;
 }) => {
-  if (shouldListAll) return agencyGateway.listAllAgencies(position);
+  if (shouldListAll) return agencyGateway.listAllAgenciesWithPosition(position);
   return connectedWith && isPeConnectIdentity(connectedWith)
     ? agencyGateway.listPeAgencies(position)
-    : agencyGateway.listAllAgencies(position);
+    : agencyGateway.listAllAgenciesWithPosition(position);
   // : agencyGateway.listNonPeAgencies(position);
   // -> for easy revert when new page is ready
 };
 
-const placeholderAgency: AgencyInListDto = {
+const placeholderAgency: AgencyWithPositionDto = {
   id: "",
   name: "Veuillez indiquer un code postal",
   position: { lat: 0, lon: 0 },
 };
 
-const emptyAgency: AgencyInListDto = {
+const emptyAgency: AgencyWithPositionDto = {
   id: "",
   name: "",
   position: {

@@ -2,7 +2,7 @@ import { Observable } from "rxjs";
 import {
   AgencyDto,
   AgencyId,
-  AgencyInListDto,
+  AgencyWithPositionDto,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   WithAgencyId,
@@ -12,9 +12,11 @@ import { LatLonDto } from "shared/src/latLon";
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
 
-  listAllAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
-  listNonPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
-  listPeAgencies(position: LatLonDto): Promise<AgencyInListDto[]>;
+  listAllAgenciesWithPosition(
+    position: LatLonDto,
+  ): Promise<AgencyWithPositionDto[]>;
+  listNonPeAgencies(position: LatLonDto): Promise<AgencyWithPositionDto[]>;
+  listPeAgencies(position: LatLonDto): Promise<AgencyWithPositionDto[]>;
   listAgenciesNeedingReview(): Promise<AgencyDto[]>;
   validateAgency(agencyId: AgencyId): Promise<void>;
   getAgencyPublicInfoById(
