@@ -1,7 +1,7 @@
 import { ConventionId } from "shared/src/convention/convention.dto";
 import jwt from "jsonwebtoken";
 import {
-  emailHashForMagicLink,
+  stringToMd5,
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
@@ -146,7 +146,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     // Only renew the link if the email hash matches
     let foundHit = false;
     for (const email of emails) {
-      if (!emailHash || emailHashForMagicLink(email) === emailHash) {
+      if (!emailHash || stringToMd5(email) === emailHash) {
         foundHit = true;
         const jwt = this.generateMagicLinkJwt(
           createConventionMagicLinkPayload(

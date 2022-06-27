@@ -1,5 +1,6 @@
 import { secondsToMilliseconds } from "date-fns";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
 import {
   AccessTokenDto,
@@ -27,17 +28,22 @@ import {
   createAxiosInstance,
   PrettyAxiosResponseError,
 } from "../../utils/axiosUtils";
+import type { AxiosInstance } from "axios";
 import { createLogger } from "../../utils/logger";
 import { AccessTokenConfig } from "../primary/config/appConfig";
 import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";
 import { ManagedRedirectError } from "../primary/helpers/redirectErrors";
 
-const _logger = createLogger(__filename);
+const logger = createLogger(__filename);
 
 export class HttpPeConnectGateway implements PeConnectGateway {
   private ApiPeConnectUrls: ReturnType<typeof makeApiPeConnectUrls>;
+  private axiosInstance: AxiosInstance;
 
-  public constructor(private readonly config: AccessTokenConfig) {
+  public constructor(
+    private readonly config: AccessTokenConfig, // private readonly retryStrategy: RetryStrategy,
+  ) {
+    this.axiosInstance = createAxiosInstance(logger);
     this.ApiPeConnectUrls = makeApiPeConnectUrls({
       peAuthCandidatUrl: config.peAuthCandidatUrl,
       immersionBaseUrl: config.immersionFacileBaseUrl,
@@ -73,7 +79,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         redirect_uri: this.ApiPeConnectUrls.REGISTERED_REDIRECT_URL,
       };
 
-    const response = await createAxiosInstance(_logger)
+    const response = await createAxiosInstance(logger)
       .post(
         this.ApiPeConnectUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
         queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
@@ -99,17 +105,24 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       response.data,
     );
 
+    const accessToken = toAccessToken(externalAccessToken);
+    const trackId = stringToMd5(accessToken.value);
+    logger.info({ trackId }, "PeConnect Get Access Token Success");
+
     return toAccessToken(externalAccessToken);
   }
 
   private async getUserInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectUserDto> {
-    const response = await createAxiosInstance()
+    const trackId = stringToMd5(accessToken.value);
+    const response = await this.axiosInstance
       .get(this.ApiPeConnectUrls.PECONNECT_USER_INFO, {
         headers: headersWithAuthPeAccessToken(accessToken),
       })
       .catch((error) => {
+        logger.error({ trackId, error }, "GetUserInfo PE Error");
+
         if (!error || error.status === undefined)
           throw new ManagedRedirectError("peConnectNoValidUser", error);
 
@@ -118,6 +131,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           error,
         );
       });
+
+    logger.info({ trackId, body: response.data }, "GetUserInfo PE Response");
 
     const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
       externalPeConnectUserSchema,
@@ -130,12 +145,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   private async getAdvisorsInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectAdvisorDto[]> {
+    const trackId = stringToMd5(accessToken.value);
     const response = await createAxiosInstance()
       .get(this.ApiPeConnectUrls.PECONNECT_ADVISORS_INFO, {
         headers: headersWithAuthPeAccessToken(accessToken),
         timeout: secondsToMilliseconds(10),
       })
       .catch((error) => {
+        logger.error({ trackId, error }, "GetAdvisorsInfo PE Error");
         if (!error || error.status === undefined)
           throw new ManagedRedirectError("peConnectNoValidAdvisor", error);
 
@@ -144,6 +161,11 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           error,
         );
       });
+
+    logger.info(
+      { trackId, body: response.data },
+      "GetAdvisorsInfo PE Response",
+    );
 
     const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
       externalPeConnectAdvisorsSchema,

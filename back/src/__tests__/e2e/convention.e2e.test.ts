@@ -1,7 +1,7 @@
 import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
 import {
   currentJwtVersions,
-  emailHashForMagicLink,
+  stringToMd5,
 } from "shared/src/tokens/MagicLinkPayload";
 import { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
@@ -185,7 +185,7 @@ describe("/demandes-immersion route", () => {
         const payload = {
           applicationId: convention.id,
           role: "beneficiary" as Role,
-          emailHash: emailHashForMagicLink(convention.email),
+          emailHash: stringToMd5(convention.email),
           iat: Math.round(Date.now() / 1000),
           exp: Math.round(Date.now() / 1000) + 31 * 24 * 3600,
           version: currentJwtVersions.application,

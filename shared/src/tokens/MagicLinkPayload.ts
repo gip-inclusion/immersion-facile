@@ -42,7 +42,7 @@ export type ConventionMagicLinkPayload = {
   emailHash: string; //< md5 of email
 };
 
-export const emailHashForMagicLink = (str: string) =>
+export const stringToMd5 = (str: string) =>
   crypto.createHash("md5").update(str).digest("hex");
 
 export const createConventionMagicLinkPayload = (
@@ -60,7 +60,7 @@ export const createConventionMagicLinkPayload = (
   role,
   iat,
   exp,
-  emailHash: emailHashForMagicLink(email),
+  emailHash: stringToMd5(email),
 });
 
 type JwtPayload = {
