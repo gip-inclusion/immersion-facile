@@ -246,7 +246,6 @@ export const createUseCases = (
       ),
     notifyAllActorsOfFinalConventionValidation:
       new NotifyAllActorsOfFinalApplicationValidation(
-        emailFilter,
         repositories.email,
         repositories.agency,
       ),

@@ -5,54 +5,58 @@ import {
   prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
-import { createLogger } from "../../../../utils/logger";
-import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyRepository";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   EmailGateway,
   ValidatedConventionFinalConfirmationParams,
 } from "../../ports/EmailGateway";
-import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 
-const logger = createLogger(__filename);
-export class NotifyAllActorsOfFinalApplicationValidation extends UseCase<ConventionDto> {
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+
+export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUseCase<ConventionDto> {
   constructor(
-    private readonly emailFilter: EmailFilter,
+    uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly agencyRepository: AgencyRepository,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = conventionSchema;
 
-  public async _execute(dto: ConventionDto): Promise<void> {
-    logger.info({ ConventionId: dto.id }, "------------- Entering execute.");
+  public async _execute(
+    convention: ConventionDto,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    const agency = await uow.agencyRepo.getById(convention.agencyId);
 
-    const agency = await this.agencyRepository.getById(dto.agencyId);
-    if (!agency) {
-      throw new Error(
-        `Unable to send mail. No agency config found for ${dto.agencyId}`,
+    if (!agency)
+      throw new NotFoundError(
+        `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
-    }
+
+    const peUserAdvisorOrUndefined =
+      await uow.conventionPoleEmploiAdvisorRepo.getByConventionId(
+        convention.id,
+      );
 
     const recipients = [
-      dto.email,
-      dto.mentorEmail,
+      convention.email,
+      convention.mentorEmail,
       ...agency.counsellorEmails,
       ...agency.validatorEmails,
+      ...getPeAdvisorEmailIfExist(peUserAdvisorOrUndefined),
     ];
 
-    await this.emailFilter.withAllowedRecipients(
+    await this.emailGateway.sendValidatedConventionFinalConfirmation(
       recipients,
-      (recipients) =>
-        this.emailGateway.sendValidatedConventionFinalConfirmation(
-          recipients,
-          getValidatedApplicationFinalConfirmationParams(agency, dto),
-        ),
-      logger,
+      getValidatedApplicationFinalConfirmationParams(agency, convention),
     );
   }
 }
@@ -91,3 +95,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
   signature: agency.signature,
   workConditions: dto.workConditions,
 });
+
+const getPeAdvisorEmailIfExist = (
+  advisor: ConventionPoleEmploiUserAdvisorEntity | undefined,
+): [string] | [] => (advisor?.email ? [advisor.email] : []);
