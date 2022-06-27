@@ -68,13 +68,14 @@ export class PgAgencyRepository implements AgencyRepository {
         )}, position)`
       : "";
 
-    const pgResult = await this.client.query(
-      `SELECT *, ST_AsGeoJSON(position) AS position
-       FROM public.agencies 
-       ${whereClause}
-       ${limitClause}
-       ${sortClause}`,
-    );
+    const query = `SELECT *, ST_AsGeoJSON(position) AS position
+    FROM public.agencies
+    ${whereClause}
+    ${limitClause}
+    ${sortClause}`;
+
+    const pgResult = await this.client.query(query);
+
     return pgResult.rows.map(pgToEntity);
   }
 

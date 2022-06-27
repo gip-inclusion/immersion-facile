@@ -15,7 +15,7 @@ import {
   agencyKindList,
   CreateAgencyDto,
 } from "shared/src/agency/agency.dto";
-import { agencySchema } from "shared/src/agency/agency.schema";
+import { createAgencySchema } from "shared/src/agency/agency.schema";
 import { zEmail } from "shared/src/zodUtils";
 import { Button, Title } from "react-design-system/immersionFacile";
 import { FillableList } from "src/uiComponents/form/FillableList";
@@ -64,7 +64,7 @@ export const AddAgencyPage = () => {
         <Title>Ajout d'organisme encadrant les PMSMP</Title>
         <Formik
           initialValues={initialValues}
-          validationSchema={toFormikValidationSchema(agencySchema)}
+          validationSchema={toFormikValidationSchema(createAgencySchema)}
           onSubmit={(values) =>
             agencyGateway
               .addAgency({
