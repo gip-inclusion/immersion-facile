@@ -1,4 +1,4 @@
-import { z, preprocess } from "zod";
+import { preprocess, z } from "zod";
 
 export const zString = z
   .string({
@@ -33,16 +33,17 @@ export const zBoolean = z.boolean({
   invalid_type_error: "Un booléen est attendu",
 });
 
-export const zPreprocessedBoolean = (schema: z.ZodBoolean = z.boolean()) =>
-  preprocess((a) => {
-    if (typeof a === "boolean") return a;
-    const aLowerCase = zTrimmedString.parse(a).toLowerCase();
-    const parsedA = z.enum(["true", "false"]).optional().parse(aLowerCase);
-    if (parsedA) return parsedA.toLowerCase() === "true";
-  }, schema);
+export const zPreprocessedBoolean = () =>
+  preprocess((candidate) => {
+    if (typeof candidate !== "string") return candidate;
+    return candidate.toLowerCase() === "true";
+  }, z.boolean());
 
-export const zPreprocessedNumber = (schema: z.ZodNumber = z.number()) =>
-  preprocess((a) => {
-    if (typeof a === "number") return a;
-    return parseFloat(z.string().parse(a));
+export const zPreprocessedNumber = (schema = z.number()) =>
+  preprocess((nAsString) => {
+    if (typeof nAsString !== "string") return nAsString;
+    const n = parseFloat(nAsString);
+    if (isNaN(n))
+      throw new Error(`'${nAsString}' cannot be converted to number`);
+    return n;
   }, schema);

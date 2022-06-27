@@ -174,13 +174,15 @@ describe("search-immersion route", () => {
             },
           },
         ];
-        await request
+        const response = await request
           .get(
             `/v1/immersion-offers?rome=A1000&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }))
-          .expect(200, expectedResult);
+          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }));
+        expect(response.body).toEqual(expectedResult);
+        expect(response.status).toBe(200);
       });
+
       it("with no specified rome", async () => {
         await request
           .get(
