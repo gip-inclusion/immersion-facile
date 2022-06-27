@@ -71,8 +71,8 @@ export class PgAgencyRepository implements AgencyRepository {
     const query = `SELECT *, ST_AsGeoJSON(position) AS position
     FROM public.agencies
     ${whereClause}
-    ${limitClause}
-    ${sortClause}`;
+    ${sortClause}
+    ${limitClause}`;
 
     const pgResult = await this.client.query(query);
 

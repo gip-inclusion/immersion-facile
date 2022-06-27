@@ -26,9 +26,8 @@ export const AgencyTab = () => {
   const [activationButtonDisabled, setActivationButtonDisabled] =
     useState(true);
 
-  const [activationResult, setActivationResult] = useState<
-    ActivationResult | undefined
-  >();
+  const [activationResult, setActivationResult] =
+    useState<ActivationResult | undefined>();
 
   const fetchAgenciesNeedingReview = () => {
     agencyGateway.listAgenciesNeedingReview().then(
@@ -81,11 +80,19 @@ export const AgencyTab = () => {
         fetchAgenciesNeedingReview();
       });
   };
+
+  const numberOfAgenciesToReview = agenciesNeedingReview.length;
+
   return (
     <div>
       <DsfrTitle level={5} text="Activer des agences" />
       <WithBackground>
         <div className="w-2/3">
+          {numberOfAgenciesToReview > 0
+            ? `${numberOfAgenciesToReview} agence${
+                numberOfAgenciesToReview === 1 ? "" : "s"
+              } en attente d'activation`
+            : "Aucune agence en attente d'activation"}
           <ArrayDropdown
             label="Sélectionner une agence"
             options={agenciesNeedingReview.map(prop("name"))}
