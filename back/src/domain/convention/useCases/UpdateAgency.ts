@@ -23,12 +23,12 @@ export class UpdateAgency extends TransactionalUseCase<
   ): Promise<void> {
     if (status) await uow.agencyRepo.update({ id, status });
     if (status === "active") {
-      const agencyDto = await uow.agencyRepo.getById(id);
-      if (agencyDto)
+      const agency = await uow.agencyRepo.getById(id);
+      if (agency)
         await uow.outboxRepo.save(
           this.createNewEvent({
             topic: "AgencyActivated",
-            payload: agencyDto,
+            payload: { agency },
           }),
         );
     }

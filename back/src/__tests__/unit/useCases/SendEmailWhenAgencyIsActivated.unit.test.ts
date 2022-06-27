@@ -13,7 +13,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       .build();
 
     // Act
-    await useCase.execute(updatedAgency);
+    await useCase.execute({ agency: updatedAgency });
 
     // Assert
     const sentEmails = emailGateway.getSentEmails();

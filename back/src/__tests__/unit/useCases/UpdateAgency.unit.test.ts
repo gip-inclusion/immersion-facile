@@ -52,7 +52,7 @@ describe("Update agency", () => {
     expect(outboxRepo.events[0]).toMatchObject({
       id: nextUuid,
       topic: "AgencyActivated",
-      payload: { ...existingAgency, status: "active" },
+      payload: { agency: { ...existingAgency, status: "active" } },
     });
   });
 });
