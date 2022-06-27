@@ -2,10 +2,13 @@ import { Request, Response } from "express";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { AuthChecker } from "../../../domain/auth/AuthChecker";
 import { deleteFileAndParentFolder } from "../../../utils/filesystemUtils";
+import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { handleHttpResponseError } from "./handleHttpResponseError";
 import { ManagedRedirectError, RawRedirectError } from "./redirectErrors";
 import { unhandledError } from "./unhandledError";
+
+const logger = createLogger(__filename);
 
 const authenticationCheck = (req: Request, authChecker?: AuthChecker): void => {
   if (authChecker) {
@@ -46,7 +49,22 @@ export const sendRedirectResponse = async (
     const redirectUrl = await callback();
     res.status(302);
     return res.redirect(redirectUrl);
-  } catch (error: unknown) {
+  } catch (error: any) {
+    const stack = JSON.stringify(error.stack, null, 2);
+    logger.error(
+      {
+        error,
+        errorMessage: error.message,
+        stack,
+        request: {
+          path: req.path,
+          method: req.method,
+          body: req.body,
+        },
+      },
+      "Redirect error",
+    );
+
     if (error instanceof ManagedRedirectError)
       return handleManagedRedirectResponseError(error, res);
 

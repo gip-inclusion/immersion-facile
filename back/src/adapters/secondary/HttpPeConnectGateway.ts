@@ -86,7 +86,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       )
       .catch((error: any) => {
         if (isInvalidGrantError(error))
-          throw new ManagedRedirectError("peConnectInvalidGrant");
+          throw new ManagedRedirectError("peConnectInvalidGrant", error);
 
         throw PrettyAxiosResponseError(
           "PeConnect Get Access Token Failure",
@@ -111,7 +111,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       })
       .catch((error) => {
         if (!error || error.status === undefined)
-          throw new ManagedRedirectError("peConnectNoValidUser");
+          throw new ManagedRedirectError("peConnectNoValidUser", error);
 
         throw PrettyAxiosResponseError(
           "PeConnect Get User Info Failure",
@@ -137,7 +137,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       })
       .catch((error) => {
         if (!error || error.status === undefined)
-          throw new ManagedRedirectError("peConnectNoValidAdvisor");
+          throw new ManagedRedirectError("peConnectNoValidAdvisor", error);
 
         throw PrettyAxiosResponseError(
           "PeConnect Get Advisor Info Failure",
