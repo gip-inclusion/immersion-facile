@@ -1,0 +1,41 @@
+name: Destroy scalingo application on feature/* branch deletion
+
+on:
+  delete:
+    branches:
+      - feature/*
+  workflow_dispatch:
+
+env:
+  application-name: 'immersion-facile'
+
+jobs:
+  dynamic-variables:
+    outputs:
+      application-name: ${{ steps.application-name.outputs.value }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Application name from env variable
+        id: application-name
+        run: |
+          APPLICATION_NAME=${{ env.application-name }}
+          echo "::set-output name=value::$APPLICATION_NAME"
+
+  get-deleted-branch-ref:
+    runs-on: ubuntu-latest
+    outputs:
+      deleted-branch-ref: ${{ steps.deleted-branch-ref.outputs.branch-ref }}
+    steps:
+      - name: Get the deleted branch reference without the 'feature/' prefix
+        id: deleted-branch-ref
+        run: echo "::set-output name=branch-ref::$(echo ${{ github.event.ref }} | cut -d'/' -f 2)"
+
+  destroy-deployed-application:
+    needs:
+      - dynamic-variables
+      - get-deleted-branch-ref
+    uses: ./.github/workflows/_destroy-application.scalingo.reusable.yml
+    with:
+      application-alias: ${{ format('{0}-{1}', needs.dynamic-variables.outputs.application-name, needs.get-deleted-branch-ref.outputs.deleted-branch-ref) }}
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
