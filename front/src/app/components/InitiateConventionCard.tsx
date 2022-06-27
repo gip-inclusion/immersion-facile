@@ -1,16 +1,15 @@
 import { keys } from "ramda";
 import React from "react";
 import { ButtonHome } from "react-design-system";
-import { useDispatch } from "react-redux";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { Section } from "src/app/components/Section";
 import { deviceRepository } from "src/app/config/dependencies";
 import { ConventionPageRoute } from "src/app/pages/Convention/ConventionPage";
 import { PeConnectButton } from "src/app/pages/Convention/PeConnectButton";
 import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
-import { routes, useRoute } from "src/app/routing/routes";
+import { useRoute } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { useRedirectToConventionWithoutIdentityProvider } from "src/hooks/redirections.hooks";
 
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionPageRoute["params"],
@@ -26,8 +25,9 @@ const storeConventionRouteParamsOnDevice = (
 
 export const InitiateConventionCard = () => {
   const { enablePeConnectApi } = useFeatureFlags();
-  const dispatch = useDispatch();
   const currentRoute = useRoute();
+  const redirectToConventionWithoutIdentityProvider =
+    useRedirectToConventionWithoutIdentityProvider();
 
   return (
     <Section type="candidate">
@@ -63,12 +63,7 @@ export const InitiateConventionCard = () => {
         {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
         <ButtonHome
           type="error"
-          onClick={() => {
-            dispatch(
-              authSlice.actions.federatedIdentityProvided("noIdentityProvider"),
-            );
-            if (currentRoute.name !== "convention") routes.convention().push();
-          }}
+          onClick={redirectToConventionWithoutIdentityProvider}
         >
           Je demande une convention
         </ButtonHome>

@@ -1,4 +1,5 @@
 import React from "react";
+import { routes } from "src/app/routing/routes";
 
 export const PEConnectNoAuthorisation = () => (
   <div role="alert" className={`fr-alert fr-alert--warning`}>
@@ -9,14 +10,22 @@ export const PEConnectNoAuthorisation = () => (
     Vous avez refusé d'accorder les autorisations nécessaires sur l'interface
     Pôle Emploi Connect.
     <br />
-    <a href="https://immersion-facile.beta.gouv.fr">
+    <br />
+    <button
+      className="text-immersionBlue-dark font-sans"
+      onClick={() => {
+        routes.home().push();
+      }}
+    >
       {" "}
       Revenir à la page d'accueil.{" "}
-    </a>
+    </button>
     <br />
-    En cas de questionnement,{" "}
+    <br />
+    En cas de questionnement, n'hésitez pas à nous contacter par email sur
+    <br />
     <a href="mailto:contact@immersion-facile.com">
-      n'hésitez pas à nous contacter par email ici.
+      contact@immersion-facile.com
     </a>
   </div>
 );
