@@ -26,8 +26,9 @@ export const AgencyTab = () => {
   const [activationButtonDisabled, setActivationButtonDisabled] =
     useState(true);
 
-  const [activationResult, setActivationResult] =
-    useState<ActivationResult | undefined>();
+  const [activationResult, setActivationResult] = useState<
+    ActivationResult | undefined
+  >();
 
   const fetchAgenciesNeedingReview = () => {
     agencyGateway.listAgenciesNeedingReview().then(

@@ -114,6 +114,23 @@ describe("PgAgencyRepository", () => {
         agencyAddedFromPeReferenciel,
       ]);
     });
+
+    it("returns all agencies filtered on statuses, respecting provided limit and position", async () => {
+      await Promise.all([
+        agencyRepository.insert(agency1PE),
+        agencyRepository.insert(agency2MissionLocale),
+        agencyRepository.insert(agencyAddedFromPeReferenciel),
+        agencyRepository.insert(inactiveAgency),
+      ]);
+
+      const agencies = await agencyRepository.getAgencies({
+        filters: {
+          position: { position: { lat: 0, lon: 0 }, distance_km: 10 },
+        },
+        limit: 2,
+      });
+      expect(sortById(agencies)).toEqual([agency2MissionLocale, agency1PE]);
+    });
     it("if agencyKindFilter = 'peOnly', returns only pe agencies", async () => {
       await Promise.all([
         agencyRepository.insert(agency1PE),
