@@ -51,11 +51,11 @@ export const ImmersionConditionsCommonFields = ({
       />
       <br />
       <SchedulePicker
-        name="schedule"
-        setFieldValue={(x) => {
-          setFieldValue("schedule", x);
-        }}
         disabled={disabled}
+        interval={{
+          start: new Date(values.dateStart),
+          end: new Date(values.dateEnd),
+        }}
       />
       <br />
       <TextInput

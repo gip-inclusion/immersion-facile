@@ -5,49 +5,49 @@ import { ButtonDelete, ButtonAdd } from "react-design-system/immersionFacile";
 
 type HourPickerProps = {
   name: string;
-  schedule: Array<TimePeriodDto>;
-  onValueChange: (schedule: Array<TimePeriodDto>) => void;
+  timePeriods: Array<TimePeriodDto>;
+  onValueChange: (timePeriods: Array<TimePeriodDto>) => void;
   disabled?: boolean;
 };
 export const HourPicker = ({
   name,
-  schedule,
+  timePeriods,
   onValueChange,
   disabled,
 }: HourPickerProps) => {
   const add = () => {
-    let start = "--:--";
-    let end = "--:--";
-    if (schedule.length > 0) {
+    let start = "09:00";
+    let end = "09:00";
+    if (timePeriods.length > 0) {
       // Autofill next period as end of current period + 1h,
       // w/ duration of 1h.
-      const last = schedule[schedule.length - 1];
+      const last = timePeriods[timePeriods.length - 1];
       const endH = last.end.split(":").map(Number)[0];
       if (endH < 22) {
         start = (endH + 1).toString() + ":00";
         end = (endH + 2).toString() + ":00";
       }
     }
-    schedule.push({ start, end });
-    onValueChange(schedule);
+    timePeriods.push({ start, end });
+    onValueChange(timePeriods);
   };
 
   return (
     <>
       <div className="col"></div>
-      {schedule.length > 0 &&
-        schedule.map((hours, index) => {
+      {timePeriods.length > 0 &&
+        timePeriods.map((hours, index) => {
           const onStartChange = (index: number, value: string) => {
-            schedule[index].start = value;
-            onValueChange(schedule);
+            timePeriods[index].start = value;
+            onValueChange(timePeriods);
           };
           const onEndChange = (index: number, value: string) => {
-            schedule[index].end = value;
-            onValueChange(schedule);
+            timePeriods[index].end = value;
+            onValueChange(timePeriods);
           };
           const remove = (index: number) => {
-            schedule.splice(index, 1);
-            onValueChange(schedule);
+            timePeriods.splice(index, 1);
+            onValueChange(timePeriods);
           };
 
           return (

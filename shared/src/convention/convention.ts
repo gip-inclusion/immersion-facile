@@ -65,7 +65,10 @@ export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
   mentor: "Alain Prost",
   mentorPhone: "0601010101",
   mentorEmail: "alain@prost.fr",
-  schedule: reasonableSchedule,
+  schedule: reasonableSchedule({
+    start: new Date("2021-08-01"),
+    end: new Date("2021-08-31"),
+  }),
   legacySchedule: undefined,
   workConditions: undefined,
   immersionAddress: "75001 Centre du monde",

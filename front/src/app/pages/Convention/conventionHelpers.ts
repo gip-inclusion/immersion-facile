@@ -50,6 +50,9 @@ export const conventionInitialValuesFromUrl = (
     route.params as Partial<ConventionPresentation>,
   );
 
+  const dateStart =
+    params.dateStart ?? toDateString(addDays(startOfToday(), 2));
+  const dateEnd = params.dateEnd ?? toDateString(addDays(startOfToday(), 3));
   const initialFormWithStoredAndUrlParams = {
     id: uuidV4(),
     status: "DRAFT" as ConventionStatus,
@@ -69,8 +72,8 @@ export const conventionInitialValuesFromUrl = (
     emergencyContact: params.emergencyContact ?? "",
     emergencyContactPhone: params.emergencyContactPhone ?? "",
 
-    dateStart: params.dateStart ?? toDateString(addDays(startOfToday(), 2)),
-    dateEnd: params.dateEnd ?? toDateString(addDays(startOfToday(), 3)),
+    dateStart,
+    dateEnd,
 
     // Enterprise
     siret: params.siret ?? "",
@@ -78,7 +81,12 @@ export const conventionInitialValuesFromUrl = (
     mentor: params.mentor ?? "",
     mentorPhone: params.mentorPhone ?? "",
     mentorEmail: params.mentorEmail ?? "",
-    schedule: params.schedule ?? reasonableSchedule,
+    schedule:
+      params.schedule ??
+      reasonableSchedule({
+        start: new Date(dateStart),
+        end: new Date(dateEnd),
+      }),
     immersionAddress: params.immersionAddress ?? "",
     agencyId: params.agencyId ?? undefined,
     workConditions: params.workConditions ?? "",

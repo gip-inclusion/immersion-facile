@@ -1,63 +1,164 @@
-import { addDays } from "date-fns";
+import { addDays, getDay, parseISO } from "date-fns";
 import {
   ComplexScheduleDto,
+  DailyScheduleDto,
+  DayPeriodsDto,
   LegacyScheduleDto,
+  RegularScheduleDto,
   ScheduleDto,
-  SimpleScheduleDto,
   TimePeriodDto,
+  TimePeriodsDto,
+  Weekday,
+  WeekDayRangeSchemaDTO,
   weekdays,
 } from "./ScheduleSchema";
 
-const minutesInDay = (timePeriods: TimePeriodDto[]): number =>
-  timePeriods.reduce(
-    (totalMinutes, period) => totalMinutes + timePeriodDuration(period),
-    0,
-  );
+export type WeeklyImmersionTimetableDto = {
+  dailySchedule: DailyScheduleDto | null;
+  key: number;
+}[];
 
-export const calculateHoursOfComplexSchedule = (
-  complexSchedule: ComplexScheduleDto,
-): number =>
-  complexSchedule.reduce(
-    (minutesInWeek, day) => minutesInWeek + minutesInDay(day),
-    0,
-  ) / 60;
+type ImmersionTimeTable = WeeklyImmersionTimetableDto[];
 
-// Calculate total hours per week for a given schedule.
-export const calculateWeeklyHoursFromSchedule = (schedule: ScheduleDto) => {
-  if (schedule.isSimple) {
-    let numberOfDays = 0;
-    for (const period of schedule.simpleSchedule.dayPeriods) {
-      numberOfDays += period[1] - period[0] + 1;
-    }
-    let numberOfHours = 0;
-    for (const period of schedule.simpleSchedule.hours) {
-      numberOfHours += timePeriodDuration(period);
-    }
+export const emptyRegularSchedule: RegularScheduleDto = {
+  dayPeriods: [[0, 6]],
+  timePeriods: [],
+};
+export const maxPermittedHoursPerWeek = 35;
 
-    return (numberOfDays * numberOfHours) / 60;
-  } else {
-    return calculateHoursOfComplexSchedule(schedule.complexSchedule);
-  }
+type WeekdayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+type UniversalDayMappingToFrenchCalendar = {
+  universalDay: WeekdayNumber;
+  frenchDay: WeekdayNumber;
+  frenchDayName: Weekday;
 };
 
-export const maxPermittedHoursPerWeek = 35;
+const dayOfWeekMapping: UniversalDayMappingToFrenchCalendar[] = [
+  { frenchDayName: "lundi", frenchDay: 0, universalDay: 1 },
+  { frenchDayName: "mardi", frenchDay: 1, universalDay: 2 },
+  { frenchDayName: "mercredi", frenchDay: 2, universalDay: 3 },
+  { frenchDayName: "jeudi", frenchDay: 3, universalDay: 4 },
+  { frenchDayName: "vendredi", frenchDay: 4, universalDay: 5 },
+  { frenchDayName: "samedi", frenchDay: 5, universalDay: 6 },
+  { frenchDayName: "dimanche", frenchDay: 6, universalDay: 0 },
+];
+
+// Calculate total hours per week for a given schedule.
+export const calculateWeeklyHoursFromSchedule = (schedule: ScheduleDto) =>
+  makeImmersionTimetable(schedule.complexSchedule).map((week) =>
+    calculateWeeklyHours(week),
+  );
+
+export const isArrayOfWeekdays = (value: any): boolean =>
+  Array.isArray(value) && value.every((el) => weekdays.includes(el));
+
+export const prettyPrintDayFromSchedule = (
+  schedule: ScheduleDto,
+  dayIndex: number,
+): string => {
+  const complexSchedule = schedule.complexSchedule;
+  return prettyPrintDaySchedule(complexSchedule[dayIndex].timePeriods);
+};
+
+type DatesOfImmersion = {
+  dateStart: string;
+  dateEnd: string;
+};
+
+type CalculateTotalHoursProps = DatesOfImmersion & {
+  schedule: ScheduleDto;
+};
+
+export const calculateTotalImmersionHoursBetweenDate = ({
+  schedule,
+  ...dates
+}: CalculateTotalHoursProps): number =>
+  calculateTotalImmersionHoursBetweenDateComplex({
+    complexSchedule: schedule.complexSchedule,
+    ...dates,
+  });
+
+export const complexScheduleFromRegularSchedule = (
+  complexSchedule: ComplexScheduleDto,
+  regularSchedule: RegularScheduleDto,
+): ComplexScheduleDto => {
+  const isDailyScheduleOnRegularDayPeriod = (
+    dailySchedule: DailyScheduleDto,
+    regularDayPeriods: DayPeriodsDto,
+  ): boolean =>
+    regularDayPeriods.some(([startWorkingDay, endWorkingDay]) => {
+      for (
+        let currentWorkingDay = startWorkingDay;
+        currentWorkingDay <= endWorkingDay;
+        currentWorkingDay++
+      ) {
+        if (
+          currentWorkingDay === frenchDayMapping(dailySchedule.date).frenchDay
+        )
+          return true;
+      }
+      return false;
+    });
+  for (let index = complexSchedule.length - 1; index >= 0; index--) {
+    const check = isDailyScheduleOnRegularDayPeriod(
+      complexSchedule[index],
+      regularSchedule.dayPeriods,
+    );
+    if (check) complexSchedule[index].timePeriods = regularSchedule.timePeriods;
+    else complexSchedule.splice(index, 1);
+  }
+  return complexSchedule;
+};
+
+export const prettyPrintSchedule = (schedule: ScheduleDto): string =>
+  prettyPrintComplexSchedule(schedule.complexSchedule);
+
+// Extract all weekday names for which there is at least one
+export const convertToFrenchNamedDays = (schedule: ScheduleDto) => {
+  const complexSchedule = schedule.complexSchedule;
+  return complexSchedule
+    .filter((daily) => daily.timePeriods.length > 0)
+    .map((daily) => weekdays[frenchDayMapping(daily.date).frenchDay]);
+};
+
+export const frenchDayMapping = (
+  date: Date | string,
+): UniversalDayMappingToFrenchCalendar => {
+  if (!(date instanceof Date)) date = parseISO(date);
+  const universalDay = getDay(date);
+  const mapping = dayOfWeekMapping.find(
+    (value) => value.universalDay === universalDay,
+  );
+  if (mapping !== undefined) return mapping;
+  throw new Error(
+    `Universal day index ${universalDay} of date ${date} missing on dayMapping: ${JSON.stringify(
+      dayOfWeekMapping,
+    )}`,
+  );
+};
+
+const minutesInDay = (timePeriods: TimePeriodDto[]): number =>
+  timePeriods.reduce(
+    (totalMinutes, period) => totalMinutes + timePeriodDurationMinutes(period),
+    0,
+  );
 
 const periodStringToHoursMinutes = (s: string) => {
   const [hour, minute] = s.split(":").map(Number);
   return [hour, minute];
 };
 
-const timePeriodDuration = (period: TimePeriodDto) => {
+const timePeriodDurationMinutes = (period: TimePeriodDto) => {
   const [startHour, startMinute] = periodStringToHoursMinutes(period.start);
   const [endHour, endMinute] = periodStringToHoursMinutes(period.end);
   return Math.max(0, (endHour - startHour) * 60 + endMinute - startMinute);
 };
 
-const checkTimePeriodPositive = (period: TimePeriodDto) => {
+const isTimePeriodPositive = (period: TimePeriodDto) => {
   const [startHour, startMinute] = periodStringToHoursMinutes(period.start);
   const [endHour, endMinute] = periodStringToHoursMinutes(period.end);
   const duration = (endHour - startHour) * 60 + endMinute - startMinute;
-
   return duration > 0;
 };
 
@@ -67,7 +168,7 @@ const periodStringToMinutesFromMidnight = (s: string) => {
 };
 
 // Returns true if the two periods overlap (for at least one minute).
-const checkTimePeriodsOverlap = (
+const isPeriodsOverlap = (
   period1: TimePeriodDto,
   period2: TimePeriodDto,
 ): boolean => {
@@ -76,125 +177,59 @@ const checkTimePeriodsOverlap = (
   const period2Start = periodStringToMinutesFromMidnight(period2.start);
 
   // Force ordering
-  if (period1Start > period2Start) {
-    return checkTimePeriodsOverlap(period2, period1);
-  }
-
-  return period2Start < period1End;
-};
-
-export const checkSimpleSchedule = (schedule: SimpleScheduleDto) => {
-  if (schedule.dayPeriods.length === 0) {
-    return "Selectionnez au moins un jour !";
-  }
-
-  for (
-    let periodIndex = 0;
-    periodIndex < schedule.hours.length;
-    periodIndex++
-  ) {
-    const period = schedule.hours[periodIndex];
-    if (!checkTimePeriodPositive(period)) {
-      return (
-        "La plage horaire " +
-        (periodIndex + 1) +
-        " " +
-        periodToHumanReadableString(period) +
-        " est incorrecte. L'heure de début doit précéder l'heure de fin. "
-      );
-    }
-  }
-
-  // Check if all periods are positive.
-  schedule.hours.forEach((period: TimePeriodDto, index: number) => {
-    if (!checkTimePeriodPositive(period)) {
-      return "La plage horaire " + index.toString() + " est incorrecte !";
-    }
-  });
-
-  // Check if any periods overlap.
-  for (let i = 0; i < schedule.hours.length; i++) {
-    for (let j = i + 1; j < schedule.hours.length; j++) {
-      const period1 = schedule.hours[i];
-      const period2 = schedule.hours[j];
-      if (checkTimePeriodsOverlap(schedule.hours[i], schedule.hours[j])) {
-        return (
-          "Les plages horaires " +
-          periodToHumanReadableString(period1) +
-          " et " +
-          periodToHumanReadableString(period2) +
-          " se chevauchent !"
-        );
-      }
-    }
-  }
+  return period1Start > period2Start
+    ? isPeriodsOverlap(period2, period1)
+    : period2Start < period1End;
 };
 
 // Generates a string in format: "(09:00 - 13:00)"
 const periodToHumanReadableString = (period: TimePeriodDto): string =>
   "(" + period.start + " - " + period.end + ")";
 
-export const checkComplexSchedule = (schedule: ComplexScheduleDto) => {
-  for (let dayIndex = 0; dayIndex < schedule.length; dayIndex++) {
-    const day = schedule[dayIndex];
-    for (let periodIndex = 0; periodIndex < day.length; periodIndex++) {
-      const period = day[periodIndex];
+export const isScheduleValid = (schedule: ScheduleDto) => {
+  const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule);
+  for (const [totalHoursIndex, totalHours] of totalWeeksHours.entries()) {
+    if (totalHours > maxPermittedHoursPerWeek)
+      return `Veuillez saisir moins de ${maxPermittedHoursPerWeek}h pour la semaine ${
+        totalHoursIndex + 1
+      }.`;
+  }
+  for (const dailySchedule of schedule.complexSchedule) {
+    for (const [periodIndex, period] of dailySchedule.timePeriods.entries()) {
       // Check if all periods are positive.
-      if (!checkTimePeriodPositive(period)) {
-        return (
-          "La plage horaire " +
-          (periodIndex + 1) +
-          " " +
-          periodToHumanReadableString(period) +
-          " de " +
-          weekdays[dayIndex] +
-          " incorrecte. L'heure de début doit précéder l'heure de fin. "
-        );
-      }
+      if (!isTimePeriodPositive(period))
+        return `La plage horaire ${
+          periodIndex + 1
+        } ${periodToHumanReadableString(period)} du ${toFrenchReadableDate(
+          dailySchedule.date,
+        )} est incorrecte. L'heure de début doit précéder l'heure de fin.`;
 
       // Check for overlap with other periods
-      for (let j = periodIndex + 1; j < day.length; j++) {
-        const otherPeriod = day[j];
-        if (checkTimePeriodsOverlap(period, otherPeriod)) {
-          return (
-            "Les plages horaires " +
-            periodToHumanReadableString(period) +
-            " et " +
-            periodToHumanReadableString(otherPeriod) +
-            " de " +
-            weekdays[dayIndex] +
-            " se chevauchent !"
-          );
-        }
+      for (const [
+        otherPeriodIndex,
+        otherPeriod,
+      ] of dailySchedule.timePeriods.entries()) {
+        if (
+          periodIndex !== otherPeriodIndex &&
+          isPeriodsOverlap(period, otherPeriod)
+        )
+          return `Les plages horaires ${
+            periodIndex + 1
+          } ${periodToHumanReadableString(period)} et ${
+            otherPeriodIndex + 1
+          } ${periodToHumanReadableString(
+            otherPeriod,
+          )} du ${toFrenchReadableDate(dailySchedule.date)} se chevauchent.`;
       }
     }
   }
+  const totalScheduleHours = totalWeeksHours.reduce((a, b) => a + b, 0);
+  if (totalScheduleHours === 0) return "Veuillez remplir les horaires.";
 };
 
-export const checkSchedule = (schedule: ScheduleDto) => {
-  if (schedule.isSimple) {
-    return checkSimpleSchedule(schedule.simpleSchedule);
-  } else {
-    return checkComplexSchedule(schedule.complexSchedule);
-  }
-};
-
-// Converts a SimpleScheduleDto to its corresponding ComplexSchduleDto representation.
-const convertSimpleToComplexSchedule = (
-  simpleSchedule: SimpleScheduleDto,
-): ComplexScheduleDto => {
-  const complexSchedule: ComplexScheduleDto = Array.from(
-    { length: 7 },
-    () => [],
-  );
-  simpleSchedule.dayPeriods.forEach((dayPeriod) => {
-    for (let dayIndex = dayPeriod[0]; dayIndex <= dayPeriod[1]; dayIndex++) {
-      complexSchedule[dayIndex] = complexSchedule[dayIndex].concat(
-        simpleSchedule.hours,
-      );
-    }
-  });
-  return complexSchedule;
+const toFrenchReadableDate = (date: Date) => {
+  if (!(date instanceof Date)) date = parseISO(date);
+  `${date.getDate()}/${date.getMonth() + 1}`;
 };
 
 // Converts an array of TimePeriodDto to a readable schedule, e.g.
@@ -222,23 +257,23 @@ const prettyPrintDaySchedule = (timePeriods: TimePeriodDto[]): string => {
 const prettyPrintComplexSchedule = (
   complexSchedule: ComplexScheduleDto,
 ): string => {
-  const lines: string[] = weekdays.map(
-    (dayLabel: string, dayIndex: number) =>
-      dayLabel + " : " + prettyPrintDaySchedule(complexSchedule[dayIndex]),
-  );
-
-  const hours = calculateHoursOfComplexSchedule(complexSchedule);
-  lines.unshift(`Heures de travail hebdomadaires : ${hours}`);
+  const lines: string[] = [];
+  makeImmersionTimetable(complexSchedule).forEach((week) => {
+    lines.push(
+      `Heures de travail hebdomadaires : ${calculateWeeklyHours(week)}`,
+    );
+    week.forEach((day, index) =>
+      lines.push(
+        day.dailySchedule
+          ? `${
+              weekdays[getIndexInWeekFromMonday(day.dailySchedule.date)]
+            } : ${prettyPrintDaySchedule(day.dailySchedule.timePeriods)}`
+          : `${weekdays[index]} : libre`,
+      ),
+    );
+  });
   return lines.join("\n");
 };
-
-const prettyPrintSimpleSchedule = (simpleSchedule: SimpleScheduleDto): string =>
-  prettyPrintComplexSchedule(convertSimpleToComplexSchedule(simpleSchedule));
-
-export const prettyPrintSchedule = (schedule: ScheduleDto): string =>
-  schedule.isSimple
-    ? prettyPrintSimpleSchedule(schedule.simpleSchedule)
-    : prettyPrintComplexSchedule(schedule.complexSchedule);
 
 export const prettyPrintLegacySchedule = (
   schedule: LegacyScheduleDto,
@@ -248,84 +283,9 @@ export const prettyPrintLegacySchedule = (
     schedule.description,
   ].join("\n");
 
-// Extract all weekday names for which there is at least one
-export const convertToFrenchNamedDays = (aSchedule: ScheduleDto) => {
-  const complexSchedule = aSchedule.isSimple
-    ? convertSimpleToComplexSchedule(aSchedule.simpleSchedule)
-    : aSchedule.complexSchedule;
-
-  return weekdays.filter(
-    (_dayLabel, dayIndex) => complexSchedule[dayIndex].length > 0,
-  );
-};
-
-export const isArrayOfWeekdays = (value: any): boolean =>
-  Array.isArray(value) && value.every((el) => weekdays.includes(el));
-
-export const prettyPrintDayFromSchedule = (
-  schedule: ScheduleDto,
-  dayIndex: number,
-): string => {
-  const complexSchedule = schedule.isSimple
-    ? convertSimpleToComplexSchedule(schedule.simpleSchedule)
-    : schedule.complexSchedule;
-  return prettyPrintDaySchedule(complexSchedule[dayIndex]);
-};
-
-type DatesOfImmersion = {
-  dateStart: string;
-  dateEnd: string;
-};
-
-type CalculateTotalHoursProps = DatesOfImmersion & {
-  schedule: ScheduleDto;
-};
-
-export const calculateTotalImmersionHoursBetweenDate = ({
-  schedule,
-  ...dates
-}: CalculateTotalHoursProps): number => {
-  if (schedule.isSimple)
-    return calculateTotalImmersionHoursBetweenDateSimple({
-      simpleSchedule: schedule.simpleSchedule,
-      ...dates,
-    });
-
-  return calculateTotalImmersionHoursBetweenDateComplex({
-    complexSchedule: schedule.complexSchedule,
-    ...dates,
-  });
-};
-
 const getIndexInWeekFromMonday = (date: Date) => {
   const dayIndex = date.getDay();
   return dayIndex === 0 ? 6 : dayIndex - 1;
-};
-
-const calculateTotalImmersionHoursBetweenDateSimple = ({
-  dateStart,
-  dateEnd,
-  simpleSchedule,
-}: DatesOfImmersion & { simpleSchedule: SimpleScheduleDto }): number => {
-  const start = new Date(dateStart);
-  const end = new Date(dateEnd);
-
-  let totalOfHours = 0;
-
-  for (
-    let currentDate = start;
-    currentDate <= end;
-    currentDate = addDays(currentDate, 1)
-  ) {
-    const indexInWeek = getIndexInWeekFromMonday(currentDate);
-    const isDayInSchedule = simpleSchedule.dayPeriods.some(
-      (period) => period[0] <= indexInWeek && indexInWeek <= period[1],
-    );
-    if (!isDayInSchedule) continue;
-    totalOfHours += minutesInDay(simpleSchedule.hours) / 60;
-  }
-
-  return totalOfHours;
 };
 
 const calculateTotalImmersionHoursBetweenDateComplex = ({
@@ -333,23 +293,128 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
   dateEnd,
   complexSchedule,
 }: DatesOfImmersion & { complexSchedule: ComplexScheduleDto }): number => {
-  const minutesOfWorkByDay = complexSchedule.map(minutesInDay);
-
-  const start = new Date(dateStart);
-  const end = new Date(dateEnd);
-
+  const start = parseISO(dateStart);
+  const end = parseISO(dateEnd);
   let totalOfMinutes = 0;
-
   for (
     let currentDate = start;
     currentDate <= end;
     currentDate = addDays(currentDate, 1)
   ) {
-    const indexInWeek = getIndexInWeekFromMonday(currentDate);
-    const numberOfMinutesInDay = minutesOfWorkByDay[indexInWeek];
-    if (!numberOfMinutesInDay) continue;
-    totalOfMinutes += numberOfMinutesInDay;
+    const date = complexSchedule.find(
+      (dailySchedule) =>
+        dailySchedule.date.getDate() === currentDate.getDate() &&
+        dailySchedule.date.getMonth() === currentDate.getMonth() &&
+        dailySchedule.date.getFullYear() === currentDate.getFullYear(),
+    );
+    if (date) totalOfMinutes += minutesInDay(date.timePeriods);
   }
-
   return totalOfMinutes / 60;
+};
+
+export const dayPeriodsFromComplexSchedule = (
+  complexSchedule: ComplexScheduleDto,
+): DayPeriodsDto => {
+  const dayPeriods: DayPeriodsDto = [];
+  let currentWeekDayRange: null | WeekDayRangeSchemaDTO = null;
+  const weekDayAlreadyInUse: WeekdayNumber[] = [];
+  function addPeriod(currentWeekDayRange: number[]) {
+    if (
+      !dayPeriods.some(
+        (dayPeriod) =>
+          JSON.stringify(dayPeriod) === JSON.stringify(currentWeekDayRange),
+      )
+    )
+      dayPeriods.push(currentWeekDayRange);
+  }
+  makeImmersionTimetable(complexSchedule).forEach((week) => {
+    week.forEach((day) => {
+      if (weekDayAlreadyInUse.length < 7) {
+        if (day.dailySchedule) {
+          const frenchDay = frenchDayMapping(day.dailySchedule.date).frenchDay;
+          if (!weekDayAlreadyInUse.includes(frenchDay)) {
+            if (!Array.isArray(currentWeekDayRange))
+              currentWeekDayRange = [frenchDay];
+            currentWeekDayRange[1] = frenchDay;
+            weekDayAlreadyInUse.push(frenchDay);
+          }
+        }
+        if (!day.dailySchedule && currentWeekDayRange) {
+          addPeriod(currentWeekDayRange);
+          currentWeekDayRange = null;
+        }
+      }
+    });
+    if (currentWeekDayRange !== null) {
+      addPeriod(currentWeekDayRange);
+      currentWeekDayRange = null;
+    }
+  });
+  dayPeriods.sort((a, b) => a[0] - b[0]);
+  return dayPeriods;
+};
+
+export const makeImmersionTimetable = (
+  complexSchedule: ComplexScheduleDto,
+): ImmersionTimeTable => {
+  const calendar: WeeklyImmersionTimetableDto[] = [];
+  const lastDayOfTheWeekIndex = 6;
+  applyDaysWithScheduleOnTimetable(complexSchedule, calendar);
+  applyDaysWithoutScheduleOnTimetable(calendar, lastDayOfTheWeekIndex);
+  return calendar;
+};
+
+const applyDaysWithoutScheduleOnTimetable = (
+  calendar: WeeklyImmersionTimetableDto[],
+  lastDayOfTheWeekIndex: number,
+) => {
+  let outOfRangeDayskey = 10000;
+  for (let weekIndex = 0; weekIndex < calendar.length; weekIndex++) {
+    for (let dayIndex = 0; dayIndex <= lastDayOfTheWeekIndex; dayIndex++) {
+      if (calendar[weekIndex][dayIndex] === undefined) {
+        calendar[weekIndex][dayIndex] = {
+          dailySchedule: null,
+          key: outOfRangeDayskey,
+        };
+        outOfRangeDayskey++;
+      }
+    }
+  }
+};
+
+const applyDaysWithScheduleOnTimetable = (
+  complexSchedule: ComplexScheduleDto,
+  calendar: WeeklyImmersionTimetableDto[],
+) => {
+  let currentWeekIndex = 0;
+  let higherWeekDay = 0;
+  complexSchedule.forEach((dailySchedule, dayIndex) => {
+    const frenchDay = frenchDayMapping(dailySchedule.date).frenchDay;
+    if (frenchDay < higherWeekDay) currentWeekIndex++;
+    if (calendar.at(currentWeekIndex) === undefined) calendar.push([]);
+    calendar[currentWeekIndex][frenchDay] = {
+      dailySchedule,
+      key: dayIndex,
+    };
+    higherWeekDay = frenchDay;
+  });
+};
+
+export const calculateWeeklyHours = (
+  week: WeeklyImmersionTimetableDto,
+): number =>
+  week.reduce(
+    (previousValue, currentDay) =>
+      currentDay.dailySchedule
+        ? previousValue +
+          minutesInDay(currentDay.dailySchedule.timePeriods) / 60
+        : previousValue,
+    0,
+  );
+
+export const regularTimePeriods = (schedule: ScheduleDto): TimePeriodsDto => {
+  const scheduleWithTimePeriods = schedule.complexSchedule.find(
+    (dailySchedule) => dailySchedule.timePeriods.length > 0,
+  );
+  return scheduleWithTimePeriods ? scheduleWithTimePeriods.timePeriods : [];
 };

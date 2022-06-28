@@ -1,51 +1,139 @@
-import { weekdays } from "shared/src/schedule/ScheduleSchema";
+import {
+  weekdays,
+  makeDailySchedule,
+} from "shared/src/schedule/ScheduleSchema";
+
+import { ScheduleDtoBuilder } from "shared/src/schedule/ScheduleDtoBuilder";
 import {
   calculateTotalImmersionHoursBetweenDate,
+  complexScheduleFromRegularSchedule,
   convertToFrenchNamedDays,
   isArrayOfWeekdays,
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
-import { ScheduleDtoBuilder } from "shared/src/schedule/ScheduleDtoBuilder";
 
-const complexSchedule = new ScheduleDtoBuilder()
-  .withComplexSchedule([
-    [{ start: "01:00", end: "02:00" }],
-    [],
-    [],
-    [
-      { start: "01:00", end: "02:00" },
-      { start: "03:00", end: "04:00" },
-    ],
-    [],
-    [],
-    [
-      { start: "01:00", end: "02:00" },
-      { start: "03:00", end: "04:00" },
-      { start: "05:00", end: "06:00" },
-    ],
-  ])
-  .build();
+const complexSchedule = () =>
+  new ScheduleDtoBuilder()
+    .withComplexSchedule([
+      makeDailySchedule(new Date("2022-06-13"), [
+        { start: "01:00", end: "02:00" },
+      ]),
+      makeDailySchedule(new Date("2022-06-14"), []),
+      makeDailySchedule(new Date("2022-06-15"), []),
+      makeDailySchedule(new Date("2022-06-16"), [
+        { start: "01:00", end: "02:00" },
+        { start: "03:00", end: "04:00" },
+      ]),
+      makeDailySchedule(new Date("2022-06-17"), []),
+      makeDailySchedule(new Date("2022-06-18"), []),
+      makeDailySchedule(new Date("2022-06-19"), [
+        { start: "01:00", end: "02:00" },
+        { start: "03:00", end: "04:00" },
+        { start: "05:00", end: "06:00" },
+      ]),
+    ])
+    .build();
 
-const simpleSchedule = new ScheduleDtoBuilder()
-  .withSimpleSchedule({
-    dayPeriods: [
-      [0, 0],
-      [2, 3],
-      [6, 6],
-    ],
-    hours: [
-      { start: "01:00", end: "02:00" },
-      { start: "03:00", end: "04:00" },
-    ],
-  })
-  .build();
+const regularSchedule = () =>
+  new ScheduleDtoBuilder()
+    .withRegularSchedule({
+      dayPeriods: [
+        [0, 0],
+        [2, 3],
+        [6, 6],
+      ],
+      timePeriods: [
+        { start: "01:00", end: "02:00" },
+        { start: "03:00", end: "04:00" },
+      ],
+    })
+    .build();
 
 describe("ScheduleUtils", () => {
+  describe("complexScheduleFromRegularSchedule", () => {
+    const timePeriods = [{ start: "08:00", end: "10:00" }];
+    it("with empty regular schedule and same days", () => {
+      const scheduleFromEmptyComplexSchedule = new ScheduleDtoBuilder()
+        .withEmptyComplexSchedule({
+          start: new Date("2022-06-25"),
+          end: new Date("2022-06-26"),
+        })
+        .build();
+
+      expect(
+        complexScheduleFromRegularSchedule(
+          scheduleFromEmptyComplexSchedule.complexSchedule,
+          {
+            dayPeriods: [[5, 6]],
+            timePeriods,
+          },
+        ),
+      ).toEqual(
+        new ScheduleDtoBuilder()
+          .withComplexSchedule([
+            { date: new Date("2022-06-25"), timePeriods },
+            { date: new Date("2022-06-26"), timePeriods },
+          ])
+          .build().complexSchedule,
+      );
+    });
+    describe("with updated regular schedule dayPeriods", () => {
+      const scheduleFromEmptyComplexSchedule = new ScheduleDtoBuilder()
+        .withEmptyComplexSchedule({
+          start: new Date("2022-06-22"),
+          end: new Date("2022-07-03"),
+        })
+        .build();
+      it("initial dayPeriods", () => {
+        expect(
+          complexScheduleFromRegularSchedule(
+            scheduleFromEmptyComplexSchedule.complexSchedule,
+            {
+              dayPeriods: [[0, 1]],
+              timePeriods,
+            },
+          ),
+        ).toEqual(
+          new ScheduleDtoBuilder()
+            .withComplexSchedule([
+              { date: new Date("2022-06-27"), timePeriods },
+              { date: new Date("2022-06-28"), timePeriods },
+            ])
+            .build().complexSchedule,
+        );
+      });
+      it("updated dayPeriods", () => {
+        expect(
+          complexScheduleFromRegularSchedule(
+            new ScheduleDtoBuilder()
+              .withEmptyComplexSchedule({
+                start: new Date("2022-06-22"),
+                end: new Date("2022-07-03"),
+              })
+              .build().complexSchedule,
+            {
+              dayPeriods: [[2, 3]],
+              timePeriods,
+            },
+          ),
+        ).toEqual(
+          new ScheduleDtoBuilder()
+            .withComplexSchedule([
+              { date: new Date("2022-06-22"), timePeriods },
+              { date: new Date("2022-06-23"), timePeriods },
+              { date: new Date("2022-06-29"), timePeriods },
+              { date: new Date("2022-06-30"), timePeriods },
+            ])
+            .build().complexSchedule,
+        );
+      });
+    });
+  });
   describe("prettyPrintSchedule", () => {
     it("prints complex schedules", () => {
       expect(
         prettyPrintSchedule(
-          new ScheduleDtoBuilder().withEmptySimpleSchedule().build(),
+          new ScheduleDtoBuilder().withEmptyRegularSchedule().build(),
         ).split("\n"),
       ).toEqual([
         "Heures de travail hebdomadaires : 0",
@@ -57,7 +145,7 @@ describe("ScheduleUtils", () => {
         "samedi : libre",
         "dimanche : libre",
       ]);
-      expect(prettyPrintSchedule(complexSchedule).split("\n")).toEqual([
+      expect(prettyPrintSchedule(complexSchedule()).split("\n")).toEqual([
         "Heures de travail hebdomadaires : 6",
         "lundi : 01:00-02:00",
         "mardi : libre",
@@ -73,7 +161,7 @@ describe("ScheduleUtils", () => {
     it("prints simple schedules", () => {
       expect(
         prettyPrintSchedule(
-          new ScheduleDtoBuilder().withEmptySimpleSchedule().build(),
+          new ScheduleDtoBuilder().withEmptyRegularSchedule().build(),
         ).split("\n"),
       ).toEqual([
         "Heures de travail hebdomadaires : 0",
@@ -85,7 +173,7 @@ describe("ScheduleUtils", () => {
         "samedi : libre",
         "dimanche : libre",
       ]);
-      expect(prettyPrintSchedule(simpleSchedule).split("\n")).toEqual([
+      expect(prettyPrintSchedule(regularSchedule()).split("\n")).toEqual([
         "Heures de travail hebdomadaires : 8",
         "lundi : 01:00-02:00, 03:00-04:00",
         "mardi : libre",
@@ -102,10 +190,15 @@ describe("ScheduleUtils", () => {
     it("converts complex schedule", () => {
       expect(
         convertToFrenchNamedDays(
-          new ScheduleDtoBuilder().withEmptyComplexSchedule().build(),
+          new ScheduleDtoBuilder()
+            .withEmptyComplexSchedule({
+              start: new Date(2022, 6, 13),
+              end: new Date(2022, 6, 19),
+            })
+            .build(),
         ),
       ).toEqual([]);
-      expect(convertToFrenchNamedDays(complexSchedule)).toEqual([
+      expect(convertToFrenchNamedDays(complexSchedule())).toEqual([
         "lundi",
         "jeudi",
         "dimanche",
@@ -115,10 +208,10 @@ describe("ScheduleUtils", () => {
     it("converts simple schedule", () => {
       expect(
         convertToFrenchNamedDays(
-          new ScheduleDtoBuilder().withEmptySimpleSchedule().build(),
+          new ScheduleDtoBuilder().withEmptyRegularSchedule().build(),
         ),
       ).toEqual([]);
-      expect(convertToFrenchNamedDays(simpleSchedule)).toEqual([
+      expect(convertToFrenchNamedDays(regularSchedule())).toEqual([
         "lundi",
         "mercredi",
         "jeudi",
@@ -145,13 +238,17 @@ describe("ScheduleUtils", () => {
 
   describe("calculateTotalImmersionHoursBetweenDate", () => {
     describe("with simple schedule", () => {
-      const simpleScheduleClassic = new ScheduleDtoBuilder()
-        .withSimpleSchedule({
+      const regularScheduleClassic = new ScheduleDtoBuilder()
+        .withEmptyComplexSchedule({
+          start: new Date("2022-06-04"),
+          end: new Date("2022-06-28"),
+        })
+        .withRegularSchedule({
           dayPeriods: [
             [0, 0],
             [2, 3],
           ],
-          hours: [
+          timePeriods: [
             { start: "09:00", end: "12:30" },
             { start: "14:00", end: "18:00" },
           ],
@@ -160,36 +257,45 @@ describe("ScheduleUtils", () => {
 
       it("give hours time when immersion last only one day", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-04-04",
-          dateEnd: "2022-04-04",
-          schedule: simpleScheduleClassic,
+          dateStart: "2022-06-13",
+          dateEnd: "2022-06-13",
+          schedule: regularScheduleClassic,
         });
         expect(totalHours).toBe(7.5);
       });
 
-      it("has no hours if the day is not one of the worked day", () => {
+      it("has no hours if the day is out of immersion date range", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-04-05",
-          dateEnd: "2022-04-05",
-          schedule: simpleScheduleClassic,
+          dateStart: "2022-06-03",
+          dateEnd: "2022-06-03",
+          schedule: regularScheduleClassic,
         });
         expect(totalHours).toBe(0);
       });
 
-      it("calculate the some of days worked", () => {
+      it("has no hours if the day is not one of the worked day", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-04-04",
-          dateEnd: "2022-04-07",
-          schedule: simpleScheduleClassic,
+          dateStart: "2022-06-12",
+          dateEnd: "2022-06-12",
+          schedule: regularScheduleClassic,
+        });
+        expect(totalHours).toBe(0);
+      });
+
+      it("calculate the some of days worked on same week", () => {
+        const totalHours = calculateTotalImmersionHoursBetweenDate({
+          dateStart: "2022-06-13",
+          dateEnd: "2022-06-19",
+          schedule: regularScheduleClassic,
         });
         expect(totalHours).toBe(22.5);
       });
 
       it("calculate the some of days worked even on several weeks", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-04-04",
-          dateEnd: "2022-04-18",
-          schedule: simpleScheduleClassic,
+          dateStart: "2022-06-04",
+          dateEnd: "2022-06-20",
+          schedule: regularScheduleClassic,
         });
         expect(totalHours).toBe(52.5);
       });
@@ -198,27 +304,47 @@ describe("ScheduleUtils", () => {
     describe("with complex schedule", () => {
       const complexSchedule = new ScheduleDtoBuilder()
         .withComplexSchedule([
-          [{ start: "08:00", end: "12:00" }],
-          [],
-          [],
-          [
+          makeDailySchedule(new Date("2022-06-13"), [
+            { start: "08:00", end: "12:00" },
+          ]),
+          makeDailySchedule(new Date("2022-06-14"), []),
+          makeDailySchedule(new Date("2022-06-15"), []),
+          makeDailySchedule(new Date("2022-06-16"), [
             { start: "06:00", end: "12:00" },
             { start: "18:00", end: "22:00" },
-          ],
-          [],
-          [],
-          [
+          ]),
+          makeDailySchedule(new Date("2022-06-17"), []),
+          makeDailySchedule(new Date("2022-06-18"), []),
+          makeDailySchedule(new Date("2022-06-19"), [
             { start: "02:00", end: "06:00" },
             { start: "07:00", end: "10:00" },
             { start: "19:00", end: "21:00" },
-          ],
+          ]),
+          makeDailySchedule(new Date("2022-06-20"), [
+            { start: "08:00", end: "12:00" },
+          ]),
+          makeDailySchedule(new Date("2022-06-21"), []),
+          makeDailySchedule(new Date("2022-06-22"), []),
+          makeDailySchedule(new Date("2022-06-23"), [
+            { start: "06:00", end: "12:00" },
+            { start: "18:00", end: "22:00" },
+          ]),
+          makeDailySchedule(new Date("2022-06-24"), []),
+          makeDailySchedule(new Date("2022-06-25"), [
+            { start: "07:00", end: "11:00" },
+          ]),
+          makeDailySchedule(new Date("2022-06-26"), [
+            { start: "02:00", end: "06:00" },
+            { start: "07:00", end: "10:00" },
+            { start: "19:00", end: "21:00" },
+          ]),
         ])
         .build();
 
       it("give day hours when immersion last only one day", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-04-04",
-          dateEnd: "2022-04-04",
+          dateStart: "2022-06-13",
+          dateEnd: "2022-06-13",
           schedule: complexSchedule,
         });
         expect(totalHours).toBe(4);
@@ -226,8 +352,8 @@ describe("ScheduleUtils", () => {
 
       it("has no hours if the day is not one of the worked day", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-04-05",
-          dateEnd: "2022-04-05",
+          dateStart: "2022-06-18",
+          dateEnd: "2022-06-18",
           schedule: complexSchedule,
         });
         expect(totalHours).toBe(0);
@@ -235,8 +361,8 @@ describe("ScheduleUtils", () => {
 
       it("calculate the some of days worked", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-04-04",
-          dateEnd: "2022-04-10",
+          dateStart: "2022-06-13",
+          dateEnd: "2022-06-19",
           schedule: complexSchedule,
         });
         expect(totalHours).toBe(23);
@@ -244,78 +370,36 @@ describe("ScheduleUtils", () => {
 
       it("calculate the some of days worked even on several weeks", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022-04-04",
-          dateEnd: "2022-04-18",
+          dateStart: "2022-06-13",
+          dateEnd: "2022-06-26",
           schedule: complexSchedule,
         });
         expect(totalHours).toBe(50);
       });
     });
-    describe("with complex schedule that return 0 on prod from Excel sample but OK on unit test", () => {
+    describe("with complex schedule that return 0 if bad date string format", () => {
       const complexSchedule = new ScheduleDtoBuilder()
-        .withComplexSchedule([
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
+        .withEmptyComplexSchedule({
+          start: new Date("2022-06-13"),
+          end: new Date("2022-07-11"),
+        })
+        .withRegularSchedule({
+          dayPeriods: [[0, 4]],
+          timePeriods: [
+            { end: "12:00", start: "08:00" },
+            { end: "16:40", start: "14:00" },
           ],
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
-          ],
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
-          ],
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
-          ],
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
-          ],
-          [],
-          [],
-        ])
+        })
         .build();
 
       it("has 140 hours with good date format.", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
-          dateStart: "2022/04/11",
-          dateEnd: "2022/05/08",
+          dateStart: "2022-06-13",
+          dateEnd: "2022-07-11",
           schedule: complexSchedule,
         });
         expect(totalHours).toBe(140);
       });
-    });
-    describe("with complex schedule that return 0 on prod from PG sample and 0 on unit test", () => {
-      const complexSchedule = new ScheduleDtoBuilder()
-        .withComplexSchedule([
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
-          ],
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
-          ],
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
-          ],
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
-          ],
-          [
-            { end: "12:30", start: "08:00" },
-            { end: "16:30", start: "14:00" },
-          ],
-          [],
-          [],
-        ])
-        .build();
-
       it("has no hours if the start and end dates are in french format", () => {
         const totalHours = calculateTotalImmersionHoursBetweenDate({
           dateStart: "11/04/2022",

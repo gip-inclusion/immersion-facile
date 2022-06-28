@@ -1,30 +1,45 @@
+import { Builder } from "../Builder";
 import type {
   ComplexScheduleDto,
+  DateInterval,
   ScheduleDto,
-  SimpleScheduleDto,
+  RegularScheduleDto,
 } from "./ScheduleSchema";
 import { emptySchedule } from "./ScheduleSchema";
-import { Builder } from "../Builder";
+import {
+  complexScheduleFromRegularSchedule,
+  emptyRegularSchedule,
+} from "./ScheduleUtils";
+
+const defaultInterval: DateInterval = {
+  start: new Date("2022-06-13"),
+  end: new Date("2022-06-19"),
+};
 
 export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
-  constructor(private dto: ScheduleDto = emptySchedule) {}
+  constructor(private dto: ScheduleDto = emptySchedule(defaultInterval)) {}
 
-  public withEmptySimpleSchedule(): ScheduleDtoBuilder {
-    return this.withSimpleSchedule(emptySchedule.simpleSchedule);
+  public withEmptyRegularSchedule(): ScheduleDtoBuilder {
+    return this.withRegularSchedule(emptyRegularSchedule);
   }
 
-  public withSimpleSchedule(
-    simpleSchedule: SimpleScheduleDto,
+  public withRegularSchedule(
+    regularSchedule: RegularScheduleDto,
   ): ScheduleDtoBuilder {
+    const complexSchedule = complexScheduleFromRegularSchedule(
+      this.dto.complexSchedule,
+      regularSchedule,
+    );
+
     return new ScheduleDtoBuilder({
       ...this.dto,
       isSimple: true,
-      simpleSchedule,
+      complexSchedule,
     });
   }
 
-  public withEmptyComplexSchedule(): ScheduleDtoBuilder {
-    return this.withComplexSchedule(emptySchedule.complexSchedule);
+  public withEmptyComplexSchedule(interval: DateInterval): ScheduleDtoBuilder {
+    return this.withComplexSchedule(emptySchedule(interval).complexSchedule);
   }
 
   public withComplexSchedule(

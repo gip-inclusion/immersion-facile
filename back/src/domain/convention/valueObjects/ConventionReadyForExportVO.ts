@@ -14,7 +14,7 @@ export type ConventionReadyForExportVO = OmitFromExistingKeys<
   beneficiaryAccepted: string;
   enterpriseAccepted: string;
   totalHours: number;
-  weeklyHours: number;
+  weeklyHours: number[];
   monday: string;
   tuesday: string;
   wednesday: string;

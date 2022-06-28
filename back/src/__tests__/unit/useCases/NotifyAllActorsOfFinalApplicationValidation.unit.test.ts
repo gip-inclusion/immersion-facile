@@ -131,7 +131,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .build();
 
     const expectedParams: ValidatedConventionFinalConfirmationParams = {
-      totalHours: 56,
+      totalHours: 70,
       beneficiaryFirstName: application.firstName,
       beneficiaryLastName: application.lastName,
       emergencyContact: application.emergencyContact,

@@ -1,12 +1,12 @@
 import { ConventionDto } from "shared/src/convention/convention.dto";
+import type { ConventionReadyForExportVO } from "./ConventionReadyForExportVO";
+import slugify from "slugify";
+import { format } from "date-fns";
 import {
   calculateTotalImmersionHoursBetweenDate,
   calculateWeeklyHoursFromSchedule,
   prettyPrintDayFromSchedule,
 } from "shared/src/schedule/ScheduleUtils";
-import type { ConventionReadyForExportVO } from "./ConventionReadyForExportVO";
-import slugify from "slugify";
-import { format } from "date-fns";
 
 type KeysForExport =
   | "status"

@@ -1,36 +1,49 @@
-import { FieldHookConfig, useField } from "formik";
-import React from "react";
-import { ScheduleDto } from "shared/src/schedule/ScheduleSchema";
+import { useField } from "formik";
+import React, { useEffect } from "react";
+import {
+  DateInterval,
+  emptySchedule,
+  ScheduleDto,
+} from "shared/src/schedule/ScheduleSchema";
+import { ConventionDto } from "src/../../shared/src/convention/convention.dto";
 import { DayPicker } from "./DayPicker";
 import { HourPicker } from "./HourPicker";
 
 type ComplexSchedulePickerProps = {
   selectedIndex: number;
-  setFieldValue: (updatedSchedule: ScheduleDto) => void;
   disabled?: boolean;
-} & FieldHookConfig<ScheduleDto>;
+  interval: DateInterval;
+};
 
 export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
-  const [field] = useField(props);
+  const name: keyof ConventionDto = "schedule";
+  const [field, _, { setValue }] = useField<ScheduleDto>({ name });
+  useEffect(() => {
+    setValue(emptySchedule(props.interval));
+  }, [props.interval.start.getTime(), props.interval.end.getTime()]);
+
   return (
-    <div className="schedule-picker">
+    <div className="flex flex-col items-center">
       <DayPicker
         complexSchedule={field.value.complexSchedule}
         selectedIndex={field.value.selectedIndex}
         onChange={(lastClickedIndex) => {
           const schedule = field.value;
           schedule.selectedIndex = lastClickedIndex;
-          props.setFieldValue(schedule);
+          setValue(schedule);
         }}
       />
 
       <HourPicker
-        name={props.name}
-        schedule={field.value.complexSchedule[field.value.selectedIndex]}
+        name={name}
+        timePeriods={
+          field.value.complexSchedule[field.value.selectedIndex].timePeriods
+        }
         onValueChange={(newHours) => {
-          const schedule = field.value;
-          schedule.complexSchedule[schedule.selectedIndex] = newHours;
-          props.setFieldValue(schedule);
+          const schedule: ScheduleDto = { ...field.value };
+          schedule.complexSchedule[schedule.selectedIndex].timePeriods =
+            newHours;
+          setValue(schedule);
         }}
         disabled={props.disabled}
       />

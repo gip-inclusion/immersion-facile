@@ -1,46 +1,29 @@
 import { useField } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import {
+  DateInterval,
   emptySchedule,
   reasonableSchedule,
   ScheduleDto,
 } from "shared/src/schedule/ScheduleSchema";
-import {
-  calculateWeeklyHoursFromSchedule,
-  checkSchedule,
-  maxPermittedHoursPerWeek,
-} from "shared/src/schedule/ScheduleUtils";
 import { BoolRadioPicker } from "./BoolRadioPicker";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
+import { RegularSchedulePicker } from "./RegularSchedulePicker";
 import "./SchedulePicker.css";
-import { SimpleSchedulePicker } from "./SimpleSchedulePicker";
-import { TotalHoursIndicator } from "./TotalHoursIndicator";
-
-// Function that can be used as `validate` in Formik.
-function scheduleValidator(value: ScheduleDto): string | void {
-  const totalHours = calculateWeeklyHoursFromSchedule(value);
-
-  if (totalHours > maxPermittedHoursPerWeek) {
-    return "Veuillez saisir moins de 35h par semaine.";
-  } else if (totalHours === 0) {
-    return "Veuillez remplir les horaires!";
-  }
-
-  return checkSchedule(value);
-}
+import { scheduleValidator } from "./utils/scheduleValidator";
 
 type SchedulePickerProps = {
-  name: string;
-  setFieldValue: (schedule: ScheduleDto) => void;
   disabled?: boolean;
+  interval: DateInterval;
 };
 
-export const SchedulePicker = (props: SchedulePickerProps) => {
-  const [field, meta] = useField<ScheduleDto>({
-    name: props.name,
-    validate: scheduleValidator,
-  });
-
+export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
+  const name: keyof ConventionDto = "schedule";
+  const [field, meta, { setValue, setError }] = useField<ScheduleDto>({ name });
+  useEffect(() => {
+    setError(scheduleValidator(field.value));
+  }, [field.value, meta.error]);
   return (
     <>
       <BoolRadioPicker
@@ -51,7 +34,11 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
         noLabel="Non, irréguliers"
         checked={field.value.isSimple}
         setFieldValue={(isSimple) => {
-          props.setFieldValue(isSimple ? reasonableSchedule : emptySchedule);
+          setValue(
+            isSimple
+              ? reasonableSchedule(props.interval)
+              : emptySchedule(props.interval),
+          );
         }}
         disabled={props.disabled}
       />
@@ -63,13 +50,10 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
       </h4>
 
       {meta.error && (
-        <div id={props.name + "-error-description"} className="fr-error-text">
+        <div id={name + "-error-description"} className="fr-error-text">
           {meta.error}
         </div>
       )}
-      <TotalHoursIndicator
-        totalHours={calculateWeeklyHoursFromSchedule(field.value)}
-      />
 
       {!field.value.isSimple && (
         <ComplexSchedulePicker
@@ -77,7 +61,7 @@ export const SchedulePicker = (props: SchedulePickerProps) => {
           {...props}
         />
       )}
-      {field.value.isSimple && <SimpleSchedulePicker {...props} />}
+      {field.value.isSimple && <RegularSchedulePicker {...props} />}
     </>
   );
 };

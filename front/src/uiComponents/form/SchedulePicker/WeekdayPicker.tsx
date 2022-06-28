@@ -1,55 +1,53 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
-import { ScheduleDto } from "shared/src/schedule/ScheduleSchema";
+import { DayPeriodsDto, ScheduleDto } from "shared/src/schedule/ScheduleSchema";
 import { ButtonAdd, ButtonDelete } from "react-design-system/immersionFacile";
 import { WeekdayDropdown } from "./WeekdayDropdown";
 
 type WeekdayPickerProps = {
-  schedule: number[][];
-  onValueChange: (updatedWeekdays: number[][]) => void;
+  dayPeriods: DayPeriodsDto;
+  onValueChange: (dayPeriods: DayPeriodsDto) => void;
   disabled?: boolean;
 } & FieldHookConfig<ScheduleDto>;
 
 export const WeekdayPicker = ({
   name,
-  schedule,
+  dayPeriods,
   onValueChange,
   disabled,
 }: WeekdayPickerProps) => {
   const add = () => {
     let start = 0;
     let end = 5;
-    if (schedule.length > 0) {
+    if (dayPeriods.length > 0) {
       // Autofill next period as one day after the current period,
       // with duration of 1 day.
-      const last = schedule[schedule.length - 1];
+      const last = dayPeriods[dayPeriods.length - 1];
       if (last[1] < 5) {
         start = last[1] + 2;
         end = last[1] + 2;
       }
     }
-
-    schedule.push([start, end]);
-    onValueChange(schedule);
+    dayPeriods.push([start, end]);
+    onValueChange(dayPeriods);
   };
-
   return (
     <>
       <div className="col"></div>
-      {schedule.length > 0 &&
-        schedule.map((dayRange, index) => {
+      {dayPeriods.length > 0 &&
+        dayPeriods.map((dayRange, index) => {
           const onStartChange = (value: number) => {
             dayRange[0] = value;
-            onValueChange(schedule);
+            onValueChange(dayPeriods);
           };
           const onEndChange = (value: number) => {
             dayRange[1] = value;
-            onValueChange(schedule);
+            onValueChange(dayPeriods);
           };
 
           const remove = (index: number) => {
-            schedule.splice(index, 1);
-            onValueChange(schedule);
+            dayPeriods.splice(index, 1);
+            onValueChange(dayPeriods);
           };
 
           const isRemovable = index > 0;

@@ -5,8 +5,8 @@
   padding: 10px;
   margin-right: 5px;
 
-  background: #f0f0f0;
-  color: #666;
+  background: #e5e5e5;
+  color: #000091;
   text-align: center;
 
   font: 14px Arial, sans-serif;
@@ -20,20 +20,22 @@
 }
 
 .numberCircle:hover {
-  background: #aeaeca;
+  background: #cacafb;
+  font-weight: bold;
 }
 
 .numberCircle.filled {
-  background: #e5e5f4;
+  background: #e5e5e5;
 }
 
 .numberCircle.selected:hover {
-  background: #996cdd;
+  background: #2323ff;
+  color: #e5e5e5;
 }
 
 .numberCircle.selected {
-  background: #9a9aff;
-  color: #00006d;
+  background: #000091;
+  color: #e5e5e5;
   font-weight: bold;
 }
 

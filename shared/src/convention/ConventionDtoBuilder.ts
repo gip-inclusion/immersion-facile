@@ -1,5 +1,6 @@
 import { AgencyId } from "../agency/agency.dto";
 import {
+  DateInterval,
   LegacyScheduleDto,
   reasonableSchedule,
   ScheduleDto,
@@ -52,7 +53,10 @@ const validConvention: ConventionDto = {
   mentor: "Alain Prost",
   mentorPhone: VALID_PHONES[1],
   mentorEmail: VALID_EMAILS[1],
-  schedule: reasonableSchedule,
+  schedule: reasonableSchedule({
+    start: new Date(DATE_START),
+    end: new Date(DATE_END),
+  }),
   individualProtection: true,
   sanitaryPrevention: true,
   sanitaryPreventionDescription: "fourniture de gel",
@@ -182,10 +186,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withSchedule(schedule: ScheduleDto) {
+  public withSchedule(schedule: (interval: DateInterval) => ScheduleDto) {
     return new ConventionDtoBuilder({
       ...this.dto,
-      schedule,
+      schedule: schedule({
+        start: new Date(this.dto.dateStart),
+        end: new Date(this.dto.dateEnd),
+      }),
     });
   }
 
