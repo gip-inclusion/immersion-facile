@@ -1,29 +1,27 @@
 import { parseISO } from "date-fns";
-import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
-import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { ValidatedConventionFinalConfirmationParams } from "../../../domain/convention/ports/EmailGateway";
 import {
   getValidatedApplicationFinalConfirmationParams,
   NotifyAllActorsOfFinalApplicationValidation,
 } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import {
-  LegacyScheduleDto,
-  reasonableSchedule,
-} from "shared/src/schedule/ScheduleSchema";
-import {
-  prettyPrintLegacySchedule,
-  prettyPrintSchedule,
-} from "shared/src/schedule/ScheduleUtils";
+import { reasonableSchedule } from "shared/src/schedule/ScheduleSchema";
+import { prettyPrintSchedule } from "shared/src/schedule/ScheduleUtils";
 import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../_testBuilders/emailAssertions";
-import {
-  AllowListEmailFilter,
-  AlwaysAllowEmailFilter,
-} from "../../../adapters/secondary/core/EmailFilterImplementations";
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../domain/core/ports/UnitOfWork";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { ConventionPoleEmploiUserAdvisorEntity } from "../../../domain/peConnect/dto/PeConnect.dto";
+import { PeConnectIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 
 const validConvention: ConventionDto = new ConventionDtoBuilder().build();
 
@@ -31,92 +29,33 @@ const counsellorEmail = "counsellor@email.fr";
 
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
 
-describe("NotifyAllActorsOfFinalApplicationValidation", () => {
-  let emailFilter: EmailFilter;
+describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email to all actors", () => {
+  let uow: UnitOfWork;
   let emailGw: InMemoryEmailGateway;
   let agency: AgencyDto;
+  let unitOfWorkPerformer: UnitOfWorkPerformer;
 
   beforeEach(() => {
-    emailFilter = new AlwaysAllowEmailFilter();
-    emailGw = new InMemoryEmailGateway();
+    uow = createInMemoryUow();
     agency = defaultAgency;
+    uow.agencyRepo = new InMemoryAgencyRepository([defaultAgency]);
+    emailGw = new InMemoryEmailGateway();
+
+    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
   });
 
-  const createUseCase = () =>
-    new NotifyAllActorsOfFinalApplicationValidation(
-      emailFilter,
+  it("Default actors: beneficiary, mentor, agency counsellor", async () => {
+    agency = new AgencyDtoBuilder(defaultAgency)
+      .withCounsellorEmails([counsellorEmail])
+      .build();
+    uow.agencyRepo = new InMemoryAgencyRepository([agency]);
+
+    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
+
+    await new NotifyAllActorsOfFinalApplicationValidation(
+      unitOfWorkPerformer,
       emailGw,
-      new InMemoryAgencyRepository([agency]),
-    );
-
-  it("Sends no emails when allowList is enforced and empty", async () => {
-    emailFilter = new AllowListEmailFilter([]);
-    await createUseCase().execute(validConvention);
-    expect(emailGw.getSentEmails()).toHaveLength(0);
-  });
-
-  it("Sends confirmation email to beneficiary when on allowList", async () => {
-    emailFilter = new AllowListEmailFilter([validConvention.email]);
-
-    await createUseCase().execute(validConvention);
-
-    const sentEmails = emailGw.getSentEmails();
-
-    expect(sentEmails).toHaveLength(1);
-    expectEmailFinalValidationConfirmationMatchingConvention(
-      [validConvention.email],
-      sentEmails[0],
-      agency,
-      validConvention,
-    );
-  });
-
-  it("Sends confirmation email to mentor when on allowList", async () => {
-    emailFilter = new AllowListEmailFilter([validConvention.mentorEmail]);
-
-    await createUseCase().execute(validConvention);
-
-    const sentEmails = emailGw.getSentEmails();
-
-    expect(sentEmails).toHaveLength(1);
-    expectEmailFinalValidationConfirmationMatchingConvention(
-      [validConvention.mentorEmail],
-      sentEmails[0],
-      agency,
-      validConvention,
-    );
-  });
-
-  it("Sends confirmation email to counsellor when on allowList", async () => {
-    agency = new AgencyDtoBuilder(defaultAgency)
-      .withCounsellorEmails([counsellorEmail])
-      .build();
-    emailFilter = new AllowListEmailFilter([counsellorEmail]);
-
-    await createUseCase().execute(validConvention);
-
-    const sentEmails = emailGw.getSentEmails();
-
-    expect(sentEmails).toHaveLength(1);
-    expectEmailFinalValidationConfirmationMatchingConvention(
-      [counsellorEmail],
-      sentEmails[0],
-      agency,
-      validConvention,
-    );
-  });
-
-  it("Sends confirmation email to beneficiary, mentor, and counsellor when on allowList", async () => {
-    agency = new AgencyDtoBuilder(defaultAgency)
-      .withCounsellorEmails([counsellorEmail])
-      .build();
-    emailFilter = new AllowListEmailFilter([
-      counsellorEmail,
-      validConvention.email,
-      validConvention.mentorEmail,
-    ]);
-
-    await createUseCase().execute(validConvention);
+    ).execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -129,17 +68,45 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     );
   });
 
-  it("Sends confirmation email to beneficiary, mentor, and counsellor when unrestricted email sending is allowed", async () => {
+  it("With PeConnect Federated identity: beneficiary, mentor, agency counsellor, and dedicated advisor", async () => {
+    const userPeExternalId: PeConnectIdentity = `peConnect:i-am-an-external-id`;
+    const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
+      _entityName: "ConventionPoleEmploiAdvisor",
+      conventionId: validConvention.id,
+      email: "elsa.oldenburg@pole-emploi.net",
+      firstName: "Elsa",
+      lastName: "Oldenburg",
+      userPeExternalId,
+      type: "CAPEMPLOI",
+    };
+
+    (
+      uow.conventionPoleEmploiAdvisorRepo as InMemoryConventionPoleEmploiAdvisorRepository
+    ).setConventionPoleEmploiUsersAdvisor(userConventionAdvisor);
+
     agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
-    await createUseCase().execute(validConvention);
+
+    uow.agencyRepo = new InMemoryAgencyRepository([agency]);
+
+    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
+
+    await new NotifyAllActorsOfFinalApplicationValidation(
+      unitOfWorkPerformer,
+      emailGw,
+    ).execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingConvention(
-      [validConvention.email, validConvention.mentorEmail, counsellorEmail],
+      [
+        validConvention.email,
+        validConvention.mentorEmail,
+        counsellorEmail,
+        userConventionAdvisor.email,
+      ],
       sentEmails[0],
       agency,
       validConvention,
@@ -188,25 +155,6 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     expect(
       getValidatedApplicationFinalConfirmationParams(agency, application),
     ).toEqual(expectedParams);
-  });
-
-  it("prioritizes legacy schedule when available", () => {
-    const legacySchedule: LegacyScheduleDto = {
-      workdays: ["lundi"],
-      description: "legacyScheduleDescription",
-    };
-    const application = new ConventionDtoBuilder()
-      .withLegacySchedule(legacySchedule)
-      .build();
-
-    const actualParms = getValidatedApplicationFinalConfirmationParams(
-      agency,
-      application,
-    );
-
-    expect(actualParms.scheduleText).toEqual(
-      prettyPrintLegacySchedule(legacySchedule),
-    );
   });
 
   it("prints correct sanitaryPreventionMessage when missing", () => {

@@ -3,7 +3,6 @@ import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder
 import { frontRoutes } from "shared/src/routes";
 import { OmitFromExistingKeys } from "shared/src/utils";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { AlwaysAllowEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
@@ -16,7 +15,6 @@ import {
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import {
-  expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
   fakeGenerateMagicLinkUrlFn,
 } from "../../../_testBuilders/test.helpers";
@@ -49,20 +47,17 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       );
   });
 
-  it("should throw an error if the convention is not found", async () => {
+  it("should resolve to undefined if the convention pole emploi user advisor is not found", async () => {
     const conventionDtoFromEvent: ConventionDto = new ConventionDtoBuilder()
       .withId("some-invalid-id")
       .withFederatedIdentity("peConnect:blop")
       .build();
 
-    await expectPromiseToFailWithError(
-      notifyPoleEmploiUserAdvisorOnConventionFullySigned.execute(
+    expect(
+      await notifyPoleEmploiUserAdvisorOnConventionFullySigned.execute(
         conventionDtoFromEvent,
       ),
-      new NotFoundError(
-        "There is no open pole emploi advisor entity linked to this user conventionId",
-      ),
-    );
+    ).toBeUndefined();
   });
 
   it("should send email with the correct params", async () => {

@@ -43,18 +43,10 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
 
   public async getByConventionId(
     conventionId: ConventionId,
-  ): Promise<ConventionPoleEmploiUserAdvisorEntity> {
-    const entity: ConventionPoleEmploiUserAdvisorEntity | undefined =
-      this._conventionPoleEmploiUsersAdvisors.find(
-        matchConventionId(conventionId),
-      );
-
-    if (!isEntity(entity))
-      throw new NotFoundError(
-        "There is no open pole emploi advisor entity linked to this user conventionId",
-      );
-
-    return entity;
+  ): Promise<ConventionPoleEmploiUserAdvisorEntity | undefined> {
+    return this._conventionPoleEmploiUsersAdvisors.find(
+      matchConventionId(conventionId),
+    );
   }
 
   //test purposes only

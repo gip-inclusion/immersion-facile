@@ -246,8 +246,8 @@ export const createUseCases = (
       ),
     notifyAllActorsOfFinalConventionValidation:
       new NotifyAllActorsOfFinalApplicationValidation(
+        uowPerformer,
         repositories.email,
-        repositories.agency,
       ),
     notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
       repositories.email,
