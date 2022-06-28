@@ -6,7 +6,6 @@ import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { handleHttpResponseError } from "./handleHttpResponseError";
 import { ManagedRedirectError, RawRedirectError } from "./redirectErrors";
-import { unhandledError } from "./unhandledError";
 
 const logger = createLogger(__filename);
 
@@ -71,7 +70,7 @@ export const sendRedirectResponse = async (
     if (error instanceof RawRedirectError)
       return handleRawRedirectResponseError(error, res);
 
-    return unhandledError(error, req, res);
+    return handleHttpResponseError(req, res, error);
   }
 };
 
