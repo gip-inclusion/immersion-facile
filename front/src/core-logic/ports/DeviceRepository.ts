@@ -5,22 +5,19 @@ type GenericPair<K extends string, Payload> = {
   payload: Payload;
 };
 
-type StoredPair = GenericPair<
-  "partialConvention",
-  Partial<ConventionPresentation>
->;
-// new cases could be added with a union like this :
-// | GenericPair<"yourKey", YourPayloadType>;
+type StoredPair =
+  | GenericPair<"partialConvention", Partial<ConventionPresentation>>
+  | GenericPair<"adminToken", string>;
 
-type Keys = StoredPair["key"];
+export type KeyInDevice = StoredPair["key"];
 
-export type NarrowPair<
-  K extends Keys,
+type NarrowPair<
+  K extends KeyInDevice,
   P extends StoredPair = StoredPair,
 > = Extract<P, { key: K }>;
 
 export interface DeviceRepository {
-  set<K extends Keys>(key: K, value: NarrowPair<K>["payload"]): void;
-  get<K extends Keys>(key: K): NarrowPair<K>["payload"] | undefined;
-  delete(key: Keys): void;
+  set<K extends KeyInDevice>(key: K, value: NarrowPair<K>["payload"]): void;
+  get<K extends KeyInDevice>(key: K): NarrowPair<K>["payload"] | undefined;
+  delete(key: KeyInDevice): void;
 }

@@ -1,4 +1,5 @@
 import { asyncScheduler, SchedulerLike } from "rxjs";
+import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/SimulatedAdminGateway";
 import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
 import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
 import { createLocalStorageDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createLocalStorageDeviceRepository";
@@ -23,7 +24,9 @@ import {
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 import { ReactNavigationGateway } from "src/core-logic/adapters/ReactNavigationGateway";
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SimulatedSiretGatewayThroughBack";
+import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
+import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
@@ -74,6 +77,11 @@ const getSimulatedSiretGatewayThroughBack = () =>
     },
   });
 
+export const adminGateway =
+  ENV.gateway === "IN_MEMORY"
+    ? new SimulatedAdminGateway()
+    : new SimulatedAdminGateway();
+
 export const siretGatewayThroughBack =
   ENV.gateway === "IN_MEMORY"
     ? getSimulatedSiretGatewayThroughBack()
@@ -117,6 +125,7 @@ export const immersionAssessmentGateway: ImmersionAssessmentGateway =
     : new HttpImmersionAssessmentGateway();
 
 export type Dependencies = {
+  adminGateway: AdminGateway;
   immersionAssessmentGateway: ImmersionAssessmentGateway;
   siretGatewayThroughBack: SiretGatewayThroughBack;
   agencyGateway: AgencyGateway;
@@ -127,12 +136,14 @@ export type Dependencies = {
   immersionSearchGateway: ImmersionSearchGateway;
   romeAutocompleteGateway: RomeAutocompleteGateway;
   navigationGateway: NavigationGateway;
+  deviceRepository: DeviceRepository;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
 };
 
 export const store = createStore({
   dependencies: {
+    adminGateway,
     siretGatewayThroughBack,
     agencyGateway,
     apiAdresseGateway,
@@ -141,9 +152,10 @@ export const store = createStore({
     conventionGateway,
     immersionSearchGateway,
     romeAutocompleteGateway,
-    minSearchResultsToPreventRefetch: 10,
-    scheduler: asyncScheduler,
     immersionAssessmentGateway,
     navigationGateway,
+    deviceRepository,
+    minSearchResultsToPreventRefetch: 10,
+    scheduler: asyncScheduler,
   },
 });

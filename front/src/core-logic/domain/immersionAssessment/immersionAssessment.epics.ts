@@ -1,4 +1,5 @@
-import { catchError, filter, map, of, switchMap } from "rxjs";
+import { filter, map, switchMap } from "rxjs";
+import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
@@ -18,8 +19,8 @@ const createAssessmentEpic: AppEpic<ImmersionAssessmentAction> = (
       immersionAssessmentGateway.createAssessment(action.payload),
     ),
     map((_result) => immersionAssessmentSlice.actions.creationSucceeded()),
-    catchError((error) =>
-      of(immersionAssessmentSlice.actions.creationFailed(error.message)),
+    catchEpicError((error) =>
+      immersionAssessmentSlice.actions.creationFailed(error.message),
     ),
   );
 

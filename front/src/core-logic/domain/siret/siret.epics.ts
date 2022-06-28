@@ -1,4 +1,4 @@
-import { catchError, filter, iif, map, Observable, of, switchMap } from "rxjs";
+import { filter, iif, map, Observable, of, switchMap } from "rxjs";
 import { SiretDto, siretSchema } from "shared/src/siret";
 import {
   SiretAction,
@@ -8,6 +8,7 @@ import {
   GetSiretInfo,
   SiretGatewayThroughBack,
 } from "src/core-logic/ports/SiretGatewayThroughBack";
+import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import { AppEpic } from "src/core-logic/storeConfig/redux.helpers";
 
 const shouldTriggerSearch = (candidate: string) => {
@@ -59,7 +60,7 @@ const getSiretEpic: SiretEpic = (
       }),
     ),
     // the condition on siretResult type should not be handled here but in the gateway
-    // (with an errored observable, caught here with catchError())
+    // (with an errored observable, caught here with catchEpicError())
     map<GetSiretInfo | null, SiretAction>((siretResult) => {
       if (siretResult === null)
         return siretSlice.actions.siretInfoDisabledAndNoMatchInDbFound();
@@ -67,8 +68,8 @@ const getSiretEpic: SiretEpic = (
         ? siretSlice.actions.siretInfoFailed(siretResult)
         : siretSlice.actions.siretInfoSucceeded(siretResult);
     }),
-    catchError((error) =>
-      of(siretSlice.actions.siretInfoFailed(error.message)),
+    catchEpicError((error) =>
+      siretSlice.actions.siretInfoFailed(error.message),
     ),
   );
 };

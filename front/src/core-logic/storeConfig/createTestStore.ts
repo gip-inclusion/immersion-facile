@@ -1,5 +1,7 @@
 import { VirtualTimeScheduler } from "rxjs";
+import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
+import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
@@ -7,11 +9,13 @@ import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemory
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/InMemoryNavigationGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
+import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/TestSiretGatewayThroughBack";
 
 export interface TestDependencies {
+  adminGateway: TestAdminGateway;
   immersionAssessmentGateway: TestImmersionAssessmentGateway;
   siretGatewayThroughBack: TestSiretGatewayThroughBack;
   agencyGateway: InMemoryAgencyGateway;
@@ -21,6 +25,7 @@ export interface TestDependencies {
   conventionGateway: InMemoryConventionGateway;
   immersionSearchGateway: InMemoryImmersionSearchGateway;
   romeAutocompleteGateway: InMemoryRomeAutocompleteGateway;
+  deviceRepository: DeviceRepository;
   navigationGateway: InMemoryNavigationGateway;
   scheduler: VirtualTimeScheduler;
   minSearchResultsToPreventRefetch: number;
@@ -31,6 +36,7 @@ export const createTestStore = (
   message?: "skip" | string,
 ) => {
   const dependencies: TestDependencies = {
+    adminGateway: new TestAdminGateway(),
     immersionAssessmentGateway: new TestImmersionAssessmentGateway(),
     siretGatewayThroughBack: new TestSiretGatewayThroughBack(),
     immersionSearchGateway: new InMemoryImmersionSearchGateway(),
@@ -40,6 +46,7 @@ export const createTestStore = (
     technicalGateway: new TestTechnicalGateway(),
     agencyGateway: new InMemoryAgencyGateway(),
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),
+    deviceRepository: createTestDeviceRepository(),
     navigationGateway: new InMemoryNavigationGateway(),
     scheduler: new VirtualTimeScheduler(),
     minSearchResultsToPreventRefetch: 2,

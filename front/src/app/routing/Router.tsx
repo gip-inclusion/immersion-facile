@@ -3,15 +3,16 @@ import { SearchDebugPage } from "src/app/components/SearchDebugPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AdminVerificationPage } from "src/app/pages/admin/AdminVerificationPage";
 import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
-import { ErrorRedirectPage } from "src/app/pages/Error/ErrorRedirectPage";
-import { EstablishmentEditionFormPage } from "src/app/pages/Establishment/EstablishmentEditionFormPage";
-import { EstablishmentFormPageForExternals } from "src/app/pages/Establishment/EstablishmentFormPageForExternals";
 import { ConventionPage } from "src/app/pages/Convention/ConventionPage";
 import { ConventionPageForUkraine } from "src/app/pages/Convention/ConventionPageForUkraine";
 import { ConventionSignPage } from "src/app/pages/Convention/ConventionSignPage";
 import { ConventionValidatePage } from "src/app/pages/Convention/ConventionValidatePage";
+import { ErrorRedirectPage } from "src/app/pages/Error/ErrorRedirectPage";
+import { EstablishmentEditionFormPage } from "src/app/pages/Establishment/EstablishmentEditionFormPage";
+import { EstablishmentFormPageForExternals } from "src/app/pages/Establishment/EstablishmentFormPageForExternals";
 import { SearchPage } from "src/app/pages/Search/SearchPage";
 import { LandingEstablishmentPage } from "src/app/pages/Static/LandingEstablishmentPage";
+import { PrivateRoute } from "src/app/routing/PrivateRoute";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ENV } from "src/environmentVariables";
 import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
@@ -32,7 +33,11 @@ export const Router = () => {
     <>
       {route.name === false && <NotAvailable />}
       {route.name === "addAgency" && <AddAgencyPage />}
-      {route.name === "admin" && <AdminPage route={route} />}
+      {route.name === "admin" && (
+        <PrivateRoute>
+          <AdminPage route={route} />
+        </PrivateRoute>
+      )}
       {route.name === "adminVerification" &&
         (featureFlags.enableAdminUi ? (
           <AdminVerificationPage route={route} />

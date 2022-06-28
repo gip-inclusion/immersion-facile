@@ -1,4 +1,5 @@
-import { filter, switchMap, map, catchError, of } from "rxjs";
+import { filter, map, switchMap } from "rxjs";
+import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
@@ -18,8 +19,8 @@ const getConventionEpic: ConventionEpic = (
     filter(conventionSlice.actions.conventionRequested.match),
     switchMap(({ payload }) => conventionGateway.retreiveFromToken(payload)),
     map(conventionSlice.actions.conventionSucceeded),
-    catchError((error: Error) =>
-      of(conventionSlice.actions.conventionFailed(error.message)),
+    catchEpicError((error: Error) =>
+      conventionSlice.actions.conventionFailed(error.message),
     ),
   );
 
