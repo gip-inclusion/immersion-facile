@@ -64,7 +64,10 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
     config.emailGateway === "SENDINBLUE"
       ? SendinblueEmailGateway.create(
           config.sendinblueApiKey,
-          makeEmailAllowListPredicate(config),
+          makeEmailAllowListPredicate({
+            skipEmailAllowlist: config.skipEmailAllowlist,
+            emailAllowList: config.emailAllowList,
+          }),
         )
       : new InMemoryEmailGateway();
 

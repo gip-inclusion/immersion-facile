@@ -52,8 +52,6 @@ import { AppConfig } from "./appConfig";
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/InMemoryPoleEmploiGateway";
 import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
-import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgConventionPoleEmploiAdvisorRepository";
-import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 
 const logger = createLogger(__filename);
 
@@ -130,13 +128,6 @@ export const createRepositories = async (
     convention: conventionRepository,
     conventionQueries: conventionRepositoryQueries,
 
-    conventionPoleEmploiAdvisor:
-      config.repositories === "PG"
-        ? new PgConventionPoleEmploiAdvisorRepository(
-            await getPgPoolFn().connect(),
-          )
-        : new InMemoryConventionPoleEmploiAdvisorRepository(),
-
     establishmentExport:
       config.repositories === "PG"
         ? new PgEstablishmentExportQueries(await getPgPoolFn().connect())
@@ -186,7 +177,10 @@ export const createRepositories = async (
       config.emailGateway === "SENDINBLUE"
         ? SendinblueEmailGateway.create(
             config.sendinblueApiKey,
-            makeEmailAllowListPredicate(config),
+            makeEmailAllowListPredicate({
+              skipEmailAllowlist: config.skipEmailAllowlist,
+              emailAllowList: config.emailAllowList,
+            }),
           )
         : new InMemoryEmailGateway(),
 
@@ -251,12 +245,16 @@ export const createRepositories = async (
   };
 };
 
-export const makeEmailAllowListPredicate = (
-  config: AppConfig,
-): ((recipient: string) => boolean) =>
-  config.skipEmailAllowlist
+export const makeEmailAllowListPredicate = ({
+  skipEmailAllowlist,
+  emailAllowList,
+}: {
+  skipEmailAllowlist: boolean;
+  emailAllowList: string[];
+}): ((recipient: string) => boolean) =>
+  skipEmailAllowlist
     ? (_recipient: string) => true
-    : (recipient: string): boolean => config.emailAllowList.includes(recipient);
+    : (recipient: string): boolean => emailAllowList.includes(recipient);
 
 const createRomeRepository = async (
   config: AppConfig,
