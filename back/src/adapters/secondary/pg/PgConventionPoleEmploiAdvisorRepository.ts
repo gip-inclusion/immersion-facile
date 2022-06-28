@@ -33,7 +33,9 @@ export class PgConventionPoleEmploiAdvisorRepository
     );
 
     if (pgResult.rowCount != 1)
-      throw new Error("Association between Convention and userAdvisor failed");
+      throw new Error(
+        `Association between Convention and userAdvisor failed. rowCount: ${pgResult.rowCount}, conventionId: ${conventionId}, peExternalId: ${peExternalId}`,
+      );
 
     return {
       conventionId,

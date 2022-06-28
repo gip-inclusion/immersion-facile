@@ -111,7 +111,9 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
           userPeExternalId,
         ),
       ).rejects.toThrow(
-        new Error("Association between Convention and userAdvisor failed"),
+        new Error(
+          "Association between Convention and userAdvisor failed. rowCount: 0, conventionId: 88401348-bad9-4933-87c6-405b8a8fe4cc, peExternalId: 92f44bbf-103d-4312-bd74-217c7d79f618",
+        ),
       );
     });
 
