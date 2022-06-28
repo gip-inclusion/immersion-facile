@@ -132,11 +132,15 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         );
       });
 
-    logger.info({ trackId, body: response.data }, "GetUserInfo PE Response");
+    const body = response.data;
+
+    logger.info({ trackId, body }, "GetUserInfo PE Response");
+
+    const bodyFromPeFixed = body === "" ? [] : body; // this is because PE does not respect their own contracts and sends "" instead of []
 
     const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
       externalPeConnectUserSchema,
-      response.data,
+      bodyFromPeFixed,
     );
 
     return toPeConnectUserDto(externalUser);
