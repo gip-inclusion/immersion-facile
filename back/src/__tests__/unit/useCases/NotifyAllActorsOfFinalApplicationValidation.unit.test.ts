@@ -48,7 +48,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
-    uow.agencyRepo = new InMemoryAgencyRepository([agency]);
+
+    (uow.agencyRepo as InMemoryAgencyRepository).setAgencies([agency]);
 
     unitOfWorkPerformer = new InMemoryUowPerformer(uow);
 

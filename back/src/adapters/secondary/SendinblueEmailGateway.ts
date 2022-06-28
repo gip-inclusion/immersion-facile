@@ -1,9 +1,10 @@
 import promClient from "prom-client";
-import * as SibApiV3Sdk from "sib-api-v3-typescript";
 import {
   SendSmtpEmail,
   SendSmtpEmailCc,
   SendSmtpEmailTo,
+  TransactionalEmailsApi,
+  TransactionalEmailsApiApiKeys,
 } from "sib-api-v3-typescript";
 import type {
   BeneficiarySignatureRequestNotificationParams,
@@ -35,110 +36,18 @@ import { notifyObjectDiscord } from "../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 
-const counterSendTransactEmailTotal = new promClient.Counter({
-  name: "sendinblue_send_transac_email_total",
-  help: "The total count of sendTransacEmail requests, broken down by email type.",
-  labelNames: ["emailType"],
-});
-
-const counterSendTransactEmailSuccess = new promClient.Counter({
-  name: "sendinblue_send_transac_email_success",
-  help: "The success count of sendTransacEmail requests, broken down by email type.",
-  labelNames: ["emailType"],
-});
-
-const counterSendTransactEmailError = new promClient.Counter({
-  name: "sendinblue_send_transac_email_error",
-  help: "The error count of sendTransacEmail requests, broken down by email type.",
-  labelNames: ["emailType", "errorType"],
-});
-
-const emailTypeToTemplateId: Record<EmailType, number> = {
-  // https://my.sendinblue.com/camp/template/10/message-setup
-  NEW_CONVENTION_ADMIN_NOTIFICATION: 10, // v2
-
-  // https://my.sendinblue.com/camp/template/27/message-setup
-  NEW_CONVENTION_AGENCY_NOTIFICATION: 27,
-
-  // https://my.sendinblue.com/camp/template/4/message-setup
-  NEW_CONVENTION_BENEFICIARY_CONFIRMATION: 4, // v1
-
-  // https://my.sendinblue.com/camp/template/5/message-setup
-  NEW_CONVENTION_MENTOR_CONFIRMATION: 5, // v1
-
-  // https://my.sendinblue.com/camp/template/6/message-setup
-  VALIDATED_CONVENTION_FINAL_CONFIRMATION: 6,
-
-  // https://my.sendinblue.com/camp/template/9/message-setup
-  REJECTED_CONVENTION_NOTIFICATION: 9,
-
-  // https://my.sendinblue.com/camp/template/13/message-setup
-  CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: 13,
-
-  // https://my.sendinblue.com/camp/template/11/message-setup
-  NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: 11,
-
-  // https://my.sendinblue.com/camp/template/14/message-setup
-  MAGIC_LINK_RENEWAL: 14,
-
-  // https://my.sendinblue.com/camp/template/15/message-setup
-  NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: 15,
-
-  // https://my.sendinblue.com/camp/template/16/message-setup
-  BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION: 16, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
-
-  // https://my.sendinblue.com/camp/template/18/message-setup
-  NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE: 18,
-
-  // https://my.sendinblue.com/camp/template/19/message-setup
-  NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE: 19,
-
-  // https://my.sendinblue.com/camp/template/20/message-setup
-  CONTACT_BY_EMAIL_REQUEST: 20,
-
-  // https://my.sendinblue.com/camp/template/21/message-setup
-  CONTACT_BY_PHONE_INSTRUCTIONS: 21,
-
-  // https://my.sendinblue.com/camp/template/22/message-setup
-  CONTACT_IN_PERSON_INSTRUCTIONS: 22,
-
-  // https://my.sendinblue.com/camp/template/24/message-setup
-  SHARE_DRAFT_CONVENTION_BY_LINK: 24,
-
-  // https://my.sendinblue.com/camp/template/25/message-setup
-  EDIT_FORM_ESTABLISHMENT_LINK: 25,
-
-  // https://my.sendinblue.com/camp/template/26/message-setup
-  SUGGEST_EDIT_FORM_ESTABLISHMENT: 26,
-
-  // https://my.sendinblue.com/camp/template/41/message-setup
-  CREATE_IMMERSION_ASSESSMENT: 41,
-
-  // https://my.sendinblue.com/camp/template/39/message-setup
-  POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: 39,
-
-  // https://my.sendinblue.com/camp/template/42/message-setup
-  POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: 42,
-
-  // https://my.sendinblue.com/camp/template/42/message-setup
-  AGENCY_WAS_ACTIVATED: 48,
-};
-
 export class SendinblueEmailGateway implements EmailGateway {
   private constructor(
-    private readonly apiInstance: SibApiV3Sdk.TransactionalEmailsApi,
+    private readonly apiInstance: TransactionalEmailsApi,
     private readonly emailAllowListPredicate: (recipient: string) => boolean,
   ) {}
 
   public static create(
     apiKey: string,
     emailAllowListPredicate: (recipient: string) => boolean,
+    apiInstance: TransactionalEmailsApi = new TransactionalEmailsApi(),
   ): SendinblueEmailGateway {
-    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-    apiInstance.setApiKey(
-      SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
-      apiKey,
-    );
+    apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, apiKey);
 
     return new SendinblueEmailGateway(apiInstance, emailAllowListPredicate);
   }
@@ -597,6 +506,95 @@ export class SendinblueEmailGateway implements EmailGateway {
     }
   }
 }
+
+const counterSendTransactEmailTotal = new promClient.Counter({
+  name: "sendinblue_send_transac_email_total",
+  help: "The total count of sendTransacEmail requests, broken down by email type.",
+  labelNames: ["emailType"],
+});
+
+const counterSendTransactEmailSuccess = new promClient.Counter({
+  name: "sendinblue_send_transac_email_success",
+  help: "The success count of sendTransacEmail requests, broken down by email type.",
+  labelNames: ["emailType"],
+});
+
+const counterSendTransactEmailError = new promClient.Counter({
+  name: "sendinblue_send_transac_email_error",
+  help: "The error count of sendTransacEmail requests, broken down by email type.",
+  labelNames: ["emailType", "errorType"],
+});
+
+const emailTypeToTemplateId: Record<EmailType, number> = {
+  // https://my.sendinblue.com/camp/template/10/message-setup
+  NEW_CONVENTION_ADMIN_NOTIFICATION: 10, // v2
+
+  // https://my.sendinblue.com/camp/template/27/message-setup
+  NEW_CONVENTION_AGENCY_NOTIFICATION: 27,
+
+  // https://my.sendinblue.com/camp/template/4/message-setup
+  NEW_CONVENTION_BENEFICIARY_CONFIRMATION: 4, // v1
+
+  // https://my.sendinblue.com/camp/template/5/message-setup
+  NEW_CONVENTION_MENTOR_CONFIRMATION: 5, // v1
+
+  // https://my.sendinblue.com/camp/template/6/message-setup
+  VALIDATED_CONVENTION_FINAL_CONFIRMATION: 6,
+
+  // https://my.sendinblue.com/camp/template/9/message-setup
+  REJECTED_CONVENTION_NOTIFICATION: 9,
+
+  // https://my.sendinblue.com/camp/template/13/message-setup
+  CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: 13,
+
+  // https://my.sendinblue.com/camp/template/11/message-setup
+  NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: 11,
+
+  // https://my.sendinblue.com/camp/template/14/message-setup
+  MAGIC_LINK_RENEWAL: 14,
+
+  // https://my.sendinblue.com/camp/template/15/message-setup
+  NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: 15,
+
+  // https://my.sendinblue.com/camp/template/16/message-setup
+  BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION: 16, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
+
+  // https://my.sendinblue.com/camp/template/18/message-setup
+  NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE: 18,
+
+  // https://my.sendinblue.com/camp/template/19/message-setup
+  NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE: 19,
+
+  // https://my.sendinblue.com/camp/template/20/message-setup
+  CONTACT_BY_EMAIL_REQUEST: 20,
+
+  // https://my.sendinblue.com/camp/template/21/message-setup
+  CONTACT_BY_PHONE_INSTRUCTIONS: 21,
+
+  // https://my.sendinblue.com/camp/template/22/message-setup
+  CONTACT_IN_PERSON_INSTRUCTIONS: 22,
+
+  // https://my.sendinblue.com/camp/template/24/message-setup
+  SHARE_DRAFT_CONVENTION_BY_LINK: 24,
+
+  // https://my.sendinblue.com/camp/template/25/message-setup
+  EDIT_FORM_ESTABLISHMENT_LINK: 25,
+
+  // https://my.sendinblue.com/camp/template/26/message-setup
+  SUGGEST_EDIT_FORM_ESTABLISHMENT: 26,
+
+  // https://my.sendinblue.com/camp/template/41/message-setup
+  CREATE_IMMERSION_ASSESSMENT: 41,
+
+  // https://my.sendinblue.com/camp/template/39/message-setup
+  POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: 39,
+
+  // https://my.sendinblue.com/camp/template/42/message-setup
+  POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: 42,
+
+  // https://my.sendinblue.com/camp/template/42/message-setup
+  AGENCY_WAS_ACTIVATED: 48,
+};
 
 const addCarbonCopyFieldIfNeeded = (
   baseEmailConfig: SendSmtpEmail,
