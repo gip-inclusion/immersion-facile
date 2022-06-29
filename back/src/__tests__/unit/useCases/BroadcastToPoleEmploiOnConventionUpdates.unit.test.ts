@@ -80,6 +80,12 @@ describe("Broadcasts events to pole-emploi", () => {
     const convention = new ConventionDtoBuilder()
       .withId(immersionConventionId)
       .withExternalId("1")
+      .withImmersionAppelation({
+        appellationCode: "11111",
+        appellationLabel: "some Appellation",
+        romeCode: "A1111",
+        romeLabel: "some Rome",
+      })
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withFederatedIdentity("peConnect:some-id")
       .withDateStart("2021-05-12")
@@ -100,6 +106,7 @@ describe("Broadcasts events to pole-emploi", () => {
       dateDebut: "2021-05-12T00:00:00.000Z",
       dateFin: "2021-05-14T00:30:00.000Z",
       status: "DEMANDE_VALIDÉE",
+      codeAppellation: "011111",
     });
   });
 });

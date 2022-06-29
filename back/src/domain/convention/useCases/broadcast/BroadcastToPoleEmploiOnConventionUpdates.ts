@@ -99,7 +99,10 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       objectifDeImmersion:
         conventionObjectiveToObjectifDeImmersion[convention.immersionObjective],
       codeRome: convention.immersionAppellation.romeCode,
-      codeAppellation: convention.immersionAppellation.appellationCode,
+      codeAppellation: convention.immersionAppellation.appellationCode.padStart(
+        6,
+        "0",
+      ),
       activitesObservees: convention.immersionActivities,
       competencesObservees: convention.immersionSkills,
       signatureBeneficiaire: convention.beneficiaryAccepted,
