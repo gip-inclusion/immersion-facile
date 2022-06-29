@@ -108,7 +108,7 @@ export const createUseCases = (
       config.backofficeUsername,
       config.backofficePassword,
       generateAdminJwt,
-      sleep,
+      () => sleep(config.nodeEnv !== "test" ? 500 : 0),
     ),
     getConvention: new GetImmersionApplication(repositories.convention),
     linkPoleEmploiAdvisorAndRedirectToConvention:

@@ -6,6 +6,7 @@ import { ConventionId } from "../convention/convention.dto";
 export type JwtPayloads = {
   application?: ConventionMagicLinkPayload;
   establishment?: EstablishmentJwtPayload;
+  admin?: AppJwtPayload;
 };
 
 type ValueOf<T> = T[keyof T];
@@ -16,6 +17,7 @@ export type PayloadOption = ValueOf<Required<JwtPayloads>>;
 export const currentJwtVersions: Record<PayloadKey, number> = {
   application: 1,
   establishment: 1,
+  admin: 1,
 };
 
 export type Role =
@@ -63,13 +65,13 @@ export const createConventionMagicLinkPayload = (
   emailHash: stringToMd5(email),
 });
 
-type JwtPayload = {
+export type AppJwtPayload = {
   iat: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
   exp: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
   version: number;
 };
 
-export type EstablishmentJwtPayload = JwtPayload & {
+export type EstablishmentJwtPayload = AppJwtPayload & {
   siret: string;
 };
 

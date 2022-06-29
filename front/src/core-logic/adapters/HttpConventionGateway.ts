@@ -1,4 +1,5 @@
 import axios from "axios";
+import { AdminToken } from "shared/src/admin/admin.dto";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import {
@@ -52,13 +53,17 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public async getAll(
+    adminToken: AdminToken,
     agency?: AgencyId,
     status?: ConventionStatus,
   ): Promise<Array<ConventionDto>> {
-    const response = await axios.get(`/${prefix}/${conventionsRoute}`, {
+    const response = await axios.get(`/${prefix}/admin/${conventionsRoute}`, {
       params: {
         agency,
         status,
+      },
+      headers: {
+        authorization: adminToken,
       },
     });
 

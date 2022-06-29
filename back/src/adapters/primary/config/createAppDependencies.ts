@@ -12,6 +12,7 @@ import {
 } from "../../secondary/core/EmailFilterImplementations";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
+import { createAdminAuthMiddleware } from "../adminAuthMiddleware";
 import {
   createApiKeyAuthMiddlewareV0,
   createApiKeyAuthMiddlewareV1,
@@ -57,7 +58,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const generateMagicLinkJwt = makeGenerateJwtES256(
     config.magicLinkJwtPrivateKey,
   );
-  const generateAdminJwt = makeGenerateJwtHS256(config.adminJwtSecret);
+  const generateAdminJwt = makeGenerateJwtHS256(config.adminJwtSecret, "365d");
   const generateMagicLinkFn = createGenerateConventionMagicLink(config);
 
   const emailFilter = config.skipEmailAllowlist
@@ -95,15 +96,19 @@ export const createAppDependencies = async (config: AppConfig) => {
       config,
       "establishment",
     ),
-    apiKeyAuthMiddlewareV0: await createApiKeyAuthMiddlewareV0(
+    apiKeyAuthMiddlewareV0: createApiKeyAuthMiddlewareV0(
       repositories.getApiConsumerById,
       clock,
       config,
     ),
-    apiKeyAuthMiddleware: await createApiKeyAuthMiddlewareV1(
+    apiKeyAuthMiddleware: createApiKeyAuthMiddlewareV1(
       repositories.getApiConsumerById,
       clock,
       config,
+    ),
+    adminAuthMiddleware: await createAdminAuthMiddleware(
+      config.adminJwtSecret,
+      clock,
     ),
     generateMagicLinkJwt,
     generateApiJwt,

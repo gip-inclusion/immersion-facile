@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+import { AdminToken } from "shared/src/admin/admin.dto";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import {
   ConventionStatus,
@@ -31,6 +32,7 @@ export interface ConventionGateway {
   signApplication(jwt: string): Promise<WithConventionId>;
 
   getAll(
+    adminToken: AdminToken,
     agency?: AgencyId,
     status?: ConventionStatus,
   ): Promise<Array<ConventionDto>>;

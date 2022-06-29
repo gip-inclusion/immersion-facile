@@ -1,9 +1,5 @@
 import { Router } from "express";
-import {
-  conventionShareRoute,
-  conventionsRoute,
-  validateConventionRoute,
-} from "shared/src/routes";
+import { conventionShareRoute, conventionsRoute } from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
@@ -20,28 +16,9 @@ export const createConventionRouter = (deps: AppDependencies) => {
 
   conventionRouter
     .route(`/${conventionsRoute}`)
-    .get(async (req, res) =>
-      sendHttpResponse(
-        req,
-        res,
-        () => deps.useCases.listConventions.execute(req.query),
-        deps.authChecker,
-      ),
-    )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.addConvention.execute(req.body),
-      ),
-    );
-
-  conventionRouter
-    .route(`/${validateConventionRoute}/:id`)
-    .get(async (req, res) =>
-      sendHttpResponse(
-        req,
-        res,
-        () => deps.useCases.validateConvention.execute(req.params.id),
-        deps.authChecker,
       ),
     );
 

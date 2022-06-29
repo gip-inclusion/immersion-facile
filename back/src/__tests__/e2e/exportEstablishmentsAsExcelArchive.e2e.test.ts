@@ -1,10 +1,33 @@
+import { AdminToken } from "shared/src/admin/admin.dto";
+import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { exportEstablismentsExcelRoute } from "shared/src/routes";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 
 describe("/export-establishments", () => {
+  let adminToken: AdminToken;
+  let request: SuperTest<Test>;
+  let appConfig: AppConfig;
+
+  beforeEach(async () => {
+    ({ request, appConfig } = await buildTestApp());
+
+    const response = await request
+      .post("/admin/login")
+      .send({
+        user: appConfig.backofficeUsername,
+        password: appConfig.backofficePassword,
+      })
+      .expect(200);
+
+    adminToken = response.body;
+  });
+
   it("fails with 401 without authentication", async () => {
     const { request } = await buildTestApp();
-    await request.get(`/${exportEstablismentsExcelRoute}`).expect(401);
+    await request
+      .get(`/admin/excel/${exportEstablismentsExcelRoute}`)
+      .expect(401);
   });
 
   it("by region and aggregated when authenticated", async () => {
@@ -12,9 +35,9 @@ describe("/export-establishments", () => {
 
     const result = await request
       .get(
-        `/${exportEstablismentsExcelRoute}?groupKey=region&aggregateProfession=true&sourceProvider=all`,
+        `/admin/excel/${exportEstablismentsExcelRoute}?groupKey=region&aggregateProfession=true&sourceProvider=all`,
       )
-      .auth("e2e_tests", "e2e");
+      .set("Authorization", adminToken);
 
     expect(result.headers).toMatchObject({
       "content-disposition":
@@ -29,9 +52,9 @@ describe("/export-establishments", () => {
 
     const result = await request
       .get(
-        `/${exportEstablismentsExcelRoute}?groupKey=department&aggregateProfession=false&sourceProvider=all`,
+        `/admin/excel/${exportEstablismentsExcelRoute}?groupKey=department&aggregateProfession=false&sourceProvider=all`,
       )
-      .auth("e2e_tests", "e2e");
+      .set("Authorization", adminToken);
 
     expect(result.headers).toMatchObject({
       "content-disposition":
@@ -45,9 +68,9 @@ describe("/export-establishments", () => {
 
     const result = await request
       .get(
-        `/${exportEstablismentsExcelRoute}?groupBy=lol&aggregateProfession=poney&sourceProvider=cma`,
+        `/admin/excel/${exportEstablismentsExcelRoute}?groupBy=lol&aggregateProfession=poney&sourceProvider=cma`,
       )
-      .auth("e2e_tests", "e2e");
+      .set("Authorization", adminToken);
 
     expect(result.status).toBe(200);
     expect(result.headers).toMatchObject({
@@ -61,9 +84,9 @@ describe("/export-establishments", () => {
 
     const result = await request
       .get(
-        `/${exportEstablismentsExcelRoute}?groupKey=region&aggregateProfession=true&sourceProvider=cci`,
+        `/admin/excel/${exportEstablismentsExcelRoute}?groupKey=region&aggregateProfession=true&sourceProvider=cci`,
       )
-      .auth("e2e_tests", "e2e");
+      .set("Authorization", adminToken);
 
     expect(result.status).toBe(200);
     expect(result.headers).toMatchObject({

@@ -10,7 +10,7 @@ type AnyObject = Record<string, unknown>;
 export type GenerateMagicLinkJwt = GenerateJwtFn<PayloadOption>;
 export type GenerateEditFormEstablishmentUrl =
   GenerateJwtFn<EstablishmentJwtPayload>;
-export type GenerateAdminJwt = GenerateJwtFn<{ expiresIn: string }>;
+export type GenerateAdminJwt = GenerateJwtFn<{ version: number }>;
 
 export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
 
@@ -34,11 +34,11 @@ export const makeVerifyJwtES256 =
     }) as Payload;
 
 export const makeGenerateJwtHS256 =
-  <P extends AnyObject>(secret: string): GenerateJwtFn<P> =>
+  <P extends AnyObject>(secret: string, expiresIn: string): GenerateJwtFn<P> =>
   (payload) =>
     jwt.sign(payload, secret, {
       algorithm: "HS256",
-      noTimestamp: true,
+      expiresIn,
     });
 
 export const makeVerifyJwtHS256 =

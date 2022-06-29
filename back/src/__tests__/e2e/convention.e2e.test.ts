@@ -1,3 +1,4 @@
+import { AdminToken } from "shared/src/admin/admin.dto";
 import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
 import {
   currentJwtVersions,
@@ -28,6 +29,7 @@ let request: SuperTest<Test>;
 let generateJwt: GenerateMagicLinkJwt;
 let eventCrawler: BasicEventCrawler;
 let reposAndGateways: InMemoryRepositories;
+let adminToken: AdminToken;
 
 const convention = new ConventionDtoBuilder()
   .withStatus("IN_REVIEW")
@@ -56,122 +58,106 @@ const initializeSystemUnderTest = async (
     conventionRepository.setConventions({ [convention.id]: convention });
   }
   generateJwt = generateMagicLinkJwt;
-};
-
-describe("/demandes-immersion route", () => {
-  describe("Backoffice", () => {
-    beforeEach(async () => {
-      await initializeSystemUnderTest(new AppConfigBuilder().build(), {
-        withImmersionStored: true,
-      });
-    });
-    describe("Application validation", () => {
-      it("Validating an existing application succeeds, with auth", async () => {
-        // Validating an application with existing id succeeds (with auth).
-        await request
-          .get(`/${validateConventionRoute}/${convention.id}`)
-          .auth("e2e_tests", "e2e")
-          .expect(200, { id: convention.id });
-
-        const validatedConvention = {
-          ...convention,
-          status: "VALIDATED",
-        };
-
-        // Getting the application succeeds and shows that it's validated.
-        await request
-          .get(`/admin/${conventionsRoute}/${convention.id}`)
-          .auth("e2e_tests", "e2e")
-          .expect(200, validatedConvention);
-      });
-
-      it("Validating applications without credentials fails with 401 Unauthorized", async () => {
-        await request
-          .get(`/${validateConventionRoute}/${convention.id}`)
-          .expect(401);
-
-        // Getting the application succeeds and shows that it's NOT validated.
-        await request
-          .get(`/admin/${conventionsRoute}/${convention.id}`)
-          .auth("e2e_tests", "e2e")
-          .expect(200, convention);
-      });
-
-      it("Validating applications with invalid credentials fails with 403 Forbidden", async () => {
-        await request
-          .get(`/${validateConventionRoute}/${convention.id}`)
-          .auth("not real user", "not real password")
-          .expect(403);
-
-        // Getting the application succeeds and shows that it's NOT validated.
-        await request
-          .get(`/admin/${conventionsRoute}/${convention.id}`)
-          .auth("e2e_tests", "e2e")
-          .expect(200, convention);
-      });
-
-      it("Validating non-existent application with valid credentials fails with 404", async () => {
-        await request
-          .get(`/${validateConventionRoute}/unknown-demande-immersion-id`)
-          .auth("e2e_tests", "e2e")
-          .expect(404);
-
-        // Getting the existing application succeeds and shows that it's NOT validated.
-        await request
-          .get(`/admin/${conventionsRoute}/${convention.id}`)
-          .auth("e2e_tests", "e2e")
-          .expect(200, convention);
-      });
-    });
+  const response = await request.post("/admin/login").send({
+    user: config.backofficeUsername,
+    password: config.backofficePassword,
   });
 
-  describe("DEV environment", () => {
-    beforeEach(async () => {
-      await initializeSystemUnderTest(new AppConfigBuilder().build(), {
-        withImmersionStored: false,
+  adminToken = response.body;
+};
+
+describe("convention e2e", () => {
+  describe("/demandes-immersion route", () => {
+    describe("Backoffice", () => {
+      beforeEach(async () => {
+        await initializeSystemUnderTest(new AppConfigBuilder().build(), {
+          withImmersionStored: true,
+        });
+      });
+      describe("Application validation", () => {
+        it("Validating an existing application succeeds, with auth", async () => {
+          // Validating an application with existing id succeeds (with auth).
+          await request
+            .get(`/admin/${validateConventionRoute}/${convention.id}`)
+            .set("Authorization", adminToken)
+            .expect(200, { id: convention.id });
+
+          const validatedConvention = {
+            ...convention,
+            status: "VALIDATED",
+          };
+
+          // Getting the application succeeds and shows that it's validated.
+          await request
+            .get(`/admin/${conventionsRoute}/${convention.id}`)
+            .set("Authorization", adminToken)
+            .expect(200, validatedConvention);
+        });
+
+        it("Validating applications without credentials fails with 401 Unauthorized", async () => {
+          await request
+            .get(`/${validateConventionRoute}/${convention.id}`)
+            .expect(401);
+
+          // Getting the application succeeds and shows that it's NOT validated.
+          await request
+            .get(`/admin/${conventionsRoute}/${convention.id}`)
+            .set("Authorization", adminToken)
+            .expect(200, convention);
+        });
+
+        it("Validating applications with invalid credentials fails with 403 Forbidden", async () => {
+          await request
+            .get(`/admin/${validateConventionRoute}/${convention.id}`)
+            .set("Authorization", "wrong-token")
+            .expect(401);
+
+          // Getting the application succeeds and shows that it's NOT validated.
+          await request
+            .get(`/admin/${conventionsRoute}/${convention.id}`)
+            .set("Authorization", adminToken)
+            .expect(200, convention);
+        });
+
+        it("Validating non-existent application with valid credentials fails with 404", async () => {
+          await request
+            .get(
+              `/admin/${validateConventionRoute}/unknown-demande-immersion-id`,
+            )
+            .set("Authorization", adminToken)
+            .expect(404);
+
+          // Getting the existing application succeeds and shows that it's NOT validated.
+          await request
+            .get(`/admin/${conventionsRoute}/${convention.id}`)
+            .set("Authorization", adminToken)
+            .expect(200, convention);
+        });
       });
     });
 
-    it("Creating an invalid application fails", async () => {
-      await request
-        .post(`/${conventionsRoute}`)
-        .send({ invalid_params: true })
-        .expect(400);
-    });
-
-    it("Creating a valid application succeeds", async () => {
-      const convention = new ConventionDtoBuilder().build();
-      const { externalId, ...createConventionParams } = convention;
-
-      // GET /demandes-immersion returns an empty list.
-      await request
-        .get(`/${conventionsRoute}`)
-        .auth("e2e_tests", "e2e")
-        .expect(200, []);
-
-      // POSTing a valid application succeeds.
-      await request
-        .post(`/${conventionsRoute}`)
-        .send(createConventionParams)
-        .expect(200, { id: convention.id });
-
-      // GETting the created application succeeds.
-      await request
-        .get(`/admin/${conventionsRoute}/${convention.id}`)
-        .auth("e2e_tests", "e2e")
-        .expect(200, convention);
-    });
-
-    describe("Getting an application", () => {
-      const convention = new ConventionDtoBuilder().build();
-      const { externalId, ...createConventionParams } =
-        new ConventionDtoBuilder().build();
-
+    describe("DEV environment", () => {
       beforeEach(async () => {
+        await initializeSystemUnderTest(new AppConfigBuilder().build(), {
+          withImmersionStored: false,
+        });
+      });
+
+      it("Creating an invalid application fails", async () => {
+        await request
+          .post(`/${conventionsRoute}`)
+          .send({ invalid_params: true })
+          .expect(400);
+      });
+
+      it("Creating a valid application succeeds", async () => {
+        const convention = new ConventionDtoBuilder().build();
+        const { externalId, ...createConventionParams } = convention;
+
         // GET /demandes-immersion returns an empty list.
         await request
-          .get(`/${conventionsRoute}`)
-          .auth("e2e_tests", "e2e")
+          .get(`/admin/${conventionsRoute}`)
+          .set("Authorization", adminToken)
           .expect(200, []);
 
         // POSTing a valid application succeeds.
@@ -179,234 +165,242 @@ describe("/demandes-immersion route", () => {
           .post(`/${conventionsRoute}`)
           .send(createConventionParams)
           .expect(200, { id: convention.id });
-      });
-
-      it("succeeds with correct magic link", async () => {
-        const payload = {
-          applicationId: convention.id,
-          role: "beneficiary" as Role,
-          emailHash: stringToMd5(convention.email),
-          iat: Math.round(Date.now() / 1000),
-          exp: Math.round(Date.now() / 1000) + 31 * 24 * 3600,
-          version: currentJwtVersions.application,
-        };
-        const jwt = generateJwt(payload);
 
         // GETting the created application succeeds.
         await request
-          .get(`/auth/${conventionsRoute}/${convention.id}`)
-          .set("Authorization", jwt)
+          .get(`/admin/${conventionsRoute}/${convention.id}`)
+          .set("Authorization", adminToken)
           .expect(200, convention);
       });
 
-      it("redirects expired magic links to a renewal page", async () => {
-        const payload = createConventionMagicLinkPayload(
-          convention.id,
-          "beneficiary",
-          convention.email,
-          1,
-          undefined,
-          undefined,
-          Math.round(Date.now() / 1000) - 2 * 24 * 3600,
-        );
-        const jwt = generateJwt(payload);
+      describe("Getting an application", () => {
+        const convention = new ConventionDtoBuilder().build();
+        const { externalId, ...createConventionParams } =
+          new ConventionDtoBuilder().build();
 
-        // GETting the created application 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
+        beforeEach(async () => {
+          // GET /demandes-immersion returns an empty list.
+          await request
+            .get(`/admin/${conventionsRoute}`)
+            .set("Authorization", adminToken)
+            .expect(200, []);
+
+          // POSTing a valid application succeeds.
+          await request
+            .post(`/${conventionsRoute}`)
+            .send(createConventionParams)
+            .expect(200, { id: convention.id });
+        });
+
+        it("succeeds with correct magic link", async () => {
+          const payload = {
+            applicationId: convention.id,
+            role: "beneficiary" as Role,
+            emailHash: stringToMd5(convention.email),
+            iat: Math.round(Date.now() / 1000),
+            exp: Math.round(Date.now() / 1000) + 31 * 24 * 3600,
+            version: currentJwtVersions.application,
+          };
+          const jwt = generateJwt(payload);
+
+          // GETting the created application succeeds.
+          await request
+            .get(`/auth/${conventionsRoute}/${convention.id}`)
+            .set("Authorization", jwt)
+            .expect(200, convention);
+        });
+
+        it("redirects expired magic links to a renewal page", async () => {
+          const payload = createConventionMagicLinkPayload(
+            convention.id,
+            "beneficiary",
+            convention.email,
+            1,
+            undefined,
+            undefined,
+            Math.round(Date.now() / 1000) - 2 * 24 * 3600,
+          );
+          const jwt = generateJwt(payload);
+
+          // GETting the created application 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
+          await request
+            .get(`/auth/${conventionsRoute}/${convention.id}`)
+            .set("Authorization", jwt)
+            .expect(403, {
+              message: "Le lien magique est périmé",
+              needsNewMagicLink: true,
+            });
+        });
+      });
+
+      it("Updating an existing application succeeds", async () => {
+        const convention = new ConventionDtoBuilder().build();
+        const { externalId, ...createConventionParams } = convention;
+
+        // POSTing a valid application succeeds.
         await request
-          .get(`/auth/${conventionsRoute}/${convention.id}`)
+          .post(`/${conventionsRoute}`)
+          .send(createConventionParams)
+          .expect(200, { id: convention.id });
+
+        // POSTing an updated application to the same id succeeds.
+        const updatedConvention = {
+          ...convention,
+          email: "new@email.fr",
+          status: "READY_TO_SIGN",
+        };
+
+        const jwt = generateJwt(
+          createConventionMagicLinkPayload(
+            convention.id,
+            "beneficiary",
+            convention.email,
+          ),
+        );
+
+        await request
+          .post(`/auth/${conventionsRoute}/${convention.id}`)
           .set("Authorization", jwt)
-          .expect(403, {
-            message: "Le lien magique est périmé",
-            needsNewMagicLink: true,
-          });
+          .send(updatedConvention)
+          .expect(200);
+
+        // GETting the updated application succeeds.
+        await request
+          .get(`/admin/${conventionsRoute}/${convention.id}`)
+          .set("Authorization", adminToken)
+          .expect(200, updatedConvention);
+      });
+
+      it("Fetching unknown application IDs fails with 404 Not Found", async () => {
+        const unknownId = "unknown-demande-immersion-id";
+        const jwt = generateJwt(
+          createConventionMagicLinkPayload(
+            unknownId,
+            "beneficiary",
+            "some email",
+          ),
+        );
+        await request
+          .get(`/${conventionsRoute}/anything`)
+          .set("Authorization", jwt)
+          .expect(404);
+
+        await request
+          .get(`/admin/${conventionsRoute}/${unknownId}`)
+          .set("Authorization", adminToken)
+          .expect(404);
+      });
+
+      it("Updating an unknown application IDs fails with 404 Not Found", async () => {
+        const unknownId = "unknown-demande-immersion-id";
+        const conventionWithUnknownId = new ConventionDtoBuilder()
+          .withId(unknownId)
+          .build();
+        const { externalId, ...createConventionParams } =
+          conventionWithUnknownId;
+
+        const jwt = generateJwt(
+          createConventionMagicLinkPayload(
+            unknownId,
+            "beneficiary",
+            "some email",
+          ),
+        );
+
+        await request
+          .post(`/${conventionsRoute}/${unknownId}`)
+          .set("Authorization", jwt)
+          .send(createConventionParams)
+          .expect(404);
+      });
+
+      it("Creating an application with an existing ID fails with 409 Conflict", async () => {
+        const convention = new ConventionDtoBuilder().build();
+        const { externalId, ...createConventionParams } = convention;
+
+        // POSTing a valid application succeeds.
+        await request
+          .post(`/${conventionsRoute}`)
+          .send(createConventionParams)
+          .expect(200, { id: convention.id });
+
+        // POSTing a another valid application with the same ID fails.
+        await request
+          .post(`/${conventionsRoute}`)
+          .send({
+            ...createConventionParams,
+            email: "another@email.fr",
+          })
+          .expect(409);
+      });
+    });
+  });
+
+  describe("/update-application-status route", () => {
+    beforeEach(async () => {
+      await initializeSystemUnderTest(new AppConfigBuilder().build(), {
+        withImmersionStored: true,
       });
     });
 
-    it("Updating an existing application succeeds", async () => {
-      const convention = new ConventionDtoBuilder().build();
-      const { externalId, ...createConventionParams } = convention;
-
-      // POSTing a valid application succeeds.
-      await request
-        .post(`/${conventionsRoute}`)
-        .send(createConventionParams)
-        .expect(200, { id: convention.id });
-
-      // POSTing an updated application to the same id succeeds.
-      const updatedConvention = {
-        ...convention,
-        email: "new@email.fr",
-        status: "READY_TO_SIGN",
-      };
-
-      const jwt = generateJwt(
+    it("Succeeds for rejected application and notifies Pole Emploi", async () => {
+      // A counsellor rejects the application.
+      const counsellorJwt = generateJwt(
         createConventionMagicLinkPayload(
-          convention.id,
-          "beneficiary",
-          convention.email,
+          conventionId,
+          "counsellor",
+          "counsellor@pe.fr",
         ),
       );
-
       await request
-        .post(`/auth/${conventionsRoute}/${convention.id}`)
-        .set("Authorization", jwt)
-        .send(updatedConvention)
+        .post(`/auth/${updateConventionStatusRoute}/${counsellorJwt}`)
+        .set("Authorization", counsellorJwt)
+        .send({ status: "REJECTED", justification: "test-justification" })
         .expect(200);
 
-      // GETting the updated application succeeds.
-      await request
-        .get(`/admin/${conventionsRoute}/${convention.id}`)
-        .auth("e2e_tests", "e2e")
-        .expect(200, updatedConvention);
+      await eventCrawler.processNewEvents();
+
+      const notifications = reposAndGateways.poleEmploiGateway.notifications;
+      expect(notifications).toHaveLength(1);
+      expect(notifications[0].status).toBe("REJETÉ");
     });
 
-    it("Fetching unknown application IDs fails with 404 Not Found", async () => {
-      const unknownId = "unknown-demande-immersion-id";
-      const jwt = generateJwt(
+    it("Returns error 401 if no JWT", async () => {
+      await request
+        .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
+        .send({ status: "VALIDATED" })
+        .expect(401);
+    });
+
+    it("Returns error 403 for unauthorized requests", async () => {
+      // A tutor tries to validate the application, but fails.
+      const tutorJwt = generateJwt(
         createConventionMagicLinkPayload(
-          unknownId,
-          "beneficiary",
-          "some email",
+          conventionId,
+          "establishment",
+          convention.mentorEmail,
         ),
       );
       await request
-        .get(`/${conventionsRoute}/anything`)
-        .set("Authorization", jwt)
-        .expect(404);
-
-      await request
-        .get(`/admin/${conventionsRoute}/${unknownId}`)
-        .auth("e2e_tests", "e2e")
-        .expect(404);
-    });
-
-    it("Updating an unknown application IDs fails with 404 Not Found", async () => {
-      const unknownId = "unknown-demande-immersion-id";
-      const conventionWithUnknownId = new ConventionDtoBuilder()
-        .withId(unknownId)
-        .build();
-      const { externalId, ...createConventionParams } = conventionWithUnknownId;
-
-      const jwt = generateJwt(
-        createConventionMagicLinkPayload(
-          unknownId,
-          "beneficiary",
-          "some email",
-        ),
-      );
-
-      await request
-        .post(`/${conventionsRoute}/${unknownId}`)
-        .set("Authorization", jwt)
-        .send(createConventionParams)
-        .expect(404);
-    });
-
-    it("Creating an application with an existing ID fails with 409 Conflict", async () => {
-      const convention = new ConventionDtoBuilder().build();
-      const { externalId, ...createConventionParams } = convention;
-
-      // POSTing a valid application succeeds.
-      await request
-        .post(`/${conventionsRoute}`)
-        .send(createConventionParams)
-        .expect(200, { id: convention.id });
-
-      // POSTing a another valid application with the same ID fails.
-      await request
-        .post(`/${conventionsRoute}`)
-        .send({
-          ...createConventionParams,
-          email: "another@email.fr",
-        })
-        .expect(409);
-    });
-
-    it("Listing applications without credentials fails with 401 Unauthorized", async () => {
-      await request.get(`/${conventionsRoute}`).expect(401);
-    });
-
-    it("Listing applications with invalid credentials fails with 403 Forbidden", async () => {
-      await request
-        .get(`/${conventionsRoute}`)
-        .auth("not real user", "not real password")
+        .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
+        .set("Authorization", tutorJwt)
+        .send({ status: "VALIDATED" })
         .expect(403);
     });
 
-    it("Listing applications with valid credentials succeeds", async () => {
-      // GET /demandes-immersion succeeds with login/pass.
+    it("Returns error 404 for unknown application ids", async () => {
+      const counsellorJwt = generateJwt(
+        createConventionMagicLinkPayload(
+          "unknown_application_id",
+          "counsellor",
+          "counsellor@pe.fr",
+        ),
+      );
       await request
-        .get(`/${conventionsRoute}`)
-        .auth("e2e_tests", "e2e")
-        .expect(200);
+        .post(`/auth/${updateConventionStatusRoute}/unknown_application_id`)
+        .set("Authorization", counsellorJwt)
+        .send({ status: "ACCEPTED_BY_COUNSELLOR" })
+        .expect(404); // Not found
     });
-  });
-});
-
-describe("/update-application-status route", () => {
-  beforeEach(async () => {
-    await initializeSystemUnderTest(new AppConfigBuilder().build(), {
-      withImmersionStored: true,
-    });
-  });
-
-  it("Succeeds for rejected application and notifies Pole Emploi", async () => {
-    // A counsellor rejects the application.
-    const counsellorJwt = generateJwt(
-      createConventionMagicLinkPayload(
-        conventionId,
-        "counsellor",
-        "counsellor@pe.fr",
-      ),
-    );
-    await request
-      .post(`/auth/${updateConventionStatusRoute}/${counsellorJwt}`)
-      .set("Authorization", counsellorJwt)
-      .send({ status: "REJECTED", justification: "test-justification" })
-      .expect(200);
-
-    await eventCrawler.processNewEvents();
-
-    const notifications = reposAndGateways.poleEmploiGateway.notifications;
-    expect(notifications).toHaveLength(1);
-    expect(notifications[0].status).toBe("REJETÉ");
-  });
-
-  it("Returns error 401 if no JWT", async () => {
-    await request
-      .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
-      .send({ status: "VALIDATED" })
-      .expect(401);
-  });
-
-  it("Returns error 403 for unauthorized requests", async () => {
-    // A tutor tries to validate the application, but fails.
-    const tutorJwt = generateJwt(
-      createConventionMagicLinkPayload(
-        conventionId,
-        "establishment",
-        convention.mentorEmail,
-      ),
-    );
-    await request
-      .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
-      .set("Authorization", tutorJwt)
-      .send({ status: "VALIDATED" })
-      .expect(403);
-  });
-
-  it("Returns error 404 for unknown application ids", async () => {
-    const counsellorJwt = generateJwt(
-      createConventionMagicLinkPayload(
-        "unknown_application_id",
-        "counsellor",
-        "counsellor@pe.fr",
-      ),
-    );
-    await request
-      .post(`/auth/${updateConventionStatusRoute}/unknown_application_id`)
-      .set("Authorization", counsellorJwt)
-      .send({ status: "ACCEPTED_BY_COUNSELLOR" })
-      .expect(404); // Not found
   });
 });

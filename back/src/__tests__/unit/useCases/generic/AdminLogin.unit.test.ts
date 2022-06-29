@@ -10,8 +10,8 @@ describe("AdminLogin", () => {
     adminLogin = new AdminLogin(
       "user",
       "pwd",
-      (payload) => correctToken + payload.expiresIn,
-      async (_) => {
+      (_) => correctToken,
+      async () => {
         /* do not wait in case of unit tests */
       },
     );
@@ -31,6 +31,6 @@ describe("AdminLogin", () => {
 
   it("returns a jwt when user and password match", async () => {
     const token = await adminLogin.execute({ user: "user", password: "pwd" });
-    expect(token).toBe(correctToken + "365d");
+    expect(token).toBe(correctToken);
   });
 });

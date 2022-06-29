@@ -1,3 +1,4 @@
+import { AdminToken } from "shared/src/admin/admin.dto";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { AgencyId, AgencyWithPositionDto } from "shared/src/agency/agency.dto";
@@ -57,6 +58,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   }
 
   public async getAll(
+    _adminToken: AdminToken,
     agency?: AgencyId,
     status?: ConventionStatus,
   ): Promise<Array<ConventionDto>> {

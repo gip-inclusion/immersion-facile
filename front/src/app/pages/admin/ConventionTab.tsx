@@ -6,7 +6,10 @@ import {
   ConventionDto,
   ConventionStatus,
 } from "shared/src/convention/convention.dto";
-import { conventionGateway } from "src/app/config/dependencies";
+import {
+  conventionGateway,
+  deviceRepository,
+} from "src/app/config/dependencies";
 import { AdminRoute } from "src/app/pages/admin/AdminRoute";
 import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
 import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
@@ -31,13 +34,16 @@ export const ConventionTab = ({ route }: { route: AdminRoute }) => {
   };
 
   useEffect(() => {
-    conventionGateway.getAll(agency, statusFilter).then(
-      (applications) => setConventions(applications),
-      (error: any) => {
-        // eslint-disable-next-line no-console
-        console.log("getFormEstablishmentFromJwt", error);
-      },
-    );
+    conventionGateway
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      .getAll(deviceRepository.get("adminToken")!, agency, statusFilter)
+      .then(
+        (applications) => setConventions(applications),
+        (error: any) => {
+          // eslint-disable-next-line no-console
+          console.log("getFormEstablishmentFromJwt", error);
+        },
+      );
   }, [statusFilter]);
   return (
     <div>

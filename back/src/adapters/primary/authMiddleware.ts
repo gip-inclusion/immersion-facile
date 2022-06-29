@@ -208,6 +208,9 @@ export const createMagicLinkAuthMiddleware = (
         case "establishment":
           req.payloads = { establishment: payload as EstablishmentJwtPayload };
           break;
+        case "admin":
+          req.payloads = { admin: payload };
+          break;
         default:
           // eslint-disable-next-line no-case-declarations
           const unhandledPayloadKey: never = payloadKey;

@@ -1,19 +1,30 @@
+import { AdminToken } from "shared/src/admin/admin.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { agenciesRoute } from "shared/src/routes";
 import { SuperTest, Test } from "supertest";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import {
   buildTestApp,
   InMemoryRepositories,
 } from "../../_testBuilders/buildTestApp";
 
-describe("/agencies route", () => {
+describe(`/${agenciesRoute} route`, () => {
   let request: SuperTest<Test>;
   let reposAndGateways: InMemoryRepositories;
   let eventCrawler: BasicEventCrawler;
+  let adminToken: AdminToken;
+  let appConfig: AppConfig;
 
   beforeEach(async () => {
-    ({ request, reposAndGateways, eventCrawler } = await buildTestApp());
+    ({ request, reposAndGateways, eventCrawler, appConfig } =
+      await buildTestApp());
+
+    const response = await request.post("/admin/login").send({
+      user: appConfig.backofficeUsername,
+      password: appConfig.backofficePassword,
+    });
+    adminToken = response.body;
   });
 
   const agency1ActiveNearBy = AgencyDtoBuilder.create("test-agency-1")
@@ -51,7 +62,7 @@ describe("/agencies route", () => {
         ].map(async (agencyDto) => reposAndGateways.agency.insert(agencyDto)),
       );
       // Act and asseer
-      await request.get(`/agencies?lat=10.123&lon=10.123`).expect(200, [
+      await request.get(`/${agenciesRoute}?lat=10.123&lon=10.123`).expect(200, [
         {
           id: agency1ActiveNearBy.id,
           name: agency1ActiveNearBy.name,
@@ -66,6 +77,17 @@ describe("/agencies route", () => {
     });
   });
   describe("private route to get agencies full dto given filters", () => {
+    it("Returns Forbidden if no token provided", async () => {
+      const response = await request.get(
+        `/admin/${agenciesRoute}?status=needsReview`,
+      );
+
+      expect(response.body).toEqual({
+        error: "You need to authenticate first",
+      });
+      expect(response.status).toBe(401);
+    });
+
     it("Returns all agency dtos with a given status", async () => {
       // Prepare
       await Promise.all(
@@ -76,7 +98,7 @@ describe("/agencies route", () => {
       // Getting the application succeeds and shows that it's validated.
       await request
         .get(`/admin/${agenciesRoute}?status=needsReview`)
-        .auth("e2e_tests", "e2e")
+        .set("Authorization", adminToken)
         .expect(200, [agency4NeedsReview]);
     });
   });
@@ -89,7 +111,7 @@ describe("/agencies route", () => {
       // Act and assert
       await request
         .patch(`/admin/${agenciesRoute}/test-agency-4`)
-        .auth("e2e_tests", "e2e")
+        .set("Authorization", adminToken)
         .send({ status: "active" })
         .expect(200);
 
