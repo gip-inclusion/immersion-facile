@@ -1,4 +1,8 @@
-import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
+import {
+  GenerateAdminJwt,
+  GenerateMagicLinkJwt,
+  makeGenerateJwtHS256,
+} from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
@@ -7,6 +11,7 @@ import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { ExportEstablishmentsAsExcelArchive } from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
+import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
 import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
 import { ExportImmersionApplicationsReport } from "../../../domain/convention/useCases/ExportImmersionApplicationsReport";
@@ -72,6 +77,7 @@ export const createUseCases = (
   repositories: Repositories,
   generateJwtFn: GenerateMagicLinkJwt,
   generateMagicLinkFn: GenerateConventionMagicLink,
+  generateAdminJwt: GenerateAdminJwt,
   emailFilter: EmailFilter,
   uowPerformer: UnitOfWorkPerformer,
   clock: Clock,
@@ -97,6 +103,11 @@ export const createUseCases = (
       uowPerformer,
       createNewEvent,
       getSiret,
+    ),
+    adminLogin: new AdminLogin(
+      config.backofficeUsername,
+      config.backofficePassword,
+      generateAdminJwt,
     ),
     getConvention: new GetImmersionApplication(repositories.convention),
     linkPoleEmploiAdvisorAndRedirectToConvention:

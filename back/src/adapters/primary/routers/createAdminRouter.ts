@@ -4,12 +4,21 @@ import {
   generateMagicLinkRoute,
   conventionsRoute,
   agenciesRoute,
+  adminLogin,
 } from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
 export const createAdminRouter = (deps: AppDependencies) => {
   const adminRouter = Router({ mergeParams: true });
+
+  adminRouter
+    .route(`/${adminLogin}`)
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.adminLogin.execute(req.body),
+      ),
+    );
 
   adminRouter
     .route(`/${conventionsRoute}/:id`)

@@ -3,7 +3,7 @@ import {
   createConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
-import { makeGenerateJwt } from "../../../domain/auth/jwt";
+import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
 
 export type GenerateConventionMagicLink = ReturnType<
@@ -11,7 +11,7 @@ export type GenerateConventionMagicLink = ReturnType<
 >;
 
 export const createGenerateConventionMagicLink = (config: AppConfig) => {
-  const generateJwt = makeGenerateJwt(config.magicLinkJwtPrivateKey);
+  const generateJwt = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
 
   return ({
     id,

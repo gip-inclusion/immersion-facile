@@ -1,4 +1,7 @@
-import { makeGenerateJwt, makeVerifyJwt } from "../../domain/auth/jwt";
+import {
+  makeGenerateJwtES256,
+  makeVerifyJwtES256,
+} from "../../domain/auth/jwt";
 import { DeliverRenewedMagicLink } from "../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
@@ -76,7 +79,7 @@ describe("Magic link renewal flow", () => {
     const agencyRepository = new InMemoryAgencyRepository([agency]);
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
-    generateJwtFn = makeGenerateJwt(config.magicLinkJwtPrivateKey);
+    generateJwtFn = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
 
     renewMagicLink = new RenewMagicLink(
       conventionRepository,
@@ -124,7 +127,7 @@ describe("Magic link renewal flow", () => {
     expect(ml.startsWith("immersionfacile.fr/")).toBeTruthy();
     const jwt = ml.replace("immersionfacile.fr/", "");
 
-    const verifyJwt = makeVerifyJwt(config.magicLinkJwtPublicKey);
+    const verifyJwt = makeVerifyJwtES256(config.magicLinkJwtPublicKey);
     expect(verifyJwt(jwt)).toBeDefined();
   });
 });

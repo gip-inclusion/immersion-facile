@@ -1,5 +1,5 @@
 import { addYears } from "date-fns";
-import { makeGenerateJwt } from "../../../domain/auth/jwt";
+import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import {
   ApiConsumer,
   ApiConsumerName,
@@ -15,7 +15,7 @@ const logger = createLogger(__filename);
 const uuidGenerator = new UuidV4Generator();
 const clock = new RealClock();
 const appConfig = AppConfig.createFromEnv();
-const generateApiKeyJwt = makeGenerateJwt<WithApiConsumerId>(
+const generateApiKeyJwt = makeGenerateJwtES256<WithApiConsumerId>(
   appConfig.apiJwtPrivateKey,
 );
 

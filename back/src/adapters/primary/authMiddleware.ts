@@ -14,7 +14,7 @@ import {
   PayloadOption,
 } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
-import { makeVerifyJwt } from "../../domain/auth/jwt";
+import { makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { AppConfig } from "./config/appConfig";
 import jwt from "jsonwebtoken";
 import promClient from "prom-client";
@@ -57,7 +57,9 @@ export const createApiKeyAuthMiddlewareV0 = (
   clock: Clock,
   config: AppConfig,
 ) => {
-  const verifyJwt = makeVerifyJwt<WithApiConsumerId>(config.apiJwtPublicKey);
+  const verifyJwt = makeVerifyJwtES256<WithApiConsumerId>(
+    config.apiJwtPublicKey,
+  );
 
   return async (req: Request, _res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
@@ -118,7 +120,9 @@ export const createApiKeyAuthMiddlewareV1 = (
   clock: Clock,
   config: AppConfig,
 ) => {
-  const verifyJwt = makeVerifyJwt<WithApiConsumerId>(config.apiJwtPublicKey);
+  const verifyJwt = makeVerifyJwtES256<WithApiConsumerId>(
+    config.apiJwtPublicKey,
+  );
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
@@ -254,10 +258,12 @@ const sendNeedsRenewedLinkError = (res: Response, err: Error) => {
   });
 };
 export const verifyJwtConfig = (config: AppConfig) => {
-  const verifyJwt = makeVerifyJwt<PayloadOption>(config.magicLinkJwtPublicKey);
+  const verifyJwt = makeVerifyJwtES256<PayloadOption>(
+    config.magicLinkJwtPublicKey,
+  );
 
   const verifyDeprecatedJwt = config.magicLinkJwtPreviousPublicKey
-    ? makeVerifyJwt<PayloadOption>(config.magicLinkJwtPreviousPublicKey)
+    ? makeVerifyJwtES256<PayloadOption>(config.magicLinkJwtPreviousPublicKey)
     : () => {
         throw new Error("No deprecated JWT private key provided");
       };

@@ -244,10 +244,14 @@ export class AppConfig {
   // == Backoffice ==
 
   public get backofficeUsername() {
-    return this.env.BACKOFFICE_USERNAME;
+    return this.throwIfNotDefined("BACKOFFICE_USERNAME");
   }
   public get backofficePassword() {
-    return this.env.BACKOFFICE_PASSWORD;
+    return this.throwIfNotDefined("BACKOFFICE_PASSWORD");
+  }
+
+  public get adminJwtSecret() {
+    return this.throwIfNotDefined("ADMIN_JWT_SECRET");
   }
 
   // == Email notifications ==

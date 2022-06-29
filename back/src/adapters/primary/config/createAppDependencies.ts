@@ -1,7 +1,10 @@
 import promClient from "prom-client";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { frontRoutes } from "shared/src/routes";
-import { makeGenerateJwt } from "../../../domain/auth/jwt";
+import {
+  makeGenerateJwtES256,
+  makeGenerateJwtHS256,
+} from "../../../domain/auth/jwt";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   AllowListEmailFilter,
@@ -50,8 +53,11 @@ export const createAppDependencies = async (config: AppConfig) => {
     return repositories.outbox.save(event);
   });
   const uowPerformer = createUowPerformer(config, getPgPoolFn, repositories);
-  const generateApiJwt = makeGenerateJwt(config.apiJwtPrivateKey);
-  const generateMagicLinkJwt = makeGenerateJwt(config.magicLinkJwtPrivateKey);
+  const generateApiJwt = makeGenerateJwtES256(config.apiJwtPrivateKey);
+  const generateMagicLinkJwt = makeGenerateJwtES256(
+    config.magicLinkJwtPrivateKey,
+  );
+  const generateAdminJwt = makeGenerateJwtHS256(config.adminJwtSecret);
   const generateMagicLinkFn = createGenerateConventionMagicLink(config);
 
   const emailFilter = config.skipEmailAllowlist
@@ -72,6 +78,7 @@ export const createAppDependencies = async (config: AppConfig) => {
       repositories,
       generateMagicLinkJwt,
       generateMagicLinkFn,
+      generateAdminJwt,
       emailFilter,
       uowPerformer,
       clock,

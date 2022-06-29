@@ -6,7 +6,7 @@ import {
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { makeGenerateJwt } from "../../domain/auth/jwt";
+import { makeGenerateJwtES256 } from "../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
@@ -34,7 +34,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
       .withAuthorizedApiKeyIds([authorizedApiKeyId])
       .build();
     ({ request, reposAndGateways } = await buildTestApp(config));
-    generateApiJwt = makeGenerateJwt(config.apiJwtPrivateKey);
+    generateApiJwt = makeGenerateJwtES256(config.apiJwtPrivateKey);
 
     await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()

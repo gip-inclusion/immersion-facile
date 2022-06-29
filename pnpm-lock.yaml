@@ -283,6 +283,7 @@ importers:
 
   shared:
     specifiers:
+      '@types/node': ^17.0.33
       '@types/ramda': ^0.28.1
       date-fns: ^2.28.0
       ramda: ^0.28.0
@@ -292,6 +293,7 @@ importers:
       ramda: 0.28.0
       zod: 3.17.2
     devDependencies:
+      '@types/node': 17.0.35
       '@types/ramda': 0.28.13
 
 packages:

@@ -3,7 +3,7 @@ import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEs
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
 import { formEstablishmentsRoute } from "shared/src/routes";
 import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { makeGenerateJwt } from "../../domain/auth/jwt";
+import { makeGenerateJwtES256 } from "../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { subYears } from "date-fns";
 
@@ -21,7 +21,9 @@ describe("Route to post edited form establishments", () => {
   it("Throws 401 if Jwt is generated from wrong private key", async () => {
     const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
     const { request } = await buildTestApp();
-    const generateJwtWithWrongKey = makeGenerateJwt(config.apiJwtPrivateKey); // Private Key is the wrong one !
+    const generateJwtWithWrongKey = makeGenerateJwtES256(
+      config.apiJwtPrivateKey,
+    ); // Private Key is the wrong one !
 
     const wrongJwt = generateJwtWithWrongKey(
       createEstablishmentMagicLinkPayload({
@@ -53,7 +55,9 @@ describe("Route to post edited form establishments", () => {
   it("Throws 401 if Jwt is expired", async () => {
     const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
     const { request, clock } = await buildTestApp();
-    const generateJwtWithWrongKey = makeGenerateJwt(config.apiJwtPrivateKey); // Private Key is the wrong one !
+    const generateJwtWithWrongKey = makeGenerateJwtES256(
+      config.apiJwtPrivateKey,
+    ); // Private Key is the wrong one !
 
     const wrongJwt = generateJwtWithWrongKey(
       createEstablishmentMagicLinkPayload({

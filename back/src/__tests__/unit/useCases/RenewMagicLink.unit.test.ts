@@ -1,4 +1,7 @@
-import { makeGenerateJwt, makeVerifyJwt } from "../../../domain/auth/jwt";
+import {
+  makeGenerateJwtES256,
+  makeVerifyJwtES256,
+} from "../../../domain/auth/jwt";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import {
   BadRequestError,
@@ -57,7 +60,7 @@ describe("RenewMagicLink use case", () => {
     conventionRepository.setConventions({ [entity.id]: entity });
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
-    generateJwtFn = makeGenerateJwt(config.magicLinkJwtPrivateKey);
+    generateJwtFn = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
   });
 
   const createUseCase = () =>
@@ -173,7 +176,7 @@ describe("RenewMagicLink use case", () => {
     expect(ml.startsWith("immersionfacile.fr/")).toBeTruthy();
     const jwt = ml.replace("immersionfacile.fr/", "");
 
-    const verifyJwt = makeVerifyJwt(config.magicLinkJwtPublicKey);
+    const verifyJwt = makeVerifyJwtES256(config.magicLinkJwtPublicKey);
     expect(verifyJwt(jwt)).toBeDefined();
   });
 });
