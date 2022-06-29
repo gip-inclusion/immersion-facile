@@ -11,18 +11,21 @@ describe("AdminLogin", () => {
       "user",
       "pwd",
       (payload) => correctToken + payload.expiresIn,
+      async (_) => {
+        /* do not wait in case of unit tests */
+      },
     );
   });
 
   it("throws Forbidden if user and password are not corret", async () => {
     await expectPromiseToFailWithError(
       adminLogin.execute({ user: "user", password: "password" }),
-      new ForbiddenError("Les identifiants ne sont pas corrects"),
+      new ForbiddenError("Wrong credentials"),
     );
 
     await expectPromiseToFailWithError(
       adminLogin.execute({ user: "lala", password: "pwd" }),
-      new ForbiddenError("Les identifiants ne sont pas corrects"),
+      new ForbiddenError("Wrong credentials"),
     );
   });
 

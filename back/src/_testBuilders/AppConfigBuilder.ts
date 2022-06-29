@@ -19,6 +19,7 @@ const defaultConfigParams = {
   API_JWT_PUBLIC_KEY:
     "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXNo97BD4w2huuAYsmINnn/+TPolx\nYUexkcD49YyxsjJPA2d91B2rDzteUKnEsloNYDTeYW88oLPMdgmbzm+sQg==\n-----END PUBLIC KEY-----",
 
+  ADMIN_JWT_SECRET: "secret",
   BACKOFFICE_USERNAME: "e2e_tests",
   BACKOFFICE_PASSWORD: "e2e",
   ADMIN_EMAIL: "myAdmin@mail.com",

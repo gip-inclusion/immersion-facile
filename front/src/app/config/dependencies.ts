@@ -1,4 +1,5 @@
 import { asyncScheduler, SchedulerLike } from "rxjs";
+import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/SimulatedAdminGateway";
 import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
 import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
@@ -80,7 +81,7 @@ const getSimulatedSiretGatewayThroughBack = () =>
 export const adminGateway =
   ENV.gateway === "IN_MEMORY"
     ? new SimulatedAdminGateway()
-    : new SimulatedAdminGateway();
+    : new HttpAdminGateway();
 
 export const siretGatewayThroughBack =
   ENV.gateway === "IN_MEMORY"

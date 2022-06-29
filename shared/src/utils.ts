@@ -6,8 +6,10 @@ export const stringOfNumbers = /^\+?[0-9]+$/;
 export type SleepFn = typeof sleep;
 
 // sleep function is use to simulate latency for demo and dev purpose
-export const sleep = (ms: number): Promise<number> =>
-  new Promise((resolve: any) => setTimeout(resolve, ms));
+export const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve: any) => {
+    setTimeout(resolve, ms);
+  });
 
 export type RandomFn = typeof random;
 export const random = (max: number): number => Math.floor(Math.random() * max);

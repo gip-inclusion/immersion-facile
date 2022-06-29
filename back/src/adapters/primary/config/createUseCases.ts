@@ -1,7 +1,7 @@
+import { sleep } from "shared/src/utils";
 import {
   GenerateAdminJwt,
   GenerateMagicLinkJwt,
-  makeGenerateJwtHS256,
 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { Clock } from "../../../domain/core/ports/Clock";
@@ -108,6 +108,7 @@ export const createUseCases = (
       config.backofficeUsername,
       config.backofficePassword,
       generateAdminJwt,
+      sleep,
     ),
     getConvention: new GetImmersionApplication(repositories.convention),
     linkPoleEmploiAdvisorAndRedirectToConvention:

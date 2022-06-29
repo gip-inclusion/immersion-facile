@@ -24,7 +24,7 @@ describe("admin login", () => {
       password: "lulu",
     });
     expect(response.body).toEqual({
-      errors: "Forbidden : Les identifiants ne sont pas corrects",
+      errors: "Forbidden : Wrong credentials",
     });
     expect(response.status).toBe(403);
   });

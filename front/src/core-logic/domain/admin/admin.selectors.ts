@@ -9,5 +9,13 @@ export const adminSelectors = {
     ({ isAuthenticated }) => isAuthenticated,
   ),
   isLoading: createSelector(adminState, ({ isLoading }) => isLoading),
-  error: createSelector(adminState, ({ error }) => error),
+  error: createSelector(
+    adminState,
+    ({ error }) => (error && knownErrors[error]) ?? error,
+  ),
+};
+
+const knownErrors: Record<string, string> = {
+  "Request failed with status code 403":
+    "Les identifiants ne sont pas corrects",
 };
