@@ -119,6 +119,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({ ...this.dto, dateEnd });
   }
 
+  public withDateValidation(dateValidation: string): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, dateValidation });
+  }
+  public withoutDateValidation(): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, dateValidation: undefined });
+  }
+
   public withId(id: ConventionId): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, id });
   }

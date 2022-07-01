@@ -40,6 +40,9 @@ export class InMemoryConventionQueries implements ConventionQueries {
       dateSubmission: new Date(dto.dateSubmission).toISOString(),
       dateStart: new Date(dto.dateStart).toISOString(),
       dateEnd: new Date(dto.dateEnd).toISOString(),
+      dateValidation: dto.dateValidation
+        ? new Date(dto.dateValidation).toISOString()
+        : undefined,
       businessName: dto.businessName,
       mentor: dto.mentor,
       mentorPhone: dto.mentorPhone,

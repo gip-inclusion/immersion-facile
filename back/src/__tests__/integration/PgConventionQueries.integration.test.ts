@@ -56,6 +56,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withDateStart(new Date("2021-01-15").toISOString())
         .withDateEnd(new Date("2021-01-20").toISOString())
         .withDateSubmission(new Date("2021-01-10").toISOString())
+        .withDateValidation(new Date("2021-01-12").toISOString())
         .withAgencyId(appleAgencyId)
         .withoutWorkCondition()
         .build();
@@ -89,6 +90,7 @@ describe("Pg implementation of ConventionQueries", () => {
         dateEnd: new Date("2021-01-20").toISOString(),
         dateStart: new Date("2021-01-15").toISOString(),
         dateSubmission: new Date("2021-01-10").toISOString(),
+        dateValidation: new Date("2021-01-12").toISOString(),
       });
     });
   });

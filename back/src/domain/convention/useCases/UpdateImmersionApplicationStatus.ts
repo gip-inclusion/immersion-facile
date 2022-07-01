@@ -9,6 +9,7 @@ import {
   UpdateConventionStatusRequestDto,
   WithConventionId,
   ConventionDto,
+  validatedConventionStatuses,
 } from "shared/src/convention/convention.dto";
 import { statusTransitionConfigs } from "shared/src/convention/conventionStatusTransitions";
 import {
@@ -17,11 +18,12 @@ import {
 } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { DomainTopic } from "../../core/eventBus/events";
+import { DomainEvent, DomainTopic } from "../../core/eventBus/events";
 import { OutboxRepository } from "../../core/ports/OutboxRepository";
 import { UseCase } from "../../core/UseCase";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { updateConventionStatusRequestSchema } from "shared/src/convention/convention.schema";
+import { Clock } from "../../core/ports/Clock";
 
 const logger = createLogger(__filename);
 
@@ -47,6 +49,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
   constructor(
     private readonly conventionRepository: ConventionRepository,
     private readonly createNewEvent: CreateNewEvent,
+    private readonly clock: Clock,
     private readonly outboxRepository: OutboxRepository,
   ) {
     super();
@@ -59,20 +62,24 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     { applicationId, role }: ConventionMagicLinkPayload,
   ): Promise<WithConventionId> {
     logger.debug({ status, applicationId, role });
-    const convention = await this.getImmersionStatusOrThrowIfNotAllowed(
+    const storedDto = await this.getStoredConventionOrThrowIfNotAllowed(
       status,
       role,
       applicationId,
     );
 
-    const updatedDto = {
-      ...convention,
+    const conventionUpdatedAt = this.clock.now().toISOString();
+    const updatedDto: ConventionDto = {
+      ...storedDto,
       ...(status === "REJECTED" && { rejectionJustification: justification }),
       ...(status === "DRAFT" && {
         enterpriseAccepted: false,
         beneficiaryAccepted: false,
       }),
       status,
+      dateValidation: validatedConventionStatuses.includes(status)
+        ? conventionUpdatedAt
+        : undefined,
     };
 
     const updatedId = await this.conventionRepository.update(updatedDto);
@@ -81,7 +88,10 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     const domainTopic = domainTopicByTargetStatusMap[status];
     if (!domainTopic) return { id: updatedId };
 
-    const event = this.createEvent(updatedDto, domainTopic, justification);
+    const event: DomainEvent = {
+      ...this.createEvent(updatedDto, domainTopic, justification),
+      occurredAt: conventionUpdatedAt,
+    };
     await this.outboxRepository.save(event);
     return { id: updatedId };
   }
@@ -107,7 +117,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     });
   }
 
-  private async getImmersionStatusOrThrowIfNotAllowed(
+  private async getStoredConventionOrThrowIfNotAllowed(
     status: ConventionStatus,
     role: Role,
     applicationId: ConventionId,

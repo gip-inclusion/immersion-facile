@@ -68,7 +68,9 @@ const conventionWithoutExternalIdZObject = z.object({
   dateSubmission: zString.regex(dateRegExp, "La date de saisie est invalide."),
   dateStart: zString.regex(dateRegExp, "La date de démarrage est invalide."),
   dateEnd: zString.regex(dateRegExp, "La date de fin invalide."),
-
+  dateValidation: zString
+    .regex(dateRegExp, "La date de validation invalide.")
+    .optional(),
   siret: siretSchema,
   businessName: zTrimmedString,
   mentor: zTrimmedString,

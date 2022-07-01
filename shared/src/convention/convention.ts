@@ -60,6 +60,7 @@ export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
   dateSubmission: "2021-07-01",
   dateStart: "2021-08-01",
   dateEnd: "2021-08-31",
+  dateValidation: "2021-08-05",
   businessName: "Beta.gouv.fr",
   siret: "12345678901234",
   mentor: "Alain Prost",

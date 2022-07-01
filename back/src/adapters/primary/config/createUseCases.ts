@@ -138,6 +138,7 @@ export const createUseCases = (
     updateConventionStatus: new UpdateImmersionApplicationStatus(
       repositories.convention,
       createNewEvent,
+      clock,
       repositories.outbox,
     ),
     signConvention: new SignImmersionApplication(

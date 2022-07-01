@@ -51,6 +51,7 @@ export type ConventionDtoWithoutExternalId = {
   dateSubmission: string; // Date iso string
   dateStart: string; // Date iso string
   dateEnd: string; // Date iso string
+  dateValidation?: string; // Date iso string (undefined until the convention is validated)
   siret: SiretDto;
   businessName: string;
   mentor: string;

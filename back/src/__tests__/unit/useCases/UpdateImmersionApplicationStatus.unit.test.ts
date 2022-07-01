@@ -69,15 +69,19 @@ describe("UpdateImmersionApplicationStatus", () => {
   });
 
   describe("* -> ACCEPTED_BY_VALIDATOR transition", () => {
+    const validationDate = new Date("2022-01-01T12:00:00.000");
     testForAllRolesAndInitialStatusCases({
       targetStatus: "ACCEPTED_BY_VALIDATOR",
       expectedDomainTopic: "ImmersionApplicationAcceptedByValidator",
       allowedRoles: ["validator"],
       allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
+      updatedFields: { dateValidation: validationDate.toISOString() },
+      nextDate: validationDate,
     });
   });
 
   describe("* -> VALIDATED transition", () => {
+    const validationDate = new Date("2022-01-01T12:00:00.000");
     testForAllRolesAndInitialStatusCases({
       targetStatus: "VALIDATED",
       expectedDomainTopic: "FinalImmersionApplicationValidationByAdmin",
@@ -86,6 +90,8 @@ describe("UpdateImmersionApplicationStatus", () => {
         "ACCEPTED_BY_COUNSELLOR",
         "ACCEPTED_BY_VALIDATOR",
       ],
+      updatedFields: { dateValidation: validationDate.toISOString() },
+      nextDate: validationDate,
     });
   });
 

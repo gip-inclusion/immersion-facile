@@ -55,21 +55,25 @@ export const setupInitialState = async ({
   initialStatus,
   alreadySigned = true,
 }: SetupInitialStateParams) => {
-  const immersionBuilder = new ConventionDtoBuilder().withStatus(initialStatus);
+  const immersionBuilder = new ConventionDtoBuilder()
+    .withStatus(initialStatus)
+    .withoutDateValidation();
   const originalConvention = alreadySigned
     ? immersionBuilder.build()
     : immersionBuilder.notSigned().build();
 
   const conventionRepository = new InMemoryConventionRepository();
   const outboxRepository = new InMemoryOutboxRepository();
+  const clock = new CustomClock();
   const createNewEvent = makeCreateNewEvent({
-    clock: new CustomClock(),
+    clock,
     uuidGenerator: new TestUuidGenerator(),
   });
 
   const updateConventionStatus = new UpdateImmersionApplicationStatus(
     conventionRepository,
     createNewEvent,
+    clock,
     outboxRepository,
   );
 
@@ -79,6 +83,7 @@ export const setupInitialState = async ({
     updateConventionStatus,
     conventionRepository,
     outboxRepository,
+    clock,
   };
 };
 
@@ -132,6 +137,7 @@ type TestAcceptExpectation = {
   expectedDomainTopic: ConventionDomainTopic;
   updatedFields?: Partial<ConventionDto>;
   justification?: string;
+  nextDate?: Date;
 };
 
 const makeTestAcceptsStatusUpdate =
@@ -140,6 +146,7 @@ const makeTestAcceptsStatusUpdate =
     expectedDomainTopic,
     updatedFields = {},
     justification,
+    nextDate,
   }: TestAcceptExpectation) =>
   async ({ role, initialStatus }: TestAcceptNewStatusParams) => {
     const {
@@ -147,9 +154,13 @@ const makeTestAcceptsStatusUpdate =
       updateConventionStatus,
       conventionRepository,
       outboxRepository,
+      clock,
     } = await setupInitialState({
       initialStatus,
     });
+
+    if (nextDate) clock.setNextDate(nextDate);
+
     const storedConvention = await executeUpdateConventionStatusUseCase({
       conventionId: originalConvention.id,
       role,
@@ -235,6 +246,7 @@ interface TestAllCaseProps {
   justification?: string;
   allowedRoles: Role[];
   allowedInitialStatuses: ConventionStatus[];
+  nextDate?: Date;
 }
 
 export const testForAllRolesAndInitialStatusCases = ({
@@ -245,6 +257,7 @@ export const testForAllRolesAndInitialStatusCases = ({
   justification,
   allowedInitialStatuses,
   targetStatus,
+  nextDate,
 }: TestAllCaseProps) => {
   const [allowToRejectRoles, notAllowedToRejectRoles] =
     splitCasesBetweenPassingAndFailing<Role>(allRoles, allowedRoles);
@@ -263,6 +276,7 @@ export const testForAllRolesAndInitialStatusCases = ({
     expectedDomainTopic,
     updatedFields,
     justification,
+    nextDate,
   });
 
   const testRejectsStatusUpdate = makeTestRejectsStatusUpdate({

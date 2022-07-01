@@ -72,6 +72,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     const initialConvention = new ConventionDtoBuilder()
       .notSigned()
       .withStatus("READY_TO_SIGN")
+      .withoutDateValidation()
       .build();
 
     const appAndDeps = await buildTestApp();
@@ -245,13 +246,17 @@ const establishmentSignsApplication = async (
 };
 
 const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
-  { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
+  { request, reposAndGateways, eventCrawler, clock }: TestAppAndDeps,
   validatorReviewJwt: string,
   initialConvention: ConventionDto,
 ) => {
   const params: UpdateConventionStatusRequestDto = {
     status: "ACCEPTED_BY_VALIDATOR",
   };
+
+  const validationDate = new Date("2022-01-01T12:00:00.000");
+  clock.now = () => validationDate;
+
   await request
     .post(`/auth/${updateConventionStatusRoute}/${initialConvention.id}`)
     .set("Authorization", validatorReviewJwt)
@@ -263,6 +268,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     {
       ...initialConvention,
       status: "ACCEPTED_BY_VALIDATOR",
+      dateValidation: validationDate.toISOString(),
       beneficiaryAccepted: true,
       enterpriseAccepted: true,
       rejectionJustification: undefined,

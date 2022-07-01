@@ -16,7 +16,7 @@ export class PgConventionQueries implements ConventionQueries {
     ConventionRawBeforeExport[]
   > {
     const pgResult = await this.client.query(`
-      SELECT *, conventions.status as immersion_applications_status, agencies.status as agency_status, cei.external_id
+      SELECT *, conventions.status as convention_status, agencies.status as agency_status, cei.external_id
       FROM conventions
       LEFT JOIN agencies ON agencies.id = conventions.agency_id
       LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = conventions.immersion_appellation
@@ -25,7 +25,7 @@ export class PgConventionQueries implements ConventionQueries {
 
     return pgResult.rows.map((row) => ({
       agencyName: row.name,
-      status: row.immersion_applications_status,
+      status: row.convention_status,
       postalCode: row.postal_code,
       email: row.email,
       phone: row.phone,
@@ -36,6 +36,8 @@ export class PgConventionQueries implements ConventionQueries {
       dateSubmission: new Date(row.date_submission).toISOString(),
       dateStart: new Date(row.date_start).toISOString(),
       dateEnd: new Date(row.date_end).toISOString(),
+      dateValidation:
+        row.validation_date ?? new Date(row.date_validation).toISOString(),
       businessName: row.business_name,
       mentor: row.mentor,
       mentorPhone: row.mentor_phone,
