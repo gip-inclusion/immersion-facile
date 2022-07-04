@@ -91,6 +91,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         },
       )
       .catch((error: any) => {
+        logger.error(
+          {
+            message: error?.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+          },
+          "oAuthGetAccessTokenThroughAuthorizationCode Error",
+        );
         if (isInvalidGrantError(error))
           throw new ManagedRedirectError("peConnectInvalidGrant", error);
 
