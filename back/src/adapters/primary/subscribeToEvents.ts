@@ -28,6 +28,13 @@ const getUseCasesByTopics = (
     useCases.associatePeConnectFederatedIdentity,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
+  ConventionSubmittedAfterModification: [
+    useCases.confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature,
+    useCases.confirmToMentorThatConventionCorrectlySubmittedRequestSignature,
+    useCases.notifyToTeamConventionSubmittedByBeneficiary,
+    useCases.notifyToAgencyConventionSubmitted,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
+  ],
   ImmersionApplicationPartiallySigned: [
     useCases.notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty,
     useCases.broadcastToPoleEmploiOnConventionUpdates,

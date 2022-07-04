@@ -42,6 +42,7 @@ export type DomainEvent =
   // HAPPY PATH
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ConventionDto>
+  | GenericEvent<"ConventionSubmittedAfterModification", ConventionDto>
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationPartiallySigned", ConventionDto>
   // prettier-ignore

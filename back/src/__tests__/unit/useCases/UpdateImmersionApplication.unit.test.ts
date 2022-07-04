@@ -15,10 +15,12 @@ import {
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
-import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
 import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import {
+  expectPromiseToFailWithError,
+  expectTypeToMatchAndEqual,
+} from "../../../_testBuilders/test.helpers";
 import {
   ConventionId,
   allConventionStatuses,
@@ -29,14 +31,16 @@ import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryC
 describe("Update Convention", () => {
   let updateConvention: UpdateImmersionApplication;
   let conventionRepository: InMemoryConventionRepository;
-  let outboxRepo: OutboxRepository;
+  let outboxRepo: InMemoryOutboxRepository;
   let createNewEvent: CreateNewEvent;
   let getFeatureFlags: GetFeatureFlags;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
-    conventionRepository = new InMemoryConventionRepository();
-    outboxRepo = new InMemoryOutboxRepository();
+    const uow = createInMemoryUow();
+    conventionRepository = uow.conventionRepository;
+    outboxRepo = uow.outboxRepo;
+
     createNewEvent = makeCreateNewEvent({
       clock: new CustomClock(),
       uuidGenerator: new TestUuidGenerator(),
@@ -47,9 +51,7 @@ describe("Update Convention", () => {
     });
 
     uowPerformer = new InMemoryUowPerformer({
-      ...createInMemoryUow(),
-      outboxRepo,
-      conventionRepository,
+      ...uow,
       getFeatureFlags,
     });
 
@@ -61,12 +63,13 @@ describe("Update Convention", () => {
 
   describe("When the Convention is valid", () => {
     it("updates the Convention in the repository", async () => {
-      const conventions: Record<string, ConventionDto> = {};
-      const convention = new ConventionDtoBuilder().build();
-      conventions[convention.id] = convention;
-      conventionRepository.setConventions(conventions);
+      const conventionsInRepo: Record<string, ConventionDto> = {};
+      const conventionInRepo = new ConventionDtoBuilder().build();
+      conventionsInRepo[conventionInRepo.id] = conventionInRepo;
+      conventionRepository.setConventions(conventionsInRepo);
 
       const updatedConvention = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
         .withEmail("new@email.fr")
         .build();
 
@@ -86,22 +89,34 @@ describe("Update Convention", () => {
   describe("When no Convention with id exists", () => {
     it("throws NotFoundError", async () => {
       const id = "40400000000000404";
-      const validConvention = new ConventionDtoBuilder().withId(id).build();
+      const validConvention = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .withId(id)
+        .build();
 
       await expectPromiseToFailWithError(
         updateConvention.execute({
           id,
           convention: validConvention,
         }),
-        new NotFoundError(id),
+        new NotFoundError("Convention with id 40400000000000404 was not found"),
       );
     });
   });
 
   describe("When previous state is not draft (testing with READY_TO_SIGN)", () => {
     it("throws Bad request", async () => {
+      const storedConvention = new ConventionDtoBuilder()
+        .withStatus("PARTIALLY_SIGNED")
+        .build();
+
+      conventionRepository.setConventions({
+        [storedConvention.id]: storedConvention,
+      });
+
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedConvention = new ConventionDtoBuilder()
+        .withId(storedConvention.id)
         .withStatus("READY_TO_SIGN")
         .build();
 
@@ -110,7 +125,9 @@ describe("Update Convention", () => {
           id: updatedConvention.id,
           convention: updatedConvention,
         }),
-        new BadRequestError(updatedConvention.id),
+        new BadRequestError(
+          `Convention ${storedConvention.id} cannot be modified as it has status PARTIALLY_SIGNED`,
+        ),
       );
     });
   });
@@ -123,20 +140,6 @@ describe("Update Convention", () => {
       conventions[convention.id] = convention;
       conventionRepository.setConventions(conventions);
       id = convention.id;
-    });
-
-    // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021
-    it("allows applications submitted as DRAFT", async () => {
-      const validConvention = new ConventionDtoBuilder().withId(id).build();
-
-      expect(
-        await updateConvention.execute({
-          convention: validConvention,
-          id: validConvention.id,
-        }),
-      ).toEqual({
-        id: validConvention.id,
-      });
     });
 
     it("allows applications submitted as READY_TO_SIGN", async () => {
@@ -171,9 +174,53 @@ describe("Update Convention", () => {
             convention,
             id: convention.id,
           }),
-          new ForbiddenError(),
+          new ForbiddenError(
+            "Convention 40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb with modifications should have status READY_TO_SIGN",
+          ),
         );
       }
+    });
+
+    it("should emit ConventionSubmittedAfterModification event when successful", async () => {
+      const inReviewConvention = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .withId(id)
+        .build();
+
+      const response = await updateConvention.execute({
+        convention: inReviewConvention,
+        id: inReviewConvention.id,
+      });
+
+      expect(outboxRepo.events).toHaveLength(1);
+      expectTypeToMatchAndEqual(
+        outboxRepo.events[0],
+        createNewEvent({
+          topic: "ConventionSubmittedAfterModification",
+          payload: inReviewConvention,
+        }),
+      );
+
+      expectTypeToMatchAndEqual(response, {
+        id: inReviewConvention.id,
+      });
+    });
+
+    it("should throw forbidden Error if provided convention has status DRAFT", async () => {
+      const draftConvention = new ConventionDtoBuilder()
+        .withStatus("DRAFT")
+        .withId(id)
+        .build();
+
+      await expectPromiseToFailWithError(
+        updateConvention.execute({
+          convention: draftConvention,
+          id: draftConvention.id,
+        }),
+        new ForbiddenError(
+          "Convention 40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb with modifications should have status READY_TO_SIGN",
+        ),
+      );
     });
   });
 });

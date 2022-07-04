@@ -236,6 +236,7 @@ describe("/demandes-immersion route", () => {
       const updatedConvention = {
         ...convention,
         email: "new@email.fr",
+        status: "READY_TO_SIGN",
       };
 
       const jwt = generateJwt(
