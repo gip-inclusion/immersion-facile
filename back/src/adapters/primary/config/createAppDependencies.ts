@@ -23,7 +23,6 @@ import {
   makeHandleRawRedirectResponseError,
 } from "../helpers/handleRedirectResponseError";
 import { AppConfig } from "./appConfig";
-import { createAuthChecker } from "./createAuthChecker";
 import { createEventCrawler } from "./createEventCrawler";
 import { createGenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { createUseCases } from "./createUseCases";
@@ -86,7 +85,6 @@ export const createAppDependencies = async (config: AppConfig) => {
       uuidGenerator,
     ),
     repositories,
-    authChecker: createAuthChecker(config),
     applicationMagicLinkAuthMiddleware: createMagicLinkAuthMiddleware(
       config,
       "application",

@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { AuthChecker } from "../../../domain/auth/AuthChecker";
 import { deleteFileAndParentFolder } from "../../../utils/filesystemUtils";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
@@ -9,21 +8,12 @@ import { ManagedRedirectError, RawRedirectError } from "./redirectErrors";
 
 const logger = createLogger(__filename);
 
-const authenticationCheck = (req: Request, authChecker?: AuthChecker): void => {
-  if (authChecker) {
-    authChecker.checkAuth(req);
-  }
-};
-
 export const sendHttpResponse = async (
   request: Request,
   res: Response,
   callback: () => Promise<unknown>,
-  authChecker?: AuthChecker,
 ) => {
   try {
-    authenticationCheck(request, authChecker);
-
     const response = await callback();
     res.status(200);
 
@@ -40,11 +30,8 @@ export const sendRedirectResponse = async (
   callback: () => Promise<AbsoluteUrl>,
   handleManagedRedirectResponseError: (error: ManagedRedirectError, res: Response) => void,
   handleRawRedirectResponseError: (error: RawRedirectError, res: Response ) => void,
-  authChecker?: AuthChecker,
 ) => {
   try {
-    authenticationCheck(req, authChecker);
-
     const redirectUrl = await callback();
     res.status(302);
     return res.redirect(redirectUrl);
@@ -78,11 +65,8 @@ export const sendZipResponse = async (
   req: Request,
   res: Response,
   callback: () => Promise<string>,
-  authChecker?: AuthChecker,
 ) => {
   try {
-    authenticationCheck(req, authChecker);
-
     const archivePath = await callback();
 
     res.status(200);
