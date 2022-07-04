@@ -139,7 +139,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           .catch((error) => {
             logger.error({ trackId, error }, "GetUserInfo PE Error");
 
-            if (!error || error.status === undefined)
+            if (getUndefinedErrorUserFromPe(error))
               throw new ManagedRedirectError("peConnectNoValidUser", error);
             throw error;
           });
@@ -179,7 +179,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           })
           .catch((error) => {
             logger.error({ trackId, error }, "GetAdvisorsInfo PE Error");
-            if (!error || error.status === undefined)
+            if (getUndefinedErrorAdvisorFromPe(error))
               throw new ManagedRedirectError("peConnectNoValidAdvisor", error);
 
             throw PrettyAxiosResponseError(
@@ -269,6 +269,24 @@ const headersUrlEncoded = (): { [key: string]: string } => ({
   "Content-Type": "application/x-www-form-urlencoded",
 });
 
-const isInvalidGrantError = (error: any): boolean =>
-  error?.response?.status === "400" &&
-  error?.response?.data?.error === "invalid_grant";
+const isInvalidGrantError = (error: any): boolean => {
+  // eslint-disable-next-line no-console
+  console.error("try isInvalidGrantError ", error);
+  return (
+    error?.response?.status === "400" &&
+    error?.response?.data?.error === "invalid_grant"
+  );
+};
+
+const getUndefinedErrorAdvisorFromPe = (error: any): boolean => {
+  // eslint-disable-next-line no-console
+  console.error("try getUndefinedErrorAdvisorFromPe ", error);
+
+  return !error || error.status === undefined || error === {};
+};
+const getUndefinedErrorUserFromPe = (error: any): boolean => {
+  // eslint-disable-next-line no-console
+  console.error("try getUndefinedErrorUserFromPe", error);
+
+  return !error || error.status === undefined || error === {};
+};
