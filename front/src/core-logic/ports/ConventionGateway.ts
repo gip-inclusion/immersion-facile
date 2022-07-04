@@ -38,6 +38,7 @@ export interface ConventionGateway {
   ): Promise<Array<ConventionDto>>;
 
   generateMagicLink(
+    adminToken: AdminToken,
     applicationId: ConventionId,
     role: Role,
     expired: boolean,

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { map, Observable } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
+import { AdminToken } from "shared/src/admin/admin.dto";
 import {
   AgencyDto,
   AgencyId,
@@ -75,18 +76,24 @@ export class HttpAgencyGateway implements AgencyGateway {
     return this.getAgencies(request);
   }
 
-  public async listAgenciesNeedingReview(): Promise<AgencyDto[]> {
+  public async listAgenciesNeedingReview(
+    adminToken: AdminToken,
+  ): Promise<AgencyDto[]> {
     const needsReviewStatus: AgencyStatus = "needsReview";
     // const httpResponse = await axios.get(
     //   `/${prefix}/admin/${agenciesRoute}?status=${needsReviewStatus}`,
     // );
     const httpResponse = await axios.get(`/${prefix}/admin/${agenciesRoute}`, {
       params: { status: needsReviewStatus },
+      headers: { authorization: adminToken },
     });
     return httpResponse.data;
   }
 
-  public async validateAgency(agencyId: AgencyId): Promise<void> {
+  public async validateAgency(
+    adminToken: AdminToken,
+    agencyId: AgencyId,
+  ): Promise<void> {
     const { id, ...validateAgencyParams }: UpdateAgencyRequestDto = {
       id: agencyId,
       status: "active",
@@ -94,6 +101,7 @@ export class HttpAgencyGateway implements AgencyGateway {
     await axios.patch(
       `/${prefix}/admin/${agenciesRoute}/${agencyId}`,
       validateAgencyParams,
+      { headers: { authorization: adminToken } },
     );
   }
   private async getAgencies(

@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+import { AdminToken } from "shared/src/admin/admin.dto";
 import {
   AgencyDto,
   AgencyId,
@@ -17,8 +18,8 @@ export interface AgencyGateway {
   ): Promise<AgencyWithPositionDto[]>;
   listNonPeAgencies(position: LatLonDto): Promise<AgencyWithPositionDto[]>;
   listPeAgencies(position: LatLonDto): Promise<AgencyWithPositionDto[]>;
-  listAgenciesNeedingReview(): Promise<AgencyDto[]>;
-  validateAgency(agencyId: AgencyId): Promise<void>;
+  listAgenciesNeedingReview(adminToken: AdminToken): Promise<AgencyDto[]>;
+  validateAgency(adminToken: AdminToken, agencyId: AgencyId): Promise<void>;
   getAgencyPublicInfoById(
     agencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto>;

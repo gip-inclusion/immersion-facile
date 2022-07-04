@@ -126,12 +126,14 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public async generateMagicLink(
+    adminToken: AdminToken,
     applicationId: ConventionId,
     role: Role,
     expired: boolean,
   ): Promise<string> {
     const httpResponse = await axios.get(
       `/${prefix}/admin/${generateMagicLinkRoute}?id=${applicationId}&role=${role}&expired=${expired}`,
+      { headers: { authorization: adminToken } },
     );
     return httpResponse.data.jwt;
   }
