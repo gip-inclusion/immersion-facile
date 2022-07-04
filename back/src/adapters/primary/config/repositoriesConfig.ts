@@ -67,7 +67,7 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
     if (!pgPool) {
       const { host, pathname } = new URL(config.pgImmersionDbUrl);
       logger.info({ host, pathname }, "creating postgresql connection pool");
-      pgPool = new Pool({ connectionString: config.pgImmersionDbUrl, max: 20 });
+      pgPool = new Pool({ connectionString: config.pgImmersionDbUrl, max: 25 });
     }
     return pgPool;
   };
