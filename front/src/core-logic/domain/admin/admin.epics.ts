@@ -29,7 +29,7 @@ const checkIfAdminLoggedIn: AdminEpic = (action$, _, { deviceRepository }) =>
     filter(adminSlice.actions.checkIfLoggedInRequested.match),
     map(() => {
       const token = deviceRepository.get("adminToken");
-      if (token) return adminSlice.actions.tokenFoundInDevice();
+      if (token) return adminSlice.actions.tokenFoundInDevice(token);
       return adminSlice.actions.noTokenFoundInDevice();
     }),
   );

@@ -4,9 +4,10 @@ import { createRootSelector } from "src/core-logic/storeConfig/store";
 const adminState = createRootSelector((state) => state.admin);
 
 export const adminSelectors = {
+  token: createSelector(adminState, ({ adminToken }) => adminToken),
   isAuthenticated: createSelector(
     adminState,
-    ({ isAuthenticated }) => isAuthenticated,
+    ({ adminToken }) => adminToken !== null,
   ),
   isLoading: createSelector(adminState, ({ isLoading }) => isLoading),
   error: createSelector(

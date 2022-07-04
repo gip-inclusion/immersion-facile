@@ -2,13 +2,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AdminToken } from "shared/src/admin/admin.dto";
 
 interface AdminState {
-  isAuthenticated: boolean;
+  adminToken: AdminToken | null;
   isLoading: boolean;
   error: string | null;
 }
 
 const initialState: AdminState = {
-  isAuthenticated: false,
+  adminToken: null,
   isLoading: false,
   error: null,
 };
@@ -23,8 +23,8 @@ export const adminSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
-    loginSucceeded: (state, _action: PayloadAction<AdminToken>) => {
-      state.isAuthenticated = true;
+    loginSucceeded: (state, action: PayloadAction<AdminToken>) => {
+      state.adminToken = action.payload;
       state.isLoading = false;
       state.error = null;
     },
@@ -34,15 +34,15 @@ export const adminSlice = createSlice({
     },
     adminTokenStoredInDevice: (state) => state,
     checkIfLoggedInRequested: (state) => state,
-    tokenFoundInDevice: (state) => {
-      state.isAuthenticated = true;
+    tokenFoundInDevice: (state, action: PayloadAction<AdminToken>) => {
+      state.adminToken = action.payload;
     },
     noTokenFoundInDevice: (state) => {
-      state.isAuthenticated = false;
+      state.adminToken = null;
     },
     logoutRequested: (state) => state,
     loggedOut: (state) => {
-      state.isAuthenticated = false;
+      state.adminToken = null;
     },
   },
 });

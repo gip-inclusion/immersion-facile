@@ -6,17 +6,17 @@ import {
   ConventionDto,
   ConventionStatus,
 } from "shared/src/convention/convention.dto";
-import {
-  conventionGateway,
-  deviceRepository,
-} from "src/app/config/dependencies";
+import { conventionGateway } from "src/app/config/dependencies";
 import { AdminRoute } from "src/app/pages/admin/AdminRoute";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
 import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
 
 export const ConventionTab = ({ route }: { route: AdminRoute }) => {
+  const adminToken = useAppSelector(adminSelectors.token);
   const [conventions, setConventions] = useState<ConventionDto[]>([]);
 
   const [statusFilter, setStatusFilter] = useState<
@@ -36,7 +36,7 @@ export const ConventionTab = ({ route }: { route: AdminRoute }) => {
   useEffect(() => {
     conventionGateway
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      .getAll(deviceRepository.get("adminToken")!, agency, statusFilter)
+      .getAll(adminToken!, agency, statusFilter)
       .then(
         (applications) => setConventions(applications),
         (error: any) => {
