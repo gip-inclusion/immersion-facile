@@ -31,7 +31,7 @@ describe("PgImmersionAssessmentRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    await client.query("DELETE FROM immersion_applications");
+    await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
     const agencyRepository = new PgAgencyRepository(client);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());

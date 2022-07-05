@@ -44,7 +44,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     // REVIEW I had to add this not to have an error
     // TODO Remove when https://git.beta.pole-emploi.fr/jburkard/immersion-facile/-/merge_requests/967 is merged ?
     await client.query("DELETE FROM immersion_assessments");
-    await client.query("DELETE FROM immersion_applications");
+    await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
     const agencyRepository = new PgAgencyRepository(client);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());

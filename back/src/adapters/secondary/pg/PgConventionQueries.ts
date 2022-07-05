@@ -14,11 +14,11 @@ export class PgConventionQueries implements ConventionQueries {
     ConventionRawBeforeExportVO[]
   > {
     const pgResult = await this.client.query(`
-      SELECT *, immersion_applications.status as immersion_applications_status, agencies.status as agency_status, cei.external_id
-      FROM immersion_applications
-      LEFT JOIN agencies ON agencies.id = immersion_applications.agency_id
-      LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_applications.immersion_appellation
-      LEFT JOIN convention_external_ids AS cei ON cei.convention_id = immersion_applications.id
+      SELECT *, conventions.status as immersion_applications_status, agencies.status as agency_status, cei.external_id
+      FROM conventions
+      LEFT JOIN agencies ON agencies.id = conventions.agency_id
+      LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = conventions.immersion_appellation
+      LEFT JOIN convention_external_ids AS cei ON cei.convention_id = conventions.id
       `);
     return pgResult.rows.map(
       (row) =>
@@ -53,12 +53,12 @@ export class PgConventionQueries implements ConventionQueries {
   public async getLatestUpdated(): Promise<ConventionDto[]> {
     const pgResult = await this.client.query(
       `SELECT *, vad.*, cei.external_id
-       FROM immersion_applications 
+       FROM conventions 
        LEFT JOIN view_appellations_dto AS vad 
-         ON vad.appellation_code = immersion_applications.immersion_appellation
+         ON vad.appellation_code = conventions.immersion_appellation
         LEFT JOIN convention_external_ids AS cei
-         ON cei.convention_id = immersion_applications.id
-       ORDER BY immersion_applications.updated_at DESC
+         ON cei.convention_id = conventions.id
+       ORDER BY conventions.updated_at DESC
        LIMIT 10`,
     );
 
@@ -75,7 +75,7 @@ export class PgConventionQueries implements ConventionQueries {
               'beneficiaryLastName', last_name,
               'mentorName', mentor, 
               'mentorEmail', mentor_email) AS params
-       FROM immersion_applications 
+       FROM conventions 
        WHERE date_end::date = $1
        AND status IN (%1$L)
        AND id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )`,

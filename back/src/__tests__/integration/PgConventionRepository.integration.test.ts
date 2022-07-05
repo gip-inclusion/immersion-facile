@@ -25,7 +25,7 @@ describe("PgConventionRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM partners_pe_connect");
-    await client.query("DELETE FROM immersion_applications");
+    await client.query("DELETE FROM conventions");
     await client.query(
       "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
     );
