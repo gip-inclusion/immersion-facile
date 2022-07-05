@@ -38,6 +38,10 @@ export type TemplatedEmail = {
 export class InMemoryEmailGateway implements EmailGateway {
   private readonly sentEmails: TemplatedEmail[] = [];
 
+  public getLastSentEmails() {
+    return this.sentEmails;
+  }
+
   public async sendImmersionAssessmentCreationLink(
     recipient: string,
     params: {

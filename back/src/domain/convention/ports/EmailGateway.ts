@@ -1,5 +1,6 @@
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { TemplatedEmail } from "../../../adapters/secondary/InMemoryEmailGateway";
 
 export type NewConventionAdminNotificationParams = {
   demandeId: string;
@@ -204,6 +205,7 @@ export type EmailType =
   | "AGENCY_WAS_ACTIVATED";
 
 export interface EmailGateway {
+  getLastSentEmails: () => TemplatedEmail[];
   sendImmersionAssessmentCreationLink: (
     recipient: string,
     params: {

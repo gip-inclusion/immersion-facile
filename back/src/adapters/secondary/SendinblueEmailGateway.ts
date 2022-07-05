@@ -33,6 +33,7 @@ import {
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { createLogger } from "../../utils/logger";
 import { notifyObjectDiscord } from "../../utils/notifyDiscord";
+import { TemplatedEmail } from "./InMemoryEmailGateway";
 
 const logger = createLogger(__filename);
 
@@ -50,6 +51,12 @@ export class SendinblueEmailGateway implements EmailGateway {
     apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, apiKey);
 
     return new SendinblueEmailGateway(apiInstance, emailAllowListPredicate);
+  }
+
+  public getLastSentEmails(): TemplatedEmail[] {
+    throw new Error(
+      "Send in blue email gateway cannot send the list of last sent emails",
+    );
   }
 
   public async sendImmersionAssessmentCreationLink(
