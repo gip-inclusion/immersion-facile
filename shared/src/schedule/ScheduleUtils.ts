@@ -9,7 +9,6 @@ import {
   TimePeriodDto,
   TimePeriodsDto,
   Weekday,
-  WeekDayRangeSchemaDTO,
   weekdays,
 } from "./ScheduleSchema";
 
@@ -315,10 +314,57 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
 export const dayPeriodsFromComplexSchedule = (
   complexSchedule: ComplexScheduleDto,
 ): DayPeriodsDto => {
+  const timePeriodsOnFrenchDays: boolean[] = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ];
+
+  const manageTimePeriodOnDay = (frenchDay: number) => {
+    const isSameFrenchDay = (day: DailyScheduleDto, frenchDay: number) =>
+      frenchDayMapping(day.date).frenchDay === frenchDay;
+    const hasTimePeriod = (day: DailyScheduleDto) => day.timePeriods.length > 0;
+    complexSchedule.some(
+      (day) => isSameFrenchDay(day, frenchDay) && hasTimePeriod(day),
+    ) && timePeriodsOnFrenchDays.splice(frenchDay, 1, true);
+  };
+
+  for (
+    let frenchDay = 0;
+    frenchDay < timePeriodsOnFrenchDays.length;
+    frenchDay++
+  )
+    manageTimePeriodOnDay(frenchDay);
+
+  const dayPeriods: DayPeriodsDto = [];
+  for (
+    let frenchDay = 0;
+    frenchDay < timePeriodsOnFrenchDays.length;
+    frenchDay++
+  ) {
+    if (timePeriodsOnFrenchDays[frenchDay] === true) {
+      let lastFrenchDayWithTimePeriod = frenchDay;
+      while (timePeriodsOnFrenchDays[lastFrenchDayWithTimePeriod + 1] === true)
+        lastFrenchDayWithTimePeriod++;
+      dayPeriods.push([frenchDay, lastFrenchDayWithTimePeriod]);
+      frenchDay = lastFrenchDayWithTimePeriod;
+    }
+  }
+  return dayPeriods;
+};
+
+/*
+export const dayPeriodsFromComplexSchedule = (
+  complexSchedule: ComplexScheduleDto,
+): DayPeriodsDto => {
   const dayPeriods: DayPeriodsDto = [];
   let currentWeekDayRange: null | WeekDayRangeSchemaDTO = null;
   const weekDayAlreadyInUse: WeekdayNumber[] = [];
-  function addPeriod(currentWeekDayRange: number[]) {
+  const addPeriod = (currentWeekDayRange: number[]) => {
     if (
       !dayPeriods.some(
         (dayPeriod) =>
@@ -326,7 +372,7 @@ export const dayPeriodsFromComplexSchedule = (
       )
     )
       dayPeriods.push(currentWeekDayRange);
-  }
+  };
   makeImmersionTimetable(complexSchedule).forEach((week) => {
     week.forEach((day) => {
       if (weekDayAlreadyInUse.length < 7) {
@@ -353,6 +399,7 @@ export const dayPeriodsFromComplexSchedule = (
   dayPeriods.sort((a, b) => a[0] - b[0]);
   return dayPeriods;
 };
+*/
 
 export const makeImmersionTimetable = (
   complexSchedule: ComplexScheduleDto,

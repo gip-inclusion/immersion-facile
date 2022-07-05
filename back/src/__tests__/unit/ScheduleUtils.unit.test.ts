@@ -1,6 +1,7 @@
 import {
   weekdays,
   makeDailySchedule,
+  DayPeriodsDto,
 } from "shared/src/schedule/ScheduleSchema";
 
 import { ScheduleDtoBuilder } from "shared/src/schedule/ScheduleDtoBuilder";
@@ -8,6 +9,7 @@ import {
   calculateTotalImmersionHoursBetweenDate,
   complexScheduleFromRegularSchedule,
   convertToFrenchNamedDays,
+  dayPeriodsFromComplexSchedule,
   isArrayOfWeekdays,
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
@@ -408,6 +410,123 @@ describe("ScheduleUtils", () => {
         });
         expect(totalHours).toBe(0);
       });
+    });
+  });
+
+  describe("dayPeriodsFromComplexSchedule", () => {
+    const timePeriods = [
+      { start: "09:00", end: "12:30" },
+      { start: "14:00", end: "18:00" },
+    ];
+    const dateInterval = {
+      start: new Date("2022-06-29"),
+      end: new Date("2022-07-21"),
+    };
+    describe("with no schedule", () => {
+      it("empty day period without simple schedule build", () => {
+        const schedule = new ScheduleDtoBuilder()
+          .withEmptyComplexSchedule(dateInterval)
+          .build();
+        expect(dayPeriodsFromComplexSchedule(schedule.complexSchedule)).toEqual(
+          [],
+        );
+      });
+      it(`dayperiods '${JSON.stringify([])}'`, () => {
+        const schedule = new ScheduleDtoBuilder()
+          .withEmptyComplexSchedule(dateInterval)
+          .withRegularSchedule({ dayPeriods: [], timePeriods })
+          .build();
+        expect(dayPeriodsFromComplexSchedule(schedule.complexSchedule)).toEqual(
+          [],
+        );
+      });
+    });
+
+    describe("with one day period of one day", () => {
+      const dayPeriodsScenarios: DayPeriodsDto[] = [
+        [[0, 0]],
+        [[1, 1]],
+        [[2, 2]],
+        [[3, 3]],
+        [[4, 4]],
+        [[5, 5]],
+        [[6, 6]],
+      ];
+      dayPeriodsScenarios.forEach((dayPeriods) =>
+        it(`dayperiods '${JSON.stringify(dayPeriods)}'`, () => {
+          const schedule = new ScheduleDtoBuilder()
+            .withEmptyComplexSchedule(dateInterval)
+            .withRegularSchedule({
+              dayPeriods,
+              timePeriods,
+            })
+            .build();
+          expect(
+            dayPeriodsFromComplexSchedule(schedule.complexSchedule),
+          ).toEqual(dayPeriods);
+        }),
+      );
+    });
+
+    describe("with one day period of multiple days", () => {
+      const dayPeriodsScenarios: DayPeriodsDto[] = [
+        [[0, 1]],
+        [[2, 3]],
+        [[2, 4]],
+        [[1, 6]],
+        [[3, 6]],
+        [[0, 4]],
+        [[5, 6]],
+      ];
+      dayPeriodsScenarios.forEach((dayPeriods) =>
+        it(`dayperiods '${JSON.stringify(dayPeriods)}'`, () => {
+          const schedule = new ScheduleDtoBuilder()
+            .withEmptyComplexSchedule(dateInterval)
+            .withRegularSchedule({
+              dayPeriods,
+              timePeriods,
+            })
+            .build();
+          expect(
+            dayPeriodsFromComplexSchedule(schedule.complexSchedule),
+          ).toEqual(dayPeriods);
+        }),
+      );
+    });
+    describe("with multiple day periods of multiple days", () => {
+      const dayPeriodsScenarios: DayPeriodsDto[] = [
+        [
+          [0, 1],
+          [3, 4],
+        ],
+        [
+          [0, 4],
+          [6, 6],
+        ],
+        [
+          [1, 2],
+          [4, 5],
+        ],
+        [
+          [0, 0],
+          [2, 4],
+          [6, 6],
+        ],
+      ];
+      dayPeriodsScenarios.forEach((dayPeriods) =>
+        it(`dayperiods '${JSON.stringify(dayPeriods)}'`, () => {
+          const schedule = new ScheduleDtoBuilder()
+            .withEmptyComplexSchedule(dateInterval)
+            .withRegularSchedule({
+              dayPeriods,
+              timePeriods,
+            })
+            .build();
+          expect(
+            dayPeriodsFromComplexSchedule(schedule.complexSchedule),
+          ).toEqual(dayPeriods);
+        }),
+      );
     });
   });
 });
