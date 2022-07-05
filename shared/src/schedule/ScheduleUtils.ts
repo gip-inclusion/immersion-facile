@@ -226,8 +226,8 @@ export const isScheduleValid = (schedule: ScheduleDto) => {
   if (totalScheduleHours === 0) return "Veuillez remplir les horaires.";
 };
 
-const toFrenchReadableDate = (date: Date) => {
-  if (!(date instanceof Date)) date = parseISO(date);
+const toFrenchReadableDate = (isoStringDate: string) => {
+  const date = parseISO(isoStringDate);
   `${date.getDate()}/${date.getMonth() + 1}`;
 };
 
@@ -282,8 +282,8 @@ export const prettyPrintLegacySchedule = (
     schedule.description,
   ].join("\n");
 
-const getIndexInWeekFromMonday = (date: Date) => {
-  const dayIndex = date.getDay();
+const getIndexInWeekFromMonday = (isoStringDate: string) => {
+  const dayIndex = parseISO(isoStringDate).getDay();
   return dayIndex === 0 ? 6 : dayIndex - 1;
 };
 
@@ -302,9 +302,10 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
   ) {
     const date = complexSchedule.find(
       (dailySchedule) =>
-        dailySchedule.date.getDate() === currentDate.getDate() &&
-        dailySchedule.date.getMonth() === currentDate.getMonth() &&
-        dailySchedule.date.getFullYear() === currentDate.getFullYear(),
+        parseISO(dailySchedule.date).getDate() === currentDate.getDate() &&
+        parseISO(dailySchedule.date).getMonth() === currentDate.getMonth() &&
+        parseISO(dailySchedule.date).getFullYear() ===
+          currentDate.getFullYear(),
     );
     if (date) totalOfMinutes += minutesInDay(date.timePeriods);
   }
@@ -314,6 +315,14 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
 export const dayPeriodsFromComplexSchedule = (
   complexSchedule: ComplexScheduleDto,
 ): DayPeriodsDto => {
+  const manageTimePeriodOnDay = (frenchDay: number) => {
+    const isSameFrenchDay = (day: DailyScheduleDto, frenchDay: number) =>
+      frenchDayMapping(day.date).frenchDay === frenchDay;
+    const hasTimePeriod = (day: DailyScheduleDto) => day.timePeriods.length > 0;
+    complexSchedule.some(
+      (day) => isSameFrenchDay(day, frenchDay) && hasTimePeriod(day),
+    ) && timePeriodsOnFrenchDays.splice(frenchDay, 1, true);
+  };
   const timePeriodsOnFrenchDays: boolean[] = [
     false,
     false,
@@ -324,21 +333,9 @@ export const dayPeriodsFromComplexSchedule = (
     false,
   ];
 
-  const manageTimePeriodOnDay = (frenchDay: number) => {
-    const isSameFrenchDay = (day: DailyScheduleDto, frenchDay: number) =>
-      frenchDayMapping(day.date).frenchDay === frenchDay;
-    const hasTimePeriod = (day: DailyScheduleDto) => day.timePeriods.length > 0;
-    complexSchedule.some(
-      (day) => isSameFrenchDay(day, frenchDay) && hasTimePeriod(day),
-    ) && timePeriodsOnFrenchDays.splice(frenchDay, 1, true);
-  };
-
-  for (
-    let frenchDay = 0;
-    frenchDay < timePeriodsOnFrenchDays.length;
-    frenchDay++
-  )
-    manageTimePeriodOnDay(frenchDay);
+  timePeriodsOnFrenchDays.forEach((_, frenchDay) =>
+    manageTimePeriodOnDay(frenchDay),
+  );
 
   const dayPeriods: DayPeriodsDto = [];
   for (
@@ -356,50 +353,6 @@ export const dayPeriodsFromComplexSchedule = (
   }
   return dayPeriods;
 };
-
-/*
-export const dayPeriodsFromComplexSchedule = (
-  complexSchedule: ComplexScheduleDto,
-): DayPeriodsDto => {
-  const dayPeriods: DayPeriodsDto = [];
-  let currentWeekDayRange: null | WeekDayRangeSchemaDTO = null;
-  const weekDayAlreadyInUse: WeekdayNumber[] = [];
-  const addPeriod = (currentWeekDayRange: number[]) => {
-    if (
-      !dayPeriods.some(
-        (dayPeriod) =>
-          JSON.stringify(dayPeriod) === JSON.stringify(currentWeekDayRange),
-      )
-    )
-      dayPeriods.push(currentWeekDayRange);
-  };
-  makeImmersionTimetable(complexSchedule).forEach((week) => {
-    week.forEach((day) => {
-      if (weekDayAlreadyInUse.length < 7) {
-        if (day.dailySchedule) {
-          const frenchDay = frenchDayMapping(day.dailySchedule.date).frenchDay;
-          if (!weekDayAlreadyInUse.includes(frenchDay)) {
-            if (!Array.isArray(currentWeekDayRange))
-              currentWeekDayRange = [frenchDay];
-            currentWeekDayRange[1] = frenchDay;
-            weekDayAlreadyInUse.push(frenchDay);
-          }
-        }
-        if (!day.dailySchedule && currentWeekDayRange) {
-          addPeriod(currentWeekDayRange);
-          currentWeekDayRange = null;
-        }
-      }
-    });
-    if (currentWeekDayRange !== null) {
-      addPeriod(currentWeekDayRange);
-      currentWeekDayRange = null;
-    }
-  });
-  dayPeriods.sort((a, b) => a[0] - b[0]);
-  return dayPeriods;
-};
-*/
 
 export const makeImmersionTimetable = (
   complexSchedule: ComplexScheduleDto,

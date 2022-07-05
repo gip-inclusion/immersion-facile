@@ -15,8 +15,8 @@ type WeeklyRowProperties = {
   disabled?: boolean;
   onChange: (index: number) => void;
 };
-const makeName = (date: Date) => {
-  if (!(date instanceof Date)) date = parseISO(date);
+const makeName = (isoStringDate: string) => {
+  const date = parseISO(isoStringDate);
   return `${date.getDate()}/${date.getMonth() + 1}`;
 };
 export const WeeklyRow = ({

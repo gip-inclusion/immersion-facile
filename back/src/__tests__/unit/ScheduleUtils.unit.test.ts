@@ -73,8 +73,8 @@ describe("ScheduleUtils", () => {
       ).toEqual(
         new ScheduleDtoBuilder()
           .withComplexSchedule([
-            { date: new Date("2022-06-25"), timePeriods },
-            { date: new Date("2022-06-26"), timePeriods },
+            { date: new Date("2022-06-25").toISOString(), timePeriods },
+            { date: new Date("2022-06-26").toISOString(), timePeriods },
           ])
           .build().complexSchedule,
       );
@@ -98,8 +98,8 @@ describe("ScheduleUtils", () => {
         ).toEqual(
           new ScheduleDtoBuilder()
             .withComplexSchedule([
-              { date: new Date("2022-06-27"), timePeriods },
-              { date: new Date("2022-06-28"), timePeriods },
+              { date: new Date("2022-06-27").toISOString(), timePeriods },
+              { date: new Date("2022-06-28").toISOString(), timePeriods },
             ])
             .build().complexSchedule,
         );
@@ -121,10 +121,10 @@ describe("ScheduleUtils", () => {
         ).toEqual(
           new ScheduleDtoBuilder()
             .withComplexSchedule([
-              { date: new Date("2022-06-22"), timePeriods },
-              { date: new Date("2022-06-23"), timePeriods },
-              { date: new Date("2022-06-29"), timePeriods },
-              { date: new Date("2022-06-30"), timePeriods },
+              { date: new Date("2022-06-22").toISOString(), timePeriods },
+              { date: new Date("2022-06-23").toISOString(), timePeriods },
+              { date: new Date("2022-06-29").toISOString(), timePeriods },
+              { date: new Date("2022-06-30").toISOString(), timePeriods },
             ])
             .build().complexSchedule,
         );

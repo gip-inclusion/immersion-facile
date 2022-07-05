@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { addDays, parseISO } from "date-fns";
 import { z } from "zod";
 import { NotEmptyArray } from "../utils";
 import { zTrimmedString } from "../zodUtils";
@@ -50,7 +50,7 @@ export const makeDailySchedule = (
   date: Date,
   schedules: TimePeriodsDto,
 ): DailyScheduleDto => ({
-  date,
+  date: date.toISOString(),
   timePeriods: [...schedules],
 });
 
@@ -80,13 +80,14 @@ export const timePeriodSchema = z.object({
   end: zTrimmedString,
 });
 
-const dateSchema = z.preprocess((arg) => {
-  if (typeof arg == "string" || arg instanceof Date) return new Date(arg);
-}, z.date());
+const isoStringSchema = z.preprocess((arg) => {
+  if (arg instanceof Date) return arg.toISOString();
+  if (typeof arg === "string") return parseISO(arg).toISOString();
+}, z.string());
 
 const timePeriodsSchema = z.array(timePeriodSchema);
 export const dailyScheduleSchema = z.object({
-  date: dateSchema,
+  date: isoStringSchema,
   timePeriods: timePeriodsSchema,
 });
 
@@ -115,8 +116,8 @@ export const makeDateInterval = (
 ): DateInterval => {
   const dates = complexSchedule.map((schedule) => schedule.date);
   return {
-    start: new Date(Math.min(...dates.map((date) => date.getTime()))),
-    end: new Date(Math.max(...dates.map((date) => date.getTime()))),
+    start: new Date(Math.min(...dates.map((date) => new Date(date).getTime()))),
+    end: new Date(Math.max(...dates.map((date) => new Date(date).getTime()))),
   };
 };
 
@@ -125,15 +126,6 @@ export const scheduleSchema = z.object({
   selectedIndex: z.number().default(0),
   complexSchedule: complexScheduleSchema,
 });
-
-/*
-export const scheduleSchemaV0 = z.object({
-  isSimple: z.boolean(),
-  selectedIndex: z.number().default(0),
-  complexSchedule: complexScheduleSchema,
-  regularSchedule: regularScheduleSchema,
-});
-*/
 
 export const legacyScheduleSchema = z.object({
   workdays: z.array(z.enum(weekdays)),
@@ -146,5 +138,4 @@ export type TimePeriodsDto = z.infer<typeof timePeriodsSchema>;
 export type ComplexScheduleDto = z.infer<typeof complexScheduleSchema>;
 export type RegularScheduleDto = z.infer<typeof regularScheduleSchema>;
 export type LegacyScheduleDto = z.infer<typeof legacyScheduleSchema>;
-export type DateSchema = z.infer<typeof dateSchema>;
 export type DailyScheduleDto = z.infer<typeof dailyScheduleSchema>;

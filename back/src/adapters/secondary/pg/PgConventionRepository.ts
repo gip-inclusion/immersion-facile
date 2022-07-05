@@ -1,12 +1,12 @@
 import { format } from "date-fns";
 import { PoolClient } from "pg";
-import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
 import {
-  ConventionId,
-  ConventionExternalId,
   ConventionDto,
   ConventionDtoWithoutExternalId,
+  ConventionExternalId,
+  ConventionId,
 } from "shared/src/convention/convention.dto";
+import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
 import { optional } from "./pgUtils";
 
 const toDateString = (date: Date): string => format(date, "yyyy-MM-dd");
