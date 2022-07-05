@@ -115,7 +115,7 @@ export const createApiKeyAuthMiddlewareV0 = (
 const responseError = (res: Response, message: string, status = 403) =>
   res.status(status).json({ error: `forbidden: ${message}` });
 
-export const createApiKeyAuthMiddlewareV1 = (
+export const makeApiKeyAuthMiddlewareV1 = (
   getApiConsumerById: GetApiConsumerById,
   clock: Clock,
   config: AppConfig,
@@ -175,7 +175,7 @@ export const createApiKeyAuthMiddlewareV1 = (
   };
 };
 
-export const createMagicLinkAuthMiddleware = (
+export const makeMagicLinkAuthMiddleware = (
   config: AppConfig,
   payloadKey: PayloadKey,
 ) => {

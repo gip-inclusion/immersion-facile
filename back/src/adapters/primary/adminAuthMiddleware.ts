@@ -6,7 +6,7 @@ import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 
-export const createAdminAuthMiddleware = (
+export const makeAdminAuthMiddleware = (
   jwtAdminSecret: string,
   clock: Clock,
 ) => {

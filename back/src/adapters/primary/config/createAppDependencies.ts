@@ -12,11 +12,11 @@ import {
 } from "../../secondary/core/EmailFilterImplementations";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
-import { createAdminAuthMiddleware } from "../adminAuthMiddleware";
+import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
 import {
   createApiKeyAuthMiddlewareV0,
-  createApiKeyAuthMiddlewareV1,
-  createMagicLinkAuthMiddleware,
+  makeApiKeyAuthMiddlewareV1,
+  makeMagicLinkAuthMiddleware,
 } from "../authMiddleware";
 import {
   makeHandleManagedRedirectResponseError,
@@ -85,12 +85,12 @@ export const createAppDependencies = async (config: AppConfig) => {
       uuidGenerator,
     ),
     repositories,
-    applicationMagicLinkAuthMiddleware: createMagicLinkAuthMiddleware(
+    applicationMagicLinkAuthMiddleware: makeMagicLinkAuthMiddleware(
       config,
       "application",
     ),
     errorHandlers,
-    establishmentMagicLinkAuthMiddleware: createMagicLinkAuthMiddleware(
+    establishmentMagicLinkAuthMiddleware: makeMagicLinkAuthMiddleware(
       config,
       "establishment",
     ),
@@ -99,12 +99,12 @@ export const createAppDependencies = async (config: AppConfig) => {
       clock,
       config,
     ),
-    apiKeyAuthMiddleware: createApiKeyAuthMiddlewareV1(
+    apiKeyAuthMiddleware: makeApiKeyAuthMiddlewareV1(
       repositories.getApiConsumerById,
       clock,
       config,
     ),
-    adminAuthMiddleware: await createAdminAuthMiddleware(
+    adminAuthMiddleware: await makeAdminAuthMiddleware(
       config.adminJwtSecret,
       clock,
     ),
