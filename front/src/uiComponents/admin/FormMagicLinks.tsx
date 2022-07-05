@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { conventionGateway } from "src/app/config/dependencies";
 import { frontRoutes } from "shared/src/routes";
 import { allRoles, Role } from "shared/src/tokens/MagicLinkPayload";
+import { useAdminToken } from "src/hooks/useAdminToken";
 import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 
@@ -9,6 +10,7 @@ import { WithBackground } from "src/uiComponents/admin/WithBackground";
 export const FormMagicLinks = ({
   convention,
 }: ConventionFormAccordionProps) => {
+  const adminToken = useAdminToken();
   const [role, setRole] = useState(allRoles[0]);
   const [route, setRoute] = useState(
     Object.keys(frontRoutes)[0] as keyof typeof frontRoutes,
@@ -19,7 +21,7 @@ export const FormMagicLinks = ({
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     conventionGateway
-      .generateMagicLink(convention.id, role, expired)
+      .generateMagicLink(adminToken, convention.id, role, expired)
       .then(
         (jwt) =>
           `${location.protocol}//${location.host}/${frontRoutes[route]}/?jwt=${jwt}`,

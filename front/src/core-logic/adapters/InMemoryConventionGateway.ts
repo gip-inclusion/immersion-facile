@@ -122,7 +122,11 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return id;
   }
 
-  public async generateMagicLink(_: ConventionId, role: Role): Promise<string> {
+  public async generateMagicLink(
+    _: AdminToken,
+    _convention: ConventionId,
+    role: Role,
+  ): Promise<string> {
     return `magic/link/with/role/${role}`;
   }
 

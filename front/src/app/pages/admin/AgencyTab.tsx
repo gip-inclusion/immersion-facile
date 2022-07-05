@@ -8,6 +8,7 @@ import {
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import { propEq } from "src/../../shared/src/ramdaExtensions/propEq";
 import { agencyGateway } from "src/app/config/dependencies";
+import { useAdminToken } from "src/hooks/useAdminToken";
 import { AgencyDetails } from "src/uiComponents/admin/AgencyDetails";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
@@ -19,6 +20,7 @@ type ActivationResult = {
 };
 
 export const AgencyTab = () => {
+  const adminToken = useAdminToken();
   const [agenciesNeedingReview, setAgenciesNeedingReview] = useState<
     AgencyDto[]
   >([]);
@@ -31,7 +33,7 @@ export const AgencyTab = () => {
   >();
 
   const fetchAgenciesNeedingReview = () => {
-    agencyGateway.listAgenciesNeedingReview().then(
+    agencyGateway.listAgenciesNeedingReview(adminToken).then(
       (agencies) => {
         setAgenciesNeedingReview(agencies);
       },
@@ -62,7 +64,7 @@ export const AgencyTab = () => {
   const validateAgency = (agency: AgencyDto) => {
     setActivationButtonDisabled(true);
     return agencyGateway
-      .validateAgency(agency.id)
+      .validateAgency(adminToken, agency.id)
       .then(() => {
         setActivationResult({
           status: "success",

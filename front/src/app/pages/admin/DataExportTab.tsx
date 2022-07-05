@@ -2,23 +2,18 @@ import React, { useState } from "react";
 import { ArrayDropdown, DsfrTitle } from "react-design-system/immersionFacile";
 import {
   DepartmentOrRegion,
-  EstablishmentExportConfigDto,
   FormSourceProvider,
 } from "shared/src/establishmentExport/establishmentExport.dto";
-import {
-  exportConventionsExcelRoute,
-  exportEstablismentsExcelRoute,
-} from "shared/src/routes";
-import { queryParamsAsString } from "shared/src/utils/queryParams";
+import { HttpExcelExportGateway } from "src/core-logic/adapters/HttpExcelExportGateway";
+import { useAdminToken } from "src/hooks/useAdminToken";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
 
-const buildExportEstablishmentRoute = (params: EstablishmentExportConfigDto) =>
-  `/api/${exportEstablismentsExcelRoute}?${queryParamsAsString<EstablishmentExportConfigDto>(
-    params,
-  )}`;
+export const excelExportGateway = new HttpExcelExportGateway();
 
 export const DataExportTab = () => {
+  const adminToken = useAdminToken();
+
   const [
     conventionExportSelectedGroupKey,
     setConventionExportSelectedGroupKey,
@@ -35,7 +30,7 @@ export const DataExportTab = () => {
         <DsfrTitle level={5} text="Les conventions" />
         <Link
           text="Les conventions par agences"
-          href={`/api/${exportConventionsExcelRoute}`}
+          onClick={() => excelExportGateway.exportConventions(adminToken)}
         />
       </div>
       <div>
@@ -85,11 +80,13 @@ export const DataExportTab = () => {
                 conventionExportSelectedSourceProvider
           } par ${conventionExportSelectedGroupKey} sans aggrégation
       des métiers`}
-          href={buildExportEstablishmentRoute({
-            aggregateProfession: false,
-            groupKey: conventionExportSelectedGroupKey,
-            sourceProvider: conventionExportSelectedSourceProvider,
-          })}
+          onClick={() =>
+            excelExportGateway.exportEstablishments(adminToken, {
+              aggregateProfession: false,
+              groupKey: conventionExportSelectedGroupKey,
+              sourceProvider: conventionExportSelectedSourceProvider,
+            })
+          }
         />
 
         <Link
@@ -100,20 +97,34 @@ export const DataExportTab = () => {
                 conventionExportSelectedSourceProvider
           } par ${conventionExportSelectedGroupKey} avec aggrégation
       des métiers`}
-          href={buildExportEstablishmentRoute({
-            aggregateProfession: true,
-            groupKey: conventionExportSelectedGroupKey,
-            sourceProvider: conventionExportSelectedSourceProvider,
-          })}
+          onClick={() =>
+            excelExportGateway.exportEstablishments(adminToken, {
+              aggregateProfession: true,
+              groupKey: conventionExportSelectedGroupKey,
+              sourceProvider: conventionExportSelectedSourceProvider,
+            })
+          }
         />
       </div>
     </div>
   );
 };
-const Link = ({ text, href }: { text: string; href: string }) => (
+
+// implementation could be improved, using a button and giving it a link style for exemple
+const Link = ({
+  text,
+  onClick,
+}: {
+  text: string;
+  onClick: React.MouseEventHandler<HTMLAnchorElement>;
+}) => (
   <a
     className="fr-link fr-fi-arrow-right-line fr-link--icon-left"
-    href={href}
+    onClick={(e) => {
+      e.preventDefault();
+      onClick(e);
+    }}
+    href="#"
     target="_blank"
   >
     {text}

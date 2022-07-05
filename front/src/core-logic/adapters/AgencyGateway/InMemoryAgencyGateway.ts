@@ -1,4 +1,5 @@
 import { Observable, of } from "rxjs";
+import { AdminToken } from "shared/src/admin/admin.dto";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
 import {
@@ -82,7 +83,7 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     return values(this._agencies).filter(propEq("status", "needsReview"));
   }
 
-  async validateAgency(agencyId: AgencyId): Promise<void> {
+  async validateAgency(_: AdminToken, agencyId: AgencyId): Promise<void> {
     this._agencies[agencyId].status = "active";
   }
 
