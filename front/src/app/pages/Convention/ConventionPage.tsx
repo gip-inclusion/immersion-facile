@@ -25,7 +25,7 @@ interface ConventionPageProps {
 
 export type ConventionPresentation = OmitFromExistingKeys<
   Partial<ConventionDto>,
-  "id" | "rejectionJustification" | "legacySchedule"
+  "id" | "rejectionJustification"
 > & {
   beneficiaryAccepted: boolean;
   enterpriseAccepted: boolean;

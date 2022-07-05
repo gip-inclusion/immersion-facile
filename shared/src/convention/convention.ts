@@ -1,6 +1,6 @@
+import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { Role } from "../tokens/MagicLinkPayload";
 import { ConventionStatus, ConventionDto } from "./convention.dto";
-import { reasonableSchedule } from "../schedule/ScheduleSchema";
 
 const getNewStatus = (
   enterpriseAccepted: boolean,
@@ -69,7 +69,6 @@ export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
     start: new Date("2021-08-01"),
     end: new Date("2021-08-31"),
   }),
-  legacySchedule: undefined,
   workConditions: undefined,
   immersionAddress: "75001 Centre du monde",
   individualProtection: true,

@@ -1,16 +1,18 @@
 import { addDays, getDay, parseISO } from "date-fns";
+
 import {
   ComplexScheduleDto,
   DailyScheduleDto,
+  DateIntervalDto,
   DayPeriodsDto,
-  LegacyScheduleDto,
-  RegularScheduleDto,
   ScheduleDto,
   TimePeriodDto,
   TimePeriodsDto,
   Weekday,
+  WeekdayNumber,
+  WeekDayRangeSchemaDTO,
   weekdays,
-} from "./ScheduleSchema";
+} from "./Schedule.dto";
 
 export type WeeklyImmersionTimetableDto = {
   dailySchedule: DailyScheduleDto | null;
@@ -19,13 +21,16 @@ export type WeeklyImmersionTimetableDto = {
 
 type ImmersionTimeTable = WeeklyImmersionTimetableDto[];
 
-export const emptyRegularSchedule: RegularScheduleDto = {
-  dayPeriods: [[0, 6]],
-  timePeriods: [],
-};
 export const maxPermittedHoursPerWeek = 35;
-
-type WeekdayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export const makeDateInterval = (
+  complexSchedule: ComplexScheduleDto,
+): DateIntervalDto => {
+  const dates = complexSchedule.map((schedule) => schedule.date);
+  return {
+    start: new Date(Math.min(...dates.map((date) => new Date(date).getTime()))),
+    end: new Date(Math.max(...dates.map((date) => new Date(date).getTime()))),
+  };
+};
 
 type UniversalDayMappingToFrenchCalendar = {
   universalDay: WeekdayNumber;
@@ -78,48 +83,32 @@ export const calculateTotalImmersionHoursBetweenDate = ({
     ...dates,
   });
 
-export const complexScheduleFromRegularSchedule = (
-  complexSchedule: ComplexScheduleDto,
-  regularSchedule: RegularScheduleDto,
-): ComplexScheduleDto => {
-  const isDailyScheduleOnRegularDayPeriod = (
-    dailySchedule: DailyScheduleDto,
-    regularDayPeriods: DayPeriodsDto,
-  ): boolean =>
-    regularDayPeriods.some(([startWorkingDay, endWorkingDay]) => {
-      for (
-        let currentWorkingDay = startWorkingDay;
-        currentWorkingDay <= endWorkingDay;
-        currentWorkingDay++
-      ) {
-        if (
-          currentWorkingDay === frenchDayMapping(dailySchedule.date).frenchDay
-        )
-          return true;
-      }
-      return false;
-    });
-  for (let index = complexSchedule.length - 1; index >= 0; index--) {
-    const check = isDailyScheduleOnRegularDayPeriod(
-      complexSchedule[index],
-      regularSchedule.dayPeriods,
-    );
-    if (check) complexSchedule[index].timePeriods = regularSchedule.timePeriods;
-    else complexSchedule.splice(index, 1);
-  }
-  return complexSchedule;
-};
-
 export const prettyPrintSchedule = (schedule: ScheduleDto): string =>
   prettyPrintComplexSchedule(schedule.complexSchedule);
 
 // Extract all weekday names for which there is at least one
-export const convertToFrenchNamedDays = (schedule: ScheduleDto) => {
+export const convertToFrenchNamedDays = (schedule: ScheduleDto): Weekday[] => {
   const complexSchedule = schedule.complexSchedule;
   return complexSchedule
     .filter((daily) => daily.timePeriods.length > 0)
     .map((daily) => weekdays[frenchDayMapping(daily.date).frenchDay]);
 };
+
+const reasonableTimePeriods: TimePeriodsDto = [
+  {
+    start: "08:00",
+    end: "12:00",
+  },
+  {
+    start: "13:00",
+    end: "16:00",
+  },
+];
+export const reasonableSchedule = (interval: DateIntervalDto): ScheduleDto => ({
+  isSimple: true,
+  selectedIndex: 0,
+  complexSchedule: makeComplexSchedule(interval, reasonableTimePeriods),
+});
 
 export const frenchDayMapping = (
   date: Date | string,
@@ -228,7 +217,7 @@ export const isScheduleValid = (schedule: ScheduleDto) => {
 
 const toFrenchReadableDate = (isoStringDate: string) => {
   const date = parseISO(isoStringDate);
-  `${date.getDate()}/${date.getMonth() + 1}`;
+  return `${date.getDate()}/${date.getMonth() + 1}`;
 };
 
 // Converts an array of TimePeriodDto to a readable schedule, e.g.
@@ -273,14 +262,6 @@ const prettyPrintComplexSchedule = (
   });
   return lines.join("\n");
 };
-
-export const prettyPrintLegacySchedule = (
-  schedule: LegacyScheduleDto,
-): string =>
-  [
-    "Les jours de l'immersion seront " + schedule.workdays.join(", "),
-    schedule.description,
-  ].join("\n");
 
 const getIndexInWeekFromMonday = (isoStringDate: string) => {
   const dayIndex = parseISO(isoStringDate).getDay();
@@ -347,7 +328,10 @@ export const dayPeriodsFromComplexSchedule = (
       let lastFrenchDayWithTimePeriod = frenchDay;
       while (timePeriodsOnFrenchDays[lastFrenchDayWithTimePeriod + 1] === true)
         lastFrenchDayWithTimePeriod++;
-      dayPeriods.push([frenchDay, lastFrenchDayWithTimePeriod]);
+      dayPeriods.push([
+        frenchDay,
+        lastFrenchDayWithTimePeriod,
+      ] as WeekDayRangeSchemaDTO);
       frenchDay = lastFrenchDayWithTimePeriod;
     }
   }
@@ -417,4 +401,34 @@ export const regularTimePeriods = (schedule: ScheduleDto): TimePeriodsDto => {
     (dailySchedule) => dailySchedule.timePeriods.length > 0,
   );
   return scheduleWithTimePeriods ? scheduleWithTimePeriods.timePeriods : [];
+};
+
+export const emptySchedule = (
+  interval: DateIntervalDto,
+): Readonly<ScheduleDto> => ({
+  isSimple: false,
+  selectedIndex: 0,
+  complexSchedule: makeComplexSchedule(interval, []),
+});
+
+export const makeDailySchedule = (
+  date: Date,
+  schedules: TimePeriodsDto,
+): DailyScheduleDto => ({
+  date: date.toISOString(),
+  timePeriods: [...schedules],
+});
+
+export const makeComplexSchedule = (
+  { start, end }: DateIntervalDto,
+  timePeriods: TimePeriodsDto,
+): ComplexScheduleDto => {
+  const complexSchedules: ComplexScheduleDto = [];
+  for (
+    let currentDate = start;
+    currentDate <= end;
+    currentDate = addDays(currentDate, 1)
+  )
+    complexSchedules.push(makeDailySchedule(currentDate, timePeriods));
+  return complexSchedules;
 };

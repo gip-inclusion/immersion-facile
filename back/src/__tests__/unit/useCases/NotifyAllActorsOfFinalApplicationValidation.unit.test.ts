@@ -5,7 +5,6 @@ import {
   getValidatedApplicationFinalConfirmationParams,
   NotifyAllActorsOfFinalApplicationValidation,
 } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
-import { reasonableSchedule } from "shared/src/schedule/ScheduleSchema";
 import { prettyPrintSchedule } from "shared/src/schedule/ScheduleUtils";
 import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../_testBuilders/emailAssertions";
@@ -22,6 +21,7 @@ import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAg
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { PeConnectIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
+import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
 
 const validConvention: ConventionDto = new ConventionDtoBuilder().build();
 

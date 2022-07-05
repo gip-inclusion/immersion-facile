@@ -7,7 +7,7 @@ import { LatLonDto } from "shared/src/latLon";
 import {
   FederatedIdentity,
   isPeConnectIdentity,
-} from "src/../../shared/src/federatedIdentities/federatedIdentity.dto";
+} from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { Agencies } from "src/app/components/Agency";
 import { agencyGateway } from "src/app/config/dependencies";
 import { useConnectedWith } from "src/hooks/connectedWith";

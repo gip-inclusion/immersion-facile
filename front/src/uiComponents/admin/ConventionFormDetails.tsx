@@ -66,14 +66,14 @@ const allFields: FieldsAndTitle[] = [
 export const ConnventionFormDetails = ({
   convention,
 }: ConventionFormAccordionProps) => {
-  const scheduleText = convention.legacySchedule
-    ? convention.legacySchedule.description
-    : prettyPrintSchedule(convention.schedule);
-
   const buildContent = (field: ImmersionField): ReactNode => {
     const value = convention[field];
     if (field === "schedule")
-      return <div style={{ whiteSpace: "pre" }}>{scheduleText}</div>;
+      return (
+        <div style={{ whiteSpace: "pre" }}>
+          {prettyPrintSchedule(convention.schedule)}
+        </div>
+      );
     if (field === "sanitaryPrevention") {
       return value ? convention.sanitaryPreventionDescription ?? "✅" : "❌";
     }

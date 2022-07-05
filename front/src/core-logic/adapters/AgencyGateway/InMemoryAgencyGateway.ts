@@ -13,7 +13,7 @@ import {
 import { LatLonDto } from "shared/src/latLon";
 import { values } from "ramda";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { propEq, propNotEq } from "src/../../shared/src/ramdaExtensions/propEq";
+import { propEq, propNotEq } from "shared/src/ramdaExtensions/propEq";
 
 const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withId("test-agency-1-front")

@@ -5,9 +5,9 @@ import {
   ImmersionObjective,
 } from "shared/src/convention/convention.dto";
 import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
-import { reasonableSchedule } from "shared/src/schedule/ScheduleSchema";
 import { toDateString } from "shared/src/utils/date";
 import { mergeObjectsExceptFalsyValues } from "shared/src/utils/mergeObjectsExpectFalsyValues";
+import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
 import {
   conventionGateway,
   deviceRepository,

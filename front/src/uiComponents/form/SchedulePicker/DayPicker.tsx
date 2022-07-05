@@ -1,5 +1,5 @@
 import React from "react";
-import { ComplexScheduleDto } from "shared/src/schedule/ScheduleSchema";
+import { ComplexScheduleDto } from "shared/src/schedule/Schedule.dto";
 import { makeImmersionTimetable } from "shared/src/schedule/ScheduleUtils";
 import { DayCircle } from "./DayCircle";
 import { WeeklyRow } from "./WeeklyRow";

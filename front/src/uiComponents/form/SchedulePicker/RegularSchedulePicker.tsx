@@ -2,24 +2,26 @@ import { useField } from "formik";
 import React, { useEffect } from "react";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ScheduleDtoBuilder } from "shared/src/schedule/ScheduleDtoBuilder";
-import {
-  DailyScheduleDto,
-  DateInterval,
-  DayPeriodsDto,
-  reasonableSchedule,
-  ScheduleDto,
-} from "shared/src/schedule/ScheduleSchema";
+
 import {
   calculateWeeklyHoursFromSchedule,
   dayPeriodsFromComplexSchedule,
+  reasonableSchedule,
   regularTimePeriods,
 } from "shared/src/schedule/ScheduleUtils";
+import {
+  ScheduleDto,
+  DailyScheduleDto,
+  DateIntervalDto,
+  DayPeriodsDto,
+} from "shared/src/schedule/Schedule.dto";
+
 import { HourPicker } from "./HourPicker";
 import { TotalWeeklyHoursIndicator } from "./TotaWeeklylHoursIndicator";
 import { WeekdayPicker } from "./WeekdayPicker";
 
 export type RegularSchedulePickerProps = {
-  interval: DateInterval;
+  interval: DateIntervalDto;
   disabled?: boolean;
 };
 

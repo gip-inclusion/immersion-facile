@@ -1,12 +1,11 @@
 import { useField } from "formik";
 import React, { useEffect } from "react";
 import { ConventionDto } from "shared/src/convention/convention.dto";
+import { DateIntervalDto, ScheduleDto } from "shared/src/schedule/Schedule.dto";
 import {
-  DateInterval,
-  emptySchedule,
   reasonableSchedule,
-  ScheduleDto,
-} from "shared/src/schedule/ScheduleSchema";
+  emptySchedule,
+} from "shared/src/schedule/ScheduleUtils";
 import { BoolRadioPicker } from "./BoolRadioPicker";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import { RegularSchedulePicker } from "./RegularSchedulePicker";
@@ -15,7 +14,7 @@ import { scheduleValidator } from "./utils/scheduleValidator";
 
 type SchedulePickerProps = {
   disabled?: boolean;
-  interval: DateInterval;
+  interval: DateIntervalDto;
 };
 
 export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {

@@ -31,7 +31,7 @@ import {
   ConventionDtoWithoutExternalId,
   conventionObjectiveOptions,
 } from "./convention.dto";
-import { LegacyScheduleDto, ScheduleDto } from "../schedule/ScheduleSchema";
+import { ScheduleDto } from "../schedule/Schedule.dto";
 import { dateRegExp } from "../utils/date";
 import { allRoles } from "../tokens/MagicLinkPayload";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
@@ -43,7 +43,6 @@ export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
 
 const scheduleSchema: z.ZodSchema<ScheduleDto> = z.any();
-const legacyScheduleSchema: z.ZodSchema<LegacyScheduleDto> = z.any();
 
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
@@ -79,7 +78,6 @@ const conventionWithoutExternalIdZObject = z.object({
   ),
   mentorEmail: zEmail,
   schedule: scheduleSchema,
-  legacySchedule: legacyScheduleSchema.optional(),
   workConditions: z.string().optional(),
   individualProtection: zBoolean,
   sanitaryPrevention: zBoolean,

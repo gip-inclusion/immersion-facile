@@ -1,5 +1,5 @@
 import { AgencyId } from "../agency/agency.dto";
-import { LegacyScheduleDto, ScheduleDto } from "../schedule/ScheduleSchema";
+import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret";
 import { Flavor } from "../typeFlavors";
 
@@ -57,7 +57,6 @@ export type ConventionDtoWithoutExternalId = {
   mentorPhone: string;
   mentorEmail: string;
   schedule: ScheduleDto;
-  legacySchedule?: LegacyScheduleDto;
   workConditions?: string;
   individualProtection: boolean;
   sanitaryPrevention: boolean;

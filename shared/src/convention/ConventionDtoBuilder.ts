@@ -1,10 +1,5 @@
 import { AgencyId } from "../agency/agency.dto";
-import {
-  DateInterval,
-  LegacyScheduleDto,
-  reasonableSchedule,
-  ScheduleDto,
-} from "../schedule/ScheduleSchema";
+import { DateIntervalDto, ScheduleDto } from "../schedule/Schedule.dto";
 import { Builder } from "../Builder";
 import {
   ConventionStatus,
@@ -15,6 +10,7 @@ import {
 } from "./convention.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import { reasonableSchedule } from "../schedule/ScheduleUtils";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 export const CONVENTION_EXTERNAL_ID = "00000000001";
@@ -179,14 +175,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withLegacySchedule(legacySchedule: LegacyScheduleDto) {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      legacySchedule,
-    });
-  }
-
-  public withSchedule(schedule: (interval: DateInterval) => ScheduleDto) {
+  public withSchedule(schedule: (interval: DateIntervalDto) => ScheduleDto) {
     return new ConventionDtoBuilder({
       ...this.dto,
       schedule: schedule({

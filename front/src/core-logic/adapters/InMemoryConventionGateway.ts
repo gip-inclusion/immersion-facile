@@ -17,7 +17,7 @@ import {
 } from "shared/src/tokens/MagicLinkPayload";
 import { sleep } from "shared/src/utils";
 import { Observable, Subject, from } from "rxjs";
-import { ConventionDtoBuilder } from "src/../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 const CONVENTION_DRAFT_TEST = new ConventionDtoBuilder()
   .withStatus("DRAFT")

@@ -2,7 +2,6 @@ import { parseISO } from "date-fns";
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import {
   calculateTotalImmersionHoursBetweenDate,
-  prettyPrintLegacySchedule,
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
 import { TransactionalUseCase } from "../../../core/UseCase";
@@ -78,9 +77,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
   dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
   dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
   mentorName: dto.mentor,
-  scheduleText: dto.legacySchedule?.description
-    ? prettyPrintLegacySchedule(dto.legacySchedule)
-    : prettyPrintSchedule(dto.schedule),
+  scheduleText: prettyPrintSchedule(dto.schedule),
   businessName: dto.businessName,
   immersionAddress: dto.immersionAddress || "",
   immersionAppellationLabel: dto.immersionAppellation.appellationLabel,

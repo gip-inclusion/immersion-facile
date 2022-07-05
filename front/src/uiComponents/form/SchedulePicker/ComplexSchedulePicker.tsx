@@ -1,18 +1,15 @@
 import { useField } from "formik";
 import React, { useEffect } from "react";
-import {
-  DateInterval,
-  emptySchedule,
-  ScheduleDto,
-} from "shared/src/schedule/ScheduleSchema";
-import { ConventionDto } from "src/../../shared/src/convention/convention.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
+import { DateIntervalDto, ScheduleDto } from "shared/src/schedule/Schedule.dto";
+import { emptySchedule } from "src/../../shared/src/schedule/ScheduleUtils";
 import { DayPicker } from "./DayPicker";
 import { HourPicker } from "./HourPicker";
 
 type ComplexSchedulePickerProps = {
   selectedIndex: number;
   disabled?: boolean;
-  interval: DateInterval;
+  interval: DateIntervalDto;
 };
 
 export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {

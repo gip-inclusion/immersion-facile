@@ -1,4 +1,4 @@
-import { DailyScheduleDto } from "shared/src/schedule/ScheduleSchema";
+import { DailyScheduleDto } from "shared/src/schedule/Schedule.dto";
 
 export type DayStatus = "empty" | "hasTime" | "isSelected";
 

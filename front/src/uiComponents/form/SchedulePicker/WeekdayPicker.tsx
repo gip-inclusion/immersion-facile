@@ -1,7 +1,12 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
-import { DayPeriodsDto, ScheduleDto } from "shared/src/schedule/ScheduleSchema";
 import { ButtonAdd, ButtonDelete } from "react-design-system/immersionFacile";
+import {
+  DayPeriodsDto,
+  ScheduleDto,
+  WeekdayNumber,
+  WeekDayRangeSchemaDTO,
+} from "shared/src/schedule/Schedule.dto";
 import { WeekdayDropdown } from "./WeekdayDropdown";
 
 type WeekdayPickerProps = {
@@ -28,7 +33,7 @@ export const WeekdayPicker = ({
         end = last[1] + 2;
       }
     }
-    dayPeriods.push([start, end]);
+    dayPeriods.push([start, end] as WeekDayRangeSchemaDTO);
     onValueChange(dayPeriods);
   };
   return (
@@ -37,11 +42,11 @@ export const WeekdayPicker = ({
       {dayPeriods.length > 0 &&
         dayPeriods.map((dayRange, index) => {
           const onStartChange = (value: number) => {
-            dayRange[0] = value;
+            dayRange[0] = value as WeekdayNumber;
             onValueChange(dayPeriods);
           };
           const onEndChange = (value: number) => {
-            dayRange[1] = value;
+            dayRange[1] = value as WeekdayNumber;
             onValueChange(dayPeriods);
           };
 
