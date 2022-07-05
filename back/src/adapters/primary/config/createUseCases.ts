@@ -30,7 +30,7 @@ import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../../domain/convention/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
-import { RenewMagicLink } from "../../../domain/convention/useCases/RenewMagicLink";
+import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { ShareApplicationLinkByEmail } from "../../../domain/convention/useCases/ShareApplicationLinkByEmail";
 import { SignImmersionApplication } from "../../../domain/convention/useCases/SignImmersionApplication";
 import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
@@ -148,11 +148,9 @@ export const createUseCases = (
       repositories.outbox,
     ),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
-    renewMagicLink: new RenewMagicLink(
-      repositories.convention,
+    renewConventionMagicLink: new RenewConventionMagicLink(
+      uowPerformer,
       createNewEvent,
-      repositories.outbox,
-      repositories.agency,
       generateJwtFn,
       config,
       clock,

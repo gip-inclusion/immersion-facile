@@ -6,7 +6,7 @@ import { Route } from "type-route";
 import { Button, Notification } from "react-design-system/immersionFacile";
 
 interface RenewExpiredLinkProps {
-  route: Route<typeof routes.renewMagicLink>;
+  route: Route<typeof routes.renewConventionMagicLink>;
 }
 
 interface RenewExpiredLinkContentsProps {

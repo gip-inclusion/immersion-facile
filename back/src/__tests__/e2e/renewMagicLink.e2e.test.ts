@@ -1,41 +1,47 @@
-import {
-  makeGenerateJwtES256,
-  makeVerifyJwtES256,
-} from "../../domain/auth/jwt";
-import { DeliverRenewedMagicLink } from "../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { RenewMagicLinkRequestDto } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
+import { InMemoryOutboxQueries } from "../../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
 import {
   InMemoryEmailGateway,
   TemplatedEmail,
 } from "../../adapters/secondary/InMemoryEmailGateway";
-import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
+import {
+  GenerateMagicLinkJwt,
+  makeGenerateJwtES256,
+  makeVerifyJwtES256,
+} from "../../domain/auth/jwt";
+import { DeliverRenewedMagicLink } from "../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
+import { RenewConventionMagicLink } from "../../domain/convention/useCases/RenewConventionMagicLink";
 import {
   CreateNewEvent,
   EventBus,
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import {
-  ConventionDto,
-  RenewMagicLinkRequestDto,
-} from "shared/src/convention/convention.dto";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { RenewMagicLink } from "../../domain/convention/useCases/RenewMagicLink";
-import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
-import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { InMemoryOutboxQueries } from "../../adapters/secondary/core/InMemoryOutboxQueries";
 
 const adminEmail = "admin@email.fr";
+
+const validConvention = new ConventionDtoBuilder().build();
+
+const agency = AgencyDtoBuilder.create(validConvention.agencyId)
+  .withName("TEST-name")
+  .withAdminEmails([adminEmail])
+  .withQuestionnaireUrl("TEST-questionnaireUrl")
+  .withSignature("TEST-signature")
+  .build();
 
 describe("Magic link renewal flow", () => {
   let conventionRepository: InMemoryConventionRepository;
@@ -44,48 +50,40 @@ describe("Magic link renewal flow", () => {
   let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
   let emailGw: InMemoryEmailGateway;
-  let validConvention: ConventionDto;
   let eventBus: EventBus;
   let eventCrawler: BasicEventCrawler;
   let emailFilter: EmailFilter;
   let sentEmails: TemplatedEmail[];
-  let agency: AgencyDto;
-  let renewMagicLink: RenewMagicLink;
+  let renewMagicLink: RenewConventionMagicLink;
   let deliverRenewedMagicLink: DeliverRenewedMagicLink;
   let config: AppConfig;
   let generateJwtFn: GenerateMagicLinkJwt;
 
   beforeEach(() => {
-    conventionRepository = new InMemoryConventionRepository();
-    outboxRepository = new InMemoryOutboxRepository();
+    const uow = createInMemoryUow();
+
+    const agencyRepository = uow.agencyRepo;
+    agencyRepository.setAgencies([agency]);
+    conventionRepository = uow.conventionRepository;
+    outboxRepository = uow.outboxRepo;
     const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
     clock = new CustomClock();
     clock.setNextDate(new Date());
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     emailGw = new InMemoryEmailGateway();
-    validConvention = new ConventionDtoBuilder().build();
     eventBus = new InMemoryEventBus(clock, (e) => outboxRepository.save(e));
     eventCrawler = new BasicEventCrawler(eventBus, outboxQueries);
 
     emailFilter = new AlwaysAllowEmailFilter();
 
-    agency = AgencyDtoBuilder.create(validConvention.agencyId)
-      .withName("TEST-name")
-      .withAdminEmails([adminEmail])
-      .withQuestionnaireUrl("TEST-questionnaireUrl")
-      .withSignature("TEST-signature")
-      .build();
-    const agencyRepository = new InMemoryAgencyRepository([agency]);
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
     generateJwtFn = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
 
-    renewMagicLink = new RenewMagicLink(
-      conventionRepository,
+    renewMagicLink = new RenewConventionMagicLink(
+      new InMemoryUowPerformer(uow),
       createNewEvent,
-      outboxRepository,
-      agencyRepository,
       generateJwtFn,
       config,
       clock,

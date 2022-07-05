@@ -1,29 +1,28 @@
-import { ConventionId } from "shared/src/convention/convention.dto";
-import jwt from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
-  stringToMd5,
+  ConventionId,
+  RenewMagicLinkRequestDto,
+} from "shared/src/convention/convention.dto";
+import { renewMagicLinkRequestSchema } from "shared/src/convention/convention.schema";
+import {
   ConventionMagicLinkPayload,
+  createConventionMagicLinkPayload,
   Role,
+  stringToMd5,
 } from "shared/src/tokens/MagicLinkPayload";
+import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
+import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { RenewMagicLinkRequestDto } from "shared/src/convention/convention.dto";
+import { createLogger } from "../../../utils/logger";
 import { GenerateMagicLinkJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { UseCase } from "../../core/UseCase";
-import { ConventionRepository } from "../ports/ConventionRepository";
-import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { AgencyRepository } from "../ports/AgencyRepository";
-import { createLogger } from "../../../utils/logger";
-import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { AppConfig } from "../../../adapters/primary/config/appConfig";
-import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
-import { TokenExpiredError } from "jsonwebtoken";
 import { Clock } from "../../core/ports/Clock";
-import { renewMagicLinkRequestSchema } from "shared/src/convention/convention.schema";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
 
@@ -55,22 +54,26 @@ const extractDataFromExpiredJwt: (payload: any) => LinkRenewData = (
   }
 };
 
-export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
+export class RenewConventionMagicLink extends TransactionalUseCase<
+  RenewMagicLinkRequestDto,
+  void
+> {
   constructor(
-    readonly conventionRepository: ConventionRepository,
+    uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly outboxRepository: OutboxRepository,
-    private readonly agencyRepository: AgencyRepository,
     private readonly generateMagicLinkJwt: GenerateMagicLinkJwt,
     private readonly config: AppConfig,
     private readonly clock: Clock,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = renewMagicLinkRequestSchema;
 
-  public async _execute({ expiredJwt, linkFormat }: RenewMagicLinkRequestDto) {
+  public async _execute(
+    { expiredJwt, linkFormat }: RenewMagicLinkRequestDto,
+    uow: UnitOfWork,
+  ) {
     const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(this.config);
 
     let payloadToExtract: any | undefined;
@@ -107,12 +110,10 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
     const { emailHash, role, applicationId } =
       extractDataFromExpiredJwt(payloadToExtract);
 
-    const conventionDto = await this.conventionRepository.getById(
-      applicationId,
-    );
+    const conventionDto = await uow.conventionRepository.getById(applicationId);
     if (!conventionDto) throw new NotFoundError(applicationId);
 
-    const agency = await this.agencyRepository.getById(conventionDto.agencyId);
+    const agency = await uow.agencyRepo.getById(conventionDto.agencyId);
     if (!agency) {
       logger.error(
         { agencyId: conventionDto.agencyId },
@@ -168,7 +169,7 @@ export class RenewMagicLink extends UseCase<RenewMagicLinkRequestDto, void> {
           },
         });
 
-        await this.outboxRepository.save(event);
+        await uow.outboxRepo.save(event);
       }
     }
     if (!foundHit) {

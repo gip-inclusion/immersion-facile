@@ -61,7 +61,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.immersionAssessment}`,
   ),
   landingEstablishment: defineRoute("/accueil-etablissement"),
-  renewMagicLink: defineRoute(
+  renewConventionMagicLink: defineRoute(
     {
       expiredJwt: param.query.string,
       originalURL: param.query.string,

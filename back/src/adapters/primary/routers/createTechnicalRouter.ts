@@ -13,7 +13,7 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
   const technicalRouter = Router();
   technicalRouter.route(`/${renewMagicLinkRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.renewMagicLink.execute({
+      deps.useCases.renewConventionMagicLink.execute({
         expiredJwt: req.query.expiredJwt,
         linkFormat: req.query.linkFormat,
       } as any),

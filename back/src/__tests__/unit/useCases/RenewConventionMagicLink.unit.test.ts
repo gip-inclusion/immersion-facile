@@ -1,41 +1,41 @@
-import {
-  makeGenerateJwtES256,
-  makeVerifyJwtES256,
-} from "../../../domain/auth/jwt";
-import { AppConfig } from "../../../adapters/primary/config/appConfig";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import {
-  CreateNewEvent,
-  makeCreateNewEvent,
-} from "../../../domain/core/eventBus/EventBus";
-import { RenewMagicLink } from "../../../domain/convention/useCases/RenewMagicLink";
-import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
-import { RenewMagicLinkPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import {
   ConventionDto,
   RenewMagicLinkRequestDto,
 } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { AppConfig } from "../../../adapters/primary/config/appConfig";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
+import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  GenerateMagicLinkJwt,
+  makeGenerateJwtES256,
+  makeVerifyJwtES256,
+} from "../../../domain/auth/jwt";
+import { RenewMagicLinkPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../../domain/core/eventBus/EventBus";
 
 const validConvention: ConventionDto = new ConventionDtoBuilder().build();
 
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
 
-describe("RenewMagicLink use case", () => {
-  let agency: AgencyDto;
+describe("RenewConventionMagicLink use case", () => {
   let conventionRepository: InMemoryConventionRepository;
   let outboxRepository: InMemoryOutboxRepository;
   let clock: CustomClock;
@@ -43,36 +43,33 @@ describe("RenewMagicLink use case", () => {
   let createNewEvent: CreateNewEvent;
   let agencyRepository: InMemoryAgencyRepository;
   let config: AppConfig;
-
   let generateJwtFn: GenerateMagicLinkJwt;
+  let renewConventionMagicLink: RenewConventionMagicLink;
 
   beforeEach(() => {
-    agency = defaultAgency;
-    conventionRepository = new InMemoryConventionRepository();
-    outboxRepository = new InMemoryOutboxRepository();
+    const uow = createInMemoryUow();
+    conventionRepository = uow.conventionRepository;
+    outboxRepository = uow.outboxRepo;
+    agencyRepository = uow.agencyRepo;
+    agencyRepository.setAgencies([defaultAgency]);
     clock = new CustomClock();
     clock.setNextDate(new Date());
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
-    agencyRepository = new InMemoryAgencyRepository([agency]);
 
     const entity = new ConventionDtoBuilder().build();
     conventionRepository.setConventions({ [entity.id]: entity });
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
     generateJwtFn = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
-  });
-
-  const createUseCase = () =>
-    new RenewMagicLink(
-      conventionRepository,
+    renewConventionMagicLink = new RenewConventionMagicLink(
+      new InMemoryUowPerformer(uow),
       createNewEvent,
-      outboxRepository,
-      agencyRepository,
       generateJwtFn,
       config,
       clock,
     );
+  });
 
   it("requires a valid application id", async () => {
     const payload = createConventionMagicLinkPayload(
@@ -87,7 +84,7 @@ describe("RenewMagicLink use case", () => {
     };
 
     await expectPromiseToFailWithError(
-      createUseCase().execute(request),
+      renewConventionMagicLink.execute(request),
       new NotFoundError("not-a-valid-id"),
     );
   });
@@ -111,7 +108,7 @@ describe("RenewMagicLink use case", () => {
     };
 
     await expectPromiseToFailWithError(
-      createUseCase().execute(request),
+      renewConventionMagicLink.execute(request),
       new BadRequestError(storedUnknownId),
     );
   });
@@ -130,7 +127,7 @@ describe("RenewMagicLink use case", () => {
     };
 
     await expectPromiseToFailWithError(
-      createUseCase().execute(request),
+      renewConventionMagicLink.execute(request),
       new BadRequestError("L'admin n'a pas de liens magiques."),
     );
   });
@@ -148,7 +145,7 @@ describe("RenewMagicLink use case", () => {
     };
 
     await expectPromiseToFailWithError(
-      createUseCase().execute(request),
+      renewConventionMagicLink.execute(request),
       new BadRequestError(request.linkFormat),
     );
   });
@@ -165,7 +162,7 @@ describe("RenewMagicLink use case", () => {
       expiredJwt: generateJwtFn(expiredPayload),
     };
 
-    await createUseCase().execute(request);
+    await renewConventionMagicLink.execute(request);
 
     expect(outboxRepository.events).toHaveLength(1);
     const renewalEvent = outboxRepository.events[0];
