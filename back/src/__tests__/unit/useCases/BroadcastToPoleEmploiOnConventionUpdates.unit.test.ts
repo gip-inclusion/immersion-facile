@@ -1,11 +1,12 @@
 import { ConventionId } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
-import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
+import { reasonableSchedule } from "shared/src/schedule/ScheduleSchema";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryPoleEmploiGateway } from "../../../adapters/secondary/InMemoryPoleEmploiGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
+import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
 
 const prepareUseCase = ({
   enablePeConventionBroadcast,
@@ -90,6 +91,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withFederatedIdentity("peConnect:some-id")
       .withDateStart("2021-05-12")
       .withDateEnd("2021-05-14T00:30:00.000Z") //
+      .withSchedule(reasonableSchedule)
       .withImmersionObjective("Initier une démarche de recrutement")
       .build();
 
