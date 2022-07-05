@@ -1,4 +1,4 @@
-import { addDays, parseISO } from "date-fns";
+import { addDays } from "date-fns";
 import { z } from "zod";
 import { NotEmptyArray } from "../utils";
 import { zTrimmedString } from "../zodUtils";
@@ -80,9 +80,9 @@ export const timePeriodSchema = z.object({
   end: zTrimmedString,
 });
 
-const isoStringSchema = z.preprocess((arg) => {
+export const isoStringSchema = z.preprocess((arg) => {
   if (arg instanceof Date) return arg.toISOString();
-  if (typeof arg === "string") return parseISO(arg).toISOString();
+  if (typeof arg === "string") return new Date(arg).toISOString();
 }, z.string());
 
 const timePeriodsSchema = z.array(timePeriodSchema);

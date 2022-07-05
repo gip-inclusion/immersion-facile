@@ -2,6 +2,7 @@ import {
   weekdays,
   makeDailySchedule,
   DayPeriodsDto,
+  isoStringSchema,
 } from "shared/src/schedule/ScheduleSchema";
 
 import { ScheduleDtoBuilder } from "shared/src/schedule/ScheduleDtoBuilder";
@@ -526,6 +527,20 @@ describe("ScheduleUtils", () => {
             dayPeriodsFromComplexSchedule(schedule.complexSchedule),
           ).toEqual(dayPeriods);
         }),
+      );
+    });
+  });
+
+  describe("schemas", () => {
+    it("isoStringSchema parse", () => {
+      expect(() => isoStringSchema.parse("Not a date")).toThrow(
+        "Invalid time value",
+      );
+      expect(() => isoStringSchema.parse("31-07-2022")).toThrow(
+        "Invalid time value",
+      );
+      expect(isoStringSchema.parse("2022-07-05")).toEqual(
+        new Date("2022-07-05").toISOString(),
       );
     });
   });
