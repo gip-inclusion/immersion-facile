@@ -174,7 +174,7 @@ const isPeriodsOverlap = (
 const periodToHumanReadableString = (period: TimePeriodDto): string =>
   "(" + period.start + " - " + period.end + ")";
 
-export const isScheduleValid = (schedule: ScheduleDto) => {
+export const isScheduleValid = (schedule: ScheduleDto): string | undefined => {
   const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule);
   for (const [totalHoursIndex, totalHours] of totalWeeksHours.entries()) {
     if (totalHours > maxPermittedHoursPerWeek)
@@ -215,7 +215,7 @@ export const isScheduleValid = (schedule: ScheduleDto) => {
   if (totalScheduleHours === 0) return "Veuillez remplir les horaires.";
 };
 
-const toFrenchReadableDate = (isoStringDate: string) => {
+const toFrenchReadableDate = (isoStringDate: string): string => {
   const date = parseISO(isoStringDate);
   return `${date.getDate()}/${date.getMonth() + 1}`;
 };
@@ -254,18 +254,13 @@ const prettyPrintComplexSchedule = (
       lines.push(
         day.dailySchedule
           ? `${
-              weekdays[getIndexInWeekFromMonday(day.dailySchedule.date)]
+              frenchDayMapping(day.dailySchedule.date).frenchDayName
             } : ${prettyPrintDaySchedule(day.dailySchedule.timePeriods)}`
           : `${weekdays[index]} : libre`,
       ),
     );
   });
   return lines.join("\n");
-};
-
-const getIndexInWeekFromMonday = (isoStringDate: string) => {
-  const dayIndex = parseISO(isoStringDate).getDay();
-  return dayIndex === 0 ? 6 : dayIndex - 1;
 };
 
 const calculateTotalImmersionHoursBetweenDateComplex = ({

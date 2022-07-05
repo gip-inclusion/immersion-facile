@@ -149,8 +149,8 @@ const tranformScheduleToV0Schedule = ({
   isSimple,
   selectedIndex,
 }: ScheduleDto): ScheduleV0Dto => ({
-  isSimple: isSimple,
-  selectedIndex: selectedIndex,
+  isSimple,
+  selectedIndex,
   simpleSchedule:
     isSimple === true
       ? v0SimpleScheduleFromComplexSchedule(complexSchedule)
@@ -163,8 +163,8 @@ const tranformV0ScheduleToSchedule = (
   start: Date,
   end: Date,
 ): ScheduleDto => ({
-  isSimple: isSimple,
-  selectedIndex: selectedIndex,
+  isSimple,
+  selectedIndex,
   complexSchedule: isSimple
     ? complexScheduleFromSimpleSchedule(simpleSchedule, start, end)
     : complexScheduleFromV0ComplexSchedule(complexSchedule, start, end),
@@ -210,7 +210,7 @@ const complexScheduleFromV0ComplexSchedule = (
 };
 
 const getDates = (startDate: Date, stopDate: Date) => {
-  const dateArray = new Array();
+  const dateArray = [];
   let currentDate = startDate;
   while (currentDate <= stopDate) {
     dateArray.push(new Date(currentDate));
