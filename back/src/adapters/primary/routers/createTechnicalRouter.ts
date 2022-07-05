@@ -11,14 +11,13 @@ import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
 export const createTechnicalRouter = (deps: AppDependencies) => {
   const technicalRouter = Router();
-  technicalRouter.route(`/${renewMagicLinkRoute}`).get(async (req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.renewConventionMagicLink.execute({
-        expiredJwt: req.query.expiredJwt,
-        linkFormat: req.query.linkFormat,
-      } as any),
-    ),
-  );
+  technicalRouter
+    .route(`/${renewMagicLinkRoute}`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.renewConventionMagicLink.execute(req.query as any),
+      ),
+    );
 
   technicalRouter
     .route(`/${getFeatureFlags}`)

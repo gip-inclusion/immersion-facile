@@ -51,7 +51,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     const payload = createEstablishmentMagicLinkPayload({
       siret,
       now,
-      durationDays: 2,
+      durationDays: 1,
     });
 
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);

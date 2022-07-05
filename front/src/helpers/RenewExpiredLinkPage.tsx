@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { LinkHome } from "src/app/components/ImmersionMarianneHeader";
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 
 import { Route } from "type-route";
 import { Button, Notification } from "react-design-system/immersionFacile";
@@ -18,6 +21,7 @@ export const RenewExpiredLinkContent = ({
   expiredJwt,
   originalURL,
 }: RenewExpiredLinkContentsProps) => {
+  const jwtPayload = decodeJwt<ConventionMagicLinkPayload>(expiredJwt);
   // Flag that tracks if the link renewal had already been requested.
   const [requested, setRequested] = useState(false);
   // Tracks the success of the server request.
@@ -49,6 +53,15 @@ export const RenewExpiredLinkContent = ({
         setRequested(false);
       });
   };
+
+  if (!jwtPayload.applicationId)
+    return (
+      <div>
+        Votre lien est périmé, veuillez renouveler votre demande si vous
+        souhaitez éditer votre établissement.
+        <LinkHome>Page d'accueil</LinkHome>
+      </div>
+    );
 
   return (
     <>

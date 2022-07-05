@@ -104,7 +104,7 @@ const ModifyEstablishmentRequestNotification = () => (
     <EstablishmentSubTitle type="establishment" text="Demande envoyée" />
     <p className="text-immersionBlue-dark  text-center text-xs py-2">
       Un e-mail a été envoyé au référent de cet établissement avec un lien
-      permettant la mise à jour des informations.
+      permettant la mise à jour des informations. Le lien est valable 24h.
     </p>
   </>
 );

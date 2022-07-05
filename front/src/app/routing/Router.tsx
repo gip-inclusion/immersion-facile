@@ -76,7 +76,7 @@ export const Router = () => {
       {route.name === "immersionAssessment" && (
         <ImmersionAssessmentPage route={route} />
       )}
-      {route.name === "renewMagicLink" && (
+      {route.name === "renewConventionMagicLink" && (
         <RenewExpiredLinkPage route={route} />
       )}
       {route.name === "search" && <SearchPage />}
