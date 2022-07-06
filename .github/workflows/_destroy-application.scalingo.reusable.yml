@@ -1,0 +1,29 @@
+name: Destroy scalingo application
+
+on:
+  workflow_call:
+    inputs:
+      application-alias:
+        required: true
+        type: string
+
+    secrets:
+      SCALINGO_API_TOKEN:
+        required: true
+
+jobs:
+  destroy-deployed-application:
+    runs-on: ubuntu-latest
+    container:
+      image: rcambonie/scalingo-cli
+    steps:
+      - name: Login with api-token
+        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN }}
+
+      - name: Destroy the application if it exist
+        run: |
+          APP_NAME=${{ inputs.application-alias }}
+          set +e
+          APP_EXIST=$(scalingo apps | grep -c $APP_NAME)
+          set -e
+          if [[ $APP_EXIST -eq 1 ]]; then scalingo -a $APP_NAME destroy --force; else echo 'App not found'; fi
