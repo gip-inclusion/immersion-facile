@@ -13,7 +13,8 @@
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck && npm run lint",
-    "lint": "pnpm -w run lint:front"
+    "lint": "pnpm -w run lint:front",
+    "cypress": "cypress open"
   },
   "dependencies": {
     "@dataesr/react-dsfr": "^1.0.5",
@@ -34,12 +35,12 @@
     "prop-types": "^15.8.1",
     "ramda": "^0.28.0",
     "react": "^17.0.2",
+    "react-design-system": "workspace:*",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.8",
     "redux-observable": "^2.0.0",
     "rxjs": "^7.5.5",
     "shared": "workspace:*",
-    "react-design-system": "workspace:*",
     "type-route": "^0.6.0",
     "uuid": "^8.3.2",
     "zod": "^3.14.2"
@@ -59,6 +60,7 @@
     "@vitejs/plugin-react": "^1.2.0",
     "autoprefixer": "^10.4.4",
     "babel-jest": "^27.5.1",
+    "cypress": "^10.3.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^27.5.1",
