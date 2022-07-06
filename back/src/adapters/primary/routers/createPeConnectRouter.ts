@@ -3,7 +3,7 @@ import { loginPeConnect, peConnect } from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { FeatureDisabledError } from "../helpers/httpErrors";
 import { ManagedRedirectError } from "../helpers/redirectErrors";
-import { sendRedirectResponse } from "../helpers/sendHttpResponse";
+import { sendRedirectResponse } from "../helpers/sendRedirectResponse";
 
 export const createPeConnectRouter = (deps: AppDependencies) => {
   const peConnectRouter = Router({ mergeParams: true });

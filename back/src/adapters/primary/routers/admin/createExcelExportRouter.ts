@@ -7,7 +7,7 @@ import {
 import { capitalize } from "shared/src/utils/string";
 import { temporaryStoragePath } from "../../../../utils/filesystemUtils";
 import type { AppDependencies } from "../../config/createAppDependencies";
-import { sendZipResponse } from "../../helpers/sendHttpResponse";
+import { sendZipResponse } from "../../helpers/sendZipResponse";
 
 export const createExcelExportRouter = (deps: AppDependencies) => {
   const excelExportRouter = Router({ mergeParams: true });

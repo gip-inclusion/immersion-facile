@@ -134,10 +134,6 @@ export class AppConfig {
     return this.throwIfNotDefined("PASS_EMPLOI_URL");
   }
 
-  public get poleEmploiKey() {
-    return this.throwIfNotDefined("PASS_EMPLOI_KEY");
-  }
-
   public get sireneHttpsConfig(): AxiosConfig {
     return {
       endpoint: this.throwIfNotDefined("SIRENE_ENDPOINT"),
@@ -183,6 +179,10 @@ export class AppConfig {
 
   public get poleEmploiClientId() {
     return this.throwIfNotDefined("POLE_EMPLOI_CLIENT_ID");
+  }
+
+  public get poleEmploiClientSecret() {
+    return this.throwIfNotDefined("POLE_EMPLOI_CLIENT_SECRET");
   }
 
   public get peApiUrl(): AbsoluteUrl {

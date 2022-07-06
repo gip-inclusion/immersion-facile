@@ -1,12 +1,8 @@
 import type { AxiosInstance } from "axios";
-import { secondsToMilliseconds } from "date-fns";
+import { AxiosResponse } from "axios";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
-import {
-  RetryableError,
-  RetryStrategy,
-} from "../../domain/core/ports/RetryStrategy";
 import {
   AccessTokenDto,
   ExternalAccessToken,
@@ -29,28 +25,29 @@ import {
   externalPeConnectUserSchema,
 } from "../../domain/peConnect/port/PeConnect.schema";
 import { PeConnectGateway } from "../../domain/peConnect/port/PeConnectGateway";
-import {
-  createAxiosInstance,
-  isRetryableError,
-  PrettyAxiosResponseError,
-} from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
-import { AccessTokenConfig } from "../primary/config/appConfig";
 import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";
-import { ManagedRedirectError } from "../primary/helpers/redirectErrors";
 
 const logger = createLogger(__filename);
 
+const AXIOS_TIMEOUT_FIVE_SECOND = 5000;
+
+export type HttpPeConnectGatewayConfig = {
+  peAuthCandidatUrl: AbsoluteUrl;
+  immersionFacileBaseUrl: AbsoluteUrl;
+  peApiUrl: AbsoluteUrl;
+  clientId: string;
+  clientSecret: string;
+};
+
 export class HttpPeConnectGateway implements PeConnectGateway {
-  private ApiPeConnectUrls: ReturnType<typeof makeApiPeConnectUrls>;
-  private axiosInstance: AxiosInstance;
+  private apiPeConnectUrls: Record<PeConnectUrlTargets, AbsoluteUrl>;
 
   public constructor(
-    private readonly config: AccessTokenConfig,
-    private readonly retryStrategy: RetryStrategy,
+    private readonly config: HttpPeConnectGatewayConfig,
+    private readonly httpClient: AxiosInstance,
   ) {
-    this.axiosInstance = createAxiosInstance(logger);
-    this.ApiPeConnectUrls = makeApiPeConnectUrls({
+    this.apiPeConnectUrls = makeApiPeConnectUrls({
       peAuthCandidatUrl: config.peAuthCandidatUrl,
       immersionBaseUrl: config.immersionFacileBaseUrl,
       peApiUrl: config.peApiUrl,
@@ -62,18 +59,18 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       response_type: "code",
       client_id: this.config.clientId,
       realm: "/individu",
-      redirect_uri: this.ApiPeConnectUrls.REGISTERED_REDIRECT_URL,
+      redirect_uri: this.apiPeConnectUrls.REGISTERED_REDIRECT_URL,
       scope: peConnectNeededScopes(this.config.clientId),
     };
 
     return `${
-      this.ApiPeConnectUrls.OAUTH2_AUTH_CODE_STEP_1
+      this.apiPeConnectUrls.OAUTH2_AUTH_CODE_STEP_1
     }?${queryParamsAsString<ExternalPeConnectOAuthGrantPayload>(
       authorizationCodePayload,
     )}`;
   }
 
-  private async oAuthGetAccessTokenThroughAuthorizationCode(
+  public async peAccessTokenThroughAuthorizationCode(
     authorizationCode: string,
   ): Promise<AccessTokenDto> {
     const getAccessTokenPayload: ExternalPeConnectOAuthGetTokenWithCodeGrantPayload =
@@ -82,37 +79,15 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         code: authorizationCode,
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
-        redirect_uri: this.ApiPeConnectUrls.REGISTERED_REDIRECT_URL,
+        redirect_uri: this.apiPeConnectUrls.REGISTERED_REDIRECT_URL,
       };
 
-    const response = await this.axiosInstance
-      .post(
-        this.ApiPeConnectUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
-        queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
-          getAccessTokenPayload,
-        ),
-        {
-          headers: headersUrlEncoded(),
-          timeout: secondsToMilliseconds(10),
-        },
-      )
-      .catch((error: any) => {
-        logger.error(
-          {
-            message: error?.message,
-            status: error?.response?.status,
-            data: error?.response?.data,
-          },
-          "oAuthGetAccessTokenThroughAuthorizationCode Error",
-        );
-        if (isInvalidGrantError(error))
-          throw new ManagedRedirectError("peConnectInvalidGrant", error);
-
-        throw PrettyAxiosResponseError(
-          "PeConnect Get Access Token Failure",
-          error,
-        );
-      });
+    const response: AxiosResponse =
+      await getOAuthGetAccessTokenThroughAuthorizationCodeResponse(
+        this.httpClient,
+        this.apiPeConnectUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
+        getAccessTokenPayload,
+      );
 
     const externalAccessToken: ExternalAccessToken = validateAndParseZodSchema(
       externalAccessTokenSchema,
@@ -129,91 +104,54 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   private async getUserInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectUserDto> {
-    const trackId = stringToMd5(accessToken.value);
-    return this.retryStrategy.apply(async () => {
-      try {
-        const response = await this.axiosInstance
-          .get(this.ApiPeConnectUrls.PECONNECT_USER_INFO, {
-            headers: headersWithAuthPeAccessToken(accessToken),
-          })
-          .catch((error) => {
-            logger.error({ trackId, error }, "GetUserInfo PE Error");
+    //const trackId = stringToMd5(accessToken.value);
+    const response = await this.httpClient.get(
+      this.apiPeConnectUrls.PECONNECT_USER_INFO,
+      {
+        headers: headersWithAuthPeAccessToken(accessToken),
+        timeout: AXIOS_TIMEOUT_FIVE_SECOND,
+      },
+    );
 
-            if (getUndefinedErrorUserFromPe(error))
-              throw new ManagedRedirectError("peConnectNoValidUser", error);
-            throw error;
-          });
+    const body = this.extractUserInfoBodyFromResponse(response);
 
-        const body = response.data;
+    const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
+      externalPeConnectUserSchema,
+      body,
+    );
 
-        logger.info({ trackId, body }, "GetUserInfo PE Response");
-
-        const bodyFromPeFixed = body === "" ? [] : body; // this is because PE does not respect their own contracts and sends "" instead of []
-
-        const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
-          externalPeConnectUserSchema,
-          bodyFromPeFixed,
-        );
-
-        return toPeConnectUserDto(externalUser);
-      } catch (error: any) {
-        if (isRetryableError(logger, error)) throw new RetryableError(error);
-        throw PrettyAxiosResponseError(
-          "PeConnect Get User Info Failure",
-          error,
-        );
-      }
-    });
+    return toPeConnectUserDto(externalUser);
   }
 
   private async getAdvisorsInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectAdvisorDto[]> {
-    const trackId = stringToMd5(accessToken.value);
-    return this.retryStrategy.apply(async () => {
-      try {
-        const response = await createAxiosInstance()
-          .get(this.ApiPeConnectUrls.PECONNECT_ADVISORS_INFO, {
-            headers: headersWithAuthPeAccessToken(accessToken),
-            timeout: secondsToMilliseconds(10),
-          })
-          .catch((error) => {
-            logger.error({ trackId, error }, "GetAdvisorsInfo PE Error");
-            if (getUndefinedErrorAdvisorFromPe(error))
-              throw new ManagedRedirectError("peConnectNoValidAdvisor", error);
+    //const trackId = stringToMd5(accessToken.value);
+    //return this.retryStrategy.apply(async () => {
 
-            throw PrettyAxiosResponseError(
-              "PeConnect Get Advisor Info Failure",
-              error,
-            );
-          });
+    const response: AxiosResponse = await this.httpClient.get(
+      this.apiPeConnectUrls.PECONNECT_ADVISORS_INFO,
+      {
+        headers: headersWithAuthPeAccessToken(accessToken),
+        timeout: AXIOS_TIMEOUT_FIVE_SECOND,
+      },
+    );
 
-        logger.info(
-          { trackId, body: response.data },
-          "GetAdvisorsInfo PE Response",
-        );
+    const body = this.extractAdvisorsBodyFromResponse(response);
 
-        const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
-          externalPeConnectAdvisorsSchema,
-          response.data,
-        );
+    const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
+      externalPeConnectAdvisorsSchema,
+      body,
+    );
 
-        return advisors.map(toPeConnectAdvisorDto);
-      } catch (error: any) {
-        if (isRetryableError(logger, error)) throw new RetryableError(error);
-        throw PrettyAxiosResponseError(
-          "PeConnect Get User Info Failure",
-          error,
-        );
-      }
-    });
+    return advisors.map(toPeConnectAdvisorDto);
   }
 
   public async getUserAndAdvisors(
     authorizationCode: string,
   ): Promise<PeUserAndAdvisors> {
     const accessToken: AccessTokenDto =
-      await this.oAuthGetAccessTokenThroughAuthorizationCode(authorizationCode);
+      await this.peAccessTokenThroughAuthorizationCode(authorizationCode);
 
     const [user, advisors] = await Promise.all([
       this.getUserInfo(accessToken),
@@ -224,6 +162,22 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       user,
       advisors,
     };
+  }
+
+  private extractUserInfoBodyFromResponse(response: AxiosResponse): {
+    [key: string]: any;
+  } {
+    const body = response.data;
+
+    return body === "" ? {} : body;
+  }
+
+  private extractAdvisorsBodyFromResponse(response: AxiosResponse): {
+    [key: string]: any;
+  } {
+    const body = response.data;
+
+    return body === "" ? [] : body;
   }
 }
 
@@ -265,28 +219,22 @@ const headersWithAuthPeAccessToken = (
   Authorization: `Bearer ${accessToken.value}`,
 });
 
+const getOAuthGetAccessTokenThroughAuthorizationCodeResponse = (
+  axiosInstance: AxiosInstance,
+  url: AbsoluteUrl,
+  getAccessTokenPayload: ExternalPeConnectOAuthGetTokenWithCodeGrantPayload,
+): Promise<AxiosResponse> =>
+  axiosInstance.post(
+    url,
+    queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
+      getAccessTokenPayload,
+    ),
+    {
+      headers: headersUrlEncoded(),
+      timeout: AXIOS_TIMEOUT_FIVE_SECOND,
+    },
+  );
+
 const headersUrlEncoded = (): { [key: string]: string } => ({
   "Content-Type": "application/x-www-form-urlencoded",
 });
-
-const isInvalidGrantError = (error: any): boolean => {
-  // eslint-disable-next-line no-console
-  console.error("try isInvalidGrantError ", error);
-  return (
-    error?.response?.status === "400" &&
-    error?.response?.data?.error === "invalid_grant"
-  );
-};
-
-const getUndefinedErrorAdvisorFromPe = (error: any): boolean => {
-  // eslint-disable-next-line no-console
-  console.error("try getUndefinedErrorAdvisorFromPe ", error);
-
-  return !error || error.status === undefined || error === {};
-};
-const getUndefinedErrorUserFromPe = (error: any): boolean => {
-  // eslint-disable-next-line no-console
-  console.error("try getUndefinedErrorUserFromPe", error);
-
-  return !error || error.status === undefined || error === {};
-};

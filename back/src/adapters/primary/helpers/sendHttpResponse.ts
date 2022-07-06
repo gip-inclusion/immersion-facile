@@ -1,81 +1,62 @@
 import { Request, Response } from "express";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { deleteFileAndParentFolder } from "../../../utils/filesystemUtils";
-import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { handleHttpResponseError } from "./handleHttpResponseError";
-import { ManagedRedirectError, RawRedirectError } from "./redirectErrors";
-
-const logger = createLogger(__filename);
+import { HttpClientError } from "shared/src/httpClient/errors/4xxClientError.error";
+import { HttpServerError } from "shared/src/httpClient/errors/5xxServerError.error";
+import { HttpError, UnauthorizedError } from "./httpErrors";
+import { unhandledError } from "./unhandledError";
 
 export const sendHttpResponse = async (
-  request: Request,
-  res: Response,
+  expressRequest: Request,
+  expressResponse: Response,
   callback: () => Promise<unknown>,
 ) => {
   try {
-    const response = await callback();
-    res.status(200);
+    const serializableResponse = await callback();
+    expressResponse.status(200);
 
-    return res.json(response ?? { success: true });
+    return expressResponse.json(serializableResponse ?? { success: true });
   } catch (error: any) {
-    handleHttpResponseError(request, res, error);
+    handleHttpJsonResponseError(expressRequest, expressResponse, error);
   }
 };
 
-//prettier-ignore
-export const sendRedirectResponse = async (
+export const handleHttpJsonResponseError = (
   req: Request,
   res: Response,
-  callback: () => Promise<AbsoluteUrl>,
-  handleManagedRedirectResponseError: (error: ManagedRedirectError, res: Response) => void,
-  handleRawRedirectResponseError: (error: RawRedirectError, res: Response ) => void,
-) => {
-  try {
-    const redirectUrl = await callback();
-    res.status(302);
-    return res.redirect(redirectUrl);
-  } catch (error: any) {
-    const stack = JSON.stringify(error.stack, null, 2);
-    logger.error(
-      {
-        error,
-        errorMessage: error.message,
-        stack,
-        request: {
-          path: req.path,
-          method: req.method,
-          body: req.body,
-        },
-      },
-      "Redirect error",
-    );
+  error: any,
+): Response<any, Record<string, any>> => {
+  if (!isManagedError(error)) return unhandledError(error, req, res);
 
-    if (error instanceof ManagedRedirectError)
-      return handleManagedRedirectResponseError(error, res);
+  // Current application wide error management
+  if (error instanceof HttpError) {
+    if (error instanceof UnauthorizedError)
+      res.setHeader("WWW-Authenticate", "Basic");
 
-    if (error instanceof RawRedirectError)
-      return handleRawRedirectResponseError(error, res);
+    res.status(error.httpCode);
 
-    return handleHttpResponseError(req, res, error);
+    return res.json({ errors: toValidJSONObjectOrString(error) });
   }
+
+  return res.json(toJSONObject(error));
 };
 
-export const sendZipResponse = async (
-  req: Request,
-  res: Response,
-  callback: () => Promise<string>,
-) => {
-  try {
-    const archivePath = await callback();
+const isManagedError = (error: unknown): boolean =>
+  error instanceof HttpError ||
+  error instanceof HttpClientError ||
+  error instanceof HttpServerError;
 
-    res.status(200);
-    res.setHeader("content-type", "application/zip");
-    return res.download(archivePath, (err?: Error) => {
-      if (err) notifyObjectDiscord(err);
-      deleteFileAndParentFolder(archivePath);
-    });
-  } catch (error: any) {
-    handleHttpResponseError(req, res, error);
+const toJSONObject = (error: HttpClientError | HttpServerError) => ({
+  _message: error.message,
+  _name: error.name,
+  stack: error.stack,
+  cause: error.cause?.message,
+});
+
+const toValidJSONObjectOrString = (
+  error: HttpError,
+): string | { [key: string]: string } => {
+  try {
+    return JSON.parse(error.message);
+  } catch (_) {
+    return error.message;
   }
 };

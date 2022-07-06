@@ -1,15 +1,14 @@
 import { Pool } from "pg";
-import { random, sleep } from "shared/src/utils";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { createLogger } from "../../../utils/logger";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
-import { ExponentialBackoffRetryStrategy } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { HttpPeConnectGateway } from "../../secondary/HttpPeConnectGateway";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/HttpLaBonneBoiteAPI";
@@ -111,13 +110,14 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
       config.peConnectGateway === "HTTPS"
         ? new HttpPeConnectGateway(
             config.poleEmploiAccessTokenConfig,
-            new ExponentialBackoffRetryStrategy(
+            createManagedAxiosInstance(),
+            /*new ExponentialBackoffRetryStrategy(
               3_000,
               15_0000,
               clock,
               sleep,
               random,
-            ),
+            ),*/
           )
         : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl),
 

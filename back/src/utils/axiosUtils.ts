@@ -11,13 +11,14 @@ export const createAxiosInstance = (
   config?: AxiosRequestConfig,
 ): AxiosInstance => {
   const axiosInstance = axios.create(config);
-  axiosInstance.interceptors.request.use((request) => {
-    logger.debug(
+  axiosInstance.interceptors.request.use(
+    (request) =>
+      /*logger.debug(
       { request: extractPartialRequest(request) },
       "Sending HTTP request",
-    );
-    return request;
-  });
+    );*/
+      request,
+  );
   axiosInstance.interceptors.response.use((response) => {
     logger.debug(
       { response: extractPartialResponse(response) },
@@ -61,10 +62,12 @@ export const PrettyAxiosResponseError = (message: string, error: any): Error =>
         status: `${error?.response?.status}`,
         error_description: `${error?.response?.data?.error_description}`,
         error: `${error?.response?.data?.error}`,
+        url: `${error?.url}`,
       },
       null,
       2,
     ),
+    { cause: error },
   );
 
 const extractPartialRequest = (request: AxiosRequestConfig) => ({
