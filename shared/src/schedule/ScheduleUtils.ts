@@ -21,7 +21,7 @@ export type WeeklyImmersionTimetableDto = {
 
 type ImmersionTimeTable = WeeklyImmersionTimetableDto[];
 
-export const maxPermittedHoursPerWeek = 35;
+export const maxPermittedHoursPerWeek = 48;
 export const makeDateInterval = (
   complexSchedule: ComplexScheduleDto,
 ): DateIntervalDto => {
