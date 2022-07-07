@@ -16,7 +16,7 @@ export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
   const name: keyof ConventionDto = "schedule";
   const [field, _, { setValue }] = useField<ScheduleDto>({ name });
   useEffect(() => {
-    setValue(emptySchedule(props.interval));
+    if (!(props.disabled === true)) setValue(emptySchedule(props.interval));
   }, [props.interval.start.getTime(), props.interval.end.getTime()]);
 
   return (
