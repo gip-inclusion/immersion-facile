@@ -41,6 +41,9 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ENV } from "src/environmentVariables";
 import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
+import { EmailGateway } from "src/core-logic/ports/EmailGateway";
+import { InMemoryEmailGateway } from "src/core-logic/adapters/EmailGateway/InMemoryEmailGateway";
+import { HttpEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpEmailGateway";
 
 export const deviceRepository = createLocalStorageDeviceRepository();
 
@@ -118,6 +121,11 @@ export const romeAutocompleteGateway: RomeAutocompleteGateway =
     ? new InMemoryRomeAutocompleteGateway(seedRomeDtos, 500)
     : new HttpRomeAutocompleteGateway();
 
+export const emailGateway: EmailGateway =
+  ENV.gateway === "IN_MEMORY"
+    ? new InMemoryEmailGateway()
+    : new HttpEmailGateway();
+
 const navigationGateway = new ReactNavigationGateway();
 
 export const immersionAssessmentGateway: ImmersionAssessmentGateway =
@@ -138,6 +146,7 @@ export type Dependencies = {
   romeAutocompleteGateway: RomeAutocompleteGateway;
   navigationGateway: NavigationGateway;
   deviceRepository: DeviceRepository;
+  emailGateway: EmailGateway;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
 };
@@ -158,5 +167,6 @@ export const store = createStore({
     deviceRepository,
     minSearchResultsToPreventRefetch: 10,
     scheduler: asyncScheduler,
+    emailGateway,
   },
 });

@@ -6,6 +6,7 @@ import {
   agenciesRoute,
   adminLogin,
   validateConventionRoute,
+  emailRoute,
 } from "shared/src/routes";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
@@ -80,5 +81,11 @@ export const createAdminRouter = (deps: AppDependencies) => {
       ),
     );
 
+  // GET admin/emails
+  adminRouter
+    .route(`/${emailRoute}`)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, () => deps.useCases.getSentEmails.execute()),
+    );
   return adminRouter;
 };

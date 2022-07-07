@@ -17,6 +17,7 @@ export const appellationRoute = "appellation";
 export const contactEstablishmentRoute = "contact-establishment";
 export const conventionShareRoute = "share-immersion-demand";
 export const conventionsRoute = "demandes-immersion";
+export const emailRoute = "emails";
 export const exportConventionsExcelRoute = "export-demande-immersions-excel";
 export const exportEstablismentsExcelRoute = "export-establishments";
 export const extractConventionsExcelRoute = "extract-demande-immersion-excel";

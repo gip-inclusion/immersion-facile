@@ -21,6 +21,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const client = await pool.connect();
   const outboxRepository = new PgOutboxRepository(client);
   const conventionQueries = new PgConventionQueries(client);
+  const clock = new RealClock();
 
   const emailGateway =
     config.emailGateway === "SENDINBLUE"
@@ -30,10 +31,10 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
             skipEmailAllowlist: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
           }),
+          clock,
         )
-      : new InMemoryEmailGateway();
+      : new InMemoryEmailGateway(clock);
 
-  const clock = new RealClock();
   const sendEmailsWithAssessmentCreationLink =
     new SendEmailsWithAssessmentCreationLink(
       outboxRepository,

@@ -68,8 +68,9 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
             skipEmailAllowlist: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
           }),
+          clock,
         )
-      : new InMemoryEmailGateway();
+      : new InMemoryEmailGateway(clock);
 
   const suggestEditFormEstablishment = new SuggestEditFormEstablishment(
     pgUowPerformer,

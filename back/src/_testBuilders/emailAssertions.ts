@@ -1,4 +1,4 @@
-import { TemplatedEmail } from "../adapters/secondary/InMemoryEmailGateway";
+import { TemplatedEmail } from "shared/email";
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentEntity";

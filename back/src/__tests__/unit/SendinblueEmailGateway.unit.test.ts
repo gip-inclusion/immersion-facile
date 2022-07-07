@@ -5,6 +5,7 @@ import type {
   TransactionalEmailsApi,
 } from "sib-api-v3-typescript";
 import { makeEmailAllowListPredicate } from "../../adapters/primary/config/repositoriesConfig";
+import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { ValidatedConventionFinalConfirmationParams } from "../../domain/convention/ports/EmailGateway";
 
@@ -18,6 +19,7 @@ describe("SendingBlueEmailGateway", () => {
   let allowListPredicate;
   let sibGateway: SendinblueEmailGateway;
   let sentEmails: SendSmtpEmail[];
+  let clock: CustomClock;
 
   beforeEach(() => {
     sentEmails = [];
@@ -42,9 +44,11 @@ describe("SendingBlueEmailGateway", () => {
       skipEmailAllowlist: false,
     });
 
+    clock = new CustomClock();
     sibGateway = SendinblueEmailGateway.create(
       "plop",
       allowListPredicate,
+      clock,
       mockedApi,
     );
   });
@@ -95,6 +99,22 @@ describe("SendingBlueEmailGateway", () => {
         EDIT_FRONT_LINK: "plop",
       },
       templateId: 26,
+    });
+  });
+
+  it("should be able to retrieve last emails sent", async () => {
+    await sibGateway.sendFormEstablishmentEditionSuggestion(
+      "establishment-ceo@gmail.com",
+      [],
+      { editFrontUrl: "plop" },
+    );
+    const actual = await sibGateway.getLastSentEmailDtos();
+    expect(actual).toHaveLength(1);
+    expect(actual[0].template).toMatchObject({
+      recipients: ["establishment-ceo@gmail.com"],
+      cc: [],
+      params: { EDIT_FRONT_LINK: "plop" },
+      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
     });
   });
 });

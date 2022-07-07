@@ -9,6 +9,7 @@ import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCase
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
@@ -32,6 +33,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
     emailGw = SendinblueEmailGateway.create(
       config.sendinblueApiKey,
       (_) => true,
+      new CustomClock(),
     );
     generateMagicLinkFn = createGenerateConventionMagicLink(config);
   });

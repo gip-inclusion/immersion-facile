@@ -183,8 +183,9 @@ export const createRepositories = async (
               skipEmailAllowlist: config.skipEmailAllowlist,
               emailAllowList: config.emailAllowList,
             }),
+            clock,
           )
-        : new InMemoryEmailGateway(),
+        : new InMemoryEmailGateway(clock),
 
     rome: await createRomeRepository(config, getPgPoolFn),
 

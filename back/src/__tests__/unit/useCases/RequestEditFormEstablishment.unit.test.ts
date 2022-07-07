@@ -5,10 +5,7 @@ import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemory
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import {
-  InMemoryEmailGateway,
-  TemplatedEmail,
-} from "../../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
@@ -17,6 +14,7 @@ import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { TemplatedEmail } from "shared/email";
 
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";

@@ -9,10 +9,8 @@ import {
   expectJwtInMagicLinkAndGetIt,
 } from "../../_testBuilders/test.helpers";
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
-import {
-  InMemoryEmailGateway,
-  TemplatedEmail,
-} from "../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../adapters/secondary/InMemoryEmailGateway";
+import { TemplatedEmail } from "shared/email";
 import { DomainEvent } from "../../domain/core/eventBus/events";
 import {
   ConventionDto,

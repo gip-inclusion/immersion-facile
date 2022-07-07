@@ -13,23 +13,21 @@ import { InMemoryOutboxQueries } from "../../adapters/secondary/core/InMemoryOut
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
-import {
-  InMemoryEmailGateway,
-  TemplatedEmail,
-} from "../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../adapters/secondary/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import {
   GenerateMagicLinkJwt,
-  makeGenerateJwtES256,
   makeVerifyJwtES256,
 } from "../../domain/auth/jwt";
 import { DeliverRenewedMagicLink } from "../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { RenewConventionMagicLink } from "../../domain/convention/useCases/RenewConventionMagicLink";
+import { TemplatedEmail } from "shared/email";
 import {
   CreateNewEvent,
   EventBus,
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
+import { makeGenerateJwtES256 } from "../../domain/auth/jwt";
 import { EmailFilter } from "../../domain/core/ports/EmailFilter";
 
 const adminEmail = "admin@email.fr";
@@ -71,7 +69,7 @@ describe("Magic link renewal flow", () => {
     clock.setNextDate(new Date());
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
-    emailGw = new InMemoryEmailGateway();
+    emailGw = new InMemoryEmailGateway(clock);
     eventBus = new InMemoryEventBus(clock, (e) => outboxRepository.save(e));
     eventCrawler = new BasicEventCrawler(eventBus, outboxQueries);
 

@@ -11,7 +11,6 @@ import type {
   ContactByEmailRequestParams,
   ContactByPhoneInstructionsParams,
   ContactInPersonInstructionsParams,
-  EmailType,
   EnterpriseSignatureRequestNotificationParams,
   ConventionModificationRequestNotificationParams,
   NewConventionAdminNotificationParams,
@@ -33,30 +32,37 @@ import {
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { createLogger } from "../../utils/logger";
 import { notifyObjectDiscord } from "../../utils/notifyDiscord";
-import { TemplatedEmail } from "./InMemoryEmailGateway";
+import { TemplatedEmail, EmailType, EmailSentDto } from "shared/email";
+import { Clock } from "../../domain/core/ports/Clock";
 
 const logger = createLogger(__filename);
 
+const NB_OF_EMAILS_TO_PERSIST = 15;
 export class SendinblueEmailGateway implements EmailGateway {
   private constructor(
     private readonly apiInstance: TransactionalEmailsApi,
     private readonly emailAllowListPredicate: (recipient: string) => boolean,
+    private readonly clock: Clock,
+    private lastEmailSentDtos: EmailSentDto[] = [],
   ) {}
 
   public static create(
     apiKey: string,
     emailAllowListPredicate: (recipient: string) => boolean,
+    clock: Clock,
     apiInstance: TransactionalEmailsApi = new TransactionalEmailsApi(),
   ): SendinblueEmailGateway {
     apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, apiKey);
 
-    return new SendinblueEmailGateway(apiInstance, emailAllowListPredicate);
+    return new SendinblueEmailGateway(
+      apiInstance,
+      emailAllowListPredicate,
+      clock,
+    );
   }
 
-  public getLastSentEmails(): TemplatedEmail[] {
-    throw new Error(
-      "Send in blue email gateway cannot send the list of last sent emails",
-    );
+  public getLastSentEmailDtos(): EmailSentDto[] {
+    return this.lastEmailSentDtos;
   }
 
   public async sendImmersionAssessmentCreationLink(
@@ -474,8 +480,9 @@ export class SendinblueEmailGateway implements EmailGateway {
       this.emailAllowListPredicate,
     );
 
+    const templateId = emailTypeToTemplateId[emailType];
     const baseEmailConfig: SendSmtpEmail = {
-      templateId: emailTypeToTemplateId[emailType],
+      templateId,
       to: filteredRecipients,
       params,
     };
@@ -484,12 +491,19 @@ export class SendinblueEmailGateway implements EmailGateway {
       baseEmailConfig,
       filteredCarbonCopy,
     );
-
+    const template: TemplatedEmail = {
+      type: emailType,
+      params,
+      recipients,
+      cc: carbonCopy,
+    };
+    const sentAt = this.clock.now().toISOString();
     try {
       counterSendTransactEmailTotal.inc({ emailType });
       logger.info({ fullEmailConfig }, "Sending email");
 
       const data = await this.apiInstance.sendTransacEmail(fullEmailConfig);
+      this.persistEmail(template, sentAt);
 
       counterSendTransactEmailSuccess.inc({ emailType });
       logger.info(data, "Email sending succeeded");
@@ -509,8 +523,28 @@ export class SendinblueEmailGateway implements EmailGateway {
           2,
         ),
       });
+      this.persistEmail(
+        template,
+        sentAt,
+        `${error?.response?.statusCode} : ${error?.response?.body}`,
+      );
       throw error;
     }
+  }
+
+  private persistEmail(
+    template: TemplatedEmail,
+    sentAt: string,
+    error?: string,
+  ) {
+    this.lastEmailSentDtos = [
+      {
+        template,
+        sentAt,
+        error,
+      },
+      ...this.lastEmailSentDtos.slice(NB_OF_EMAILS_TO_PERSIST),
+    ];
   }
 }
 

@@ -4,6 +4,7 @@ import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgenc
 import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/convention/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
@@ -27,6 +28,7 @@ describe("NotifyToTeamApplicationSubmittedByBeneficiary", () => {
     emailGw = SendinblueEmailGateway.create(
       config.sendinblueApiKey,
       (_) => true,
+      new CustomClock(),
     );
     notifyToTeamApplicationSubmittedByBeneficiary =
       new NotifyToTeamApplicationSubmittedByBeneficiary(

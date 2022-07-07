@@ -6,6 +6,7 @@ import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../d
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { AllowListEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
+import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
@@ -28,9 +29,11 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
+    const clock = new CustomClock();
     emailGw = SendinblueEmailGateway.create(
       config.sendinblueApiKey,
       (_) => true,
+      clock,
     );
     agencyRepository = new InMemoryAgencyRepository([
       AgencyDtoBuilder.create(validConvention.agencyId)

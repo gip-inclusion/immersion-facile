@@ -40,7 +40,7 @@ const prepareUseCase = () => {
   setMethodGetContactEmailFromSiret(establishmentAggregateRepo); // In most of the tests, we need the contact to be defined
 
   const clock = new CustomClock();
-  const emailGateway = new InMemoryEmailGateway();
+  const emailGateway = new InMemoryEmailGateway(clock);
   const uuidGenerator = new UuidV4Generator();
   const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 

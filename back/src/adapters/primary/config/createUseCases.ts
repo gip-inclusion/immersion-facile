@@ -69,6 +69,7 @@ import { AppConfig } from "./appConfig";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
 import { Repositories } from "./repositoriesConfig";
+import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
 
 export type UseCases = ReturnType<typeof createUseCases>;
 
@@ -95,6 +96,17 @@ export const createUseCases = (
     associatePeConnectFederatedIdentity:
       new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),
     uploadFile: new UploadFile(uowPerformer, repositories.documentGateway),
+
+    // Admin
+    adminLogin: new AdminLogin(
+      config.backofficeUsername,
+      config.backofficePassword,
+      generateAdminJwt,
+      () => sleep(config.nodeEnv !== "test" ? 500 : 0),
+    ),
+    getSentEmails: new GetSentEmails(repositories.email),
+
+    // Conventions
     createImmersionAssessment: new CreateImmersionAssessment(
       uowPerformer,
       createNewEvent,
@@ -103,12 +115,6 @@ export const createUseCases = (
       uowPerformer,
       createNewEvent,
       getSiret,
-    ),
-    adminLogin: new AdminLogin(
-      config.backofficeUsername,
-      config.backofficePassword,
-      generateAdminJwt,
-      () => sleep(config.nodeEnv !== "test" ? 500 : 0),
     ),
     getConvention: new GetConvention(repositories.conventionQueries),
     linkPoleEmploiAdvisorAndRedirectToConvention:
