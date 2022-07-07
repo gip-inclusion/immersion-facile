@@ -1,20 +1,18 @@
 import { useField } from "formik";
-import React, { useEffect } from "react";
+import React from "react";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ScheduleDtoBuilder } from "shared/src/schedule/ScheduleDtoBuilder";
-
 import {
-  calculateWeeklyHoursFromSchedule,
-  dayPeriodsFromComplexSchedule,
-  reasonableSchedule,
-  regularTimePeriods,
-} from "shared/src/schedule/ScheduleUtils";
-import {
-  ScheduleDto,
   DailyScheduleDto,
   DateIntervalDto,
   DayPeriodsDto,
+  ScheduleDto,
 } from "shared/src/schedule/Schedule.dto";
+import {
+  calculateWeeklyHoursFromSchedule,
+  dayPeriodsFromComplexSchedule,
+  regularTimePeriods,
+} from "shared/src/schedule/ScheduleUtils";
 
 import { HourPicker } from "./HourPicker";
 import { TotalWeeklyHoursIndicator } from "./TotaWeeklylHoursIndicator";
@@ -28,9 +26,6 @@ export type RegularSchedulePickerProps = {
 export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
   const name: keyof ConventionDto = "schedule";
   const [field, _, { setValue }] = useField<ScheduleDto>({ name });
-  useEffect(() => {
-    setValue(reasonableSchedule(props.interval));
-  }, [props.interval.start.getTime(), props.interval.end.getTime()]);
   return (
     <>
       <div className="schedule-picker">

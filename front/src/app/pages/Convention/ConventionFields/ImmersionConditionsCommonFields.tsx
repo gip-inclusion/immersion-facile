@@ -5,6 +5,10 @@ import {
   conventionObjectiveOptions,
 } from "shared/src/convention/convention.dto";
 import {
+  emptySchedule,
+  reasonableSchedule,
+} from "src/../../shared/src/schedule/ScheduleUtils";
+import {
   BoolRadioGroup,
   RadioGroupForField,
 } from "src/app/components/RadioGroup";
@@ -34,6 +38,18 @@ export const ImmersionConditionsCommonFields = ({
     disabled: isSiretFetcherDisabled,
   });
 
+  const resetSchedule = (dateStart: string, dateEnd: string) => {
+    const interval = {
+      start: new Date(dateStart),
+      end: new Date(dateEnd),
+    };
+    setFieldValue(
+      "schedule",
+      values.schedule.isSimple
+        ? reasonableSchedule(interval)
+        : emptySchedule(interval),
+    );
+  };
   return (
     <>
       <DateInput
@@ -41,6 +57,10 @@ export const ImmersionConditionsCommonFields = ({
         name="dateStart"
         type="date"
         disabled={disabled}
+        onDateChange={(dateStart) => {
+          resetSchedule(dateStart, values.dateEnd);
+          setFieldValue("dateStart", dateStart);
+        }}
       />
       <br />
       <DateInput
@@ -48,6 +68,10 @@ export const ImmersionConditionsCommonFields = ({
         name="dateEnd"
         type="date"
         disabled={disabled}
+        onDateChange={(dateEnd) => {
+          resetSchedule(values.dateStart, dateEnd);
+          setFieldValue("dateEnd", dateEnd);
+        }}
       />
       <br />
       <SchedulePicker

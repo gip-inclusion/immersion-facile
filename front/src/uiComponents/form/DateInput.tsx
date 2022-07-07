@@ -4,6 +4,7 @@ import React from "react";
 type DateInputProps = {
   label: string;
   disabled?: boolean;
+  onDateChange: (value: string) => void;
 } & FieldHookConfig<string>;
 
 export const DateInput = (props: DateInputProps) => {
@@ -28,6 +29,7 @@ export const DateInput = (props: DateInputProps) => {
             value={field.value}
             type="date"
             disabled={props.disabled}
+            onChange={(event) => props.onDateChange(event.target.value)}
           />
         </div>
         {meta.touched && meta.error && (

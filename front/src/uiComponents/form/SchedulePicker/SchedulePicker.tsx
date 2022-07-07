@@ -23,6 +23,14 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
   useEffect(() => {
     setError(scheduleValidator(field.value));
   }, [field.value, meta.error]);
+
+  const onBoolRadioPickerChange = (isSimple: boolean): void =>
+    setValue(
+      isSimple
+        ? reasonableSchedule(props.interval)
+        : emptySchedule(props.interval),
+    );
+
   return (
     <>
       <BoolRadioPicker
@@ -32,13 +40,7 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
         yesLabel="Oui"
         noLabel="Non, irréguliers"
         checked={field.value.isSimple}
-        setFieldValue={(isSimple) => {
-          setValue(
-            isSimple
-              ? reasonableSchedule(props.interval)
-              : emptySchedule(props.interval),
-          );
-        }}
+        setFieldValue={onBoolRadioPickerChange}
         disabled={props.disabled}
       />
 
