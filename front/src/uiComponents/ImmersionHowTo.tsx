@@ -44,7 +44,7 @@ const ImmersionHowTo = ({ videoUrl, videoImage }: ImmersionHowToProps) => (
         <SubTitle red>L'immersion professionnelle, mode d'emploi</SubTitle>
         <div className="border-blue-200 border border-solid">
           <a href={videoUrl} target="_blank">
-            <img src={videoImage} width="480" height="270" alt="video_img" />
+            <img src={videoImage} width="480" height="263" alt="video_img" />
           </a>
         </div>
       </div>
