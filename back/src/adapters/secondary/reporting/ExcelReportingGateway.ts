@@ -1,5 +1,5 @@
 import { Column } from "exceljs";
-
+import { ConventionReadyForExport } from "../../../domain/convention/useCases/ExportConventionsReport";
 import {
   ArchivedReport,
   ConventionExportByAgency,
@@ -7,7 +7,6 @@ import {
 } from "../../../domain/core/ports/ReportingGateway";
 import { Archive } from "../../../domain/generic/archive/port/Archive";
 import { Workbook } from "../../../domain/generic/excel/port/Workbook";
-import { ConventionReadyForExportVO } from "../../../domain/convention/valueObjects/ConventionReadyForExportVO";
 import { retrieveParentDirectory } from "../../../utils/filesystemUtils";
 
 export class ExcelReportingGateway implements ReportingGateway {
@@ -66,7 +65,7 @@ export class ExcelReportingGateway implements ReportingGateway {
       },
       {
         header: "Identifiant Externe Pole Emploi",
-        key: "peExternalId",
+        key: "formatedFederatedIdentity",
         width: 30,
       },
       {
@@ -122,39 +121,9 @@ export class ExcelReportingGateway implements ReportingGateway {
         width: 15,
       },
       {
-        header: "Horaires Lundi",
-        key: "monday",
-        width: 30,
-      },
-      {
-        header: "Horaires Mardi",
-        key: "tuesday",
-        width: 30,
-      },
-      {
-        header: "Horaires Mercredi",
-        key: "wednesday",
-        width: 30,
-      },
-      {
-        header: "Horaires Jeudi",
-        key: "thursday",
-        width: 30,
-      },
-      {
-        header: "Horaires Vendredi",
-        key: "friday",
-        width: 30,
-      },
-      {
-        header: "Horaires Samedi",
-        key: "saturday",
-        width: 30,
-      },
-      {
-        header: "Horaires Dimanche",
-        key: "sunday",
-        width: 30,
+        header: "Planning",
+        key: "planning",
+        width: 75,
       },
       {
         header: "Conditions de travail particulières",
@@ -166,9 +135,9 @@ export class ExcelReportingGateway implements ReportingGateway {
   }
   private toWorkbook(
     workbookTitle: string,
-    conventions: ConventionReadyForExportVO[],
+    conventions: ConventionReadyForExport[],
     excelColumFormatConfig: Partial<Column>[],
-  ): Workbook<ConventionReadyForExportVO> {
+  ): Workbook<ConventionReadyForExport> {
     return new Workbook()
       .withTitle(workbookTitle)
       .withSheet()

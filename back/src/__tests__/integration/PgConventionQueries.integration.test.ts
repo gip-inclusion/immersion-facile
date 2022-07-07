@@ -1,17 +1,17 @@
 import { Pool, PoolClient } from "pg";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { ConventionId } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
+import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionQueries } from "../../adapters/secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
-import { ConventionId } from "shared/src/convention/convention.dto";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { ConventionRawBeforeExportVO } from "../../domain/convention/valueObjects/ConventionRawBeforeExportVO";
 import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
+import { ConventionRawBeforeExport } from "../../domain/convention/useCases/ExportConventionsReport";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
-import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
-import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 
 describe("Pg implementation of ConventionQueries", () => {
   let pool: Pool;
@@ -64,7 +64,7 @@ describe("Pg implementation of ConventionQueries", () => {
       await conventionRepository.save(convention);
 
       // Act
-      const actualExport: ConventionRawBeforeExportVO[] =
+      const actualExport: ConventionRawBeforeExport[] =
         await conventionQueries.getAllConventionsForExport();
 
       const {
@@ -81,17 +81,15 @@ describe("Pg implementation of ConventionQueries", () => {
         ...filteredProperties
       } = convention;
       // Assert
-      expect(actualExport[0]._props).toStrictEqual(
-        new ConventionRawBeforeExportVO({
-          ...filteredProperties,
-          agencyName: appleAgency.name,
-          immersionProfession: convention.immersionAppellation.appellationLabel,
-          status: convention.status,
-          dateEnd: new Date("2021-01-20").toISOString(),
-          dateStart: new Date("2021-01-15").toISOString(),
-          dateSubmission: new Date("2021-01-10").toISOString(),
-        })._props,
-      );
+      expect(actualExport[0]).toStrictEqual({
+        ...filteredProperties,
+        agencyName: appleAgency.name,
+        immersionProfession: convention.immersionAppellation.appellationLabel,
+        status: convention.status,
+        dateEnd: new Date("2021-01-20").toISOString(),
+        dateStart: new Date("2021-01-15").toISOString(),
+        dateSubmission: new Date("2021-01-10").toISOString(),
+      });
     });
   });
   describe("PG implementation of method getLatestUpdated", () => {

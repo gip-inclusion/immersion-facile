@@ -1,4 +1,4 @@
-import { addDays, getDay, parseISO } from "date-fns";
+import { addDays, format, getDay, parseISO } from "date-fns";
 
 import {
   ComplexScheduleDto,
@@ -215,10 +215,8 @@ export const isScheduleValid = (schedule: ScheduleDto): string | undefined => {
   if (totalScheduleHours === 0) return "Veuillez remplir les horaires.";
 };
 
-const toFrenchReadableDate = (isoStringDate: string): string => {
-  const date = parseISO(isoStringDate);
-  return `${date.getDate()}/${date.getMonth() + 1}`;
-};
+const toFrenchReadableDate = (isoStringDate: string): string =>
+  format(parseISO(isoStringDate), "dd/MM/yyyy");
 
 // Converts an array of TimePeriodDto to a readable schedule, e.g.
 // "08:00-12:00, 14:00-17:00". Empty arrays get converted to "libre".
@@ -258,6 +256,26 @@ const prettyPrintComplexSchedule = (
             } : ${prettyPrintDaySchedule(day.dailySchedule.timePeriods)}`
           : `${weekdays[index]} : libre`,
       ),
+    );
+  });
+  return lines.join("\n");
+};
+
+export const prettyPrintComplexScheduleSummary = (
+  complexSchedule: ComplexScheduleDto,
+): string => {
+  const lines: string[] = [];
+  makeImmersionTimetable(complexSchedule).forEach((week) => {
+    week.forEach(
+      (day) =>
+        day.dailySchedule &&
+        lines.push(
+          `${
+            frenchDayMapping(day.dailySchedule.date).frenchDayName
+          } ${toFrenchReadableDate(
+            day.dailySchedule.date,
+          )} : ${prettyPrintDaySchedule(day.dailySchedule.timePeriods)}`,
+        ),
     );
   });
   return lines.join("\n");

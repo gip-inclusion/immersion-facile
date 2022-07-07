@@ -1,9 +1,9 @@
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ImmersionAssessmentEmailParams } from "../../immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
-import { ConventionRawBeforeExportVO } from "../valueObjects/ConventionRawBeforeExportVO";
+import { ConventionRawBeforeExport } from "../useCases/ExportConventionsReport";
 
 export interface ConventionQueries {
-  getAllConventionsForExport: () => Promise<ConventionRawBeforeExportVO[]>;
+  getAllConventionsForExport: () => Promise<ConventionRawBeforeExport[]>;
   getLatestUpdated: () => Promise<ConventionDto[]>;
   getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink: (
     dateEnd: Date,

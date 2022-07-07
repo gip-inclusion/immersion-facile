@@ -1,4 +1,4 @@
-import { ConventionReadyForExportVO } from "../../convention/valueObjects/ConventionReadyForExportVO";
+import { ConventionReadyForExport } from "../../convention/useCases/ExportConventionsReport";
 
 export type ArchivedReport<T> = {
   report: T;
@@ -6,7 +6,7 @@ export type ArchivedReport<T> = {
 };
 export type ConventionExportByAgency = Record<
   string,
-  ConventionReadyForExportVO[]
+  ConventionReadyForExport[]
 >;
 export interface ReportingGateway {
   exportConventions(
