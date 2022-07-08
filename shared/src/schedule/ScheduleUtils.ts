@@ -83,8 +83,18 @@ export const calculateTotalImmersionHoursBetweenDate = ({
     ...dates,
   });
 
-export const prettyPrintSchedule = (schedule: ScheduleDto): string =>
-  prettyPrintComplexSchedule(schedule.complexSchedule);
+export const prettyPrintSchedule = (schedule: ScheduleDto): string => {
+  try {
+    return prettyPrintComplexSchedule(schedule.complexSchedule);
+  } catch (error) {
+    // DEBUG: ERROR expected date iso string on schedule during prettyPrintSchedule but invalid date error
+    // eslint-disable-next-line no-console
+    console.log("prettyPrintSchedule", error, schedule);
+    return `ERREUR FORMATAGE PLANNING
+    ================================
+    ${JSON.stringify(schedule)}`;
+  }
+};
 
 // Extract all weekday names for which there is at least one
 export const convertToFrenchNamedDays = (schedule: ScheduleDto): Weekday[] => {

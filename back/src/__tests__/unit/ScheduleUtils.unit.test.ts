@@ -134,6 +134,77 @@ describe("ScheduleUtils", () => {
         "dimanche : 01:00-02:00, 03:00-04:00",
       ]);
     });
+    it("prints schedules with schedule that have no timeperiod", () => {
+      expect(
+        prettyPrintSchedule({
+          isSimple: false,
+          selectedIndex: 6,
+          complexSchedule: [
+            {
+              date: "2022-07-18T00:00:00.000Z",
+              timePeriods: [
+                {
+                  end: "17:00",
+                  start: "14:00",
+                },
+              ],
+            },
+            {
+              date: "2022-07-19T00:00:00.000Z",
+              timePeriods: [],
+            },
+            {
+              date: "2022-07-20T00:00:00.000Z",
+              timePeriods: [
+                {
+                  end: "12:00",
+                  start: "10:00",
+                },
+                {
+                  end: "16:00",
+                  start: "14:00",
+                },
+              ],
+            },
+            {
+              date: "2022-07-21T00:00:00.000Z",
+              timePeriods: [
+                {
+                  end: "16:00",
+                  start: "14:00",
+                },
+              ],
+            },
+            {
+              date: "2022-07-22T00:00:00.000Z",
+              timePeriods: [],
+            },
+            {
+              date: "2022-07-23T00:00:00.000Z",
+              timePeriods: [
+                {
+                  end: "12:00",
+                  start: "09:00",
+                },
+              ],
+            },
+            {
+              date: "2022-07-24T00:00:00.000Z",
+              timePeriods: [],
+            },
+          ],
+        }).split("\n"),
+      ).toEqual([
+        "Heures de travail hebdomadaires : 12",
+        "lundi : 14:00-17:00",
+        "mardi : libre",
+        "mercredi : 10:00-12:00, 14:00-16:00",
+        "jeudi : 14:00-16:00",
+        "vendredi : libre",
+        "samedi : 09:00-12:00",
+        "dimanche : libre",
+      ]);
+    });
   });
 
   describe("convertToFrenchNamedDays", () => {
