@@ -126,7 +126,6 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
   if (convention.status === "REJECTED") return <ConventionRejectedMessage />;
   if (convention.status === "DRAFT")
     return <ConventionNeedsModificationMessage jwt={jwt} />;
-
   return (
     <SignPageLayout>
       <h2>

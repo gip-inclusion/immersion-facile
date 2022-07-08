@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { ConventionReadDto } from "shared/src/convention/convention.dto";
 import {
   conventionsRoute,
   immersionAssessmentRoute,
@@ -28,11 +29,13 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   authenticatedRouter
     .route(`/${conventionsRoute}/:jwt`)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, () => {
+      sendHttpResponse(req, res, async () => {
         if (!req.payloads?.application) throw new UnauthorizedError();
-        return deps.useCases.getConvention.execute({
-          id: req.payloads.application.applicationId,
-        });
+        const result: ConventionReadDto =
+          await deps.useCases.getConvention.execute({
+            id: req.payloads.application.applicationId,
+          });
+        return result;
       }),
     )
     .post(async (req, res) =>

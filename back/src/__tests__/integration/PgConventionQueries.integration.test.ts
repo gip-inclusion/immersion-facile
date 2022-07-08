@@ -234,12 +234,12 @@ describe("Pg implementation of ConventionQueries", () => {
       .withId(agencyId)
       .withName(agencyName)
       .build();
-    const { externalId, ...convention } = new ConventionDtoBuilder()
+    const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
       .withId(conventionId)
       .build();
     await agencyRepo.insert(agency);
-    await conventionRepository.save(convention);
-    return { ...convention, agencyName };
+    const externalId = await conventionRepository.save(convention);
+    return { ...convention, externalId, agencyName };
   };
 });

@@ -96,7 +96,6 @@ const conventionWithoutExternalIdZObject = z.object({
 
 export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =
   conventionWithoutExternalIdZObject
-    .strict()
     .refine(startDateIsBeforeEndDate, {
       message: "La date de fin doit être après la date de début.",
       path: ["dateEnd"],
@@ -121,7 +120,6 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
 export const conventionSchema: z.Schema<ConventionDto> =
   conventionWithoutExternalIdZObject
     .merge(z.object({ externalId: externalConventionIdSchema }))
-    .strict()
     .refine(startDateIsBeforeEndDate, {
       message: "La date de fin doit être après la date de début.",
       path: ["dateEnd"],

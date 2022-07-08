@@ -107,9 +107,10 @@ export class PgConventionQueries implements ConventionQueries {
   ) {
     const query = `
     SELECT 
-      c.*, vad.*,
+      c.*, vad.*, cei.external_id,
       agencies.name AS agency_name
       FROM conventions AS c 
+      LEFT JOIN convention_external_ids AS cei ON cei.convention_id = c.id
       LEFT JOIN agencies ON agencies.id = c.agency_id
       LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = c.immersion_appellation
       LEFT JOIN partners_pe_connect AS partners ON partners.convention_id = c.id

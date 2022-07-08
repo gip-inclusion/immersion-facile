@@ -32,10 +32,7 @@ export class PgConventionRepository implements ConventionRepository {
 
     const pgConvention = pgResult.rows[0];
     if (!pgConvention) return;
-    return {
-      ...pgConventionRowToDto(pgConvention),
-      externalId: pgConvention.external_id?.toString(),
-    };
+    return pgConventionRowToDto(pgConvention);
   }
 
   public async save(
@@ -85,8 +82,9 @@ export class PgConventionRepository implements ConventionRepository {
 
 export const pgConventionRowToDto = (
   params: Record<any, any>,
-): ConventionDtoWithoutExternalId => ({
+): ConventionDto => ({
   id: params.id,
+  externalId: (params.external_id as number).toString(),
   status: params.status,
   email: params.email,
   firstName: params.first_name,
