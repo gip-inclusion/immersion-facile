@@ -21,7 +21,6 @@ export const App = () => {
 
   return (
     <>
-      {frontEnvType === "DEV" && <Navigation />}
       <Router />
     </>
   );

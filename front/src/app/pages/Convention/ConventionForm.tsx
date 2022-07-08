@@ -31,6 +31,7 @@ export const ConventionForm = ({
   properties,
   routeParams = {},
 }: ConventionFormProps) => {
+  console.log(properties);
   const federatedIdentity = useAppSelector(authSelectors.connectedWith);
   const [initialValues, setInitialValues] = useState<ConventionPresentation>({
     ...properties,

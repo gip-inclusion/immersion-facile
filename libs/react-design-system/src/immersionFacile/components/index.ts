@@ -11,3 +11,5 @@ export * from "./notification";
 export * from "./text";
 export * from "./bulletPoint";
 export * from "./tabs";
+export * from "./header";
+export * from "./logo";
