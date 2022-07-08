@@ -111,16 +111,17 @@ export const reasonableSchedule = (interval: DateIntervalDto): ScheduleDto => ({
 });
 
 export const frenchDayMapping = (
-  date: Date | string,
+  originalDate: Date | string,
 ): UniversalDayMappingToFrenchCalendar => {
-  if (!(date instanceof Date)) date = parseISO(date);
+  const date =
+    originalDate instanceof Date ? originalDate : parseISO(originalDate);
   const universalDay = getDay(date);
   const mapping = dayOfWeekMapping.find(
     (value) => value.universalDay === universalDay,
   );
-  if (mapping !== undefined) return mapping;
+  if (mapping) return mapping;
   throw new Error(
-    `Universal day index ${universalDay} of date ${date} missing on dayMapping: ${JSON.stringify(
+    `Universal day index ${universalDay} of date ${originalDate} missing on dayMapping: ${JSON.stringify(
       dayOfWeekMapping,
     )}`,
   );
