@@ -113,7 +113,7 @@ export const ConnventionFormDetails = ({
                 title="Heures hebdomadaires"
                 contents={calculateWeeklyHoursFromSchedule(
                   convention.schedule,
-                ).join(" ,")}
+                ).join(", ")}
                 key="weeklyHours"
               />
               <TextCell
