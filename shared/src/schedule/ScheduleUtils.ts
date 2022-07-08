@@ -111,10 +111,9 @@ export const reasonableSchedule = (interval: DateIntervalDto): ScheduleDto => ({
 });
 
 export const frenchDayMapping = (
-  originalDate: Date | string,
+  originalDate: string,
 ): UniversalDayMappingToFrenchCalendar => {
-  const date =
-    originalDate instanceof Date ? originalDate : parseISO(originalDate);
+  const date = parseISO(originalDate);
   const universalDay = getDay(date);
   const mapping = dayOfWeekMapping.find(
     (value) => value.universalDay === universalDay,
