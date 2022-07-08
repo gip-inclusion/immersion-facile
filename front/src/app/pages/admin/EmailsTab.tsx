@@ -58,7 +58,10 @@ const Email = ({ email }: { email: EmailSentDto }) => {
               <li>
                 {" "}
                 <span className="font-normal">{param[0]} :</span>{" "}
-                <span className="font-thin">
+                <span
+                  style={{ width: "500px" }}
+                  className="font-thin inline-block break-words"
+                >
                   {JSON.stringify(param[1], undefined, 2)}
                 </span>
               </li>

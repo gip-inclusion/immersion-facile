@@ -9,7 +9,7 @@ import { EmailsTab } from "src/app/pages/admin/EmailsTab";
 import { ENV } from "src/environmentVariables";
 import "./Admin.css";
 
-const { frontEnvType } = ENV;
+const { dev } = ENV;
 
 export const AdminPage = ({ route }: { route: AdminRoute }) => {
   const prodTabContent = {
@@ -29,9 +29,7 @@ export const AdminPage = ({ route }: { route: AdminRoute }) => {
         <div className="fr-col-lg-8 fr-p-2w mt-4" style={{ width: "95%" }}>
           <Tabs
             content={
-              frontEnvType === "DEV"
-                ? { ...prodTabContent, ...devOnlyTabContent }
-                : prodTabContent
+              dev ? { ...prodTabContent, ...devOnlyTabContent } : prodTabContent
             }
           />
         </div>
