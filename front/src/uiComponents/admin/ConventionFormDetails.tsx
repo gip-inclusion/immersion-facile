@@ -74,12 +74,16 @@ export const ConnventionFormDetails = ({
 }: ConventionFormAccordionProps) => {
   const buildContent = (field: ConventionField): ReactNode => {
     const value = convention[field];
-    if (field === "schedule")
+    if (field === "schedule") {
+      // DEBUG: ERROR expected date iso string on schedule during prettyPrintSchedule but invalid date error
+      // eslint-disable-next-line no-console
+      console.log("prettyPrintSchedule", convention.schedule);
       return (
         <div style={{ whiteSpace: "pre" }}>
           {prettyPrintSchedule(convention.schedule)}
         </div>
       );
+    }
     if (field === "sanitaryPrevention") {
       return value ? convention.sanitaryPreventionDescription ?? "✅" : "❌";
     }
