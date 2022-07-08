@@ -19,4 +19,6 @@ export const defaultInitialValue = (
     copyEmails: [],
   },
   isSearchable: true,
+  website: "",
+  additionalInformation: "",
 });

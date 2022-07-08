@@ -57,5 +57,7 @@ export const formEstablishmentDtoPublicV0ToDomain = (
     },
 
     isSearchable: true,
+    website: "",
+    additionalInformation: "",
   };
 };

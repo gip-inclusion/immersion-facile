@@ -5,6 +5,7 @@ import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablish
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { SiretDto } from "shared/src/siret";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
+import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { AppellationList } from "./AppellationList";
 import { BusinessContact } from "./BusinessContact";
@@ -77,13 +78,16 @@ export const EstablishmentFormikForm = ({
         }}
       >
         {({ isSubmitting, submitCount, errors, values }) => (
-          <div style={{ margin: "5px 12px", maxWidth: "600px" }}>
+          <div
+            style={{ margin: "5px 12px", maxWidth: "600px" }}
+            className="flex flex-col  gap-1"
+          >
             <p>
               Bienvenue sur l'espace de référencement des entreprises
               volontaires pour l'accueil des immersions professionnelles.
             </p>
 
-            <p className="mt-4">
+            <p>
               En référençant votre entreprise, vous rejoignez la communauté{" "}
               <a
                 href={"https://lesentreprises-sengagent.gouv.fr/"}
@@ -93,31 +97,40 @@ export const EstablishmentFormikForm = ({
               </a>
               .
             </p>
-
-            <p className="mt-4">
+            <p>
               Ce formulaire vous permet d'indiquer les métiers de votre
               établissement ouverts aux immersions. Si votre entreprise comprend
               plusieurs établissements, il convient de renseigner un formulaire
               pour chaque établissement (Siret différent).
             </p>
             <Form>
-              <span className="py-6 block text-lg font-semibold">
-                Votre établissement
-              </span>
-              {children}
-              <p className="mt-4" />
-              <BoolCheckboxGroup
-                {...getLabelAndName("isEngagedEnterprise")}
-                description=""
-                descriptionLink=""
-                disabled={false}
-              />
-              <AppellationList
-                name="appellations"
-                title={`${fieldsToLabel["appellations"]} *`}
-              />
-              <BusinessContact />
-
+              <div className="flex flex-col gap-10 mt-4">
+                <div>
+                  <span className="flex-col gap-1 block text-lg font-semibold">
+                    Votre établissement
+                  </span>
+                  {children}
+                  <BoolCheckboxGroup
+                    {...getLabelAndName("isEngagedEnterprise")}
+                    description=""
+                    descriptionLink=""
+                    disabled={false}
+                  />
+                  <TextInput
+                    label="URL vers votre site internet"
+                    name="website"
+                  />
+                  <TextInput
+                    label="Informations complémentaires"
+                    name="additionnalInformation"
+                  />
+                </div>
+                <AppellationList
+                  name="appellations"
+                  title={`${fieldsToLabel["appellations"]} *`}
+                />
+                <BusinessContact />
+              </div>
               {isEditing && (
                 <BoolCheckboxGroup
                   name="isSearchable"

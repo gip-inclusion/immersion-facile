@@ -102,6 +102,8 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         },
       ],
       businessContact: contact,
+      website: establishment.website,
+      additionalInformation: establishment.additionalInformation,
     };
     expect(retrievedForm).toMatchObject(expectedForm);
   });

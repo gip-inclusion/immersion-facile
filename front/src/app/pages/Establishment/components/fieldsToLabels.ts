@@ -12,6 +12,8 @@ export const fieldsToLabel: Record<FieldsWithLabel, string> = {
     "Indiquez le nom de l'enseigne de l'établissement d'accueil, si elle diffère de la raison sociale",
   appellations: "Métiers ouverts à l'immersion",
   siret: "Indiquez le SIRET de la structure d'accueil",
+  website: "Site de l'entreprise",
+  additionalInformation: "Information complémentaire",
   isEngagedEnterprise:
     "Mon entreprise est membre de la communauté « Les entreprises s'engagent »",
 };

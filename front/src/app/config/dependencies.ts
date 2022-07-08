@@ -62,13 +62,13 @@ const getSimulatedSiretGatewayThroughBack = () =>
   new SimulatedSiretGatewayThroughBack(500, {
     12345678901238: {
       siret: "12345678901238",
-      businessName: "",
+      businessName: "Entreprise 38",
       businessAddress: "",
       isOpen: true,
     },
     12345678901239: {
       siret: "12345678901239",
-      businessName: "",
+      businessName: "Entreprise 39",
       businessAddress: "",
       isOpen: false,
     },

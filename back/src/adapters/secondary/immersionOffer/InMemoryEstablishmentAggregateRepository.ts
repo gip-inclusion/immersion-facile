@@ -287,6 +287,8 @@ const buildSearchImmersionResultDto = (
   voluntaryToImmersion: establishment.voluntaryToImmersion,
   contactMode: contact?.contactMethod,
   numberOfEmployeeRange: establishment.numberEmployeesRange,
+  website: establishment?.website,
+  additionalInformation: establishment?.additionalInformation,
   distance_m: distanceBetweenCoordinatesInMeters(
     TEST_POSITION.lat,
     TEST_POSITION.lon,

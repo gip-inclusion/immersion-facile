@@ -4,7 +4,13 @@ import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret";
 import { NotEmptyArray, phoneRegExp } from "../utils";
-import { zBoolean, zEmail, zString, zTrimmedString } from "../zodUtils";
+import {
+  zBoolean,
+  zEmail,
+  zString,
+  zStringPossiblyEmpty,
+  zTrimmedString,
+} from "../zodUtils";
 import {
   BusinessContactDto,
   FormEstablishmentSource,
@@ -49,6 +55,8 @@ export const formEstablishmentSchema = z.object(
     siret: siretSchema,
     businessName: zTrimmedString,
     businessNameCustomized: zTrimmedString.optional(),
+    website: zStringPossiblyEmpty.optional(),
+    additionalInformation: zStringPossiblyEmpty.optional(),
     businessAddress: addressWithPostalCodeSchema,
     isEngagedEnterprise: zBoolean.optional(),
     naf: nafSchema.optional(),

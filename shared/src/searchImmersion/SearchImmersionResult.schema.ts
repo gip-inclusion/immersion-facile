@@ -2,6 +2,7 @@ import { z } from "zod";
 import { latLonSchema } from "../latLon";
 import { romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret";
+import { zStringPossiblyEmpty } from "../zodUtils";
 import {
   SearchContactDto,
   SearchImmersionResultDto,
@@ -34,6 +35,8 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
     distance_m: z.number().optional(),
     contactDetails: contactDetailsSchema.optional(),
     numberOfEmployeeRange: z.string().optional(),
+    website: zStringPossiblyEmpty.optional(),
+    additionalInformation: zStringPossiblyEmpty.optional(),
   });
 
 export const searchImmersionResponseSchema = z.array(

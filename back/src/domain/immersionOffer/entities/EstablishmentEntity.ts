@@ -27,6 +27,8 @@ export type EstablishmentEntityV2 = {
   isActive: boolean;
   isSearchable: boolean;
   isCommited?: boolean;
+  website?: string;
+  additionalInformation?: string;
 };
 
 export type AnnotatedEstablishmentEntityV2 = EstablishmentEntityV2 & {

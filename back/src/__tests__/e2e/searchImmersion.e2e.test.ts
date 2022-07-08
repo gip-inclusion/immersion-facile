@@ -142,6 +142,7 @@ describe("search-immersion route", () => {
                   lat: 48.8531,
                   lon: 2.34999,
                 })
+                .withWebsite("www.jobs.fr")
                 .build(),
             )
             .build(),
@@ -154,6 +155,8 @@ describe("search-immersion route", () => {
             naf: "8539A",
             nafLabel: "test_naf_label",
             name: "Company inside repository",
+            website: "www.jobs.fr",
+            additionalInformation: "",
             rome: "A1000",
             romeLabel: "test_rome_label",
             appellationLabels: ["test_appellation_label"],
@@ -227,6 +230,7 @@ describe("search-immersion route", () => {
                   lat: 48.8531,
                   lon: 2.34999,
                 })
+                .withWebsite("www.jobs.fr")
                 .build(),
             )
             .build(),
@@ -249,6 +253,8 @@ describe("search-immersion route", () => {
             distance_m: 719436,
             position: { lat: 43.8666, lon: 8.3333 },
             city: "test_city",
+            website: "www.jobs.fr",
+            additionalInformation: "",
           },
         ];
         await request

@@ -30,6 +30,8 @@ export type SearchImmersionResultPublicV1 = {
   distance_m?: number;
   contactDetails?: SearchContactDto;
   numberOfEmployeeRange?: string;
+  website?: string;
+  additionalInformation?: string;
 };
 
 export const domainToSearchImmersionResultPublicV1 = (

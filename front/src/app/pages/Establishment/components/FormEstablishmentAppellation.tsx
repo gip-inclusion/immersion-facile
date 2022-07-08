@@ -16,7 +16,7 @@ export const FormEstablishmentAppellation = ({
   const [{ value }, _, { setValue }] = useField<AppellationDto>(name);
 
   return (
-    <div className="flex items-end my-5">
+    <div className="flex items-end">
       <div className="flex-1">
         <AppellationAutocomplete
           title="Rechercher un métier *"

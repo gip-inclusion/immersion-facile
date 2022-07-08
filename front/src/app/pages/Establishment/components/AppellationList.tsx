@@ -24,14 +24,16 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
   return (
     <div className="flex flex-col items-center">
       <div className="w-full">
-        {title && <h5 className="text-lg font-semibold mt-6">{title}</h5>}
-        {professions.map(({ appellationCode }, index) => (
-          <FormEstablishmentAppellation
-            name={`${name}[${index}]`}
-            onDelete={() => onDelete(index)}
-            key={appellationCode}
-          />
-        ))}
+        {title && <h5 className="text-lg font-semibold">{title}</h5>}
+        <div className="flex flex-col gap-5">
+          {professions.map(({ appellationCode }, index) => (
+            <FormEstablishmentAppellation
+              name={`${name}[${index}]`}
+              onDelete={() => onDelete(index)}
+              key={appellationCode}
+            />
+          ))}
+        </div>
       </div>
       <ButtonAdd
         className="my-4"

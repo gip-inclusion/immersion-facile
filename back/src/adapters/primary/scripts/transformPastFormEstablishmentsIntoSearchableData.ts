@@ -98,6 +98,8 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       siret: row.siret,
       businessName: row.business_name,
       businessNameCustomized: row.business_name_customized,
+      website: row.website,
+      additionalInformation: row.additional_information,
       businessAddress: row.business_address,
       naf: row.naf,
       appellations: row.professions,

@@ -157,6 +157,8 @@ const creationInitialValuesWithoutSourceAndSearchable = (
     ? defaultInitialValue(siret)
     : {
         siret: "1234567890123",
+        website: "www@boucherie.fr/immersions",
+        additionalInformation: "Végétariens, s'abstenir !",
         businessName: "My business name, replaced by result from API",
         businessNameCustomized:
           "My Customized Business name, not replaced by API",

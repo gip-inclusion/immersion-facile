@@ -50,6 +50,9 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     const retrievedForm: FormEstablishmentDto = {
       siret,
       source: "immersion-facile",
+      website: establishmentAggregate.establishment.website,
+      additionalInformation:
+        establishmentAggregate.establishment.additionalInformation,
       businessName: establishmentAggregate.establishment.name,
       businessNameCustomized:
         establishmentAggregate.establishment.customizedName,

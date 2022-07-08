@@ -125,6 +125,8 @@ export class PgEstablishmentAggregateRepository
       establishment.siret,
       establishment.name,
       establishment.customizedName,
+      establishment.website,
+      establishment.additionalInformation,
       establishment.address,
       establishment.numberEmployeesRange,
       establishment.nafDto.code,
@@ -146,7 +148,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, address, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited
+          siret, name, customized_name, website, additional_information, address, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -448,8 +450,17 @@ export class PgEstablishmentAggregateRepository
                        ? ", is_commited=%13$L"
                        : ""
                    }
-
-                   WHERE siret=%14$L;`;
+                   ${
+                     propertiesToUpdate.website !== undefined
+                       ? ", website=%14$L"
+                       : ""
+                   }
+                  ${
+                    propertiesToUpdate.additionalInformation !== undefined
+                      ? ", additional_information=%15$L"
+                      : ""
+                  }
+                   WHERE siret=%16$L;`;
     const queryArgs = [
       propertiesToUpdate.updatedAt.toISOString(),
       propertiesToUpdate.isActive,
@@ -467,6 +478,8 @@ export class PgEstablishmentAggregateRepository
       propertiesToUpdate.customizedName,
       propertiesToUpdate.isSearchable,
       propertiesToUpdate.isCommited,
+      propertiesToUpdate.website,
+      propertiesToUpdate.additionalInformation,
 
       propertiesToUpdate.siret,
     ];
@@ -511,7 +524,7 @@ export class PgEstablishmentAggregateRepository
     const immersionSearchResultDtos =
       await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `
-        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, COALESCE(json_agg(pad.libelle_appellation_long) 
+        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, COALESCE(json_agg(pad.libelle_appellation_long)
         FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels, null AS distance_m, 1 AS row_number
         FROM immersion_offers AS io
         LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.rome_appellation 
@@ -611,6 +624,8 @@ export class PgEstablishmentAggregateRepository
             'siret', e.siret, 
             'name', e.name, 
             'customizedName', e.customized_name, 
+            'website', e.website, 
+            'additionalInformation', e.additional_information, 
             'address', e.address, 
             'voluntaryToImmersion', e.data_source = 'form',
             'dataSource', e.data_source, 
@@ -694,6 +709,8 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       'siret', io.siret, 
       'distance_m', io.distance_m, 
       'name', e.name, 
+      'website', e.website, 
+      'additionalInformation', e.additional_information, 
       'customizedName', e.customized_name, 
       'voluntaryToImmersion', e.data_source = 'form',
       'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 

@@ -1272,6 +1272,8 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret,
         name: establishment.name,
         customizedName: establishment.customizedName,
+        website: establishment.website,
+        additionalInformation: establishment.additionalInformation,
         voluntaryToImmersion: establishment.voluntaryToImmersion,
         position: establishment.position,
         address: establishment.address,
@@ -1326,6 +1328,8 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret,
         name: establishment.name,
         customizedName: establishment.customizedName,
+        website: establishment.website,
+        additionalInformation: establishment.additionalInformation,
         voluntaryToImmersion: establishment.voluntaryToImmersion,
         position: establishment.position,
         address: establishment.address,
@@ -1462,6 +1466,8 @@ describe("Postgres implementation of immersion offer repository", () => {
             numberEmployeesRange: "100-199",
             isActive: true,
             isSearchable: false,
+            website: "www.updated-website.fr",
+            additionalInformation: "Some additional informations",
           },
         };
         await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(

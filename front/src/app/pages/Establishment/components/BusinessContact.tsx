@@ -37,7 +37,7 @@ export const BusinessContact = () => {
   const { values, setFieldValue } = useFormikContext<FormEstablishmentDto>();
   return (
     <div>
-      <div className=" py-2 my-2">
+      <div>
         <h4 className="text-lg font-semibold m-0">
           Détails du correspondant immersion :
         </h4>

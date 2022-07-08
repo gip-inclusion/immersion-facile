@@ -29,4 +29,6 @@ export type SearchImmersionResultDto = {
   distance_m?: number;
   contactDetails?: SearchContactDto;
   numberOfEmployeeRange?: string;
+  website?: string;
+  additionalInformation?: string;
 };

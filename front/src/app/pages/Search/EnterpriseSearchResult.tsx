@@ -1,4 +1,6 @@
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import LaunchIcon from "@mui/icons-material/Launch";
+import CommentIcon from "@mui/icons-material/Comment";
 import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import React, { ReactNode } from "react";
 import { DistanceIcon } from "src/icons/DistanceIcon";
@@ -43,6 +45,8 @@ export const EnterpriseSearchResult = ({
     romeLabel,
     appellationLabels,
     voluntaryToImmersion,
+    website,
+    additionalInformation,
   } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
   return (
@@ -59,6 +63,7 @@ export const EnterpriseSearchResult = ({
               : romeLabel}
           </div>
         </div>
+
         <InfoLabel
           className=""
           contactMode={contactMode}
@@ -79,6 +84,16 @@ export const EnterpriseSearchResult = ({
       <SearchResultInfo icon={<LocationOnIcon sx={{ color: iconColor }} />}>
         {address.toLocaleLowerCase()}
       </SearchResultInfo>
+      {website && (
+        <SearchResultInfo icon={<LaunchIcon sx={{ color: iconColor }} />}>
+          <a href={website}>{website}</a>
+        </SearchResultInfo>
+      )}
+      {additionalInformation && (
+        <SearchResultInfo icon={<CommentIcon sx={{ color: iconColor }} />}>
+          {additionalInformation}
+        </SearchResultInfo>
+      )}
       <hr className="pb-2" />
       <ButtonSearch onClick={onButtonClick} disabled={disableButton}>
         {contactMode === "PHONE" ||

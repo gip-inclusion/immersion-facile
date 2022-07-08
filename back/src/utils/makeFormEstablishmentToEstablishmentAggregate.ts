@@ -80,6 +80,8 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
       siret: formEstablishment.siret,
       name: formEstablishment.businessName,
       customizedName: formEstablishment.businessNameCustomized,
+      website: formEstablishment.website,
+      additionalInformation: formEstablishment.additionalInformation,
       isCommited: formEstablishment.isEngagedEnterprise,
       address: formEstablishment.businessAddress,
       voluntaryToImmersion: true,

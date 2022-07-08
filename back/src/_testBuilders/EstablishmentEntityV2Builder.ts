@@ -12,6 +12,8 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   siret: "78000403200019",
   name: "Company inside repository",
   address: "30 avenue des champs Elysées, 75017 Paris",
+  website: "www.jobs.fr",
+  additionalInformation: "",
   customizedName: undefined,
   isCommited: undefined,
   dataSource: "form",
@@ -38,6 +40,9 @@ export class EstablishmentEntityV2Builder
 
   withAddress(address: string) {
     return new EstablishmentEntityV2Builder({ ...this.entity, address });
+  }
+  withWebsite(website: string) {
+    return new EstablishmentEntityV2Builder({ ...this.entity, website });
   }
   withPosition(position: LatLonDto) {
     return new EstablishmentEntityV2Builder({ ...this.entity, position });

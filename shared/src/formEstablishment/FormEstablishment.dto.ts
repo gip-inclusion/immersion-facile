@@ -45,5 +45,7 @@ export type FormEstablishmentDto = {
   naf?: NafDto; // { code: string, nomenclature: string }
   appellations: AppellationDto[]; // at least one
   businessContact: BusinessContactDto;
+  website?: string;
+  additionalInformation?: string;
   isSearchable: boolean;
 };

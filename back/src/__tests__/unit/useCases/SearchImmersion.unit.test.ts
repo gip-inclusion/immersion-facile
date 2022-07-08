@@ -60,6 +60,7 @@ const prepareSearchableData = async () => {
     .withAddress("55 Rue du Faubourg Saint-Honoré")
     .withDataSource("form")
     .withNumberOfEmployeeRange("20-49")
+    .withWebsite("www.website.com")
     .build();
 
   const secretariatImmersionOffer = new ImmersionOfferEntityV2Builder()
@@ -154,6 +155,7 @@ describe("SearchImmersionUseCase", () => {
       city: TEST_CITY,
       nafLabel: TEST_NAF_LABEL,
       romeLabel: TEST_ROME_LABEL,
+      website: "www.website.com",
     });
   });
   it("gets only form establishments if voluntaryToImmersion is true", async () => {

@@ -22,6 +22,9 @@ const validEstablishmentFromLaBonneBoite: LaBonneBoiteCompanyProps = {
   contact_mode: "phone",
   raison_sociale: "",
   naf_text: "",
+  social_network: "",
+  boosted: false,
+  website: "",
 };
 
 export class LaBonneBoiteCompanyBuilder

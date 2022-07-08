@@ -23,9 +23,12 @@ export type LaBonneBoiteCompanyProps = {
   stars: number;
   raison_sociale: string;
   url: string; // URL to the company reference page on LaBonneBoite
+  social_network: string; // Lien vers réseaux sociaux
+  website: string; // URL vers la page de l'entreprise
   headcount_text: string; // Libelle of nb of employees
   distance: number; // Distance to searched geographical position
   alternance: boolean; // Whether or not the company accepts alternance contracts
+  boosted: boolean;
   contact_mode: string; // | "Envoyez votre candidature par mail" | "Se présenter spontanément" | "Postulez via le site internet de l'entreprise" |  "Envoyer un CV et une lettre de motivation"
 };
 
@@ -60,6 +63,8 @@ export class LaBonneBoiteCompanyVO {
       isActive: true,
       updatedAt: undefined,
       isSearchable: true,
+      additionalInformation: "",
+      website: this.props.website ?? this.props.url,
     };
 
     return {

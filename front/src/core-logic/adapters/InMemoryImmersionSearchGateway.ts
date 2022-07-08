@@ -77,6 +77,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     appellationLabels: ["Facteur", "Développeuse"],
     nafLabel: "Métallurgie",
     city: "xxxx",
+    website: "www.corp.com/job",
+    additionalInformation:
+      "Si vous aimez la métallurgie et la bonne bière, vous serez ravis !",
   },
   {
     rome: "A0001",
@@ -94,6 +97,9 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     nafLabel: "Accueil et Restauration",
     city: "xxxx",
     numberOfEmployeeRange: "11-49",
+    website: "www.mega-corp.com/job",
+    additionalInformation:
+      "Un texte super long qui donne des tonnes d'informations complémentaires sur l'immersion, les métiers proposés, tout ça... ",
   },
   {
     rome: "A0002",
