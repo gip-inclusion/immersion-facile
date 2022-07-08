@@ -77,7 +77,7 @@ export const ConnventionFormDetails = ({
     if (field === "schedule") {
       // DEBUG: ERROR expected date iso string on schedule during prettyPrintSchedule but invalid date error
       // eslint-disable-next-line no-console
-      console.log("prettyPrintSchedule", convention.schedule);
+      console.log("prettyPrintSchedule", convention);
       return (
         <div style={{ whiteSpace: "pre" }}>
           {prettyPrintSchedule(convention.schedule)}
