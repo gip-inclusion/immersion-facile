@@ -9,7 +9,6 @@ import { AppConfig } from "../../adapters/primary/config/appConfig";
 import {
   conventionsRoute,
   updateConventionStatusRoute,
-  validateConventionRoute,
 } from "shared/src/routes";
 import {
   createConventionMagicLinkPayload,
@@ -69,80 +68,6 @@ const initializeSystemUnderTest = async (
 
 describe("convention e2e", () => {
   describe("/demandes-immersion route", () => {
-    describe("Backoffice", () => {
-      beforeEach(async () => {
-        await initializeSystemUnderTest(new AppConfigBuilder().build(), {
-          withImmersionStored: true,
-        });
-      });
-      describe("Application validation", () => {
-        it("Validating an existing application succeeds, with auth", async () => {
-          // Validating an application with existing id succeeds (with auth).
-          await request
-            .get(`/admin/${validateConventionRoute}/${convention.id}`)
-            .set("Authorization", adminToken)
-            .expect(200, { id: convention.id });
-
-          const validatedConvention = {
-            ...convention,
-            status: "VALIDATED",
-          };
-
-          // Getting the application succeeds and shows that it's validated.
-          await request
-            .get(`/admin/${conventionsRoute}/${convention.id}`)
-            .set("Authorization", adminToken)
-            .expect(200, {
-              ...validatedConvention,
-              agencyName: TEST_AGENCY_NAME,
-            });
-        });
-
-        it("Validating applications without credentials fails with 401 Unauthorized", async () => {
-          await request
-            .get(`/${validateConventionRoute}/${convention.id}`)
-            .expect(401);
-
-          // Getting the application succeeds and shows that it's NOT validated.
-          await request
-            .get(`/admin/${conventionsRoute}/${convention.id}`)
-            .set("Authorization", adminToken)
-            .expect(200, { ...convention, agencyName: TEST_AGENCY_NAME });
-        });
-
-        it("Validating applications with invalid credentials fails with 403 Forbidden", async () => {
-          await request
-            .get(`/admin/${validateConventionRoute}/${convention.id}`)
-            .set("Authorization", "wrong-token")
-            .expect(401);
-
-          // Getting the application succeeds and shows that it's NOT validated.
-          await request
-            .get(`/admin/${conventionsRoute}/${convention.id}`)
-            .set("Authorization", adminToken)
-            .expect(200, { ...convention, agencyName: TEST_AGENCY_NAME });
-        });
-
-        it("Validating non-existent application with valid credentials fails with 404", async () => {
-          await request
-            .get(
-              `/admin/${validateConventionRoute}/unknown-demande-immersion-id`,
-            )
-            .set("Authorization", adminToken)
-            .expect(404);
-
-          // Getting the existing application succeeds and shows that it's NOT validated.
-          await request
-            .get(`/admin/${conventionsRoute}/${convention.id}`)
-            .set("Authorization", adminToken)
-            .expect(200, {
-              ...convention,
-              agencyName: TEST_AGENCY_NAME,
-            });
-        });
-      });
-    });
-
     describe("DEV environment", () => {
       beforeEach(async () => {
         await initializeSystemUnderTest(new AppConfigBuilder().build(), {
@@ -384,7 +309,7 @@ describe("convention e2e", () => {
     it("Returns error 401 if no JWT", async () => {
       await request
         .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
-        .send({ status: "VALIDATED" })
+        .send({ status: "ACCEPTED_BY_VALIDATOR" })
         .expect(401);
     });
 
@@ -400,7 +325,7 @@ describe("convention e2e", () => {
       await request
         .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
         .set("Authorization", tutorJwt)
-        .send({ status: "VALIDATED" })
+        .send({ status: "ACCEPTED_BY_VALIDATOR" })
         .expect(403);
     });
 

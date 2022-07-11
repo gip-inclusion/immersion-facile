@@ -51,8 +51,6 @@ export type DomainEvent =
   | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ConventionDto>
   // prettier-ignore
   | GenericEvent<"ImmersionApplicationAcceptedByValidator", ConventionDto>
-  // prettier-ignore
-  | GenericEvent<"FinalImmersionApplicationValidationByAdmin", ConventionDto>
 
   // UNHAPPY PATHS
   | GenericEvent<"ImmersionApplicationRejected", ConventionDto>

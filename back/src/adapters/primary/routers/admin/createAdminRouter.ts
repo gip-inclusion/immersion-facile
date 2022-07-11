@@ -5,7 +5,6 @@ import {
   conventionsRoute,
   agenciesRoute,
   adminLogin,
-  validateConventionRoute,
   emailRoute,
 } from "shared/src/routes";
 import type { AppDependencies } from "../../config/createAppDependencies";
@@ -43,14 +42,6 @@ export const createAdminRouter = (deps: AppDependencies) => {
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getConvention.execute(req.params),
-      ),
-    );
-
-  adminRouter
-    .route(`/${validateConventionRoute}/:id`)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.validateConvention.execute(req.params.id),
       ),
     );
 

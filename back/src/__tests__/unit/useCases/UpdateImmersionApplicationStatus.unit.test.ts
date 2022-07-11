@@ -80,21 +80,6 @@ describe("UpdateImmersionApplicationStatus", () => {
     });
   });
 
-  describe("* -> VALIDATED transition", () => {
-    const validationDate = new Date("2022-01-01T12:00:00.000");
-    testForAllRolesAndInitialStatusCases({
-      targetStatus: "VALIDATED",
-      expectedDomainTopic: "FinalImmersionApplicationValidationByAdmin",
-      allowedRoles: ["admin"],
-      allowedInitialStatuses: [
-        "ACCEPTED_BY_COUNSELLOR",
-        "ACCEPTED_BY_VALIDATOR",
-      ],
-      updatedFields: { dateValidation: validationDate.toISOString() },
-      nextDate: validationDate,
-    });
-  });
-
   describe("* -> REJECTED transition", () => {
     testForAllRolesAndInitialStatusCases({
       targetStatus: "REJECTED",
@@ -133,9 +118,9 @@ describe("UpdateImmersionApplicationStatus", () => {
     await expectPromiseToFailWithError(
       executeUpdateConventionStatusUseCase({
         conventionId: "unknown_application_id",
-        role: "admin",
+        role: "validator",
         email: "test@test.fr",
-        targetStatus: "VALIDATED",
+        targetStatus: "ACCEPTED_BY_VALIDATOR",
         updateConventionStatus,
         conventionRepository,
       }),

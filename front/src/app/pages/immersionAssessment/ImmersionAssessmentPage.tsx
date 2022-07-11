@@ -62,9 +62,7 @@ export const ImmersionAssessmentPage = ({
     );
   }
 
-  const canCreateAssessment =
-    convention?.status === "ACCEPTED_BY_VALIDATOR" ||
-    convention?.status === "VALIDATED";
+  const canCreateAssessment = convention?.status === "ACCEPTED_BY_VALIDATOR";
 
   return (
     <HeaderFooterLayout>

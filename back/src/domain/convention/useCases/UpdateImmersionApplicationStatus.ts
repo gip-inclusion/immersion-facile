@@ -36,7 +36,6 @@ const domainTopicByTargetStatusMap: Record<
   IN_REVIEW: "ImmersionApplicationFullySigned",
   ACCEPTED_BY_COUNSELLOR: "ImmersionApplicationAcceptedByCounsellor",
   ACCEPTED_BY_VALIDATOR: "ImmersionApplicationAcceptedByValidator",
-  VALIDATED: "FinalImmersionApplicationValidationByAdmin",
   REJECTED: "ImmersionApplicationRejected",
   CANCELLED: "ImmersionApplicationCancelled",
   DRAFT: "ImmersionApplicationRequiresModification",

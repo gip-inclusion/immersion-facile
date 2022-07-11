@@ -37,8 +37,6 @@ const getPrefix = (status: ConventionStatus) => {
       return "[📗 DEMANDE ÉLIGIBLE]";
     case "ACCEPTED_BY_VALIDATOR":
       return "[✅ DEMANDE VALIDÉE]";
-    case "VALIDATED":
-      return "[👩‍💼 ENVOI DE CONVENTION VALIDÉE PAR ADMIN]";
     case "CANCELLED":
       return "[🗑️ CONVENTION ANNULÉE PAR ADMIN]";
   }

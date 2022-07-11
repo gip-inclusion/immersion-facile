@@ -1,7 +1,6 @@
 import React from "react";
 import { SearchDebugPage } from "src/app/components/SearchDebugPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
-import { AdminVerificationPage } from "src/app/pages/admin/AdminVerificationPage";
 import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
 import { ConventionPage } from "src/app/pages/Convention/ConventionPage";
 import { ConventionPageForUkraine } from "src/app/pages/Convention/ConventionPageForUkraine";
@@ -38,12 +37,6 @@ export const Router = () => {
           <AdminPage route={route} />
         </PrivateRoute>
       )}
-      {route.name === "adminVerification" &&
-        (featureFlags.enableAdminUi ? (
-          <AdminVerificationPage route={route} />
-        ) : (
-          <NotAvailable />
-        ))}
       {route.name === "agencyAdmin" &&
         (featureFlags.enableAdminUi ? (
           <AdminPage route={route} />

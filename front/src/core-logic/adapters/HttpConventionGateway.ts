@@ -18,7 +18,6 @@ import {
   renewMagicLinkRoute,
   signConventionRoute,
   updateConventionStatusRoute,
-  validateConventionRoute,
 } from "shared/src/routes";
 import { ShareLinkByEmailDto } from "shared/src/ShareLinkByEmailDto";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
@@ -119,13 +118,6 @@ export class HttpConventionGateway implements ConventionGateway {
     );
 
     return withConventionIdSchema.parse(httpResponse.data);
-  }
-
-  public async validate(id: ConventionId): Promise<string> {
-    const { data } = await axios.get(
-      `/${prefix}/${validateConventionRoute}/${id}`,
-    );
-    return data.id;
   }
 
   public async generateMagicLink(

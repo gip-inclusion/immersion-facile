@@ -22,7 +22,6 @@ import {
   updateConventionStatusRoute,
 } from "shared/src/routes";
 
-const adminEmail = "admin@email.fr";
 const validatorEmail = "validator@mail.com";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
@@ -57,10 +56,6 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       {
         type: "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [validConvention.mentorEmail],
-      },
-      {
-        type: "NEW_CONVENTION_ADMIN_NOTIFICATION",
-        recipients: ["admin@email.fr"],
       },
     ]);
   });
@@ -153,11 +148,10 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(4);
+  expect(sentEmails).toHaveLength(3);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],
-    [adminEmail],
     ["validator@mail.com"],
   ]);
 
@@ -201,7 +195,7 @@ const beneficiarySignsApplication = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(5);
+  expect(sentEmails).toHaveLength(4);
   const needsReviewEmail = sentEmails[sentEmails.length - 1];
   expect(needsReviewEmail.recipients).toEqual(["establishment@example.com"]);
   expectTypeToMatchAndEqual(
@@ -233,7 +227,7 @@ const establishmentSignsApplication = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(6);
+  expect(sentEmails).toHaveLength(5);
   const needsReviewEmail = sentEmails[sentEmails.length - 1];
   expect(needsReviewEmail.recipients).toEqual([validatorEmail]);
   return {
@@ -275,7 +269,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 
   await eventCrawler.processNewEvents();
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(7);
+  expect(sentEmails).toHaveLength(6);
   const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
   expectTypeToMatchAndEqual(
     needsToTriggerConventionSentEmail.type,

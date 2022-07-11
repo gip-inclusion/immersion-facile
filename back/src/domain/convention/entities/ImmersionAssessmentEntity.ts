@@ -13,7 +13,6 @@ export type ImmersionAssessmentEntity = EntityFromDto<
 
 const acceptedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",
-  "VALIDATED",
 ];
 
 export const createImmersionAssessmentEntity = (

@@ -23,7 +23,6 @@ const getUseCasesByTopics = (
   ImmersionApplicationSubmittedByBeneficiary: [
     useCases.confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature,
     useCases.confirmToMentorThatConventionCorrectlySubmittedRequestSignature,
-    useCases.notifyToTeamConventionSubmittedByBeneficiary,
     useCases.notifyToAgencyConventionSubmitted,
     useCases.associatePeConnectFederatedIdentity,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
@@ -31,7 +30,6 @@ const getUseCasesByTopics = (
   ConventionSubmittedAfterModification: [
     useCases.confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature,
     useCases.confirmToMentorThatConventionCorrectlySubmittedRequestSignature,
-    useCases.notifyToTeamConventionSubmittedByBeneficiary,
     useCases.notifyToAgencyConventionSubmitted,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
@@ -49,11 +47,6 @@ const getUseCasesByTopics = (
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationAcceptedByValidator: [
-    useCases.notifyAllActorsOfFinalConventionValidation,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
-  ],
-
-  FinalImmersionApplicationValidationByAdmin: [
     useCases.notifyAllActorsOfFinalConventionValidation,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],

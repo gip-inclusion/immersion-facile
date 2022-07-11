@@ -123,23 +123,6 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
                     : "Valider la demande"}
                 </VerificationActionButton>
               )}
-              {isAllowedTransition(status, "VALIDATED", role) && (
-                <VerificationActionButton
-                  {...buttonProps}
-                  newStatus="VALIDATED"
-                  messageToShowOnSuccess={
-                    "Succès. La confirmation de cette validation est bien envoyée par mail au bénéficiaire et à l'entreprise."
-                  }
-                  disabled={
-                    !!successMessage || currentStatus != "ACCEPTED_BY_VALIDATOR"
-                  }
-                >
-                  {currentStatus === "VALIDATED"
-                    ? "Convention envoyée."
-                    : "Envoyer la Convention"}
-                </VerificationActionButton>
-              )}
-
               {errorMessage && (
                 <Notification
                   type="error"

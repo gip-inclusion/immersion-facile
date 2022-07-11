@@ -33,10 +33,6 @@ export const statusTransitionConfigs: Record<
     validInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
     validRoles: ["validator"],
   },
-  VALIDATED: {
-    validInitialStatuses: ["ACCEPTED_BY_COUNSELLOR", "ACCEPTED_BY_VALIDATOR"],
-    validRoles: ["admin"],
-  },
 
   // This config allows a counsellor to reject or cancel a Convention after it been
   // accepted by a validator. Should we be stricter? We assume that this is a

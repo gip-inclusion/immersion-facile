@@ -126,7 +126,7 @@ describe("CreateImmersionAssessment", () => {
   const [passingStatuses, failingStatuses] =
     splitCasesBetweenPassingAndFailing<ConventionStatus>(
       allConventionStatuses,
-      ["ACCEPTED_BY_VALIDATOR", "VALIDATED"],
+      ["ACCEPTED_BY_VALIDATOR"],
     );
 
   it.each(failingStatuses.map((status) => ({ status })))(

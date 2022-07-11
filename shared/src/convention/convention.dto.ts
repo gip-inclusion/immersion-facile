@@ -15,14 +15,12 @@ export const allConventionStatuses = [
   "IN_REVIEW",
   "ACCEPTED_BY_COUNSELLOR",
   "ACCEPTED_BY_VALIDATOR",
-  "VALIDATED",
   "REJECTED",
   "CANCELLED",
 ] as const;
 
 export const validatedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",
-  "VALIDATED",
 ];
 
 export type ConventionId = Flavor<string, "ConventionId">;

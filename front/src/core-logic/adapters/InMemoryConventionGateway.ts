@@ -126,18 +126,6 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return { id: payload.applicationId };
   }
 
-  public async validate(id: ConventionId): Promise<string> {
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-    const form = { ...this._conventions[id] };
-    if (form.status === "IN_REVIEW") {
-      form.status = "VALIDATED";
-      this._conventions[id] = form;
-    } else {
-      throw new Error("400 Bad Request");
-    }
-    return id;
-  }
-
   public async generateMagicLink(
     _: AdminToken,
     _convention: ConventionId,

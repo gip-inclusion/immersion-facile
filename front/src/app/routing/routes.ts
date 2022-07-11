@@ -5,10 +5,6 @@ import { conventionValuesFromUrl } from "./route-params";
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute("/ajouter-prescripteur"),
   admin: defineRoute("/admin"),
-  adminVerification: defineRoute(
-    { demandeId: param.path.string },
-    (params) => `/admin-verification/${params.demandeId}`,
-  ),
   agencyAdmin: defineRoute(
     { agencyId: param.path.string },
     (params) => `/agence/${params.agencyId}`,

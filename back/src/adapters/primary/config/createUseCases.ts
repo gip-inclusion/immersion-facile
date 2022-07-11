@@ -11,8 +11,8 @@ import { ExportConventionsReport } from "../../../domain/convention/useCases/Exp
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
-import { ListAgenciesWithPosition } from "../../../domain/convention/useCases/ListAgenciesWithPosition";
 import { ListAdminConventions } from "../../../domain/convention/useCases/ListAdminConventions";
+import { ListAgenciesWithPosition } from "../../../domain/convention/useCases/ListAgenciesWithPosition";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
@@ -22,7 +22,6 @@ import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "
 import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/convention/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
-import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../../domain/convention/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/PrivateListAgencies";
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
@@ -31,7 +30,6 @@ import { SignImmersionApplication } from "../../../domain/convention/useCases/Si
 import { UpdateAgency } from "../../../domain/convention/useCases/UpdateAgency";
 import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
-import { ValidateImmersionApplication } from "../../../domain/convention/useCases/ValidateImmersionApplication";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
@@ -42,6 +40,7 @@ import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { ExportEstablishmentsAsExcelArchive } from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
+import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
@@ -69,7 +68,6 @@ import { AppConfig } from "./appConfig";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
 import { Repositories } from "./repositoriesConfig";
-import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
 
 export type UseCases = ReturnType<typeof createUseCases>;
 
@@ -135,11 +133,6 @@ export const createUseCases = (
     updateConvention: new UpdateImmersionApplication(
       uowPerformer,
       createNewEvent,
-    ),
-    validateConvention: new ValidateImmersionApplication(
-      repositories.convention,
-      createNewEvent,
-      repositories.outbox,
     ),
     updateConventionStatus: new UpdateImmersionApplicationStatus(
       repositories.convention,
@@ -269,12 +262,6 @@ export const createUseCases = (
       repositories.agency,
       generateMagicLinkFn,
     ),
-    notifyToTeamConventionSubmittedByBeneficiary:
-      new NotifyToTeamApplicationSubmittedByBeneficiary(
-        repositories.email,
-        repositories.agency,
-        generateMagicLinkFn,
-      ),
     notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
       uowPerformer,
       emailFilter,

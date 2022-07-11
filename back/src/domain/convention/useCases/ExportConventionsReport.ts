@@ -141,7 +141,6 @@ const translateStatus: Record<string, string> = {
   ["IN_REVIEW"]: "Demande à étudier",
   ["ACCEPTED_BY_COUNSELLOR"]: "Éligible",
   ["ACCEPTED_BY_VALIDATOR"]: "Validé par la structure",
-  ["VALIDATED"]: "Convention envoyée",
   ["REJECTED"]: "Refusée",
   ["CANCELLED"]: "Annulée",
 };

@@ -1,4 +1,4 @@
-import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   expectPromiseToFailWithError,
   splitCasesBetweenPassingAndFailing,
@@ -40,7 +40,6 @@ type ConventionDomainTopic = ExtractFromDomainTopics<
   | "ImmersionApplicationFullySigned"
   | "ImmersionApplicationAcceptedByCounsellor"
   | "ImmersionApplicationAcceptedByValidator"
-  | "FinalImmersionApplicationValidationByAdmin"
   | "ImmersionApplicationRejected"
   | "ImmersionApplicationRequiresModification"
   | "ImmersionApplicationCancelled"

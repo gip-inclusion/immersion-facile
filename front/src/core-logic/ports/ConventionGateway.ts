@@ -22,8 +22,6 @@ export interface ConventionGateway {
 
   update(conventionDto: ConventionDto): Promise<string>;
   updateMagicLink(conventionDto: ConventionDto, jwt: string): Promise<string>;
-  // Calls validate-demande on backend.
-  validate(id: ConventionId): Promise<string>;
 
   updateStatus(
     params: UpdateConventionStatusRequestDto,

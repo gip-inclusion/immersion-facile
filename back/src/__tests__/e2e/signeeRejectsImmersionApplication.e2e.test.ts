@@ -15,8 +15,6 @@ import {
 } from "shared/src/routes";
 import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
 
-const adminEmail = "admin@email.fr";
-
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid applications in the repository, and ask for establishment edition", async () => {
     const validConvention = new ConventionDtoBuilder()
@@ -60,11 +58,10 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(3);
+  expect(sentEmails).toHaveLength(2);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [createConventionParams.email],
     [createConventionParams.mentorEmail],
-    [adminEmail],
   ]);
 
   const beneficiarySignEmail = sentEmails[0];
@@ -98,16 +95,16 @@ const expectEstablishmentRequiresChanges = async (
 
   // Expect two emails sent (to beneficiary and to mentor)
   const sentEmails = reposAndGateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(5);
-  expect(sentEmails.slice(3, 5).map((e) => e.recipients)).toEqual([
+  expect(sentEmails).toHaveLength(4);
+  expect(sentEmails.slice(2, 4).map((e) => e.recipients)).toEqual([
     ["beneficiary@email.fr"],
     ["establishment@example.com"],
   ]);
 
   expectStoreImmersionToHaveStatus(reposAndGateways.convention, "DRAFT");
 
-  const beneficiaryEditEmail = sentEmails[3];
-  const establishmentEditEmail = sentEmails[4];
+  const beneficiaryEditEmail = sentEmails[2];
+  const establishmentEditEmail = sentEmails[3];
 
   const beneficiaryEditJwt = expectJwtInMagicLinkAndGetIt(
     beneficiaryEditEmail.params.magicLink,

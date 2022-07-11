@@ -31,11 +31,9 @@ const conventionStatusToPoleEmploiStatus: Record<ConventionStatus, string> = {
   ACCEPTED_BY_COUNSELLOR: "DEMANDE_ELIGIBLE",
   ACCEPTED_BY_VALIDATOR: "DEMANDE_VALIDÉE",
 
-  // n'est plus utilisé
-  VALIDATED: "ENVOI_DE_CONVENTION_VALIDÉE_PAR_ADMIN",
-
   // si demande de modifications
   DRAFT: "BROUILLON",
+
   // si rejeté
   REJECTED: "REJETÉ",
   CANCELLED: "ANNULÉ",

@@ -77,7 +77,7 @@ describe("PgConventionRepository", () => {
     const updatedConvention = new ConventionDtoBuilder()
       .withId(idA)
       .withExternalId(externalId)
-      .withStatus("VALIDATED")
+      .withStatus("ACCEPTED_BY_VALIDATOR")
       .withEmail("someUpdated@email.com")
       .withDateEnd("2021-01-20")
       .build();
