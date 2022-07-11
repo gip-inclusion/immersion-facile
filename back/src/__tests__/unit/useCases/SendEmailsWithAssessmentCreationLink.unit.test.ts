@@ -4,7 +4,7 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";

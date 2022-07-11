@@ -4,7 +4,7 @@ import {
   fakeGenerateMagicLinkUrlFn,
 } from "../../../_testBuilders/test.helpers";
 import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { SignedByOtherPartyNotificationParams } from "../../../domain/convention/ports/EmailGateway";
 import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/convention/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
 import { ConventionDto } from "shared/src/convention/convention.dto";

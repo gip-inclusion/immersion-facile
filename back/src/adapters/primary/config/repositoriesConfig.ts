@@ -22,7 +22,7 @@ import { InMemorySearchMadeRepository } from "../../secondary/immersionOffer/InM
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryDocumentGateway } from "../../secondary/InMemoryDocumentGateway";
-import { InMemoryEmailGateway } from "../../secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
@@ -47,7 +47,7 @@ import { PgRomeRepository } from "../../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/PgSearchMadeRepository";
 import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
 import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
-import { SendinblueEmailGateway } from "../../secondary/SendinblueEmailGateway";
+import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
 import { StubEstablishmentExportQueries } from "../../secondary/StubEstablishmentExportQueries";
 import { StubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";

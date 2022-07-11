@@ -6,7 +6,7 @@ import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { AlwaysAllowEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { PoleEmploiAdvisorOnConventionFullysignedParams } from "../../../domain/convention/ports/EmailGateway";
 import {

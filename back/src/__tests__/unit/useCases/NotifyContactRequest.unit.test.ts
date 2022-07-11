@@ -3,7 +3,7 @@ import {
   InMemoryEstablishmentAggregateRepository,
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
 import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";

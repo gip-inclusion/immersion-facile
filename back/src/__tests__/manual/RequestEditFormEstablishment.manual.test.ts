@@ -5,7 +5,7 @@ import {
   RealClock,
 } from "../../adapters/secondary/core/ClockImplementations";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
-import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
+import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
 import { CreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { OutboxQueries } from "../../domain/core/ports/OutboxQueries";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";

@@ -1,6 +1,6 @@
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
-import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
+import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
 import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";

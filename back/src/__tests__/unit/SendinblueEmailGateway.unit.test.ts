@@ -6,7 +6,7 @@ import type {
 } from "sib-api-v3-typescript";
 import { makeEmailAllowListPredicate } from "../../adapters/primary/config/repositoriesConfig";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
-import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
+import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
 import { ValidatedConventionFinalConfirmationParams } from "../../domain/convention/ports/EmailGateway";
 
 describe("SendingBlueEmailGateway", () => {

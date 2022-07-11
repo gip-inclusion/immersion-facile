@@ -1,5 +1,5 @@
 import { parseISO } from "date-fns";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { ValidatedConventionFinalConfirmationParams } from "../../../domain/convention/ports/EmailGateway";
 import {
   getValidatedApplicationFinalConfirmationParams,

@@ -1,7 +1,7 @@
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { AlwaysAllowEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { NewConventionAdminNotificationParams } from "../../../domain/convention/ports/EmailGateway";
 import { frontRoutes } from "shared/src/routes";

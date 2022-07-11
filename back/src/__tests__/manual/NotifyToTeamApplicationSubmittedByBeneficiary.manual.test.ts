@@ -1,7 +1,7 @@
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { createGenerateConventionMagicLink } from "../../adapters/primary/config/createGenerateConventionMagicLink";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
-import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
+import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../domain/convention/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";

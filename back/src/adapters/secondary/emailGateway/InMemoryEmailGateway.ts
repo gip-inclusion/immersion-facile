@@ -16,18 +16,18 @@ import type {
   PoleEmploiAdvisorOnConventionAssociationParams,
   PoleEmploiAdvisorOnConventionFullysignedParams,
   AgencyWasActivatedParams,
-} from "../../domain/convention/ports/EmailGateway";
+} from "../../../domain/convention/ports/EmailGateway";
 
 import {
   EmailGateway,
   ShareDraftConventionByLinkParams,
-} from "../../domain/convention/ports/EmailGateway";
+} from "../../../domain/convention/ports/EmailGateway";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { createLogger } from "../../utils/logger";
+import { createLogger } from "../../../utils/logger";
 import { EmailSentDto, TemplatedEmail } from "shared/email";
-import { Clock } from "../../domain/core/ports/Clock";
+import { Clock } from "../../../domain/core/ports/Clock";
 import { prop } from "ramda";
-import { CustomClock } from "./core/ClockImplementations";
+import { CustomClock } from "../core/ClockImplementations";
 
 const logger = createLogger(__filename);
 export class InMemoryEmailGateway implements EmailGateway {

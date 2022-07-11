@@ -13,7 +13,7 @@ import { InMemoryOutboxQueries } from "../../adapters/secondary/core/InMemoryOut
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
-import { InMemoryEmailGateway } from "../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import {
   GenerateMagicLinkJwt,

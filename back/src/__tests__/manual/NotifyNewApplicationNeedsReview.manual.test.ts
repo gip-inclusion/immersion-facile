@@ -4,7 +4,7 @@ import {
   GenerateConventionMagicLink,
 } from "../../adapters/primary/config/createGenerateConventionMagicLink";
 import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
-import { SendinblueEmailGateway } from "../../adapters/secondary/SendinblueEmailGateway";
+import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";

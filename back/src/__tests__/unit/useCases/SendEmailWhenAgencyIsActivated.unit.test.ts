@@ -1,5 +1,5 @@
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
 
 describe("SendEmailWhenAgencyIsActivated", () => {

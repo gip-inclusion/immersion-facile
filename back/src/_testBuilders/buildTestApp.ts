@@ -11,7 +11,7 @@ import { InMemoryLaBonneBoiteRequestRepository } from "../adapters/secondary/imm
 import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
-import type { InMemoryEmailGateway } from "../adapters/secondary/InMemoryEmailGateway";
+import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
 import type { InMemoryConventionRepository } from "../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/InMemoryPeConnectGateway";

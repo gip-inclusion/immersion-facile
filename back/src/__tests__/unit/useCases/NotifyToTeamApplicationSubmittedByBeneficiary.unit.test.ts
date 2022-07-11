@@ -1,6 +1,6 @@
 import { parseISO } from "date-fns";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/InMemoryEmailGateway";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { NotifyToTeamApplicationSubmittedByBeneficiary } from "../../../domain/convention/useCases/notifications/NotifyToTeamApplicationSubmittedByBeneficiary";
 import { frontRoutes } from "shared/src/routes";
 import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
