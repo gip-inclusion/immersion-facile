@@ -34,6 +34,7 @@ import {
 import { Clock } from "../../../domain/core/ports/Clock";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+import { BadRequestError } from "../../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
@@ -60,7 +61,7 @@ export class SendinblueEmailGateway implements EmailGateway {
   }
 
   public getLastSentEmailDtos(): EmailSentDto[] {
-    throw new Error(
+    throw new BadRequestError(
       "It is not possible de get last sent mails from SendInBlue email gateway",
     );
   }

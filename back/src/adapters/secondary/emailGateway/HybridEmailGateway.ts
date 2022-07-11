@@ -3,6 +3,8 @@ import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { InMemoryEmailGateway } from "./InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "./SendinblueEmailGateway";
 
+type ParamsToPass = [any, any, any?];
+
 export class HybridEmailGateway implements EmailGateway {
   constructor(
     private sendinblue: SendinblueEmailGateway,
@@ -13,152 +15,152 @@ export class HybridEmailGateway implements EmailGateway {
     return this.inMemory.getLastSentEmailDtos();
   }
 
-  sendAgencyWasActivated(...params: [any, any, any?]) {
+  sendAgencyWasActivated(...params: ParamsToPass) {
     return this.callBothImplementations("sendAgencyWasActivated", ...params);
   }
 
-  sendBeneficiarySignatureRequestNotification(...params: [any, any, any?]) {
+  sendBeneficiarySignatureRequestNotification(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendBeneficiarySignatureRequestNotification",
       ...params,
     );
   }
 
-  sendContactByEmailRequest(...params: [any, any, any?]) {
+  sendContactByEmailRequest(...params: ParamsToPass) {
     return this.callBothImplementations("sendContactByEmailRequest", ...params);
   }
 
-  sendContactByPhoneInstructions(...params: [any, any, any?]) {
+  sendContactByPhoneInstructions(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendContactByPhoneInstructions",
       ...params,
     );
   }
 
-  sendContactInPersonInstructions(...params: [any, any, any?]) {
+  sendContactInPersonInstructions(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendContactInPersonInstructions",
       ...params,
     );
   }
 
-  sendConventionModificationRequestNotification(...params: [any, any, any?]) {
+  sendConventionModificationRequestNotification(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendConventionModificationRequestNotification",
       ...params,
     );
   }
 
-  sendEnterpriseSignatureRequestNotification(...params: [any, any, any?]) {
+  sendEnterpriseSignatureRequestNotification(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendEnterpriseSignatureRequestNotification",
       ...params,
     );
   }
 
-  sendFormEstablishmentEditionSuggestion(...params: [any, any, any?]) {
+  sendFormEstablishmentEditionSuggestion(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendFormEstablishmentEditionSuggestion",
       ...params,
     );
   }
 
-  sendImmersionAssessmentCreationLink(...params: [any, any, any?]) {
+  sendImmersionAssessmentCreationLink(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendImmersionAssessmentCreationLink",
       ...params,
     );
   }
 
-  sendNewConventionAdminNotification(...params: [any, any, any?]) {
+  sendNewConventionAdminNotification(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendImmersionAssessmentCreationLink",
       ...params,
     );
   }
 
-  sendNewConventionAgencyNotification(...params: [any, any, any?]) {
+  sendNewConventionAgencyNotification(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendNewConventionAgencyNotification",
       ...params,
     );
   }
 
-  sendNewConventionBeneficiaryConfirmation(...params: [any, any, any?]) {
+  sendNewConventionBeneficiaryConfirmation(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendNewConventionBeneficiaryConfirmation",
       ...params,
     );
   }
 
-  sendNewConventionForReviewNotification(...params: [any, any, any?]) {
+  sendNewConventionForReviewNotification(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendNewConventionForReviewNotification",
       ...params,
     );
   }
 
-  sendNewConventionMentorConfirmation(...params: [any, any, any?]) {
+  sendNewConventionMentorConfirmation(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendNewConventionMentorConfirmation",
       ...params,
     );
   }
 
-  sendNewEstablishmentContactConfirmation(...params: [any, any, any?]) {
+  sendNewEstablishmentContactConfirmation(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendNewEstablishmentContactConfirmation",
       ...params,
     );
   }
 
-  sendRejectedConventionNotification(...params: [any, any, any?]) {
+  sendRejectedConventionNotification(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendRejectedConventionNotification",
       ...params,
     );
   }
 
-  sendRenewedMagicLink(...params: [any, any, any?]) {
+  sendRenewedMagicLink(...params: ParamsToPass) {
     return this.callBothImplementations("sendRenewedMagicLink", ...params);
   }
 
-  sendRequestedEditFormEstablishmentLink(...params: [any, any, any?]) {
+  sendRequestedEditFormEstablishmentLink(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendRequestedEditFormEstablishmentLink",
       ...params,
     );
   }
 
-  sendShareDraftConventionByLink(...params: [any, any, any?]) {
+  sendShareDraftConventionByLink(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendShareDraftConventionByLink",
       ...params,
     );
   }
 
-  sendSignedByOtherPartyNotification(...params: [any, any, any?]) {
+  sendSignedByOtherPartyNotification(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendSignedByOtherPartyNotification",
       ...params,
     );
   }
 
-  sendToPoleEmploiAdvisorOnConventionAssociation(...params: [any, any, any?]) {
+  sendToPoleEmploiAdvisorOnConventionAssociation(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendToPoleEmploiAdvisorOnConventionAssociation",
       ...params,
     );
   }
 
-  sendToPoleEmploiAdvisorOnConventionFullySigned(...params: [any, any, any?]) {
+  sendToPoleEmploiAdvisorOnConventionFullySigned(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendToPoleEmploiAdvisorOnConventionFullySigned",
       ...params,
     );
   }
 
-  sendValidatedConventionFinalConfirmation(...params: [any, any, any?]) {
+  sendValidatedConventionFinalConfirmation(...params: ParamsToPass) {
     return this.callBothImplementations(
       "sendValidatedConventionFinalConfirmation",
       ...params,
@@ -167,7 +169,7 @@ export class HybridEmailGateway implements EmailGateway {
 
   private async callBothImplementations(
     method: keyof EmailGateway,
-    ...params: [any, any, any?]
+    ...params: ParamsToPass
   ) {
     await Promise.all([
       this.inMemory[method](...params),

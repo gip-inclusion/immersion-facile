@@ -16,7 +16,11 @@ export class HttpSentEmailGateway implements SentEmailGateway {
             authorization: adminToken,
           },
         })
-        .then((response) => response.data),
+        .then((response) => response.data)
+        .catch((error) => {
+          const message = error?.response?.data?.errors ?? error.message;
+          throw new Error(message);
+        }),
     );
   }
 }

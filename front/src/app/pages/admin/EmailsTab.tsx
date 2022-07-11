@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Accordion, DsfrTitle } from "react-design-system/immersionFacile";
+import {
+  Accordion,
+  DsfrTitle,
+  Notification,
+} from "react-design-system/immersionFacile";
 import { EmailSentDto } from "src/../../shared/email";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
@@ -14,18 +18,25 @@ export const EmailsTab = () => {
     dispatch(adminSlice.actions.lastSentEmailsRequested());
   }, []);
   const latestEmails = useAppSelector(adminSelectors.sentEmails);
+  const errorMessage = useAppSelector(adminSelectors.error);
 
   return (
     <div>
       <DsfrTitle level={5} text="Derniers emails envoyés" />
-      <ul className="fr-accordions-group">
-        {latestEmails.map((email, index) => (
-          <li key={index}>
-            <Email email={email} />
-            <hr />
-          </li>
-        ))}
-      </ul>
+      {errorMessage ? (
+        <Notification title={"Oups..."} type="error">
+          {errorMessage}
+        </Notification>
+      ) : (
+        <ul className="fr-accordions-group">
+          {latestEmails.map((email, index) => (
+            <li key={index}>
+              <Email email={email} />
+              <hr />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

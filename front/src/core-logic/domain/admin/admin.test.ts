@@ -99,6 +99,14 @@ describe("admin slice", () => {
       expectSentEmails(sentEmails);
       expectIsLoadingToBe(false);
     });
+
+    it("stores the error when something goes wrong", () => {
+      store.dispatch(adminSlice.actions.lastSentEmailsRequested());
+      expectIsLoadingToBe(true);
+      feedSentEmailGatewayWithError(new Error("Something went wrong"));
+      expectError("Something went wrong");
+      expectIsLoadingToBe(false);
+    });
   });
 
   const expectIsAuthenticatedToBe = (expected: boolean) => {
@@ -135,5 +143,9 @@ describe("admin slice", () => {
 
   const feedSentEmailGatewayWithEmails = (sentEmails: EmailSentDto[]) => {
     dependencies.sentEmailGateway.sentEmails$.next(sentEmails);
+  };
+
+  const feedSentEmailGatewayWithError = (error: Error) => {
+    dependencies.sentEmailGateway.sentEmails$.error(error);
   };
 });

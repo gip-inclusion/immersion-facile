@@ -52,6 +52,11 @@ export const adminSlice = createSlice({
     },
     lastSentEmailsSucceeded: (state, action: PayloadAction<EmailSentDto[]>) => {
       state.sentEmails = action.payload;
+      state.error = null;
+      state.isLoading = false;
+    },
+    lastSentEmailsFailed: (state, action: PayloadAction<string>) => {
+      state.error = action.payload;
       state.isLoading = false;
     },
   },

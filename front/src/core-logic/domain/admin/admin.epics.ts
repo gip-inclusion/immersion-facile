@@ -48,6 +48,9 @@ const getSentEmail: AdminEpic = (action$, state$, { sentEmailGateway }) =>
       sentEmailGateway.getLatest(state$.value.admin.adminToken || ""),
     ),
     map(adminSlice.actions.lastSentEmailsSucceeded),
+    catchEpicError((error) =>
+      adminSlice.actions.lastSentEmailsFailed(error.message),
+    ),
   );
 
 export const adminEpics = [
