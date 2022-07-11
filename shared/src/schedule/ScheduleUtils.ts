@@ -22,15 +22,6 @@ export type WeeklyImmersionTimetableDto = {
 type ImmersionTimeTable = WeeklyImmersionTimetableDto[];
 
 export const maxPermittedHoursPerWeek = 48;
-export const makeDateInterval = (
-  complexSchedule: ComplexScheduleDto,
-): DateIntervalDto => {
-  const dates = complexSchedule.map((schedule) => schedule.date);
-  return {
-    start: new Date(Math.min(...dates.map((date) => new Date(date).getTime()))),
-    end: new Date(Math.max(...dates.map((date) => new Date(date).getTime()))),
-  };
-};
 
 type UniversalDayMappingToFrenchCalendar = {
   universalDay: WeekdayNumber;
@@ -388,7 +379,7 @@ const applyDaysWithScheduleOnTimetable = (
   complexSchedule.forEach((dailySchedule, dayIndex) => {
     const frenchDay = frenchDayMapping(dailySchedule.date).frenchDay;
     if (frenchDay < higherWeekDay) currentWeekIndex++;
-    if (calendar.at(currentWeekIndex) === undefined) calendar.push([]);
+    if (calendar[currentWeekIndex] === undefined) calendar.push([]);
     calendar[currentWeekIndex][frenchDay] = {
       dailySchedule,
       key: dayIndex,
