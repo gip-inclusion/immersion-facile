@@ -30,8 +30,12 @@ import { prop } from "ramda";
 import { CustomClock } from "../core/ClockImplementations";
 
 const logger = createLogger(__filename);
+
 export class InMemoryEmailGateway implements EmailGateway {
-  public constructor(private readonly clock: Clock = new CustomClock()) {}
+  public constructor(
+    private readonly clock: Clock = new CustomClock(),
+    private readonly numberOfEmailToKeep: number | null = null,
+  ) {}
 
   private readonly sentEmails: EmailSentDto[] = [];
 
@@ -49,14 +53,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     },
   ) {
     logger.info({ recipient, params }, "sendImmersionAssessmentCreationLink");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "CREATE_IMMERSION_ASSESSMENT",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "CREATE_IMMERSION_ASSESSMENT",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -66,14 +67,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: { editFrontUrl: string },
   ) {
     logger.info({ recipient, params, copy }, "sendEditFormEstablishmentLink");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "EDIT_FORM_ESTABLISHMENT_LINK",
-        recipients: [recipient],
-        cc: copy,
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "EDIT_FORM_ESTABLISHMENT_LINK",
+      recipients: [recipient],
+      cc: copy,
+      params,
     });
   }
   public async sendFormEstablishmentEditionSuggestion(
@@ -85,14 +83,11 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipient, params, copy },
       "sendFormEstablishmentEditionSuggestion",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
-        recipients: [recipient],
-        cc: copy,
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+      recipients: [recipient],
+      cc: copy,
+      params,
     });
   }
 
@@ -105,14 +100,11 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipient, formEstablishmentDto, copy },
       "sendNewEstablismentContactConfirmation",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
-        recipients: [recipient],
-        cc: copy,
-        params: { establishmentDto: formEstablishmentDto },
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
+      recipients: [recipient],
+      cc: copy,
+      params: { establishmentDto: formEstablishmentDto },
     });
   }
 
@@ -124,14 +116,11 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipient, params },
       "sendNewApplicationBeneficiaryConfirmation",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -140,14 +129,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: NewConventionMentorConfirmationParams,
   ): Promise<void> {
     logger.info({ recipient, params }, "sendNewApplicationMentorConfirmation");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "NEW_CONVENTION_MENTOR_CONFIRMATION",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "NEW_CONVENTION_MENTOR_CONFIRMATION",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -156,14 +142,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: NewConventionAdminNotificationParams,
   ): Promise<void> {
     logger.info({ recipients, params }, "sendNewApplicationAdminNotification");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "NEW_CONVENTION_ADMIN_NOTIFICATION",
-        recipients,
-        params,
-        cc: [],
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "NEW_CONVENTION_ADMIN_NOTIFICATION",
+      recipients,
+      params,
+      cc: [],
     });
   }
 
@@ -172,14 +155,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: NewConventionAdminNotificationParams,
   ): Promise<void> {
     logger.info({ recipients, params }, "sendNewApplicationAgencyNotification");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-        recipients,
-        params,
-        cc: [],
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+      recipients,
+      params,
+      cc: [],
     });
   }
 
@@ -191,14 +171,11 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipients, params },
       "sendNewApplicationForReviewNotification",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-        recipients,
-        params,
-        cc: [],
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+      recipients,
+      params,
+      cc: [],
     });
   }
 
@@ -210,15 +187,12 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipients, params },
       "sendValidatedApplicationFinalConfirmation",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-        recipients,
-        params,
+    this.sendEmail({
+      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      recipients,
+      params,
 
-        cc: [],
-      },
-      sentAt: this.clock.now().toISOString(),
+      cc: [],
     });
   }
 
@@ -227,15 +201,12 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: RejectedConventionNotificationParams,
   ): Promise<void> {
     logger.info({ recipients, params }, "sendRejecteddApplicationNotification");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "REJECTED_CONVENTION_NOTIFICATION",
-        recipients,
-        params,
+    this.sendEmail({
+      type: "REJECTED_CONVENTION_NOTIFICATION",
+      recipients,
+      params,
 
-        cc: [],
-      },
-      sentAt: this.clock.now().toISOString(),
+      cc: [],
     });
   }
 
@@ -247,15 +218,12 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipients, params },
       "sendModificationRequestApplicationNotification",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-        recipients,
-        params,
+    this.sendEmail({
+      type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+      recipients,
+      params,
 
-        cc: [],
-      },
-      sentAt: this.clock.now().toISOString(),
+      cc: [],
     });
   }
 
@@ -264,15 +232,12 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: SendRenewedMagicLinkParams,
   ): Promise<void> {
     logger.info({ recipients, params }, "sendRenewedMagicLink");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "MAGIC_LINK_RENEWAL",
-        recipients,
-        params,
+    this.sendEmail({
+      type: "MAGIC_LINK_RENEWAL",
+      recipients,
+      params,
 
-        cc: [],
-      },
-      sentAt: this.clock.now().toISOString(),
+      cc: [],
     });
   }
 
@@ -281,14 +246,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: SignedByOtherPartyNotificationParams,
   ): Promise<void> {
     logger.info({ recipient, params }, "sendSignedByOtherPartyNotification");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -300,14 +262,11 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipient, params },
       "sendBeneficiarySignatureRequestNotification",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -319,14 +278,11 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipient, params },
       "sendEnterpriseSignatureRequestNotification",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -336,14 +292,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: ContactByEmailRequestParams,
   ): Promise<void> {
     logger.info({ recipient, params }, "sendContactByEmailRequest");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "CONTACT_BY_EMAIL_REQUEST",
-        recipients: [recipient],
-        cc: copy,
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "CONTACT_BY_EMAIL_REQUEST",
+      recipients: [recipient],
+      cc: copy,
+      params,
     });
   }
 
@@ -352,14 +305,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: ContactByPhoneInstructionsParams,
   ): Promise<void> {
     logger.info({ recipient, params }, "sendContactByPhoneInstructions");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "CONTACT_BY_PHONE_INSTRUCTIONS",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "CONTACT_BY_PHONE_INSTRUCTIONS",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -368,14 +318,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: ContactInPersonInstructionsParams,
   ): Promise<void> {
     logger.info({ recipient, params }, "sendContactInPersonInstructions");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "CONTACT_IN_PERSON_INSTRUCTIONS",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "CONTACT_IN_PERSON_INSTRUCTIONS",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -384,14 +331,11 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: ShareDraftConventionByLinkParams,
   ): Promise<void> {
     logger.info({ recipient, params }, "sendShareDraftApplicationByLinkParams");
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "SHARE_DRAFT_CONVENTION_BY_LINK",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "SHARE_DRAFT_CONVENTION_BY_LINK",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -403,14 +347,11 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipient, params },
       "sendToPoleEmploiAdvisorOnConventionAssociation",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
 
@@ -422,14 +363,11 @@ export class InMemoryEmailGateway implements EmailGateway {
       { recipient, params },
       "sendToPoleEmploiAdvisorOnConventionFullySigned",
     );
-    this.sentEmails.push({
-      templatedEmail: {
-        type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
-        recipients: [recipient],
-        cc: [],
-        params,
-      },
-      sentAt: this.clock.now().toISOString(),
+    this.sendEmail({
+      type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
+      recipients: [recipient],
+      cc: [],
+      params,
     });
   }
   public async sendAgencyWasActivated(
@@ -437,13 +375,32 @@ export class InMemoryEmailGateway implements EmailGateway {
     params: AgencyWasActivatedParams,
   ): Promise<void> {
     logger.info({ recipients, params }, "sendAgencyWasActivated");
+    this.sendEmail({
+      type: "AGENCY_WAS_ACTIVATED",
+      recipients,
+      cc: [],
+      params,
+    });
+  }
+
+  private sendEmail(templatedEmail: TemplatedEmail) {
+    if (!this.numberOfEmailToKeep) {
+      this.sentEmails.push({
+        templatedEmail,
+        sentAt: this.clock.now().toISOString(),
+      });
+      return;
+    }
+
+    const numberOfEmailsToDrop =
+      this.sentEmails.length + 1 - this.numberOfEmailToKeep;
+
+    if (numberOfEmailsToDrop > 0) {
+      this.sentEmails.splice(0, numberOfEmailsToDrop);
+    }
+
     this.sentEmails.push({
-      templatedEmail: {
-        type: "AGENCY_WAS_ACTIVATED",
-        recipients,
-        cc: [],
-        params,
-      },
+      templatedEmail,
       sentAt: this.clock.now().toISOString(),
     });
   }

@@ -102,19 +102,17 @@ describe("SendingBlueEmailGateway", () => {
     });
   });
 
-  it("should be able to retrieve last emails sent", async () => {
+  it("should NOT be able to retrieve last emails sent", async () => {
     await sibGateway.sendFormEstablishmentEditionSuggestion(
       "establishment-ceo@gmail.com",
       [],
       { editFrontUrl: "plop" },
     );
-    const actual = await sibGateway.getLastSentEmailDtos();
-    expect(actual).toHaveLength(1);
-    expect(actual[0].templatedEmail).toMatchObject({
-      recipients: ["establishment-ceo@gmail.com"],
-      cc: [],
-      params: { EDIT_FRONT_LINK: "plop" },
-      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
-    });
+
+    await expect(() => sibGateway.getLastSentEmailDtos()).toThrow(
+      new Error(
+        "It is not possible de get last sent mails from SendInBlue email gateway",
+      ),
+    );
   });
 });

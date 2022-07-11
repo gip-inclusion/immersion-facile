@@ -151,7 +151,7 @@ export class AppConfig {
     return throwIfNotInArray({
       processEnv: this.env,
       variableName: "EMAIL_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "SENDINBLUE"],
+      authorizedValues: ["IN_MEMORY", "HYBRID", "SENDINBLUE"],
       defaultValue: "IN_MEMORY",
     });
   }

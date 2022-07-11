@@ -1,4 +1,6 @@
 import promClient from "prom-client";
+import { EmailSentDto, EmailType } from "shared/email";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import {
   SendSmtpEmail,
   SendSmtpEmailCc,
@@ -7,43 +9,39 @@ import {
   TransactionalEmailsApiApiKeys,
 } from "sib-api-v3-typescript";
 import type {
+  AgencyWasActivatedParams,
   BeneficiarySignatureRequestNotificationParams,
   ContactByEmailRequestParams,
   ContactByPhoneInstructionsParams,
   ContactInPersonInstructionsParams,
-  EnterpriseSignatureRequestNotificationParams,
   ConventionModificationRequestNotificationParams,
+  EnterpriseSignatureRequestNotificationParams,
   NewConventionAdminNotificationParams,
   NewConventionBeneficiaryConfirmationParams,
   NewConventionMentorConfirmationParams,
   NewConventionReviewForEligibilityOrValidationParams,
+  PoleEmploiAdvisorOnConventionAssociationParams,
+  PoleEmploiAdvisorOnConventionFullysignedParams,
   RejectedConventionNotificationParams,
   SendRenewedMagicLinkParams,
   SignedByOtherPartyNotificationParams,
   ValidatedConventionFinalConfirmationParams,
-  PoleEmploiAdvisorOnConventionAssociationParams,
-  PoleEmploiAdvisorOnConventionFullysignedParams,
-  AgencyWasActivatedParams,
 } from "../../../domain/convention/ports/EmailGateway";
 import {
   EmailGateway,
   ShareDraftConventionByLinkParams,
 } from "../../../domain/convention/ports/EmailGateway";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { Clock } from "../../../domain/core/ports/Clock";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { TemplatedEmail, EmailType, EmailSentDto } from "shared/email";
-import { Clock } from "../../../domain/core/ports/Clock";
 
 const logger = createLogger(__filename);
 
-const NB_OF_EMAILS_TO_PERSIST = 15;
 export class SendinblueEmailGateway implements EmailGateway {
   private constructor(
     private readonly apiInstance: TransactionalEmailsApi,
     private readonly emailAllowListPredicate: (recipient: string) => boolean,
     private readonly clock: Clock,
-    private lastEmailSentDtos: EmailSentDto[] = [],
   ) {}
 
   public static create(
@@ -62,7 +60,9 @@ export class SendinblueEmailGateway implements EmailGateway {
   }
 
   public getLastSentEmailDtos(): EmailSentDto[] {
-    return this.lastEmailSentDtos;
+    throw new Error(
+      "It is not possible de get last sent mails from SendInBlue email gateway",
+    );
   }
 
   public async sendImmersionAssessmentCreationLink(
@@ -491,19 +491,12 @@ export class SendinblueEmailGateway implements EmailGateway {
       baseEmailConfig,
       filteredCarbonCopy,
     );
-    const template: TemplatedEmail = {
-      type: emailType,
-      params,
-      recipients,
-      cc: carbonCopy,
-    };
-    const sentAt = this.clock.now().toISOString();
+
     try {
       counterSendTransactEmailTotal.inc({ emailType });
       logger.info({ fullEmailConfig }, "Sending email");
 
       const data = await this.apiInstance.sendTransacEmail(fullEmailConfig);
-      this.persistEmail(template, sentAt);
 
       counterSendTransactEmailSuccess.inc({ emailType });
       logger.info(data, "Email sending succeeded");
@@ -523,28 +516,8 @@ export class SendinblueEmailGateway implements EmailGateway {
           2,
         ),
       });
-      this.persistEmail(
-        template,
-        sentAt,
-        `${error?.response?.statusCode} : ${error?.response?.body}`,
-      );
       throw error;
     }
-  }
-
-  private persistEmail(
-    template: TemplatedEmail,
-    sentAt: string,
-    error?: string,
-  ) {
-    this.lastEmailSentDtos = [
-      {
-        templatedEmail: template,
-        sentAt,
-        error,
-      },
-      ...this.lastEmailSentDtos.slice(NB_OF_EMAILS_TO_PERSIST),
-    ];
   }
 }
 

@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { random, sleep } from "shared/src/utils";
+import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
@@ -10,6 +11,7 @@ import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTok
 import { ExponentialBackoffRetryStrategy } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
+import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { HttpPeConnectGateway } from "../../secondary/HttpPeConnectGateway";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/HttpLaBonneBoiteAPI";
@@ -175,17 +177,7 @@ export const createRepositories = async (
           )
         : new InMemorySireneGateway(),
 
-    email:
-      config.emailGateway === "SENDINBLUE"
-        ? SendinblueEmailGateway.create(
-            config.sendinblueApiKey,
-            makeEmailAllowListPredicate({
-              skipEmailAllowlist: config.skipEmailAllowlist,
-              emailAllowList: config.emailAllowList,
-            }),
-            clock,
-          )
-        : new InMemoryEmailGateway(clock),
+    email: createEmailGateway(config, clock),
 
     rome: await createRomeRepository(config, getPgPoolFn),
 
@@ -278,4 +270,29 @@ const createRomeRepository = async (
     default:
       return new InMemoryRomeRepository();
   }
+};
+
+const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
+  if (config.emailGateway === "IN_MEMORY")
+    return new InMemoryEmailGateway(clock);
+
+  const sendInBlueEmailGateway = SendinblueEmailGateway.create(
+    config.sendinblueApiKey,
+    makeEmailAllowListPredicate({
+      skipEmailAllowlist: config.skipEmailAllowlist,
+      emailAllowList: config.emailAllowList,
+    }),
+    clock,
+  );
+
+  if (config.emailGateway === "SENDINBLUE") return sendInBlueEmailGateway;
+
+  if (config.emailGateway === "HYBRID")
+    return new HybridEmailGateway(
+      sendInBlueEmailGateway,
+      new InMemoryEmailGateway(clock, 15),
+    );
+
+  const _notReached: never = config.emailGateway;
+  throw new Error("Unknown email gateway kind");
 };
