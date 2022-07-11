@@ -12,7 +12,7 @@ export const EmailsTab = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(adminSlice.actions.lastSentEmailsRequested());
-  });
+  }, []);
   const latestEmails = useAppSelector(adminSelectors.sentEmails);
 
   return (
@@ -50,15 +50,19 @@ const Email = ({ email }: { email: EmailSentDto }) => {
         title="Paramètres"
         contents={
           <ul className="text-xs">
-            {Object.entries(email.template.params).map((param) => (
+            {Object.entries(email.template.params).map(([key, value]) => (
               <li>
                 {" "}
-                <span className="font-normal">{param[0]} :</span>{" "}
+                <span className="font-normal">{key} :</span>{" "}
                 <span
                   style={{ width: "500px" }}
                   className="font-thin inline-block break-words"
                 >
-                  {JSON.stringify(param[1], undefined, 2)}
+                  {key === "magicLink" ? (
+                    <a href={value as string}>Magic link</a>
+                  ) : (
+                    JSON.stringify(value, undefined, 2)
+                  )}
                 </span>
               </li>
             ))}
