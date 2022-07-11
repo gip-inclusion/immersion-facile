@@ -44,5 +44,6 @@ export const adminSlice = createSlice({
     loggedOut: (state) => {
       state.adminToken = null;
     },
+    lastSentEmailsRequested: (state) => state,
   },
 });

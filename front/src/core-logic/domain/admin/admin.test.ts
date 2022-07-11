@@ -31,6 +31,7 @@ describe("admin slice", () => {
       expectIsLoadingToBe(false);
       expectIsAuthenticatedToBe(true);
       expectAdminTokenInDevice("my-admin-token");
+      expectTokenToBe("my-admin-token");
     });
 
     it("admin fails to log in and gets explicit message", () => {
@@ -38,6 +39,7 @@ describe("admin slice", () => {
       feedAdminGatewayWithError(new Error("Forbidden !"));
       expectIsLoadingToBe(false);
       expectError("Forbidden !");
+      expectTokenToBe(null);
     });
   });
 
@@ -46,12 +48,14 @@ describe("admin slice", () => {
       dependencies.deviceRepository.set("adminToken", "already-there-token");
       store.dispatch(adminSlice.actions.checkIfLoggedInRequested());
       expectIsAuthenticatedToBe(true);
+      expectTokenToBe("already-there-token");
     });
 
     it("appears as NOT logged in if a NO token in device", () => {
       dependencies.deviceRepository.delete("adminToken");
       store.dispatch(adminSlice.actions.checkIfLoggedInRequested());
       expectIsAuthenticatedToBe(false);
+      expectTokenToBe(null);
     });
   });
 
@@ -69,12 +73,17 @@ describe("admin slice", () => {
       dependencies.deviceRepository.set("adminToken", adminToken);
       store.dispatch(adminSlice.actions.logoutRequested());
       expectIsAuthenticatedToBe(false);
+      expectTokenToBe(null);
       expectAdminTokenInDevice(undefined);
     });
   });
 
   const expectIsAuthenticatedToBe = (expected: boolean) => {
     expect(adminSelectors.isAuthenticated(store.getState())).toBe(expected);
+  };
+
+  const expectTokenToBe = (expected: AdminToken | null) => {
+    expect(adminSelectors.token(store.getState())).toBe(expected);
   };
 
   const expectIsLoadingToBe = (expected: boolean) => {

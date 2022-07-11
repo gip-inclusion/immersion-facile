@@ -41,9 +41,9 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ENV } from "src/environmentVariables";
 import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
-import { EmailGateway } from "src/core-logic/ports/EmailGateway";
-import { InMemoryEmailGateway } from "src/core-logic/adapters/EmailGateway/InMemoryEmailGateway";
-import { HttpEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpEmailGateway";
+import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
+import { InMemorySentEmailGateway } from "src/core-logic/adapters/EmailGateway/InMemorySentEmailGateway";
+import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";
 
 export const deviceRepository = createLocalStorageDeviceRepository();
 
@@ -121,10 +121,10 @@ export const romeAutocompleteGateway: RomeAutocompleteGateway =
     ? new InMemoryRomeAutocompleteGateway(seedRomeDtos, 500)
     : new HttpRomeAutocompleteGateway();
 
-export const emailGateway: EmailGateway =
+export const emailGateway: SentEmailGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryEmailGateway()
-    : new HttpEmailGateway();
+    ? new InMemorySentEmailGateway()
+    : new HttpSentEmailGateway();
 
 const navigationGateway = new ReactNavigationGateway();
 
@@ -146,7 +146,7 @@ export type Dependencies = {
   romeAutocompleteGateway: RomeAutocompleteGateway;
   navigationGateway: NavigationGateway;
   deviceRepository: DeviceRepository;
-  emailGateway: EmailGateway;
+  emailGateway: SentEmailGateway;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
 };

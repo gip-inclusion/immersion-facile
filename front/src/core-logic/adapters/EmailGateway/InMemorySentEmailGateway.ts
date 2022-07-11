@@ -1,8 +1,8 @@
-import { EmailGateway } from "src/core-logic/ports/EmailGateway";
+import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
 import { EmailSentDto } from "src/../../shared/email";
 import { AdminToken } from "src/../../shared/src/admin/admin.dto";
 
-export class InMemoryEmailGateway implements EmailGateway {
+export class InMemorySentEmailGateway implements SentEmailGateway {
   public async getLatest(_adminToken: AdminToken): Promise<EmailSentDto[]> {
     return [
       {
