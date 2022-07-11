@@ -87,7 +87,7 @@ describe("admin slice", () => {
       const sentEmails: EmailSentDto[] = [
         {
           sentAt: "2022-07-10",
-          template: {
+          templatedEmail: {
             type: "CONTACT_BY_EMAIL_REQUEST",
             recipients: ["bob@mail.com"],
             cc: [],

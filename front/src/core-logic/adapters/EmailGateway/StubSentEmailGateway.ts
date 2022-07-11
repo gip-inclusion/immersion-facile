@@ -6,7 +6,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
   public getLatest(_adminToken: AdminToken): Observable<EmailSentDto[]> {
     return of([
       {
-        template: {
+        templatedEmail: {
           type: "REJECTED_CONVENTION_NOTIFICATION",
           recipients: ["tom.cruise@email.com"],
           cc: ["emilie.cooper@immersion.fr"],
@@ -24,7 +24,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
         sentAt: "2022-01-07T19:00:00.000",
       },
       {
-        template: {
+        templatedEmail: {
           type: "CREATE_IMMERSION_ASSESSMENT",
           recipients: ["virgina.wolf@email.com", "helene.joyeux@email.com"],
           cc: ["erika.grandjean@immersion.fr"],

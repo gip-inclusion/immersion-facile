@@ -50,7 +50,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ) {
     logger.info({ recipient, params }, "sendImmersionAssessmentCreationLink");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "CREATE_IMMERSION_ASSESSMENT",
         recipients: [recipient],
         cc: [],
@@ -67,7 +67,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ) {
     logger.info({ recipient, params, copy }, "sendEditFormEstablishmentLink");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "EDIT_FORM_ESTABLISHMENT_LINK",
         recipients: [recipient],
         cc: copy,
@@ -86,7 +86,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendFormEstablishmentEditionSuggestion",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
         recipients: [recipient],
         cc: copy,
@@ -106,7 +106,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendNewEstablismentContactConfirmation",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
         recipients: [recipient],
         cc: copy,
@@ -125,7 +125,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendNewApplicationBeneficiaryConfirmation",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
         recipients: [recipient],
         cc: [],
@@ -141,7 +141,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipient, params }, "sendNewApplicationMentorConfirmation");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "NEW_CONVENTION_MENTOR_CONFIRMATION",
         recipients: [recipient],
         cc: [],
@@ -157,7 +157,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipients, params }, "sendNewApplicationAdminNotification");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "NEW_CONVENTION_ADMIN_NOTIFICATION",
         recipients,
         params,
@@ -173,7 +173,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipients, params }, "sendNewApplicationAgencyNotification");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients,
         params,
@@ -192,7 +192,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendNewApplicationForReviewNotification",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
         recipients,
         params,
@@ -211,7 +211,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendValidatedApplicationFinalConfirmation",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
         recipients,
         params,
@@ -228,7 +228,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipients, params }, "sendRejecteddApplicationNotification");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "REJECTED_CONVENTION_NOTIFICATION",
         recipients,
         params,
@@ -248,7 +248,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendModificationRequestApplicationNotification",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
         recipients,
         params,
@@ -265,7 +265,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipients, params }, "sendRenewedMagicLink");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "MAGIC_LINK_RENEWAL",
         recipients,
         params,
@@ -282,7 +282,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipient, params }, "sendSignedByOtherPartyNotification");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
         recipients: [recipient],
         cc: [],
@@ -301,7 +301,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendBeneficiarySignatureRequestNotification",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [recipient],
         cc: [],
@@ -320,7 +320,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendEnterpriseSignatureRequestNotification",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [recipient],
         cc: [],
@@ -337,7 +337,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipient, params }, "sendContactByEmailRequest");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "CONTACT_BY_EMAIL_REQUEST",
         recipients: [recipient],
         cc: copy,
@@ -353,7 +353,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipient, params }, "sendContactByPhoneInstructions");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "CONTACT_BY_PHONE_INSTRUCTIONS",
         recipients: [recipient],
         cc: [],
@@ -369,7 +369,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipient, params }, "sendContactInPersonInstructions");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "CONTACT_IN_PERSON_INSTRUCTIONS",
         recipients: [recipient],
         cc: [],
@@ -385,7 +385,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipient, params }, "sendShareDraftApplicationByLinkParams");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "SHARE_DRAFT_CONVENTION_BY_LINK",
         recipients: [recipient],
         cc: [],
@@ -404,7 +404,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendToPoleEmploiAdvisorOnConventionAssociation",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION",
         recipients: [recipient],
         cc: [],
@@ -423,7 +423,7 @@ export class InMemoryEmailGateway implements EmailGateway {
       "sendToPoleEmploiAdvisorOnConventionFullySigned",
     );
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
         recipients: [recipient],
         cc: [],
@@ -438,7 +438,7 @@ export class InMemoryEmailGateway implements EmailGateway {
   ): Promise<void> {
     logger.info({ recipients, params }, "sendAgencyWasActivated");
     this.sentEmails.push({
-      template: {
+      templatedEmail: {
         type: "AGENCY_WAS_ACTIVATED",
         recipients,
         cc: [],
@@ -450,6 +450,6 @@ export class InMemoryEmailGateway implements EmailGateway {
 
   // For testing.
   getSentEmails(): TemplatedEmail[] {
-    return this.sentEmails.map(prop("template"));
+    return this.sentEmails.map(prop("templatedEmail"));
   }
 }

@@ -31,7 +31,7 @@ export type TemplatedEmail = {
 };
 
 export type EmailSentDto = {
-  template: TemplatedEmail,
-  sentAt: string,
-  error?: string
-}
+  templatedEmail: TemplatedEmail;
+  sentAt: string;
+  error?: string;
+};

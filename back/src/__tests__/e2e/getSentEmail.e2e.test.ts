@@ -45,7 +45,7 @@ describe(`/${emailRoute} route`, () => {
 
       // Getting the application succeeds and shows that it's validated.
       const expectedDto: EmailSentDto = {
-        template: {
+        templatedEmail: {
           type: "AGENCY_WAS_ACTIVATED",
           recipients: ["toto@email.com"],
           cc: [],

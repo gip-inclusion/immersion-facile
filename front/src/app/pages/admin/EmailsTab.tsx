@@ -35,22 +35,22 @@ const Email = ({ email }: { email: EmailSentDto }) => {
   return (
     <Accordion
       title={`${email.error ? "❌" : "✅"} ${
-        email.template.type
+        email.templatedEmail.type
       } envoyé le ${sentAtDate.toLocaleDateString(
         "fr",
       )} à ${sentAtDate.toLocaleTimeString("fr")}`}
     >
-      <TextCell title="Type" contents={email.template.type} />
+      <TextCell title="Type" contents={email.templatedEmail.type} />
       <TextCell
         title="Destinataires"
-        contents={email.template.recipients.join(", ")}
+        contents={email.templatedEmail.recipients.join(", ")}
       />
-      <TextCell title="CC" contents={email.template.cc.join(", ")} />
+      <TextCell title="CC" contents={email.templatedEmail.cc.join(", ")} />
       <TextCell
         title="Paramètres"
         contents={
           <ul className="text-xs">
-            {Object.entries(email.template.params).map(([key, value]) => (
+            {Object.entries(email.templatedEmail.params).map(([key, value]) => (
               <li>
                 {" "}
                 <span className="font-normal">{key} :</span>{" "}

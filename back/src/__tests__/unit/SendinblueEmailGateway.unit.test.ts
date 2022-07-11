@@ -110,7 +110,7 @@ describe("SendingBlueEmailGateway", () => {
     );
     const actual = await sibGateway.getLastSentEmailDtos();
     expect(actual).toHaveLength(1);
-    expect(actual[0].template).toMatchObject({
+    expect(actual[0].templatedEmail).toMatchObject({
       recipients: ["establishment-ceo@gmail.com"],
       cc: [],
       params: { EDIT_FRONT_LINK: "plop" },

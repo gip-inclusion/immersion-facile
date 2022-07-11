@@ -539,7 +539,7 @@ export class SendinblueEmailGateway implements EmailGateway {
   ) {
     this.lastEmailSentDtos = [
       {
-        template,
+        templatedEmail: template,
         sentAt,
         error,
       },
