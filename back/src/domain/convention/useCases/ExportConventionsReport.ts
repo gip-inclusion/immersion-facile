@@ -47,12 +47,15 @@ export const toImmersionApplicationReadyForExport = (
     dateEnd: conventionRaw.dateEnd,
     schedule: conventionRaw.schedule,
   }),
-  formatedDateEnd: format(new Date(conventionRaw.dateEnd), "yyyy-MM-dd"),
-  formatedDateStart: format(new Date(conventionRaw.dateStart), "yyyy-MM-dd"),
+  formatedDateEnd: format(new Date(conventionRaw.dateEnd), "dd/MM/yyyy"),
+  formatedDateStart: format(new Date(conventionRaw.dateStart), "dd/MM/yyyy"),
   formatedDateSubmission: format(
     new Date(conventionRaw.dateSubmission),
-    "yyyy-MM-dd",
+    "dd/MM/yyyy",
   ),
+  formatedDateValidation: conventionRaw.dateValidation
+    ? format(new Date(conventionRaw.dateValidation), "dd/MM/yyyy")
+    : "",
   planning: prettyPrintComplexScheduleSummary(
     conventionRaw.schedule.complexSchedule,
   ),
@@ -75,6 +78,7 @@ export type ConventionReadyForExport = OmitFromExistingKeys<
   formatedDateSubmission: string;
   formatedDateStart: string;
   formatedDateEnd: string;
+  formatedDateValidation: string;
   formatedFederatedIdentity: string;
   status: string;
   beneficiaryAccepted: string;
@@ -94,6 +98,7 @@ type KeysForExport =
   | "dateSubmission"
   | "dateStart"
   | "dateEnd"
+  | "dateValidation"
   | "businessName"
   | "emergencyContact"
   | "emergencyContactPhone"

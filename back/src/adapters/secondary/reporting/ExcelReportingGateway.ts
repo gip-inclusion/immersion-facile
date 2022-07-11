@@ -74,7 +74,11 @@ export class ExcelReportingGateway implements ReportingGateway {
         width: 15,
       },
       { header: "Date de fin", key: "formatedDateEnd", width: 15 },
-      { header: "Date de validation", key: "formatedDateEnd", width: 15 },
+      {
+        header: "Date de validation",
+        key: "formatedDateValidation",
+        width: 15,
+      },
       {
         header: "Nombre d'heures total de l'immersion",
         key: "totalHours",

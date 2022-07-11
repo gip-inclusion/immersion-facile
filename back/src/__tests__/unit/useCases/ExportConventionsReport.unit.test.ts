@@ -63,6 +63,7 @@ describe("ExportConventionsReport", () => {
         .withAgencyId("nantes")
         .withFederatedIdentity("peConnect:uuid-personne-pe-connectee")
         .withSchedule(reasonableSchedule)
+        .withDateValidation("2022-05-05T12:00:00.000Z")
         .build(),
     };
 
@@ -77,14 +78,16 @@ describe("ExportConventionsReport", () => {
       dateEnd: "2021-01-15T00:00:00.000Z",
       dateStart: "2021-01-06T00:00:00.000Z",
       dateSubmission: "2021-01-04T00:00:00.000Z",
+      dateValidation: "2022-05-05T12:00:00.000Z",
       email: "beneficiary@email.fr",
       emergencyContact: "Clariss Ocon",
       emergencyContactPhone: "0663567896",
       enterpriseAccepted: "OUI",
       firstName: "Esteban",
-      formatedDateEnd: "2021-01-15",
-      formatedDateStart: "2021-01-06",
-      formatedDateSubmission: "2021-01-04",
+      formatedDateEnd: "15/01/2021",
+      formatedDateStart: "06/01/2021",
+      formatedDateSubmission: "04/01/2021",
+      formatedDateValidation: "05/05/2022",
       immersionObjective: "Confirmer un projet professionnel",
       immersionProfession: "Pilote de machines d'abattage",
       lastName: "Ocon",
