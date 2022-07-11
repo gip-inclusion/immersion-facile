@@ -41,9 +41,19 @@ const logout: AdminEpic = (action$, _, { deviceRepository }) =>
     map(adminSlice.actions.loggedOut),
   );
 
+const getSentEmail: AdminEpic = (action$, state$, { sentEmailGateway }) =>
+  action$.pipe(
+    filter(adminSlice.actions.lastSentEmailsRequested.match),
+    switchMap(() =>
+      sentEmailGateway.getLatest(state$.value.admin.adminToken || ""),
+    ),
+    map(adminSlice.actions.lastSentEmailsSucceeded),
+  );
+
 export const adminEpics = [
   callLoginEpic,
   storeTokenInDevice,
   checkIfAdminLoggedIn,
   logout,
+  getSentEmail,
 ];

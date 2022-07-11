@@ -2,7 +2,7 @@ import { VirtualTimeScheduler } from "rxjs";
 import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
-import { InMemorySentEmailGateway } from "src/core-logic/adapters/EmailGateway/InMemorySentEmailGateway";
+import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
@@ -28,7 +28,7 @@ export interface TestDependencies {
   romeAutocompleteGateway: InMemoryRomeAutocompleteGateway;
   deviceRepository: DeviceRepository;
   navigationGateway: InMemoryNavigationGateway;
-  emailGateway: InMemorySentEmailGateway;
+  sentEmailGateway: TestSentEmailGateway;
   scheduler: VirtualTimeScheduler;
   minSearchResultsToPreventRefetch: number;
 }
@@ -50,7 +50,7 @@ export const createTestStore = (
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),
     deviceRepository: createTestDeviceRepository(),
     navigationGateway: new InMemoryNavigationGateway(),
-    emailGateway: new InMemorySentEmailGateway(),
+    sentEmailGateway: new TestSentEmailGateway(),
     scheduler: new VirtualTimeScheduler(),
     minSearchResultsToPreventRefetch: 2,
   };

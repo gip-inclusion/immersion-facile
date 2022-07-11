@@ -1,10 +1,10 @@
-import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
+import { Observable, of } from "rxjs";
 import { EmailSentDto } from "src/../../shared/email";
 import { AdminToken } from "src/../../shared/src/admin/admin.dto";
 
-export class InMemorySentEmailGateway implements SentEmailGateway {
-  public async getLatest(_adminToken: AdminToken): Promise<EmailSentDto[]> {
-    return [
+export class StubSentEmailGateway implements StubSentEmailGateway {
+  public getLatest(_adminToken: AdminToken): Observable<EmailSentDto[]> {
+    return of([
       {
         template: {
           type: "REJECTED_CONVENTION_NOTIFICATION",
@@ -38,6 +38,6 @@ export class InMemorySentEmailGateway implements SentEmailGateway {
         sentAt: "2022-01-07T20:00:00.000",
         error: "Wrong template. Could not send",
       },
-    ];
+    ]);
   }
 }

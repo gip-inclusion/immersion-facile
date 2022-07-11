@@ -38,7 +38,6 @@ import { Clock } from "../../domain/core/ports/Clock";
 const logger = createLogger(__filename);
 
 const NB_OF_EMAILS_TO_PERSIST = 15;
-
 export class SendinblueEmailGateway implements EmailGateway {
   private constructor(
     private readonly apiInstance: TransactionalEmailsApi,

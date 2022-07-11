@@ -14,6 +14,7 @@ export const adminSelectors = {
     adminState,
     ({ error }) => (error && knownErrors[error]) ?? error,
   ),
+  sentEmails: createSelector(adminState, ({ sentEmails }) => sentEmails),
 };
 
 const knownErrors: Record<string, string> = {

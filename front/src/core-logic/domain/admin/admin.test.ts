@@ -1,4 +1,6 @@
+import { EmailSentDto } from "shared/email";
 import { AdminToken } from "shared/src/admin/admin.dto";
+import { expectToEqual } from "shared/src/expectToEqual";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
 import {
@@ -65,7 +67,7 @@ describe("admin slice", () => {
 
       ({ store, dependencies } = createTestStore(
         {
-          admin: { isLoading: false, adminToken, error: null },
+          admin: { isLoading: false, adminToken, error: null, sentEmails: [] },
         },
         "skip",
       ));
@@ -75,6 +77,27 @@ describe("admin slice", () => {
       expectIsAuthenticatedToBe(false);
       expectTokenToBe(null);
       expectAdminTokenInDevice(undefined);
+    });
+  });
+
+  describe("get latest sent emails", () => {
+    it("gets the last emails sent from the backend", () => {
+      store.dispatch(adminSlice.actions.lastSentEmailsRequested());
+      expectIsLoadingToBe(true);
+      const sentEmails: EmailSentDto[] = [
+        {
+          sentAt: "2022-07-10",
+          template: {
+            type: "CONTACT_BY_EMAIL_REQUEST",
+            recipients: ["bob@mail.com"],
+            cc: [],
+            params: { message: "salut" },
+          },
+        },
+      ];
+      feedSentEmailGatewayWithEmails(sentEmails);
+      expectSentEmails(sentEmails);
+      expectIsLoadingToBe(false);
     });
   });
 
@@ -94,6 +117,10 @@ describe("admin slice", () => {
     expect(adminSelectors.error(store.getState())).toBe(expected);
   };
 
+  const expectSentEmails = (expected: EmailSentDto[]) => {
+    expectToEqual(adminSelectors.sentEmails(store.getState()), expected);
+  };
+
   const expectAdminTokenInDevice = (expectedToken: AdminToken | undefined) => {
     expect(dependencies.deviceRepository.get("adminToken")).toBe(expectedToken);
   };
@@ -104,5 +131,9 @@ describe("admin slice", () => {
 
   const feedAdminGatewayWithError = (error: Error) => {
     dependencies.adminGateway.token$.error(error);
+  };
+
+  const feedSentEmailGatewayWithEmails = (sentEmails: EmailSentDto[]) => {
+    dependencies.sentEmailGateway.sentEmails$.next(sentEmails);
   };
 });

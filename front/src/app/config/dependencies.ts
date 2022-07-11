@@ -1,19 +1,23 @@
 import { asyncScheduler, SchedulerLike } from "rxjs";
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/SimulatedAdminGateway";
+import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
+import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
 import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
 import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
 import { createLocalStorageDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createLocalStorageDeviceRepository";
+import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";
+import { StubSentEmailGateway } from "src/core-logic/adapters/EmailGateway/StubSentEmailGateway";
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
-import { HttpEstablishmentGateway } from "src/core-logic/adapters/HttpEstablishmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/HttpConventionGateway";
+import { HttpEstablishmentGateway } from "src/core-logic/adapters/HttpEstablishmentGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/HttpSiretGatewayThroughBack";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/HttpTechnicalGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
-import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
+import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
 import {
   InMemoryImmersionSearchGateway,
   seedSearchResults,
@@ -22,28 +26,24 @@ import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,
 } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
-import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 import { ReactNavigationGateway } from "src/core-logic/adapters/ReactNavigationGateway";
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SimulatedSiretGatewayThroughBack";
+import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
+import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
+import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
-import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
+import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
-import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ENV } from "src/environmentVariables";
-import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
-import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
-import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
-import { InMemorySentEmailGateway } from "src/core-logic/adapters/EmailGateway/InMemorySentEmailGateway";
-import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";
 
 export const deviceRepository = createLocalStorageDeviceRepository();
 
@@ -121,9 +121,9 @@ export const romeAutocompleteGateway: RomeAutocompleteGateway =
     ? new InMemoryRomeAutocompleteGateway(seedRomeDtos, 500)
     : new HttpRomeAutocompleteGateway();
 
-export const emailGateway: SentEmailGateway =
+export const sentEmailGateway: SentEmailGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemorySentEmailGateway()
+    ? new StubSentEmailGateway()
     : new HttpSentEmailGateway();
 
 const navigationGateway = new ReactNavigationGateway();
@@ -146,7 +146,7 @@ export type Dependencies = {
   romeAutocompleteGateway: RomeAutocompleteGateway;
   navigationGateway: NavigationGateway;
   deviceRepository: DeviceRepository;
-  emailGateway: SentEmailGateway;
+  sentEmailGateway: SentEmailGateway;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
 };
@@ -167,6 +167,6 @@ export const store = createStore({
     deviceRepository,
     minSearchResultsToPreventRefetch: 10,
     scheduler: asyncScheduler,
-    emailGateway,
+    sentEmailGateway,
   },
 });

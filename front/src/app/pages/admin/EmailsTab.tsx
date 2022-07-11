@@ -1,23 +1,19 @@
-import React, { useEffect, useState } from "react";
-import {
-  Accordion,
-  DsfrTitle,
-} from "src/../../libs/react-design-system/immersionFacile";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { Accordion, DsfrTitle } from "react-design-system/immersionFacile";
 import { EmailSentDto } from "src/../../shared/email";
-import { emailGateway } from "src/app/config/dependencies";
-import { useAdminToken } from "src/hooks/useAdminToken";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
+import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
 import { TextCell } from "src/uiComponents/admin/TextCell";
 import "./Admin.css";
 
 export const EmailsTab = () => {
-  const adminToken = useAdminToken();
-  const [latestEmails, setLatestEmails] = useState<EmailSentDto[]>([]);
+  const dispatch = useDispatch();
   useEffect(() => {
-    emailGateway.getLatest(adminToken).then(setLatestEmails, (error: any) => {
-      // eslint-disable-next-line no-console
-      console.log("emailGateway.getLatest", error);
-    });
-  }, []);
+    dispatch(adminSlice.actions.lastSentEmailsRequested());
+  });
+  const latestEmails = useAppSelector(adminSelectors.sentEmails);
 
   return (
     <div>
