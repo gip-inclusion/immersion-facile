@@ -37,25 +37,20 @@ type GenericEvent<T extends string, P> = {
   wasQuarantined: boolean;
 };
 
+// prettier-ignore
 export type DomainEvent =
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
-  // prettier-ignore
   | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ConventionDto>
   | GenericEvent<"ConventionSubmittedAfterModification", ConventionDto>
-  // prettier-ignore
   | GenericEvent<"ImmersionApplicationPartiallySigned", ConventionDto>
-  // prettier-ignore
   | GenericEvent<"ImmersionApplicationFullySigned", ConventionDto>
-  // prettier-ignore
   | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ConventionDto>
-  // prettier-ignore
   | GenericEvent<"ImmersionApplicationAcceptedByValidator", ConventionDto>
 
   // UNHAPPY PATHS
   | GenericEvent<"ImmersionApplicationRejected", ConventionDto>
   | GenericEvent<"ImmersionApplicationCancelled", ConventionDto>
-  // prettier-ignore
   | GenericEvent<"ImmersionApplicationRequiresModification", ConventionRequiresModificationPayload>
 
   // MAGIC LINK RENEWAL
@@ -64,11 +59,8 @@ export type DomainEvent =
   // FORM ESTABLISHMENT RELATED
   | GenericEvent<"FormEstablishmentAdded", FormEstablishmentDto>
   | GenericEvent<"FormEstablishmentEdited", FormEstablishmentDto>
-  // prettier-ignore
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentRequestDto>
-  // prettier-ignore
   | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload>
-  // prettier-ignore
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", EstablishmentAggregate>
 
   // AGENCY RELATED
@@ -77,11 +69,9 @@ export type DomainEvent =
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"ImmersionAssessmentCreated", ImmersionAssessmentDto>
-  // prettier-ignore
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionId>
 
   // PECONNECT related
-  // prettier-ignore
   | GenericEvent<"PeConnectFederatedIdentityAssociated", ConventionAndPeExternalIds>;
 
 export type DomainTopic = DomainEvent["topic"];

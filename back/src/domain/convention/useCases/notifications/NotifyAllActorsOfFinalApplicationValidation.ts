@@ -53,10 +53,18 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
       ...getPeAdvisorEmailIfExist(peUserAdvisorOrUndefined),
     ];
 
-    await this.emailGateway.sendValidatedConventionFinalConfirmation(
+    await this.emailGateway.sendEmail({
+      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients,
-      getValidatedApplicationFinalConfirmationParams(agency, convention),
-    );
+      params: getValidatedApplicationFinalConfirmationParams(
+        agency,
+        convention,
+      ),
+    });
+    // await this.emailGateway.sendValidatedConventionFinalConfirmation(
+    //   recipients,
+    //   getValidatedApplicationFinalConfirmationParams(agency, convention),
+    // );
   }
 }
 
