@@ -3,10 +3,10 @@ import { RenewMagicLinkRequestDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { expectEmailOfType } from "../../_testBuilders/test.helpers";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
-import { AlwaysAllowEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
 import { InMemoryOutboxQueries } from "../../adapters/secondary/core/InMemoryOutboxQueries";
@@ -28,7 +28,6 @@ import {
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
 import { makeGenerateJwtES256 } from "../../domain/auth/jwt";
-import { EmailFilter } from "../../domain/core/ports/EmailFilter";
 
 const adminEmail = "admin@email.fr";
 
@@ -50,7 +49,6 @@ describe("Magic link renewal flow", () => {
   let emailGw: InMemoryEmailGateway;
   let eventBus: EventBus;
   let eventCrawler: BasicEventCrawler;
-  let emailFilter: EmailFilter;
   let sentEmails: TemplatedEmail[];
   let renewMagicLink: RenewConventionMagicLink;
   let deliverRenewedMagicLink: DeliverRenewedMagicLink;
@@ -73,8 +71,6 @@ describe("Magic link renewal flow", () => {
     eventBus = new InMemoryEventBus(clock, (e) => outboxRepository.save(e));
     eventCrawler = new BasicEventCrawler(eventBus, outboxQueries);
 
-    emailFilter = new AlwaysAllowEmailFilter();
-
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
     generateJwtFn = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
@@ -87,7 +83,7 @@ describe("Magic link renewal flow", () => {
       clock,
     );
 
-    deliverRenewedMagicLink = new DeliverRenewedMagicLink(emailFilter, emailGw);
+    deliverRenewedMagicLink = new DeliverRenewedMagicLink(emailGw);
 
     const entity = new ConventionDtoBuilder().build();
     conventionRepository.setConventions({ [entity.id]: entity });
@@ -116,10 +112,11 @@ describe("Magic link renewal flow", () => {
 
     expect(sentEmails).toHaveLength(1);
 
-    expect(sentEmails[0].type).toBe("MAGIC_LINK_RENEWAL");
-    expect(sentEmails[0].recipients).toEqual([validConvention.email]);
+    const email = expectEmailOfType(sentEmails[0], "MAGIC_LINK_RENEWAL");
 
-    const ml = sentEmails[0].params.magicLink as string;
+    expect(email.recipients).toEqual([validConvention.email]);
+
+    const ml = email.params.magicLink as string;
     expect(ml.startsWith("immersionfacile.fr/")).toBeTruthy();
     const jwt = ml.replace("immersionfacile.fr/", "");
 

@@ -56,13 +56,12 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
-    await this.emailGateway.sendRequestedEditFormEstablishmentLink(
-      contact.email,
-      contact.copyEmails,
-      {
-        editFrontUrl,
-      },
-    );
+    await this.emailGateway.sendEmail({
+      type: "EDIT_FORM_ESTABLISHMENT_LINK",
+      recipients: [contact.email],
+      cc: contact.copyEmails,
+      params: { editFrontUrl },
+    });
 
     const event = this.createNewEvent({
       topic: "FormEstablishmentEditLinkSent",

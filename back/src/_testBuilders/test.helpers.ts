@@ -1,5 +1,6 @@
 import { addDays as dateFnsAddDays, format } from "date-fns";
 import { partition } from "ramda";
+import { EmailType, TemplatedEmail } from "shared/email";
 import { ConventionId } from "shared/src/convention/convention.dto";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateConventionMagicLink } from "../adapters/primary/config/createGenerateConventionMagicLink";
@@ -103,3 +104,14 @@ export const splitCasesBetweenPassingAndFailing = <T>(
   cases: readonly T[],
   passing: readonly T[],
 ): [T[], T[]] => partition((status: T) => passing.includes(status), cases);
+
+export const expectEmailOfType = <
+  T extends EmailType,
+  E extends TemplatedEmail = TemplatedEmail,
+>(
+  email: E,
+  expectedEmailType: T,
+): Extract<E, { type: T }> => {
+  expect(email.type).toBe(expectedEmailType);
+  return email as Extract<E, { type: T }>;
+};

@@ -56,7 +56,7 @@ const Email = ({ email }: { email: EmailSentDto }) => {
         title="Destinataires"
         contents={email.templatedEmail.recipients.join(", ")}
       />
-      <TextCell title="CC" contents={email.templatedEmail.cc.join(", ")} />
+      <TextCell title="CC" contents={email.templatedEmail.cc?.join(", ")} />
       <TextCell
         title="Paramètres"
         contents={

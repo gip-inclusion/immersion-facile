@@ -5,10 +5,7 @@ import {
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import {
-  EmailGateway,
-  ValidatedConventionFinalConfirmationParams,
-} from "../../ports/EmailGateway";
+import { EmailGateway } from "../../ports/EmailGateway";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 
@@ -61,10 +58,6 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
         convention,
       ),
     });
-    // await this.emailGateway.sendValidatedConventionFinalConfirmation(
-    //   recipients,
-    //   getValidatedApplicationFinalConfirmationParams(agency, convention),
-    // );
   }
 }
 
@@ -72,7 +65,7 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
 export const getValidatedApplicationFinalConfirmationParams = (
   agency: AgencyDto,
   dto: ConventionDto,
-): ValidatedConventionFinalConfirmationParams => ({
+) => ({
   totalHours: calculateTotalImmersionHoursBetweenDate({
     dateStart: dto.dateStart,
     dateEnd: dto.dateEnd,
@@ -85,7 +78,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
   dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
   dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
   mentorName: dto.mentor,
-  scheduleText: prettyPrintSchedule(dto.schedule),
+  scheduleText: prettyPrintSchedule(dto.schedule).split("\n"),
   businessName: dto.businessName,
   immersionAddress: dto.immersionAddress || "",
   immersionAppellationLabel: dto.immersionAppellation.appellationLabel,

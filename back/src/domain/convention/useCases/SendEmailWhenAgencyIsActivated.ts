@@ -14,9 +14,12 @@ export class SendEmailWhenAgencyIsActivated extends UseCase<WithAgency> {
   }
 
   public async _execute({ agency }: WithAgency): Promise<void> {
-    const recipients = agency.validatorEmails;
-    await this.emailGateway.sendAgencyWasActivated(recipients, {
-      agencyName: agency.name,
+    await this.emailGateway.sendEmail({
+      type: "AGENCY_WAS_ACTIVATED",
+      recipients: agency.validatorEmails,
+      params: {
+        agencyName: agency.name,
+      },
     });
   }
 }

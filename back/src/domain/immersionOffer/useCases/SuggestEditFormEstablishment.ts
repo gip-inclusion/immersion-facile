@@ -40,13 +40,14 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
     try {
-      await this.emailGateway.sendFormEstablishmentEditionSuggestion(
-        contact.email,
-        contact.copyEmails,
-        {
+      await this.emailGateway.sendEmail({
+        type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+        recipients: [contact.email],
+        cc: contact.copyEmails,
+        params: {
           editFrontUrl,
         },
-      );
+      });
 
       const event = this.createNewEvent({
         topic: "FormEstablishmentEditLinkSent",

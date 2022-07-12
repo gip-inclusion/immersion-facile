@@ -1,6 +1,6 @@
 import promClient from "prom-client";
-import { EmailSentDto, EmailType } from "shared/email";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { keys } from "ramda";
+import { EmailSentDto, EmailType, TemplatedEmail } from "shared/email";
 import {
   SendSmtpEmail,
   SendSmtpEmailCc,
@@ -8,30 +8,7 @@ import {
   TransactionalEmailsApi,
   TransactionalEmailsApiApiKeys,
 } from "sib-api-v3-typescript";
-import type {
-  AgencyWasActivatedParams,
-  BeneficiarySignatureRequestNotificationParams,
-  ContactByEmailRequestParams,
-  ContactByPhoneInstructionsParams,
-  ContactInPersonInstructionsParams,
-  ConventionModificationRequestNotificationParams,
-  EnterpriseSignatureRequestNotificationParams,
-  NewConventionAdminNotificationParams,
-  NewConventionBeneficiaryConfirmationParams,
-  NewConventionMentorConfirmationParams,
-  NewConventionReviewForEligibilityOrValidationParams,
-  PoleEmploiAdvisorOnConventionAssociationParams,
-  PoleEmploiAdvisorOnConventionFullysignedParams,
-  RejectedConventionNotificationParams,
-  SendRenewedMagicLinkParams,
-  SignedByOtherPartyNotificationParams,
-  ValidatedConventionFinalConfirmationParams,
-} from "../../../domain/convention/ports/EmailGateway";
-import {
-  EmailGateway,
-  ShareDraftConventionByLinkParams,
-} from "../../../domain/convention/ports/EmailGateway";
-import { Clock } from "../../../domain/core/ports/Clock";
+import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
@@ -42,22 +19,16 @@ export class SendinblueEmailGateway implements EmailGateway {
   private constructor(
     private readonly apiInstance: TransactionalEmailsApi,
     private readonly emailAllowListPredicate: (recipient: string) => boolean,
-    private readonly clock: Clock,
   ) {}
 
   public static create(
     apiKey: string,
     emailAllowListPredicate: (recipient: string) => boolean,
-    clock: Clock,
     apiInstance: TransactionalEmailsApi = new TransactionalEmailsApi(),
   ): SendinblueEmailGateway {
     apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, apiKey);
 
-    return new SendinblueEmailGateway(
-      apiInstance,
-      emailAllowListPredicate,
-      clock,
-    );
+    return new SendinblueEmailGateway(apiInstance, emailAllowListPredicate);
   }
 
   public getLastSentEmailDtos(): EmailSentDto[] {
@@ -66,418 +37,14 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendImmersionAssessmentCreationLink(
-    recipient: string,
-    params: {
-      beneficiaryFirstName: string;
-      beneficiaryLastName: string;
-      mentorName: string;
-      immersionAssessmentCreationLink: string;
-    },
-  ) {
-    await this.sendTransacEmail(
-      "CREATE_IMMERSION_ASSESSMENT",
-      [recipient],
-      {
-        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-        MENTOR_NAME: params.mentorName,
-        IMMERSION_ASSESSMENT_CREATION_LINK:
-          params.immersionAssessmentCreationLink,
-      },
-      [],
-    );
-  }
-
-  public async sendFormEstablishmentEditionSuggestion(
-    recipient: string,
-    copy: string[],
-    params: { editFrontUrl: string },
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "SUGGEST_EDIT_FORM_ESTABLISHMENT",
-      [recipient],
-      {
-        EDIT_FRONT_LINK: params.editFrontUrl,
-      },
-      copy,
-    );
-  }
-
-  public async sendRequestedEditFormEstablishmentLink(
-    recipient: string,
-    copy: string[],
-    params: { editFrontUrl: string },
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "EDIT_FORM_ESTABLISHMENT_LINK",
-      [recipient],
-      {
-        EDIT_FRONT_LINK: params.editFrontUrl,
-      },
-      copy,
-    );
-  }
-
-  public async sendNewEstablishmentContactConfirmation(
-    recipient: string,
-    copy: string[],
-    formEstablishmentDto: FormEstablishmentDto,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
-      [recipient],
-      {
-        CONTACT_FIRST_NAME: formEstablishmentDto.businessContact.firstName,
-        CONTACT_LAST_NAME: formEstablishmentDto.businessContact.lastName,
-        BUSINESS_NAME: formEstablishmentDto.businessName,
-      },
-      copy,
-    );
-  }
-
-  public async sendNewConventionBeneficiaryConfirmation(
-    recipient: string,
-    params: NewConventionBeneficiaryConfirmationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
-      [recipient],
-      {
-        DEMANDE_ID: params.demandeId,
-        FIRST_NAME: params.firstName,
-        LAST_NAME: params.lastName,
-      },
-    );
-  }
-
-  public async sendNewConventionMentorConfirmation(
-    recipient: string,
-    params: NewConventionMentorConfirmationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "NEW_CONVENTION_MENTOR_CONFIRMATION",
-      [recipient],
-      {
-        DEMANDE_ID: params.demandeId,
-        MENTOR_NAME: params.mentorName,
-        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-      },
-    );
-  }
-
-  public async sendNewConventionAdminNotification(
-    recipients: string[],
-    params: NewConventionAdminNotificationParams,
-  ) {
-    await this.sendTransacEmail(
-      "NEW_CONVENTION_ADMIN_NOTIFICATION",
-      recipients,
-      {
-        DEMANDE_ID: params.demandeId,
-        FIRST_NAME: params.firstName,
-        LAST_NAME: params.lastName,
-        DATE_START: params.dateStart,
-        DATE_END: params.dateEnd,
-        BUSINESS_NAME: params.businessName,
-        AGENCY_NAME: params.agencyName,
-        MAGIC_LINK: params.magicLink,
-      },
-    );
-  }
-
-  public async sendNewConventionAgencyNotification(
-    recipients: string[],
-    params: NewConventionAdminNotificationParams,
-  ) {
-    await this.sendTransacEmail(
-      "NEW_CONVENTION_AGENCY_NOTIFICATION",
-      recipients,
-      {
-        DEMANDE_ID: params.demandeId,
-        FIRST_NAME: params.firstName,
-        LAST_NAME: params.lastName,
-        DATE_START: params.dateStart,
-        DATE_END: params.dateEnd,
-        BUSINESS_NAME: params.businessName,
-        AGENCY_NAME: params.agencyName,
-        MAGIC_LINK: params.magicLink,
-      },
-    );
-  }
-
-  public async sendValidatedConventionFinalConfirmation(
-    recipients: string[],
-    params: ValidatedConventionFinalConfirmationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      recipients,
-      {
-        TOTAL_HOURS: params.totalHours,
-        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-        EMERGENCY_CONTACT: params.emergencyContact,
-        EMERGENCY_CONTACT_PHONE: params.emergencyContactPhone,
-        DATE_START: params.dateStart,
-        DATE_END: params.dateEnd,
-        MENTOR_NAME: params.mentorName,
-        SCHEDULE_LINES: params.scheduleText.split("\n"),
-        BUSINESS_NAME: params.businessName,
-        IMMERSION_ADDRESS: params.immersionAddress,
-        IMMERSION_PROFESSION: params.immersionAppellationLabel,
-        IMMERSION_ACTIVITIES: params.immersionActivities,
-        IMMERSION_SKILLS: params.immersionSkills,
-        SANITARY_PREVENTION_DESCRIPTION: params.sanitaryPrevention,
-        INDIVIDUAL_PROTECTION: params.individualProtection,
-        QUESTIONNAIRE_URL: params.questionnaireUrl,
-        SIGNATURE: params.signature,
-        WORK_CONDITIONS: params.workConditions,
-      },
-    );
-  }
-
-  public async sendRejectedConventionNotification(
-    recipients: string[],
-    params: RejectedConventionNotificationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "REJECTED_CONVENTION_NOTIFICATION",
-      recipients,
-      {
-        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-        BUSINESS_NAME: params.businessName,
-        REASON: params.rejectionReason,
-        AGENCY: params.agency,
-        SIGNATURE: params.signature,
-      },
-    );
-  }
-
-  public async sendConventionModificationRequestNotification(
-    recipients: string[],
-    params: ConventionModificationRequestNotificationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-      recipients,
-      {
-        AGENCY: params.agency,
-        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-        BUSINESS_NAME: params.businessName,
-        REASON: params.reason,
-        SIGNATURE: params.signature,
-        URL: params.magicLink,
-      },
-    );
-  }
-
-  public async sendNewConventionForReviewNotification(
-    recipients: string[],
-    params: NewConventionReviewForEligibilityOrValidationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-      recipients,
-      {
-        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-        BUSINESS_NAME: params.businessName,
-        MAGIC_LINK: params.magicLink,
-        POSSIBLE_ROLE_ACTION: params.possibleRoleAction,
-      },
-    );
-  }
-
-  public async sendRenewedMagicLink(
-    recipients: string[],
-    params: SendRenewedMagicLinkParams,
-  ): Promise<void> {
-    await this.sendTransacEmail("MAGIC_LINK_RENEWAL", recipients, {
-      MAGIC_LINK: params.magicLink,
-    });
-  }
-
-  public async sendSignedByOtherPartyNotification(
-    recipient: string,
-    params: SignedByOtherPartyNotificationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
-      [recipient],
-      {
-        FIRST_NAME: params.beneficiaryFirstName,
-        LAST_NAME: params.beneficiaryLastName,
-        IMMERSION_PROFESSION: params.immersionProfession,
-        COMPANY_NAME: params.businessName,
-        MENTOR: params.mentor,
-        EXISTING_SIGNATURE_NAME: params.existingSignatureName,
-        MAGIC_LINK: params.magicLink,
-      },
-    );
-  }
-
-  public async sendBeneficiarySignatureRequestNotification(
-    recipient: string,
-    params: BeneficiarySignatureRequestNotificationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
-      [recipient],
-      {
-        MAGIC_LINK: params.magicLink,
-        FIRST_NAME: params.beneficiaryFirstName,
-        LAST_NAME: params.beneficiaryLastName,
-        COMPANY_NAME: params.businessName,
-      },
-    );
-  }
-
-  public async sendEnterpriseSignatureRequestNotification(
-    recipient: string,
-    params: EnterpriseSignatureRequestNotificationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
-      [recipient],
-      {
-        MAGIC_LINK: params.magicLink,
-        FIRST_NAME: params.beneficiaryFirstName,
-        LAST_NAME: params.beneficiaryLastName,
-        COMPANY_NAME: params.businessName,
-        MENTOR_NAME: params.mentorName,
-      },
-    );
-  }
-
-  public async sendContactByEmailRequest(
-    recipient: string,
-    copy: string[],
-    params: ContactByEmailRequestParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "CONTACT_BY_EMAIL_REQUEST",
-      [recipient],
-      {
-        BUSINESS_NAME: params.businessName,
-        CONTACT_FIRSTNAME: params.contactFirstName,
-        CONTACT_LASTNAME: params.contactLastName,
-        JOB_LABEL: params.jobLabel,
-        POTENTIAL_BENEFICIARY_FIRSTNAME: params.potentialBeneficiaryFirstName,
-        POTENTIAL_BENEFICIARY_LASTNAME: params.potentialBeneficiaryLastName,
-        POTENTIAL_BENEFICIARY_EMAIL: params.potentialBeneficiaryEmail,
-        MESSAGE: params.message,
-      },
-      copy,
-    );
-  }
-
-  public async sendContactByPhoneInstructions(
-    recipient: string,
-    params: ContactByPhoneInstructionsParams,
-  ): Promise<void> {
-    await this.sendTransacEmail("CONTACT_BY_PHONE_INSTRUCTIONS", [recipient], {
-      BUSINESS_NAME: params.businessName,
-      CONTACT_FIRSTNAME: params.contactFirstName,
-      CONTACT_LASTNAME: params.contactLastName,
-      CONTACT_PHONE: params.contactPhone,
-      POTENTIAL_BENEFICIARY_FIRSTNAME: params.potentialBeneficiaryFirstName,
-      POTENTIAL_BENEFICIARY_LASTNAME: params.potentialBeneficiaryLastName,
-    });
-  }
-
-  public async sendContactInPersonInstructions(
-    recipient: string,
-    params: ContactInPersonInstructionsParams,
-  ): Promise<void> {
-    await this.sendTransacEmail("CONTACT_IN_PERSON_INSTRUCTIONS", [recipient], {
-      BUSINESS_NAME: params.businessName,
-      CONTACT_FIRSTNAME: params.contactFirstName,
-      CONTACT_LASTNAME: params.contactLastName,
-      BUSINESS_ADDRESS: params.businessAddress,
-      POTENTIAL_BENEFICIARY_FIRSTNAME: params.potentialBeneficiaryFirstName,
-      POTENTIAL_BENEFICIARY_LASTNAME: params.potentialBeneficiaryLastName,
-    });
-  }
-
-  public async sendShareDraftConventionByLink(
-    recipient: string,
-    params: ShareDraftConventionByLinkParams,
-  ): Promise<void> {
-    await this.sendTransacEmail("SHARE_DRAFT_CONVENTION_BY_LINK", [recipient], {
-      ADDITIONAL_DETAILS: params.additionalDetails,
-      APPLICATION_FORM_LINK: params.conventionFormUrl,
-    });
-  }
-
-  public async sendToPoleEmploiAdvisorOnConventionAssociation(
-    recipient: string,
-    params: PoleEmploiAdvisorOnConventionAssociationParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION",
-      [recipient],
-      {
-        ADVISOR_FIRST_NAME: params.advisorFirstName,
-        ADVISOR_LAST_NAME: params.advisorLastName,
-        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-        BENEFICIARY_EMAIL: params.beneficiaryEmail,
-        DATE_START: params.dateStart,
-        DATE_END: params.dateEnd,
-        BUSINESS_NAME: params.businessName,
-        IMMERSION_ADDRESS: params.immersionAddress,
-        MAGIC_LINK: params.magicLink,
-      },
-    );
-  }
-
-  public async sendToPoleEmploiAdvisorOnConventionFullySigned(
-    recipient: string,
-    params: PoleEmploiAdvisorOnConventionFullysignedParams,
-  ): Promise<void> {
-    await this.sendTransacEmail(
-      "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
-      [recipient],
-      {
-        ADVISOR_FIRST_NAME: params.advisorFirstName,
-        ADVISOR_LAST_NAME: params.advisorLastName,
-        BENEFICIARY_FIRST_NAME: params.beneficiaryFirstName,
-        BENEFICIARY_LAST_NAME: params.beneficiaryLastName,
-        BENEFICIARY_EMAIL: params.beneficiaryEmail,
-        DATE_START: params.dateStart,
-        DATE_END: params.dateEnd,
-        BUSINESS_NAME: params.businessName,
-        IMMERSION_ADDRESS: params.immersionAddress,
-        MAGIC_LINK: params.magicLink,
-      },
-    );
-  }
-
-  public async sendAgencyWasActivated(
-    recipients: string[],
-    params: AgencyWasActivatedParams,
-  ): Promise<void> {
-    await this.sendTransacEmail("AGENCY_WAS_ACTIVATED", recipients, {
-      AGENCY_NAME: params.agencyName,
-    });
-  }
-
-  private async sendTransacEmail(
-    emailType: EmailType,
-    recipients: string[],
-    params: any,
-    carbonCopy: string[] = [],
-  ) {
+  public async sendEmail(email: TemplatedEmail) {
+    const { recipients, type: emailType } = email;
     const filteredRecipients = recipients
       .filter(this.emailAllowListPredicate)
       .map((email): SendSmtpEmailTo => ({ email }));
     if (filteredRecipients.length === 0) return;
 
-    const filteredCarbonCopy: string[] = carbonCopy.filter(
+    const filteredCarbonCopy: string[] = (email.cc ?? []).filter(
       this.emailAllowListPredicate,
     );
 
@@ -485,7 +52,7 @@ export class SendinblueEmailGateway implements EmailGateway {
     const baseEmailConfig: SendSmtpEmail = {
       templateId,
       to: filteredRecipients,
-      params,
+      params: convertToSendInBlueParams(email.params),
     };
 
     const fullEmailConfig = addCarbonCopyFieldIfNeeded(
@@ -542,7 +109,7 @@ const counterSendTransactEmailError = new promClient.Counter({
 
 const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/10/message-setup
-  NEW_CONVENTION_ADMIN_NOTIFICATION: 10, // v2
+  // NEW_CONVENTION_ADMIN_NOTIFICATION: 10, // v2 -> not used any more
 
   // https://my.sendinblue.com/camp/template/27/message-setup
   NEW_CONVENTION_AGENCY_NOTIFICATION: 27,
@@ -621,4 +188,71 @@ const addCarbonCopyFieldIfNeeded = (
     ...baseEmailConfig,
     cc: carbonCopy.map((email): SendSmtpEmailCc => ({ email })),
   };
+};
+
+const convertToSendInBlueParams = (params: TemplatedEmail["params"]) =>
+  keys(params).reduce(
+    (acc, key) => ({
+      ...acc,
+      [sendInBlueKeyByEmailVariables[key]]: params[key],
+    }),
+    {},
+  );
+
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+// https://stackoverflow.com/questions/49401866/all-possible-keys-of-an-union-type
+
+type EmailVariables = KeysOfUnion<TemplatedEmail["params"]>;
+
+// keys are from our domain, values are SendInBlue keys in the templates :
+const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
+  additionalDetails: "ADDITIONAL_DETAILS",
+  advisorFirstName: "ADVISOR_FIRST_NAME",
+  advisorLastName: "ADVISOR_LAST_NAME",
+  agency: "AGENCY",
+  agencyName: "AGENCY_NAME",
+  beneficiaryEmail: "BENEFICIARY_EMAIL",
+  beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+  beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+  businessAddress: "BUSINESS_ADDRESS",
+  businessName: "BUSINESS_NAME",
+  // businessName: "COMPANY_NAME",
+  contactFirstName: "CONTACT_FIRSTNAME",
+  contactLastName: "CONTACT_LASTNAME",
+  contactPhone: "CONTACT_PHONE",
+  conventionFormUrl: "APPLICATION_FORM_LINK",
+  dateEnd: "DATE_END",
+  dateStart: "DATE_START",
+  demandeId: "DEMANDE_ID",
+  editFrontUrl: "EDIT_FRONT_LINK",
+  emergencyContact: "EMERGENCY_CONTACT",
+  emergencyContactPhone: "EMERGENCY_CONTACT_PHONE",
+  existingSignatureName: "EXISTING_SIGNATURE_NAME",
+  firstName: "FIRST_NAME",
+  immersionActivities: "IMMERSION_ACTIVITIES",
+  immersionAddress: "IMMERSION_ADDRESS",
+  immersionAppellation: "IMMERSION_PROFESSION",
+  immersionAppellationLabel: "IMMERSION_PROFESSION",
+  immersionAssessmentCreationLink: "IMMERSION_ASSESSMENT_CREATION_LINK",
+  immersionProfession: "IMMERSION_PROFESSION",
+  immersionSkills: "IMMERSION_SKILLS",
+  individualProtection: "INDIVIDUAL_PROTECTION",
+  jobLabel: "JOB_LABEL",
+  lastName: "LAST_NAME",
+  magicLink: "MAGIC_LINK",
+  mentor: "MENTOR",
+  mentorName: "MENTOR_NAME",
+  message: "MESSAGE",
+  possibleRoleAction: "POSSIBLE_ROLE_ACTION",
+  potentialBeneficiaryEmail: "POTENTIAL_BENEFICIARY_EMAIL",
+  potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRSTNAME",
+  potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LASTNAME",
+  questionnaireUrl: "QUESTIONNAIRE_URL",
+  reason: "REASON",
+  rejectionReason: "REASON",
+  sanitaryPrevention: "SANITARY_PREVENTION_DESCRIPTION",
+  scheduleText: "SCHEDULE_LINES",
+  signature: "SIGNATURE",
+  totalHours: "TOTAL_HOURS",
+  workConditions: "WORK_CONDITIONS",
 };

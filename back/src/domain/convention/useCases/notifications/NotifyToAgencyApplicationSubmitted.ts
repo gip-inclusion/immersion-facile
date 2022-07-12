@@ -1,19 +1,15 @@
+import { ConventionDto } from "shared/src/convention/convention.dto";
+import { conventionSchema } from "shared/src/convention/convention.schema";
+import { frontRoutes } from "shared/src/routes";
+import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
-import { EmailFilter } from "../../../core/ports/EmailFilter";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
-import { frontRoutes } from "shared/src/routes";
-import { Role } from "shared/src/tokens/MagicLinkPayload";
-import { createLogger } from "../../../../utils/logger";
-
-const logger = createLogger(__filename);
 
 export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
   ConventionDto,
@@ -23,7 +19,6 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
@@ -31,13 +26,13 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
   }
 
   protected async _execute(
-    application: ConventionDto,
+    convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const agency = await uow.agencyRepo.getById(application.agencyId);
+    const agency = await uow.agencyRepo.getById(convention.agencyId);
     if (!agency) {
       throw new NotFoundError(
-        `Unable to send mail. No agency config found for ${application.agencyId}`,
+        `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
     }
 
@@ -46,14 +41,14 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
     if (!hasCounsellors)
       return this.sendEmailToRecipients({
         recipients: agency.validatorEmails,
-        application,
+        convention,
         agencyName: agency.name,
         role: "validator",
       });
 
     return this.sendEmailToRecipients({
       recipients: agency.counsellorEmails,
-      application,
+      convention,
       agencyName: agency.name,
       role: "counsellor",
     });
@@ -61,42 +56,37 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
 
   private async sendEmailToRecipients({
     recipients,
-    application,
+    convention,
     agencyName,
     role,
   }: {
     recipients: string[];
-    application: ConventionDto;
+    convention: ConventionDto;
     agencyName: string;
     role: Role;
   }) {
-    await this.emailFilter.withAllowedRecipients(
-      recipients,
-      async (filteredRecipients) => {
-        await Promise.all(
-          filteredRecipients.map((counsellorEmail) =>
-            this.emailGateway.sendNewConventionAgencyNotification(
-              [counsellorEmail],
-              {
-                agencyName,
-                businessName: application.businessName,
-                dateEnd: application.dateEnd,
-                dateStart: application.dateStart,
-                demandeId: application.id,
-                firstName: application.firstName,
-                lastName: application.lastName,
-                magicLink: this.generateMagicLinkFn({
-                  id: application.id,
-                  role,
-                  targetRoute: frontRoutes.conventionToValidate,
-                  email: counsellorEmail,
-                }),
-              },
-            ),
-          ),
-        );
-      },
-      logger,
+    await Promise.all(
+      recipients.map((counsellorEmail) =>
+        this.emailGateway.sendEmail({
+          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          recipients: [counsellorEmail],
+          params: {
+            agencyName,
+            businessName: convention.businessName,
+            dateEnd: convention.dateEnd,
+            dateStart: convention.dateStart,
+            demandeId: convention.id,
+            firstName: convention.firstName,
+            lastName: convention.lastName,
+            magicLink: this.generateMagicLinkFn({
+              id: convention.id,
+              role,
+              targetRoute: frontRoutes.conventionToValidate,
+              email: counsellorEmail,
+            }),
+          },
+        }),
+      ),
     );
   }
 }

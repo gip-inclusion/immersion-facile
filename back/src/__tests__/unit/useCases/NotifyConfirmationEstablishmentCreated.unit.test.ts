@@ -1,24 +1,18 @@
-import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
-import { NotifyConfirmationEstablishmentCreated as NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
+import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { expectedEmailEstablishmentCreatedReviewMatchingEstablisment } from "../../../_testBuilders/emailAssertions";
-import { FormEstablishmentDtoBuilder } from "../../../../../shared/src/formEstablishment/FormEstablishmentDtoBuilder";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { NotifyConfirmationEstablishmentCreated as NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 
 describe("NotifyConfirmationEstablismentCreated", () => {
   const validEstablishment = FormEstablishmentDtoBuilder.valid().build();
   let emailGw: InMemoryEmailGateway;
-  let emailFilter: EmailFilter;
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
-    emailFilter = new AllowListEmailFilter([
-      validEstablishment.businessContact.email,
-    ]);
   });
 
   const createUseCase = () =>
-    new NotifyConfirmationEstablishmentCreated(emailFilter, emailGw);
+    new NotifyConfirmationEstablishmentCreated(emailGw);
 
   describe("When establishment is valid", () => {
     it("Nominal case: Sends notification email to Establisment contact", async () => {
@@ -32,13 +26,5 @@ describe("NotifyConfirmationEstablismentCreated", () => {
         validEstablishment,
       );
     });
-  });
-
-  it("Sends no emails when allowList is enforced and empty", async () => {
-    emailFilter = new AllowListEmailFilter([]);
-    await createUseCase().execute(validEstablishment);
-
-    const sentEmails = emailGw.getSentEmails();
-    expect(sentEmails).toHaveLength(0);
   });
 });

@@ -3,9 +3,9 @@ import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/I
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { ConventionDto } from "shared/src/convention/convention.dto";
-import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { expectedEmailConventionReviewMatchingConvention } from "../../../_testBuilders/emailAssertions";
-import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 import { frontRoutes } from "shared/src/routes";
 

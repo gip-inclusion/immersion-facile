@@ -39,8 +39,10 @@ describe(`/${emailRoute} route`, () => {
       // Prepare
       const dateNow = new Date("2022-01-01T12:00:00.000Z");
       clock.now = () => dateNow;
-      await reposAndGateways.email.sendAgencyWasActivated(["toto@email.com"], {
-        agencyName: "Agence du Grand Est",
+      await reposAndGateways.email.sendEmail({
+        type: "AGENCY_WAS_ACTIVATED",
+        recipients: ["toto@email.com"],
+        params: { agencyName: "Agence du Grand Est" },
       });
 
       // Getting the application succeeds and shows that it's validated.
@@ -48,7 +50,6 @@ describe(`/${emailRoute} route`, () => {
         templatedEmail: {
           type: "AGENCY_WAS_ACTIVATED",
           recipients: ["toto@email.com"],
-          cc: [],
           params: { agencyName: "Agence du Grand Est" },
         },
         sentAt: dateNow.toISOString(),

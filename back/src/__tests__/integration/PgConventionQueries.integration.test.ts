@@ -225,6 +225,7 @@ describe("Pg implementation of ConventionQueries", () => {
       expect(queryResults[0]).toEqual(expectedResult);
     });
   });
+
   const insertAgencyAndConvention = async (
     conventionId: ConventionId,
     agencyId: string,

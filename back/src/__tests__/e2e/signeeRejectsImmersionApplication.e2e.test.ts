@@ -3,6 +3,7 @@ import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder
 import {
   expectObjectsToMatch,
   expectJwtInMagicLinkAndGetIt,
+  expectEmailOfType,
 } from "../../_testBuilders/test.helpers";
 import {
   ConventionStatus,
@@ -64,8 +65,14 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     [createConventionParams.mentorEmail],
   ]);
 
-  const beneficiarySignEmail = sentEmails[0];
-  const establishmentSignEmail = sentEmails[1];
+  const beneficiarySignEmail = expectEmailOfType(
+    sentEmails[0],
+    "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+  );
+  const establishmentSignEmail = expectEmailOfType(
+    sentEmails[1],
+    "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+  );
 
   const beneficiaryJwt = expectJwtInMagicLinkAndGetIt(
     beneficiarySignEmail.params.magicLink,
@@ -103,8 +110,14 @@ const expectEstablishmentRequiresChanges = async (
 
   expectStoreImmersionToHaveStatus(reposAndGateways.convention, "DRAFT");
 
-  const beneficiaryEditEmail = sentEmails[2];
-  const establishmentEditEmail = sentEmails[3];
+  const beneficiaryEditEmail = expectEmailOfType(
+    sentEmails[2],
+    "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+  );
+  const establishmentEditEmail = expectEmailOfType(
+    sentEmails[3],
+    "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+  );
 
   const beneficiaryEditJwt = expectJwtInMagicLinkAndGetIt(
     beneficiaryEditEmail.params.magicLink,

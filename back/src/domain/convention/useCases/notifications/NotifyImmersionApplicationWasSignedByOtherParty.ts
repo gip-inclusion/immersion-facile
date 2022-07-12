@@ -1,18 +1,13 @@
 import { ConventionDto } from "shared/src/convention/convention.dto";
+import { conventionSchema } from "shared/src/convention/convention.schema";
 import { frontRoutes } from "shared/src/routes";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
-import { createLogger } from "../../../../utils/logger";
-import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { conventionSchema } from "shared/src/convention/convention.schema";
-
-const logger = createLogger(__filename);
 
 export class NotifyImmersionApplicationWasSignedByOtherParty extends UseCase<ConventionDto> {
   constructor(
-    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
@@ -36,21 +31,19 @@ export class NotifyImmersionApplicationWasSignedByOtherParty extends UseCase<Con
       email: recipientEmail,
     });
 
-    await this.emailFilter.withAllowedRecipients(
-      [recipientEmail],
-      ([recipientEmail]) =>
-        this.emailGateway.sendSignedByOtherPartyNotification(recipientEmail, {
-          magicLink,
-          existingSignatureName,
-          beneficiaryFirstName: application.firstName,
-          beneficiaryLastName: application.lastName,
-          immersionProfession:
-            application.immersionAppellation.appellationLabel,
-          mentor: application.mentor,
-          businessName: application.businessName,
-        }),
-      logger,
-    );
+    await this.emailGateway.sendEmail({
+      type: "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
+      recipients: [recipientEmail],
+      params: {
+        magicLink,
+        existingSignatureName,
+        beneficiaryFirstName: application.firstName,
+        beneficiaryLastName: application.lastName,
+        immersionProfession: application.immersionAppellation.appellationLabel,
+        mentor: application.mentor,
+        businessName: application.businessName,
+      },
+    });
   }
 }
 

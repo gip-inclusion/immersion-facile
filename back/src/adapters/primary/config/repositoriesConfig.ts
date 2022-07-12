@@ -250,13 +250,13 @@ export const createRepositories = async (
 };
 
 export const makeEmailAllowListPredicate = ({
-  skipEmailAllowlist,
+  skipEmailAllowList,
   emailAllowList,
 }: {
-  skipEmailAllowlist: boolean;
+  skipEmailAllowList: boolean;
   emailAllowList: string[];
 }): ((recipient: string) => boolean) =>
-  skipEmailAllowlist
+  skipEmailAllowList
     ? (_recipient: string) => true
     : (recipient: string): boolean => emailAllowList.includes(recipient);
 
@@ -279,10 +279,9 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
   const sendInBlueEmailGateway = SendinblueEmailGateway.create(
     config.sendinblueApiKey,
     makeEmailAllowListPredicate({
-      skipEmailAllowlist: config.skipEmailAllowlist,
+      skipEmailAllowList: config.skipEmailAllowlist,
       emailAllowList: config.emailAllowList,
     }),
-    clock,
   );
 
   if (config.emailGateway === "SENDINBLUE") return sendInBlueEmailGateway;

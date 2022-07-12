@@ -13,7 +13,7 @@ import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
-import { FormEstablishmentDtoBuilder } from "../../../../../shared/src/formEstablishment/FormEstablishmentDtoBuilder";
+import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 const prepareUseCase = () => {

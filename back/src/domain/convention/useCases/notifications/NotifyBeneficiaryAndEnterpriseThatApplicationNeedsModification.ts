@@ -1,21 +1,12 @@
-import { z } from "zod";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import { conventionSchema } from "shared/src/convention/convention.schema";
 import { frontRoutes } from "shared/src/routes";
 import { allRoles } from "shared/src/tokens/MagicLinkPayload";
 import { zTrimmedString } from "shared/src/zodUtils";
+import { z } from "zod";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
-import { createLogger } from "../../../../utils/logger";
-import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { UseCase } from "../../../core/UseCase";
 import { AgencyRepository } from "../../ports/AgencyRepository";
-import {
-  EmailGateway,
-  ConventionModificationRequestNotificationParams,
-} from "../../ports/EmailGateway";
-import { conventionSchema } from "shared/src/convention/convention.schema";
-
-const logger = createLogger(__filename);
+import { EmailGateway } from "../../ports/EmailGateway";
 
 // prettier-ignore
 export type ConventionRequiresModificationPayload = z.infer<typeof conventionRequiresModificationSchema>
@@ -34,7 +25,6 @@ export const renewMagicLinkPayloadSchema = z.object({
 
 export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends UseCase<ConventionRequiresModificationPayload> {
   constructor(
-    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
     private readonly agencyRepository: AgencyRepository,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
@@ -71,41 +61,25 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
         );
       }
 
-      await this.emailFilter.withAllowedRecipients(
-        [email],
-        ([email]) =>
-          this.emailGateway.sendConventionModificationRequestNotification(
-            [email],
-            getModificationRequestApplicationNotificationParams(
-              convention,
-              agency,
-              reason,
-              this.generateMagicLinkFn({
-                id: convention.id,
-                role,
-                targetRoute: frontRoutes.conventionRoute,
-                email,
-              }),
-            ),
-          ),
-        logger,
-      );
+      await this.emailGateway.sendEmail({
+        type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+        recipients: [email],
+        params: {
+          beneficiaryFirstName: convention.firstName,
+          beneficiaryLastName: convention.lastName,
+          businessName: convention.businessName,
+          reason,
+          signature: agency.signature,
+          agency: agency.name,
+          immersionAppellation: convention.immersionAppellation,
+          magicLink: this.generateMagicLinkFn({
+            id: convention.id,
+            role,
+            targetRoute: frontRoutes.conventionRoute,
+            email,
+          }),
+        },
+      });
     }
   }
 }
-
-const getModificationRequestApplicationNotificationParams = (
-  convention: ConventionDto,
-  agency: AgencyDto,
-  reason: string,
-  magicLink: string,
-): ConventionModificationRequestNotificationParams => ({
-  beneficiaryFirstName: convention.firstName,
-  beneficiaryLastName: convention.lastName,
-  businessName: convention.businessName,
-  reason,
-  signature: agency.signature,
-  agency: agency.name,
-  immersionAppellation: convention.immersionAppellation,
-  magicLink,
-});

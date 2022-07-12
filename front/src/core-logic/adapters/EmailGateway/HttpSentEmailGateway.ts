@@ -2,7 +2,7 @@ import axios from "axios";
 import { from, Observable } from "rxjs";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { emailRoute } from "shared/src/routes";
-import { EmailSentDto } from "src/../../shared/email";
+import { EmailSentDto } from "shared/email";
 import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
 
 const prefix = "api";

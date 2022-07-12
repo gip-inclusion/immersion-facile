@@ -1,23 +1,20 @@
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { frontRoutes } from "shared/src/routes";
-import { OmitFromExistingKeys } from "shared/src/utils";
+import {
+  expectTypeToMatchAndEqual,
+  fakeGenerateMagicLinkUrlFn,
+} from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { AlwaysAllowEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { PoleEmploiAdvisorOnConventionFullysignedParams } from "../../../domain/convention/ports/EmailGateway";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PoleEmploiUserAdvisorDto,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
-import {
-  expectTypeToMatchAndEqual,
-  fakeGenerateMagicLinkUrlFn,
-} from "../../../_testBuilders/test.helpers";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   let emailGateway: InMemoryEmailGateway;
@@ -27,21 +24,15 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
   beforeEach(() => {
     emailGateway = new InMemoryEmailGateway();
-    const emailFilter = new AlwaysAllowEmailFilter();
-    conventionPoleEmploiAdvisorRepository =
-      new InMemoryConventionPoleEmploiAdvisorRepository();
-    conventionRepository = new InMemoryConventionRepository();
+    const uow = createInMemoryUow();
+    conventionPoleEmploiAdvisorRepository = uow.conventionPoleEmploiAdvisorRepo;
+    conventionRepository = uow.conventionRepository;
 
-    const uowPerformer = new InMemoryUowPerformer({
-      ...createInMemoryUow(),
-      conventionPoleEmploiAdvisorRepo: conventionPoleEmploiAdvisorRepository,
-      conventionRepository,
-    });
+    const uowPerformer = new InMemoryUowPerformer(uow);
 
     notifyPoleEmploiUserAdvisorOnConventionFullySigned =
       new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
         uowPerformer,
-        emailFilter,
         emailGateway,
         fakeGenerateMagicLinkUrlFn,
       );
@@ -94,10 +85,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
     const sentEmails = emailGateway.getSentEmails();
 
-    const expectedParams: OmitFromExistingKeys<
-      PoleEmploiAdvisorOnConventionFullysignedParams,
-      "magicLink"
-    > = {
+    const expectedParams = {
       advisorFirstName: conventionPoleEmploiAdvisor.firstName,
       advisorLastName: conventionPoleEmploiAdvisor.lastName,
       immersionAddress: conventionDtoFromEvent.immersionAddress!,
@@ -113,7 +101,6 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       {
         type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
         recipients: [conventionPoleEmploiAdvisor.email],
-        cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({

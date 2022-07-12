@@ -1,5 +1,5 @@
 import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
-import { FormEstablishmentDtoBuilder } from "../../../../../shared/src/formEstablishment/FormEstablishmentDtoBuilder";
+import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import {
   expectObjectsToMatch,

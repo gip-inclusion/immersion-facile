@@ -6,10 +6,6 @@ import {
   makeGenerateJwtHS256,
 } from "../../../domain/auth/jwt";
 import { RealClock } from "../../secondary/core/ClockImplementations";
-import {
-  AllowListEmailFilter,
-  AlwaysAllowEmailFilter,
-} from "../../secondary/core/EmailFilterImplementations";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
@@ -60,10 +56,6 @@ export const createAppDependencies = async (config: AppConfig) => {
   const generateAdminJwt = makeGenerateJwtHS256(config.adminJwtSecret, "365d");
   const generateMagicLinkFn = createGenerateConventionMagicLink(config);
 
-  const emailFilter = config.skipEmailAllowlist
-    ? new AlwaysAllowEmailFilter()
-    : new AllowListEmailFilter(config.emailAllowList);
-
   const redirectErrorUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}/${frontRoutes.error}`;
   const errorHandlers = {
     handleManagedRedirectResponseError:
@@ -79,7 +71,6 @@ export const createAppDependencies = async (config: AppConfig) => {
       generateMagicLinkJwt,
       generateMagicLinkFn,
       generateAdminJwt,
-      emailFilter,
       uowPerformer,
       clock,
       uuidGenerator,

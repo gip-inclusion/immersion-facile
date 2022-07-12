@@ -1,3 +1,5 @@
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { frontRoutes } from "shared/src/routes";
 import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
@@ -5,20 +7,15 @@ import {
 } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { AlwaysAllowEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PoleEmploiUserAdvisorDto,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionAssociation } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionAssociation";
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { OmitFromExistingKeys } from "shared/src/utils";
-import { PoleEmploiAdvisorOnConventionAssociationParams } from "../../../domain/convention/ports/EmailGateway";
-import { frontRoutes } from "shared/src/routes";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
   let emailGateway: InMemoryEmailGateway;
@@ -28,7 +25,6 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
 
   beforeEach(() => {
     emailGateway = new InMemoryEmailGateway();
-    const emailFilter = new AlwaysAllowEmailFilter();
 
     const uow = createInMemoryUow();
     conventionPoleEmploiAdvisorRepository = uow.conventionPoleEmploiAdvisorRepo;
@@ -39,7 +35,6 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
     notifyPoleEmploiUserAdvisorOnAssociation =
       new NotifyPoleEmploiUserAdvisorOnConventionAssociation(
         uowPerformer,
-        emailFilter,
         emailGateway,
         fakeGenerateMagicLinkUrlFn,
       );
@@ -125,10 +120,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
 
     const sentEmails = emailGateway.getSentEmails();
 
-    const expectedParams: OmitFromExistingKeys<
-      PoleEmploiAdvisorOnConventionAssociationParams,
-      "magicLink"
-    > = {
+    const expectedParams = {
       advisorFirstName: conventionPoleEmploiAdvisor.firstName,
       advisorLastName: conventionPoleEmploiAdvisor.lastName,
       immersionAddress: conventionDto.immersionAddress!,
@@ -144,7 +136,6 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
       {
         type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION",
         recipients: [conventionPoleEmploiAdvisor.email],
-        cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({

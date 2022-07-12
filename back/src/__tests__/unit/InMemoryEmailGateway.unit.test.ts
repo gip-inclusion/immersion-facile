@@ -13,17 +13,16 @@ describe("In memory EmailGateway", () => {
 
   it("should be able to retrieve last email sent", async () => {
     clock.setNextDate(new Date("2022-01-01T12:00:00.000Z"));
-    await inMemoryEmailGateway.sendFormEstablishmentEditionSuggestion(
-      "establishment-ceo@gmail.com",
-      [],
-      { editFrontUrl: "plop" },
-    );
+    await inMemoryEmailGateway.sendEmail({
+      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+      recipients: ["establishment-ceo@gmail.com"],
+      params: { editFrontUrl: "plop" },
+    });
 
     await expectArraysToMatch(inMemoryEmailGateway.getLastSentEmailDtos(), [
       {
         sentAt: "2022-01-01T12:00:00.000Z",
         templatedEmail: {
-          cc: [],
           params: {
             editFrontUrl: "plop",
           },
@@ -36,16 +35,16 @@ describe("In memory EmailGateway", () => {
 
   it("should be able to retrieve at most the given maximum of emails", async () => {
     clock.setNextDate(new Date("2022-01-01T12:00:00.000Z"));
-    await inMemoryEmailGateway.sendFormEstablishmentEditionSuggestion(
-      "establishment-ceo@gmail.com",
-      [],
-      { editFrontUrl: "plop" },
-    );
-    await inMemoryEmailGateway.sendFormEstablishmentEditionSuggestion(
-      "other-ceo@gmail.com",
-      [],
-      { editFrontUrl: "other-mail" },
-    );
+    await inMemoryEmailGateway.sendEmail({
+      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+      recipients: ["establishment-ceo@gmail.com"],
+      params: { editFrontUrl: "plop" },
+    });
+    await inMemoryEmailGateway.sendEmail({
+      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+      recipients: ["other-ceo@gmail.com"],
+      params: { editFrontUrl: "other-mail" },
+    });
 
     const sentEmails = inMemoryEmailGateway.getLastSentEmailDtos();
     expect(sentEmails).toHaveLength(1);
@@ -53,7 +52,6 @@ describe("In memory EmailGateway", () => {
       {
         sentAt: "2022-01-01T12:00:00.000Z",
         templatedEmail: {
-          cc: [],
           params: {
             editFrontUrl: "other-mail",
           },

@@ -1,17 +1,14 @@
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { AlwaysAllowEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
-import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { NewConventionAdminNotificationParams } from "../../../domain/convention/ports/EmailGateway";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { frontRoutes } from "shared/src/routes";
-import { OmitFromExistingKeys } from "shared/src/utils";
-import { AgencyDtoBuilder } from "../../../../../shared/src/agency/AgencyDtoBuilder";
-import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
 import {
   expectTypeToMatchAndEqual,
   fakeGenerateMagicLinkUrlFn,
 } from "../../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
 
 const councellorEmail = "councellor@email.fr";
@@ -37,7 +34,6 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
 
   beforeEach(() => {
     emailGateway = new InMemoryEmailGateway();
-    const emailFilter = new AlwaysAllowEmailFilter();
     agencyRepository = new InMemoryAgencyRepository();
     agencyRepository.setAgencies([
       agencyWithCounsellors,
@@ -51,7 +47,6 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
 
     notifyToAgencyApplicationSubmitted = new NotifyToAgencyApplicationSubmitted(
       uowPerformer,
-      emailFilter,
       emailGateway,
       fakeGenerateMagicLinkUrlFn,
     );
@@ -65,10 +60,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
 
     const sentEmails = emailGateway.getSentEmails();
 
-    const expectedParams: OmitFromExistingKeys<
-      NewConventionAdminNotificationParams,
-      "magicLink"
-    > = {
+    const expectedParams = {
       agencyName: agencyWithCounsellors.name,
       businessName: validConvention.businessName,
       dateEnd: validConvention.dateEnd,
@@ -82,7 +74,6 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
-        cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({
@@ -96,7 +87,6 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail2],
-        cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({
@@ -119,10 +109,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
 
     const sentEmails = emailGateway.getSentEmails();
 
-    const expectedParams: OmitFromExistingKeys<
-      NewConventionAdminNotificationParams,
-      "magicLink"
-    > = {
+    const expectedParams = {
       agencyName: agencyWithCounsellors.name,
       businessName: validConvention.businessName,
       dateEnd: validConvention.dateEnd,
@@ -136,7 +123,6 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [validatorEmail],
-        cc: [],
         params: {
           ...expectedParams,
           magicLink: fakeGenerateMagicLinkUrlFn({

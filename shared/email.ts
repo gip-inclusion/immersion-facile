@@ -1,3 +1,4 @@
+import { FormEstablishmentDto } from "./src/formEstablishment/FormEstablishment.dto";
 import { AppellationDto } from "./src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type GenericTemplatedEmail<
@@ -19,9 +20,9 @@ export type EmailSentDto = {
 };
 
 export type TemplatedEmail =
-  | NewConventionAdminNotificationEmail
   | NewConventionBeneficiaryConfirmationEmail
   | NewConventionMentorConfirmationEmail
+  | NewConventionAgencyNotificationEmail
   | ValidatedConventionFinalConfirmationEmail
   | PoleEmploiAdvisorOnConventionFullySignedEmail
   | PoleEmploiAdvisorOnConventionAssociationEmail
@@ -36,10 +37,14 @@ export type TemplatedEmail =
   | ContactByPhoneInstructionsEmail
   | ContactInPersonInstructionsEmail
   | ShareDraftConventionByLinkEmail
-  | AgencyWasActivatedEmail;
+  | AgencyWasActivatedEmail
+  | FormEstablishmentEditionSuggestionEmail
+  | EditFormEstablishmentLinkEmail
+  | NewEstablishmentCreatedContactConfirmationEmail
+  | CreatImmersionAssessmentEmail;
 
-type NewConventionAdminNotificationEmail = GenericTemplatedEmail<
-  "NEW_CONVENTION_ADMIN_NOTIFICATION",
+type NewConventionAgencyNotificationEmail = GenericTemplatedEmail<
+  "NEW_CONVENTION_AGENCY_NOTIFICATION",
   {
     demandeId: string;
     firstName: string;
@@ -82,7 +87,7 @@ type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
     dateStart: string;
     dateEnd: string;
     mentorName: string;
-    scheduleText: string;
+    scheduleText: string[];
     businessName: string;
     immersionAddress: string;
     immersionAppellationLabel: string;
@@ -258,6 +263,35 @@ type AgencyWasActivatedEmail = GenericTemplatedEmail<
   "AGENCY_WAS_ACTIVATED",
   {
     agencyName: string;
+  }
+>;
+
+type EditFormEstablishmentLinkEmail = GenericTemplatedEmail<
+  "EDIT_FORM_ESTABLISHMENT_LINK",
+  {
+    editFrontUrl: string;
+  }
+>;
+
+type FormEstablishmentEditionSuggestionEmail = GenericTemplatedEmail<
+  "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+  {
+    editFrontUrl: string;
+  }
+>;
+
+type NewEstablishmentCreatedContactConfirmationEmail = GenericTemplatedEmail<
+  "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
+  { contactFirstName: string; contactLastName: string; businessName: string }
+>;
+
+type CreatImmersionAssessmentEmail = GenericTemplatedEmail<
+  "CREATE_IMMERSION_ASSESSMENT",
+  {
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    mentorName: string;
+    immersionAssessmentCreationLink: string;
   }
 >;
 

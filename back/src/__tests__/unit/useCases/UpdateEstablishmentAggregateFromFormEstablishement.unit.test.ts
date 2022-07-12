@@ -10,7 +10,7 @@ import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionO
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { FormEstablishmentDtoBuilder } from "../../../../../shared/src/formEstablishment/FormEstablishmentDtoBuilder";
+import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { expectPromiseToFailWith } from "../../../_testBuilders/test.helpers";
 import {

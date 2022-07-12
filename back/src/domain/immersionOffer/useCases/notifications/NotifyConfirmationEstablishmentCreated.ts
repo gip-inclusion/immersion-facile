@@ -1,17 +1,10 @@
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
-import { createLogger } from "../../../../utils/logger";
-import { EmailFilter } from "../../../core/ports/EmailFilter";
-import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../../convention/ports/EmailGateway";
-
-const logger = createLogger(__filename);
+import { UseCase } from "../../../core/UseCase";
 
 export class NotifyConfirmationEstablishmentCreated extends UseCase<FormEstablishmentDto> {
-  constructor(
-    private readonly emailFilter: EmailFilter,
-    private readonly emailGateway: EmailGateway,
-  ) {
+  constructor(private readonly emailGateway: EmailGateway) {
     super();
   }
   inputSchema = formEstablishmentSchema;
@@ -19,15 +12,15 @@ export class NotifyConfirmationEstablishmentCreated extends UseCase<FormEstablis
   public async _execute(
     formEstablishment: FormEstablishmentDto,
   ): Promise<void> {
-    await this.emailFilter.withAllowedRecipients(
-      [formEstablishment.businessContact.email],
-      ([establishmentContactEmail]) =>
-        this.emailGateway.sendNewEstablishmentContactConfirmation(
-          establishmentContactEmail,
-          formEstablishment.businessContact.copyEmails,
-          { ...formEstablishment },
-        ),
-      logger,
-    );
+    await this.emailGateway.sendEmail({
+      type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
+      recipients: [formEstablishment.businessContact.email],
+      cc: formEstablishment.businessContact.copyEmails,
+      params: {
+        contactFirstName: formEstablishment.businessContact.firstName,
+        contactLastName: formEstablishment.businessContact.lastName,
+        businessName: formEstablishment.businessName,
+      },
+    });
   }
 }

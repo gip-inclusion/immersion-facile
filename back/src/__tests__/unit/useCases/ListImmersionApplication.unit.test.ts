@@ -1,7 +1,7 @@
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { ListAdminConventions } from "../../../domain/convention/useCases/ListAdminConventions";
 import { AgencyId } from "shared/src/agency/agency.dto";
-import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   ConventionReadDto,
   allConventionStatuses,

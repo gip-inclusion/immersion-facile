@@ -5,9 +5,7 @@ import type {
   TransactionalEmailsApi,
 } from "sib-api-v3-typescript";
 import { makeEmailAllowListPredicate } from "../../adapters/primary/config/repositoriesConfig";
-import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
-import { ValidatedConventionFinalConfirmationParams } from "../../domain/convention/ports/EmailGateway";
 
 describe("SendingBlueEmailGateway", () => {
   type SendTransacEmailResponse = {
@@ -19,7 +17,6 @@ describe("SendingBlueEmailGateway", () => {
   let allowListPredicate;
   let sibGateway: SendinblueEmailGateway;
   let sentEmails: SendSmtpEmail[];
-  let clock: CustomClock;
 
   beforeEach(() => {
     sentEmails = [];
@@ -41,30 +38,29 @@ describe("SendingBlueEmailGateway", () => {
         "establishment-ceo@gmail.com",
         "establishment-cto@gmail.com",
       ],
-      skipEmailAllowlist: false,
+      skipEmailAllowList: false,
     });
 
-    clock = new CustomClock();
     sibGateway = SendinblueEmailGateway.create(
       "plop",
       allowListPredicate,
-      clock,
       mockedApi,
     );
   });
 
   // eslint-disable-next-line @typescript-eslint/require-await
   it("should filter emails according to predicate", async () => {
-    await sibGateway.sendValidatedConventionFinalConfirmation(
-      [
+    await sibGateway.sendEmail({
+      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      recipients: [
         "beneficiary@gmail.com",
         "advisor@gmail.com",
         "i-am-not-allowed@mail.net",
       ],
-      {
+      params: {
         scheduleText: "",
-      } as unknown as ValidatedConventionFinalConfirmationParams,
-    );
+      } as any,
+    });
 
     expect(sentEmails[0].to).toEqual([
       { email: "beneficiary@gmail.com" },
@@ -78,11 +74,12 @@ describe("SendingBlueEmailGateway", () => {
       "establishment-comptable-not-allowed@gmail.com",
     ];
 
-    await sibGateway.sendFormEstablishmentEditionSuggestion(
-      "establishment-ceo@gmail.com",
-      carbonCopy,
-      { editFrontUrl: "plop" },
-    );
+    await sibGateway.sendEmail({
+      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+      recipients: ["establishment-ceo@gmail.com"],
+      cc: carbonCopy,
+      params: { editFrontUrl: "plop" },
+    });
 
     expect(sentEmails[0]).toEqual({
       cc: [
@@ -103,11 +100,12 @@ describe("SendingBlueEmailGateway", () => {
   });
 
   it("should NOT be able to retrieve last emails sent", async () => {
-    await sibGateway.sendFormEstablishmentEditionSuggestion(
-      "establishment-ceo@gmail.com",
-      [],
-      { editFrontUrl: "plop" },
-    );
+    await sibGateway.sendEmail({
+      type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+      recipients: ["establishment-ceo@gmail.com"],
+      cc: [],
+      params: { editFrontUrl: "plop" },
+    });
 
     await expect(() => sibGateway.getLastSentEmailDtos()).toThrow(
       new Error(

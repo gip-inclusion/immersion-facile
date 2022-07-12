@@ -1,10 +1,8 @@
-import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import {
   InMemoryEstablishmentAggregateRepository,
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
 import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
@@ -37,24 +35,15 @@ const allowedCopyEmail = "copy@gmail.com";
 describe("NotifyContactRequest", () => {
   let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
   let emailGw: InMemoryEmailGateway;
-  let emailFilter: EmailFilter;
 
   beforeEach(() => {
     establishmentAggregateRepository =
       new InMemoryEstablishmentAggregateRepository();
     emailGw = new InMemoryEmailGateway();
-    emailFilter = new AllowListEmailFilter([
-      allowedContactEmail,
-      payload.potentialBeneficiaryEmail,
-    ]);
   });
 
   const createUseCase = () =>
-    new NotifyContactRequest(
-      establishmentAggregateRepository,
-      emailFilter,
-      emailGw,
-    );
+    new NotifyContactRequest(establishmentAggregateRepository, emailGw);
 
   it("Sends ContactByEmailRequest email to establishment", async () => {
     const validEmailPayload: ContactEstablishmentRequestDto = {
@@ -164,33 +153,5 @@ describe("NotifyContactRequest", () => {
       contact,
       validInPersonPayload,
     );
-  });
-
-  it("Sends no email when allowList is enforced and empty", async () => {
-    emailFilter = new AllowListEmailFilter([]);
-
-    const validInPersonPayload: ContactEstablishmentRequestDto = {
-      ...payload,
-      contactMode: "IN_PERSON",
-    };
-    const establishment = new EstablishmentEntityV2Builder()
-      .withSiret(siret)
-      .build();
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(establishment)
-        .withContact(
-          new ContactEntityV2Builder()
-            .withId(contactId)
-            .withContactMethod("IN_PERSON")
-            .build(),
-        )
-        .withImmersionOffers([immersionOffer])
-        .build(),
-    ]);
-
-    await createUseCase().execute(validInPersonPayload);
-
-    expect(emailGw.getSentEmails()).toHaveLength(0);
   });
 });

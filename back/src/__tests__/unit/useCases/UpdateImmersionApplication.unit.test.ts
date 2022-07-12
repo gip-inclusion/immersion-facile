@@ -16,7 +16,7 @@ import {
 } from "../../../domain/core/eventBus/EventBus";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
-import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,

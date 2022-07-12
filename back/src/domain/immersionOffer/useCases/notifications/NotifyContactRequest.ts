@@ -2,18 +2,13 @@ import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "shared/src/contactEstablishment";
-import { createLogger } from "../../../../utils/logger";
-import { EmailFilter } from "../../../core/ports/EmailFilter";
-import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../../convention/ports/EmailGateway";
+import { UseCase } from "../../../core/UseCase";
 import { EstablishmentAggregateRepository } from "../../ports/EstablishmentAggregateRepository";
-
-const logger = createLogger(__filename);
 
 export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto> {
   constructor(
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
-    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
   ) {
     super();
@@ -45,69 +40,55 @@ export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto
 
     switch (payload.contactMode) {
       case "EMAIL": {
-        await this.emailFilter.withAllowedRecipients(
-          [contact.email],
-          ([establishmentContactEmail]) =>
-            this.emailGateway.sendContactByEmailRequest(
-              establishmentContactEmail,
-              contact.copyEmails,
-              {
-                businessName: establishmentAggregate.establishment.name,
-                contactFirstName: contact.firstName,
-                contactLastName: contact.lastName,
-                jobLabel: romeLabel,
-                potentialBeneficiaryFirstName:
-                  payload.potentialBeneficiaryFirstName,
-                potentialBeneficiaryLastName:
-                  payload.potentialBeneficiaryLastName,
-                potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
-                message: payload.message,
-              },
-            ),
-          logger,
-        );
+        await this.emailGateway.sendEmail({
+          type: "CONTACT_BY_EMAIL_REQUEST",
+          recipients: [contact.email],
+          cc: contact.copyEmails,
+          params: {
+            businessName: establishmentAggregate.establishment.name,
+            contactFirstName: contact.firstName,
+            contactLastName: contact.lastName,
+            jobLabel: romeLabel,
+            potentialBeneficiaryFirstName:
+              payload.potentialBeneficiaryFirstName,
+            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+            potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
+            message: payload.message,
+          },
+        });
+
         break;
       }
       case "PHONE": {
-        await this.emailFilter.withAllowedRecipients(
-          [payload.potentialBeneficiaryEmail],
-          ([potentialBeneficiaryEmail]) =>
-            this.emailGateway.sendContactByPhoneInstructions(
-              potentialBeneficiaryEmail,
-              {
-                businessName: establishmentAggregate.establishment.name,
-                contactFirstName: contact.firstName,
-                contactLastName: contact.lastName,
-                contactPhone: contact.phone,
-                potentialBeneficiaryFirstName:
-                  payload.potentialBeneficiaryFirstName,
-                potentialBeneficiaryLastName:
-                  payload.potentialBeneficiaryLastName,
-              },
-            ),
-          logger,
-        );
+        await this.emailGateway.sendEmail({
+          type: "CONTACT_BY_PHONE_INSTRUCTIONS",
+          recipients: [payload.potentialBeneficiaryEmail],
+          params: {
+            businessName: establishmentAggregate.establishment.name,
+            contactFirstName: contact.firstName,
+            contactLastName: contact.lastName,
+            contactPhone: contact.phone,
+            potentialBeneficiaryFirstName:
+              payload.potentialBeneficiaryFirstName,
+            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+          },
+        });
         break;
       }
       case "IN_PERSON": {
-        await this.emailFilter.withAllowedRecipients(
-          [payload.potentialBeneficiaryEmail],
-          ([potentialBeneficiaryEmail]) =>
-            this.emailGateway.sendContactInPersonInstructions(
-              potentialBeneficiaryEmail,
-              {
-                businessName: establishmentAggregate.establishment.name,
-                contactFirstName: contact.firstName,
-                contactLastName: contact.lastName,
-                businessAddress: establishmentAggregate.establishment.address,
-                potentialBeneficiaryFirstName:
-                  payload.potentialBeneficiaryFirstName,
-                potentialBeneficiaryLastName:
-                  payload.potentialBeneficiaryLastName,
-              },
-            ),
-          logger,
-        );
+        await this.emailGateway.sendEmail({
+          type: "CONTACT_IN_PERSON_INSTRUCTIONS",
+          recipients: [payload.potentialBeneficiaryEmail],
+          params: {
+            businessName: establishmentAggregate.establishment.name,
+            contactFirstName: contact.firstName,
+            contactLastName: contact.lastName,
+            businessAddress: establishmentAggregate.establishment.address,
+            potentialBeneficiaryFirstName:
+              payload.potentialBeneficiaryFirstName,
+            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+          },
+        });
         break;
       }
     }

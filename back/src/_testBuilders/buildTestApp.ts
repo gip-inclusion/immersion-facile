@@ -19,7 +19,7 @@ import { InMemoryRomeRepository } from "../adapters/secondary/InMemoryRomeReposi
 import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
 import { GetApiConsumerById } from "../domain/core/ports/GetApiConsumerById";
 import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
-import { AgencyDtoBuilder } from "../../../shared/src/agency/AgencyDtoBuilder";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { EstablishmentExportQueries } from "../domain/establishment/ports/EstablishmentExportQueries";

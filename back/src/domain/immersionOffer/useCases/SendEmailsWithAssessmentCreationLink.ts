@@ -79,16 +79,17 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
       targetRoute: frontRoutes.immersionAssessment,
     });
 
-    await this.emailGateway.sendImmersionAssessmentCreationLink(
-      immersionAssessmentEmailParams.mentorEmail,
-      {
+    await this.emailGateway.sendEmail({
+      type: "CREATE_IMMERSION_ASSESSMENT",
+      recipients: [immersionAssessmentEmailParams.mentorEmail],
+      params: {
         immersionAssessmentCreationLink,
         mentorName: immersionAssessmentEmailParams.mentorName,
         beneficiaryFirstName:
           immersionAssessmentEmailParams.beneficiaryFirstName,
         beneficiaryLastName: immersionAssessmentEmailParams.beneficiaryLastName,
       },
-    );
+    });
 
     const event = this.createNewEvent({
       topic: "EmailWithLinkToCreateAssessmentSent",

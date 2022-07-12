@@ -88,10 +88,9 @@ describe("admin slice", () => {
         {
           sentAt: "2022-07-10",
           templatedEmail: {
-            type: "CONTACT_BY_EMAIL_REQUEST",
+            type: "EDIT_FORM_ESTABLISHMENT_LINK",
             recipients: ["bob@mail.com"],
-            cc: [],
-            params: { message: "salut" },
+            params: { editFrontUrl: "my-url" },
           },
         },
       ];

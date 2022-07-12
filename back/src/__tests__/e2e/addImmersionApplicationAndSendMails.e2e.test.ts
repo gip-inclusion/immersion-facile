@@ -1,26 +1,27 @@
-import supertest from "supertest";
-import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
-import {
-  ConventionDtoBuilder,
-  VALID_EMAILS,
-} from "shared/src/convention/ConventionDtoBuilder";
-import {
-  expectTypeToMatchAndEqual,
-  expectJwtInMagicLinkAndGetIt,
-} from "../../_testBuilders/test.helpers";
-import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
-import { InMemoryEmailGateway } from "../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { TemplatedEmail } from "shared/email";
-import { DomainEvent } from "../../domain/core/eventBus/events";
 import {
   ConventionDto,
   UpdateConventionStatusRequestDto,
 } from "shared/src/convention/convention.dto";
 import {
+  ConventionDtoBuilder,
+  VALID_EMAILS,
+} from "shared/src/convention/ConventionDtoBuilder";
+import {
   conventionsRoute,
   signConventionRoute,
   updateConventionStatusRoute,
 } from "shared/src/routes";
+import supertest from "supertest";
+import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
+import {
+  expectEmailOfType,
+  expectJwtInMagicLinkAndGetIt,
+  expectTypeToMatchAndEqual,
+} from "../../_testBuilders/test.helpers";
+import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
+import { InMemoryEmailGateway } from "../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { DomainEvent } from "../../domain/core/eventBus/events";
 
 const validatorEmail = "validator@mail.com";
 
@@ -155,8 +156,14 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     ["validator@mail.com"],
   ]);
 
-  const beneficiarySignEmail = sentEmails[0];
-  const establishmentSignEmail = sentEmails[1];
+  const beneficiarySignEmail = expectEmailOfType(
+    sentEmails[0],
+    "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+  );
+  const establishmentSignEmail = expectEmailOfType(
+    sentEmails[1],
+    "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+  );
 
   const beneficiarySignJwt = expectJwtInMagicLinkAndGetIt(
     beneficiarySignEmail.params.magicLink,
@@ -228,7 +235,10 @@ const establishmentSignsApplication = async (
 
   const sentEmails = reposAndGateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(5);
-  const needsReviewEmail = sentEmails[sentEmails.length - 1];
+  const needsReviewEmail = expectEmailOfType(
+    sentEmails[sentEmails.length - 1],
+    "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+  );
   expect(needsReviewEmail.recipients).toEqual([validatorEmail]);
   return {
     validatorReviewJwt: expectJwtInMagicLinkAndGetIt(

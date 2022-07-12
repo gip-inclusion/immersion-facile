@@ -1,11 +1,8 @@
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../../adapters/primary/config/makeGenerateEditFormEstablishmentUrl";
-import {
-  CustomClock,
-  RealClock,
-} from "../../adapters/secondary/core/ClockImplementations";
-import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
+import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
+import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { CreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { OutboxQueries } from "../../domain/core/ports/OutboxQueries";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
@@ -54,7 +51,6 @@ describe("RequestEditFormEstablishment", () => {
     const emailGateway: SendinblueEmailGateway = SendinblueEmailGateway.create(
       config.sendinblueApiKey,
       (_) => true,
-      new CustomClock(),
     );
     const generateEditFormEstablishmentUrl =
       makeGenerateEditFormEstablishmentUrl(config);

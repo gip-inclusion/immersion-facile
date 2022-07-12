@@ -61,20 +61,24 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ConventionDto> {
 
     await Promise.all(
       recipients.emails.map((email) =>
-        this.emailGateway.sendNewConventionForReviewNotification([email], {
-          businessName: conventionDto.businessName,
-          magicLink: this.generateMagicLinkFn({
-            id: conventionDto.id,
-            role: recipients.role,
-            targetRoute: frontRoutes.conventionToValidate,
-            email,
-          }),
-          beneficiaryFirstName: conventionDto.firstName,
-          beneficiaryLastName: conventionDto.lastName,
-          possibleRoleAction:
-            recipients.role === "counsellor"
-              ? "en vérifier l'éligibilité"
-              : "en considérer la validation",
+        this.emailGateway.sendEmail({
+          type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          recipients: [email],
+          params: {
+            businessName: conventionDto.businessName,
+            magicLink: this.generateMagicLinkFn({
+              id: conventionDto.id,
+              role: recipients.role,
+              targetRoute: frontRoutes.conventionToValidate,
+              email,
+            }),
+            beneficiaryFirstName: conventionDto.firstName,
+            beneficiaryLastName: conventionDto.lastName,
+            possibleRoleAction:
+              recipients.role === "counsellor"
+                ? "en vérifier l'éligibilité"
+                : "en considérer la validation",
+          },
         }),
       ),
     );
@@ -82,7 +86,7 @@ export class NotifyNewApplicationNeedsReview extends UseCase<ConventionDto> {
     logger.info(
       {
         recipients,
-        immersionId: conventionDto.id,
+        conventionId: conventionDto.id,
       },
       "Mail to review an immersion sent",
     );

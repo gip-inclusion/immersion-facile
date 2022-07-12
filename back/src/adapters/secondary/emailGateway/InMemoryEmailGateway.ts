@@ -25,16 +25,9 @@ export class InMemoryEmailGateway implements EmailGateway {
   }
 
   private pushEmail(templatedEmail: TemplatedEmail) {
-    if (!this.numberOfEmailToKeep) {
-      this.sentEmails.push({
-        templatedEmail,
-        sentAt: this.clock.now().toISOString(),
-      });
-      return;
-    }
-
-    const numberOfEmailsToDrop =
-      this.sentEmails.length + 1 - this.numberOfEmailToKeep;
+    const numberOfEmailsToDrop = this.numberOfEmailToKeep
+      ? this.sentEmails.length + 1 - this.numberOfEmailToKeep
+      : 0;
 
     if (numberOfEmailsToDrop > 0) {
       this.sentEmails.splice(0, numberOfEmailsToDrop);

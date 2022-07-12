@@ -1,19 +1,11 @@
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { createLogger } from "../../../../utils/logger";
-import { EmailFilter } from "../../../core/ports/EmailFilter";
-import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyRepository";
-import {
-  EmailGateway,
-  RejectedConventionNotificationParams,
-} from "../../ports/EmailGateway";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
+import { UseCase } from "../../../core/UseCase";
+import { AgencyRepository } from "../../ports/AgencyRepository";
+import { EmailGateway } from "../../ports/EmailGateway";
 
-const logger = createLogger(__filename);
 export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends UseCase<ConventionDto> {
   constructor(
-    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
     private readonly agencyRepository: AgencyRepository,
   ) {
@@ -31,27 +23,18 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Use
     }
 
     const recipients = [dto.email, dto.mentorEmail, ...agency.counsellorEmails];
-    await this.emailFilter.withAllowedRecipients(
+    await this.emailGateway.sendEmail({
+      type: "REJECTED_CONVENTION_NOTIFICATION",
       recipients,
-      (recipients) =>
-        this.emailGateway.sendRejectedConventionNotification(
-          recipients,
-          getRejectedApplicationNotificationParams(dto, agency),
-        ),
-      logger,
-    );
+      params: {
+        beneficiaryFirstName: dto.firstName,
+        beneficiaryLastName: dto.lastName,
+        businessName: dto.businessName,
+        rejectionReason: dto.rejectionJustification || "",
+        signature: agency.signature,
+        agency: agency.name,
+        immersionProfession: dto.immersionAppellation.appellationLabel,
+      },
+    });
   }
 }
-
-const getRejectedApplicationNotificationParams = (
-  dto: ConventionDto,
-  agency: AgencyDto,
-): RejectedConventionNotificationParams => ({
-  beneficiaryFirstName: dto.firstName,
-  beneficiaryLastName: dto.lastName,
-  businessName: dto.businessName,
-  rejectionReason: dto.rejectionJustification || "",
-  signature: agency.signature,
-  agency: agency.name,
-  immersionProfession: dto.immersionAppellation.appellationLabel,
-});

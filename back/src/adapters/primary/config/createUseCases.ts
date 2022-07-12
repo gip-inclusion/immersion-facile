@@ -32,7 +32,6 @@ import { UpdateImmersionApplication } from "../../../domain/convention/useCases/
 import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { Clock } from "../../../domain/core/ports/Clock";
-import { EmailFilter } from "../../../domain/core/ports/EmailFilter";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
@@ -77,7 +76,6 @@ export const createUseCases = (
   generateJwtFn: GenerateMagicLinkJwt,
   generateMagicLinkFn: GenerateConventionMagicLink,
   generateAdminJwt: GenerateAdminJwt,
-  emailFilter: EmailFilter,
   uowPerformer: UnitOfWorkPerformer,
   clock: Clock,
   uuidGenerator: UuidGenerator,
@@ -242,13 +240,11 @@ export const createUseCases = (
     // notifications
     confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature:
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
-        emailFilter,
         repositories.email,
         generateMagicLinkFn,
       ),
     confirmToMentorThatConventionCorrectlySubmittedRequestSignature:
       new ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature(
-        emailFilter,
         repositories.email,
         generateMagicLinkFn,
       ),
@@ -264,54 +260,41 @@ export const createUseCases = (
     ),
     notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
       uowPerformer,
-      emailFilter,
       repositories.email,
       generateMagicLinkFn,
     ),
     notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
       new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
-        emailFilter,
         repositories.email,
         repositories.agency,
       ),
     notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
       new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
-        emailFilter,
         repositories.email,
         repositories.agency,
         generateMagicLinkFn,
       ),
-    deliverRenewedMagicLink: new DeliverRenewedMagicLink(
-      emailFilter,
-      repositories.email,
-    ),
+    deliverRenewedMagicLink: new DeliverRenewedMagicLink(repositories.email),
     notifyConfirmationEstablishmentCreated:
-      new NotifyConfirmationEstablishmentCreated(
-        emailFilter,
-        repositories.email,
-      ),
+      new NotifyConfirmationEstablishmentCreated(repositories.email),
     notifyContactRequest: new NotifyContactRequest(
       repositories.immersionOffer,
-      emailFilter,
       repositories.email,
     ),
     notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty:
       new NotifyImmersionApplicationWasSignedByOtherParty(
-        emailFilter,
         repositories.email,
         generateMagicLinkFn,
       ),
     notifyPoleEmploiUserAdvisorOnAssociation:
       new NotifyPoleEmploiUserAdvisorOnConventionAssociation(
         uowPerformer,
-        emailFilter,
         repositories.email,
         generateMagicLinkFn,
       ),
     notifyPoleEmploiUserAdvisorOnConventionFullySigned:
       new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
         uowPerformer,
-        emailFilter,
         repositories.email,
         generateMagicLinkFn,
       ),

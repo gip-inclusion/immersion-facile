@@ -1,11 +1,9 @@
-import { ConventionDtoBuilder } from "../../../../../shared/src/convention/ConventionDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   expectTypeToMatchAndEqual,
   fakeGenerateMagicLinkUrlFn,
 } from "../../../_testBuilders/test.helpers";
-import { AllowListEmailFilter } from "../../../adapters/secondary/core/EmailFilterImplementations";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { SignedByOtherPartyNotificationParams } from "../../../domain/convention/ports/EmailGateway";
 import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/convention/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { frontRoutes } from "shared/src/routes";
@@ -27,15 +25,10 @@ describe("NotifyImmersionApplicationWasSignedByOtherParty", () => {
   let notifySignedByOtherParty: NotifyImmersionApplicationWasSignedByOtherParty;
 
   beforeEach(() => {
-    const emailFilter = new AllowListEmailFilter([
-      beneficiaryEmail,
-      mentorEmail,
-    ]);
     emailGateway = new InMemoryEmailGateway();
 
     notifySignedByOtherParty =
       new NotifyImmersionApplicationWasSignedByOtherParty(
-        emailFilter,
         emailGateway,
         fakeGenerateMagicLinkUrlFn,
       );
@@ -81,7 +74,7 @@ describe("NotifyImmersionApplicationWasSignedByOtherParty", () => {
       recipientRole: Role;
     },
   ) => {
-    const params: SignedByOtherPartyNotificationParams = {
+    const params = {
       beneficiaryFirstName: application.firstName,
       beneficiaryLastName: application.lastName,
       existingSignatureName,
@@ -101,7 +94,6 @@ describe("NotifyImmersionApplicationWasSignedByOtherParty", () => {
         type: "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
         recipients: [recipientEmail],
         params,
-        cc: [],
       },
     ]);
   };

@@ -2,7 +2,6 @@ import { GenerateConventionMagicLink } from "../../../../adapters/primary/config
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 import { createLogger } from "../../../../utils/logger";
-import { EmailFilter } from "../../../core/ports/EmailFilter";
 import { frontRoutes } from "shared/src/routes";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
@@ -11,7 +10,6 @@ const logger = createLogger(__filename);
 
 export class ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature extends UseCase<ConventionDto> {
   constructor(
-    private readonly emailFilter: EmailFilter,
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
@@ -20,33 +18,30 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignatu
 
   inputSchema = conventionSchema;
 
-  public async _execute(application: ConventionDto): Promise<void> {
-    if (application.status === "PARTIALLY_SIGNED") {
+  public async _execute(convention: ConventionDto): Promise<void> {
+    if (convention.status === "PARTIALLY_SIGNED") {
       logger.info(
-        `Skipping sending signature-requiring beneficiary confirmation as application is already partially signed`,
+        `Skipping sending signature-requiring beneficiary confirmation as convention is already partially signed`,
       );
       return;
     }
 
-    const { id, email, firstName, lastName, businessName } = application;
+    const { id, email, firstName, lastName, businessName } = convention;
 
-    logger.info({ ConventionId: id }, `------------- Entering execute`);
-
-    await this.emailFilter.withAllowedRecipients(
-      [email],
-      ([email]) =>
-        this.emailGateway.sendBeneficiarySignatureRequestNotification(email, {
-          beneficiaryFirstName: firstName,
-          beneficiaryLastName: lastName,
-          magicLink: this.generateMagicLinkFn({
-            id: application.id,
-            role: "beneficiary",
-            targetRoute: frontRoutes.conventionToSign,
-            email,
-          }),
-          businessName,
+    await this.emailGateway.sendEmail({
+      type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+      recipients: [email],
+      params: {
+        beneficiaryFirstName: firstName,
+        beneficiaryLastName: lastName,
+        magicLink: this.generateMagicLinkFn({
+          id,
+          role: "beneficiary",
+          targetRoute: frontRoutes.conventionToSign,
+          email,
         }),
-      logger,
-    );
+        businessName,
+      },
+    });
   }
 }

@@ -1,12 +1,10 @@
-import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
-import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
-import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
-import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { AllowListEmailFilter } from "../../adapters/secondary/core/EmailFilterImplementations";
-import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
+import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
+import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
+import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
@@ -29,11 +27,9 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    const clock = new CustomClock();
     emailGw = SendinblueEmailGateway.create(
       config.sendinblueApiKey,
       (_) => true,
-      clock,
     );
     agencyRepository = new InMemoryAgencyRepository([
       AgencyDtoBuilder.create(validConvention.agencyId)
@@ -49,15 +45,8 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
     validConvention.mentorEmail = "jeanfrancois.macresy@gmail.com";
     validConvention.email = "jeanfrancois.macresy+beneficiary@gmail.com";
 
-    const emailFilter = new AllowListEmailFilter([
-      validConvention.mentorEmail,
-      validConvention.email,
-      counsellorEmail,
-    ]);
-
     notifyBeneficiaryAndEnterpriseThatApplicationIsRejected =
       new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
-        emailFilter,
         emailGw,
         agencyRepository,
       );

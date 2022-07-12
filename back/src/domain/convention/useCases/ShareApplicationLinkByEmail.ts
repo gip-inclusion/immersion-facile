@@ -12,9 +12,13 @@ export class ShareApplicationLinkByEmail extends UseCase<ShareLinkByEmailDto> {
   inputSchema = shareLinkByEmailSchema;
 
   public async _execute(params: ShareLinkByEmailDto): Promise<void> {
-    await this.emailGateway.sendShareDraftConventionByLink(params.email, {
-      additionalDetails: params.details,
-      conventionFormUrl: params.conventionLink,
+    await this.emailGateway.sendEmail({
+      type: "SHARE_DRAFT_CONVENTION_BY_LINK",
+      recipients: [params.email],
+      params: {
+        additionalDetails: params.details,
+        conventionFormUrl: params.conventionLink,
+      },
     });
   }
 }
