@@ -1,54 +1,71 @@
 import axios from "axios";
 import { map, Observable } from "rxjs";
-import { ajax, AjaxResponse } from "rxjs/ajax";
+import { ajax } from "rxjs/ajax";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import {
   AgencyDto,
   AgencyId,
-  AgencyWithPositionDto,
   AgencyPublicDisplayDto,
   AgencyStatus,
+  AgencyWithPositionDto,
   CreateAgencyDto,
   ListAgenciesWithPositionRequestDto,
   UpdateAgencyRequestDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
-import { listAgenciesResponseSchema } from "shared/src/agency/agency.schema";
+import {
+  agenciesSchema,
+  agenciesWithPositionSchema,
+  agencyIdResponseSchema,
+  agencyPublicDisplaySchema,
+} from "shared/src/agency/agency.schema";
 import { LatLonDto } from "shared/src/latLon";
 import {
   agenciesRoute,
   agencyImmersionFacileIdRoute,
   agencyPublicInfoByIdRoute,
 } from "shared/src/routes";
+import { validateDataFromSchema } from "src/../../shared/src/zodUtils";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const prefix = "api";
 
 export class HttpAgencyGateway implements AgencyGateway {
   getImmersionFacileAgencyId(): Observable<AgencyId | false> {
-    return ajax
-      .get<AgencyId | { success: boolean }>(
-        `/${prefix}/${agencyImmersionFacileIdRoute}`,
-      )
-      .pipe(
-        map((response: AjaxResponse<AgencyId | { success: boolean }>) =>
-          typeof response.response === "string" ? response.response : false,
-        ),
-      );
+    return ajax.get<unknown>(`/${prefix}/${agencyImmersionFacileIdRoute}`).pipe(
+      map(({ response }) => {
+        const agencyIdResponse = validateDataFromSchema(
+          agencyIdResponseSchema,
+          response,
+        );
+        if (agencyIdResponse instanceof Error) throw agencyIdResponse;
+        return typeof agencyIdResponse === "string" ? agencyIdResponse : false;
+      }),
+    );
   }
 
-  public async addAgency(createAgencyParams: CreateAgencyDto) {
-    await axios.post(`/${prefix}/${agenciesRoute}`, createAgencyParams);
+  public async addAgency(createAgencyParams: CreateAgencyDto): Promise<void> {
+    await axios.post<unknown>(
+      `/${prefix}/${agenciesRoute}`,
+      createAgencyParams,
+    );
   }
 
   public async getAgencyPublicInfoById(
     agencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto> {
-    return (
-      await axios.get(`/${prefix}/${agencyPublicInfoByIdRoute}`, {
+    const { data } = await axios.get<unknown>(
+      `/${prefix}/${agencyPublicInfoByIdRoute}`,
+      {
         params: agencyId,
-      })
-    ).data;
+      },
+    );
+    const agencyPublicDisplayDto = validateDataFromSchema(
+      agencyPublicDisplaySchema,
+      data,
+    );
+    if (agencyPublicDisplayDto instanceof Error) throw agencyPublicDisplayDto;
+    return agencyPublicDisplayDto;
   }
 
   public listAllAgenciesWithPosition(
@@ -80,14 +97,16 @@ export class HttpAgencyGateway implements AgencyGateway {
     adminToken: AdminToken,
   ): Promise<AgencyDto[]> {
     const needsReviewStatus: AgencyStatus = "needsReview";
-    // const httpResponse = await axios.get(
-    //   `/${prefix}/admin/${agenciesRoute}?status=${needsReviewStatus}`,
-    // );
-    const httpResponse = await axios.get(`/${prefix}/admin/${agenciesRoute}`, {
-      params: { status: needsReviewStatus },
-      headers: { authorization: adminToken },
-    });
-    return httpResponse.data;
+    const { data } = await axios.get<unknown>(
+      `/${prefix}/admin/${agenciesRoute}`,
+      {
+        params: { status: needsReviewStatus },
+        headers: { authorization: adminToken },
+      },
+    );
+    const agenciesDto = validateDataFromSchema(agenciesSchema, data);
+    if (agenciesDto instanceof Error) throw agenciesDto;
+    return agenciesDto;
   }
 
   public async validateAgency(
@@ -98,18 +117,24 @@ export class HttpAgencyGateway implements AgencyGateway {
       id: agencyId,
       status: "active",
     };
-    await axios.patch(
+    await axios.patch<unknown>(
       `/${prefix}/admin/${agenciesRoute}/${agencyId}`,
       validateAgencyParams,
       { headers: { authorization: adminToken } },
     );
   }
+
   private async getAgencies(
     request: ListAgenciesWithPositionRequestDto,
   ): Promise<AgencyWithPositionDto[]> {
-    const httpResponse = await axios.get(`/${prefix}/${agenciesRoute}`, {
+    const { data } = await axios.get<unknown>(`/${prefix}/${agenciesRoute}`, {
       params: request,
     });
-    return listAgenciesResponseSchema.parse(httpResponse.data);
+    const agenciesWithPositionDto = validateDataFromSchema(
+      agenciesWithPositionSchema,
+      data,
+    );
+    if (agenciesWithPositionDto instanceof Error) throw agenciesWithPositionDto;
+    return agenciesWithPositionDto;
   }
 }

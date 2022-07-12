@@ -12,6 +12,8 @@ import {
   allAgencyStatuses,
   AgencyDto,
   UpdateAgencyRequestDto,
+  AgencyPublicDisplayDto,
+  AgencyIdResponse,
 } from "./agency.dto";
 import { latLonSchema } from "../latLon";
 import {
@@ -27,6 +29,11 @@ export const withAgencyIdSchema: z.Schema<WithAgencyId> = z.object({
   id: agencyIdSchema,
 });
 
+export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> = z.union([
+  agencyIdSchema,
+  z.object({ success: z.boolean() }),
+]);
+
 export const agencyWithPositionSchema: z.ZodSchema<AgencyWithPositionDto> =
   z.object({
     id: agencyIdSchema,
@@ -34,7 +41,7 @@ export const agencyWithPositionSchema: z.ZodSchema<AgencyWithPositionDto> =
     position: latLonSchema,
   });
 
-export const listAgenciesResponseSchema: z.ZodSchema<AgencyWithPositionDto[]> =
+export const agenciesWithPositionSchema: z.ZodSchema<AgencyWithPositionDto[]> =
   z.array(agencyWithPositionSchema);
 
 const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
@@ -78,6 +85,8 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z.object({
   codeSafir: zString.optional(),
 });
 
+export const agenciesSchema: z.ZodSchema<AgencyDto[]> = z.array(agencySchema);
+
 export const privateListAgenciesRequestSchema: z.ZodSchema<PrivateListAgenciesRequestDto> =
   z.object({
     status: agencyStatusSchema.optional(),
@@ -87,4 +96,13 @@ export const updateAgencyRequestSchema: z.ZodSchema<UpdateAgencyRequestDto> =
   z.object({
     id: agencyIdSchema,
     status: agencyStatusSchema.optional(),
+  });
+
+export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
+  z.object({
+    id: agencyIdSchema,
+    name: zString,
+    address: zString,
+    position: latLonSchema,
+    logoUrl: absoluteUrlSchema.optional(),
   });
