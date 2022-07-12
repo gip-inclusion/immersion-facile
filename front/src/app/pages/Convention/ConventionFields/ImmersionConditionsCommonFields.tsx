@@ -7,7 +7,7 @@ import {
 import {
   emptySchedule,
   reasonableSchedule,
-} from "src/../../shared/src/schedule/ScheduleUtils";
+} from "shared/src/schedule/ScheduleUtils";
 import {
   BoolRadioGroup,
   RadioGroupForField,

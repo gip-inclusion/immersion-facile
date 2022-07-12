@@ -25,7 +25,7 @@ import {
   agencyImmersionFacileIdRoute,
   agencyPublicInfoByIdRoute,
 } from "shared/src/routes";
-import { validateDataFromSchema } from "src/../../shared/src/zodUtils";
+import { validateDataFromSchema } from "shared/src/zodUtils";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const prefix = "api";
