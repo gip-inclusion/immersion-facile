@@ -5,7 +5,7 @@ import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceReposi
 import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/ApiAdresse/InMemoryApiAdresseGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
-import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
+import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/InMemoryNavigationGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";

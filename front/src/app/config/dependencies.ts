@@ -8,15 +8,13 @@ import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/Ass
 import { createLocalStorageDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createLocalStorageDeviceRepository";
 import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";
 import { StubSentEmailGateway } from "src/core-logic/adapters/EmailGateway/StubSentEmailGateway";
-
-import { HttpEstablishmentGateway } from "src/core-logic/adapters/HttpEstablishmentGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/HttpSiretGatewayThroughBack";
 
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/ApiAdresse/InMemoryApiAdresseGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
-import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
+import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
 import {
   InMemoryImmersionSearchGateway,
   seedSearchResults,
@@ -46,6 +44,7 @@ import { ENV } from "src/environmentVariables";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/ApiAdresse/HttpApiAdresseGateway";
+import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 
 export const deviceRepository = createLocalStorageDeviceRepository();
 

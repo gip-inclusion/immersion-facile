@@ -16,6 +16,7 @@ import {
   FormEstablishmentSource,
   ImmersionContactInEstablishmentId,
   ContactMethod,
+  FormEstablishmentDto,
 } from "./FormEstablishment.dto";
 
 // prettier-ignore
@@ -49,7 +50,7 @@ const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "passeEmploi",
 ];
 
-export const formEstablishmentSchema = z.object(
+export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
   {
     source: z.enum(formEstablishmentSources),
     siret: siretSchema,

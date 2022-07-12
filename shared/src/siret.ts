@@ -18,6 +18,8 @@ export const siretSchema: z.Schema<SiretDto> = zString
   .regex(siretRegex, "SIRET doit être composé de 14 chiffres")
   .transform(normalizeSiret);
 
+export const isSiretExistResponseSchema: z.Schema<boolean> = z.boolean();
+
 export type GetSiretRequestDto = z.infer<typeof getSiretRequestSchema>;
 export const getSiretRequestSchema = z.object({
   siret: siretSchema,

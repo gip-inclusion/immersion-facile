@@ -6,6 +6,7 @@ import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Build
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
 import { DomainEvent } from "../../domain/core/eventBus/events";
+import { requestEmailToUpdateFormRoute } from "shared/src/routes";
 
 describe("Route to generate an establishment edition link", () => {
   let request: SuperTest<Test>;
@@ -38,7 +39,7 @@ describe("Route to generate an establishment edition link", () => {
 
     // Act and assert
     await request
-      .get("/request-email-to-update-form/11111111111111")
+      .post(`/${requestEmailToUpdateFormRoute}/11111111111111`)
       .expect(400, {
         errors: `Un email a déjà été envoyé au contact référent de l'établissement le ${new Date(
           lastPayload.iat,
@@ -48,7 +49,7 @@ describe("Route to generate an establishment edition link", () => {
 
   it("Returns 200  if an edit link for this siret is still valid", async () => {
     await request
-      .get("/request-email-to-update-form/11111111111111")
+      .post(`/${requestEmailToUpdateFormRoute}/11111111111111`)
       .expect(200, '{"success":true}');
   });
 });

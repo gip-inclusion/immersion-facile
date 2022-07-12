@@ -42,7 +42,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
 
   establishmentRouter
     .route(`/${requestEmailToUpdateFormRoute}/:siret`)
-    .get(async (req, res) =>
+    .post(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.requestEditFormEstablishment.execute(req.params.siret),
       ),
