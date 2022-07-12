@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { GetSiretInfoError } from "src/../../shared/src/siret";
+import { GetSiretInfoError } from "shared/src/siret";
 import { InvalidSiretError } from "src/core-logic/domain/siret/siret.slice";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 

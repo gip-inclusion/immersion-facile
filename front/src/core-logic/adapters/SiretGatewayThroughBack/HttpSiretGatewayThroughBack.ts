@@ -15,7 +15,7 @@ import {
   SiretDto,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared/src/siret";
-import { validateDataFromSchema } from "src/../../shared/src/zodUtils";
+import { validateDataFromSchema } from "shared/src/zodUtils";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 const prefix = "api";

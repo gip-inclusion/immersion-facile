@@ -13,7 +13,7 @@ import {
   siretSchema,
 } from "shared/src/siret";
 import { validateDataFromSchema } from "shared/src/zodUtils";
-import { formEstablishmentSchema } from "src/../../shared/src/formEstablishment/FormEstablishment.schema";
+import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 
 const prefix = "api";
 export class HttpEstablishmentGateway implements EstablishmentGateway {

@@ -8,7 +8,7 @@ import {
 } from "shared/src/featureFlags";
 import { getFeatureFlags, uploadFileRoute } from "shared/src/routes";
 import { map, Observable } from "rxjs";
-import { validateDataFromSchema } from "src/../../shared/src/zodUtils";
+import { validateDataFromSchema } from "shared/src/zodUtils";
 
 const prefix = "api";
 

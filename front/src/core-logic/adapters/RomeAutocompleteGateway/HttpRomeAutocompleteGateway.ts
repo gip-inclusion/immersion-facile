@@ -12,8 +12,8 @@ import { queryParamsAsString } from "shared/src/utils/queryParams";
 import {
   appellationSearchResponseSchema,
   romeListResponseSchema,
-} from "src/../../shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
-import { validateDataFromSchema } from "src/../../shared/src/zodUtils";
+} from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
+import { validateDataFromSchema } from "shared/src/zodUtils";
 
 const prefix = "api";
 
