@@ -8,7 +8,7 @@ import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/In
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/InMemoryNavigationGateway";
-import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
+import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";

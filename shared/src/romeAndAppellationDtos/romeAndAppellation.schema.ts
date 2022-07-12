@@ -1,7 +1,7 @@
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 import { z } from "zod";
 import { zTrimmedString } from "../zodUtils";
-import { RomeSearchInput } from "./romeAndAppellation.dto";
+import { RomeDto, RomeSearchInput } from "./romeAndAppellation.dto";
 import type {
   AppellationDto,
   AppellationMatchDto,
@@ -25,6 +25,15 @@ export const appellationDtoSchema: z.Schema<AppellationDto> = z.object({
   romeLabel: zTrimmedString,
   appellationCode: codeAppellationSchema,
   appellationLabel: zTrimmedString,
+});
+
+export const romeSchema: z.Schema<RomeDto> = z.object({
+  romeCode: codeRomeSchema,
+  romeLabel: zTrimmedString,
+});
+export const romeListSchema: z.Schema<RomeDto[]> = z.array(romeSchema);
+export const romeListResponseSchema: z.Schema<{ data: RomeDto[] }> = z.object({
+  data: romeListSchema,
 });
 
 export const romeAutocompleteInputSchema: z.Schema<RomeSearchInput> = z.object({
@@ -54,6 +63,7 @@ export const AppellationMatchSchema: z.Schema<AppellationMatchDto> = z.object(
   { required_error: "Veuillez saisir un métier" },
 );
 
-export const appellationSearchResponseSchema = z.array(AppellationMatchSchema, {
-  required_error: "Veuillez saisir un métier",
-});
+export const appellationSearchResponseSchema: z.Schema<AppellationMatchDto[]> =
+  z.array(AppellationMatchSchema, {
+    required_error: "Veuillez saisir un métier",
+  });
