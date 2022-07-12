@@ -1,4 +1,3 @@
-import { FormEstablishmentDto } from "./src/formEstablishment/FormEstablishment.dto";
 import { AppellationDto } from "./src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type GenericTemplatedEmail<
