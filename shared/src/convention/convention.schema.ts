@@ -30,19 +30,19 @@ import {
   ConventionExternalId,
   ConventionDtoWithoutExternalId,
   conventionObjectiveOptions,
+  ConventionReadDto,
 } from "./convention.dto";
-import { ScheduleDto } from "../schedule/Schedule.dto";
+
 import { dateRegExp } from "../utils/date";
 import { allRoles } from "../tokens/MagicLinkPayload";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { peConnectPrefixSchema } from "../federatedIdentities/federatedIdentity.schema";
+import { scheduleSchema } from "../schedule/Schedule.schema";
 
 export const conventionIdSchema: z.ZodSchema<ConventionId> = zTrimmedString;
 export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
-
-const scheduleSchema: z.ZodSchema<ScheduleDto> = z.any();
 
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
@@ -140,6 +140,38 @@ export const conventionSchema: z.Schema<ConventionDto> =
       message: "La confirmation de votre accord est obligatoire.",
       path: ["enterpriseAccepted"],
     });
+
+export const conventionReadSchema: z.Schema<ConventionReadDto> =
+  conventionWithoutExternalIdZObject
+    .merge(
+      z.object({
+        externalId: externalConventionIdSchema,
+        agencyName: z.string(),
+      }),
+    )
+    .refine(startDateIsBeforeEndDate, {
+      message: "La date de fin doit être après la date de début.",
+      path: ["dateEnd"],
+    })
+    .refine(underMaxDuration, {
+      message: "La durée maximale d'immersion est de 28 jours.",
+      path: ["dateEnd"],
+    })
+    .refine(emailAndMentorEmailAreDifferent, {
+      message: "Votre adresse e-mail doit être différente de celle du tuteur",
+      path: ["mentorEmail"],
+    })
+    .refine(mustBeSignedByBeneficiary, {
+      message: "La confirmation de votre accord est obligatoire.",
+      path: ["beneficiaryAccepted"],
+    })
+    .refine(mustBeSignedByEstablishment, {
+      message: "La confirmation de votre accord est obligatoire.",
+      path: ["enterpriseAccepted"],
+    });
+
+export const conventionReadsSchema: z.Schema<Array<ConventionReadDto>> =
+  z.array(conventionReadSchema);
 
 export const conventionUkraineSchema: z.Schema<ConventionDto> =
   conventionSchema;

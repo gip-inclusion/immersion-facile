@@ -4,7 +4,7 @@ import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InM
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
 import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
-import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
+import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/InMemoryNavigationGateway";

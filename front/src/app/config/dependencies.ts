@@ -9,14 +9,14 @@ import { createLocalStorageDeviceRepository } from "src/core-logic/adapters/Devi
 import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";
 import { StubSentEmailGateway } from "src/core-logic/adapters/EmailGateway/StubSentEmailGateway";
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/HttpApiAdresseGateway";
-import { HttpConventionGateway } from "src/core-logic/adapters/HttpConventionGateway";
+
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/HttpEstablishmentGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/HttpSiretGatewayThroughBack";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/HttpTechnicalGateway";
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/InMemoryApiAdresseGateway";
-import { InMemoryConventionGateway } from "src/core-logic/adapters/InMemoryConventionGateway";
+import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/InMemoryEstablishmentGateway";
 import {
   InMemoryImmersionSearchGateway,
@@ -44,6 +44,7 @@ import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroug
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
 import { ENV } from "src/environmentVariables";
+import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 
 export const deviceRepository = createLocalStorageDeviceRepository();
 
