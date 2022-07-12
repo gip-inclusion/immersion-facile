@@ -1,3 +1,18 @@
+import { z } from "zod";
+
+export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
+  enableAdminUi: z.boolean(),
+  enableInseeApi: z.boolean(),
+  enablePeConnectApi: z.boolean(),
+  enableLogoUpload: z.boolean(),
+  enablePeConventionBroadcast: z.boolean(),
+});
+
+export const featureFlagsResponseSchema: z.Schema<{ data: FeatureFlags }> =
+  z.object({
+    data: featureFlagsSchema,
+  });
+
 export type FeatureFlags = {
   enableAdminUi: boolean;
   enableInseeApi: boolean;
