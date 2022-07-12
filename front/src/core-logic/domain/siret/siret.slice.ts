@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { GetSiretInfoError } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
-import { GetSiretResponseDto } from "shared/src/siret";
+import { GetSiretInfoError, GetSiretResponseDto } from "shared/src/siret";
 
 export type InvalidSiretError = "SIRET must be 14 digits";
 

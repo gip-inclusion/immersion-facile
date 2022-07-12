@@ -5,15 +5,18 @@ import {
   getSiretIfNotSavedRoute,
   siretRoute,
 } from "shared/src/routes";
-import { SiretDto } from "shared/src/siret";
 import {
   GetSiretInfo,
   GetSiretInfoError,
+  getSiretInfoSchema,
+  isSiretExistResponseSchema,
   sirenApiMissingEstablishmentMessage,
   sirenApiUnavailableSiretErrorMessage,
-  SiretGatewayThroughBack,
+  SiretDto,
   tooManiSirenRequestsSiretErrorMessage,
-} from "../ports/SiretGatewayThroughBack";
+} from "shared/src/siret";
+import { validateDataFromSchema } from "src/../../shared/src/zodUtils";
+import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 const prefix = "api";
 
@@ -29,8 +32,15 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
   isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean> {
     return from(
       this.axiosInstance
-        .get(`/${formAlreadyExistsRoute}/${siret}`)
-        .then((response) => response.data),
+        .get<unknown>(`/${formAlreadyExistsRoute}/${siret}`)
+        .then(({ data }) => {
+          const isSiretAlreadyExist = validateDataFromSchema(
+            isSiretExistResponseSchema,
+            data,
+          );
+          if (isSiretAlreadyExist instanceof Error) throw isSiretAlreadyExist;
+          return isSiretAlreadyExist;
+        }),
     );
   }
 
@@ -39,8 +49,15 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
   public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
     return from(
       this.axiosInstance
-        .get(`/${siretRoute}/${siret}`)
-        .then((response) => response.data)
+        .get<unknown>(`/${siretRoute}/${siret}`)
+        .then(({ data }) => {
+          const getSiretInfoDto = validateDataFromSchema(
+            getSiretInfoSchema,
+            data,
+          );
+          if (getSiretInfoDto instanceof Error) throw getSiretInfoDto;
+          return getSiretInfoDto;
+        })
         .catch((error) => {
           const errorMessage = errorMessageByCode[error?.response?.status];
           if (!errorMessage) throw error;
@@ -54,8 +71,15 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
   ): Observable<GetSiretInfo> {
     return from(
       this.axiosInstance
-        .get(`/${getSiretIfNotSavedRoute}/${siret}`)
-        .then((response) => response.data)
+        .get<unknown>(`/${getSiretIfNotSavedRoute}/${siret}`)
+        .then(({ data }) => {
+          const getSiretInfoDto = validateDataFromSchema(
+            getSiretInfoSchema,
+            data,
+          );
+          if (getSiretInfoDto instanceof Error) throw getSiretInfoDto;
+          return getSiretInfoDto;
+        })
         .catch((error) => {
           const errorMessage = errorMessageByCode[error?.response?.status];
           if (!errorMessage) throw error;

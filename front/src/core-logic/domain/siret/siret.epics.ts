@@ -1,13 +1,10 @@
 import { filter, iif, map, Observable, of, switchMap } from "rxjs";
-import { SiretDto, siretSchema } from "shared/src/siret";
+import { GetSiretInfo, SiretDto, siretSchema } from "shared/src/siret";
 import {
   SiretAction,
   siretSlice,
 } from "src/core-logic/domain/siret/siret.slice";
-import {
-  GetSiretInfo,
-  SiretGatewayThroughBack,
-} from "src/core-logic/ports/SiretGatewayThroughBack";
+import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import { AppEpic } from "src/core-logic/storeConfig/redux.helpers";
 

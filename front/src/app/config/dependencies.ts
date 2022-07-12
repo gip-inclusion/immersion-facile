@@ -10,7 +10,6 @@ import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpS
 import { StubSentEmailGateway } from "src/core-logic/adapters/EmailGateway/StubSentEmailGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/HttpRomeAutocompleteGateway";
-import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/HttpSiretGatewayThroughBack";
 
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/ApiAdresse/InMemoryApiAdresseGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
@@ -24,7 +23,6 @@ import {
   seedRomeDtos,
 } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
 import { ReactNavigationGateway } from "src/core-logic/adapters/ReactNavigationGateway";
-import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SimulatedSiretGatewayThroughBack";
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
@@ -45,6 +43,8 @@ import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpCo
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
 import { HttpApiAdresseGateway } from "src/core-logic/adapters/ApiAdresse/HttpApiAdresseGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
+import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/HttpSiretGatewayThroughBack";
+import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/SimulatedSiretGatewayThroughBack";
 
 export const deviceRepository = createLocalStorageDeviceRepository();
 

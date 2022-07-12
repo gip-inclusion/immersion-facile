@@ -1,14 +1,15 @@
 import { makeStubFeatureFlags } from "shared/src/featureFlags";
-import { GetSiretResponseDto } from "shared/src/siret";
+import {
+  GetSiretInfo,
+  GetSiretResponseDto,
+  tooManiSirenRequestsSiretErrorMessage,
+} from "shared/src/siret";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import {
   siretSlice,
   SiretState,
 } from "src/core-logic/domain/siret/siret.slice";
-import {
-  GetSiretInfo,
-  tooManiSirenRequestsSiretErrorMessage,
-} from "src/core-logic/ports/SiretGatewayThroughBack";
+
 import {
   createTestStore,
   TestDependencies,

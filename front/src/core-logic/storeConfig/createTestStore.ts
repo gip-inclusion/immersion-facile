@@ -13,7 +13,7 @@ import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/T
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
-import { TestSiretGatewayThroughBack } from "../adapters/TestSiretGatewayThroughBack";
+import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
 
 export interface TestDependencies {
   adminGateway: TestAdminGateway;

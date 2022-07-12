@@ -1,19 +1,5 @@
 import { Observable } from "rxjs";
-import { SiretDto, GetSiretResponseDto } from "shared/src/siret";
-
-export const tooManiSirenRequestsSiretErrorMessage =
-  "Too many requests on SIRENE API.";
-export const sirenApiUnavailableSiretErrorMessage = "SIRENE API not available.";
-export const sirenApiUnexpectedErrorErrorMessage = "Unexpected Error";
-export const sirenApiMissingEstablishmentMessage =
-  "Missing establishment on SIRENE API.";
-export type GetSiretInfoError =
-  | typeof sirenApiMissingEstablishmentMessage
-  | typeof tooManiSirenRequestsSiretErrorMessage
-  | typeof sirenApiUnavailableSiretErrorMessage
-  | "Establishment with this siret is already in our DB";
-
-export type GetSiretInfo = GetSiretResponseDto | GetSiretInfoError;
+import { SiretDto, GetSiretInfo } from "src/../../shared/src/siret";
 
 export interface SiretGatewayThroughBack {
   isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean>;

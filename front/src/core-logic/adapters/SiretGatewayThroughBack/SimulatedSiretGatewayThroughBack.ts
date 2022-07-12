@@ -3,19 +3,17 @@ import {
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
   conflictErrorSiret,
-  GetSiretResponseDto,
-  SiretDto,
-  siretSchema,
-  tooManySirenRequestsSiret,
-} from "shared/src/siret";
-import {
   GetSiretInfo,
+  GetSiretResponseDto,
   sirenApiMissingEstablishmentMessage,
   sirenApiUnavailableSiretErrorMessage,
   sirenApiUnexpectedErrorErrorMessage,
-  SiretGatewayThroughBack,
+  SiretDto,
+  siretSchema,
   tooManiSirenRequestsSiretErrorMessage,
-} from "../ports/SiretGatewayThroughBack";
+  tooManySirenRequestsSiret,
+} from "shared/src/siret";
+import { SiretGatewayThroughBack } from "../../ports/SiretGatewayThroughBack";
 
 export class SimulatedSiretGatewayThroughBack
   implements SiretGatewayThroughBack

@@ -2,15 +2,13 @@ import { firstValueFrom } from "rxjs";
 import {
   apiSirenNotAvailableSiret,
   conflictErrorSiret,
+  GetSiretInfoError,
   tooManySirenRequestsSiret,
 } from "shared/src/siret";
-import {
-  GetSiretInfoError,
-  SiretGatewayThroughBack,
-} from "../ports/SiretGatewayThroughBack";
 import { expectToEqual } from "shared/src/expectToEqual";
-import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
+import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { SimulatedSiretGatewayThroughBack } from "./SimulatedSiretGatewayThroughBack";
+import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
 
 const simulated = new SimulatedSiretGatewayThroughBack(0, {
   "12345678901234": {

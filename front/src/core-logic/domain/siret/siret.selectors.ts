@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { GetSiretInfoError } from "src/../../shared/src/siret";
 import { InvalidSiretError } from "src/core-logic/domain/siret/siret.slice";
-import { GetSiretInfoError } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
 const siretState = createRootSelector(({ siret }) => siret);
