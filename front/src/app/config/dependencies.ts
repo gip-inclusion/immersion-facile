@@ -8,7 +8,7 @@ import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/Ass
 import { createLocalStorageDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createLocalStorageDeviceRepository";
 import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";
 import { StubSentEmailGateway } from "src/core-logic/adapters/EmailGateway/StubSentEmailGateway";
-import { HttpImmersionSearchGateway } from "src/core-logic/adapters/HttpImmersionSearchGateway";
+import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/HttpSiretGatewayThroughBack";
 
@@ -18,7 +18,7 @@ import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/Establishm
 import {
   InMemoryImmersionSearchGateway,
   seedSearchResults,
-} from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
+} from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
 import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,

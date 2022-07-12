@@ -39,6 +39,8 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
     additionalInformation: zStringPossiblyEmpty.optional(),
   });
 
-export const searchImmersionResponseSchema = z.array(
-  searchImmersionResultSchema,
-);
+export const searchImmersionsSchema = z.array(searchImmersionResultSchema);
+
+export const searchImmersionsResponseSchema = z.object({
+  data: searchImmersionsSchema,
+});

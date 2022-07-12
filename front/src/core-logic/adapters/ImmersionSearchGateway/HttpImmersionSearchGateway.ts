@@ -10,6 +10,8 @@ import {
 import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
+import { validateDataFromSchema } from "shared/src/zodUtils";
+import { searchImmersionsResponseSchema } from "shared/src/searchImmersion/SearchImmersionResult.schema";
 
 const prefix = "api";
 
@@ -18,12 +20,21 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
     searchParams: SearchImmersionQueryParamsDto,
   ): Observable<SearchImmersionResultDto[]> {
     return ajax
-      .get<SearchImmersionResultDto[]>(
+      .get<unknown>(
         `/${prefix}/${immersionOffersRoute}?${queryParamsAsString<SearchImmersionQueryParamsDto>(
           searchParams,
         )}`,
       )
-      .pipe(map(({ response }) => response));
+      .pipe(
+        map(({ response }) => {
+          const formEstablishmentDto = validateDataFromSchema(
+            searchImmersionsResponseSchema,
+            response,
+          );
+          if (formEstablishmentDto instanceof Error) throw formEstablishmentDto;
+          return formEstablishmentDto.data;
+        }),
+      );
   }
 
   public async contactEstablishment(

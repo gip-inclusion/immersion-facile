@@ -6,7 +6,7 @@ import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestS
 import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/ApiAdresse/InMemoryApiAdresseGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
-import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/InMemoryImmersionSearchGateway";
+import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/InMemoryNavigationGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/InMemoryRomeAutocompleteGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";

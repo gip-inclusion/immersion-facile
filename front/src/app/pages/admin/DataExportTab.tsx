@@ -4,7 +4,7 @@ import {
   DepartmentOrRegion,
   FormSourceProvider,
 } from "shared/src/establishmentExport/establishmentExport.dto";
-import { HttpExcelExportGateway } from "src/core-logic/adapters/HttpExcelExportGateway";
+import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGateway/HttpExcelExportGateway";
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
