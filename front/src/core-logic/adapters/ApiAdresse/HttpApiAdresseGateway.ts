@@ -5,6 +5,8 @@ import {
   ApiAdresseGateway,
 } from "src/core-logic/ports/ApiAdresseGateway";
 import { LatLonDto } from "shared/src/latLon";
+import { validateDataFromSchema } from "shared/src/zodUtils";
+import { featuresSchemaResponse } from "shared/src/apiAdresse/apiAddress.schema";
 
 type ValidFeature = {
   properties: {
@@ -23,7 +25,7 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
     query: string,
   ): Promise<AddressWithCoordinates[]> {
     try {
-      const response = await axios.get(
+      const { data } = await axios.get<unknown>(
         "https://api-adresse.data.gouv.fr/search/",
         {
           params: {
@@ -32,8 +34,12 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
           },
         },
       );
-
-      return (response.data.features as unknown[])
+      const featuresResponce = validateDataFromSchema(
+        featuresSchemaResponse,
+        data,
+      );
+      if (featuresResponce instanceof Error) throw featuresResponce;
+      return featuresResponce.features
         .filter(keepOnlyValidFeatures)
         .map(featureToStreetAddressWithCoordinates)
         .filter(removeNilValues);
@@ -46,7 +52,7 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
 
   public async lookupPostCode(query: string): Promise<LatLonDto | null> {
     try {
-      const response = await axios.get(
+      const { data } = await axios.get<unknown>(
         "https://api-adresse.data.gouv.fr/search/",
         {
           params: {
@@ -56,18 +62,20 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
         },
       );
 
-      const validFeatures = (response.data.features as unknown[]).filter(
+      const featuresResponce = validateDataFromSchema(
+        featuresSchemaResponse,
+        data,
+      );
+      if (featuresResponce instanceof Error) throw featuresResponce;
+      const validFeatures = featuresResponce.features.filter(
         keepOnlyValidFeatures,
       );
-      if (validFeatures.length > 0) {
-        const feature = validFeatures[0];
-        return {
-          lat: feature.geometry.coordinates[1],
-          lon: feature.geometry.coordinates[0],
-        };
-      } else {
-        return null;
-      }
+      return validFeatures.length > 0
+        ? {
+            lat: validFeatures[0].geometry.coordinates[1],
+            lon: validFeatures[0].geometry.coordinates[0],
+          }
+        : null;
     } catch (e) {
       //eslint-disable-next-line no-console
       console.error("Api Adresse Search Error", e);
@@ -93,15 +101,15 @@ const featureToStreetAddressWithCoordinates = (
   feature: ValidFeature,
 ): AddressWithCoordinates | undefined => {
   const label = buildLabel(feature);
-  if (!label) return;
-
-  return {
-    coordinates: {
-      lat: feature.geometry.coordinates[1],
-      lon: feature.geometry.coordinates[0],
-    },
-    label,
-  };
+  return label
+    ? {
+        coordinates: {
+          lat: feature.geometry.coordinates[1],
+          lon: feature.geometry.coordinates[0],
+        },
+        label,
+      }
+    : undefined;
 };
 
 const buildLabel = (feature: {
