@@ -22,7 +22,7 @@ import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,
 } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
-import { ReactNavigationGateway } from "src/core-logic/adapters/ReactNavigationGateway";
+import { ReactNavigationGateway } from "src/core-logic/adapters/NavigationGateway/ReactNavigationGateway";
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
