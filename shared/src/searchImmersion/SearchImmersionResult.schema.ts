@@ -40,7 +40,3 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
   });
 
 export const searchImmersionsSchema = z.array(searchImmersionResultSchema);
-
-export const searchImmersionsResponseSchema = z.object({
-  data: searchImmersionsSchema,
-});

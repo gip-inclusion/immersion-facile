@@ -8,11 +8,6 @@ export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
   enablePeConventionBroadcast: z.boolean(),
 });
 
-export const featureFlagsResponseSchema: z.Schema<{ data: FeatureFlags }> =
-  z.object({
-    data: featureFlagsSchema,
-  });
-
 export type FeatureFlags = {
   enableAdminUi: boolean;
   enableInseeApi: boolean;

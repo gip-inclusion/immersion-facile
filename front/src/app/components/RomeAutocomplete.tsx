@@ -20,7 +20,7 @@ export const RomeAutocomplete = ({
   setFormValue,
   title,
   className,
-}: RomeAutocompleteProps) => {
+}: RomeAutocompleteProps): JSX.Element => {
   const { romeSearchText, isSearching, selectedRomeDto, romeOptions } =
     useAppSelector(romeAutocompleteSelector);
   const { updateSearchTerm, selectOption } = useRomeAutocompleteUseCase();

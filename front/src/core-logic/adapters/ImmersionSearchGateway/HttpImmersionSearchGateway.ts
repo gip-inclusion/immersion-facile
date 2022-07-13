@@ -11,7 +11,7 @@ import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/Search
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
 import { validateDataFromSchema } from "shared/src/zodUtils";
-import { searchImmersionsResponseSchema } from "shared/src/searchImmersion/SearchImmersionResult.schema";
+import { searchImmersionsSchema } from "shared/src/searchImmersion/SearchImmersionResult.schema";
 
 const prefix = "api";
 
@@ -28,11 +28,11 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
       .pipe(
         map(({ response }) => {
           const formEstablishmentDto = validateDataFromSchema(
-            searchImmersionsResponseSchema,
+            searchImmersionsSchema,
             response,
           );
           if (formEstablishmentDto instanceof Error) throw formEstablishmentDto;
-          return formEstablishmentDto.data;
+          return formEstablishmentDto;
         }),
       );
   }

@@ -11,7 +11,7 @@ import { appellationRoute, romeRoute } from "shared/src/routes";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
 import {
   appellationSearchResponseSchema,
-  romeListResponseSchema,
+  romeListSchema,
 } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
 import { validateDataFromSchema } from "shared/src/zodUtils";
 
@@ -23,11 +23,11 @@ export class HttpRomeAutocompleteGateway implements RomeAutocompleteGateway {
     return ajax.getJSON<unknown>(`/${prefix}/${romeRoute}?${queryParams}`).pipe(
       map((response) => {
         const romeListResponse = validateDataFromSchema(
-          romeListResponseSchema,
+          romeListSchema,
           response,
         );
         if (romeListResponse instanceof Error) throw romeListResponse;
-        return romeListResponse.data;
+        return romeListResponse;
       }),
     );
   }

@@ -20,20 +20,19 @@ type ValidFeature = {
   };
 };
 
+const apiAdresseSearchUrl = "https://api-adresse.data.gouv.fr/search/";
+
 export class HttpApiAdresseGateway implements ApiAdresseGateway {
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressWithCoordinates[]> {
     try {
-      const { data } = await axios.get<unknown>(
-        "https://api-adresse.data.gouv.fr/search/",
-        {
-          params: {
-            q: query,
-            limit: 10,
-          },
+      const { data } = await axios.get<unknown>(apiAdresseSearchUrl, {
+        params: {
+          q: query,
+          limit: 10,
         },
-      );
+      });
       const featuresResponce = validateDataFromSchema(
         featuresSchemaResponse,
         data,
@@ -52,15 +51,12 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
 
   public async lookupPostCode(query: string): Promise<LatLonDto | null> {
     try {
-      const { data } = await axios.get<unknown>(
-        "https://api-adresse.data.gouv.fr/search/",
-        {
-          params: {
-            q: query,
-            type: "municipality",
-          },
+      const { data } = await axios.get<unknown>(apiAdresseSearchUrl, {
+        params: {
+          q: query,
+          type: "municipality",
         },
-      );
+      });
 
       const featuresResponce = validateDataFromSchema(
         featuresSchemaResponse,

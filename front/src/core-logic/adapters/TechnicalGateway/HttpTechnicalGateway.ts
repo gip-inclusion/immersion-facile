@@ -2,10 +2,7 @@ import axios from "axios";
 import { ajax } from "rxjs/ajax";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
-import {
-  FeatureFlags,
-  featureFlagsResponseSchema,
-} from "shared/src/featureFlags";
+import { FeatureFlags, featureFlagsSchema } from "shared/src/featureFlags";
 import { getFeatureFlags, uploadFileRoute } from "shared/src/routes";
 import { map, Observable } from "rxjs";
 import { validateDataFromSchema } from "shared/src/zodUtils";
@@ -26,12 +23,9 @@ export class HttpTechnicalGateway implements TechnicalGateway {
   getAllFeatureFlags = (): Observable<FeatureFlags> =>
     ajax.getJSON<unknown>(`/${prefix}/${getFeatureFlags}`).pipe(
       map((result) => {
-        const featureFlags = validateDataFromSchema(
-          featureFlagsResponseSchema,
-          result,
-        );
+        const featureFlags = validateDataFromSchema(featureFlagsSchema, result);
         if (featureFlags instanceof Error) throw featureFlags;
-        return featureFlags.data;
+        return featureFlags;
       }),
     );
 }
