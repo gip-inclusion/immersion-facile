@@ -1,27 +1,27 @@
 import { Column } from "exceljs";
-import { map, prop, groupBy, uniq, reduceBy, values } from "ramda";
+import { groupBy, map, prop, reduceBy, uniq, values } from "ramda";
+import { EstablishmentExportConfigDto } from "shared/src/establishmentExport/establishmentExport.dto";
+import { establishmentExportSchemaObj } from "shared/src/establishmentExport/establishmentExport.schema";
 import { pipeWithValue } from "shared/src/pipeWithValue";
+import {
+  captureAddressGroups,
+  CaptureAddressGroupsResult,
+} from "shared/src/utils/address";
+import { z } from "zod";
+import { retrieveParentDirectory } from "../../../utils/filesystemUtils";
+import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { Archive } from "../../generic/archive/port/Archive";
 import { Workbook } from "../../generic/excel/port/Workbook";
-import { EstablishmentReadyForExportVO } from "../valueObjects/EstablishmentReadyForExportVO";
+import { DepartmentAndRegion } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import {
   EstablishmentRawBeforeExportProps,
   EstablishmentRawBeforeExportPropsKeys,
   EstablishmentRawBeforeExportVO,
   EstablishmentRawProps,
 } from "../valueObjects/EstablishmentRawBeforeExportVO";
-import { notifyDiscord } from "../../../utils/notifyDiscord";
-import { DepartmentAndRegion } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
-import { establishmentExportSchemaObj } from "shared/src/establishmentExport/establishmentExport.schema";
-import { EstablishmentExportConfigDto } from "shared/src/establishmentExport/establishmentExport.dto";
-import { z } from "zod";
-import {
-  captureAddressGroups,
-  CaptureAddressGroupsResult,
-} from "shared/src/utils/address";
-import { retrieveParentDirectory } from "../../../utils/filesystemUtils";
+import { EstablishmentReadyForExportVO } from "../valueObjects/EstablishmentReadyForExportVO";
 
 export type EstablishmentExportConfig = EstablishmentExportConfigDto & {
   archivePath: string;

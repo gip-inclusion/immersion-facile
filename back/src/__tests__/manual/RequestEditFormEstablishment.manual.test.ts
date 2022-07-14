@@ -34,14 +34,14 @@ describe("RequestEditFormEstablishment", () => {
     const clock = new RealClock();
 
     const unitOfWork = {
-      establishmentAggregateRepo: {
+      establishmentAggregateRepository: {
         getContactForEstablishmentSiret: (): ContactEntityV2 => businessContact,
       } as unknown as EstablishmentAggregateRepository,
       outboxQueries: {
         getLastPayloadOfFormEstablishmentEditLinkSentWithSiret: (): undefined =>
           undefined,
       } as unknown as OutboxQueries,
-      outboxRepo: {
+      outboxRepository: {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         save: () => {},
       } as unknown as OutboxRepository,

@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
-import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { FeatureFlags } from "shared/src/featureFlags";
+import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 
 const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
   raw.reduce(

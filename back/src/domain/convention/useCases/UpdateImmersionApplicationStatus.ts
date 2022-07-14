@@ -1,29 +1,28 @@
 import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
-import {
-  ConventionStatus,
-  ConventionId,
-  UpdateConventionStatusRequestDto,
-  WithConventionId,
   ConventionDto,
+  ConventionId,
+  ConventionStatus,
+  UpdateConventionStatusRequestDto,
   validatedConventionStatuses,
+  WithConventionId,
 } from "shared/src/convention/convention.dto";
+import { updateConventionStatusRequestSchema } from "shared/src/convention/convention.schema";
 import { statusTransitionConfigs } from "shared/src/convention/conventionStatusTransitions";
 import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../core/eventBus/events";
-import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { UseCase } from "../../core/UseCase";
-import { ConventionRepository } from "../ports/ConventionRepository";
-import { updateConventionStatusRequestSchema } from "shared/src/convention/convention.schema";
 import { Clock } from "../../core/ports/Clock";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
 
@@ -41,27 +40,28 @@ const domainTopicByTargetStatusMap: Record<
   DRAFT: "ImmersionApplicationRequiresModification",
 };
 
-export class UpdateImmersionApplicationStatus extends UseCase<
+export class UpdateImmersionApplicationStatus extends TransactionalUseCase<
   UpdateConventionStatusRequestDto,
   WithConventionId
 > {
   constructor(
-    private readonly conventionRepository: ConventionRepository,
+    uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
     private readonly clock: Clock,
-    private readonly outboxRepository: OutboxRepository,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = updateConventionStatusRequestSchema;
 
   public async _execute(
     { status, justification }: UpdateConventionStatusRequestDto,
+    uow: UnitOfWork,
     { applicationId, role }: ConventionMagicLinkPayload,
   ): Promise<WithConventionId> {
     logger.debug({ status, applicationId, role });
     const storedDto = await this.getStoredConventionOrThrowIfNotAllowed(
+      uow,
       status,
       role,
       applicationId,
@@ -81,7 +81,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
         : undefined,
     };
 
-    const updatedId = await this.conventionRepository.update(updatedDto);
+    const updatedId = await uow.conventionRepository.update(updatedDto);
     if (!updatedId) throw new NotFoundError(updatedId);
 
     const domainTopic = domainTopicByTargetStatusMap[status];
@@ -91,7 +91,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
       ...this.createEvent(updatedDto, domainTopic, justification),
       occurredAt: conventionUpdatedAt,
     };
-    await this.outboxRepository.save(event);
+    await uow.outboxRepository.save(event);
     return { id: updatedId };
   }
 
@@ -117,6 +117,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
   }
 
   private async getStoredConventionOrThrowIfNotAllowed(
+    uow: UnitOfWork,
     status: ConventionStatus,
     role: Role,
     applicationId: ConventionId,
@@ -126,7 +127,7 @@ export class UpdateImmersionApplicationStatus extends UseCase<
     if (!statusTransitionConfig.validRoles.includes(role))
       throw new ForbiddenError();
 
-    const convention = await this.conventionRepository.getById(applicationId);
+    const convention = await uow.conventionRepository.getById(applicationId);
     if (!convention) throw new NotFoundError(applicationId);
 
     if (

@@ -1,7 +1,7 @@
-import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -33,8 +33,8 @@ export class EditFormEstablishment extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.formEstablishmentRepo.update(dto),
-      uow.outboxRepo.save(event),
+      uow.formEstablishmentRepository.update(dto),
+      uow.outboxRepository.save(event),
     ]);
   }
 }

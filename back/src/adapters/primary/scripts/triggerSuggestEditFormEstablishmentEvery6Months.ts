@@ -1,21 +1,21 @@
 import { addMonths } from "date-fns";
 import { Pool } from "pg";
+import { SiretDto } from "shared/src/siret";
+import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
-import { SiretDto } from "shared/src/siret";
 import { createLogger } from "../../../utils/logger";
 
 import { notifyDiscord } from "../../../utils/notifyDiscord";
-import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
-import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
+import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
+import { makeEmailAllowListPredicate } from "../config/createGateways";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/makeGenerateEditFormEstablishmentUrl";
 import { createPgUow } from "../config/uowConfig";
-import { makeEmailAllowListPredicate } from "../config/repositoriesConfig";
 
 const NB_MONTHS_BEFORE_SUGGEST = 6;
 

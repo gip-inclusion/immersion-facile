@@ -1,20 +1,20 @@
 import { parseISO } from "date-fns";
 import { AgencyDto } from "shared/src/agency/agency.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
+import { conventionSchema } from "shared/src/convention/convention.schema";
 import {
   calculateTotalImmersionHoursBetweenDate,
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
-import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { EmailGateway } from "../../ports/EmailGateway";
 
 export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUseCase<ConventionDto> {
   constructor(
@@ -30,7 +30,7 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const agency = await uow.agencyRepo.getById(convention.agencyId);
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
 
     if (!agency)
       throw new NotFoundError(
@@ -38,7 +38,7 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
       );
 
     const peUserAdvisorOrUndefined =
-      await uow.conventionPoleEmploiAdvisorRepo.getByConventionId(
+      await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
         convention.id,
       );
 

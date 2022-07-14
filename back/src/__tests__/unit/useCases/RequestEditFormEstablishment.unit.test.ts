@@ -1,20 +1,17 @@
+import { TemplatedEmail } from "shared/email";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
-import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
-import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
-import { TemplatedEmail } from "shared/email";
 
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";
@@ -36,23 +33,19 @@ const setMethodGetContactEmailFromSiret = (
 };
 
 const prepareUseCase = () => {
-  const outboxRepo = new InMemoryOutboxRepository();
-  const outboxQueries = new InMemoryOutboxQueries(outboxRepo);
-  const establishmentAggregateRepo =
-    new InMemoryEstablishmentAggregateRepository();
-  setMethodGetContactEmailFromSiret(establishmentAggregateRepo); // In most of the tests, we need the contact to be defined
+  const uow = createInMemoryUow();
+  const outboxRepository = uow.outboxRepository;
+  const outboxQueries = uow.outboxQueries;
+  const establishmentAggregateRepository = uow.establishmentAggregateRepository;
+
+  setMethodGetContactEmailFromSiret(establishmentAggregateRepository); // In most of the tests, we need the contact to be defined
 
   const clock = new CustomClock();
   const emailGateway = new InMemoryEmailGateway();
   const uuidGenerator = new UuidV4Generator();
   const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
-  const uowPerformer = new InMemoryUowPerformer({
-    ...createInMemoryUow(),
-    establishmentAggregateRepo,
-    outboxRepo,
-    outboxQueries,
-  });
+  const uowPerformer = new InMemoryUowPerformer(uow);
 
   const generateEditFormEstablishmentUrl = (payload: EstablishmentJwtPayload) =>
     `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
@@ -67,8 +60,8 @@ const prepareUseCase = () => {
   return {
     useCase,
     outboxQueries,
-    outboxRepo,
-    establishmentAggregateRepo,
+    outboxRepository,
+    establishmentAggregateRepository,
     emailGateway,
     clock,
   };
@@ -77,9 +70,9 @@ const prepareUseCase = () => {
 describe("RequestUpdateFormEstablishment", () => {
   it("Throws an error if contact email is unknown", async () => {
     // Prepare
-    const { useCase, establishmentAggregateRepo } = prepareUseCase();
+    const { useCase, establishmentAggregateRepository } = prepareUseCase();
 
-    establishmentAggregateRepo.getEstablishmentAggregateBySiret =
+    establishmentAggregateRepository.getEstablishmentAggregateBySiret =
       //eslint-disable-next-line @typescript-eslint/require-await
       async (_siret: string) =>
         new EstablishmentAggregateBuilder().withoutContact().build();
@@ -114,14 +107,14 @@ describe("RequestUpdateFormEstablishment", () => {
     });
     it("Saves an event in outbox repo", async () => {
       // Prepare
-      const { useCase, outboxRepo } = prepareUseCase();
+      const { useCase, outboxRepository } = prepareUseCase();
 
       // Act
       await useCase.execute(siret);
 
       // Assert
-      expect(outboxRepo.events).toHaveLength(1);
-      expect(outboxRepo.events[0]).toMatchObject({
+      expect(outboxRepository.events).toHaveLength(1);
+      expect(outboxRepository.events[0]).toMatchObject({
         topic: "FormEstablishmentEditLinkSent",
         payload: { siret },
       });
@@ -155,7 +148,7 @@ describe("RequestUpdateFormEstablishment", () => {
 
   it("Sends a new email if the edit link in last email has expired", async () => {
     // Prepare
-    const { useCase, outboxRepo, outboxQueries, emailGateway, clock } =
+    const { useCase, outboxRepository, outboxQueries, emailGateway, clock } =
       prepareUseCase();
 
     outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
@@ -173,6 +166,6 @@ describe("RequestUpdateFormEstablishment", () => {
 
     // Assert
     expect(emailGateway.getSentEmails()).toHaveLength(1);
-    expect(outboxRepo.events).toHaveLength(1);
+    expect(outboxRepository.events).toHaveLength(1);
   });
 });

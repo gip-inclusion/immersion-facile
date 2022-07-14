@@ -1,7 +1,7 @@
 import { PoolClient } from "pg";
 import {
-  PostalCodeDepartmentRegionQueries,
   DepartmentAndRegion,
+  PostalCodeDepartmentRegionQueries,
 } from "../../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 
 export class PgPostalCodeDepartmentRegionQueries

@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { AgencyDto, AgencyId } from "shared/src/agency/agency.dto";
 import {
-  generateMagicLinkRoute,
-  conventionsRoute,
-  agenciesRoute,
   adminLogin,
+  agenciesRoute,
+  conventionsRoute,
   emailRoute,
+  generateMagicLinkRoute,
 } from "shared/src/routes";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";

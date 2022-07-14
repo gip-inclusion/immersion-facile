@@ -1,9 +1,9 @@
-import { EstablishmentExportQueries } from "../../domain/establishment/ports/EstablishmentExportQueries";
-import { EstablishmentRawProps } from "../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 import { format } from "date-fns";
 import { FormSourceProvider } from "shared/src/establishmentExport/establishmentExport.dto";
+import { EstablishmentExportQueries } from "../../domain/establishment/ports/EstablishmentExportQueries";
+import { EstablishmentRawProps } from "../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 
-export const StubEstablishmentExportQueries: EstablishmentExportQueries = {
+export const stubEstablishmentExportQueries: EstablishmentExportQueries = {
   async getEstablishmentsBySourceProviderForExport(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sourceProvider: FormSourceProvider,

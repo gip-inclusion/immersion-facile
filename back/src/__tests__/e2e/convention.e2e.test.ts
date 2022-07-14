@@ -1,34 +1,32 @@
 import { AdminToken } from "shared/src/admin/admin.dto";
-import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
-import {
-  currentJwtVersions,
-  stringToMd5,
-} from "shared/src/tokens/MagicLinkPayload";
-import { SuperTest, Test } from "supertest";
-import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   conventionsRoute,
   updateConventionStatusRoute,
 } from "shared/src/routes";
 import {
   createConventionMagicLinkPayload,
+  currentJwtVersions,
   Role,
+  stringToMd5,
 } from "shared/src/tokens/MagicLinkPayload";
+import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
-import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import {
   buildTestApp,
-  InMemoryRepositories,
-  TestAppAndDeps,
+  InMemoryGateways,
 } from "../../_testBuilders/buildTestApp";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
+import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import { TEST_AGENCY_NAME } from "../../adapters/secondary/InMemoryConventionQueries";
+import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
 
 let request: SuperTest<Test>;
-let generateJwt: GenerateMagicLinkJwt;
+let generateMagicLinkJwt: GenerateMagicLinkJwt;
+let inMemoryUow: InMemoryUnitOfWork;
 let eventCrawler: BasicEventCrawler;
-let reposAndGateways: InMemoryRepositories;
+let gateways: InMemoryGateways;
 let adminToken: AdminToken;
 
 const convention = new ConventionDtoBuilder()
@@ -42,22 +40,14 @@ const initializeSystemUnderTest = async (
   config: AppConfig,
   { withImmersionStored }: { withImmersionStored: boolean },
 ) => {
-  const {
-    eventCrawler: testEventCrawler,
-    reposAndGateways: testReposAndGateways,
-    request: testRequest,
-    generateMagicLinkJwt,
-  }: TestAppAndDeps = await buildTestApp(config);
-  eventCrawler = testEventCrawler;
-  request = testRequest;
-  reposAndGateways = testReposAndGateways;
+  ({ eventCrawler, gateways, request, generateMagicLinkJwt, inMemoryUow } =
+    await buildTestApp(config));
 
   if (withImmersionStored) {
-    const conventionRepository =
-      reposAndGateways.convention as InMemoryConventionRepository;
+    const conventionRepository = inMemoryUow.conventionRepository;
     conventionRepository.setConventions({ [convention.id]: convention });
   }
-  generateJwt = generateMagicLinkJwt;
+
   const response = await request.post("/admin/login").send({
     user: config.backofficeUsername,
     password: config.backofficePassword,
@@ -136,7 +126,7 @@ describe("convention e2e", () => {
             exp: Math.round(Date.now() / 1000) + 31 * 24 * 3600,
             version: currentJwtVersions.application,
           };
-          const jwt = generateJwt(payload);
+          const jwt = generateMagicLinkJwt(payload);
 
           // GETting the created application succeeds.
           await request
@@ -158,7 +148,7 @@ describe("convention e2e", () => {
             undefined,
             Math.round(Date.now() / 1000) - 2 * 24 * 3600,
           );
-          const jwt = generateJwt(payload);
+          const jwt = generateMagicLinkJwt(payload);
 
           // GETting the created application 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
           await request
@@ -188,7 +178,7 @@ describe("convention e2e", () => {
           status: "READY_TO_SIGN",
         };
 
-        const jwt = generateJwt(
+        const jwt = generateMagicLinkJwt(
           createConventionMagicLinkPayload(
             convention.id,
             "beneficiary",
@@ -214,7 +204,7 @@ describe("convention e2e", () => {
 
       it("Fetching unknown application IDs fails with 404 Not Found", async () => {
         const unknownId = "unknown-demande-immersion-id";
-        const jwt = generateJwt(
+        const jwt = generateMagicLinkJwt(
           createConventionMagicLinkPayload(
             unknownId,
             "beneficiary",
@@ -240,7 +230,7 @@ describe("convention e2e", () => {
         const { externalId, ...createConventionParams } =
           conventionWithUnknownId;
 
-        const jwt = generateJwt(
+        const jwt = generateMagicLinkJwt(
           createConventionMagicLinkPayload(
             unknownId,
             "beneficiary",
@@ -286,7 +276,7 @@ describe("convention e2e", () => {
 
     it("Succeeds for rejected application and notifies Pole Emploi", async () => {
       // A counsellor rejects the application.
-      const counsellorJwt = generateJwt(
+      const counsellorJwt = generateMagicLinkJwt(
         createConventionMagicLinkPayload(
           conventionId,
           "counsellor",
@@ -301,7 +291,7 @@ describe("convention e2e", () => {
 
       await eventCrawler.processNewEvents();
 
-      const notifications = reposAndGateways.poleEmploiGateway.notifications;
+      const notifications = gateways.poleEmploiGateway.notifications;
       expect(notifications).toHaveLength(1);
       expect(notifications[0].status).toBe("REJETÉ");
     });
@@ -315,7 +305,7 @@ describe("convention e2e", () => {
 
     it("Returns error 403 for unauthorized requests", async () => {
       // A tutor tries to validate the application, but fails.
-      const tutorJwt = generateJwt(
+      const tutorJwt = generateMagicLinkJwt(
         createConventionMagicLinkPayload(
           conventionId,
           "establishment",
@@ -330,7 +320,7 @@ describe("convention e2e", () => {
     });
 
     it("Returns error 404 for unknown application ids", async () => {
-      const counsellorJwt = generateJwt(
+      const counsellorJwt = generateMagicLinkJwt(
         createConventionMagicLinkPayload(
           "unknown_application_id",
           "counsellor",

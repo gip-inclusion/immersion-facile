@@ -1,13 +1,13 @@
-import { Pool, PoolClient } from "pg";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
-import { EstablishmentAggregate } from "../../domain/immersionOffer/entities/EstablishmentEntity";
-import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
-import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
-import { PgEstablishmentExportQueries } from "../../adapters/secondary/pg/PgEstablishmentExportQueries";
 import { format } from "date-fns";
+import { Pool, PoolClient } from "pg";
+import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
+import { PgEstablishmentExportQueries } from "../../adapters/secondary/pg/PgEstablishmentExportQueries";
 import { EstablishmentRawProps } from "../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
+import { EstablishmentAggregate } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 
 describe("PgEstablishmentExportQueries", () => {
   let pool: Pool;

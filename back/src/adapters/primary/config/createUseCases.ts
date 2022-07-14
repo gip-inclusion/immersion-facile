@@ -1,3 +1,4 @@
+import { SiretDto } from "shared/src/siret";
 import { sleep } from "shared/src/utils";
 import {
   GenerateAdminJwt,
@@ -36,6 +37,7 @@ import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
+import { ApiConsumerId } from "../../../domain/core/valueObjects/ApiConsumer";
 import { ExportEstablishmentsAsExcelArchive } from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
@@ -64,15 +66,15 @@ import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
 import { AppConfig } from "./appConfig";
+import { Gateways } from "./createGateways";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
-import { Repositories } from "./repositoriesConfig";
 
 export type UseCases = ReturnType<typeof createUseCases>;
 
 export const createUseCases = (
   config: AppConfig,
-  repositories: Repositories,
+  gateways: Gateways,
   generateJwtFn: GenerateMagicLinkJwt,
   generateMagicLinkFn: GenerateConventionMagicLink,
   generateAdminJwt: GenerateAdminJwt,
@@ -85,13 +87,13 @@ export const createUseCases = (
     uuidGenerator,
     quarantinedTopics: config.quarantinedTopics,
   });
-  const getSiret = new GetSiret(repositories.sirene);
+  const getSiret = new GetSiret(gateways.sirene);
   const adresseAPI = new HttpAdresseAPI(noRateLimit, noRetries);
 
   return {
     associatePeConnectFederatedIdentity:
       new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),
-    uploadFile: new UploadFile(uowPerformer, repositories.documentGateway),
+    uploadFile: new UploadFile(uowPerformer, gateways.documentGateway),
 
     // Admin
     adminLogin: new AdminLogin(
@@ -100,7 +102,7 @@ export const createUseCases = (
       generateAdminJwt,
       () => sleep(config.nodeEnv !== "test" ? 500 : 0),
     ),
-    getSentEmails: new GetSentEmails(repositories.email),
+    getSentEmails: new GetSentEmails(gateways.email),
 
     // Conventions
     createImmersionAssessment: new CreateImmersionAssessment(
@@ -112,17 +114,18 @@ export const createUseCases = (
       createNewEvent,
       getSiret,
     ),
-    getConvention: new GetConvention(repositories.conventionQueries),
+    getConvention: new GetConvention(uowPerformer),
     linkPoleEmploiAdvisorAndRedirectToConvention:
       new LinkPoleEmploiAdvisorAndRedirectToConvention(
         uowPerformer,
-        repositories.peConnectGateway,
+        gateways.peConnectGateway,
         config.immersionFacileBaseUrl,
       ),
-    listAdminConventions: new ListAdminConventions(
-      repositories.conventionQueries,
+    listAdminConventions: new ListAdminConventions(uowPerformer),
+    exportConventionsAsExcelArchive: new ExportConventionsReport(
+      uowPerformer,
+      gateways.reportingGateway,
     ),
-    exportConventionsAsExcelArchive: new ExportConventionsReport(uowPerformer),
 
     exportEstablishmentsAsExcelArchive: new ExportEstablishmentsAsExcelArchive(
       uowPerformer,
@@ -133,16 +136,11 @@ export const createUseCases = (
       createNewEvent,
     ),
     updateConventionStatus: new UpdateImmersionApplicationStatus(
-      repositories.convention,
+      uowPerformer,
       createNewEvent,
       clock,
-      repositories.outbox,
     ),
-    signConvention: new SignImmersionApplication(
-      repositories.convention,
-      createNewEvent,
-      repositories.outbox,
-    ),
+    signConvention: new SignImmersionApplication(uowPerformer, createNewEvent),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewConventionMagicLink: new RenewConventionMagicLink(
       uowPerformer,
@@ -153,16 +151,10 @@ export const createUseCases = (
     ),
 
     // immersionOffer
-    searchImmersion: new SearchImmersion(
-      repositories.searchesMade,
-      repositories.immersionOffer,
-      uuidGenerator,
-    ),
-    getImmersionOfferById: new GetImmersionOfferById(
-      repositories.immersionOffer,
-    ),
+    searchImmersion: new SearchImmersion(uowPerformer, uuidGenerator),
+    getImmersionOfferById: new GetImmersionOfferById(uowPerformer),
     getImmersionOfferBySiretAndRome: new GetImmersionOfferBySiretAndRome(
-      repositories.immersionOffer,
+      uowPerformer,
     ),
 
     addFormEstablishment: new AddFormEstablishment(
@@ -180,7 +172,7 @@ export const createUseCases = (
     updateEstablishmentAggregateFromForm:
       new UpdateEstablishmentAggregateFromForm(
         uowPerformer,
-        repositories.sirene,
+        gateways.sirene,
         adresseAPI,
         uuidGenerator,
         clock,
@@ -188,7 +180,7 @@ export const createUseCases = (
     insertEstablishmentAggregateFromForm:
       new InsertEstablishmentAggregateFromForm(
         uowPerformer,
-        repositories.sirene,
+        gateways.sirene,
         adresseAPI,
         uuidGenerator,
         clock,
@@ -201,14 +193,13 @@ export const createUseCases = (
 
     callLaBonneBoiteAndUpdateRepositories:
       new CallLaBonneBoiteAndUpdateRepositories(
-        repositories.immersionOffer,
-        repositories.laBonneBoiteRequest,
-        repositories.laBonneBoiteAPI,
+        uowPerformer,
+        gateways.laBonneBoiteAPI,
         clock,
       ),
     requestEditFormEstablishment: new RequestEditFormEstablishment(
       uowPerformer,
-      repositories.email,
+      gateways.email,
       clock,
       makeGenerateEditFormEstablishmentUrl(config),
       createNewEvent,
@@ -216,14 +207,14 @@ export const createUseCases = (
 
     notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:
       new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
-        repositories.passEmploiGateway,
+        gateways.passEmploiGateway,
       ),
 
     // siret
     getSiret,
     getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
       uowPerformer,
-      repositories.sirene,
+      gateways.sirene,
     ),
 
     // romes
@@ -231,84 +222,97 @@ export const createUseCases = (
     romeSearch: new RomeSearch(uowPerformer),
 
     // agencies
-    listAgenciesWithPosition: new ListAgenciesWithPosition(repositories.agency),
-    privateListAgencies: new PrivateListAgencies(repositories.agency),
-    getAgencyPublicInfoById: new GetAgencyPublicInfoById(repositories.agency),
+    listAgenciesWithPosition: new ListAgenciesWithPosition(uowPerformer),
+    privateListAgencies: new PrivateListAgencies(uowPerformer),
+    getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
     sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
-      repositories.email,
+      gateways.email,
     ),
     // notifications
     confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature:
       new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
-        repositories.email,
+        gateways.email,
         generateMagicLinkFn,
       ),
     confirmToMentorThatConventionCorrectlySubmittedRequestSignature:
       new ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature(
-        repositories.email,
+        gateways.email,
         generateMagicLinkFn,
       ),
     notifyAllActorsOfFinalConventionValidation:
       new NotifyAllActorsOfFinalApplicationValidation(
         uowPerformer,
-        repositories.email,
+        gateways.email,
       ),
     notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
-      repositories.email,
-      repositories.agency,
+      uowPerformer,
+      gateways.email,
       generateMagicLinkFn,
     ),
     notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
       uowPerformer,
-      repositories.email,
+      gateways.email,
       generateMagicLinkFn,
     ),
     notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
       new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
-        repositories.email,
-        repositories.agency,
+        uowPerformer,
+        gateways.email,
       ),
     notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
       new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
-        repositories.email,
-        repositories.agency,
+        uowPerformer,
+        gateways.email,
         generateMagicLinkFn,
       ),
-    deliverRenewedMagicLink: new DeliverRenewedMagicLink(repositories.email),
+    deliverRenewedMagicLink: new DeliverRenewedMagicLink(gateways.email),
     notifyConfirmationEstablishmentCreated:
-      new NotifyConfirmationEstablishmentCreated(repositories.email),
+      new NotifyConfirmationEstablishmentCreated(gateways.email),
     notifyContactRequest: new NotifyContactRequest(
-      repositories.immersionOffer,
-      repositories.email,
+      uowPerformer,
+      gateways.email,
     ),
     notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty:
       new NotifyImmersionApplicationWasSignedByOtherParty(
-        repositories.email,
+        gateways.email,
         generateMagicLinkFn,
       ),
     notifyPoleEmploiUserAdvisorOnAssociation:
       new NotifyPoleEmploiUserAdvisorOnConventionAssociation(
         uowPerformer,
-        repositories.email,
+        gateways.email,
         generateMagicLinkFn,
       ),
     notifyPoleEmploiUserAdvisorOnConventionFullySigned:
       new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
         uowPerformer,
-        repositories.email,
+        gateways.email,
         generateMagicLinkFn,
       ),
     broadcastToPoleEmploiOnConventionUpdates:
       new BroadcastToPoleEmploiOnConventionUpdates(
         uowPerformer,
-        repositories.poleEmploiGateway,
+        gateways.poleEmploiGateway,
       ),
-    shareConventionByEmail: new ShareApplicationLinkByEmail(repositories.email),
+    shareConventionByEmail: new ShareApplicationLinkByEmail(gateways.email),
     addAgency: new AddAgency(
       uowPerformer,
       createNewEvent,
       config.defaultAdminEmail,
     ),
     updateAgency: new UpdateAgency(uowPerformer, createNewEvent),
+    getFeatureFlags: () => uowPerformer.perform((uow) => uow.getFeatureFlags()),
+    getApiConsumerById: (id: ApiConsumerId) =>
+      uowPerformer.perform((uow) => uow.getApiConsumersById(id)),
+    isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
+      uowPerformer.perform((uow) =>
+        uow.establishmentAggregateRepository.hasEstablishmentFromFormWithSiret(
+          siret,
+        ),
+      ),
+    getImmersionFacileAgencyIdByKind: () =>
+      uowPerformer.perform((uow) =>
+        uow.agencyRepository.getImmersionFacileAgencyId(),
+      ),
   };
 };

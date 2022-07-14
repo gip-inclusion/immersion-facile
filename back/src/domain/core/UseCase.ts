@@ -1,9 +1,9 @@
+import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { z } from "zod";
 import {
   BadRequestError,
   validateAndParseZodSchema,
 } from "../../adapters/primary/helpers/httpErrors";
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
 export abstract class UseCase<

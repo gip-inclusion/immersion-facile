@@ -1,8 +1,8 @@
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
+import { HttpsSireneGateway } from "../../adapters/secondary/HttpsSireneGateway";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
-import { HttpsSireneGateway } from "../../adapters/secondary/HttpsSireneGateway";
 import { SireneGateway } from "../../domain/sirene/ports/SireneGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the

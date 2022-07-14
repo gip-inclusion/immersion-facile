@@ -1,19 +1,19 @@
-import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
-  expectObjectsToMatch,
-  expectJwtInMagicLinkAndGetIt,
-  expectEmailOfType,
-} from "../../_testBuilders/test.helpers";
-import {
+  ConventionDtoWithoutExternalId,
   ConventionStatus,
   UpdateConventionStatusRequestDto,
-  ConventionDtoWithoutExternalId,
 } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   conventionsRoute,
   updateConventionStatusRoute,
 } from "shared/src/routes";
+import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
+import {
+  expectEmailOfType,
+  expectJwtInMagicLinkAndGetIt,
+  expectObjectsToMatch,
+} from "../../_testBuilders/test.helpers";
 import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
@@ -43,7 +43,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 });
 
 const beneficiarySubmitsApplicationForTheFirstTime = async (
-  { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   createConventionParams: ConventionDtoWithoutExternalId,
 ) => {
   await request
@@ -52,13 +52,13 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     .expect(200);
 
   await expectStoreImmersionToHaveStatus(
-    reposAndGateways.convention,
+    inMemoryUow.conventionRepository,
     "READY_TO_SIGN",
   );
 
   await eventCrawler.processNewEvents();
 
-  const sentEmails = reposAndGateways.email.getSentEmails();
+  const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(2);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [createConventionParams.email],
@@ -88,7 +88,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 };
 
 const expectEstablishmentRequiresChanges = async (
-  { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   establishmentJwt: string,
   immersionApplicationId: string,
   { status, justification }: UpdateConventionStatusRequestDto,
@@ -101,14 +101,14 @@ const expectEstablishmentRequiresChanges = async (
   await eventCrawler.processNewEvents();
 
   // Expect two emails sent (to beneficiary and to mentor)
-  const sentEmails = reposAndGateways.email.getSentEmails();
+  const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(4);
   expect(sentEmails.slice(2, 4).map((e) => e.recipients)).toEqual([
     ["beneficiary@email.fr"],
     ["establishment@example.com"],
   ]);
 
-  expectStoreImmersionToHaveStatus(reposAndGateways.convention, "DRAFT");
+  expectStoreImmersionToHaveStatus(inMemoryUow.conventionRepository, "DRAFT");
 
   const beneficiaryEditEmail = expectEmailOfType(
     sentEmails[2],

@@ -1,11 +1,11 @@
 import { secondsToMilliseconds } from "date-fns";
+import { LatLonDto } from "shared/src/latLon";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
   RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
-import { LatLonDto } from "shared/src/latLon";
 import {
   createAxiosInstance,
   isRetryableError,

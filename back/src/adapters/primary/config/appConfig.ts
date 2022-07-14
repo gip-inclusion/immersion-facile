@@ -1,6 +1,5 @@
 import * as dotenv from "dotenv";
 import { trim } from "ramda";
-import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import {
   makeGetBooleanVariable,
@@ -9,6 +8,7 @@ import {
   ProcessEnv,
   throwIfNotInArray,
 } from "shared/src/envHelpers";
+import { DomainTopic } from "../../../domain/core/eventBus/events";
 import type { MinioParams } from "../../secondary/MinioDocumentGateway";
 
 export type AccessTokenConfig = {

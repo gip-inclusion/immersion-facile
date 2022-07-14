@@ -1,27 +1,33 @@
 import { addDays } from "date-fns";
+import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { SireneGateway } from "../../sirene/ports/SireneGateway";
 import { SireneEstablishmentVO } from "../../sirene/valueObjects/SireneEstablishmentVO";
 import { AdresseAPI } from "../ports/AdresseAPI";
-import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
 const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
 
 const logger = createLogger(__filename);
 
-export class UpdateEstablishmentsFromSireneAPI {
+export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void> {
   constructor(
+    uowPerformer: UnitOfWorkPerformer,
     private readonly sireneGateway: SireneGateway,
-    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly adresseAPI: AdresseAPI,
     private readonly clock: Clock,
-  ) {}
+  ) {
+    super(uowPerformer);
+  }
 
-  public async execute() {
+  inputSchema = z.void();
+
+  public async _execute(_: void, uow: UnitOfWork) {
     const since = addDays(this.clock.now(), -SIRENE_NB_DAYS_BEFORE_REFRESH);
     const establishmentSiretsToUpdate =
-      await this.establishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
+      await uow.establishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
         since,
       );
 
@@ -37,7 +43,7 @@ export class UpdateEstablishmentsFromSireneAPI {
     for (const siret of establishmentSiretsToUpdate) {
       try {
         logger.info(`Updating establishment with siret ${siret}...`);
-        await this.updateEstablishmentWithSiret(siret);
+        await this.updateEstablishmentWithSiret(uow, siret);
         logger.info(`Successfuly updated establishment with siret ${siret} !`);
       } catch (error) {
         logger.warn(
@@ -48,7 +54,7 @@ export class UpdateEstablishmentsFromSireneAPI {
       }
     }
   }
-  private async updateEstablishmentWithSiret(siret: string) {
+  private async updateEstablishmentWithSiret(uow: UnitOfWork, siret: string) {
     const includeClosedEstablishments = false;
     const sireneAnswer = await this.sireneGateway.get(
       siret,
@@ -56,7 +62,7 @@ export class UpdateEstablishmentsFromSireneAPI {
     );
 
     if (!sireneAnswer || sireneAnswer.etablissements.length === 0) {
-      await this.establishmentAggregateRepository.updateEstablishment({
+      await uow.establishmentAggregateRepository.updateEstablishment({
         siret,
         updatedAt: this.clock.now(),
         isActive: false,
@@ -79,7 +85,7 @@ export class UpdateEstablishmentsFromSireneAPI {
         "Unable to retrieve position from API Adresse",
       );
     }
-    await this.establishmentAggregateRepository.updateEstablishment({
+    await uow.establishmentAggregateRepository.updateEstablishment({
       siret,
       updatedAt: this.clock.now(),
       nafDto,

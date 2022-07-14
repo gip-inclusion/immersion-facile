@@ -1,6 +1,6 @@
 import {
-  PoleEmploiGateway,
   PoleEmploiConvention,
+  PoleEmploiGateway,
 } from "../../domain/convention/ports/PoleEmploiGateway";
 
 export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {

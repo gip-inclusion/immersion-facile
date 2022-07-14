@@ -1,3 +1,4 @@
+import { CreateAgencyDto } from "shared/src/agency/agency.dto";
 import {
   expectObjectsToMatch,
   expectTypeToMatchAndEqual,
@@ -8,12 +9,11 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import {
   AddAgency,
   defaultQuestionnaireUrl,
 } from "../../../domain/convention/useCases/AddAgency";
-import { CreateAgencyDto } from "shared/src/agency/agency.dto";
+import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 
 const defaultAdminEmail = "myAdmin@mail.com";
 
@@ -38,8 +38,8 @@ describe("AddAgency use case", () => {
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    outboxRepo = uow.outboxRepo;
-    agencyRepo = uow.agencyRepo;
+    outboxRepo = uow.outboxRepository;
+    agencyRepo = uow.agencyRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
     const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();

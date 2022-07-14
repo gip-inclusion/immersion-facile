@@ -1,11 +1,11 @@
 import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
-import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "shared/src/contactEstablishment";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -25,12 +25,14 @@ export class ContactEstablishment extends TransactionalUseCase<
 
   public async _execute(
     params: ContactEstablishmentRequestDto,
-    { establishmentAggregateRepo, outboxRepo }: UnitOfWork,
+    { establishmentAggregateRepository, outboxRepository }: UnitOfWork,
   ): Promise<void> {
     const { siret, contactMode } = params;
 
     const establishmentAggregate =
-      await establishmentAggregateRepo.getEstablishmentAggregateBySiret(siret);
+      await establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        siret,
+      );
     if (!establishmentAggregate) throw new NotFoundError(siret);
 
     const contact = establishmentAggregate.contact;
@@ -47,6 +49,6 @@ export class ContactEstablishment extends TransactionalUseCase<
       payload: params,
     });
 
-    await outboxRepo.save(event);
+    await outboxRepository.save(event);
   }
 }

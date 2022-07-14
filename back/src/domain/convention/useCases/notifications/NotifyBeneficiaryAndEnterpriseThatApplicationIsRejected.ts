@@ -1,21 +1,24 @@
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
-import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyRepository";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
-export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends UseCase<ConventionDto> {
+export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends TransactionalUseCase<ConventionDto> {
   constructor(
+    uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly agencyRepository: AgencyRepository,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = conventionSchema;
 
-  public async _execute(dto: ConventionDto): Promise<void> {
-    const agency = await this.agencyRepository.getById(dto.agencyId);
+  public async _execute(dto: ConventionDto, uow: UnitOfWork): Promise<void> {
+    const agency = await uow.agencyRepository.getById(dto.agencyId);
     if (!agency) {
       throw new Error(
         `Unable to send mail. No agency config found for ${dto.agencyId}`,

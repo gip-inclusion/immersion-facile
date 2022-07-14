@@ -30,7 +30,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   ): Promise<void> {
     const establishmentAlreadyExists =
       (
-        await uow.establishmentAggregateRepo.getEstablishmentAggregateBySiret(
+        await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
           formEstablishment.siret,
         )
       )?.establishment?.dataSource === "form";
@@ -49,7 +49,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     if (!establishmentAggregate) return;
 
-    await uow.establishmentAggregateRepo.updateEstablishmentAggregate(
+    await uow.establishmentAggregateRepository.updateEstablishmentAggregate(
       establishmentAggregate,
       this.clock.now(),
     );

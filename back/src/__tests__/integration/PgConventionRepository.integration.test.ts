@@ -1,10 +1,10 @@
 import { Pool, PoolClient } from "pg";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { ConventionId } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
-import { ConventionId } from "shared/src/convention/convention.dto";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 describe("PgConventionRepository", () => {
   let pool: Pool;

@@ -1,9 +1,3 @@
-import {
-  InMemoryEstablishmentAggregateRepository,
-  TEST_ROME_LABEL,
-} from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
 import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import {
@@ -14,6 +8,14 @@ import {
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import {
+  InMemoryEstablishmentAggregateRepository,
+  TEST_ROME_LABEL,
+} from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 
@@ -35,15 +37,17 @@ const allowedCopyEmail = "copy@gmail.com";
 describe("NotifyContactRequest", () => {
   let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
   let emailGw: InMemoryEmailGateway;
+  let notifyContactRequest: NotifyContactRequest;
 
   beforeEach(() => {
-    establishmentAggregateRepository =
-      new InMemoryEstablishmentAggregateRepository();
     emailGw = new InMemoryEmailGateway();
+    const uow = createInMemoryUow();
+    establishmentAggregateRepository = uow.establishmentAggregateRepository;
+    notifyContactRequest = new NotifyContactRequest(
+      new InMemoryUowPerformer(uow),
+      emailGw,
+    );
   });
-
-  const createUseCase = () =>
-    new NotifyContactRequest(establishmentAggregateRepository, emailGw);
 
   it("Sends ContactByEmailRequest email to establishment", async () => {
     const validEmailPayload: ContactEstablishmentRequestDto = {
@@ -68,7 +72,7 @@ describe("NotifyContactRequest", () => {
         .build(),
     ]);
 
-    await createUseCase().execute(validEmailPayload);
+    await notifyContactRequest.execute(validEmailPayload);
 
     const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);
@@ -107,7 +111,7 @@ describe("NotifyContactRequest", () => {
         .build(),
     ]);
 
-    await createUseCase().execute(validPhonePayload);
+    await notifyContactRequest.execute(validPhonePayload);
 
     const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);
@@ -141,7 +145,7 @@ describe("NotifyContactRequest", () => {
         .build(),
     ]);
 
-    await createUseCase().execute(validInPersonPayload);
+    await notifyContactRequest.execute(validInPersonPayload);
 
     const sentEmails = emailGw.getSentEmails();
     expect(sentEmails).toHaveLength(1);

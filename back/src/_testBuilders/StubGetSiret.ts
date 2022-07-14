@@ -1,9 +1,9 @@
-import { UseCase } from "../domain/core/UseCase";
 import {
   GetSiretRequestDto,
   getSiretRequestSchema,
   GetSiretResponseDto,
 } from "shared/src/siret";
+import { UseCase } from "../domain/core/UseCase";
 
 const initialResponse: GetSiretResponseDto = {
   siret: "12345678901234",

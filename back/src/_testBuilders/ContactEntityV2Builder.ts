@@ -1,9 +1,9 @@
+import { Builder } from "shared/src/Builder";
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   ContactEntityV2,
   ContactMethod,
 } from "../domain/immersionOffer/entities/ContactEntity";
-import { Builder } from "shared/src/Builder";
 
 const validContactEntityV2: ContactEntityV2 = {
   id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",

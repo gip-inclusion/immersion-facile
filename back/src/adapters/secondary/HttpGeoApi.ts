@@ -4,6 +4,12 @@ import {
   RetryableError,
   RetryStrategy,
 } from "../../domain/core/ports/RetryStrategy";
+import {
+  codeDepartmentToDepartmentName,
+  codeRegionToRegionName,
+  GeoApi,
+  RegionAndDepartment,
+} from "../../domain/generic/geo/ports/GeoApi";
 
 import {
   createAxiosInstance,
@@ -11,12 +17,6 @@ import {
   logAxiosError,
 } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
-import {
-  codeDepartmentToDepartmentName,
-  codeRegionToRegionName,
-  GeoApi,
-  RegionAndDepartment,
-} from "../../domain/generic/geo/ports/GeoApi";
 
 const logger = createLogger(__filename);
 

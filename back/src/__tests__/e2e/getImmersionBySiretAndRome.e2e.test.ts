@@ -1,4 +1,12 @@
 import { SuperTest, Test } from "supertest";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { buildTestApp } from "../../_testBuilders/buildTestApp";
+import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
+import { SearchImmersionResultPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 import {
   TEST_APPELLATION_LABEL,
   TEST_CITY,
@@ -6,18 +14,10 @@ import {
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { makeGenerateJwtES256 } from "../../domain/auth/jwt";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import {
-  buildTestApp,
-  InMemoryRepositories,
-} from "../../_testBuilders/buildTestApp";
-import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
-import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
-import { SearchImmersionResultPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
+  GenerateApiConsumerJtw,
+  makeGenerateJwtES256,
+} from "../../domain/auth/jwt";
 
 const authorizedApiKeyId = "my-authorized-id";
 const immersionOfferRome = "B1805";
@@ -25,7 +25,7 @@ const immersionOfferSiret = "78000403200019";
 
 describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
   let request: SuperTest<Test>;
-  let reposAndGateways: InMemoryRepositories;
+  let inMemoryUow: InMemoryUnitOfWork;
   let generateApiJwt: GenerateApiConsumerJtw;
 
   beforeEach(async () => {
@@ -33,29 +33,31 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
       .withRepositories("IN_MEMORY")
       .withAuthorizedApiKeyIds([authorizedApiKeyId])
       .build();
-    ({ request, reposAndGateways } = await buildTestApp(config));
+    ({ request, inMemoryUow } = await buildTestApp(config));
     generateApiJwt = makeGenerateJwtES256(config.apiJwtPrivateKey);
 
-    await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityV2Builder()
-            .withSiret(immersionOfferSiret)
-            .withPosition(TEST_POSITION)
-            .withNumberOfEmployeeRange("10-19")
-            .withAddress("55 rue de Faubourg Sante Honoré 75008 Paris")
-            .build(),
-        )
-        .withContact(
-          new ContactEntityV2Builder().withContactMethod("EMAIL").build(),
-        )
-        .withImmersionOffers([
-          new ImmersionOfferEntityV2Builder()
-            .withRomeCode(immersionOfferRome)
-            .build(),
-        ])
-        .build(),
-    ]);
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+      [
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityV2Builder()
+              .withSiret(immersionOfferSiret)
+              .withPosition(TEST_POSITION)
+              .withNumberOfEmployeeRange("10-19")
+              .withAddress("55 rue de Faubourg Sante Honoré 75008 Paris")
+              .build(),
+          )
+          .withContact(
+            new ContactEntityV2Builder().withContactMethod("EMAIL").build(),
+          )
+          .withImmersionOffers([
+            new ImmersionOfferEntityV2Builder()
+              .withRomeCode(immersionOfferRome)
+              .build(),
+          ])
+          .build(),
+      ],
+    );
   });
 
   it("rejects unauthenticated requests", async () => {

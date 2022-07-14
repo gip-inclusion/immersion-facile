@@ -1,10 +1,10 @@
 import { values } from "ramda";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import {
   DomainEvent,
   eventsToDebugInfo,
 } from "../../../domain/core/eventBus/events";
 import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
-import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../../utils/logger";
 import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 

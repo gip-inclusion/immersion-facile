@@ -3,9 +3,9 @@ import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { PgOutboxQueries } from "../../adapters/secondary/pg/PgOutboxQueries";
+import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../domain/core/eventBus/events";
-import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
 
 describe("PgOutboxQueries for form establishments", () => {
   let pool: Pool;

@@ -1,15 +1,15 @@
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   expectObjectsToMatch,
   expectTypeToMatchAndEqual,
   spyOnTopic,
 } from "../../_testBuilders/test.helpers";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
+import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
 import type {
   DomainEvent,
   EventFailure,
 } from "../../domain/core/eventBus/events";
-import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 const domainEvt: DomainEvent = {
   id: "anId",

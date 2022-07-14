@@ -1,11 +1,13 @@
+import { AgencyDto } from "shared/src/agency/agency.dto";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConsoleAppLogger } from "../../../adapters/secondary/core/ConsoleAppLogger";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryPeAgenciesReferential } from "../../../adapters/secondary/immersionOffer/InMemoryPeAgenciesReferential";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { defaultQuestionnaireUrl } from "../../../domain/convention/useCases/AddAgency";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
-import { AgencyDto } from "shared/src/agency/agency.dto";
 import { PeAgencyFromReferenciel } from "../../../domain/immersionOffer/ports/PeAgenciesReferential";
 
 const adminMail = "admin@mail.com";
@@ -17,12 +19,13 @@ describe("UpdateAllPeAgencies use case", () => {
   let uuid: TestUuidGenerator;
 
   beforeEach(() => {
+    const uow = createInMemoryUow();
     peAgenciesReferential = new InMemoryPeAgenciesReferential();
-    agencyRepository = new InMemoryAgencyRepository();
+    agencyRepository = uow.agencyRepository;
     uuid = new TestUuidGenerator();
     updateAllPeAgencies = new UpdateAllPeAgencies(
+      new InMemoryUowPerformer(uow),
       peAgenciesReferential,
-      agencyRepository,
       adminMail,
       uuid,
       new ConsoleAppLogger(),

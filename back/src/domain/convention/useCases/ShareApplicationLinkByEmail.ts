@@ -1,9 +1,9 @@
-import { UseCase } from "../../core/UseCase";
-import { EmailGateway } from "../ports/EmailGateway";
 import {
   ShareLinkByEmailDto,
   shareLinkByEmailSchema,
 } from "shared/src/ShareLinkByEmailDto";
+import { UseCase } from "../../core/UseCase";
+import { EmailGateway } from "../ports/EmailGateway";
 
 export class ShareApplicationLinkByEmail extends UseCase<ShareLinkByEmailDto> {
   constructor(private readonly emailGateway: EmailGateway) {

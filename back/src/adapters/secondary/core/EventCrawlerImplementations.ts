@@ -1,14 +1,14 @@
 import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
 import { eventsToDebugInfo } from "../../../domain/core/eventBus/events";
-import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
+import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 export class BasicEventCrawler implements EventCrawler {
   constructor(
+    private uowPerformer: UnitOfWorkPerformer,
     private readonly eventBus: EventBus,
-    private readonly outboxQueries: OutboxQueries,
   ) {}
 
   startCrawler() {
@@ -20,7 +20,9 @@ export class BasicEventCrawler implements EventCrawler {
   public async processNewEvents() {
     //eslint-disable-next-line no-console
     console.time("__metrics : getAllUnpublishedEvents query duration");
-    const events = await this.outboxQueries.getAllUnpublishedEvents();
+    const events = await this.uowPerformer.perform((uow) =>
+      uow.outboxQueries.getAllUnpublishedEvents(),
+    );
     //eslint-disable-next-line no-console
     console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
     logger.debug(
@@ -33,7 +35,9 @@ export class BasicEventCrawler implements EventCrawler {
   public async retryFailedEvents() {
     //eslint-disable-next-line no-console
     console.time("__metrics : getAllFailedEvents query duration");
-    const events = await this.outboxQueries.getAllFailedEvents();
+    const events = await this.uowPerformer.perform((uow) =>
+      uow.outboxQueries.getAllFailedEvents(),
+    );
     //eslint-disable-next-line no-console
     console.timeEnd("__metrics : getAllFailedEvents query duration");
     logger.debug({ events: eventsToDebugInfo(events) }, "retrying Events");
@@ -48,11 +52,11 @@ export class RealEventCrawler
   implements EventCrawler
 {
   constructor(
+    uowPerformer: UnitOfWorkPerformer,
     eventBus: EventBus,
-    outboxQueries: OutboxQueries,
     private readonly crawlingPeriodMs: number = 10_000,
   ) {
-    super(eventBus, outboxQueries);
+    super(uowPerformer, eventBus);
   }
 
   public override startCrawler() {

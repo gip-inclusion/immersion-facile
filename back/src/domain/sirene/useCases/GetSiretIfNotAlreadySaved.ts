@@ -31,7 +31,7 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<GetSiretResponseDto> {
     const isEstablishmentWithProvidedSiretAlreadyInDb =
-      await uow.establishmentAggregateRepo.hasEstablishmentFromFormWithSiret(
+      await uow.establishmentAggregateRepository.hasEstablishmentFromFormWithSiret(
         siret,
       );
 

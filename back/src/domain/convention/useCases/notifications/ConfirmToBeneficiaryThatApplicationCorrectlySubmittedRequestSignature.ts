@@ -1,10 +1,10 @@
-import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
-import { UseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
-import { createLogger } from "../../../../utils/logger";
-import { frontRoutes } from "shared/src/routes";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
+import { frontRoutes } from "shared/src/routes";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { createLogger } from "../../../../utils/logger";
+import { UseCase } from "../../../core/UseCase";
+import { EmailGateway } from "../../ports/EmailGateway";
 
 const logger = createLogger(__filename);
 

@@ -1,6 +1,6 @@
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { ProcessEnv } from "shared/src/envHelpers";
 import { Builder } from "shared/src/Builder";
+import { ProcessEnv } from "shared/src/envHelpers";
+import { AppConfig } from "../adapters/primary/config/appConfig";
 
 const defaultConfigParams = {
   DOMAIN: "localhost",

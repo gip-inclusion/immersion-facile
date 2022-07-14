@@ -1,10 +1,10 @@
 import { Pool, PoolClient } from "pg";
+import { activeAgencyStatuses, AgencyDto } from "shared/src/agency/agency.dto";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { LatLonDto } from "shared/src/latLon";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { activeAgencyStatuses, AgencyDto } from "shared/src/agency/agency.dto";
-import { LatLonDto } from "shared/src/latLon";
 
 const agency1builder = AgencyDtoBuilder.create(
   "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -77,7 +77,7 @@ describe("PgAgencyRepository", () => {
 
   describe("getImmersionFacileIdByKind", () => {
     it("returns undefined for missing agency", async () => {
-      const agency = await agencyRepository.getImmersionFacileIdByKind();
+      const agency = await agencyRepository.getImmersionFacileAgencyId();
       expect(agency).toBeUndefined();
     });
   });

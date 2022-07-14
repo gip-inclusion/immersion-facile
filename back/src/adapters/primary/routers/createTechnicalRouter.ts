@@ -22,7 +22,7 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
   technicalRouter
     .route(`/${getFeatureFlags}`)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, deps.repositories.getFeatureFlags),
+      sendHttpResponse(req, res, deps.useCases.getFeatureFlags),
     );
 
   const upload = multer({ dest: "storage/tmp" });
@@ -31,7 +31,7 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
     .route(`/${uploadFileRoute}`)
     .post(upload.single(uploadFileRoute), (req, res) =>
       sendHttpResponse(req, res, async () => {
-        const { enableLogoUpload } = await deps.repositories.getFeatureFlags();
+        const { enableLogoUpload } = await deps.useCases.getFeatureFlags();
         if (!enableLogoUpload) {
           throw new FeatureDisabledError("Upload Logo");
         }

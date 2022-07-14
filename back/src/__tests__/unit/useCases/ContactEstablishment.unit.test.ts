@@ -1,3 +1,4 @@
+import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
@@ -16,7 +17,6 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
-import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 const siret = "11112222333344";
@@ -45,8 +45,8 @@ describe("ContactEstablishment", () => {
     outboxRepository = new InMemoryOutboxRepository();
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
-      establishmentAggregateRepo: establishmentAggregateRepository,
-      outboxRepo: outboxRepository,
+      establishmentAggregateRepository,
+      outboxRepository,
     });
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();

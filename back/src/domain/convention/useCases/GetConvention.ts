@@ -1,24 +1,27 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { UseCase } from "../../core/UseCase";
 import {
   ConventionReadDto,
   WithConventionId,
 } from "shared/src/convention/convention.dto";
 import { withConventionIdSchema } from "shared/src/convention/convention.schema";
-import { ConventionQueries } from "../ports/ConventionQueries";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 
-export class GetConvention extends UseCase<
+export class GetConvention extends TransactionalUseCase<
   WithConventionId,
   ConventionReadDto
 > {
-  constructor(readonly conventionQueries: ConventionQueries) {
-    super();
+  constructor(uowPerformer: UnitOfWorkPerformer) {
+    super(uowPerformer);
   }
 
   inputSchema = withConventionIdSchema;
 
-  public async _execute({ id }: WithConventionId): Promise<ConventionReadDto> {
-    const convention = await this.conventionQueries.getConventionById(id);
+  public async _execute(
+    { id }: WithConventionId,
+    uow: UnitOfWork,
+  ): Promise<ConventionReadDto> {
+    const convention = await uow.conventionQueries.getConventionById(id);
     if (!convention || convention.status === "CANCELLED")
       throw new NotFoundError(id);
     return convention;

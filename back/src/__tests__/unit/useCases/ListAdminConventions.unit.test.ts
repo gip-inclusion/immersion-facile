@@ -1,13 +1,14 @@
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
-import { ListAdminConventions } from "../../../domain/convention/useCases/ListAdminConventions";
 import { AgencyId } from "shared/src/agency/agency.dto";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
-  ConventionReadDto,
   allConventionStatuses,
   ConventionDto,
+  ConventionReadDto,
 } from "shared/src/convention/convention.dto";
-import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { ListAdminConventions } from "../../../domain/convention/useCases/ListAdminConventions";
 
 const agencyIds: AgencyId[] = [
   "11111111-1111-1111-1111-111111111111",
@@ -15,18 +16,17 @@ const agencyIds: AgencyId[] = [
   "33333333-3333-3333-3333-333333333333",
 ];
 
-describe("List Immersion Applications", () => {
+describe("List Conventions", () => {
   let listConventions: ListAdminConventions;
-  let repository: InMemoryConventionRepository;
-  let queries: InMemoryConventionQueries;
+  let conventionRepository: InMemoryConventionRepository;
 
   beforeEach(() => {
-    repository = new InMemoryConventionRepository();
-    queries = new InMemoryConventionQueries(repository);
-    listConventions = new ListAdminConventions(queries);
+    const uow = createInMemoryUow();
+    conventionRepository = uow.conventionRepository;
+    listConventions = new ListAdminConventions(new InMemoryUowPerformer(uow));
   });
 
-  describe("When the repository is empty", () => {
+  describe("When the conventionRepository is empty", () => {
     it("returns empty list", async () => {
       const conventions = await listConventions.execute({
         status: undefined,
@@ -39,7 +39,7 @@ describe("List Immersion Applications", () => {
   describe("When a Convention is stored", () => {
     it("returns the Convention", async () => {
       const convention = new ConventionDtoBuilder().build();
-      repository.setConventions({ form_id: convention });
+      conventionRepository.setConventions({ form_id: convention });
 
       const listedAdminConventions = await listConventions.execute({
         status: undefined,
@@ -72,7 +72,7 @@ describe("List Immersion Applications", () => {
         });
       });
 
-      repository.setConventions(
+      conventionRepository.setConventions(
         entities.reduce(
           (dict, entity) => ({ ...dict, [entity.id as string]: entity }),
           {},

@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from "supertest";
-import { createApp } from "../../adapters/primary/server";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { createApp } from "../../adapters/primary/server";
 
 describe("/appellation route", () => {
   let request: SuperTest<Test>;

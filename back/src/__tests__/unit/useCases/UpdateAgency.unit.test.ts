@@ -28,8 +28,8 @@ const prepareUseCase = () => {
 
   return {
     useCase,
-    outboxRepo: uow.outboxRepo,
-    agencyRepo: uow.agencyRepo,
+    outboxRepository: uow.outboxRepository,
+    agencyRepository: uow.agencyRepository,
     clock,
     uuidGenerator,
   };
@@ -38,18 +38,18 @@ const prepareUseCase = () => {
 describe("Update agency", () => {
   it("Updates an agency in repository and publishes an event to notify if status becomes active", async () => {
     // Prepare
-    const { useCase, agencyRepo, outboxRepo } = prepareUseCase();
+    const { useCase, agencyRepository, outboxRepository } = prepareUseCase();
     const existingAgency = AgencyDtoBuilder.create("agency-123")
       .withStatus("needsReview")
       .build();
-    agencyRepo.setAgencies([existingAgency]);
+    agencyRepository.setAgencies([existingAgency]);
 
     // Act
     await useCase.execute({ id: "agency-123", status: "active" });
 
     // Assert
-    expect(agencyRepo.agencies[0].status).toBe("active");
-    expect(outboxRepo.events[0]).toMatchObject({
+    expect(agencyRepository.agencies[0].status).toBe("active");
+    expect(outboxRepository.events[0]).toMatchObject({
       id: nextUuid,
       topic: "AgencyActivated",
       payload: { agency: { ...existingAgency, status: "active" } },

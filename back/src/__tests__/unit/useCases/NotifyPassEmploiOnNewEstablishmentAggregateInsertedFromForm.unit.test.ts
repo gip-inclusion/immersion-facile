@@ -1,16 +1,16 @@
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemoryPassEmploiGateway } from "../../../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
-import { PassEmploiNotificationParams } from "../../../domain/immersionOffer/ports/PassEmploiGateway";
-import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/immersionOffer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { expectArraysToEqual } from "../../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { InMemoryPassEmploiGateway } from "../../../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
+import { PassEmploiNotificationParams } from "../../../domain/immersionOffer/ports/PassEmploiGateway";
+import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domain/immersionOffer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 
 const prepareUseCase = () => {
-  const establishmentAggregateRepo =
-    new InMemoryEstablishmentAggregateRepository();
+  const uow = createInMemoryUow();
+  const establishmentAggregateRepository = uow.establishmentAggregateRepository;
   const clock = new CustomClock();
   const passEmploiGateway = new InMemoryPassEmploiGateway();
   const useCase =
@@ -18,7 +18,12 @@ const prepareUseCase = () => {
       passEmploiGateway,
     );
 
-  return { useCase, clock, passEmploiGateway, establishmentAggregateRepo };
+  return {
+    useCase,
+    clock,
+    passEmploiGateway,
+    establishmentAggregateRepository,
+  };
 };
 describe("Notify pass-emploi", () => {
   it("Calls pass-emploi API with formatted immersion offers from just inserted aggregate", async () => {

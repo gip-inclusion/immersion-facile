@@ -24,7 +24,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
     .route(`/${formAlreadyExistsRoute}/:siret`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
-        deps.repositories.immersionOffer.hasEstablishmentFromFormWithSiret(
+        deps.useCases.isFormEstablishmentWithSiretAlreadySaved(
           req.params.siret,
         ),
       ),
@@ -34,7 +34,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
     .route(`/${formAlreadyExistsRoute}/:siret`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
-        deps.repositories.immersionOffer.hasEstablishmentFromFormWithSiret(
+        deps.useCases.isFormEstablishmentWithSiretAlreadySaved(
           req.params.siret,
         ),
       ),

@@ -1,3 +1,6 @@
+import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
+import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import {
   ConflictError,
   ForbiddenError,
@@ -6,9 +9,6 @@ import {
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
-import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import {
   createImmersionAssessmentEntity,
   ImmersionAssessmentEntity,
@@ -41,7 +41,7 @@ export class CreateImmersionAssessment extends TransactionalUseCase<ImmersionAss
 
     await Promise.all([
       uow.immersionAssessmentRepository.save(immersionAssessmentEntity),
-      uow.outboxRepo.save(event),
+      uow.outboxRepository.save(event),
     ]);
   }
 }

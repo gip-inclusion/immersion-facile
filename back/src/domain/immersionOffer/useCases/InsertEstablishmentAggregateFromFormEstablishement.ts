@@ -32,7 +32,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     // Remove existing aggregate that could have been inserted by another process (eg. La Bonne Boite)
-    await uow.establishmentAggregateRepo.removeEstablishmentAndOffersAndContactWithSiret(
+    await uow.establishmentAggregateRepository.removeEstablishmentAndOffersAndContactWithSiret(
       formEstablishment.siret,
     );
 
@@ -46,7 +46,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     if (!establishmentAggregate) return;
 
-    await uow.establishmentAggregateRepo
+    await uow.establishmentAggregateRepository
       .insertEstablishmentAggregates([establishmentAggregate])
       .catch((err: any) => {
         notifyAndThrowErrorDiscord(
@@ -60,6 +60,6 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       topic: "NewEstablishmentAggregateInsertedFromForm",
       payload: establishmentAggregate,
     });
-    await uow.outboxRepo.save(event);
+    await uow.outboxRepository.save(event);
   }
 }

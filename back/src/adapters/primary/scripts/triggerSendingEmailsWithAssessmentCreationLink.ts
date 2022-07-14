@@ -4,12 +4,11 @@ import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionO
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
-import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
-import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
 import { AppConfig } from "../config/appConfig";
+import { makeEmailAllowListPredicate } from "../config/createGateways";
 import { createGenerateConventionMagicLink } from "../config/createGenerateConventionMagicLink";
-import { makeEmailAllowListPredicate } from "../config/repositoriesConfig";
+import { createUowPerformer } from "../config/uowConfig";
 
 const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const config = AppConfig.createFromEnv();
@@ -18,9 +17,6 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const pool = new Pool({
     connectionString: dbUrl,
   });
-  const client = await pool.connect();
-  const outboxRepository = new PgOutboxRepository(client);
-  const conventionQueries = new PgConventionQueries(client);
   const clock = new RealClock();
 
   const emailGateway =
@@ -34,10 +30,11 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
         )
       : new InMemoryEmailGateway(clock);
 
+  const { uowPerformer } = createUowPerformer(config, () => pool);
+
   const sendEmailsWithAssessmentCreationLink =
     new SendEmailsWithAssessmentCreationLink(
-      outboxRepository,
-      conventionQueries,
+      uowPerformer,
       emailGateway,
       clock,
       createGenerateConventionMagicLink(config),

@@ -1,3 +1,10 @@
+import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   InMemoryEstablishmentAggregateRepository,
@@ -7,16 +14,10 @@ import {
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemorySearchMadeRepository } from "../../../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
-import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 const secretariatRome = "M1607";
 const boulangerRome = "D1102";
@@ -42,15 +43,14 @@ const insertLBBAggregate = async (
   ]);
 
 const prepareSearchableData = async () => {
-  const establishmentAggregateRepository =
-    new InMemoryEstablishmentAggregateRepository();
-  const searchMadeRepository = new InMemorySearchMadeRepository();
+  const uow = createInMemoryUow();
+  const establishmentAggregateRepository = uow.establishmentAggregateRepository;
+  const searchMadeRepository = uow.searchMadeRepository;
 
   const uuidGenerator = new TestUuidGenerator();
 
   const searchImmersion = new SearchImmersion(
-    searchMadeRepository,
-    establishmentAggregateRepository,
+    new InMemoryUowPerformer(uow),
     uuidGenerator,
   );
   const siret = "78000403200019";

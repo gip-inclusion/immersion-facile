@@ -113,7 +113,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     const conventionDto = await uow.conventionRepository.getById(applicationId);
     if (!conventionDto) throw new NotFoundError(applicationId);
 
-    const agency = await uow.agencyRepo.getById(conventionDto.agencyId);
+    const agency = await uow.agencyRepository.getById(conventionDto.agencyId);
     if (!agency) {
       logger.error(
         { agencyId: conventionDto.agencyId },
@@ -169,7 +169,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
           },
         });
 
-        await uow.outboxRepo.save(event);
+        await uow.outboxRepository.save(event);
       }
     }
     if (!foundHit) {

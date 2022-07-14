@@ -29,7 +29,8 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
   it("saves valid app in repository with full express app", async () => {
     const validConvention = new ConventionDtoBuilder().build();
     const { externalId, ...validConventionParams } = validConvention;
-    const { request, reposAndGateways, eventCrawler } = await buildTestApp();
+    const { request, gateways, eventCrawler, inMemoryUow } =
+      await buildTestApp();
 
     const res = await request
       .post(`/${conventionsRoute}`)
@@ -37,9 +38,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     expectResponseBody(res, { id: validConvention.id });
     expect(
-      await reposAndGateways.convention.getById(validConvention.id),
+      await inMemoryUow.conventionRepository.getById(validConvention.id),
     ).toEqual(validConvention);
-    expectEventsInOutbox(reposAndGateways.outbox, [
+    expectEventsInOutbox(inMemoryUow.outboxRepository, [
       {
         topic: "ImmersionApplicationSubmittedByBeneficiary",
         payload: validConvention,
@@ -49,7 +50,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     await eventCrawler.processNewEvents();
 
-    expectSentEmails(reposAndGateways.email, [
+    expectSentEmails(gateways.email, [
       {
         type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [validConvention.email],
@@ -70,13 +71,13 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .build();
 
     const appAndDeps = await buildTestApp();
-    const agency = await appAndDeps.reposAndGateways.agency.getById(
+    const agency = await appAndDeps.inMemoryUow.agencyRepository.getById(
       initialConvention.agencyId,
     );
 
     if (!agency) throw new Error("Test agency not found with this id");
 
-    appAndDeps.reposAndGateways.agency.setAgencies([
+    appAndDeps.inMemoryUow.agencyRepository.setAgencies([
       { ...agency, validatorEmails: ["validator@mail.com"] },
     ]);
 
@@ -131,7 +132,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 });
 
 const beneficiarySubmitsApplicationForTheFirstTime = async (
-  { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   convention: ConventionDto,
 ) => {
   const { externalId, ...createConventionParams } = convention;
@@ -142,13 +143,13 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   expect(result.status).toBe(200);
 
   expectTypeToMatchAndEqual(
-    await reposAndGateways.convention.getById(convention.id),
+    await inMemoryUow.conventionRepository.getById(convention.id),
     convention,
   );
 
   await eventCrawler.processNewEvents();
 
-  const sentEmails = reposAndGateways.email.getSentEmails();
+  const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(3);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [VALID_EMAILS[0]],
@@ -179,7 +180,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 };
 
 const beneficiarySignsApplication = async (
-  { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   beneficiarySignJwt: string,
   initialConvention: ConventionDto,
 ) => {
@@ -190,7 +191,7 @@ const beneficiarySignsApplication = async (
   expect(response.status).toBe(200);
 
   expectTypeToMatchAndEqual(
-    await reposAndGateways.convention.getById(initialConvention.id),
+    await inMemoryUow.conventionRepository.getById(initialConvention.id),
     {
       ...initialConvention,
       status: "PARTIALLY_SIGNED",
@@ -201,7 +202,7 @@ const beneficiarySignsApplication = async (
 
   await eventCrawler.processNewEvents();
 
-  const sentEmails = reposAndGateways.email.getSentEmails();
+  const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(4);
   const needsReviewEmail = sentEmails[sentEmails.length - 1];
   expect(needsReviewEmail.recipients).toEqual(["establishment@example.com"]);
@@ -212,7 +213,7 @@ const beneficiarySignsApplication = async (
 };
 
 const establishmentSignsApplication = async (
-  { request, reposAndGateways, eventCrawler }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   establishmentSignJwt: string,
   initialConvention: ConventionDto,
 ) => {
@@ -222,7 +223,7 @@ const establishmentSignsApplication = async (
     .expect(200);
 
   expectTypeToMatchAndEqual(
-    await reposAndGateways.convention.getById(initialConvention.id),
+    await inMemoryUow.conventionRepository.getById(initialConvention.id),
     {
       ...initialConvention,
       status: "IN_REVIEW",
@@ -233,7 +234,7 @@ const establishmentSignsApplication = async (
 
   await eventCrawler.processNewEvents();
 
-  const sentEmails = reposAndGateways.email.getSentEmails();
+  const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(5);
   const needsReviewEmail = expectEmailOfType(
     sentEmails[sentEmails.length - 1],
@@ -248,7 +249,7 @@ const establishmentSignsApplication = async (
 };
 
 const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
-  { request, reposAndGateways, eventCrawler, clock }: TestAppAndDeps,
+  { request, gateways, eventCrawler, clock, inMemoryUow }: TestAppAndDeps,
   validatorReviewJwt: string,
   initialConvention: ConventionDto,
 ) => {
@@ -266,7 +267,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     .expect(200);
 
   expectTypeToMatchAndEqual(
-    await reposAndGateways.convention.getById(initialConvention.id),
+    await inMemoryUow.conventionRepository.getById(initialConvention.id),
     {
       ...initialConvention,
       status: "ACCEPTED_BY_VALIDATOR",
@@ -278,7 +279,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   );
 
   await eventCrawler.processNewEvents();
-  const sentEmails = reposAndGateways.email.getSentEmails();
+  const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(6);
   const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
   expectTypeToMatchAndEqual(

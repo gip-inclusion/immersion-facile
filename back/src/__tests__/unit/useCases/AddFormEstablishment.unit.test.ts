@@ -38,8 +38,8 @@ describe("Add FormEstablishment", () => {
 
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
-      outboxRepo,
-      formEstablishmentRepo,
+      outboxRepository: outboxRepo,
+      formEstablishmentRepository: formEstablishmentRepo,
       getFeatureFlags,
     });
 

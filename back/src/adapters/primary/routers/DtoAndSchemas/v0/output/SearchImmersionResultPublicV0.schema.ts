@@ -1,10 +1,10 @@
-import { z } from "zod";
 import { latLonSchema } from "shared/src/latLon";
 import { romeCodeSchema } from "shared/src/rome";
 import { appellationDtoSchema } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "shared/src/siret";
 import { phoneRegExp } from "shared/src/utils";
 import { zEmail, zString, zTrimmedString } from "shared/src/zodUtils";
+import { z } from "zod";
 import { SearchImmersionResultPublicV0 } from "./SearchImmersionResultPublicV0.dto";
 
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<string> =

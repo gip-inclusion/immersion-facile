@@ -1,6 +1,8 @@
 import { PoolClient } from "pg";
 import promClient from "prom-client";
 import { differenceWith } from "ramda";
+import { propEq } from "shared/src/ramdaExtensions/propEq";
+import { replaceArrayElement } from "shared/src/utils";
 import {
   DomainEvent,
   DomainTopic,
@@ -9,8 +11,6 @@ import {
 } from "../../../domain/core/eventBus/events";
 import { DateStr } from "../../../domain/core/ports/Clock";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
-import { propEq } from "shared/src/ramdaExtensions/propEq";
-import { replaceArrayElement } from "shared/src/utils";
 
 const counterEventsSaved = new promClient.Counter({
   name: "pg_outbox_repository_events_saved",

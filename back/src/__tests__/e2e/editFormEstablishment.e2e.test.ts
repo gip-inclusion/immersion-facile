@@ -1,11 +1,11 @@
-import { buildTestApp } from "../../_testBuilders/buildTestApp";
+import { subYears } from "date-fns";
 import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
 import { formEstablishmentsRoute } from "shared/src/routes";
 import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { makeGenerateJwtES256 } from "../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { subYears } from "date-fns";
+import { buildTestApp } from "../../_testBuilders/buildTestApp";
+import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
+import { makeGenerateJwtES256 } from "../../domain/auth/jwt";
 
 describe("Route to post edited form establishments", () => {
   it("Throws 401 if not authenticated", async () => {
@@ -78,8 +78,7 @@ describe("Route to post edited form establishments", () => {
 
   it("Supports posting already existing form establisment when authenticated", async () => {
     // Prepare
-    const { request, reposAndGateways, generateMagicLinkJwt } =
-      await buildTestApp();
+    const { request, inMemoryUow, generateMagicLinkJwt } = await buildTestApp();
 
     const validJwt = generateMagicLinkJwt(
       createEstablishmentMagicLinkPayload({
@@ -88,7 +87,7 @@ describe("Route to post edited form establishments", () => {
         now: new Date(),
       }),
     );
-    await reposAndGateways.formEstablishment.create(
+    await inMemoryUow.formEstablishmentRepository.create(
       FormEstablishmentDtoBuilder.valid()
         .withSiret(TEST_ESTABLISHMENT1_SIRET)
         .build(),
@@ -106,8 +105,8 @@ describe("Route to post edited form establishments", () => {
     // Assert
     expect(response.status).toBe(200);
 
-    expect(reposAndGateways.outbox.events).toHaveLength(1);
-    expect(await reposAndGateways.formEstablishment.getAll()).toEqual([
+    expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+    expect(await inMemoryUow.formEstablishmentRepository.getAll()).toEqual([
       formEstablishment,
     ]);
   });

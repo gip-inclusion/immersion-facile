@@ -1,16 +1,15 @@
+import { addDays } from "date-fns";
+import { ConventionId } from "shared/src/convention/convention.dto";
 import { frontRoutes } from "shared/src/routes";
+import { z } from "zod";
+import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { createLogger } from "../../../utils/logger";
+import { notifyDiscord } from "../../../utils/notifyDiscord";
+import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
-import { UseCase } from "../../core/UseCase";
-import { EmailGateway } from "../../convention/ports/EmailGateway";
-import { notifyDiscord } from "../../../utils/notifyDiscord";
-import { ConventionId } from "shared/src/convention/convention.dto";
-import { z } from "zod";
-import { createLogger } from "../../../utils/logger";
-import { addDays } from "date-fns";
-import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { ConventionQueries } from "../../convention/ports/ConventionQueries";
-import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
 
@@ -22,27 +21,27 @@ export type ImmersionAssessmentEmailParams = {
   beneficiaryLastName: string;
 };
 
-export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
+export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<void> {
   inputSchema = z.void();
 
   constructor(
-    private outboxRepo: OutboxRepository,
-    private conventionQueries: ConventionQueries,
+    uowPerformer: UnitOfWorkPerformer,
     private emailGateway: EmailGateway,
     private clock: Clock,
     private generateConventionMagicLink: GenerateConventionMagicLink,
     private createNewEvent: CreateNewEvent,
   ) {
-    super();
+    super(uowPerformer);
   }
 
-  protected async _execute(): Promise<void> {
+  protected async _execute(_: void, uow: UnitOfWork): Promise<void> {
     const now = this.clock.now();
     const tomorrow = addDays(now, 1);
     const assessmentEmailParamsOfImmersionEndingTomorrow =
-      await this.conventionQueries.getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
+      await uow.conventionQueries.getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
         tomorrow,
       );
+
     logger.info(
       `[${now.toISOString()}]: About to send assessment email to ${
         assessmentEmailParamsOfImmersionEndingTomorrow.length
@@ -55,6 +54,7 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
       assessmentEmailParamsOfImmersionEndingTomorrow.map(
         async (immersionEndingTomorrow) => {
           await this._sendOneEmailWithImmersionAssessmentCreationLink(
+            uow,
             immersionEndingTomorrow,
           ).catch((error: any) => {
             errors[immersionEndingTomorrow.immersionId] = error;
@@ -70,6 +70,7 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
     );
   }
   private async _sendOneEmailWithImmersionAssessmentCreationLink(
+    uow: UnitOfWork,
     immersionAssessmentEmailParams: ImmersionAssessmentEmailParams,
   ) {
     const immersionAssessmentCreationLink = this.generateConventionMagicLink({
@@ -95,7 +96,7 @@ export class SendEmailsWithAssessmentCreationLink extends UseCase<void> {
       topic: "EmailWithLinkToCreateAssessmentSent",
       payload: { id: immersionAssessmentEmailParams.immersionId },
     });
-    await this.outboxRepo.save(event);
+    await uow.outboxRepository.save(event);
   }
 
   private notifyDiscord(

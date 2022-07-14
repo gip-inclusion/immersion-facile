@@ -26,7 +26,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
   ): Promise<void> {
     const [convention, conventionUserAdvisor] = await Promise.all([
       uow.conventionRepository.getById(conventionUserAdvisorIds.conventionId),
-      uow.conventionPoleEmploiAdvisorRepo.getByConventionId(
+      uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
         conventionUserAdvisorIds.conventionId,
       ),
     ]);

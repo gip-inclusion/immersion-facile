@@ -2,11 +2,11 @@ import { ConventionId } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
+import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryPoleEmploiGateway } from "../../../adapters/secondary/InMemoryPoleEmploiGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
-import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
 
 const prepareUseCase = ({
   enablePeConventionBroadcast,

@@ -1,5 +1,5 @@
-import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { v4 as uuidV4 } from "uuid";
+import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 
 // To be used mostly for tests
 export class TestUuidGenerator implements UuidGenerator {

@@ -4,7 +4,7 @@ import type {
   SendSmtpEmail,
   TransactionalEmailsApi,
 } from "sib-api-v3-typescript";
-import { makeEmailAllowListPredicate } from "../../adapters/primary/config/repositoriesConfig";
+import { makeEmailAllowListPredicate } from "../../adapters/primary/config/createGateways";
 import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
 
 describe("SendingBlueEmailGateway", () => {

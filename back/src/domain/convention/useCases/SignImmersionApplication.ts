@@ -1,8 +1,4 @@
-import { z } from "zod";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+import { signConventionDtoWithRole } from "shared/src/convention/convention";
 import {
   ConventionStatus,
   WithConventionId,
@@ -11,13 +7,16 @@ import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
+import { z } from "zod";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
-import { OutboxRepository } from "../../core/ports/OutboxRepository";
-import { UseCase } from "../../core/UseCase";
-import { ConventionRepository } from "../ports/ConventionRepository";
-import { signConventionDtoWithRole } from "shared/src/convention/convention";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
 
@@ -30,19 +29,22 @@ const domainTopicByTargetStatusMap: Partial<
 
 const roleAllowToSign: Role[] = ["establishment", "beneficiary"];
 
-export class SignImmersionApplication extends UseCase<void, WithConventionId> {
+export class SignImmersionApplication extends TransactionalUseCase<
+  void,
+  WithConventionId
+> {
   constructor(
-    private readonly conventionRepository: ConventionRepository,
+    uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly outboxRepository: OutboxRepository,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = z.void();
 
   public async _execute(
     _: void,
+    uow: UnitOfWork,
     { applicationId, role }: ConventionMagicLinkPayload,
   ): Promise<WithConventionId> {
     logger.debug({ applicationId, role });
@@ -51,13 +53,11 @@ export class SignImmersionApplication extends UseCase<void, WithConventionId> {
         "Only Beneficiary or Mentor are allowed to sign convention",
       );
 
-    const conventionDto = await this.conventionRepository.getById(
-      applicationId,
-    );
+    const conventionDto = await uow.conventionRepository.getById(applicationId);
     if (!conventionDto) throw new NotFoundError(applicationId);
     const signedConvention = signConventionDtoWithRole(conventionDto, role);
 
-    const signedId = await this.conventionRepository.update(signedConvention);
+    const signedId = await uow.conventionRepository.update(signedConvention);
     if (!signedId) throw new NotFoundError(signedId);
 
     const domainTopic = domainTopicByTargetStatusMap[signedConvention.status];
@@ -66,7 +66,7 @@ export class SignImmersionApplication extends UseCase<void, WithConventionId> {
         topic: domainTopic,
         payload: signedConvention,
       });
-      await this.outboxRepository.save(event);
+      await uow.outboxRepository.save(event);
     }
 
     return { id: signedId };

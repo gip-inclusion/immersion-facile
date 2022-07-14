@@ -1,31 +1,30 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { SiretAndRomeDto } from "shared/src/siretAndRome/SiretAndRome.dto";
 import { siretAndRomeSchema } from "shared/src/siretAndRome/SiretAndRome.schema";
-import { UseCase } from "../../core/UseCase";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
-import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
-export class GetImmersionOfferBySiretAndRome extends UseCase<
+export class GetImmersionOfferBySiretAndRome extends TransactionalUseCase<
   SiretAndRomeDto,
   SearchImmersionResultDto,
   ApiConsumer
 > {
-  constructor(
-    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
-  ) {
-    super();
+  constructor(uowPerformer: UnitOfWorkPerformer) {
+    super(uowPerformer);
   }
 
   inputSchema = siretAndRomeSchema;
 
   public async _execute(
     siretAndRomeDto: SiretAndRomeDto,
+    uow: UnitOfWork,
   ): Promise<SearchImmersionResultDto> {
     const { siret, rome } = siretAndRomeDto;
 
     const searchImmersionResultDto =
-      await this.establishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
+      await uow.establishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
         siret,
         rome,
       );

@@ -1,13 +1,13 @@
 import {
-  SireneGateway,
-  SireneGatewayAnswer,
-} from "../../domain/sirene/ports/SireneGateway";
-import {
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
   SiretDto,
   tooManySirenRequestsSiret,
 } from "shared/src/siret";
+import {
+  SireneGateway,
+  SireneGatewayAnswer,
+} from "../../domain/sirene/ports/SireneGateway";
 import { SireneEstablishmentVO } from "../../domain/sirene/valueObjects/SireneEstablishmentVO";
 import { createLogger } from "../../utils/logger";
 

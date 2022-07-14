@@ -1,14 +1,14 @@
+import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
-import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 const prepareUseCase = () => {
   const romeRepo = new InMemoryRomeRepository();
   const uowPerformer = new InMemoryUowPerformer({
     ...createInMemoryUow(),
-    romeRepo,
+    romeRepository: romeRepo,
   });
   return new RomeSearch(uowPerformer);
 };

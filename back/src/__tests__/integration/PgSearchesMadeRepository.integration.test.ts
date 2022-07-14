@@ -1,11 +1,11 @@
 import { Pool, PoolClient } from "pg";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import { SearchMadeEntityBuilder } from "../../_testBuilders/SearchMadeEntityBuilder";
+import { PgSearchMadeRepository } from "../../adapters/secondary/pg/PgSearchMadeRepository";
 import {
   SearchMade,
   SearchMadeEntity,
 } from "../../domain/immersionOffer/entities/SearchMadeEntity";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { PgSearchMadeRepository } from "../../adapters/secondary/pg/PgSearchMadeRepository";
-import { SearchMadeEntityBuilder } from "../../_testBuilders/SearchMadeEntityBuilder";
 
 describe("PgSearchesMadeRepository", () => {
   let pool: Pool;

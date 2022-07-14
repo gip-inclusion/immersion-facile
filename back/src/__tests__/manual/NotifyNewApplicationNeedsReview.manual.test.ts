@@ -1,14 +1,15 @@
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { ConventionDto } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import {
   createGenerateConventionMagicLink,
   GenerateConventionMagicLink,
 } from "../../adapters/primary/config/createGenerateConventionMagicLink";
-import { InMemoryAgencyRepository } from "../../adapters/secondary/InMemoryAgencyRepository";
+import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
+import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
@@ -46,10 +47,13 @@ describe("Notify To 2 Counsellors that an application is available", () => {
     agency = AgencyDtoBuilder.create(validConvention.agencyId)
       .withCounsellorEmails(counsellorEmails)
       .build();
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository([agency]);
+
+    const uow = createInMemoryUow();
+    uow.agencyRepository.setAgencies([agency]);
+
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
+      new InMemoryUowPerformer(uow),
       emailGw,
-      inMemoryAgencyRepository,
       generateMagicLinkFn,
     );
     await notifyNewApplicationNeedsReview.execute(validConvention);
@@ -69,10 +73,13 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       .build();
 
     validConvention.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository([agency]);
+
+    const uow = createInMemoryUow();
+    uow.agencyRepository.setAgencies([agency]);
+
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
+      new InMemoryUowPerformer(uow),
       emailGw,
-      inMemoryAgencyRepository,
       generateMagicLinkFn,
     );
     await notifyNewApplicationNeedsReview.execute(validConvention);
@@ -89,10 +96,13 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       .withValidatorEmails(validationEmails)
       .build();
     validConvention.id = "ef725832-c8f9-41e1-974b-44372e6e474c";
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository([agency]);
+
+    const uow = createInMemoryUow();
+    uow.agencyRepository.setAgencies([agency]);
+
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
+      new InMemoryUowPerformer(uow),
       emailGw,
-      inMemoryAgencyRepository,
       generateMagicLinkFn,
     );
     await notifyNewApplicationNeedsReview.execute(validConvention);

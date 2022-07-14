@@ -1,3 +1,4 @@
+import { TemplatedEmail } from "shared/email";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { RenewMagicLinkRequestDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
@@ -9,25 +10,23 @@ import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
-import { InMemoryOutboxQueries } from "../../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryEmailGateway } from "../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import {
   GenerateMagicLinkJwt,
+  makeGenerateJwtES256,
   makeVerifyJwtES256,
 } from "../../domain/auth/jwt";
 import { DeliverRenewedMagicLink } from "../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { RenewConventionMagicLink } from "../../domain/convention/useCases/RenewConventionMagicLink";
-import { TemplatedEmail } from "shared/email";
 import {
   CreateNewEvent,
   EventBus,
   makeCreateNewEvent,
 } from "../../domain/core/eventBus/EventBus";
-import { makeGenerateJwtES256 } from "../../domain/auth/jwt";
 
 const adminEmail = "admin@email.fr";
 
@@ -58,25 +57,25 @@ describe("Magic link renewal flow", () => {
   beforeEach(() => {
     const uow = createInMemoryUow();
 
-    const agencyRepository = uow.agencyRepo;
+    const agencyRepository = uow.agencyRepository;
     agencyRepository.setAgencies([agency]);
     conventionRepository = uow.conventionRepository;
-    outboxRepository = uow.outboxRepo;
-    const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
+    outboxRepository = uow.outboxRepository;
     clock = new CustomClock();
     clock.setNextDate(new Date());
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    const uowPerformer = new InMemoryUowPerformer(uow);
     emailGw = new InMemoryEmailGateway(clock);
     eventBus = new InMemoryEventBus(clock, (e) => outboxRepository.save(e));
-    eventCrawler = new BasicEventCrawler(eventBus, outboxQueries);
+    eventCrawler = new BasicEventCrawler(uowPerformer, eventBus);
 
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
     generateJwtFn = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
 
     renewMagicLink = new RenewConventionMagicLink(
-      new InMemoryUowPerformer(uow),
+      uowPerformer,
       createNewEvent,
       generateJwtFn,
       config,

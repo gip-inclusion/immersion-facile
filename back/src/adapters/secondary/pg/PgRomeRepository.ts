@@ -1,9 +1,9 @@
 import { PoolClient } from "pg";
-import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import {
   AppellationDto,
   RomeDto,
 } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);

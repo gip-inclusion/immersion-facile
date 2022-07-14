@@ -1,12 +1,12 @@
-import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { CreateAgencyDto } from "shared/src/agency/agency.dto";
 import { agenciesRoute } from "shared/src/routes";
+import { buildTestApp } from "../../_testBuilders/buildTestApp";
+import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 
 describe("Route to add Agency", () => {
   it("support posting valid agency", async () => {
-    const { request, reposAndGateways, appConfig } = await buildTestApp();
-    reposAndGateways.agency.setAgencies([]);
+    const { request, inMemoryUow, appConfig } = await buildTestApp();
+    inMemoryUow.agencyRepository.setAgencies([]);
     const parisMissionLocaleParams: CreateAgencyDto = {
       id: "some-id",
       address: "paris",
@@ -25,7 +25,7 @@ describe("Route to add Agency", () => {
 
     expect(response.status).toBe(200);
 
-    const inRepo = reposAndGateways.agency.agencies;
+    const inRepo = inMemoryUow.agencyRepository.agencies;
     expectTypeToMatchAndEqual(inRepo, [
       {
         ...parisMissionLocaleParams,

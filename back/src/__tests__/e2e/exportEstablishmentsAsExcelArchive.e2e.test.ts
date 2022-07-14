@@ -1,7 +1,7 @@
 import { AdminToken } from "shared/src/admin/admin.dto";
+import { exportEstablismentsExcelRoute } from "shared/src/routes";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { exportEstablismentsExcelRoute } from "shared/src/routes";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 
 describe("/export-establishments", () => {

@@ -1,56 +1,56 @@
 import {
-  AgencyDto,
-  AgencyWithPositionDto,
-  AgencyKindFilter,
-  ListAgenciesWithPositionRequestDto,
   activeAgencyStatuses,
+  AgencyDto,
+  AgencyKindFilter,
+  AgencyWithPositionDto,
+  ListAgenciesWithPositionRequestDto,
 } from "shared/src/agency/agency.dto";
 import { listAgenciesRequestSchema } from "shared/src/agency/agency.schema";
 import { LatLonDto } from "shared/src/latLon";
-import { UseCase } from "../../core/UseCase";
-import { AgencyRepository } from "../ports/AgencyRepository";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 
-export class ListAgenciesWithPosition extends UseCase<
+export class ListAgenciesWithPosition extends TransactionalUseCase<
   ListAgenciesWithPositionRequestDto,
   AgencyWithPositionDto[]
 > {
-  constructor(readonly agencyRepository: AgencyRepository) {
-    super();
+  constructor(uowPerformer: UnitOfWorkPerformer) {
+    super(uowPerformer);
   }
 
   inputSchema = listAgenciesRequestSchema;
 
-  public async _execute({
-    lon,
-    lat,
-    filter,
-  }: ListAgenciesWithPositionRequestDto): Promise<AgencyWithPositionDto[]> {
-    const agencies = await this.getActiveAgencies(
+  public async _execute(
+    { lon, lat, filter }: ListAgenciesWithPositionRequestDto,
+    uow: UnitOfWork,
+  ): Promise<AgencyWithPositionDto[]> {
+    const agencies = await getActiveAgencies(
+      uow,
       lon && lat ? { lon, lat } : undefined,
       filter,
     );
     return agencies.map(agencyToAgencyWithPositionDto);
   }
-
-  private getActiveAgencies(
-    position?: LatLonDto,
-    agencyKindFilter?: AgencyKindFilter,
-  ): Promise<AgencyDto[]> {
-    return this.agencyRepository.getAgencies({
-      filters: {
-        position: position
-          ? {
-              distance_km: 100,
-              position,
-            }
-          : undefined,
-        kind: agencyKindFilter,
-        status: activeAgencyStatuses,
-      },
-      limit: 20,
-    });
-  }
 }
+
+const getActiveAgencies = (
+  uow: UnitOfWork,
+  position?: LatLonDto,
+  agencyKindFilter?: AgencyKindFilter,
+): Promise<AgencyDto[]> =>
+  uow.agencyRepository.getAgencies({
+    filters: {
+      position: position
+        ? {
+            distance_km: 100,
+            position,
+          }
+        : undefined,
+      kind: agencyKindFilter,
+      status: activeAgencyStatuses,
+    },
+    limit: 20,
+  });
 
 const agencyToAgencyWithPositionDto = (
   config: AgencyDto,

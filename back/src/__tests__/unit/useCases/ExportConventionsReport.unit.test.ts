@@ -1,3 +1,5 @@
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryReportingGateway } from "../../../adapters/secondary/reporting/InMemoryReportingGateway";
@@ -5,10 +7,6 @@ import {
   ConventionReadyForExport,
   ExportConventionsReport,
 } from "../../../domain/convention/useCases/ExportConventionsReport";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
-import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import {
   ArchivedReport,
   ConventionExportByAgency,
@@ -125,14 +123,14 @@ vendredi 15/01/2021 : 08:00-12:00, 13:00-16:00`,
 });
 
 const prepareUseCase = () => {
+  const uow = createInMemoryUow();
+  const uowPerformer = new InMemoryUowPerformer(uow);
   const reportingGateway = new InMemoryReportingGateway();
-  const conventionRepository = new InMemoryConventionRepository();
-  const conventionQueries = new InMemoryConventionQueries(conventionRepository);
-  const uowPerformer = new InMemoryUowPerformer({
-    ...createInMemoryUow(),
+  const useCase = new ExportConventionsReport(uowPerformer, reportingGateway);
+
+  return {
+    useCase,
     reportingGateway,
-    conventionQueries,
-  });
-  const useCase = new ExportConventionsReport(uowPerformer);
-  return { useCase, reportingGateway, conventionRepository };
+    conventionRepository: uow.conventionRepository,
+  };
 };

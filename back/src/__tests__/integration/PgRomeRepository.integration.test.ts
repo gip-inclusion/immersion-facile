@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
-import { PgRomeRepository } from "../../adapters/secondary/pg/PgRomeRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
+import { PgRomeRepository } from "../../adapters/secondary/pg/PgRomeRepository";
 
 describe("Postgres implementation of Rome Gateway", () => {
   let pool: Pool;

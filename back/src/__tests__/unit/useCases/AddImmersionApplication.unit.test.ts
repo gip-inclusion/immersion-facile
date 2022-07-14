@@ -1,3 +1,4 @@
+import { allConventionStatuses } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
@@ -13,14 +14,13 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
-import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
-import { allConventionStatuses } from "shared/src/convention/convention.dto";
 
 describe("Add Convention", () => {
   let addConvention: AddImmersionApplication;
@@ -49,7 +49,7 @@ describe("Add Convention", () => {
     stubGetSiret = new StubGetSiret();
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
-      outboxRepo: outboxRepository,
+      outboxRepository,
       conventionRepository,
       getFeatureFlags,
     });

@@ -1,9 +1,9 @@
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { HttpPoleEmploiGateway } from "../../adapters/secondary/immersionOffer/HttpPoleEmploiGateway";
 import { PoleEmploiAccessTokenGateway } from "../../adapters/secondary/immersionOffer/PoleEmploiAccessTokenGateway";
+import { PoleEmploiConvention } from "../../domain/convention/ports/PoleEmploiGateway";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
-import { PoleEmploiConvention } from "../../domain/convention/ports/PoleEmploiGateway";
 
 const config = AppConfig.createFromEnv();
 const accessTokenGateway = new PoleEmploiAccessTokenGateway(

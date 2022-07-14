@@ -44,7 +44,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
         }),
       );
 
-    await uow.conventionPoleEmploiAdvisorRepo.openSlotForNextConvention(
+    await uow.conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
       poleEmploiUserAdvisorEntity,
     );
 

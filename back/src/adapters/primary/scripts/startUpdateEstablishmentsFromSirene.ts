@@ -1,5 +1,6 @@
-import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
+import { Pool } from "pg";
 import { random, sleep } from "shared/src/utils";
+import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import { RealClock } from "../../secondary/core/ClockImplementations";
@@ -12,10 +13,7 @@ import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
 import { AppConfig } from "../config/appConfig";
-import {
-  createGetPgPoolFn,
-  createRepositories,
-} from "../config/repositoriesConfig";
+import { createUowPerformer } from "../config/uowConfig";
 
 const logger = createLogger(__filename);
 const MAX_QPS_SIRENE__AND_ADDRESS_API = 0.49;
@@ -44,26 +42,26 @@ const main = async () => {
     clock,
     sleep,
   );
-  const sireneRepo = new HttpsSireneGateway(
+  const sireneGateway = new HttpsSireneGateway(
     config.sireneHttpsConfig,
     clock,
     rateLimiter,
     retryStrategy,
   );
 
-  const addresseAPI = new HttpAdresseAPI(rateLimiter, retryStrategy);
+  const adresseAPI = new HttpAdresseAPI(rateLimiter, retryStrategy);
 
-  const repositories = await createRepositories(
-    config,
-    createGetPgPoolFn(config),
-    clock,
-  );
+  const pool = new Pool({
+    connectionString: config.pgImmersionDbUrl,
+  });
+
+  const { uowPerformer } = createUowPerformer(config, () => pool);
 
   const updateEstablishmentsFromSireneAPI =
     new UpdateEstablishmentsFromSireneAPI(
-      sireneRepo,
-      repositories.immersionOffer,
-      addresseAPI,
+      uowPerformer,
+      sireneGateway,
+      adresseAPI,
       new RealClock(),
     );
 

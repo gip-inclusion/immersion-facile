@@ -1,12 +1,12 @@
-import { toPeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
+import { toPeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { createLogger } from "../../../utils/logger";
+import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { isPeConnectIdentity } from "../entities/ConventionPoleEmploiAdvisorEntity";
 import { ConventionAndPeExternalIds } from "../port/ConventionPoleEmploiAdvisorRepository";
-import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
@@ -32,7 +32,7 @@ export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<Co
     }
 
     const conventionAndPeExternalIds: ConventionAndPeExternalIds =
-      await uow.conventionPoleEmploiAdvisorRepo.associateConventionAndUserAdvisor(
+      await uow.conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
         convention.id,
         toPeExternalId(convention.federatedIdentity),
       );
@@ -42,6 +42,6 @@ export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<Co
       payload: conventionAndPeExternalIds,
     });
 
-    await uow.outboxRepo.save(event);
+    await uow.outboxRepository.save(event);
   }
 }

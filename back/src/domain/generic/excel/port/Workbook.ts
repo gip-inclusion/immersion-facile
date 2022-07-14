@@ -1,6 +1,5 @@
-import { Column, Worksheet } from "exceljs";
 import * as excel from "exceljs";
-import { AddWorksheetOptions } from "exceljs";
+import { AddWorksheetOptions, Column, Worksheet } from "exceljs";
 import * as fse from "fs-extra";
 
 enum WorksheetOptionsConfigurations {

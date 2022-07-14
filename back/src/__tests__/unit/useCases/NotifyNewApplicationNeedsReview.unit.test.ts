@@ -1,13 +1,14 @@
-import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
-import { ConventionDto } from "shared/src/convention/convention.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { expectedEmailConventionReviewMatchingConvention } from "../../../_testBuilders/emailAssertions";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 import { frontRoutes } from "shared/src/routes";
+import { expectedEmailConventionReviewMatchingConvention } from "../../../_testBuilders/emailAssertions";
+import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 
 const defaultConvention = new ConventionDtoBuilder().build();
 const defaultAgency = AgencyDtoBuilder.create(
@@ -17,22 +18,20 @@ const defaultAgency = AgencyDtoBuilder.create(
 describe("NotifyImmersionApplicationNeedsReview", () => {
   let validConvention: ConventionDto;
   let emailGw: InMemoryEmailGateway;
-  let agency: AgencyDto;
+  let agencyRepository: InMemoryAgencyRepository;
+  let notifyNewConventionNeedsReview: NotifyNewApplicationNeedsReview;
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
     validConvention = defaultConvention;
-    agency = defaultAgency;
-  });
-
-  const createUseCase = () => {
-    const inMemoryAgencyRepository = new InMemoryAgencyRepository([agency]);
-    return new NotifyNewApplicationNeedsReview(
+    const uow = createInMemoryUow();
+    agencyRepository = uow.agencyRepository;
+    notifyNewConventionNeedsReview = new NotifyNewApplicationNeedsReview(
+      new InMemoryUowPerformer(uow),
       emailGw,
-      inMemoryAgencyRepository,
       fakeGenerateMagicLinkUrlFn,
     );
-  };
+  });
 
   describe("When application status is IN_REVIEW", () => {
     beforeEach(() => {
@@ -46,10 +45,13 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         "aCouncellor@unmail.com",
         "anotherCouncellor@unmail.com",
       ];
-      agency = new AgencyDtoBuilder(defaultAgency)
+      const agency = new AgencyDtoBuilder(defaultAgency)
         .withCounsellorEmails(counsellorEmails)
         .build();
-      await createUseCase().execute(validConvention);
+
+      agencyRepository.setAgencies([agency]);
+
+      await notifyNewConventionNeedsReview.execute(validConvention);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(2);
@@ -77,10 +79,11 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         "aValidator@unmail.com",
         "anotherValidator@unmail.com",
       ];
-      agency = new AgencyDtoBuilder(defaultAgency)
+      const agency = new AgencyDtoBuilder(defaultAgency)
         .withValidatorEmails(validatorEmails)
         .build();
-      await createUseCase().execute(validConvention);
+      agencyRepository.setAgencies([agency]);
+      await notifyNewConventionNeedsReview.execute(validConvention);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(2);
@@ -104,17 +107,18 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     it("No counsellors available, neither validators => ensure no mail is sent", async () => {
-      await createUseCase().execute(validConvention);
+      await notifyNewConventionNeedsReview.execute(validConvention);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
 
     it("No counsellors available, neither validators, still we got admins => ensure no mail is sent", async () => {
       const adminEmail = ["aValidator@unmail.com"];
-      agency = new AgencyDtoBuilder(defaultAgency)
+      const agency = new AgencyDtoBuilder(defaultAgency)
         .withAdminEmails(adminEmail)
         .build();
-      await createUseCase().execute(validConvention);
+      agencyRepository.setAgencies([agency]);
+      await notifyNewConventionNeedsReview.execute(validConvention);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
@@ -133,10 +137,11 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         "aValidator@unmail.com",
         "anotherValidator@unmail.com",
       ];
-      agency = new AgencyDtoBuilder(defaultAgency)
+      const agency = new AgencyDtoBuilder(defaultAgency)
         .withValidatorEmails(validatorEmails)
         .build();
-      await createUseCase().execute(validConvention);
+      agencyRepository.setAgencies([agency]);
+      await notifyNewConventionNeedsReview.execute(validConvention);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(2);
@@ -160,17 +165,18 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     it("No validators available => ensure no mail is sent", async () => {
-      await createUseCase().execute(validConvention);
+      await notifyNewConventionNeedsReview.execute(validConvention);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
 
     it("No validators available, still we got admins => ensure no mail is sent", async () => {
       const adminEmail = ["anAdmin@unmail.com"];
-      agency = new AgencyDtoBuilder(defaultAgency)
+      const agency = new AgencyDtoBuilder(defaultAgency)
         .withAdminEmails(adminEmail)
         .build();
-      await createUseCase().execute(validConvention);
+      agencyRepository.setAgencies([agency]);
+      await notifyNewConventionNeedsReview.execute(validConvention);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
@@ -186,10 +192,12 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
     it("Nominal case: Sends notification email to admins", async () => {
       const adminEmail = "anAdmin@unmail.com";
-      agency = new AgencyDtoBuilder(defaultAgency)
+      const agency = new AgencyDtoBuilder(defaultAgency)
         .withAdminEmails([adminEmail])
         .build();
-      await createUseCase().execute(validConvention);
+      agencyRepository.setAgencies([agency]);
+
+      await notifyNewConventionNeedsReview.execute(validConvention);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(1);
@@ -210,7 +218,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     it("No admin available => ensure no mail is sent", async () => {
-      await createUseCase().execute(validConvention);
+      await notifyNewConventionNeedsReview.execute(validConvention);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });

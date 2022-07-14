@@ -1,6 +1,6 @@
 import { Router } from "express";
-import type { AppDependencies } from "../config/createAppDependencies";
 import { immersionOffersRoute } from "shared/src/routes";
+import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
 export const createSearchImmersionRouter = (deps: AppDependencies) => {

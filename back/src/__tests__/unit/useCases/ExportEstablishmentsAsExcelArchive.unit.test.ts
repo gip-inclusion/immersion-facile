@@ -1,18 +1,18 @@
+import { format } from "date-fns";
+import { stubEstablishmentExportQueries } from "../../../adapters/secondary/StubEstablishmentExportQueries";
+import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
 import {
-  inferColumnsFromConfigDto,
   addZonesDelimiters,
   aggregateProfessionsIfNeeded,
   EstablishmentExportConfig,
   getEstablishmentsForExport,
+  inferColumnsFromConfigDto,
 } from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import {
   EstablishmentRawBeforeExportProps,
   EstablishmentRawProps,
 } from "../../../domain/establishment/valueObjects/EstablishmentRawBeforeExportVO";
 import { DepartmentAndRegion } from "../../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
-import { StubEstablishmentExportQueries } from "../../../adapters/secondary/StubEstablishmentExportQueries";
-import { format } from "date-fns";
-import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
 
 describe("ExportEstablishmentsAsExcelArchive", () => {
   describe("establishmentsExportColumnsOptions", () => {
@@ -113,7 +113,7 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
       } as EstablishmentExportConfig;
 
       const rawEstablishments =
-        await StubEstablishmentExportQueries.getAllEstablishmentsForExport();
+        await stubEstablishmentExportQueries.getAllEstablishmentsForExport();
 
       expect(
         aggregateProfessionsIfNeeded(config, rawEstablishments),
@@ -126,7 +126,7 @@ describe("ExportEstablishmentsAsExcelArchive", () => {
       } as EstablishmentExportConfig;
 
       const rawEstablishments =
-        await StubEstablishmentExportQueries.getAllEstablishmentsForExport();
+        await stubEstablishmentExportQueries.getAllEstablishmentsForExport();
 
       const expected: EstablishmentRawProps[] = [
         {

@@ -1,7 +1,7 @@
-import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { SiretDto } from "shared/src/siret";
+import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -29,7 +29,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
     const featureFlags = await uow.getFeatureFlags();
 
     const existingFormEstablishment =
-      await uow.formEstablishmentRepo.getBySiret(dto.siret);
+      await uow.formEstablishmentRepository.getBySiret(dto.siret);
 
     if (existingFormEstablishment) {
       throw new ConflictError(
@@ -48,8 +48,8 @@ export class AddFormEstablishment extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.formEstablishmentRepo.create(dto),
-      uow.outboxRepo.save(event),
+      uow.formEstablishmentRepository.create(dto),
+      uow.outboxRepository.save(event),
     ]);
 
     return dto.siret;

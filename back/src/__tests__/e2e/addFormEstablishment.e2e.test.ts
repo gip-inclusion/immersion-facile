@@ -1,15 +1,15 @@
-import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
+import { formEstablishmentsRoute } from "shared/src/routes";
+import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
 import { FormEstablishmentDtoPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
-import { formEstablishmentsRoute } from "shared/src/routes";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 
 describe("Route to post form establishments from front (hence, without API key)", () => {
   // from front
   it("support posting valid establishment from front", async () => {
-    const { request, reposAndGateways } = await buildTestApp();
+    const { request, inMemoryUow } = await buildTestApp();
 
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(TEST_ESTABLISHMENT1_SIRET)
@@ -22,12 +22,12 @@ describe("Route to post form establishments from front (hence, without API key)"
     expect(response.status).toBe(200);
     expect(response.body).toEqual(formEstablishment.siret);
 
-    const inRepo = await reposAndGateways.formEstablishment.getAll();
+    const inRepo = await inMemoryUow.formEstablishmentRepository.getAll();
     expect(inRepo).toEqual([formEstablishment]);
   });
 
   it("Check if email notification has been sent and published after FormEstablishment added", async () => {
-    const { eventCrawler, reposAndGateways, request }: TestAppAndDeps =
+    const { eventCrawler, gateways, request }: TestAppAndDeps =
       await buildTestApp();
 
     const formEstablishment: FormEstablishmentDto =
@@ -50,7 +50,7 @@ describe("Route to post form establishments from front (hence, without API key)"
 
     await eventCrawler.processNewEvents();
 
-    const sentEmails = reposAndGateways.email.getSentEmails();
+    const sentEmails = gateways.email.getSentEmails();
     expect(sentEmails).toHaveLength(1);
     expect(sentEmails.map((e) => e.recipients)).toEqual([
       ["tiredofthismess@seriously.com"],

@@ -1,23 +1,22 @@
 import { NextFunction, Request, Response } from "express";
-import { TokenExpiredError } from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
+import promClient from "prom-client";
+import {
+  ConventionMagicLinkPayload,
+  currentJwtVersions,
+  EstablishmentJwtPayload,
+  PayloadKey,
+  PayloadOption,
+} from "shared/src/tokens/MagicLinkPayload";
+import { makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { Clock } from "../../domain/core/ports/Clock";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
 import {
   ApiConsumerName,
   WithApiConsumerId,
 } from "../../domain/core/valueObjects/ApiConsumer";
-import {
-  currentJwtVersions,
-  EstablishmentJwtPayload,
-  ConventionMagicLinkPayload,
-  PayloadKey,
-  PayloadOption,
-} from "shared/src/tokens/MagicLinkPayload";
 import { createLogger } from "../../utils/logger";
-import { makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { AppConfig } from "./config/appConfig";
-import jwt from "jsonwebtoken";
-import promClient from "prom-client";
 
 const logger = createLogger(__filename);
 

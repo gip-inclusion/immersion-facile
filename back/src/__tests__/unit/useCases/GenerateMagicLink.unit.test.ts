@@ -1,10 +1,10 @@
-import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
-import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 import {
-  createConventionMagicLinkPayload,
   ConventionMagicLinkPayload,
+  createConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
+import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
+import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 
 const generateJwtFn: GenerateMagicLinkJwt = (payload) => {
   const { applicationId, role, iat } = payload as ConventionMagicLinkPayload;

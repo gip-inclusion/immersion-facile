@@ -25,7 +25,7 @@ export class AppellationSearch extends TransactionalUseCase<
   ): Promise<AppellationMatchDto[]> {
     if (searchText.length <= MIN_SEARCH_TEXT_LENGTH) return [];
 
-    const appellations = await uow.romeRepo.searchAppellation(searchText);
+    const appellations = await uow.romeRepository.searchAppellation(searchText);
 
     const appellationsWithMatch: AppellationMatchDto[] = appellations.map(
       (appellation) => ({

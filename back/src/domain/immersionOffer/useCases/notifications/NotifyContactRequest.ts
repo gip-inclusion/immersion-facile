@@ -3,25 +3,30 @@ import {
   contactEstablishmentRequestSchema,
 } from "shared/src/contactEstablishment";
 import { EmailGateway } from "../../../convention/ports/EmailGateway";
-import { UseCase } from "../../../core/UseCase";
-import { EstablishmentAggregateRepository } from "../../ports/EstablishmentAggregateRepository";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
 
-export class NotifyContactRequest extends UseCase<ContactEstablishmentRequestDto> {
+export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentRequestDto> {
   constructor(
-    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
+    uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
   ) {
-    super();
+    super(uowPerformer);
   }
+
   inputSchema = contactEstablishmentRequestSchema;
 
   public async _execute(
     payload: ContactEstablishmentRequestDto,
+    uow: UnitOfWork,
   ): Promise<void> {
     const { siret, romeLabel } = payload;
 
     const establishmentAggregate =
-      await this.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
     if (!establishmentAggregate)

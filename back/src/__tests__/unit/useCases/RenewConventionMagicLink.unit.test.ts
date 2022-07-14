@@ -49,8 +49,8 @@ describe("RenewConventionMagicLink use case", () => {
   beforeEach(() => {
     const uow = createInMemoryUow();
     conventionRepository = uow.conventionRepository;
-    outboxRepository = uow.outboxRepo;
-    agencyRepository = uow.agencyRepo;
+    outboxRepository = uow.outboxRepository;
+    agencyRepository = uow.agencyRepository;
     agencyRepository.setAgencies([defaultAgency]);
     clock = new CustomClock();
     clock.setNextDate(new Date());

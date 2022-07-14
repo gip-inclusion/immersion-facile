@@ -2,9 +2,9 @@ import { activeAgencyStatuses, AgencyDto } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { z } from "zod";
 import { AppLogger } from "../../core/ports/AppLogger";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { UseCase } from "../../core/UseCase";
-import { AgencyRepository } from "../ports/AgencyRepository";
+import { TransactionalUseCase } from "../../core/UseCase";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
@@ -22,20 +22,20 @@ const counts = {
 };
 
 // this use case is used only in one script (not in the back app)
-export class UpdateAllPeAgencies extends UseCase<void, void> {
+export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
   constructor(
+    uowPerformer: UnitOfWorkPerformer,
     private referencielAgencesPe: PeAgenciesReferential,
-    private agencyRepository: AgencyRepository,
     private defaultAdminEmail: string,
     private uuid: UuidGenerator,
     private logger: AppLogger,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   protected inputSchema = z.void();
 
-  async _execute(): Promise<void> {
+  async _execute(_: void, uow: UnitOfWork): Promise<void> {
     const start = new Date();
     const peReferentialAgencies =
       await this.referencielAgencesPe.getPeAgencies();
@@ -48,7 +48,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
 
     this.logger.info(
       "Total number of active agencies in DB before script : ",
-      (await this.agencyRepository.getAgencies({})).length,
+      (await uow.agencyRepository.getAgencies({})).length,
     );
 
     for (const peReferentialAgency of peReferentialAgencies) {
@@ -60,24 +60,26 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
         continue;
       }
 
-      const matchedEmailAgency = await this.getAgencyWhereEmailMatches(
+      const matchedEmailAgency = await getAgencyWhereEmailMatches(
+        uow,
         peReferentialAgency,
       );
 
       if (matchedEmailAgency) {
         counts.matchedEmail++;
-        await this.updateAgency(matchedEmailAgency, peReferentialAgency);
+        await updateAgency(uow, matchedEmailAgency, peReferentialAgency);
         continue;
       }
 
-      const matchedNearbyAgencies = await this.getNearestPeAgencies(
+      const matchedNearbyAgencies = await getNearestPeAgencies(
+        uow,
         peReferentialAgency,
       );
 
       switch (matchedNearbyAgencies.length) {
         case 0: {
           const newAgency = this.convertToAgency(peReferentialAgency);
-          await this.agencyRepository.insert(newAgency);
+          await uow.agencyRepository.insert(newAgency);
           counts.added++;
           break;
         }
@@ -85,7 +87,7 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
         case 1: {
           const matchedAgency = matchedNearbyAgencies[0];
           if (matchedAgency.status === "from-api-PE") break;
-          await this.updateAgency(matchedAgency, peReferentialAgency);
+          await updateAgency(uow, matchedAgency, peReferentialAgency);
           counts.matchedNearby++;
           break;
         }
@@ -133,56 +135,57 @@ export class UpdateAllPeAgencies extends UseCase<void, void> {
       status: "from-api-PE",
     };
   }
-
-  private async getNearestPeAgencies(
-    peReferentialAgency: PeAgencyFromReferenciel,
-  ): Promise<AgencyDto[]> {
-    const agencies = await this.agencyRepository.getAgencies({
-      filters: {
-        status: activeAgencyStatuses,
-        position: {
-          position: {
-            lon: peReferentialAgency.adressePrincipale.gpsLon,
-            lat: peReferentialAgency.adressePrincipale.gpsLat,
-          },
-          distance_km: 0.2,
-        },
-      },
-    });
-    return agencies.filter((agency) => agency.kind === "pole-emploi");
-  }
-
-  private async getAgencyWhereEmailMatches(
-    peReferentialAgency: PeAgencyFromReferenciel,
-  ): Promise<AgencyDto | undefined> {
-    if (!peReferentialAgency.contact?.email) return;
-
-    const result = await this.agencyRepository.getAgencyWhereEmailMatches(
-      peReferentialAgency.contact.email,
-    );
-
-    return result;
-  }
-
-  private async updateAgency(
-    existingAgency: AgencyDto,
-    peReferentialAgency: PeAgencyFromReferenciel,
-  ): Promise<void> {
-    counts.updated++;
-    const updatedAgency: AgencyDto = {
-      ...existingAgency,
-      ...normalizeAddressAndPosition(peReferentialAgency),
-      ...updateEmails({
-        validatorEmails: existingAgency.validatorEmails,
-        counsellorEmails: existingAgency.counsellorEmails,
-        newEmail: peReferentialAgency.contact?.email,
-      }),
-      agencySiret: peReferentialAgency.siret,
-      codeSafir: peReferentialAgency.codeSafir,
-    };
-    await this.agencyRepository.update(updatedAgency);
-  }
 }
+
+const getNearestPeAgencies = async (
+  uow: UnitOfWork,
+  peReferentialAgency: PeAgencyFromReferenciel,
+): Promise<AgencyDto[]> => {
+  const agencies = await uow.agencyRepository.getAgencies({
+    filters: {
+      status: activeAgencyStatuses,
+      position: {
+        position: {
+          lon: peReferentialAgency.adressePrincipale.gpsLon,
+          lat: peReferentialAgency.adressePrincipale.gpsLat,
+        },
+        distance_km: 0.2,
+      },
+    },
+  });
+  return agencies.filter((agency) => agency.kind === "pole-emploi");
+};
+
+const getAgencyWhereEmailMatches = async (
+  uow: UnitOfWork,
+  peReferentialAgency: PeAgencyFromReferenciel,
+): Promise<AgencyDto | undefined> => {
+  if (!peReferentialAgency.contact?.email) return;
+
+  return uow.agencyRepository.getAgencyWhereEmailMatches(
+    peReferentialAgency.contact.email,
+  );
+};
+
+const updateAgency = async (
+  uow: UnitOfWork,
+  existingAgency: AgencyDto,
+  peReferentialAgency: PeAgencyFromReferenciel,
+): Promise<void> => {
+  counts.updated++;
+  const updatedAgency: AgencyDto = {
+    ...existingAgency,
+    ...normalizeAddressAndPosition(peReferentialAgency),
+    ...updateEmails({
+      validatorEmails: existingAgency.validatorEmails,
+      counsellorEmails: existingAgency.counsellorEmails,
+      newEmail: peReferentialAgency.contact?.email,
+    }),
+    agencySiret: peReferentialAgency.siret,
+    codeSafir: peReferentialAgency.codeSafir,
+  };
+  await uow.agencyRepository.update(updatedAgency);
+};
 
 const updateEmails = ({
   counsellorEmails,

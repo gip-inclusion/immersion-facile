@@ -1,5 +1,5 @@
-import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { ConventionId } from "shared/src/convention/convention.dto";
+import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
 
 export type ConventionAndPeExternalIds = {

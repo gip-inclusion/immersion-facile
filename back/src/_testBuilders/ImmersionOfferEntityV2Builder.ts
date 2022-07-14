@@ -1,6 +1,6 @@
-import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { RomeCode } from "shared/src/rome";
 import { Builder } from "shared/src/Builder";
+import { RomeCode } from "shared/src/rome";
+import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 
 const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {
   romeCode: "B1805",

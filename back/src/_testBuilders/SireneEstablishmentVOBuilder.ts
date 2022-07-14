@@ -1,8 +1,8 @@
+import { Builder } from "shared/src/Builder";
 import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,
 } from "../domain/sirene/valueObjects/SireneEstablishmentVO";
-import { Builder } from "shared/src/Builder";
 
 const validSireneEstablishmentProps: SireneEstablishmentProps = {
   siret: "20006765000016",

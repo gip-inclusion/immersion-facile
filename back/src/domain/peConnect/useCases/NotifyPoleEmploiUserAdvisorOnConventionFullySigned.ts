@@ -27,7 +27,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
   ): Promise<void> {
     const conventionUserAdvisor:
       | ConventionPoleEmploiUserAdvisorEntity
-      | undefined = await uow.conventionPoleEmploiAdvisorRepo.getByConventionId(
+      | undefined = await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
       conventionFromEvent.id,
     );
 

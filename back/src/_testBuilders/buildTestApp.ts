@@ -1,61 +1,34 @@
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import supertest from "supertest";
 import { AppConfig } from "../adapters/primary/config/appConfig";
-import { Repositories } from "../adapters/primary/config/repositoriesConfig";
+import { Gateways } from "../adapters/primary/config/createGateways";
+import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
 import { createApp } from "../adapters/primary/server";
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
-import type { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
-import { InMemoryEstablishmentAggregateRepository } from "../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
-import { InMemorySearchMadeRepository } from "../adapters/secondary/immersionOffer/InMemorySearchMadeRepository";
-import { InMemoryLaBonneBoiteRequestRepository } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
-import type { InMemoryAgencyRepository } from "../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryConventionPoleEmploiAdvisorRepository } from "../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
-import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
 import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { InMemoryFormEstablishmentRepository } from "../adapters/secondary/InMemoryFormEstablishmentRepository";
-import type { InMemoryConventionRepository } from "../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
+import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
+import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/InMemoryPeConnectGateway";
-import { InMemoryRomeRepository } from "../adapters/secondary/InMemoryRomeRepository";
+import { InMemoryPoleEmploiGateway } from "../adapters/secondary/InMemoryPoleEmploiGateway";
 import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
-import { GetApiConsumerById } from "../domain/core/ports/GetApiConsumerById";
-import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { AppConfigBuilder } from "./AppConfigBuilder";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { EstablishmentExportQueries } from "../domain/establishment/ports/EstablishmentExportQueries";
-import { PostalCodeDepartmentRegionQueries } from "../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
+import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
 import {
   GenerateApiConsumerJtw,
   GenerateMagicLinkJwt,
 } from "../domain/auth/jwt";
-import { InMemoryOutboxQueries } from "../adapters/secondary/core/InMemoryOutboxQueries";
-import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
-import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
 import { Clock } from "../domain/core/ports/Clock";
-import { InMemoryConventionQueries } from "../adapters/secondary/InMemoryConventionQueries";
-import { InMemoryPoleEmploiGateway } from "../adapters/secondary/InMemoryPoleEmploiGateway";
+import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
+import { AppConfigBuilder } from "./AppConfigBuilder";
 
-export type InMemoryRepositories = {
-  conventionPoleEmploiAdvisor: InMemoryConventionPoleEmploiAdvisorRepository;
-  outbox: InMemoryOutboxRepository;
-  outboxQueries: InMemoryOutboxQueries;
-  immersionOffer: InMemoryEstablishmentAggregateRepository;
-  agency: InMemoryAgencyRepository;
-  formEstablishment: InMemoryFormEstablishmentRepository;
-  convention: InMemoryConventionRepository;
-  conventionQueries: InMemoryConventionQueries;
-  searchesMade: InMemorySearchMadeRepository;
-  rome: InMemoryRomeRepository;
+export type InMemoryGateways = {
   email: InMemoryEmailGateway;
   peConnectGateway: InMemoryPeConnectGateway;
   sirene: InMemorySireneGateway;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
-  laBonneBoiteRequest: InMemoryLaBonneBoiteRequestRepository;
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;
-  establishmentExport: EstablishmentExportQueries;
-  postalCodeDepartmentRegion: PostalCodeDepartmentRegionQueries;
-  getApiConsumerById: GetApiConsumerById;
   getFeatureFlags: GetFeatureFlags;
   documentGateway: InMemoryDocumentGateway;
   reportingGateway: InMemoryReportingGateway;
@@ -63,16 +36,17 @@ export type InMemoryRepositories = {
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
 // prettier-ignore
-const _isAssignable = (inMemoryRepos: InMemoryRepositories): Repositories => inMemoryRepos;
+const _isAssignable = (inMemoryRepos: InMemoryGateways): Gateways => inMemoryRepos;
 
 export type TestAppAndDeps = {
   request: supertest.SuperTest<supertest.Test>;
-  reposAndGateways: InMemoryRepositories;
+  gateways: InMemoryGateways;
   eventCrawler: BasicEventCrawler;
   appConfig: AppConfig;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
   clock: Clock;
+  inMemoryUow: InMemoryUnitOfWork;
 };
 
 export const buildTestApp = async (
@@ -107,27 +81,31 @@ export const buildTestApp = async (
 
   const {
     app,
-    repositories,
+    gateways,
     eventCrawler: rawEventCrawler,
     generateApiJwt,
     generateMagicLinkJwt,
     clock,
+    inMemoryUow: uow,
   } = await createApp(appConfig);
 
   const request = supertest(app);
   const eventCrawler = rawEventCrawler as BasicEventCrawler;
-  const reposAndGateways = repositories as InMemoryRepositories;
 
-  await reposAndGateways.agency.insert(agency);
+  /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
+  const inMemoryUow = uow!;
+
+  await inMemoryUow.agencyRepository.insert(agency);
 
   return {
     request,
-    reposAndGateways,
+    gateways: gateways as InMemoryGateways,
     eventCrawler,
     appConfig,
     generateApiJwt,
     generateMagicLinkJwt,
     clock,
+    inMemoryUow,
   };
 };
 

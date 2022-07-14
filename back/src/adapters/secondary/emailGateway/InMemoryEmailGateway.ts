@@ -1,8 +1,8 @@
-import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
-import { createLogger } from "../../../utils/logger";
-import { EmailSentDto, TemplatedEmail } from "shared/email";
-import { Clock } from "../../../domain/core/ports/Clock";
 import { prop } from "ramda";
+import { EmailSentDto, TemplatedEmail } from "shared/email";
+import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
+import { Clock } from "../../../domain/core/ports/Clock";
+import { createLogger } from "../../../utils/logger";
 import { CustomClock } from "../core/ClockImplementations";
 
 const logger = createLogger(__filename);

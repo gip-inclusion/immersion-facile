@@ -1,27 +1,36 @@
+import { pathEq } from "shared/src/ramdaExtensions/path";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentVOBuilder";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentVOBuilder";
-import { pathEq } from "shared/src/ramdaExtensions/path";
 
 const prepareUseCase = () => {
   const sireneRepo = new InMemorySireneGateway();
-  const immersionRepo = new InMemoryEstablishmentAggregateRepository();
+  const uow = createInMemoryUow();
+  const establishmentAggregateRepository = uow.establishmentAggregateRepository;
   const clock = new CustomClock();
   const adresseAPI = new InMemoryAdresseAPI();
   const useCase = new UpdateEstablishmentsFromSireneAPI(
+    new InMemoryUowPerformer(uow),
     sireneRepo,
-    immersionRepo,
     adresseAPI,
     clock,
   );
 
-  return { sireneRepo, immersionRepo, adresseAPI, clock, useCase };
+  return {
+    sireneRepo,
+    establishmentAggregateRepository,
+    adresseAPI,
+    clock,
+    useCase,
+  };
 };
 
 const makeEstablishmentWithUpdatedAt = (siret: string, updatedAt: Date) =>
@@ -35,10 +44,10 @@ const makeEstablishmentWithUpdatedAt = (siret: string, updatedAt: Date) =>
     .build();
 
 const findEstablishmentEntityGivenSiret = (
-  immersionRepo: InMemoryEstablishmentAggregateRepository,
+  establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository,
   siret: string,
 ): EstablishmentEntityV2 | undefined =>
-  immersionRepo.establishmentAggregates.find(
+  establishmentAggregateRepository.establishmentAggregates.find(
     pathEq("establishment.siret", siret),
   )?.establishment;
 
@@ -48,9 +57,10 @@ describe("Update establishments from Sirene API", () => {
   const moreThanAWeekAgo = new Date("2020-01-06T00:00:00");
 
   it("Should update modification date of establishments that have not been modified since one week", async () => {
-    const { clock, sireneRepo, immersionRepo, useCase } = prepareUseCase();
+    const { clock, sireneRepo, establishmentAggregateRepository, useCase } =
+      prepareUseCase();
     // Prepare
-    immersionRepo.establishmentAggregates = [
+    establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt("oldSiret", moreThanAWeekAgo),
       makeEstablishmentWithUpdatedAt("recentSiret", lessThanAWeekAgo),
     ];
@@ -64,18 +74,24 @@ describe("Update establishments from Sirene API", () => {
 
     // Assert old establishments only have been updated
     expect(
-      findEstablishmentEntityGivenSiret(immersionRepo, "oldSiret")?.updatedAt,
+      findEstablishmentEntityGivenSiret(
+        establishmentAggregateRepository,
+        "oldSiret",
+      )?.updatedAt,
     ).toEqual(now);
     expect(
-      findEstablishmentEntityGivenSiret(immersionRepo, "recentSiret")
-        ?.updatedAt,
+      findEstablishmentEntityGivenSiret(
+        establishmentAggregateRepository,
+        "recentSiret",
+      )?.updatedAt,
     ).toEqual(lessThanAWeekAgo);
   });
 
   it("Should close establishments that are not longer referenced in Sirene API", async () => {
     // Prepare
-    const { clock, immersionRepo, useCase } = prepareUseCase();
-    immersionRepo.establishmentAggregates = [
+    const { clock, establishmentAggregateRepository, useCase } =
+      prepareUseCase();
+    establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt(
         "closedEstablishmentSiret", // This siret is not referenced in sireneRepo
         moreThanAWeekAgo,
@@ -89,7 +105,7 @@ describe("Update establishments from Sirene API", () => {
     // Assert
     expectEstablishmentToMatch(
       findEstablishmentEntityGivenSiret(
-        immersionRepo,
+        establishmentAggregateRepository,
         "closedEstablishmentSiret",
       ),
       { isActive: false, updatedAt: now },
@@ -97,8 +113,9 @@ describe("Update establishments from Sirene API", () => {
   });
   it("Should update naf code and number of employee range of establishment based on Sirene answer", async () => {
     // Prepare
-    const { clock, sireneRepo, immersionRepo, useCase } = prepareUseCase();
-    immersionRepo.establishmentAggregates = [
+    const { clock, sireneRepo, establishmentAggregateRepository, useCase } =
+      prepareUseCase();
+    establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt("establishmentToUpdate", moreThanAWeekAgo),
     ];
     sireneRepo.setEstablishment(
@@ -119,7 +136,10 @@ describe("Update establishments from Sirene API", () => {
 
     // Assert
     expectEstablishmentToMatch(
-      findEstablishmentEntityGivenSiret(immersionRepo, "establishmentToUpdate"),
+      findEstablishmentEntityGivenSiret(
+        establishmentAggregateRepository,
+        "establishmentToUpdate",
+      ),
       {
         updatedAt: now,
         nafDto: { code: "8559A", nomenclature: "nafNom" },
@@ -131,9 +151,14 @@ describe("Update establishments from Sirene API", () => {
   describe("Should update establishment address and position based on sirene and address API", () => {
     it("If adresse API succeeds, it should update adresse and coordinates", async () => {
       // Prepare
-      const { clock, sireneRepo, immersionRepo, adresseAPI, useCase } =
-        prepareUseCase();
-      immersionRepo.establishmentAggregates = [
+      const {
+        clock,
+        sireneRepo,
+        establishmentAggregateRepository,
+        adresseAPI,
+        useCase,
+      } = prepareUseCase();
+      establishmentAggregateRepository.establishmentAggregates = [
         makeEstablishmentWithUpdatedAt(
           "establishmentToUpdate",
           moreThanAWeekAgo,
@@ -161,7 +186,7 @@ describe("Update establishments from Sirene API", () => {
       // Assert
       expectEstablishmentToMatch(
         findEstablishmentEntityGivenSiret(
-          immersionRepo,
+          establishmentAggregateRepository,
           "establishmentToUpdate",
         ),
         {
@@ -173,13 +198,20 @@ describe("Update establishments from Sirene API", () => {
     });
     it("If adresse API fails, it should not change the address and position", async () => {
       // Prepare
-      const { clock, sireneRepo, immersionRepo, adresseAPI, useCase } =
-        prepareUseCase();
+      const {
+        clock,
+        sireneRepo,
+        establishmentAggregateRepository,
+        adresseAPI,
+        useCase,
+      } = prepareUseCase();
       const establishmentToUpdate = makeEstablishmentWithUpdatedAt(
         "establishmentToUpdate",
         moreThanAWeekAgo,
       );
-      immersionRepo.establishmentAggregates = [establishmentToUpdate];
+      establishmentAggregateRepository.establishmentAggregates = [
+        establishmentToUpdate,
+      ];
       sireneRepo.setEstablishment(
         new SireneEstablishmentVOBuilder()
           .withSiret("establishmentToUpdate")
@@ -195,7 +227,7 @@ describe("Update establishments from Sirene API", () => {
       // Assert
       expectEstablishmentToMatch(
         findEstablishmentEntityGivenSiret(
-          immersionRepo,
+          establishmentAggregateRepository,
           "establishmentToUpdate",
         ),
         {

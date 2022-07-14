@@ -5,6 +5,7 @@ import {
   makeGenerateJwtES256,
   makeGenerateJwtHS256,
 } from "../../../domain/auth/jwt";
+import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
@@ -20,9 +21,9 @@ import {
 } from "../helpers/handleRedirectResponseError";
 import { AppConfig } from "./appConfig";
 import { createEventCrawler } from "./createEventCrawler";
+import { createGateways, createGetPgPoolFn } from "./createGateways";
 import { createGenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { createUseCases } from "./createUseCases";
-import { createGetPgPoolFn, createRepositories } from "./repositoriesConfig";
 import { createUowPerformer } from "./uowConfig";
 
 const counterEventsMarkedAsPublished = new promClient.Counter({
@@ -42,13 +43,17 @@ export type AppDependencies = ReturnType<
 
 export const createAppDependencies = async (config: AppConfig) => {
   const getPgPoolFn = createGetPgPoolFn(config);
-  const repositories = await createRepositories(config, getPgPoolFn, clock);
+  const gateways = await createGateways(config, clock);
+
+  const { uowPerformer, inMemoryUow } = createUowPerformer(config, getPgPoolFn);
+
+  const saveEvent = (event: DomainEvent) =>
+    uowPerformer.perform((uow) => uow.outboxRepository.save(event));
 
   const eventBus = new InMemoryEventBus(clock, (event) => {
     counterEventsMarkedAsPublished.inc({ topic: event.topic });
-    return repositories.outbox.save(event);
+    return saveEvent(event);
   });
-  const uowPerformer = createUowPerformer(config, getPgPoolFn, repositories);
   const generateApiJwt = makeGenerateJwtES256(config.apiJwtPrivateKey);
   const generateMagicLinkJwt = makeGenerateJwtES256(
     config.magicLinkJwtPrivateKey,
@@ -64,18 +69,20 @@ export const createAppDependencies = async (config: AppConfig) => {
       makeHandleRawRedirectResponseError(redirectErrorUrl),
   };
 
+  const useCases = createUseCases(
+    config,
+    gateways,
+    generateMagicLinkJwt,
+    generateMagicLinkFn,
+    generateAdminJwt,
+    uowPerformer,
+    clock,
+    uuidGenerator,
+  );
+
   return {
-    useCases: createUseCases(
-      config,
-      repositories,
-      generateMagicLinkJwt,
-      generateMagicLinkFn,
-      generateAdminJwt,
-      uowPerformer,
-      clock,
-      uuidGenerator,
-    ),
-    repositories,
+    useCases,
+    gateways,
     applicationMagicLinkAuthMiddleware: makeMagicLinkAuthMiddleware(
       config,
       "application",
@@ -86,12 +93,12 @@ export const createAppDependencies = async (config: AppConfig) => {
       "establishment",
     ),
     apiKeyAuthMiddlewareV0: createApiKeyAuthMiddlewareV0(
-      repositories.getApiConsumerById,
+      useCases.getApiConsumerById,
       clock,
       config,
     ),
     apiKeyAuthMiddleware: makeApiKeyAuthMiddlewareV1(
-      repositories.getApiConsumerById,
+      useCases.getApiConsumerById,
       clock,
       config,
     ),
@@ -102,11 +109,8 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateMagicLinkJwt,
     generateApiJwt,
     eventBus,
-    eventCrawler: createEventCrawler(
-      config,
-      repositories.outboxQueries,
-      eventBus,
-    ),
+    eventCrawler: createEventCrawler(config, uowPerformer, eventBus),
     clock,
+    inMemoryUow,
   };
 };

@@ -1,11 +1,11 @@
-import { ConventionRepository } from "../../domain/convention/ports/ConventionRepository";
-import { createLogger } from "../../utils/logger";
 import {
   ConventionDto,
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
 } from "shared/src/convention/convention.dto";
+import { ConventionRepository } from "../../domain/convention/ports/ConventionRepository";
+import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 

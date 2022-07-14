@@ -1,17 +1,17 @@
 import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
-import {
   ConventionStatus,
   UpdateConventionRequestDto,
   WithConventionId,
 } from "shared/src/convention/convention.dto";
+import { updateConventionRequestSchema } from "shared/src/convention/convention.schema";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { updateConventionRequestSchema } from "shared/src/convention/convention.schema";
 
 //TODO UpdateConventionAfterModifications request
 // should receive a convention with draft status
@@ -59,7 +59,7 @@ export class UpdateImmersionApplication extends TransactionalUseCase<
 
     await Promise.all([
       uow.conventionRepository.update(params.convention),
-      uow.outboxRepo.save(
+      uow.outboxRepository.save(
         this.createNewEvent({
           topic: "ConventionSubmittedAfterModification",
           payload: params.convention,

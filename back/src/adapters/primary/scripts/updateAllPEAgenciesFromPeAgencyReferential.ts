@@ -1,13 +1,13 @@
 import { Pool } from "pg";
+import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
-import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { AppConfig } from "../config/appConfig";
+import { createUowPerformer } from "../config/uowConfig";
 
 const updateAllPeAgenciesScript = async () => {
   const config = AppConfig.createFromEnv();
@@ -27,12 +27,12 @@ const updateAllPeAgenciesScript = async () => {
   const pool = new Pool({
     connectionString: dbUrl,
   });
-  const client = await pool.connect();
-  const agencyRepository = new PgAgencyRepository(client);
+
+  const { uowPerformer } = createUowPerformer(config, () => pool);
 
   const updateAllPeAgencies = new UpdateAllPeAgencies(
+    uowPerformer,
     httpPeAgenciesReferential,
-    agencyRepository,
     config.defaultAdminEmail,
     new UuidV4Generator(),
     new ConsoleAppLogger(),

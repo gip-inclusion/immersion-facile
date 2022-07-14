@@ -40,7 +40,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
   beforeEach(() => {
     uow = createInMemoryUow();
     agency = defaultAgency;
-    uow.agencyRepo = new InMemoryAgencyRepository([defaultAgency]);
+    uow.agencyRepository = new InMemoryAgencyRepository([defaultAgency]);
     emailGw = new InMemoryEmailGateway();
 
     unitOfWorkPerformer = new InMemoryUowPerformer(uow);
@@ -51,7 +51,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
       .withCounsellorEmails([counsellorEmail])
       .build();
 
-    (uow.agencyRepo as InMemoryAgencyRepository).setAgencies([agency]);
+    (uow.agencyRepository as InMemoryAgencyRepository).setAgencies([agency]);
 
     unitOfWorkPerformer = new InMemoryUowPerformer(uow);
 
@@ -84,14 +84,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     };
 
     (
-      uow.conventionPoleEmploiAdvisorRepo as InMemoryConventionPoleEmploiAdvisorRepository
+      uow.conventionPoleEmploiAdvisorRepository as InMemoryConventionPoleEmploiAdvisorRepository
     ).setConventionPoleEmploiUsersAdvisor(userConventionAdvisor);
 
     agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
 
-    uow.agencyRepo = new InMemoryAgencyRepository([agency]);
+    uow.agencyRepository = new InMemoryAgencyRepository([agency]);
 
     unitOfWorkPerformer = new InMemoryUowPerformer(uow);
 

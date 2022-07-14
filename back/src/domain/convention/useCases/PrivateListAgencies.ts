@@ -3,23 +3,24 @@ import {
   PrivateListAgenciesRequestDto,
 } from "shared/src/agency/agency.dto";
 import { privateListAgenciesRequestSchema } from "shared/src/agency/agency.schema";
-import { UseCase } from "../../core/UseCase";
-import { AgencyRepository } from "../ports/AgencyRepository";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 
-export class PrivateListAgencies extends UseCase<
+export class PrivateListAgencies extends TransactionalUseCase<
   PrivateListAgenciesRequestDto,
   AgencyDto[]
 > {
-  constructor(readonly agencyRepository: AgencyRepository) {
-    super();
+  constructor(uowPerformer: UnitOfWorkPerformer) {
+    super(uowPerformer);
   }
 
   inputSchema = privateListAgenciesRequestSchema;
 
-  public async _execute({
-    status,
-  }: PrivateListAgenciesRequestDto): Promise<AgencyDto[]> {
-    const agencies = await this.agencyRepository.getAgencies({
+  public async _execute(
+    { status }: PrivateListAgenciesRequestDto,
+    uow: UnitOfWork,
+  ): Promise<AgencyDto[]> {
+    const agencies = await uow.agencyRepository.getAgencies({
       filters: { status: status && [status] },
     });
     return agencies;

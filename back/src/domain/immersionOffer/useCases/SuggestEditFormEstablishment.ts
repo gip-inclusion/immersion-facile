@@ -1,12 +1,12 @@
 import { SiretDto, siretSchema } from "shared/src/siret";
 import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { GenerateEditFormEstablishmentUrl } from "../../auth/jwt";
+import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { EmailGateway } from "../../convention/ports/EmailGateway";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
   inputSchema = siretSchema;
@@ -23,7 +23,7 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
   protected async _execute(siret: SiretDto, uow: UnitOfWork) {
     const contact = (
-      await uow.establishmentAggregateRepo.getEstablishmentAggregateBySiret(
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       )
     )?.contact;
@@ -53,7 +53,7 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
         topic: "FormEstablishmentEditLinkSent",
         payload,
       });
-      await uow.outboxRepo.save(event);
+      await uow.outboxRepository.save(event);
     } catch (error) {
       notifyObjectDiscord(error);
     }

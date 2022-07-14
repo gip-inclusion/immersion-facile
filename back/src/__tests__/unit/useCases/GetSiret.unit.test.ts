@@ -1,10 +1,10 @@
-import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
-import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import {
   NotFoundError,
   TooManyRequestApiError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
+import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { SireneEstablishmentVO } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
 
 const validEstablishment = new SireneEstablishmentVO({

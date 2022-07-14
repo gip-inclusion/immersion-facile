@@ -1,4 +1,10 @@
 import {
+  ConventionDtoWithoutExternalId,
+  ConventionStatus,
+  WithConventionId,
+} from "shared/src/convention/convention.dto";
+import { conventionWithoutExternalIdSchema } from "shared/src/convention/convention.schema";
+import {
   ConflictError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
@@ -7,12 +13,6 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
-import {
-  ConventionStatus,
-  WithConventionId,
-  ConventionDtoWithoutExternalId,
-} from "shared/src/convention/convention.dto";
-import { conventionWithoutExternalIdSchema } from "shared/src/convention/convention.schema";
 
 export class AddImmersionApplication extends TransactionalUseCase<
   ConventionDtoWithoutExternalId,
@@ -59,7 +59,7 @@ export class AddImmersionApplication extends TransactionalUseCase<
       payload: { ...createConventionParams, externalId },
     });
 
-    await uow.outboxRepo.save(event);
+    await uow.outboxRepository.save(event);
 
     return { id: createConventionParams.id };
   }

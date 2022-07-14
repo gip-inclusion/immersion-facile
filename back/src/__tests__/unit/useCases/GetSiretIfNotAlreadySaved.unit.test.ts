@@ -22,7 +22,7 @@ describe("GetSiretIfNotAlreadySaved", () => {
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
-      establishmentAggregateRepo,
+      establishmentAggregateRepository: establishmentAggregateRepo,
     });
     getSiretIfNotAlreadySaved = new GetSiretIfNotAlreadySaved(
       uowPerformer,

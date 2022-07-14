@@ -42,7 +42,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
 
     const uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
-      agencyRepo: agencyRepository,
+      agencyRepository,
     });
 
     notifyToAgencyApplicationSubmitted = new NotifyToAgencyApplicationSubmitted(

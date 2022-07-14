@@ -2,8 +2,8 @@ import { Router } from "express";
 import { romeAutocompleteInputSchema } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
 import {
   appellationRoute,
-  romeRoute,
   getSiretIfNotSavedRoute,
+  romeRoute,
   siretRoute,
 } from "shared/src/routes";
 import { createLogger } from "../../../utils/logger";

@@ -1,4 +1,5 @@
 import { formatISO, secondsToMilliseconds } from "date-fns";
+import { SiretDto } from "shared/src/siret";
 import { Clock } from "../../domain/core/ports/Clock";
 import { RateLimiter } from "../../domain/core/ports/RateLimiter";
 import {
@@ -9,7 +10,6 @@ import {
   SireneGateway,
   SireneGatewayAnswer,
 } from "../../domain/sirene/ports/SireneGateway";
-import { SiretDto } from "shared/src/siret";
 import {
   createAxiosInstance,
   isRetryableError,

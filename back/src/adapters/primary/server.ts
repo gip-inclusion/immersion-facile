@@ -1,29 +1,30 @@
 import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
+import expressPrometheusMiddleware from "express-prometheus-middleware";
 import PinoHttp from "pino-http";
 import {
   GenerateApiConsumerJtw,
   GenerateMagicLinkJwt,
 } from "../../domain/auth/jwt";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
+import { Clock } from "../../domain/core/ports/Clock";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 import { createAppDependencies } from "./config/createAppDependencies";
-import { Repositories } from "./config/repositoriesConfig";
+import { Gateways } from "./config/createGateways";
+import { InMemoryUnitOfWork } from "./config/uowConfig";
 import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/createAgenciesRouter";
 import { createApiKeyAuthRouter } from "./routers/createApiKeyAuthRouter";
+import { createApiKeyAuthRouterV1 } from "./routers/createApiKeyAuthRouter.v1";
+import { createConventionRouter } from "./routers/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/createEstablishmentRouter";
 import { createFormCompletionRouter } from "./routers/createFormCompletionRouter";
-import { createConventionRouter } from "./routers/createConventionRouter";
 import { createMagicLinkRouter } from "./routers/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/createPeConnectRouter";
+import { createSearchImmersionRouter } from "./routers/createSearchImmersionRouter";
 import { createTechnicalRouter } from "./routers/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
-import expressPrometheusMiddleware from "express-prometheus-middleware";
-import { createApiKeyAuthRouterV1 } from "./routers/createApiKeyAuthRouter.v1";
-import { Clock } from "../../domain/core/ports/Clock";
-import { createSearchImmersionRouter } from "./routers/createSearchImmersionRouter";
 
 const logger = createLogger(__filename);
 
@@ -36,11 +37,12 @@ export const createApp = async (
   config: AppConfig,
 ): Promise<{
   app: Express;
-  repositories: Repositories;
+  gateways: Gateways;
   eventCrawler: EventCrawler;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
   clock: Clock;
+  inMemoryUow?: InMemoryUnitOfWork;
 }> => {
   const app = express();
   const router = Router();
@@ -75,10 +77,11 @@ export const createApp = async (
 
   return {
     app,
-    repositories: deps.repositories,
+    gateways: deps.gateways,
     eventCrawler: deps.eventCrawler,
     generateApiJwt: deps.generateApiJwt,
     generateMagicLinkJwt: deps.generateMagicLinkJwt,
     clock: deps.clock,
+    inMemoryUow: deps.inMemoryUow,
   };
 };

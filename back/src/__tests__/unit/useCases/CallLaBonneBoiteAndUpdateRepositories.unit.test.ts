@@ -1,26 +1,25 @@
+import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
+import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
-import { InMemoryLaBonneBoiteRequestRepository } from "../../../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import {
   LaBonneBoiteCompanyProps,
   LaBonneBoiteCompanyVO,
 } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
-import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
 const prepareUseCase = () => {
-  const establishmentAggregateRepository =
-    new InMemoryEstablishmentAggregateRepository();
-  const laBonneBoiteRequestRepository =
-    new InMemoryLaBonneBoiteRequestRepository();
+  const uow = createInMemoryUow();
+  const establishmentAggregateRepository = uow.establishmentAggregateRepository;
+  const laBonneBoiteRequestRepository = uow.laBonneBoiteRequestRepository;
 
   const laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
   const uuidGenerator = new TestUuidGenerator();
@@ -34,8 +33,7 @@ const prepareUseCase = () => {
   laBonneBoiteAPI.setNextResults([lbbCompany]);
 
   const useCase = new CallLaBonneBoiteAndUpdateRepositories(
-    establishmentAggregateRepository,
-    laBonneBoiteRequestRepository,
+    new InMemoryUowPerformer(uow),
     laBonneBoiteAPI,
     clock,
   );

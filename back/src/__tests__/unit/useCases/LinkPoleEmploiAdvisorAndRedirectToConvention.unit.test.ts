@@ -24,7 +24,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepo;
+    conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
     peConnectGateway = new InMemoryPeConnectGateway(baseurl);
 

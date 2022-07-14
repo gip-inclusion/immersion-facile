@@ -9,7 +9,7 @@ const conventionId = "my-Convention-id";
 describe("Immersion assessment routes", () => {
   describe(`POST /auth/${immersionAssessmentRoute}/:jwt`, () => {
     it("returns 200 if the jwt is valid", async () => {
-      const { request, generateMagicLinkJwt, reposAndGateways } =
+      const { request, generateMagicLinkJwt, inMemoryUow } =
         await buildTestApp();
 
       const jwt = generateMagicLinkJwt(
@@ -25,7 +25,7 @@ describe("Immersion assessment routes", () => {
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .build();
 
-      reposAndGateways.convention.setConventions({
+      inMemoryUow.conventionRepository.setConventions({
         [convention.id]: convention,
       });
 

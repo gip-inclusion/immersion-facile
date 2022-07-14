@@ -2,22 +2,24 @@ import { AdminToken } from "shared/src/admin/admin.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { agenciesRoute } from "shared/src/routes";
 import { SuperTest, Test } from "supertest";
-import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import {
   buildTestApp,
-  InMemoryRepositories,
+  InMemoryGateways,
 } from "../../_testBuilders/buildTestApp";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
+import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 
 describe(`/${agenciesRoute} route`, () => {
   let request: SuperTest<Test>;
-  let reposAndGateways: InMemoryRepositories;
+  let gateways: InMemoryGateways;
+  let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
   let adminToken: AdminToken;
   let appConfig: AppConfig;
 
   beforeEach(async () => {
-    ({ request, reposAndGateways, eventCrawler, appConfig } =
+    ({ request, gateways, eventCrawler, appConfig, inMemoryUow } =
       await buildTestApp());
 
     const response = await request.post("/admin/login").send({
@@ -59,7 +61,9 @@ describe(`/${agenciesRoute} route`, () => {
           agency2ActiveNearBy,
           agency3ActiveFarAway,
           agency4NeedsReview,
-        ].map(async (agencyDto) => reposAndGateways.agency.insert(agencyDto)),
+        ].map(async (agencyDto) =>
+          inMemoryUow.agencyRepository.insert(agencyDto),
+        ),
       );
       // Act and asseer
       await request.get(`/${agenciesRoute}?lat=10.123&lon=10.123`).expect(200, [
@@ -92,7 +96,7 @@ describe(`/${agenciesRoute} route`, () => {
       // Prepare
       await Promise.all(
         [agency1ActiveNearBy, agency4NeedsReview].map(async (agencyDto) =>
-          reposAndGateways.agency.insert(agencyDto),
+          inMemoryUow.agencyRepository.insert(agencyDto),
         ),
       );
       // Getting the application succeeds and shows that it's validated.
@@ -106,7 +110,7 @@ describe(`/${agenciesRoute} route`, () => {
   describe("private route to update an agency", () => {
     it("Updates the agency, sends an email to validators and returns code 200", async () => {
       // Prepare
-      await reposAndGateways.agency.insert(agency4NeedsReview);
+      await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
 
       // Act and assert
       await request
@@ -116,12 +120,12 @@ describe(`/${agenciesRoute} route`, () => {
         .expect(200);
 
       expect(
-        (await reposAndGateways.agency.getById("test-agency-4"))?.status,
+        (await inMemoryUow.agencyRepository.getById("test-agency-4"))?.status,
       ).toBe("active");
-      expect(reposAndGateways.outbox.events).toHaveLength(1);
+      expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
 
       await eventCrawler.processNewEvents();
-      expect(reposAndGateways.email.getSentEmails()).toHaveLength(1);
+      expect(gateways.email.getSentEmails()).toHaveLength(1);
     });
   });
 });

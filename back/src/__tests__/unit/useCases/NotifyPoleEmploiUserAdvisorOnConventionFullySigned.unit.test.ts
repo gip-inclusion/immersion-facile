@@ -25,7 +25,8 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   beforeEach(() => {
     emailGateway = new InMemoryEmailGateway();
     const uow = createInMemoryUow();
-    conventionPoleEmploiAdvisorRepository = uow.conventionPoleEmploiAdvisorRepo;
+    conventionPoleEmploiAdvisorRepository =
+      uow.conventionPoleEmploiAdvisorRepository;
     conventionRepository = uow.conventionRepository;
 
     const uowPerformer = new InMemoryUowPerformer(uow);

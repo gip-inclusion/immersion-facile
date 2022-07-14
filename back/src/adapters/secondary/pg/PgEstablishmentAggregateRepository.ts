@@ -1,6 +1,10 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import R from "ramda";
+import { LatLonDto } from "shared/src/latLon";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { SiretDto } from "shared/src/siret";
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   DataSource,
@@ -13,10 +17,6 @@ import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
-import { LatLonDto } from "shared/src/latLon";
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { SiretDto } from "shared/src/siret";
 
 import { createLogger } from "../../../utils/logger";
 import { NotFoundError } from "../../primary/helpers/httpErrors";

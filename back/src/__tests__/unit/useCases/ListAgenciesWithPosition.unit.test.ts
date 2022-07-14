@@ -1,5 +1,7 @@
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { ListAgenciesWithPosition } from "../../../domain/convention/useCases/ListAgenciesWithPosition";
 
 const agency1 = AgencyDtoBuilder.empty()
@@ -28,22 +30,28 @@ const agencyAddedFromPeReferencial = AgencyDtoBuilder.empty()
   .build();
 
 describe("ListAgencies", () => {
-  it("returns empty list when the repository is empty", async () => {
-    const repository = new InMemoryAgencyRepository([]);
-    const listAgencies = new ListAgenciesWithPosition(repository);
+  let agencyRepository: InMemoryAgencyRepository;
+  let listAgencies: ListAgenciesWithPosition;
 
+  beforeEach(() => {
+    const uow = createInMemoryUow();
+    agencyRepository = uow.agencyRepository;
+    listAgencies = new ListAgenciesWithPosition(new InMemoryUowPerformer(uow));
+  });
+
+  it("returns empty list when the repository is empty", async () => {
+    agencyRepository.setAgencies([]);
     const agencies = await listAgencies.execute({});
     expect(agencies).toEqual([]);
   });
 
   it("returns active stored agencies", async () => {
-    const repository = new InMemoryAgencyRepository([
+    agencyRepository.setAgencies([
       agency1,
       agency2,
       agencyInReview,
       agencyAddedFromPeReferencial,
     ]);
-    const listAgencies = new ListAgenciesWithPosition(repository);
 
     const agencies = await listAgencies.execute({});
     expect(agencies).toHaveLength(3);
@@ -78,8 +86,7 @@ describe("ListAgencies", () => {
       );
     }
 
-    const repository = new InMemoryAgencyRepository(agencies);
-    const listAgencies = new ListAgenciesWithPosition(repository);
+    agencyRepository.setAgencies(agencies);
 
     const nearestAgencies = await listAgencies.execute({
       lat: 20,

@@ -2,25 +2,25 @@ import {
   ConventionReadDto,
   ListConventionsRequestDto as ListConventionsForAdminRequestDto,
 } from "shared/src/convention/convention.dto";
-import { UseCase } from "../../core/UseCase";
 import { listConventionsRequestSchema } from "shared/src/convention/convention.schema";
-import { ConventionQueries } from "../ports/ConventionQueries";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 
-export class ListAdminConventions extends UseCase<
+export class ListAdminConventions extends TransactionalUseCase<
   ListConventionsForAdminRequestDto,
   ConventionReadDto[]
 > {
-  constructor(private readonly conventionQueries: ConventionQueries) {
-    super();
+  constructor(uowPerformer: UnitOfWorkPerformer) {
+    super(uowPerformer);
   }
 
   inputSchema = listConventionsRequestSchema;
 
-  public async _execute({
-    status,
-    agencyId,
-  }: ListConventionsForAdminRequestDto) {
-    const entities = await this.conventionQueries.getLatestConventions({
+  public async _execute(
+    { status, agencyId }: ListConventionsForAdminRequestDto,
+    uow: UnitOfWork,
+  ) {
+    const entities = await uow.conventionQueries.getLatestConventions({
       status,
       agencyId,
     });

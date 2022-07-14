@@ -4,8 +4,11 @@ import { allRoles } from "shared/src/tokens/MagicLinkPayload";
 import { zTrimmedString } from "shared/src/zodUtils";
 import { z } from "zod";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
-import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyRepository";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
 // prettier-ignore
@@ -23,23 +26,22 @@ export const renewMagicLinkPayloadSchema = z.object({
   magicLink: z.string(),
 });
 
-export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends UseCase<ConventionRequiresModificationPayload> {
+export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends TransactionalUseCase<ConventionRequiresModificationPayload> {
   constructor(
+    uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly agencyRepository: AgencyRepository,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = conventionRequiresModificationSchema;
 
-  public async _execute({
-    convention,
-    reason,
-    roles,
-  }: ConventionRequiresModificationPayload): Promise<void> {
-    const agency = await this.agencyRepository.getById(convention.agencyId);
+  public async _execute(
+    { convention, reason, roles }: ConventionRequiresModificationPayload,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency) {
       throw new Error(
         `Unable to send mail. No agency config found for ${convention.agencyId}`,

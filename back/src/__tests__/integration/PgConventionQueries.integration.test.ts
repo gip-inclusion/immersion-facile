@@ -1,24 +1,24 @@
 import { Pool, PoolClient } from "pg";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import {
+  ConventionId,
+  ConventionReadDto,
+} from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import {
+  expectArraysToEqualIgnoringOrder,
+  expectTypeToMatchAndEqual,
+} from "../../_testBuilders/test.helpers";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionQueries } from "../../adapters/secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
-import {
-  ConventionId,
-  ConventionReadDto,
-} from "shared/src/convention/convention.dto";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
 import { ConventionRawBeforeExport } from "../../domain/convention/useCases/ExportConventionsReport";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
-import {
-  expectArraysToEqualIgnoringOrder,
-  expectTypeToMatchAndEqual,
-} from "../../_testBuilders/test.helpers";
 
 const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
 const idB: ConventionId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";

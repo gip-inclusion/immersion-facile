@@ -1,3 +1,11 @@
+import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
+import { LatLonDto } from "shared/src/latLon";
+import { NafDto } from "shared/src/naf";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -9,14 +17,6 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
-import { LatLonDto } from "shared/src/latLon";
-import { NafDto } from "shared/src/naf";
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,
@@ -63,8 +63,8 @@ describe("Insert Establishment aggregate from form data", () => {
 
     const uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
-      establishmentAggregateRepo,
-      outboxRepo,
+      establishmentAggregateRepository: establishmentAggregateRepo,
+      outboxRepository: outboxRepo,
     });
     const clock = new CustomClock();
 

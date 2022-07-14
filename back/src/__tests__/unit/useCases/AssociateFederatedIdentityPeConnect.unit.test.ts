@@ -1,17 +1,17 @@
-import { PeConnectIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { PeConnectIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { PoleEmploiUserAdvisorDto } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 
 describe("AssociatePeConnectFederatedIdentity", () => {
   let associatePeConnectFederatedIdentity: AssociatePeConnectFederatedIdentity;
@@ -21,8 +21,8 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepo;
-    outboxRepo = uow.outboxRepo;
+    conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepository;
+    outboxRepo = uow.outboxRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
 
     const clock = new CustomClock();

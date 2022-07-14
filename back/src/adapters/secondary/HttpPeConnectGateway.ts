@@ -1,3 +1,4 @@
+import type { AxiosInstance } from "axios";
 import { secondsToMilliseconds } from "date-fns";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
@@ -33,7 +34,6 @@ import {
   isRetryableError,
   PrettyAxiosResponseError,
 } from "../../utils/axiosUtils";
-import type { AxiosInstance } from "axios";
 import { createLogger } from "../../utils/logger";
 import { AccessTokenConfig } from "../primary/config/appConfig";
 import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";

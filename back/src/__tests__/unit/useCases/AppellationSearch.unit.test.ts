@@ -1,9 +1,9 @@
+import { AppellationMatchDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
-import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
-import { AppellationMatchDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 
 describe("AppellationSearch", () => {
   let romeRepo: RomeRepository;
@@ -15,7 +15,7 @@ describe("AppellationSearch", () => {
   const createUseCase = () => {
     const uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
-      romeRepo,
+      romeRepository: romeRepo,
     });
     return new AppellationSearch(uowPerformer);
   };

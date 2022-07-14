@@ -1,29 +1,28 @@
 import { SuperTest, Test } from "supertest";
-import { SearchImmersionResultPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
-import { SearchImmersionResultPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
-import { InMemoryEstablishmentAggregateRepository } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
-import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { SearchImmersionResultPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
+import { SearchImmersionResultPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
+import { InMemoryEstablishmentAggregateRepository } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
+import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
 
 describe("search-immersion route", () => {
   let request: SuperTest<Test>;
-  let immersionOfferRepo:
-    | InMemoryEstablishmentAggregateRepository
-    | PgEstablishmentAggregateRepository;
+  let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
+
   let generateApiJwt: GenerateApiConsumerJtw;
 
   beforeEach(async () => {
     const {
       request: testAppRequest,
       generateApiJwt: testAppGenerateApiJwt,
-      reposAndGateways,
+      inMemoryUow,
     } = await buildTestApp();
     request = testAppRequest;
-    immersionOfferRepo = reposAndGateways.immersionOffer;
+    establishmentAggregateRepository =
+      inMemoryUow.establishmentAggregateRepository;
     generateApiJwt = testAppGenerateApiJwt;
   });
 
@@ -31,7 +30,7 @@ describe("search-immersion route", () => {
     describe("accepts valid requests", () => {
       it("with given rome and location", async () => {
         // Prepare
-        await immersionOfferRepo.insertEstablishmentAggregates([
+        await establishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
             .withImmersionOffers([
               new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
@@ -131,7 +130,7 @@ describe("search-immersion route", () => {
     describe("authenficated consumer", () => {
       it("with given rome and position", async () => {
         // Prepare
-        await immersionOfferRepo.insertEstablishmentAggregates([
+        await establishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
             .withImmersionOffers([
               new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
@@ -219,7 +218,7 @@ describe("search-immersion route", () => {
     describe("accepts valid requests", () => {
       it("with given rome and position", async () => {
         // Prepare
-        await immersionOfferRepo.insertEstablishmentAggregates([
+        await establishmentAggregateRepository.insertEstablishmentAggregates([
           new EstablishmentAggregateBuilder()
             .withImmersionOffers([
               new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),

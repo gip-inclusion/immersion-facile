@@ -1,18 +1,18 @@
 import {
+  allConventionStatuses,
+  ConventionDto,
+  ConventionStatus,
+} from "shared/src/convention/convention.dto";
+import { conventionSchema } from "shared/src/convention/convention.schema";
+import {
+  ConventionDtoBuilder,
   DATE_START,
   DATE_SUBMISSION,
 } from "shared/src/convention/ConventionDtoBuilder";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   addDays,
   splitCasesBetweenPassingAndFailing,
 } from "../../_testBuilders/test.helpers";
-import {
-  ConventionStatus,
-  ConventionDto,
-  allConventionStatuses,
-} from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
 
 describe("conventionDtoSchema", () => {
   it("accepts valid Convention", () => {

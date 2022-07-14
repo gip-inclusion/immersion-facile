@@ -1,7 +1,8 @@
 import {
-  ConventionStatus,
   allConventionStatuses,
+  ConventionStatus,
 } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
 import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import {
@@ -24,7 +25,6 @@ import { InMemoryImmersionAssessmentRepository } from "../../../adapters/seconda
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 const conventionId = "conventionId";
 
@@ -54,7 +54,7 @@ describe("CreateImmersionAssessment", () => {
     const uow = createInMemoryUow();
     immersionAssessmentRepository = uow.immersionAssessmentRepository;
     conventionRepository = uow.conventionRepository;
-    outboxRepository = uow.outboxRepo;
+    outboxRepository = uow.outboxRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
     const convention = ConventionDtoBuilderWithId.withStatus(
       "ACCEPTED_BY_VALIDATOR",

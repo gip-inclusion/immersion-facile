@@ -14,7 +14,7 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
       res,
       async () => {
         await throwIfPeConnectDisabled(deps);
-        return deps.repositories.peConnectGateway.oAuthGetAuthorizationCodeRedirectUrl();
+        return deps.gateways.peConnectGateway.oAuthGetAuthorizationCodeRedirectUrl();
       },
       deps.errorHandlers.handleManagedRedirectResponseError,
       deps.errorHandlers.handleRawRedirectResponseError,
@@ -44,7 +44,7 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
 };
 
 const throwIfPeConnectDisabled = async (deps: AppDependencies) => {
-  const features = await deps.repositories.getFeatureFlags();
+  const features = await deps.useCases.getFeatureFlags();
   if (!features.enablePeConnectApi) {
     throw new FeatureDisabledError("PeConnect");
   }

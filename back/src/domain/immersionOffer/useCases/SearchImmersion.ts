@@ -3,12 +3,11 @@ import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/Search
 import { searchImmersionQueryParamsSchema } from "shared/src/searchImmersion/SearchImmersionQueryParams.schema";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { createLogger } from "../../../utils/logger";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
-import { UseCase } from "../../core/UseCase";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
-import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
-import { SearchMadeRepository } from "../ports/SearchMadeRepository";
 
 const logger = createLogger(__filename);
 
@@ -18,23 +17,23 @@ const histogramSearchImmersionStoredCount = new promClient.Histogram({
   buckets: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
 });
 
-export class SearchImmersion extends UseCase<
+export class SearchImmersion extends TransactionalUseCase<
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto[],
   ApiConsumer
 > {
   constructor(
-    private readonly searchesMadeRepository: SearchMadeRepository,
-    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
+    uowPerformer: UnitOfWorkPerformer,
     private readonly uuidGenerator: UuidGenerator,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = searchImmersionQueryParamsSchema;
 
   public async _execute(
     params: SearchImmersionQueryParamsDto,
+    uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
     const apiConsumerName = apiConsumer?.consumer;
@@ -55,11 +54,11 @@ export class SearchImmersion extends UseCase<
       apiConsumerName,
     };
 
-    await this.searchesMadeRepository.insertSearchMade(searchMadeEntity);
+    await uow.searchMadeRepository.insertSearchMade(searchMadeEntity);
 
     const dateStartQuery = new Date();
     const resultsFromStorage =
-      await this.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
+      await uow.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
         {
           searchMade,
           withContactDetails: apiConsumerName !== undefined,

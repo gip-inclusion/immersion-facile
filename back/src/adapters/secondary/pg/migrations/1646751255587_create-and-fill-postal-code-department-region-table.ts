@@ -1,5 +1,5 @@
-import type { MigrationBuilder } from "node-pg-migrate";
 import * as fse from "fs-extra";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 export const up = async (pgm: MigrationBuilder) => {
   pgm.sql(

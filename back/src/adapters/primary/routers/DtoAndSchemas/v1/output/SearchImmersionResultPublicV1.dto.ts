@@ -1,9 +1,9 @@
-import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
 import { LatLonDto } from "shared/src/latLon";
 import { RomeCode } from "shared/src/rome";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 
 import { SiretDto } from "shared/src/siret";
+import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
 
 export type SearchContactDto = {
   id: string;

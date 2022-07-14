@@ -1,11 +1,11 @@
+import { Pool, PoolClient } from "pg";
+import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { createPgUow } from "../../adapters/primary/config/uowConfig";
-import { PgUowPerformer } from "../../adapters/secondary/pg/PgUowPerformer";
-import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { Pool, PoolClient } from "pg";
-import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
-import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
+import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
+import { PgUowPerformer } from "../../adapters/secondary/pg/PgUowPerformer";
+import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { UnitOfWork } from "../../domain/core/ports/UnitOfWork";
 
 const someSiret = "12345678901234";
@@ -64,13 +64,13 @@ describe("PgUowPerformer", () => {
       .withSiret(someSiret)
       .build();
 
-    await uow.formEstablishmentRepo.create(formEstablishment)!;
+    await uow.formEstablishmentRepository.create(formEstablishment)!;
 
     const event = createNewEvent({
       topic: "FormEstablishmentAdded",
       payload: formEstablishment,
     });
-    await uow.outboxRepo.save(event);
+    await uow.outboxRepository.save(event);
   };
 
   const expectLengthOfRepos = async ({

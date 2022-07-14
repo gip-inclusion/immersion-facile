@@ -5,17 +5,14 @@ import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/Search
 import { searchImmersionQueryParamsSchema } from "shared/src/searchImmersion/SearchImmersionQueryParams.schema";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
-import { UseCase } from "../../core/UseCase";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
-import {
-  EstablishmentAggregateRepository,
-  OfferWithSiret,
-} from "../ports/EstablishmentAggregateRepository";
+import { OfferWithSiret } from "../ports/EstablishmentAggregateRepository";
 import {
   LaBonneBoiteAPI,
   LaBonneBoiteRequestParams,
 } from "../ports/LaBonneBoiteAPI";
-import { LaBonneBoiteRequestRepository } from "../ports/LaBonneBoiteRequestRepository";
 import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 const logger = createLogger(__filename);
@@ -36,22 +33,23 @@ const counterSearchImmersionLBBRequestsSkipped = new promClient.Counter({
 });
 
 const LBB_DISTANCE_KM_REQUEST_PARAM = 50;
-export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
+export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
   SearchImmersionQueryParamsDto,
   void
 > {
   constructor(
-    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
-    private readonly laBonneBoiteRequestRepository: LaBonneBoiteRequestRepository,
+    uowPerformer: UnitOfWorkPerformer,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly clock: Clock,
   ) {
-    super();
+    super(uowPerformer);
   }
+
   inputSchema = searchImmersionQueryParamsSchema;
 
   public async _execute(
     searchImmersionRequestDto: SearchImmersionQueryParamsDto,
+    uow: UnitOfWork,
   ): Promise<void> {
     if (!searchImmersionRequestDto.rome) return;
 
@@ -64,6 +62,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
 
     const shouldCallLaBonneBoite: boolean =
       await this.laBonneBoiteHasNotBeenRequestedWithThisRomeAndThisAreaInTheLastMonth(
+        uow,
         requestParams,
       );
 
@@ -78,7 +77,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
         distance_km: LBB_DISTANCE_KM_REQUEST_PARAM,
       });
 
-    await this.laBonneBoiteRequestRepository.insertLaBonneBoiteRequest(
+    await uow.laBonneBoiteRequestRepository.insertLaBonneBoiteRequest(
       lbbRequestEntity,
     );
 
@@ -86,7 +85,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
 
     const lbbSirets = relevantCompanies.map(prop("siret"));
     const siretGroupedByDataSource =
-      await this.establishmentAggregateRepository.groupEstablishmentSiretsByDataSource(
+      await uow.establishmentAggregateRepository.groupEstablishmentSiretsByDataSource(
         lbbSirets,
       );
 
@@ -98,12 +97,12 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
       (company) => !existingEstablishments.includes(company.siret),
     );
 
-    await this.insertRelevantCompaniesInRepositories(newRelevantCompanies);
+    await this.insertRelevantCompaniesInRepositories(uow, newRelevantCompanies);
 
     if (!siretGroupedByDataSource.api_labonneboite) return;
 
     const existingCompaniesWithSameRome =
-      await this.establishmentAggregateRepository.getSiretsOfEstablishmentsWithRomeCode(
+      await uow.establishmentAggregateRepository.getSiretsOfEstablishmentsWithRomeCode(
         requestParams.rome,
       );
     const existingCompaniesSiretsFromLaBonneBoiteWithoutThisRome =
@@ -122,7 +121,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
           score: company.props.stars,
         };
       });
-    await this.establishmentAggregateRepository.createImmersionOffersToEstablishments(
+    await uow.establishmentAggregateRepository.createImmersionOffersToEstablishments(
       immersionOffersWithSiretsToAdd,
     );
   }
@@ -170,19 +169,22 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
       };
     }
   }
+
   private async insertRelevantCompaniesInRepositories(
+    uow: UnitOfWork,
     companies: LaBonneBoiteCompanyVO[],
   ) {
     const llbResultsConvertedToEstablishmentAggregates = companies.map(
       (company) => company.toEstablishmentAggregate(this.clock),
     );
 
-    await this.establishmentAggregateRepository.insertEstablishmentAggregates(
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregates(
       llbResultsConvertedToEstablishmentAggregates,
     );
   }
 
   private async laBonneBoiteHasNotBeenRequestedWithThisRomeAndThisAreaInTheLastMonth(
+    uow: UnitOfWork,
     requestParams: LaBonneBoiteRequestParams,
   ) {
     const closestRequestParamsWithSameRomeInTheMonth: {
@@ -190,7 +192,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends UseCase<
       distanceToPositionKm: number;
     } | null = !requestParams.rome
       ? null
-      : await this.laBonneBoiteRequestRepository.getClosestRequestParamsWithThisRomeSince(
+      : await uow.laBonneBoiteRequestRepository.getClosestRequestParamsWithThisRomeSince(
           {
             rome: requestParams.rome,
             position: { lat: requestParams.lat, lon: requestParams.lon },

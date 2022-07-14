@@ -1,15 +1,16 @@
-import { SuperTest, Test } from "supertest";
-import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
+import { SuperTest, Test } from "supertest";
 import {
   buildTestApp,
-  InMemoryRepositories,
+  InMemoryGateways,
 } from "../../_testBuilders/buildTestApp";
+import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
-import { expectArraysToMatch } from "../../_testBuilders/test.helpers";
-import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { expectArraysToMatch } from "../../_testBuilders/test.helpers";
+import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
+import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 
 const siret = "11112222333344";
 const contactId = "theContactId";
@@ -26,11 +27,12 @@ const validRequest: ContactEstablishmentRequestDto = {
 
 describe("/contact-establishment route", () => {
   let request: SuperTest<Test>;
-  let reposAndGateways: InMemoryRepositories;
+  let gateways: InMemoryGateways;
   let eventCrawler: BasicEventCrawler;
+  let inMemoryUow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
-    ({ request, reposAndGateways, eventCrawler } = await buildTestApp());
+    ({ request, gateways, eventCrawler, inMemoryUow } = await buildTestApp());
   });
 
   it("sends email for valid request", async () => {
@@ -43,17 +45,19 @@ describe("/contact-establishment route", () => {
       .build();
     const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 
-    await reposAndGateways.immersionOffer.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(establishment)
-        .withContact(contact)
-        .withImmersionOffers([immersionOffer])
-        .build(),
-    ]);
+    await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
+      [
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(establishment)
+          .withContact(contact)
+          .withImmersionOffers([immersionOffer])
+          .build(),
+      ],
+    );
 
     await request.post(`/contact-establishment`).send(validRequest).expect(200);
 
-    expectArraysToMatch(reposAndGateways.outbox.events, [
+    expectArraysToMatch(inMemoryUow.outboxRepository.events, [
       {
         topic: "ContactRequestedByBeneficiary",
         payload: validRequest,
@@ -61,8 +65,8 @@ describe("/contact-establishment route", () => {
     ]);
 
     await eventCrawler.processNewEvents();
-    expect(reposAndGateways.email.getSentEmails()).toHaveLength(1);
-    expect(reposAndGateways.email.getSentEmails()[0].type).toBe(
+    expect(gateways.email.getSentEmails()).toHaveLength(1);
+    expect(gateways.email.getSentEmails()[0].type).toBe(
       "CONTACT_BY_EMAIL_REQUEST",
     );
   });

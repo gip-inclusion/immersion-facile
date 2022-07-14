@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/require-await */
 import { AxiosResponse } from "axios";
+import secondsToMilliseconds from "date-fns/secondsToMilliseconds";
+import { FeatureFlags } from "shared/src/featureFlags";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
+import supertest, { SuperTest, Test } from "supertest";
 // Those are mocked test because real calls to pole emploi api can only be made thought production domain registered with pole emploi
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { createApp } from "../../adapters/primary/server";
+import { HttpPeConnectGateway } from "../../adapters/secondary/HttpPeConnectGateway";
 import {
   AccessTokenDto,
   ExternalAccessToken,
@@ -14,11 +19,6 @@ import {
   createAxiosInstance,
   PrettyAxiosResponseError,
 } from "../../utils/axiosUtils";
-import { queryParamsAsString } from "shared/src/utils/queryParams";
-import secondsToMilliseconds from "date-fns/secondsToMilliseconds";
-import { FeatureFlags } from "shared/src/featureFlags";
-import supertest, { SuperTest, Test } from "supertest";
-import { HttpPeConnectGateway } from "../../adapters/secondary/HttpPeConnectGateway";
 
 const mockedBehavioursWithInvalidSchemaError =
   () => async (): Promise<AccessTokenDto> => {
@@ -74,28 +74,29 @@ const prepareAppWithMockedPeConnect = async (
     authorization_code: string,
   ) => Promise<AccessTokenDto>,
 ) => {
-  const { app, repositories } = await createAppWithMockedGateway();
+  const { app, gateways, inMemoryUow } = await createAppWithMockedGateway();
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  repositories.getFeatureFlags = async (): Promise<FeatureFlags> =>
+  inMemoryUow!.getFeatureFlags = async (): Promise<FeatureFlags> =>
     ({ enablePeConnectApi: true } as FeatureFlags);
-  // eslint-disable-next-line @typescript-eslint/require-await
 
-  repositories.peConnectGateway = {
-    ...repositories.peConnectGateway,
+  gateways.peConnectGateway = {
+    ...gateways.peConnectGateway,
     oAuthGetAccessTokenThroughAuthorizationCode: mockedOAuthAccessToken,
   } as unknown as HttpPeConnectGateway;
 
   return app;
 };
 const createAppWithMockedGateway = async () => {
-  const { app, repositories } = await createApp(new AppConfigBuilder().build());
-  repositories.peConnectGateway = {
-    ...repositories.peConnectGateway,
+  const { app, gateways, inMemoryUow } = await createApp(
+    new AppConfigBuilder().build(),
+  );
+  gateways.peConnectGateway = {
+    ...gateways.peConnectGateway,
     oAuthGetAccessTokenThroughAuthorizationCode:
       mockedBehavioursWithHttpError(),
   } as unknown as HttpPeConnectGateway;
-  return { app, repositories };
+  return { app, gateways, inMemoryUow };
 };
 
 describe("/pe-connect", () => {

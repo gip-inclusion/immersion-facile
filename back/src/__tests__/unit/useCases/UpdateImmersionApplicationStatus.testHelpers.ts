@@ -1,8 +1,20 @@
+import {
+  allConventionStatuses,
+  ConventionDto,
+  ConventionId,
+  ConventionStatus,
+} from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import {
+  allRoles,
+  createConventionMagicLinkPayload,
+  Role,
+} from "shared/src/tokens/MagicLinkPayload";
 import {
   expectPromiseToFailWithError,
   splitCasesBetweenPassingAndFailing,
 } from "../../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
   ForbiddenError,
@@ -13,24 +25,14 @@ import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemory
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { ConventionRequiresModificationPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
 import {
   makeCreateNewEvent,
   NarrowEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
-import { ConventionRequiresModificationPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
-import {
-  ConventionStatus,
-  ConventionDto,
-  allConventionStatuses,
-  ConventionId,
-} from "shared/src/convention/convention.dto";
-import {
-  allRoles,
-  createConventionMagicLinkPayload,
-  Role,
-} from "shared/src/tokens/MagicLinkPayload";
 
 type ExtractFromDomainTopics<T extends DomainTopic> = Extract<DomainTopic, T>;
 
@@ -61,8 +63,9 @@ export const setupInitialState = async ({
     ? immersionBuilder.build()
     : immersionBuilder.notSigned().build();
 
-  const conventionRepository = new InMemoryConventionRepository();
-  const outboxRepository = new InMemoryOutboxRepository();
+  const uow = createInMemoryUow();
+  const conventionRepository = uow.conventionRepository;
+  const outboxRepository = uow.outboxRepository;
   const clock = new CustomClock();
   const createNewEvent = makeCreateNewEvent({
     clock,
@@ -70,10 +73,9 @@ export const setupInitialState = async ({
   });
 
   const updateConventionStatus = new UpdateImmersionApplicationStatus(
-    conventionRepository,
+    new InMemoryUowPerformer(uow),
     createNewEvent,
     clock,
-    outboxRepository,
   );
 
   await conventionRepository.save(originalConvention);

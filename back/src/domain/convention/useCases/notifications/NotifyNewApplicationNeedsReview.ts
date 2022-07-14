@@ -1,32 +1,38 @@
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import {
-  ConventionStatus,
   ConventionDto,
+  ConventionStatus,
 } from "shared/src/convention/convention.dto";
+import { conventionSchema } from "shared/src/convention/convention.schema";
 import { frontRoutes } from "shared/src/routes";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../../utils/logger";
-import { UseCase } from "../../../core/UseCase";
-import { AgencyRepository } from "../../ports/AgencyRepository";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
-import { conventionSchema } from "shared/src/convention/convention.schema";
 
 const logger = createLogger(__filename);
 
-export class NotifyNewApplicationNeedsReview extends UseCase<ConventionDto> {
+export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<ConventionDto> {
   constructor(
+    uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly agencyRepository: AgencyRepository,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = conventionSchema;
 
-  public async _execute(conventionDto: ConventionDto): Promise<void> {
-    const agency = await this.agencyRepository.getById(conventionDto.agencyId);
+  public async _execute(
+    conventionDto: ConventionDto,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    const agency = await uow.agencyRepository.getById(conventionDto.agencyId);
 
     if (!agency) {
       logger.error(

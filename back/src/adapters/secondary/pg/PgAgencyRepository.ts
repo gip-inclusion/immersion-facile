@@ -1,6 +1,5 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { AgencyRepository } from "../../../domain/convention/ports/AgencyRepository";
 import {
   AgencyDto,
   AgencyId,
@@ -11,6 +10,7 @@ import {
   PartialAgencyDto,
 } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
+import { AgencyRepository } from "../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../utils/logger";
 import { optional } from "./pgUtils";
 
@@ -155,7 +155,7 @@ export class PgAgencyRepository implements AgencyRepository {
     await this.client.query(format(query, ...params));
   }
 
-  async getImmersionFacileIdByKind(): Promise<AgencyId> {
+  async getImmersionFacileAgencyId(): Promise<AgencyId> {
     const pgResult = await this.client.query(`
            SELECT id 
            FROM agencies

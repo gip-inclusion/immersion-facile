@@ -1,10 +1,10 @@
 import { propEq } from "ramda";
 import {
+  ConventionId,
+  ConventionReadDto,
+  ListConventionsRequestDto,
   validatedConventionStatuses,
   WithConventionId,
-  ListConventionsRequestDto,
-  ConventionReadDto,
-  ConventionId,
 } from "shared/src/convention/convention.dto";
 import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
 import { ConventionRawBeforeExport } from "../../domain/convention/useCases/ExportConventionsReport";

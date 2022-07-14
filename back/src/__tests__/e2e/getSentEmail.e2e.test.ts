@@ -2,22 +2,22 @@ import { EmailSentDto } from "shared/email";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { emailRoute } from "shared/src/routes";
 import { SuperTest, Test } from "supertest";
-import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { Clock } from "../../domain/core/ports/Clock";
 import {
   buildTestApp,
-  InMemoryRepositories,
+  InMemoryGateways,
 } from "../../_testBuilders/buildTestApp";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { Clock } from "../../domain/core/ports/Clock";
 
 describe(`/${emailRoute} route`, () => {
   let request: SuperTest<Test>;
-  let reposAndGateways: InMemoryRepositories;
+  let gateways: InMemoryGateways;
   let adminToken: AdminToken;
   let appConfig: AppConfig;
   let clock: Clock;
 
   beforeEach(async () => {
-    ({ request, reposAndGateways, appConfig, clock } = await buildTestApp());
+    ({ request, gateways, appConfig, clock } = await buildTestApp());
 
     const response = await request.post("/admin/login").send({
       user: appConfig.backofficeUsername,
@@ -25,6 +25,7 @@ describe(`/${emailRoute} route`, () => {
     });
     adminToken = response.body;
   });
+
   describe("private route to get last email sent", () => {
     it("Returns Forbidden if no token provided", async () => {
       const response = await request.get(`/admin/${emailRoute}`);
@@ -39,7 +40,7 @@ describe(`/${emailRoute} route`, () => {
       // Prepare
       const dateNow = new Date("2022-01-01T12:00:00.000Z");
       clock.now = () => dateNow;
-      await reposAndGateways.email.sendEmail({
+      await gateways.email.sendEmail({
         type: "AGENCY_WAS_ACTIVATED",
         recipients: ["toto@email.com"],
         params: { agencyName: "Agence du Grand Est" },

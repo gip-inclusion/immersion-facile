@@ -1,13 +1,13 @@
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { frontRoutes } from "shared/src/routes";
+import { Role } from "shared/src/tokens/MagicLinkPayload";
 import {
   expectTypeToMatchAndEqual,
   fakeGenerateMagicLinkUrlFn,
 } from "../../../_testBuilders/test.helpers";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/convention/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { frontRoutes } from "shared/src/routes";
-import { Role } from "shared/src/tokens/MagicLinkPayload";
 
 const beneficiaryEmail = "beneficiary@mail.com";
 const mentorEmail = "mentor@mail.com";

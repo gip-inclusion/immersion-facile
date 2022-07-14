@@ -1,6 +1,6 @@
+import { HttpGeoApi } from "../../adapters/secondary/HttpGeoApi";
 import { noRateLimit } from "../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
-import { HttpGeoApi } from "../../adapters/secondary/HttpGeoApi";
 
 describe("HttpGeoAPI", () => {
   it("Should return a region and department by names from a postal code", async () => {

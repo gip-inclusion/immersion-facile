@@ -1,36 +1,36 @@
+import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   ConflictError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
-import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 
 const prepareUseCase = () => {
-  const formEstablishmentRepo = new InMemoryFormEstablishmentRepository();
-  const outboxRepo = new InMemoryOutboxRepository();
-  const uowPerformer = new InMemoryUowPerformer({
-    ...createInMemoryUow(),
-    outboxRepo,
-    formEstablishmentRepo,
-  });
+  const uow = createInMemoryUow();
+  const formEstablishmentRepository = uow.formEstablishmentRepository;
+  const outboxRepository = uow.outboxRepository;
+  const uowPerformer = new InMemoryUowPerformer(uow);
   const clock = new CustomClock();
   const uuidGenerator = new TestUuidGenerator();
   const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
   const useCase = new EditFormEstablishment(uowPerformer, createNewEvent);
 
-  return { useCase, clock, outboxRepo, formEstablishmentRepo };
+  return {
+    useCase,
+    clock,
+    outboxRepository,
+    formEstablishmentRepository,
+  };
 };
 describe("Edit Form Establishment", () => {
   describe("Siret in JWT Payload does not match siret in edited establishment DTO", () => {
@@ -63,28 +63,29 @@ describe("Edit Form Establishment", () => {
 
       it("should publish an event", async () => {
         // Prepare
-        const { useCase, formEstablishmentRepo, outboxRepo } = prepareUseCase();
-        await formEstablishmentRepo.create(existingDto);
+        const { useCase, formEstablishmentRepository, outboxRepository } =
+          prepareUseCase();
+        await formEstablishmentRepository.create(existingDto);
 
         // Act
         await useCase.execute(updatedDto, payload);
 
         // Assert
-        expect(outboxRepo.events).toHaveLength(1);
+        expect(outboxRepository.events).toHaveLength(1);
         const expectedEventTopic: DomainTopic = "FormEstablishmentEdited";
-        expect(outboxRepo.events[0].topic).toEqual(expectedEventTopic);
-        expect(outboxRepo.events[0].payload).toEqual(updatedDto);
+        expect(outboxRepository.events[0].topic).toEqual(expectedEventTopic);
+        expect(outboxRepository.events[0].payload).toEqual(updatedDto);
       });
       it("should update the establishment form in repository", async () => {
         // Prepare
-        const { useCase, formEstablishmentRepo } = prepareUseCase();
-        await formEstablishmentRepo.create(existingDto);
+        const { useCase, formEstablishmentRepository } = prepareUseCase();
+        await formEstablishmentRepository.create(existingDto);
 
         // Act
         await useCase.execute(updatedDto, payload);
 
         // Assert
-        expect(await formEstablishmentRepo.getBySiret(formSiret)).toEqual(
+        expect(await formEstablishmentRepository.getBySiret(formSiret)).toEqual(
           updatedDto,
         );
       });

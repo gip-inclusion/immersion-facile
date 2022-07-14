@@ -1,10 +1,10 @@
+import { frontRoutes } from "shared/src/routes";
+import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import {
   GenerateEditFormEstablishmentUrl,
   makeGenerateJwtES256,
 } from "../../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
-import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
-import { frontRoutes } from "shared/src/routes";
 
 export const makeGenerateEditFormEstablishmentUrl = (
   config: AppConfig,

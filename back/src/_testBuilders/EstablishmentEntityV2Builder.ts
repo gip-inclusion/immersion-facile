@@ -1,12 +1,12 @@
+import { Builder } from "shared/src/Builder";
+import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { LatLonDto } from "shared/src/latLon";
+import { NafDto } from "shared/src/naf";
 import {
   DataSource,
   EstablishmentEntityV2,
   NumberEmployeesRange,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
-import { NafDto } from "shared/src/naf";
-import { Builder } from "shared/src/Builder";
-import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { LatLonDto } from "shared/src/latLon";
 
 export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   siret: "78000403200019",

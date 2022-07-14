@@ -1,5 +1,5 @@
-import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { path, pathEq } from "shared/src/ramdaExtensions/path";
+import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 
 type Address = {
   postCode: string;

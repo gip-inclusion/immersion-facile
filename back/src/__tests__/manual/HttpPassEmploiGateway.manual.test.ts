@@ -1,5 +1,5 @@
-import { HttpPassEmploiGateway } from "../../adapters/secondary/immersionOffer/HttpPassEmploiGateway";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { HttpPassEmploiGateway } from "../../adapters/secondary/immersionOffer/HttpPassEmploiGateway";
 
 describe("HttpPassEmploiGateway", () => {
   it("Should resolve promise when calling method notifyOnNewImmersionOfferCreatedFromForm", async () => {

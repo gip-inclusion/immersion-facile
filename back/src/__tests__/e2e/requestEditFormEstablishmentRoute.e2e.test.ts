@@ -1,21 +1,19 @@
 import { addHours } from "date-fns";
-import { SuperTest, Test } from "supertest";
-import { DomainEvent } from "../../domain/core/eventBus/events";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
-import {
-  buildTestApp,
-  InMemoryRepositories,
-} from "../../_testBuilders/buildTestApp";
+import { SuperTest, Test } from "supertest";
+import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
+import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
+import { DomainEvent } from "../../domain/core/eventBus/events";
 
 describe("Route to generate an establishment edition link", () => {
   let request: SuperTest<Test>;
-  let reposAndGateways: InMemoryRepositories;
+  let inMemoryUow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
-    ({ request, reposAndGateways } = await buildTestApp());
-    reposAndGateways.immersionOffer.getEstablishmentAggregateBySiret =
+    ({ request, inMemoryUow } = await buildTestApp());
+    inMemoryUow.establishmentAggregateRepository.getEstablishmentAggregateBySiret =
       //eslint-disable-next-line @typescript-eslint/require-await
       async () =>
         new EstablishmentAggregateBuilder()
@@ -33,7 +31,7 @@ describe("Route to generate an establishment edition link", () => {
       exp: addHours(now, 24).getTime(),
       version: 1,
     };
-    await reposAndGateways.outbox.save({
+    await inMemoryUow.outboxRepository.save({
       topic: "FormEstablishmentEditLinkSent",
       payload: lastPayload,
     } as DomainEvent);

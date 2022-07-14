@@ -1,8 +1,8 @@
 import { Pool, PoolClient } from "pg";
 import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { PgFormEstablishmentRepository } from "../../adapters/secondary/pg/PgFormEstablishmentRepository";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { expectArraysToEqualIgnoringOrder } from "../../_testBuilders/test.helpers";
+import { PgFormEstablishmentRepository } from "../../adapters/secondary/pg/PgFormEstablishmentRepository";
 
 describe("PgFormEstablishmentRepository", () => {
   let pool: Pool;

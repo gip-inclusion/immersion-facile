@@ -1,26 +1,20 @@
 import { ConventionId } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
-import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { InMemoryConventionQueries } from "../../../adapters/secondary/InMemoryConventionQueries";
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 
 const prepareUseCase = () => {
-  const conventionRepo = new InMemoryConventionRepository();
-  const outboxRepo = new InMemoryOutboxRepository();
-
-  const conventionQueries = new InMemoryConventionQueries(
-    conventionRepo,
-    outboxRepo,
-  );
-  const outboxQueries = new InMemoryOutboxQueries(outboxRepo);
+  const uow = createInMemoryUow();
+  const outboxQueries = uow.outboxQueries;
+  const outboxRepository = uow.outboxRepository;
+  const conventionRepository = uow.conventionRepository;
 
   const clock = new CustomClock();
   const emailGateway = new InMemoryEmailGateway();
@@ -37,20 +31,21 @@ const prepareUseCase = () => {
     email: string;
   }) => `www.immersion-facile.fr/${targetRoute}?jwt=jwtOfImmersion[${id}]`;
 
-  const useCase = new SendEmailsWithAssessmentCreationLink(
-    outboxRepo,
-    conventionQueries,
-    emailGateway,
-    clock,
-    generateConventionMagicLink,
-    createNewEvent,
-  );
+  const sendEmailWithAssessmentCreationLink =
+    new SendEmailsWithAssessmentCreationLink(
+      new InMemoryUowPerformer(uow),
+      emailGateway,
+      clock,
+      generateConventionMagicLink,
+      createNewEvent,
+    );
+
   return {
-    useCase,
+    sendEmailWithAssessmentCreationLink,
     outboxQueries,
-    outboxRepo,
+    outboxRepository,
     emailGateway,
-    applicationRepo: conventionRepo,
+    conventionRepository,
     clock,
   };
 };
@@ -58,8 +53,13 @@ const prepareUseCase = () => {
 describe("SendEmailWithImmersionAssessmentCreationLink", () => {
   it("Sends an email to immersions ending tomorrow", async () => {
     // Prepare
-    const { useCase, outboxRepo, emailGateway, applicationRepo, clock } =
-      prepareUseCase();
+    const {
+      sendEmailWithAssessmentCreationLink,
+      outboxRepository,
+      emailGateway,
+      conventionRepository,
+      clock,
+    } = prepareUseCase();
 
     clock.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
 
@@ -75,11 +75,11 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
       .validated()
       .build();
 
-    await applicationRepo.save(immersionApplicationEndingTomorrow);
-    await applicationRepo.save(immersionApplicationEndingYesterday);
+    await conventionRepository.save(immersionApplicationEndingTomorrow);
+    await conventionRepository.save(immersionApplicationEndingYesterday);
 
     // Act
-    await useCase.execute();
+    await sendEmailWithAssessmentCreationLink.execute();
 
     // Assert
     const sentEmails = emailGateway.getSentEmails();
@@ -95,15 +95,21 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
       beneficiaryFirstName: immersionApplicationEndingTomorrow.firstName,
       beneficiaryLastName: immersionApplicationEndingTomorrow.lastName,
     });
-    expect(outboxRepo.events).toHaveLength(1);
-    expect(outboxRepo.events[0].payload).toMatchObject({
+    expect(outboxRepository.events).toHaveLength(1);
+    expect(outboxRepository.events[0].payload).toMatchObject({
       id: "immersion-ending-tommorow-id",
     });
   });
+
   it("Does not send an email to immersions having already received one", async () => {
     // Prepare
-    const { useCase, outboxRepo, emailGateway, applicationRepo, clock } =
-      prepareUseCase();
+    const {
+      sendEmailWithAssessmentCreationLink,
+      outboxRepository,
+      emailGateway,
+      conventionRepository,
+      clock,
+    } = prepareUseCase();
 
     clock.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
 
@@ -112,18 +118,18 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
       .validated()
       .withId("immersion-ending-tommorow-id")
       .build();
-    await applicationRepo.save(immersionApplicationEndingTomorrow);
-    await outboxRepo.save({
+    await conventionRepository.save(immersionApplicationEndingTomorrow);
+    await outboxRepository.save({
       topic: "EmailWithLinkToCreateAssessmentSent",
       payload: { id: immersionApplicationEndingTomorrow.id },
     } as DomainEvent);
 
     // Act
-    await useCase.execute();
+    await sendEmailWithAssessmentCreationLink.execute();
 
     // Assert
     const sentEmails = emailGateway.getSentEmails();
     expect(sentEmails).toHaveLength(0);
-    expect(outboxRepo.events).toHaveLength(1);
+    expect(outboxRepository.events).toHaveLength(1);
   });
 });

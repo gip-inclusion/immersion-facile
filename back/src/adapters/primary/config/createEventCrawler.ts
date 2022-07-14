@@ -1,6 +1,6 @@
 import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
-import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
+import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import {
   BasicEventCrawler,
   RealEventCrawler,
@@ -9,9 +9,9 @@ import { AppConfig } from "./appConfig";
 
 export const createEventCrawler = (
   config: AppConfig,
-  outboxQueries: OutboxQueries,
+  uowPerformer: UnitOfWorkPerformer,
   eventBus: EventBus,
 ): EventCrawler =>
   config.eventCrawlerPeriodMs > 0
-    ? new RealEventCrawler(eventBus, outboxQueries, config.eventCrawlerPeriodMs)
-    : new BasicEventCrawler(eventBus, outboxQueries);
+    ? new RealEventCrawler(uowPerformer, eventBus, config.eventCrawlerPeriodMs)
+    : new BasicEventCrawler(uowPerformer, eventBus);

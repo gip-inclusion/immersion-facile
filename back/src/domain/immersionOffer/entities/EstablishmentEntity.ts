@@ -1,9 +1,9 @@
+import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { NafDto } from "shared/src/naf";
+import { SiretDto } from "shared/src/siret";
 import { ContactEntityV2 } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
-import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { SiretDto } from "shared/src/siret";
 
 export type DataSource = "api_labonneboite" | "form";
 type ApiSource = "api_labonneboite";

@@ -1,8 +1,8 @@
 import { Router } from "express";
 import {
   agenciesRoute,
-  agencyPublicInfoByIdRoute,
   agencyImmersionFacileIdRoute,
+  agencyPublicInfoByIdRoute,
 } from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
@@ -27,7 +27,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
     .route(`/${agencyImmersionFacileIdRoute}`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
-        deps.repositories.agency.getImmersionFacileIdByKind(),
+        deps.useCases.getImmersionFacileAgencyIdByKind(),
       ),
     );
 

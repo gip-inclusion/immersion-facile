@@ -1,13 +1,9 @@
 import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
-import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
 import {
-  DataSource,
-  EstablishmentAggregate,
-  EstablishmentEntityV2,
-  NumberEmployeesRange,
-} from "../../domain/immersionOffer/entities/EstablishmentEntity";
-import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
+  ContactMethod,
+  FormEstablishmentSource,
+} from "shared/src/formEstablishment/FormEstablishment.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
@@ -17,14 +13,18 @@ import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentE
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
 import {
-  ContactMethod,
-  FormEstablishmentSource,
-} from "shared/src/formEstablishment/FormEstablishment.dto";
-import {
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWith,
   expectTypeToMatchAndEqual,
 } from "../../_testBuilders/test.helpers";
+import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
+import {
+  DataSource,
+  EstablishmentAggregate,
+  EstablishmentEntityV2,
+  NumberEmployeesRange,
+} from "../../domain/immersionOffer/entities/EstablishmentEntity";
+import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
 
 const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
 const testUid2 = "22222222-a2a5-430a-b558-ed3e2f03512d";

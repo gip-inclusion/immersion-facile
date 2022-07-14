@@ -1,22 +1,20 @@
-import supertest, { SuperTest, Test } from "supertest";
+import { getSiretIfNotSavedRoute } from "shared/src/routes";
+import { SuperTest, Test } from "supertest";
+import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
-import { createApp } from "../../adapters/primary/server";
+import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
 import { InMemoryEstablishmentAggregateRepository } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { TEST_ESTABLISHMENT1 } from "../../adapters/secondary/InMemorySireneGateway";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { getSiretIfNotSavedRoute } from "shared/src/routes";
 
 describe("/siret route", () => {
   let request: SuperTest<Test>;
   let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
+  let inMemoryUow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
-    const { app, repositories } = await createApp(
-      new AppConfigBuilder().build(),
-    );
+    ({ request, inMemoryUow } = await buildTestApp());
     establishmentAggregateRepository =
-      repositories.immersionOffer as InMemoryEstablishmentAggregateRepository;
-    request = supertest(app);
+      inMemoryUow.establishmentAggregateRepository;
   });
 
   it("processes valid requests", async () => {

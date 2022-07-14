@@ -1,11 +1,11 @@
-import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
-import { GenerateMagicLinkJwt } from "../../auth/jwt";
-import { UseCase } from "../../core/UseCase";
 import {
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto,
 } from "shared/src/convention/convention.dto";
 import { generateMagicLinkRequestSchema } from "shared/src/convention/convention.schema";
+import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { GenerateMagicLinkJwt } from "../../auth/jwt";
+import { UseCase } from "../../core/UseCase";
 
 export class GenerateMagicLink extends UseCase<
   GenerateMagicLinkRequestDto,

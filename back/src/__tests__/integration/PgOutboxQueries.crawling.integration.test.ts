@@ -1,13 +1,13 @@
 import { Pool, PoolClient } from "pg";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import { expectArraysToEqualIgnoringOrder } from "../../_testBuilders/test.helpers";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { PgOutboxQueries } from "../../adapters/secondary/pg/PgOutboxQueries";
+import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../domain/core/eventBus/events";
-import { expectArraysToEqualIgnoringOrder } from "../../_testBuilders/test.helpers";
-import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
 
 describe("PgOutboxQueries for crawling purposes", () => {
   let pool: Pool;

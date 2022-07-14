@@ -11,13 +11,17 @@ import {
 import { OmitFromExistingKeys } from "shared/src/utils";
 import slugify from "slugify";
 import { z } from "zod";
+import { ReportingGateway } from "../../core/ports/ReportingGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 export class ExportConventionsReport extends TransactionalUseCase<string> {
   inputSchema = z.string();
 
-  constructor(uowPerformer: UnitOfWorkPerformer) {
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    private reportingGateway: ReportingGateway,
+  ) {
     super(uowPerformer);
   }
 
@@ -30,7 +34,7 @@ export class ExportConventionsReport extends TransactionalUseCase<string> {
       map(toImmersionApplicationReadyForExport),
       groupBy(prop("agencyName")),
     );
-    await uow.reportingGateway.exportConventions({
+    await this.reportingGateway.exportConventions({
       report,
       archivePath,
     });

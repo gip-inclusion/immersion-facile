@@ -1,8 +1,8 @@
-import {
-  LaBonneBoiteCompanyVO,
-  LaBonneBoiteCompanyProps,
-} from "../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 import { Builder } from "shared/src/Builder";
+import {
+  LaBonneBoiteCompanyProps,
+  LaBonneBoiteCompanyVO,
+} from "../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 
 const validEstablishmentFromLaBonneBoite: LaBonneBoiteCompanyProps = {
   address:

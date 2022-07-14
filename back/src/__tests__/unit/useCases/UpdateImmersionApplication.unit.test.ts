@@ -1,4 +1,14 @@
+import {
+  allConventionStatuses,
+  ConventionDto,
+  ConventionId,
+} from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
+import {
+  expectPromiseToFailWithError,
+  expectTypeToMatchAndEqual,
+} from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -10,22 +20,12 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
-import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import {
-  expectPromiseToFailWithError,
-  expectTypeToMatchAndEqual,
-} from "../../../_testBuilders/test.helpers";
-import {
-  ConventionId,
-  allConventionStatuses,
-  ConventionDto,
-} from "shared/src/convention/convention.dto";
 
 describe("Update Convention", () => {
   let updateConvention: UpdateImmersionApplication;
@@ -38,7 +38,7 @@ describe("Update Convention", () => {
   beforeEach(() => {
     const uow = createInMemoryUow();
     conventionRepository = uow.conventionRepository;
-    outboxRepo = uow.outboxRepo;
+    outboxRepo = uow.outboxRepository;
 
     createNewEvent = makeCreateNewEvent({
       clock: new CustomClock(),

@@ -35,8 +35,8 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
     });
 
     await Promise.all([
-      uow.agencyRepo.insert(agency),
-      uow.outboxRepo.save(newAgencyAddEvent),
+      uow.agencyRepository.insert(agency),
+      uow.outboxRepository.save(newAgencyAddEvent),
     ]);
   }
 }

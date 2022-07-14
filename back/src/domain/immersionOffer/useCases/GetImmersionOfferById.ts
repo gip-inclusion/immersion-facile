@@ -1,30 +1,29 @@
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { UseCase } from "../../core/UseCase";
-import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
-import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { zString } from "shared/src/zodUtils";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
+import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
 
-export class GetImmersionOfferById extends UseCase<
+export class GetImmersionOfferById extends TransactionalUseCase<
   string,
   SearchImmersionResultDto,
   ApiConsumer
 > {
-  constructor(
-    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
-  ) {
-    super();
+  constructor(uowPerformer: UnitOfWorkPerformer) {
+    super(uowPerformer);
   }
 
   inputSchema = zString;
 
   public async _execute(
     immersionOfferId: string,
+    uow: UnitOfWork,
     apiConsumer?: ApiConsumer,
   ): Promise<SearchImmersionResultDto> {
     const [siret, romeCode] = immersionOfferId.split("-");
     const searchImmersionResultDto =
-      await this.establishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
+      await uow.establishmentAggregateRepository.getSearchImmersionResultDtoBySiretAndRome(
         siret,
         romeCode,
       );

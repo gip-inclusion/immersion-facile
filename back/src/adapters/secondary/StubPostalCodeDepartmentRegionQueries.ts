@@ -3,7 +3,7 @@ import {
   PostalCodeDepartmentRegionQueries,
 } from "../../domain/generic/geo/ports/PostalCodeDepartmentRegionQueries";
 
-export const StubPostalCodeDepartmentRegionQueries: PostalCodeDepartmentRegionQueries =
+export const stubPostalCodeDepartmentRegionQueries: PostalCodeDepartmentRegionQueries =
   {
     async getAllRegionAndDepartmentByPostalCode(): Promise<
       Record<string, DepartmentAndRegion>

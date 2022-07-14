@@ -1,18 +1,18 @@
-import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
+import { values } from "ramda";
 import {
-  AgencyWithPositionDto,
+  AgencyDto,
   AgencyId,
-  AgencyStatus,
   AgencyKindFilter,
-  GetAgenciesFilter as GetAgenciesFilters,
   AgencyPositionFilter,
+  AgencyStatus,
+  AgencyWithPositionDto,
+  GetAgenciesFilter as GetAgenciesFilters,
   PartialAgencyDto,
 } from "shared/src/agency/agency.dto";
-import { createLogger } from "../../utils/logger";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { values } from "ramda";
-import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
 import { LatLonDto } from "shared/src/latLon";
+import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
+import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
+import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 
@@ -144,7 +144,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     this._agencies[agency.id] = { ...this._agencies[agency.id], ...agency };
   }
 
-  public async getImmersionFacileIdByKind(): Promise<AgencyId> {
+  public async getImmersionFacileAgencyId(): Promise<AgencyId> {
     return "immersion-facile-agency";
   }
 

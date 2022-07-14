@@ -3,20 +3,18 @@ import { AgencyDto } from "shared/src/agency/agency.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { exportConventionsExcelRoute } from "shared/src/routes";
 import { SuperTest, Test } from "supertest";
-import {
-  buildTestApp,
-  InMemoryRepositories,
-} from "../../_testBuilders/buildTestApp";
+import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
 
 describe("/export-demande-immersions-excel", () => {
   let adminToken: AdminToken;
   let request: SuperTest<Test>;
-  let reposAndGateways: InMemoryRepositories;
+  let inMemoryUow: InMemoryUnitOfWork;
   let appConfig: AppConfig;
 
   beforeEach(async () => {
-    ({ request, reposAndGateways, appConfig } = await buildTestApp());
+    ({ request, inMemoryUow, appConfig } = await buildTestApp());
 
     const response = await request
       .post("/admin/login")
@@ -37,13 +35,13 @@ describe("/export-demande-immersions-excel", () => {
 
   it("works when authenticated", async () => {
     const linkedAgency: AgencyDto = (
-      await reposAndGateways.agency.getAgencies({})
+      await inMemoryUow.agencyRepository.getAgencies({})
     )[0];
     const convention = new ConventionDtoBuilder()
       .withAgencyId(linkedAgency.id)
       .build();
 
-    reposAndGateways.convention.setConventions({
+    inMemoryUow.conventionRepository.setConventions({
       [convention.id]: convention,
     });
 

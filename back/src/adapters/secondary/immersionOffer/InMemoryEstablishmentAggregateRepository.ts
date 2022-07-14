@@ -1,3 +1,10 @@
+import { groupBy } from "ramda";
+import { path, pathEq, pathNotEq } from "shared/src/ramdaExtensions/path";
+import { propEq } from "shared/src/ramdaExtensions/propEq";
+import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { conflictErrorSiret, SiretDto } from "shared/src/siret";
+import { replaceArrayElement } from "shared/src/utils";
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   DataSource,
@@ -10,16 +17,9 @@ import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
-import { path, pathEq, pathNotEq } from "shared/src/ramdaExtensions/path";
-import { propEq } from "shared/src/ramdaExtensions/propEq";
-import { createLogger } from "../../../utils/logger";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { conflictErrorSiret, SiretDto } from "shared/src/siret";
+import { createLogger } from "../../../utils/logger";
 import { ConflictError, NotFoundError } from "../../primary/helpers/httpErrors";
-import { replaceArrayElement } from "shared/src/utils";
-import { groupBy } from "ramda";
 
 const logger = createLogger(__filename);
 

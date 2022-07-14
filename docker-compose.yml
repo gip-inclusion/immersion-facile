@@ -22,7 +22,7 @@ services:
       context: "."
       dockerfile: Dockerfile.pipelines
     env_file:
-        - .env
+      - .env
     environment:
       - LOGDIR=/var/lib/pipelines/log
       - CRONFILE=/var/lib/pipelines/crontab
@@ -80,4 +80,3 @@ services:
       - ./backup/script:/home/script
       - ./:/home/docker
       - ${MNT:-/mnt}:/mnt
-
