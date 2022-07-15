@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "type-route";
 
-export type ToolType = {
+type ToolType = {
   iconClassName: string;
   label: string;
   callback: () => void;
@@ -9,7 +9,7 @@ export type ToolType = {
 
 export type ToolsType = ToolType[];
 
-export type NavLinkType = {
+type NavLinkType = {
   link: Link;
   label: string;
   display: boolean;
@@ -18,7 +18,7 @@ export type NavLinkType = {
 
 export type NavLinksType = NavLinkType[];
 
-export type ImmersionPureHeaderProps = {
+type ImmersionPureHeaderProps = {
   marianneLogo: React.ReactNode;
   immersionLogo: React.ReactNode;
   tools?: ToolsType;

@@ -1,6 +1,6 @@
 import React from "react";
 
-export type LinkHomeProps = {
+type LinkHomeProps = {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;

@@ -1,7 +1,7 @@
 import React from "react";
 import { Image } from "../image";
 
-export type ImmersionLogoProps = {
+type ImmersionLogoProps = {
   url: string;
 };
 
