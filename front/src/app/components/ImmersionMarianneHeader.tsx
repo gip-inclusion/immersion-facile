@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { routes } from "src/app/routing/routes";
+import { routes, useRoute } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
@@ -18,6 +18,7 @@ import immersionFacileLogo from "/Logo-immersion-facilitee-01-RVB-reflets-crop.s
 export const ImmersionMarianneHeader = () => {
   const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
+  const currentRoute = useRoute();
   const isAdminConnected = useAppSelector(adminSelectors.isAuthenticated);
   const tools: ToolsType = [];
   if (isAdminConnected) {
@@ -32,36 +33,43 @@ export const ImmersionMarianneHeader = () => {
       label: "Home",
       link: routes.home().link,
       display: isAdminConnected,
+      active: currentRoute.name === routes.home().name,
     },
     {
       label: "Demande immersion",
       link: routes.convention().link,
       display: isAdminConnected,
+      active: currentRoute.name === routes.convention().name,
     },
     {
       label: "Backoffice",
       link: routes.admin().link,
       display: isAdminConnected && featureFlags.enableAdminUi,
+      active: currentRoute.name === routes.admin().name,
     },
     {
       label: "Formulaire Entreprise",
       link: routes.formEstablishment().link,
       display: isAdminConnected,
+      active: currentRoute.name === routes.formEstablishment().name,
     },
     {
       label: "Landing entreprise",
       link: routes.landingEstablishment().link,
       display: isAdminConnected,
+      active: currentRoute.name === routes.landingEstablishment().name,
     },
     {
       label: "Recherche",
       link: routes.search().link,
       display: isAdminConnected,
+      active: currentRoute.name === routes.search().name,
     },
     {
       label: "Ajouter agence",
       link: routes.addAgency().link,
       display: isAdminConnected,
+      active: currentRoute.name === routes.addAgency().name,
     },
   ];
   const linksFiltered = links.filter((link) => link.display);
