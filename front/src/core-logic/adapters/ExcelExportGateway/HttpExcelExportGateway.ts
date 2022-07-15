@@ -1,4 +1,4 @@
-import axios from "axios";
+import { AxiosInstance } from "axios";
 import { values } from "ramda";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { EstablishmentExportConfigDto } from "shared/src/establishmentExport/establishmentExport.dto";
@@ -10,30 +10,33 @@ import { queryParamsAsString } from "shared/src/utils/queryParams";
 import { ExcelExportGateway } from "src/core-logic/ports/ExcelExportGateway";
 
 export class HttpExcelExportGateway implements ExcelExportGateway {
+  constructor(private readonly httpClient: AxiosInstance) {}
+
   public async exportConventions(adminToken: AdminToken) {
-    const response = await axios.get(
-      `/api/admin/excel/${exportConventionsExcelRoute}`,
+    const { data } = await this.httpClient.get(
+      `/admin/excel/${exportConventionsExcelRoute}`,
       {
         headers: { authorization: adminToken },
         responseType: "arraybuffer",
       },
     );
 
-    downloadData(response.data, "conventions");
+    downloadData(data, "conventions");
   }
 
   public async exportEstablishments(
     adminToken: AdminToken,
     params: EstablishmentExportConfigDto,
   ) {
-    const response = await axios.get(buildExportEstablishmentRoute(params), {
-      headers: { authorization: adminToken },
-      responseType: "arraybuffer",
-    });
-
+    const { data } = await this.httpClient.get(
+      buildExportEstablishmentRoute(params),
+      {
+        headers: { authorization: adminToken },
+        responseType: "arraybuffer",
+      },
+    );
     const nameForParams = values(params).join("-");
-
-    downloadData(response.data, `establishments_${nameForParams}`);
+    downloadData(data, `establishments_${nameForParams}`);
   }
 }
 

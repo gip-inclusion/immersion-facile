@@ -1,12 +1,10 @@
-import axios from "axios";
-
 import {
   AddressWithCoordinates,
   ApiAdresseGateway,
 } from "src/core-logic/ports/ApiAdresseGateway";
 import { LatLonDto } from "shared/src/latLon";
-import { validateDataFromSchema } from "shared/src/zodUtils";
 import { featuresSchemaResponse } from "shared/src/apiAdresse/apiAddress.schema";
+import { AxiosInstance } from "axios";
 
 type ValidFeature = {
   properties: {
@@ -23,22 +21,20 @@ type ValidFeature = {
 const apiAdresseSearchUrl = "https://api-adresse.data.gouv.fr/search/";
 
 export class HttpApiAdresseGateway implements ApiAdresseGateway {
+  constructor(private readonly httpClient: AxiosInstance) {}
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressWithCoordinates[]> {
+    //TODO Remove catch to differentiate between http & domain errors
     try {
-      const { data } = await axios.get<unknown>(apiAdresseSearchUrl, {
+      const { data } = await this.httpClient.get<unknown>(apiAdresseSearchUrl, {
         params: {
           q: query,
           limit: 10,
         },
       });
-      const featuresResponce = validateDataFromSchema(
-        featuresSchemaResponse,
-        data,
-      );
-      if (featuresResponce instanceof Error) throw featuresResponce;
-      return featuresResponce.features
+      const featuresResponse = featuresSchemaResponse.parse(data);
+      return featuresResponse.features
         .filter(keepOnlyValidFeatures)
         .map(featureToStreetAddressWithCoordinates)
         .filter(removeNilValues);
@@ -50,19 +46,16 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
   }
 
   public async lookupPostCode(query: string): Promise<LatLonDto | null> {
+    //TODO Remove catch to differentiate between http & domain errors
     try {
-      const { data } = await axios.get<unknown>(apiAdresseSearchUrl, {
+      const { data } = await this.httpClient.get<unknown>(apiAdresseSearchUrl, {
         params: {
           q: query,
           type: "municipality",
         },
       });
 
-      const featuresResponce = validateDataFromSchema(
-        featuresSchemaResponse,
-        data,
-      );
-      if (featuresResponce instanceof Error) throw featuresResponce;
+      const featuresResponce = featuresSchemaResponse.parse(data);
       const validFeatures = featuresResponce.features.filter(
         keepOnlyValidFeatures,
       );

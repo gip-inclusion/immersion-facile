@@ -1,6 +1,5 @@
-import axios from "axios";
-import { map, Observable } from "rxjs";
-import { ajax } from "rxjs/ajax";
+import { AxiosInstance, AxiosResponse } from "axios";
+import { from, map, Observable } from "rxjs";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
 import {
   AppellationMatchDto,
@@ -13,39 +12,29 @@ import {
   appellationSearchResponseSchema,
   romeListSchema,
 } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
-import { validateDataFromSchema } from "shared/src/zodUtils";
-
-const prefix = "api";
 
 export class HttpRomeAutocompleteGateway implements RomeAutocompleteGateway {
+  constructor(private readonly httpClient: AxiosInstance) {}
+
   public getRomeDtoMatching(searchText: string): Observable<RomeDto[]> {
     const queryParams = queryParamsAsString<RomeSearchInput>({ searchText });
-    return ajax.getJSON<unknown>(`/${prefix}/${romeRoute}?${queryParams}`).pipe(
-      map((response) => {
-        const romeListResponse = validateDataFromSchema(
-          romeListSchema,
-          response,
-        );
-        if (romeListResponse instanceof Error) throw romeListResponse;
-        return romeListResponse;
-      }),
-    );
+    return from(
+      this.httpClient.get<unknown>(`/${romeRoute}?${queryParams}`),
+    ).pipe(map(validateRomeList));
   }
 
   public async getAppellationDtoMatching(
     searchText: string,
   ): Promise<AppellationMatchDto[]> {
-    const { data } = await axios.get<unknown>(
-      `/${prefix}/${appellationRoute}`,
+    const { data } = await this.httpClient.get<unknown>(
+      `/${appellationRoute}`,
       {
         params: { searchText },
       },
     );
-    const appelationsDto = validateDataFromSchema(
-      appellationSearchResponseSchema,
-      data,
-    );
-    if (appelationsDto instanceof Error) throw appelationsDto;
+    const appelationsDto = appellationSearchResponseSchema.parse(data);
     return appelationsDto;
   }
 }
+const validateRomeList = ({ data }: AxiosResponse<unknown>): RomeDto[] =>
+  romeListSchema.parse(data);

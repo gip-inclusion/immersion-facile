@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import { from, Observable } from "rxjs";
 import {
   formAlreadyExistsRoute,
@@ -15,30 +15,19 @@ import {
   SiretDto,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared/src/siret";
-import { validateDataFromSchema } from "shared/src/zodUtils";
+import { HttpClientError } from "src/../../shared/src/httpClient/errors/4xxClientError.error";
+import { HttpServerError } from "src/../../shared/src/httpClient/errors/5xxServerError.error";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
-const prefix = "api";
-
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
-  private axiosInstance: AxiosInstance;
-
-  constructor(baseURL = `/${prefix}`) {
-    this.axiosInstance = axios.create({
-      baseURL,
-    });
-  }
+  constructor(private readonly httpClient: AxiosInstance) {}
 
   isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean> {
     return from(
-      this.axiosInstance
+      this.httpClient
         .get<unknown>(`/${formAlreadyExistsRoute}/${siret}`)
         .then(({ data }) => {
-          const isSiretAlreadyExist = validateDataFromSchema(
-            isSiretExistResponseSchema,
-            data,
-          );
-          if (isSiretAlreadyExist instanceof Error) throw isSiretAlreadyExist;
+          const isSiretAlreadyExist = isSiretExistResponseSchema.parse(data);
           return isSiretAlreadyExist;
         }),
     );
@@ -48,20 +37,30 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
 
   public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
     return from(
-      this.axiosInstance
+      this.httpClient
         .get<unknown>(`/${siretRoute}/${siret}`)
         .then(({ data }) => {
-          const getSiretInfoDto = validateDataFromSchema(
-            getSiretInfoSchema,
-            data,
-          );
-          if (getSiretInfoDto instanceof Error) throw getSiretInfoDto;
+          const getSiretInfoDto = getSiretInfoSchema.parse(data);
           return getSiretInfoDto;
         })
         .catch((error) => {
-          const errorMessage = errorMessageByCode[error?.response?.status];
-          if (!errorMessage) throw error;
-          return errorMessage;
+          if (
+            error instanceof HttpClientError ||
+            error instanceof HttpServerError
+          ) {
+            //TODO Changer le contract de HttpClientError/HttpServerError pour avoir le status en public sur l'instance directement
+            // (l'info doit être porté par le domaine et forcément définie)
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const err = error.cause! as AxiosError;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const resp = err.response! as AxiosResponse;
+            //TODO errorMessageByCode[error.status];
+            const errorMessage = errorMessageByCode[resp.status];
+            if (errorMessage) return errorMessage;
+          }
+          throw new Error("Une erreur non managée est survenue", {
+            cause: error,
+          });
         }),
     );
   }
@@ -70,20 +69,30 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     siret: SiretDto,
   ): Observable<GetSiretInfo> {
     return from(
-      this.axiosInstance
+      this.httpClient
         .get<unknown>(`/${getSiretIfNotSavedRoute}/${siret}`)
         .then(({ data }) => {
-          const getSiretInfoDto = validateDataFromSchema(
-            getSiretInfoSchema,
-            data,
-          );
-          if (getSiretInfoDto instanceof Error) throw getSiretInfoDto;
+          const getSiretInfoDto = getSiretInfoSchema.parse(data);
           return getSiretInfoDto;
         })
         .catch((error) => {
-          const errorMessage = errorMessageByCode[error?.response?.status];
-          if (!errorMessage) throw error;
-          return errorMessage;
+          if (
+            error instanceof HttpClientError ||
+            error instanceof HttpServerError
+          ) {
+            //TODO Changer le contract de HttpClientError/HttpServerError pour avoir le status en public sur l'instance directement
+            // (l'info doit être porté par le domaine et forcément définie)
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const err = error.cause! as AxiosError;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const resp = err.response! as AxiosResponse;
+            //TODO errorMessageByCode[error.status];
+            const errorMessage = errorMessageByCode[resp.status];
+            if (errorMessage) return errorMessage;
+          }
+          throw new Error("Une erreur non managée est survenue", {
+            cause: error,
+          });
         }),
     );
   }

@@ -1,6 +1,11 @@
 //TODO Découpler les notions entre axios et client http générique ?
 
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
 import { HttpClientError } from "../errors/4xxClientError.error";
 import { HttpServerError } from "../errors/5xxServerError.error";
 import {
@@ -12,10 +17,10 @@ import { isHttpClientError, isHttpServerError } from "../httpClient";
 type AxiosErrorWithResponse = AxiosError & { response: AxiosResponse };
 
 // TODO For now directly use this
-export const createManagedAxiosInstance = (): AxiosInstance => {
-  const axiosRequestConfig = {};
-
-  const axiosInstance = axios.create(axiosRequestConfig);
+export const createManagedAxiosInstance = (
+  axiosConfig: AxiosRequestConfig = {},
+): AxiosInstance => {
+  const axiosInstance = axios.create(axiosConfig);
   axiosInstance.interceptors.request.use(
     (request) => request,
     axiosErrorRequestInterceptor,

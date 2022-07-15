@@ -1,5 +1,6 @@
 import { firstValueFrom } from "rxjs";
 import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { HttpImmersionAssessmentGateway } from "./HttpImmersionAssessmentGateway";
 import {
@@ -16,7 +17,9 @@ const expectPromiseToFailWithError = async (
 };
 
 const simulated = new SimulatedImmersionAssessmentGateway();
-const http = new HttpImmersionAssessmentGateway("http://localhost:1234");
+const http = new HttpImmersionAssessmentGateway(
+  createManagedAxiosInstance({ baseURL: "http://localhost:1234" }),
+);
 
 const immersionAssessmentGateways: ImmersionAssessmentGateway[] = [
   simulated,

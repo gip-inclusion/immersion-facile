@@ -47,16 +47,3 @@ export const zPreprocessedNumber = (schema = z.number()) =>
       throw new Error(`'${nAsString}' cannot be converted to number`);
     return n;
   }, schema);
-
-export const validateDataFromSchema = <T>(
-  schema: z.Schema<T>,
-  data: unknown,
-): T | Error => {
-  try {
-    return schema.parse(data);
-  } catch (error: unknown) {
-    return error instanceof Error
-      ? error
-      : new Error(`Must be an Error, got '${error}'`);
-  }
-};

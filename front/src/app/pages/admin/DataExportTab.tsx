@@ -8,8 +8,12 @@ import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGatew
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 
-export const excelExportGateway = new HttpExcelExportGateway();
+// TODO Mettre dans les dépendances ?
+export const excelExportGateway = new HttpExcelExportGateway(
+  createManagedAxiosInstance({ baseURL: "/api" }),
+);
 
 export const DataExportTab = () => {
   const adminToken = useAdminToken();

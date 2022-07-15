@@ -1,4 +1,4 @@
-import axios from "axios";
+import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { AgencyId } from "shared/src/agency/agency.dto";
@@ -25,13 +25,12 @@ import {
 } from "shared/src/routes";
 import { ShareLinkByEmailDto } from "shared/src/ShareLinkByEmailDto";
 import { jwtSchema } from "shared/src/tokens/jwt.schema";
-import { validateDataFromSchema } from "shared/src/zodUtils";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
-const prefix = "api";
-
 export class HttpConventionGateway implements ConventionGateway {
+  constructor(private readonly httpClient: AxiosInstance) {}
+
   retrieveFromToken(
     payload: string,
   ): Observable<ConventionReadDto | undefined> {
@@ -39,42 +38,30 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   public async add(conventionDto: ConventionDto): Promise<string> {
-    const { data } = await axios.post<unknown>(
-      `/${prefix}/${conventionsRoute}`,
+    const { data } = await this.httpClient.post<unknown>(
+      `/${conventionsRoute}`,
       conventionDto,
     );
-    const withConventionId = validateDataFromSchema(
-      withConventionIdSchema,
-      data,
-    );
-    if (withConventionId instanceof Error) throw withConventionId;
+    const withConventionId = withConventionIdSchema.parse(data);
     return withConventionId.id;
   }
 
   public async getById(id: string): Promise<ConventionReadDto> {
-    const { data } = await axios.get<unknown>(
-      `/${prefix}/${conventionsRoute}/${id}`,
+    const { data } = await this.httpClient.get<unknown>(
+      `/${conventionsRoute}/${id}`,
     );
-    const conventionReadDto = validateDataFromSchema(
-      conventionReadSchema,
-      data,
-    );
-    if (conventionReadDto instanceof Error) throw conventionReadDto;
+    const conventionReadDto = conventionReadSchema.parse(data);
     return conventionReadDto;
   }
 
   public async getMagicLink(jwt: string): Promise<ConventionReadDto> {
-    const { data } = await axios.get<unknown>(
-      `/${prefix}/auth/${conventionsRoute}/id`,
+    const { data } = await this.httpClient.get<unknown>(
+      `/auth/${conventionsRoute}/id`,
       {
         headers: { Authorization: jwt },
       },
     );
-    const conventionReadDto = validateDataFromSchema(
-      conventionReadSchema,
-      data,
-    );
-    if (conventionReadDto instanceof Error) throw conventionReadDto;
+    const conventionReadDto = conventionReadSchema.parse(data);
     return conventionReadDto;
   }
 
@@ -83,8 +70,8 @@ export class HttpConventionGateway implements ConventionGateway {
     agency?: AgencyId,
     status?: ConventionStatus,
   ): Promise<Array<ConventionReadDto>> {
-    const { data } = await axios.get<unknown>(
-      `/${prefix}/admin/${conventionsRoute}`,
+    const { data } = await this.httpClient.get<unknown>(
+      `/admin/${conventionsRoute}`,
       {
         params: {
           agency,
@@ -96,24 +83,16 @@ export class HttpConventionGateway implements ConventionGateway {
       },
     );
 
-    const conventionReadDtos = validateDataFromSchema(
-      conventionReadsSchema,
-      data,
-    );
-    if (conventionReadDtos instanceof Error) throw conventionReadDtos;
+    const conventionReadDtos = conventionReadsSchema.parse(data);
     return conventionReadDtos;
   }
 
   public async update(conventionDto: ConventionDto): Promise<string> {
-    const { data } = await axios.post(
-      `/${prefix}/${conventionsRoute}/${conventionDto.id}`,
+    const { data } = await this.httpClient.post(
+      `/${conventionsRoute}/${conventionDto.id}`,
       conventionDto,
     );
-    const withConventionId = validateDataFromSchema(
-      withConventionIdSchema,
-      data,
-    );
-    if (withConventionId instanceof Error) throw withConventionId;
+    const withConventionId = withConventionIdSchema.parse(data);
     return withConventionId.id;
   }
 
@@ -121,16 +100,12 @@ export class HttpConventionGateway implements ConventionGateway {
     conventionDto: ConventionDto,
     jwt: string,
   ): Promise<string> {
-    const { data } = await axios.post(
-      `/${prefix}/auth/${conventionsRoute}/${jwt}`,
+    const { data } = await this.httpClient.post(
+      `/auth/${conventionsRoute}/${jwt}`,
       conventionDto,
       { headers: { authorization: jwt } },
     );
-    const withConventionId = validateDataFromSchema(
-      withConventionIdSchema,
-      data,
-    );
-    if (withConventionId instanceof Error) throw withConventionId;
+    const withConventionId = withConventionIdSchema.parse(data);
     return withConventionId.id;
   }
 
@@ -138,32 +113,25 @@ export class HttpConventionGateway implements ConventionGateway {
     params: UpdateConventionStatusRequestDto,
     jwt: string,
   ): Promise<WithConventionId> {
-    const { data } = await axios.post(
-      `/${prefix}/auth/${updateConventionStatusRoute}/${jwt}`,
+    const { data } = await this.httpClient.post(
+      `/auth/${updateConventionStatusRoute}/${jwt}`,
       params,
       { headers: { Authorization: jwt } },
     );
 
-    const withConventionId = validateDataFromSchema(
-      withConventionIdSchema,
-      data,
-    );
+    const withConventionId = withConventionIdSchema.parse(data);
     if (withConventionId instanceof Error) throw withConventionId;
     return withConventionId;
   }
 
   public async signApplication(jwt: string): Promise<WithConventionId> {
-    const { data } = await axios.post<unknown>(
-      `/${prefix}/auth/${signConventionRoute}/${jwt}`,
+    const { data } = await this.httpClient.post<unknown>(
+      `/auth/${signConventionRoute}/${jwt}`,
       undefined,
       { headers: { authorization: jwt } },
     );
 
-    const withConventionIdDto = validateDataFromSchema(
-      withConventionIdSchema,
-      data,
-    );
-    if (withConventionIdDto instanceof Error) throw withConventionIdDto;
+    const withConventionIdDto = withConventionIdSchema.parse(data);
     return withConventionIdDto;
   }
 
@@ -173,13 +141,12 @@ export class HttpConventionGateway implements ConventionGateway {
     role: Role,
     expired: boolean,
   ): Promise<string> {
-    const { data } = await axios.get<unknown>(
-      `/${prefix}/admin/${generateMagicLinkRoute}?id=${applicationId}&role=${role}&expired=${expired}`,
+    const { data } = await this.httpClient.get<unknown>(
+      `/admin/${generateMagicLinkRoute}?id=${applicationId}&role=${role}&expired=${expired}`,
       { headers: { authorization: adminToken } },
     );
 
-    const jwtDto = validateDataFromSchema(jwtSchema, data);
-    if (jwtDto instanceof Error) throw jwtDto;
+    const jwtDto = jwtSchema.parse(data);
     return jwtDto.jwt;
   }
 
@@ -187,8 +154,8 @@ export class HttpConventionGateway implements ConventionGateway {
     expiredJwt: string,
     linkFormat: string,
   ): Promise<void> {
-    await axios.get(
-      `/${prefix}/${renewMagicLinkRoute}?expiredJwt=${expiredJwt}&linkFormat=${encodeURIComponent(
+    await this.httpClient.get(
+      `/${renewMagicLinkRoute}?expiredJwt=${expiredJwt}&linkFormat=${encodeURIComponent(
         linkFormat,
       )}`,
     );
@@ -197,8 +164,8 @@ export class HttpConventionGateway implements ConventionGateway {
   public async shareLinkByEmail(
     conventionDto: ShareLinkByEmailDto,
   ): Promise<boolean> {
-    const httpResponse = await axios.post(
-      `/${prefix}/${conventionShareRoute}`,
+    const httpResponse = await this.httpClient.post(
+      `/${conventionShareRoute}`,
       conventionDto,
     );
     return httpResponse.status === 200;

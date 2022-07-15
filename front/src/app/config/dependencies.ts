@@ -45,6 +45,7 @@ import { HttpApiAdresseGateway } from "src/core-logic/adapters/ApiAdresse/HttpAp
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/HttpSiretGatewayThroughBack";
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/SimulatedSiretGatewayThroughBack";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 
 export const deviceRepository = createLocalStorageDeviceRepository();
 
@@ -55,7 +56,9 @@ export const establishmentGateway: EstablishmentGateway =
         undefined,
         true,
       )
-    : new HttpEstablishmentGateway();
+    : new HttpEstablishmentGateway(
+        createManagedAxiosInstance({ baseURL: "/api" }),
+      );
 
 const inMemoryConventionGateway = new InMemoryConventionGateway(500);
 
@@ -85,54 +88,64 @@ const getSimulatedSiretGatewayThroughBack = () =>
 export const adminGateway =
   ENV.gateway === "IN_MEMORY"
     ? new SimulatedAdminGateway()
-    : new HttpAdminGateway();
+    : new HttpAdminGateway(createManagedAxiosInstance({ baseURL: "/api" }));
 
 export const siretGatewayThroughBack =
   ENV.gateway === "IN_MEMORY"
     ? getSimulatedSiretGatewayThroughBack()
-    : new HttpSiretGatewayThroughBack();
+    : new HttpSiretGatewayThroughBack(
+        createManagedAxiosInstance({ baseURL: "/api" }),
+      );
 
 export const conventionGateway: ConventionGateway =
   ENV.gateway === "IN_MEMORY"
     ? inMemoryConventionGateway
-    : new HttpConventionGateway();
+    : new HttpConventionGateway(
+        createManagedAxiosInstance({ baseURL: "/api" }),
+      );
 
 export const immersionSearchGateway: ImmersionSearchGateway =
   ENV.gateway === "IN_MEMORY"
     ? new InMemoryImmersionSearchGateway(seedSearchResults, 500)
-    : new HttpImmersionSearchGateway();
+    : new HttpImmersionSearchGateway(
+        createManagedAxiosInstance({ baseURL: "/api" }),
+      );
 
 export const apiAdresseGateway: ApiAdresseGateway =
   ENV.gateway === "IN_MEMORY"
     ? new InMemoryApiAdresseGateway()
-    : new HttpApiAdresseGateway();
+    : new HttpApiAdresseGateway(createManagedAxiosInstance());
 
 export const technicalGateway: TechnicalGateway =
   ENV.gateway === "IN_MEMORY"
     ? new SimulatedTechnicalGateway()
-    : new HttpTechnicalGateway();
+    : new HttpTechnicalGateway(createManagedAxiosInstance({ baseURL: "/api" }));
 
 export const agencyGateway: AgencyGateway =
   ENV.gateway === "IN_MEMORY"
     ? new InMemoryAgencyGateway()
-    : new HttpAgencyGateway();
+    : new HttpAgencyGateway(createManagedAxiosInstance({ baseURL: "/api" }));
 
 export const romeAutocompleteGateway: RomeAutocompleteGateway =
   ENV.gateway === "IN_MEMORY"
     ? new InMemoryRomeAutocompleteGateway(seedRomeDtos, 500)
-    : new HttpRomeAutocompleteGateway();
+    : new HttpRomeAutocompleteGateway(
+        createManagedAxiosInstance({ baseURL: "/api" }),
+      );
 
 export const sentEmailGateway: SentEmailGateway =
   ENV.gateway === "IN_MEMORY"
     ? new StubSentEmailGateway()
-    : new HttpSentEmailGateway();
+    : new HttpSentEmailGateway(createManagedAxiosInstance({ baseURL: "/api" }));
 
 const navigationGateway = new ReactNavigationGateway();
 
 export const immersionAssessmentGateway: ImmersionAssessmentGateway =
   ENV.gateway === "IN_MEMORY"
     ? new SimulatedImmersionAssessmentGateway()
-    : new HttpImmersionAssessmentGateway();
+    : new HttpImmersionAssessmentGateway(
+        createManagedAxiosInstance({ baseURL: "/api" }),
+      );
 
 export type Dependencies = {
   adminGateway: AdminGateway;

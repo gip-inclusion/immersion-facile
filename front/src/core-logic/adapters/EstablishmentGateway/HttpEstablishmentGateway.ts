@@ -1,4 +1,4 @@
-import axios from "axios";
+import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
@@ -12,41 +12,36 @@ import {
   SiretDto,
   siretSchema,
 } from "shared/src/siret";
-import { validateDataFromSchema } from "shared/src/zodUtils";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 
-const prefix = "api";
 export class HttpEstablishmentGateway implements EstablishmentGateway {
+  constructor(private readonly httpClient: AxiosInstance) {}
+
   public async addFormEstablishment(
     establishment: FormEstablishmentDto,
   ): Promise<SiretDto> {
-    const { data } = await axios.post<unknown>(
-      `/${prefix}/${formEstablishmentsRoute}`,
+    const { data } = await this.httpClient.post<unknown>(
+      `/${formEstablishmentsRoute}`,
       establishment,
     );
-    const siretDto = validateDataFromSchema(siretSchema, data);
-    if (siretDto instanceof Error) throw siretDto;
+    const siretDto = siretSchema.parse(data);
     return siretDto;
   }
 
   public async isEstablishmentAlreadyRegisteredBySiret(
     siret: SiretDto,
   ): Promise<boolean> {
-    const { data } = await axios.get<unknown>(
-      `/${prefix}/${formAlreadyExistsRoute}/${siret}`,
+    const { data } = await this.httpClient.get<unknown>(
+      `/${formAlreadyExistsRoute}/${siret}`,
     );
-    const isSiretExistResponse = validateDataFromSchema(
-      isSiretExistResponseSchema,
-      data,
-    );
-    if (isSiretExistResponse instanceof Error) throw isSiretExistResponse;
+    const isSiretExistResponse = isSiretExistResponseSchema.parse(data);
     return isSiretExistResponse;
   }
 
   public async requestEstablishmentModification(
     siret: SiretDto,
   ): Promise<void> {
-    await axios.post(`/${prefix}/${requestEmailToUpdateFormRoute}/${siret}`);
+    await this.httpClient.post(`/${requestEmailToUpdateFormRoute}/${siret}`);
   }
 
   public requestEstablishmentModificationObservable(
@@ -59,19 +54,15 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     siret: SiretDto,
     jwt: string,
   ): Promise<FormEstablishmentDto> {
-    const { data } = await axios.get(
-      `/${prefix}/${formEstablishmentsRoute}/${siret}`,
+    const { data } = await this.httpClient.get(
+      `/${formEstablishmentsRoute}/${siret}`,
       {
         headers: {
           Authorization: jwt,
         },
       },
     );
-    const formEstablishmentDto = validateDataFromSchema(
-      formEstablishmentSchema,
-      data,
-    );
-    if (formEstablishmentDto instanceof Error) throw formEstablishmentDto;
+    const formEstablishmentDto = formEstablishmentSchema.parse(data);
     return formEstablishmentDto;
   }
 
@@ -79,7 +70,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     establishment: FormEstablishmentDto,
     jwt: string,
   ): Promise<void> {
-    await axios.put(`/${prefix}/${formEstablishmentsRoute}`, establishment, {
+    await this.httpClient.put(`/${formEstablishmentsRoute}`, establishment, {
       headers: {
         Authorization: jwt,
       },

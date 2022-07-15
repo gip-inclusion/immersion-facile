@@ -9,6 +9,7 @@ import { expectToEqual } from "shared/src/expectToEqual";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { SimulatedSiretGatewayThroughBack } from "./SimulatedSiretGatewayThroughBack";
 import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
+import { createManagedAxiosInstance } from "src/../../shared/src/httpClient/ports/axios.port";
 
 const simulated = new SimulatedSiretGatewayThroughBack(0, {
   "12345678901234": {
@@ -35,7 +36,9 @@ const simulated = new SimulatedSiretGatewayThroughBack(0, {
   },
 });
 
-const http = new HttpSiretGatewayThroughBack("http://localhost:1234");
+const http = new HttpSiretGatewayThroughBack(
+  createManagedAxiosInstance({ baseURL: "http://localhost:1234" }),
+);
 
 const siretGatewaysThroughBack: SiretGatewayThroughBack[] = [simulated, http];
 

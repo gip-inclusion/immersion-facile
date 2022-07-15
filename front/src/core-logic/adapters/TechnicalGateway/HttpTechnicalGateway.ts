@@ -1,31 +1,26 @@
-import axios from "axios";
-import { ajax } from "rxjs/ajax";
+import { AxiosInstance, AxiosResponse } from "axios";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { FeatureFlags, featureFlagsSchema } from "shared/src/featureFlags";
 import { getFeatureFlags, uploadFileRoute } from "shared/src/routes";
-import { map, Observable } from "rxjs";
-import { validateDataFromSchema } from "shared/src/zodUtils";
-
-const prefix = "api";
-
+import { from, map, Observable } from "rxjs";
 export class HttpTechnicalGateway implements TechnicalGateway {
+  constructor(private readonly httpClient: AxiosInstance) {}
+
   async uploadFile(file: File): Promise<AbsoluteUrl> {
     const formData = new FormData();
     formData.append(uploadFileRoute, file);
-    const { data } = await axios.post(
-      `/${prefix}/${uploadFileRoute}`,
+    const { data } = await this.httpClient.post(
+      `/${uploadFileRoute}`,
       formData,
     );
     return data;
   }
 
   getAllFeatureFlags = (): Observable<FeatureFlags> =>
-    ajax.getJSON<unknown>(`/${prefix}/${getFeatureFlags}`).pipe(
-      map((result) => {
-        const featureFlags = validateDataFromSchema(featureFlagsSchema, result);
-        if (featureFlags instanceof Error) throw featureFlags;
-        return featureFlags;
-      }),
+    from(this.httpClient.get<unknown>(`/${getFeatureFlags}`)).pipe(
+      map(validateFeatureFlags),
     );
 }
+const validateFeatureFlags = ({ data }: AxiosResponse<unknown>): FeatureFlags =>
+  featureFlagsSchema.parse(data);

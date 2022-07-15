@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
 import { immersionAssessmentRoute } from "shared/src/routes";
 import {
@@ -6,22 +6,14 @@ import {
   ImmersionAssessmentGateway,
 } from "src/core-logic/ports/ImmersionAssessmentGateway";
 
-const prefix = "api";
-
 export class HttpImmersionAssessmentGateway
   implements ImmersionAssessmentGateway
 {
-  private axiosInstance: AxiosInstance;
-
-  constructor(baseURL = `/${prefix}`) {
-    this.axiosInstance = axios.create({
-      baseURL,
-    });
-  }
+  constructor(private readonly httpClient: AxiosInstance) {}
 
   createAssessment({ jwt, assessment }: AssessmentAndJwt): Observable<void> {
     return from(
-      this.axiosInstance
+      this.httpClient
         .post<void>(`/auth/${immersionAssessmentRoute}`, assessment, {
           headers: { Authorization: jwt },
         })

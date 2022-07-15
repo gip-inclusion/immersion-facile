@@ -32,9 +32,6 @@ export const romeSchema: z.Schema<RomeDto> = z.object({
   romeLabel: zTrimmedString,
 });
 export const romeListSchema: z.Schema<RomeDto[]> = z.array(romeSchema);
-export const romeListResponseSchema: z.Schema<{ data: RomeDto[] }> = z.object({
-  data: romeListSchema,
-});
 
 export const romeAutocompleteInputSchema: z.Schema<RomeSearchInput> = z.object({
   searchText: zTrimmedString,

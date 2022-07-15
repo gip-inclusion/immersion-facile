@@ -1,10 +1,14 @@
 import { firstValueFrom } from "rxjs";
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 
 describe("HttpAdminGateway", () => {
   let adminGateway: HttpAdminGateway;
   beforeEach(() => {
-    adminGateway = new HttpAdminGateway("http://localhost:1234");
+    const axiosInstance = createManagedAxiosInstance({
+      baseURL: "http://localhost:1234",
+    });
+    adminGateway = new HttpAdminGateway(axiosInstance);
   });
 
   it("fails when credential are wrong", async () => {
