@@ -84,15 +84,17 @@ export const HeaderV2 = ({
               </p>
             </div>
           </div>
-          <div className="fr-header__tools">
-            <div className="fr-header__tools-links">
-              <ul className="fr-links-group">{renderActions(actions)}</ul>
+          {actions && actions.length > 0 && (
+            <div className="fr-header__tools">
+              <div className="fr-header__tools-links">
+                <ul className="fr-links-group">{renderActions(actions)}</ul>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
-    {links.length > 0 && (
+    {links && links.length > 0 && (
       <nav
         className="fr-nav fr-container"
         id="header-navigation"
