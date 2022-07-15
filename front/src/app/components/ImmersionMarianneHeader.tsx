@@ -7,70 +7,66 @@ import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import {
   LinkHome,
-  HeaderV2,
+  Header,
   MarianneLogo,
   ImmersionLogo,
-  ActionsType,
-  LinksType,
+  ToolsType,
+  NavLinksType,
 } from "react-design-system/immersionFacile";
-import { ENV } from "src/environmentVariables";
 import immersionFacileLogo from "/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
-
-const { frontEnvType } = ENV;
 
 export const ImmersionMarianneHeader = () => {
   const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
   const isAdminConnected = useAppSelector(adminSelectors.isAuthenticated);
-  const actions: ActionsType = [];
+  const tools: ToolsType = [];
   if (isAdminConnected) {
-    actions.push({
-      iconClassName: "fr-fi-lock-line",
+    tools.push({
+      iconClassName: "fr-link fr-fi-lock-line",
       label: "Se déconnecter",
       callback: () => dispatch(adminSlice.actions.logoutRequested()),
     });
   }
-  const isDev = frontEnvType === "DEV";
-  const links: LinksType = [
+  const links: NavLinksType = [
     {
       label: "Home",
       link: routes.home().link,
-      display: isDev,
+      display: isAdminConnected,
     },
     {
       label: "Demande immersion",
       link: routes.convention().link,
-      display: isDev,
+      display: isAdminConnected,
     },
     {
       label: "Backoffice",
       link: routes.admin().link,
-      display: isDev && featureFlags.enableAdminUi,
+      display: isAdminConnected && featureFlags.enableAdminUi,
     },
     {
       label: "Formulaire Entreprise",
       link: routes.formEstablishment().link,
-      display: isDev,
+      display: isAdminConnected,
     },
     {
       label: "Landing entreprise",
       link: routes.landingEstablishment().link,
-      display: isDev,
+      display: isAdminConnected,
     },
     {
       label: "Recherche",
       link: routes.search().link,
-      display: isDev,
+      display: isAdminConnected,
     },
     {
       label: "Ajouter agence",
       link: routes.addAgency().link,
-      display: isDev,
+      display: isAdminConnected,
     },
   ];
   const linksFiltered = links.filter((link) => link.display);
   return (
-    <HeaderV2
+    <Header
       marianneLogo={
         <LinkHome {...routes.home().link}>
           <MarianneLogo />
@@ -81,7 +77,7 @@ export const ImmersionMarianneHeader = () => {
           <ImmersionLogo url={immersionFacileLogo} />
         </LinkHome>
       }
-      actions={actions}
+      tools={tools}
       links={linksFiltered}
     />
   );
