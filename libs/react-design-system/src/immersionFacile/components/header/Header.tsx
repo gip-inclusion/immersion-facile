@@ -89,8 +89,8 @@ export const Header = ({
             <div className="fr-header__tools">
               <div className="fr-header__tools-links">
                 <ul className="fr-nav fr-nav--right">
-                  {tools.map((tool) => (
-                    <Tool tool={tool} />
+                  {tools.map((tool, index) => (
+                    <Tool tool={tool} key={index} />
                   ))}
                 </ul>
               </div>
@@ -107,8 +107,8 @@ export const Header = ({
         aria-label="Menu principal"
       >
         <ul className="fr-nav__list">
-          {links.map((link) => (
-            <NavLink link={link} />
+          {links.map((link, index) => (
+            <NavLink link={link} key={index} />
           ))}
         </ul>
       </nav>
