@@ -3,8 +3,8 @@ import { createRouter, defineRoute, param } from "type-route";
 import { conventionValuesFromUrl } from "./route-params";
 
 export const { RouteProvider, useRoute, routes } = createRouter({
-  addAgency: defineRoute("/ajouter-prescripteur"),
-  admin: defineRoute("/admin"),
+  addAgency: defineRoute(`/${frontRoutes.addAgency}`),
+  admin: defineRoute(`/${frontRoutes.admin}`),
   agencyAdmin: defineRoute(
     { agencyId: param.path.string },
     (params) => `/agence/${params.agencyId}`,
@@ -23,11 +23,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       message: param.query.optional.string,
       kind: param.query.optional.string,
     },
-    () => "/error",
+    () => `/${frontRoutes.error}`,
   ),
   formEstablishment: defineRoute(
     { siret: param.query.optional.string },
-    () => "/etablissement",
+    () => `/${frontRoutes.establishment}`,
   ),
   formEstablishmentForExternals: defineRoute(
     { consumer: param.path.string },
@@ -36,7 +36,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   home: defineRoute("/"),
   convention: defineRoute(
     { jwt: param.query.optional.string, ...conventionValuesFromUrl },
-    () => "/demande-immersion",
+    () => `/${frontRoutes.conventionRoute}`,
   ),
   conventionForUkraine: defineRoute(
     {
@@ -56,7 +56,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.immersionAssessment}`,
   ),
-  landingEstablishment: defineRoute("/accueil-etablissement"),
+  landingEstablishment: defineRoute(`/${frontRoutes.landingEstablishment}`),
   renewConventionMagicLink: defineRoute(
     {
       expiredJwt: param.query.string,
@@ -65,5 +65,5 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.magicLinkRenewal}`,
   ),
   searchDebug: defineRoute("/debug/search"),
-  search: defineRoute("/recherche"),
+  search: defineRoute(`/${frontRoutes.search}`),
 });

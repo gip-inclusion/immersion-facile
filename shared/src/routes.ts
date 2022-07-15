@@ -1,11 +1,16 @@
 export const frontRoutes = {
+  admin: "admin",
+  addAgency: "ajouter-prescripteur",
+  conventionRoute: "demande-immersion",
   conventionToValidate: "verification",
   conventionToSign: "verifier-et-signer",
-  conventionRoute: "demande-immersion",
-  immersionAssessment: "bilan-immersion",
   editFormEstablishmentRoute: "edition-etablissement",
-  magicLinkRenewal: "refraichir-lien",
   error: "error",
+  establishment: "establishment",
+  immersionAssessment: "bilan-immersion",
+  landingEstablishment: "accueil-etablissement",
+  magicLinkRenewal: "refraichir-lien",
+  search: "recherche",
 };
 
 export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments
