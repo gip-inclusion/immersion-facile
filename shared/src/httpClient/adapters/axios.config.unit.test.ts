@@ -1,38 +1,52 @@
-import { isValidAxiosErrorResponse } from "./axios.port";
+import { isValidErrorResponse } from "./axios.config";
 
-import axios from "axios";
-
-describe("Error Response format", () => {
+describe("Error Response format standart", () => {
   it.each([
-    [{ response: {} }, false],
+    [null, false],
+    ["plop", false],
+    [{}, false],
     [
       {
-        isAxiosError: false,
+        request: { status: "plop" },
+      },
+      false,
+    ],
+    [[], false],
+    [[{}], false],
+    [{}, false],
+    [
+      {
+        data: "",
+        status: 400,
       },
       false,
     ],
     [
       {
-        isAxiosError: true,
+        data: "plop",
+        status: 400,
       },
       true,
     ],
     [
       {
-        response: {
-          status: 400,
+        data: {
+          prop: "A nested property",
         },
-        isAxiosError: true,
+        status: 400,
       },
       true,
     ],
   ])(
-    "isAxiosError should detect if the response has a valid format, expect: (%s to be %s)",
+    "isAxiosResponse should detect if the response has a valid response structure code, expect: (%s to be %s)",
     (raw: any, expected: boolean) => {
-      expect(axios.isAxiosError(raw)).toBe(expected);
+      expect(isValidErrorResponse(raw)).toBe(expected);
     },
   );
+});
 
+// TODO PE version with data that can be equal to ""
+/*describe("Error Response format standart POLE EMPLOI", () => {
   it.each([
     [null, false],
     ["plop", false],
@@ -72,7 +86,7 @@ describe("Error Response format", () => {
   ])(
     "isAxiosResponse should detect if the response has a valid response structure code, expect: (%s to be %s)",
     (raw: any, expected: boolean) => {
-      expect(isValidAxiosErrorResponse(raw)).toBe(expected);
+      expect(isValidErrorResponse(raw)).toBe(expected);
     },
   );
-});
+});*/

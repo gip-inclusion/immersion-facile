@@ -47,6 +47,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     private readonly config: HttpPeConnectGatewayConfig,
     private readonly httpClient: AxiosInstance,
   ) {
+    // TODO Extract and inject
     this.apiPeConnectUrls = makeApiPeConnectUrls({
       peAuthCandidatUrl: config.peAuthCandidatUrl,
       immersionBaseUrl: config.immersionFacileBaseUrl,
@@ -82,12 +83,16 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         redirect_uri: this.apiPeConnectUrls.REGISTERED_REDIRECT_URL,
       };
 
-    const response: AxiosResponse =
-      await getOAuthGetAccessTokenThroughAuthorizationCodeResponse(
-        this.httpClient,
-        this.apiPeConnectUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
+    const response: AxiosResponse = await this.httpClient.post(
+      this.apiPeConnectUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
+      queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
         getAccessTokenPayload,
-      );
+      ),
+      {
+        headers: headersUrlEncoded(),
+        timeout: AXIOS_TIMEOUT_FIVE_SECOND,
+      },
+    );
 
     const externalAccessToken: ExternalAccessToken = validateAndParseZodSchema(
       externalAccessTokenSchema,
@@ -137,6 +142,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       },
     );
 
+    // Here
+
     const body = this.extractAdvisorsBodyFromResponse(response);
 
     const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
@@ -181,14 +188,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   }
 }
 
-type PeConnectUrlTargets =
+export type PeConnectUrlTargets =
   | "OAUTH2_AUTH_CODE_STEP_1"
   | "OAUTH2_ACCESS_TOKEN_STEP_2"
   | "REGISTERED_REDIRECT_URL"
   | "PECONNECT_USER_INFO"
   | "PECONNECT_ADVISORS_INFO";
 
-const makeApiPeConnectUrls = (params: {
+export const makeApiPeConnectUrls = (params: {
   peAuthCandidatUrl: AbsoluteUrl;
   peApiUrl: AbsoluteUrl;
   immersionBaseUrl: AbsoluteUrl;
@@ -221,11 +228,11 @@ const headersWithAuthPeAccessToken = (
 
 const getOAuthGetAccessTokenThroughAuthorizationCodeResponse = (
   axiosInstance: AxiosInstance,
-  url: AbsoluteUrl,
+  targetUrl: PeConnectUrlTargets,
   getAccessTokenPayload: ExternalPeConnectOAuthGetTokenWithCodeGrantPayload,
 ): Promise<AxiosResponse> =>
   axiosInstance.post(
-    url,
+    targetUrl,
     queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
       getAccessTokenPayload,
     ),
