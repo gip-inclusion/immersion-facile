@@ -42,6 +42,15 @@ export type TemplatedEmail =
   | NewEstablishmentCreatedContactConfirmationEmail
   | CreatImmersionAssessmentEmail;
 
+type NewConventionBeneficiaryConfirmationEmail = GenericTemplatedEmail<
+  "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
+  {
+    demandeId: string;
+    firstName: string;
+    lastName: string;
+  }
+>;
+
 type NewConventionAgencyNotificationEmail = GenericTemplatedEmail<
   "NEW_CONVENTION_AGENCY_NOTIFICATION",
   {
@@ -53,15 +62,6 @@ type NewConventionAgencyNotificationEmail = GenericTemplatedEmail<
     businessName: string;
     agencyName: string;
     magicLink: string;
-  }
->;
-
-type NewConventionBeneficiaryConfirmationEmail = GenericTemplatedEmail<
-  "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
-  {
-    demandeId: string;
-    firstName: string;
-    lastName: string;
   }
 >;
 

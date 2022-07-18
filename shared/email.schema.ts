@@ -1,14 +1,54 @@
 import { z } from "zod";
-import { EmailType } from "./email";
+import type { EmailType, TemplatedEmail } from "./email";
 
-export const emailTypeSchema: Zod.Schema<EmailType> = z.any();
+// <<<<------ TO BE DELETE BEFORE MERGE
+// type GenericMachin<T extends string, P extends Record<string, any>> = {
+//   type: T;
+//   params: P;
+// };
+//
+// type Machin =
+//   | GenericMachin<"Truc", { lala: number }>
+//   | GenericMachin<"Bidule", { lala: number }>;
+//
+// type MachinKind = Machin["type"];
+//
+// // const machinKindSchema: z.Schema<MachinKind> = z.enum(["Truc", "Bidule"]);
+// const machinKindSchema: z.Schema<MachinKind> = z.any();
+//
+// const machinSchema: z.Schema<GenericMachin<MachinKind, any>> = z.object({
+//   type: machinKindSchema,
+//   params: z.object({}),
+// });
+//
+// machinSchema.parse({});
+//
+
+// This works but is not strict enough for usage, as we want to have TemplatedEmail type back
+// export const templatedEmailSchema: z.Schema<
+//   GenericTemplatedEmail<EmailType, any>
+// > = z.object({
+//   type: emailTypeSchema,
+//   recipients: z.array(z.string()),
+//   cc: z.array(z.string()),
+//   params: z.object({}),
+// });
+// TO BE DELETE BEFORE MERGE --->>>>
+
+export const emailTypeSchema: z.Schema<EmailType> = z.any();
 
 export const templatedEmailSchema = z.object({
   type: emailTypeSchema,
   recipients: z.array(z.string()),
   cc: z.array(z.string()),
-  params: z.object({}),
-});
+  params: z.any(),
+}) as z.Schema<TemplatedEmail>;
+
+const email = templatedEmailSchema.parse({});
+
+if (email.type === "NEW_CONVENTION_BENEFICIARY_CONFIRMATION") {
+  email.params.demandeId;
+}
 
 export const emailSentSchema = z.object({
   templatedEmail: templatedEmailSchema,
