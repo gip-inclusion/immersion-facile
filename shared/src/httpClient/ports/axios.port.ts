@@ -9,6 +9,8 @@ import {
 } from "../errors/ConnectionRefused.error";
 import { isHttpClientError, isHttpServerError } from "../httpClient";
 
+type AxiosErrorWithResponse = AxiosError & { response: AxiosResponse };
+
 // TODO For now directly use this
 export const createManagedAxiosInstance = (): AxiosInstance => {
   const axiosRequestConfig = {};
@@ -19,10 +21,13 @@ export const createManagedAxiosInstance = (): AxiosInstance => {
     axiosErrorRequestInterceptor,
   );
 
-  axiosInstance.interceptors.response.use(
-    (validResponse) => validResponse,
-    axiosErrorResponseInterceptor,
-  );
+  axiosInstance.interceptors.response.use((validResponse) => {
+    // eslint-disable-next-line no-console
+    console.log("[Axios Managed Request url]: ", validResponse.config.url);
+    // eslint-disable-next-line no-console
+    console.log("[Axios Managed Response Status]: ", validResponse.status);
+    return validResponse;
+  }, axiosErrorResponseInterceptor);
 
   return axiosInstance;
 };
@@ -30,7 +35,7 @@ export const createManagedAxiosInstance = (): AxiosInstance => {
 const axiosErrorResponseInterceptor = (rawAxiosError: AxiosError): never => {
   handleConnectionRefused(rawAxiosError);
 
-  const error: AxiosError & { response: AxiosResponse } =
+  const error: AxiosErrorWithResponse =
     validateAxiosErrorResponse(rawAxiosError);
 
   handleHttpClientError(error);
@@ -57,30 +62,28 @@ export const isValidAxiosErrorResponse = (
 
 const isValidResponseBody = (data: any): boolean => !!data || data === "";
 
-const handleHttpClientError = (
-  error: AxiosError & { response: AxiosResponse },
-): never | void => {
+const handleHttpClientError = (error: AxiosErrorWithResponse): never | void => {
   // TODO Manage some specific status here ? (429)
   if (isHttpClientError(error.response.status)) throwClientError(error);
 };
 
-const handleServerError = (
-  error: AxiosError & { response: AxiosResponse },
-): never | void => {
+const handleServerError = (error: AxiosErrorWithResponse): never | void => {
   if (isHttpServerError(error.response.status)) throwServerError(error);
 };
 
-const throwClientError = (error: AxiosError): never => {
+const throwClientError = (error: AxiosErrorWithResponse): never => {
   throw new HttpClientError(
     `4XX Status Code ${toAxiosHttpErrorString(error)}`,
     error,
+    error.response.status,
   );
 };
 
-const throwServerError = (error: AxiosError): never => {
+const throwServerError = (error: AxiosErrorWithResponse): never => {
   throw new HttpServerError(
     `5XX Status Code ${toAxiosHttpErrorString(error)}`,
     error,
+    error.response.status,
   );
 };
 
@@ -93,8 +96,8 @@ const handleConnectionRefused = (error: AxiosError): never | void => {
 };
 
 const validateAxiosErrorResponse = (
-  error: AxiosError & { response?: AxiosResponse },
-): AxiosError & { response: AxiosResponse } => {
+  error: AxiosError,
+): AxiosErrorWithResponse => {
   if (!axios.isAxiosError(error))
     throwUnhandledError(
       `error Response does not have the property isAxiosError set to true`,
@@ -107,7 +110,7 @@ const validateAxiosErrorResponse = (
       error,
     );
 
-  return error as AxiosError & { response: AxiosResponse };
+  return error as AxiosErrorWithResponse;
 };
 
 export const throwUnhandledError = (

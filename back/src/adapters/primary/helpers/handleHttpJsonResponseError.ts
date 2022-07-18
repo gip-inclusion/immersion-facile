@@ -11,18 +11,35 @@ export const handleHttpJsonResponseError = (
 ): Response<any, Record<string, any>> => {
   if (!isManagedError(error)) return unhandledError(error, req, res);
 
-  if (error instanceof UnauthorizedError)
-    res.setHeader("WWW-Authenticate", "Basic");
+  if (error instanceof HttpError) {
+    if (error instanceof UnauthorizedError)
+      res.setHeader("WWW-Authenticate", "Basic");
 
-  res.status(error.httpCode);
+    res.status(error.httpCode);
 
-  return res.json({ errors: toValidJSONObjectOrString(error) });
+    return res.json({ errors: toValidJSONObjectOrString(error) });
+  }
+
+  if (error instanceof HttpClientError || error instanceof HttpServerError) {
+    res.status(error.httpStatusCode);
+
+    return res.json(toJSONObject(error));
+  }
+
+  throw Error("Should never reach there");
 };
 
 const isManagedError = (error: unknown): boolean =>
+  error instanceof HttpError ||
   error instanceof HttpClientError ||
-  error instanceof HttpServerError ||
-  error instanceof HttpError;
+  error instanceof HttpServerError;
+
+const toJSONObject = (error: HttpClientError | HttpServerError) => ({
+  _message: error.message,
+  _name: error.name,
+  stack: error.stack,
+  cause: error.cause?.message,
+});
 
 const toValidJSONObjectOrString = (
   error: HttpError,
