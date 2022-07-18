@@ -5,8 +5,8 @@ import {
   ConventionExportByAgency,
   ReportingGateway,
 } from "../../../domain/core/ports/ReportingGateway";
-import { Archive } from "../../../domain/generic/archive/port/Archive";
-import { Workbook } from "../../../domain/generic/excel/port/Workbook";
+import { Workbook } from "../../../utils/Workbook";
+import { Archive } from "../../../utils/Archive";
 import { retrieveParentDirectory } from "../../../utils/filesystemUtils";
 
 export class ExcelReportingGateway implements ReportingGateway {

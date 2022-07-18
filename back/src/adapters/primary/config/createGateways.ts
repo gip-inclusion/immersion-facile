@@ -34,6 +34,7 @@ import {
   HttpPeConnectGateway,
   PeConnectUrlTargets,
 } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
+import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
 import {
   httpPeConnectGatewayTargetMapperMaker,
   onRejectPeSpecificResponseInterceptorMaker,
@@ -41,8 +42,9 @@ import {
 } from "../../secondary/PeConnectGateway/HttpPeConnectGateway.config";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
-import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
+import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
+import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 
 const logger = createLogger(__filename);
 
@@ -152,6 +154,10 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
             noRetries,
           )
         : new InMemorySireneGateway(),
+    exportGateway:
+      config.reporting === "EXCEL"
+        ? new ExcelExportGateway()
+        : new InMemoryExportGateway(),
   };
 };
 

@@ -3,12 +3,12 @@ import path from "path";
 import {
   deleteFileAndParentFolder,
   retrieveParentDirectory,
-  temporaryStoragePath,
+  makeTemporaryStorageFile,
 } from "../../utils/filesystemUtils";
 
 describe("Filesystem utils", () => {
   it("should return the temporary storage directory located in $STORAGE_ROOT/tmp", async () => {
-    const tempPath = await temporaryStoragePath();
+    const tempPath = await makeTemporaryStorageFile("./");
     const temporaryStoragePathRegex = /storage\/tmp\/[A-Za-z0-9]{6}/;
     expect(tempPath).toMatch(temporaryStoragePathRegex);
     expect(fse.pathExistsSync(tempPath)).toBe(true);
@@ -18,7 +18,7 @@ describe("Filesystem utils", () => {
 
   it("should return the filepath located temporary storage directory", async () => {
     const filename = "myfile";
-    const pathResult = await temporaryStoragePath(filename);
+    const pathResult = await makeTemporaryStorageFile(filename);
     fse.writeFileSync(pathResult, "Hey there!");
 
     expect(fse.pathExistsSync(pathResult)).toBe(true);
@@ -28,7 +28,7 @@ describe("Filesystem utils", () => {
 
   it("should remove the filepath and randomized temporary storage directory", async () => {
     const filename = "myfile";
-    const pathResult = await temporaryStoragePath(filename);
+    const pathResult = await makeTemporaryStorageFile(filename);
     const parentDirectory = path.dirname(pathResult);
 
     fse.writeFileSync(pathResult, "Hey there!");

@@ -2,16 +2,14 @@ import React from "react";
 
 export const WithBackground = ({
   children,
-  className,
 }: {
   children: React.ReactElement;
   className?: string;
 }) => (
   <div
-    className={className}
+    className="p-5"
     style={{
       backgroundColor: "#E5E5F4",
-      padding: "10px",
     }}
   >
     {" "}

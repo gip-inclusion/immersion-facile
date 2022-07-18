@@ -1,5 +1,5 @@
 import { CellValue, Column, Worksheet } from "exceljs";
-import { Workbook } from "../../../../domain/generic/excel/port/Workbook";
+import { Workbook } from "../../../../utils/Workbook";
 
 const isCellDefined = (
   cell: CellValue[] | undefined | null,

@@ -1,22 +1,35 @@
 import { Router } from "express";
 import { FormSourceProvider } from "shared/src/establishmentExport/establishmentExport.dto";
+import { ExportDataDto } from "shared/src/exportable";
 import {
   exportConventionsExcelRoute,
   exportEstablismentsExcelRoute,
 } from "shared/src/routes";
 import { capitalize } from "shared/src/utils/string";
-import { temporaryStoragePath } from "../../../../utils/filesystemUtils";
+import { makeTemporaryStorageFile } from "../../../../utils/filesystemUtils";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendZipResponse } from "../../helpers/sendZipResponse";
 
 export const createExcelExportRouter = (deps: AppDependencies) => {
   const excelExportRouter = Router({ mergeParams: true });
 
+  excelExportRouter.route(`/export`).post(async (req, res) =>
+    sendZipResponse(req, res, async () => {
+      const exportDataParams: ExportDataDto = req.body;
+      const archivePath = await deps.useCases.exportData.execute(
+        exportDataParams,
+      );
+      return archivePath;
+    }),
+  );
+
   excelExportRouter
     .route(`/${exportConventionsExcelRoute}`)
     .get(async (req, res) =>
       sendZipResponse(req, res, async () => {
-        const archivePath = await temporaryStoragePath("exportAgencies.zip");
+        const archivePath = await makeTemporaryStorageFile(
+          "exportAgencies.zip",
+        );
         await deps.useCases.exportConventionsAsExcelArchive.execute(
           archivePath,
         );
@@ -42,7 +55,7 @@ export const createExcelExportRouter = (deps: AppDependencies) => {
           ? (req.query.sourceProvider as FormSourceProvider)
           : "all";
 
-        const archivePath = await temporaryStoragePath(
+        const archivePath = await makeTemporaryStorageFile(
           `export${capitalize(sourceProvider)}EstablishmentsBy${capitalize(
             groupKey,
           )}${aggregateProfession ? "AggregatedProfessions" : ""}.zip`,

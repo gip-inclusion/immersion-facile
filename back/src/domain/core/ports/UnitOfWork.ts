@@ -1,3 +1,4 @@
+import { ExportQueries } from "../../backoffice/ports/ExportQueries";
 import { AgencyRepository } from "../../convention/ports/AgencyRepository";
 import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
@@ -32,6 +33,7 @@ export type UnitOfWork = {
   laBonneBoiteRequestRepository: LaBonneBoiteRequestRepository;
   searchMadeRepository: SearchMadeRepository;
   getApiConsumersById: GetApiConsumerById;
+  exportQueries: ExportQueries;
 };
 
 export interface UnitOfWorkPerformer {

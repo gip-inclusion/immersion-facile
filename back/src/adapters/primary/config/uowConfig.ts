@@ -14,6 +14,7 @@ import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyReposito
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
+import { InMemoryExportQueries } from "../../secondary/InMemoryExportQueries";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
@@ -27,6 +28,7 @@ import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgEstablishmentExportQueries } from "../../secondary/pg/PgEstablishmentExportQueries";
+import { PgExportQueries } from "../../secondary/pg/PgExportQueries";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
 import { PgLaBonneBoiteRequestRepository } from "../../secondary/pg/PgLaBonneBoiteRequestRepository";
@@ -69,6 +71,7 @@ export const createInMemoryUow = () => {
     laBonneBoiteRequestRepository: new InMemoryLaBonneBoiteRequestRepository(),
     searchMadeRepository: new InMemorySearchMadeRepository(),
     getApiConsumersById: makeStubGetApiConsumerById({ clock: new RealClock() }),
+    exportQueries: new InMemoryExportQueries(),
   };
 };
 
@@ -98,6 +101,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
   searchMadeRepository: new PgSearchMadeRepository(client),
   getApiConsumersById: makePgGetApiConsumerById(client),
+  exportQueries: new PgExportQueries(client),
 });
 
 export const createUowPerformer = (

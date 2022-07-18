@@ -64,3 +64,54 @@ export class Workbook<T extends Record<string, unknown>> extends excel.Workbook 
     return xlsFilePath;
   }
 }
+
+// prettier-ignore
+export class WorkbookV2 extends excel.Workbook {
+  public withCustomFieldsHeaders(
+    customColumns: Partial<Column>[],
+  ): WorkbookV2 {
+    this.getWorksheet("main").columns = customColumns;
+    return this;
+  }
+
+  public withPayload(payload: any[]) {
+    const worksheet = this.getWorksheet("main");
+    payload.map((entity: any) => {
+      worksheet.addRow({ ...entity });
+    });
+
+    return this;
+  }
+
+  public withSheet(): WorkbookV2 {
+    this.addWorksheet(
+      "main",
+      configs[WorksheetOptionsConfigurations.RowAsHeaderDisplay],
+    );
+    return this;
+  }
+
+  public withConditionalFormatting(
+    sheet: string,
+    options: excel.ConditionalFormattingOptions,
+  ): WorkbookV2 {
+    const worksheet: Worksheet = this.getWorksheet(sheet);
+    worksheet.addConditionalFormatting(options);
+
+    return this;
+  }
+
+  public withTitle(title: string): WorkbookV2 {
+    this.title = title;
+    return this;
+  }
+
+  public async toXlsx(path?: string): Promise<string> {
+    const fileName = `${this.title}.xlsx`;
+    const directoryPath: string = path ? path : `./`;
+    const xlsFilePath = `${directoryPath}/${fileName}`;
+    const stream = fse.createWriteStream(xlsFilePath);
+    await this.xlsx.write(stream);
+    return xlsFilePath;
+  }
+}

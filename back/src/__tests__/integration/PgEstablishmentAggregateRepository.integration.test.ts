@@ -1278,7 +1278,6 @@ describe("Postgres implementation of immersion offer repository", () => {
           siret,
           boulangerRome,
         );
-
       // Assert
       expectTypeToMatchAndEqual(actualSearchResultDto, {
         rome: boulangerRome,

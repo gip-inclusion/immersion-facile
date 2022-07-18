@@ -4,6 +4,7 @@ import {
   GenerateAdminJwt,
   GenerateMagicLinkJwt,
 } from "../../../domain/auth/jwt";
+import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
 import { AddAgency } from "../../../domain/convention/useCases/AddAgency";
 import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
@@ -110,6 +111,7 @@ export const createUseCases = (
       () => sleep(config.nodeEnv !== "test" ? 500 : 0),
     ),
     getSentEmails: new GetSentEmails(gateways.email),
+    exportData: new ExportData(uowPerformer, gateways.exportGateway),
 
     // Conventions
     createImmersionAssessment: new CreateImmersionAssessment(
