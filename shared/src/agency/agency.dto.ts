@@ -43,10 +43,9 @@ export const agencyKindList: NotEmptyArray<
   "autre",
 ];
 
-export type AgencyWithPositionDto = {
+export type AgencyIdAndName = {
   id: AgencyId;
   name: string;
-  position: LatLonDto;
 };
 
 export type AgencyKind =
@@ -70,13 +69,15 @@ export type AgencyPositionFilter = {
 
 export type GetAgenciesFilter = {
   position?: AgencyPositionFilter;
+  countyCode?: CountyCode;
   kind?: AgencyKindFilter;
   status?: AgencyStatus[];
 };
 
+export type CountyCode = Flavor<number, "CountyCode">;
+
 export type ListAgenciesWithPositionRequestDto = {
-  lon?: number;
-  lat?: number;
+  countyCode: CountyCode;
   filter?: AgencyKindFilter;
 };
 
@@ -102,6 +103,7 @@ export type CreateAgencyDto = {
   position: LatLonDto;
   counsellorEmails: string[];
   validatorEmails: string[];
+  countyCode: CountyCode;
   // adminEmails: string[];
   questionnaireUrl?: string;
   logoUrl?: AbsoluteUrl;

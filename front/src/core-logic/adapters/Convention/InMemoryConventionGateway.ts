@@ -1,7 +1,7 @@
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
-import { AgencyId, AgencyWithPositionDto } from "shared/src/agency/agency.dto";
+import { AgencyId, AgencyIdAndName } from "shared/src/agency/agency.dto";
 import { signConventionDtoWithRole } from "shared/src/convention/convention";
 import {
   ConventionStatus,
@@ -33,7 +33,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     [CONVENTION_DRAFT_TEST.id]: CONVENTION_DRAFT_TEST,
     [CONVENTION_VALIDATED_TEST.id]: CONVENTION_VALIDATED_TEST,
   };
-  private _agencies: { [id: string]: AgencyWithPositionDto } = {};
+  private _agencies: { [id: string]: AgencyIdAndName } = {};
 
   public convention$ = new Subject<ConventionReadDto | undefined>();
 

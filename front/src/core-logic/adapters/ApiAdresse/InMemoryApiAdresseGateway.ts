@@ -1,8 +1,8 @@
+import { CountyCode } from "shared/src/agency/agency.dto";
 import {
   AddressWithCoordinates,
   ApiAdresseGateway,
 } from "src/core-logic/ports/ApiAdresseGateway";
-import { LatLonDto } from "shared/src/latLon";
 
 import { sleep } from "shared/src/utils";
 
@@ -39,14 +39,14 @@ export class InMemoryApiAdresseGateway implements ApiAdresseGateway {
     ];
   }
 
-  public async lookupPostCode(query: string): Promise<LatLonDto | null> {
+  public async lookupPostCode(query: string): Promise<CountyCode | null> {
     //eslint-disable-next-line no-console
     console.log("InMemoryApiAddresseGateway.lookupPostCode", query);
     await sleep(SIMULATED_LATENCY_MS);
 
     if (query === "00000") return null;
     if (query === "99999") throw new Error("418 I'm a teapot");
-    if (query === "21200") return { lat: 47.0, lon: 4 };
-    return { lat: 48, lon: 2 };
+    if (query === "21200") return 21;
+    return +query.slice(0, 2);
   }
 }

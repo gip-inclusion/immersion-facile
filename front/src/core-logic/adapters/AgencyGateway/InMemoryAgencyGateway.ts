@@ -1,19 +1,19 @@
+import { values } from "ramda";
 import { Observable, of } from "rxjs";
 import { AdminToken } from "shared/src/admin/admin.dto";
-import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
 import {
   AgencyDto,
   AgencyId,
-  AgencyWithPositionDto,
+  AgencyIdAndName,
   AgencyPublicDisplayDto,
+  CountyCode,
   CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
-import { LatLonDto } from "shared/src/latLon";
-import { values } from "ramda";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { propEq, propNotEq } from "shared/src/ramdaExtensions/propEq";
+import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withId("test-agency-1-front")
@@ -64,18 +64,16 @@ export class InMemoryAgencyGateway implements AgencyGateway {
   }
 
   async listAllAgenciesWithPosition(
-    _position: LatLonDto,
-  ): Promise<AgencyWithPositionDto[]> {
+    _countyCode: CountyCode,
+  ): Promise<AgencyIdAndName[]> {
     return values(this._agencies);
   }
 
-  async listPeAgencies(_position: LatLonDto): Promise<AgencyWithPositionDto[]> {
+  async listPeAgencies(_countyCode: CountyCode): Promise<AgencyIdAndName[]> {
     return values(this._agencies).filter(propEq("kind", "pole-emploi"));
   }
 
-  async listNonPeAgencies(
-    _position: LatLonDto,
-  ): Promise<AgencyWithPositionDto[]> {
+  async listNonPeAgencies(_countyCode: CountyCode): Promise<AgencyIdAndName[]> {
     return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
   }
 

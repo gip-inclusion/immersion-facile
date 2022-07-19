@@ -16,6 +16,24 @@ import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
+type AgencyColumns =
+  | "address"
+  | "admin_emails"
+  | "agency_siret"
+  | "code_safir"
+  | "counsellor_emails"
+  | "county_code"
+  | "id"
+  | "kind"
+  | "logo_url"
+  | "name"
+  | "position"
+  | "questionnaire_url"
+  | "email_signature"
+  | "status"
+  | "validator_emails";
+type AgencyPgRow = Record<AgencyColumns, any>;
+
 const makeAgencyKindFiterSQL = (
   agencyKindFilter?: AgencyKindFilter,
 ): string | undefined => {
@@ -187,21 +205,22 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
   agency.codeSafir,
 ];
 
-const pgToEntity = (params: Record<any, any>): AgencyDto => ({
-  id: params.id,
-  name: params.name,
-  status: params.status,
-  kind: params.kind,
+const pgToEntity = (params: AgencyPgRow): AgencyDto => ({
   address: params.address,
-  counsellorEmails: params.counsellor_emails,
-  validatorEmails: params.validator_emails,
   adminEmails: params.admin_emails,
-  questionnaireUrl: params.questionnaire_url,
-  signature: params.email_signature,
-  logoUrl: optional(params.logo_url),
-  position: parseGeoJson(params.position),
   agencySiret: optional(params.agency_siret),
   codeSafir: optional(params.code_safir),
+  counsellorEmails: params.counsellor_emails,
+  countyCode: params.county_code,
+  id: params.id,
+  kind: params.kind,
+  logoUrl: optional(params.logo_url),
+  name: params.name,
+  position: parseGeoJson(params.position),
+  questionnaireUrl: params.questionnaire_url,
+  signature: params.email_signature,
+  status: params.status,
+  validatorEmails: params.validator_emails,
 });
 
 export const parseGeoJson = (raw: string): LatLonDto => {

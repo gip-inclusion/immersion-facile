@@ -1,18 +1,19 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { agencyGateway } from "src/app/config/dependencies";
-import { AgencyId, AgencyWithPositionDto } from "shared/src/agency/agency.dto";
+import {
+  AgencyId,
+  AgencyIdAndName,
+  CountyCode,
+} from "shared/src/agency/agency.dto";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
-import { LatLonDto } from "shared/src/latLon";
-
+import { agencyGateway } from "src/app/config/dependencies";
 import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
 import { Agencies } from "./Agency";
 
-const placeholderAgency: AgencyWithPositionDto = {
+const placeholderAgency: AgencyIdAndName = {
   id: "",
   name: "Veuillez indiquer un code postal",
-  position: { lat: 0, lon: 0 },
 };
 
 type AgencyDisplayProps = {
@@ -33,7 +34,7 @@ export const AgencyDisplay = ({
   const [isLoading, setIsLoading] = useState(false);
   const [_loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-  const [position, setPosition] = useState<LatLonDto | null>(null);
+  const [countyCode, setCountyCode] = useState<CountyCode | null>(null);
   const [agencies, setAgencies] = useState([placeholderAgency]);
 
   useEffect(() => {
@@ -46,10 +47,6 @@ export const AgencyDisplay = ({
           {
             id: "",
             name: "",
-            position: {
-              lat: 0,
-              lon: 0,
-            },
           },
           { ...agency },
         ]);
@@ -68,7 +65,7 @@ export const AgencyDisplay = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [position]);
+  }, [countyCode]);
 
   const userError = touched && error;
   const showError = userError || loadingError;
@@ -77,7 +74,7 @@ export const AgencyDisplay = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      <PostcodeAutocomplete onFound={setPosition} disabled={true} />
+      <PostcodeAutocomplete onFound={setCountyCode} disabled={true} />
       <label className="fr-label pt-4" htmlFor={name}>
         {label}
       </label>

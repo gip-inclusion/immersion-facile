@@ -45,6 +45,7 @@ describe("UpdateAllPeAgencies use case", () => {
         validatorEmails: ["molsheim@pole-emploi.fr"],
         adminEmails: [adminMail],
         address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
+        countyCode: 75,
         position: {
           lon: 7.511,
           lat: 48.532571,
@@ -75,6 +76,7 @@ describe("UpdateAllPeAgencies use case", () => {
         validatorEmails: [commonEmail],
         adminEmails: ["someAdmin@mail.com"],
         address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
+        countyCode: 75,
         position: {
           lon: 7,
           lat: 49,
@@ -118,6 +120,7 @@ describe("UpdateAllPeAgencies use case", () => {
         validatorEmails: [],
         adminEmails: ["someAdmin@mail.com"],
         address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
+        countyCode: 75,
         position: {
           lon: 3,
           lat: 50,
@@ -156,6 +159,7 @@ describe("UpdateAllPeAgencies use case", () => {
         validatorEmails: ["existing@mail.com"],
         adminEmails: ["someAdmin@mail.com"],
         address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
+        countyCode: 75,
         position: {
           lon: 7.51213,
           lat: 48.532571324,
@@ -197,6 +201,7 @@ describe("UpdateAllPeAgencies use case", () => {
       validatorEmails: ["existing@mail.com"],
       adminEmails: ["someAdmin@mail.com"],
       address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
+      countyCode: 75,
       position: {
         lon: 7,
         lat: 49,

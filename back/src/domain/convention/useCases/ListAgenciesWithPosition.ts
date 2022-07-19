@@ -2,17 +2,26 @@ import {
   activeAgencyStatuses,
   AgencyDto,
   AgencyKindFilter,
-  AgencyWithPositionDto,
+  AgencyIdAndName,
+  CountyCode,
   ListAgenciesWithPositionRequestDto,
 } from "shared/src/agency/agency.dto";
 import { listAgenciesRequestSchema } from "shared/src/agency/agency.schema";
-import { LatLonDto } from "shared/src/latLon";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
+// type FullAddressVO = {
+//   roadNumber: string,
+//   street: string,
+//   street2?: string,
+//   postalCode: number, // (ex: 75001)
+//   countyCode: number, // numéro de département (ex: 75)
+//   city: string,
+// }
+
 export class ListAgenciesWithPosition extends TransactionalUseCase<
   ListAgenciesWithPositionRequestDto,
-  AgencyWithPositionDto[]
+  AgencyIdAndName[]
 > {
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
@@ -21,44 +30,29 @@ export class ListAgenciesWithPosition extends TransactionalUseCase<
   inputSchema = listAgenciesRequestSchema;
 
   public async _execute(
-    { lon, lat, filter }: ListAgenciesWithPositionRequestDto,
+    { countyCode, filter }: ListAgenciesWithPositionRequestDto,
     uow: UnitOfWork,
-  ): Promise<AgencyWithPositionDto[]> {
-    const agencies = await getActiveAgencies(
-      uow,
-      lon && lat ? { lon, lat } : undefined,
-      filter,
-    );
+  ): Promise<AgencyIdAndName[]> {
+    const agencies = await getActiveAgencies(uow, countyCode, filter);
     return agencies.map(agencyToAgencyWithPositionDto);
   }
 }
 
 const getActiveAgencies = (
   uow: UnitOfWork,
-  position?: LatLonDto,
+  countyCode: CountyCode,
   agencyKindFilter?: AgencyKindFilter,
 ): Promise<AgencyDto[]> =>
   uow.agencyRepository.getAgencies({
     filters: {
-      position: position
-        ? {
-            distance_km: 100,
-            position,
-          }
-        : undefined,
+      countyCode,
       kind: agencyKindFilter,
       status: activeAgencyStatuses,
     },
     limit: 20,
   });
 
-const agencyToAgencyWithPositionDto = (
-  config: AgencyDto,
-): AgencyWithPositionDto => ({
+const agencyToAgencyWithPositionDto = (config: AgencyDto): AgencyIdAndName => ({
   id: config.id,
   name: config.name,
-  position: {
-    lat: config.position.lat,
-    lon: config.position.lon,
-  },
 });

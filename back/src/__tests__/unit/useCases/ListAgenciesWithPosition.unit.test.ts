@@ -41,7 +41,7 @@ describe("ListAgencies", () => {
 
   it("returns empty list when the repository is empty", async () => {
     agencyRepository.setAgencies([]);
-    const agencies = await listAgencies.execute({});
+    const agencies = await listAgencies.execute({ countyCode: 0 });
     expect(agencies).toEqual([]);
   });
 
@@ -53,23 +53,20 @@ describe("ListAgencies", () => {
       agencyAddedFromPeReferencial,
     ]);
 
-    const agencies = await listAgencies.execute({});
+    const agencies = await listAgencies.execute({ countyCode: 75 });
     expect(agencies).toHaveLength(3);
     expect(agencies).toEqual([
       {
         id: agency1.id,
         name: agency1.name,
-        position: agency1.position,
       },
       {
         id: agency2.id,
         name: agency2.name,
-        position: agency2.position,
       },
       {
         id: agencyAddedFromPeReferencial.id,
         name: agencyAddedFromPeReferencial.name,
-        position: agencyAddedFromPeReferencial.position,
       },
     ]);
   });
@@ -82,6 +79,7 @@ describe("ListAgencies", () => {
           .withId(i.toString())
           .withName("agency " + i)
           .withPosition(20 + 0.01 * i, 20)
+          .withCountyCode(75)
           .build(),
       );
     }
@@ -89,8 +87,7 @@ describe("ListAgencies", () => {
     agencyRepository.setAgencies(agencies);
 
     const nearestAgencies = await listAgencies.execute({
-      lat: 20,
-      lon: 20,
+      countyCode: 75,
     });
     expect(nearestAgencies).toHaveLength(20);
     expect(nearestAgencies[0].id).toBe("0");

@@ -3,21 +3,21 @@ import { AdminToken } from "shared/src/admin/admin.dto";
 import {
   AgencyDto,
   AgencyId,
-  AgencyWithPositionDto,
   AgencyPublicDisplayDto,
+  AgencyIdAndName,
+  CountyCode,
   CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
-import { LatLonDto } from "shared/src/latLon";
 
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
 
   listAllAgenciesWithPosition(
-    position: LatLonDto,
-  ): Promise<AgencyWithPositionDto[]>;
-  listNonPeAgencies(position: LatLonDto): Promise<AgencyWithPositionDto[]>;
-  listPeAgencies(position: LatLonDto): Promise<AgencyWithPositionDto[]>;
+    countyCode: CountyCode,
+  ): Promise<AgencyIdAndName[]>;
+  listNonPeAgencies(countyCode: CountyCode): Promise<AgencyIdAndName[]>;
+  listPeAgencies(countyCode: CountyCode): Promise<AgencyIdAndName[]>;
   listAgenciesNeedingReview(adminToken: AdminToken): Promise<AgencyDto[]>;
   validateAgency(adminToken: AdminToken, agencyId: AgencyId): Promise<void>;
   getAgencyPublicInfoById(

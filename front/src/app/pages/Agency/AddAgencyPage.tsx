@@ -31,6 +31,7 @@ const initialValues: CreateAgencyDto = {
   kind: "pole-emploi",
   name: "",
   address: "",
+  countyCode: 0,
   position: {
     lat: 0,
     lon: 0,

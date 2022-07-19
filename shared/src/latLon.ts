@@ -11,3 +11,7 @@ export const latLonSchema = z.object({
     .gte(-180, "'lon' doit être >= 180.0")
     .lte(180, "'lon' doit être <= 180.0"),
 });
+
+export type WithPosition = {
+  position: LatLonDto;
+};

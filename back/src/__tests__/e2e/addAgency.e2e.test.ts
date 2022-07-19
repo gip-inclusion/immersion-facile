@@ -15,6 +15,7 @@ describe("Route to add Agency", () => {
       kind: "mission-locale",
       name: "Mission locale de Paris",
       position: { lat: 10, lon: 20 },
+      countyCode: 75,
       questionnaireUrl: "www.myUrl.com",
       signature: "Super signature of the agency",
     };

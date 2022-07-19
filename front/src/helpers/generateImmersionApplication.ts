@@ -1,6 +1,6 @@
 import { addDays, format } from "date-fns";
 import { frenchFirstNames } from "src/helpers/namesList";
-import { AgencyWithPositionDto } from "shared/src/agency/agency.dto";
+import { AgencyIdAndName } from "shared/src/agency/agency.dto";
 import { IMMERSION_APPLICATION_TEMPLATE } from "shared/src/convention/convention";
 import {
   ConventionDto,
@@ -9,7 +9,7 @@ import {
 
 export const generateApplication = (
   i: number,
-  agencies: AgencyWithPositionDto[],
+  agencies: AgencyIdAndName[],
 ): ConventionDto => {
   const firstName =
     frenchFirstNames[Math.floor(Math.random() * frenchFirstNames.length)];

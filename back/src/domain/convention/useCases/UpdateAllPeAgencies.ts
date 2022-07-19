@@ -128,6 +128,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       adminEmails: [this.defaultAdminEmail],
       ...normalizeAddressAndPosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
+      countyCode: 1,
       questionnaireUrl: defaultQuestionnaireUrl,
       codeSafir: peReferentialAgency.codeSafir,
       agencySiret: peReferentialAgency.siret,

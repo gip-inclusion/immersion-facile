@@ -66,7 +66,7 @@ describe(`/${agenciesRoute} route`, () => {
         ),
       );
       // Act and asseer
-      await request.get(`/${agenciesRoute}?lat=10.123&lon=10.123`).expect(200, [
+      await request.get(`/${agenciesRoute}?countyCode=75`).expect(200, [
         {
           id: agency1ActiveNearBy.id,
           name: agency1ActiveNearBy.name,

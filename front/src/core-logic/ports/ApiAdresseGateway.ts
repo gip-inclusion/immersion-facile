@@ -1,3 +1,4 @@
+import { CountyCode } from "shared/src/agency/agency.dto";
 import { LatLonDto } from "shared/src/latLon";
 
 export type AddressWithCoordinates = {
@@ -7,5 +8,5 @@ export type AddressWithCoordinates = {
 
 export interface ApiAdresseGateway {
   lookupStreetAddress(query: string): Promise<AddressWithCoordinates[]>;
-  lookupPostCode(query: string): Promise<LatLonDto | null>;
+  lookupPostCode(query: string): Promise<CountyCode | null>;
 }

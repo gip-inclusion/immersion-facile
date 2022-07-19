@@ -2,7 +2,7 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
   AgencyId,
-  AgencyWithPositionDto,
+  AgencyIdAndName,
   AgencyKind,
   agencyKindList,
   CreateAgencyDto,
@@ -34,26 +34,24 @@ export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> = z.union([
   z.object({ success: z.boolean() }),
 ]);
 
-export const agencyWithPositionSchema: z.ZodSchema<AgencyWithPositionDto> =
-  z.object({
-    id: agencyIdSchema,
-    name: z.string(),
-    position: latLonSchema,
-  });
+export const agencyWithPositionSchema: z.ZodSchema<AgencyIdAndName> = z.object({
+  id: agencyIdSchema,
+  name: z.string(),
+  position: latLonSchema,
+});
 
-export const agenciesWithPositionSchema: z.ZodSchema<AgencyWithPositionDto[]> =
+export const agenciesWithPositionSchema: z.ZodSchema<AgencyIdAndName[]> =
   z.array(agencyWithPositionSchema);
 
 const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 
 export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesWithPositionRequestDto> =
   z.object({
-    lat: zPreprocessedNumber().optional(),
-    lon: zPreprocessedNumber().optional(),
+    countyCode: zPreprocessedNumber(),
     filter: z.enum(["peOnly", "peExcluded"]).optional(),
   });
 
-export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z.object({
+const createAgencyShape = {
   id: agencyIdSchema,
   name: zString,
   kind: agencyKindSchema,
@@ -63,23 +61,19 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z.object({
   validatorEmails: z.array(zEmail).min(1),
   questionnaireUrl: z.string().optional(),
   signature: zString,
+  countyCode: z.number(),
   logoUrl: absoluteUrlSchema.optional(),
-});
+};
+
+export const createAgencySchema: z.ZodSchema<CreateAgencyDto> =
+  z.object(createAgencyShape);
 
 const agencyStatusSchema = z.enum(allAgencyStatuses);
 
 export const agencySchema: z.ZodSchema<AgencyDto> = z.object({
-  id: agencyIdSchema,
-  name: zString,
-  kind: agencyKindSchema,
+  ...createAgencyShape,
+  questionnaireUrl: z.string(),
   status: agencyStatusSchema,
-  address: zString,
-  position: latLonSchema,
-  counsellorEmails: z.array(zEmail),
-  validatorEmails: z.array(zEmail).min(1),
-  questionnaireUrl: zString,
-  signature: zString,
-  logoUrl: absoluteUrlSchema.optional(),
   adminEmails: z.array(zString),
   agencySiret: zString.optional(),
   codeSafir: zString.optional(),

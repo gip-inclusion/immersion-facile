@@ -1,9 +1,12 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { AgencyId, AgencyWithPositionDto } from "shared/src/agency/agency.dto";
+import {
+  AgencyId,
+  AgencyIdAndName,
+  CountyCode,
+} from "shared/src/agency/agency.dto";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
-import { LatLonDto } from "shared/src/latLon";
 import {
   FederatedIdentity,
   isPeConnectIdentity,
@@ -35,17 +38,17 @@ export const AgencySelector = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-  const [position, setPosition] = useState<LatLonDto | null>(null);
+  const [countyCode, setCountyCode] = useState<CountyCode | null>(null);
   const [agencies, setAgencies] = useState([placeholderAgency]);
   const connectedWith = useConnectedWith();
 
   useEffect(() => {
-    if (!position) return;
+    if (!countyCode) return;
 
     setIsLoading(true);
     agenciesRetriever({
       shouldListAll,
-      position,
+      countyCode,
       connectedWith,
     })
       .then((agencies) => {
@@ -72,7 +75,7 @@ export const AgencySelector = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [position]);
+  }, [countyCode]);
 
   const userError = touched && error;
   const showError = userError || loadingError;
@@ -81,7 +84,7 @@ export const AgencySelector = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      <PostcodeAutocomplete onFound={setPosition} disabled={disabled} />
+      <PostcodeAutocomplete onFound={setCountyCode} disabled={disabled} />
       <label className="fr-label pt-4" htmlFor={name}>
         {label}
       </label>
@@ -106,7 +109,7 @@ export const AgencySelector = ({
           }}
           onBlur={onBlur}
           aria-describedby={`agency-code-{name}-error-desc-error`}
-          disabled={disabled || !loaded || !position}
+          disabled={disabled || !loaded || !countyCode}
         >
           <Agencies agencies={agencies} />
         </select>
@@ -126,37 +129,33 @@ export const AgencySelector = ({
 const isDefaultAgencyOnAgenciesAndEnabled = (
   disabled: boolean | undefined,
   defaultAgencyId: string,
-  agencies: AgencyWithPositionDto[],
+  agencies: AgencyIdAndName[],
 ) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);
 
 const agenciesRetriever = ({
-  position,
+  countyCode,
   shouldListAll,
   connectedWith,
 }: {
-  position: LatLonDto;
+  countyCode: CountyCode;
   shouldListAll: boolean;
   connectedWith: FederatedIdentity | null;
 }) => {
-  if (shouldListAll) return agencyGateway.listAllAgenciesWithPosition(position);
+  if (shouldListAll)
+    return agencyGateway.listAllAgenciesWithPosition(countyCode);
   return connectedWith && isPeConnectIdentity(connectedWith)
-    ? agencyGateway.listPeAgencies(position)
-    : agencyGateway.listAllAgenciesWithPosition(position);
+    ? agencyGateway.listPeAgencies(countyCode)
+    : agencyGateway.listAllAgenciesWithPosition(countyCode);
   // : agencyGateway.listNonPeAgencies(position);
   // -> for easy revert when new page is ready
 };
 
-const placeholderAgency: AgencyWithPositionDto = {
+const placeholderAgency: AgencyIdAndName = {
   id: "",
   name: "Veuillez indiquer un code postal",
-  position: { lat: 0, lon: 0 },
 };
 
-const emptyAgency: AgencyWithPositionDto = {
+const emptyAgency: AgencyIdAndName = {
   id: "",
   name: "",
-  position: {
-    lat: 0,
-    lon: 0,
-  },
 };

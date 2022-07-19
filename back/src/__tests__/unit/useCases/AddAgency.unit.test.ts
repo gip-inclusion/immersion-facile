@@ -26,6 +26,7 @@ const parisMissionLocaleParams: CreateAgencyDto = {
   name: "Mission locale de Paris",
   position: { lat: 10, lon: 20 },
   questionnaireUrl: "www.myUrl.com",
+  countyCode: 75,
   signature: "Super signature of the agency",
   logoUrl: "https://www.myUrl.com",
 };

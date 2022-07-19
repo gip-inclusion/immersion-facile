@@ -6,7 +6,8 @@ import {
   AgencyId,
   AgencyPublicDisplayDto,
   AgencyStatus,
-  AgencyWithPositionDto,
+  AgencyIdAndName,
+  CountyCode,
   CreateAgencyDto,
   ListAgenciesWithPositionRequestDto,
   UpdateAgencyRequestDto,
@@ -18,7 +19,6 @@ import {
   agencyIdResponseSchema,
   agencyPublicDisplaySchema,
 } from "shared/src/agency/agency.schema";
-import { LatLonDto } from "shared/src/latLon";
 import {
   agenciesRoute,
   agencyImmersionFacileIdRoute,
@@ -61,25 +61,23 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public listAllAgenciesWithPosition(
-    position: LatLonDto,
-  ): Promise<AgencyWithPositionDto[]> {
-    const request: ListAgenciesWithPositionRequestDto = { ...position };
+    countyCode: CountyCode,
+  ): Promise<AgencyIdAndName[]> {
+    const request: ListAgenciesWithPositionRequestDto = { countyCode };
     return this.getAgencies(request);
   }
 
-  public listPeAgencies(position: LatLonDto): Promise<AgencyWithPositionDto[]> {
+  public listPeAgencies(countyCode: CountyCode): Promise<AgencyIdAndName[]> {
     const request: ListAgenciesWithPositionRequestDto = {
-      ...position,
+      countyCode,
       filter: "peOnly",
     };
     return this.getAgencies(request);
   }
 
-  public listNonPeAgencies(
-    position: LatLonDto,
-  ): Promise<AgencyWithPositionDto[]> {
+  public listNonPeAgencies(countyCode: CountyCode): Promise<AgencyIdAndName[]> {
     const request: ListAgenciesWithPositionRequestDto = {
-      ...position,
+      countyCode,
       filter: "peExcluded",
     };
     return this.getAgencies(request);
@@ -117,7 +115,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   private async getAgencies(
     request: ListAgenciesWithPositionRequestDto,
-  ): Promise<AgencyWithPositionDto[]> {
+  ): Promise<AgencyIdAndName[]> {
     const { data } = await this.httpClient.get<unknown>(`/${agenciesRoute}`, {
       params: request,
     });

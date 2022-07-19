@@ -5,11 +5,11 @@ import {
   AgencyKindFilter,
   AgencyPositionFilter,
   AgencyStatus,
-  AgencyWithPositionDto,
+  AgencyIdAndName,
   GetAgenciesFilter as GetAgenciesFilters,
   PartialAgencyDto,
 } from "shared/src/agency/agency.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { LatLonDto, WithPosition } from "shared/src/latLon";
 import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
 import { createLogger } from "../../utils/logger";
@@ -28,6 +28,7 @@ const testAgencies: AgencyDto[] = [
     questionnaireUrl: "",
     signature: "Signature of Immersion Facile",
     address: "No address",
+    countyCode: 75,
     position: {
       lat: 22.319469,
       lon: 114.189505,
@@ -43,6 +44,7 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["admin@agency1.fr"],
     questionnaireUrl: "http://questionnaire.agency1.fr",
     signature: "Signature of Test Agency 1",
+    countyCode: 75,
     address: "Agency 1 address",
     position: {
       lat: 1,
@@ -60,6 +62,7 @@ const testAgencies: AgencyDto[] = [
     questionnaireUrl: "http://questionnaire.agency2.fr",
     signature: "Signature of Test Agency 2",
     address: "Agency 2 address",
+    countyCode: 75,
     position: {
       lat: 40,
       lon: 50,
@@ -76,6 +79,7 @@ const testAgencies: AgencyDto[] = [
     questionnaireUrl: "http://questionnaire.agency3.fr",
     signature: "Signature of Test Agency 3",
     address: "Agency 3 address",
+    countyCode: 75,
     position: {
       lat: 88,
       lon: 89.9999,
@@ -167,7 +171,7 @@ const isAgencyNotPE = (agency: AgencyDto) => agency.kind !== "pole-emploi";
 
 const sortByNearestFrom =
   (position: LatLonDto) =>
-  (a: AgencyWithPositionDto, b: AgencyWithPositionDto) =>
+  (a: AgencyIdAndName & WithPosition, b: AgencyIdAndName & WithPosition) =>
     distanceBetweenCoordinatesInMeters(
       a.position.lat,
       a.position.lon,
