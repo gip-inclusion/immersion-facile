@@ -1,9 +1,18 @@
 import { Pool } from "pg";
+import { random, sleep } from "shared/src/utils";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import { RealClock } from "../../secondary/core/ClockImplementations";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
+import {
+  defaultMaxBackoffPeriodMs,
+  defaultRetryDeadlineMs,
+} from "../../secondary/core/ExponentialBackoffRetryStrategy";
+import { ExponentialBackoffRetryStrategy } from "../../secondary/core/ExponentialBackoffRetryStrategy";
+import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
+import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "../config/appConfig";
@@ -23,6 +32,20 @@ const updateAllPeAgenciesScript = async () => {
     config.poleEmploiClientId,
   );
 
+  const maxQpsAdresseApi = 0.2;
+  const clock = new RealClock();
+
+  const adressAPI = new HttpAdresseAPI(
+    new QpsRateLimiter(maxQpsAdresseApi, clock, sleep),
+    new ExponentialBackoffRetryStrategy(
+      defaultMaxBackoffPeriodMs,
+      defaultRetryDeadlineMs,
+      clock,
+      sleep,
+      random,
+    ),
+  );
+
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({
     connectionString: dbUrl,
@@ -33,6 +56,7 @@ const updateAllPeAgenciesScript = async () => {
   const updateAllPeAgencies = new UpdateAllPeAgencies(
     uowPerformer,
     httpPeAgenciesReferential,
+    adressAPI,
     config.defaultAdminEmail,
     new UuidV4Generator(),
     new ConsoleAppLogger(),

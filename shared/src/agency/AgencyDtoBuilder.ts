@@ -1,12 +1,14 @@
-import {
-  AgencyDto,
-  AgencyStatus,
-  AgencyId,
-  AgencyKind,
-  CountyCode,
-} from "./agency.dto";
 import { AbsoluteUrl } from "../AbsoluteUrl";
+import { AddressDto } from "../address/address.dto";
 import { Builder } from "../Builder";
+import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
+
+const emptyAddress: AddressDto = {
+  streetNumberAndAddress: "",
+  countyCode: "",
+  city: "",
+  postCode: "",
+};
 
 const emptyAgency: AgencyDto = {
   id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -18,8 +20,7 @@ const emptyAgency: AgencyDto = {
   adminEmails: [],
   questionnaireUrl: "empty-questionnaire-url",
   signature: "empty-signature",
-  address: "empty-address",
-  countyCode: 75,
+  address: emptyAddress,
   position: {
     lat: 0,
     lon: 0,
@@ -69,17 +70,10 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withAddress(address: string) {
+  public withAddress(address: AddressDto) {
     return new AgencyDtoBuilder({
       ...this.agency,
       address,
-    });
-  }
-
-  public withCountyCode(countyCode: CountyCode) {
-    return new AgencyDtoBuilder({
-      ...this.agency,
-      countyCode,
     });
   }
 

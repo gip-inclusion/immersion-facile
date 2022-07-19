@@ -1,11 +1,12 @@
 import { values } from "ramda";
+import { CountyCode } from "shared/src/address/address.dto";
 import {
   AgencyDto,
   AgencyId,
+  AgencyIdAndName,
   AgencyKindFilter,
   AgencyPositionFilter,
   AgencyStatus,
-  AgencyIdAndName,
   GetAgenciesFilter as GetAgenciesFilters,
   PartialAgencyDto,
 } from "shared/src/agency/agency.dto";
@@ -27,8 +28,12 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["contact@immersion-facile.fr"],
     questionnaireUrl: "",
     signature: "Signature of Immersion Facile",
-    address: "No address",
-    countyCode: 75,
+    address: {
+      streetNumberAndAddress: "No address",
+      countyCode: "75",
+      city: "NoWhere",
+      postCode: "75001",
+    },
     position: {
       lat: 22.319469,
       lon: 114.189505,
@@ -44,8 +49,12 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["admin@agency1.fr"],
     questionnaireUrl: "http://questionnaire.agency1.fr",
     signature: "Signature of Test Agency 1",
-    countyCode: 75,
-    address: "Agency 1 address",
+    address: {
+      streetNumberAndAddress: "Agency 1 address",
+      countyCode: "75",
+      city: "AgencyCity",
+      postCode: "75001",
+    },
     position: {
       lat: 1,
       lon: 2,
@@ -61,8 +70,12 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["admin1@agency2.fr", "admin2@agency2.fr"],
     questionnaireUrl: "http://questionnaire.agency2.fr",
     signature: "Signature of Test Agency 2",
-    address: "Agency 2 address",
-    countyCode: 75,
+    address: {
+      city: "Mulhouse",
+      countyCode: "68",
+      postCode: "68100",
+      streetNumberAndAddress: "48 Rue Franklin",
+    },
     position: {
       lat: 40,
       lon: 50,
@@ -78,8 +91,12 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["admin@agency3.fr"],
     questionnaireUrl: "http://questionnaire.agency3.fr",
     signature: "Signature of Test Agency 3",
-    address: "Agency 3 address",
-    countyCode: 75,
+    address: {
+      streetNumberAndAddress: "3 Agency street",
+      countyCode: "64",
+      city: "Bayonne",
+      postCode: "64100",
+    },
     position: {
       lat: 88,
       lon: 89.9999,
@@ -112,6 +129,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     logger.info({ configs: this._agencies }, "getAgencies");
     const filterPredicate = (agency: AgencyDto) =>
       ![
+        agencyHasCountyCode(agency, filters?.countyCode),
         agencyIsOfKind(agency, filters?.kind),
         agencyIsOfPosition(agency, filters?.position),
         agencyIsOfStatus(agency, filters?.status),
@@ -201,6 +219,14 @@ const agencyIsOfStatus = (
 ): boolean => {
   if (!statuses) return true;
   return statuses.includes(agency.status);
+};
+
+const agencyHasCountyCode = (
+  agency: AgencyDto,
+  countyCode?: CountyCode,
+): boolean => {
+  if (!countyCode) return true;
+  return countyCode === agency.address.countyCode;
 };
 
 const agencyIsOfPosition = (

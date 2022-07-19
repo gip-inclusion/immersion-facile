@@ -9,13 +9,17 @@ describe("Route to add Agency", () => {
     inMemoryUow.agencyRepository.setAgencies([]);
     const parisMissionLocaleParams: CreateAgencyDto = {
       id: "some-id",
-      address: "paris",
+      address: {
+        streetNumberAndAddress: "Agency 1 address",
+        city: "Paris",
+        postCode: "75001",
+        countyCode: "75",
+      },
       counsellorEmails: ["counsellor@mail.com"],
       validatorEmails: ["validator@mail.com"],
       kind: "mission-locale",
       name: "Mission locale de Paris",
       position: { lat: 10, lon: 20 },
-      countyCode: 75,
       questionnaireUrl: "www.myUrl.com",
       signature: "Super signature of the agency",
     };

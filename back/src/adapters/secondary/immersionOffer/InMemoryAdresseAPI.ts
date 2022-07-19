@@ -1,8 +1,19 @@
+import { AddressDto } from "shared/src/address/address.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
 
 export class InMemoryAdresseAPI implements AdresseAPI {
-  constructor(private _position?: LatLonDto, private _cityCode?: number) {}
+  constructor(
+    private _position?: LatLonDto,
+    private _cityCode?: number,
+    private _address?: AddressDto,
+  ) {}
+
+  public async getAddressFromPosition(
+    _position: LatLonDto,
+  ): Promise<AddressDto | undefined> {
+    return this._address;
+  }
 
   public async getPositionFromAddress(): Promise<LatLonDto | undefined> {
     return this._position;
@@ -13,11 +24,14 @@ export class InMemoryAdresseAPI implements AdresseAPI {
   }
 
   // for test purposes only
+  public setNextAddress(address: AddressDto | undefined) {
+    this._address = address;
+  }
+
   public setNextPosition(position: LatLonDto | undefined) {
     this._position = position;
   }
 
-  // eslint-disable-next-line
   public setNextCityCode(cityCode: number | undefined) {
     this._cityCode = cityCode;
   }

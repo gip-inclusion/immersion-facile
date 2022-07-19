@@ -1,18 +1,29 @@
+import { AddressDto } from "shared/src/address/address.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ListAgenciesWithPosition } from "../../../domain/convention/useCases/ListAgenciesWithPosition";
+import { ListAgenciesWithCountyCode } from "../../../domain/convention/useCases/ListAgenciesWithCountyCode";
+import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+
+const defaultAdress: AddressDto = {
+  city: "",
+  streetNumberAndAddress: "",
+  postCode: "",
+  countyCode: "64",
+};
 
 const agency1 = AgencyDtoBuilder.empty()
   .withId("11111111-1111-1111-1111-111111111111")
   .withName("agency1")
+  .withAddress(defaultAdress)
   .build();
 
 const agency2 = AgencyDtoBuilder.empty()
   .withId("22222222-2222-2222-2222-222222222222")
   .withName("agency2")
   .withPosition(10, 10)
+  .withAddress(defaultAdress)
   .build();
 
 const agencyInReview = AgencyDtoBuilder.empty()
@@ -20,6 +31,7 @@ const agencyInReview = AgencyDtoBuilder.empty()
   .withName("agency3")
   .withStatus("needsReview")
   .withPosition(11, 10)
+  .withAddress(defaultAdress)
   .build();
 
 const agencyAddedFromPeReferencial = AgencyDtoBuilder.empty()
@@ -27,21 +39,24 @@ const agencyAddedFromPeReferencial = AgencyDtoBuilder.empty()
   .withName("agency4")
   .withPosition(10, 10)
   .withStatus("from-api-PE")
+  .withAddress(defaultAdress)
   .build();
 
 describe("ListAgencies", () => {
   let agencyRepository: InMemoryAgencyRepository;
-  let listAgencies: ListAgenciesWithPosition;
+  let listAgencies: ListAgenciesWithCountyCode;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     agencyRepository = uow.agencyRepository;
-    listAgencies = new ListAgenciesWithPosition(new InMemoryUowPerformer(uow));
+    listAgencies = new ListAgenciesWithCountyCode(
+      new InMemoryUowPerformer(uow),
+    );
   });
 
   it("returns empty list when the repository is empty", async () => {
     agencyRepository.setAgencies([]);
-    const agencies = await listAgencies.execute({ countyCode: 0 });
+    const agencies = await listAgencies.execute({ countyCode: "75" });
     expect(agencies).toEqual([]);
   });
 
@@ -53,7 +68,7 @@ describe("ListAgencies", () => {
       agencyAddedFromPeReferencial,
     ]);
 
-    const agencies = await listAgencies.execute({ countyCode: 75 });
+    const agencies = await listAgencies.execute({ countyCode: "64" });
     expect(agencies).toHaveLength(3);
     expect(agencies).toEqual([
       {
@@ -71,6 +86,36 @@ describe("ListAgencies", () => {
     ]);
   });
 
+  it("filters on countyCode", async () => {
+    const agency75 = AgencyDtoBuilder.empty()
+      .withAddress({
+        city: "",
+        streetNumberAndAddress: "",
+        postCode: "",
+        countyCode: "75",
+      })
+      .build();
+
+    const agency20 = AgencyDtoBuilder.empty()
+      .withId("20")
+      .withAddress({
+        city: "",
+        streetNumberAndAddress: "",
+        postCode: "",
+        countyCode: "20",
+      })
+      .build();
+
+    agencyRepository.setAgencies([agency75, agency20]);
+
+    const agenciesOf75 = await listAgencies.execute({
+      countyCode: "75",
+    });
+    expectTypeToMatchAndEqual(agenciesOf75, [
+      { id: agency75.id, name: agency75.name },
+    ]);
+  });
+
   it("returns 20 nearest agencies", async () => {
     const agencies = [];
     for (let i = 0; i < 100; i++) {
@@ -79,17 +124,22 @@ describe("ListAgencies", () => {
           .withId(i.toString())
           .withName("agency " + i)
           .withPosition(20 + 0.01 * i, 20)
-          .withCountyCode(75)
+          .withAddress({
+            city: "",
+            streetNumberAndAddress: "",
+            postCode: "",
+            countyCode: "75",
+          })
           .build(),
       );
     }
 
     agencyRepository.setAgencies(agencies);
 
-    const nearestAgencies = await listAgencies.execute({
-      countyCode: 75,
+    const agenciesOf75 = await listAgencies.execute({
+      countyCode: "75",
     });
-    expect(nearestAgencies).toHaveLength(20);
-    expect(nearestAgencies[0].id).toBe("0");
+    expect(agenciesOf75).toHaveLength(20);
+    expect(agenciesOf75[0].id).toBe("0");
   });
 });

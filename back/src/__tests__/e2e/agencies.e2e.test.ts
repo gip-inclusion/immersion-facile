@@ -9,6 +9,14 @@ import {
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
+import { AddressDto } from "shared/src/address/address.dto";
+
+const defaultAddress: AddressDto = {
+  streetNumberAndAddress: "",
+  postCode: "",
+  countyCode: "75",
+  city: "",
+};
 
 describe(`/${agenciesRoute} route`, () => {
   let request: SuperTest<Test>;
@@ -33,49 +41,47 @@ describe(`/${agenciesRoute} route`, () => {
     .withName("Test Agency 1")
     .withStatus("active")
     .withPosition(10.11, 10.12)
+    .withAddress({ ...defaultAddress, countyCode: "20" })
     .build();
 
   const agency2ActiveNearBy = AgencyDtoBuilder.create("test-agency-2")
     .withName("Test Agency 2")
     .withStatus("active")
     .withPosition(10, 10)
+    .withAddress({ ...defaultAddress, countyCode: "20" })
     .build();
 
   const agency3ActiveFarAway = AgencyDtoBuilder.create("test-agency-3")
     .withName("Test Agency 3")
     .withStatus("active")
     .withPosition(1, 2)
+    .withAddress(defaultAddress)
     .build();
   const agency4NeedsReview = AgencyDtoBuilder.create("test-agency-4")
     .withName("Test Agency 4")
     .withStatus("needsReview")
     .withValidatorEmails(["emmanuelle@email.com"])
+    .withAddress(defaultAddress)
     .build();
 
   describe("public route to get agencies with name and position given filters", () => {
     it("returns agency list with name and position nearby a given position", async () => {
       // Prepare
-      await Promise.all(
-        [
-          agency1ActiveNearBy,
-          agency2ActiveNearBy,
-          agency3ActiveFarAway,
-          agency4NeedsReview,
-        ].map(async (agencyDto) =>
-          inMemoryUow.agencyRepository.insert(agencyDto),
-        ),
-      );
+      inMemoryUow.agencyRepository.setAgencies([
+        agency1ActiveNearBy,
+        agency2ActiveNearBy,
+        agency3ActiveFarAway,
+        agency4NeedsReview,
+      ]);
       // Act and asseer
-      await request.get(`/${agenciesRoute}?countyCode=75`).expect(200, [
+      await request.get(`/${agenciesRoute}?countyCode=20`).expect(200, [
         {
           id: agency1ActiveNearBy.id,
           name: agency1ActiveNearBy.name,
-          position: agency1ActiveNearBy.position,
         },
         {
           id: agency2ActiveNearBy.id,
           name: agency2ActiveNearBy.name,
-          position: agency2ActiveNearBy.position,
         },
       ]);
     });

@@ -1,10 +1,12 @@
+import { AddressDto } from "shared/src/address/address.dto";
 import { activeAgencyStatuses, AgencyDto } from "shared/src/agency/agency.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { WithPosition } from "shared/src/latLon";
 import { z } from "zod";
 import { AppLogger } from "../../core/ports/AppLogger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { AdresseAPI } from "../../immersionOffer/ports/AdresseAPI";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
@@ -26,6 +28,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private referencielAgencesPe: PeAgenciesReferential,
+    private adresseAPI: AdresseAPI,
     private defaultAdminEmail: string,
     private uuid: UuidGenerator,
     private logger: AppLogger,
@@ -78,7 +81,21 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
 
       switch (matchedNearbyAgencies.length) {
         case 0: {
-          const newAgency = this.convertToAgency(peReferentialAgency);
+          const geocodedAddress = await this.adresseAPI.getAddressFromPosition({
+            lat: peReferentialAgency.adressePrincipale.gpsLat,
+            lon: peReferentialAgency.adressePrincipale.gpsLon,
+          });
+          if (!geocodedAddress) {
+            this.logger.error(
+              `No address found for agency : ${peReferentialAgency.libelle} | siret: ${peReferentialAgency.siret} | codeSafir: ${peReferentialAgency.codeSafir}`,
+            );
+            continue;
+          }
+
+          const newAgency = this.convertToAgency(
+            peReferentialAgency,
+            geocodedAddress,
+          );
           await uow.agencyRepository.insert(newAgency);
           counts.added++;
           break;
@@ -117,6 +134,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
 
   private convertToAgency(
     peReferentialAgency: PeAgencyFromReferenciel,
+    geocodedAddress: AddressDto,
   ): AgencyDto {
     return {
       id: this.uuid.new(),
@@ -126,9 +144,9 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
         ? [peReferentialAgency.contact.email]
         : [],
       adminEmails: [this.defaultAdminEmail],
-      ...normalizeAddressAndPosition(peReferentialAgency),
+      ...normalizePosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
-      countyCode: 1,
+      address: geocodedAddress,
       questionnaireUrl: defaultQuestionnaireUrl,
       codeSafir: peReferentialAgency.codeSafir,
       agencySiret: peReferentialAgency.siret,
@@ -176,7 +194,7 @@ const updateAgency = async (
   counts.updated++;
   const updatedAgency: AgencyDto = {
     ...existingAgency,
-    ...normalizeAddressAndPosition(peReferentialAgency),
+    ...normalizePosition(peReferentialAgency),
     ...updateEmails({
       validatorEmails: existingAgency.validatorEmails,
       counsellorEmails: existingAgency.counsellorEmails,
@@ -211,11 +229,9 @@ const updateEmails = ({
   return { counsellorEmails, validatorEmails: [...validatorEmails, newEmail] };
 };
 
-const normalizeAddressAndPosition = ({
+const normalizePosition = ({
   adressePrincipale,
-  adressePrincipale: { ligne4, ligne5, ligne6 },
-}: PeAgencyFromReferenciel): { address: string; position: LatLonDto } => ({
-  address: [ligne4, ligne5, ligne6].filter((v) => !!v).join(", "),
+}: PeAgencyFromReferenciel): WithPosition => ({
   position: {
     lat: adressePrincipale.gpsLat,
     lon: adressePrincipale.gpsLon,

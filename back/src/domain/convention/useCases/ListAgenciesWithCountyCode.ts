@@ -1,25 +1,16 @@
+import { CountyCode } from "shared/src/address/address.dto";
 import {
   activeAgencyStatuses,
   AgencyDto,
   AgencyKindFilter,
   AgencyIdAndName,
-  CountyCode,
   ListAgenciesWithPositionRequestDto,
 } from "shared/src/agency/agency.dto";
 import { listAgenciesRequestSchema } from "shared/src/agency/agency.schema";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-// type FullAddressVO = {
-//   roadNumber: string,
-//   street: string,
-//   street2?: string,
-//   postalCode: number, // (ex: 75001)
-//   countyCode: number, // numéro de département (ex: 75)
-//   city: string,
-// }
-
-export class ListAgenciesWithPosition extends TransactionalUseCase<
+export class ListAgenciesWithCountyCode extends TransactionalUseCase<
   ListAgenciesWithPositionRequestDto,
   AgencyIdAndName[]
 > {

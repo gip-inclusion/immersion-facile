@@ -19,14 +19,18 @@ const defaultAdminEmail = "myAdmin@mail.com";
 
 const parisMissionLocaleParams: CreateAgencyDto = {
   id: "some-id",
-  address: "paris",
+  address: {
+    streetNumberAndAddress: "10 avenue des Champs Elysées",
+    city: "Paris",
+    countyCode: "75",
+    postCode: "75017",
+  },
   counsellorEmails: ["counsellor@mail.com"],
   validatorEmails: ["validator@mail.com"],
   kind: "mission-locale",
   name: "Mission locale de Paris",
   position: { lat: 10, lon: 20 },
   questionnaireUrl: "www.myUrl.com",
-  countyCode: 75,
   signature: "Super signature of the agency",
   logoUrl: "https://www.myUrl.com",
 };

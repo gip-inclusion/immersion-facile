@@ -1,4 +1,5 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
+import { AddressDto, CountyCode } from "../address/address.dto";
 import { LatLonDto } from "../latLon";
 import { Flavor } from "../typeFlavors";
 import { NotEmptyArray, RequireField } from "../utils";
@@ -74,8 +75,6 @@ export type GetAgenciesFilter = {
   status?: AgencyStatus[];
 };
 
-export type CountyCode = Flavor<number, "CountyCode">;
-
 export type ListAgenciesWithPositionRequestDto = {
   countyCode: CountyCode;
   filter?: AgencyKindFilter;
@@ -99,11 +98,10 @@ export type CreateAgencyDto = {
   id: AgencyId;
   kind: AgencyKind;
   name: string;
-  address: string;
+  address: AddressDto;
   position: LatLonDto;
   counsellorEmails: string[];
   validatorEmails: string[];
-  countyCode: CountyCode;
   // adminEmails: string[];
   questionnaireUrl?: string;
   logoUrl?: AbsoluteUrl;

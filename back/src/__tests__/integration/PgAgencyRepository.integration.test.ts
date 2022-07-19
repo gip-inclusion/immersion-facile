@@ -11,7 +11,12 @@ const agency1builder = AgencyDtoBuilder.create(
 )
   .withName("agency1")
   .withKind("pole-emploi")
-  .withAddress("Agency 1 address")
+  .withAddress({
+    streetNumberAndAddress: "Agency 1 address",
+    city: "Paris",
+    postCode: "75001",
+    countyCode: "75",
+  })
   .withCounsellorEmails(["counsellorA@agency1.fr", "counsellorB@agency1.fr"])
   .withValidatorEmails(["validatorA@agency1.fr", "validatorB@agency1.fr"])
   .withAdminEmails(["adminA@agency1.fr", "adminB@agency1.fr"])
@@ -24,7 +29,12 @@ const agency2builder = AgencyDtoBuilder.create(
 )
   .withName("agency2")
   .withKind("mission-locale")
-  .withAddress("Agency 2 address")
+  .withAddress({
+    streetNumberAndAddress: "Agency 2 address",
+    city: "Paris",
+    postCode: "75001",
+    countyCode: "75",
+  })
   .withCounsellorEmails(["counsellorA@agency2.fr", "counsellorB@agency2.fr"])
   .withValidatorEmails([]) // no validators
   .withAdminEmails(["adminA@agency2.fr", "adminB@agency2.fr"])

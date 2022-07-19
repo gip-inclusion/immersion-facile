@@ -28,10 +28,13 @@ type AgencyColumns =
   | "logo_url"
   | "name"
   | "position"
+  | "post_code"
+  | "city"
   | "questionnaire_url"
   | "email_signature"
   | "status"
   | "validator_emails";
+
 type AgencyPgRow = Record<AgencyColumns, any>;
 
 const makeAgencyKindFiterSQL = (
@@ -206,12 +209,16 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
 ];
 
 const pgToEntity = (params: AgencyPgRow): AgencyDto => ({
-  address: params.address,
+  address: {
+    streetNumberAndAddress: params.address,
+    postCode: params.post_code,
+    countyCode: params.county_code,
+    city: params.city,
+  },
   adminEmails: params.admin_emails,
   agencySiret: optional(params.agency_siret),
   codeSafir: optional(params.code_safir),
   counsellorEmails: params.counsellor_emails,
-  countyCode: params.county_code,
   id: params.id,
   kind: params.kind,
   logoUrl: optional(params.logo_url),

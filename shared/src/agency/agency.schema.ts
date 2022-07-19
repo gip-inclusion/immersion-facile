@@ -1,27 +1,23 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { addressSchema } from "../address/address.schema";
+import { latLonSchema } from "../latLon";
+import { zEmail, zString, zTrimmedString } from "../zodUtils";
 import {
+  AgencyDto,
   AgencyId,
   AgencyIdAndName,
+  AgencyIdResponse,
   AgencyKind,
   agencyKindList,
+  AgencyPublicDisplayDto,
+  allAgencyStatuses,
   CreateAgencyDto,
   ListAgenciesWithPositionRequestDto,
-  WithAgencyId,
   PrivateListAgenciesRequestDto,
-  allAgencyStatuses,
-  AgencyDto,
   UpdateAgencyRequestDto,
-  AgencyPublicDisplayDto,
-  AgencyIdResponse,
+  WithAgencyId,
 } from "./agency.dto";
-import { latLonSchema } from "../latLon";
-import {
-  zEmail,
-  zPreprocessedNumber,
-  zString,
-  zTrimmedString,
-} from "../zodUtils";
 
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
 
@@ -47,7 +43,7 @@ const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 
 export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesWithPositionRequestDto> =
   z.object({
-    countyCode: zPreprocessedNumber(),
+    countyCode: z.string(),
     filter: z.enum(["peOnly", "peExcluded"]).optional(),
   });
 
@@ -55,13 +51,12 @@ const createAgencyShape = {
   id: agencyIdSchema,
   name: zString,
   kind: agencyKindSchema,
-  address: zString,
+  address: addressSchema,
   position: latLonSchema,
   counsellorEmails: z.array(zEmail),
   validatorEmails: z.array(zEmail).min(1),
   questionnaireUrl: z.string().optional(),
   signature: zString,
-  countyCode: z.number(),
   logoUrl: absoluteUrlSchema.optional(),
 };
 
@@ -96,7 +91,7 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
   z.object({
     id: agencyIdSchema,
     name: zString,
-    address: zString,
+    address: addressSchema,
     position: latLonSchema,
     logoUrl: absoluteUrlSchema.optional(),
   });

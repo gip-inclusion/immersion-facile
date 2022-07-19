@@ -1,31 +1,43 @@
+import { AddressDto } from "shared/src/address/address.dto";
 import { AgencyDto } from "shared/src/agency/agency.dto";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConsoleAppLogger } from "../../../adapters/secondary/core/ConsoleAppLogger";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
 import { InMemoryPeAgenciesReferential } from "../../../adapters/secondary/immersionOffer/InMemoryPeAgenciesReferential";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { defaultQuestionnaireUrl } from "../../../domain/convention/useCases/AddAgency";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { PeAgencyFromReferenciel } from "../../../domain/immersionOffer/ports/PeAgenciesReferential";
+import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
 const adminMail = "admin@mail.com";
+
+const address: AddressDto = {
+  city: "Molsheim",
+  countyCode: "67",
+  postCode: "67120",
+  streetNumberAndAddress: "6B RUE Gaston Romazzotti",
+};
 
 describe("UpdateAllPeAgencies use case", () => {
   let updateAllPeAgencies: UpdateAllPeAgencies;
   let peAgenciesReferential: InMemoryPeAgenciesReferential;
   let agencyRepository: InMemoryAgencyRepository;
   let uuid: TestUuidGenerator;
+  let adresseApi: InMemoryAdresseAPI;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     peAgenciesReferential = new InMemoryPeAgenciesReferential();
     agencyRepository = uow.agencyRepository;
     uuid = new TestUuidGenerator();
+    adresseApi = new InMemoryAdresseAPI();
     updateAllPeAgencies = new UpdateAllPeAgencies(
       new InMemoryUowPerformer(uow),
       peAgenciesReferential,
+      adresseApi,
       adminMail,
       uuid,
       new ConsoleAppLogger(),
@@ -36,6 +48,7 @@ describe("UpdateAllPeAgencies use case", () => {
     peAgenciesReferential.setPeAgencies([peReferentialAgency]);
     agencyRepository.setAgencies([]);
     uuid.setNextUuid("some-uuid");
+    adresseApi.setNextAddress(address);
     await updateAllPeAgencies.execute();
     expectTypeToMatchAndEqual(agencyRepository.agencies, [
       {
@@ -44,8 +57,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [],
         validatorEmails: ["molsheim@pole-emploi.fr"],
         adminEmails: [adminMail],
-        address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
-        countyCode: 75,
+        address,
         position: {
           lon: 7.511,
           lat: 48.532571,
@@ -75,8 +87,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [],
         validatorEmails: [commonEmail],
         adminEmails: ["someAdmin@mail.com"],
-        address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
-        countyCode: 75,
+        address,
         position: {
           lon: 7,
           lat: 49,
@@ -94,7 +105,7 @@ describe("UpdateAllPeAgencies use case", () => {
         {
           ...initialAgency,
           validatorEmails: [commonEmail],
-          address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
+          address,
           position: {
             lon: 7.511,
             lat: 48.532571,
@@ -119,8 +130,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [commonEmail],
         validatorEmails: [],
         adminEmails: ["someAdmin@mail.com"],
-        address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
-        countyCode: 75,
+        address,
         position: {
           lon: 3,
           lat: 50,
@@ -139,7 +149,7 @@ describe("UpdateAllPeAgencies use case", () => {
           ...initialAgency,
           counsellorEmails: [commonEmail],
           validatorEmails: [],
-          address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
+          address,
           position: {
             lon: 7.511,
             lat: 48.532571,
@@ -158,8 +168,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [],
         validatorEmails: ["existing@mail.com"],
         adminEmails: ["someAdmin@mail.com"],
-        address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
-        countyCode: 75,
+        address,
         position: {
           lon: 7.51213,
           lat: 48.532571324,
@@ -180,7 +189,7 @@ describe("UpdateAllPeAgencies use case", () => {
             ...initialAgency.validatorEmails,
             "molsheim@pole-emploi.fr",
           ],
-          address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
+          address,
           position: {
             lon: 7.511,
             lat: 48.532571,
@@ -192,7 +201,7 @@ describe("UpdateAllPeAgencies use case", () => {
     });
   });
 
-  it("if existing agency is not of kind pole-emploi or is of kind 'from-api-PE' it should not be considered, and a new one should be created", async () => {
+  it("if existing agency is not of kind 'pole-emploi' or 'from-api-PE' it should not be considered, and a new one should be created", async () => {
     peAgenciesReferential.setPeAgencies([peReferentialAgency]);
     const initialAgency: AgencyDto = {
       id: "some-uuid",
@@ -200,8 +209,7 @@ describe("UpdateAllPeAgencies use case", () => {
       counsellorEmails: [],
       validatorEmails: ["existing@mail.com"],
       adminEmails: ["someAdmin@mail.com"],
-      address: "16B RUE Gaston Romazzotti, 67120 Molsheim",
-      countyCode: 75,
+      address,
       position: {
         lon: 7,
         lat: 49,
@@ -213,6 +221,7 @@ describe("UpdateAllPeAgencies use case", () => {
     };
     agencyRepository.setAgencies([initialAgency]);
     uuid.setNextUuid("other-uuid");
+    adresseApi.setNextAddress(address);
     await updateAllPeAgencies.execute();
 
     expectTypeToMatchAndEqual(agencyRepository.agencies, [
@@ -223,7 +232,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [],
         validatorEmails: ["molsheim@pole-emploi.fr"],
         adminEmails: [adminMail],
-        address: "16 b RUE Gaston Romazzotti, 67120 MOLSHEIM",
+        address,
         position: {
           lon: 7.511,
           lat: 48.532571,
