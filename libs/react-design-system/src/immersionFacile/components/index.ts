@@ -10,6 +10,6 @@ export * from "./link";
 export * from "./notification";
 export * from "./text";
 export * from "./bulletPoint";
-export * from "./tabs";
+export * from "./tabLinks";
 export * from "./header";
 export * from "./logo";

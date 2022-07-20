@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "type-route";
+import { NavLink, TabLinks } from "../tabLinks";
 
-type ToolType = {
+export type ToolType = {
   iconClassName: string;
   label: string;
   callback: () => void;
@@ -9,39 +9,10 @@ type ToolType = {
 
 export type ToolsType = ToolType[];
 
-type NavLinkType = {
-  link: Link;
-  label: string;
-  display: boolean;
-  active?: boolean;
-};
-
-export type NavLinksType = NavLinkType[];
-
-type ImmersionPureHeaderProps = {
-  marianneLogo: React.ReactNode;
-  immersionLogo: React.ReactNode;
-  tools?: ToolsType;
-  links?: NavLinksType;
-  sticky?: boolean;
-};
-
 const Tool = ({ tool }: { tool: ToolType }) => (
   <li>
     <a className={tool.iconClassName} onClick={tool.callback} href="#">
       {tool.label}
-    </a>
-  </li>
-);
-
-const NavLink = ({ link }: { link: NavLinkType }) => (
-  <li className="fr-nav__item">
-    <a
-      className="fr-nav__link"
-      {...link.link}
-      aria-current={link.active ? "page" : undefined}
-    >
-      {link.label}
     </a>
   </li>
 );
@@ -54,11 +25,19 @@ const getStickyStyles = (): React.CSSProperties => ({
   zIndex: 1,
 });
 
+type ImmersionPureHeaderProps = {
+  marianneLogo: React.ReactNode;
+  immersionLogo: React.ReactNode;
+  tools?: ToolsType;
+  navLinks: NavLink[];
+  sticky?: boolean;
+};
+
 export const Header = ({
   tools,
   marianneLogo,
   immersionLogo,
-  links,
+  navLinks,
   sticky,
 }: ImmersionPureHeaderProps) => (
   <header
@@ -85,7 +64,7 @@ export const Header = ({
               </p>
             </div>
           </div>
-          {tools && tools.length > 0 && (
+          {tools && tools?.length > 0 && (
             <div className="fr-header__tools">
               <div className="fr-header__tools-links">
                 <ul className="fr-nav fr-nav--right">
@@ -99,18 +78,14 @@ export const Header = ({
         </div>
       </div>
     </div>
-    {links && links.length > 0 && (
+    {navLinks.length > 0 && (
       <nav
         className="fr-nav fr-container"
         id="header-navigation"
         role="navigation"
         aria-label="Menu principal"
       >
-        <ul className="fr-nav__list">
-          {links.map((link, index) => (
-            <NavLink link={link} key={index} />
-          ))}
-        </ul>
+        <TabLinks navLinks={navLinks} />
       </nav>
     )}
   </header>

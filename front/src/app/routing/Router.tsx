@@ -12,7 +12,6 @@ import { EstablishmentFormPageForExternals } from "src/app/pages/Establishment/E
 import { SearchPage } from "src/app/pages/Search/SearchPage";
 import { LandingEstablishmentPage } from "src/app/pages/Static/LandingEstablishmentPage";
 import { PrivateRoute } from "src/app/routing/PrivateRoute";
-import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ENV } from "src/environmentVariables";
 import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
 import { EstablishmentFormPage } from "../pages/Establishment/EstablishmentFormPage";
@@ -26,7 +25,6 @@ const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
 
 export const Router = () => {
   const route = useRoute();
-  const featureFlags = useFeatureFlags();
 
   return (
     <>
@@ -37,12 +35,6 @@ export const Router = () => {
           <AdminPage route={route} />
         </PrivateRoute>
       )}
-      {route.name === "agencyAdmin" &&
-        (featureFlags.enableAdminUi ? (
-          <AdminPage route={route} />
-        ) : (
-          <NotAvailable />
-        ))}
       {route.name === "editFormEstablishment" && (
         <EstablishmentEditionFormPage route={route} />
       )}

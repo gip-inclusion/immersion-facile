@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { ArrayDropdown, DsfrTitle } from "react-design-system/immersionFacile";
+import {
+  ArrayDropdown,
+  DsfrTitle,
+  ImmersionTextField,
+} from "react-design-system/immersionFacile";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import {
-  ConventionReadDto,
   allConventionStatuses,
+  ConventionReadDto,
   ConventionStatus,
 } from "shared/src/convention/convention.dto";
 import { conventionGateway } from "src/app/config/dependencies";
-import { AdminRoute } from "src/app/pages/admin/AdminRoute";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
@@ -15,7 +18,7 @@ import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
 
-export const ConventionTab = ({ route }: { route: AdminRoute }) => {
+export const ConventionTab = () => {
   const adminToken = useAppSelector(adminSelectors.token);
   const [conventions, setConventions] = useState<ConventionReadDto[]>([]);
 
@@ -23,10 +26,7 @@ export const ConventionTab = ({ route }: { route: AdminRoute }) => {
     ConventionStatus | undefined
   >();
 
-  const agency =
-    "agencyId" in route.params
-      ? (route.params.agencyId as AgencyId)
-      : undefined;
+  const [agencyFilter, setAgencyFilter] = useState<AgencyId | undefined>();
 
   const filterChanged = (selectedConventionStatus?: ConventionStatus) => {
     setConventions([]);
@@ -36,7 +36,7 @@ export const ConventionTab = ({ route }: { route: AdminRoute }) => {
   useEffect(() => {
     conventionGateway
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      .getAll(adminToken!, agency, statusFilter)
+      .getAll(adminToken!, agencyFilter, statusFilter)
       .then(
         (applications) => setConventions(applications),
         (error: any) => {
@@ -45,6 +45,7 @@ export const ConventionTab = ({ route }: { route: AdminRoute }) => {
         },
       );
   }, [statusFilter]);
+
   return (
     <div>
       <DsfrTitle level={5} text="Gérer les conventions" />
@@ -59,6 +60,14 @@ export const ConventionTab = ({ route }: { route: AdminRoute }) => {
                 allowEmpty={false}
                 defaultSelectedOption={"IN_REVIEW"}
               />
+              <br />
+              <ImmersionTextField
+                name="agencyId"
+                label={
+                  "Si vous souhaitez filtrer sur une agence particulière, saisissez son ID"
+                }
+                onChange={(e) => setAgencyFilter(e.target.value)}
+              />
             </div>
           </WithBackground>
 
@@ -66,7 +75,7 @@ export const ConventionTab = ({ route }: { route: AdminRoute }) => {
             {conventions.map((item) => (
               <li key={item.id}>
                 <ConventionFormAccordion convention={item} />
-                {route.name === "admin" && <FormMagicLinks convention={item} />}
+                <FormMagicLinks convention={item} />
                 <hr />
               </li>
             ))}

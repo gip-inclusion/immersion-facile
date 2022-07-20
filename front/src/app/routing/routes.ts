@@ -1,13 +1,12 @@
 import { frontRoutes } from "shared/src/routes";
 import { createRouter, defineRoute, param } from "type-route";
-import { conventionValuesFromUrl } from "./route-params";
+import { adminTabSerializer, conventionValuesFromUrl } from "./route-params";
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
-  admin: defineRoute(`/${frontRoutes.admin}`),
-  agencyAdmin: defineRoute(
-    { agencyId: param.path.string },
-    (params) => `/agence/${params.agencyId}`,
+  admin: defineRoute(
+    { tab: param.path.ofType(adminTabSerializer) },
+    ({ tab }) => `/${frontRoutes.admin}/${tab}`,
   ),
   debugPopulateDB: defineRoute(
     { count: param.path.number },

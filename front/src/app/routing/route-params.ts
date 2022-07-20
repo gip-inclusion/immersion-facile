@@ -2,6 +2,17 @@ import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppella
 import { ScheduleDto } from "shared/src/schedule/Schedule.dto";
 import { param, ValueSerializer } from "type-route";
 
+export type AdminTab =
+  | "conventions"
+  | "agency-validation"
+  | "exports"
+  | "emails";
+
+export const adminTabSerializer: ValueSerializer<AdminTab> = {
+  parse: (raw) => raw as AdminTab,
+  stringify: (tab) => tab,
+};
+
 const scheduleSerializer: ValueSerializer<ScheduleDto> = {
   parse: (raw) => JSON.parse(raw),
   stringify: (schedule) => JSON.stringify(schedule),

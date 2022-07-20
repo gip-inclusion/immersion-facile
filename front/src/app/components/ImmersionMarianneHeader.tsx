@@ -10,8 +10,8 @@ import {
   Header,
   MarianneLogo,
   ImmersionLogo,
-  ToolsType,
-  NavLinksType,
+  ToolType,
+  NavLink,
 } from "react-design-system/immersionFacile";
 import immersionFacileLogo from "/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 
@@ -20,7 +20,7 @@ export const ImmersionMarianneHeader = () => {
   const dispatch = useDispatch();
   const currentRoute = useRoute();
   const isAdminConnected = useAppSelector(adminSelectors.isAuthenticated);
-  const tools: ToolsType = [];
+  const tools: ToolType[] = [];
   if (isAdminConnected) {
     tools.push({
       iconClassName: "fr-link fr-fi-lock-line",
@@ -28,7 +28,8 @@ export const ImmersionMarianneHeader = () => {
       callback: () => dispatch(adminSlice.actions.logoutRequested()),
     });
   }
-  const links: NavLinksType = [
+
+  const links: (NavLink & { display: boolean })[] = [
     {
       label: "Home",
       link: routes.home().link,
@@ -40,12 +41,6 @@ export const ImmersionMarianneHeader = () => {
       link: routes.convention().link,
       display: isAdminConnected,
       active: currentRoute.name === routes.convention().name,
-    },
-    {
-      label: "Backoffice",
-      link: routes.admin().link,
-      display: isAdminConnected && featureFlags.enableAdminUi,
-      active: currentRoute.name === routes.admin().name,
     },
     {
       label: "Formulaire Entreprise",
@@ -71,6 +66,12 @@ export const ImmersionMarianneHeader = () => {
       display: isAdminConnected,
       active: currentRoute.name === routes.addAgency().name,
     },
+    {
+      label: "Backoffice",
+      link: routes.admin({ tab: "conventions" }).link,
+      display: isAdminConnected && featureFlags.enableAdminUi,
+      active: currentRoute.name === routes.admin({ tab: "conventions" }).name,
+    },
   ];
   const linksFiltered = links.filter((link) => link.display);
   return (
@@ -86,7 +87,7 @@ export const ImmersionMarianneHeader = () => {
         </LinkHome>
       }
       tools={tools}
-      links={linksFiltered}
+      navLinks={linksFiltered}
     />
   );
 };

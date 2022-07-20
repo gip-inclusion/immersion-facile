@@ -20,6 +20,7 @@ const enterpriseFields: FieldsToLabel = {
 };
 
 const agencyFields: FieldsToLabel = {
+  id: "Id de l'agence",
   agencyName: "Nom de la structure",
   dateValidation: "Date de validation",
 };
