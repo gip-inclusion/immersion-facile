@@ -68,9 +68,10 @@ export const ImmersionMarianneHeader = () => {
     },
     {
       label: "Backoffice",
-      link: routes.admin({ tab: "conventions" }).link,
+      link: routes.adminTab({ tab: "conventions" }).link,
       display: isAdminConnected && featureFlags.enableAdminUi,
-      active: currentRoute.name === routes.admin({ tab: "conventions" }).name,
+      active:
+        currentRoute.name === routes.adminTab({ tab: "conventions" }).name,
     },
   ];
   const linksFiltered = links.filter((link) => link.display);

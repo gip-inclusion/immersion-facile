@@ -1,3 +1,4 @@
+import { root } from "postcss";
 import React from "react";
 import { SearchDebugPage } from "src/app/components/SearchDebugPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
@@ -17,7 +18,7 @@ import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
 import { EstablishmentFormPage } from "../pages/Establishment/EstablishmentFormPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersionAssessment/ImmersionAssessmentPage";
-import { useRoute } from "./routes";
+import { routes, useRoute } from "./routes";
 
 const { frontEnvType } = ENV;
 
@@ -30,11 +31,13 @@ export const Router = () => {
     <>
       {route.name === false && <NotAvailable />}
       {route.name === "addAgency" && <AddAgencyPage />}
-      {route.name === "admin" && (
+      {route.name === "adminTab" && (
         <PrivateRoute>
           <AdminPage route={route} />
         </PrivateRoute>
       )}
+      {route.name === "adminRoot" &&
+        routes.adminTab({ tab: "conventions" }).replace()}
       {route.name === "editFormEstablishment" && (
         <EstablishmentEditionFormPage route={route} />
       )}
