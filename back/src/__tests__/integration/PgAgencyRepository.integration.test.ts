@@ -353,6 +353,12 @@ describe("PgAgencyRepository", () => {
         .withValidatorEmails(["updated@mail.com"])
         .withAgencySiret("11110000111100")
         .withCodeSafir("CODE_123")
+        .withAddress({
+          streetNumberAndAddress: "My new adress",
+          postCode: "64100",
+          countyCode: "64",
+          city: "Bayonne",
+        })
         .build();
 
       await agencyRepository.update(updatedAgency1);

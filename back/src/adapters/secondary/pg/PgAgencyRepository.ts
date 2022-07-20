@@ -17,22 +17,22 @@ import { optional } from "./pgUtils";
 const logger = createLogger(__filename);
 
 type AgencyColumns =
-  | "address"
   | "admin_emails"
   | "agency_siret"
+  | "city"
   | "code_safir"
   | "counsellor_emails"
   | "county_code"
+  | "email_signature"
   | "id"
   | "kind"
   | "logo_url"
   | "name"
   | "position"
   | "post_code"
-  | "city"
   | "questionnaire_url"
-  | "email_signature"
   | "status"
+  | "street_number_and_address"
   | "validator_emails";
 
 type AgencyPgRow = Record<AgencyColumns, any>;
@@ -108,7 +108,8 @@ export class PgAgencyRepository implements AgencyRepository {
       "CAST(counsellor_emails AS text) ILIKE '%' || $1 || '%'";
 
     const pgResult = await this.client.query(
-      `SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir
+      `SELECT id, name, status, kind, legacy_address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir,
+        street_number_and_address, post_code, city, county_code
        FROM public.agencies
        WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
       [email],
@@ -122,7 +123,9 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
     const pgResult = await this.client.query(
-      "SELECT id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position\
+      "SELECT id, name, status, kind, legacy_address, counsellor_emails, validator_emails, \
+        admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, \
+        street_number_and_address, post_code, city, county_code \
       FROM public.agencies\
       WHERE id = $1",
       [id],
@@ -136,8 +139,10 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
     const query = `INSERT INTO public.agencies(
-      id, name, status, kind, address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, position, agency_siret, code_safir
-    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L)`;
+      id, name, status, kind, legacy_address, counsellor_emails, validator_emails, admin_emails, 
+      questionnaire_url, email_signature, logo_url, position, agency_siret, code_safir,
+      street_number_and_address, post_code, city, county_code
+    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L, %L, %L, %L, %L)`;
     try {
       await this.client.query(format(query, ...entityToPgArray(agency)));
     } catch (error: any) {
@@ -157,7 +162,7 @@ export class PgAgencyRepository implements AgencyRepository {
       name = COALESCE(%2$L, name),
       status = COALESCE(%3$L, status),
       kind= COALESCE(%4$L, kind),
-      address= COALESCE(%5$L, address),
+      legacy_address= COALESCE(%5$L, legacy_address),
       counsellor_emails= COALESCE(%6$L, counsellor_emails),
       validator_emails= COALESCE(%7$L, validator_emails),
       admin_emails= COALESCE(%8$L, admin_emails),
@@ -167,6 +172,10 @@ export class PgAgencyRepository implements AgencyRepository {
       ${agency.position ? "position = ST_GeographyFromText(%12$L)," : ""}
       agency_siret = COALESCE(%13$L, agency_siret),
       code_safir = COALESCE(%14$L, code_safir),
+      street_number_and_address = COALESCE(%15$L, street_number_and_address),
+      post_code = COALESCE(%16$L, post_code),
+      city = COALESCE(%17$L, city),
+      county_code = COALESCE(%18$L, county_code),
       updated_at = NOW()
     WHERE id = %1$L`;
 
@@ -196,7 +205,7 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
   agency.name,
   agency.status,
   agency.kind,
-  agency.address,
+  null,
   agency.counsellorEmails && JSON.stringify(agency.counsellorEmails),
   agency.validatorEmails && JSON.stringify(agency.validatorEmails),
   agency.adminEmails && JSON.stringify(agency.adminEmails),
@@ -206,11 +215,15 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
   agency.position && STPointStringFromPosition(agency.position),
   agency.agencySiret,
   agency.codeSafir,
+  agency.address?.streetNumberAndAddress,
+  agency.address?.postCode,
+  agency.address?.city,
+  agency.address?.countyCode,
 ];
 
 const pgToEntity = (params: AgencyPgRow): AgencyDto => ({
   address: {
-    streetNumberAndAddress: params.address,
+    streetNumberAndAddress: params.street_number_and_address,
     postCode: params.post_code,
     countyCode: params.county_code,
     city: params.city,
