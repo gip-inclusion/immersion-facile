@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { CountyCode } from "shared/src/agency/agency.dto";
+import { CountyCode } from "shared/src/address/address.dto";
 import { apiAdresseGateway } from "src/app/config/dependencies";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { TextInput } from "src/uiComponents/form/TextInput";
@@ -26,7 +26,7 @@ export const PostcodeAutocomplete = ({
       const sanitizedTerm = value.trim();
       if (sanitizedTerm.length !== 5) return;
       try {
-        const countyCode = await apiAdresseGateway.lookupPostCode(
+        const countyCode = await apiAdresseGateway.findCountyCodeFromPostCode(
           sanitizedTerm,
         );
         if (countyCode) {

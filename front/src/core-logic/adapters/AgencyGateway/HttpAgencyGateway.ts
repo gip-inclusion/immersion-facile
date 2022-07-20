@@ -1,5 +1,6 @@
 import { AxiosInstance } from "axios";
 import { from, map, Observable } from "rxjs";
+import { CountyCode } from "shared/src/address/address.dto";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import {
   AgencyDto,
@@ -7,7 +8,6 @@ import {
   AgencyPublicDisplayDto,
   AgencyStatus,
   AgencyIdAndName,
-  CountyCode,
   CreateAgencyDto,
   ListAgenciesWithPositionRequestDto,
   UpdateAgencyRequestDto,

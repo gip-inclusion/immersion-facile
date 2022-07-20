@@ -1,4 +1,4 @@
-import { CountyCode } from "shared/src/agency/agency.dto";
+import { CountyCode } from "shared/src/address/address.dto";
 import {
   AddressWithCoordinates,
   ApiAdresseGateway,
@@ -10,6 +10,8 @@ type ValidFeature = {
   properties: {
     type: string;
     label: string;
+    name: string;
+    city: string;
     postcode: string;
     context: string;
   };
@@ -46,7 +48,9 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
     }
   }
 
-  public async lookupPostCode(query: string): Promise<CountyCode | null> {
+  public async findCountyCodeFromPostCode(
+    query: string,
+  ): Promise<CountyCode | null> {
     //TODO Remove catch to differentiate between http & domain errors
     try {
       const { data } = await this.httpClient.get<unknown>(apiAdresseSearchUrl, {
@@ -61,14 +65,7 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
         keepOnlyValidFeatures,
       );
       if (!validFeatures.length) return null;
-
-      const context = validFeatures[0].properties.context;
-      const countyCode = +context.split(", ")[0];
-      if (isNaN(countyCode))
-        throw new Error(
-          `Api Adresse feature context has incorrect countyCode. Context was : ${context}`,
-        );
-      return countyCode;
+      return getCountyCodeFromFeature(validFeatures[0]);
     } catch (e) {
       //eslint-disable-next-line no-console
       console.error("Api Adresse Search Error", e);
@@ -76,6 +73,11 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
     }
   }
 }
+
+const getCountyCodeFromFeature = (feature: ValidFeature) => {
+  const context = feature.properties.context;
+  return context.split(", ")[0];
+};
 
 const removeNilValues = (
   address: AddressWithCoordinates | undefined,
@@ -101,6 +103,10 @@ const featureToStreetAddressWithCoordinates = (
           lat: feature.geometry.coordinates[1],
           lon: feature.geometry.coordinates[0],
         },
+        streetNumberAndAddress: feature.properties.name,
+        postCode: feature.properties.postcode,
+        city: feature.properties.city,
+        countyCode: getCountyCodeFromFeature(feature),
         label,
       }
     : undefined;

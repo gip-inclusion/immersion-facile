@@ -1,5 +1,6 @@
 import { values } from "ramda";
 import { Observable, of } from "rxjs";
+import { CountyCode } from "shared/src/address/address.dto";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
 import {
@@ -7,7 +8,6 @@ import {
   AgencyId,
   AgencyIdAndName,
   AgencyPublicDisplayDto,
-  CountyCode,
   CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
@@ -18,7 +18,12 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withId("test-agency-1-front")
   .withName("Test Agency 1 (front)")
-  .withAddress("Paris")
+  .withAddress({
+    streetNumberAndAddress: "Agency 1",
+    postCode: "75001",
+    city: "Paris",
+    countyCode: "75",
+  })
   .withQuestionnaireUrl("www.questionnaireMissionLocale.com")
   .withKind("mission-locale")
   .withStatus("active")
@@ -27,7 +32,12 @@ const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
 const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withId("PE-test-agency-2-front")
   .withName("Test Agency 2 PE (front)")
-  .withAddress("Paris")
+  .withAddress({
+    streetNumberAndAddress: "Agency 2",
+    postCode: "75001",
+    city: "Paris",
+    countyCode: "75",
+  })
   .withQuestionnaireUrl("www.PE.com")
   .withKind("pole-emploi")
   .withSignature("Mon agence PE")

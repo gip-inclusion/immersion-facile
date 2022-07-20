@@ -3,12 +3,12 @@ import { AdminToken } from "shared/src/admin/admin.dto";
 import {
   AgencyDto,
   AgencyId,
-  AgencyPublicDisplayDto,
   AgencyIdAndName,
-  CountyCode,
+  AgencyPublicDisplayDto,
   CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
+import { CountyCode } from "shared/src/address/address.dto";
 
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;

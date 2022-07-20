@@ -94,7 +94,14 @@ const onAutocompleteChange =
     setFormValue(
       selectedOption
         ? selectedOption
-        : { label: "", coordinates: { lat: 0, lon: 0 } },
+        : {
+            label: "",
+            streetNumberAndAddress: "",
+            postCode: "",
+            city: "",
+            countyCode: "",
+            coordinates: { lat: 0, lon: 0 },
+          },
     );
   };
 

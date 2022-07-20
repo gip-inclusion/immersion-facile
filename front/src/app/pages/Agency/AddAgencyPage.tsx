@@ -2,6 +2,14 @@ import { Form, Formik, FormikHelpers } from "formik";
 import { keys } from "ramda";
 import * as React from "react";
 import { useState } from "react";
+import { Button, Title } from "react-design-system/immersionFacile";
+import {
+  AgencyKind,
+  agencyKindList,
+  CreateAgencyDto,
+} from "shared/src/agency/agency.dto";
+import { createAgencySchema } from "shared/src/agency/agency.schema";
+import { zEmail } from "shared/src/zodUtils";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import {
   SubmitFeedback,
@@ -10,28 +18,24 @@ import {
 import { UploadFile } from "src/app/components/UploadFile";
 import { agencyGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import {
-  AgencyKind,
-  agencyKindList,
-  CreateAgencyDto,
-} from "shared/src/agency/agency.dto";
-import { createAgencySchema } from "shared/src/agency/agency.schema";
-import { zEmail } from "shared/src/zodUtils";
-import { Button, Title } from "react-design-system/immersionFacile";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { v4 as uuidV4 } from "uuid";
-import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 
 const initialValues: CreateAgencyDto = {
   id: uuidV4(),
   kind: "pole-emploi",
   name: "",
-  address: "",
-  countyCode: 0,
+  address: {
+    streetNumberAndAddress: "",
+    postCode: "",
+    city: "",
+    countyCode: "",
+  },
   position: {
     lat: 0,
     lon: 0,
@@ -103,9 +107,9 @@ export const AddAgencyPage = () => {
                   />
                   <AddressAutocomplete
                     label="Adresse de la structure"
-                    setFormValue={({ coordinates, label }) => {
+                    setFormValue={({ coordinates, label, ...address }) => {
                       typedSetField("position")(coordinates);
-                      typedSetField("address")(label);
+                      typedSetField("address")(address);
                     }}
                   />
 

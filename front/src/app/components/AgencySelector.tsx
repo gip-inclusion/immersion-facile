@@ -1,11 +1,8 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import {
-  AgencyId,
-  AgencyIdAndName,
-  CountyCode,
-} from "shared/src/agency/agency.dto";
+import { CountyCode } from "shared/src/address/address.dto";
+import { AgencyId, AgencyIdAndName } from "shared/src/agency/agency.dto";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
 import {
   FederatedIdentity,
