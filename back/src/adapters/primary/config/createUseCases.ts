@@ -1,3 +1,4 @@
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { SiretDto } from "shared/src/siret";
 import { sleep } from "shared/src/utils";
 import {
@@ -33,7 +34,6 @@ import { UpdateImmersionApplication } from "../../../domain/convention/useCases/
 import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { Clock } from "../../../domain/core/ports/Clock";
-import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
@@ -64,7 +64,11 @@ import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSear
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
-import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
+import {
+  apiAddressBaseUrl,
+  apiAddressRateLimiter,
+  HttpAdresseAPI,
+} from "../../secondary/immersionOffer/HttpAdresseAPI";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
@@ -88,7 +92,11 @@ export const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const getSiret = new GetSiret(gateways.sirene);
-  const adresseAPI = new HttpAdresseAPI(noRateLimit, noRetries);
+  const adresseAPI = new HttpAdresseAPI(
+    createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+    apiAddressRateLimiter(clock),
+    noRetries,
+  );
 
   return {
     associatePeConnectFederatedIdentity:

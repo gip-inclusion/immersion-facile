@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { random, sleep } from "shared/src/utils";
 import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
 import { createLogger } from "../../../utils/logger";
@@ -11,7 +12,11 @@ import {
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
-import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
+import {
+  apiAddressBaseUrl,
+  apiAddressRateLimiter,
+  HttpAdresseAPI,
+} from "../../secondary/immersionOffer/HttpAdresseAPI";
 import { AppConfig } from "../config/appConfig";
 import { createUowPerformer } from "../config/uowConfig";
 
@@ -49,7 +54,11 @@ const main = async () => {
     retryStrategy,
   );
 
-  const adresseAPI = new HttpAdresseAPI(rateLimiter, retryStrategy);
+  const adresseAPI = new HttpAdresseAPI(
+    createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+    apiAddressRateLimiter(clock),
+    retryStrategy,
+  );
 
   const pool = new Pool({
     connectionString: config.pgImmersionDbUrl,

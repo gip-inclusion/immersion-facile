@@ -16,12 +16,16 @@ import {
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
-import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
+import {
+  apiAddressBaseUrl,
+  apiAddressRateLimiter,
+  HttpAdresseAPI,
+} from "../../secondary/immersionOffer/HttpAdresseAPI";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 
-const maxQpsApiAdresse = 5;
 const maxQpsSireneApi = 0.25;
 
 const logger = createLogger(__filename);
@@ -48,7 +52,8 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   });
   const clientDestination = await poolDestination.connect();
   const adresseAPI = new HttpAdresseAPI(
-    new QpsRateLimiter(maxQpsApiAdresse, clock, sleep),
+    createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+    apiAddressRateLimiter(clock),
     new ExponentialBackoffRetryStrategy(
       defaultMaxBackoffPeriodMs,
       defaultRetryDeadlineMs,

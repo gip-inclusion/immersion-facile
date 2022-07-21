@@ -1,5 +1,12 @@
-import { HttpAdresseAPI } from "../../adapters/secondary/immersionOffer/HttpAdresseAPI";
-import { noRateLimit } from "../../domain/core/ports/RateLimiter";
+import { AddressDto } from "shared/src/address/address.dto";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
+import { LatLonDto } from "shared/src/latLon";
+import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
+import {
+  apiAddressRateLimiter,
+  apiAddressBaseUrl,
+  HttpAdresseAPI,
+} from "../../adapters/secondary/immersionOffer/HttpAdresseAPI";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 
@@ -38,8 +45,12 @@ const resultFromApiAddress = {
 };
 
 describe("HttpLaBonneBoiteAPI", () => {
-  it("Should return all `companies` susceptible to offer immerison of given rome located within the geographical area", async () => {
-    const adapter = new HttpAdresseAPI(noRateLimit, noRetries);
+  it("Should return expected address DTO when providing accurate position.", async () => {
+    const adapter = new HttpAdresseAPI(
+      createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+      apiAddressRateLimiter(new RealClock()),
+      noRetries,
+    );
 
     const result = await adapter.getAddressFromPosition({
       lat: resultFromApiAddress.features[0].geometry.coordinates[1],
@@ -53,4 +64,36 @@ describe("HttpLaBonneBoiteAPI", () => {
       postCode: "67120",
     });
   });
+  const parallelCalls = 200;
+  it(`Should support ${parallelCalls} of parallel calls`, async () => {
+    const adapter = new HttpAdresseAPI(
+      createManagedAxiosInstance({
+        baseURL: apiAddressBaseUrl,
+      }),
+      apiAddressRateLimiter(new RealClock()),
+      noRetries,
+    );
+
+    const coordinates: LatLonDto[] = [];
+    const expectedResults: AddressDto[] = [];
+
+    for (let index = 0; index < parallelCalls; index++) {
+      coordinates.push({
+        lat: resultFromApiAddress.features[0].geometry.coordinates[1],
+        lon: resultFromApiAddress.features[0].geometry.coordinates[0],
+      });
+      expectedResults.push({
+        streetNumberAndAddress: "14 Rue Gaston Romazzotti",
+        city: "Molsheim",
+        countyCode: "67",
+        postCode: "67120",
+      });
+    }
+    expectTypeToMatchAndEqual(
+      await Promise.all(
+        coordinates.map((latLon) => adapter.getAddressFromPosition(latLon)),
+      ),
+      expectedResults,
+    );
+  }, 20000);
 });

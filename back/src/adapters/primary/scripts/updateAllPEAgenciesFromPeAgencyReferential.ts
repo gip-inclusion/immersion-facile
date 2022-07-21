@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { random, sleep } from "shared/src/utils";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
@@ -8,11 +9,14 @@ import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
+  ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
-import { ExponentialBackoffRetryStrategy } from "../../secondary/core/ExponentialBackoffRetryStrategy";
-import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
-import { HttpAdresseAPI } from "../../secondary/immersionOffer/HttpAdresseAPI";
+import {
+  apiAddressBaseUrl,
+  apiAddressRateLimiter,
+  HttpAdresseAPI,
+} from "../../secondary/immersionOffer/HttpAdresseAPI";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "../config/appConfig";
@@ -32,11 +36,11 @@ const updateAllPeAgenciesScript = async () => {
     config.poleEmploiClientId,
   );
 
-  const maxQpsAdresseApi = 0.2;
   const clock = new RealClock();
 
   const adressAPI = new HttpAdresseAPI(
-    new QpsRateLimiter(maxQpsAdresseApi, clock, sleep),
+    createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+    apiAddressRateLimiter(clock),
     new ExponentialBackoffRetryStrategy(
       defaultMaxBackoffPeriodMs,
       defaultRetryDeadlineMs,
