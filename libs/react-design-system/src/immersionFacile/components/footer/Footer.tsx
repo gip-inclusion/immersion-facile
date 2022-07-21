@@ -1,40 +1,30 @@
 import React from "react";
-import { NavLinksType } from "../header";
+import { NavLink } from "../tabLinks";
 
 type FooterProps = {
-  links: NavLinksType;
+  links: NavLink[];
+  ministereLogo: React.ReactNode;
+  partnersLogos: React.ReactNode[];
 };
 
-const TopLink = ({ link }: { link: NavLinksType }) => (
+const TopLink = ({ link }: { link: NavLink }) => (
   <li className="fr-footer__content-item">
-    <a
-      className="fr-footer__content-link"
-      target="_blank"
-      href="https://legifrance.gouv.fr"
-    >
-      legifrance.gouv.fr
+    <a className="fr-footer__content-link" target="_blank" {...link}>
+      {link.label}
     </a>
   </li>
 );
 
-export const Footer = ({ links }: FooterProps) => (
+export const Footer = ({ links, ministereLogo }: FooterProps) => (
   <footer className="fr-footer" role="contentinfo" id="footer-1060">
     <div className="fr-container">
       <div className="fr-footer__body">
-        <div className="fr-footer__brand fr-enlarge-link">
-          <a href="/" title="Retour à l’accueil">
-            <p className="fr-logo">
-              Intitulé
-              <br />
-              officiel
-            </p>
-          </a>
-        </div>
+        {ministereLogo}
         <div className="fr-footer__content">
           <p className="fr-footer__content-desc">Lorem [...] elit ut.</p>
           <ul className="fr-footer__content-list">
-            {links.map((link) => (
-              <TopLink key={link.link} link={link} />
+            {links.map((link, index) => (
+              <TopLink key={index} link={link} />
             ))}
             <li className="fr-footer__content-item">
               <a
