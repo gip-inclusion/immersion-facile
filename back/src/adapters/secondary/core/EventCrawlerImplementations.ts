@@ -43,7 +43,7 @@ export class BasicEventCrawler implements EventCrawler {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
-      logger.error("Event Crawler failed to process new events", error);
+      logger.error({ error }, "Event Crawler failed to process new events");
       notifyObjectDiscord(error);
       return [];
     }
