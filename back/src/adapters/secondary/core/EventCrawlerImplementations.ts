@@ -1,8 +1,12 @@
 import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
-import { eventsToDebugInfo } from "../../../domain/core/eventBus/events";
+import {
+  DomainEvent,
+  eventsToDebugInfo,
+} from "../../../domain/core/eventBus/events";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 export class BasicEventCrawler implements EventCrawler {
@@ -18,18 +22,31 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   public async processNewEvents() {
-    //eslint-disable-next-line no-console
-    console.time("__metrics : getAllUnpublishedEvents query duration");
-    const events = await this.uowPerformer.perform((uow) =>
-      uow.outboxQueries.getAllUnpublishedEvents(),
-    );
-    //eslint-disable-next-line no-console
-    console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
+    const events = await this.retreiveAllUnpublishedEvents();
     logger.debug(
       { events: eventsToDebugInfo(events) },
       "processing new Events",
     );
     await Promise.all(events.map((event) => this.eventBus.publish(event)));
+  }
+
+  private async retreiveAllUnpublishedEvents(): Promise<DomainEvent[]> {
+    //eslint-disable-next-line no-console
+    console.time("__metrics : getAllUnpublishedEvents query duration");
+    try {
+      const events = await this.uowPerformer.perform((uow) =>
+        uow.outboxQueries.getAllUnpublishedEvents(),
+      );
+      //eslint-disable-next-line no-console
+      console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
+      return events;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
+      logger.error("Event Crawler failed to process new events", error);
+      notifyObjectDiscord(error);
+      return [];
+    }
   }
 
   public async retryFailedEvents() {
