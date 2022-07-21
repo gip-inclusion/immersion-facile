@@ -1,11 +1,11 @@
 import React from "react";
 import { NavLink } from "../tabLinks";
 
-type FooterProps = {
-  links: NavLink[];
-  bottomLinks: NavLink[];
+export type FooterProps = {
+  links?: NavLink[];
+  bottomLinks?: NavLink[];
   ministereLogo: React.ReactNode;
-  partnersLogos: React.ReactNode[];
+  partnersLogos?: React.ReactNode[];
 };
 
 const TopLink = ({ link }: { link: NavLink }) => (
@@ -41,25 +41,29 @@ export const Footer = ({
     <div className="fr-container">
       <div className="fr-footer__body">
         {ministereLogo}
-        {partnersLogos.map((logo) => (
-          <LogoPartner>{logo}</LogoPartner>
-        ))}
+        {partnersLogos &&
+          partnersLogos.map((logo) => <LogoPartner>{logo}</LogoPartner>)}
 
         <div className="fr-footer__content">
-          <ul className="fr-footer__content-list">
-            {links.map((link, index) => (
-              <TopLink key={index} link={link} />
-            ))}
-          </ul>
+          {links && links.length > 0 && (
+            <ul className="fr-footer__content-list">
+              {links.map((link, index) => (
+                <TopLink key={index} link={link} />
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 
       <div className="fr-footer__bottom">
-        <ul className="fr-footer__bottom-list">
-          {bottomLinks.map((link, index) => (
-            <BottomLink key={index} link={link} />
-          ))}
-        </ul>
+        {bottomLinks && bottomLinks.length > 0 && (
+          <ul className="fr-footer__bottom-list">
+            {bottomLinks.map((link, index) => (
+              <BottomLink key={index} link={link} />
+            ))}
+          </ul>
+        )}
+
         <div className="fr-footer__bottom-copy">
           <p>
             Sauf mention contraire, tous les contenus de ce site sont sous{" "}

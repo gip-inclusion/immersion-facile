@@ -30,11 +30,11 @@ const getStickyStyles = (): React.CSSProperties => ({
   zIndex: 1,
 });
 
-type ImmersionPureHeaderProps = {
+export type ImmersionPureHeaderProps = {
   marianneLogo: React.ReactNode;
   immersionLogo: React.ReactNode;
   tools?: Tool[];
-  navLinks: NavLink[];
+  navLinks?: NavLink[];
   sticky?: boolean;
 };
 
@@ -83,7 +83,7 @@ export const Header = ({
         </div>
       </div>
     </div>
-    {navLinks.length > 0 && (
+    {navLinks && navLinks.length > 0 && (
       <TabLinks navLinks={navLinks} navWrapper={navWrapperOptions} />
     )}
   </header>
