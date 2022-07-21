@@ -1,15 +1,13 @@
 import React from "react";
 import { NavLink, TabLinks } from "../tabLinks";
 
-export type ToolType = {
+export type Tool = {
   iconClassName: string;
   label: string;
   callback: () => void;
 };
 
-export type ToolsType = ToolType[];
-
-const Tool = ({ tool }: { tool: ToolType }) => (
+const Tool = ({ tool }: { tool: Tool }) => (
   <li>
     <a className={tool.iconClassName} onClick={tool.callback} href="#">
       {tool.label}
@@ -28,7 +26,7 @@ const getStickyStyles = (): React.CSSProperties => ({
 type ImmersionPureHeaderProps = {
   marianneLogo: React.ReactNode;
   immersionLogo: React.ReactNode;
-  tools?: ToolsType;
+  tools?: Tool[];
   navLinks: NavLink[];
   sticky?: boolean;
 };

@@ -10,7 +10,7 @@ import {
   Header,
   MarianneLogo,
   ImmersionLogo,
-  ToolType,
+  Tool,
   NavLink,
 } from "react-design-system/immersionFacile";
 import immersionFacileLogo from "/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
@@ -20,7 +20,7 @@ export const ImmersionMarianneHeader = () => {
   const dispatch = useDispatch();
   const currentRoute = useRoute();
   const isAdminConnected = useAppSelector(adminSelectors.isAuthenticated);
-  const tools: ToolType[] = [];
+  const tools: Tool[] = [];
   if (isAdminConnected) {
     tools.push({
       iconClassName: "fr-link fr-fi-lock-line",
