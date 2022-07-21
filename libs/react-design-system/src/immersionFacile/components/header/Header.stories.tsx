@@ -1,13 +1,13 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { linkPrefix } from ".";
+import { headerPrefix } from ".";
 import { Header, ImmersionPureHeaderProps } from "./Header";
 
 const Component = Header;
 const argTypes: Partial<ArgTypes<ImmersionPureHeaderProps>> | undefined = {};
 
 export default {
-  title: `${linkPrefix}${Component.name}`,
+  title: `${headerPrefix}${Component.name}`,
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

@@ -1,3 +1,3 @@
 export * from "./Header";
 import { storybookPrefix } from "../../storyPrefixes";
-export const linkPrefix = storybookPrefix("Header");
+export const headerPrefix = storybookPrefix("Header");

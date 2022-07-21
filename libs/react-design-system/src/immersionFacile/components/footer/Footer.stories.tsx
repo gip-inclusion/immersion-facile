@@ -1,13 +1,13 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { linkPrefix } from ".";
+import { footerPrefix } from ".";
 import { Footer, FooterProps } from "./Footer";
 
 const Component = Footer;
 const argTypes: Partial<ArgTypes<FooterProps>> | undefined = {};
 
 export default {
-  title: `${linkPrefix}${Component.name}`,
+  title: `${footerPrefix}${Component.name}`,
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;
