@@ -13,3 +13,4 @@ export * from "./bulletPoint";
 export * from "./tabLinks";
 export * from "./header";
 export * from "./logo";
+export * from "./footer";
