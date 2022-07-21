@@ -2,8 +2,9 @@ import React from "react";
 import { Link } from "type-route";
 
 export type NavLink = {
-  link: Link | string;
+  link?: Link;
   label: string;
+  href?: string;
   active?: boolean;
   target?: string;
 };
@@ -41,8 +42,8 @@ export const TabLinks = ({
     aria-label={navWrapper.ariaLabel}
   >
     <ul className="fr-nav__list">
-      {navLinks.map((link) => (
-        <TabLink {...link} key={link.link.href} />
+      {navLinks.map((link, index) => (
+        <TabLink {...link} key={index} />
       ))}
     </ul>
   </nav>

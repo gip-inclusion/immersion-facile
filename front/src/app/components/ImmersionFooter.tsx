@@ -30,36 +30,36 @@ export const ImmersionFooter = () => {
   const links: NavLink[] = [
     {
       label: "gouvernement.fr",
-      link: "https://www.gouvernement.fr/",
+      href: "https://www.gouvernement.fr/",
     },
     {
       label: "service-public.fr",
-      link: "https://www.service-public.fr/",
+      href: "https://www.service-public.fr/",
     },
   ];
   const bottomsLinks: NavLink[] = [
     {
       label: "Mentions légales",
-      link: "https://immersion-facile-1.gitbook.io/mentions-legales/",
+      href: "https://immersion-facile-1.gitbook.io/mentions-legales/",
       target: "_blank",
     },
     {
       label: "Politique de confidentialité",
-      link: "https://immersion-facile-1.gitbook.io/mentions-legales/politique-de-confidentialite",
+      href: "https://immersion-facile-1.gitbook.io/mentions-legales/politique-de-confidentialite",
       target: "_blank",
     },
     {
       label: "Conditions générales d'utilisation",
-      link: "https://immersion-facile-1.gitbook.io/mentions-legales/conditions-generales-dutilisation",
+      href: "https://immersion-facile-1.gitbook.io/mentions-legales/conditions-generales-dutilisation",
       target: "_blank",
     },
     {
       label: "Nous contacter",
-      link: "mailto:contact@immersion-facile.beta.gouv.fr",
+      href: "mailto:contact@immersion-facile.beta.gouv.fr",
     },
     {
       label: "Statistiques",
-      link: "https://immersion-facile-1.gitbook.io/la-page-stats-de-immersion-facilitee/mXyCG0khRml5mCWUU0Pe/la-mesure-de-limpact-dimmersion-facilitee",
+      href: "https://immersion-facile-1.gitbook.io/la-page-stats-de-immersion-facilitee/mXyCG0khRml5mCWUU0Pe/la-mesure-de-limpact-dimmersion-facilitee",
       target: "_blank",
     },
   ];

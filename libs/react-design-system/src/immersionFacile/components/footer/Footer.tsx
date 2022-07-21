@@ -12,9 +12,7 @@ const TopLink = ({ link }: { link: NavLink }) => (
   <li className="fr-footer__content-item">
     <a
       className="fr-footer__content-link fr-fi-external-link-line fr-link--icon-right"
-      target="_blank"
-      rel="noopener"
-      href={link.link}
+      {...link}
     >
       {link.label}
     </a>
@@ -23,7 +21,7 @@ const TopLink = ({ link }: { link: NavLink }) => (
 
 const BottomLink = ({ link }: { link: NavLink }) => (
   <li className="fr-footer__bottom-item">
-    <a className="fr-footer__bottom-link" href={link.link}>
+    <a className="fr-footer__bottom-link" {...link}>
       {link.label}
     </a>
   </li>
@@ -39,7 +37,7 @@ export const Footer = ({
   ministereLogo,
   partnersLogos,
 }: FooterProps) => (
-  <footer className="fr-footer" role="contentinfo" id="footer-1060">
+  <footer className="fr-footer fr-mt-10w" role="contentinfo" id="main-footer">
     <div className="fr-container">
       <div className="fr-footer__body">
         {ministereLogo}
