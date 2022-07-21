@@ -10,7 +10,7 @@ export type Tool = {
 const navWrapperOptions: NavWrapper = {
   role: "navigation",
   id: "main-menu",
-  className: "fr-nav fr-nav--main",
+  className: "fr-nav fr-nav--main fr-container",
   ariaLabel: "Menu principal",
 };
 
