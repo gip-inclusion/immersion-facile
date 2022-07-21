@@ -1,10 +1,17 @@
 import React from "react";
-import { NavLink, TabLinks } from "../tabLinks";
+import { NavLink, TabLinks, NavWrapper } from "../tabLinks";
 
 export type Tool = {
   iconClassName: string;
   label: string;
   callback: () => void;
+};
+
+const navWrapperOptions: NavWrapper = {
+  role: "navigation",
+  id: "main-menu",
+  className: "fr-nav fr-nav--main",
+  ariaLabel: "Menu principal",
 };
 
 const Tool = ({ tool }: { tool: Tool }) => (
@@ -77,14 +84,7 @@ export const Header = ({
       </div>
     </div>
     {navLinks.length > 0 && (
-      <nav
-        className="fr-nav fr-container"
-        id="header-navigation"
-        role="navigation"
-        aria-label="Menu principal"
-      >
-        <TabLinks navLinks={navLinks} />
-      </nav>
+      <TabLinks navLinks={navLinks} navWrapper={navWrapperOptions} />
     )}
   </header>
 );

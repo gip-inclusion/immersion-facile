@@ -7,6 +7,13 @@ export type NavLink = {
   active?: boolean;
 };
 
+export type NavWrapper = {
+  role: string;
+  id: string;
+  className?: string;
+  ariaLabel: string;
+};
+
 const TabLink = ({ link, active, label }: NavLink) => (
   <li className="fr-nav__item">
     <a
@@ -19,10 +26,23 @@ const TabLink = ({ link, active, label }: NavLink) => (
   </li>
 );
 
-export const TabLinks = ({ navLinks }: { navLinks: NavLink[] }) => (
-  <ul className="fr-nav__list">
-    {navLinks.map((link) => (
-      <TabLink {...link} key={link.link.href} />
-    ))}
-  </ul>
+export const TabLinks = ({
+  navLinks,
+  navWrapper,
+}: {
+  navLinks: NavLink[];
+  navWrapper: NavWrapper;
+}) => (
+  <nav
+    className={`fr-nav ${navWrapper.className}`}
+    id={navWrapper.id}
+    role={navWrapper.role}
+    aria-label={navWrapper.ariaLabel}
+  >
+    <ul className="fr-nav__list">
+      {navLinks.map((link) => (
+        <TabLink {...link} key={link.link.href} />
+      ))}
+    </ul>
+  </nav>
 );

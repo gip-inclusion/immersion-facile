@@ -1,7 +1,7 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
 import { NavLink, tabLinksPrefix } from ".";
-import { TabLinks } from "./TabLinks";
+import { TabLinks, NavWrapper } from "./TabLinks";
 
 const Component = TabLinks;
 const argTypes: Partial<ArgTypes> | undefined = {}; // <TabsProperties>
@@ -48,8 +48,15 @@ const navLinks: NavLink[] = [
   },
 ];
 
+const navWrapperOptions: NavWrapper = {
+  role: "navigation",
+  id: "menu-example",
+  className: "fr-nav fr-nav--example",
+  ariaLabel: "Menu example",
+};
+
 const componentStory: ComponentStory<typeof Component> = () => (
-  <Component navLinks={navLinks} />
+  <Component navLinks={navLinks} navWrapper={navWrapperOptions} />
 );
 
 export const Basic = componentStory.bind({});
