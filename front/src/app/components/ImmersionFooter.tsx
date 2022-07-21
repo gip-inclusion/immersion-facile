@@ -6,7 +6,7 @@ import { NavLink } from "src/../../libs/react-design-system";
 import { Footer } from "src/../../libs/react-design-system";
 
 export const MinistereLogo = () => (
-  <div className="fr-footer__brand fr-enlarge-link">
+  <div className="fr-footer__brand fr-enlarge-link fr-footer__partners-main">
     <p className="fr-logo">
       Ministère
       <br />
@@ -19,86 +19,56 @@ export const MinistereLogo = () => (
   </div>
 );
 
+const PoleEmploiLogo = () => (
+  <img src={poleEmploiLogo} alt="Pole Emploi" style={{ margin: "0 1.5rem" }} />
+);
+const EntreprisesLogo = () => (
+  <img src={lesEntrepriseSengagent} alt="Les entreprises s'engagent" />
+);
+
 export const ImmersionFooter = () => {
-  const links: NavLink[] = []; // NavLinksType => NavLink[]
+  const links: NavLink[] = [
+    {
+      label: "gouvernement.fr",
+      link: "https://www.gouvernement.fr/",
+    },
+    {
+      label: "service-public.fr",
+      link: "https://www.service-public.fr/",
+    },
+  ];
+  const bottomsLinks: NavLink[] = [
+    {
+      label: "Mentions légales",
+      link: "https://immersion-facile-1.gitbook.io/mentions-legales/",
+      target: "_blank",
+    },
+    {
+      label: "Politique de confidentialité",
+      link: "https://immersion-facile-1.gitbook.io/mentions-legales/politique-de-confidentialite",
+      target: "_blank",
+    },
+    {
+      label: "Conditions générales d'utilisation",
+      link: "https://immersion-facile-1.gitbook.io/mentions-legales/conditions-generales-dutilisation",
+      target: "_blank",
+    },
+    {
+      label: "Nous contacter",
+      link: "mailto:contact@immersion-facile.beta.gouv.fr",
+    },
+    {
+      label: "Statistiques",
+      link: "https://immersion-facile-1.gitbook.io/la-page-stats-de-immersion-facilitee/mXyCG0khRml5mCWUU0Pe/la-mesure-de-limpact-dimmersion-facilitee",
+      target: "_blank",
+    },
+  ];
   return (
     <Footer
       links={links}
       ministereLogo={<MinistereLogo />}
-      partnersLogos={[]}
+      partnersLogos={[<PoleEmploiLogo />, <EntreprisesLogo />]}
+      bottomLinks={bottomsLinks}
     />
   );
 };
-
-// <div className="mx-3 md:mx-20 mt-10">
-//   <footer className="fr-footer" role="contentinfo" id="footer">
-//     <div className="fr-container">
-//       <div className="flex justify-between fr-footer__body">
-//         <MinistereLogo />
-//         <div className="flex">
-//           <img src={poleEmploiLogo} alt="logo-pole-emploi" />
-//           <img src={lesEntrepriseSengagent} alt="logo-pole-emploi" />
-//         </div>
-//       </div>
-//       <div className="fr-footer__bottom">
-//         <ul className="fr-footer__bottom-list">
-//           <li className="fr-footer__bottom-item">
-//             <a
-//               className="fr-footer__bottom-link"
-//               href="https://immersion-facile-1.gitbook.io/mentions-legales/"
-//               target="_blank"
-//             >
-//               Mentions légales
-//             </a>
-//           </li>
-//           <li className="fr-footer__bottom-item">
-//             <a
-//               className="fr-footer__bottom-link"
-//               href="https://immersion-facile-1.gitbook.io/mentions-legales/politique-de-confidentialite"
-//               target="_blank"
-//             >
-//               Politique de confidentialité
-//             </a>
-//           </li>
-//           <li className="fr-footer__bottom-item">
-//             <a
-//               className="fr-footer__bottom-link"
-//               href="https://immersion-facile-1.gitbook.io/mentions-legales/conditions-generales-dutilisation"
-//               target="_blank"
-//             >
-//               Conditions générales d'utilisation
-//             </a>
-//           </li>
-//           <li className="fr-footer__bottom-item">
-//             <a
-//               className="fr-footer__bottom-link"
-//               href="mailto:contact@immersion-facile.beta.gouv.fr"
-//             >
-//               Nous contacter
-//             </a>
-//           </li>
-//           <li className="fr-footer__bottom-item">
-//             <a
-//               className="fr-footer__bottom-link"
-//               href="https://immersion-facile-1.gitbook.io/la-page-stats-de-immersion-facilitee/mXyCG0khRml5mCWUU0Pe/la-mesure-de-limpact-dimmersion-facilitee"
-//               target="_blank"
-//             >
-//               Statistiques
-//             </a>
-//           </li>
-//         </ul>
-//         <div className="fr-footer__bottom-copy">
-//           <p>
-//             Sauf mention contraire, tous les textes de ce site sont sous{" "}
-//             <a
-//               href="https://github.com/etalab/licence-ouverte/blob/master/LO.md"
-//               target="_blank"
-//             >
-//               licence etalab-2.0
-//             </a>
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   </footer>
-// </div>

@@ -2,9 +2,10 @@ import React from "react";
 import { Link } from "type-route";
 
 export type NavLink = {
-  link: Link;
+  link: Link | string;
   label: string;
   active?: boolean;
+  target?: string;
 };
 
 export type NavWrapper = {
