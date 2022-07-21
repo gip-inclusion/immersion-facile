@@ -35,7 +35,7 @@ type ContextType<TargetUrls extends string> = {
 export class ManagedAxios<TargetUrls extends string> implements HttpClient {
   constructor(
     //prettier-ignore
-    private readonly targetsUrls: Record<TargetUrls, (params: any) => AbsoluteUrl>,
+    public readonly targetsUrls: Record<TargetUrls, (params?: any) => AbsoluteUrl>,
     //prettier-ignore
     private readonly targetsErrorMapper: ErrorMapper<TargetUrls> = {},
     //prettier-ignore
@@ -56,12 +56,6 @@ export class ManagedAxios<TargetUrls extends string> implements HttpClient {
     context: AxiosInstanceContext,
   ): AxiosInstance => {
     const axiosInstance = axios.create(context.axiosRequestConfig);
-
-    //TODO Add request interceptors ?
-    /*    axiosInstance.interceptors.request.use(
-      axiosValidRequestInterceptor(targetsUrlsMapper),
-      axiosErrorRequestInterceptor,
-    );*/
 
     axiosInstance.interceptors.response.use(
       context.onFulfilledResponseInterceptor,

@@ -13,8 +13,6 @@ export class HttpClientError extends Error {
 }
 
 export class HttpClientForbiddenError extends HttpClientError {
-  //public readonly httpStatusCode = 401;
-
   constructor(
     public override readonly message: string,
     public override readonly cause: Error, //TODO Restrict to valid HttpStatusCodeError

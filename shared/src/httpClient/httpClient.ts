@@ -47,8 +47,8 @@ export type ErrorMapper<TargetUrls extends string> = Partial<
   Record<TargetUrls, Partial<Record<string, (error: Error) => Error>>>
 >;
 
-export interface HttpResponse<T = any, _D = any> {
-  data: T;
+export interface HttpResponse {
+  data: unknown;
   status: number;
   statusText: string;
   headers: any;

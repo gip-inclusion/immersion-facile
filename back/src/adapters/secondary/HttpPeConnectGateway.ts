@@ -1,4 +1,3 @@
-import type { AxiosInstance } from "axios";
 import { AxiosResponse } from "axios";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
@@ -27,10 +26,15 @@ import {
 import { PeConnectGateway } from "../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../utils/logger";
 import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";
+import {
+  ErrorMapper,
+  HttpResponse,
+  TargetUrlsMapper,
+} from "shared/src/httpClient/httpClient";
+import { ManagedRedirectError } from "../primary/helpers/redirectErrors";
+import { ManagedAxios } from "shared/src/httpClient/adapters/axios.adapter";
 
 const logger = createLogger(__filename);
-
-const AXIOS_TIMEOUT_FIVE_SECOND = 5000;
 
 export type HttpPeConnectGatewayConfig = {
   peAuthCandidatUrl: AbsoluteUrl;
@@ -41,32 +45,21 @@ export type HttpPeConnectGatewayConfig = {
 };
 
 export class HttpPeConnectGateway implements PeConnectGateway {
-  private apiPeConnectUrls: Record<PeConnectUrlTargets, AbsoluteUrl>;
-
   public constructor(
     private readonly config: HttpPeConnectGatewayConfig,
-    private readonly httpClient: AxiosInstance,
-  ) {
-    // TODO Extract and inject
-    this.apiPeConnectUrls = makeApiPeConnectUrls({
-      peAuthCandidatUrl: config.peAuthCandidatUrl,
-      immersionBaseUrl: config.immersionFacileBaseUrl,
-      peApiUrl: config.peApiUrl,
-    });
-  }
+    private readonly httpClient: ManagedAxios<PeConnectUrlTargets>,
+  ) {}
 
   public oAuthGetAuthorizationCodeRedirectUrl(): AbsoluteUrl {
     const authorizationCodePayload: ExternalPeConnectOAuthGrantPayload = {
       response_type: "code",
       client_id: this.config.clientId,
       realm: "/individu",
-      redirect_uri: this.apiPeConnectUrls.REGISTERED_REDIRECT_URL,
+      redirect_uri: this.httpClient.targetsUrls.REGISTERED_REDIRECT_URL(),
       scope: peConnectNeededScopes(this.config.clientId),
     };
 
-    return `${
-      this.apiPeConnectUrls.OAUTH2_AUTH_CODE_STEP_1
-    }?${queryParamsAsString<ExternalPeConnectOAuthGrantPayload>(
+    return `${this.httpClient.targetsUrls.OAUTH2_AUTH_CODE_STEP_1()}?${queryParamsAsString<ExternalPeConnectOAuthGrantPayload>(
       authorizationCodePayload,
     )}`;
   }
@@ -80,19 +73,18 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         code: authorizationCode,
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
-        redirect_uri: this.apiPeConnectUrls.REGISTERED_REDIRECT_URL,
+        redirect_uri: this.httpClient.targetsUrls.REGISTERED_REDIRECT_URL(),
       };
 
-    const response: AxiosResponse = await this.httpClient.post(
-      this.apiPeConnectUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
-      queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
+    const response: HttpResponse = await this.httpClient.post({
+      target: this.httpClient.targetsUrls.OAUTH2_ACCESS_TOKEN_STEP_2,
+      data: queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
         getAccessTokenPayload,
       ),
-      {
+      adapterConfig: {
         headers: headersUrlEncoded(),
-        timeout: AXIOS_TIMEOUT_FIVE_SECOND,
       },
-    );
+    });
 
     const externalAccessToken: ExternalAccessToken = validateAndParseZodSchema(
       externalAccessTokenSchema,
@@ -110,13 +102,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     accessToken: AccessTokenDto,
   ): Promise<PeConnectUserDto> {
     //const trackId = stringToMd5(accessToken.value);
-    const response = await this.httpClient.get(
-      this.apiPeConnectUrls.PECONNECT_USER_INFO,
-      {
+    const response: HttpResponse = await this.httpClient.get({
+      target: this.httpClient.targetsUrls.PECONNECT_USER_INFO,
+      adapterConfig: {
         headers: headersWithAuthPeAccessToken(accessToken),
-        timeout: AXIOS_TIMEOUT_FIVE_SECOND,
       },
-    );
+    });
 
     const body = this.extractUserInfoBodyFromResponse(response);
 
@@ -134,13 +125,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     //const trackId = stringToMd5(accessToken.value);
     //return this.retryStrategy.apply(async () => {
 
-    const response: AxiosResponse = await this.httpClient.get(
-      this.apiPeConnectUrls.PECONNECT_ADVISORS_INFO,
-      {
+    const response: AxiosResponse = await this.httpClient.get({
+      target: this.httpClient.targetsUrls.PECONNECT_ADVISORS_INFO,
+      adapterConfig: {
         headers: headersWithAuthPeAccessToken(accessToken),
-        timeout: AXIOS_TIMEOUT_FIVE_SECOND,
       },
-    );
+    });
 
     // Here
 
@@ -188,6 +178,21 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   }
 }
 
+export const httpPeConnectGatewayTargetMapperMaker = (
+  config: HttpPeConnectGatewayConfig,
+): TargetUrlsMapper<PeConnectUrlTargets> => ({
+  OAUTH2_AUTH_CODE_STEP_1: (): AbsoluteUrl =>
+    `${config.peAuthCandidatUrl}/connexion/oauth2/authorize/`,
+  OAUTH2_ACCESS_TOKEN_STEP_2: () =>
+    `${config.peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
+  REGISTERED_REDIRECT_URL: () =>
+    `${config.immersionFacileBaseUrl}/api/pe-connect`,
+  PECONNECT_USER_INFO: () =>
+    `${config.peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
+  PECONNECT_ADVISORS_INFO: () =>
+    `${config.peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
+});
+
 export type PeConnectUrlTargets =
   | "OAUTH2_AUTH_CODE_STEP_1"
   | "OAUTH2_ACCESS_TOKEN_STEP_2"
@@ -195,17 +200,16 @@ export type PeConnectUrlTargets =
   | "PECONNECT_USER_INFO"
   | "PECONNECT_ADVISORS_INFO";
 
-export const makeApiPeConnectUrls = (params: {
-  peAuthCandidatUrl: AbsoluteUrl;
-  peApiUrl: AbsoluteUrl;
-  immersionBaseUrl: AbsoluteUrl;
-}): Record<PeConnectUrlTargets, AbsoluteUrl> => ({
-  OAUTH2_AUTH_CODE_STEP_1: `${params.peAuthCandidatUrl}/connexion/oauth2/authorize`,
-  OAUTH2_ACCESS_TOKEN_STEP_2: `${params.peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
-  REGISTERED_REDIRECT_URL: `${params.immersionBaseUrl}/api/pe-connect`,
-  PECONNECT_USER_INFO: `${params.peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
-  PECONNECT_ADVISORS_INFO: `${params.peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
-});
+export const errorMapper: ErrorMapper<PeConnectUrlTargets> = {
+  PECONNECT_ADVISORS_INFO: {
+    HttpClientForbiddenError: (error) =>
+      new ManagedRedirectError("peConnectAdvisorForbiddenAccess", error),
+  },
+  OAUTH2_ACCESS_TOKEN_STEP_2: {
+    HttpClientBadError: (error) =>
+      new ManagedRedirectError("peConnectInvalidGrant", error),
+  },
+};
 
 const peConnectNeededScopes = (clientId: string): string =>
   [
@@ -225,22 +229,6 @@ const headersWithAuthPeAccessToken = (
   Accept: "application/json",
   Authorization: `Bearer ${accessToken.value}`,
 });
-
-const getOAuthGetAccessTokenThroughAuthorizationCodeResponse = (
-  axiosInstance: AxiosInstance,
-  targetUrl: PeConnectUrlTargets,
-  getAccessTokenPayload: ExternalPeConnectOAuthGetTokenWithCodeGrantPayload,
-): Promise<AxiosResponse> =>
-  axiosInstance.post(
-    targetUrl,
-    queryParamsAsString<ExternalPeConnectOAuthGetTokenWithCodeGrantPayload>(
-      getAccessTokenPayload,
-    ),
-    {
-      headers: headersUrlEncoded(),
-      timeout: AXIOS_TIMEOUT_FIVE_SECOND,
-    },
-  );
 
 const headersUrlEncoded = (): { [key: string]: string } => ({
   "Content-Type": "application/x-www-form-urlencoded",

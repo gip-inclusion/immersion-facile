@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { HttpClientError } from "shared/src/httpClient/errors/4xxClientError.error";
-import { HttpServerError } from "shared/src/httpClient/errors/5xxServerError.error";
+import { HttpClientError } from "shared/src/httpClient/errors/HttpClientError.error";
+import { HttpServerError } from "shared/src/httpClient/errors/HttpServerError.error";
 import { HttpError, UnauthorizedError } from "./httpErrors";
 import { unhandledError } from "./unhandledError";
 

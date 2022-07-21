@@ -9,13 +9,9 @@ import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGate
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
 import {
-  createManagedAxiosInstance,
-  ErrorMapper,
-  TargetMapper,
-} from "../shared/src/httpClient/ports/axios.adapter";
-import {
+  errorMapper,
   HttpPeConnectGateway,
-  makeApiPeConnectUrls,
+  httpPeConnectGatewayTargetMapperMaker,
   PeConnectUrlTargets,
 } from "../../secondary/HttpPeConnectGateway";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
@@ -34,9 +30,12 @@ import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
 import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
 import { AppConfig } from "./appConfig";
-import { ManagedRedirectError } from "../helpers/redirectErrors";
+import { TargetUrlsMapper } from "shared/src/httpClient/httpClient";
+import { ManagedAxios } from "shared/src/httpClient/adapters/axios.adapter";
 
 const logger = createLogger(__filename);
+
+const AXIOS_TIMEOUT_FIVE_SECOND = 5000;
 
 export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
@@ -65,15 +64,6 @@ export type Gateways = ReturnType<typeof createGateways> extends Promise<infer T
   ? T
   : never;
 
-const errorMapper: ErrorMapper<PeConnectUrlTargets> = {
-  PECONNECT_ADVISORS_INFO: {
-    401: () => new ManagedRedirectError("peConnectAdvisorForbiddenAccess"),
-  },
-  OAUTH2_ACCESS_TOKEN_STEP_2: {
-    400: () => new ManagedRedirectError("peConnectInvalidGrant"),
-  },
-};
-
 // eslint-disable-next-line @typescript-eslint/require-await
 export const createGateways = async (config: AppConfig, clock: Clock) => {
   logger.info({
@@ -82,18 +72,6 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
     emailGateway: config.emailGateway,
     romeRepository: config.romeRepository,
   });
-
-  // TODO Move from here
-  const httpPeConnectGatewayTargetMapper: TargetMapper<PeConnectUrlTargets> =
-    config.poleEmploiGateway === "HTTPS"
-      ? makeApiPeConnectUrls({
-          peAuthCandidatUrl:
-            config.poleEmploiAccessTokenConfig.peAuthCandidatUrl,
-          immersionBaseUrl:
-            config.poleEmploiAccessTokenConfig.immersionFacileBaseUrl,
-          peApiUrl: config.poleEmploiAccessTokenConfig.peApiUrl,
-        })
-      : ({} as TargetMapper<PeConnectUrlTargets>);
 
   const cachingAccessTokenGateway = [
     config.laBonneBoiteGateway,
@@ -108,6 +86,13 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
         clock,
       )
     : new InMemoryAccessTokenGateway();
+
+  const httpPeConnectGatewayTargetUrlsMapper: TargetUrlsMapper<PeConnectUrlTargets> =
+    config.poleEmploiGateway === "HTTPS"
+      ? httpPeConnectGatewayTargetMapperMaker(
+          config.poleEmploiAccessTokenConfig,
+        )
+      : ({} as TargetUrlsMapper<PeConnectUrlTargets>);
 
   return {
     email: createEmailGateway(config, clock),
@@ -140,17 +125,13 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
       config.peConnectGateway === "HTTPS"
         ? new HttpPeConnectGateway(
             config.poleEmploiAccessTokenConfig,
-            createManagedAxiosInstance(
-              httpPeConnectGatewayTargetMapper,
+            new ManagedAxios(
+              httpPeConnectGatewayTargetUrlsMapper,
               errorMapper,
+              {
+                timeout: AXIOS_TIMEOUT_FIVE_SECOND,
+              },
             ),
-            /*new ExponentialBackoffRetryStrategy(
-              3_000,
-              15_0000,
-              clock,
-              sleep,
-              random,
-            ),*/
           )
         : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl),
 
