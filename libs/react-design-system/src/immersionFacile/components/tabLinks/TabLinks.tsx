@@ -1,10 +1,9 @@
 import React from "react";
-import { Link } from "type-route";
 
 export type NavLink = {
-  link?: Link;
+  onClick?: () => void;
   label: string;
-  href?: string;
+  href: string;
   active?: boolean;
   target?: string;
 };
@@ -16,11 +15,12 @@ export type NavWrapper = {
   ariaLabel: string;
 };
 
-const TabLink = ({ link, active, label }: NavLink) => (
+const TabLink = ({ href, onClick, active, label }: NavLink) => (
   <li className="fr-nav__item">
     <a
       className="fr-nav__link"
-      {...link}
+      href={href}
+      onClick={onClick}
       aria-current={active ? "page" : undefined}
     >
       {label}
