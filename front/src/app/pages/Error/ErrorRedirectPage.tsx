@@ -24,6 +24,8 @@ const managedErrors: Record<ManagedRedirectErrorKinds, () => JSX.Element> = {
   peConnectNoValidAdvisor: PEConnectNoValidAdvisor,
   peConnectNoValidUser: PEConnectNoValidUser,
   peConnectInvalidGrant: PEConnectInvalidGrantError,
+  // TODO Create view PEConnectAdvisorForbiddenAccess
+  peConnectAdvisorForbiddenAccess: PEConnectNoValidAdvisor,
 };
 
 export const ErrorRedirectPage = ({ route }: ErrorRedirectProps) => (

@@ -11,15 +11,3 @@ export class HttpClientError extends Error {
     this.message = message;
   }
 }
-
-export class HttpClientForbiddenError extends HttpClientError {
-  constructor(
-    public override readonly message: string,
-    public override readonly cause: Error, //TODO Restrict to valid HttpStatusCodeError
-  ) {
-    super(message, cause, 401);
-    Error.captureStackTrace(this, this.constructor);
-    this.name = this.constructor.name;
-    this.message = message;
-  }
-}

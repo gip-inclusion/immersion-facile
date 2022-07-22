@@ -1,3 +1,5 @@
+import { TargetUrlsMapper } from "@serenity-dev/http-client";
+import { ManagedAxios } from "@serenity-dev/http-client/src/adapters/axios.adapter";
 import { Pool } from "pg";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
@@ -30,8 +32,6 @@ import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
 import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
 import { AppConfig } from "./appConfig";
-import { TargetUrlsMapper } from "shared/src/httpClient/httpClient";
-import { ManagedAxios } from "shared/src/httpClient/adapters/axios.adapter";
 
 const logger = createLogger(__filename);
 
@@ -125,7 +125,7 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
       config.peConnectGateway === "HTTPS"
         ? new HttpPeConnectGateway(
             config.poleEmploiAccessTokenConfig,
-            new ManagedAxios(
+            new ManagedAxios<PeConnectUrlTargets>(
               httpPeConnectGatewayTargetUrlsMapper,
               errorMapper,
               {

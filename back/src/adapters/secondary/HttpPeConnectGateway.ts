@@ -1,3 +1,9 @@
+import { ManagedAxios } from "@serenity-dev/http-client/src/adapters/axios.adapter";
+import {
+  ErrorMapper,
+  HttpResponse,
+  TargetUrlsMapper,
+} from "@serenity-dev/http-client/src/httpClient";
 import { AxiosResponse } from "axios";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
@@ -26,13 +32,7 @@ import {
 import { PeConnectGateway } from "../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../utils/logger";
 import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";
-import {
-  ErrorMapper,
-  HttpResponse,
-  TargetUrlsMapper,
-} from "shared/src/httpClient/httpClient";
 import { ManagedRedirectError } from "../primary/helpers/redirectErrors";
-import { ManagedAxios } from "shared/src/httpClient/adapters/axios.adapter";
 
 const logger = createLogger(__filename);
 
@@ -206,7 +206,7 @@ export const errorMapper: ErrorMapper<PeConnectUrlTargets> = {
       new ManagedRedirectError("peConnectAdvisorForbiddenAccess", error),
   },
   OAUTH2_ACCESS_TOKEN_STEP_2: {
-    HttpClientBadError: (error) =>
+    HttpClientBadRequestError: (error) =>
       new ManagedRedirectError("peConnectInvalidGrant", error),
   },
 };
