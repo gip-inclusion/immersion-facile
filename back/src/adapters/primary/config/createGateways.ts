@@ -31,7 +31,7 @@ import { InMemorySireneGateway } from "../../secondary/InMemorySireneGateway";
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
 import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
-import { AppConfig } from "./appConfig";
+import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 
 const logger = createLogger(__filename);
 
@@ -158,17 +158,6 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
         : new InMemoryDocumentGateway(),
   };
 };
-
-export const makeEmailAllowListPredicate = ({
-  skipEmailAllowList,
-  emailAllowList,
-}: {
-  skipEmailAllowList: boolean;
-  emailAllowList: string[];
-}): ((recipient: string) => boolean) =>
-  skipEmailAllowList
-    ? (_recipient: string) => true
-    : (recipient: string): boolean => emailAllowList.includes(recipient);
 
 const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
   if (config.emailGateway === "IN_MEMORY")

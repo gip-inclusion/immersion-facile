@@ -327,3 +327,15 @@ const parseStringList = (str: string | undefined, separator = ","): string[] =>
     .split(separator)
     .map(trim)
     .filter((el) => !!el);
+
+// Email allow list from env variable
+export const makeEmailAllowListPredicate = ({
+  skipEmailAllowList,
+  emailAllowList,
+}: {
+  skipEmailAllowList: boolean;
+  emailAllowList: string[];
+}): ((recipient: string) => boolean) =>
+  skipEmailAllowList
+    ? (_recipient: string) => true
+    : (recipient: string): boolean => emailAllowList.includes(recipient);

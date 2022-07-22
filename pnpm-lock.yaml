@@ -10,7 +10,7 @@ importers:
       '@babel/core': ^7.17.9
       '@babel/preset-env': ^7.16.11
       '@babel/preset-typescript': ^7.16.7
-      '@serenity-dev/http-client': ^0.0.4
+      '@serenity-dev/http-client': ^0.0.5
       '@types/archiver': ^5.3.1
       '@types/body-parser': ^1.19.2
       '@types/express': ^4.17.13
@@ -68,7 +68,7 @@ importers:
       uuid: ^8.3.2
       zod: ^3.14.2
     dependencies:
-      '@serenity-dev/http-client': 0.0.4
+      '@serenity-dev/http-client': 0.0.5
       archiver: 5.3.1
       axios: 0.26.1
       body-parser: 1.20.0
@@ -3992,8 +3992,8 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /@serenity-dev/http-client/0.0.4:
-    resolution: {integrity: sha512-h5zBeg+SkSzL7e7JcGjj9Qwqcolp6C0BVcEMCjr4+Nj+PaFDI/u8vs1+u8/zGXJFbxxd+gL29wACeF0aK+MlUA==}
+  /@serenity-dev/http-client/0.0.5:
+    resolution: {integrity: sha512-xfF3yWuCCbHBsAoe0T5SXR6xevPu4IpXP9H9ZKbJuKNgKVhErCNpFZyt9BFMGOGsZ3Kpbm+VaQROTDnzE4QhXw==}
     dependencies:
       axios: 0.26.1
     transitivePeerDependencies:
