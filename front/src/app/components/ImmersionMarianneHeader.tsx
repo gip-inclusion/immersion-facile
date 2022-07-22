@@ -32,52 +32,46 @@ export const ImmersionMarianneHeader = () => {
   const links: (NavLink & { display: boolean })[] = [
     {
       label: "Home",
-      href: routes.home().link.href,
       display: isAdminConnected,
       active: currentRoute.name === routes.home().name,
+      ...routes.home().link,
     },
     {
       label: "Demande immersion",
-      href: routes.convention().link.href,
-      onClick: routes.convention().link.onClick,
       display: isAdminConnected,
       active: currentRoute.name === routes.convention().name,
+      ...routes.convention().link,
     },
     {
       label: "Formulaire Entreprise",
-      href: routes.formEstablishment().link.href,
-      onClick: routes.formEstablishment().link.onClick,
       display: isAdminConnected,
       active: currentRoute.name === routes.formEstablishment().name,
+      ...routes.formEstablishment().link,
     },
     {
       label: "Landing entreprise",
-      href: routes.landingEstablishment().link.href,
-      onClick: routes.landingEstablishment().link.onClick,
       display: isAdminConnected,
       active: currentRoute.name === routes.landingEstablishment().name,
+      ...routes.landingEstablishment().link,
     },
     {
       label: "Recherche",
-      href: routes.search().link.href,
-      onClick: routes.search().link.onClick,
       display: isAdminConnected,
       active: currentRoute.name === routes.search().name,
+      ...routes.search().link,
     },
     {
       label: "Ajouter agence",
-      href: routes.addAgency().link.href,
-      onClick: routes.addAgency().link.onClick,
       display: isAdminConnected,
       active: currentRoute.name === routes.addAgency().name,
+      ...routes.addAgency().link,
     },
     {
       label: "Backoffice",
-      href: routes.adminTab({ tab: "conventions" }).link.href,
-      onClick: routes.adminTab({ tab: "conventions" }).link.onClick,
       display: isAdminConnected && featureFlags.enableAdminUi,
       active:
         currentRoute.name === routes.adminTab({ tab: "conventions" }).name,
+      ...routes.adminTab({ tab: "conventions" }).link,
     },
   ];
   const linksFiltered = links.filter((link) => link.display);

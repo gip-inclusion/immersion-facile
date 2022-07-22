@@ -12,28 +12,24 @@ import "./Admin.css";
 
 const getNavLinks = (currentTab: AdminTab): NavLink[] => [
   {
-    href: routes.adminTab({ tab: "conventions" }).link.href,
-    onClick: routes.adminTab({ tab: "conventions" }).link.onClick,
     label: "Conventions",
     active: currentTab === "conventions",
+    ...routes.adminTab({ tab: "agency-validation" }).link,
   },
   {
-    href: routes.adminTab({ tab: "agency-validation" }).link.href,
-    onClick: routes.adminTab({ tab: "agency-validation" }).link.onClick,
     label: "Agences",
     active: currentTab === "agency-validation",
+    ...routes.adminTab({ tab: "agency-validation" }).link,
   },
   {
-    href: routes.adminTab({ tab: "exports" }).link.href,
-    onClick: routes.adminTab({ tab: "exports" }).link.onClick,
     label: "Export de données",
     active: currentTab === "exports",
+    ...routes.adminTab({ tab: "exports" }).link,
   },
   {
-    href: routes.adminTab({ tab: "emails" }).link.href,
-    onClick: routes.adminTab({ tab: "emails" }).link.onClick,
     label: "Emails",
     active: currentTab === "emails",
+    ...routes.adminTab({ tab: "emails" }).link,
   },
 ];
 
