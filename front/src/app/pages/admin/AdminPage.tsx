@@ -14,7 +14,7 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
   {
     label: "Conventions",
     active: currentTab === "conventions",
-    ...routes.adminTab({ tab: "agency-validation" }).link,
+    ...routes.adminTab({ tab: "conventions" }).link,
   },
   {
     label: "Agences",
