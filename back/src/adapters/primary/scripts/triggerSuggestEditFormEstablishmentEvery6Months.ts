@@ -12,8 +12,7 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
-import { AppConfig } from "../config/appConfig";
-import { makeEmailAllowListPredicate } from "../config/createGateways";
+import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/makeGenerateEditFormEstablishmentUrl";
 import { createPgUow } from "../config/uowConfig";
 

@@ -5,8 +5,7 @@ import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
-import { AppConfig } from "../config/appConfig";
-import { makeEmailAllowListPredicate } from "../config/createGateways";
+import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { createGenerateConventionMagicLink } from "../config/createGenerateConventionMagicLink";
 import { createUowPerformer } from "../config/uowConfig";
 

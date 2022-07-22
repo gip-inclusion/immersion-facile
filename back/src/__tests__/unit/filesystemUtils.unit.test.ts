@@ -22,9 +22,8 @@ describe("Filesystem utils", () => {
     fse.writeFileSync(pathResult, "Hey there!");
 
     expect(fse.pathExistsSync(pathResult)).toBe(true);
-
     fse.unlinkSync(pathResult);
-    fse.removeSync(pathResult);
+    //fse.removeSync(pathResult);
   });
 
   it("should remove the filepath and randomized temporary storage directory", async () => {
