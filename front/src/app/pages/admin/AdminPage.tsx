@@ -43,23 +43,24 @@ export const AdminPage = ({
   return (
     <>
       <ImmersionMarianneHeader />
-
-      <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
-        <div className="fr-col-lg-8 fr-p-2w mt-4">
-          <TabLinks
-            navLinks={getNavLinks(currentTab)}
-            navWrapper={{
-              role: "navigation",
-              id: "menu-admin",
-              className: "fr-nav fr-nav--admin",
-              ariaLabel: "Menu admin",
-            }}
-          />
-          <div className="fr-tab-content">
-            {currentTab === "conventions" && <ConventionTab />}
-            {currentTab === "agency-validation" && <AgencyTab />}
-            {currentTab === "exports" && <DataExportTab />}
-            {currentTab === "emails" && <EmailsTab />}
+      <div className="fr-container">
+        <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+          <div className="fr-col-lg-8 fr-p-2w mt-4">
+            <TabLinks
+              navLinks={getNavLinks(currentTab)}
+              navWrapper={{
+                role: "navigation",
+                id: "menu-admin",
+                className: "fr-nav fr-nav--admin",
+                ariaLabel: "Menu admin",
+              }}
+            />
+            <div className="fr-tab-content">
+              {currentTab === "conventions" && <ConventionTab />}
+              {currentTab === "agency-validation" && <AgencyTab />}
+              {currentTab === "exports" && <DataExportTab />}
+              {currentTab === "emails" && <EmailsTab />}
+            </div>
           </div>
         </div>
       </div>
