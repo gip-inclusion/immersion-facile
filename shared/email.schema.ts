@@ -6,7 +6,7 @@ export const emailTypeSchema = z.string() as z.Schema<EmailType>;
 export const templatedEmailSchema = z.object({
   type: emailTypeSchema,
   recipients: z.array(z.string()),
-  cc: z.array(z.string()),
+  cc: z.array(z.string()).optional(),
   params: z.any(),
 }) as z.Schema<TemplatedEmail>;
 
