@@ -12,6 +12,8 @@
     "front": "pnpm --dir front",
     "shared": "pnpm --dir shared",
 
+    "cypress": "pnpm --dir cypress cypress:open",
+
     "lint:back": "eslint back/src --fix",
     "lint:front": "eslint front/src --fix",
     "lint:shared": "eslint shared/src --fix",

@@ -3,3 +3,4 @@ packages:
   - "back"
   - "shared"
   - "libs/*"
+  - "cypress"

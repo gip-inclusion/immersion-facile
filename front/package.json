@@ -13,8 +13,7 @@
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck && npm run lint",
-    "lint": "pnpm -w run lint:front",
-    "cypress": "cypress open"
+    "lint": "pnpm -w run lint:front"
   },
   "dependencies": {
     "@dataesr/react-dsfr": "^1.0.5",
@@ -60,7 +59,6 @@
     "@vitejs/plugin-react": "^1.2.0",
     "autoprefixer": "^10.4.4",
     "babel-jest": "^27.5.1",
-    "cypress": "^10.3.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^27.5.1",

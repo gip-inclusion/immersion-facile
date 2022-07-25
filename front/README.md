@@ -40,6 +40,7 @@ sudo apt-get update && sudo apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev li
 ```
 
 ### Open the app
+At the root of the project run :
 ```shell
 pnpm cypress
 ```

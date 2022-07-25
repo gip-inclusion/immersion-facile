@@ -1,4 +1,3 @@
-import { values } from "ramda";
 import { frontRoutes } from "shared/src/routes";
 
 describe("Simple navigation", () => {

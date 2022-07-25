@@ -18,7 +18,7 @@ stages:
 #build:
 #  stage: build
 #  before_script:
-#    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7.0.0-rc.9
+#    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
 #    - pnpm config set store-dir .pnpm-store
 #  script:
 #    - pnpm install --frozen-lockfile
@@ -26,7 +26,7 @@ stages:
 front:
   stage: test
   before_script:
-    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7.0.0-rc.9
+    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
     - pnpm config set store-dir .pnpm-store
   script:
     - pnpm install --frozen-lockfile
@@ -43,7 +43,7 @@ front:
 back:
   stage: test
   before_script:
-    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7.0.0-rc.9
+    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
     - pnpm config set store-dir .pnpm-store
   services:
     - name: postgis/postgis:13-master
@@ -61,25 +61,25 @@ back:
     - NODE_ENV=test DATABASE_URL=$PG_TEST_URL npm run migrate up
     - PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm run test:all
 
-sonarqube-check:
-  stage: test
-  image:
-    name: sonarsource/sonar-scanner-cli:latest
-  variables:
-    SONAR_TOKEN: "${SONAR_TOKEN}"
-    SONAR_HOST_URL: "https://sonarqube.beta.pole-emploi.fr"
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
-    GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the analysis task
-  cache:
-    key: ${CI_JOB_NAME}
-    paths:
-      - .sonar/cache
-  script:
-    - npm install typescript
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=immersion-facile -Dsonar.scm.disabled=true
-  allow_failure: true
-  only:
-    - dev
+#sonarqube-check:
+#  stage: test
+#  image:
+#    name: sonarsource/sonar-scanner-cli:latest
+#  variables:
+#    SONAR_TOKEN: "${SONAR_TOKEN}"
+#    SONAR_HOST_URL: "https://sonarqube.beta.pole-emploi.fr"
+#    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
+#    GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the analysis task
+#  cache:
+#    key: ${CI_JOB_NAME}
+#    paths:
+#      - .sonar/cache
+#  script:
+#    - npm install typescript
+#    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=immersion-facile -Dsonar.scm.disabled=true
+#  allow_failure: true
+#  only:
+#    - dev
 
 deploy_on_dev:
   cache: []

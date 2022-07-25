@@ -16,4 +16,4 @@ FILENAME="docker_$DAY.tar.bz2";
 
 mkdir -p $DIST_DIR;
 
-$NICE tar --exclude=cache/* --exclude=*.log --exclude=*.gz --exclude=*.bz2 -C /home/docker/ -I pbzip2 -cf - . | tee $LOCAL_DIR/$FILENAME $DIST_DIR/$FILENAME >/dev/null;
+$NICE tar --exclude=cache/* --exclude=*.log --exclude=*.gz --exclude=*.bz2 -C /home/docker/immersion-facile/docker-data -I pbzip2 -cf - . | tee $LOCAL_DIR/$FILENAME $DIST_DIR/$FILENAME >/dev/null;

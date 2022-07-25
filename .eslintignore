@@ -4,3 +4,4 @@ node_modules/
 .idea/
 .git/
 vite.config.ts
+cypress
