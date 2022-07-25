@@ -32,17 +32,17 @@ export class BasicEventCrawler implements EventCrawler {
 
   private async retreiveAllUnpublishedEvents(): Promise<DomainEvent[]> {
     //eslint-disable-next-line no-console
-    console.time("__metrics : getAllUnpublishedEvents query duration");
+    //console.time("__metrics : getAllUnpublishedEvents query duration");
     try {
       const events = await this.uowPerformer.perform((uow) =>
         uow.outboxQueries.getAllUnpublishedEvents(),
       );
       //eslint-disable-next-line no-console
-      console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
+      //console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
       return events;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
+      //console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
       logger.error({ error }, "Event Crawler failed to process new events");
       notifyObjectDiscord(error);
       return [];
@@ -50,15 +50,17 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   public async retryFailedEvents() {
-    //eslint-disable-next-line no-console
-    console.time("__metrics : getAllFailedEvents query duration");
-    const events = await this.uowPerformer.perform((uow) =>
-      uow.outboxQueries.getAllFailedEvents(),
-    );
-    //eslint-disable-next-line no-console
-    console.timeEnd("__metrics : getAllFailedEvents query duration");
-    logger.debug({ events: eventsToDebugInfo(events) }, "retrying Events");
-    await Promise.all(events.map((event) => this.eventBus.publish(event)));
+    try {
+      const events = await this.uowPerformer.perform((uow) =>
+        uow.outboxQueries.getAllFailedEvents(),
+      );
+      logger.info({ events: eventsToDebugInfo(events) }, "retrying Events");
+      await Promise.all(events.map((event) => this.eventBus.publish(event)));
+    } catch (error) {
+      logger.error({ error }, "Event Crawler failed to process failed events");
+      notifyObjectDiscord(error);
+      return [];
+    }
   }
 }
 

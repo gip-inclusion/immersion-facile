@@ -41,7 +41,7 @@ export class HttpExcelExportGateway implements ExcelExportGateway {
 }
 
 const buildExportEstablishmentRoute = (params: EstablishmentExportConfigDto) =>
-  `/api/admin/excel/${exportEstablismentsExcelRoute}?${queryParamsAsString<EstablishmentExportConfigDto>(
+  `/admin/excel/${exportEstablismentsExcelRoute}?${queryParamsAsString<EstablishmentExportConfigDto>(
     params,
   )}`;
 
