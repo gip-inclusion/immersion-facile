@@ -1,5 +1,6 @@
 import {
   AxiosErrorWithResponse,
+  HttpClientError,
   InfrastructureError,
   isHttpError,
   ManagedAxios,
@@ -41,7 +42,10 @@ import {
 import { PeConnectGateway } from "../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../utils/logger";
 import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";
-import { ManagedRedirectError } from "../primary/helpers/redirectErrors";
+import {
+  ManagedRedirectError,
+  RawRedirectError,
+} from "../primary/helpers/redirectErrors";
 import { notifyObjectDiscord } from "../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
@@ -210,15 +214,58 @@ export type PeConnectUrlTargets =
   | "PECONNECT_USER_INFO"
   | "PECONNECT_ADVISORS_INFO";
 
+const notifyHttpErrorsToHandleBetter = (
+  target: string,
+  error: HttpClientError,
+) =>
+  notifyObjectDiscord({
+    target,
+    name: error.name,
+    message: error.message,
+    httpStatusCode: error.httpStatusCode,
+  });
+
 export const errorMapper: ErrorMapper<PeConnectUrlTargets> = {
   PECONNECT_ADVISORS_INFO: {
     HttpClientForbiddenError: (error) =>
       new ManagedRedirectError("peConnectAdvisorForbiddenAccess", error),
+    HttpClientError: (error) => {
+      notifyHttpErrorsToHandleBetter(
+        "PECONNECT_ADVISORS_INFO",
+        error as HttpClientError,
+      );
+      return new RawRedirectError(error.name, error.message, error);
+    },
+  },
+  PECONNECT_USER_INFO: {
+    HttpClientForbiddenError: (error) =>
+      new ManagedRedirectError("peConnectUserForbiddenAccess", error),
+    HttpClientError: (error) => {
+      notifyHttpErrorsToHandleBetter(
+        "PECONNECT_USER_INFO",
+        error as HttpClientError,
+      );
+      return new RawRedirectError(error.name, error.message, error);
+    },
   },
   OAUTH2_ACCESS_TOKEN_STEP_2: {
-    HttpClientBadRequestError: (error) =>
-      new ManagedRedirectError("peConnectInvalidGrant", error),
+    HttpClientError: (error) => {
+      if (isInvalidGrantError(error as HttpClientError))
+        return new ManagedRedirectError("peConnectInvalidGrant", error);
+
+      notifyHttpErrorsToHandleBetter(
+        "OAUTH2_ACCESS_TOKEN_STEP_2",
+        error as HttpClientError,
+      );
+
+      return new RawRedirectError(error.name, error.message, error);
+    },
   },
+};
+
+const isInvalidGrantError = (error: HttpClientError) => {
+  notifyObjectDiscord({ debug: "test invalid grant", ...error });
+  return (error.cause as AxiosError).response?.data.error === "invalid_grant";
 };
 
 const peConnectNeededScopes = (clientId: string): string =>
@@ -246,10 +293,8 @@ const headersUrlEncoded = (): { [key: string]: string } => ({
 
 const isValidPeErrorResponse = (
   response: AxiosResponse | undefined,
-): response is AxiosResponse => {
-  notifyObjectDiscord(response);
-  return !!response && typeof response.status === "number";
-};
+): response is AxiosResponse =>
+  !!response && typeof response.status === "number";
 
 export const onRejectPeSpecificResponseInterceptorMaker = <
   TargetUrls extends string,

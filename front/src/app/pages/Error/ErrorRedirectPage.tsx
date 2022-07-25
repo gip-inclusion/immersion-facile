@@ -13,6 +13,7 @@ import { PEConnectInvalidGrantError } from "./PEConnectInvalidGrantError";
 import { PEConnectNoAuthorisation } from "./PEConnectNoAuthorisation";
 import { PEConnectNoValidAdvisor } from "./PEConnectNoValidAdvisor";
 import { PEConnectNoValidUser } from "./PEConnectNoValidUser";
+import { PEConnectUserForbiddenAccess } from "./PEConnectUserForbiddenAccess";
 
 export type ErrorRedirectRoute = Route<typeof routes.errorRedirect>;
 
@@ -26,6 +27,7 @@ const managedErrors: Record<ManagedRedirectErrorKinds, () => JSX.Element> = {
   peConnectNoValidUser: PEConnectNoValidUser,
   peConnectInvalidGrant: PEConnectInvalidGrantError,
   peConnectAdvisorForbiddenAccess: PEConnectAdvisorForbiddenAccess,
+  peConnectUserForbiddenAccess: PEConnectUserForbiddenAccess,
 };
 
 export const ErrorRedirectPage = ({ route }: ErrorRedirectProps) => (

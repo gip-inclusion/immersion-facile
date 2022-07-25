@@ -1,4 +1,7 @@
-import { HttpClientError } from "../errors/HttpClientError.error";
+import {
+  HttpClientError,
+  HttpClientForbiddenError,
+} from "../errors/HttpClientError.error";
 import { HttpServerError } from "../errors/HttpServerError.error";
 
 import { AxiosError } from "../../../../node_modules/axios";
@@ -8,6 +11,9 @@ export const toHttpError = (
   error: AxiosErrorWithResponse,
 ): HttpClientError | HttpServerError | undefined => {
   if (isHttpClientError(error.response.status)) {
+    if (error.response.status === 401)
+      return new HttpClientForbiddenError(`Forbidden Access`, error);
+
     return new HttpClientError(
       `4XX Status Code ${toAxiosHttpErrorString(error)}`,
       error,

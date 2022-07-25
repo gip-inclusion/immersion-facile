@@ -4,6 +4,7 @@ export const managedRedirectErrorKinds = [
   "peConnectNoValidAdvisor",
   "peConnectNoValidUser",
   "peConnectAdvisorForbiddenAccess",
+  "peConnectUserForbiddenAccess",
 ] as const;
 
 export type ManagedRedirectErrorKinds =
