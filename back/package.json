@@ -66,7 +66,6 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "@serenity-dev/http-client": "^0.0.5",
     "archiver": "^5.3.0",
     "axios": "^0.26.1",
     "body-parser": "^1.20.0",
@@ -91,7 +90,6 @@
     "shared": "workspace:*",
     "sib-api-v3-typescript": "^2.2.2",
     "slugify": "^1.6.5",
-    "ts-jest": "^28.0.7",
     "ts-node": "^10.7.0",
     "uuid": "^8.3.2",
     "zod": "^3.14.2"

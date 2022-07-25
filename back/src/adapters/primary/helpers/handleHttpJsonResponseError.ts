@@ -1,5 +1,5 @@
-import { HttpClientError } from "@serenity-dev/http-client/src/errors/HttpClientError.error";
-import { HttpServerError } from "@serenity-dev/http-client/src/errors/HttpServerError.error";
+import { HttpClientError } from "shared/src/serenity-http-client";
+import { HttpServerError } from "shared/src/serenity-http-client";
 import { Request, Response } from "express";
 import { HttpError, UnauthorizedError } from "./httpErrors";
 import { unhandledError } from "./unhandledError";

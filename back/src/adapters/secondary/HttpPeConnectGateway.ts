@@ -1,9 +1,9 @@
-import { ManagedAxios } from "@serenity-dev/http-client/src/adapters/axios.adapter";
+import { ManagedAxios } from "shared/src/serenity-http-client";
 import {
   ErrorMapper,
   HttpResponse,
   TargetUrlsMapper,
-} from "@serenity-dev/http-client/src/httpClient";
+} from "shared/src/serenity-http-client";
 import { AxiosResponse } from "axios";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
