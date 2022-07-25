@@ -8,6 +8,7 @@ import { ContainerLayout } from "src/app/layouts/ContainerLayout";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { Route } from "type-route";
+import { PEConnectAdvisorForbiddenAccess } from "./PEConnectAdvisorForbiddenAccess";
 import { PEConnectInvalidGrantError } from "./PEConnectInvalidGrantError";
 import { PEConnectNoAuthorisation } from "./PEConnectNoAuthorisation";
 import { PEConnectNoValidAdvisor } from "./PEConnectNoValidAdvisor";
@@ -24,8 +25,7 @@ const managedErrors: Record<ManagedRedirectErrorKinds, () => JSX.Element> = {
   peConnectNoValidAdvisor: PEConnectNoValidAdvisor,
   peConnectNoValidUser: PEConnectNoValidUser,
   peConnectInvalidGrant: PEConnectInvalidGrantError,
-  // TODO Create view PEConnectAdvisorForbiddenAccess
-  peConnectAdvisorForbiddenAccess: PEConnectNoValidAdvisor,
+  peConnectAdvisorForbiddenAccess: PEConnectAdvisorForbiddenAccess,
 };
 
 export const ErrorRedirectPage = ({ route }: ErrorRedirectProps) => (

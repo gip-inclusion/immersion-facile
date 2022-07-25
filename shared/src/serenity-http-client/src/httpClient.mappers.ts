@@ -5,6 +5,7 @@ import {
   isConnectionResetError,
   ConnectionResetError,
 } from "./errors/InfrastructureError.error";
+import { UnhandledError } from "./errors/UnhandledError";
 import { ErrorMapper } from "./httpClient";
 
 export const toMappedErrorMaker =
@@ -53,9 +54,9 @@ export const toUnhandledError = (details: string, error: Error): Error => {
         : "Object.keys(error) returned an empty array"
     }`;
   }
-  return new Error(
-    `Unhandled Http Client Error - ${details} - JSON Stringify tentative result -> ${rawString}`,
-    { cause: error },
+  return new UnhandledError(
+    `${details} - JSON Stringify tentative result -> ${rawString}`,
+    error,
   );
 };
 

@@ -1,4 +1,7 @@
-import { TargetUrlsMapper } from "shared/src/serenity-http-client";
+import {
+  onFullfilledDefaultResponseInterceptorMaker,
+  TargetUrlsMapper,
+} from "shared/src/serenity-http-client";
 import { ManagedAxios } from "shared/src/serenity-http-client";
 import { Pool } from "pg";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
@@ -14,6 +17,7 @@ import {
   errorMapper,
   HttpPeConnectGateway,
   httpPeConnectGatewayTargetMapperMaker,
+  onRejectPeSpecificResponseInterceptorMaker,
   PeConnectUrlTargets,
 } from "../../secondary/HttpPeConnectGateway";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
@@ -131,6 +135,8 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
               {
                 timeout: AXIOS_TIMEOUT_FIVE_SECOND,
               },
+              onFullfilledDefaultResponseInterceptorMaker,
+              onRejectPeSpecificResponseInterceptorMaker,
             ),
           )
         : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl),

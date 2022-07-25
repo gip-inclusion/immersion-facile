@@ -1,10 +1,19 @@
-import { ManagedAxios } from "shared/src/serenity-http-client";
+import {
+  AxiosErrorWithResponse,
+  InfrastructureError,
+  isHttpError,
+  ManagedAxios,
+  toHttpError,
+  toInfrastructureError,
+  toMappedErrorMaker,
+  toUnhandledError,
+} from "shared/src/serenity-http-client";
 import {
   ErrorMapper,
   HttpResponse,
   TargetUrlsMapper,
 } from "shared/src/serenity-http-client";
-import { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
@@ -33,6 +42,7 @@ import { PeConnectGateway } from "../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../utils/logger";
 import { validateAndParseZodSchema } from "../primary/helpers/httpErrors";
 import { ManagedRedirectError } from "../primary/helpers/redirectErrors";
+import { notifyObjectDiscord } from "../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 
@@ -182,7 +192,7 @@ export const httpPeConnectGatewayTargetMapperMaker = (
   config: HttpPeConnectGatewayConfig,
 ): TargetUrlsMapper<PeConnectUrlTargets> => ({
   OAUTH2_AUTH_CODE_STEP_1: (): AbsoluteUrl =>
-    `${config.peAuthCandidatUrl}/connexion/oauth2/authorize/`,
+    `${config.peAuthCandidatUrl}/connexion/oauth2/authorize`,
   OAUTH2_ACCESS_TOKEN_STEP_2: () =>
     `${config.peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
   REGISTERED_REDIRECT_URL: () =>
@@ -233,3 +243,47 @@ const headersWithAuthPeAccessToken = (
 const headersUrlEncoded = (): { [key: string]: string } => ({
   "Content-Type": "application/x-www-form-urlencoded",
 });
+
+const isValidPeErrorResponse = (
+  response: AxiosResponse | undefined,
+): response is AxiosResponse => {
+  notifyObjectDiscord(response);
+  return !!response && typeof response.status === "number";
+};
+
+export const onRejectPeSpecificResponseInterceptorMaker = <
+  TargetUrls extends string,
+>(context: {
+  target: TargetUrls;
+  errorMapper: ErrorMapper<TargetUrls>;
+}) => {
+  const toMappedError = toMappedErrorMaker(context.target, context.errorMapper);
+
+  return (rawAxiosError: AxiosError): never => {
+    const infrastructureError: InfrastructureError | undefined =
+      toInfrastructureError(rawAxiosError);
+    if (infrastructureError) throw toMappedError(infrastructureError);
+
+    if (!axios.isAxiosError(rawAxiosError))
+      throw toUnhandledError(
+        `error Response does not have the property isAxiosError set to true`,
+        rawAxiosError,
+      );
+
+    if (!isValidPeErrorResponse(rawAxiosError.response))
+      throw toUnhandledError(
+        "error response objects does not have mandatory keys",
+        rawAxiosError,
+      );
+
+    const error = toHttpError(rawAxiosError as AxiosErrorWithResponse);
+
+    if (!isHttpError(error))
+      throw toUnhandledError(
+        "failed to convert error to HttpClientError or HttpServerError",
+        rawAxiosError,
+      );
+
+    throw toMappedError(error);
+  };
+};
