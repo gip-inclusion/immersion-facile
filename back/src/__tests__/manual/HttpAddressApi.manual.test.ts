@@ -5,8 +5,8 @@ import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import {
   apiAddressRateLimiter,
   apiAddressBaseUrl,
-  HttpAdresseAPI,
-} from "../../adapters/secondary/immersionOffer/HttpAdresseAPI";
+  HttpAddressAPI,
+} from "../../adapters/secondary/immersionOffer/HttpAddressAPI";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 
@@ -46,7 +46,7 @@ const resultFromApiAddress = {
 
 describe("HttpLaBonneBoiteAPI", () => {
   it("Should return expected address DTO when providing accurate position.", async () => {
-    const adapter = new HttpAdresseAPI(
+    const adapter = new HttpAddressAPI(
       createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
       apiAddressRateLimiter(new RealClock()),
       noRetries,
@@ -60,13 +60,13 @@ describe("HttpLaBonneBoiteAPI", () => {
     expectTypeToMatchAndEqual(result, {
       streetNumberAndAddress: "14 Rue Gaston Romazzotti",
       city: "Molsheim",
-      countyCode: "67",
-      postCode: "67120",
+      departmentCode: "67",
+      postcode: "67120",
     });
   });
   const parallelCalls = 200;
   it(`Should support ${parallelCalls} of parallel calls`, async () => {
-    const adapter = new HttpAdresseAPI(
+    const adapter = new HttpAddressAPI(
       createManagedAxiosInstance({
         baseURL: apiAddressBaseUrl,
       }),
@@ -85,8 +85,8 @@ describe("HttpLaBonneBoiteAPI", () => {
       expectedResults.push({
         streetNumberAndAddress: "14 Rue Gaston Romazzotti",
         city: "Molsheim",
-        countyCode: "67",
-        postCode: "67120",
+        departmentCode: "67",
+        postcode: "67120",
       });
     }
     expectTypeToMatchAndEqual(

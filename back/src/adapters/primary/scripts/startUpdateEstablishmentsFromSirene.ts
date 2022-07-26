@@ -15,8 +15,8 @@ import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import {
   apiAddressBaseUrl,
   apiAddressRateLimiter,
-  HttpAdresseAPI,
-} from "../../secondary/immersionOffer/HttpAdresseAPI";
+  HttpAddressAPI,
+} from "../../secondary/immersionOffer/HttpAddressAPI";
 import { AppConfig } from "../config/appConfig";
 import { createUowPerformer } from "../config/uowConfig";
 
@@ -54,7 +54,7 @@ const main = async () => {
     retryStrategy,
   );
 
-  const adresseAPI = new HttpAdresseAPI(
+  const addressAPI = new HttpAddressAPI(
     createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
     apiAddressRateLimiter(clock),
     retryStrategy,
@@ -70,7 +70,7 @@ const main = async () => {
     new UpdateEstablishmentsFromSireneAPI(
       uowPerformer,
       sireneGateway,
-      adresseAPI,
+      addressAPI,
       new RealClock(),
     );
 

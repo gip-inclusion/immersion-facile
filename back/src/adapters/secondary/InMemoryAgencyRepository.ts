@@ -1,5 +1,5 @@
 import { values } from "ramda";
-import { CountyCode } from "shared/src/address/address.dto";
+import { DepartmentCode } from "shared/src/address/address.dto";
 import {
   AgencyDto,
   AgencyId,
@@ -30,9 +30,9 @@ const testAgencies: AgencyDto[] = [
     signature: "Signature of Immersion Facile",
     address: {
       streetNumberAndAddress: "No address",
-      countyCode: "75",
+      departmentCode: "75",
       city: "NoWhere",
-      postCode: "75001",
+      postcode: "75001",
     },
     position: {
       lat: 22.319469,
@@ -51,9 +51,9 @@ const testAgencies: AgencyDto[] = [
     signature: "Signature of Test Agency 1",
     address: {
       streetNumberAndAddress: "Agency 1 address",
-      countyCode: "75",
+      departmentCode: "75",
       city: "AgencyCity",
-      postCode: "75001",
+      postcode: "75001",
     },
     position: {
       lat: 1,
@@ -72,8 +72,8 @@ const testAgencies: AgencyDto[] = [
     signature: "Signature of Test Agency 2",
     address: {
       city: "Mulhouse",
-      countyCode: "68",
-      postCode: "68100",
+      departmentCode: "68",
+      postcode: "68100",
       streetNumberAndAddress: "48 Rue Franklin",
     },
     position: {
@@ -93,9 +93,9 @@ const testAgencies: AgencyDto[] = [
     signature: "Signature of Test Agency 3",
     address: {
       streetNumberAndAddress: "3 Agency street",
-      countyCode: "64",
+      departmentCode: "64",
       city: "Bayonne",
-      postCode: "64100",
+      postcode: "64100",
     },
     position: {
       lat: 88,
@@ -129,7 +129,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     logger.info({ configs: this._agencies }, "getAgencies");
     const filterPredicate = (agency: AgencyDto) =>
       ![
-        agencyHasCountyCode(agency, filters?.countyCode),
+        agencyHasDepartmentCode(agency, filters?.departmentCode),
         agencyIsOfKind(agency, filters?.kind),
         agencyIsOfPosition(agency, filters?.position),
         agencyIsOfStatus(agency, filters?.status),
@@ -221,12 +221,12 @@ const agencyIsOfStatus = (
   return statuses.includes(agency.status);
 };
 
-const agencyHasCountyCode = (
+const agencyHasDepartmentCode = (
   agency: AgencyDto,
-  countyCode?: CountyCode,
+  departmentCode?: DepartmentCode,
 ): boolean => {
-  if (!countyCode) return true;
-  return countyCode === agency.address.countyCode;
+  if (!departmentCode) return true;
+  return departmentCode === agency.address.departmentCode;
 };
 
 const agencyIsOfPosition = (

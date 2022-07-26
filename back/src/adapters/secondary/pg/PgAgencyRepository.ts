@@ -22,7 +22,7 @@ type AgencyColumns =
   | "city"
   | "code_safir"
   | "counsellor_emails"
-  | "county_code"
+  | "department_code"
   | "email_signature"
   | "id"
   | "kind"
@@ -109,7 +109,7 @@ export class PgAgencyRepository implements AgencyRepository {
 
     const pgResult = await this.client.query(
       `SELECT id, name, status, kind, legacy_address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir,
-        street_number_and_address, post_code, city, county_code
+        street_number_and_address, post_code, city, department_code
        FROM public.agencies
        WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
       [email],
@@ -125,7 +125,7 @@ export class PgAgencyRepository implements AgencyRepository {
     const pgResult = await this.client.query(
       "SELECT id, name, status, kind, legacy_address, counsellor_emails, validator_emails, \
         admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, \
-        street_number_and_address, post_code, city, county_code \
+        street_number_and_address, post_code, city, department_code \
       FROM public.agencies\
       WHERE id = $1",
       [id],
@@ -141,7 +141,7 @@ export class PgAgencyRepository implements AgencyRepository {
     const query = `INSERT INTO public.agencies(
       id, name, status, kind, legacy_address, counsellor_emails, validator_emails, admin_emails, 
       questionnaire_url, email_signature, logo_url, position, agency_siret, code_safir,
-      street_number_and_address, post_code, city, county_code
+      street_number_and_address, post_code, city, department_code
     ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L, %L, %L, %L, %L)`;
     try {
       await this.client.query(format(query, ...entityToPgArray(agency)));
@@ -175,7 +175,7 @@ export class PgAgencyRepository implements AgencyRepository {
       street_number_and_address = COALESCE(%15$L, street_number_and_address),
       post_code = COALESCE(%16$L, post_code),
       city = COALESCE(%17$L, city),
-      county_code = COALESCE(%18$L, county_code),
+      department_code = COALESCE(%18$L, department_code),
       updated_at = NOW()
     WHERE id = %1$L`;
 
@@ -216,16 +216,16 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
   agency.agencySiret,
   agency.codeSafir,
   agency.address?.streetNumberAndAddress,
-  agency.address?.postCode,
+  agency.address?.postcode,
   agency.address?.city,
-  agency.address?.countyCode,
+  agency.address?.departmentCode,
 ];
 
 const pgToEntity = (params: AgencyPgRow): AgencyDto => ({
   address: {
     streetNumberAndAddress: params.street_number_and_address,
-    postCode: params.post_code,
-    countyCode: params.county_code,
+    postcode: params.post_code,
+    departmentCode: params.department_code,
     city: params.city,
   },
   adminEmails: params.admin_emails,

@@ -13,12 +13,12 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   agenciesRouter
     .route(`/${agenciesRoute}`)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.listAgenciesWithCountyCode.execute(req.query as any),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.listAgenciesWithDepartmentCode.execute(req.query as any),
       ),
     )
     .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
+      sendHttpResponse(req, res, async () =>
         deps.useCases.addAgency.execute(req.body),
       ),
     );

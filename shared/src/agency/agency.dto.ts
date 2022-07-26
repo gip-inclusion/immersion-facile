@@ -1,5 +1,5 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
-import { AddressDto, CountyCode } from "../address/address.dto";
+import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { LatLonDto } from "../latLon";
 import { Flavor } from "../typeFlavors";
 import { NotEmptyArray, RequireField } from "../utils";
@@ -70,13 +70,13 @@ export type AgencyPositionFilter = {
 
 export type GetAgenciesFilter = {
   position?: AgencyPositionFilter;
-  countyCode?: CountyCode;
+  departmentCode?: DepartmentCode;
   kind?: AgencyKindFilter;
   status?: AgencyStatus[];
 };
 
 export type ListAgenciesWithPositionRequestDto = {
-  countyCode: CountyCode;
+  departmentCode: DepartmentCode;
   filter?: AgencyKindFilter;
 };
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useDebounce } from "src/app/utils/useDebounce";
-import { AddressWithCoordinates } from "src/core-logic/ports/ApiAdresseGateway";
+import { AddressWithCoordinates } from "src/core-logic/ports/ApiAddressGateway";
 import { getAddressesFromApi } from "./getAddressesFromApi";
 import { AutocompleteInput } from "react-design-system/immersionFacile";
 
@@ -97,9 +97,9 @@ const onAutocompleteChange =
         : {
             label: "",
             streetNumberAndAddress: "",
-            postCode: "",
+            postcode: "",
             city: "",
-            countyCode: "",
+            departmentCode: "",
             coordinates: { lat: 0, lon: 0 },
           },
     );

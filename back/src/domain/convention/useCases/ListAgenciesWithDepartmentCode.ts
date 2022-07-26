@@ -1,4 +1,4 @@
-import { CountyCode } from "shared/src/address/address.dto";
+import { DepartmentCode } from "shared/src/address/address.dto";
 import {
   activeAgencyStatuses,
   AgencyDto,
@@ -10,7 +10,7 @@ import { listAgenciesRequestSchema } from "shared/src/agency/agency.schema";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export class ListAgenciesWithCountyCode extends TransactionalUseCase<
+export class ListAgenciesWithDepartmentCode extends TransactionalUseCase<
   ListAgenciesWithPositionRequestDto,
   AgencyIdAndName[]
 > {
@@ -21,22 +21,22 @@ export class ListAgenciesWithCountyCode extends TransactionalUseCase<
   inputSchema = listAgenciesRequestSchema;
 
   public async _execute(
-    { countyCode, filter }: ListAgenciesWithPositionRequestDto,
+    { departmentCode, filter }: ListAgenciesWithPositionRequestDto,
     uow: UnitOfWork,
   ): Promise<AgencyIdAndName[]> {
-    const agencies = await getActiveAgencies(uow, countyCode, filter);
+    const agencies = await getActiveAgencies(uow, departmentCode, filter);
     return agencies.map(agencyToAgencyWithPositionDto);
   }
 }
 
 const getActiveAgencies = (
   uow: UnitOfWork,
-  countyCode: CountyCode,
+  departmentCode: DepartmentCode,
   agencyKindFilter?: AgencyKindFilter,
 ): Promise<AgencyDto[]> =>
   uow.agencyRepository.getAgencies({
     filters: {
-      countyCode,
+      departmentCode,
       kind: agencyKindFilter,
       status: activeAgencyStatuses,
     },

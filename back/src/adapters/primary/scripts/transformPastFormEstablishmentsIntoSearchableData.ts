@@ -19,8 +19,8 @@ import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import {
   apiAddressBaseUrl,
   apiAddressRateLimiter,
-  HttpAdresseAPI,
-} from "../../secondary/immersionOffer/HttpAdresseAPI";
+  HttpAddressAPI,
+} from "../../secondary/immersionOffer/HttpAddressAPI";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";
@@ -51,7 +51,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     connectionString: destinationPgConnectionString,
   });
   const clientDestination = await poolDestination.connect();
-  const adresseAPI = new HttpAdresseAPI(
+  const addressAPI = new HttpAddressAPI(
     createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
     apiAddressRateLimiter(clock),
     new ExponentialBackoffRetryStrategy(
@@ -80,7 +80,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   const upsertAggregateFromForm = new InsertEstablishmentAggregateFromForm(
     pgUowPerformer,
     sireneGateway,
-    adresseAPI,
+    addressAPI,
     new UuidV4Generator(),
     clock,
     makeCreateNewEvent({ clock, uuidGenerator }),

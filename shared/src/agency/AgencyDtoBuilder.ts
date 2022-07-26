@@ -5,9 +5,9 @@ import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
 
 const emptyAddress: AddressDto = {
   streetNumberAndAddress: "",
-  countyCode: "",
+  departmentCode: "",
   city: "",
-  postCode: "",
+  postcode: "",
 };
 
 const emptyAgency: AgencyDto = {

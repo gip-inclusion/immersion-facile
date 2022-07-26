@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { CountyCode } from "shared/src/address/address.dto";
+import { DepartmentCode } from "shared/src/address/address.dto";
 import { AgencyId, AgencyIdAndName } from "shared/src/agency/agency.dto";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
 import { agencyGateway } from "src/app/config/dependencies";
@@ -31,7 +31,9 @@ export const AgencyDisplay = ({
   const [isLoading, setIsLoading] = useState(false);
   const [_loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-  const [countyCode, setCountyCode] = useState<CountyCode | null>(null);
+  const [departmentCode, setDepartmentCode] = useState<DepartmentCode | null>(
+    null,
+  );
   const [agencies, setAgencies] = useState([placeholderAgency]);
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export const AgencyDisplay = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [countyCode]);
+  }, [departmentCode]);
 
   const userError = touched && error;
   const showError = userError || loadingError;
@@ -71,7 +73,7 @@ export const AgencyDisplay = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      <PostcodeAutocomplete onFound={setCountyCode} disabled={true} />
+      <PostcodeAutocomplete onFound={setDepartmentCode} disabled={true} />
       <label className="fr-label pt-4" htmlFor={name}>
         {label}
       </label>

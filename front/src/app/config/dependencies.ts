@@ -10,8 +10,6 @@ import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpS
 import { StubSentEmailGateway } from "src/core-logic/adapters/EmailGateway/StubSentEmailGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/HttpRomeAutocompleteGateway";
-
-import { InMemoryApiAdresseGateway } from "src/core-logic/adapters/ApiAdresse/InMemoryApiAdresseGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
 import {
@@ -26,7 +24,7 @@ import { ReactNavigationGateway } from "src/core-logic/adapters/NavigationGatewa
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
-import { ApiAdresseGateway } from "src/core-logic/ports/ApiAdresseGateway";
+import { ApiAddressGateway } from "src/core-logic/ports/ApiAddressGateway";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
@@ -41,11 +39,12 @@ import { createStore } from "src/core-logic/storeConfig/store";
 import { ENV } from "src/environmentVariables";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
-import { HttpApiAdresseGateway } from "src/core-logic/adapters/ApiAdresse/HttpApiAdresseGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/HttpSiretGatewayThroughBack";
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/SimulatedSiretGatewayThroughBack";
 import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
+import { HttpApiAddressGateway } from "src/core-logic/adapters/ApiAddress/HttpApiAddressGateway";
+import { InMemoryApiAddressGateway } from "src/core-logic/adapters/ApiAddress/InMemoryApiAddressGateway";
 
 export const deviceRepository = createLocalStorageDeviceRepository();
 
@@ -111,10 +110,10 @@ export const immersionSearchGateway: ImmersionSearchGateway =
         createManagedAxiosInstance({ baseURL: "/api" }),
       );
 
-export const apiAdresseGateway: ApiAdresseGateway =
+export const apiAddressGateway: ApiAddressGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryApiAdresseGateway()
-    : new HttpApiAdresseGateway(createManagedAxiosInstance());
+    ? new InMemoryApiAddressGateway()
+    : new HttpApiAddressGateway(createManagedAxiosInstance());
 
 export const technicalGateway: TechnicalGateway =
   ENV.gateway === "IN_MEMORY"
@@ -152,7 +151,7 @@ export type Dependencies = {
   immersionAssessmentGateway: ImmersionAssessmentGateway;
   siretGatewayThroughBack: SiretGatewayThroughBack;
   agencyGateway: AgencyGateway;
-  apiAdresseGateway: ApiAdresseGateway;
+  apiAddressGateway: ApiAddressGateway;
   technicalGateway: TechnicalGateway;
   establishmentGateway: EstablishmentGateway;
   conventionGateway: ConventionGateway;
@@ -170,7 +169,7 @@ export const store = createStore({
     adminGateway,
     siretGatewayThroughBack,
     agencyGateway,
-    apiAdresseGateway,
+    apiAddressGateway,
     technicalGateway,
     establishmentGateway,
     conventionGateway,

@@ -8,7 +8,7 @@ import {
   RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
-import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
+import { AddressAPI } from "../../../domain/immersionOffer/ports/AddressAPI";
 import {
   createAxiosInstance,
   isRetryableError,
@@ -36,7 +36,7 @@ const apiRoutes = {
   reverse: `/reverse`,
 };
 
-export class HttpAdresseAPI implements AdresseAPI {
+export class HttpAddressAPI implements AddressAPI {
   public constructor(
     private readonly httpClient: AxiosInstance,
     private readonly rateLimiter: RateLimiter,
@@ -126,6 +126,6 @@ export class HttpAdresseAPI implements AdresseAPI {
 const featureToAddressDto = (feature: any): AddressDto => ({
   streetNumberAndAddress: feature.properties.name,
   city: feature.properties.city,
-  countyCode: feature.properties.context.split(", ")[0],
-  postCode: feature.properties.postcode,
+  departmentCode: feature.properties.context.split(", ")[0],
+  postcode: feature.properties.postcode,
 });

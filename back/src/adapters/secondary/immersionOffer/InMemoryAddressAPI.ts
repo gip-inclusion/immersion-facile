@@ -1,8 +1,8 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { LatLonDto } from "shared/src/latLon";
-import { AdresseAPI } from "../../../domain/immersionOffer/ports/AdresseAPI";
+import { AddressAPI } from "../../../domain/immersionOffer/ports/AddressAPI";
 
-export class InMemoryAdresseAPI implements AdresseAPI {
+export class InMemoryAddressAPI implements AddressAPI {
   constructor(
     private _position?: LatLonDto,
     private _cityCode?: number,

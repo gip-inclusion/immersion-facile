@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { CountyCode } from "shared/src/address/address.dto";
-import { apiAdresseGateway } from "src/app/config/dependencies";
+import { DepartmentCode } from "shared/src/address/address.dto";
+import { apiAddressGateway } from "src/app/config/dependencies";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { TextInput } from "src/uiComponents/form/TextInput";
 
@@ -9,7 +9,7 @@ export type PostcodeAutocompleteProps = {
   initialSearchTerm?: string;
   disabled?: boolean;
   inputStyle?: React.CSSProperties;
-  onFound: (countyCode: CountyCode) => void;
+  onFound: (departmentCode: DepartmentCode) => void;
 };
 
 export const PostcodeAutocomplete = ({
@@ -26,11 +26,10 @@ export const PostcodeAutocomplete = ({
       const sanitizedTerm = value.trim();
       if (sanitizedTerm.length !== 5) return;
       try {
-        const countyCode = await apiAdresseGateway.findCountyCodeFromPostCode(
-          sanitizedTerm,
-        );
-        if (countyCode) {
-          onFound(countyCode);
+        const departmentCode =
+          await apiAddressGateway.findDepartmentCodeFromPostCode(sanitizedTerm);
+        if (departmentCode) {
+          onFound(departmentCode);
           setError(null);
         } else {
           setError("Code postal inconnu");

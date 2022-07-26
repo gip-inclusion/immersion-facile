@@ -8,16 +8,16 @@ import {
   CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
-import { CountyCode } from "shared/src/address/address.dto";
+import { DepartmentCode } from "shared/src/address/address.dto";
 
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
 
   listAllAgenciesWithPosition(
-    countyCode: CountyCode,
+    departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]>;
-  listNonPeAgencies(countyCode: CountyCode): Promise<AgencyIdAndName[]>;
-  listPeAgencies(countyCode: CountyCode): Promise<AgencyIdAndName[]>;
+  listNonPeAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
+  listPeAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
   listAgenciesNeedingReview(adminToken: AdminToken): Promise<AgencyDto[]>;
   validateAgency(adminToken: AdminToken, agencyId: AgencyId): Promise<void>;
   getAgencyPublicInfoById(

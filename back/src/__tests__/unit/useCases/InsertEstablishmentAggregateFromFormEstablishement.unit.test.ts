@@ -10,7 +10,7 @@ import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
+import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -49,7 +49,7 @@ describe("Insert Establishment aggregate from form data", () => {
   let sireneRepo: InMemorySireneGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let outboxRepo: InMemoryOutboxRepository;
-  let addresseAPI: InMemoryAdresseAPI;
+  let addressAPI: InMemoryAddressAPI;
   let useCase: InsertEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
@@ -58,7 +58,7 @@ describe("Insert Establishment aggregate from form data", () => {
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     outboxRepo = new InMemoryOutboxRepository();
 
-    addresseAPI = new InMemoryAdresseAPI(fakePosition);
+    addressAPI = new InMemoryAddressAPI(fakePosition);
     uuidGenerator = new TestUuidGenerator();
 
     const uowPerformer = new InMemoryUowPerformer({
@@ -71,7 +71,7 @@ describe("Insert Establishment aggregate from form data", () => {
     useCase = new InsertEstablishmentAggregateFromForm(
       uowPerformer,
       sireneRepo,
-      addresseAPI,
+      addressAPI,
       uuidGenerator,
       clock,
       makeCreateNewEvent({ clock, uuidGenerator }),

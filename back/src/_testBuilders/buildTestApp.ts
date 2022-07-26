@@ -7,6 +7,7 @@ import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
 import { createApp } from "../adapters/primary/server";
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryAddressAPI } from "../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
@@ -32,6 +33,7 @@ export type InMemoryGateways = {
   getFeatureFlags: GetFeatureFlags;
   documentGateway: InMemoryDocumentGateway;
   reportingGateway: InMemoryReportingGateway;
+  addressApi: InMemoryAddressAPI;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :

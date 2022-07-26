@@ -1,6 +1,7 @@
 import { onFullfilledDefaultResponseInterceptorMaker } from "shared/src/serenity-http-client";
 import { ManagedAxios } from "shared/src/serenity-http-client";
 import { Pool } from "pg";
+import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
@@ -15,10 +16,16 @@ import {
   PeConnectUrlTargets,
 } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
+import {
+  apiAddressBaseUrl,
+  apiAddressRateLimiter,
+  HttpAddressAPI,
+} from "../../secondary/immersionOffer/HttpAddressAPI";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/HttpPassEmploiGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/HttpPoleEmploiGateway";
 import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
+import { InMemoryAddressAPI } from "../../secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
@@ -91,6 +98,14 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
     : new InMemoryAccessTokenGateway();
 
   return {
+    addressApi:
+      config.apiAddress === "HTTPS"
+        ? new HttpAddressAPI(
+            createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+            apiAddressRateLimiter(clock),
+            noRetries,
+          )
+        : new InMemoryAddressAPI(),
     documentGateway:
       config.documentGateway === "MINIO"
         ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

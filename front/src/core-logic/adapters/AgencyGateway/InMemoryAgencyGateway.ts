@@ -1,6 +1,6 @@
 import { values } from "ramda";
 import { Observable, of } from "rxjs";
-import { CountyCode } from "shared/src/address/address.dto";
+import { DepartmentCode } from "shared/src/address/address.dto";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
 import {
@@ -20,9 +20,9 @@ const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withName("Test Agency 1 (front)")
   .withAddress({
     streetNumberAndAddress: "Agency 1",
-    postCode: "75001",
+    postcode: "75001",
     city: "Paris",
-    countyCode: "75",
+    departmentCode: "75",
   })
   .withQuestionnaireUrl("www.questionnaireMissionLocale.com")
   .withKind("mission-locale")
@@ -34,9 +34,9 @@ const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withName("Test Agency 2 PE (front)")
   .withAddress({
     streetNumberAndAddress: "Agency 2",
-    postCode: "75001",
+    postcode: "75001",
     city: "Paris",
-    countyCode: "75",
+    departmentCode: "75",
   })
   .withQuestionnaireUrl("www.PE.com")
   .withKind("pole-emploi")
@@ -74,16 +74,20 @@ export class InMemoryAgencyGateway implements AgencyGateway {
   }
 
   async listAllAgenciesWithPosition(
-    _countyCode: CountyCode,
+    _departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
     return values(this._agencies);
   }
 
-  async listPeAgencies(_countyCode: CountyCode): Promise<AgencyIdAndName[]> {
+  async listPeAgencies(
+    _departmentCode: DepartmentCode,
+  ): Promise<AgencyIdAndName[]> {
     return values(this._agencies).filter(propEq("kind", "pole-emploi"));
   }
 
-  async listNonPeAgencies(_countyCode: CountyCode): Promise<AgencyIdAndName[]> {
+  async listNonPeAgencies(
+    _departmentCode: DepartmentCode,
+  ): Promise<AgencyIdAndName[]> {
     return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
   }
 

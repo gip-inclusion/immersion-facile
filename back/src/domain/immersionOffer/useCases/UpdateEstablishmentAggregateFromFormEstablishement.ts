@@ -6,7 +6,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SireneGateway } from "../../sirene/ports/SireneGateway";
-import { AdresseAPI } from "../ports/AdresseAPI";
+import { AddressAPI } from "../ports/AddressAPI";
 
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
@@ -15,7 +15,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly sireneGateway: SireneGateway,
-    private readonly adresseAPI: AdresseAPI,
+    private readonly addressAPI: AddressAPI,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
   ) {
@@ -42,7 +42,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     const establishmentAggregate =
       await makeFormEstablishmentToEstablishmentAggregate({
         sireneGateway: this.sireneGateway,
-        adresseAPI: this.adresseAPI,
+        addressAPI: this.addressAPI,
         uuidGenerator: this.uuidGenerator,
         clock: this.clock,
       })(formEstablishment);

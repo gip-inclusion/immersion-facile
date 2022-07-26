@@ -1,8 +1,8 @@
-import { CountyCode } from "shared/src/address/address.dto";
+import { DepartmentCode } from "shared/src/address/address.dto";
 import {
   AddressWithCoordinates,
-  ApiAdresseGateway,
-} from "src/core-logic/ports/ApiAdresseGateway";
+  ApiAddressGateway,
+} from "src/core-logic/ports/ApiAddressGateway";
 import { featuresSchemaResponse } from "shared/src/apiAdresse/apiAddress.schema";
 import { AxiosInstance } from "axios";
 
@@ -23,7 +23,7 @@ type ValidFeature = {
 
 const apiAdresseSearchUrl = "https://api-adresse.data.gouv.fr/search/";
 
-export class HttpApiAdresseGateway implements ApiAdresseGateway {
+export class HttpApiAddressGateway implements ApiAddressGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
   public async lookupStreetAddress(
     query: string,
@@ -48,9 +48,9 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
     }
   }
 
-  public async findCountyCodeFromPostCode(
+  public async findDepartmentCodeFromPostCode(
     query: string,
-  ): Promise<CountyCode | null> {
+  ): Promise<DepartmentCode | null> {
     //TODO Remove catch to differentiate between http & domain errors
     try {
       const { data } = await this.httpClient.get<unknown>(apiAdresseSearchUrl, {
@@ -65,7 +65,7 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
         keepOnlyValidFeatures,
       );
       if (!validFeatures.length) return null;
-      return getCountyCodeFromFeature(validFeatures[0]);
+      return getDepartmentCodeFromFeature(validFeatures[0]);
     } catch (e) {
       //eslint-disable-next-line no-console
       console.error("Api Adresse Search Error", e);
@@ -74,7 +74,7 @@ export class HttpApiAdresseGateway implements ApiAdresseGateway {
   }
 }
 
-const getCountyCodeFromFeature = (feature: ValidFeature) => {
+const getDepartmentCodeFromFeature = (feature: ValidFeature) => {
   const context = feature.properties.context;
   return context.split(", ")[0];
 };
@@ -104,9 +104,9 @@ const featureToStreetAddressWithCoordinates = (
           lon: feature.geometry.coordinates[0],
         },
         streetNumberAndAddress: feature.properties.name,
-        postCode: feature.properties.postcode,
+        postcode: feature.properties.postcode,
         city: feature.properties.city,
-        countyCode: getCountyCodeFromFeature(feature),
+        departmentCode: getDepartmentCodeFromFeature(feature),
         label,
       }
     : undefined;

@@ -43,7 +43,7 @@ const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 
 export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesWithPositionRequestDto> =
   z.object({
-    countyCode: z.string(),
+    departmentCode: z.string(),
     filter: z.enum(["peOnly", "peExcluded"]).optional(),
   });
 

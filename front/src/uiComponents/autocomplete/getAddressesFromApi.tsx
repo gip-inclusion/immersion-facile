@@ -1,6 +1,6 @@
 import React from "react";
-import { apiAdresseGateway } from "src/app/config/dependencies";
-import { AddressWithCoordinates } from "src/core-logic/ports/ApiAdresseGateway";
+import { apiAddressGateway } from "src/app/config/dependencies";
+import { AddressWithCoordinates } from "src/core-logic/ports/ApiAddressGateway";
 
 export const getAddressesFromApi = async (
   term: string,
@@ -11,7 +11,7 @@ export const getAddressesFromApi = async (
   if (!sanitizedTerm) return [];
   try {
     setIsSearching(true);
-    const addresses = await apiAdresseGateway.lookupStreetAddress(
+    const addresses = await apiAddressGateway.lookupStreetAddress(
       sanitizedTerm,
     );
     setOptions(addresses);

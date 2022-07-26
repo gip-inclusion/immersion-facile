@@ -7,12 +7,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     street_number_and_address: { type: "text", notNull: true, default: "" },
     post_code: { type: "text", notNull: true, default: "" },
     city: { type: "text", notNull: true, default: "" },
-    county_code: { type: "text", notNull: true, default: "" },
+    department_code: { type: "text", notNull: true, default: "" },
   });
 
   pgm.alterColumn("agencies", "street_number_and_address", { default: null });
   pgm.alterColumn("agencies", "post_code", { default: null });
-  pgm.alterColumn("agencies", "county_code", { default: null });
+  pgm.alterColumn("agencies", "department_code", { default: null });
   pgm.alterColumn("agencies", "city", { default: null });
 }
 
@@ -21,7 +21,7 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumns("agencies", [
     "street_number_and_address",
     "post_code",
-    "county_code",
+    "department_code",
     "city",
   ]);
 }

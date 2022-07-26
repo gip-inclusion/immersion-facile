@@ -14,7 +14,7 @@ import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateM
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { ListAdminConventions } from "../../../domain/convention/useCases/ListAdminConventions";
-import { ListAgenciesWithCountyCode } from "../../../domain/convention/useCases/ListAgenciesWithCountyCode";
+import { ListAgenciesWithDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesWithDepartmentCode";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
@@ -67,8 +67,8 @@ import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSi
 import {
   apiAddressBaseUrl,
   apiAddressRateLimiter,
-  HttpAdresseAPI,
-} from "../../secondary/immersionOffer/HttpAdresseAPI";
+  HttpAddressAPI,
+} from "../../secondary/immersionOffer/HttpAddressAPI";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
@@ -92,7 +92,7 @@ export const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const getSiret = new GetSiret(gateways.sirene);
-  const adresseAPI = new HttpAdresseAPI(
+  const addressAPI = new HttpAddressAPI(
     createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
     apiAddressRateLimiter(clock),
     noRetries,
@@ -181,7 +181,7 @@ export const createUseCases = (
       new UpdateEstablishmentAggregateFromForm(
         uowPerformer,
         gateways.sirene,
-        adresseAPI,
+        addressAPI,
         uuidGenerator,
         clock,
       ),
@@ -189,7 +189,7 @@ export const createUseCases = (
       new InsertEstablishmentAggregateFromForm(
         uowPerformer,
         gateways.sirene,
-        adresseAPI,
+        addressAPI,
         uuidGenerator,
         clock,
         createNewEvent,
@@ -230,7 +230,9 @@ export const createUseCases = (
     romeSearch: new RomeSearch(uowPerformer),
 
     // agencies
-    listAgenciesWithCountyCode: new ListAgenciesWithCountyCode(uowPerformer),
+    listAgenciesWithDepartmentCode: new ListAgenciesWithDepartmentCode(
+      uowPerformer,
+    ),
     privateListAgencies: new PrivateListAgencies(uowPerformer),
     getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
     sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(

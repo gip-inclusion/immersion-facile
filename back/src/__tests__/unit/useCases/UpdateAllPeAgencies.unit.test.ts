@@ -3,7 +3,7 @@ import { AgencyDto } from "shared/src/agency/agency.dto";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConsoleAppLogger } from "../../../adapters/secondary/core/ConsoleAppLogger";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
+import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryPeAgenciesReferential } from "../../../adapters/secondary/immersionOffer/InMemoryPeAgenciesReferential";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -16,8 +16,8 @@ const adminMail = "admin@mail.com";
 
 const address: AddressDto = {
   city: "Molsheim",
-  countyCode: "67",
-  postCode: "67120",
+  departmentCode: "67",
+  postcode: "67120",
   streetNumberAndAddress: "6B RUE Gaston Romazzotti",
 };
 
@@ -26,18 +26,18 @@ describe("UpdateAllPeAgencies use case", () => {
   let peAgenciesReferential: InMemoryPeAgenciesReferential;
   let agencyRepository: InMemoryAgencyRepository;
   let uuid: TestUuidGenerator;
-  let adresseApi: InMemoryAdresseAPI;
+  let addressApi: InMemoryAddressAPI;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     peAgenciesReferential = new InMemoryPeAgenciesReferential();
     agencyRepository = uow.agencyRepository;
     uuid = new TestUuidGenerator();
-    adresseApi = new InMemoryAdresseAPI();
+    addressApi = new InMemoryAddressAPI();
     updateAllPeAgencies = new UpdateAllPeAgencies(
       new InMemoryUowPerformer(uow),
       peAgenciesReferential,
-      adresseApi,
+      addressApi,
       adminMail,
       uuid,
       new ConsoleAppLogger(),
@@ -48,7 +48,7 @@ describe("UpdateAllPeAgencies use case", () => {
     peAgenciesReferential.setPeAgencies([peReferentialAgency]);
     agencyRepository.setAgencies([]);
     uuid.setNextUuid("some-uuid");
-    adresseApi.setNextAddress(address);
+    addressApi.setNextAddress(address);
     await updateAllPeAgencies.execute();
     expectTypeToMatchAndEqual(agencyRepository.agencies, [
       {
@@ -72,7 +72,7 @@ describe("UpdateAllPeAgencies use case", () => {
     ]);
   });
 
-  describe("Agency already exists, should add the new emails, siret, code and replaces the adresse and position", () => {
+  describe("Agency already exists, should add the new emails, siret, code and replaces the address and position", () => {
     it("if PE agency email is same as one of the already existing validator Email", async () => {
       const commonEmail = "common@mail.com";
       peAgenciesReferential.setPeAgencies([
@@ -221,7 +221,7 @@ describe("UpdateAllPeAgencies use case", () => {
     };
     agencyRepository.setAgencies([initialAgency]);
     uuid.setNextUuid("other-uuid");
-    adresseApi.setNextAddress(address);
+    addressApi.setNextAddress(address);
     await updateAllPeAgencies.execute();
 
     expectTypeToMatchAndEqual(agencyRepository.agencies, [

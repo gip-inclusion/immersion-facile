@@ -6,7 +6,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SireneGateway } from "../../sirene/ports/SireneGateway";
 import { SireneEstablishmentVO } from "../../sirene/valueObjects/SireneEstablishmentVO";
-import { AdresseAPI } from "../ports/AdresseAPI";
+import { AddressAPI } from "../ports/AddressAPI";
 
 const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
 
@@ -16,7 +16,7 @@ export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly sireneGateway: SireneGateway,
-    private readonly adresseAPI: AdresseAPI,
+    private readonly addressAPI: AddressAPI,
     private readonly clock: Clock,
   ) {
     super(uowPerformer);
@@ -78,11 +78,11 @@ export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
     const address = sireneEstablishment.formatedAddress;
 
-    const position = await this.adresseAPI.getPositionFromAddress(address);
+    const position = await this.addressAPI.getPositionFromAddress(address);
     if (!position) {
       logger.warn(
         { siret, address },
-        "Unable to retrieve position from API Adresse",
+        "Unable to retrieve position from API Address",
       );
     }
     await uow.establishmentAggregateRepository.updateEstablishment({

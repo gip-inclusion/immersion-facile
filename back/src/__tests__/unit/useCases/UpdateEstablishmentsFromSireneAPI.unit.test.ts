@@ -4,7 +4,7 @@ import { EstablishmentEntityV2Builder } from "../../../_testBuilders/Establishme
 import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentVOBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
-import { InMemoryAdresseAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAdresseAPI";
+import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -16,18 +16,18 @@ const prepareUseCase = () => {
   const uow = createInMemoryUow();
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
   const clock = new CustomClock();
-  const adresseAPI = new InMemoryAdresseAPI();
+  const addressAPI = new InMemoryAddressAPI();
   const useCase = new UpdateEstablishmentsFromSireneAPI(
     new InMemoryUowPerformer(uow),
     sireneRepo,
-    adresseAPI,
+    addressAPI,
     clock,
   );
 
   return {
     sireneRepo,
     establishmentAggregateRepository,
-    adresseAPI,
+    addressAPI,
     clock,
     useCase,
   };
@@ -149,13 +149,13 @@ describe("Update establishments from Sirene API", () => {
   });
 
   describe("Should update establishment address and position based on sirene and address API", () => {
-    it("If adresse API succeeds, it should update adresse and coordinates", async () => {
+    it("If address API succeeds, it should update address and coordinates", async () => {
       // Prepare
       const {
         clock,
         sireneRepo,
         establishmentAggregateRepository,
-        adresseAPI,
+        addressAPI,
         useCase,
       } = prepareUseCase();
       establishmentAggregateRepository.establishmentAggregates = [
@@ -177,7 +177,7 @@ describe("Update establishments from Sirene API", () => {
           .build(),
       );
       const newEstablishmentPosition = { lon: 2.2931917, lat: 48.8840654 };
-      adresseAPI.setNextPosition(newEstablishmentPosition);
+      addressAPI.setNextPosition(newEstablishmentPosition);
       clock.setNextDate(now);
 
       // Act
@@ -202,7 +202,7 @@ describe("Update establishments from Sirene API", () => {
         clock,
         sireneRepo,
         establishmentAggregateRepository,
-        adresseAPI,
+        addressAPI,
         useCase,
       } = prepareUseCase();
       const establishmentToUpdate = makeEstablishmentWithUpdatedAt(
@@ -218,7 +218,7 @@ describe("Update establishments from Sirene API", () => {
           .withAdresseEtablissement({ libelleVoieEtablissement: "" })
           .build(),
       );
-      adresseAPI.setNextPosition(undefined);
+      addressAPI.setNextPosition(undefined);
       clock.setNextDate(now);
 
       // Act

@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { CountyCode } from "shared/src/address/address.dto";
+import { DepartmentCode } from "shared/src/address/address.dto";
 import { AgencyId, AgencyIdAndName } from "shared/src/agency/agency.dto";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
 import {
@@ -35,17 +35,19 @@ export const AgencySelector = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-  const [countyCode, setCountyCode] = useState<CountyCode | null>(null);
+  const [departmentCode, setDepartmentCode] = useState<DepartmentCode | null>(
+    null,
+  );
   const [agencies, setAgencies] = useState([placeholderAgency]);
   const connectedWith = useConnectedWith();
 
   useEffect(() => {
-    if (!countyCode) return;
+    if (!departmentCode) return;
 
     setIsLoading(true);
     agenciesRetriever({
       shouldListAll,
-      countyCode,
+      departmentCode,
       connectedWith,
     })
       .then((agencies) => {
@@ -72,7 +74,7 @@ export const AgencySelector = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [countyCode]);
+  }, [departmentCode]);
 
   const userError = touched && error;
   const showError = userError || loadingError;
@@ -81,7 +83,7 @@ export const AgencySelector = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      <PostcodeAutocomplete onFound={setCountyCode} disabled={disabled} />
+      <PostcodeAutocomplete onFound={setDepartmentCode} disabled={disabled} />
       <label className="fr-label pt-4" htmlFor={name}>
         {label}
       </label>
@@ -106,7 +108,7 @@ export const AgencySelector = ({
           }}
           onBlur={onBlur}
           aria-describedby={`agency-code-{name}-error-desc-error`}
-          disabled={disabled || !loaded || !countyCode}
+          disabled={disabled || !loaded || !departmentCode}
         >
           <Agencies agencies={agencies} />
         </select>
@@ -130,19 +132,19 @@ const isDefaultAgencyOnAgenciesAndEnabled = (
 ) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);
 
 const agenciesRetriever = ({
-  countyCode,
+  departmentCode,
   shouldListAll,
   connectedWith,
 }: {
-  countyCode: CountyCode;
+  departmentCode: DepartmentCode;
   shouldListAll: boolean;
   connectedWith: FederatedIdentity | null;
 }) => {
   if (shouldListAll)
-    return agencyGateway.listAllAgenciesWithPosition(countyCode);
+    return agencyGateway.listAllAgenciesWithPosition(departmentCode);
   return connectedWith && isPeConnectIdentity(connectedWith)
-    ? agencyGateway.listPeAgencies(countyCode)
-    : agencyGateway.listAllAgenciesWithPosition(countyCode);
+    ? agencyGateway.listPeAgencies(departmentCode)
+    : agencyGateway.listAllAgenciesWithPosition(departmentCode);
   // : agencyGateway.listNonPeAgencies(position);
   // -> for easy revert when new page is ready
 };

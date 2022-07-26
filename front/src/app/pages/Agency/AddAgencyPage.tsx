@@ -32,9 +32,9 @@ const initialValues: CreateAgencyDto = {
   name: "",
   address: {
     streetNumberAndAddress: "",
-    postCode: "",
+    postcode: "",
     city: "",
-    countyCode: "",
+    departmentCode: "",
   },
   position: {
     lat: 0,

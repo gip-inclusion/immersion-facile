@@ -15,8 +15,8 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import {
   apiAddressBaseUrl,
   apiAddressRateLimiter,
-  HttpAdresseAPI,
-} from "../../secondary/immersionOffer/HttpAdresseAPI";
+  HttpAddressAPI,
+} from "../../secondary/immersionOffer/HttpAddressAPI";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "../config/appConfig";
@@ -38,7 +38,7 @@ const updateAllPeAgenciesScript = async () => {
 
   const clock = new RealClock();
 
-  const adressAPI = new HttpAdresseAPI(
+  const adressAPI = new HttpAddressAPI(
     createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
     apiAddressRateLimiter(clock),
     new ExponentialBackoffRetryStrategy(

@@ -13,8 +13,8 @@ import { AddressDto } from "shared/src/address/address.dto";
 
 const defaultAddress: AddressDto = {
   streetNumberAndAddress: "",
-  postCode: "",
-  countyCode: "75",
+  postcode: "",
+  departmentCode: "75",
   city: "",
 };
 
@@ -41,14 +41,14 @@ describe(`/${agenciesRoute} route`, () => {
     .withName("Test Agency 1")
     .withStatus("active")
     .withPosition(10.11, 10.12)
-    .withAddress({ ...defaultAddress, countyCode: "20" })
+    .withAddress({ ...defaultAddress, departmentCode: "20" })
     .build();
 
   const agency2ActiveNearBy = AgencyDtoBuilder.create("test-agency-2")
     .withName("Test Agency 2")
     .withStatus("active")
     .withPosition(10, 10)
-    .withAddress({ ...defaultAddress, countyCode: "20" })
+    .withAddress({ ...defaultAddress, departmentCode: "20" })
     .build();
 
   const agency3ActiveFarAway = AgencyDtoBuilder.create("test-agency-3")
@@ -74,7 +74,7 @@ describe(`/${agenciesRoute} route`, () => {
         agency4NeedsReview,
       ]);
       // Act and asseer
-      await request.get(`/${agenciesRoute}?countyCode=20`).expect(200, [
+      await request.get(`/${agenciesRoute}?departmentCode=20`).expect(200, [
         {
           id: agency1ActiveNearBy.id,
           name: agency1ActiveNearBy.name,

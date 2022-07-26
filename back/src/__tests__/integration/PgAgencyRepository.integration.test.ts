@@ -14,8 +14,8 @@ const agency1builder = AgencyDtoBuilder.create(
   .withAddress({
     streetNumberAndAddress: "Agency 1 address",
     city: "Paris",
-    postCode: "75001",
-    countyCode: "75",
+    postcode: "75001",
+    departmentCode: "75",
   })
   .withCounsellorEmails(["counsellorA@agency1.fr", "counsellorB@agency1.fr"])
   .withValidatorEmails(["validatorA@agency1.fr", "validatorB@agency1.fr"])
@@ -32,8 +32,8 @@ const agency2builder = AgencyDtoBuilder.create(
   .withAddress({
     streetNumberAndAddress: "Agency 2 address",
     city: "Paris",
-    postCode: "75001",
-    countyCode: "75",
+    postcode: "75001",
+    departmentCode: "75",
   })
   .withCounsellorEmails(["counsellorA@agency2.fr", "counsellorB@agency2.fr"])
   .withValidatorEmails([]) // no validators
@@ -355,8 +355,8 @@ describe("PgAgencyRepository", () => {
         .withCodeSafir("CODE_123")
         .withAddress({
           streetNumberAndAddress: "My new adress",
-          postCode: "64100",
-          countyCode: "64",
+          postcode: "64100",
+          departmentCode: "64",
           city: "Bayonne",
         })
         .build();

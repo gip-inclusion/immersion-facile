@@ -162,6 +162,16 @@ export class AppConfig {
     });
   }
 
+  // == Address Api gateway ==
+  public get apiAddress() {
+    return throwIfNotInArray({
+      processEnv: this.env,
+      variableName: "ADDRESS_API_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
   public get sendinblueApiKey() {
     return this.throwIfNotDefined("SENDINBLUE_API_KEY");
   }

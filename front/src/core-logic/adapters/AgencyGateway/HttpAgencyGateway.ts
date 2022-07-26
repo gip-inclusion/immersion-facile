@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 import { from, map, Observable } from "rxjs";
-import { CountyCode } from "shared/src/address/address.dto";
+import { DepartmentCode } from "shared/src/address/address.dto";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import {
   AgencyDto,
@@ -61,23 +61,29 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public listAllAgenciesWithPosition(
-    countyCode: CountyCode,
+    departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesWithPositionRequestDto = { countyCode };
+    const request: ListAgenciesWithPositionRequestDto = {
+      departmentCode,
+    };
     return this.getAgencies(request);
   }
 
-  public listPeAgencies(countyCode: CountyCode): Promise<AgencyIdAndName[]> {
+  public listPeAgencies(
+    departmentCode: DepartmentCode,
+  ): Promise<AgencyIdAndName[]> {
     const request: ListAgenciesWithPositionRequestDto = {
-      countyCode,
+      departmentCode,
       filter: "peOnly",
     };
     return this.getAgencies(request);
   }
 
-  public listNonPeAgencies(countyCode: CountyCode): Promise<AgencyIdAndName[]> {
+  public listNonPeAgencies(
+    departmentCode: DepartmentCode,
+  ): Promise<AgencyIdAndName[]> {
     const request: ListAgenciesWithPositionRequestDto = {
-      countyCode,
+      departmentCode,
       filter: "peExcluded",
     };
     return this.getAgencies(request);

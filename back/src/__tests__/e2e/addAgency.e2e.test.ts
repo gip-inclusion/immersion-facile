@@ -12,8 +12,8 @@ describe("Route to add Agency", () => {
       address: {
         streetNumberAndAddress: "Agency 1 address",
         city: "Paris",
-        postCode: "75001",
-        countyCode: "75",
+        postcode: "75001",
+        departmentCode: "75",
       },
       counsellorEmails: ["counsellor@mail.com"],
       validatorEmails: ["validator@mail.com"],

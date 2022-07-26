@@ -22,8 +22,8 @@ const parisMissionLocaleParams: CreateAgencyDto = {
   address: {
     streetNumberAndAddress: "10 avenue des Champs Elysées",
     city: "Paris",
-    countyCode: "75",
-    postCode: "75017",
+    departmentCode: "75",
+    postcode: "75017",
   },
   counsellorEmails: ["counsellor@mail.com"],
   validatorEmails: ["validator@mail.com"],

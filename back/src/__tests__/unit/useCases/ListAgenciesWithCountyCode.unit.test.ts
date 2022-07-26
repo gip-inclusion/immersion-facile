@@ -3,14 +3,14 @@ import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ListAgenciesWithCountyCode } from "../../../domain/convention/useCases/ListAgenciesWithCountyCode";
+import { ListAgenciesWithDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesWithDepartmentCode";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
 const defaultAdress: AddressDto = {
   city: "",
   streetNumberAndAddress: "",
-  postCode: "",
-  countyCode: "64",
+  postcode: "",
+  departmentCode: "64",
 };
 
 const agency1 = AgencyDtoBuilder.empty()
@@ -44,19 +44,19 @@ const agencyAddedFromPeReferencial = AgencyDtoBuilder.empty()
 
 describe("ListAgencies", () => {
   let agencyRepository: InMemoryAgencyRepository;
-  let listAgencies: ListAgenciesWithCountyCode;
+  let listAgencies: ListAgenciesWithDepartmentCode;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     agencyRepository = uow.agencyRepository;
-    listAgencies = new ListAgenciesWithCountyCode(
+    listAgencies = new ListAgenciesWithDepartmentCode(
       new InMemoryUowPerformer(uow),
     );
   });
 
   it("returns empty list when the repository is empty", async () => {
     agencyRepository.setAgencies([]);
-    const agencies = await listAgencies.execute({ countyCode: "75" });
+    const agencies = await listAgencies.execute({ departmentCode: "75" });
     expect(agencies).toEqual([]);
   });
 
@@ -68,7 +68,7 @@ describe("ListAgencies", () => {
       agencyAddedFromPeReferencial,
     ]);
 
-    const agencies = await listAgencies.execute({ countyCode: "64" });
+    const agencies = await listAgencies.execute({ departmentCode: "64" });
     expect(agencies).toHaveLength(3);
     expect(agencies).toEqual([
       {
@@ -86,13 +86,13 @@ describe("ListAgencies", () => {
     ]);
   });
 
-  it("filters on countyCode", async () => {
+  it("filters on departmentCode", async () => {
     const agency75 = AgencyDtoBuilder.empty()
       .withAddress({
         city: "",
         streetNumberAndAddress: "",
-        postCode: "",
-        countyCode: "75",
+        postcode: "",
+        departmentCode: "75",
       })
       .build();
 
@@ -101,15 +101,15 @@ describe("ListAgencies", () => {
       .withAddress({
         city: "",
         streetNumberAndAddress: "",
-        postCode: "",
-        countyCode: "20",
+        postcode: "",
+        departmentCode: "20",
       })
       .build();
 
     agencyRepository.setAgencies([agency75, agency20]);
 
     const agenciesOf75 = await listAgencies.execute({
-      countyCode: "75",
+      departmentCode: "75",
     });
     expectTypeToMatchAndEqual(agenciesOf75, [
       { id: agency75.id, name: agency75.name },
@@ -127,8 +127,8 @@ describe("ListAgencies", () => {
           .withAddress({
             city: "",
             streetNumberAndAddress: "",
-            postCode: "",
-            countyCode: "75",
+            postcode: "",
+            departmentCode: "75",
           })
           .build(),
       );
@@ -137,7 +137,7 @@ describe("ListAgencies", () => {
     agencyRepository.setAgencies(agencies);
 
     const agenciesOf75 = await listAgencies.execute({
-      countyCode: "75",
+      departmentCode: "75",
     });
     expect(agenciesOf75).toHaveLength(20);
     expect(agenciesOf75[0].id).toBe("0");
