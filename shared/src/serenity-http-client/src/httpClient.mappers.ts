@@ -1,43 +1,19 @@
-import {
-  InfrastructureError,
-  ConnectionRefusedError,
-  isConnectionRefusedError,
-  isConnectionResetError,
-  ConnectionResetError,
-} from "./errors/InfrastructureError.error";
-import { UnhandledError } from "./errors/UnhandledError";
+import { UnhandledError } from "./errors";
 import { ErrorMapper } from "./httpClient";
 
+// TODO is there a way to handle abstract classe and inheritance ?
 export const toMappedErrorMaker =
   <T extends string>(target: T, errorMapper: ErrorMapper<T> = {}) =>
   (error: Error): Error => {
-    const errorByConstructorName = errorMapper[target];
-    if (!errorByConstructorName) return error;
+    const errorByName = errorMapper[target];
+    if (!errorByName) return error;
 
-    const newErrorMaker = errorByConstructorName[error.constructor.name];
+    const newErrorMaker = errorByName[error.name];
 
     if (!newErrorMaker) return error;
 
     return newErrorMaker(error);
   };
-
-export const toInfrastructureError = (
-  error: Error,
-): InfrastructureError | undefined => {
-  if (isConnectionRefusedError(error))
-    return new ConnectionRefusedError(
-      `Could not connect to server : ${toRawErrorString(error)}`,
-      error,
-    );
-
-  if (isConnectionResetError(error))
-    return new ConnectionResetError(
-      `The other side of the TCP conversation abruptly closed its end of the connection: ${toRawErrorString(
-        error,
-      )}`,
-      error,
-    );
-};
 
 export const toUnhandledError = (details: string, error: Error): Error => {
   let rawString: string;
@@ -59,21 +35,3 @@ export const toUnhandledError = (details: string, error: Error): Error => {
     error,
   );
 };
-
-const toRawErrorString = (error: any): string =>
-  JSON.stringify(
-    {
-      code: error.code,
-      address: error.address,
-      port: error.port,
-      config: {
-        headers: error.config?.headers,
-        method: error.config?.method,
-        url: error.config?.url,
-        baseUrl: error.config?.baseUrl,
-        data: error.config?.data,
-      },
-    },
-    null,
-    2,
-  );

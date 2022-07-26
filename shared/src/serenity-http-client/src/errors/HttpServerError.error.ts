@@ -7,7 +7,7 @@ export class HttpServerError extends Error {
   ) {
     super();
     Error.captureStackTrace(this, this.constructor);
-    this.name = this.constructor.name;
+    this.name = "HttpServerError";
     this.message = message;
   }
 }

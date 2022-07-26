@@ -1,13 +1,18 @@
 import {
   AxiosErrorWithResponse,
+  AxiosInfrastructureError,
+  ConnectionRefusedError,
+  ConnectionResetError,
   HttpClientError,
-  InfrastructureError,
+  HttpServerError,
+  InfrastructureErrorKinds,
   isHttpError,
   ManagedAxios,
   toHttpError,
   toInfrastructureError,
   toMappedErrorMaker,
   toUnhandledError,
+  UnhandledError,
 } from "shared/src/serenity-http-client";
 import {
   ErrorMapper,
@@ -115,7 +120,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   private async getUserInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectUserDto> {
-    //const trackId = stringToMd5(accessToken.value);
     const response: HttpResponse = await this.httpClient.get({
       target: this.httpClient.targetsUrls.PECONNECT_USER_INFO,
       adapterConfig: {
@@ -136,18 +140,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   private async getAdvisorsInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectAdvisorDto[]> {
-    //const trackId = stringToMd5(accessToken.value);
-    //return this.retryStrategy.apply(async () => {
-
     const response: AxiosResponse = await this.httpClient.get({
       target: this.httpClient.targetsUrls.PECONNECT_ADVISORS_INFO,
       adapterConfig: {
         headers: headersWithAuthPeAccessToken(accessToken),
       },
     });
-
-    // Here
-
     const body = this.extractAdvisorsBodyFromResponse(response);
 
     const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
@@ -225,28 +223,99 @@ const notifyHttpErrorsToHandleBetter = (
     httpStatusCode: error.httpStatusCode,
   });
 
+const notifyUnhandledErrorToHandleBetter = (
+  target: string,
+  error: UnhandledError,
+) =>
+  notifyObjectDiscord({
+    target,
+    name: `UnhandledError ${error.name}`,
+    message: error.message,
+  });
+
+const notifyInfrastructureErrorToHandleBetter = (
+  target: string,
+  error: InfrastructureErrorKinds,
+) =>
+  notifyObjectDiscord({
+    target,
+    name: `InfrastructureError ${error.name}`,
+    message: error.message,
+    code: error.code,
+  });
+
+const handleInfrastructureError = (
+  target: string,
+  error: InfrastructureErrorKinds,
+) => {
+  notifyInfrastructureErrorToHandleBetter(target, error);
+  return new RawRedirectError(error.name, error.message, error);
+};
+
+const handleUnhandledError = (target: string, error: UnhandledError) => {
+  notifyUnhandledErrorToHandleBetter(target, error);
+  return new RawRedirectError(error.name, error.message, error);
+};
+
+const handleHttpError = (
+  target: string,
+  error: HttpClientError | HttpServerError,
+) => {
+  notifyHttpErrorsToHandleBetter(target, error);
+  return new RawRedirectError(error.name, error.message, error);
+};
+
+// TODO Improve with default mappers to reduce repetition
 export const errorMapper: ErrorMapper<PeConnectUrlTargets> = {
   PECONNECT_ADVISORS_INFO: {
     HttpClientForbiddenError: (error) =>
       new ManagedRedirectError("peConnectAdvisorForbiddenAccess", error),
-    HttpClientError: (error) => {
-      notifyHttpErrorsToHandleBetter(
+    HttpClientError: (error) =>
+      handleHttpError("PECONNECT_ADVISORS_INFO", error as HttpClientError),
+    HttpServerError: (error) =>
+      handleHttpError("PECONNECT_ADVISORS_INFO", error as HttpServerError),
+    UnhandledError: (error) =>
+      handleUnhandledError("PECONNECT_ADVISORS_INFO", error as UnhandledError),
+    AxiosInfrastructureError: (error) =>
+      handleInfrastructureError(
         "PECONNECT_ADVISORS_INFO",
-        error as HttpClientError,
-      );
-      return new RawRedirectError(error.name, error.message, error);
-    },
+        error as AxiosInfrastructureError,
+      ),
+    ConnectionRefusedError: (error) =>
+      handleInfrastructureError(
+        "PECONNECT_ADVISORS_INFO",
+        error as ConnectionRefusedError,
+      ),
+    ConnectionResetError: (error) =>
+      handleInfrastructureError(
+        "PECONNECT_ADVISORS_INFO",
+        error as ConnectionResetError,
+      ),
   },
   PECONNECT_USER_INFO: {
     HttpClientForbiddenError: (error) =>
       new ManagedRedirectError("peConnectUserForbiddenAccess", error),
-    HttpClientError: (error) => {
-      notifyHttpErrorsToHandleBetter(
+    HttpClientError: (error) =>
+      handleHttpError("PECONNECT_USER_INFO", error as HttpClientError),
+    HttpServerError: (error) =>
+      handleHttpError("PECONNECT_USER_INFO", error as HttpServerError),
+    UnhandledError: (error) =>
+      handleUnhandledError("PECONNECT_USER_INFO", error as UnhandledError),
+    AxiosInfrastructureError: (error) =>
+      handleInfrastructureError(
         "PECONNECT_USER_INFO",
-        error as HttpClientError,
-      );
-      return new RawRedirectError(error.name, error.message, error);
-    },
+        error as AxiosInfrastructureError,
+      ),
+    ConnectionRefusedError: (error) =>
+      handleInfrastructureError(
+        "PECONNECT_USER_INFO",
+        error as ConnectionRefusedError,
+      ),
+    ConnectionResetError: (error) =>
+      handleInfrastructureError(
+        "PECONNECT_USER_INFO",
+        error as ConnectionResetError,
+      ),
   },
   OAUTH2_ACCESS_TOKEN_STEP_2: {
     HttpClientError: (error) => {
@@ -260,6 +329,28 @@ export const errorMapper: ErrorMapper<PeConnectUrlTargets> = {
 
       return new RawRedirectError(error.name, error.message, error);
     },
+    HttpServerError: (error) =>
+      handleHttpError("OAUTH2_ACCESS_TOKEN_STEP_2", error as HttpServerError),
+    UnhandledError: (error) =>
+      handleUnhandledError(
+        "OAUTH2_ACCESS_TOKEN_STEP_2",
+        error as UnhandledError,
+      ),
+    AxiosInfrastructureError: (error) =>
+      handleInfrastructureError(
+        "OAUTH2_ACCESS_TOKEN_STEP_2",
+        error as AxiosInfrastructureError,
+      ),
+    ConnectionRefusedError: (error) =>
+      handleInfrastructureError(
+        "OAUTH2_ACCESS_TOKEN_STEP_2",
+        error as ConnectionRefusedError,
+      ),
+    ConnectionResetError: (error) =>
+      handleInfrastructureError(
+        "OAUTH2_ACCESS_TOKEN_STEP_2",
+        error as ConnectionResetError,
+      ),
   },
 };
 
@@ -305,16 +396,19 @@ export const onRejectPeSpecificResponseInterceptorMaker = <
   const toMappedError = toMappedErrorMaker(context.target, context.errorMapper);
 
   return (rawAxiosError: AxiosError): never => {
-    const infrastructureError: InfrastructureError | undefined =
+    // Handle infrastructure and network errors
+    const infrastructureError: InfrastructureErrorKinds | undefined =
       toInfrastructureError(rawAxiosError);
     if (infrastructureError) throw toMappedError(infrastructureError);
 
+    // Axios failed to convert the error into a valid error
     if (!axios.isAxiosError(rawAxiosError))
       throw toUnhandledError(
         `error Response does not have the property isAxiosError set to true`,
         rawAxiosError,
       );
 
+    // Error does not satisfy our minimal requirements
     if (!isValidPeErrorResponse(rawAxiosError.response))
       throw toUnhandledError(
         "error response objects does not have mandatory keys",
@@ -323,6 +417,7 @@ export const onRejectPeSpecificResponseInterceptorMaker = <
 
     const error = toHttpError(rawAxiosError as AxiosErrorWithResponse);
 
+    // Failed to convert the error into a valid http error
     if (!isHttpError(error))
       throw toUnhandledError(
         "failed to convert error to HttpClientError or HttpServerError",

@@ -1,6 +1,6 @@
-import { ConfigurationError } from "./errors/ConfigurationError.error";
-import { HttpClientError } from "./errors/HttpClientError.error";
-import { HttpServerError } from "./errors/HttpServerError.error";
+import { ConfigurationError } from "./errors";
+import { HttpClientError } from "./errors";
+import { HttpServerError } from "./errors";
 
 export interface HttpClient {
   get: (config: HttpClientGetConfig) => Promise<HttpResponse>;

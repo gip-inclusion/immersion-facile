@@ -7,7 +7,7 @@ export class HttpClientError extends Error {
   ) {
     super();
     Error.captureStackTrace(this, this.constructor);
-    this.name = this.constructor.name;
+    this.name = "HttpClientError";
     this.message = message;
   }
 }
@@ -19,7 +19,7 @@ export class HttpClientForbiddenError extends HttpClientError {
   ) {
     super(message, cause, 401);
     Error.captureStackTrace(this, this.constructor);
-    this.name = this.constructor.name;
+    this.name = "HttpClientForbiddenError";
     this.message = message;
   }
 }

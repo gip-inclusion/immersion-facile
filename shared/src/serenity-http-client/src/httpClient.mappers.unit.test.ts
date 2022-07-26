@@ -1,5 +1,5 @@
-import { HttpClientForbiddenError } from "./errors/HttpClientError.error";
-import { ConnectionRefusedError } from "./errors/InfrastructureError.error";
+import { ConnectionRefusedError } from "./adapters";
+import { HttpClientForbiddenError } from "./errors";
 import { ErrorMapper } from "./httpClient";
 import { toMappedErrorMaker } from "./httpClient.mappers";
 
@@ -57,7 +57,7 @@ describe("toMappedErrorMaker", () => {
     expect(toMappedError(error)).toBe(expectedError);
   });
 
-  it("toErrorMapper should return mapped infrastructure error", () => {
+  it("toErrorMapper should return mapped ConnectionRefusedError", () => {
     type TargetUrls = "ADDRESS_API_SEARCH_ENDPOINT";
     const error = new ConnectionRefusedError(
       "Could not connect to server because there is no server !",

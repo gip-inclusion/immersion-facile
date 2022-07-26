@@ -5,7 +5,7 @@ export class ConfigurationError extends Error {
   ) {
     super();
     Error.captureStackTrace(this, this.constructor);
-    this.name = this.constructor.name;
+    this.name = "ConfigurationError";
     this.message = message;
   }
 }

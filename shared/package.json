@@ -1,7 +1,10 @@
 {
   "name": "shared",
   "scripts": {
+    "test": "jest --testRegex=.unit.test.ts",
     "includecheck": "./check_includes.sh",
+    "typecheck": "tsc --noEmit",
+    "fullcheck": "pnpm run includecheck && pnpm run test && pnpm run typecheck && pnpm run lint",
     "lint": "pnpm -w run lint:shared"
   },
   "devDependencies": {

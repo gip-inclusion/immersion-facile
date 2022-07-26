@@ -1,4 +1,4 @@
-import { ManagedAxios } from "./axios.adapter";
+import { HttpClientError } from "../errors";
 
 import {
   AbsoluteUrl,
@@ -7,7 +7,7 @@ import {
   HttpResponse,
   TargetUrlsMapper,
 } from "../httpClient";
-import { HttpClientError } from "../errors/HttpClientError.error";
+import { ManagedAxios } from "./axios.adapter";
 
 describe("httpClient with axios concrete adapter", () => {
   const targetToValidSearchUrl = (rawQueryString: string): AbsoluteUrl =>

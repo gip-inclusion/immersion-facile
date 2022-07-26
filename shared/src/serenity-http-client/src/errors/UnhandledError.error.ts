@@ -5,7 +5,7 @@ export class UnhandledError extends Error {
   ) {
     super();
     Error.captureStackTrace(this, this.constructor);
-    this.name = this.constructor.name;
+    this.name = "UnhandledError";
     this.message = message;
   }
 }
