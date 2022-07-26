@@ -33,7 +33,7 @@ export class BasicEventCrawler implements EventCrawler {
     await Promise.all(events.map((event) => this.eventBus.publish(event)));
   }
 
-  private async retreiveEvents(
+  private async retrieveEvents(
     type: "unpublished" | "failed",
   ): Promise<DomainEvent[]> {
     //eslint-disable-next-line no-console
