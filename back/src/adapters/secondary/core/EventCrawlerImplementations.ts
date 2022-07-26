@@ -22,13 +22,13 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   public async processNewEvents(): Promise<void> {
-    const events = await this.retreiveEvents("unpublished");
+    const events = await this.retrieveEvents("unpublished");
     logger.debug({ events: eventsToDebugInfo(events) }, "processNewEvents");
     await Promise.all(events.map((event) => this.eventBus.publish(event)));
   }
 
   public async retryFailedEvents(): Promise<void> {
-    const events = await this.retreiveEvents("failed");
+    const events = await this.retrieveEvents("failed");
     logger.debug({ events: eventsToDebugInfo(events) }, "retryFailedEvents");
     await Promise.all(events.map((event) => this.eventBus.publish(event)));
   }
