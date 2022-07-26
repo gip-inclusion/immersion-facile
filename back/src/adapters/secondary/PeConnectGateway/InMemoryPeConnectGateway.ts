@@ -1,7 +1,7 @@
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { peConnect } from "shared/src/routes";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
-import { AccessTokenDto } from "../../domain/peConnect/dto/AccessToken.dto";
+import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
 import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
@@ -10,13 +10,13 @@ import {
   PeUserAndAdvisors,
   toPeConnectAdvisorDto,
   toPeConnectUserDto,
-} from "../../domain/peConnect/dto/PeConnect.dto";
+} from "../../../domain/peConnect/dto/PeConnect.dto";
 
 import {
   externalPeConnectAdvisorsSchema,
   externalPeConnectUserSchema,
-} from "../../domain/peConnect/port/PeConnect.schema";
-import { PeConnectGateway } from "../../domain/peConnect/port/PeConnectGateway";
+} from "../../../domain/peConnect/port/PeConnect.schema";
+import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 
 export class InMemoryPeConnectGateway implements PeConnectGateway {
   private _user: ExternalPeConnectUser = mockedUser;

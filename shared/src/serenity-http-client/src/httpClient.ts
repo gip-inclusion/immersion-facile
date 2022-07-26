@@ -47,6 +47,7 @@ export type ErrorMapper<TargetUrls extends string> = Partial<
   Record<TargetUrls, Partial<Record<string, (error: Error) => Error>>>
 >;
 
+// TODO Permettre de retourner data: T si une fct de validation qui fait le typeguard est fournie.
 export interface HttpResponse {
   data: unknown;
   status: number;

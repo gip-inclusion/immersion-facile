@@ -7,7 +7,7 @@ import supertest, { SuperTest, Test } from "supertest";
 // Those are mocked test because real calls to pole emploi api can only be made thought production domain registered with pole emploi
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { createApp } from "../../adapters/primary/server";
-import { HttpPeConnectGateway } from "../../adapters/secondary/HttpPeConnectGateway";
+import { HttpPeConnectGateway } from "../../adapters/secondary/PeConnectGateway/HttpPeConnectGateway";
 import {
   AccessTokenDto,
   ExternalAccessToken,

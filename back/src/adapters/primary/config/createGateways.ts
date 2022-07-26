@@ -1,7 +1,4 @@
-import {
-  onFullfilledDefaultResponseInterceptorMaker,
-  TargetUrlsMapper,
-} from "shared/src/serenity-http-client";
+import { onFullfilledDefaultResponseInterceptorMaker } from "shared/src/serenity-http-client";
 import { ManagedAxios } from "shared/src/serenity-http-client";
 import { Pool } from "pg";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
@@ -14,12 +11,9 @@ import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGate
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
 import {
-  errorMapper,
   HttpPeConnectGateway,
-  httpPeConnectGatewayTargetMapperMaker,
-  onRejectPeSpecificResponseInterceptorMaker,
   PeConnectUrlTargets,
-} from "../../secondary/HttpPeConnectGateway";
+} from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/HttpPassEmploiGateway";
@@ -29,13 +23,18 @@ import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/InMemory
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { InMemoryDocumentGateway } from "../../secondary/InMemoryDocumentGateway";
-import { InMemoryPeConnectGateway } from "../../secondary/InMemoryPeConnectGateway";
+import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/InMemoryPoleEmploiGateway";
 import { InMemorySireneGateway } from "../../secondary/InMemorySireneGateway";
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
 import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
+import {
+  httpPeConnectGatewayTargetMapperMaker,
+  onRejectPeSpecificResponseInterceptorMaker,
+  peConnectApiErrorsToDomainErrors,
+} from "../../secondary/PeConnectGateway/HttpPeConnectGateway.config";
 
 const logger = createLogger(__filename);
 
@@ -71,10 +70,10 @@ export type Gateways = ReturnType<typeof createGateways> extends Promise<infer T
 // eslint-disable-next-line @typescript-eslint/require-await
 export const createGateways = async (config: AppConfig, clock: Clock) => {
   logger.info({
-    repositories: config.repositories,
-    sireneGateway: config.sireneGateway,
     emailGateway: config.emailGateway,
+    repositories: config.repositories,
     romeRepository: config.romeRepository,
+    sireneGateway: config.sireneGateway,
   });
 
   const cachingAccessTokenGateway = [
@@ -91,24 +90,13 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
       )
     : new InMemoryAccessTokenGateway();
 
-  const httpPeConnectGatewayTargetUrlsMapper: TargetUrlsMapper<PeConnectUrlTargets> =
-    config.poleEmploiGateway === "HTTPS"
-      ? httpPeConnectGatewayTargetMapperMaker(
-          config.poleEmploiAccessTokenConfig,
-        )
-      : ({} as TargetUrlsMapper<PeConnectUrlTargets>);
-
   return {
+    documentGateway:
+      config.documentGateway === "MINIO"
+        ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          new MinioDocumentGateway(config.minioParams!)
+        : new InMemoryDocumentGateway(),
     email: createEmailGateway(config, clock),
-    sirene:
-      config.sireneGateway === "HTTPS"
-        ? new HttpsSireneGateway(
-            config.sireneHttpsConfig,
-            clock,
-            noRateLimit,
-            noRetries,
-          )
-        : new InMemorySireneGateway(),
     laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteAPI(
@@ -119,28 +107,11 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
             noRetries,
           )
         : new InMemoryLaBonneBoiteAPI(),
-
     passEmploiGateway:
       config.passEmploiGateway === "HTTPS"
         ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)
         : new InMemoryPassEmploiGateway(),
-
-    peConnectGateway:
-      config.peConnectGateway === "HTTPS"
-        ? new HttpPeConnectGateway(
-            config.poleEmploiAccessTokenConfig,
-            new ManagedAxios<PeConnectUrlTargets>(
-              httpPeConnectGatewayTargetUrlsMapper,
-              errorMapper,
-              {
-                timeout: AXIOS_TIMEOUT_FIVE_SECOND,
-              },
-              onFullfilledDefaultResponseInterceptorMaker,
-              onRejectPeSpecificResponseInterceptorMaker,
-            ),
-          )
-        : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl),
-
+    peConnectGateway: createPoleEmploiConnectGateway(config),
     poleEmploiGateway:
       config.poleEmploiGateway === "HTTPS"
         ? new HttpPoleEmploiGateway(
@@ -151,17 +122,19 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
             noRetries,
           )
         : new InMemoryPoleEmploiGateway(),
-
     reportingGateway:
       config.reporting === "EXCEL"
         ? new ExcelReportingGateway()
         : new InMemoryReportingGateway(),
-
-    documentGateway:
-      config.documentGateway === "MINIO"
-        ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          new MinioDocumentGateway(config.minioParams!)
-        : new InMemoryDocumentGateway(),
+    sirene:
+      config.sireneGateway === "HTTPS"
+        ? new HttpsSireneGateway(
+            config.sireneHttpsConfig,
+            clock,
+            noRateLimit,
+            noRetries,
+          )
+        : new InMemorySireneGateway(),
   };
 };
 
@@ -188,3 +161,22 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
   const _notReached: never = config.emailGateway;
   throw new Error("Unknown email gateway kind");
 };
+
+const createPoleEmploiConnectGateway = (config: AppConfig) =>
+  config.peConnectGateway === "HTTPS"
+    ? new HttpPeConnectGateway(
+        {
+          clientId: config.poleEmploiClientId,
+          clientSecret: config.poleEmploiClientSecret,
+        },
+        new ManagedAxios<PeConnectUrlTargets>(
+          httpPeConnectGatewayTargetMapperMaker(config),
+          peConnectApiErrorsToDomainErrors,
+          {
+            timeout: AXIOS_TIMEOUT_FIVE_SECOND,
+          },
+          onFullfilledDefaultResponseInterceptorMaker,
+          onRejectPeSpecificResponseInterceptorMaker,
+        ),
+      )
+    : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl);

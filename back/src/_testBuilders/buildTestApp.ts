@@ -10,7 +10,7 @@ import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/In
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
-import { InMemoryPeConnectGateway } from "../adapters/secondary/InMemoryPeConnectGateway";
+import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/InMemoryPoleEmploiGateway";
 import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
 import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
@@ -70,6 +70,7 @@ export const buildTestApp = async (
     REPOSITORIES: "IN_MEMORY",
     LA_BONNE_BOITE_GATEWAY: "IN_MEMORY",
     PASS_EMPLOI_GATEWAY: "IN_MEMORY",
+    PE_CONNECT_GATEWAY: "IN_MEMORY",
     EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
     REPORTING_GATEWAY: "EXCEL",
     ...appConfigOverrides?.configParams,
