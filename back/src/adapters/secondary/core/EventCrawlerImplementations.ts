@@ -21,44 +21,41 @@ export class BasicEventCrawler implements EventCrawler {
     );
   }
 
-  public async processNewEvents() {
-    const events = await this.retreiveAllUnpublishedEvents();
-    logger.debug(
-      { events: eventsToDebugInfo(events) },
-      "processing new Events",
-    );
+  public async processNewEvents(): Promise<void> {
+    const events = await this.retreiveEvents("unpublished");
+    logger.debug({ events: eventsToDebugInfo(events) }, "processNewEvents");
     await Promise.all(events.map((event) => this.eventBus.publish(event)));
   }
 
-  private async retreiveAllUnpublishedEvents(): Promise<DomainEvent[]> {
+  public async retryFailedEvents(): Promise<void> {
+    const events = await this.retreiveEvents("failed");
+    logger.debug({ events: eventsToDebugInfo(events) }, "retryFailedEvents");
+    await Promise.all(events.map((event) => this.eventBus.publish(event)));
+  }
+
+  private async retreiveEvents(
+    type: "unpublished" | "failed",
+  ): Promise<DomainEvent[]> {
     //eslint-disable-next-line no-console
     //console.time("__metrics : getAllUnpublishedEvents query duration");
     try {
       const events = await this.uowPerformer.perform((uow) =>
-        uow.outboxQueries.getAllUnpublishedEvents(),
+        type === "unpublished"
+          ? uow.outboxQueries.getAllUnpublishedEvents()
+          : uow.outboxQueries.getAllFailedEvents(),
       );
       //eslint-disable-next-line no-console
       //console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
       return events;
     } catch (error) {
+      const message = `Event Crawler failed to process ${type} events.`;
       // eslint-disable-next-line no-console
       //console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
-      logger.error({ error }, "Event Crawler failed to process new events");
-      notifyObjectDiscord(error);
-      return [];
-    }
-  }
-
-  public async retryFailedEvents() {
-    try {
-      const events = await this.uowPerformer.perform((uow) =>
-        uow.outboxQueries.getAllFailedEvents(),
-      );
-      logger.info({ events: eventsToDebugInfo(events) }, "retrying Events");
-      await Promise.all(events.map((event) => this.eventBus.publish(event)));
-    } catch (error) {
-      logger.error({ error }, "Event Crawler failed to process failed events");
-      notifyObjectDiscord(error);
+      logger.error({ error }, message);
+      notifyObjectDiscord({
+        message,
+        error,
+      });
       return [];
     }
   }
