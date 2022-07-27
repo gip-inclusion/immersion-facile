@@ -9,17 +9,19 @@ import {
   DepartmentOrRegion,
   FormSourceProvider,
 } from "shared/src/establishmentExport/establishmentExport.dto";
-import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGateway/HttpExcelExportGateway";
 import {
+  AgenciesExportableParams,
+  ContactRequestsExportableParams,
+  ConventionsExportableParams,
   EstablishmentsWithAggregatedOffersExportableParams,
   EstablishmentsWithFlattenOffersExportableParams,
 } from "src/../../shared/src/exportable";
-import { HttpExcelExportGateway } from "src/core-logic/adapters/HttpExcelExportGateway";
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
 import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import DownloadIcon from "@mui/icons-material/Download";
+import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGateway/HttpExcelExportGateway";
 
 // TODO Mettre dans les dépendances ?
 export const excelExportGateway = new HttpExcelExportGateway(
@@ -38,8 +40,13 @@ export const DataExportTab = () => {
           onClick={() => excelExportGateway.exportConventions(adminToken)}
         />
       </div>
-      <ExportEntreprisesV1 />
-      <ExportEntreprisesV2 />
+      <div className="flex flex-col gap-8">
+        <ExportEntreprisesV1 />
+        <ExportEntreprisesV2 />
+        <ExportConventions />
+        <ExportAgencies />
+        <ExportContactRequests />
+      </div>
     </div>
   );
 };
@@ -176,15 +183,13 @@ const ExportEntreprisesV2 = () => {
               "testConsumer",
             ]}
             onSelect={(selectedSourceProvider) => {
-              if (selectedSourceProvider) {
-                setExportableParams({
-                  ...exportableParams,
-                  filters: {
-                    ...exportableParams.filters,
-                    Origine: selectedSourceProvider,
-                  },
-                });
-              }
+              setExportableParams({
+                ...exportableParams,
+                filters: {
+                  ...exportableParams.filters,
+                  Origine: selectedSourceProvider,
+                },
+              });
             }}
             allowEmpty={true}
             defaultSelectedOption={undefined}
@@ -224,6 +229,195 @@ const ExportEntreprisesV2 = () => {
               onClick={() =>
                 excelExportGateway.exportData(adminToken, {
                   fileName: "Établissements sans aggregation des métiers",
+                  exportableParams,
+                })
+              }
+            />
+          </div>
+        </div>
+      </WithBackground>
+    </div>
+  );
+};
+
+const ExportConventions = () => {
+  const adminToken = useAdminToken();
+
+  const [exportableParams, setExportableParams] =
+    useState<ConventionsExportableParams>({
+      name: "conventions",
+      filters: {},
+      keyToGroupBy: undefined,
+    });
+
+  return (
+    <div>
+      <DsfrTitle level={5} text="Les conventions (v2)" />
+      <WithBackground>
+        <div className="w-2/3">
+          <ArrayDropdown
+            label="Groupement"
+            options={["Région", "Département", "Structure"]}
+            allowEmpty={true}
+            onSelect={(selectedGroupKey) => {
+              if (selectedGroupKey) {
+                setExportableParams({
+                  ...exportableParams,
+                  keyToGroupBy: selectedGroupKey,
+                });
+              }
+            }}
+            defaultSelectedOption={undefined}
+          />
+          <ArrayDropdown
+            label="Filtre par statut"
+            options={[
+              "DRAFT",
+              "CANCELLED",
+              "REJECTED",
+              "ACCEPTED_BY_VALIDATOR",
+              "ACCEPTED_BY_COUNSELLOR",
+              "PARTIALLY_SIGNED",
+              "READY_TO_SIGN",
+              "IN_REVIEW",
+            ]}
+            onSelect={(selectedStatut) => {
+              setExportableParams({
+                ...exportableParams,
+                filters: {
+                  ...exportableParams.filters,
+                  Statut: selectedStatut,
+                },
+              });
+            }}
+            allowEmpty={true}
+            defaultSelectedOption={undefined}
+          />
+          <ImmersionTextField
+            label="Filtre par type de structure"
+            name="Filter par type de structure"
+            className="flex justify-between"
+            onChange={(event) => {
+              setExportableParams({
+                ...exportableParams,
+                filters: {
+                  ...exportableParams.filters,
+                  "Type de structure": event.target.value,
+                },
+              });
+            }}
+          />
+          <div className="self-center mt-3">
+            <DownloadButton
+              onClick={() =>
+                excelExportGateway.exportData(adminToken, {
+                  fileName: "Conventions",
+                  exportableParams,
+                })
+              }
+            />
+          </div>
+        </div>
+      </WithBackground>
+    </div>
+  );
+};
+
+const ExportAgencies = () => {
+  const adminToken = useAdminToken();
+
+  const [exportableParams, setExportableParams] =
+    useState<AgenciesExportableParams>({
+      name: "agencies",
+      filters: {},
+      keyToGroupBy: undefined,
+    });
+
+  return (
+    <div>
+      <DsfrTitle level={5} text="Les agences (v2)" />
+      <WithBackground>
+        <div className="w-2/3">
+          <ArrayDropdown
+            label="Groupement"
+            options={["Région", "Département", "Type"]}
+            allowEmpty={true}
+            onSelect={(selectedGroupKey) => {
+              if (selectedGroupKey) {
+                setExportableParams({
+                  ...exportableParams,
+                  keyToGroupBy: selectedGroupKey,
+                });
+              }
+            }}
+            defaultSelectedOption={undefined}
+          />
+          <ArrayDropdown
+            label="Filtre par statut"
+            options={["from-api-PE", "active", "closed", "needsReview"]}
+            onSelect={(selectedStatut) => {
+              setExportableParams({
+                ...exportableParams,
+                filters: {
+                  ...exportableParams.filters,
+                  Statut: selectedStatut,
+                },
+              });
+            }}
+            allowEmpty={true}
+            defaultSelectedOption={undefined}
+          />
+          <div className="self-center mt-3">
+            <DownloadButton
+              onClick={() =>
+                excelExportGateway.exportData(adminToken, {
+                  fileName: "Agences",
+                  exportableParams,
+                })
+              }
+            />
+          </div>
+        </div>
+      </WithBackground>
+    </div>
+  );
+};
+
+const ExportContactRequests = () => {
+  const adminToken = useAdminToken();
+
+  const [exportableParams, setExportableParams] =
+    useState<ContactRequestsExportableParams>({
+      name: "contact_requests",
+      filters: {},
+      keyToGroupBy: undefined,
+    });
+
+  return (
+    <div>
+      <DsfrTitle level={5} text="Mises en relation (v2)" />
+      <WithBackground>
+        <div className="w-2/3">
+          <ArrayDropdown
+            label="Groupement"
+            options={["Région", "Département"]}
+            allowEmpty={true}
+            onSelect={(selectedGroupKey) => {
+              if (selectedGroupKey) {
+                setExportableParams({
+                  ...exportableParams,
+                  keyToGroupBy: selectedGroupKey,
+                });
+              }
+            }}
+            defaultSelectedOption={undefined}
+          />
+
+          <div className="self-center mt-3">
+            <DownloadButton
+              onClick={() =>
+                excelExportGateway.exportData(adminToken, {
+                  fileName: "Mises en relation",
                   exportableParams,
                 })
               }

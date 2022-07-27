@@ -51,16 +51,6 @@ export class HttpExcelExportGateway implements ExcelExportGateway {
     adminToken: AdminToken,
     exportDataDto: ExportDataDto,
   ) {
-    // const exportDataDto: ExportDataDto = {
-    //   fileName: "Établissements",
-    //   exportableParams: {
-    //     name: "establishmentsWithFlattenOffers",
-    //     filters: {
-    //       // "Division NAF": "Activités des agences de travail temporaire",
-    //     },
-    //     keyToGroupBy: "",
-    //   },
-    // };
     const response = await axios.post(
       "/api/admin/excel/export",
       exportDataDto,
@@ -70,7 +60,9 @@ export class HttpExcelExportGateway implements ExcelExportGateway {
       },
     );
     const nameForParams = `${exportDataDto.fileName} ${
-      "groupés par" + exportDataDto.exportableParams.keyToGroupBy ?? ""
+      exportDataDto.exportableParams.keyToGroupBy
+        ? " par " + exportDataDto.exportableParams.keyToGroupBy
+        : ""
     }`;
 
     downloadData(

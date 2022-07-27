@@ -8,7 +8,10 @@ export type ExportableName = GetExportableParams["name"];
 
 export type GetExportableParams =
   | EstablishmentsWithAggregatedOffersExportableParams
-  | EstablishmentsWithFlattenOffersExportableParams;
+  | EstablishmentsWithFlattenOffersExportableParams
+  | ConventionsExportableParams
+  | AgenciesExportableParams
+  | ContactRequestsExportableParams;
 
 export type EstablishmentsWithAggregatedOffersExportableParams =
   GenericExportable<
@@ -19,6 +22,21 @@ export type EstablishmentsWithAggregatedOffersExportableParams =
 export type EstablishmentsWithFlattenOffersExportableParams = GenericExportable<
   "establishments_with_flatten_offers",
   "Origine" | "Division NAF" | "Département" | "Région"
+>;
+
+export type AgenciesExportableParams = GenericExportable<
+  "agencies",
+  "Département" | "Région" | "Statut" | "Type"
+>;
+
+export type ConventionsExportableParams = GenericExportable<
+  "conventions",
+  "Département" | "Région" | "Statut" | "Structure" | "Type de structure"
+>;
+
+export type ContactRequestsExportableParams = GenericExportable<
+  "contact_requests",
+  "Région" | "Département"
 >;
 
 export type ExportDataDto = {
