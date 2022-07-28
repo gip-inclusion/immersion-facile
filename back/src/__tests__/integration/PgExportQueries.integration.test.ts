@@ -51,7 +51,7 @@ describe("PgExportQueries", () => {
 
         // Assert
         const expectedExportedRowWithSiret = {
-          "Date de mise à jour": "04/01/2022",
+          "Date de mise à jour": "05/01/2022",
           Siret: "79158476600012",
           "Raison Sociale": "ARTUS INTERIM LA ROCHE SUR YON",
           Enseigne: null,

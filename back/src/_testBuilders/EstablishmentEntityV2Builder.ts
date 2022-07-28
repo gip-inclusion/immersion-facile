@@ -24,7 +24,7 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   position: { lat: 35, lon: 50 },
   nafDto: { code: "8539A", nomenclature: "NAFRev2" },
   numberEmployeesRange: "10-19",
-  updatedAt: new Date("2022-01-05T00:00:00.000"),
+  updatedAt: new Date("2022-01-05T12:00:00.000"),
   isActive: true,
   isSearchable: true,
 };

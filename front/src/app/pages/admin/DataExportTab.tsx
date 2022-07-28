@@ -6,10 +6,6 @@ import {
   ImmersionTextField,
 } from "react-design-system/immersionFacile";
 import {
-  DepartmentOrRegion,
-  FormSourceProvider,
-} from "shared/src/establishmentExport/establishmentExport.dto";
-import {
   AgenciesExportableParams,
   ContactRequestsExportableParams,
   ConventionsExportableParams,
@@ -28,120 +24,16 @@ export const excelExportGateway = new HttpExcelExportGateway(
   createManagedAxiosInstance({ baseURL: "/api" }),
 );
 
-export const DataExportTab = () => {
-  const adminToken = useAdminToken();
+export const DataExportTab = () => (
+  <div className="flex flex-col gap-8">
+    <ExportEntreprises />
+    <ExportConventions />
+    <ExportAgencies />
+    <ExportContactRequests />
+  </div>
+);
 
-  return (
-    <div className="flex flex-col gap-1">
-      <div>
-        <DsfrTitle level={5} text="Les conventions" />
-        <Link
-          text="Les conventions par agences"
-          onClick={() => excelExportGateway.exportConventions(adminToken)}
-        />
-      </div>
-      <div className="flex flex-col gap-8">
-        <ExportEntreprisesV1 />
-        <ExportEntreprisesV2 />
-        <ExportConventions />
-        <ExportAgencies />
-        <ExportContactRequests />
-      </div>
-    </div>
-  );
-};
-
-const ExportEntreprisesV1 = () => {
-  const adminToken = useAdminToken();
-
-  const [
-    conventionExportSelectedGroupKey,
-    setConventionExportSelectedGroupKey,
-  ] = useState<DepartmentOrRegion>("region");
-
-  const [
-    conventionExportSelectedSourceProvider,
-    setConventionExportSelectedSourceProvider,
-  ] = useState<FormSourceProvider>("all");
-
-  return (
-    <div>
-      <DsfrTitle level={5} text="Les entreprises référencées (v1)" />
-      <WithBackground>
-        <div className="w-2/3">
-          <ArrayDropdown
-            label="Sélectionner un groupement"
-            options={["region", "department"]}
-            onSelect={(selectedGroupKey) => {
-              if (selectedGroupKey) {
-                setConventionExportSelectedGroupKey(selectedGroupKey);
-              }
-            }}
-            allowEmpty={false}
-            defaultSelectedOption={conventionExportSelectedGroupKey}
-          />
-          <ArrayDropdown
-            label="Sélectionner une source"
-            options={[
-              "all",
-              "immersion-facile",
-              "cci",
-              "cma",
-              "lesentreprises-sengagent",
-              "unJeuneUneSolution",
-              "testConsumer",
-            ]}
-            onSelect={(selectedSourceProvider) => {
-              if (selectedSourceProvider) {
-                setConventionExportSelectedSourceProvider(
-                  selectedSourceProvider,
-                );
-              }
-            }}
-            allowEmpty={false}
-            defaultSelectedOption={conventionExportSelectedSourceProvider}
-          />
-        </div>
-      </WithBackground>
-
-      <Link
-        text={`${
-          conventionExportSelectedSourceProvider === "all"
-            ? "Toutes les entreprises référencées"
-            : "Les entreprises de source " +
-              conventionExportSelectedSourceProvider
-        } par ${conventionExportSelectedGroupKey} sans aggrégation
-des métiers`}
-        onClick={() =>
-          excelExportGateway.exportEstablishments(adminToken, {
-            aggregateProfession: false,
-            groupKey: conventionExportSelectedGroupKey,
-            sourceProvider: conventionExportSelectedSourceProvider,
-          })
-        }
-      />
-
-      <Link
-        text={`${
-          conventionExportSelectedSourceProvider === "all"
-            ? "Toutes les entreprises référencées"
-            : "Les entreprises de source " +
-              conventionExportSelectedSourceProvider
-        } par ${conventionExportSelectedGroupKey} avec aggrégation
-des métiers`}
-        onClick={() =>
-          excelExportGateway.exportEstablishments(adminToken, {
-            aggregateProfession: true,
-            groupKey: conventionExportSelectedGroupKey,
-            sourceProvider: conventionExportSelectedSourceProvider,
-          })
-        }
-      />
-    </div>
-  );
-};
-
-const ExportEntreprisesV2 = () => {
+const ExportEntreprises = () => {
   const adminToken = useAdminToken();
 
   const [exportableParams, setExportableParams] = useState<
@@ -155,7 +47,7 @@ const ExportEntreprisesV2 = () => {
 
   return (
     <div>
-      <DsfrTitle level={5} text="Les entreprises référencées (v2)" />
+      <DsfrTitle level={5} text="Les entreprises référencées" />
       <WithBackground>
         <div className="w-2/3">
           <ArrayDropdown
@@ -252,7 +144,7 @@ const ExportConventions = () => {
 
   return (
     <div>
-      <DsfrTitle level={5} text="Les conventions (v2)" />
+      <DsfrTitle level={5} text="Les conventions" />
       <WithBackground>
         <div className="w-2/3">
           <ArrayDropdown
@@ -335,7 +227,7 @@ const ExportAgencies = () => {
 
   return (
     <div>
-      <DsfrTitle level={5} text="Les agences (v2)" />
+      <DsfrTitle level={5} text="Les agences" />
       <WithBackground>
         <div className="w-2/3">
           <ArrayDropdown
@@ -395,7 +287,7 @@ const ExportContactRequests = () => {
 
   return (
     <div>
-      <DsfrTitle level={5} text="Mises en relation (v2)" />
+      <DsfrTitle level={5} text="Mises en relation" />
       <WithBackground>
         <div className="w-2/3">
           <ArrayDropdown
@@ -440,27 +332,6 @@ const DownloadButton = ({ onClick }: { onClick: () => void }) => (
     <DownloadIcon />
     Télécharger
   </button>
-);
-
-// implementation could be improved, using a button and giving it a link style for exemple
-const Link = ({
-  text,
-  onClick,
-}: {
-  text: string;
-  onClick: React.MouseEventHandler<HTMLAnchorElement>;
-}) => (
-  <a
-    className="fr-link fr-fi-arrow-right-line fr-link--icon-left"
-    onClick={(e) => {
-      e.preventDefault();
-      onClick(e);
-    }}
-    href="#"
-    target="_blank"
-  >
-    {text}
-  </a>
 );
 
 const LabeledCheckbox = ({

@@ -16,7 +16,6 @@ import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyReposito
 import { PgConventionQueries } from "../../adapters/secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
 import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
-import { ConventionRawBeforeExport } from "../../domain/convention/useCases/ExportConventionsReport";
 import { makeCreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 
@@ -50,59 +49,6 @@ describe("Pg implementation of ConventionQueries", () => {
   afterAll(async () => {
     client.release();
     await pool.end();
-  });
-  describe("get for export", () => {
-    it("retrieves all convention exports", async () => {
-      // Prepare
-      const appleAgencyId = "11111111-1111-1111-1111-111111111111";
-      const appleAgency = AgencyDtoBuilder.create(appleAgencyId)
-        .withName("apple")
-        .build();
-
-      const ConventionId: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
-
-      const convention = new ConventionDtoBuilder()
-        .withId(ConventionId)
-        .withDateStart(new Date("2021-01-15").toISOString())
-        .withDateEnd(new Date("2021-01-20").toISOString())
-        .withDateSubmission(new Date("2021-01-10").toISOString())
-        .withDateValidation(new Date("2021-01-12").toISOString())
-        .withAgencyId(appleAgencyId)
-        .withoutWorkCondition()
-        .build();
-
-      await agencyRepo.insert(appleAgency);
-      await conventionRepository.save(convention);
-
-      // Act
-      const actualExport: ConventionRawBeforeExport[] =
-        await conventionQueries.getAllConventionsForExport();
-
-      const {
-        agencyId,
-        id,
-        immersionActivities,
-        immersionSkills,
-        individualProtection,
-        sanitaryPrevention,
-        sanitaryPreventionDescription,
-        immersionAppellation,
-        externalId,
-        immersionAddress,
-        ...filteredProperties
-      } = convention;
-      // Assert
-      expect(actualExport[0]).toStrictEqual({
-        ...filteredProperties,
-        agencyName: appleAgency.name,
-        immersionProfession: convention.immersionAppellation.appellationLabel,
-        status: convention.status,
-        dateEnd: new Date("2021-01-20").toISOString(),
-        dateStart: new Date("2021-01-15").toISOString(),
-        dateSubmission: new Date("2021-01-10").toISOString(),
-        dateValidation: new Date("2021-01-12").toISOString(),
-      });
-    });
   });
   describe("PG implementation of method getConventionById", () => {
     it("Returns undefined if no convention with such id", async () => {

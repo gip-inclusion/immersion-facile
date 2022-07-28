@@ -7,7 +7,6 @@ import {
   WithConventionId,
 } from "shared/src/convention/convention.dto";
 import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
-import { ConventionRawBeforeExport } from "../../domain/convention/useCases/ExportConventionsReport";
 import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../utils/logger";
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
@@ -46,40 +45,6 @@ export class InMemoryConventionQueries implements ConventionQueries {
         agencyName: TEST_AGENCY_NAME,
       }
     );
-  }
-
-  public async getAllConventionsForExport(): Promise<
-    ConventionRawBeforeExport[]
-  > {
-    return Object.values(this.conventionRepository._conventions).map((dto) => ({
-      agencyName: `TEST_AGENCY_NAME_WITH_ID_${dto.agencyId}`,
-      status: dto.status,
-      postalCode: dto.postalCode,
-      email: dto.email,
-      phone: dto.phone,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      emergencyContact: dto.emergencyContact,
-      emergencyContactPhone: dto.emergencyContactPhone,
-      dateSubmission: new Date(dto.dateSubmission).toISOString(),
-      dateStart: new Date(dto.dateStart).toISOString(),
-      dateEnd: new Date(dto.dateEnd).toISOString(),
-      dateValidation: dto.dateValidation
-        ? new Date(dto.dateValidation).toISOString()
-        : undefined,
-      businessName: dto.businessName,
-      mentor: dto.mentor,
-      mentorPhone: dto.mentorPhone,
-      mentorEmail: dto.mentorEmail,
-      immersionObjective: dto.immersionObjective,
-      immersionProfession: dto.immersionAppellation.appellationLabel,
-      beneficiaryAccepted: dto.beneficiaryAccepted,
-      enterpriseAccepted: dto.enterpriseAccepted,
-      schedule: dto.schedule,
-      siret: dto.siret,
-      workConditions: dto.workConditions,
-      federatedIdentity: dto.federatedIdentity,
-    }));
   }
 
   public async getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(

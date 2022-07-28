@@ -27,7 +27,6 @@ import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgCo
 import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
-import { PgEstablishmentExportQueries } from "../../secondary/pg/PgEstablishmentExportQueries";
 import { PgExportQueries } from "../../secondary/pg/PgExportQueries";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
@@ -38,7 +37,6 @@ import { PgPostalCodeDepartmentRegionQueries } from "../../secondary/pg/PgPostal
 import { PgRomeRepository } from "../../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/PgSearchMadeRepository";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
-import { stubEstablishmentExportQueries } from "../../secondary/StubEstablishmentExportQueries";
 import { stubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";
 import { GetPgPoolFn } from "./createGateways";
@@ -64,7 +62,6 @@ export const createInMemoryUow = () => {
       conventionRepository,
       outboxRepository,
     ),
-    establishmentExportQueries: stubEstablishmentExportQueries,
     postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
     getFeatureFlags: makeStubGetFeatureFlags(),
     agencyRepository: new InMemoryAgencyRepository(),
@@ -92,7 +89,6 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
     client,
   ),
   conventionRepository: new PgConventionRepository(client),
-  establishmentExportQueries: new PgEstablishmentExportQueries(client),
   conventionQueries: new PgConventionQueries(client),
   postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
     client,

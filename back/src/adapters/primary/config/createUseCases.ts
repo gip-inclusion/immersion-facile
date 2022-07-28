@@ -9,7 +9,6 @@ import { AddAgency } from "../../../domain/convention/useCases/AddAgency";
 import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
-import { ExportConventionsReport } from "../../../domain/convention/useCases/ExportConventionsReport";
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
@@ -38,7 +37,6 @@ import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { ApiConsumerId } from "../../../domain/core/valueObjects/ApiConsumer";
-import { ExportEstablishmentsAsExcelArchive } from "../../../domain/establishment/useCases/ExportEstablishmentsAsExcelArchive";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
@@ -131,14 +129,6 @@ export const createUseCases = (
         config.immersionFacileBaseUrl,
       ),
     listAdminConventions: new ListAdminConventions(uowPerformer),
-    exportConventionsAsExcelArchive: new ExportConventionsReport(
-      uowPerformer,
-      gateways.reportingGateway,
-    ),
-
-    exportEstablishmentsAsExcelArchive: new ExportEstablishmentsAsExcelArchive(
-      uowPerformer,
-    ),
 
     updateConvention: new UpdateImmersionApplication(
       uowPerformer,

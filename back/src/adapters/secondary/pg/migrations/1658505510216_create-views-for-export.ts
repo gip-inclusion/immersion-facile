@@ -5,31 +5,30 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     "view_siret_with_department_region",
     {},
     `
-  WITH 
-        left_digits_code_department_region AS (
-            SELECT DISTINCT 
-            postal_code_department_region.department,
-            postal_code_department_region.region,
-            left(postal_code_department_region.postal_code, 3) AS department_code
-            FROM postal_code_department_region
-            ),
-        siret_postal_code AS (
-            SELECT siret, (regexp_match(address, '\\d{5}'))[1] AS postal_code 
-            FROM establishments 
-            WHERE data_source = 'form'
-            )
-    SELECT  e.siret, postal_code, department, region
-    FROM establishments AS e
-    LEFT JOIN siret_postal_code spc ON spc.siret = e.siret
-    LEFT JOIN left_digits_code_department_region ldcdr ON ldcdr.department_code = left(spc.postal_code, 3)
-`,
+    WITH 
+          left_digits_code_department_region AS (
+              SELECT DISTINCT 
+              postal_code_department_region.department,
+              postal_code_department_region.region,
+              left(postal_code_department_region.postal_code, 3) AS department_code
+              FROM postal_code_department_region
+              ),
+          siret_postal_code AS (
+              SELECT siret, (regexp_match(address, '\\d{5}'))[1] AS postal_code 
+              FROM establishments 
+              WHERE data_source = 'form'
+              )
+      SELECT  e.siret, postal_code, department, region
+      FROM establishments AS e
+      LEFT JOIN siret_postal_code spc ON spc.siret = e.siret
+      LEFT JOIN left_digits_code_department_region ldcdr ON ldcdr.department_code = left(spc.postal_code, 3)`,
   );
 
   pgm.createView(
     "view_contact_requests",
     {},
     `
-  WITH outbox_contact_requests AS (
+    WITH outbox_contact_requests AS (
         SELECT 
           TO_CHAR(outbox.occurred_at::date, 'dd/mm/yyyy') AS "Date de la mise en relation",
           (outbox.payload ->> 'contactMode'::text) AS "Type de mise en relation",

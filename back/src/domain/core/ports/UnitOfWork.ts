@@ -3,7 +3,6 @@ import { AgencyRepository } from "../../convention/ports/AgencyRepository";
 import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import { ImmersionAssessmentRepository } from "../../convention/ports/ImmersionAssessmentRepository";
-import { EstablishmentExportQueries } from "../../establishment/ports/EstablishmentExportQueries";
 import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { EstablishmentAggregateRepository } from "../../immersionOffer/ports/EstablishmentAggregateRepository";
 import { FormEstablishmentRepository } from "../../immersionOffer/ports/FormEstablishmentRepository";
@@ -27,7 +26,6 @@ export type UnitOfWork = {
   establishmentAggregateRepository: EstablishmentAggregateRepository;
   conventionRepository: ConventionRepository;
   conventionQueries: ConventionQueries;
-  establishmentExportQueries: EstablishmentExportQueries;
   postalCodeDepartmentRegionQueries: PostalCodeDepartmentRegionQueries;
   getFeatureFlags: GetFeatureFlags;
   laBonneBoiteRequestRepository: LaBonneBoiteRequestRepository;

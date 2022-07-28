@@ -5,11 +5,13 @@ import {
   agenciesRoute,
   conventionsRoute,
   emailRoute,
+  exportRoute,
   generateMagicLinkRoute,
 } from "shared/src/routes";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
-import { createExcelExportRouter } from "./createExcelExportRouter";
+import { sendZipResponse } from "../../helpers/sendZipResponse";
+import { ExportDataDto } from "shared/src/exportable";
 
 export const createAdminRouter = (deps: AppDependencies) => {
   const adminRouter = Router({ mergeParams: true });
@@ -22,10 +24,7 @@ export const createAdminRouter = (deps: AppDependencies) => {
       ),
     );
 
-  const excelRouter = createExcelExportRouter(deps);
-
   adminRouter.use(deps.adminAuthMiddleware);
-  adminRouter.use("/excel", excelRouter);
 
   adminRouter.route(`/${generateMagicLinkRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, () =>
@@ -78,5 +77,16 @@ export const createAdminRouter = (deps: AppDependencies) => {
     .get(async (req, res) =>
       sendHttpResponse(req, res, () => deps.useCases.getSentEmails.execute()),
     );
+
+  adminRouter.route(`/${exportRoute}`).post(async (req, res) =>
+    sendZipResponse(req, res, async () => {
+      const exportDataParams: ExportDataDto = req.body;
+      const archivePath = await deps.useCases.exportData.execute(
+        exportDataParams,
+      );
+      return archivePath;
+    }),
+  );
+
   return adminRouter;
 };

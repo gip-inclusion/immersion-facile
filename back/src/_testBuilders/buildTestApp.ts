@@ -15,7 +15,6 @@ import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/InMemoryPoleEmploiGateway";
 import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
 import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
-import { InMemoryReportingGateway } from "../adapters/secondary/reporting/InMemoryReportingGateway";
 import {
   GenerateApiConsumerJtw,
   GenerateMagicLinkJwt,
@@ -33,7 +32,6 @@ export type InMemoryGateways = {
   poleEmploiGateway: InMemoryPoleEmploiGateway;
   getFeatureFlags: GetFeatureFlags;
   documentGateway: InMemoryDocumentGateway;
-  reportingGateway: InMemoryReportingGateway;
   addressApi: InMemoryAddressAPI;
   exportGateway: InMemoryExportGateway;
 };

@@ -3,6 +3,7 @@ import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { ExportDataDto } from "shared/src/exportable";
+import { exportRoute } from "shared/src/routes";
 
 describe("/export", () => {
   let adminToken: AdminToken;
@@ -24,7 +25,7 @@ describe("/export", () => {
 
   it("fails with 401 without authentication", async () => {
     const { request } = await buildTestApp();
-    await request.get(`/admin/export`).expect(401);
+    await request.get(`/admin/${exportRoute}`).expect(401);
   });
 
   it("returns a ZIP file when authenticated", async () => {
@@ -52,7 +53,7 @@ describe("/export", () => {
 
     // Act
     const result = await request
-      .post(`/admin/excel/export`)
+      .post(`/admin/${exportRoute}`)
       .set("Authorization", adminToken)
       .send(exportDataParams);
 
