@@ -36,7 +36,7 @@ const conventionStatusToPoleEmploiStatus: Record<ConventionStatus, string> = {
 
   // si rejeté
   REJECTED: "REJETÉ",
-  CANCELLED: "ANNULÉ",
+  CANCELLED: "DEMANDE_ANNULEE",
 
   // // à venir potentiellement
   // ABANDONNED: "ABANDONNÉ",
