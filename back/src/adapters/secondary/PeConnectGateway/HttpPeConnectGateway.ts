@@ -100,7 +100,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     const response: HttpResponse = await this.httpClient.get({
       target: this.httpClient.targetsUrls.PECONNECT_USER_INFO,
       adapterConfig: {
-        headers: headersWithBearerAuthToken(accessToken),
+        headers: peConnectheadersWithBearerAuthToken(accessToken),
       },
     });
 
@@ -118,7 +118,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     const response: AxiosResponse = await this.httpClient.get({
       target: this.httpClient.targetsUrls.PECONNECT_ADVISORS_INFO,
       adapterConfig: {
-        headers: headersWithBearerAuthToken(accessToken),
+        headers: peConnectheadersWithBearerAuthToken(accessToken),
       },
     });
 
@@ -159,7 +159,7 @@ const peConnectNeededScopes = (clientId: string): string =>
     "email",
   ].join(" ");
 
-const headersWithBearerAuthToken = (
+export const peConnectheadersWithBearerAuthToken = (
   accessToken: AccessTokenDto,
 ): { [key: string]: string } => ({
   "Content-Type": "application/json",

@@ -52,7 +52,7 @@ export const peConnectApiErrorsToDomainErrors: ErrorMapper<PeConnectUrlTargets> 
         notifyObjectDiscord({
           target: "PECONNECT_ADVISORS_INFO",
           name: error.name,
-          message: (error as HttpClientError).cause.message,
+          message: JSON.stringify(error.cause, null, 2),
           httpStatusCode: (error as HttpClientError).httpStatusCode,
         });
         return new ManagedRedirectError(
@@ -90,7 +90,7 @@ export const peConnectApiErrorsToDomainErrors: ErrorMapper<PeConnectUrlTargets> 
         notifyObjectDiscord({
           target: "PECONNECT_USER_INFO",
           name: error.name,
-          message: (error as HttpClientError).cause.message,
+          message: JSON.stringify(error.cause, null, 2),
           httpStatusCode: (error as HttpClientError).httpStatusCode,
         });
         return new ManagedRedirectError("peConnectUserForbiddenAccess", error);
@@ -161,7 +161,7 @@ const notifyHttpErrorsToHandleBetter = (
   notifyObjectDiscord({
     target,
     name: error.name,
-    message: error.cause.message,
+    message: JSON.stringify(error.cause, null, 2),
     httpStatusCode: error.httpStatusCode,
   });
 
@@ -172,7 +172,7 @@ const notifyUnhandledErrorToHandleBetter = (
   notifyObjectDiscord({
     target,
     name: `UnhandledError ${error.name}`,
-    message: error.cause.message,
+    message: JSON.stringify(error.cause, null, 2),
   });
 
 const notifyInfrastructureErrorToHandleBetter = (
@@ -182,7 +182,7 @@ const notifyInfrastructureErrorToHandleBetter = (
   notifyObjectDiscord({
     target,
     name: `InfrastructureError ${error.name}`,
-    message: error.cause.message,
+    message: JSON.stringify(error.cause, null, 2),
     code: error.code,
   });
 
