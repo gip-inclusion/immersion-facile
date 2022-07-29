@@ -48,8 +48,18 @@ export const httpPeConnectGatewayTargetMapperMaker = (config: {
 export const peConnectApiErrorsToDomainErrors: ErrorMapper<PeConnectUrlTargets> =
   {
     PECONNECT_ADVISORS_INFO: {
-      HttpClientForbiddenError: (error) =>
-        new ManagedRedirectError("peConnectAdvisorForbiddenAccess", error),
+      HttpClientForbiddenError: (error) => {
+        notifyObjectDiscord({
+          target: "PECONNECT_ADVISORS_INFO",
+          name: error.name,
+          message: error.message,
+          httpStatusCode: (error as HttpClientError).httpStatusCode,
+        });
+        return new ManagedRedirectError(
+          "peConnectAdvisorForbiddenAccess",
+          error,
+        );
+      },
       HttpClientError: (error) =>
         handleHttpError("PECONNECT_ADVISORS_INFO", error as HttpClientError),
       HttpServerError: (error) =>
@@ -76,8 +86,15 @@ export const peConnectApiErrorsToDomainErrors: ErrorMapper<PeConnectUrlTargets> 
         ),
     },
     PECONNECT_USER_INFO: {
-      HttpClientForbiddenError: (error) =>
-        new ManagedRedirectError("peConnectUserForbiddenAccess", error),
+      HttpClientForbiddenError: (error) => {
+        notifyObjectDiscord({
+          target: "PECONNECT_ADVISORS_INFO",
+          name: error.name,
+          message: error.message,
+          httpStatusCode: (error as HttpClientError).httpStatusCode,
+        });
+        return new ManagedRedirectError("peConnectUserForbiddenAccess", error);
+      },
       HttpClientError: (error) =>
         handleHttpError("PECONNECT_USER_INFO", error as HttpClientError),
       HttpServerError: (error) =>
