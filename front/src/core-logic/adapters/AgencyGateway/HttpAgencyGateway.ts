@@ -122,10 +122,10 @@ export class HttpAgencyGateway implements AgencyGateway {
   private async getAgencies(
     request: ListAgenciesWithDepartmentCodeRequestDto,
   ): Promise<AgencyIdAndName[]> {
-    return agenciesIdAndNameSchema.parse(
-      await this.httpClient.get<unknown>(`/${agenciesRoute}`, {
-        params: request,
-      }),
-    );
+    const response = await this.httpClient.get<unknown>(`/${agenciesRoute}`, {
+      params: request,
+    });
+    const agencies = agenciesIdAndNameSchema.parse(response.data);
+    return agencies;
   }
 }

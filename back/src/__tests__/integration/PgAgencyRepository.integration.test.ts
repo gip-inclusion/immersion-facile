@@ -312,6 +312,49 @@ describe("PgAgencyRepository", () => {
     });
   });
 
+  describe("to get agencies near by a given department", () => {
+    it("returns only agencies in department", async () => {
+      const cergyAgency = agency1builder
+        .withId("11111111-1111-1111-1111-111111111111")
+        .withName("Agency Val d'Oise")
+        .withAddress({
+          departmentCode: "95",
+          city: "Cergy",
+          postcode: "",
+          streetNumberAndAddress: "",
+        })
+        .build();
+
+      const parisAgency = agency1builder
+        .withId("11111111-1111-1111-1111-111211111112")
+        .withName("Agency Val d'Oise")
+        .withAddress({
+          departmentCode: "75",
+          city: "Paris",
+          postcode: "",
+          streetNumberAndAddress: "",
+        })
+        .build();
+
+      await Promise.all([
+        agencyRepository.insert(parisAgency),
+        agencyRepository.insert(cergyAgency),
+      ]);
+
+      // Act
+      const agencies = await agencyRepository.getAgencies({
+        filters: {
+          departmentCode: "95",
+        },
+      });
+
+      // Assert
+      expect(agencies[0].address.departmentCode).toEqual(
+        cergyAgency.address.departmentCode,
+      );
+    });
+  });
+
   describe("insert", () => {
     let agency1: AgencyDto;
     let agency2: AgencyDto;

@@ -1,5 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
+import { DepartmentCode } from "shared/src/address/address.dto";
 import {
   AgencyDto,
   AgencyId,
@@ -46,6 +47,13 @@ const makeAgencyKindFiterSQL = (
     : "kind != 'pole-emploi'";
 };
 
+const makeDepartmentCodeFilterSQL = (
+  departmentCode?: DepartmentCode,
+): string | undefined => {
+  if (!departmentCode) return;
+  return format("department_code =%1$L", departmentCode);
+};
+
 const makePositionFiterSQL = (
   positionFilter?: AgencyPositionFilter,
 ): string | undefined => {
@@ -75,6 +83,7 @@ export class PgAgencyRepository implements AgencyRepository {
     limit?: number;
   }): Promise<AgencyDto[]> {
     const filtersSQL = [
+      makeDepartmentCodeFilterSQL(filters.departmentCode),
       makeAgencyKindFiterSQL(filters.kind),
       makePositionFiterSQL(filters.position),
       makeStatusFiterSQL(filters.status),

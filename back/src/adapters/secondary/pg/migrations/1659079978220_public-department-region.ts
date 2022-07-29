@@ -531,4 +531,10 @@ const addLinesQuery = (
 VALUES\n${lines.map(lineToInsertValue).join(",\n")};`;
 
 const lineToInsertValue = (line: TableLine) =>
-  `('${line.department_code.replace("'","''")}', '${line.department_name.replace("'","''")}', '${line.region_name.replace("'","''")}')`;
+  `('${line.department_code.replace(
+    "'",
+    "''",
+  )}', '${line.department_name.replace(
+    "'",
+    "''",
+  )}', '${line.region_name.replace("'", "''")}')`;
