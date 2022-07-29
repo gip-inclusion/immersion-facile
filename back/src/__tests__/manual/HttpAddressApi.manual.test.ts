@@ -1,11 +1,20 @@
+import { AxiosResponse } from "axios";
 import { AddressDto } from "shared/src/address/address.dto";
 import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { LatLonDto } from "shared/src/latLon";
+import {
+  ContextType,
+  ManagedAxios,
+  TargetUrlsMapper,
+} from "shared/src/serenity-http-client";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import {
   apiAddressRateLimiter,
   apiAddressBaseUrl,
   HttpAddressAPI,
+  apiRoutes,
+  targetUrlsMapper,
+  httpAddressApiClient,
 } from "../../adapters/secondary/immersionOffer/HttpAddressAPI";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
@@ -47,7 +56,7 @@ const resultFromApiAddress = {
 describe("HttpAddressAPI", () => {
   it("Should return expected address DTO when providing accurate position.", async () => {
     const adapter = new HttpAddressAPI(
-      createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+      httpAddressApiClient,
       apiAddressRateLimiter(new RealClock()),
       noRetries,
     );

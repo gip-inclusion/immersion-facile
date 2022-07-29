@@ -28,7 +28,7 @@ type AxiosInstanceContext = {
   onRejectResponseInterceptor: (rawAxiosError: AxiosError) => never;
 };
 
-type ContextType<TargetUrls extends string> = {
+export type ContextType<TargetUrls extends string> = {
   config: AxiosRequestConfig;
   target: TargetUrls;
   errorMapper: ErrorMapper<TargetUrls>;

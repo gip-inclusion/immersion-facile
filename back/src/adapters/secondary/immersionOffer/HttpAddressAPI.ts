@@ -1,7 +1,12 @@
-import { AxiosInstance } from "axios";
+import { AxiosResponse } from "axios";
 import { secondsToMilliseconds } from "date-fns";
 import { AddressDto } from "shared/src/address/address.dto";
 import { LatLonDto } from "shared/src/latLon";
+import {
+  HttpClient,
+  ManagedAxios,
+  TargetUrlsMapper,
+} from "shared/src/serenity-http-client";
 import { sleep } from "shared/src/utils";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
@@ -31,14 +36,32 @@ export const apiAddressRateLimiter = (clock: RealClock) =>
   );
 
 export const apiAddressBaseUrl = `https://api-adresse.data.gouv.fr`;
-const apiRoutes = {
+export const apiRoutes = {
   search: `/search`,
   reverse: `/reverse`,
 };
+export const targetUrlsMapper: TargetUrlsMapper<TargetUrl> = {
+  apiAddressReverse: (param: { lat: string; lon: string }) =>
+    `${apiAddressBaseUrl}${apiRoutes.reverse}?lon=${param.lon}&lat=${param.lat}`,
+};
+
+const onFulfilledResponseInterceptorMaker: () => (
+  response: AxiosResponse,
+) => AxiosResponse = () => (response) => response;
+
+export const httpAddressApiClient = new ManagedAxios(
+  targetUrlsMapper,
+  undefined,
+  undefined,
+  onFulfilledResponseInterceptorMaker,
+  undefined,
+);
+
+type TargetUrl = "apiAddressReverse";
 
 export class HttpAddressAPI implements AddressAPI {
   public constructor(
-    private readonly httpClient: AxiosInstance,
+    private readonly httpClient: HttpClient,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
   ) {}
@@ -46,26 +69,29 @@ export class HttpAddressAPI implements AddressAPI {
   public async getAddressFromPosition(
     latLongDto: LatLonDto,
   ): Promise<AddressDto | undefined> {
-    return this.retryStrategy.apply(async () =>
-      this.rateLimiter.whenReady(async () => {
-        try {
-          const response = await this.httpClient.get<any>(apiRoutes.reverse, {
+    logger.debug({ latLongDto }, "getAddressFromPosition");
+    return this.retryStrategy.apply(async () => {
+      try {
+        const response = await this.rateLimiter.whenReady(() =>this.httpClient.get({
+            target: this.httpClient.
+          })
+
+          /*
+          .get<any>(apiRoutes.reverse, {
             timeout: secondsToMilliseconds(10),
-            params: {
-              lat: latLongDto.lat,
-              lon: latLongDto.lon,
-            },
-          });
-          return response.data.features && response.data.features.length > 0
-            ? featureToAddressDto(response.data.features[0])
-            : undefined;
-        } catch (error: any) {
-          if (isRetryableError(logger, error)) throw new RetryableError(error);
-          logAxiosError(logger, error);
-          return;
-        }
-      }),
-    );
+            params: { lat: latLongDto.lat, lon: latLongDto.lon },
+          }),
+          */
+        );
+        return response.data.features && response.data.features.length > 0
+          ? featureToAddressDto(response.data.features[0])
+          : undefined;
+      } catch (error: any) {
+        if (isRetryableError(logger, error)) throw new RetryableError(error);
+        logAxiosError(logger, error);
+        return undefined;
+      }
+    });
   }
 
   public async getPositionFromAddress(
